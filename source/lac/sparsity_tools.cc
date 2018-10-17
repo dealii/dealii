@@ -66,7 +66,7 @@ namespace SparsityTools
       (void)cell_weights;
       (void)n_partitions;
       (void)partition_indices;
-      AssertThrow(false, ExcMETISNotInstalled());
+      DEAL_II_AssertThrow(false, ExcMETISNotInstalled());
 #else
 
       // generate the data structures for
@@ -114,9 +114,9 @@ namespace SparsityTools
       std::vector<idx_t> int_cell_weights;
       if (cell_weights.size() > 0)
         {
-          Assert(cell_weights.size() == sparsity_pattern.n_rows(),
-                 ExcDimensionMismatch(cell_weights.size(),
-                                      sparsity_pattern.n_rows()));
+          DEAL_II_Assert(cell_weights.size() == sparsity_pattern.n_rows(),
+                         ExcDimensionMismatch(cell_weights.size(),
+                                              sparsity_pattern.n_rows()));
           int_cell_weights.resize(cell_weights.size());
           std::copy(cell_weights.begin(),
                     cell_weights.end(),
@@ -167,7 +167,7 @@ namespace SparsityTools
 
       // If metis returns normally, an error code METIS_OK=1 is returned from
       // the above functions (see metish.h)
-      AssertThrow(ierr == 1, ExcMETISError(ierr));
+      DEAL_II_AssertThrow(ierr == 1, ExcMETISError(ierr));
 
       // now copy back generated indices into the output array
       std::copy(int_partition_indices.begin(),
@@ -204,8 +204,8 @@ namespace SparsityTools
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
       *ierr                  = ZOLTAN_OK;
 
-      Assert(globalID != nullptr, ExcInternalError());
-      Assert(localID != nullptr, ExcInternalError());
+      DEAL_II_Assert(globalID != nullptr, ExcInternalError());
+      DEAL_II_Assert(localID != nullptr, ExcInternalError());
 
       // set global degrees of freedom
       auto n_dofs = graph->n_rows();
@@ -232,7 +232,7 @@ namespace SparsityTools
 
       *ierr = ZOLTAN_OK;
 
-      Assert(numEdges != nullptr, ExcInternalError());
+      DEAL_II_Assert(numEdges != nullptr, ExcInternalError());
 
       for (int i = 0; i < num_obj; ++i)
         {
@@ -277,8 +277,8 @@ namespace SparsityTools
             // Ignore diagonal entries. Not needed for partitioning.
             if (i != col->column())
               {
-                Assert(nextNborGID != nullptr, ExcInternalError());
-                Assert(nextNborProc != nullptr, ExcInternalError());
+                DEAL_II_Assert(nextNborGID != nullptr, ExcInternalError());
+                DEAL_II_Assert(nextNborProc != nullptr, ExcInternalError());
 
                 *nextNborGID++  = col->column();
                 *nextNborProc++ = 0; // All the vertices on processor 0
@@ -301,10 +301,10 @@ namespace SparsityTools
       (void)cell_weights;
       (void)n_partitions;
       (void)partition_indices;
-      AssertThrow(false, ExcZOLTANNotInstalled());
+      DEAL_II_AssertThrow(false, ExcZOLTANNotInstalled());
 #else
 
-      Assert(
+      DEAL_II_Assert(
         cell_weights.size() == 0,
         ExcMessage(
           "The cell weighting functionality for Zoltan has not yet been implemented."));
@@ -380,7 +380,7 @@ namespace SparsityTools
       (void)rc;
 
       // check for error code in partitioner
-      Assert(rc == ZOLTAN_OK, ExcInternalError());
+      DEAL_II_Assert(rc == ZOLTAN_OK, ExcInternalError());
 
       // By default, all indices belong to part 0. After zoltan partition
       // some are migrated to different part ID, which is stored in
@@ -419,15 +419,16 @@ namespace SparsityTools
             std::vector<unsigned int> &      partition_indices,
             const Partitioner                partitioner)
   {
-    Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
-           ExcNotQuadratic());
-    Assert(sparsity_pattern.is_compressed(),
-           SparsityPattern::ExcNotCompressed());
+    DEAL_II_Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
+                   ExcNotQuadratic());
+    DEAL_II_Assert(sparsity_pattern.is_compressed(),
+                   SparsityPattern::ExcNotCompressed());
 
-    Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
-    Assert(partition_indices.size() == sparsity_pattern.n_rows(),
-           ExcInvalidArraySize(partition_indices.size(),
-                               sparsity_pattern.n_rows()));
+    DEAL_II_Assert(n_partitions > 0,
+                   ExcInvalidNumberOfPartitions(n_partitions));
+    DEAL_II_Assert(partition_indices.size() == sparsity_pattern.n_rows(),
+                   ExcInvalidArraySize(partition_indices.size(),
+                                       sparsity_pattern.n_rows()));
 
     // check for an easy return
     if (n_partitions == 1 || (sparsity_pattern.n_rows() == 1))
@@ -447,7 +448,7 @@ namespace SparsityTools
                        n_partitions,
                        partition_indices);
     else
-      AssertThrow(false, ExcInternalError());
+      DEAL_II_AssertThrow(false, ExcInternalError());
   }
 
 
@@ -460,7 +461,7 @@ namespace SparsityTools
 #ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
     (void)sparsity_pattern;
     (void)color_indices;
-    AssertThrow(false, ExcZOLTANNotInstalled());
+    DEAL_II_AssertThrow(false, ExcZOLTANNotInstalled());
     return 0;
 #else
     // coloring algorithm is run in serial by each processor.
@@ -505,12 +506,13 @@ namespace SparsityTools
 
     (void)rc;
     // Check for error code
-    Assert(rc == ZOLTAN_OK, ExcInternalError());
+    DEAL_II_Assert(rc == ZOLTAN_OK, ExcInternalError());
 
     // Allocate and assign color indices
     color_indices.resize(num_objects);
-    Assert(color_exp.size() == color_indices.size(),
-           ExcDimensionMismatch(color_exp.size(), color_indices.size()));
+    DEAL_II_Assert(color_exp.size() == color_indices.size(),
+                   ExcDimensionMismatch(color_exp.size(),
+                                        color_indices.size()));
 
     std::copy(color_exp.begin(), color_exp.end(), color_indices.begin());
 
@@ -565,8 +567,8 @@ namespace SparsityTools
                 break;
               }
 
-          Assert(starting_point != numbers::invalid_size_type,
-                 ExcInternalError());
+          DEAL_II_Assert(starting_point != numbers::invalid_size_type,
+                         ExcInternalError());
         }
 
       return starting_point;
@@ -581,22 +583,24 @@ namespace SparsityTools
     std::vector<DynamicSparsityPattern::size_type> &      new_indices,
     const std::vector<DynamicSparsityPattern::size_type> &starting_indices)
   {
-    Assert(sparsity.n_rows() == sparsity.n_cols(),
-           ExcDimensionMismatch(sparsity.n_rows(), sparsity.n_cols()));
-    Assert(sparsity.n_rows() == new_indices.size(),
-           ExcDimensionMismatch(sparsity.n_rows(), new_indices.size()));
-    Assert(starting_indices.size() <= sparsity.n_rows(),
-           ExcMessage(
-             "You can't specify more starting indices than there are rows"));
-    Assert(sparsity.row_index_set().size() == 0 ||
-             sparsity.row_index_set().size() == sparsity.n_rows(),
-           ExcMessage(
-             "Only valid for sparsity patterns which store all rows."));
+    DEAL_II_Assert(sparsity.n_rows() == sparsity.n_cols(),
+                   ExcDimensionMismatch(sparsity.n_rows(), sparsity.n_cols()));
+    DEAL_II_Assert(sparsity.n_rows() == new_indices.size(),
+                   ExcDimensionMismatch(sparsity.n_rows(), new_indices.size()));
+    DEAL_II_Assert(
+      starting_indices.size() <= sparsity.n_rows(),
+      ExcMessage(
+        "You can't specify more starting indices than there are rows"));
+    DEAL_II_Assert(sparsity.row_index_set().size() == 0 ||
+                     sparsity.row_index_set().size() == sparsity.n_rows(),
+                   ExcMessage(
+                     "Only valid for sparsity patterns which store all rows."));
     for (SparsityPattern::size_type i = 0; i < starting_indices.size(); ++i)
-      Assert(starting_indices[i] < sparsity.n_rows(),
-             ExcMessage("Invalid starting index: All starting indices need "
-                        "to be between zero and the number of rows in the "
-                        "sparsity pattern."));
+      DEAL_II_Assert(starting_indices[i] < sparsity.n_rows(),
+                     ExcMessage(
+                       "Invalid starting index: All starting indices need "
+                       "to be between zero and the number of rows in the "
+                       "sparsity pattern."));
 
     // store the indices of the dofs renumbered in the last round. Default to
     // starting points
@@ -669,12 +673,13 @@ namespace SparsityTools
             // if no starting indices were provided by the user (see the
             // documentation of this function) so produce an error if we got
             // here and starting indices were given
-            Assert(starting_indices.empty(),
-                   ExcMessage("The input graph appears to have more than one "
-                              "component, but as stated in the documentation "
-                              "we only want to reorder such graphs if no "
-                              "starting indices are given. The function was "
-                              "called with starting indices, however."))
+            DEAL_II_Assert(starting_indices.empty(),
+                           ExcMessage(
+                             "The input graph appears to have more than one "
+                             "component, but as stated in the documentation "
+                             "we only want to reorder such graphs if no "
+                             "starting indices are given. The function was "
+                             "called with starting indices, however."))
 
               next_round_dofs.push_back(
                 internal::find_unnumbered_starting_index(sparsity,
@@ -716,11 +721,12 @@ namespace SparsityTools
     // test for all indices numbered. this mostly tests whether the
     // front-marching-algorithm (which Cuthill-McKee actually is) has reached
     // all points.
-    Assert((std::find(new_indices.begin(),
-                      new_indices.end(),
-                      numbers::invalid_size_type) == new_indices.end()) &&
-             (next_free_number == sparsity.n_rows()),
-           ExcInternalError());
+    DEAL_II_Assert((std::find(new_indices.begin(),
+                              new_indices.end(),
+                              numbers::invalid_size_type) ==
+                    new_indices.end()) &&
+                     (next_free_number == sparsity.n_rows()),
+                   ExcInternalError());
   }
 
 
@@ -732,12 +738,12 @@ namespace SparsityTools
       const DynamicSparsityPattern &                  connectivity,
       std::vector<DynamicSparsityPattern::size_type> &renumbering)
     {
-      AssertDimension(connectivity.n_rows(), connectivity.n_cols());
-      AssertDimension(connectivity.n_rows(), renumbering.size());
-      Assert(connectivity.row_index_set().size() == 0 ||
-               connectivity.row_index_set().size() == connectivity.n_rows(),
-             ExcMessage(
-               "Only valid for sparsity patterns which store all rows."));
+      DEAL_II_AssertDimension(connectivity.n_rows(), connectivity.n_cols());
+      DEAL_II_AssertDimension(connectivity.n_rows(), renumbering.size());
+      DEAL_II_Assert(
+        connectivity.row_index_set().size() == 0 ||
+          connectivity.row_index_set().size() == connectivity.n_rows(),
+        ExcMessage("Only valid for sparsity patterns which store all rows."));
 
       std::vector<types::global_dof_index> touched_nodes(
         connectivity.n_rows(), numbers::invalid_dof_index);
@@ -754,7 +760,7 @@ namespace SparsityTools
       for (types::global_dof_index row = 0; row < connectivity.n_rows(); ++row)
         {
           row_lengths[row] = connectivity.row_length(row);
-          Assert(row_lengths[row] > 0, ExcInternalError());
+          DEAL_II_Assert(row_lengths[row] > 0, ExcInternalError());
         }
       std::vector<unsigned int> n_remaining_neighbors(row_lengths);
 
@@ -783,7 +789,7 @@ namespace SparsityTools
           if (min_neighbors.first == numbers::invalid_dof_index)
             break;
 
-          Assert(min_neighbors.second > 0, ExcInternalError());
+          DEAL_II_Assert(min_neighbors.second > 0, ExcInternalError());
 
           current_neighbors.clear();
           current_neighbors.insert(min_neighbors.first);
@@ -798,8 +804,9 @@ namespace SparsityTools
                    it != current_neighbors.end();
                    ++it)
                 {
-                  Assert(touched_nodes[*it] == numbers::invalid_dof_index,
-                         ExcInternalError());
+                  DEAL_II_Assert(touched_nodes[*it] ==
+                                   numbers::invalid_dof_index,
+                                 ExcInternalError());
                   if (n_remaining_neighbors[*it] < min_neighbors.second)
                     min_neighbors =
                       std::make_pair(*it, n_remaining_neighbors[*it]);
@@ -859,7 +866,7 @@ namespace SparsityTools
 
       // Sanity check: for all nodes, there should not be any neighbors left
       for (types::global_dof_index row = 0; row < connectivity.n_rows(); ++row)
-        Assert(n_remaining_neighbors[row] == 0, ExcInternalError());
+        DEAL_II_Assert(n_remaining_neighbors[row] == 0, ExcInternalError());
 
       // If the number of groups is smaller than the number of nodes, we
       // continue by recursively calling this method
@@ -1007,7 +1014,7 @@ namespace SparsityTools
                                      124,
                                      mpi_comm,
                                      &requests[idx]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
     }
 
@@ -1019,11 +1026,11 @@ namespace SparsityTools
           MPI_Status status;
           int        len;
           int ierr = MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
-          AssertThrowMPI(ierr);
-          Assert(status.MPI_TAG == 124, ExcInternalError());
+          DEAL_II_AssertThrowMPI(ierr);
+          DEAL_II_Assert(status.MPI_TAG == 124, ExcInternalError());
 
           ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           recv_buf.resize(len);
           ierr = MPI_Recv(recv_buf.data(),
                           len,
@@ -1032,7 +1039,7 @@ namespace SparsityTools
                           status.MPI_TAG,
                           mpi_comm,
                           &status);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           std::vector<DynamicSparsityPattern::size_type>::const_iterator ptr =
             recv_buf.begin();
@@ -1041,16 +1048,16 @@ namespace SparsityTools
           while (ptr != end)
             {
               DynamicSparsityPattern::size_type num = *(ptr++);
-              Assert(ptr != end, ExcInternalError());
+              DEAL_II_Assert(ptr != end, ExcInternalError());
               DynamicSparsityPattern::size_type row = *(ptr++);
               for (unsigned int c = 0; c < num; ++c)
                 {
-                  Assert(ptr != end, ExcInternalError());
+                  DEAL_II_Assert(ptr != end, ExcInternalError());
                   dsp.add(row, *ptr);
                   ++ptr;
                 }
             }
-          Assert(ptr == end, ExcInternalError());
+          DEAL_II_Assert(ptr == end, ExcInternalError());
         }
     }
 
@@ -1059,7 +1066,7 @@ namespace SparsityTools
       {
         const int ierr =
           MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
   }
 
@@ -1153,7 +1160,7 @@ namespace SparsityTools
                                      124,
                                      mpi_comm,
                                      &requests[idx]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
     }
 
@@ -1165,11 +1172,11 @@ namespace SparsityTools
           MPI_Status status;
           int        len;
           int ierr = MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &status);
-          AssertThrowMPI(ierr);
-          Assert(status.MPI_TAG == 124, ExcInternalError());
+          DEAL_II_AssertThrowMPI(ierr);
+          DEAL_II_Assert(status.MPI_TAG == 124, ExcInternalError());
 
           ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           recv_buf.resize(len);
           ierr = MPI_Recv(recv_buf.data(),
                           len,
@@ -1178,7 +1185,7 @@ namespace SparsityTools
                           status.MPI_TAG,
                           mpi_comm,
                           &status);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           std::vector<BlockDynamicSparsityPattern::size_type>::const_iterator
             ptr = recv_buf.begin();
@@ -1187,16 +1194,16 @@ namespace SparsityTools
           while (ptr != end)
             {
               BlockDynamicSparsityPattern::size_type num = *(ptr++);
-              Assert(ptr != end, ExcInternalError());
+              DEAL_II_Assert(ptr != end, ExcInternalError());
               BlockDynamicSparsityPattern::size_type row = *(ptr++);
               for (unsigned int c = 0; c < num; ++c)
                 {
-                  Assert(ptr != end, ExcInternalError());
+                  DEAL_II_Assert(ptr != end, ExcInternalError());
                   dsp.add(row, *ptr);
                   ++ptr;
                 }
             }
-          Assert(ptr == end, ExcInternalError());
+          DEAL_II_Assert(ptr == end, ExcInternalError());
         }
     }
 
@@ -1205,7 +1212,7 @@ namespace SparsityTools
       {
         const int ierr =
           MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
   }
 #endif

@@ -33,11 +33,11 @@
 #include "../tests.h"
 
 
-DeclException2(ExcNumberMismatch,
-               int,
-               int,
-               << "The numbers " << arg1 << " and " << arg2
-               << " should be equal, but are not.");
+DEAL_II_DeclException2(ExcNumberMismatch,
+                       int,
+                       int,
+                       << "The numbers " << arg1 << " and " << arg2
+                       << " should be equal, but are not.");
 
 
 template <int dim>
@@ -61,7 +61,7 @@ test()
       for (unsigned int d = 0; d < dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1 << d);
-      AssertThrow(subdomain < (1 << dim), ExcInternalError());
+      DEAL_II_AssertThrow(subdomain < (1 << dim), ExcInternalError());
 
       cell->set_subdomain_id(subdomain);
     };
@@ -77,13 +77,15 @@ test()
       std::vector<unsigned int> subdomain_cells(1 << dim, 0);
       for (; cell != endc; ++cell)
         {
-          AssertThrow(cell->subdomain_id() < (1 << dim), ExcInternalError());
+          DEAL_II_AssertThrow(cell->subdomain_id() < (1 << dim),
+                              ExcInternalError());
           ++subdomain_cells[cell->subdomain_id()];
         };
       for (unsigned int i = 0; i < (1 << dim); ++i)
-        AssertThrow(subdomain_cells[i] == tria.n_active_cells() / (1 << dim),
-                    ExcNumberMismatch(subdomain_cells[i],
-                                      tria.n_active_cells() / (1 << dim)));
+        DEAL_II_AssertThrow(
+          subdomain_cells[i] == tria.n_active_cells() / (1 << dim),
+          ExcNumberMismatch(subdomain_cells[i],
+                            tria.n_active_cells() / (1 << dim)));
       deallog << "Check 1 (dim=" << dim << ") ok" << std::endl;
     };
 
@@ -101,13 +103,15 @@ test()
       std::vector<unsigned int> subdomain_cells(1 << dim, 0);
       for (; cell != endc; ++cell)
         {
-          AssertThrow(cell->subdomain_id() < (1 << dim), ExcInternalError());
+          DEAL_II_AssertThrow(cell->subdomain_id() < (1 << dim),
+                              ExcInternalError());
           ++subdomain_cells[cell->subdomain_id()];
         };
       for (unsigned int i = 0; i < (1 << dim); ++i)
-        AssertThrow(subdomain_cells[i] == tria.n_active_cells() / (1 << dim),
-                    ExcNumberMismatch(subdomain_cells[i],
-                                      tria.n_active_cells() / (1 << dim)));
+        DEAL_II_AssertThrow(
+          subdomain_cells[i] == tria.n_active_cells() / (1 << dim),
+          ExcNumberMismatch(subdomain_cells[i],
+                            tria.n_active_cells() / (1 << dim)));
       deallog << "Check 2 (dim=" << dim << ") ok" << std::endl;
     };
 
@@ -126,13 +130,13 @@ test()
           DoFTools::extract_subdomain_dofs(dof_handler,
                                            subdomain,
                                            selected_dofs);
-          AssertThrow(static_cast<unsigned int>(std::count(
-                        selected_dofs.begin(), selected_dofs.end(), true)) ==
-                        dof_handler.n_dofs() / (1 << dim),
-                      ExcNumberMismatch(std::count(selected_dofs.begin(),
-                                                   selected_dofs.end(),
-                                                   true),
-                                        dof_handler.n_dofs() / (1 << dim)));
+          DEAL_II_AssertThrow(
+            static_cast<unsigned int>(
+              std::count(selected_dofs.begin(), selected_dofs.end(), true)) ==
+              dof_handler.n_dofs() / (1 << dim),
+            ExcNumberMismatch(
+              std::count(selected_dofs.begin(), selected_dofs.end(), true),
+              dof_handler.n_dofs() / (1 << dim)));
         }
       deallog << "Check 3 (dim=" << dim << ") ok" << std::endl;
     };
@@ -158,7 +162,7 @@ test()
           DoFTools::extract_subdomain_dofs(dof_handler,
                                            subdomain,
                                            selected_dofs);
-          AssertThrow(
+          DEAL_II_AssertThrow(
             static_cast<unsigned int>(
               std::count(selected_dofs.begin(), selected_dofs.end(), true)) ==
               std::pow(static_cast<double>(cells_per_direction / 2 + 1), dim),

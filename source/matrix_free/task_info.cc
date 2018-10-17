@@ -76,7 +76,7 @@ namespace internal
         {
           MFWorkerInterface *used_worker =
             worker != nullptr ? worker : *worker_pointer;
-          Assert(used_worker != nullptr, ExcInternalError());
+          DEAL_II_Assert(used_worker != nullptr, ExcInternalError());
           used_worker->cell(
             std::make_pair(task_info.cell_partition_data[partition],
                            task_info.cell_partition_data[partition + 1]));
@@ -252,7 +252,7 @@ namespace internal
 
           if (task_info.face_partition_data.empty() == false)
             {
-              AssertThrow(false, ExcNotImplemented());
+              DEAL_II_AssertThrow(false, ExcNotImplemented());
             }
         }
 
@@ -471,8 +471,8 @@ namespace internal
                               *blocked_worker[(part - 1) / 2]);
                           else
                             {
-                              Assert(spawn_index_child >= 0,
-                                     ExcInternalError());
+                              DEAL_II_Assert(spawn_index_child >= 0,
+                                             ExcInternalError());
                               worker[spawn_index]->spawn(
                                 *worker[spawn_index_child]);
                             }
@@ -545,7 +545,8 @@ namespace internal
                     }
                   if (evens == odds)
                     {
-                      Assert(spawn_index_child >= 0, ExcInternalError());
+                      DEAL_II_Assert(spawn_index_child >= 0,
+                                     ExcInternalError());
                       worker[spawn_index]->spawn(*worker[spawn_index_child]);
                     }
                   root->wait_for_all();
@@ -556,7 +557,7 @@ namespace internal
               // each color
               else
                 {
-                  Assert(evens <= 1, ExcInternalError());
+                  DEAL_II_Assert(evens <= 1, ExcInternalError());
                   funct.vector_update_ghosts_finish();
 
                   for (unsigned int color = 0; color < partition_row_index[1];
@@ -592,7 +593,7 @@ namespace internal
                    i < partition_row_index[part + 1];
                    ++i)
                 {
-                  AssertIndexRange(i + 1, cell_partition_data.size());
+                  DEAL_II_AssertIndexRange(i + 1, cell_partition_data.size());
                   if (cell_partition_data[i + 1] > cell_partition_data[i])
                     {
                       funct.zero_dst_vector_range(i);
@@ -762,9 +763,9 @@ namespace internal
 
       // check that number of boundary cells is divisible by
       // vectorization_length or that it contains all cells
-      Assert(boundary_cells.size() % vectorization_length == 0 ||
-               boundary_cells.size() == n_active_cells,
-             ExcInternalError());
+      DEAL_II_Assert(boundary_cells.size() % vectorization_length == 0 ||
+                       boundary_cells.size() == n_active_cells,
+                     ExcInternalError());
     }
 
 
@@ -803,9 +804,9 @@ namespace internal
           for (unsigned int i = 0; i < n_boundary_cells; ++i)
             cell_marked[boundary_cells[i]] = 2;
 
-          Assert(boundary_cells.size() % vectorization_length == 0 ||
-                   boundary_cells.size() == n_active_cells,
-                 ExcInternalError());
+          DEAL_II_Assert(boundary_cells.size() % vectorization_length == 0 ||
+                           boundary_cells.size() == n_active_cells,
+                         ExcInternalError());
 
           const unsigned int n_second_slot =
             ((n_active_cells - n_boundary_cells) / 2 / vectorization_length) *
@@ -837,14 +838,14 @@ namespace internal
         std::fill(cell_marked.begin(), cell_marked.end(), 1);
 
       for (unsigned int i = 0; i < cell_marked.size(); ++i)
-        Assert(cell_marked[i] != 0, ExcInternalError());
+        DEAL_II_Assert(cell_marked[i] != 0, ExcInternalError());
 
       unsigned int              n_categories = 1;
       std::vector<unsigned int> tight_category_map;
       if (cell_vectorization_categories.empty() == false)
         {
-          AssertDimension(cell_vectorization_categories.size(),
-                          n_active_cells + n_ghost_cells);
+          DEAL_II_AssertDimension(cell_vectorization_categories.size(),
+                                  n_active_cells + n_ghost_cells);
 
           // create a tight map of categories for not taking exceeding amounts
           // of memory below. Sort the new categories by the numbers in the
@@ -865,7 +866,7 @@ namespace internal
                                  used_categories_vector.end(),
                                  cell_vectorization_categories[i]) -
                 used_categories_vector.begin();
-              AssertIndexRange(index, used_categories_vector.size());
+              DEAL_II_AssertIndexRange(index, used_categories_vector.size());
               tight_category_map[i] = index;
             }
 
@@ -953,14 +954,15 @@ namespace internal
         }
       if (cell_vectorization_categories_strict == true)
         {
-          Assert(n_cells >= n_macro_cells + n_ghost_slots, ExcInternalError());
+          DEAL_II_Assert(n_cells >= n_macro_cells + n_ghost_slots,
+                         ExcInternalError());
         }
       else
         {
-          AssertDimension(n_cells, n_macro_cells + n_ghost_slots);
+          DEAL_II_AssertDimension(n_cells, n_macro_cells + n_ghost_slots);
         }
-      AssertDimension(cell_partition_data.back(), n_cells);
-      AssertDimension(counter, n_active_cells + n_ghost_cells);
+      DEAL_II_AssertDimension(cell_partition_data.back(), n_cells);
+      DEAL_II_AssertDimension(counter, n_active_cells + n_ghost_cells);
 
       incompletely_filled_vectorization.resize(cell_partition_data.back());
     }
@@ -996,7 +998,7 @@ namespace internal
         if (reverse_numbering[j] == numbers::invalid_unsigned_int)
           reverse_numbering[j] = counter++;
 
-      AssertDimension(counter, n_active_cells);
+      DEAL_II_AssertDimension(counter, n_active_cells);
       renumbering = Utilities::invert_permutation(reverse_numbering);
 
       for (unsigned int j = n_active_cells; j < n_active_cells + n_ghost_cells;
@@ -1018,7 +1020,7 @@ namespace internal
                                         n_macro_boundary_cells);
         }
       else
-        AssertDimension(boundary_cells.size(), 0);
+        DEAL_II_AssertDimension(boundary_cells.size(), 0);
       cell_partition_data.push_back(n_macro_cells);
       cell_partition_data.push_back(cell_partition_data.back() + n_ghost_slots);
       partition_row_index.resize(n_procs > 1 ? 4 : 2);
@@ -1071,7 +1073,7 @@ namespace internal
       if (n_macro_cells == 0)
         return;
 
-      Assert(vectorization_length > 0, ExcInternalError());
+      DEAL_II_Assert(vectorization_length > 0, ExcInternalError());
 
       unsigned int partition = 0, counter = 0;
 
@@ -1128,7 +1130,7 @@ namespace internal
         std::vector<unsigned int> sorted_pc_list(partition_color_list);
         std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
         for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
-          Assert(sorted_pc_list[i] == i, ExcInternalError());
+          DEAL_II_Assert(sorted_pc_list[i] == i, ExcInternalError());
       }
 #endif
 
@@ -1181,12 +1183,12 @@ namespace internal
             irregular[counter_macro++] =
               irregular_cells[present_block * block_size + j];
         }
-      AssertDimension(tick + 1, cell_partition_data.size());
+      DEAL_II_AssertDimension(tick + 1, cell_partition_data.size());
       cell_partition_data.back() = counter_macro;
 
       irregular_cells.swap(irregular);
-      AssertDimension(counter, n_active_cells);
-      AssertDimension(counter_macro, n_macro_cells);
+      DEAL_II_AssertDimension(counter, n_active_cells);
+      DEAL_II_AssertDimension(counter_macro, n_macro_cells);
 
       // check that the renumbering is one-to-one
 #ifdef DEBUG
@@ -1194,7 +1196,7 @@ namespace internal
         std::vector<unsigned int> sorted_renumbering(renumbering);
         std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
         for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
-          Assert(sorted_renumbering[i] == i, ExcInternalError());
+          DEAL_II_Assert(sorted_renumbering[i] == i, ExcInternalError());
       }
 #endif
 
@@ -1202,7 +1204,7 @@ namespace internal
       update_task_info(
         partition); // Actually sets too much for partition color case
 
-      AssertDimension(cell_partition_data.back(), n_macro_cells);
+      DEAL_II_AssertDimension(cell_partition_data.back(), n_macro_cells);
     }
 
 
@@ -1219,7 +1221,7 @@ namespace internal
       if (n_macro_cells == 0)
         return;
 
-      Assert(vectorization_length > 0, ExcInternalError());
+      DEAL_II_Assert(vectorization_length > 0, ExcInternalError());
 
       // if we want to block before partitioning, create connectivity graph
       // for blocks based on connectivity graph for cells.
@@ -1309,7 +1311,7 @@ namespace internal
         std::vector<unsigned int> sorted_pc_list(partition_2layers_list);
         std::sort(sorted_pc_list.begin(), sorted_pc_list.end());
         for (unsigned int i = 0; i < sorted_pc_list.size(); ++i)
-          Assert(sorted_pc_list[i] == i, ExcInternalError());
+          DEAL_II_Assert(sorted_pc_list[i] == i, ExcInternalError());
       }
 #endif
 
@@ -1379,19 +1381,19 @@ namespace internal
                 irregular[counter_macro++] =
                   irregular_cells[present_block * block_size + j];
             }
-          AssertDimension(tick + 1, cell_partition_data.size());
+          DEAL_II_AssertDimension(tick + 1, cell_partition_data.size());
           cell_partition_data.back() = counter_macro;
 
           irregular_cells.swap(irregular);
-          AssertDimension(counter, n_active_cells);
-          AssertDimension(counter_macro, n_macro_cells);
+          DEAL_II_AssertDimension(counter, n_active_cells);
+          DEAL_II_AssertDimension(counter_macro, n_macro_cells);
           // check that the renumbering is one-to-one
 #ifdef DEBUG
           {
             std::vector<unsigned int> sorted_renumbering(renumbering);
             std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
             for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
-              Assert(sorted_renumbering[i] == i, ExcInternalError());
+              DEAL_II_Assert(sorted_renumbering[i] == i, ExcInternalError());
           }
 #endif
         }
@@ -1495,7 +1497,7 @@ namespace internal
                 }
             }
         }
-      AssertDimension(cell, n_active_cells);
+      DEAL_II_AssertDimension(cell, n_active_cells);
       for (unsigned int i = 0; i < cell_blocks.size(); ++i)
         for (unsigned int col = 0; col < cell_blocks[i].size(); ++col)
           {
@@ -1545,8 +1547,8 @@ namespace internal
       unsigned int max_fe_index = 0;
       for (unsigned int i = 0; i < cell_active_fe_index.size(); ++i)
         max_fe_index = std::max(cell_active_fe_index[i], max_fe_index);
-      Assert(!hp_bool || cell_active_fe_index.size() == n_active_cells,
-             ExcInternalError());
+      DEAL_II_Assert(!hp_bool || cell_active_fe_index.size() == n_active_cells,
+                     ExcInternalError());
 
       {
         unsigned int n_macro_cells_before = 0;
@@ -1589,7 +1591,8 @@ namespace internal
                           partition_counter = 1;
                           // To start up, set the start_up cell to partition
                           // and list all its neighbors.
-                          AssertIndexRange(start_up, partition_size[part + 1]);
+                          DEAL_II_AssertIndexRange(start_up,
+                                                   partition_size[part + 1]);
                           cell_partition_l2[partition_list[start_up]] =
                             partition_l2;
                           neighbor_neighbor_list.push_back(
@@ -1605,11 +1608,11 @@ namespace internal
                     partition_counter = 0;
                     for (unsigned int j = 0; j < neighbor_list.size(); ++j)
                       {
-                        Assert(cell_partition[neighbor_list[j]] == part,
-                               ExcInternalError());
-                        Assert(cell_partition_l2[neighbor_list[j]] ==
-                                 partition_l2 - 1,
-                               ExcInternalError());
+                        DEAL_II_Assert(cell_partition[neighbor_list[j]] == part,
+                                       ExcInternalError());
+                        DEAL_II_Assert(cell_partition_l2[neighbor_list[j]] ==
+                                         partition_l2 - 1,
+                                       ExcInternalError());
                         DynamicSparsityPattern::iterator neighbor =
                                                            connectivity.begin(
                                                              neighbor_list[j]),
@@ -1911,7 +1914,7 @@ namespace internal
         }
       cell_partition_data.push_back(n_blocks);
       partition_row_index[partition] = index_counter;
-      AssertDimension(color_counter, n_blocks);
+      DEAL_II_AssertDimension(color_counter, n_blocks);
     }
 
 
@@ -2059,8 +2062,9 @@ namespace internal
               // all their neighbors in current partition
               for (unsigned int j = 0; j < neighbor_list.size(); ++j)
                 {
-                  Assert(cell_partition[neighbor_list[j]] == partition - 1,
-                         ExcInternalError());
+                  DEAL_II_Assert(cell_partition[neighbor_list[j]] ==
+                                   partition - 1,
+                                 ExcInternalError());
                   DynamicSparsityPattern::iterator neighbor =
                                                      connectivity.begin(
                                                        neighbor_list[j]),
@@ -2144,7 +2148,7 @@ namespace internal
       if (remainder != 0)
         partition++;
 
-      AssertDimension(partition_size[partition], n_blocks);
+      DEAL_II_AssertDimension(partition_size[partition], n_blocks);
     }
 
 

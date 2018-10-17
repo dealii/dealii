@@ -59,8 +59,9 @@ test()
   v *= 2.0;
 
   rw_vector.import(v, VectorOperation::insert);
-  Assert(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0,
+                 ExcInternalError());
 
   // set ghost dof to zero on remote processors,
   // compress
@@ -80,8 +81,9 @@ test()
 
   // check that nothing has changed
   rw_vector.import(v, VectorOperation::insert);
-  Assert(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0,
+                 ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -105,10 +107,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   if (myid == 0)
     {

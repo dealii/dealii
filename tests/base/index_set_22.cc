@@ -41,7 +41,7 @@ test()
   is1.print(deallog);
 
   for (unsigned int i = 0; i < is1.size(); i++)
-    Assert(is1.is_element(i) == zeros_and_ones[i], ExcInternalError());
+    DEAL_II_Assert(is1.is_element(i) == zeros_and_ones[i], ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

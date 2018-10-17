@@ -81,7 +81,7 @@ check()
       bool res = cell->point_inside(testpoint);
       deallog << testpoint << "  \t inside " << res << " expected "
               << expected[i] << std::endl;
-      Assert(res == expected[i], ExcInternalError());
+      DEAL_II_Assert(res == expected[i], ExcInternalError());
     }
 }
 

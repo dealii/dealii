@@ -3143,10 +3143,10 @@ namespace VectorTools
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcPointNotAvailableHere,
-                   "The given point is inside a cell of a "
-                   "parallel::distributed::Triangulation that is not "
-                   "locally owned by this processor.");
+  DEAL_II_DeclExceptionMsg(ExcPointNotAvailableHere,
+                           "The given point is inside a cell of a "
+                           "parallel::distributed::Triangulation that is not "
+                           "locally owned by this processor.");
 } // namespace VectorTools
 
 

@@ -100,8 +100,8 @@ main()
           // there should now be two
           // normal vectors, one for
           // each vertex of the face
-          Assert(c1_values.get_all_normal_vectors().size() == 2,
-                 ExcInternalError());
+          DEAL_II_Assert(c1_values.get_all_normal_vectors().size() == 2,
+                         ExcInternalError());
 
           // check that these two
           // normal vectors have
@@ -124,16 +124,16 @@ main()
           // some numerical checks for correctness
           for (unsigned int i = 0; i < 2; ++i)
             {
-              AssertThrow(std::fabs(c1_values.normal_vector(i) *
-                                      c1_values.normal_vector(i) -
-                                    1) < 1e-14,
-                          ExcInternalError());
+              DEAL_II_AssertThrow(std::fabs(c1_values.normal_vector(i) *
+                                              c1_values.normal_vector(i) -
+                                            1) < 1e-14,
+                                  ExcInternalError());
               Point<2> radius = c1_values.quadrature_point(i);
               radius /= std::sqrt(radius.square());
 
-              AssertThrow((radius - c1_values.normal_vector(i)).norm_square() <
-                            1e-14,
-                          ExcInternalError());
+              DEAL_II_AssertThrow(
+                (radius - c1_values.normal_vector(i)).norm_square() < 1e-14,
+                ExcInternalError());
             };
         };
 }

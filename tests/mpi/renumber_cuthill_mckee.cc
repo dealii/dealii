@@ -99,7 +99,7 @@ test()
 
   if (myid == 0)
     {
-      AssertDimension(offset, complete_renumbering.size());
+      DEAL_II_AssertDimension(offset, complete_renumbering.size());
       for (unsigned int i = 0; i < complete_renumbering.size(); ++i)
         deallog << complete_renumbering[i] << std::endl;
     }

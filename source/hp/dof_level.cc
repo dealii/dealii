@@ -54,10 +54,10 @@ namespace internal
               (next_cell < dof_offsets.size() ? dof_offsets[next_cell] :
                                                 dof_indices.size());
 
-            Assert(next_offset - dof_offsets[cell] ==
-                     fe_collection[active_fe_indices[cell]]
-                       .template n_dofs_per_object<dim>(),
-                   ExcInternalError());
+            DEAL_II_Assert(next_offset - dof_offsets[cell] ==
+                             fe_collection[active_fe_indices[cell]]
+                               .template n_dofs_per_object<dim>(),
+                           ExcInternalError());
 
             // see if the range of dofs for this cell can be compressed and if
             // so how many slots we have to store for them
@@ -102,10 +102,10 @@ namespace internal
               (next_cell < dof_offsets.size() ? dof_offsets[next_cell] :
                                                 dof_indices.size());
 
-            Assert(next_offset - dof_offsets[cell] ==
-                     fe_collection[active_fe_indices[cell]]
-                       .template n_dofs_per_object<dim>(),
-                   ExcInternalError());
+            DEAL_II_Assert(next_offset - dof_offsets[cell] ==
+                             fe_collection[active_fe_indices[cell]]
+                               .template n_dofs_per_object<dim>(),
+                           ExcInternalError());
 
             new_dof_offsets[cell] = new_dof_indices.size();
 
@@ -130,9 +130,9 @@ namespace internal
 
                     // make sure that the current active_fe_index indicates
                     // that this entry hasn't been compressed yet
-                    Assert(is_compressed_entry(active_fe_indices[cell]) ==
-                             false,
-                           ExcInternalError());
+                    DEAL_II_Assert(is_compressed_entry(
+                                     active_fe_indices[cell]) == false,
+                                   ExcInternalError());
 
                     // then mark the compression
                     active_fe_indices[cell] =
@@ -150,7 +150,7 @@ namespace internal
           ++cell;
 
       // finally swap old and new content
-      Assert(new_dof_indices.size() == new_size, ExcInternalError());
+      DEAL_II_Assert(new_dof_indices.size() == new_size, ExcInternalError());
       dof_indices.swap(new_dof_indices);
       dof_offsets.swap(new_dof_offsets);
     }
@@ -203,18 +203,18 @@ namespace internal
             if (is_compressed_entry(active_fe_indices[cell]) == false)
               {
                 // apparently not. simply copy them
-                Assert(next_offset - dof_offsets[cell] ==
-                         fe_collection[active_fe_indices[cell]]
-                           .template n_dofs_per_object<dim>(),
-                       ExcInternalError());
+                DEAL_II_Assert(next_offset - dof_offsets[cell] ==
+                                 fe_collection[active_fe_indices[cell]]
+                                   .template n_dofs_per_object<dim>(),
+                               ExcInternalError());
                 for (unsigned int i = dof_offsets[cell]; i < next_offset; ++i)
                   new_dof_indices.push_back(dof_indices[i]);
               }
             else
               {
                 // apparently so. uncompress
-                Assert(next_offset - dof_offsets[cell] == 1,
-                       ExcInternalError());
+                DEAL_II_Assert(next_offset - dof_offsets[cell] == 1,
+                               ExcInternalError());
                 const unsigned int dofs_per_object =
                   fe_collection[get_toggled_compression_state(
                                   active_fe_indices[cell])]
@@ -234,7 +234,7 @@ namespace internal
           ++cell;
 
       // verify correct size, then swap arrays
-      Assert(new_dof_indices.size() == new_size, ExcInternalError());
+      DEAL_II_Assert(new_dof_indices.size() == new_size, ExcInternalError());
       dof_indices.swap(new_dof_indices);
       dof_offsets.swap(new_dof_offsets);
     }

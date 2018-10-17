@@ -49,11 +49,11 @@ main(int argc, char **argv)
       {
         if ((i == 2) && (j == 1))
           {
-            AssertThrow(B.exists(i, j) == true, ExcInternalError());
+            DEAL_II_AssertThrow(B.exists(i, j) == true, ExcInternalError());
           }
         else
           {
-            AssertThrow(B.exists(i, j) == false, ExcInternalError());
+            DEAL_II_AssertThrow(B.exists(i, j) == false, ExcInternalError());
           }
       }
   deallog << "OK" << std::endl;

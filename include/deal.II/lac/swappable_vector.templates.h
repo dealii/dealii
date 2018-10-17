@@ -39,7 +39,7 @@ SwappableVector<number>::SwappableVector(const SwappableVector<number> &v)
   , filename()
   , data_is_preloaded(false)
 {
-  Assert(v.filename == "", ExcInvalidCopyOperation());
+  DEAL_II_Assert(v.filename == "", ExcInvalidCopyOperation());
 }
 
 
@@ -102,7 +102,7 @@ SwappableVector<number>::swap_out(const std::string &name)
 
   filename = name;
 
-  Assert(this->size() != 0, ExcSizeZero());
+  DEAL_II_Assert(this->size() != 0, ExcSizeZero());
 
   // if in MT mode, block all other
   // operations. if not in MT mode,
@@ -112,7 +112,7 @@ SwappableVector<number>::swap_out(const std::string &name)
   //  check that we have not called
   //  @p alert without the respective
   //  @p reload function
-  Assert(data_is_preloaded == false, ExcInternalError());
+  DEAL_II_Assert(data_is_preloaded == false, ExcInternalError());
 
   std::ofstream tmp_out(filename.c_str());
   this->block_write(tmp_out);
@@ -197,8 +197,8 @@ SwappableVector<number>::reload_vector(const bool set_flag)
 {
   (void)set_flag;
 
-  Assert(filename != "", ExcInvalidFilename(filename));
-  Assert(this->size() == 0, ExcSizeNonzero());
+  DEAL_II_Assert(filename != "", ExcInvalidFilename(filename));
+  DEAL_II_Assert(this->size() == 0, ExcSizeNonzero());
 
   std::ifstream tmp_in(filename.c_str());
   this->block_read(tmp_in);
@@ -231,13 +231,13 @@ SwappableVector<number>::kill_file()
   // requested the vector in advance,
   // but never got to fetch it. this
   // is most probably an error, not?
-  Assert(data_is_preloaded == false, ExcInternalError());
+  DEAL_II_Assert(data_is_preloaded == false, ExcInternalError());
 
   if (filename != "")
     {
       int status = std::remove(filename.c_str());
       (void)status;
-      AssertThrow(status == 0, ExcIO());
+      DEAL_II_AssertThrow(status == 0, ExcIO());
 
       filename = "";
     };

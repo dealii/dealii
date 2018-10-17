@@ -135,13 +135,14 @@ test()
   A.add(-1., B);
   deallog << "|A|=" << A.frobenius_norm() << std::endl;
   deallog << "|B|=" << B.frobenius_norm() << std::endl;
-  Assert(A.frobenius_norm() < 1e-12 * B.frobenius_norm(), ExcInternalError());
+  DEAL_II_Assert(A.frobenius_norm() < 1e-12 * B.frobenius_norm(),
+                 ExcInternalError());
 
   // similar for b1 and b2
   b1 -= b2;
   deallog << "|b1|=" << b1.l2_norm() << std::endl;
   deallog << "|b2|=" << b2.l2_norm() << std::endl;
-  Assert(b1.l2_norm() < 1e-12 * b2.l2_norm(), ExcInternalError());
+  DEAL_II_Assert(b1.l2_norm() < 1e-12 * b2.l2_norm(), ExcInternalError());
 }
 
 

@@ -85,15 +85,17 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
               for (unsigned int d = 0; d < dim; ++d)
                 {
-                  AssertThrow(fe_values[vec_components].value(i, q)[d] ==
-                                fe_values.shape_value_component(i, q, c + d),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(
+                    fe_values[vec_components].value(i, q)[d] ==
+                      fe_values.shape_value_component(i, q, c + d),
+                    ExcInternalError());
 
-                  AssertThrow(fe_values[vec_components].gradient(i, q)[d] ==
-                                fe_values.shape_grad_component(i, q, c + d),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(
+                    fe_values[vec_components].gradient(i, q)[d] ==
+                      fe_values.shape_grad_component(i, q, c + d),
+                    ExcInternalError());
 
-                  AssertThrow(
+                  DEAL_II_AssertThrow(
                     fe_values[vec_components].symmetric_gradient(i, q) ==
                       decltype(
                         fe_values[vec_components].symmetric_gradient(i, q))(
@@ -102,14 +104,16 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                         2),
                     ExcInternalError());
 
-                  AssertThrow(fe_values[vec_components].hessian(i, q)[d] ==
-                                fe_values.shape_hessian_component(i, q, c + d),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(
+                    fe_values[vec_components].hessian(i, q)[d] ==
+                      fe_values.shape_hessian_component(i, q, c + d),
+                    ExcInternalError());
                 }
 
-              AssertThrow(fe_values[vec_components].divergence(i, q) ==
-                            trace(fe_values[vec_components].gradient(i, q)),
-                          ExcInternalError());
+              DEAL_II_AssertThrow(fe_values[vec_components].divergence(i, q) ==
+                                    trace(
+                                      fe_values[vec_components].gradient(i, q)),
+                                  ExcInternalError());
             }
       }
 }

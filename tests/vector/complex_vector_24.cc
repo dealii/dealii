@@ -39,8 +39,8 @@ test(Vector<std::complex<double>> &v)
   // vector is really empty
   const unsigned int sz = v.size();
   v                     = 0;
-  Assert(v.size() == sz, ExcInternalError());
-  Assert(v.l2_norm() == 0, ExcInternalError());
+  DEAL_II_Assert(v.size() == sz, ExcInternalError());
+  DEAL_II_Assert(v.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

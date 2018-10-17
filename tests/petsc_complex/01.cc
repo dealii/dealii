@@ -39,17 +39,19 @@ test(PETScWrappers::SparseMatrix &m)
     for (unsigned int j = 0; j < m.m(); ++j)
       if ((i + 2 * j + 1) % 3 == 0)
         {
-          AssertThrow(m(i, j) == std::complex<double>(0., i * j * .5 + .5),
-                      ExcInternalError());
-          AssertThrow(m.el(i, j) == std::complex<double>(0., i * j * .5 + .5),
-                      ExcInternalError());
+          DEAL_II_AssertThrow(m(i, j) ==
+                                std::complex<double>(0., i * j * .5 + .5),
+                              ExcInternalError());
+          DEAL_II_AssertThrow(m.el(i, j) ==
+                                std::complex<double>(0., i * j * .5 + .5),
+                              ExcInternalError());
         }
       else
         {
-          AssertThrow(m(i, j) == std::complex<double>(0., 0.),
-                      ExcInternalError());
-          AssertThrow(m.el(i, j) == std::complex<double>(0., 0.),
-                      ExcInternalError());
+          DEAL_II_AssertThrow(m(i, j) == std::complex<double>(0., 0.),
+                              ExcInternalError());
+          DEAL_II_AssertThrow(m.el(i, j) == std::complex<double>(0., 0.),
+                              ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

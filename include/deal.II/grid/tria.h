@@ -3393,17 +3393,17 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcInvalidLevel,
-                 int,
-                 << "The given level " << arg1
-                 << " is not in the valid range!");
+  DEAL_II_DeclException1(ExcInvalidLevel,
+                         int,
+                         << "The given level " << arg1
+                         << " is not in the valid range!");
   /**
    * The function raising this exception can only operate on an empty
    * Triangulation, i.e., a Triangulation without grid cells.
    *
    * @ingroup Exceptions
    */
-  DeclException2(
+  DEAL_II_DeclException2(
     ExcTriangulationNotEmpty,
     int,
     int,
@@ -3416,27 +3416,27 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcGridReadError);
+  DEAL_II_DeclException0(ExcGridReadError);
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0(ExcFacesHaveNoLevel);
+  DEAL_II_DeclException0(ExcFacesHaveNoLevel);
   /**
    * The triangulation level you accessed is empty.
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcEmptyLevel,
-                 int,
-                 << "You tried to do something on level " << arg1
-                 << ", but this level is empty.");
+  DEAL_II_DeclException1(ExcEmptyLevel,
+                         int,
+                         << "You tried to do something on level " << arg1
+                         << ", but this level is empty.");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcNonOrientableTriangulation);
+  DEAL_II_DeclException0(ExcNonOrientableTriangulation);
 
   /**
    * Exception
@@ -3445,10 +3445,10 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcBoundaryIdNotFound,
-                 types::boundary_id,
-                 << "The given boundary_id " << arg1
-                 << " is not defined in this Triangulation!");
+  DEAL_II_DeclException1(ExcBoundaryIdNotFound,
+                         types::boundary_id,
+                         << "The given boundary_id " << arg1
+                         << " is not defined in this Triangulation!");
 
   /*
    * @}
@@ -3907,8 +3907,8 @@ template <int dim, int spacedim>
 inline bool
 Triangulation<dim, spacedim>::vertex_used(const unsigned int index) const
 {
-  Assert(index < vertices_used.size(),
-         ExcIndexRange(index, 0, vertices_used.size()));
+  DEAL_II_Assert(index < vertices_used.size(),
+                 ExcIndexRange(index, 0, vertices_used.size()));
   return vertices_used[index];
 }
 
@@ -4033,10 +4033,10 @@ Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   bool my_check_for_distorted_cells;
   ar & my_check_for_distorted_cells;
 
-  Assert(my_check_for_distorted_cells == check_for_distorted_cells,
-         ExcMessage("The triangulation loaded into here must have the "
-                    "same setting with regard to reporting distorted "
-                    "cell as the one previously stored."));
+  DEAL_II_Assert(my_check_for_distorted_cells == check_for_distorted_cells,
+                 ExcMessage("The triangulation loaded into here must have the "
+                            "same setting with regard to reporting distorted "
+                            "cell as the one previously stored."));
 
   if (dim == 1)
     {

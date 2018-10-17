@@ -42,7 +42,7 @@ test()
 
   // verify equality
   for (unsigned int i = 0; i < v1.size(); ++i)
-    AssertThrow(m[i] == (v1[i] && v2[i]), ExcInternalError());
+    DEAL_II_AssertThrow(m[i] == (v1[i] && v2[i]), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

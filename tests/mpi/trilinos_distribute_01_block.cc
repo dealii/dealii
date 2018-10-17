@@ -46,16 +46,16 @@ test()
     vec.block(1).reinit(is, MPI_COMM_WORLD);
   }
   vec.collect_sizes();
-  AssertThrow(vec.block(0).local_size() == 100, ExcInternalError());
-  AssertThrow(vec.block(0).local_range().first == 100 * myid,
-              ExcInternalError());
-  AssertThrow(vec.block(0).local_range().second == 100 * myid + 100,
-              ExcInternalError());
-  AssertThrow(vec.block(1).local_size() == 100, ExcInternalError());
-  AssertThrow(vec.block(1).local_range().first == 100 * myid,
-              ExcInternalError());
-  AssertThrow(vec.block(1).local_range().second == 100 * myid + 100,
-              ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(0).local_size() == 100, ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(0).local_range().first == 100 * myid,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(0).local_range().second == 100 * myid + 100,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(1).local_size() == 100, ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(1).local_range().first == 100 * myid,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(1).local_range().second == 100 * myid + 100,
+                      ExcInternalError());
 
   for (unsigned int i = vec.block(0).local_range().first;
        i < vec.block(0).local_range().second;
@@ -72,7 +72,7 @@ test()
     double exact_l1 = 0;
     for (unsigned int i = 0; i < vec.block(0).size(); ++i)
       exact_l1 += 2 * i;
-    AssertThrow(vec.l1_norm() == exact_l1, ExcInternalError());
+    DEAL_II_AssertThrow(vec.l1_norm() == exact_l1, ExcInternalError());
   }
 
 
@@ -127,24 +127,26 @@ test()
 
   // verify correctness
   if (myid != 0)
-    AssertThrow(vec(vec.block(0).local_range().first + 10) ==
-                  vec.block(0).local_range().first - 25,
-                ExcInternalError());
+    DEAL_II_AssertThrow(vec(vec.block(0).local_range().first + 10) ==
+                          vec.block(0).local_range().first - 25,
+                        ExcInternalError());
 
   if (myid != n_processes - 1)
-    AssertThrow(vec(vec.block(0).local_range().first + 90) ==
-                  vec.block(0).local_range().first + 105,
-                ExcInternalError());
+    DEAL_II_AssertThrow(vec(vec.block(0).local_range().first + 90) ==
+                          vec.block(0).local_range().first + 105,
+                        ExcInternalError());
 
   if (myid != 0)
-    AssertThrow(vec(vec.block(0).size() + vec.block(1).local_range().first +
-                    10) == vec.block(1).local_range().first - 25,
-                ExcInternalError());
+    DEAL_II_AssertThrow(vec(vec.block(0).size() +
+                            vec.block(1).local_range().first + 10) ==
+                          vec.block(1).local_range().first - 25,
+                        ExcInternalError());
 
   if (myid != n_processes - 1)
-    AssertThrow(vec(vec.block(0).size() + vec.block(1).local_range().first +
-                    90) == vec.block(1).local_range().first + 105,
-                ExcInternalError());
+    DEAL_II_AssertThrow(vec(vec.block(0).size() +
+                            vec.block(1).local_range().first + 90) ==
+                          vec.block(1).local_range().first + 105,
+                        ExcInternalError());
 
 
   for (unsigned int i = vec.block(0).local_range().first;
@@ -155,7 +157,7 @@ test()
           (i != vec.block(0).local_range().first + 90))
         {
           double val = vec.block(0)(i);
-          AssertThrow(std::fabs(val - i) <= 1e-6, ExcInternalError());
+          DEAL_II_AssertThrow(std::fabs(val - i) <= 1e-6, ExcInternalError());
         }
     }
   for (unsigned int i = vec.block(1).local_range().first;
@@ -166,7 +168,7 @@ test()
           (i != vec.block(1).local_range().first + 90))
         {
           double val = vec.block(1)(i);
-          AssertThrow(std::fabs(val - i) <= 1e-6, ExcInternalError());
+          DEAL_II_AssertThrow(std::fabs(val - i) <= 1e-6, ExcInternalError());
         }
     }
 
@@ -187,7 +189,7 @@ test()
       }
 
     const double l1_norm = vec.l1_norm();
-    AssertThrow(l1_norm == 2 * exact_l1, ExcInternalError());
+    DEAL_II_AssertThrow(l1_norm == 2 * exact_l1, ExcInternalError());
 
     // generate output. write the norm divided by two so that it matches the
     // results of the _01 test

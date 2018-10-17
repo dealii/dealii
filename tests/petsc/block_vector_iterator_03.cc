@@ -66,7 +66,7 @@ test()
       PETScWrappers::MPI::BlockVector::iterator p2 = v2.begin();
       for (unsigned int i = 0; i < v1.size(); ++i, ++p2)
         *p2 = i;
-      Assert(p2 == v2.end(), ExcInternalError());
+      DEAL_II_Assert(p2 == v2.end(), ExcInternalError());
 
       // check that the two vectors are equal
       deallog << "Check 1: " << (v1 == v2 ? "true" : "false") << std::endl;
@@ -85,9 +85,9 @@ test()
 
       PETScWrappers::MPI::BlockVector::iterator p1 = v1.begin();
       for (unsigned int i = 0; i < v1.size(); ++i, ++p1)
-        AssertThrow(*p1 == i, ExcInternalError());
+        DEAL_II_AssertThrow(*p1 == i, ExcInternalError());
 
-      Assert(p1 == v1.end(), ExcInternalError());
+      DEAL_II_Assert(p1 == v1.end(), ExcInternalError());
 
       // move back into allowable
       // region
@@ -95,7 +95,7 @@ test()
 
       // check backwards
       for (unsigned int i = 0; i < v1.size(); ++i, --p1)
-        AssertThrow(*p1 == v1.size() - i - 1, ExcInternalError());
+        DEAL_II_AssertThrow(*p1 == v1.size() - i - 1, ExcInternalError());
 
       // if we came thus far,
       // everything is alright
@@ -115,9 +115,9 @@ test()
 
       PETScWrappers::MPI::BlockVector::const_iterator p1 = v1.begin();
       for (unsigned int i = 0; i < v1.size(); ++i, ++p1)
-        AssertThrow(*p1 == i, ExcInternalError());
+        DEAL_II_AssertThrow(*p1 == i, ExcInternalError());
 
-      Assert(p1 == v1.end(), ExcInternalError());
+      DEAL_II_Assert(p1 == v1.end(), ExcInternalError());
 
       // move back into allowable
       // region
@@ -128,7 +128,7 @@ test()
         {
           const double val = *p1;
           const double ref = v1.size() - i - 1;
-          AssertThrow(val == ref, ExcInternalError());
+          DEAL_II_AssertThrow(val == ref, ExcInternalError());
         };
 
       // if we came thus far,
@@ -217,7 +217,8 @@ test()
         {
           const PETScWrappers::MPI::BlockVector::iterator p = (v1.begin() + i);
           for (unsigned int j = 0; j < v1.size(); ++j)
-            AssertThrow(p[(signed)j - (signed)i] == j, ExcInternalError());
+            DEAL_II_AssertThrow(p[(signed)j - (signed)i] == j,
+                                ExcInternalError());
         };
 
       // if we came thus far,

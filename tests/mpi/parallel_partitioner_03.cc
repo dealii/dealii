@@ -36,7 +36,7 @@ test()
     deallog << "numproc=" << numproc << std::endl;
 
   const unsigned int set = 200;
-  AssertIndexRange(numproc, set - 2);
+  DEAL_II_AssertIndexRange(numproc, set - 2);
   const unsigned int local_size  = set - myid;
   unsigned int       global_size = 0;
   unsigned int       my_start    = 0;

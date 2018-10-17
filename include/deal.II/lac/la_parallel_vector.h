@@ -1199,43 +1199,43 @@ namespace LinearAlgebra
        *
        * @ingroup Exceptions
        */
-      DeclException0(ExcVectorTypeNotCompatible);
+      DEAL_II_DeclException0(ExcVectorTypeNotCompatible);
 
       /**
        * Attempt to perform an operation not implemented on the device.
        *
        * @ingroup Exceptions
        */
-      DeclException0(ExcNotAllowedForCuda);
+      DEAL_II_DeclException0(ExcNotAllowedForCuda);
 
       /**
        * Exception
        */
-      DeclException3(ExcNonMatchingElements,
-                     Number,
-                     Number,
-                     unsigned int,
-                     << "Called compress(VectorOperation::insert), but"
-                     << " the element received from a remote processor, value "
-                     << std::setprecision(16) << arg1
-                     << ", does not match with the value "
-                     << std::setprecision(16) << arg2
-                     << " on the owner processor " << arg3);
+      DEAL_II_DeclException3(
+        ExcNonMatchingElements,
+        Number,
+        Number,
+        unsigned int,
+        << "Called compress(VectorOperation::insert), but"
+        << " the element received from a remote processor, value "
+        << std::setprecision(16) << arg1 << ", does not match with the value "
+        << std::setprecision(16) << arg2 << " on the owner processor " << arg3);
 
       /**
        * Exception
        */
-      DeclException4(ExcAccessToNonLocalElement,
-                     size_type,
-                     size_type,
-                     size_type,
-                     size_type,
-                     << "You tried to access element " << arg1
-                     << " of a distributed vector, but this element is not "
-                     << "stored on the current processor. Note: The range of "
-                     << "locally owned elements is " << arg2 << " to " << arg3
-                     << ", and there are " << arg4 << " ghost elements "
-                     << "that this vector can access.");
+      DEAL_II_DeclException4(
+        ExcAccessToNonLocalElement,
+        size_type,
+        size_type,
+        size_type,
+        size_type,
+        << "You tried to access element " << arg1
+        << " of a distributed vector, but this element is not "
+        << "stored on the current processor. Note: The range of "
+        << "locally owned elements is " << arg2 << " to " << arg3
+        << ", and there are " << arg4 << " ghost elements "
+        << "that this vector can access.");
 
     private:
       /**
@@ -1615,10 +1615,11 @@ namespace LinearAlgebra
     inline Number
     Vector<Number, MemorySpace>::operator()(const size_type global_index) const
     {
-      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
-             ExcMessage(
-               "This function is only implemented for the Host memory space"));
-      Assert(
+      DEAL_II_Assert(
+        (std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+        ExcMessage(
+          "This function is only implemented for the Host memory space"));
+      DEAL_II_Assert(
         partitioner->in_local_range(global_index) ||
           partitioner->ghost_indices().is_element(global_index),
         ExcAccessToNonLocalElement(global_index,
@@ -1626,10 +1627,11 @@ namespace LinearAlgebra
                                    partitioner->local_range().second,
                                    partitioner->ghost_indices().n_elements()));
       // do not allow reading a vector which is not in ghost mode
-      Assert(partitioner->in_local_range(global_index) ||
-               vector_is_ghosted == true,
-             ExcMessage("You tried to read a ghost element of this vector, "
-                        "but it has not imported its ghost values."));
+      DEAL_II_Assert(partitioner->in_local_range(global_index) ||
+                       vector_is_ghosted == true,
+                     ExcMessage(
+                       "You tried to read a ghost element of this vector, "
+                       "but it has not imported its ghost values."));
       return data.values[partitioner->global_to_local(global_index)];
     }
 
@@ -1639,10 +1641,11 @@ namespace LinearAlgebra
     inline Number &
     Vector<Number, MemorySpace>::operator()(const size_type global_index)
     {
-      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
-             ExcMessage(
-               "This function is only implemented for the Host memory space"));
-      Assert(
+      DEAL_II_Assert(
+        (std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+        ExcMessage(
+          "This function is only implemented for the Host memory space"));
+      DEAL_II_Assert(
         partitioner->in_local_range(global_index) ||
           partitioner->ghost_indices().is_element(global_index),
         ExcAccessToNonLocalElement(global_index,
@@ -1683,16 +1686,18 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::local_element(
       const size_type local_index) const
     {
-      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
-             ExcMessage(
-               "This function is only implemented for the Host memory space"));
-      AssertIndexRange(local_index,
-                       partitioner->local_size() +
-                         partitioner->n_ghost_indices());
+      DEAL_II_Assert(
+        (std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+        ExcMessage(
+          "This function is only implemented for the Host memory space"));
+      DEAL_II_AssertIndexRange(local_index,
+                               partitioner->local_size() +
+                                 partitioner->n_ghost_indices());
       // do not allow reading a vector which is not in ghost mode
-      Assert(local_index < local_size() || vector_is_ghosted == true,
-             ExcMessage("You tried to read a ghost element of this vector, "
-                        "but it has not imported its ghost values."));
+      DEAL_II_Assert(local_index < local_size() || vector_is_ghosted == true,
+                     ExcMessage(
+                       "You tried to read a ghost element of this vector, "
+                       "but it has not imported its ghost values."));
 
       return data.values[local_index];
     }
@@ -1703,13 +1708,14 @@ namespace LinearAlgebra
     inline Number &
     Vector<Number, MemorySpace>::local_element(const size_type local_index)
     {
-      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
-             ExcMessage(
-               "This function is only implemented for the Host memory space"));
+      DEAL_II_Assert(
+        (std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+        ExcMessage(
+          "This function is only implemented for the Host memory space"));
 
-      AssertIndexRange(local_index,
-                       partitioner->local_size() +
-                         partitioner->n_ghost_indices());
+      DEAL_II_AssertIndexRange(local_index,
+                               partitioner->local_size() +
+                                 partitioner->n_ghost_indices());
 
       return data.values[local_index];
     }
@@ -1763,10 +1769,10 @@ namespace LinearAlgebra
       const std::vector<size_type> &       indices,
       const ::dealii::Vector<OtherNumber> &values)
     {
-      AssertDimension(indices.size(), values.size());
+      DEAL_II_AssertDimension(indices.size(), values.size());
       for (size_type i = 0; i < indices.size(); ++i)
         {
-          Assert(
+          DEAL_II_Assert(
             numbers::is_finite(values[i]),
             ExcMessage(
               "The given value is not finite but either infinite or Not A Number (NaN)"));
@@ -1785,7 +1791,7 @@ namespace LinearAlgebra
     {
       for (size_type i = 0; i < n_elements; ++i, ++indices, ++values)
         {
-          Assert(
+          DEAL_II_Assert(
             numbers::is_finite(*values),
             ExcMessage(
               "The given value is not finite but either infinite or Not A Number (NaN)"));

@@ -253,7 +253,7 @@ namespace SUNDIALS
       {
         const int ierr = MPI_Comm_free(&communicator);
         (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
+        DEAL_II_AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
       }
 #  endif
   }
@@ -290,9 +290,10 @@ namespace SUNDIALS
     else
 #  endif
       {
-        Assert(is_serial_vector<VectorType>::value,
-               ExcInternalError(
-                 "Trying to use a serial code with a parallel vector."));
+        DEAL_II_Assert(
+          is_serial_vector<VectorType>::value,
+          ExcInternalError(
+            "Trying to use a serial code with a parallel vector."));
         yy        = N_VNew_Serial(system_size);
         abs_tolls = N_VNew_Serial(system_size);
       }
@@ -309,10 +310,10 @@ namespace SUNDIALS
 
         status = SundialsARKode(arkode_mem, next_time, yy, &t, ARK_NORMAL);
 
-        AssertARKode(status);
+        DEAL_II_AssertARKode(status);
 
         status = ARKodeGetLastStep(arkode_mem, &h);
-        AssertARKode(status);
+        DEAL_II_AssertARKode(status);
 
         copy(solution, yy);
 
@@ -395,8 +396,9 @@ namespace SUNDIALS
 
     copy(yy, solution);
 
-    Assert(explicit_function || implicit_function,
-           ExcFunctionNotProvided("explicit_function || implicit_function"));
+    DEAL_II_Assert(explicit_function || implicit_function,
+                   ExcFunctionNotProvided(
+                     "explicit_function || implicit_function"));
 
     status = ARKodeInit(
       arkode_mem,
@@ -404,35 +406,35 @@ namespace SUNDIALS
       implicit_function ? &t_arkode_implicit_function<VectorType> : nullptr,
       current_time,
       yy);
-    AssertARKode(status);
+    DEAL_II_AssertARKode(status);
 
     if (get_local_tolerances)
       {
         copy(abs_tolls, get_local_tolerances());
         status =
           ARKodeSVtolerances(arkode_mem, data.relative_tolerance, abs_tolls);
-        AssertARKode(status);
+        DEAL_II_AssertARKode(status);
       }
     else
       {
         status = ARKodeSStolerances(arkode_mem,
                                     data.relative_tolerance,
                                     data.absolute_tolerance);
-        AssertARKode(status);
+        DEAL_II_AssertARKode(status);
       }
 
     status = ARKodeSetInitStep(arkode_mem, current_time_step);
-    AssertARKode(status);
+    DEAL_II_AssertARKode(status);
 
     status = ARKodeSetUserData(arkode_mem, (void *)this);
-    AssertARKode(status);
+    DEAL_II_AssertARKode(status);
 
     status = ARKodeSetStopTime(arkode_mem, data.final_time);
-    AssertARKode(status);
+    DEAL_II_AssertARKode(status);
 
     status =
       ARKodeSetMaxNonlinIters(arkode_mem, data.maximum_non_linear_iterations);
-    AssertARKode(status);
+    DEAL_II_AssertARKode(status);
 
     // Initialize solver
     ARKodeMem ARKode_mem = (ARKodeMem)arkode_mem;
@@ -440,12 +442,12 @@ namespace SUNDIALS
     if (solve_jacobian_system)
       {
         status = ARKodeSetNewton(arkode_mem);
-        AssertARKode(status);
+        DEAL_II_AssertARKode(status);
         if (data.implicit_function_is_linear)
           {
             status = ARKodeSetLinear(
               arkode_mem, data.implicit_function_is_time_independent ? 0 : 1);
-            AssertARKode(status);
+            DEAL_II_AssertARKode(status);
           }
 
 
@@ -462,7 +464,7 @@ namespace SUNDIALS
       {
         status =
           ARKodeSetFixedPoint(arkode_mem, data.maximum_non_linear_iterations);
-        AssertARKode(status);
+        DEAL_II_AssertARKode(status);
       }
 
 
@@ -480,7 +482,7 @@ namespace SUNDIALS
       }
 
     status = ARKodeSetOrder(arkode_mem, data.maximum_order);
-    AssertARKode(status);
+    DEAL_II_AssertARKode(status);
   }
 
   template <typename VectorType>
@@ -488,7 +490,7 @@ namespace SUNDIALS
   ARKode<VectorType>::set_functions_to_trigger_an_assert()
   {
     reinit_vector = [](VectorType &) {
-      AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
+      DEAL_II_AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
 
     solver_should_restart = [](const double, VectorType &) -> bool {

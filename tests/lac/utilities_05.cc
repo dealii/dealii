@@ -58,7 +58,7 @@ test(const NumberType a, const NumberType b)
       y.print(deallog.get_file_stream());
       deallog << "res:" << std::endl;
       res.print(deallog.get_file_stream());
-      AssertThrow(false, ExcInternalError());
+      DEAL_II_AssertThrow(false, ExcInternalError());
     }
 }
 

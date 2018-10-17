@@ -65,10 +65,10 @@ namespace GridTools
 
     const std::vector<Point<spacedim>> &vertices = tria.get_vertices();
 
-    Assert(tria.get_vertices().size() == marked_vertices.size() ||
-             marked_vertices.size() == 0,
-           ExcDimensionMismatch(tria.get_vertices().size(),
-                                marked_vertices.size()));
+    DEAL_II_Assert(tria.get_vertices().size() == marked_vertices.size() ||
+                     marked_vertices.size() == 0,
+                   ExcDimensionMismatch(tria.get_vertices().size(),
+                                        marked_vertices.size()));
 
     // If p is an element of marked_vertices,
     // and q is that of used_Vertices,
@@ -77,7 +77,7 @@ namespace GridTools
     // I.e., if p is true q must be true
     // (if p is false, q could be false or true).
     // p implies q logic is encapsulated in ~p|q.
-    Assert(
+    DEAL_II_Assert(
       marked_vertices.size() == 0 ||
         std::equal(marked_vertices.begin(),
                    marked_vertices.end(),
@@ -102,9 +102,9 @@ namespace GridTools
     std::vector<bool>::const_iterator first =
       std::find(used.begin(), used.end(), true);
 
-    // Assert that at least one vertex
+    // DEAL_II_Assert that at least one vertex
     // is actually used
-    Assert(first != used.end(), ExcInternalError());
+    DEAL_II_Assert(first != used.end(), ExcInternalError());
 
     unsigned int best_vertex = std::distance(used.begin(), first);
     double       best_dist   = (p - vertices[best_vertex]).norm_square();
@@ -146,10 +146,10 @@ namespace GridTools
 
     auto vertices = extract_used_vertices(tria, mapping);
 
-    Assert(tria.get_vertices().size() == marked_vertices.size() ||
-             marked_vertices.size() == 0,
-           ExcDimensionMismatch(tria.get_vertices().size(),
-                                marked_vertices.size()));
+    DEAL_II_Assert(tria.get_vertices().size() == marked_vertices.size() ||
+                     marked_vertices.size() == 0,
+                   ExcDimensionMismatch(tria.get_vertices().size(),
+                                        marked_vertices.size()));
 
     // If p is an element of marked_vertices,
     // and q is that of used_Vertices,
@@ -158,7 +158,7 @@ namespace GridTools
     // I.e., if p is true q must be true
     // (if p is false, q could be false or true).
     // p implies q logic is encapsulated in ~p|q.
-    Assert(
+    DEAL_II_Assert(
       marked_vertices.size() == 0 ||
         std::equal(marked_vertices.begin(),
                    marked_vertices.end(),
@@ -201,10 +201,12 @@ namespace GridTools
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
-    Assert(vertex < mesh.get_triangulation().n_vertices(),
-           ExcIndexRange(0, mesh.get_triangulation().n_vertices(), vertex));
-    Assert(mesh.get_triangulation().get_used_vertices()[vertex],
-           ExcVertexNotUsed(vertex));
+    DEAL_II_Assert(vertex < mesh.get_triangulation().n_vertices(),
+                   ExcIndexRange(0,
+                                 mesh.get_triangulation().n_vertices(),
+                                 vertex));
+    DEAL_II_Assert(mesh.get_triangulation().get_used_vertices()[vertex],
+                   ExcVertexNotUsed(vertex));
 
     // use a set instead of a vector
     // to ensure that cells are inserted only
@@ -311,7 +313,7 @@ namespace GridTools
 
         // in more than 3d we would probably have to do the same as
         // above also for even lower-dimensional objects
-        Assert(dim <= 3, ExcNotImplemented());
+        DEAL_II_Assert(dim <= 3, ExcNotImplemented());
 
         // move on to the next cell if we have found the
         // vertex on the current one
@@ -320,7 +322,7 @@ namespace GridTools
 
     // if this was an active vertex then there needs to have been
     // at least one cell to which it is adjacent!
-    Assert(adjacent_cells.size() > 0, ExcInternalError());
+    DEAL_II_Assert(adjacent_cells.size() > 0, ExcInternalError());
 
     // return the result as a vector, rather than the set we built above
     return std::vector<
@@ -441,7 +443,7 @@ namespace GridTools
 
       // Make sure that we have found
       // at least one cell adjacent to vertex.
-      Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
+      DEAL_II_Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
 
       // Copy all the cells into a std::set
       std::set<active_cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(),
@@ -530,8 +532,8 @@ namespace GridTools
             }
         }
 
-      AssertThrow(best_cell.first.state() == IteratorState::valid,
-                  ExcPointNotFound<spacedim>(p));
+      DEAL_II_AssertThrow(best_cell.first.state() == IteratorState::valid,
+                          ExcPointNotFound<spacedim>(p));
 
       return best_cell;
     }
@@ -675,9 +677,9 @@ namespace GridTools
                   free_direction = d;
               }
 
-            AssertDimension(count_vertex_indices, 2);
-            Assert(free_direction != numbers::invalid_unsigned_int,
-                   ExcInternalError());
+            DEAL_II_AssertDimension(count_vertex_indices, 2);
+            DEAL_II_Assert(free_direction != numbers::invalid_unsigned_int,
+                           ExcInternalError());
 
             const unsigned int first_vertex =
               (vertex_indices[0].second << vertex_indices[0].first) +
@@ -874,10 +876,12 @@ namespace GridTools
 
     // Check that we never return locally owned or artificial cells
     // What is left should only be the ghost cells
-    Assert(contains_locally_owned_cells<MeshType>(active_halo_layer) == false,
-           ExcMessage("Halo layer contains locally owned cells"));
-    Assert(contains_artificial_cells<MeshType>(active_halo_layer) == false,
-           ExcMessage("Halo layer contains artificial cells"));
+    DEAL_II_Assert(contains_locally_owned_cells<MeshType>(active_halo_layer) ==
+                     false,
+                   ExcMessage("Halo layer contains locally owned cells"));
+    DEAL_II_Assert(contains_artificial_cells<MeshType>(active_halo_layer) ==
+                     false,
+                   ExcMessage("Halo layer contains artificial cells"));
 
     return active_halo_layer;
   }
@@ -982,9 +986,9 @@ namespace GridTools
         subdomain_boundary_cells_radii.push_back(
           subdomain_boundary_cell_enclosing_ball.second);
       }
-    AssertThrow(subdomain_boundary_cells_radii.size() ==
-                  subdomain_boundary_cells_centers.size(),
-                ExcInternalError());
+    DEAL_II_AssertThrow(subdomain_boundary_cells_radii.size() ==
+                          subdomain_boundary_cells_centers.size(),
+                        ExcInternalError());
 
     // Find the cells that are within layer_thickness of predicate subdomain
     // boundary distance but are inside the extended bounding box. Most cells
@@ -1055,12 +1059,12 @@ namespace GridTools
 
     // Check that we never return locally owned or artificial cells
     // What is left should only be the ghost cells
-    Assert(
+    DEAL_II_Assert(
       contains_locally_owned_cells<MeshType>(
         ghost_cell_layer_within_distance) == false,
       ExcMessage(
         "Ghost cells within layer_thickness contains locally owned cells."));
-    Assert(
+    DEAL_II_Assert(
       contains_artificial_cells<MeshType>(ghost_cell_layer_within_distance) ==
         false,
       ExcMessage(
@@ -1132,9 +1136,10 @@ namespace GridTools
                       typename MeshType::cell_iterator>>
   get_finest_common_cells(const MeshType &mesh_1, const MeshType &mesh_2)
   {
-    Assert(have_same_coarse_mesh(mesh_1, mesh_2),
-           ExcMessage("The two meshes must be represent triangulations that "
-                      "have the same coarse meshes"));
+    DEAL_II_Assert(have_same_coarse_mesh(mesh_1, mesh_2),
+                   ExcMessage(
+                     "The two meshes must be represent triangulations that "
+                     "have the same coarse meshes"));
 
     // the algorithm goes as follows:
     // first, we fill a list with pairs
@@ -1173,9 +1178,9 @@ namespace GridTools
         if (cell_pair->first->has_children() &&
             cell_pair->second->has_children())
           {
-            Assert(cell_pair->first->refinement_case() ==
-                     cell_pair->second->refinement_case(),
-                   ExcNotImplemented());
+            DEAL_II_Assert(cell_pair->first->refinement_case() ==
+                             cell_pair->second->refinement_case(),
+                           ExcNotImplemented());
             for (unsigned int c = 0; c < cell_pair->first->n_children(); ++c)
               cell_list.emplace_back(cell_pair->first->child(c),
                                      cell_pair->second->child(c));
@@ -1204,10 +1209,11 @@ namespace GridTools
     // refinement_cases
     for (cell_pair = cell_list.begin(); cell_pair != cell_list.end();
          ++cell_pair)
-      Assert(cell_pair->first->active() || cell_pair->second->active() ||
-               (cell_pair->first->refinement_case() !=
-                cell_pair->second->refinement_case()),
-             ExcInternalError());
+      DEAL_II_Assert(cell_pair->first->active() ||
+                       cell_pair->second->active() ||
+                       (cell_pair->first->refinement_case() !=
+                        cell_pair->second->refinement_case()),
+                     ExcInternalError());
 
     return cell_list;
   }
@@ -1264,11 +1270,11 @@ namespace GridTools
     const hp::DoFHandler<dim, spacedim> &       mesh,
     const Point<spacedim> &                     p)
   {
-    Assert((mapping.size() == 1) ||
-             (mapping.size() == mesh.get_fe_collection().size()),
-           ExcMessage("Mapping collection needs to have either size 1 "
-                      "or size equal to the number of elements in "
-                      "the FECollection."));
+    DEAL_II_Assert((mapping.size() == 1) ||
+                     (mapping.size() == mesh.get_fe_collection().size()),
+                   ExcMessage("Mapping collection needs to have either size 1 "
+                              "or size equal to the number of elements in "
+                              "the FECollection."));
 
     using cell_iterator =
       typename hp::DoFHandler<dim, spacedim>::active_cell_iterator;
@@ -1298,7 +1304,7 @@ namespace GridTools
 
         // Make sure that we have found
         // at least one cell adjacent to vertex.
-        Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
+        DEAL_II_Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
 
         // Copy all the cells into a std::set
         std::set<cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(),
@@ -1380,8 +1386,8 @@ namespace GridTools
           }
       }
 
-    AssertThrow(best_cell.first.state() == IteratorState::valid,
-                ExcPointNotFound<spacedim>(p));
+    DEAL_II_AssertThrow(best_cell.first.state() == IteratorState::valid,
+                        ExcPointNotFound<spacedim>(p));
 
     return best_cell;
   }
@@ -1391,10 +1397,10 @@ namespace GridTools
   std::vector<typename MeshType::active_cell_iterator>
   get_patch_around_cell(const typename MeshType::active_cell_iterator &cell)
   {
-    Assert(cell->is_locally_owned(),
-           ExcMessage("This function only makes sense if the cell for "
-                      "which you are asking for a patch, is locally "
-                      "owned."));
+    DEAL_II_Assert(cell->is_locally_owned(),
+                   ExcMessage("This function only makes sense if the cell for "
+                              "which you are asking for a patch, is locally "
+                              "owned."));
 
     std::vector<typename MeshType::active_cell_iterator> patch;
     patch.push_back(cell);
@@ -1426,8 +1432,8 @@ namespace GridTools
               while (neighbor->has_children())
                 neighbor = neighbor->child(1 - face_number);
 
-              Assert(neighbor->neighbor(1 - face_number) == cell,
-                     ExcInternalError());
+              DEAL_II_Assert(neighbor->neighbor(1 - face_number) == cell,
+                             ExcInternalError());
               patch.push_back(neighbor);
             }
         }
@@ -1441,9 +1447,10 @@ namespace GridTools
   get_cells_at_coarsest_common_level(
     const std::vector<typename Container::active_cell_iterator> &patch)
   {
-    Assert(patch.size() > 0,
-           ExcMessage(
-             "Vector containing patch cells should not be an empty vector!"));
+    DEAL_II_Assert(
+      patch.size() > 0,
+      ExcMessage(
+        "Vector containing patch cells should not be an empty vector!"));
     // In order to extract the set of cells with the coarsest common level from
     // the give vector of cells: First it finds the number associated with the
     // minimum level of refinmenet, namely "min_level"
@@ -1537,8 +1544,8 @@ namespace GridTools
         k = k + 1;
       }
     local_triangulation.create_triangulation(vertices, cells, SubCellData());
-    Assert(local_triangulation.n_active_cells() == uniform_cells.size(),
-           ExcInternalError());
+    DEAL_II_Assert(local_triangulation.n_active_cells() == uniform_cells.size(),
+                   ExcInternalError());
     local_triangulation.clear_user_flags();
     unsigned int index = 0;
     // Create a map between cells of class DoFHandler into class Triangulation
@@ -1557,9 +1564,10 @@ namespace GridTools
         // To ensure that the cells with the same coordinates (here, we compare
         // their centers) are mapped into each other.
 
-        Assert(coarse_cell->center().distance(uniform_cells[index]->center()) <=
-                 1e-15 * coarse_cell->diameter(),
-               ExcInternalError());
+        DEAL_II_Assert(coarse_cell->center().distance(
+                         uniform_cells[index]->center()) <=
+                         1e-15 * coarse_cell->diameter(),
+                       ExcInternalError());
       }
     bool refinement_necessary;
     // In this loop we start to do refinement on the above coarse triangulation
@@ -1596,11 +1604,11 @@ namespace GridTools
                            ++v)
                         active_tria_cell->vertex(v) = patch[i]->vertex(v);
 
-                      Assert(active_tria_cell->center().distance(
-                               patch_to_global_tria_map_tmp[active_tria_cell]
-                                 ->center()) <=
-                               1e-15 * active_tria_cell->diameter(),
-                             ExcInternalError());
+                      DEAL_II_Assert(
+                        active_tria_cell->center().distance(
+                          patch_to_global_tria_map_tmp[active_tria_cell]
+                            ->center()) <= 1e-15 * active_tria_cell->diameter(),
+                        ExcInternalError());
 
                       active_tria_cell->set_user_flag();
                       break;
@@ -1678,14 +1686,14 @@ namespace GridTools
       {
         if (cell->user_flag_set())
           {
-            Assert(patch_to_global_tria_map_tmp.find(cell) !=
-                     patch_to_global_tria_map_tmp.end(),
-                   ExcInternalError());
+            DEAL_II_Assert(patch_to_global_tria_map_tmp.find(cell) !=
+                             patch_to_global_tria_map_tmp.end(),
+                           ExcInternalError());
 
-            Assert(cell->center().distance(
-                     patch_to_global_tria_map_tmp[cell]->center()) <=
-                     1e-15 * cell->diameter(),
-                   ExcInternalError());
+            DEAL_II_Assert(cell->center().distance(
+                             patch_to_global_tria_map_tmp[cell]->center()) <=
+                             1e-15 * cell->diameter(),
+                           ExcInternalError());
           }
       }
 
@@ -1832,8 +1840,9 @@ namespace GridTools
                         //   |                   |of subface|         |
                         //   *-------------------*----------*---------*
                         //
-                        Assert(cell->face(f)->child(c)->has_children() == false,
-                               ExcInternalError());
+                        DEAL_II_Assert(
+                          cell->face(f)->child(c)->has_children() == false,
+                          ExcInternalError());
 
                         const unsigned int n_dofs_per_face =
                           cell->get_fe().dofs_per_face;
@@ -1893,11 +1902,11 @@ namespace GridTools
                               cell->get_fe().dofs_per_face;
                             local_face_dof_indices.resize(n_dofs_per_face);
 
-                            Assert(cell->neighbor(f)
-                                       ->face(face_no)
-                                       ->child(c)
-                                       ->has_children() == false,
-                                   ExcInternalError());
+                            DEAL_II_Assert(cell->neighbor(f)
+                                               ->face(face_no)
+                                               ->child(c)
+                                               ->has_children() == false,
+                                           ExcInternalError());
                             cell->neighbor(f)
                               ->face(face_no)
                               ->child(c)
@@ -1931,9 +1940,9 @@ namespace GridTools
                              c < cell->line(l)->n_children();
                              ++c)
                           {
-                            Assert(cell->line(l)->child(c)->has_children() ==
-                                     false,
-                                   ExcInternalError());
+                            DEAL_II_Assert(
+                              cell->line(l)->child(c)->has_children() == false,
+                              ExcInternalError());
 
                             // dofs_per_line returns number of dofs
                             // on line not including the vertices of the line.
@@ -1957,7 +1966,8 @@ namespace GridTools
                       {
                         typename DoFHandlerType::line_iterator parent_line =
                           lines_to_parent_lines_map[cell->line(l)];
-                        Assert(parent_line->has_children(), ExcInternalError());
+                        DEAL_II_Assert(parent_line->has_children(),
+                                       ExcInternalError());
 
                         // dofs_per_line returns number of dofs
                         // on line not including the vertices of the line.
@@ -1974,9 +1984,9 @@ namespace GridTools
                         for (unsigned int c = 0; c < parent_line->n_children();
                              ++c)
                           {
-                            Assert(parent_line->child(c)->has_children() ==
-                                     false,
-                                   ExcInternalError());
+                            DEAL_II_Assert(
+                              parent_line->child(c)->has_children() == false,
+                              ExcInternalError());
 
                             const unsigned int n_dofs_per_line =
                               2 * cell->get_fe().dofs_per_vertex +
@@ -2041,11 +2051,11 @@ namespace GridTools
   {
     static const int space_dim = CellIterator::AccessorType::space_dimension;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    DEAL_II_Assert(0 <= direction && direction < space_dim,
+                   ExcIndexRange(direction, 0, space_dim));
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+    DEAL_II_Assert(pairs1.size() == pairs2.size(),
+                   ExcMessage("Unmatched faces on periodic boundaries"));
 
     unsigned int n_matches = 0;
 
@@ -2082,8 +2092,8 @@ namespace GridTools
       }
 
     // Assure that all faces are matched
-    AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
-                ExcMessage("Unmatched faces on periodic boundaries"));
+    DEAL_II_AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
+                        ExcMessage("Unmatched faces on periodic boundaries"));
   }
 
 
@@ -2103,10 +2113,10 @@ namespace GridTools
     static const int space_dim = MeshType::space_dimension;
     (void)dim;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    DEAL_II_Assert(0 <= direction && direction < space_dim,
+                   ExcIndexRange(direction, 0, space_dim));
 
-    Assert(dim == space_dim, ExcNotImplemented());
+    DEAL_II_Assert(dim == space_dim, ExcNotImplemented());
 
     // Loop over all cells on the highest level and collect all boundary
     // faces 2*direction and 2*direction*1:
@@ -2138,13 +2148,14 @@ namespace GridTools
           }
       }
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+    DEAL_II_Assert(pairs1.size() == pairs2.size(),
+                   ExcMessage("Unmatched faces on periodic boundaries"));
 
-    Assert(pairs1.size() > 0,
-           ExcMessage("No new periodic face pairs have been found. "
-                      "Are you sure that you've selected the correct boundary "
-                      "id's and that the coarsest level mesh is colorized?"));
+    DEAL_II_Assert(pairs1.size() > 0,
+                   ExcMessage(
+                     "No new periodic face pairs have been found. "
+                     "Are you sure that you've selected the correct boundary "
+                     "id's and that the coarsest level mesh is colorized?"));
 
 #ifdef DEBUG
     const unsigned int size_old = matched_pairs.size();
@@ -2159,11 +2170,11 @@ namespace GridTools
     const unsigned int size_new = matched_pairs.size();
     for (unsigned int i = size_old; i < size_new; ++i)
       {
-        Assert(matched_pairs[i].orientation == 1,
-               ExcMessage(
-                 "Found a face match with non standard orientation. "
-                 "This function is only suitable for meshes with cells "
-                 "in default orientation"));
+        DEAL_II_Assert(matched_pairs[i].orientation == 1,
+                       ExcMessage(
+                         "Found a face match with non standard orientation. "
+                         "This function is only suitable for meshes with cells "
+                         "in default orientation"));
       }
 #endif
   }
@@ -2186,8 +2197,8 @@ namespace GridTools
     static const int space_dim = MeshType::space_dimension;
     (void)dim;
     (void)space_dim;
-    Assert(0 <= direction && direction < space_dim,
-           ExcIndexRange(direction, 0, space_dim));
+    DEAL_II_Assert(0 <= direction && direction < space_dim,
+                   ExcIndexRange(direction, 0, space_dim));
 
     // Loop over all cells on the highest level and collect all boundary
     // faces belonging to b_id1 and b_id2:
@@ -2218,13 +2229,14 @@ namespace GridTools
           }
       }
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+    DEAL_II_Assert(pairs1.size() == pairs2.size(),
+                   ExcMessage("Unmatched faces on periodic boundaries"));
 
-    Assert(pairs1.size() > 0,
-           ExcMessage("No new periodic face pairs have been found. "
-                      "Are you sure that you've selected the correct boundary "
-                      "id's and that the coarsest level mesh is colorized?"));
+    DEAL_II_Assert(pairs1.size() > 0,
+                   ExcMessage(
+                     "No new periodic face pairs have been found. "
+                     "Are you sure that you've selected the correct boundary "
+                     "id's and that the coarsest level mesh is colorized?"));
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(
@@ -2250,10 +2262,10 @@ namespace GridTools
                       const Tensor<1, spacedim> &offset,
                       const FullMatrix<double> & matrix)
   {
-    Assert(0 <= direction && direction < spacedim,
-           ExcIndexRange(direction, 0, spacedim));
+    DEAL_II_Assert(0 <= direction && direction < spacedim,
+                   ExcIndexRange(direction, 0, spacedim));
 
-    Assert(matrix.m() == matrix.n(), ExcInternalError());
+    DEAL_II_Assert(matrix.m() == matrix.n(), ExcInternalError());
 
     Point<spacedim> distance;
 
@@ -2326,7 +2338,7 @@ namespace GridTools
       static const MATCH_T m_ttf = {{1, 0}};
       if (matching == m_ttf)
         return 3; // [true ,true ,false]
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
       // what follows is dead code, but it avoids warnings about the lack
       // of a return value
       return 0;
@@ -2370,7 +2382,7 @@ namespace GridTools
       static const MATCH_T m_ftt = {{1, 0, 3, 2}};
       if (matching == m_ftt)
         return 6; // [false,true ,true ]
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
       // what follows is dead code, but it avoids warnings about the lack
       // of a return value
       return 0;
@@ -2388,8 +2400,8 @@ namespace GridTools
     const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
     const FullMatrix<double> &                                    matrix)
   {
-    Assert(matrix.m() == matrix.n(),
-           ExcMessage("The supplied matrix must be a square matrix"));
+    DEAL_II_Assert(matrix.m() == matrix.n(),
+                   ExcMessage("The supplied matrix must be a square matrix"));
 
     static const int dim = FaceIterator::AccessorType::dimension;
 

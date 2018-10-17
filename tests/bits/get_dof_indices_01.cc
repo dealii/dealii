@@ -67,7 +67,7 @@ test()
         }
       catch (...)
         {
-          deallog << "Assertion: cell not active." << std::endl;
+          deallog << "DEAL_II_Assertion: cell not active." << std::endl;
           continue;
         }
 
@@ -75,8 +75,8 @@ test()
       deallog << "Cell = " << cell << ", DoFs=";
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
         {
-          Assert(local_dof_indices[i] != numbers::invalid_dof_index,
-                 ExcInternalError());
+          DEAL_II_Assert(local_dof_indices[i] != numbers::invalid_dof_index,
+                         ExcInternalError());
           deallog << local_dof_indices[i] << ' ';
         }
 

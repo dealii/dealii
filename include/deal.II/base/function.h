@@ -652,7 +652,7 @@ protected:
  *   value(const Point<dim> & p,
  *         const unsigned int component) const
  *   {
- *     Assert (component == 0, ExcMessage ("This object is scalar!"));
+ *     DEAL_II_Assert (component == 0, ExcMessage ("This object is scalar!"));
  *     return p.norm();
  *   }
  * };
@@ -679,7 +679,7 @@ protected:
  *   value (const Point<dim> & p,
  *          const unsigned int component) const
  *   {
- *     Assert(component == 0, ExcMessage("This object is scalar!"));
+ *     DEAL_II_Assert(component == 0, ExcMessage("This object is scalar!"));
  *     return q.distance(p);
  *   }
  * private:

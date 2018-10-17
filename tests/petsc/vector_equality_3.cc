@@ -38,7 +38,7 @@ test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w)
         w(i) = i + 1.;
     }
 
-  Assert(v != w, ExcInternalError());
+  DEAL_II_Assert(v != w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

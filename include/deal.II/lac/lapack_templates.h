@@ -1419,7 +1419,7 @@ axpy(const dealii::types::blas_int *,
      number3 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1441,7 +1441,7 @@ axpy(const dealii::types::blas_int *n,
   (void)incx;
   (void)sy;
   (void)incy;
-  Assert(false, LAPACKSupport::ExcMissing("saxpy"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("saxpy"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1464,7 +1464,7 @@ axpy(const dealii::types::blas_int *n,
   (void)incx;
   (void)dy;
   (void)incy;
-  Assert(false, LAPACKSupport::ExcMissing("daxpy"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("daxpy"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1487,7 +1487,7 @@ axpy(const dealii::types::blas_int *n,
   (void)incx;
   (void)cy;
   (void)incy;
-  Assert(false, LAPACKSupport::ExcMissing("caxpy"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("caxpy"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1510,7 +1510,7 @@ axpy(const dealii::types::blas_int *n,
   (void)incx;
   (void)zy;
   (void)incy;
-  Assert(false, LAPACKSupport::ExcMissing("zaxpy"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zaxpy"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1538,7 +1538,7 @@ geev(const char *,
      const dealii::types::blas_int *,
      dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1577,7 +1577,7 @@ geev(const char *                   jobvl,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgeev"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgeev"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1617,7 +1617,7 @@ geev(const char *                   jobvl,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgeev"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgeev"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1657,7 +1657,7 @@ geev(const char *                   jobvl,
   (void)lwork;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgeev"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgeev"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1697,7 +1697,7 @@ geev(const char *                   jobvl,
   (void)lwork;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgeev"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgeev"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1738,7 +1738,7 @@ geevx(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1816,7 +1816,7 @@ geevx(const char *                   balanc,
   (void)lwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgeevx"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgeevx"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1895,7 +1895,7 @@ geevx(const char *                   balanc,
   (void)lwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgeevx"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgeevx"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -1971,7 +1971,7 @@ geevx(const char *                   balanc,
   (void)lwork;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgeevx"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgeevx"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2047,7 +2047,7 @@ geevx(const char *                   balanc,
   (void)lwork;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgeevx"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgeevx"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2074,7 +2074,7 @@ gelsd(const dealii::types::blas_int *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2112,7 +2112,7 @@ gelsd(const dealii::types::blas_int *m,
   (void)lwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgelsd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgelsd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2151,7 +2151,7 @@ gelsd(const dealii::types::blas_int *m,
   (void)lwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgelsd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgelsd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2206,7 +2206,7 @@ gelsd(const dealii::types::blas_int *m,
   (void)rwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgelsd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgelsd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2261,7 +2261,7 @@ gelsd(const dealii::types::blas_int *m,
   (void)rwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgelsd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgelsd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2287,7 +2287,7 @@ gemm(const char *,
      number5 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2323,7 +2323,7 @@ gemm(const char *                   transa,
   (void)beta;
   (void)c;
   (void)ldc;
-  Assert(false, LAPACKSupport::ExcMissing("sgemm"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgemm"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2360,7 +2360,7 @@ gemm(const char *                   transa,
   (void)beta;
   (void)c;
   (void)ldc;
-  Assert(false, LAPACKSupport::ExcMissing("dgemm"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgemm"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2397,7 +2397,7 @@ gemm(const char *                   transa,
   (void)beta;
   (void)c;
   (void)ldc;
-  Assert(false, LAPACKSupport::ExcMissing("cgemm"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgemm"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2434,7 +2434,7 @@ gemm(const char *                   transa,
   (void)beta;
   (void)c;
   (void)ldc;
-  Assert(false, LAPACKSupport::ExcMissing("zgemm"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgemm"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2458,7 +2458,7 @@ gemv(const char *,
      number5 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2490,7 +2490,7 @@ gemv(const char *                   trans,
   (void)beta;
   (void)y;
   (void)incy;
-  Assert(false, LAPACKSupport::ExcMissing("sgemv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgemv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2523,7 +2523,7 @@ gemv(const char *                   trans,
   (void)beta;
   (void)y;
   (void)incy;
-  Assert(false, LAPACKSupport::ExcMissing("dgemv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgemv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2556,7 +2556,7 @@ gemv(const char *                   trans,
   (void)beta;
   (void)y;
   (void)incy;
-  Assert(false, LAPACKSupport::ExcMissing("cgemv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgemv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2589,7 +2589,7 @@ gemv(const char *                   trans,
   (void)beta;
   (void)y;
   (void)incy;
-  Assert(false, LAPACKSupport::ExcMissing("zgemv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgemv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2606,7 +2606,7 @@ geqrf(const dealii::types::blas_int *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2632,7 +2632,7 @@ geqrf(const dealii::types::blas_int *m,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgeqrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgeqrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2659,7 +2659,7 @@ geqrf(const dealii::types::blas_int *m,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgeqrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgeqrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2686,7 +2686,7 @@ geqrf(const dealii::types::blas_int *m,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgeqrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgeqrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2713,7 +2713,7 @@ geqrf(const dealii::types::blas_int *m,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgeqrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgeqrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2740,7 +2740,7 @@ gesdd(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2778,7 +2778,7 @@ gesdd(const char *                   jobz,
   (void)lwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgesdd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgesdd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2817,7 +2817,7 @@ gesdd(const char *                   jobz,
   (void)lwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgesdd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgesdd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2859,7 +2859,7 @@ gesdd(const char *                   jobz,
   (void)rwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgesdd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgesdd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2901,7 +2901,7 @@ gesdd(const char *                   jobz,
   (void)rwork;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgesdd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgesdd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -2928,7 +2928,7 @@ gesvd(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2966,7 +2966,7 @@ gesvd(const char *                   jobu,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgesvd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgesvd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3005,7 +3005,7 @@ gesvd(const char *                   jobu,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgesvd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgesvd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3047,7 +3047,7 @@ gesvd(const char *                   jobu,
   (void)lwork;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgesvd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgesvd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3089,7 +3089,7 @@ gesvd(const char *                   jobu,
   (void)lwork;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgesvd"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgesvd"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3104,7 +3104,7 @@ getrf(const dealii::types::blas_int *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -3126,7 +3126,7 @@ getrf(const dealii::types::blas_int *m,
   (void)lda;
   (void)ipiv;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgetrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgetrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3149,7 +3149,7 @@ getrf(const dealii::types::blas_int *m,
   (void)lda;
   (void)ipiv;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgetrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgetrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3172,7 +3172,7 @@ getrf(const dealii::types::blas_int *m,
   (void)lda;
   (void)ipiv;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgetrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgetrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3195,7 +3195,7 @@ getrf(const dealii::types::blas_int *m,
   (void)lda;
   (void)ipiv;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgetrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgetrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3211,7 +3211,7 @@ getri(const dealii::types::blas_int *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -3235,7 +3235,7 @@ getri(const dealii::types::blas_int *n,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgetri"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgetri"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3260,7 +3260,7 @@ getri(const dealii::types::blas_int *n,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgetri"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgetri"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3285,7 +3285,7 @@ getri(const dealii::types::blas_int *n,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgetri"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgetri"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3310,7 +3310,7 @@ getri(const dealii::types::blas_int *n,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgetri"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgetri"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3328,7 +3328,7 @@ getrs(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -3356,7 +3356,7 @@ getrs(const char *                   trans,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sgetrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sgetrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3385,7 +3385,7 @@ getrs(const char *                   trans,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dgetrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dgetrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3414,7 +3414,7 @@ getrs(const char *                   trans,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cgetrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cgetrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3443,7 +3443,7 @@ getrs(const char *                   trans,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zgetrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zgetrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3453,7 +3453,7 @@ template <typename number1>
 inline number1
 lamch(const char *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return number1();
 }
 
@@ -3467,7 +3467,7 @@ lamch(const char *cmach)
   return slamch_(cmach);
 #else
   (void)cmach;
-  Assert(false, LAPACKSupport::ExcMissing("slamch"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("slamch"));
   return float();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3482,7 +3482,7 @@ lamch(const char *cmach)
   return dlamch_(cmach);
 #else
   (void)cmach;
-  Assert(false, LAPACKSupport::ExcMissing("dlamch"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dlamch"));
   return double();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3498,7 +3498,7 @@ lange(const char *,
       const dealii::types::blas_int *,
       number2 *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return number1();
 }
 
@@ -3521,7 +3521,7 @@ lange(const char *                   norm,
   (void)a;
   (void)lda;
   (void)work;
-  Assert(false, LAPACKSupport::ExcMissing("slange"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("slange"));
   return float();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3545,7 +3545,7 @@ lange(const char *                   norm,
   (void)a;
   (void)lda;
   (void)work;
-  Assert(false, LAPACKSupport::ExcMissing("dlange"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dlange"));
   return double();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3569,7 +3569,7 @@ lange(const char *                   norm,
   (void)a;
   (void)lda;
   (void)work;
-  Assert(false, LAPACKSupport::ExcMissing("clange"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("clange"));
   return float();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3593,7 +3593,7 @@ lange(const char *                   norm,
   (void)a;
   (void)lda;
   (void)work;
-  Assert(false, LAPACKSupport::ExcMissing("zlange"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zlange"));
   return double();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3609,7 +3609,7 @@ lansy(const char *,
       const dealii::types::blas_int *,
       number2 *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return number1();
 }
 
@@ -3632,7 +3632,7 @@ lansy(const char *                   norm,
   (void)a;
   (void)lda;
   (void)work;
-  Assert(false, LAPACKSupport::ExcMissing("slansy"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("slansy"));
   return float();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3656,7 +3656,7 @@ lansy(const char *                   norm,
   (void)a;
   (void)lda;
   (void)work;
-  Assert(false, LAPACKSupport::ExcMissing("dlansy"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dlansy"));
   return double();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3680,7 +3680,7 @@ lansy(const char *                   norm,
   (void)a;
   (void)lda;
   (void)work;
-  Assert(false, LAPACKSupport::ExcMissing("clansy"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("clansy"));
   return float();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3704,7 +3704,7 @@ lansy(const char *                   norm,
   (void)a;
   (void)lda;
   (void)work;
-  Assert(false, LAPACKSupport::ExcMissing("zlansy"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zlansy"));
   return double();
 #endif // DEAL_II_WITH_LAPACK
 }
@@ -3724,7 +3724,7 @@ lascl(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -3754,7 +3754,7 @@ lascl(const char *                   type,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("slascl"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("slascl"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3785,7 +3785,7 @@ lascl(const char *                   type,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dlascl"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dlascl"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3816,7 +3816,7 @@ lascl(const char *                   type,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("clascl"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("clascl"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3847,7 +3847,7 @@ lascl(const char *                   type,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zlascl"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zlascl"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3865,7 +3865,7 @@ orgqr(const dealii::types::blas_int *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -3893,7 +3893,7 @@ orgqr(const dealii::types::blas_int *m,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sorgqr"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sorgqr"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3922,7 +3922,7 @@ orgqr(const dealii::types::blas_int *m,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dorgqr"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dorgqr"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -3947,7 +3947,7 @@ ormqr(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -3983,7 +3983,7 @@ ormqr(const char *                   side,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sormqr"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sormqr"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4020,7 +4020,7 @@ ormqr(const char *                   side,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dormqr"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dormqr"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4041,7 +4041,7 @@ pocon(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -4069,7 +4069,7 @@ pocon(const char *                   uplo,
   (void)work;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("spocon"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("spocon"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4098,7 +4098,7 @@ pocon(const char *                   uplo,
   (void)work;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dpocon"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dpocon"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4127,7 +4127,7 @@ pocon(const char *                   uplo,
   (void)work;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cpocon"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cpocon"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4156,7 +4156,7 @@ pocon(const char *                   uplo,
   (void)work;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zpocon"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zpocon"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4170,7 +4170,7 @@ potrf(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -4190,7 +4190,7 @@ potrf(const char *                   uplo,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("spotrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("spotrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4211,7 +4211,7 @@ potrf(const char *                   uplo,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dpotrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dpotrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4232,7 +4232,7 @@ potrf(const char *                   uplo,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cpotrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cpotrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4253,7 +4253,7 @@ potrf(const char *                   uplo,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zpotrf"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zpotrf"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4267,7 +4267,7 @@ potri(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -4287,7 +4287,7 @@ potri(const char *                   uplo,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("spotri"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("spotri"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4308,7 +4308,7 @@ potri(const char *                   uplo,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dpotri"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dpotri"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4329,7 +4329,7 @@ potri(const char *                   uplo,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cpotri"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cpotri"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4350,7 +4350,7 @@ potri(const char *                   uplo,
   (void)a;
   (void)lda;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zpotri"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zpotri"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4367,7 +4367,7 @@ potrs(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -4393,7 +4393,7 @@ potrs(const char *                   uplo,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("spotrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("spotrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4420,7 +4420,7 @@ potrs(const char *                   uplo,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dpotrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dpotrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4447,7 +4447,7 @@ potrs(const char *                   uplo,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("cpotrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("cpotrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4474,7 +4474,7 @@ potrs(const char *                   uplo,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("zpotrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zpotrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4494,7 +4494,7 @@ stev(const char *,
      number4 *,
      dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -4520,7 +4520,7 @@ stev(const char *                   jobz,
   (void)ldz;
   (void)work;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("sstev"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("sstev"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4547,7 +4547,7 @@ stev(const char *                   jobz,
   (void)ldz;
   (void)work;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dstev"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dstev"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4565,7 +4565,7 @@ syev(const char *,
      const dealii::types::blas_int *,
      dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -4593,7 +4593,7 @@ syev(const char *                   jobz,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ssyev"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ssyev"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4622,7 +4622,7 @@ syev(const char *                   jobz,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dsyev"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dsyev"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4658,7 +4658,7 @@ syevr(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -4741,7 +4741,7 @@ syevr(const char *                   jobz,
   (void)iwork;
   (void)liwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ssyevr"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ssyevr"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4825,7 +4825,7 @@ syevr(const char *                   jobz,
   (void)iwork;
   (void)liwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dsyevr"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dsyevr"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4860,7 +4860,7 @@ syevx(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -4929,7 +4929,7 @@ syevx(const char *                   jobz,
   (void)iwork;
   (void)ifail;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ssyevx"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ssyevx"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -4999,7 +4999,7 @@ syevx(const char *                   jobz,
   (void)iwork;
   (void)ifail;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dsyevx"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dsyevx"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5023,7 +5023,7 @@ sygv(const dealii::types::blas_int *,
      const dealii::types::blas_int *,
      dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -5057,7 +5057,7 @@ sygv(const dealii::types::blas_int *itype,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ssygv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ssygv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5092,7 +5092,7 @@ sygv(const dealii::types::blas_int *itype,
   (void)work;
   (void)lwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dsygv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dsygv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5131,7 +5131,7 @@ sygvx(const dealii::types::blas_int *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -5209,7 +5209,7 @@ sygvx(const dealii::types::blas_int *itype,
   (void)iwork;
   (void)ifail;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ssygvx"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ssygvx"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5288,7 +5288,7 @@ sygvx(const dealii::types::blas_int *itype,
   (void)iwork;
   (void)ifail;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dsygvx"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dsygvx"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5304,7 +5304,7 @@ syr(const char *,
     number3 *,
     const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -5328,7 +5328,7 @@ syr(const char *                   uplo,
   (void)incx;
   (void)a;
   (void)lda;
-  Assert(false, LAPACKSupport::ExcMissing("ssyr"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ssyr"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5353,7 +5353,7 @@ syr(const char *                   uplo,
   (void)incx;
   (void)a;
   (void)lda;
-  Assert(false, LAPACKSupport::ExcMissing("dsyr"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dsyr"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5375,7 +5375,7 @@ syrk(const char *,
      number4 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -5405,7 +5405,7 @@ syrk(const char *                   uplo,
   (void)beta;
   (void)c;
   (void)ldc;
-  Assert(false, LAPACKSupport::ExcMissing("ssyrk"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ssyrk"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5436,7 +5436,7 @@ syrk(const char *                   uplo,
   (void)beta;
   (void)c;
   (void)ldc;
-  Assert(false, LAPACKSupport::ExcMissing("dsyrk"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dsyrk"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5467,7 +5467,7 @@ syrk(const char *                   uplo,
   (void)beta;
   (void)c;
   (void)ldc;
-  Assert(false, LAPACKSupport::ExcMissing("csyrk"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("csyrk"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5498,7 +5498,7 @@ syrk(const char *                   uplo,
   (void)beta;
   (void)c;
   (void)ldc;
-  Assert(false, LAPACKSupport::ExcMissing("zsyrk"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("zsyrk"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5517,7 +5517,7 @@ trcon(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -5547,7 +5547,7 @@ trcon(const char *                   norm,
   (void)work;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("strcon"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("strcon"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5578,7 +5578,7 @@ trcon(const char *                   norm,
   (void)work;
   (void)iwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dtrcon"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dtrcon"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5609,7 +5609,7 @@ trcon(const char *                   norm,
   (void)work;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ctrcon"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ctrcon"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5640,7 +5640,7 @@ trcon(const char *                   norm,
   (void)work;
   (void)rwork;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ztrcon"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ztrcon"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5657,7 +5657,7 @@ trmv(const char *,
      number2 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -5683,7 +5683,7 @@ trmv(const char *                   uplo,
   (void)lda;
   (void)x;
   (void)incx;
-  Assert(false, LAPACKSupport::ExcMissing("strmv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("strmv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5710,7 +5710,7 @@ trmv(const char *                   uplo,
   (void)lda;
   (void)x;
   (void)incx;
-  Assert(false, LAPACKSupport::ExcMissing("dtrmv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dtrmv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5737,7 +5737,7 @@ trmv(const char *                   uplo,
   (void)lda;
   (void)x;
   (void)incx;
-  Assert(false, LAPACKSupport::ExcMissing("ctrmv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ctrmv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5764,7 +5764,7 @@ trmv(const char *                   uplo,
   (void)lda;
   (void)x;
   (void)incx;
-  Assert(false, LAPACKSupport::ExcMissing("ztrmv"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ztrmv"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5783,7 +5783,7 @@ trtrs(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -5813,7 +5813,7 @@ trtrs(const char *                   uplo,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("strtrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("strtrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5844,7 +5844,7 @@ trtrs(const char *                   uplo,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("dtrtrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dtrtrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5875,7 +5875,7 @@ trtrs(const char *                   uplo,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ctrtrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ctrtrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5906,7 +5906,7 @@ trtrs(const char *                   uplo,
   (void)b;
   (void)ldb;
   (void)info;
-  Assert(false, LAPACKSupport::ExcMissing("ztrtrs"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("ztrtrs"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5919,7 +5919,7 @@ template <typename number>
 DEAL_II_DEPRECATED inline void
 lamch(const char *, number &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -5933,7 +5933,7 @@ lamch(const char *cmach, float &precision)
 #else
   (void)cmach;
   (void)precision;
-  Assert(false, LAPACKSupport::ExcMissing("slamch"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("slamch"));
 #endif // DEAL_II_WITH_LAPACK
 }
 
@@ -5948,7 +5948,7 @@ lamch(const char *cmach, double &precision)
 #else
   (void)cmach;
   (void)precision;
-  Assert(false, LAPACKSupport::ExcMissing("dlamch"));
+  DEAL_II_Assert(false, LAPACKSupport::ExcMissing("dlamch"));
 #endif // DEAL_II_WITH_LAPACK
 }
 

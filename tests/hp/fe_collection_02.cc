@@ -38,7 +38,8 @@ test()
     hp::FECollection<dim> fe_collection;
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
-    AssertThrow(fe_collection.n_components() == dim, ExcInternalError());
+    DEAL_II_AssertThrow(fe_collection.n_components() == dim,
+                        ExcInternalError());
   }
 
   // now the same with one of the elements
@@ -48,7 +49,8 @@ test()
       hp::FECollection<dim> fe_collection;
       fe_collection.push_back(FESystem<dim>(FE_Q<dim>(2), dim));
       fe_collection.push_back(FE_RaviartThomas<dim>(1));
-      AssertThrow(fe_collection.n_components() == dim, ExcInternalError());
+      DEAL_II_AssertThrow(fe_collection.n_components() == dim,
+                          ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

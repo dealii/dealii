@@ -727,7 +727,7 @@ namespace Threads
         Mutex::ScopedLock lock(thread_is_active_mutex);
         if (thread_is_active == true)
           {
-            Assert(thread.joinable(), ExcInternalError());
+            DEAL_II_Assert(thread.joinable(), ExcInternalError());
             thread.join();
             thread_is_active = false;
           }
@@ -1370,7 +1370,7 @@ namespace Threads
     TaskDescriptor<RT>::TaskDescriptor()
       : task_is_done(false)
     {
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
     }
 
 
@@ -1381,7 +1381,7 @@ namespace Threads
     {
       // we shouldn't be getting here -- task descriptors
       // can't be copied
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
     }
 
 
@@ -1402,8 +1402,8 @@ namespace Threads
       // of the arena". rather, let's explicitly destroy the empty
       // task object. before that, make sure that the task has been
       // shut down, expressed by a zero reference count
-      AssertNothrow(task != nullptr, ExcInternalError());
-      AssertNothrow(task->ref_count() == 0, ExcInternalError());
+      DEAL_II_AssertNothrow(task != nullptr, ExcInternalError());
+      DEAL_II_AssertNothrow(task->ref_count() == 0, ExcInternalError());
       task->destroy(*task);
     }
 
@@ -1414,7 +1414,7 @@ namespace Threads
     {
       // we shouldn't be getting here -- task descriptors
       // can't be copied
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
       return *this;
     }
 
@@ -1554,7 +1554,7 @@ namespace Threads
     void
     join() const
     {
-      AssertThrow(joinable(), ExcNoTask());
+      DEAL_II_AssertThrow(joinable(), ExcNoTask());
       task_descriptor->join();
     }
 
@@ -1637,7 +1637,7 @@ namespace Threads
     bool
     operator==(const Task &t) const
     {
-      AssertThrow(joinable(), ExcNoTask());
+      DEAL_II_AssertThrow(joinable(), ExcNoTask());
       return task_descriptor == t.task_descriptor;
     }
 
@@ -1649,10 +1649,11 @@ namespace Threads
     /**
      * Exception
      */
-    DeclExceptionMsg(ExcNoTask,
-                     "The current object is not associated with a task that "
-                     "can be joined. It may have been detached, or you "
-                     "may have already joined it in the past.");
+    DEAL_II_DeclExceptionMsg(
+      ExcNoTask,
+      "The current object is not associated with a task that "
+      "can be joined. It may have been detached, or you "
+      "may have already joined it in the past.");
     //@}
   private:
     /**

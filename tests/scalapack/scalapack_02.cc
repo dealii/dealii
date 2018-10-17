@@ -82,7 +82,7 @@ test(const unsigned int size,
       full_out.print_formatted(std::cout);
       std::cout << "difference:" << std::endl;
       diff.print_formatted(std::cout);
-      AssertThrow(false, dealii::ExcInternalError());
+      DEAL_II_AssertThrow(false, dealii::ExcInternalError());
     }
   else
     pcout << "Ok" << std::endl;

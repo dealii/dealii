@@ -154,8 +154,9 @@ void EvaluateNormal2(DoFHandler<2> *dof_handler, Vector<double> &solution)
                           << ", u " << un1 << ", un " << un2 << ", Rat "
                           << un2 / un1 << std::endl;
 
-                  Assert(std::fabs((u - u_n) * nx + (v - v_n) * ny) < 1e-12,
-                         ExcInternalError());
+                  DEAL_II_Assert(std::fabs((u - u_n) * nx + (v - v_n) * ny) <
+                                   1e-12,
+                                 ExcInternalError());
                 }
             }
         }
@@ -236,8 +237,9 @@ void EvaluateNormal(DoFHandler<2> *dof_handler, Vector<double> &solution)
                           << ", u " << un1 << ", un " << un2 << ", Rat "
                           << un2 / un1 << std::endl;
 
-                  Assert(std::fabs((u - u_n) * nx + (v - v_n) * ny) < 1e-12,
-                         ExcInternalError());
+                  DEAL_II_Assert(std::fabs((u - u_n) * nx + (v - v_n) * ny) <
+                                   1e-12,
+                                 ExcInternalError());
                 }
             }
         }

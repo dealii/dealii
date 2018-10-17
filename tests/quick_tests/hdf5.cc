@@ -32,6 +32,6 @@ main()
 
   /* Terminate access to the file. */
   status = H5Fclose(file_id);
-  AssertThrow(status >= 0, dealii::ExcInternalError());
+  DEAL_II_AssertThrow(status >= 0, dealii::ExcInternalError());
   std::remove("file.h5");
 }

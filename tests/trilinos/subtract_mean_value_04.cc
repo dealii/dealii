@@ -40,8 +40,8 @@ test(VectorType &v)
 
   // then check the norm
   VectorTools::subtract_mean_value(v);
-  AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -67,8 +67,8 @@ main(int argc, char *argv[])
         v_tmp.import(v1, VectorOperation::insert);
         v2.import(v_tmp, VectorOperation::insert);
         VectorTools::subtract_mean_value(v2);
-        AssertThrow(std::fabs(v2.mean_value()) < 1e-10 * v2.l2_norm(),
-                    ExcInternalError());
+        DEAL_II_AssertThrow(std::fabs(v2.mean_value()) < 1e-10 * v2.l2_norm(),
+                            ExcInternalError());
         deallog << "OK" << std::endl;
       }
       {

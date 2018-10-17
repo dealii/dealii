@@ -35,26 +35,27 @@ test()
     partition[i] = 3;
 
   dealii::BlockVector<double> b(partition);
-  AssertThrow(b.n_blocks() == partition.size(), ExcInternalError());
+  DEAL_II_AssertThrow(b.n_blocks() == partition.size(), ExcInternalError());
 
   unsigned int size = 0;
   for (unsigned int i = 0; i < b.n_blocks(); ++i)
     {
-      AssertThrow(b.block(i).size() == partition[i], ExcInternalError());
+      DEAL_II_AssertThrow(b.block(i).size() == partition[i],
+                          ExcInternalError());
       size += b.block(i).size();
     }
-  AssertThrow(b.size() == size, ExcInternalError());
+  DEAL_II_AssertThrow(b.size() == size, ExcInternalError());
 
   for (unsigned int i = 0; i < b.size(); ++i)
     {
       b(i) = v[i];
-      AssertThrow(b(i) == v[i], ExcInternalError());
+      DEAL_II_AssertThrow(b(i) == v[i], ExcInternalError());
     }
 
   dealii::BlockVector<double> c;
   c = b;
-  AssertThrow(c == b, ExcInternalError());
-  AssertThrow(c.n_blocks() == b.n_blocks(), ExcInternalError());
+  DEAL_II_AssertThrow(c == b, ExcInternalError());
+  DEAL_II_AssertThrow(c.n_blocks() == b.n_blocks(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

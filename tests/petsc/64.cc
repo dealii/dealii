@@ -37,7 +37,7 @@ test(MatrixType &m)
   m.compress(VectorOperation::add);
   m = 0;
 
-  Assert(fabs(m.frobenius_norm()) < 1e-15, ExcInternalError());
+  DEAL_II_Assert(fabs(m.frobenius_norm()) < 1e-15, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -65,7 +65,7 @@ main(int argc, char **argv)
         int      n_jobs = 1;
         MPI_Comm_size(mpi_communicator, &n_jobs);
         const unsigned int n_mpi_processes = static_cast<unsigned int>(n_jobs);
-        Assert(n_dofs % n_mpi_processes == 0, ExcInternalError());
+        DEAL_II_Assert(n_dofs % n_mpi_processes == 0, ExcInternalError());
         const unsigned int n_local_dofs = n_dofs / n_mpi_processes;
         PETScWrappers::MPI::SparseMatrix v2(
           mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);

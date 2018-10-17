@@ -59,22 +59,24 @@ PolynomialsNedelec<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  DEAL_II_Assert(values.size() == n_pols || values.size() == 0,
+                 ExcDimensionMismatch(values.size(), n_pols));
+  DEAL_II_Assert(grads.size() == n_pols || grads.size() == 0,
+                 ExcDimensionMismatch(grads.size(), n_pols));
+  DEAL_II_Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
+                 ExcDimensionMismatch(grad_grads.size(), n_pols));
+  DEAL_II_Assert(third_derivatives.size() == n_pols ||
+                   third_derivatives.size() == 0,
+                 ExcDimensionMismatch(third_derivatives.size(), n_pols));
+  DEAL_II_Assert(fourth_derivatives.size() == n_pols ||
+                   fourth_derivatives.size() == 0,
+                 ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
   // third and fourth derivatives not implemented
   (void)third_derivatives;
-  Assert(third_derivatives.size() == 0, ExcNotImplemented());
+  DEAL_II_Assert(third_derivatives.size() == 0, ExcNotImplemented());
   (void)fourth_derivatives;
-  Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
+  DEAL_II_Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
 
   // Declare the values, derivatives
   // and second derivatives vectors of
@@ -1477,7 +1479,7 @@ PolynomialsNedelec<dim>::compute(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -1499,7 +1501,7 @@ PolynomialsNedelec<dim>::compute_n_pols(unsigned int k)
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return 0;
         }
     }

@@ -46,16 +46,16 @@ test(TrilinosWrappers::MPI::BlockVector &v)
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(w(i) == i, ExcInternalError());
-      AssertThrow(v(i) == i, ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == i, ExcInternalError());
+      DEAL_II_AssertThrow(v(i) == i, ExcInternalError());
     }
 
   // now also check the reverse assignment
   w = v;
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(w(i) == i, ExcInternalError());
-      AssertThrow(v(i) == i, ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == i, ExcInternalError());
+      DEAL_II_AssertThrow(v(i) == i, ExcInternalError());
     }
 
 

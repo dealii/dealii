@@ -35,7 +35,7 @@ using vector_t = typename dealii::Vector<double>;
 double
 compute(vector_t &G, const vector_t &X)
 {
-  AssertThrow(X.size() == 2 && G.size() == 2, ExcInternalError());
+  DEAL_II_AssertThrow(X.size() == 2 && G.size() == 2, ExcInternalError());
 
   G(0) = 2 * X(0);
   G(1) = 2 * X(1);

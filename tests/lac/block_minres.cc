@@ -72,10 +72,10 @@ main()
 
   // and while at it also check
   // whether the result was correct
-  AssertThrow(b(0) == 2, ExcInternalError());
-  AssertThrow(b(1) == 3, ExcInternalError());
-  AssertThrow(b(2) == 4, ExcInternalError());
-  AssertThrow(b(3) == 5, ExcInternalError());
+  DEAL_II_AssertThrow(b(0) == 2, ExcInternalError());
+  DEAL_II_AssertThrow(b(1) == 3, ExcInternalError());
+  DEAL_II_AssertThrow(b(2) == 4, ExcInternalError());
+  DEAL_II_AssertThrow(b(3) == 5, ExcInternalError());
 
   // now solve with MinRes. This
   // didn't work at one point

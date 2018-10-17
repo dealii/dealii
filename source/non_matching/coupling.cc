@@ -89,13 +89,13 @@ namespace NonMatching
     const ComponentMask &                   immersed_comps,
     const Mapping<dim1, spacedim> &         immersed_mapping)
   {
-    AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
-    AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
+    DEAL_II_AssertDimension(sparsity.n_rows(), space_dh.n_dofs());
+    DEAL_II_AssertDimension(sparsity.n_cols(), immersed_dh.n_dofs());
     static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
-    Assert((dynamic_cast<
-              const parallel::distributed::Triangulation<dim1, spacedim> *>(
-              &immersed_dh.get_triangulation()) == nullptr),
-           ExcNotImplemented());
+    DEAL_II_Assert(
+      (dynamic_cast<const parallel::distributed::Triangulation<dim1, spacedim>
+                      *>(&immersed_dh.get_triangulation()) == nullptr),
+      ExcNotImplemented());
 
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
@@ -124,8 +124,8 @@ namespace NonMatching
          ComponentMask(immersed_fe.n_components(), true) :
          immersed_comps);
 
-    AssertDimension(space_c.size(), space_fe.n_components());
-    AssertDimension(immersed_c.size(), immersed_fe.n_components());
+    DEAL_II_AssertDimension(space_c.size(), space_fe.n_components());
+    DEAL_II_AssertDimension(immersed_c.size(), immersed_fe.n_components());
 
     std::vector<unsigned int> space_gtl(space_fe.n_components(),
                                         numbers::invalid_unsigned_int);
@@ -235,13 +235,13 @@ namespace NonMatching
     const ComponentMask &                                 immersed_comps,
     const Mapping<dim1, spacedim> &                       immersed_mapping)
   {
-    AssertDimension(matrix.m(), space_dh.n_dofs());
-    AssertDimension(matrix.n(), immersed_dh.n_dofs());
+    DEAL_II_AssertDimension(matrix.m(), space_dh.n_dofs());
+    DEAL_II_AssertDimension(matrix.n(), immersed_dh.n_dofs());
     static_assert(dim1 <= dim0, "This function can only work if dim1 <= dim0");
-    Assert((dynamic_cast<
-              const parallel::distributed::Triangulation<dim1, spacedim> *>(
-              &immersed_dh.get_triangulation()) == nullptr),
-           ExcNotImplemented());
+    DEAL_II_Assert(
+      (dynamic_cast<const parallel::distributed::Triangulation<dim1, spacedim>
+                      *>(&immersed_dh.get_triangulation()) == nullptr),
+      ExcNotImplemented());
 
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
@@ -260,8 +260,8 @@ namespace NonMatching
          ComponentMask(immersed_fe.n_components(), true) :
          immersed_comps);
 
-    AssertDimension(space_c.size(), space_fe.n_components());
-    AssertDimension(immersed_c.size(), immersed_fe.n_components());
+    DEAL_II_AssertDimension(space_c.size(), space_fe.n_components());
+    DEAL_II_AssertDimension(immersed_c.size(), immersed_fe.n_components());
 
     std::vector<unsigned int> space_gtl(space_fe.n_components(),
                                         numbers::invalid_unsigned_int);

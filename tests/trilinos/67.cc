@@ -31,8 +31,8 @@
 void
 test(TrilinosWrappers::SparseMatrix &m)
 {
-  Assert(m.m() != 0, ExcInternalError());
-  Assert(m.n() != 0, ExcInternalError());
+  DEAL_II_Assert(m.m() != 0, ExcInternalError());
+  DEAL_II_Assert(m.n() != 0, ExcInternalError());
 
   // build a tri-diagonal pattern
   double             norm_sqr = 0;
@@ -66,10 +66,10 @@ test(TrilinosWrappers::SparseMatrix &m)
   deallog << m.frobenius_norm() << ' ' << std::sqrt(norm_sqr) << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;
 
-  Assert(std::fabs(m.frobenius_norm() - std::sqrt(norm_sqr)) <
-           std::fabs(std::sqrt(norm_sqr)),
-         ExcInternalError());
-  Assert(m.n_nonzero_elements() - nnz == 0, ExcInternalError());
+  DEAL_II_Assert(std::fabs(m.frobenius_norm() - std::sqrt(norm_sqr)) <
+                   std::fabs(std::sqrt(norm_sqr)),
+                 ExcInternalError());
+  DEAL_II_Assert(m.n_nonzero_elements() - nnz == 0, ExcInternalError());
 
   // now remove the entries of rows N/2 and N/3
   for (unsigned int i = 0; i < N; ++i)
@@ -88,14 +88,14 @@ test(TrilinosWrappers::SparseMatrix &m)
   deallog << m.frobenius_norm() << ' ' << std::sqrt(norm_sqr) << std::endl;
   deallog << m.n_nonzero_elements() << ' ' << nnz << std::endl;
 
-  Assert(std::fabs(m.frobenius_norm() - std::sqrt(norm_sqr)) <
-           std::fabs(std::sqrt(norm_sqr)),
-         ExcInternalError());
+  DEAL_II_Assert(std::fabs(m.frobenius_norm() - std::sqrt(norm_sqr)) <
+                   std::fabs(std::sqrt(norm_sqr)),
+                 ExcInternalError());
 
   // make sure that zeroing out rows does at
   // least not add new nonzero entries (it
   // may remove some, though)
-  AssertThrow(m.n_nonzero_elements() <= nnz, ExcInternalError());
+  DEAL_II_AssertThrow(m.n_nonzero_elements() <= nnz, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

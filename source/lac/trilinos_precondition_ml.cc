@@ -152,12 +152,12 @@ namespace TrilinosWrappers
         const size_type global_size = TrilinosWrappers::n_global_rows(matrix);
         (void)global_length; // work around compiler warning about unused
                              // function in release mode
-        Assert(global_size ==
-                 static_cast<size_type>(
-                   TrilinosWrappers::global_length(distributed_constant_modes)),
-               ExcDimensionMismatch(global_size,
-                                    TrilinosWrappers::global_length(
-                                      distributed_constant_modes)));
+        DEAL_II_Assert(global_size ==
+                         static_cast<size_type>(TrilinosWrappers::global_length(
+                           distributed_constant_modes)),
+                       ExcDimensionMismatch(global_size,
+                                            TrilinosWrappers::global_length(
+                                              distributed_constant_modes)));
         const bool constant_modes_are_global =
           additional_data.constant_modes[0].size() == global_size;
         const size_type my_size = domain_map.NumMyElements();
@@ -168,7 +168,7 @@ namespace TrilinosWrappers
           constant_modes_are_global ? global_size : my_size;
         for (size_type d = 0; d < constant_modes_dimension; ++d)
           {
-            Assert(
+            DEAL_II_Assert(
               additional_data.constant_modes[d].size() == expected_mode_size,
               ExcDimensionMismatch(additional_data.constant_modes[d].size(),
                                    expected_mode_size));
@@ -203,8 +203,8 @@ namespace TrilinosWrappers
         ML_Epetra::MultiLevelPreconditioner *multilevel_operator =
           dynamic_cast<ML_Epetra::MultiLevelPreconditioner *>(
             preconditioner.get());
-        Assert(multilevel_operator != nullptr,
-               ExcMessage("Preconditioner setup failed."));
+        DEAL_II_Assert(multilevel_operator != nullptr,
+                       ExcMessage("Preconditioner setup failed."));
         multilevel_operator->PrintUnused(0);
       }
   }

@@ -61,7 +61,7 @@ class MyManifold : public Manifold<dim>
   get_new_point_on_quad(
     const typename Triangulation<dim>::quad_iterator &) const override
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
     return Point<dim>(0, 0, 1.25);
   }
 };
@@ -103,18 +103,19 @@ check()
       deallog << "Found " << dcv.distorted_cells.size() << " distorted cells"
               << std::endl;
 
-      Assert(dcv.distorted_cells.size() == 2, ExcInternalError());
+      DEAL_II_Assert(dcv.distorted_cells.size() == 2, ExcInternalError());
 
       typename Triangulation<dim>::DistortedCellList subset =
         GridTools::fix_up_distorted_child_cells(dcv, coarse_grid);
       deallog << "Found " << subset.distorted_cells.size()
               << " cells that are still distorted" << std::endl;
 
-      Assert(subset.distorted_cells.size() == 0, ExcInternalError());
+      DEAL_II_Assert(subset.distorted_cells.size() == 0, ExcInternalError());
     }
 
-  Assert(coarse_grid.n_levels() == 2, ExcInternalError());
-  Assert(coarse_grid.n_active_cells() == 2 * 1 << dim, ExcInternalError());
+  DEAL_II_Assert(coarse_grid.n_levels() == 2, ExcInternalError());
+  DEAL_II_Assert(coarse_grid.n_active_cells() == 2 * 1 << dim,
+                 ExcInternalError());
 
   // output the coordinates of the
   // child cells

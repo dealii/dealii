@@ -58,7 +58,8 @@ test(const unsigned int degree)
     {
       fe_values.reinit(cell);
       for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
-        AssertThrow(fe_values.shape_value(0, q) == 1, ExcInternalError());
+        DEAL_II_AssertThrow(fe_values.shape_value(0, q) == 1,
+                            ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

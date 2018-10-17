@@ -32,7 +32,7 @@ test(Vector<double> &v)
     v(i) = i + 1.;
   Vector<float> w(v);
 
-  AssertThrow(w == v, ExcInternalError());
+  DEAL_II_AssertThrow(w == v, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -205,19 +205,19 @@ namespace internal
                     }
 
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_Assert(false, ExcNotImplemented());
                 }
 
               // double check whether the newly created entries make
               // any sense at all
               for (unsigned int i = 0; i < identities->size(); ++i)
                 {
-                  Assert((*identities)[i].first <
-                           fe1.template n_dofs_per_object<structdim>(),
-                         ExcInternalError());
-                  Assert((*identities)[i].second <
-                           fe2.template n_dofs_per_object<structdim>(),
-                         ExcInternalError());
+                  DEAL_II_Assert((*identities)[i].first <
+                                   fe1.template n_dofs_per_object<structdim>(),
+                                 ExcInternalError());
+                  DEAL_II_Assert((*identities)[i].second <
+                                   fe2.template n_dofs_per_object<structdim>(),
+                                 ExcInternalError());
                 }
             }
         }
@@ -253,18 +253,18 @@ namespace internal
                        d < dof_handler.get_fe().dofs_per_vertex;
                        ++d)
                     {
-                      Assert((cell->vertex_dof_index(v, d) ==
-                              numbers::invalid_dof_index),
-                             ExcInternalError());
+                      DEAL_II_Assert((cell->vertex_dof_index(v, d) ==
+                                      numbers::invalid_dof_index),
+                                     ExcInternalError());
                       cell->set_vertex_dof_index(v, d, next_free_dof++);
                     }
                 else
                   for (unsigned int d = 0;
                        d < dof_handler.get_fe().dofs_per_vertex;
                        ++d)
-                    Assert((cell->vertex_dof_index(v, d) !=
-                            numbers::invalid_dof_index),
-                           ExcInternalError());
+                    DEAL_II_Assert((cell->vertex_dof_index(v, d) !=
+                                    numbers::invalid_dof_index),
+                                   ExcInternalError());
               }
 
           // dofs of line
@@ -430,9 +430,9 @@ namespace internal
           // finally for the line. this one shouldn't be numbered yet
           if (fe.dofs_per_line > 0)
             {
-              Assert((cell->dof_index(0, fe_index) ==
-                      numbers::invalid_dof_index),
-                     ExcInternalError());
+              DEAL_II_Assert((cell->dof_index(0, fe_index) ==
+                              numbers::invalid_dof_index),
+                             ExcInternalError());
 
               for (unsigned int d = 0; d < fe.dofs_per_line;
                    ++d, ++next_free_dof)
@@ -496,9 +496,9 @@ namespace internal
           // finally for the quad. this one shouldn't be numbered yet
           if (fe.dofs_per_quad > 0)
             {
-              Assert((cell->dof_index(0, fe_index) ==
-                      numbers::invalid_dof_index),
-                     ExcInternalError());
+              DEAL_II_Assert((cell->dof_index(0, fe_index) ==
+                              numbers::invalid_dof_index),
+                             ExcInternalError());
 
               for (unsigned int d = 0; d < fe.dofs_per_quad;
                    ++d, ++next_free_dof)
@@ -577,9 +577,9 @@ namespace internal
           // have gotten to numbering anything on this hex (=cell)
           if (fe.dofs_per_hex > 0)
             {
-              Assert((cell->dof_index(0, fe_index) ==
-                      numbers::invalid_dof_index),
-                     ExcInternalError());
+              DEAL_II_Assert((cell->dof_index(0, fe_index) ==
+                              numbers::invalid_dof_index),
+                             ExcInternalError());
 
               for (unsigned int d = 0; d < fe.dofs_per_hex;
                    ++d, ++next_free_dof)
@@ -700,12 +700,12 @@ namespace internal
                                 // be exactly as we had computed before
                                 if (lower_dof_index !=
                                     numbers::invalid_dof_index)
-                                  Assert((dof_identities.find(
-                                            higher_dof_index) ==
-                                          dof_identities.end()) ||
-                                           (dof_identities[higher_dof_index] ==
-                                            lower_dof_index),
-                                         ExcInternalError());
+                                  DEAL_II_Assert(
+                                    (dof_identities.find(higher_dof_index) ==
+                                     dof_identities.end()) ||
+                                      (dof_identities[higher_dof_index] ==
+                                       lower_dof_index),
+                                    ExcInternalError());
 
                                 dof_identities[higher_dof_index] =
                                   lower_dof_index;
@@ -902,7 +902,7 @@ namespace internal
                                                     // must come out here to be
                                                     // exactly as we had
                                                     // computed before
-                                                    Assert(
+                                                    DEAL_II_Assert(
                                                       dof_identities.find(
                                                         dof_identities
                                                           [master_dof_index]) ==
@@ -919,7 +919,7 @@ namespace internal
                                                     // see comment above for an
                                                     // explanation of this
                                                     // assertion
-                                                    Assert(
+                                                    DEAL_II_Assert(
                                                       (dof_identities.find(
                                                          master_dof_index) ==
                                                        dof_identities.end()) ||
@@ -1030,13 +1030,14 @@ namespace internal
                                         // exactly as we had computed before
                                         if (master_dof_index !=
                                             numbers::invalid_dof_index)
-                                          Assert((dof_identities.find(
-                                                    master_dof_index) ==
-                                                  dof_identities.end()) ||
-                                                   (dof_identities
-                                                      [slave_dof_index] ==
-                                                    master_dof_index),
-                                                 ExcInternalError());
+                                          DEAL_II_Assert(
+                                            (dof_identities.find(
+                                               master_dof_index) ==
+                                             dof_identities.end()) ||
+                                              (dof_identities
+                                                 [slave_dof_index] ==
+                                               master_dof_index),
+                                            ExcInternalError());
 
                                         dof_identities[slave_dof_index] =
                                           master_dof_index;
@@ -1068,7 +1069,7 @@ namespace internal
           // this function should only be called for dim<3 where there are
           // no quad dof identies. for dim==3, the specialization below should
           // take care of it
-          Assert(dim < 3, ExcInternalError());
+          DEAL_II_Assert(dim < 3, ExcInternalError());
 
           return std::map<types::global_dof_index, types::global_dof_index>();
         }
@@ -1179,7 +1180,7 @@ namespace internal
                                     // computed before
                                     if (master_dof_index !=
                                         numbers::invalid_dof_index)
-                                      Assert(
+                                      DEAL_II_Assert(
                                         (dof_identities.find(
                                            master_dof_index) ==
                                          dof_identities.end()) ||
@@ -1225,7 +1226,8 @@ namespace internal
                                  &all_constrained_indices,
                                const hp::DoFHandler<dim, spacedim> &dof_handler)
         {
-          Assert(all_constrained_indices.size() == dim, ExcInternalError());
+          DEAL_II_Assert(all_constrained_indices.size() == dim,
+                         ExcInternalError());
 
           Threads::TaskGroup<> tasks;
 
@@ -1286,16 +1288,18 @@ namespace internal
             &all_constrained_indices,
           const DoFHandlerType &)
         {
-          Assert(all_constrained_indices.size() == DoFHandlerType::dimension,
-                 ExcInternalError());
+          DEAL_II_Assert(all_constrained_indices.size() ==
+                           DoFHandlerType::dimension,
+                         ExcInternalError());
 
           // first preset the new DoF indices that are identities
           for (const auto &constrained_dof_indices : all_constrained_indices)
             for (const auto &p : constrained_dof_indices)
               if (new_dof_indices[p.first] != numbers::invalid_dof_index)
                 {
-                  Assert(new_dof_indices[p.first] == enumeration_dof_index,
-                         ExcInternalError());
+                  DEAL_II_Assert(new_dof_indices[p.first] ==
+                                   enumeration_dof_index,
+                                 ExcInternalError());
 
                   new_dof_indices[p.first] = p.second;
                 }
@@ -1312,8 +1316,9 @@ namespace internal
             for (const auto &p : constrained_dof_indices)
               if (new_dof_indices[p.first] != numbers::invalid_dof_index)
                 {
-                  Assert(new_dof_indices[p.first] != enumeration_dof_index,
-                         ExcInternalError());
+                  DEAL_II_Assert(new_dof_indices[p.first] !=
+                                   enumeration_dof_index,
+                                 ExcInternalError());
 
                   if (p.second != numbers::invalid_dof_index)
                     new_dof_indices[p.first] = new_dof_indices[p.second];
@@ -1321,11 +1326,11 @@ namespace internal
 
           for (unsigned int i = 0; i < new_dof_indices.size(); ++i)
             {
-              Assert(new_dof_indices[i] != enumeration_dof_index,
-                     ExcInternalError());
-              Assert(new_dof_indices[i] < next_free_dof ||
-                       new_dof_indices[i] == numbers::invalid_dof_index,
-                     ExcInternalError());
+              DEAL_II_Assert(new_dof_indices[i] != enumeration_dof_index,
+                             ExcInternalError());
+              DEAL_II_Assert(new_dof_indices[i] < next_free_dof ||
+                               new_dof_indices[i] == numbers::invalid_dof_index,
+                             ExcInternalError());
             }
 
           return next_free_dof;
@@ -1763,7 +1768,7 @@ namespace internal
           // this function should only be called for dim<3 where there are
           // no quad dof identies. for dim>=3, the specialization below should
           // take care of it
-          Assert(dim < 3, ExcInternalError());
+          DEAL_II_Assert(dim < 3, ExcInternalError());
         }
 
 
@@ -1953,8 +1958,8 @@ namespace internal
         distribute_dofs(const types::subdomain_id subdomain_id,
                         DoFHandlerType &          dof_handler)
         {
-          Assert(dof_handler.get_triangulation().n_levels() > 0,
-                 ExcMessage("Empty triangulation"));
+          DEAL_II_Assert(dof_handler.get_triangulation().n_levels() > 0,
+                         ExcMessage("Empty triangulation"));
 
           // Step 1: distribute dofs on all cells, but definitely
           // exclude artificial cells
@@ -2294,7 +2299,8 @@ namespace internal
 
           const dealii::Triangulation<dim, spacedim> &tria =
             dof_handler.get_triangulation();
-          Assert(tria.n_levels() > 0, ExcMessage("Empty triangulation"));
+          DEAL_II_Assert(tria.n_levels() > 0,
+                         ExcMessage("Empty triangulation"));
           if (level >= tria.n_levels())
             return 0; // this is allowed for multigrid
 
@@ -2363,10 +2369,10 @@ namespace internal
             else if (check_validity)
               // if index is invalid_dof_index: check if this one
               // really is unused
-              Assert(dof_handler.get_triangulation().vertex_used(
-                       (i - dof_handler.vertex_dofs.begin()) /
-                       dof_handler.get_fe().dofs_per_vertex) == false,
-                     ExcInternalError());
+              DEAL_II_Assert(dof_handler.get_triangulation().vertex_used(
+                               (i - dof_handler.vertex_dofs.begin()) /
+                               dof_handler.get_fe().dofs_per_vertex) == false,
+                             ExcInternalError());
         }
 
 
@@ -2491,7 +2497,7 @@ namespace internal
               // this vertex
               if (dof_handler.get_triangulation().vertex_used(vertex_index) ==
                   false)
-                Assert(n_active_fe_indices == 0, ExcInternalError());
+                DEAL_II_Assert(n_active_fe_indices == 0, ExcInternalError());
 
               // otherwise the vertex is used; it may still not hold any dof
               // indices if it is located on an artificial cell and not adjacent
@@ -2525,8 +2531,9 @@ namespace internal
                       // must make sure that they have been set to something
                       // useful
                       if (check_validity)
-                        Assert(old_dof_index != numbers::invalid_dof_index,
-                               ExcInternalError());
+                        DEAL_II_Assert(old_dof_index !=
+                                         numbers::invalid_dof_index,
+                                       ExcInternalError());
 
                       if (old_dof_index != numbers::invalid_dof_index)
                         {
@@ -2963,7 +2970,8 @@ namespace internal
                       const bool      check_validity)
         {
           if (DoFHandlerType::dimension == 1)
-            Assert(indices_we_care_about == IndexSet(0), ExcNotImplemented());
+            DEAL_II_Assert(indices_we_care_about == IndexSet(0),
+                           ExcNotImplemented());
 
           // renumber DoF indices on vertices, cells, and faces. this
           // can be done in parallel because the respective functions
@@ -3008,8 +3016,8 @@ namespace internal
           const unsigned int         level,
           const bool                 check_validity)
         {
-          Assert(level < dof_handler.get_triangulation().n_levels(),
-                 ExcInternalError());
+          DEAL_II_Assert(level < dof_handler.get_triangulation().n_levels(),
+                         ExcInternalError());
 
           for (typename std::vector<
                  typename DoFHandler<dim, spacedim>::MGVertexDoFs>::iterator i =
@@ -3028,8 +3036,8 @@ namespace internal
                                  dof_handler.get_fe().dofs_per_vertex);
 
                   if (check_validity)
-                    Assert(idx != numbers::invalid_dof_index,
-                           ExcInternalError());
+                    DEAL_II_Assert(idx != numbers::invalid_dof_index,
+                                   ExcInternalError());
 
                   if (idx != numbers::invalid_dof_index)
                     i->set_index(level,
@@ -3066,10 +3074,10 @@ namespace internal
             {
               if (*i != numbers::invalid_dof_index)
                 {
-                  Assert((indices_we_care_about.size() > 0 ?
-                            indices_we_care_about.is_element(*i) :
-                            (*i < new_numbers.size())),
-                         ExcInternalError());
+                  DEAL_II_Assert((indices_we_care_about.size() > 0 ?
+                                    indices_we_care_about.is_element(*i) :
+                                    (*i < new_numbers.size())),
+                                 ExcInternalError());
                   *i =
                     (indices_we_care_about.size() == 0) ?
                       (new_numbers[*i]) :
@@ -3146,8 +3154,8 @@ namespace internal
                           const dealii::types::global_dof_index idx =
                             cell->line(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != numbers::invalid_dof_index,
-                                   ExcInternalError());
+                            DEAL_II_Assert(idx != numbers::invalid_dof_index,
+                                           ExcInternalError());
 
                           if (idx != numbers::invalid_dof_index)
                             cell->line(l)->set_mg_dof_index(
@@ -3214,8 +3222,8 @@ namespace internal
                           const dealii::types::global_dof_index idx =
                             cell->line(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != numbers::invalid_dof_index,
-                                   ExcInternalError());
+                            DEAL_II_Assert(idx != numbers::invalid_dof_index,
+                                           ExcInternalError());
 
                           if (idx != numbers::invalid_dof_index)
                             cell->line(l)->set_mg_dof_index(
@@ -3253,8 +3261,8 @@ namespace internal
                           const dealii::types::global_dof_index idx =
                             cell->quad(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != numbers::invalid_dof_index,
-                                   ExcInternalError());
+                            DEAL_II_Assert(idx != numbers::invalid_dof_index,
+                                           ExcInternalError());
 
                           if (idx != numbers::invalid_dof_index)
                             cell->quad(l)->set_mg_dof_index(
@@ -3286,8 +3294,9 @@ namespace internal
           const unsigned int         level,
           const bool                 check_validity)
         {
-          Assert(level < dof_handler.get_triangulation().n_global_levels(),
-                 ExcInternalError());
+          DEAL_II_Assert(level <
+                           dof_handler.get_triangulation().n_global_levels(),
+                         ExcInternalError());
 
           // renumber DoF indices on vertices, cells, and faces. this
           // can be done in parallel because the respective functions
@@ -3327,7 +3336,7 @@ namespace internal
           const unsigned int /*level*/,
           const bool /*check_validity*/)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
       };
 
@@ -3500,15 +3509,16 @@ namespace internal
                   }
             }
 
-          Assert(std::find(subdomain_association.begin(),
+          DEAL_II_Assert(std::find(subdomain_association.begin(),
+                                   subdomain_association.end(),
+                                   numbers::invalid_subdomain_id) ==
                            subdomain_association.end(),
-                           numbers::invalid_subdomain_id) ==
-                   subdomain_association.end(),
-                 ExcInternalError());
+                         ExcInternalError());
 
-          Assert(*std::max_element(subdomain_association.begin(),
-                                   subdomain_association.end()) < n_procs,
-                 ExcInternalError());
+          DEAL_II_Assert(*std::max_element(subdomain_association.begin(),
+                                           subdomain_association.end()) <
+                           n_procs,
+                         ExcInternalError());
 
           return subdomain_association;
         }
@@ -3566,15 +3576,16 @@ namespace internal
                   }
             }
 
-          Assert(std::find(level_subdomain_association.begin(),
+          DEAL_II_Assert(std::find(level_subdomain_association.begin(),
+                                   level_subdomain_association.end(),
+                                   numbers::invalid_subdomain_id) ==
                            level_subdomain_association.end(),
-                           numbers::invalid_subdomain_id) ==
-                   level_subdomain_association.end(),
-                 ExcInternalError());
+                         ExcInternalError());
 
-          Assert(*std::max_element(level_subdomain_association.begin(),
-                                   level_subdomain_association.end()) < n_procs,
-                 ExcInternalError());
+          DEAL_II_Assert(*std::max_element(level_subdomain_association.begin(),
+                                           level_subdomain_association.end()) <
+                           n_procs,
+                         ExcInternalError());
 
           return level_subdomain_association;
         }
@@ -3592,7 +3603,7 @@ namespace internal
         const parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
-        Assert(tr != nullptr, ExcInternalError());
+        DEAL_II_Assert(tr != nullptr, ExcInternalError());
 
         const unsigned int n_procs =
           Utilities::MPI::n_mpi_processes(tr->get_communicator());
@@ -3660,18 +3671,19 @@ namespace internal
             for (types::global_dof_index i = 0; i < n_dofs; ++i)
               if (subdomain_association[i] == subdomain)
                 {
-                  Assert(new_dof_indices[i] == enumeration_dof_index,
-                         ExcInternalError());
+                  DEAL_II_Assert(new_dof_indices[i] == enumeration_dof_index,
+                                 ExcInternalError());
                   new_dof_indices[i] = next_free_index;
                   ++next_free_index;
                 }
 
           // we should have numbered all dofs
-          Assert(next_free_index == n_dofs, ExcInternalError());
-          Assert(std::find(new_dof_indices.begin(),
+          DEAL_II_Assert(next_free_index == n_dofs, ExcInternalError());
+          DEAL_II_Assert(std::find(new_dof_indices.begin(),
+                                   new_dof_indices.end(),
+                                   enumeration_dof_index) ==
                            new_dof_indices.end(),
-                           enumeration_dof_index) == new_dof_indices.end(),
-                 ExcInternalError());
+                         ExcInternalError());
         }
         // finally do the renumbering. we can use the sequential
         // version of the function because we do things on all
@@ -3695,8 +3707,9 @@ namespace internal
           get_dof_subdomain_association(*this->dof_handler, n_dofs, n_procs);
 
         for (unsigned int i = 1; i < n_dofs; ++i)
-          Assert(subdomain_association[i] >= subdomain_association[i - 1],
-                 ExcInternalError());
+          DEAL_II_Assert(subdomain_association[i] >=
+                           subdomain_association[i - 1],
+                         ExcInternalError());
 
         std::vector<IndexSet> locally_owned_dofs_per_processor(
           n_procs, IndexSet(n_dofs));
@@ -3764,7 +3777,7 @@ namespace internal
         const parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
-        Assert(tr != nullptr, ExcInternalError());
+        DEAL_II_Assert(tr != nullptr, ExcInternalError());
 
         const unsigned int n_procs =
           Utilities::MPI::n_mpi_processes(tr->get_communicator());
@@ -3839,19 +3852,21 @@ namespace internal
                 for (types::global_dof_index i = 0; i < n_dofs_on_level; ++i)
                   if (level_subdomain_association[i] == level_subdomain)
                     {
-                      Assert(new_dof_indices[i] == numbers::invalid_dof_index,
-                             ExcInternalError());
+                      DEAL_II_Assert(new_dof_indices[i] ==
+                                       numbers::invalid_dof_index,
+                                     ExcInternalError());
                       new_dof_indices[i] = next_free_index;
                       ++next_free_index;
                     }
 
               // we should have numbered all dofs
-              Assert(next_free_index == n_dofs_on_level, ExcInternalError());
-              Assert(std::find(new_dof_indices.begin(),
+              DEAL_II_Assert(next_free_index == n_dofs_on_level,
+                             ExcInternalError());
+              DEAL_II_Assert(std::find(new_dof_indices.begin(),
+                                       new_dof_indices.end(),
+                                       numbers::invalid_dof_index) ==
                                new_dof_indices.end(),
-                               numbers::invalid_dof_index) ==
-                       new_dof_indices.end(),
-                     ExcInternalError());
+                             ExcInternalError());
             }
 
             // finally do the renumbering. we can use the sequential
@@ -3878,9 +3893,9 @@ namespace internal
                                                   lvl);
 
             for (unsigned int i = 1; i < n_dofs_on_level; ++i)
-              Assert(level_subdomain_association[i] >=
-                       level_subdomain_association[i - 1],
-                     ExcInternalError());
+              DEAL_II_Assert(level_subdomain_association[i] >=
+                               level_subdomain_association[i - 1],
+                             ExcInternalError());
 
             std::vector<IndexSet> locally_owned_dofs_per_processor(
               n_procs, IndexSet(n_dofs_on_level));
@@ -3947,7 +3962,7 @@ namespace internal
       {
 #ifndef DEAL_II_WITH_MPI
         (void)new_numbers;
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return NumberCache();
 #else
         const unsigned int dim      = DoFHandlerType::dimension;
@@ -3958,7 +3973,7 @@ namespace internal
         const parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
-        Assert(tr != nullptr, ExcInternalError());
+        DEAL_II_Assert(tr != nullptr, ExcInternalError());
 
         typename parallel::shared::Triangulation<dim,
                                                  spacedim>::active_cell_iterator
@@ -3987,17 +4002,19 @@ namespace internal
           }
         else
           {
-            Assert(new_numbers.size() ==
-                     this->dof_handler->locally_owned_dofs().n_elements(),
-                   ExcInternalError());
+            DEAL_II_Assert(
+              new_numbers.size() ==
+                this->dof_handler->locally_owned_dofs().n_elements(),
+              ExcInternalError());
             const unsigned int n_cpu =
               Utilities::MPI::n_mpi_processes(tr->get_communicator());
             std::vector<types::global_dof_index> gathered_new_numbers(
               this->dof_handler->n_dofs(), 0);
-            Assert(Utilities::MPI::this_mpi_process(tr->get_communicator()) ==
-                     this->dof_handler->get_triangulation()
-                       .locally_owned_subdomain(),
-                   ExcInternalError())
+            DEAL_II_Assert(Utilities::MPI::this_mpi_process(
+                             tr->get_communicator()) ==
+                             this->dof_handler->get_triangulation()
+                               .locally_owned_subdomain(),
+                           ExcInternalError())
 
             // gather new numbers among processors into one vector
             {
@@ -4018,7 +4035,7 @@ namespace internal
                                        1,
                                        MPI_INT,
                                        tr->get_communicator());
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
 
               // compute the displacements (relative to recvbuf)
               // at which to place the incoming data from process i
@@ -4028,10 +4045,10 @@ namespace internal
                   displacements[i] = shift;
                   shift += rcounts[i];
                 }
-              Assert(((int)new_numbers_copy.size()) ==
-                       rcounts[Utilities::MPI::this_mpi_process(
-                         tr->get_communicator())],
-                     ExcInternalError());
+              DEAL_II_Assert(((int)new_numbers_copy.size()) ==
+                               rcounts[Utilities::MPI::this_mpi_process(
+                                 tr->get_communicator())],
+                             ExcInternalError());
               ierr = MPI_Allgatherv(new_numbers_copy.data(),
                                     new_numbers_copy.size(),
                                     DEAL_II_DOF_INDEX_MPI_TYPE,
@@ -4040,7 +4057,7 @@ namespace internal
                                     displacements.data(),
                                     DEAL_II_DOF_INDEX_MPI_TYPE,
                                     tr->get_communicator());
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
 
             // put new numbers according to the current
@@ -4062,10 +4079,10 @@ namespace internal
                       iset.nth_index_in_set(ind);
                     const types::global_dof_index value =
                       gathered_new_numbers[shift + ind];
-                    Assert(target < this->dof_handler->n_dofs(),
-                           ExcInternalError());
-                    Assert(value < this->dof_handler->n_dofs(),
-                           ExcInternalError());
+                    DEAL_II_Assert(target < this->dof_handler->n_dofs(),
+                                   ExcInternalError());
+                    DEAL_II_Assert(value < this->dof_handler->n_dofs(),
+                                   ExcInternalError());
                     global_gathered_numbers[target] = value;
                     flag_1[target]++;
                     flag_2[value]++;
@@ -4073,14 +4090,16 @@ namespace internal
                 shift += iset.n_elements();
               }
 
-            Assert(*std::max_element(flag_1.begin(), flag_1.end()) == 1,
-                   ExcInternalError());
-            Assert(*std::min_element(flag_1.begin(), flag_1.end()) == 1,
-                   ExcInternalError());
-            Assert((*std::max_element(flag_2.begin(), flag_2.end())) == 1,
-                   ExcInternalError());
-            Assert((*std::min_element(flag_2.begin(), flag_2.end())) == 1,
-                   ExcInternalError());
+            DEAL_II_Assert(*std::max_element(flag_1.begin(), flag_1.end()) == 1,
+                           ExcInternalError());
+            DEAL_II_Assert(*std::min_element(flag_1.begin(), flag_1.end()) == 1,
+                           ExcInternalError());
+            DEAL_II_Assert((*std::max_element(flag_2.begin(), flag_2.end())) ==
+                             1,
+                           ExcInternalError());
+            DEAL_II_Assert((*std::min_element(flag_2.begin(), flag_2.end())) ==
+                             1,
+                           ExcInternalError());
           }
 
         // let the sequential algorithm do its magic; ignore the
@@ -4114,7 +4133,7 @@ namespace internal
         const std::vector<types::global_dof_index> & /*new_numbers*/) const
       {
         // multigrid is not currently implemented for shared triangulations
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
 
         return NumberCache();
       }
@@ -4167,7 +4186,7 @@ namespace internal
                                                  quadrants.size());
             if (quadrants_as_chars.size() > 0)
               {
-                Assert(quadrants.data() != nullptr, ExcInternalError());
+                DEAL_II_Assert(quadrants.data() != nullptr, ExcInternalError());
                 std::memcpy(quadrants_as_chars.data(),
                             quadrants.data(),
                             quadrants_as_chars.size());
@@ -4288,9 +4307,9 @@ namespace internal
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
               // why would somebody request a cell that is not ours?
-              Assert(dealii_cell->level_subdomain_id() ==
-                       tria.locally_owned_subdomain(),
-                     ExcInternalError());
+              DEAL_II_Assert(dealii_cell->level_subdomain_id() ==
+                               tria.locally_owned_subdomain(),
+                             ExcInternalError());
 
 
               std::vector<dealii::types::global_dof_index> local_dof_indices(
@@ -4386,9 +4405,9 @@ namespace internal
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
-              Assert(dealii_cell->level_subdomain_id() !=
-                       dealii::numbers::artificial_subdomain_id,
-                     ExcInternalError());
+              DEAL_II_Assert(dealii_cell->level_subdomain_id() !=
+                               dealii::numbers::artificial_subdomain_id,
+                             ExcInternalError());
 
               // update dof indices of cell
               std::vector<dealii::types::global_dof_index> dof_indices(
@@ -4399,9 +4418,10 @@ namespace internal
               for (unsigned int i = 0; i < dof_indices.size(); ++i)
                 if (dofs[i] != numbers::invalid_dof_index)
                   {
-                    Assert((dof_indices[i] == (numbers::invalid_dof_index)) ||
-                             (dof_indices[i] == dofs[i]),
-                           ExcInternalError());
+                    DEAL_II_Assert((dof_indices[i] ==
+                                    (numbers::invalid_dof_index)) ||
+                                     (dof_indices[i] == dofs[i]),
+                                   ExcInternalError());
                     dof_indices[i] = dofs[i];
                   }
                 else
@@ -4483,8 +4503,8 @@ namespace internal
                 p4est_coarse_cell,
                 neighbor_cell_list);
             }
-          Assert(level_ghost_owners.size() == neighbor_cell_list.size(),
-                 ExcInternalError());
+          DEAL_II_Assert(level_ghost_owners.size() == neighbor_cell_list.size(),
+                         ExcInternalError());
 
           //* send our requests:
           std::vector<std::vector<char>> sendbuffers(level_ghost_owners.size());
@@ -4506,7 +4526,7 @@ namespace internal
                                          10101,
                                          tria.get_communicator(),
                                          &requests[idx]);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
 
           //* receive requests and reply
@@ -4525,9 +4545,9 @@ namespace internal
                                    10101,
                                    tria.get_communicator(),
                                    &status);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
               receive.resize(len);
 
               char *ptr = receive.data();
@@ -4538,7 +4558,7 @@ namespace internal
                               status.MPI_TAG,
                               tria.get_communicator(),
                               &status);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
 
               cell_data_transfer_buffer.unpack_data(receive);
 
@@ -4575,7 +4595,7 @@ namespace internal
                                10102,
                                tria.get_communicator(),
                                &reply_requests[idx]);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
 
           //* finally receive the replies
@@ -4590,9 +4610,9 @@ namespace internal
                                    10102,
                                    tria.get_communicator(),
                                    &status);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
               receive.resize(len);
 
               char *ptr = receive.data();
@@ -4603,7 +4623,7 @@ namespace internal
                               status.MPI_TAG,
                               tria.get_communicator(),
                               &status);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
 
               cell_data_transfer_buffer.unpack_data(receive);
               if (cell_data_transfer_buffer.tree_indices.size() == 0)
@@ -4627,8 +4647,8 @@ namespace internal
                     p4est_coarse_cell;
                   internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
-                  Assert(cell->get_fe().dofs_per_cell == dofs[0],
-                         ExcInternalError());
+                  DEAL_II_Assert(cell->get_fe().dofs_per_cell == dofs[0],
+                                 ExcInternalError());
 
                   set_mg_dofindices_recursively<dim, spacedim>(
                     tria,
@@ -4646,14 +4666,14 @@ namespace internal
               const int ierr = MPI_Waitall(requests.size(),
                                            requests.data(),
                                            MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
           if (reply_requests.size() > 0)
             {
               const int ierr = MPI_Waitall(reply_requests.size(),
                                            reply_requests.data(),
                                            MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
         }
 
@@ -4667,7 +4687,7 @@ namespace internal
           const std::vector<dealii::types::global_dof_index> &,
           const std::vector<dealii::types::global_dof_index> &)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
 
 
@@ -4680,7 +4700,7 @@ namespace internal
           const std::vector<dealii::types::global_dof_index> &,
           const std::vector<dealii::types::global_dof_index> &)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
 
 
@@ -4711,7 +4731,7 @@ namespace internal
           const std::vector<dealii::types::global_dof_index> &,
           const std::vector<dealii::types::global_dof_index> &)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
 
 
@@ -4724,7 +4744,7 @@ namespace internal
           const std::vector<dealii::types::global_dof_index> &,
           const std::vector<dealii::types::global_dof_index> &)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
 
 
@@ -4739,7 +4759,7 @@ namespace internal
         {
 #  ifndef DEAL_II_WITH_MPI
           (void)vertices_with_ghost_neighbors;
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
 #  else
           const unsigned int dim = DoFHandlerType::dimension;
           const unsigned int spacedim = DoFHandlerType::space_dimension;
@@ -4750,7 +4770,7 @@ namespace internal
           auto pack =
             [](const typename DoFHandlerType::active_cell_iterator &cell)
             -> boost::optional<std::vector<types::global_dof_index>> {
-            Assert(cell->is_locally_owned(), ExcInternalError());
+            DEAL_II_Assert(cell->is_locally_owned(), ExcInternalError());
 
             // first see whether we need to do anything at all on this cell.
             // this is determined by whether the user_flag is set on the
@@ -4775,7 +4795,7 @@ namespace internal
                               numbers::invalid_dof_index) !=
                     local_dof_indices.end())
                   {
-                    Assert(cell->user_flag_set(), ExcInternalError());
+                    DEAL_II_Assert(cell->user_flag_set(), ExcInternalError());
                   }
                 else
                   cell->clear_user_flag();
@@ -4798,7 +4818,7 @@ namespace internal
                              local_dof_indices.end(),
                              numbers::invalid_dof_index) ==
                    local_dof_indices.end());
-                Assert(is_complete, ExcInternalError());
+                DEAL_II_Assert(is_complete, ExcInternalError());
 #    endif
                 return boost::optional<std::vector<types::global_dof_index>>();
               }
@@ -4812,8 +4832,8 @@ namespace internal
             // on top of that, only on cells that have not been
             // completed -- which we indicate via the user flag.
             // check both
-            Assert(cell->is_ghost(), ExcInternalError());
-            Assert(cell->user_flag_set(), ExcInternalError());
+            DEAL_II_Assert(cell->is_ghost(), ExcInternalError());
+            DEAL_II_Assert(cell->user_flag_set(), ExcInternalError());
 
             // if we just got an incomplete array of DoF indices, then we must
             // be in the first ghost exchange and the user flag must have been
@@ -4852,10 +4872,10 @@ namespace internal
               else
                 // we already know the dof index. check that there
                 // is no conflict
-                Assert((received_dof_indices[i] ==
-                        numbers::invalid_dof_index) ||
-                         (received_dof_indices[i] == local_dof_indices[i]),
-                       ExcInternalError());
+                DEAL_II_Assert(
+                  (received_dof_indices[i] == numbers::invalid_dof_index) ||
+                    (received_dof_indices[i] == local_dof_indices[i]),
+                  ExcInternalError());
 
             const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)
               ->set_dof_indices(local_dof_indices);
@@ -4888,14 +4908,15 @@ namespace internal
                 &dof_handler.get_triangulation()))
             {
               const int ierr = MPI_Barrier(triangulation->get_communicator());
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
           else
             {
-              Assert(false,
-                     ExcMessage(
-                       "The function communicate_dof_indices_on_marked_cells() "
-                       "only works with parallel distributed triangulations."));
+              DEAL_II_Assert(
+                false,
+                ExcMessage(
+                  "The function communicate_dof_indices_on_marked_cells() "
+                  "only works with parallel distributed triangulations."));
             }
 #  endif
         }
@@ -4921,7 +4942,7 @@ namespace internal
       ParallelDistributed<DoFHandlerType>::distribute_dofs() const
       {
 #ifndef DEAL_II_WITH_P4EST
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return NumberCache();
 #else
         const unsigned int dim      = DoFHandlerType::dimension;
@@ -4931,7 +4952,7 @@ namespace internal
           (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
             const_cast<dealii::Triangulation<dim, spacedim> *>(
               &dof_handler->get_triangulation())));
-        Assert(triangulation != nullptr, ExcInternalError());
+        DEAL_II_Assert(triangulation != nullptr, ExcInternalError());
 
         const unsigned int n_cpus =
           Utilities::MPI::n_mpi_processes(triangulation->get_communicator());
@@ -5015,7 +5036,7 @@ namespace internal
                         1,
                         DEAL_II_DOF_INDEX_MPI_TYPE,
                         triangulation->get_communicator());
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         const dealii::types::global_dof_index my_shift =
           std::accumulate(n_locally_owned_dofs_per_processor.begin(),
@@ -5056,12 +5077,12 @@ namespace internal
         }
         NumberCache number_cache(locally_owned_dofs_per_processor,
                                  triangulation->locally_owned_subdomain());
-        Assert(number_cache
-                   .locally_owned_dofs_per_processor
-                     [triangulation->locally_owned_subdomain()]
-                   .n_elements() == number_cache.n_locally_owned_dofs,
-               ExcInternalError());
-        Assert(
+        DEAL_II_Assert(number_cache
+                           .locally_owned_dofs_per_processor
+                             [triangulation->locally_owned_subdomain()]
+                           .n_elements() == number_cache.n_locally_owned_dofs,
+                       ExcInternalError());
+        DEAL_II_Assert(
           !number_cache
               .locally_owned_dofs_per_processor[triangulation
                                                   ->locally_owned_subdomain()]
@@ -5145,7 +5166,7 @@ namespace internal
           // on all cells we had previously marked. verify this
 #  ifdef DEBUG
           for (auto cell : dof_handler->active_cell_iterators())
-            Assert(cell->user_flag_set() == false, ExcInternalError());
+            DEAL_II_Assert(cell->user_flag_set() == false, ExcInternalError());
 #  endif
 
           triangulation->load_user_flags(user_flags);
@@ -5168,15 +5189,15 @@ namespace internal
                   {
                     if (cell->is_ghost())
                       {
-                        Assert(false,
-                               ExcMessage(
-                                 "A ghost cell ended up with incomplete "
-                                 "DoF index information. This should not "
-                                 "have happened!"));
+                        DEAL_II_Assert(
+                          false,
+                          ExcMessage("A ghost cell ended up with incomplete "
+                                     "DoF index information. This should not "
+                                     "have happened!"));
                       }
                     else
                       {
-                        Assert(
+                        DEAL_II_Assert(
                           false,
                           ExcMessage(
                             "A locally owned cell ended up with incomplete "
@@ -5198,7 +5219,7 @@ namespace internal
       ParallelDistributed<DoFHandlerType>::distribute_mg_dofs() const
       {
 #ifndef DEAL_II_WITH_P4EST
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return std::vector<NumberCache>();
 #else
         const unsigned int dim      = DoFHandlerType::dimension;
@@ -5208,15 +5229,15 @@ namespace internal
           (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
             const_cast<dealii::Triangulation<dim, spacedim> *>(
               &dof_handler->get_triangulation())));
-        Assert(triangulation != nullptr, ExcInternalError());
+        DEAL_II_Assert(triangulation != nullptr, ExcInternalError());
 
-        AssertThrow((triangulation->settings &
-                     parallel::distributed::Triangulation<dim, spacedim>::
-                       construct_multigrid_hierarchy),
-                    ExcMessage(
-                      "Multigrid DoFs can only be distributed on a parallel "
-                      "Triangulation if the flag construct_multigrid_hierarchy "
-                      "is set in the constructor."));
+        DEAL_II_AssertThrow(
+          (triangulation->settings &
+           parallel::distributed::Triangulation<dim, spacedim>::
+             construct_multigrid_hierarchy),
+          ExcMessage("Multigrid DoFs can only be distributed on a parallel "
+                     "Triangulation if the flag construct_multigrid_hierarchy "
+                     "is set in the constructor."));
 
 
         const unsigned int n_cpus =
@@ -5301,7 +5322,7 @@ namespace internal
               1,
               DEAL_II_DOF_INDEX_MPI_TYPE,
               triangulation->get_communicator());
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
 
             const dealii::types::global_dof_index shift = std::accumulate(
               level_number_cache.n_locally_owned_dofs_per_processor.begin(),
@@ -5356,20 +5377,21 @@ namespace internal
                     level_number_cache.n_locally_owned_dofs_per_processor[i];
                 }
             }
-            Assert(level_number_cache
-                       .locally_owned_dofs_per_processor
-                         [triangulation->locally_owned_subdomain()]
-                       .n_elements() == level_number_cache.n_locally_owned_dofs,
-                   ExcInternalError());
-            Assert(!level_number_cache
-                       .locally_owned_dofs_per_processor
-                         [triangulation->locally_owned_subdomain()]
-                       .n_elements() ||
-                     level_number_cache
-                         .locally_owned_dofs_per_processor
-                           [triangulation->locally_owned_subdomain()]
-                         .nth_index_in_set(0) == shift,
-                   ExcInternalError());
+            DEAL_II_Assert(level_number_cache
+                               .locally_owned_dofs_per_processor
+                                 [triangulation->locally_owned_subdomain()]
+                               .n_elements() ==
+                             level_number_cache.n_locally_owned_dofs,
+                           ExcInternalError());
+            DEAL_II_Assert(!level_number_cache
+                               .locally_owned_dofs_per_processor
+                                 [triangulation->locally_owned_subdomain()]
+                               .n_elements() ||
+                             level_number_cache
+                                 .locally_owned_dofs_per_processor
+                                   [triangulation->locally_owned_subdomain()]
+                                 .nth_index_in_set(0) == shift,
+                           ExcInternalError());
 
             number_caches.emplace_back(level_number_cache);
           }
@@ -5418,7 +5440,7 @@ namespace internal
           // but the cost of a barrier is negligible compared to
           // everything else we do here
           const int ierr = MPI_Barrier(triangulation->get_communicator());
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           // Phase 2, only request the cells that were not completed
           // in Phase 1.
@@ -5437,7 +5459,8 @@ namespace internal
               if (cell->level_subdomain_id() !=
                     dealii::numbers::artificial_subdomain_id &&
                   !cell->is_locally_owned_on_level())
-                Assert(cell->user_flag_set() == false, ExcInternalError());
+                DEAL_II_Assert(cell->user_flag_set() == false,
+                               ExcInternalError());
           }
 #  endif
 
@@ -5464,7 +5487,8 @@ namespace internal
                               local_dof_indices.end(),
                               numbers::invalid_dof_index))
                   {
-                    Assert(false, ExcMessage("not all DoFs got distributed!"));
+                    DEAL_II_Assert(false,
+                                   ExcMessage("not all DoFs got distributed!"));
                   }
               }
         }
@@ -5483,11 +5507,12 @@ namespace internal
       {
         (void)new_numbers;
 
-        Assert(new_numbers.size() == dof_handler->n_locally_owned_dofs(),
-               ExcInternalError());
+        DEAL_II_Assert(new_numbers.size() ==
+                         dof_handler->n_locally_owned_dofs(),
+                       ExcInternalError());
 
 #ifndef DEAL_II_WITH_P4EST
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return NumberCache();
 #else
         const unsigned int dim      = DoFHandlerType::dimension;
@@ -5497,7 +5522,7 @@ namespace internal
           (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
             const_cast<dealii::Triangulation<dim, spacedim> *>(
               &dof_handler->get_triangulation())));
-        Assert(triangulation != nullptr, ExcInternalError());
+        DEAL_II_Assert(triangulation != nullptr, ExcInternalError());
 
 
         // First figure out the new set of locally owned DoF indices.
@@ -5519,9 +5544,9 @@ namespace internal
               new_numbers_sorted.begin(), new_numbers_sorted.end());
             my_locally_owned_new_dof_indices.compress();
 
-            Assert(my_locally_owned_new_dof_indices.n_elements() ==
-                     new_numbers.size(),
-                   ExcInternalError());
+            DEAL_II_Assert(my_locally_owned_new_dof_indices.n_elements() ==
+                             new_numbers.size(),
+                           ExcInternalError());
           }
 
         // delete all knowledge of DoF indices that are not locally
@@ -5675,7 +5700,7 @@ namespace internal
                                          max_size,
                                          MPI_BYTE,
                                          triangulation->get_communicator());
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           for (unsigned int i = 0; i < n_cpus; ++i)
             if (i == Utilities::MPI::this_mpi_process(
@@ -5737,7 +5762,7 @@ namespace internal
         const parallel::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
-        Assert(tr != nullptr, ExcInternalError());
+        DEAL_II_Assert(tr != nullptr, ExcInternalError());
 
 #ifdef DEAL_II_WITH_MPI
         const unsigned int my_rank =
@@ -5746,11 +5771,12 @@ namespace internal
 #  ifdef DEBUG
         for (types::global_dof_index i : new_numbers)
           {
-            Assert(index_sets[my_rank].is_element(i),
-                   ExcNotImplemented(
-                     "Renumberings that change the locally owned mg dofs "
-                     "partitioning are currently not implemented for "
-                     "the multigrid levels"));
+            DEAL_II_Assert(
+              index_sets[my_rank].is_element(i),
+              ExcNotImplemented(
+                "Renumberings that change the locally owned mg dofs "
+                "partitioning are currently not implemented for "
+                "the multigrid levels"));
           }
 #  endif
 
@@ -5799,7 +5825,8 @@ namespace internal
             }
           if (n_ghosts_on_smaller_ranks > 0)
             {
-              Assert(ghosted_new_numbers.data() != nullptr, ExcInternalError());
+              DEAL_II_Assert(ghosted_new_numbers.data() != nullptr,
+                             ExcInternalError());
               std::memmove(ghosted_new_numbers.data(),
                            ghosted_new_numbers.data() + new_numbers.size(),
                            sizeof(types::global_dof_index) *
@@ -5807,7 +5834,7 @@ namespace internal
             }
           if (new_numbers.size() > 0)
             {
-              Assert(new_numbers.data() != nullptr, ExcInternalError());
+              DEAL_II_Assert(new_numbers.data() != nullptr, ExcInternalError());
               std::memcpy(ghosted_new_numbers.data() +
                             n_ghosts_on_smaller_ranks,
                           new_numbers.data(),
@@ -5822,7 +5849,7 @@ namespace internal
             ghosted_new_numbers, relevant_dofs, *dof_handler, level, true);
 #else
         (void)new_numbers;
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
 #endif
 
         return NumberCache(

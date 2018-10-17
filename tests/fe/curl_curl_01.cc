@@ -157,8 +157,8 @@ double
 ExactSolution<dim>::value(const Point<dim> & p,
                           const unsigned int component) const
 {
-  Assert(dim >= 2, ExcNotImplemented());
-  AssertIndexRange(component, dim);
+  DEAL_II_Assert(dim >= 2, ExcNotImplemented());
+  DEAL_II_AssertIndexRange(component, dim);
 
   double val = -1000;
   switch (component)
@@ -175,7 +175,7 @@ void
 ExactSolution<dim>::vector_value(const Point<dim> &p,
                                  Vector<double> &  result) const
 {
-  Assert(dim >= 2, ExcNotImplemented());
+  DEAL_II_Assert(dim >= 2, ExcNotImplemented());
   result(0) = cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
   result(1) = -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
 }
@@ -185,9 +185,9 @@ ExactSolution<dim>::value_list(const std::vector<Point<dim>> &points,
                                std::vector<double> &          values,
                                const unsigned int             component) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
-  AssertIndexRange(component, dim);
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_AssertIndexRange(component, dim);
   for (unsigned int i = 0; i < points.size(); ++i)
     {
       const Point<dim> &p = points[i];
@@ -207,9 +207,9 @@ void
 ExactSolution<dim>::vector_value_list(const std::vector<Point<dim>> &points,
                                       std::vector<Vector<double>> &values) const
 {
-  Assert(dim >= 2, ExcNotImplemented());
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_Assert(dim >= 2, ExcNotImplemented());
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     {
@@ -232,8 +232,9 @@ inline void
 RightHandSide<dim>::vector_value(const Point<dim> &p,
                                  Vector<double> &  values) const
 {
-  Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
-  Assert(dim >= 2, ExcNotImplemented());
+  DEAL_II_Assert(values.size() == dim,
+                 ExcDimensionMismatch(values.size(), dim));
+  DEAL_II_Assert(dim >= 2, ExcNotImplemented());
 
   // 2D solution
   values(0) = (2 * numbers::PI * numbers::PI + 1) * cos(numbers::PI * p(0)) *
@@ -249,8 +250,8 @@ RightHandSide<dim>::vector_value_list(
   const std::vector<Point<dim>> &points,
   std::vector<Vector<double>> &  value_list) const
 {
-  Assert(value_list.size() == points.size(),
-         ExcDimensionMismatch(value_list.size(), points.size()));
+  DEAL_II_Assert(value_list.size() == points.size(),
+                 ExcDimensionMismatch(value_list.size(), points.size()));
   const unsigned int n_points = points.size();
   for (unsigned int p = 0; p < n_points; ++p)
     {

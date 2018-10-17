@@ -46,7 +46,7 @@ test(TrilinosWrappers::SparseMatrix &m)
   // compare against the exact value of the
   // l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
-  Assert(m.frobenius_norm() == norm, ExcInternalError());
+  DEAL_II_Assert(m.frobenius_norm() == norm, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

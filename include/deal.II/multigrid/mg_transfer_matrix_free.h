@@ -154,7 +154,7 @@ public:
   /**
    * Finite element does not provide prolongation matrices.
    */
-  DeclException0(ExcNoProlongation);
+  DEAL_II_DeclException0(ExcNoProlongation);
 
   /**
    * Memory used by this object.
@@ -478,9 +478,11 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
   const unsigned int min_level = dst.min_level();
   const unsigned int max_level = dst.max_level();
 
-  Assert(max_level == dof_handler.get_triangulation().n_global_levels() - 1,
-         ExcDimensionMismatch(
-           max_level, dof_handler.get_triangulation().n_global_levels() - 1));
+  DEAL_II_Assert(max_level ==
+                   dof_handler.get_triangulation().n_global_levels() - 1,
+                 ExcDimensionMismatch(
+                   max_level,
+                   dof_handler.get_triangulation().n_global_levels() - 1));
 
   const parallel::Triangulation<dim, spacedim> *p_tria =
     (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
@@ -574,12 +576,12 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
   MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
   const LinearAlgebra::distributed::BlockVector<Number2> &        src) const
 {
-  AssertDimension(matrix_free_transfer_vector.size(), 1);
-  Assert(same_for_all,
-         ExcMessage(
-           "This object was initialized with support for usage with one "
-           "DoFHandler for each block, but this method assumes that "
-           "the same DoFHandler is used for all the blocks!"));
+  DEAL_II_AssertDimension(matrix_free_transfer_vector.size(), 1);
+  DEAL_II_Assert(
+    same_for_all,
+    ExcMessage("This object was initialized with support for usage with one "
+               "DoFHandler for each block, but this method assumes that "
+               "the same DoFHandler is used for all the blocks!"));
   const std::vector<const DoFHandler<dim, spacedim> *> mg_dofs(src.n_blocks(),
                                                                &mg_dof);
 
@@ -595,7 +597,7 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
   const LinearAlgebra::distributed::BlockVector<Number2> &        src) const
 {
   const unsigned int n_blocks = src.n_blocks();
-  AssertDimension(mg_dof.size(), n_blocks);
+  DEAL_II_AssertDimension(mg_dof.size(), n_blocks);
 
   if (n_blocks == 0)
     return;
@@ -611,9 +613,10 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
       (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
         &(mg_dof[0]->get_triangulation())));
     for (unsigned int i = 1; i < n_blocks; ++i)
-      AssertThrow((dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-                     &(mg_dof[0]->get_triangulation())) == tria),
-                  ExcMessage("The DoFHandler use different Triangulations!"));
+      DEAL_II_AssertThrow(
+        (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+           &(mg_dof[0]->get_triangulation())) == tria),
+        ExcMessage("The DoFHandler use different Triangulations!"));
 
     for (unsigned int level = min_level; level <= max_level; ++level)
       {
@@ -666,7 +669,7 @@ MGTransferBlockMatrixFree<dim, Number>::copy_from_mg(
   const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
   const
 {
-  AssertDimension(matrix_free_transfer_vector.size(), 1);
+  DEAL_II_AssertDimension(matrix_free_transfer_vector.size(), 1);
   const std::vector<const DoFHandler<dim, spacedim> *> mg_dofs(dst.n_blocks(),
                                                                &mg_dof);
 
@@ -683,7 +686,7 @@ MGTransferBlockMatrixFree<dim, Number>::copy_from_mg(
   const
 {
   const unsigned int n_blocks = dst.n_blocks();
-  AssertDimension(mg_dof.size(), n_blocks);
+  DEAL_II_AssertDimension(mg_dof.size(), n_blocks);
 
   if (n_blocks == 0)
     return;
@@ -692,7 +695,7 @@ MGTransferBlockMatrixFree<dim, Number>::copy_from_mg(
   const unsigned int max_level = src.max_level();
 
   for (unsigned int l = min_level; l <= max_level; ++l)
-    AssertDimension(src[l].n_blocks(), dst.n_blocks());
+    DEAL_II_AssertDimension(src[l].n_blocks(), dst.n_blocks());
 
   // FIXME: this a quite ugly as we need a temporary object:
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> src_non_block(

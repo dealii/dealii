@@ -36,8 +36,8 @@ test(Vector<std::complex<double>> &v)
   // then resize with setting to zero
   v.reinit(13, false);
 
-  AssertThrow(v.size() == 13, ExcInternalError());
-  AssertThrow(v.l2_norm() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == 13, ExcInternalError());
+  DEAL_II_AssertThrow(v.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

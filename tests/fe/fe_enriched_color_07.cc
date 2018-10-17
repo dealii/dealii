@@ -114,8 +114,8 @@ SigmaFunction<dim>::initialize(const Point<dim> & _center,
   std::map<std::string, double> constants = {{"sigma", sigma},
                                              {"pi", numbers::PI}};
 
-  AssertThrow(dim == 1 || dim == 2 || dim == 3,
-              ExcMessage("Dimension not implemented"));
+  DEAL_II_AssertThrow(dim == 1 || dim == 2 || dim == 3,
+                      ExcMessage("Dimension not implemented"));
   switch (dim)
     {
       case 1:
@@ -158,7 +158,7 @@ SigmaFunction<dim>::value_list(const std::vector<Point<dim>> &points,
 {
   const unsigned int n_points = points.size();
 
-  AssertDimension(points.size(), value_list.size());
+  DEAL_II_AssertDimension(points.size(), value_list.size());
 
   for (unsigned int p = 0; p < n_points; ++p)
     value_list[p] = value(points[p]);
@@ -243,9 +243,9 @@ public:
   {
     Tensor<1, dim> dist = p - origin;
     const double   r    = dist.norm();
-    Assert(r > 0., ExcDivideByZero());
+    DEAL_II_Assert(r > 0., ExcDivideByZero());
     dist /= r;
-    Assert(component == 0, ExcMessage("Not implemented"));
+    DEAL_II_Assert(component == 0, ExcMessage("Not implemented"));
     return cspline.gradient(Point<1>(r))[0] * dist;
   }
 
@@ -292,13 +292,13 @@ struct ParameterCollection
 
   void set_enrichment_point(Point<2> &p, const unsigned int i)
   {
-    AssertDimension(dim, 2);
+    DEAL_II_AssertDimension(dim, 2);
     p(0) = points_enrichments[2 * i];
     p(1) = points_enrichments[2 * i + 1];
   }
   void set_enrichment_point(Point<3> &p, const unsigned int i)
   {
-    AssertDimension(dim, 3);
+    DEAL_II_AssertDimension(dim, 3);
     p(0) = points_enrichments[3 * i];
     p(1) = points_enrichments[3 * i + 1];
     p(2) = points_enrichments[3 * i + 2];
@@ -422,9 +422,9 @@ ParameterCollection::ParameterCollection(const std::string &file_name)
     if (line == "#end-of-dealii parser")
       break;
 
-  AssertThrow(line == "#end-of-dealii parser",
-              ExcMessage(
-                "line missing in parameter file = \'#end-of-dealii parser\' "));
+  DEAL_II_AssertThrow(
+    line == "#end-of-dealii parser",
+    ExcMessage("line missing in parameter file = \'#end-of-dealii parser\' "));
 
   // function to read next line not starting with # or empty
   auto read_next_proper_line = [&](std::string &line) {
@@ -469,7 +469,7 @@ ParameterCollection::ParameterCollection(const std::string &file_name)
           points_enrichments[3 * i + 2] = z;
         }
       else
-        AssertThrow(false, ExcMessage("Dimension not implemented"));
+        DEAL_II_AssertThrow(false, ExcMessage("Dimension not implemented"));
     }
 
   // note vector of radii for predicates
@@ -1138,7 +1138,8 @@ LaplaceProblem<dim>::LaplaceProblem(const ParameterCollection &_par)
   , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
   , pcout(std::cout, (this_mpi_process == 0) && (prm.debug_level >= 1))
 {
-  AssertThrow(prm.dim == dim, ExcMessage("parameter file dim != problem dim"));
+  DEAL_II_AssertThrow(prm.dim == dim,
+                      ExcMessage("parameter file dim != problem dim"));
   prm.print();
   pcout << "...parameters set" << std::endl;
 }
@@ -1171,7 +1172,7 @@ LaplaceProblem<dim>::initialize()
       triangulation.set_manifold(0, spherical_manifold);
     }
   else
-    AssertThrow(false, ExcMessage("Shape not implemented."));
+    DEAL_II_AssertThrow(false, ExcMessage("Shape not implemented."));
   triangulation.refine_global(prm.global_refinement);
 
   /*
@@ -1180,7 +1181,7 @@ LaplaceProblem<dim>::initialize()
    * enrichment domains are stored as vector of numbers, the dimension of
    * points_enrichments is dim times the n_enrichments in prm file.
    */
-  Assert(
+  DEAL_II_Assert(
     prm.points_enrichments.size() / dim == prm.n_enrichments &&
       prm.radii_predicates.size() == prm.n_enrichments &&
       prm.sigmas.size() == prm.n_enrichments,
@@ -1657,7 +1658,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle)
       error_vector -= exact_soln_vector;
     }
 
-  Assert(cycle < 10, ExcNotImplemented());
+  DEAL_II_Assert(cycle < 10, ExcNotImplemented());
   if (this_mpi_process == 0)
     {
       std::string filename = "solution-";
@@ -1884,8 +1885,8 @@ main(int argc, char **argv)
           problem.run();
         }
       else
-        AssertThrow(false,
-                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
+        DEAL_II_AssertThrow(
+          false, ExcMessage("Dimension incorrect. dim can be 2 or 3"));
     }
 
 
@@ -1936,8 +1937,8 @@ main(int argc, char **argv)
           problem.run();
         }
       else
-        AssertThrow(false,
-                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
+        DEAL_II_AssertThrow(
+          false, ExcMessage("Dimension incorrect. dim can be 2 or 3"));
     }
 
 
@@ -1987,8 +1988,8 @@ main(int argc, char **argv)
           problem.run();
         }
       else
-        AssertThrow(false,
-                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
+        DEAL_II_AssertThrow(
+          false, ExcMessage("Dimension incorrect. dim can be 2 or 3"));
     }
   }
 }

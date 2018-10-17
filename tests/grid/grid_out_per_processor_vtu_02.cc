@@ -64,7 +64,7 @@ output(const parallel::shared::Triangulation<dim> &tr,
   else if (myid == 1)
     cat_file((std::string(filename) + ".proc0001.vtu").c_str());
   else
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 template <int dim>

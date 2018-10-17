@@ -772,7 +772,7 @@ namespace internal
       ...)
     {
       (void)uses_dof_handler_vector;
-      Assert(!uses_dof_handler_vector, ExcInternalError());
+      DEAL_II_Assert(!uses_dof_handler_vector, ExcInternalError());
 
       signals.transfer_to_mg(true);
       transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
@@ -835,7 +835,7 @@ namespace internal
       ...)
     {
       (void)uses_dof_handler_vector;
-      Assert(!uses_dof_handler_vector, ExcInternalError());
+      DEAL_II_Assert(!uses_dof_handler_vector, ExcInternalError());
 
       signals.transfer_to_mg(true);
       transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
@@ -912,7 +912,7 @@ IndexSet
 PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_range_indices(
   const unsigned int block) const
 {
-  AssertIndexRange(block, dof_handler_vector.size());
+  DEAL_II_AssertIndexRange(block, dof_handler_vector.size());
   return dof_handler_vector[block]->locally_owned_dofs();
 }
 
@@ -922,7 +922,7 @@ IndexSet
 PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(
   const unsigned int block) const
 {
-  AssertIndexRange(block, dof_handler_vector.size());
+  DEAL_II_AssertIndexRange(block, dof_handler_vector.size());
   return dof_handler_vector[block]->locally_owned_dofs();
 }
 
@@ -937,7 +937,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
   const Triangulation<dim> &tria = dof_handler_vector[0]->get_triangulation();
   const parallel::distributed::Triangulation<dim> *ptria =
     dynamic_cast<const parallel::distributed::Triangulation<dim> *>(&tria);
-  Assert(ptria != nullptr, ExcInternalError());
+  DEAL_II_Assert(ptria != nullptr, ExcInternalError());
   return ptria->get_communicator();
 }
 
@@ -987,7 +987,7 @@ void
 PreconditionMG<dim, VectorType, TRANSFER>::Tvmult(OtherVectorType &,
                                                   const OtherVectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -998,7 +998,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add(
   OtherVectorType &,
   const OtherVectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 #endif // DOXYGEN

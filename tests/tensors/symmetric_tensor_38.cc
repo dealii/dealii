@@ -51,22 +51,24 @@ main()
       {
         deallog << i << "\t" << j << std::endl;
         deallog << r1[i][j][0] << std::endl;
-        AssertThrow(std::abs(r1[i][j][0] - factor_float * s1[i][j][0]) < 1.e-10,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(std::abs(r1[i][j][0] - factor_float * s1[i][j][0]) <
+                              1.e-10,
+                            ExcInternalError());
         for (unsigned int k = 1; k < VectorizedArray<float>::n_array_elements;
              ++k)
           {
-            AssertThrow(std::abs(r1[i][j][k] - r1[i][j][0]) < 1.e-10,
-                        ExcInternalError());
+            DEAL_II_AssertThrow(std::abs(r1[i][j][k] - r1[i][j][0]) < 1.e-10,
+                                ExcInternalError());
           }
         deallog << r2[i][j][0] << std::endl;
-        Assert(std::abs(r2[i][j][0] - factor_double * s2[i][j][0]) < 1.e-10,
-               ExcInternalError());
+        DEAL_II_Assert(std::abs(r2[i][j][0] - factor_double * s2[i][j][0]) <
+                         1.e-10,
+                       ExcInternalError());
         for (unsigned int k = 1; k < VectorizedArray<double>::n_array_elements;
              ++k)
           {
-            AssertThrow(std::abs(r2[i][j][k] - r2[i][j][0]) < 1.e-10,
-                        ExcInternalError());
+            DEAL_II_AssertThrow(std::abs(r2[i][j][k] - r2[i][j][0]) < 1.e-10,
+                                ExcInternalError());
           }
         deallog << std::endl;
       }

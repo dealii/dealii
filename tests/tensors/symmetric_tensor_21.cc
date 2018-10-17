@@ -38,7 +38,7 @@ main()
   t = 0;
   deallog << t.norm() << std::endl;
 
-  AssertThrow(t.norm() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(t.norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

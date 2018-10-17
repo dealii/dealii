@@ -70,7 +70,7 @@ namespace
         for (unsigned int f = 0; f < GeometryInfo<1>::faces_per_cell; ++f)
           if (boundary_ids.find(cell->vertex_index(f)) != boundary_ids.end())
             {
-              AssertThrow(
+              DEAL_II_AssertThrow(
                 cell->at_boundary(f),
                 ExcMessage(
                   "You are trying to prescribe boundary ids on the face "
@@ -89,7 +89,7 @@ namespace
   {
     // we shouldn't get here since boundary ids are not assigned to
     // vertices except in 1d
-    Assert(dim != 1, ExcInternalError());
+    DEAL_II_Assert(dim != 1, ExcInternalError());
   }
 } // namespace
 
@@ -113,7 +113,7 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_vtk(std::istream &in)
 {
-  Assert((dim == 2) || (dim == 3), ExcNotImplemented());
+  DEAL_II_Assert((dim == 2) || (dim == 3), ExcNotImplemented());
   std::string line;
 
   // verify that the first, third and fourth lines match
@@ -131,7 +131,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       {
         getline(in, line);
         if (i != 1)
-          AssertThrow(
+          DEAL_II_AssertThrow(
             line.compare(text[i]) == 0,
             ExcMessage(
               std::string(
@@ -173,9 +173,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
     }
 
   else
-    AssertThrow(false,
-                ExcMessage(
-                  "While reading VTK file, failed to find POINTS section"));
+    DEAL_II_AssertThrow(
+      false,
+      ExcMessage("While reading VTK file, failed to find POINTS section"));
 
 
   //////////////////ignoring space between points and cells
@@ -213,9 +213,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   // we assume that the file contains first all cells,
                   // and only then any faces or lines
-                  AssertThrow(subcelldata.boundary_quads.size() == 0 &&
-                                subcelldata.boundary_lines.size() == 0,
-                              ExcNotImplemented());
+                  DEAL_II_AssertThrow(subcelldata.boundary_quads.size() == 0 &&
+                                        subcelldata.boundary_lines.size() == 0,
+                                      ExcNotImplemented());
 
                   cells.emplace_back();
 
@@ -237,7 +237,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 }
 
               else
-                AssertThrow(
+                DEAL_II_AssertThrow(
                   false,
                   ExcMessage(
                     "While reading VTK file, unknown file type encountered"));
@@ -255,8 +255,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   // we assume that the file contains first all cells,
                   // and only then any faces
-                  AssertThrow(subcelldata.boundary_lines.size() == 0,
-                              ExcNotImplemented());
+                  DEAL_II_AssertThrow(subcelldata.boundary_lines.size() == 0,
+                                      ExcNotImplemented());
 
                   cells.emplace_back();
 
@@ -282,16 +282,16 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 }
 
               else
-                AssertThrow(
+                DEAL_II_AssertThrow(
                   false,
                   ExcMessage(
                     "While reading VTK file, unknown file type encountered"));
             }
         }
       else
-        AssertThrow(false,
-                    ExcMessage(
-                      "While reading VTK file, failed to find CELLS section"));
+        DEAL_II_AssertThrow(
+          false,
+          ExcMessage("While reading VTK file, failed to find CELLS section"));
 
       /////////////////////Processing the CELL_TYPES
       /// section////////////////////////
@@ -321,7 +321,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
           unsigned int n_ids;
           in >> n_ids;
 
-          AssertThrow(
+          DEAL_II_AssertThrow(
             n_ids == cells.size() +
                        (dim == 3 ?
                           subcelldata.boundary_quads.size() :
@@ -354,11 +354,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 if (linenew.size() > textnew[0].size())
                   linenew.resize(textnew[0].size());
 
-              AssertThrow(linenew.compare(textnew[i]) == 0,
-                          ExcMessage(
-                            std::string(
-                              "While reading VTK file, failed to find <") +
-                            textnew[i] + "> section"));
+              DEAL_II_AssertThrow(
+                linenew.compare(textnew[i]) == 0,
+                ExcMessage(
+                  std::string("While reading VTK file, failed to find <") +
+                  textnew[i] + "> section"));
             }
 
           // read material ids first for all cells, then for all
@@ -394,7 +394,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
             }
         }
 
-      Assert(subcelldata.check_consistency(dim), ExcInternalError());
+      DEAL_II_Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
       GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
@@ -408,9 +408,9 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       return;
     }
   else
-    AssertThrow(false,
-                ExcMessage(
-                  "While reading VTK file, failed to find CELLS section"));
+    DEAL_II_AssertThrow(
+      false,
+      ExcMessage("While reading VTK file, failed to find CELLS section"));
 }
 
 
@@ -419,22 +419,22 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_unv(std::istream &in)
 {
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  Assert((dim == 2) || (dim == 3), ExcNotImplemented());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_Assert((dim == 2) || (dim == 3), ExcNotImplemented());
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
   skip_comment_lines(in, '#'); // skip comments (if any) at beginning of file
 
   int tmp;
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
   in >> tmp;
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
   in >> tmp;
 
   // section 2411 describes vertices: see
   // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2411
-  AssertThrow(tmp == 2411, ExcUnknownSectionType(tmp));
+  DEAL_II_AssertThrow(tmp == 2411, ExcUnknownSectionType(tmp));
 
   std::vector<Point<spacedim>> vertices; // vector of vertex coordinates
   std::map<int, int>
@@ -448,7 +448,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       int    dummy;
       double x[3];
 
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
       in >> no;
 
       tmp = no;
@@ -457,7 +457,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
       in >> dummy >> dummy >> dummy;
 
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
       in >> x[0] >> x[1] >> x[2];
 
       vertices.emplace_back();
@@ -470,14 +470,14 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       no_vertex++;
     }
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
   in >> tmp;
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
   in >> tmp;
 
   // section 2412 describes elements: see
   // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2412
-  AssertThrow(tmp == 2412, ExcUnknownSectionType(tmp));
+  DEAL_II_AssertThrow(tmp == 2412, ExcUnknownSectionType(tmp));
 
   std::vector<CellData<dim>> cells; // vector of cells
   SubCellData                subcelldata;
@@ -499,7 +499,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       int type;
       int dummy;
 
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
       in >> no;
 
       tmp = no;
@@ -508,15 +508,16 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
       in >> type >> dummy >> dummy >> dummy >> dummy;
 
-      AssertThrow((type == 11) || (type == 44) || (type == 94) || (type == 115),
-                  ExcUnknownElementType(type));
+      DEAL_II_AssertThrow((type == 11) || (type == 44) || (type == 94) ||
+                            (type == 115),
+                          ExcUnknownElementType(type));
 
       if ((((type == 44) || (type == 94)) && (dim == 2)) ||
           ((type == 115) && (dim == 3))) // cell
         {
           cells.emplace_back();
 
-          AssertThrow(in, ExcIO());
+          DEAL_II_AssertThrow(in, ExcIO());
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
                v++)
             in >> cells.back().vertices[v];
@@ -534,12 +535,12 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       else if (((type == 11) && (dim == 2)) ||
                ((type == 11) && (dim == 3))) // boundary line
         {
-          AssertThrow(in, ExcIO());
+          DEAL_II_AssertThrow(in, ExcIO());
           in >> dummy >> dummy >> dummy;
 
           subcelldata.boundary_lines.emplace_back();
 
-          AssertThrow(in, ExcIO());
+          DEAL_II_AssertThrow(in, ExcIO());
           for (unsigned int v = 0; v < 2; v++)
             in >> subcelldata.boundary_lines.back().vertices[v];
 
@@ -557,7 +558,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
         {
           subcelldata.boundary_quads.emplace_back();
 
-          AssertThrow(in, ExcIO());
+          DEAL_II_AssertThrow(in, ExcIO());
           for (unsigned int v = 0; v < 4; v++)
             in >> subcelldata.boundary_quads.back().vertices[v];
 
@@ -572,11 +573,11 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           no_quad++;
         }
       else
-        AssertThrow(false,
-                    ExcMessage("Unknown element label <" +
-                               Utilities::int_to_string(type) +
-                               "> when running in dim=" +
-                               Utilities::int_to_string(dim)));
+        DEAL_II_AssertThrow(false,
+                            ExcMessage("Unknown element label <" +
+                                       Utilities::int_to_string(type) +
+                                       "> when running in dim=" +
+                                       Utilities::int_to_string(dim)));
     }
 
   // note that so far all materials and bcs are explicitly set to 0
@@ -587,14 +588,15 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
 
   if (!in.eof())
     {
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
       in >> tmp;
 
       // section 2467 (2477) describes (materials - first and bcs - second) or
       // (bcs - first and materials - second) - sequence depends on which
       // group is created first: see
       // http://www.sdrl.uc.edu/sdrl/referenceinfo/universalfileformats/file-format-storehouse/universal-dataset-number-2467
-      AssertThrow((tmp == 2467) || (tmp == 2477), ExcUnknownSectionType(tmp));
+      DEAL_II_AssertThrow((tmp == 2467) || (tmp == 2477),
+                          ExcUnknownSectionType(tmp));
 
       while (tmp != -1) // we do until reach end of 2467 or 2477
         {
@@ -603,7 +605,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           int no;         // unv
           int dummy;
 
-          AssertThrow(in, ExcIO());
+          DEAL_II_AssertThrow(in, ExcIO());
           in >> dummy;
 
           tmp = dummy;
@@ -613,7 +615,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           in >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
             n_entities;
 
-          AssertThrow(in, ExcIO());
+          DEAL_II_AssertThrow(in, ExcIO());
           in >> id;
 
           const unsigned int n_lines =
@@ -631,7 +633,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
               for (unsigned int no_fragment = 0; no_fragment < n_fragments;
                    no_fragment++)
                 {
-                  AssertThrow(in, ExcIO());
+                  DEAL_II_AssertThrow(in, ExcIO());
                   in >> dummy >> no >> dummy >> dummy;
 
                   if (cell_indices.count(no) > 0) // cell - material
@@ -649,7 +651,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
         }
     }
 
-  Assert(subcelldata.check_consistency(dim), ExcInternalError());
+  DEAL_II_Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
 
@@ -669,8 +671,8 @@ void
 GridIn<dim, spacedim>::read_ucd(std::istream &in,
                                 const bool    apply_all_indicators_to_manifolds)
 {
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // skip comments at start of file
   skip_comment_lines(in, '#');
@@ -683,7 +685,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
   in >> n_vertices >> n_cells >> dummy // number of data vectors
     >> dummy                           // cell data
     >> dummy;                          // model data
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // set up array of vertices
   std::vector<Point<spacedim>> vertices(n_vertices);
@@ -698,7 +700,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
       double x[3];
 
       // read vertex
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
       in >> vertex_number >> x[0] >> x[1] >> x[2];
 
       // store vertex
@@ -721,7 +723,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
       // cells at the top, there
       // should still be input here,
       // so check this:
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
 
       std::string cell_type;
 
@@ -745,14 +747,17 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
             in >> cells.back().vertices[i];
 
           // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::material_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::material_id>::max()));
+          DEAL_II_Assert(
+            material_id <= std::numeric_limits<types::material_id>::max(),
+            ExcIndexRange(material_id,
+                          0,
+                          std::numeric_limits<types::material_id>::max()));
           // we use only material_ids in the range from 0 to
           // numbers::invalid_material_id-1
-          Assert(material_id < numbers::invalid_material_id,
-                 ExcIndexRange(material_id, 0, numbers::invalid_material_id));
+          DEAL_II_Assert(material_id < numbers::invalid_material_id,
+                         ExcIndexRange(material_id,
+                                       0,
+                                       numbers::invalid_material_id));
 
           cells.back().material_id =
             static_cast<types::material_id>(material_id);
@@ -769,9 +774,8 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
             else
               {
                 // no such vertex index
-                AssertThrow(false,
-                            ExcInvalidVertexIndex(cell,
-                                                  cells.back().vertices[i]));
+                DEAL_II_AssertThrow(
+                  false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
 
                 cells.back().vertices[i] = numbers::invalid_unsigned_int;
               }
@@ -784,16 +788,17 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
             subcelldata.boundary_lines.back().vertices[1];
 
           // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::boundary_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::boundary_id>::max()));
+          DEAL_II_Assert(
+            material_id <= std::numeric_limits<types::boundary_id>::max(),
+            ExcIndexRange(material_id,
+                          0,
+                          std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
+          DEAL_II_Assert(material_id < numbers::internal_face_boundary_id,
+                         ExcIndexRange(material_id,
+                                       0,
+                                       numbers::internal_face_boundary_id));
 
           // Make sure to set both manifold id and boundary id appropriately in
           // both cases:
@@ -826,10 +831,10 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
             else
               {
                 // no such vertex index
-                AssertThrow(false,
-                            ExcInvalidVertexIndex(
-                              cell,
-                              subcelldata.boundary_lines.back().vertices[i]));
+                DEAL_II_AssertThrow(
+                  false,
+                  ExcInvalidVertexIndex(
+                    cell, subcelldata.boundary_lines.back().vertices[i]));
                 subcelldata.boundary_lines.back().vertices[i] =
                   numbers::invalid_unsigned_int;
               };
@@ -844,16 +849,17 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
             subcelldata.boundary_quads.back().vertices[3];
 
           // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::boundary_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::boundary_id>::max()));
+          DEAL_II_Assert(
+            material_id <= std::numeric_limits<types::boundary_id>::max(),
+            ExcIndexRange(material_id,
+                          0,
+                          std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
+          DEAL_II_Assert(material_id < numbers::internal_face_boundary_id,
+                         ExcIndexRange(material_id,
+                                       0,
+                                       numbers::internal_face_boundary_id));
 
           // Make sure to set both manifold id and boundary id appropriately in
           // both cases:
@@ -886,23 +892,24 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
             else
               {
                 // no such vertex index
-                Assert(false,
-                       ExcInvalidVertexIndex(
-                         cell, subcelldata.boundary_quads.back().vertices[i]));
+                DEAL_II_Assert(
+                  false,
+                  ExcInvalidVertexIndex(
+                    cell, subcelldata.boundary_quads.back().vertices[i]));
                 subcelldata.boundary_quads.back().vertices[i] =
                   numbers::invalid_unsigned_int;
               };
         }
       else
         // cannot read this
-        AssertThrow(false, ExcUnknownIdentifier(cell_type));
+        DEAL_II_AssertThrow(false, ExcUnknownIdentifier(cell_type));
     };
 
 
   // check that no forbidden arrays are used
-  Assert(subcelldata.check_consistency(dim), ExcInternalError());
+  DEAL_II_Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -952,15 +959,15 @@ void
 GridIn<dim, spacedim>::read_abaqus(std::istream &in,
                                    const bool apply_all_indicators_to_manifolds)
 {
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
   // This implementation has only been verified for:
   // - 2d grids with codimension 0
   // - 3d grids with codimension 0
   // - 3d grids with codimension 1
-  Assert((spacedim == 2 && dim == spacedim) ||
-           (spacedim == 3 && (dim == spacedim || dim == spacedim - 1)),
-         ExcNotImplemented());
-  AssertThrow(in, ExcIO());
+  DEAL_II_Assert((spacedim == 2 && dim == spacedim) ||
+                   (spacedim == 3 && (dim == spacedim || dim == spacedim - 1)),
+                 ExcNotImplemented());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // Read in the Abaqus file into an intermediate object
   // that is to be passed along to the UCD reader
@@ -983,7 +990,7 @@ GridIn<dim, spacedim>::read_abaqus(std::istream &in,
       std::cerr << "Exception on processing internal UCD data: " << std::endl
                 << exc.what() << std::endl;
 
-      AssertThrow(
+      DEAL_II_AssertThrow(
         false,
         ExcMessage(
           "Internal conversion from ABAQUS file to UCD format was unsuccessful. "
@@ -993,7 +1000,7 @@ GridIn<dim, spacedim>::read_abaqus(std::istream &in,
     }
   catch (...)
     {
-      AssertThrow(
+      DEAL_II_AssertThrow(
         false,
         ExcMessage(
           "Internal conversion from ABAQUS file to UCD format was unsuccessful. "
@@ -1007,10 +1014,10 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
 {
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  Assert(dim == 2, ExcNotImplemented());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_Assert(dim == 2, ExcNotImplemented());
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // skip comments at start of file
   skip_comment_lines(in, '#');
@@ -1019,16 +1026,17 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   std::string line;
   getline(in, line);
 
-  AssertThrow(line == "MeshVersionFormatted 0", ExcInvalidDBMESHInput(line));
+  DEAL_II_AssertThrow(line == "MeshVersionFormatted 0",
+                      ExcInvalidDBMESHInput(line));
 
   skip_empty_lines(in);
 
   // next read dimension
   getline(in, line);
-  AssertThrow(line == "Dimension", ExcInvalidDBMESHInput(line));
+  DEAL_II_AssertThrow(line == "Dimension", ExcInvalidDBMESHInput(line));
   unsigned int dimension;
   in >> dimension;
-  AssertThrow(dimension == dim, ExcDBMESHWrongDimension(dimension));
+  DEAL_II_AssertThrow(dimension == dim, ExcDBMESHWrongDimension(dimension));
   skip_empty_lines(in);
 
   // now there are a lot of fields of
@@ -1049,7 +1057,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
 
   // now read vertices
   getline(in, line);
-  AssertThrow(line == "Vertices", ExcInvalidDBMESHInput(line));
+  DEAL_II_AssertThrow(line == "Vertices", ExcInvalidDBMESHInput(line));
 
   unsigned int n_vertices;
   double       dummy;
@@ -1064,7 +1072,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       // read Ref phi_i, whatever that may be
       in >> dummy;
     };
-  AssertThrow(in, ExcInvalidDBMeshFormat());
+  DEAL_II_AssertThrow(in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
 
@@ -1072,7 +1080,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   // present, so just read them and
   // discard the input
   getline(in, line);
-  AssertThrow(line == "Edges", ExcInvalidDBMESHInput(line));
+  DEAL_II_AssertThrow(line == "Edges", ExcInvalidDBMESHInput(line));
 
   unsigned int n_edges;
   in >> n_edges;
@@ -1083,7 +1091,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       // read Ref phi_i, whatever that may be
       in >> dummy;
     };
-  AssertThrow(in, ExcInvalidDBMeshFormat());
+  DEAL_II_AssertThrow(in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
 
@@ -1094,7 +1102,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   // present, so just read them and
   // discard the input
   getline(in, line);
-  AssertThrow(line == "CrackedEdges", ExcInvalidDBMESHInput(line));
+  DEAL_II_AssertThrow(line == "CrackedEdges", ExcInvalidDBMESHInput(line));
 
   in >> n_edges;
   for (unsigned int edge = 0; edge < n_edges; ++edge)
@@ -1104,7 +1112,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       // read Ref phi_i, whatever that may be
       in >> dummy;
     };
-  AssertThrow(in, ExcInvalidDBMeshFormat());
+  DEAL_II_AssertThrow(in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
 
@@ -1112,7 +1120,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   // now read cells.
   // set up array of cells
   getline(in, line);
-  AssertThrow(line == "Quadrilaterals", ExcInvalidDBMESHInput(line));
+  DEAL_II_AssertThrow(line == "Quadrilaterals", ExcInvalidDBMESHInput(line));
 
   std::vector<CellData<dim>> cells;
   SubCellData                subcelldata;
@@ -1127,10 +1135,11 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
         {
           in >> cells.back().vertices[i];
 
-          AssertThrow((cells.back().vertices[i] >= 1) &&
-                        (static_cast<unsigned int>(cells.back().vertices[i]) <=
-                         vertices.size()),
-                      ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
+          DEAL_II_AssertThrow(
+            (cells.back().vertices[i] >= 1) &&
+              (static_cast<unsigned int>(cells.back().vertices[i]) <=
+               vertices.size()),
+            ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
 
           --cells.back().vertices[i];
         };
@@ -1138,7 +1147,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       // read and discard Ref phi_i
       in >> dummy;
     };
-  AssertThrow(in, ExcInvalidDBMeshFormat());
+  DEAL_II_AssertThrow(in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
 
@@ -1155,9 +1164,9 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
 
 
   // check that no forbidden arrays are used
-  Assert(subcelldata.check_consistency(dim), ExcInternalError());
+  DEAL_II_Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -1174,7 +1183,7 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_xda(std::istream &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1183,8 +1192,8 @@ template <>
 void
 GridIn<2>::read_xda(std::istream &in)
 {
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   std::string line;
   // skip comments at start of file
@@ -1216,8 +1225,9 @@ GridIn<2>::read_xda(std::istream &in)
       // cells at the top, there
       // should still be input here,
       // so check this:
-      AssertThrow(in, ExcIO());
-      Assert(GeometryInfo<2>::vertices_per_cell == 4, ExcInternalError());
+      DEAL_II_AssertThrow(in, ExcIO());
+      DEAL_II_Assert(GeometryInfo<2>::vertices_per_cell == 4,
+                     ExcInternalError());
 
       for (unsigned int i = 0; i < 4; ++i)
         in >> cells[cell].vertices[i];
@@ -1238,7 +1248,7 @@ GridIn<2>::read_xda(std::istream &in)
       for (unsigned int d = 0; d < 2; ++d)
         vertices[vertex](d) = x[d];
     };
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -1254,8 +1264,8 @@ template <>
 void
 GridIn<3>::read_xda(std::istream &in)
 {
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   static const unsigned int xda_to_dealII_map[] = {0, 1, 5, 4, 3, 2, 6, 7};
 
@@ -1289,8 +1299,9 @@ GridIn<3>::read_xda(std::istream &in)
       // cells at the top, there
       // should still be input here,
       // so check this:
-      AssertThrow(in, ExcIO());
-      Assert(GeometryInfo<3>::vertices_per_cell == 8, ExcInternalError());
+      DEAL_II_AssertThrow(in, ExcIO());
+      DEAL_II_Assert(GeometryInfo<3>::vertices_per_cell == 8,
+                     ExcInternalError());
 
       unsigned int xda_ordered_nodes[8];
 
@@ -1316,7 +1327,7 @@ GridIn<3>::read_xda(std::istream &in)
       for (unsigned int d = 0; d < 3; ++d)
         vertices[vertex](d) = x[d];
     };
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // do some clean-up on vertices...
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
@@ -1332,8 +1343,8 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_msh(std::istream &in)
 {
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   unsigned int n_vertices;
   unsigned int n_cells;
@@ -1349,7 +1360,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   else if (line == "$MeshFormat")
     gmsh_file_format = 2;
   else
-    AssertThrow(false, ExcInvalidGMSHInput(line));
+    DEAL_II_AssertThrow(false, ExcInvalidGMSHInput(line));
 
   // if file format is 2 or greater
   // then we also have to read the
@@ -1361,9 +1372,9 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
       in >> version >> file_type >> data_size;
 
-      Assert((version >= 2.0) && (version <= 2.2), ExcNotImplemented());
-      Assert(file_type == 0, ExcNotImplemented());
-      Assert(data_size == sizeof(double), ExcNotImplemented());
+      DEAL_II_Assert((version >= 2.0) && (version <= 2.2), ExcNotImplemented());
+      DEAL_II_Assert(file_type == 0, ExcNotImplemented());
+      DEAL_II_Assert(data_size == sizeof(double), ExcNotImplemented());
 
       // read the end of the header
       // and the first line of the
@@ -1371,7 +1382,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       // ourselves with the format 1
       // handling above
       in >> line;
-      AssertThrow(line == "$EndMeshFormat", ExcInvalidGMSHInput(line));
+      DEAL_II_AssertThrow(line == "$EndMeshFormat", ExcInvalidGMSHInput(line));
 
       in >> line;
       // if the next block is of kind
@@ -1389,7 +1400,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       // but the next thing should,
       // in any case, be the list of
       // nodes:
-      AssertThrow(line == "$Nodes", ExcInvalidGMSHInput(line));
+      DEAL_II_AssertThrow(line == "$Nodes", ExcInvalidGMSHInput(line));
     }
 
   // now read the nodes list
@@ -1414,17 +1425,17 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       vertex_indices[vertex_number] = vertex;
     }
 
-  // Assert we reached the end of the block
+  // DEAL_II_Assert we reached the end of the block
   in >> line;
   static const std::string end_nodes_marker[] = {"$ENDNOD", "$EndNodes"};
-  AssertThrow(line == end_nodes_marker[gmsh_file_format - 1],
-              ExcInvalidGMSHInput(line));
+  DEAL_II_AssertThrow(line == end_nodes_marker[gmsh_file_format - 1],
+                      ExcInvalidGMSHInput(line));
 
   // Now read in next bit
   in >> line;
   static const std::string begin_elements_marker[] = {"$ELM", "$Elements"};
-  AssertThrow(line == begin_elements_marker[gmsh_file_format - 1],
-              ExcInvalidGMSHInput(line));
+  DEAL_II_AssertThrow(line == begin_elements_marker[gmsh_file_format - 1],
+                      ExcInvalidGMSHInput(line));
 
   in >> n_cells;
 
@@ -1442,7 +1453,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       // cells at the top, there
       // should still be input here,
       // so check this:
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
 
       unsigned int cell_type;
       unsigned int material_id;
@@ -1496,7 +1507,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             }
 
           default:
-            AssertThrow(false, ExcNotImplemented());
+            DEAL_II_AssertThrow(false, ExcNotImplemented());
         }
 
 
@@ -1519,9 +1530,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           ((cell_type == 3) && (dim == 2)) || ((cell_type == 5) && (dim == 3)))
         // found a cell
         {
-          AssertThrow(nod_num == GeometryInfo<dim>::vertices_per_cell,
-                      ExcMessage("Number of nodes does not coincide with the "
-                                 "number required for this object"));
+          DEAL_II_AssertThrow(nod_num == GeometryInfo<dim>::vertices_per_cell,
+                              ExcMessage(
+                                "Number of nodes does not coincide with the "
+                                "number required for this object"));
 
           // allocate and read indices
           cells.emplace_back();
@@ -1530,14 +1542,17 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             in >> cells.back().vertices[i];
 
           // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::material_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::material_id>::max()));
+          DEAL_II_Assert(
+            material_id <= std::numeric_limits<types::material_id>::max(),
+            ExcIndexRange(material_id,
+                          0,
+                          std::numeric_limits<types::material_id>::max()));
           // we use only material_ids in the range from 0 to
           // numbers::invalid_material_id-1
-          Assert(material_id < numbers::invalid_material_id,
-                 ExcIndexRange(material_id, 0, numbers::invalid_material_id));
+          DEAL_II_Assert(material_id < numbers::invalid_material_id,
+                         ExcIndexRange(material_id,
+                                       0,
+                                       numbers::invalid_material_id));
 
           cells.back().material_id =
             static_cast<types::material_id>(material_id);
@@ -1547,11 +1562,12 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
                ++i)
             {
-              AssertThrow(vertex_indices.find(cells.back().vertices[i]) !=
-                            vertex_indices.end(),
-                          ExcInvalidVertexIndexGmsh(cell,
-                                                    elm_number,
-                                                    cells.back().vertices[i]));
+              DEAL_II_AssertThrow(
+                vertex_indices.find(cells.back().vertices[i]) !=
+                  vertex_indices.end(),
+                ExcInvalidVertexIndexGmsh(cell,
+                                          elm_number,
+                                          cells.back().vertices[i]));
 
               // vertex with this index exists
               cells.back().vertices[i] =
@@ -1566,16 +1582,17 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             subcelldata.boundary_lines.back().vertices[1];
 
           // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::boundary_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::boundary_id>::max()));
+          DEAL_II_Assert(
+            material_id <= std::numeric_limits<types::boundary_id>::max(),
+            ExcIndexRange(material_id,
+                          0,
+                          std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
+          DEAL_II_Assert(material_id < numbers::internal_face_boundary_id,
+                         ExcIndexRange(material_id,
+                                       0,
+                                       numbers::internal_face_boundary_id));
 
           subcelldata.boundary_lines.back().boundary_id =
             static_cast<types::boundary_id>(material_id);
@@ -1592,10 +1609,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             else
               {
                 // no such vertex index
-                AssertThrow(false,
-                            ExcInvalidVertexIndex(
-                              cell,
-                              subcelldata.boundary_lines.back().vertices[i]));
+                DEAL_II_AssertThrow(
+                  false,
+                  ExcInvalidVertexIndex(
+                    cell, subcelldata.boundary_lines.back().vertices[i]));
                 subcelldata.boundary_lines.back().vertices[i] =
                   numbers::invalid_unsigned_int;
               };
@@ -1610,16 +1627,17 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             subcelldata.boundary_quads.back().vertices[3];
 
           // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::boundary_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::boundary_id>::max()));
+          DEAL_II_Assert(
+            material_id <= std::numeric_limits<types::boundary_id>::max(),
+            ExcIndexRange(material_id,
+                          0,
+                          std::numeric_limits<types::boundary_id>::max()));
           // we use only boundary_ids in the range from 0 to
           // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
+          DEAL_II_Assert(material_id < numbers::internal_face_boundary_id,
+                         ExcIndexRange(material_id,
+                                       0,
+                                       numbers::internal_face_boundary_id));
 
           subcelldata.boundary_quads.back().boundary_id =
             static_cast<types::boundary_id>(material_id);
@@ -1636,9 +1654,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
             else
               {
                 // no such vertex index
-                Assert(false,
-                       ExcInvalidVertexIndex(
-                         cell, subcelldata.boundary_quads.back().vertices[i]));
+                DEAL_II_Assert(
+                  false,
+                  ExcInvalidVertexIndex(
+                    cell, subcelldata.boundary_quads.back().vertices[i]));
                 subcelldata.boundary_quads.back().vertices[i] =
                   numbers::invalid_unsigned_int;
               }
@@ -1661,7 +1680,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                   break;
                 }
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             }
 
           // we only care about boundary indicators assigned to individual
@@ -1677,33 +1696,34 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
         // deserves a more explicit
         // error message
         {
-          AssertThrow(cell_type != 2,
-                      ExcMessage("Found triangles while reading a file "
-                                 "in gmsh format. deal.II does not "
-                                 "support triangles"));
-          AssertThrow(cell_type != 11,
-                      ExcMessage("Found tetrahedra while reading a file "
-                                 "in gmsh format. deal.II does not "
-                                 "support tetrahedra"));
+          DEAL_II_AssertThrow(cell_type != 2,
+                              ExcMessage("Found triangles while reading a file "
+                                         "in gmsh format. deal.II does not "
+                                         "support triangles"));
+          DEAL_II_AssertThrow(cell_type != 11,
+                              ExcMessage(
+                                "Found tetrahedra while reading a file "
+                                "in gmsh format. deal.II does not "
+                                "support tetrahedra"));
 
-          AssertThrow(false, ExcGmshUnsupportedGeometry(cell_type));
+          DEAL_II_AssertThrow(false, ExcGmshUnsupportedGeometry(cell_type));
         }
     }
 
-  // Assert we reached the end of the block
+  // DEAL_II_Assert we reached the end of the block
   in >> line;
   static const std::string end_elements_marker[] = {"$ENDELM", "$EndElements"};
-  AssertThrow(line == end_elements_marker[gmsh_file_format - 1],
-              ExcInvalidGMSHInput(line));
+  DEAL_II_AssertThrow(line == end_elements_marker[gmsh_file_format - 1],
+                      ExcInvalidGMSHInput(line));
 
   // check that no forbidden arrays are used
-  Assert(subcelldata.check_consistency(dim), ExcInternalError());
+  DEAL_II_Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // check that we actually read some
   // cells.
-  AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
+  DEAL_II_AssertThrow(cells.size() > 0, ExcGmshNoCellInformation());
 
   // do some clean-up on
   // vertices...
@@ -1726,14 +1746,14 @@ template <>
 void
 GridIn<1>::read_netcdf(const std::string &)
 {
-  AssertThrow(false, ExcImpossibleInDim(1));
+  DEAL_II_AssertThrow(false, ExcImpossibleInDim(1));
 }
 
 template <>
 void
 GridIn<1, 2>::read_netcdf(const std::string &)
 {
-  AssertThrow(false, ExcImpossibleInDim(1));
+  DEAL_II_AssertThrow(false, ExcImpossibleInDim(1));
 }
 
 
@@ -1741,7 +1761,7 @@ template <>
 void
 GridIn<1, 3>::read_netcdf(const std::string &)
 {
-  AssertThrow(false, ExcImpossibleInDim(1));
+  DEAL_II_AssertThrow(false, ExcImpossibleInDim(1));
 }
 
 
@@ -1749,7 +1769,7 @@ template <>
 void
 GridIn<2, 3>::read_netcdf(const std::string &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 template <>
@@ -1758,11 +1778,11 @@ GridIn<2>::read_netcdf(const std::string &filename)
 {
 #ifndef DEAL_II_WITH_NETCDF
   (void)filename;
-  AssertThrow(false, ExcNeedsNetCDF());
+  DEAL_II_AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim      = 2;
   const unsigned int spacedim = 2;
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
   // this function assumes the TAU
   // grid format.
   //
@@ -1802,25 +1822,25 @@ GridIn<2>::read_netcdf(const std::string &filename)
 
   // First, open the file
   NcFile nc(filename.c_str());
-  AssertThrow(nc.is_valid(), ExcIO());
+  DEAL_II_AssertThrow(nc.is_valid(), ExcIO());
 
   // then read n_cells
   NcDim *elements_dim = nc.get_dim("no_of_elements");
-  AssertThrow(elements_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(elements_dim->is_valid(), ExcIO());
   const unsigned int n_cells = elements_dim->size();
 
   // then we read
   //   int marker(no_of_markers)
   NcDim *marker_dim = nc.get_dim("no_of_markers");
-  AssertThrow(marker_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(marker_dim->is_valid(), ExcIO());
   const unsigned int n_markers = marker_dim->size();
 
   NcVar *marker_var = nc.get_var("marker");
-  AssertThrow(marker_var->is_valid(), ExcIO());
-  AssertThrow(marker_var->num_dims() == 1, ExcIO());
-  AssertThrow(static_cast<unsigned int>(marker_var->get_dim(0)->size()) ==
-                n_markers,
-              ExcIO());
+  DEAL_II_AssertThrow(marker_var->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(marker_var->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(
+                        marker_var->get_dim(0)->size()) == n_markers,
+                      ExcIO());
 
   std::vector<int> marker(n_markers);
   // use &* to convert
@@ -1831,15 +1851,15 @@ GridIn<2>::read_netcdf(const std::string &filename)
   // int boundarymarker_of_surfaces(
   //   no_of_surfaceelements)
   NcDim *bquads_dim = nc.get_dim("no_of_surfacequadrilaterals");
-  AssertThrow(bquads_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(bquads_dim->is_valid(), ExcIO());
   const unsigned int n_bquads = bquads_dim->size();
 
   NcVar *bmarker_var = nc.get_var("boundarymarker_of_surfaces");
-  AssertThrow(bmarker_var->is_valid(), ExcIO());
-  AssertThrow(bmarker_var->num_dims() == 1, ExcIO());
-  AssertThrow(static_cast<unsigned int>(bmarker_var->get_dim(0)->size()) ==
-                n_bquads,
-              ExcIO());
+  DEAL_II_AssertThrow(bmarker_var->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(bmarker_var->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(
+                        bmarker_var->get_dim(0)->size()) == n_bquads,
+                      ExcIO());
 
   std::vector<int> bmarker(n_bquads);
   bmarker_var->get(&*bmarker.begin(), n_bquads);
@@ -1852,9 +1872,9 @@ GridIn<2>::read_netcdf(const std::string &filename)
     {
       // the markers should all be
       // different
-      AssertThrow(n_bquads_per_bmarker.find(marker[i]) ==
-                    n_bquads_per_bmarker.end(),
-                  ExcIO());
+      DEAL_II_AssertThrow(n_bquads_per_bmarker.find(marker[i]) ==
+                            n_bquads_per_bmarker.end(),
+                          ExcIO());
 
       n_bquads_per_bmarker[marker[i]] =
         count(bmarker.begin(), bmarker.end(), marker[i]);
@@ -1877,20 +1897,21 @@ GridIn<2>::read_netcdf(const std::string &filename)
   //   no_of_surfacequadrilaterals,
   //   points_per_surfacequadrilateral)
   NcDim *quad_vertices_dim = nc.get_dim("points_per_surfacequadrilateral");
-  AssertThrow(quad_vertices_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(quad_vertices_dim->is_valid(), ExcIO());
   const unsigned int vertices_per_quad = quad_vertices_dim->size();
-  AssertThrow(vertices_per_quad == GeometryInfo<dim>::vertices_per_cell,
-              ExcIO());
+  DEAL_II_AssertThrow(vertices_per_quad == GeometryInfo<dim>::vertices_per_cell,
+                      ExcIO());
 
   NcVar *vertex_indices_var = nc.get_var("points_of_surfacequadrilaterals");
-  AssertThrow(vertex_indices_var->is_valid(), ExcIO());
-  AssertThrow(vertex_indices_var->num_dims() == 2, ExcIO());
-  AssertThrow(static_cast<unsigned int>(
-                vertex_indices_var->get_dim(0)->size()) == n_bquads,
-              ExcIO());
-  AssertThrow(static_cast<unsigned int>(
-                vertex_indices_var->get_dim(1)->size()) == vertices_per_quad,
-              ExcIO());
+  DEAL_II_AssertThrow(vertex_indices_var->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(vertex_indices_var->num_dims() == 2, ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(
+                        vertex_indices_var->get_dim(0)->size()) == n_bquads,
+                      ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(
+                        vertex_indices_var->get_dim(1)->size()) ==
+                        vertices_per_quad,
+                      ExcIO());
 
   std::vector<int> vertex_indices(n_bquads * vertices_per_quad);
   vertex_indices_var->get(&*vertex_indices.begin(),
@@ -1898,31 +1919,34 @@ GridIn<2>::read_netcdf(const std::string &filename)
                           vertices_per_quad);
 
   for (unsigned int i = 0; i < vertex_indices.size(); ++i)
-    AssertThrow(vertex_indices[i] >= 0, ExcIO());
+    DEAL_II_AssertThrow(vertex_indices[i] >= 0, ExcIO());
 
   // next we read
   //   double points_xc(no_of_points)
   //   double points_yc(no_of_points)
   //   double points_zc(no_of_points)
   NcDim *vertices_dim = nc.get_dim("no_of_points");
-  AssertThrow(vertices_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(vertices_dim->is_valid(), ExcIO());
   const unsigned int n_vertices = vertices_dim->size();
 
   NcVar *points_xc = nc.get_var("points_xc");
   NcVar *points_yc = nc.get_var("points_yc");
   NcVar *points_zc = nc.get_var("points_zc");
-  AssertThrow(points_xc->is_valid(), ExcIO());
-  AssertThrow(points_yc->is_valid(), ExcIO());
-  AssertThrow(points_zc->is_valid(), ExcIO());
-  AssertThrow(points_xc->num_dims() == 1, ExcIO());
-  AssertThrow(points_yc->num_dims() == 1, ExcIO());
-  AssertThrow(points_zc->num_dims() == 1, ExcIO());
-  AssertThrow(points_yc->get_dim(0)->size() == static_cast<int>(n_vertices),
-              ExcIO());
-  AssertThrow(points_zc->get_dim(0)->size() == static_cast<int>(n_vertices),
-              ExcIO());
-  AssertThrow(points_xc->get_dim(0)->size() == static_cast<int>(n_vertices),
-              ExcIO());
+  DEAL_II_AssertThrow(points_xc->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(points_yc->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(points_zc->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(points_xc->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(points_yc->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(points_zc->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(points_yc->get_dim(0)->size() ==
+                        static_cast<int>(n_vertices),
+                      ExcIO());
+  DEAL_II_AssertThrow(points_zc->get_dim(0)->size() ==
+                        static_cast<int>(n_vertices),
+                      ExcIO());
+  DEAL_II_AssertThrow(points_xc->get_dim(0)->size() ==
+                        static_cast<int>(n_vertices),
+                      ExcIO());
   std::vector<std::vector<double>> point_values(
     3, std::vector<double>(n_vertices));
   points_xc->get(&*point_values[0].begin(), n_vertices);
@@ -1960,7 +1984,7 @@ GridIn<2>::read_netcdf(const std::string &filename)
        iter != zero_plane_markers.end();
        ++iter)
     sum_of_zero_plane_cells += n_bquads_per_bmarker[iter->first];
-  AssertThrow(sum_of_zero_plane_cells == n_cells, ExcIO());
+  DEAL_II_AssertThrow(sum_of_zero_plane_cells == n_cells, ExcIO());
 
   // fill cells with all quads
   // associated with
@@ -1983,7 +2007,7 @@ GridIn<2>::read_netcdf(const std::string &filename)
         {
           for (unsigned int i = 0; i < vertices_per_quad; ++i)
             {
-              Assert(
+              DEAL_II_Assert(
                 point_values[coord]
                             [vertex_indices[quad * vertices_per_quad + i]] == 0,
                 ExcNotImplemented());
@@ -2011,48 +2035,50 @@ GridIn<3>::read_netcdf(const std::string &filename)
   // to make sure it at least looks used,
   // even if it is not
   (void)filename;
-  AssertThrow(false, ExcNeedsNetCDF());
+  DEAL_II_AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim      = 3;
   const unsigned int spacedim = 3;
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
   // this function assumes the TAU
   // grid format.
 
   // First, open the file
   NcFile nc(filename.c_str());
-  AssertThrow(nc.is_valid(), ExcIO());
+  DEAL_II_AssertThrow(nc.is_valid(), ExcIO());
 
   // then read n_cells
   NcDim *elements_dim = nc.get_dim("no_of_elements");
-  AssertThrow(elements_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(elements_dim->is_valid(), ExcIO());
   const unsigned int n_cells = elements_dim->size();
   // and n_hexes
   NcDim *hexes_dim = nc.get_dim("no_of_hexaeders");
-  AssertThrow(hexes_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(hexes_dim->is_valid(), ExcIO());
   const unsigned int n_hexes = hexes_dim->size();
-  AssertThrow(n_hexes == n_cells,
-              ExcMessage("deal.II can handle purely hexaedral grids, only."));
+  DEAL_II_AssertThrow(n_hexes == n_cells,
+                      ExcMessage(
+                        "deal.II can handle purely hexaedral grids, only."));
 
   // next we read
   // int points_of_hexaeders(
   //   no_of_hexaeders,
   //   points_per_hexaeder)
   NcDim *hex_vertices_dim = nc.get_dim("points_per_hexaeder");
-  AssertThrow(hex_vertices_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(hex_vertices_dim->is_valid(), ExcIO());
   const unsigned int vertices_per_hex = hex_vertices_dim->size();
-  AssertThrow(vertices_per_hex == GeometryInfo<dim>::vertices_per_cell,
-              ExcIO());
+  DEAL_II_AssertThrow(vertices_per_hex == GeometryInfo<dim>::vertices_per_cell,
+                      ExcIO());
 
   NcVar *vertex_indices_var = nc.get_var("points_of_hexaeders");
-  AssertThrow(vertex_indices_var->is_valid(), ExcIO());
-  AssertThrow(vertex_indices_var->num_dims() == 2, ExcIO());
-  AssertThrow(static_cast<unsigned int>(
-                vertex_indices_var->get_dim(0)->size()) == n_cells,
-              ExcIO());
-  AssertThrow(static_cast<unsigned int>(
-                vertex_indices_var->get_dim(1)->size()) == vertices_per_hex,
-              ExcIO());
+  DEAL_II_AssertThrow(vertex_indices_var->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(vertex_indices_var->num_dims() == 2, ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(
+                        vertex_indices_var->get_dim(0)->size()) == n_cells,
+                      ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(
+                        vertex_indices_var->get_dim(1)->size()) ==
+                        vertices_per_hex,
+                      ExcIO());
 
   std::vector<int> vertex_indices(n_cells * vertices_per_hex);
   // use &* to convert
@@ -2060,31 +2086,34 @@ GridIn<3>::read_netcdf(const std::string &filename)
   vertex_indices_var->get(&*vertex_indices.begin(), n_cells, vertices_per_hex);
 
   for (unsigned int i = 0; i < vertex_indices.size(); ++i)
-    AssertThrow(vertex_indices[i] >= 0, ExcIO());
+    DEAL_II_AssertThrow(vertex_indices[i] >= 0, ExcIO());
 
   // next we read
   //   double points_xc(no_of_points)
   //   double points_yc(no_of_points)
   //   double points_zc(no_of_points)
   NcDim *vertices_dim = nc.get_dim("no_of_points");
-  AssertThrow(vertices_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(vertices_dim->is_valid(), ExcIO());
   const unsigned int n_vertices = vertices_dim->size();
 
   NcVar *points_xc = nc.get_var("points_xc");
   NcVar *points_yc = nc.get_var("points_yc");
   NcVar *points_zc = nc.get_var("points_zc");
-  AssertThrow(points_xc->is_valid(), ExcIO());
-  AssertThrow(points_yc->is_valid(), ExcIO());
-  AssertThrow(points_zc->is_valid(), ExcIO());
-  AssertThrow(points_xc->num_dims() == 1, ExcIO());
-  AssertThrow(points_yc->num_dims() == 1, ExcIO());
-  AssertThrow(points_zc->num_dims() == 1, ExcIO());
-  AssertThrow(points_yc->get_dim(0)->size() == static_cast<int>(n_vertices),
-              ExcIO());
-  AssertThrow(points_zc->get_dim(0)->size() == static_cast<int>(n_vertices),
-              ExcIO());
-  AssertThrow(points_xc->get_dim(0)->size() == static_cast<int>(n_vertices),
-              ExcIO());
+  DEAL_II_AssertThrow(points_xc->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(points_yc->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(points_zc->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(points_xc->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(points_yc->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(points_zc->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(points_yc->get_dim(0)->size() ==
+                        static_cast<int>(n_vertices),
+                      ExcIO());
+  DEAL_II_AssertThrow(points_zc->get_dim(0)->size() ==
+                        static_cast<int>(n_vertices),
+                      ExcIO());
+  DEAL_II_AssertThrow(points_xc->get_dim(0)->size() ==
+                        static_cast<int>(n_vertices),
+                      ExcIO());
   std::vector<std::vector<double>> point_values(
     3, std::vector<double>(n_vertices));
   points_xc->get(&*point_values[0].begin(), n_vertices);
@@ -2116,19 +2145,19 @@ GridIn<3>::read_netcdf(const std::string &filename)
   //   no_of_surfacequadrilaterals,
   //   points_per_surfacequadrilateral)
   NcDim *quad_vertices_dim = nc.get_dim("points_per_surfacequadrilateral");
-  AssertThrow(quad_vertices_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(quad_vertices_dim->is_valid(), ExcIO());
   const unsigned int vertices_per_quad = quad_vertices_dim->size();
-  AssertThrow(vertices_per_quad == GeometryInfo<dim>::vertices_per_face,
-              ExcIO());
+  DEAL_II_AssertThrow(vertices_per_quad == GeometryInfo<dim>::vertices_per_face,
+                      ExcIO());
 
   NcVar *bvertex_indices_var = nc.get_var("points_of_surfacequadrilaterals");
-  AssertThrow(bvertex_indices_var->is_valid(), ExcIO());
-  AssertThrow(bvertex_indices_var->num_dims() == 2, ExcIO());
+  DEAL_II_AssertThrow(bvertex_indices_var->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(bvertex_indices_var->num_dims() == 2, ExcIO());
   const unsigned int n_bquads = bvertex_indices_var->get_dim(0)->size();
-  AssertThrow(static_cast<unsigned int>(
-                bvertex_indices_var->get_dim(1)->size()) ==
-                GeometryInfo<dim>::vertices_per_face,
-              ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(
+                        bvertex_indices_var->get_dim(1)->size()) ==
+                        GeometryInfo<dim>::vertices_per_face,
+                      ExcIO());
 
   std::vector<int> bvertex_indices(n_bquads * vertices_per_quad);
   bvertex_indices_var->get(&*bvertex_indices.begin(),
@@ -2139,16 +2168,16 @@ GridIn<3>::read_netcdf(const std::string &filename)
   // int boundarymarker_of_surfaces(
   //   no_of_surfaceelements)
   NcDim *bquads_dim = nc.get_dim("no_of_surfacequadrilaterals");
-  AssertThrow(bquads_dim->is_valid(), ExcIO());
-  AssertThrow(static_cast<unsigned int>(bquads_dim->size()) == n_bquads,
-              ExcIO());
+  DEAL_II_AssertThrow(bquads_dim->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(bquads_dim->size()) == n_bquads,
+                      ExcIO());
 
   NcVar *bmarker_var = nc.get_var("boundarymarker_of_surfaces");
-  AssertThrow(bmarker_var->is_valid(), ExcIO());
-  AssertThrow(bmarker_var->num_dims() == 1, ExcIO());
-  AssertThrow(static_cast<unsigned int>(bmarker_var->get_dim(0)->size()) ==
-                n_bquads,
-              ExcIO());
+  DEAL_II_AssertThrow(bmarker_var->is_valid(), ExcIO());
+  DEAL_II_AssertThrow(bmarker_var->num_dims() == 1, ExcIO());
+  DEAL_II_AssertThrow(static_cast<unsigned int>(
+                        bmarker_var->get_dim(0)->size()) == n_bquads,
+                      ExcIO());
 
   std::vector<int> bmarker(n_bquads);
   bmarker_var->get(&*bmarker.begin(), n_bquads);
@@ -2158,9 +2187,10 @@ GridIn<3>::read_netcdf(const std::string &filename)
   // take numbers::internal_face_boundary_id
   // as it denotes an internal face
   for (unsigned int i = 0; i < bmarker.size(); ++i)
-    Assert(0 <= bmarker[i] && static_cast<types::boundary_id>(bmarker[i]) !=
-                                numbers::internal_face_boundary_id,
-           ExcIO());
+    DEAL_II_Assert(0 <= bmarker[i] &&
+                     static_cast<types::boundary_id>(bmarker[i]) !=
+                       numbers::internal_face_boundary_id,
+                   ExcIO());
 
   // finally we setup the boundary
   // information
@@ -2196,8 +2226,8 @@ GridIn<dim, spacedim>::parse_tecplot_header(
   bool &                     structured,
   bool &                     blocked)
 {
-  Assert(tecplot2deal.size() == dim, ExcInternalError());
-  Assert(IJK.size() == dim, ExcInternalError());
+  DEAL_II_Assert(tecplot2deal.size() == dim, ExcInternalError());
+  DEAL_II_Assert(IJK.size() == dim, ExcInternalError());
   // initialize the output variables
   n_vars     = 0;
   n_vertices = 0;
@@ -2284,12 +2314,12 @@ GridIn<dim, spacedim>::parse_tecplot_header(
           // string is treated correctly
           --i;
 
-          AssertThrow(
+          DEAL_II_AssertThrow(
             n_vars >= dim,
             ExcMessage(
               "Tecplot file must contain at least one variable for each dimension"));
           for (unsigned int d = 1; d < dim; ++d)
-            AssertThrow(
+            DEAL_II_AssertThrow(
               tecplot2deal[d] > 0,
               ExcMessage(
                 "Tecplot file must contain at least one variable for each dimension."));
@@ -2311,9 +2341,9 @@ GridIn<dim, spacedim>::parse_tecplot_header(
       else if (Utilities::match_at_string_start(entries[i], "ZONETYPE="))
         // unsupported ZONETYPE
         {
-          AssertThrow(false,
-                      ExcMessage(
-                        "The tecplot file contains an unsupported ZONETYPE."));
+          DEAL_II_AssertThrow(
+            false,
+            ExcMessage("The tecplot file contains an unsupported ZONETYPE."));
         }
       else if (Utilities::match_at_string_start(entries[i],
                                                 "DATAPACKING=POINT"))
@@ -2351,7 +2381,7 @@ GridIn<dim, spacedim>::parse_tecplot_header(
       else if (Utilities::match_at_string_start(entries[i], "ET="))
         // unsupported ElementType
         {
-          AssertThrow(
+          DEAL_II_AssertThrow(
             false,
             ExcMessage(
               "The tecplot file contains an unsupported ElementType."));
@@ -2361,7 +2391,7 @@ GridIn<dim, spacedim>::parse_tecplot_header(
       else if (Utilities::match_at_string_start(entries[i], "J="))
         {
           IJK[1] = Utilities::get_integer_at_position(entries[i], 2).first;
-          AssertThrow(
+          DEAL_II_AssertThrow(
             dim > 1 || IJK[1] == 1,
             ExcMessage(
               "Parameter 'J=' found in tecplot, although this is only possible for dimensions greater than 1."));
@@ -2369,7 +2399,7 @@ GridIn<dim, spacedim>::parse_tecplot_header(
       else if (Utilities::match_at_string_start(entries[i], "K="))
         {
           IJK[2] = Utilities::get_integer_at_position(entries[i], 2).first;
-          AssertThrow(
+          DEAL_II_AssertThrow(
             dim > 2 || IJK[2] == 1,
             ExcMessage(
               "Parameter 'K=' found in tecplot, although this is only possible for dimensions greater than 2."));
@@ -2389,7 +2419,7 @@ GridIn<dim, spacedim>::parse_tecplot_header(
       n_cells    = 1;
       for (unsigned int d = 0; d < dim; ++d)
         {
-          AssertThrow(
+          DEAL_II_AssertThrow(
             IJK[d] > 0,
             ExcMessage(
               "Tecplot file does not contain a complete and consistent set of parameters"));
@@ -2399,7 +2429,7 @@ GridIn<dim, spacedim>::parse_tecplot_header(
     }
   else
     {
-      AssertThrow(
+      DEAL_II_AssertThrow(
         n_vertices > 0,
         ExcMessage(
           "Tecplot file does not contain a complete and consistent set of parameters"));
@@ -2409,7 +2439,7 @@ GridIn<dim, spacedim>::parse_tecplot_header(
         // 'J=20' instead of 'E=20'. therefore,
         // take the max of IJK
         n_cells = *std::max_element(IJK.begin(), IJK.end());
-      AssertThrow(
+      DEAL_II_AssertThrow(
         n_cells > 0,
         ExcMessage(
           "Tecplot file does not contain a complete and consistent set of parameters"));
@@ -2424,8 +2454,8 @@ GridIn<2>::read_tecplot(std::istream &in)
 {
   const unsigned int dim      = 2;
   const unsigned int spacedim = 2;
-  Assert(tria != nullptr, ExcNoTriangulationSelected());
-  AssertThrow(in, ExcIO());
+  DEAL_II_Assert(tria != nullptr, ExcNoTriangulationSelected());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // skip comments at start of file
   skip_comment_lines(in, '#');
@@ -2541,7 +2571,7 @@ GridIn<2>::read_tecplot(std::istream &in)
                 in >> dummy;
             }
         }
-      Assert(next_index == dim, ExcInternalError());
+      DEAL_II_Assert(next_index == dim, ExcInternalError());
     }
   else
     {
@@ -2593,7 +2623,7 @@ GridIn<2>::read_tecplot(std::istream &in)
             cells[cell].vertices[3] = i + (j + 1) * I;
             ++cell;
           }
-      Assert(cell == n_cells, ExcInternalError());
+      DEAL_II_Assert(cell == n_cells, ExcInternalError());
       std::vector<unsigned int> boundary_vertices(2 * I + 2 * J - 4);
       unsigned int              k = 0;
       for (unsigned int i = 1; i < I + 1; ++i)
@@ -2610,7 +2640,7 @@ GridIn<2>::read_tecplot(std::istream &in)
           boundary_vertices[k] = I + j * I;
           ++k;
         }
-      Assert(k == boundary_vertices.size(), ExcInternalError());
+      DEAL_II_Assert(k == boundary_vertices.size(), ExcInternalError());
       // delete the duplicated vertices at the
       // boundary, which occur, e.g. in c-type
       // or o-type grids around a body
@@ -2632,7 +2662,7 @@ GridIn<2>::read_tecplot(std::istream &in)
           // we found the number of cells at
           // the top, there should still be
           // input here, so check this:
-          AssertThrow(in, ExcIO());
+          DEAL_II_AssertThrow(in, ExcIO());
 
           // get the connectivity from the
           // input file. the vertices are
@@ -2648,8 +2678,8 @@ GridIn<2>::read_tecplot(std::istream &in)
   // check that no forbidden arrays are
   // used. as we do not read in any
   // subcelldata, nothing should happen here.
-  Assert(subcelldata.check_consistency(dim), ExcInternalError());
-  AssertThrow(in, ExcIO());
+  DEAL_II_Assert(subcelldata.check_consistency(dim), ExcInternalError());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // do some cleanup on cells
   GridReordering<dim, spacedim>::invert_all_cells_of_negative_grid(vertices,
@@ -2664,7 +2694,7 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_tecplot(std::istream &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2679,7 +2709,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
 {
 #ifdef DEAL_II_WITH_ASSIMP
   // Only good for surface grids.
-  AssertThrow(dim < 3, ExcImpossibleInDim(dim));
+  DEAL_II_AssertThrow(dim < 3, ExcImpossibleInDim(dim));
 
   // Create an instance of the Importer class
   Assimp::Importer importer;
@@ -2693,14 +2723,14 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
                         aiProcess_OptimizeGraph | aiProcess_OptimizeMeshes);
 
   // If the import failed, report it
-  AssertThrow(scene, ExcMessage(importer.GetErrorString()))
+  DEAL_II_AssertThrow(scene, ExcMessage(importer.GetErrorString()))
 
-    AssertThrow(scene->mNumMeshes,
-                ExcMessage("Input file contains no meshes."));
+    DEAL_II_AssertThrow(scene->mNumMeshes,
+                        ExcMessage("Input file contains no meshes."));
 
-  AssertThrow((mesh_index == numbers::invalid_unsigned_int) ||
-                (mesh_index < scene->mNumMeshes),
-              ExcMessage("Too few meshes in the file."));
+  DEAL_II_AssertThrow((mesh_index == numbers::invalid_unsigned_int) ||
+                        (mesh_index < scene->mNumMeshes),
+                      ExcMessage("Too few meshes in the file."));
 
   unsigned int start_mesh =
     (mesh_index == numbers::invalid_unsigned_int ? 0 : mesh_index);
@@ -2726,16 +2756,18 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
       // ignore it
       if ((dim == 2) && mesh->mPrimitiveTypes != aiPrimitiveType_POLYGON)
         {
-          AssertThrow(ignore_unsupported_types,
-                      ExcMessage("Incompatible mesh " + std::to_string(m) +
-                                 "/" + std::to_string(scene->mNumMeshes)));
+          DEAL_II_AssertThrow(ignore_unsupported_types,
+                              ExcMessage("Incompatible mesh " +
+                                         std::to_string(m) + "/" +
+                                         std::to_string(scene->mNumMeshes)));
           continue;
         }
       else if ((dim == 1) && mesh->mPrimitiveTypes != aiPrimitiveType_LINE)
         {
-          AssertThrow(ignore_unsupported_types,
-                      ExcMessage("Incompatible mesh " + std::to_string(m) +
-                                 "/" + std::to_string(scene->mNumMeshes)));
+          DEAL_II_AssertThrow(ignore_unsupported_types,
+                              ExcMessage("Incompatible mesh " +
+                                         std::to_string(m) + "/" +
+                                         std::to_string(scene->mNumMeshes)));
           continue;
         }
       // Vertices
@@ -2769,13 +2801,14 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
             }
           else
             {
-              AssertThrow(ignore_unsupported_types,
-                          ExcMessage("Face " + std::to_string(i) + " of mesh " +
-                                     std::to_string(m) + " has " +
-                                     std::to_string(mFaces[i].mNumIndices) +
-                                     " vertices. We expected only " +
-                                     std::to_string(
-                                       GeometryInfo<dim>::vertices_per_cell)));
+              DEAL_II_AssertThrow(ignore_unsupported_types,
+                                  ExcMessage(
+                                    "Face " + std::to_string(i) + " of mesh " +
+                                    std::to_string(m) + " has " +
+                                    std::to_string(mFaces[i].mNumIndices) +
+                                    " vertices. We expected only " +
+                                    std::to_string(
+                                      GeometryInfo<dim>::vertices_per_cell)));
             }
         }
       cells.resize(valid_cell);
@@ -2822,7 +2855,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   (void)remove_duplicates;
   (void)tol;
   (void)ignore_unsupported_types;
-  Assert(false, ExcNeedsAssimp());
+  DEAL_II_Assert(false, ExcNeedsAssimp());
 #endif
 }
 
@@ -2892,7 +2925,7 @@ GridIn<dim, spacedim>::debug_output_grid(
   const std::vector<Point<spacedim>> & /*vertices*/,
   std::ostream & /*out*/)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -3102,10 +3135,11 @@ GridIn<dim, spacedim>::read(std::istream &in, Format format)
         return;
 
       case netcdf:
-        Assert(false,
-               ExcMessage("There is no read_netcdf(istream &) function. "
-                          "Use the read_netcdf(string &filename) "
-                          "functions, instead."));
+        DEAL_II_Assert(false,
+                       ExcMessage(
+                         "There is no read_netcdf(istream &) function. "
+                         "Use the read_netcdf(string &filename) "
+                         "functions, instead."));
         return;
 
       case tecplot:
@@ -3113,16 +3147,17 @@ GridIn<dim, spacedim>::read(std::istream &in, Format format)
         return;
 
       case assimp:
-        Assert(false,
-               ExcMessage("There is no read_assimp(istream &) function. "
-                          "Use the read_assimp(string &filename, ...) "
-                          "functions, instead."));
+        DEAL_II_Assert(false,
+                       ExcMessage(
+                         "There is no read_assimp(istream &) function. "
+                         "Use the read_assimp(string &filename, ...) "
+                         "functions, instead."));
         return;
 
       case Default:
         break;
     }
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
 }
 
 
@@ -3153,7 +3188,7 @@ GridIn<dim, spacedim>::default_suffix(const Format format)
       case tecplot:
         return ".dat";
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return ".unknown_format";
     }
 }
@@ -3210,7 +3245,7 @@ GridIn<dim, spacedim>::parse_format(const std::string &format_name)
     // and throw an exception, anyway.
     return tecplot;
 
-  AssertThrow(false, ExcInvalidState());
+  DEAL_II_AssertThrow(false, ExcInvalidState());
   // return something weird
   return Format(Default);
 }
@@ -3231,7 +3266,7 @@ namespace
     : tolerance(5e-16) // Used to offset Cubit tolerance error when outputting
                        // value close to zero
   {
-    AssertThrow(spacedim == 2 || spacedim == 3, ExcNotImplemented());
+    DEAL_II_AssertThrow(spacedim == 2 || spacedim == 3, ExcNotImplemented());
   }
 
   // Convert from a string to some other data type
@@ -3270,7 +3305,7 @@ namespace
     // http://www.egr.msu.edu/software/abaqus/Documentation/docs/v6.7/books/usb/default.htm?startat=pt01ch02.html
     // http://www.cprogramming.com/tutorial/string.html
 
-    AssertThrow(input_stream, ExcIO());
+    DEAL_II_AssertThrow(input_stream, ExcIO());
     std::string line;
     std::getline(input_stream, line);
 
@@ -3614,8 +3649,8 @@ namespace
           }
         else
           {
-            AssertThrow(face_cell_face_no <= 4,
-                        ExcMessage("Invalid face number in 2d"));
+            DEAL_II_AssertThrow(face_cell_face_no <= 4,
+                                ExcMessage("Invalid face number in 2d"));
           }
       }
     else if (dim == 3)
@@ -3664,13 +3699,13 @@ namespace
           }
         else
           {
-            AssertThrow(face_cell_no <= 6,
-                        ExcMessage("Invalid face number in 3d"));
+            DEAL_II_AssertThrow(face_cell_no <= 6,
+                                ExcMessage("Invalid face number in 3d"));
           }
       }
     else
       {
-        AssertThrow(dim == 2 || dim == 3, ExcNotImplemented());
+        DEAL_II_AssertThrow(dim == 2 || dim == 3, ExcNotImplemented());
       }
 
     return quad_node_list;
@@ -3684,7 +3719,7 @@ namespace
     // http://www.dealii.org/developer/doxygen/deal.II/structGeometryInfo.html
     // http://people.scs.fsu.edu/~burkardt/data/ucd/ucd.html
 
-    AssertThrow(output, ExcIO());
+    DEAL_II_AssertThrow(output, ExcIO());
 
     // save old formatting options
     const boost::io::ios_base_all_saver formatting_saver(output);

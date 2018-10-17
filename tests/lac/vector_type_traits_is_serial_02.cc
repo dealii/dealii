@@ -27,9 +27,9 @@ test()
 {
   // make sure that is_serial_vector< dealii::TrilinosWrappers::MPI::Vector > is
   // working
-  Assert(is_serial_vector<dealii::TrilinosWrappers::MPI::Vector>::value ==
-           false,
-         ExcInternalError());
+  DEAL_II_Assert(
+    is_serial_vector<dealii::TrilinosWrappers::MPI::Vector>::value == false,
+    ExcInternalError());
 
   deallog << is_serial_vector<dealii::TrilinosWrappers::MPI::Vector>::value
           << std::endl;
@@ -38,9 +38,10 @@ test()
 
 
   // make sure that dealii::TrilinosWrappers::MPI::BlockVector > is working
-  Assert(is_serial_vector<dealii::TrilinosWrappers::MPI::BlockVector>::value ==
-           false,
-         ExcInternalError());
+  DEAL_II_Assert(
+    is_serial_vector<dealii::TrilinosWrappers::MPI::BlockVector>::value ==
+      false,
+    ExcInternalError());
 
   deallog << is_serial_vector<dealii::TrilinosWrappers::MPI::BlockVector>::value
           << std::endl;

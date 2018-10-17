@@ -49,7 +49,7 @@ reinit_vector(const dealii::DoFHandler<dim, spacedim> &     mg_dof,
   const dealii::parallel::distributed::Triangulation<dim, spacedim> *tria =
     (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
       &mg_dof.get_triangulation()));
-  AssertThrow(
+  DEAL_II_AssertThrow(
     tria != nullptr,
     ExcMessage(
       "multigrid with Trilinos vectors only works with distributed Triangulation!"));

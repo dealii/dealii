@@ -66,7 +66,7 @@ test()
         }
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 
   TrilinosWrappers::SparsityPattern sp(row_partitioning,
                                        col_partitioning,
@@ -117,7 +117,8 @@ test()
   for (unsigned int i = 0; i < row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
-      AssertThrow(dy(global_index) == y(global_index), ExcInternalError());
+      DEAL_II_AssertThrow(dy(global_index) == y(global_index),
+                          ExcInternalError());
     }
   if (my_id == 0)
     deallog << "OK" << std::endl;

@@ -112,7 +112,7 @@ public:
   void
   vmult(VectorType &dst, const VectorType &src) const
   {
-    AssertDimension(dst.size(), dim + 1);
+    DEAL_II_AssertDimension(dst.size(), dim + 1);
     for (unsigned int d = 0; d < dim + 1; ++d)
       dst[d] = 0;
     data.cell_loop(&MatrixFreeTest::local_apply, this, dst, src);

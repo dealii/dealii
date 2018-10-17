@@ -49,7 +49,7 @@ public:
   virtual void
   vector_value(const Point<dim> &p, Vector<double> &v) const
   {
-    Assert(v.size() == dim, ExcInternalError());
+    DEAL_II_Assert(v.size() == dim, ExcInternalError());
 
     switch (dim)
       {
@@ -63,7 +63,7 @@ public:
           v(2) = p[2];
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 };

@@ -108,7 +108,7 @@ make_mesh(Triangulation<dim> &tria)
       for (unsigned int d = 0; d < dim; ++d)
         if (cell->center()(d) > 0)
           material |= (1 << d);
-      AssertThrow(material < (1 << dim), ExcInternalError());
+      DEAL_II_AssertThrow(material < (1 << dim), ExcInternalError());
 
       cell->set_material_id(material);
     }
@@ -187,8 +187,8 @@ check()
         {
           deallog << i << ' ' << this_error(i) << std::endl;
 
-          AssertThrow((this_error(i) == 0) || (error2(i) == 0),
-                      ExcInternalError());
+          DEAL_II_AssertThrow((this_error(i) == 0) || (error2(i) == 0),
+                              ExcInternalError());
           if (this_error(i) != 0)
             error2(i) = this_error(i);
         }
@@ -196,7 +196,7 @@ check()
 
   // now compare the results of the two
   // computations
-  AssertThrow(error1 == error2, ExcInternalError());
+  DEAL_II_AssertThrow(error1 == error2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

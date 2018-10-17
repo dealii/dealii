@@ -76,7 +76,8 @@ test(std::ostream & /*out*/)
       }
   }
 
-  Assert(tr.n_active_cells() == tr2.n_active_cells(), ExcInternalError());
+  DEAL_II_Assert(tr.n_active_cells() == tr2.n_active_cells(),
+                 ExcInternalError());
 
 
   for (unsigned int i = 0; i < 1; ++i)
@@ -99,7 +100,7 @@ test(std::ostream & /*out*/)
             cell->set_refine_flag();
             intergrid_map[cell]->set_refine_flag();
           }
-      Assert(index == tr.n_active_cells(), ExcInternalError());
+      DEAL_II_Assert(index == tr.n_active_cells(), ExcInternalError());
 
       try
         {

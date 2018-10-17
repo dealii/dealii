@@ -144,7 +144,7 @@ template <typename VectorType>
 inline void
 MeanValueFilter::Tvmult(VectorType &, const VectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -152,7 +152,7 @@ template <typename VectorType>
 inline void
 MeanValueFilter::Tvmult_add(VectorType &, const VectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 

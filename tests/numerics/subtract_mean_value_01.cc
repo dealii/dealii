@@ -41,8 +41,8 @@ test(VectorType &v)
 
   // then check the norm
   VectorTools::subtract_mean_value(v, filter);
-  AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(v.mean_value()) < 1e-10 * v.l2_norm(),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

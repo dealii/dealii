@@ -32,7 +32,7 @@ print_it(Utilities::MPI::MinMaxAvg &result)
 void
 test()
 {
-  Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
+  DEAL_II_Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
   unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -46,19 +46,19 @@ test()
   result       = Utilities::MPI::min_max_avg(value, MPI_COMM_WORLD);
   if (myid == 0)
     print_it(result);
-  Assert(result.sum == 0.0, ExcInternalError());
-  Assert(result.min == 0.0, ExcInternalError());
-  Assert(result.max == 0.0, ExcInternalError());
-  Assert(result.avg == 0.0, ExcInternalError());
+  DEAL_II_Assert(result.sum == 0.0, ExcInternalError());
+  DEAL_II_Assert(result.min == 0.0, ExcInternalError());
+  DEAL_II_Assert(result.max == 0.0, ExcInternalError());
+  DEAL_II_Assert(result.avg == 0.0, ExcInternalError());
 
   value  = 1.0;
   result = Utilities::MPI::min_max_avg(value, MPI_COMM_WORLD);
   if (myid == 0)
     print_it(result);
-  Assert(result.sum == numprocs, ExcInternalError());
-  Assert(result.min == 1.0, ExcInternalError());
-  Assert(result.max == 1.0, ExcInternalError());
-  Assert(result.avg == 1.0, ExcInternalError());
+  DEAL_II_Assert(result.sum == numprocs, ExcInternalError());
+  DEAL_II_Assert(result.min == 1.0, ExcInternalError());
+  DEAL_II_Assert(result.max == 1.0, ExcInternalError());
+  DEAL_II_Assert(result.avg == 1.0, ExcInternalError());
 
   value = 0.0;
   if (myid == 0)
@@ -67,10 +67,10 @@ test()
   result = Utilities::MPI::min_max_avg(value, MPI_COMM_WORLD);
   if (myid == 0)
     print_it(result);
-  Assert(result.sum == 1.0, ExcInternalError());
-  Assert(result.min == (numprocs > 1) ? 0.0 : 1.0, ExcInternalError());
-  Assert(result.max == 1.0, ExcInternalError());
-  Assert(result.max_index == 0, ExcInternalError());
+  DEAL_II_Assert(result.sum == 1.0, ExcInternalError());
+  DEAL_II_Assert(result.min == (numprocs > 1) ? 0.0 : 1.0, ExcInternalError());
+  DEAL_II_Assert(result.max == 1.0, ExcInternalError());
+  DEAL_II_Assert(result.max_index == 0, ExcInternalError());
 
   if (myid == 0)
     deallog << "done" << std::endl;

@@ -89,8 +89,8 @@ inline GrowingVectorMemory<VectorType>::GrowingVectorMemory(
 template <typename VectorType>
 inline GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
 {
-  AssertNothrow(current_alloc == 0,
-                StandardExceptions::ExcMemoryLeak(current_alloc));
+  DEAL_II_AssertNothrow(current_alloc == 0,
+                        StandardExceptions::ExcMemoryLeak(current_alloc));
   if (log_statistics)
     {
       deallog << "GrowingVectorMemory:Overall allocated vectors: "
@@ -149,7 +149,8 @@ GrowingVectorMemory<VectorType>::free(const VectorType *const v)
           return;
         }
     }
-  Assert(false, typename VectorMemory<VectorType>::ExcNotAllocatedHere());
+  DEAL_II_Assert(false,
+                 typename VectorMemory<VectorType>::ExcNotAllocatedHere());
 }
 
 

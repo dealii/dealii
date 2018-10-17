@@ -52,7 +52,7 @@ check(const unsigned int testcase)
         std::swap(vertices[1], vertices[0]);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -76,7 +76,7 @@ check(const unsigned int testcase)
       flag = true;
     }
 
-  Assert(flag == true, ExcInternalError());
+  DEAL_II_Assert(flag == true, ExcInternalError());
 
   // now build an FEValues object and compute quadrature points on that cell
   FE_Nothing<dim> dummy;

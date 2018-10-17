@@ -101,7 +101,8 @@ test()
   // note that we have used a quadrature
   // formula of sufficient order to get exact
   // results
-  Assert(std::fabs(global - 1. / std::sqrt(3.)) < 1e-6, ExcInternalError());
+  DEAL_II_Assert(std::fabs(global - 1. / std::sqrt(3.)) < 1e-6,
+                 ExcInternalError());
 }
 
 

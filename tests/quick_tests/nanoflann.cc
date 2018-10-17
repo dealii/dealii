@@ -60,6 +60,6 @@ main()
       auto res = kdtree.get_closest_points(p, 1)[0];
       deallog << "P: " << p << ", distance: " << res.second
               << ", index: " << res.first << std::endl;
-      Assert(res.second < 1e-10, ExcMessage("Should be zero!"));
+      DEAL_II_Assert(res.second < 1e-10, ExcMessage("Should be zero!"));
     }
 }

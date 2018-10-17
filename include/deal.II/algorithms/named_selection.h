@@ -99,9 +99,9 @@ NamedSelection::add(const std::string &s)
 inline unsigned int
 NamedSelection::operator()(unsigned int i) const
 {
-  Assert(indices.size() == names.size(), ExcNotInitialized());
+  DEAL_II_Assert(indices.size() == names.size(), ExcNotInitialized());
 
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
 
   return indices[i];
 }

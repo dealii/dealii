@@ -40,12 +40,12 @@ void check_this(Triangulation<3> &tria)
         for (unsigned int c = 0; c < GeometryInfo<3>::max_children_per_face;
              ++c)
           {
-            Assert(cell->face_orientation(f) ==
-                     cell
-                       ->child(GeometryInfo<3>::child_cell_on_face(
-                         RefinementCase<3>::isotropic_refinement, f, c))
-                       ->face_orientation(f),
-                   ExcInternalError());
+            DEAL_II_Assert(cell->face_orientation(f) ==
+                             cell
+                               ->child(GeometryInfo<3>::child_cell_on_face(
+                                 RefinementCase<3>::isotropic_refinement, f, c))
+                               ->face_orientation(f),
+                           ExcInternalError());
             deallog << "Cell << " << cell << ", face " << f << " subface " << c
                     << " is ok." << std::endl;
           }

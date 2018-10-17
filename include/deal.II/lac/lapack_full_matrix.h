@@ -1067,9 +1067,10 @@ LAPACKFullMatrix<number>::vmult(Vector<number2> &,
                                 const Vector<number2> &,
                                 const bool) const
 {
-  Assert(false,
-         ExcMessage("LAPACKFullMatrix<number>::vmult must be called with a "
-                    "matching Vector<double> vector type."));
+  DEAL_II_Assert(false,
+                 ExcMessage(
+                   "LAPACKFullMatrix<number>::vmult must be called with a "
+                   "matching Vector<double> vector type."));
 }
 
 
@@ -1079,9 +1080,10 @@ void
 LAPACKFullMatrix<number>::vmult_add(Vector<number2> &,
                                     const Vector<number2> &) const
 {
-  Assert(false,
-         ExcMessage("LAPACKFullMatrix<number>::vmult_add must be called with a "
-                    "matching Vector<double> vector type."));
+  DEAL_II_Assert(false,
+                 ExcMessage(
+                   "LAPACKFullMatrix<number>::vmult_add must be called with a "
+                   "matching Vector<double> vector type."));
 }
 
 
@@ -1092,9 +1094,10 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number2> &,
                                  const Vector<number2> &,
                                  const bool) const
 {
-  Assert(false,
-         ExcMessage("LAPACKFullMatrix<number>::Tvmult must be called with a "
-                    "matching Vector<double> vector type."));
+  DEAL_II_Assert(false,
+                 ExcMessage(
+                   "LAPACKFullMatrix<number>::Tvmult must be called with a "
+                   "matching Vector<double> vector type."));
 }
 
 
@@ -1104,10 +1107,10 @@ void
 LAPACKFullMatrix<number>::Tvmult_add(Vector<number2> &,
                                      const Vector<number2> &) const
 {
-  Assert(false,
-         ExcMessage(
-           "LAPACKFullMatrix<number>::Tvmult_add must be called with a "
-           "matching Vector<double> vector type."));
+  DEAL_II_Assert(false,
+                 ExcMessage(
+                   "LAPACKFullMatrix<number>::Tvmult_add must be called with a "
+                   "matching Vector<double> vector type."));
 }
 
 
@@ -1115,10 +1118,10 @@ template <typename number>
 inline std::complex<number>
 LAPACKFullMatrix<number>::eigenvalue(const size_type i) const
 {
-  Assert(state & LAPACKSupport::eigenvalues, ExcInvalidState());
-  Assert(wr.size() == this->n_rows(), ExcInternalError());
-  Assert(wi.size() == this->n_rows(), ExcInternalError());
-  AssertIndexRange(i, this->n_rows());
+  DEAL_II_Assert(state & LAPACKSupport::eigenvalues, ExcInvalidState());
+  DEAL_II_Assert(wr.size() == this->n_rows(), ExcInternalError());
+  DEAL_II_Assert(wi.size() == this->n_rows(), ExcInternalError());
+  DEAL_II_AssertIndexRange(i, this->n_rows());
 
   if (numbers::NumberTraits<number>::is_complex)
     return std::complex<number>(wi[i]);
@@ -1131,9 +1134,10 @@ template <typename number>
 inline number
 LAPACKFullMatrix<number>::singular_value(const size_type i) const
 {
-  Assert(state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd,
-         LAPACKSupport::ExcState(state));
-  AssertIndexRange(i, wr.size());
+  DEAL_II_Assert(state == LAPACKSupport::svd ||
+                   state == LAPACKSupport::inverse_svd,
+                 LAPACKSupport::ExcState(state));
+  DEAL_II_AssertIndexRange(i, wr.size());
 
   return wr[i];
 }

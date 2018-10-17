@@ -50,7 +50,8 @@ test()
             check(j) = rhs_orig(j, i);
           A.apply_lu_factorization(check, transpose);
           for (unsigned int j = 0; j < n; ++j)
-            Assert(std::abs(check(j) - rhs(j, i)) < 1e-13, ExcInternalError());
+            DEAL_II_Assert(std::abs(check(j) - rhs(j, i)) < 1e-13,
+                           ExcInternalError());
         }
     }
 

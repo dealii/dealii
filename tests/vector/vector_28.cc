@@ -42,8 +42,8 @@ test(Vector<double> &v)
   // make sure they're equal
   deallog << v * w << ' ' << v.l2_norm() * w.l2_norm() << ' '
           << v * w - v.l2_norm() * w.l2_norm() << std::endl;
-  Assert(std::fabs(v * w - v.l2_norm() * w.l2_norm()) < 1e-14 * (v * w),
-         ExcInternalError());
+  DEAL_II_Assert(std::fabs(v * w - v.l2_norm() * w.l2_norm()) < 1e-14 * (v * w),
+                 ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

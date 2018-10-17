@@ -77,14 +77,14 @@ void check(Triangulation<2> &tria)
         GridTools::find_active_cell_around_point(tria, p);
 
       // check if the below function call actually finds appropriate cell
-      Assert(p.distance(cell->center()) < cell->diameter() / 2,
-             ExcInternalError());
+      DEAL_II_Assert(p.distance(cell->center()) < cell->diameter() / 2,
+                     ExcInternalError());
       deallog << "Test passed!";
       deallog << std::endl;
     }
   catch (...)
     {
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
     }
 }
 

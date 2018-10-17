@@ -40,7 +40,7 @@ main()
 
         std::vector<long double> roots =
           jacobi_polynomial_roots<long double>(degree, alpha, beta);
-        AssertDimension(roots.size(), degree);
+        DEAL_II_AssertDimension(roots.size(), degree);
         Vector<double>           roots_reference(degree);
         LAPACKFullMatrix<double> eigenvalue_mat(degree, degree);
         for (unsigned int k = 1; k < degree; k++)

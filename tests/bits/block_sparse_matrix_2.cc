@@ -71,19 +71,19 @@ main()
   B.reinit(sparsity_pattern);
 
   // check some sizes
-  AssertThrow(B.m() == B.block(0, 0).m() + B.block(1, 1).m(),
-              ExcInternalError());
-  AssertThrow(B.n() == B.block(0, 0).n() + B.block(1, 1).n(),
-              ExcInternalError());
-  AssertThrow(B.n_block_rows() == 2, ExcInternalError());
-  AssertThrow(B.n_block_cols() == 2, ExcInternalError());
+  DEAL_II_AssertThrow(B.m() == B.block(0, 0).m() + B.block(1, 1).m(),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(B.n() == B.block(0, 0).n() + B.block(1, 1).n(),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(B.n_block_rows() == 2, ExcInternalError());
+  DEAL_II_AssertThrow(B.n_block_cols() == 2, ExcInternalError());
 
   // then clear, and check again
   B.clear();
-  AssertThrow(B.m() == 0, ExcInternalError());
-  AssertThrow(B.n() == 0, ExcInternalError());
-  AssertThrow(B.n_block_rows() == 0, ExcInternalError());
-  AssertThrow(B.n_block_cols() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(B.m() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(B.n() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(B.n_block_rows() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(B.n_block_cols() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 

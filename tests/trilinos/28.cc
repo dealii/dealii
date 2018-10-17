@@ -47,8 +47,8 @@ test(TrilinosWrappers::MPI::Vector &v)
   deallog << v * w << ' ' << v.l2_norm() * w.l2_norm() << ' '
           << v * w - v.l2_norm() * w.l2_norm() << std::endl;
   const double eps = typeid(TrilinosScalar) == typeid(double) ? 1e-14 : 1e-5;
-  Assert(std::fabs(v * w - v.l2_norm() * w.l2_norm()) < eps * (v * w),
-         ExcInternalError());
+  DEAL_II_Assert(std::fabs(v * w - v.l2_norm() * w.l2_norm()) < eps * (v * w),
+                 ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

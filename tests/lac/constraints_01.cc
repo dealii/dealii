@@ -50,7 +50,7 @@ test()
 
   bool is = cm.is_inhomogeneously_constrained(18466);
   deallog << "constraint 18466 inhom? " << is << std::endl;
-  Assert(!is, ExcInternalError());
+  DEAL_II_Assert(!is, ExcInternalError());
 }
 
 

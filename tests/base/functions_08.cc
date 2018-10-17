@@ -43,7 +43,7 @@ check1()
   X<dim>                                x;
   VectorFunctionFromTensorFunction<dim> object(x, 1, dim + 2);
 
-  AssertThrow(object.n_components == dim + 2, ExcInternalError());
+  DEAL_II_AssertThrow(object.n_components == dim + 2, ExcInternalError());
 
   for (unsigned int i = 0; i < 10; ++i)
     {
@@ -54,11 +54,12 @@ check1()
       for (unsigned int c = 0; c < dim + 2; ++c)
         if (c == 0 || c == dim + 1)
           {
-            AssertThrow(object.value(p, c) == 0, ExcInternalError());
+            DEAL_II_AssertThrow(object.value(p, c) == 0, ExcInternalError());
           }
         else
           {
-            AssertThrow(object.value(p, c) == p[c - 1], ExcInternalError());
+            DEAL_II_AssertThrow(object.value(p, c) == p[c - 1],
+                                ExcInternalError());
           }
 
       Vector<double> v(dim + 2);
@@ -66,11 +67,11 @@ check1()
       for (unsigned int c = 0; c < dim + 2; ++c)
         if (c == 0 || c == dim + 1)
           {
-            AssertThrow(v(c) == 0, ExcInternalError());
+            DEAL_II_AssertThrow(v(c) == 0, ExcInternalError());
           }
         else
           {
-            AssertThrow(v(c) == p[c - 1], ExcInternalError());
+            DEAL_II_AssertThrow(v(c) == p[c - 1], ExcInternalError());
           }
     }
 

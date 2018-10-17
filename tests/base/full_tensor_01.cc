@@ -33,12 +33,12 @@ main()
   t[1][0] = 4;
   // make sure transposition doesn't change
   // anything
-  AssertThrow(t == transpose(t), ExcInternalError());
+  DEAL_II_AssertThrow(t == transpose(t), ExcInternalError());
 
   // check norm of tensor
-  AssertThrow(std::fabs(t.norm() - std::sqrt(1. * 1 + 2 * 2 + 2 * 4 * 4)) <
-                1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(t.norm() -
+                                std::sqrt(1. * 1 + 2 * 2 + 2 * 4 * 4)) < 1e-14,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

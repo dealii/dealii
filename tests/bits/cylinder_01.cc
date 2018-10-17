@@ -39,7 +39,7 @@ template <int dim>
 void
 check()
 {
-  AssertThrow(false, ExcInternalError());
+  DEAL_II_AssertThrow(false, ExcInternalError());
 }
 
 

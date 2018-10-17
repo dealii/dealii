@@ -52,10 +52,10 @@ check(const FE_Q<dim> &fe, const std::string &name)
 
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
     {
-      Assert(n1[i] < fe.dofs_per_cell, ExcInternalError());
-      Assert(n2[i] < fe.dofs_per_cell, ExcInternalError());
-      Assert(n1[n2[i]] == i, ExcInternalError());
-      Assert(n2[n1[i]] == i, ExcInternalError());
+      DEAL_II_Assert(n1[i] < fe.dofs_per_cell, ExcInternalError());
+      DEAL_II_Assert(n2[i] < fe.dofs_per_cell, ExcInternalError());
+      DEAL_II_Assert(n1[n2[i]] == i, ExcInternalError());
+      DEAL_II_Assert(n2[n1[i]] == i, ExcInternalError());
 
       deallog << n1[n2[i]] << " ";
     }

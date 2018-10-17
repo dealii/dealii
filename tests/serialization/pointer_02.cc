@@ -80,7 +80,7 @@ test()
 
     verify(p1, p2);
 
-    AssertThrow(p1 != p2, ExcInternalError());
+    DEAL_II_AssertThrow(p1 != p2, ExcInternalError());
 
     delete p1;
     delete p2;
@@ -90,7 +90,7 @@ test()
   // a pointer to a new object, leaving the
   // original object pointed to as a memory
   // leak. assert that this behavior persists
-  AssertThrow(objects_destroyed == 2, ExcInternalError());
+  DEAL_II_AssertThrow(objects_destroyed == 2, ExcInternalError());
 
   // we've checked what we wanted to check, so now delete
   // the original object to ensure we don't get undue

@@ -66,7 +66,7 @@ test()
         }
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 
   TrilinosWrappers::SparsityPattern sp(row_partitioning,
                                        col_partitioning,
@@ -105,11 +105,11 @@ test()
       {
         deallog << "Looking at entry (" << p->row() << ',' << p->column()
                 << ") with value " << p->value() << std::endl;
-        AssertThrow(p->row() == 0, ExcInternalError());
+        DEAL_II_AssertThrow(p->row() == 0, ExcInternalError());
       }
     else
       {
-        AssertThrow(p->row() == 2, ExcInternalError());
+        DEAL_II_AssertThrow(p->row() == 2, ExcInternalError());
       }
 
   if (my_id == 0)

@@ -44,7 +44,7 @@ test()
   // compare against the exact value of the
   // linfty-norm (max row-sum)
   deallog << m.linfty_norm() << std::endl;
-  Assert(m.linfty_norm() == 8.5, ExcInternalError());
+  DEAL_II_Assert(m.linfty_norm() == 8.5, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

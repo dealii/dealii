@@ -111,7 +111,7 @@ namespace LocalIntegrators
             result[2] = h0[2][0] + h1[2][1] - h2[0][0] - h2[1][1];
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
       return result;
     }
@@ -153,7 +153,7 @@ namespace LocalIntegrators
               normal[1] * (g1[0] - g2[1]) + normal[0] * (g0[2] - g2[0]);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
       return result;
     }
@@ -177,9 +177,9 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fe.get_fe().n_components(), dim);
-      AssertDimension(M.m(), n_dofs);
-      AssertDimension(M.n(), n_dofs);
+      DEAL_II_AssertDimension(fe.get_fe().n_components(), dim);
+      DEAL_II_AssertDimension(M.m(), n_dofs);
+      DEAL_II_AssertDimension(M.n(), n_dofs);
 
       // Depending on the dimension,
       // the cross product is either
@@ -234,12 +234,13 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      AssertDimension(fe.get_fe().n_components(), dim);
+      DEAL_II_AssertDimension(fe.get_fe().n_components(), dim);
       // There should be the right number of components (3 in 3D, otherwise 1)
       // for the curl.
-      AssertDimension(fetest.get_fe().n_components(), (dim == 3) ? dim : 1);
-      AssertDimension(M.m(), t_dofs);
-      AssertDimension(M.n(), n_dofs);
+      DEAL_II_AssertDimension(fetest.get_fe().n_components(),
+                              (dim == 3) ? dim : 1);
+      DEAL_II_AssertDimension(M.m(), t_dofs);
+      DEAL_II_AssertDimension(M.n(), n_dofs);
 
       const unsigned int d_max = (dim == 2) ? 1 : dim;
 
@@ -287,9 +288,9 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fe.get_fe().n_components(), dim);
-      AssertDimension(M.m(), n_dofs);
-      AssertDimension(M.n(), n_dofs);
+      DEAL_II_AssertDimension(fe.get_fe().n_components(), dim);
+      DEAL_II_AssertDimension(M.m(), n_dofs);
+      DEAL_II_AssertDimension(M.n(), n_dofs);
 
       // Depending on the
       // dimension, the cross
@@ -351,9 +352,9 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fe.get_fe().n_components(), dim);
-      AssertDimension(M.m(), n_dofs);
-      AssertDimension(M.n(), n_dofs);
+      DEAL_II_AssertDimension(fe.get_fe().n_components(), dim);
+      DEAL_II_AssertDimension(M.m(), n_dofs);
+      DEAL_II_AssertDimension(M.n(), n_dofs);
 
       // Depending on the
       // dimension, the cross
@@ -417,16 +418,16 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe1.dofs_per_cell;
 
-      AssertDimension(fe1.get_fe().n_components(), dim);
-      AssertDimension(fe2.get_fe().n_components(), dim);
-      AssertDimension(M11.m(), n_dofs);
-      AssertDimension(M11.n(), n_dofs);
-      AssertDimension(M12.m(), n_dofs);
-      AssertDimension(M12.n(), n_dofs);
-      AssertDimension(M21.m(), n_dofs);
-      AssertDimension(M21.n(), n_dofs);
-      AssertDimension(M22.m(), n_dofs);
-      AssertDimension(M22.n(), n_dofs);
+      DEAL_II_AssertDimension(fe1.get_fe().n_components(), dim);
+      DEAL_II_AssertDimension(fe2.get_fe().n_components(), dim);
+      DEAL_II_AssertDimension(M11.m(), n_dofs);
+      DEAL_II_AssertDimension(M11.n(), n_dofs);
+      DEAL_II_AssertDimension(M12.m(), n_dofs);
+      DEAL_II_AssertDimension(M12.n(), n_dofs);
+      DEAL_II_AssertDimension(M21.m(), n_dofs);
+      DEAL_II_AssertDimension(M21.n(), n_dofs);
+      DEAL_II_AssertDimension(M22.m(), n_dofs);
+      DEAL_II_AssertDimension(M22.n(), n_dofs);
 
       const double nu1     = factor1;
       const double nu2     = (factor2 < 0) ? factor1 : factor2;

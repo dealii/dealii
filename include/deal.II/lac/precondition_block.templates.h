@@ -76,10 +76,10 @@ PreconditionBlock<MatrixType, inverse_type>::initialize(
   const size_type bsize = parameters.block_size;
 
   clear();
-  Assert(M.m() == M.n(), ExcNotQuadratic());
+  DEAL_II_Assert(M.m() == M.n(), ExcNotQuadratic());
   A = &M;
-  Assert(bsize > 0, ExcIndexRange(bsize, 1, M.m()));
-  Assert(A->m() % bsize == 0, ExcWrongBlockSize(bsize, A->m()));
+  DEAL_II_Assert(bsize > 0, ExcIndexRange(bsize, 1, M.m()));
+  DEAL_II_Assert(A->m() % bsize == 0, ExcWrongBlockSize(bsize, A->m()));
   blocksize                  = bsize;
   relaxation                 = parameters.relaxation;
   const unsigned int nblocks = A->m() / bsize;
@@ -114,13 +114,13 @@ template <typename MatrixType, typename inverse_type>
 void
 PreconditionBlock<MatrixType, inverse_type>::invert_permuted_diagblocks()
 {
-  Assert(A != nullptr, ExcNotInitialized());
-  Assert(blocksize != 0, ExcNotInitialized());
+  DEAL_II_Assert(A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(blocksize != 0, ExcNotInitialized());
 
   const MatrixType &M = *A;
-  Assert(this->inverses_ready() == 0, ExcInverseMatricesAlreadyExist());
-  AssertDimension(permutation.size(), M.m());
-  AssertDimension(inverse_permutation.size(), M.m());
+  DEAL_II_Assert(this->inverses_ready() == 0, ExcInverseMatricesAlreadyExist());
+  DEAL_II_AssertDimension(permutation.size(), M.m());
+  DEAL_II_AssertDimension(inverse_permutation.size(), M.m());
 
   FullMatrix<inverse_type> M_cell(blocksize);
 
@@ -152,7 +152,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_permuted_diagblocks()
             this->inverse_svd(0).compute_inverse_svd(0.);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
   else
@@ -207,7 +207,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_permuted_diagblocks()
                 this->inverse_svd(cell).compute_inverse_svd(0.);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
     }
@@ -225,12 +225,12 @@ PreconditionBlock<MatrixType, inverse_type>::forward_step(
   const Vector<number2> &src,
   const bool             transpose_diagonal) const
 {
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
 
   const MatrixType &M = *this->A;
 
   if (permutation.size() != 0)
-    Assert(
+    DEAL_II_Assert(
       permutation.size() == M.m() || permutation.size() == this->size(),
       ExcMessage(
         "Permutation vector size must be equal to either the number of blocks or the dimension of the system"));
@@ -324,12 +324,12 @@ PreconditionBlock<MatrixType, inverse_type>::backward_step(
   const Vector<number2> &src,
   const bool             transpose_diagonal) const
 {
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
 
   const MatrixType &M = *this->A;
 
   if (permutation.size() != 0)
-    Assert(
+    DEAL_II_Assert(
       permutation.size() == M.m() || permutation.size() == this->size(),
       ExcMessage(
         "Permutation vector size must be equal to either the number of blocks or the dimension of the system"));
@@ -423,11 +423,11 @@ template <typename MatrixType, typename inverse_type>
 void
 PreconditionBlock<MatrixType, inverse_type>::invert_diagblocks()
 {
-  Assert(A != nullptr, ExcNotInitialized());
-  Assert(blocksize != 0, ExcNotInitialized());
+  DEAL_II_Assert(A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(blocksize != 0, ExcNotInitialized());
 
   const MatrixType &M = *A;
-  Assert(this->inverses_ready() == 0, ExcInverseMatricesAlreadyExist());
+  DEAL_II_Assert(this->inverses_ready() == 0, ExcInverseMatricesAlreadyExist());
 
   FullMatrix<inverse_type> M_cell(blocksize);
 
@@ -459,7 +459,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_diagblocks()
             this->inverse_svd(0).compute_inverse_svd(1.e-12);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
   else
@@ -502,7 +502,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_diagblocks()
                 this->inverse_svd(cell).compute_inverse_svd(1.e-12);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
     }
@@ -517,11 +517,12 @@ PreconditionBlock<MatrixType, inverse_type>::set_permutation(
   const std::vector<size_type> &new_permutation,
   const std::vector<size_type> &new_inverse_permutation)
 {
-  AssertDimension(new_permutation.size(), new_inverse_permutation.size());
+  DEAL_II_AssertDimension(new_permutation.size(),
+                          new_inverse_permutation.size());
 
   if (this->inverses_ready())
     {
-      AssertDimension(new_permutation.size(), this->size());
+      DEAL_II_AssertDimension(new_permutation.size(), this->size());
     }
 
   permutation         = new_permutation;
@@ -550,7 +551,7 @@ PreconditionBlockJacobi<MatrixType, inverse_type>::do_vmult(
   const Vector<number2> &src,
   bool                   adding) const
 {
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
 
   const MatrixType &M = *this->A;
 
@@ -720,14 +721,14 @@ PreconditionBlockSOR<MatrixType, inverse_type>::forward(
   const bool             transpose_diagonal,
   const bool) const
 {
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
 
   const MatrixType &M        = *this->A;
   const bool        permuted = (this->permutation.size() != 0);
   if (permuted)
     {
-      Assert(this->permutation.size() == M.m(),
-             ExcDimensionMismatch(this->permutation.size(), M.m()));
+      DEAL_II_Assert(this->permutation.size() == M.m(),
+                     ExcDimensionMismatch(this->permutation.size(), M.m()));
     }
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
@@ -809,14 +810,14 @@ PreconditionBlockSOR<MatrixType, inverse_type>::backward(
   const bool             transpose_diagonal,
   const bool) const
 {
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
 
   const MatrixType &M        = *this->A;
   const bool        permuted = (this->permutation.size() != 0);
   if (permuted)
     {
-      Assert(this->permutation.size() == M.m(),
-             ExcDimensionMismatch(this->permutation.size(), M.m()));
+      DEAL_II_Assert(this->permutation.size() == M.m(),
+                     ExcDimensionMismatch(this->permutation.size(), M.m()));
     }
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);

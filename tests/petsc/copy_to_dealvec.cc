@@ -61,8 +61,8 @@ test()
   vb *= 2.0;
   v = vb;
 
-  Assert(!vb.has_ghost_elements(), ExcInternalError());
-  Assert(v.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(!vb.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v.has_ghost_elements(), ExcInternalError());
 
   copied = vb;
 
@@ -73,15 +73,15 @@ test()
       deallog << myid * 2 + 1 << ":" << copied(myid * 2 + 1) << std::endl;
     }
 
-  Assert(copied(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(copied(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(copied(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(copied(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   copied = v;
 
   // check ghost values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << copied(1) << std::endl;
-  Assert(copied(1) == 2.0, ExcInternalError());
+  DEAL_II_Assert(copied(1) == 2.0, ExcInternalError());
 
   // check local values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -90,8 +90,8 @@ test()
       deallog << myid * 2 + 1 << ":" << copied(myid * 2 + 1) << std::endl;
     }
 
-  Assert(copied(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(copied(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(copied(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(copied(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
 
   // done

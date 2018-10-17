@@ -360,7 +360,7 @@ namespace DataOutBase
     /**
      * Exception
      */
-    DeclException2(
+    DEAL_II_DeclException2(
       ExcInvalidCombinationOfDimensions,
       int,
       int,
@@ -506,7 +506,7 @@ namespace DataOutBase
     /**
      * Exception
      */
-    DeclException2(
+    DEAL_II_DeclException2(
       ExcInvalidCombinationOfDimensions,
       int,
       int,
@@ -726,9 +726,10 @@ namespace DataOutBase
      * Exception to raise when there are not enough specified dimension
      * labels.
      */
-    DeclExceptionMsg(ExcNotEnoughSpaceDimensionLabels,
-                     "There should be at least one space dimension per spatial "
-                     "dimension (extras are ignored).");
+    DEAL_II_DeclExceptionMsg(
+      ExcNotEnoughSpaceDimensionLabels,
+      "There should be at least one space dimension per spatial "
+      "dimension (extras are ignored).");
   };
 
   /**
@@ -2711,33 +2712,34 @@ namespace DataOutBase
   /**
    * Exception
    */
-  DeclException2(ExcInvalidDatasetSize,
-                 int,
-                 int,
-                 << "The number of points in this data set is " << arg1
-                 << ", but we expected " << arg2
-                 << " in each space direction.");
+  DEAL_II_DeclException2(ExcInvalidDatasetSize,
+                         int,
+                         int,
+                         << "The number of points in this data set is " << arg1
+                         << ", but we expected " << arg2
+                         << " in each space direction.");
   /**
    * An output function did not receive any patches for writing.
    */
-  DeclExceptionMsg(ExcNoPatches,
-                   "You are trying to write graphical data into a file, but "
-                   "no data is available in the intermediate format that "
-                   "the DataOutBase functions require. Did you forget to "
-                   "call a function such as DataOut::build_patches()?");
+  DEAL_II_DeclExceptionMsg(
+    ExcNoPatches,
+    "You are trying to write graphical data into a file, but "
+    "no data is available in the intermediate format that "
+    "the DataOutBase functions require. Did you forget to "
+    "call a function such as DataOut::build_patches()?");
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcTecplotAPIError,
-                   "The error code of one of the Tecplot functions was "
-                   "not zero as expected.");
+  DEAL_II_DeclExceptionMsg(ExcTecplotAPIError,
+                           "The error code of one of the Tecplot functions was "
+                           "not zero as expected.");
   /**
    * Exception
    */
-  DeclException1(ExcErrorOpeningTecplotFile,
-                 char *,
-                 << "There was an error opening Tecplot file " << arg1
-                 << " for output.");
+  DEAL_II_DeclException1(ExcErrorOpeningTecplotFile,
+                         char *,
+                         << "There was an error opening Tecplot file " << arg1
+                         << " for output.");
 
   //@}
 } // namespace DataOutBase
@@ -3251,7 +3253,7 @@ protected:
    * Validate that the names of the datasets returned by get_dataset_names() and
    * get_nonscalar_data_ranges() are valid. This currently consists of checking
    * that names are not used more than once. If an invalid state is encountered,
-   * an Assert() will be triggered in debug mode.
+   * an DEAL_II_Assert() will be triggered in debug mode.
    */
   void
   validate_dataset_names() const;
@@ -3424,27 +3426,29 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcIncompatibleDatasetNames,
-                   "You are trying to merge two sets of patches for which the "
-                   "declared names of the variables do not match.");
+  DEAL_II_DeclExceptionMsg(
+    ExcIncompatibleDatasetNames,
+    "You are trying to merge two sets of patches for which the "
+    "declared names of the variables do not match.");
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcIncompatiblePatchLists,
-                   "You are trying to merge two sets of patches for which the "
-                   "number of subdivisions or the number of vector components "
-                   "do not match.");
+  DEAL_II_DeclExceptionMsg(
+    ExcIncompatiblePatchLists,
+    "You are trying to merge two sets of patches for which the "
+    "number of subdivisions or the number of vector components "
+    "do not match.");
   /**
    * Exception
    */
-  DeclException4(ExcIncompatibleDimensions,
-                 int,
-                 int,
-                 int,
-                 int,
-                 << "Either the dimensions <" << arg1 << "> and <" << arg2
-                 << "> or the space dimensions <" << arg3 << "> and <" << arg4
-                 << "> do not match!");
+  DEAL_II_DeclException4(ExcIncompatibleDimensions,
+                         int,
+                         int,
+                         int,
+                         int,
+                         << "Either the dimensions <" << arg1 << "> and <"
+                         << arg2 << "> or the space dimensions <" << arg3
+                         << "> and <" << arg4 << "> do not match!");
 
 protected:
   /**

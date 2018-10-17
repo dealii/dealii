@@ -72,7 +72,8 @@ solve_filtered(std::map<types::global_dof_index, double> &bv,
   for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin();
        i != bv.end();
        ++i)
-    AssertThrow(std::fabs(u(i->first) - i->second) < 1e-8, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(u(i->first) - i->second) < 1e-8,
+                        ExcInternalError());
 }
 
 
@@ -200,8 +201,8 @@ check()
   for (unsigned int i = 0; i < dof.n_dofs(); ++i)
     {
       deallog << u_filtered(i) << std::endl;
-      Assert(std::fabs(u_filtered(i) - u_eliminated(i)) < 1e-8,
-             ExcInternalError());
+      DEAL_II_Assert(std::fabs(u_filtered(i) - u_eliminated(i)) < 1e-8,
+                     ExcInternalError());
     };
 }
 

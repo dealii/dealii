@@ -58,29 +58,29 @@ test()
   typename LA::MPI::BlockVector v(partitioning, MPI_COMM_WORLD);
   typename LA::MPI::BlockVector v2(partitioning, relevant, MPI_COMM_WORLD);
 
-  Assert(!v.has_ghost_elements(), ExcInternalError());
-  Assert(v2.has_ghost_elements(), ExcInternalError());
-  Assert(!v.block(0).has_ghost_elements(), ExcInternalError());
-  Assert(!v.block(1).has_ghost_elements(), ExcInternalError());
-  Assert(v2.block(0).has_ghost_elements(), ExcInternalError());
-  Assert(v2.block(1).has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(!v.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v2.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(!v.block(0).has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(!v.block(1).has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v2.block(0).has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v2.block(1).has_ghost_elements(), ExcInternalError());
 
   v.reinit(partitioning, relevant, MPI_COMM_WORLD);
-  Assert(v.has_ghost_elements(), ExcInternalError());
-  Assert(v.block(0).has_ghost_elements(), ExcInternalError());
-  Assert(v.block(1).has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v.block(0).has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v.block(1).has_ghost_elements(), ExcInternalError());
   v.reinit(partitioning, MPI_COMM_WORLD);
-  Assert(!v.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(!v.has_ghost_elements(), ExcInternalError());
 
 
   typename LA::MPI::BlockVector v3 = v2;
-  Assert(v3.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v3.has_ghost_elements(), ExcInternalError());
 
   v3 = v; // just copy data, keep ghosts
-  Assert(v3.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v3.has_ghost_elements(), ExcInternalError());
 
   typename LA::MPI::Vector x = v2.block(0);
-  Assert(x.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(x.has_ghost_elements(), ExcInternalError());
 
   // done
   if (myid == 0)

@@ -38,7 +38,7 @@ test()
     deallog << "numproc=" << numproc << std::endl;
 
   const unsigned int set = 200;
-  AssertIndexRange(numproc, set - 2);
+  DEAL_II_AssertIndexRange(numproc, set - 2);
   const unsigned int local_size  = set - myid;
   unsigned int       global_size = 0;
   unsigned int       my_start    = 0;
@@ -88,31 +88,36 @@ test()
 
   // check local values for correctness
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(v.local_element(i) == 2.0 * (i + my_start), ExcInternalError());
+    DEAL_II_AssertThrow(v.local_element(i) == 2.0 * (i + my_start),
+                        ExcInternalError());
 
   // check local values with two different
   // access operators
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(v.local_element(i) == v(local_owned.nth_index_in_set(i)),
-                ExcInternalError());
+    DEAL_II_AssertThrow(v.local_element(i) ==
+                          v(local_owned.nth_index_in_set(i)),
+                        ExcInternalError());
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(v.local_element(i) == v(i + my_start), ExcInternalError());
+    DEAL_II_AssertThrow(v.local_element(i) == v(i + my_start),
+                        ExcInternalError());
 
   // check non-local entries on all processors
   for (unsigned int i = 0; i < 10; ++i)
-    AssertThrow(v(ghost_indices[i]) == 2. * ghost_indices[i],
-                ExcInternalError());
+    DEAL_II_AssertThrow(v(ghost_indices[i]) == 2. * ghost_indices[i],
+                        ExcInternalError());
 
   // compare direct access local_element with access ()
   for (unsigned int i = 0; i < 10; ++i)
     if (ghost_indices[i] < my_start)
-      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(v(ghost_indices[i]) ==
+                            v.local_element(local_size + i),
+                          ExcInternalError());
 
   if (myid == 0)
     for (unsigned int i = 5; i < 10; ++i)
-      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i - 5),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(v(ghost_indices[i]) ==
+                            v.local_element(local_size + i - 5),
+                          ExcInternalError());
 
 
   // now the same again, but import ghosts automatically because v had ghosts
@@ -123,31 +128,36 @@ test()
 
   // check local values for correctness
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(v.local_element(i) == 2.0 * (i + my_start), ExcInternalError());
+    DEAL_II_AssertThrow(v.local_element(i) == 2.0 * (i + my_start),
+                        ExcInternalError());
 
   // check local values with two different
   // access operators
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(v.local_element(i) == v(local_owned.nth_index_in_set(i)),
-                ExcInternalError());
+    DEAL_II_AssertThrow(v.local_element(i) ==
+                          v(local_owned.nth_index_in_set(i)),
+                        ExcInternalError());
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(v.local_element(i) == v(i + my_start), ExcInternalError());
+    DEAL_II_AssertThrow(v.local_element(i) == v(i + my_start),
+                        ExcInternalError());
 
   // check non-local entries on all processors
   for (unsigned int i = 0; i < 10; ++i)
-    AssertThrow(v(ghost_indices[i]) == 2. * ghost_indices[i],
-                ExcInternalError());
+    DEAL_II_AssertThrow(v(ghost_indices[i]) == 2. * ghost_indices[i],
+                        ExcInternalError());
 
   // compare direct access [] with access ()
   for (unsigned int i = 0; i < 10; ++i)
     if (ghost_indices[i] < my_start)
-      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(v(ghost_indices[i]) ==
+                            v.local_element(local_size + i),
+                          ExcInternalError());
 
   if (myid == 0)
     for (unsigned int i = 5; i < 10; ++i)
-      AssertThrow(v(ghost_indices[i]) == v.local_element(local_size + i - 5),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(v(ghost_indices[i]) ==
+                            v.local_element(local_size + i - 5),
+                          ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;

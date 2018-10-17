@@ -47,10 +47,10 @@ test(PETScWrappers::MPI::Vector &v,
   const double eps = typeid(PetscScalar) == typeid(double) ? 1e-14 : 1e-5;
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(w(i) == i + 1., ExcInternalError());
-      AssertThrow(x(i) == i + 2., ExcInternalError());
-      AssertThrow(std::fabs(v(i) - (i + 1.) / (i + 2.)) < eps * v(i),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == i + 1., ExcInternalError());
+      DEAL_II_AssertThrow(x(i) == i + 2., ExcInternalError());
+      DEAL_II_AssertThrow(std::fabs(v(i) - (i + 1.) / (i + 2.)) < eps * v(i),
+                          ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

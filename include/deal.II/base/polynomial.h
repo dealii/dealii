@@ -780,7 +780,7 @@ namespace Polynomials
       }
     else
       {
-        Assert(coefficients.size() > 0, ExcEmptyObject());
+        DEAL_II_Assert(coefficients.size() > 0, ExcEmptyObject());
         return coefficients.size() - 1;
       }
   }
@@ -793,7 +793,7 @@ namespace Polynomials
   {
     if (in_lagrange_product_form == false)
       {
-        Assert(coefficients.size() > 0, ExcEmptyObject());
+        DEAL_II_Assert(coefficients.size() > 0, ExcEmptyObject());
 
         // Horner scheme
         const unsigned int m     = coefficients.size();
@@ -838,8 +838,9 @@ namespace Polynomials
                           const int          beta,
                           const Number       x)
   {
-    Assert(alpha >= 0 && beta >= 0,
-           ExcNotImplemented("Negative alpha/beta coefficients not supported"));
+    DEAL_II_Assert(alpha >= 0 && beta >= 0,
+                   ExcNotImplemented(
+                     "Negative alpha/beta coefficients not supported"));
     // the Jacobi polynomial is evaluated using a recursion formula.
     Number p0, p1;
 
@@ -935,9 +936,10 @@ namespace Polynomials
               break;
           }
 
-        Assert(converged != numbers::invalid_unsigned_int,
-               ExcMessage("Newton iteration for zero of Jacobi polynomial "
-                          "did not converge."));
+        DEAL_II_Assert(converged != numbers::invalid_unsigned_int,
+                       ExcMessage(
+                         "Newton iteration for zero of Jacobi polynomial "
+                         "did not converge."));
 
         x[k] = r;
       }

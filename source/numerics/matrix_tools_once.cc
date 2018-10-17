@@ -71,12 +71,12 @@ namespace MatrixTools
     const bool                                            eliminate_columns)
   {
     (void)eliminate_columns;
-    Assert(eliminate_columns == false, ExcNotImplemented());
+    DEAL_II_Assert(eliminate_columns == false, ExcNotImplemented());
 
-    Assert(matrix.n() == right_hand_side.size(),
-           ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
-           ExcDimensionMismatch(matrix.n(), solution.size()));
+    DEAL_II_Assert(matrix.n() == right_hand_side.size(),
+                   ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+    DEAL_II_Assert(matrix.n() == solution.size(),
+                   ExcDimensionMismatch(matrix.n(), solution.size()));
 
     // if no boundary values are to be applied, then
     // jump straight to the compress() calls that we still have
@@ -85,9 +85,10 @@ namespace MatrixTools
       {
         const std::pair<types::global_dof_index, types::global_dof_index>
           local_range = matrix.local_range();
-        Assert(local_range == right_hand_side.local_range(),
-               ExcInternalError());
-        Assert(local_range == solution.local_range(), ExcInternalError());
+        DEAL_II_Assert(local_range == right_hand_side.local_range(),
+                       ExcInternalError());
+        DEAL_II_Assert(local_range == solution.local_range(),
+                       ExcInternalError());
 
         // determine the first nonzero diagonal
         // entry from within the part of the
@@ -170,11 +171,12 @@ namespace MatrixTools
     PETScWrappers::MPI::BlockVector &                     right_hand_side,
     const bool                                            eliminate_columns)
   {
-    Assert(matrix.n() == right_hand_side.size(),
-           ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
-           ExcDimensionMismatch(matrix.n(), solution.size()));
-    Assert(matrix.n_block_rows() == matrix.n_block_cols(), ExcNotQuadratic());
+    DEAL_II_Assert(matrix.n() == right_hand_side.size(),
+                   ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+    DEAL_II_Assert(matrix.n() == solution.size(),
+                   ExcDimensionMismatch(matrix.n(), solution.size()));
+    DEAL_II_Assert(matrix.n_block_rows() == matrix.n_block_cols(),
+                   ExcNotQuadratic());
 
     const unsigned int n_blocks = matrix.n_block_rows();
 
@@ -257,13 +259,14 @@ namespace MatrixTools
                             TrilinosVector &                right_hand_side,
                             const bool                      eliminate_columns)
       {
-        Assert(eliminate_columns == false, ExcNotImplemented());
+        DEAL_II_Assert(eliminate_columns == false, ExcNotImplemented());
         (void)eliminate_columns;
 
-        Assert(matrix.n() == right_hand_side.size(),
-               ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-        Assert(matrix.n() == solution.size(),
-               ExcDimensionMismatch(matrix.m(), solution.size()));
+        DEAL_II_Assert(matrix.n() == right_hand_side.size(),
+                       ExcDimensionMismatch(matrix.n(),
+                                            right_hand_side.size()));
+        DEAL_II_Assert(matrix.n() == solution.size(),
+                       ExcDimensionMismatch(matrix.m(), solution.size()));
 
         // if no boundary values are to be applied, then
         // jump straight to the compress() calls that we still have
@@ -272,9 +275,10 @@ namespace MatrixTools
           {
             const std::pair<types::global_dof_index, types::global_dof_index>
               local_range = matrix.local_range();
-            Assert(local_range == right_hand_side.local_range(),
-                   ExcInternalError());
-            Assert(local_range == solution.local_range(), ExcInternalError());
+            DEAL_II_Assert(local_range == right_hand_side.local_range(),
+                           ExcInternalError());
+            DEAL_II_Assert(local_range == solution.local_range(),
+                           ExcInternalError());
 
             // determine the first nonzero diagonal
             // entry from within the part of the
@@ -360,14 +364,15 @@ namespace MatrixTools
         TrilinosBlockVector &right_hand_side,
         const bool           eliminate_columns)
       {
-        Assert(eliminate_columns == false, ExcNotImplemented());
+        DEAL_II_Assert(eliminate_columns == false, ExcNotImplemented());
 
-        Assert(matrix.n() == right_hand_side.size(),
-               ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-        Assert(matrix.n() == solution.size(),
-               ExcDimensionMismatch(matrix.n(), solution.size()));
-        Assert(matrix.n_block_rows() == matrix.n_block_cols(),
-               ExcNotQuadratic());
+        DEAL_II_Assert(matrix.n() == right_hand_side.size(),
+                       ExcDimensionMismatch(matrix.n(),
+                                            right_hand_side.size()));
+        DEAL_II_Assert(matrix.n() == solution.size(),
+                       ExcDimensionMismatch(matrix.n(), solution.size()));
+        DEAL_II_Assert(matrix.n_block_rows() == matrix.n_block_cols(),
+                       ExcNotQuadratic());
 
         const unsigned int n_blocks = matrix.n_block_rows();
 

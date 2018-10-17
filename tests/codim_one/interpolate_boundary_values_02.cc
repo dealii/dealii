@@ -75,13 +75,14 @@ test()
                  ++v)
               for (unsigned int i = 0; i < fe.dofs_per_vertex; ++i)
                 {
-                  AssertThrow(bv.find(cell->face(f)->vertex_dof_index(v, i)) !=
-                                bv.end(),
-                              ExcInternalError());
-                  AssertThrow(bv[cell->face(f)->vertex_dof_index(v, i)] ==
-                                Functions::SquareFunction<spacedim>().value(
-                                  cell->face(f)->vertex(v), i),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(
+                    bv.find(cell->face(f)->vertex_dof_index(v, i)) != bv.end(),
+                    ExcInternalError());
+                  DEAL_II_AssertThrow(
+                    bv[cell->face(f)->vertex_dof_index(v, i)] ==
+                      Functions::SquareFunction<spacedim>().value(
+                        cell->face(f)->vertex(v), i),
+                    ExcInternalError());
                 }
     }
 }

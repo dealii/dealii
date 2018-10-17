@@ -291,10 +291,10 @@ template <typename number>
 inline number
 TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
 {
-  Assert(i < n(), ExcIndexRange(i, 0, n()));
-  Assert(j < n(), ExcIndexRange(j, 0, n()));
-  Assert(i <= j + 1, ExcIndexRange(i, j - 1, j + 2));
-  Assert(j <= i + 1, ExcIndexRange(j, i - 1, i + 2));
+  DEAL_II_Assert(i < n(), ExcIndexRange(i, 0, n()));
+  DEAL_II_Assert(j < n(), ExcIndexRange(j, 0, n()));
+  DEAL_II_Assert(i <= j + 1, ExcIndexRange(i, j - 1, j + 2));
+  DEAL_II_Assert(j <= i + 1, ExcIndexRange(j, i - 1, i + 2));
 
   if (j == i)
     return diagonal[i];
@@ -309,7 +309,7 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
   if (j == i + 1)
     return right[i];
 
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
   return 0;
 }
 
@@ -318,10 +318,10 @@ template <typename number>
 inline number &
 TridiagonalMatrix<number>::operator()(size_type i, size_type j)
 {
-  Assert(i < n(), ExcIndexRange(i, 0, n()));
-  Assert(j < n(), ExcIndexRange(j, 0, n()));
-  Assert(i <= j + 1, ExcIndexRange(i, j - 1, j + 2));
-  Assert(j <= i + 1, ExcIndexRange(j, i - 1, i + 2));
+  DEAL_II_Assert(i < n(), ExcIndexRange(i, 0, n()));
+  DEAL_II_Assert(j < n(), ExcIndexRange(j, 0, n()));
+  DEAL_II_Assert(i <= j + 1, ExcIndexRange(i, j - 1, j + 2));
+  DEAL_II_Assert(j <= i + 1, ExcIndexRange(j, i - 1, i + 2));
 
   if (j == i)
     return diagonal[i];
@@ -336,7 +336,7 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j)
   if (j == i + 1)
     return right[i];
 
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
   return diagonal[0];
 }
 

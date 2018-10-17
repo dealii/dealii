@@ -59,8 +59,8 @@ check(Triangulation<dim> &tr)
 
       typename Triangulation<dim>::cell_iterator cell2 = cid2.to_cell(tr);
 
-      Assert(cid2 == cid, ExcInternalError());
-      Assert(cell2 == cell, ExcInternalError());
+      DEAL_II_Assert(cid2 == cid, ExcInternalError());
+      DEAL_II_Assert(cell2 == cell, ExcInternalError());
 
       deallog << cell2->level() << " " << cell2->index() << std::endl;
     }

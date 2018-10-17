@@ -133,8 +133,8 @@ periodicity_tests<dim>::periodicity_tests()
   , mpi_comm(MPI_COMM_WORLD)
   , the_grid(mpi_comm)
 {
-  Assert(dim == 2 || dim == 3,
-         ExcMessage("Only implemented for the 2D and 3D case!"));
+  DEAL_II_Assert(dim == 2 || dim == 3,
+                 ExcMessage("Only implemented for the 2D and 3D case!"));
   comm_rank = Utilities::MPI::this_mpi_process(mpi_comm);
   comm_size = Utilities::MPI::n_mpi_processes(mpi_comm);
   std::vector<unsigned> repeats(dim, 2);
@@ -285,10 +285,11 @@ periodicity_tests<dim>::check_periodicity()
                             cell_it
                               ->periodic_neighbor_of_coarser_periodic_neighbor(
                                 i_face);
-                          Assert(nb_it->periodic_neighbor_child_on_subface(
-                                   face_subface.first, face_subface.second) ==
-                                   cell_it,
-                                 ExcInternalError());
+                          DEAL_II_Assert(
+                            nb_it->periodic_neighbor_child_on_subface(
+                              face_subface.first, face_subface.second) ==
+                              cell_it,
+                            ExcInternalError());
                         }
                       else if (nb_it->face(nb_i_face)->has_children())
                         {
@@ -305,15 +306,17 @@ periodicity_tests<dim>::check_periodicity()
                       deallog
                         << "-------------------------------------------------------"
                         << std::endl;
-                      Assert((cell_it->face(i_face)->center() -
-                              nb_of_nb_it->face(nb_of_nb_i_face)->center())
-                                   .norm() < 1e-10 ||
-                               cell_it->periodic_neighbor_is_coarser(i_face),
-                             ExcInternalError());
+                      DEAL_II_Assert(
+                        (cell_it->face(i_face)->center() -
+                         nb_of_nb_it->face(nb_of_nb_i_face)->center())
+                              .norm() < 1e-10 ||
+                          cell_it->periodic_neighbor_is_coarser(i_face),
+                        ExcInternalError());
 
-                      Assert(cell_it == nb_of_nb_it ||
-                               cell_it->periodic_neighbor_is_coarser(i_face),
-                             ExcInternalError());
+                      DEAL_II_Assert(cell_it == nb_of_nb_it ||
+                                       cell_it->periodic_neighbor_is_coarser(
+                                         i_face),
+                                     ExcInternalError());
                     }
                 }
             }

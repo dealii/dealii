@@ -89,14 +89,14 @@ check()
             if (fe.system_to_component_index(i).first <
                 fe.system_to_component_index(j).first)
               {
-                AssertThrow(mg_dof_indices[i] < mg_dof_indices[j],
-                            ExcInternalError());
+                DEAL_II_AssertThrow(mg_dof_indices[i] < mg_dof_indices[j],
+                                    ExcInternalError());
               }
             else if (fe.system_to_component_index(i).first >
                      fe.system_to_component_index(j).first)
               {
-                AssertThrow(mg_dof_indices[i] > mg_dof_indices[j],
-                            ExcInternalError());
+                DEAL_II_AssertThrow(mg_dof_indices[i] > mg_dof_indices[j],
+                                    ExcInternalError());
               }
           }
     }

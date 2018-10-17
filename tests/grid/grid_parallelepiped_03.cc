@@ -57,7 +57,7 @@ check_subdivided_parallelepiped(bool colorize, bool log)
         break;
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
   // The number of subdivisions can be anything reasonable:

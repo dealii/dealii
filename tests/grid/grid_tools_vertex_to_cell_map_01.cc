@@ -49,8 +49,8 @@ test()
   std::vector<std::set<typename Triangulation<2>::active_cell_iterator>>
     vertex_to_cell = GridTools::vertex_to_cell_map(tria);
 
-  AssertThrow(tria.n_vertices() == vertex_to_cell.size(),
-              ExcMessage("Wrong number of vertices"));
+  DEAL_II_AssertThrow(tria.n_vertices() == vertex_to_cell.size(),
+                      ExcMessage("Wrong number of vertices"));
   std::vector<unsigned int> n_cells;
   for (unsigned int i = 0; i < vertex_to_cell.size(); ++i)
     n_cells.push_back(vertex_to_cell[i].size());
@@ -61,11 +61,16 @@ test()
       for (unsigned int i = 0; i < n_cells.size(); ++i)
         histogram[n_cells[i]] += 1;
 
-      AssertThrow(histogram[0] == 0, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[1] == 4, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[2] == 20, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[3] == 4, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[4] == 27, ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[0] == 0,
+                          ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[1] == 4,
+                          ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[2] == 20,
+                          ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[3] == 4,
+                          ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[4] == 27,
+                          ExcMessage("Wrong cell distribution"));
     }
   if (rank == 1)
     {
@@ -73,11 +78,16 @@ test()
       for (unsigned int i = 0; i < n_cells.size(); ++i)
         histogram[n_cells[i]] += 1;
 
-      AssertThrow(histogram[0] == 0, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[1] == 4, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[2] == 18, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[3] == 6, ExcMessage("Wrong cell distribution"));
-      AssertThrow(histogram[4] == 24, ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[0] == 0,
+                          ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[1] == 4,
+                          ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[2] == 18,
+                          ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[3] == 6,
+                          ExcMessage("Wrong cell distribution"));
+      DEAL_II_AssertThrow(histogram[4] == 24,
+                          ExcMessage("Wrong cell distribution"));
     }
 }
 

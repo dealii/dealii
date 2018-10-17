@@ -556,44 +556,45 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcColumnNotExistent,
-                 std::string,
-                 << "Column <" << arg1 << "> does not exist.");
+  DEAL_II_DeclException1(ExcColumnNotExistent,
+                         std::string,
+                         << "Column <" << arg1 << "> does not exist.");
 
   /**
    * Exception
    */
-  DeclException1(ExcSuperColumnNotExistent,
-                 std::string,
-                 << "Supercolumn <" << arg1 << "> does not exist.");
+  DEAL_II_DeclException1(ExcSuperColumnNotExistent,
+                         std::string,
+                         << "Supercolumn <" << arg1 << "> does not exist.");
 
   /**
    * Exception
    */
-  DeclException1(ExcColumnOrSuperColumnNotExistent,
-                 std::string,
-                 << "Column or supercolumn <" << arg1 << "> does not exist.");
+  DEAL_II_DeclException1(ExcColumnOrSuperColumnNotExistent,
+                         std::string,
+                         << "Column or supercolumn <" << arg1
+                         << "> does not exist.");
 
   /**
    * Exception
    */
-  DeclException4(ExcWrongNumberOfDataEntries,
-                 std::string,
-                 int,
-                 std::string,
-                 int,
-                 << "Column <" << arg1 << "> has " << arg2
-                 << " rows, but Column <" << arg3 << "> has " << arg4
-                 << " rows.");
+  DEAL_II_DeclException4(ExcWrongNumberOfDataEntries,
+                         std::string,
+                         int,
+                         std::string,
+                         int,
+                         << "Column <" << arg1 << "> has " << arg2
+                         << " rows, but Column <" << arg3 << "> has " << arg4
+                         << " rows.");
 
   /**
    * Exception
    */
-  DeclException1(ExcUndefinedTexFormat,
-                 std::string,
-                 << "<" << arg1 << "> is not a tex column format. Use "
-                 << "'l', 'c', or 'r' to indicate left, centered, or "
-                 << "right aligned text.");
+  DEAL_II_DeclException1(ExcUndefinedTexFormat,
+                         std::string,
+                         << "<" << arg1 << "> is not a tex column format. Use "
+                         << "'l', 'c', or 'r' to indicate left, centered, or "
+                         << "right aligned text.");
   //@}
 protected:
   /**
@@ -783,9 +784,10 @@ namespace internal
       }
     catch (...)
       {
-        Assert(false,
-               ExcMessage(
-                 "This TableEntry object does not store a datum of type T"));
+        DEAL_II_Assert(
+          false,
+          ExcMessage(
+            "This TableEntry object does not store a datum of type T"));
         throw;
       }
   }
@@ -826,7 +828,7 @@ namespace internal
         ar &c &*p;
       }
     else
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
   }
 
 
@@ -885,7 +887,7 @@ namespace internal
           }
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
       }
   }
 } // namespace internal

@@ -274,7 +274,7 @@ LaplaceProblem<dim>::test_equality()
 
   deallog << "  Matrix difference norm: " << test_matrix.frobenius_norm()
           << std::endl;
-  Assert(test_matrix.frobenius_norm() < 1e-13, ExcInternalError());
+  DEAL_II_Assert(test_matrix.frobenius_norm() < 1e-13, ExcInternalError());
 
   // same here -- Dirichlet lines will have
   // nonzero rhs, whereas we will have zero
@@ -288,7 +288,7 @@ LaplaceProblem<dim>::test_equality()
 
   deallog << "  RHS difference norm: " << test_rhs.l2_norm() << std::endl;
 
-  Assert(test_rhs.l2_norm() < 1e-14, ExcInternalError());
+  DEAL_II_Assert(test_rhs.l2_norm() < 1e-14, ExcInternalError());
 }
 
 
@@ -530,7 +530,7 @@ LaplaceProblem<dim>::solve()
   test_all_constraints.distribute(solution_test);
   solution_test -= solution;
   deallog << "Distribute error: " << solution_test.l2_norm() << std::endl;
-  Assert(solution_test.l2_norm() < 1e-8, ExcInternalError());
+  DEAL_II_Assert(solution_test.l2_norm() < 1e-8, ExcInternalError());
 }
 
 
@@ -694,7 +694,7 @@ LaplaceProblem<dim>::estimate_smoothness(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   const unsigned      n_fourier_modes = k_vectors.size();

@@ -37,7 +37,7 @@ test(PETScWrappers::MPI::Vector &v)
 
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
-    AssertThrow(v(i) == i + 1., ExcInternalError());
+    DEAL_II_AssertThrow(v(i) == i + 1., ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

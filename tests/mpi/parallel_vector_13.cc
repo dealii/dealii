@@ -60,8 +60,8 @@ test()
   v *= 2.0;
   v.add(1.0);
 
-  AssertThrow(v(myid * 2) == myid * 4.0 + 1, ExcInternalError());
-  AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 3.0, ExcInternalError());
+  DEAL_II_AssertThrow(v(myid * 2) == myid * 4.0 + 1, ExcInternalError());
+  DEAL_II_AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 3.0, ExcInternalError());
 
   // set ghost dof on all processors, compress
   // (insert mode)
@@ -85,7 +85,7 @@ test()
 
   // import ghosts onto all procs
   v.update_ghost_values();
-  AssertThrow(v(1) == -7.0, ExcInternalError());
+  DEAL_II_AssertThrow(v(1) == -7.0, ExcInternalError());
 
   // check l2 norm
   const double l2_norm = v.l2_norm();

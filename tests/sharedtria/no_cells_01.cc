@@ -86,18 +86,18 @@ test()
   dof_handler.locally_owned_dofs().write(deallog.get_file_stream());
   deallog << std::endl;
 
-  Assert(dof_handler.n_locally_owned_dofs() ==
-           dof_handler.n_locally_owned_dofs_per_processor()
-             [triangulation.locally_owned_subdomain()],
-         ExcInternalError());
-  Assert(dof_handler.n_locally_owned_dofs() ==
-           dof_handler.locally_owned_dofs().n_elements(),
-         ExcInternalError());
+  DEAL_II_Assert(dof_handler.n_locally_owned_dofs() ==
+                   dof_handler.n_locally_owned_dofs_per_processor()
+                     [triangulation.locally_owned_subdomain()],
+                 ExcInternalError());
+  DEAL_II_Assert(dof_handler.n_locally_owned_dofs() ==
+                   dof_handler.locally_owned_dofs().n_elements(),
+                 ExcInternalError());
 
   const unsigned int N = dof_handler.n_dofs();
 
-  Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
-  Assert(
+  DEAL_II_Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
+  DEAL_II_Assert(
     std::accumulate(dof_handler.n_locally_owned_dofs_per_processor().begin(),
                     dof_handler.n_locally_owned_dofs_per_processor().end(),
                     0U) == N,
@@ -110,11 +110,11 @@ test()
     {
       IndexSet intersect =
         all & dof_handler.locally_owned_dofs_per_processor()[i];
-      Assert(intersect.n_elements() == 0, ExcInternalError());
+      DEAL_II_Assert(intersect.n_elements() == 0, ExcInternalError());
       all.add_indices(dof_handler.locally_owned_dofs_per_processor()[i]);
     }
 
-  Assert(all == complete_index_set(N), ExcInternalError());
+  DEAL_II_Assert(all == complete_index_set(N), ExcInternalError());
 }
 
 

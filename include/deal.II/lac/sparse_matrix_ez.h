@@ -808,22 +808,22 @@ public:
   /**
    * Exception for missing diagonal entry.
    */
-  DeclException0(ExcNoDiagonal);
+  DEAL_II_DeclException0(ExcNoDiagonal);
 
   /**
    * Exception
    */
-  DeclException2(ExcInvalidEntry,
-                 int,
-                 int,
-                 << "The entry with index (" << arg1 << ',' << arg2
-                 << ") does not exist.");
+  DEAL_II_DeclException2(ExcInvalidEntry,
+                         int,
+                         int,
+                         << "The entry with index (" << arg1 << ',' << arg2
+                         << ") does not exist.");
 
-  DeclException2(ExcEntryAllocationFailure,
-                 int,
-                 int,
-                 << "An entry with index (" << arg1 << ',' << arg2
-                 << ") cannot be allocated.");
+  DEAL_II_DeclException2(ExcEntryAllocationFailure,
+                         int,
+                         int,
+                         << "An entry with index (" << arg1 << ',' << arg2
+                         << ") cannot be allocated.");
   //@}
 private:
   /**
@@ -1021,7 +1021,7 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::const_iterator &
 SparseMatrixEZ<number>::const_iterator::operator++()
 {
-  Assert(accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
+  DEAL_II_Assert(accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
 
   // Increment column index
   ++(accessor.a_index);
@@ -1111,8 +1111,8 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::Entry *
 SparseMatrixEZ<number>::locate(const size_type row, const size_type col)
 {
-  Assert(row < m(), ExcIndexRange(row, 0, m()));
-  Assert(col < n(), ExcIndexRange(col, 0, n()));
+  DEAL_II_Assert(row < m(), ExcIndexRange(row, 0, m()));
+  DEAL_II_Assert(col < n(), ExcIndexRange(col, 0, n()));
 
   const RowInfo & r   = row_info[row];
   const size_type end = r.start + r.length;
@@ -1142,8 +1142,8 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::Entry *
 SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
 {
-  Assert(row < m(), ExcIndexRange(row, 0, m()));
-  Assert(col < n(), ExcIndexRange(col, 0, n()));
+  DEAL_II_Assert(row < m(), ExcIndexRange(row, 0, m()));
+  DEAL_II_Assert(col < n(), ExcIndexRange(col, 0, n()));
 
   RowInfo &       r   = row_info[row];
   const size_type end = r.start + r.length;
@@ -1175,7 +1175,7 @@ SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
       if (end >= row_info[row + 1].start)
         {
           // Failure if increment 0
-          Assert(increment != 0, ExcEntryAllocationFailure(row, col));
+          DEAL_II_Assert(increment != 0, ExcEntryAllocationFailure(row, col));
 
           // Insert new entries
           data.insert(data.begin() + end, increment, Entry());
@@ -1221,13 +1221,13 @@ SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
     {
       // There should be no invalid
       // entry below end
-      Assert(data[j].column != Entry::invalid, ExcInternalError());
+      DEAL_II_Assert(data[j].column != Entry::invalid, ExcInternalError());
 
       // TODO[GK]: This could be done more efficiently by moving starting at the
       // top rather than swapping starting at the bottom
       std::swap(data[j], temp);
     }
-  Assert(data[end].column == Entry::invalid, ExcInternalError());
+  DEAL_II_Assert(data[end].column == Entry::invalid, ExcInternalError());
 
   data[end] = temp;
 
@@ -1243,10 +1243,10 @@ SparseMatrixEZ<number>::set(const size_type i,
                             const number    value,
                             const bool      elide_zero_values)
 {
-  AssertIsFinite(value);
+  DEAL_II_AssertIsFinite(value);
 
-  Assert(i < m(), ExcIndexRange(i, 0, m()));
-  Assert(j < n(), ExcIndexRange(j, 0, n()));
+  DEAL_II_Assert(i < m(), ExcIndexRange(i, 0, m()));
+  DEAL_II_Assert(j < n(), ExcIndexRange(j, 0, n()));
 
   if (elide_zero_values && value == 0.)
     {
@@ -1269,10 +1269,10 @@ SparseMatrixEZ<number>::add(const size_type i,
                             const size_type j,
                             const number    value)
 {
-  AssertIsFinite(value);
+  DEAL_II_AssertIsFinite(value);
 
-  Assert(i < m(), ExcIndexRange(i, 0, m()));
-  Assert(j < n(), ExcIndexRange(j, 0, n()));
+  DEAL_II_Assert(i < m(), ExcIndexRange(i, 0, m()));
+  DEAL_II_Assert(j < n(), ExcIndexRange(j, 0, n()));
 
   // ignore zero additions
   if (std::abs(value) == 0.)
@@ -1369,7 +1369,7 @@ SparseMatrixEZ<number>::operator()(const size_type i, const size_type j) const
   const Entry *entry = locate(i, j);
   if (entry)
     return entry->value;
-  Assert(false, ExcInvalidEntry(i, j));
+  DEAL_II_Assert(false, ExcInvalidEntry(i, j));
   return 0.;
 }
 
@@ -1393,7 +1393,7 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::begin(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
   const_iterator result(this, r, 0);
   return result;
 }
@@ -1402,7 +1402,7 @@ template <typename number>
 inline typename SparseMatrixEZ<number>::const_iterator
 SparseMatrixEZ<number>::end(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
   const_iterator result(this, r + 1, 0);
   return result;
 }
@@ -1435,8 +1435,8 @@ template <typename MatrixType>
 inline void
 SparseMatrixEZ<number>::add(const number factor, const MatrixType &M)
 {
-  Assert(M.m() == m(), ExcDimensionMismatch(M.m(), m()));
-  Assert(M.n() == n(), ExcDimensionMismatch(M.n(), n()));
+  DEAL_II_Assert(M.m() == m(), ExcDimensionMismatch(M.m(), m()));
+  DEAL_II_Assert(M.n() == n(), ExcDimensionMismatch(M.n(), n()));
 
   if (factor == 0.)
     return;
@@ -1467,10 +1467,10 @@ SparseMatrixEZ<number>::conjugate_add(const MatrixTypeA &A,
   // Compute the result
   // r_ij = \sum_kl b_ik b_jl a_kl
 
-  //    Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
-  //    Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-  //    Assert (A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
-  //    Assert (A.m() == B.n(), ExcDimensionMismatch(A.m(), B.n()));
+  //    DEAL_II_Assert (n() == B.m(), ExcDimensionMismatch(n(), B.m()));
+  //    DEAL_II_Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  //    DEAL_II_Assert (A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
+  //    DEAL_II_Assert (A.m() == B.n(), ExcDimensionMismatch(A.m(), B.n()));
 
   // Somehow, we have to avoid making
   // this an operation of complexity

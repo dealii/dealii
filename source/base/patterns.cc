@@ -95,7 +95,7 @@ namespace Patterns
               return u;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
       return "";
     }
@@ -177,7 +177,7 @@ namespace Patterns
     if (p != nullptr)
       return p;
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 
     return p;
   }
@@ -287,7 +287,7 @@ namespace Patterns
               return "An integer";
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -467,7 +467,7 @@ namespace Patterns
               return "A floating point number";
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -596,7 +596,7 @@ namespace Patterns
             return description.str();
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -656,10 +656,10 @@ namespace Patterns
     , max_elements(max_elements)
     , separator(separator)
   {
-    Assert(min_elements <= max_elements,
-           ExcInvalidRange(min_elements, max_elements));
-    Assert(separator.size() > 0,
-           ExcMessage("The separator must have a non-zero length."));
+    DEAL_II_Assert(min_elements <= max_elements,
+                   ExcInvalidRange(min_elements, max_elements));
+    DEAL_II_Assert(separator.size() > 0,
+                   ExcMessage("The separator must have a non-zero length."));
   }
 
 
@@ -743,7 +743,7 @@ namespace Patterns
             return description.str();
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -831,17 +831,18 @@ namespace Patterns
     , separator(separator)
     , key_value_separator(key_value_separator)
   {
-    Assert(min_elements <= max_elements,
-           ExcInvalidRange(min_elements, max_elements));
-    Assert(separator.size() > 0,
-           ExcMessage("The separator must have a non-zero length."));
-    Assert(key_value_separator.size() > 0,
-           ExcMessage("The key_value_separator must have a non-zero length."));
-    Assert(separator != key_value_separator,
-           ExcMessage(
-             "The separator can not be the same of the key_value_separator "
-             "since that is used as the separator between the two elements "
-             "of <key:value> pairs"));
+    DEAL_II_Assert(min_elements <= max_elements,
+                   ExcInvalidRange(min_elements, max_elements));
+    DEAL_II_Assert(separator.size() > 0,
+                   ExcMessage("The separator must have a non-zero length."));
+    DEAL_II_Assert(key_value_separator.size() > 0,
+                   ExcMessage(
+                     "The key_value_separator must have a non-zero length."));
+    DEAL_II_Assert(
+      separator != key_value_separator,
+      ExcMessage("The separator can not be the same of the key_value_separator "
+                 "since that is used as the separator between the two elements "
+                 "of <key:value> pairs"));
   }
 
 
@@ -928,7 +929,7 @@ namespace Patterns
             return description.str();
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -1054,10 +1055,11 @@ namespace Patterns
                const std::string &                              separator)
     : separator(separator)
   {
-    Assert(ps.size() > 0,
-           ExcMessage("The Patterns list must have a non-zero length."));
-    Assert(separator.size() > 0,
-           ExcMessage("The separator must have a non-zero length."));
+    DEAL_II_Assert(ps.size() > 0,
+                   ExcMessage(
+                     "The Patterns list must have a non-zero length."));
+    DEAL_II_Assert(separator.size() > 0,
+                   ExcMessage("The separator must have a non-zero length."));
     patterns.resize(ps.size());
     for (unsigned int i = 0; i < ps.size(); ++i)
       patterns[i] = ps[i]->clone();
@@ -1142,7 +1144,7 @@ namespace Patterns
           }
 
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -1182,8 +1184,8 @@ namespace Patterns
         std::string len;
         std::getline(is, len, '>');
         const unsigned int n_elements = Utilities::string_to_int(len);
-        Assert(n_elements > 0,
-               ExcMessage("Provide at least 1 element in the tuple."));
+        DEAL_II_Assert(n_elements > 0,
+                       ExcMessage("Provide at least 1 element in the tuple."));
         patterns.resize(n_elements);
 
         is.ignore(strlen(" elements <"));
@@ -1236,8 +1238,8 @@ namespace Patterns
 
   MultipleSelection::MultipleSelection(const std::string &seq)
   {
-    Assert(seq.find(',') == std::string::npos,
-           ExcCommasNotAllowed(seq.find(',')));
+    DEAL_II_Assert(seq.find(',') == std::string::npos,
+                   ExcCommasNotAllowed(seq.find(',')));
 
     sequence = seq;
     while (sequence.find(" |") != std::string::npos)
@@ -1340,7 +1342,7 @@ namespace Patterns
             return description.str();
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -1413,7 +1415,7 @@ namespace Patterns
             return "A boolean value (true or false)";
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -1474,7 +1476,7 @@ namespace Patterns
             return "Any string";
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -1548,7 +1550,7 @@ namespace Patterns
               return "an output filename";
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining
@@ -1624,7 +1626,7 @@ namespace Patterns
             return "A directory name";
           }
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
     // Should never occur without an exception, but prevent compiler from
     // complaining

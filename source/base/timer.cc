@@ -180,7 +180,7 @@ Timer::start()
   if (sync_lap_times)
     {
       const int ierr = MPI_Barrier(mpi_communicator);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
     }
 #endif
   wall_times.current_lap_start_time = wall_clock_type::now();
@@ -414,13 +414,14 @@ TimerOutput::enter_subsection(const std::string &section_name)
 {
   std::lock_guard<std::mutex> lock(mutex);
 
-  Assert(section_name.empty() == false, ExcMessage("Section string is empty."));
+  DEAL_II_Assert(section_name.empty() == false,
+                 ExcMessage("Section string is empty."));
 
-  Assert(std::find(active_sections.begin(),
-                   active_sections.end(),
-                   section_name) == active_sections.end(),
-         ExcMessage(std::string("Cannot enter the already active section <") +
-                    section_name + ">."));
+  DEAL_II_Assert(
+    std::find(active_sections.begin(), active_sections.end(), section_name) ==
+      active_sections.end(),
+    ExcMessage(std::string("Cannot enter the already active section <") +
+               section_name + ">."));
 
   if (sections.find(section_name) == sections.end())
     {
@@ -454,19 +455,22 @@ TimerOutput::enter_subsection(const std::string &section_name)
 void
 TimerOutput::leave_subsection(const std::string &section_name)
 {
-  Assert(!active_sections.empty(),
-         ExcMessage("Cannot exit any section because none has been entered!"));
+  DEAL_II_Assert(!active_sections.empty(),
+                 ExcMessage(
+                   "Cannot exit any section because none has been entered!"));
 
   std::lock_guard<std::mutex> lock(mutex);
 
   if (section_name != "")
     {
-      Assert(sections.find(section_name) != sections.end(),
-             ExcMessage("Cannot delete a section that was never created."));
-      Assert(std::find(active_sections.begin(),
-                       active_sections.end(),
-                       section_name) != active_sections.end(),
-             ExcMessage("Cannot delete a section that has not been entered."));
+      DEAL_II_Assert(sections.find(section_name) != sections.end(),
+                     ExcMessage(
+                       "Cannot delete a section that was never created."));
+      DEAL_II_Assert(std::find(active_sections.begin(),
+                               active_sections.end(),
+                               section_name) != active_sections.end(),
+                     ExcMessage(
+                       "Cannot delete a section that has not been entered."));
     }
 
   // if no string is given, exit the last
@@ -533,7 +537,7 @@ TimerOutput::get_summary_data(const OutputData kind) const
             output[section.first] = section.second.n_calls;
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
   return output;

@@ -60,16 +60,18 @@ public:
     for (unsigned int q = 0; q < input_data.solution_values.size(); ++q)
       {
         // we only have one scalar field to output
-        Assert(input_data.solution_values[q].size() == 2, ExcInternalError());
-        Assert(computed_quantities[q].size() == dim, ExcInternalError());
+        DEAL_II_Assert(input_data.solution_values[q].size() == 2,
+                       ExcInternalError());
+        DEAL_II_Assert(computed_quantities[q].size() == dim,
+                       ExcInternalError());
 
         // get the cell this all belongs to
         typename DoFHandler<dim>::cell_iterator cell =
           input_data.template get_cell<DoFHandler<dim>>();
 
-        Assert(input_data.solution_values[q](0) ==
-                 double(cell->active_cell_index()),
-               ExcInternalError());
+        DEAL_II_Assert(input_data.solution_values[q](0) ==
+                         double(cell->active_cell_index()),
+                       ExcInternalError());
 
         computed_quantities[q][0] = input_data.solution_values[q](0);
       }

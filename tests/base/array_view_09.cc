@@ -39,11 +39,12 @@ test()
   {
     int  v[10];
     auto a = make_array_view(std::begin(v) + 1, std::end(v));
-    AssertThrow(a.begin() == v + 1, ExcInternalError());
-    AssertThrow(a.end() == v + sizeof(v) / sizeof(v[0]), ExcInternalError());
-    AssertThrow(a.begin() + 2 == &v[3], ExcInternalError());
+    DEAL_II_AssertThrow(a.begin() == v + 1, ExcInternalError());
+    DEAL_II_AssertThrow(a.end() == v + sizeof(v) / sizeof(v[0]),
+                        ExcInternalError());
+    DEAL_II_AssertThrow(a.begin() + 2 == &v[3], ExcInternalError());
     a[2] = 42;
-    AssertThrow(v[3] == 42, ExcInternalError());
+    DEAL_II_AssertThrow(v[3] == 42, ExcInternalError());
 
     // check that we cannot create a backwards array
     try
@@ -68,7 +69,7 @@ test()
                   "type should be const");
 
     v[5] = 10;
-    AssertThrow(a[5] == 10, ExcInternalError());
+    DEAL_II_AssertThrow(a[5] == 10, ExcInternalError());
   }
 
   // test for a vector (preserve iterator constness)
@@ -86,7 +87,7 @@ test()
     static_assert(is_const_reference<decltype(*a.end())>(),
                   "type should be const");
     v[2] = 10.0;
-    AssertThrow(a[0] == v[2], ExcInternalError());
+    DEAL_II_AssertThrow(a[0] == v[2], ExcInternalError());
   }
 
   // test for a (new in boost 1.54) vector class
@@ -95,7 +96,7 @@ test()
     std::fill(v.begin(), v.end(), 42.0);
 
     const auto a = make_array_view(v.cbegin() + 2, v.cend());
-    AssertThrow(a.size() + 2 == v.size(), ExcInternalError());
+    DEAL_II_AssertThrow(a.size() + 2 == v.size(), ExcInternalError());
     // some older versions of boost (1.57 in particular) do not implement
     // static_vector::cbegin() and static_vector::cend() correctly, so ignore
     // the type checking in that case
@@ -111,7 +112,7 @@ test()
                   "type should be const");
 #endif
     v[2] = 10.0;
-    AssertThrow(a[0] == v[2], ExcInternalError());
+    DEAL_II_AssertThrow(a[0] == v[2], ExcInternalError());
 
     // check that we cannot create a backwards array
     try

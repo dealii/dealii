@@ -34,14 +34,14 @@ checkVmult(FullMatrix<number> &A,
   P.vmult(O, V);
 
   // Check the dimensions of the result matrix
-  Assert(A.m() == O.size(), ExcInternalError());
+  DEAL_II_Assert(A.m() == O.size(), ExcInternalError());
   deallog << "Dimensions of result vector verified" << std::endl;
 
   // Verifying results with Method 2: O=A*V
   Vector<number> O_(A.m());
   A.vmult(O_, V);
 
-  Assert(O == O_, ExcInternalError());
+  DEAL_II_Assert(O == O_, ExcInternalError());
   deallog << "Result vector data verified" << std::endl;
 
   for (unsigned int i = 0; i < O.size(); ++i)

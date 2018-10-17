@@ -29,19 +29,19 @@ namespace Functions
     : interpolation_points(x_)
     , interpolation_values(y_)
   {
-    Assert(interpolation_points.size() > 0,
-           ExcCSplineEmpty(interpolation_points.size()));
+    DEAL_II_Assert(interpolation_points.size() > 0,
+                   ExcCSplineEmpty(interpolation_points.size()));
 
-    Assert(interpolation_points.size() == interpolation_values.size(),
-           ExcCSplineSizeMismatch(interpolation_points.size(),
-                                  interpolation_values.size()));
+    DEAL_II_Assert(interpolation_points.size() == interpolation_values.size(),
+                   ExcCSplineSizeMismatch(interpolation_points.size(),
+                                          interpolation_values.size()));
 
     // check that input vector @p interpolation_points is provided in ascending order:
     for (unsigned int i = 0; i < interpolation_points.size() - 1; i++)
-      AssertThrow(interpolation_points[i] < interpolation_points[i + 1],
-                  ExcCSplineOrder(i,
-                                  interpolation_points[i],
-                                  interpolation_points[i + 1]));
+      DEAL_II_AssertThrow(interpolation_points[i] < interpolation_points[i + 1],
+                          ExcCSplineOrder(i,
+                                          interpolation_points[i],
+                                          interpolation_points[i + 1]));
 
     acc                  = gsl_interp_accel_alloc();
     const unsigned int n = interpolation_points.size();
@@ -76,11 +76,11 @@ namespace Functions
     std::lock_guard<std::mutex> lock(acc_mutex);
 
     const double x = p[0];
-    Assert(x >= interpolation_points.front() &&
-             x <= interpolation_points.back(),
-           ExcCSplineRange(x,
-                           interpolation_points.front(),
-                           interpolation_points.back()));
+    DEAL_II_Assert(x >= interpolation_points.front() &&
+                     x <= interpolation_points.back(),
+                   ExcCSplineRange(x,
+                                   interpolation_points.front(),
+                                   interpolation_points.back()));
 
     return gsl_spline_eval(cspline, x, acc);
   }
@@ -97,11 +97,11 @@ namespace Functions
     std::lock_guard<std::mutex> lock(acc_mutex);
 
     const double x = p[0];
-    Assert(x >= interpolation_points.front() &&
-             x <= interpolation_points.back(),
-           ExcCSplineRange(x,
-                           interpolation_points.front(),
-                           interpolation_points.back()));
+    DEAL_II_Assert(x >= interpolation_points.front() &&
+                     x <= interpolation_points.back(),
+                   ExcCSplineRange(x,
+                                   interpolation_points.front(),
+                                   interpolation_points.back()));
 
     const double   deriv = gsl_spline_eval_deriv(cspline, x, acc);
     Tensor<1, dim> res;
@@ -121,11 +121,11 @@ namespace Functions
     std::lock_guard<std::mutex> lock(acc_mutex);
 
     const double x = p[0];
-    Assert(x >= interpolation_points.front() &&
-             x <= interpolation_points.back(),
-           ExcCSplineRange(x,
-                           interpolation_points.front(),
-                           interpolation_points.back()));
+    DEAL_II_Assert(x >= interpolation_points.front() &&
+                     x <= interpolation_points.back(),
+                   ExcCSplineRange(x,
+                                   interpolation_points.front(),
+                                   interpolation_points.back()));
 
     return gsl_spline_eval_deriv2(cspline, x, acc);
   }

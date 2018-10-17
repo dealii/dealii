@@ -70,16 +70,18 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
 {
-  DeclException2(ExcInvalidNumber2StringConversersion,
-                 unsigned int,
-                 unsigned int,
-                 << "When trying to convert " << arg1 << " to a string with "
-                 << arg2 << " digits");
-  DeclException1(ExcInvalidNumber, unsigned int, << "Invalid number " << arg1);
-  DeclException1(ExcCantConvertString,
-                 std::string,
-                 << "Can't convert the string " << arg1
-                 << " to the desired type");
+  DEAL_II_DeclException2(ExcInvalidNumber2StringConversersion,
+                         unsigned int,
+                         unsigned int,
+                         << "When trying to convert " << arg1
+                         << " to a string with " << arg2 << " digits");
+  DEAL_II_DeclException1(ExcInvalidNumber,
+                         unsigned int,
+                         << "Invalid number " << arg1);
+  DEAL_II_DeclException1(ExcCantConvertString,
+                         std::string,
+                         << "Can't convert the string " << arg1
+                         << " to the desired type");
 
 
   std::string
@@ -119,7 +121,8 @@ namespace Utilities
       {
         extents[i] =
           static_cast<LongDouble>(tr[i]) - static_cast<LongDouble>(bl[i]);
-        Assert(extents[i] > 0., ExcMessage("Bounding box is degenerate."));
+        DEAL_II_Assert(extents[i] > 0.,
+                       ExcMessage("Bounding box is degenerate."));
       }
 
     // make sure our conversion from fractional coordinates to
@@ -144,7 +147,7 @@ namespace Utilities
             const LongDouble v = (static_cast<LongDouble>(points[i][d]) -
                                   static_cast<LongDouble>(bl[d])) /
                                  extents[d];
-            Assert(v >= 0. && v <= 1., ExcInternalError());
+            DEAL_II_Assert(v >= 0. && v <= 1., ExcInternalError());
             int_points[i][d] =
               static_cast<Integer>(v * static_cast<LongDouble>(max_int));
           }
@@ -189,9 +192,9 @@ namespace Utilities
     //                          high  low                    0------ X[0]
 
     // Depth of the Hilbert curve
-    Assert(bits_per_dim <= std::numeric_limits<Integer>::digits,
-           ExcMessage("This integer type can not hold " +
-                      std::to_string(bits_per_dim) + " bits."));
+    DEAL_II_Assert(bits_per_dim <= std::numeric_limits<Integer>::digits,
+                   ExcMessage("This integer type can not hold " +
+                              std::to_string(bits_per_dim) + " bits."));
 
     const Integer M = 1 << (bits_per_dim - 1); // largest bit
 
@@ -367,7 +370,7 @@ namespace Utilities
       return 5;
     if (max_number < 1000000)
       return 6;
-    AssertThrow(false, ExcInvalidNumber(max_number));
+    DEAL_II_AssertThrow(false, ExcInvalidNumber(max_number));
     return 0;
   }
 
@@ -392,9 +395,9 @@ namespace Utilities
     char *p;
     errno       = 0;
     const int i = std::strtol(s.c_str(), &p, 10);
-    AssertThrow(!((errno != 0) || (s.size() == 0) ||
-                  ((s.size() > 0) && (*p != '\0'))),
-                ExcMessage("Can't convert <" + s + "> to an integer."));
+    DEAL_II_AssertThrow(!((errno != 0) || (s.size() == 0) ||
+                          ((s.size() > 0) && (*p != '\0'))),
+                        ExcMessage("Can't convert <" + s + "> to an integer."));
 
     return i;
   }
@@ -431,9 +434,9 @@ namespace Utilities
     char *p;
     errno          = 0;
     const double d = std::strtod(s.c_str(), &p);
-    AssertThrow(!((errno != 0) || (s.size() == 0) ||
-                  ((s.size() > 0) && (*p != '\0'))),
-                ExcMessage("Can't convert <" + s + "> to a double."));
+    DEAL_II_AssertThrow(!((errno != 0) || (s.size() == 0) ||
+                          ((s.size() > 0) && (*p != '\0'))),
+                        ExcMessage("Can't convert <" + s + "> to a double."));
 
     return d;
   }
@@ -603,7 +606,7 @@ namespace Utilities
   std::pair<int, unsigned int>
   get_integer_at_position(const std::string &name, const unsigned int position)
   {
-    Assert(position < name.size(), ExcInternalError());
+    DEAL_II_Assert(position < name.size(), ExcInternalError());
 
     const std::string test_string(name.begin() + position, name.end());
 
@@ -632,7 +635,7 @@ namespace Utilities
           return std::make_pair(i, 7U);
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             return std::make_pair(-1, numbers::invalid_unsigned_int);
           }
       }
@@ -684,15 +687,16 @@ namespace Utilities
 
     for (unsigned int i = 0; i < n; ++i)
       {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
+        DEAL_II_Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
         out[permutation[i]] = i;
       }
 
     // check that we have actually reached
     // all indices
     for (unsigned int i = 0; i < n; ++i)
-      Assert(out[i] != numbers::invalid_unsigned_int,
-             ExcMessage("The given input permutation had duplicate entries!"));
+      DEAL_II_Assert(out[i] != numbers::invalid_unsigned_int,
+                     ExcMessage(
+                       "The given input permutation had duplicate entries!"));
 
     return out;
   }
@@ -720,15 +724,16 @@ namespace Utilities
 
     for (unsigned long long int i = 0; i < n; ++i)
       {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
+        DEAL_II_Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
         out[permutation[i]] = i;
       }
 
     // check that we have actually reached
     // all indices
     for (unsigned long long int i = 0; i < n; ++i)
-      Assert(out[i] != numbers::invalid_unsigned_int,
-             ExcMessage("The given input permutation had duplicate entries!"));
+      DEAL_II_Assert(out[i] != numbers::invalid_unsigned_int,
+                     ExcMessage(
+                       "The given input permutation had duplicate entries!"));
 
     return out;
   }
@@ -759,15 +764,16 @@ namespace Utilities
 
     for (unsigned int i = 0; i < n; ++i)
       {
-        Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
+        DEAL_II_Assert(permutation[i] < n, ExcIndexRange(permutation[i], 0, n));
         out[permutation[i]] = i;
       }
 
     // check that we have actually reached
     // all indices
     for (unsigned int i = 0; i < n; ++i)
-      Assert(out[i] != numbers::invalid_unsigned_int,
-             ExcMessage("The given input permutation had duplicate entries!"));
+      DEAL_II_Assert(out[i] != numbers::invalid_unsigned_int,
+                     ExcMessage(
+                       "The given input permutation had duplicate entries!"));
 
     return out;
   }
@@ -784,7 +790,7 @@ namespace Utilities
       std::ifstream cpuinfo;
       cpuinfo.open("/proc/loadavg");
 
-      AssertThrow(cpuinfo, ExcIO());
+      DEAL_II_AssertThrow(cpuinfo, ExcIO());
 
       double load;
       cpuinfo >> load;
@@ -820,9 +826,10 @@ namespace Utilities
           case 3:
             return "AVX512";
           default:
-            AssertThrow(false,
-                        ExcInternalError(
-                          "Invalid DEAL_II_COMPILER_VECTORIZATION_LEVEL."));
+            DEAL_II_AssertThrow(
+              false,
+              ExcInternalError(
+                "Invalid DEAL_II_COMPILER_VECTORIZATION_LEVEL."));
             return "ERROR";
         }
     }
@@ -914,14 +921,14 @@ namespace Utilities
 #ifndef DEAL_II_MSVC
       const int ierr = ::posix_memalign(memptr, alignment, size);
 
-      AssertThrow(ierr == 0, ExcOutOfMemory());
-      AssertThrow(*memptr != nullptr, ExcOutOfMemory());
+      DEAL_II_AssertThrow(ierr == 0, ExcOutOfMemory());
+      DEAL_II_AssertThrow(*memptr != nullptr, ExcOutOfMemory());
 #else
       // Windows does not appear to have posix_memalign. just use the
       // regular malloc in that case
       *memptr = malloc(size);
       (void)alignment;
-      AssertThrow(*memptr != 0, ExcOutOfMemory());
+      DEAL_II_AssertThrow(*memptr != 0, ExcOutOfMemory());
 #endif
     }
 
@@ -990,8 +997,9 @@ namespace Utilities
       // communicator in question was in fact
       // not an MPI communicator, return a
       // copy of the same object again
-      Assert(dynamic_cast<const Epetra_SerialComm *>(&communicator) != nullptr,
-             ExcInternalError());
+      DEAL_II_Assert(dynamic_cast<const Epetra_SerialComm *>(&communicator) !=
+                       nullptr,
+                     ExcInternalError());
       return new Epetra_SerialComm(
         dynamic_cast<const Epetra_SerialComm &>(communicator));
     }
@@ -1010,7 +1018,7 @@ namespace Utilities
           MPI_Comm comm  = mpi_comm->GetMpiComm();
           *mpi_comm      = Epetra_MpiComm(MPI_COMM_SELF);
           const int ierr = MPI_Comm_free(&comm);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
 #  endif
     }

@@ -77,8 +77,8 @@ test_real_to_unit_cell()
   // now see if the point is inside
   // or outside
   const Point<dim> p(-3.56413e+06, 1.74215e+06, 2.14762e+06);
-  Assert(triangulation.begin_active()->point_inside(p) == false,
-         ExcInternalError());
+  DEAL_II_Assert(triangulation.begin_active()->point_inside(p) == false,
+                 ExcInternalError());
   deallog << "Point is outside!" << std::endl;
 }
 

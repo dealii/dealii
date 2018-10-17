@@ -46,7 +46,7 @@ public:
   void
   compute_diagonal()
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
   }
 
 protected:

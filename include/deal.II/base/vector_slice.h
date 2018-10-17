@@ -186,8 +186,8 @@ inline VectorSlice<VectorType>::VectorSlice(VectorType & v,
   , start(start)
   , length(length)
 {
-  Assert((start + length <= v.size()),
-         ExcIndexRange(length, 0, v.size() - start + 1));
+  DEAL_II_Assert((start + length <= v.size()),
+                 ExcIndexRange(length, 0, v.size() - start + 1));
 }
 
 
@@ -218,7 +218,7 @@ template <typename VectorType>
 inline typename VectorType::reference VectorSlice<VectorType>::
                                       operator[](unsigned int i)
 {
-  Assert((i < length), ExcIndexRange(i, 0, length));
+  DEAL_II_Assert((i < length), ExcIndexRange(i, 0, length));
 
   return v[start + i];
 }
@@ -228,7 +228,7 @@ template <typename VectorType>
 inline typename VectorType::const_reference VectorSlice<VectorType>::
                                             operator[](unsigned int i) const
 {
-  Assert((i < length), ExcIndexRange(i, 0, length));
+  DEAL_II_Assert((i < length), ExcIndexRange(i, 0, length));
 
   return v[start + i];
 }

@@ -125,7 +125,8 @@ mass_assembler(const typename Triangulation<dim>::active_cell_iterator &cell,
                                          std::ref(copy_data.cell_rhs)),
                                1);
 
-  AssertThrow(q == data.x_fe_values.quadrature_point(0), ExcInternalError());
+  DEAL_II_AssertThrow(q == data.x_fe_values.quadrature_point(0),
+                      ExcInternalError());
 
   copy_data.cell_rhs[0] = value(data.x_fe_values.quadrature_point(0));
 }
@@ -169,7 +170,7 @@ do_project()
                       8,
                       1);
 
-      Assert(std::fabs(sum - 288.) < 1e-12, ExcInternalError());
+      DEAL_II_Assert(std::fabs(sum - 288.) < 1e-12, ExcInternalError());
       deallog << sum << std::endl;
     }
 }

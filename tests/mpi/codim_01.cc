@@ -55,7 +55,7 @@ write_vtk(const parallel::distributed::Triangulation<dim, spacedim> &tria,
   else if (myid == 2)
     cat_file((std::string(filename) + "_0002.vtu").c_str());
   else
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 template <int dim, int spacedim>

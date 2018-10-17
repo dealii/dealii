@@ -69,8 +69,8 @@ test()
   // p2 should have been created, and should
   // have been different from the address of
   // p1
-  AssertThrow(p2 != nullptr, ExcInternalError());
-  AssertThrow(p1 != p2, ExcInternalError());
+  DEAL_II_AssertThrow(p2 != nullptr, ExcInternalError());
+  DEAL_II_AssertThrow(p1 != p2, ExcInternalError());
 
   delete p1;
   delete p2;

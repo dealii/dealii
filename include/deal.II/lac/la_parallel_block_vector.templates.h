@@ -157,7 +157,7 @@ namespace LinearAlgebra
     BlockVector<Number> &
     BlockVector<Number>::operator=(const value_type s)
     {
-      AssertIsFinite(s);
+      DEAL_II_AssertIsFinite(s);
 
       BaseClass::operator=(s);
       return *this;
@@ -171,8 +171,8 @@ namespace LinearAlgebra
     {
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
-      Assert(this->n_blocks() == 0 || this->n_blocks() == v.n_blocks(),
-             ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
+      DEAL_II_Assert(this->n_blocks() == 0 || this->n_blocks() == v.n_blocks(),
+                     ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
         reinit(v.n_blocks(), true);
@@ -215,7 +215,7 @@ namespace LinearAlgebra
     BlockVector<Number>::
     operator=(const PETScWrappers::MPI::BlockVector &petsc_vec)
     {
-      AssertDimension(this->n_blocks(), petsc_vec.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), petsc_vec.n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         this->block(i) = petsc_vec.block(i);
 
@@ -233,7 +233,7 @@ namespace LinearAlgebra
     BlockVector<Number>::
     operator=(const TrilinosWrappers::MPI::BlockVector &trilinos_vec)
     {
-      AssertDimension(this->n_blocks(), trilinos_vec.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), trilinos_vec.n_blocks());
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         this->block(i) = trilinos_vec.block(i);
 
@@ -325,8 +325,8 @@ namespace LinearAlgebra
     BlockVector<Number>::reinit(const VectorSpaceVector<Number> &V,
                                 const bool omit_zeroing_entries)
     {
-      Assert(dynamic_cast<const BlockVector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &down_V =
         dynamic_cast<const BlockVector<Number> &>(V);
       reinit(down_V, omit_zeroing_entries);
@@ -359,11 +359,11 @@ namespace LinearAlgebra
     BlockVector<Number>::scale(const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).scale(v.block(block));
     }
@@ -376,11 +376,11 @@ namespace LinearAlgebra
                              const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).equ(a, v.block(block));
     }
@@ -394,8 +394,8 @@ namespace LinearAlgebra
                              const Number               b,
                              const BlockVector<Number> &w)
     {
-      AssertDimension(this->n_blocks(), v.n_blocks());
-      AssertDimension(this->n_blocks(), w.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), w.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).equ(a, v.block(block), b, w.block(block));
     }
@@ -407,11 +407,11 @@ namespace LinearAlgebra
     BlockVector<Number>::operator+=(const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block) += v.block(block);
 
@@ -425,11 +425,11 @@ namespace LinearAlgebra
     BlockVector<Number>::operator-=(const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block) -= v.block(block);
 
@@ -454,11 +454,11 @@ namespace LinearAlgebra
                              const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).add(a, v.block(block));
     }
@@ -473,16 +473,16 @@ namespace LinearAlgebra
                              const VectorSpaceVector<Number> &ww)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
-      Assert(dynamic_cast<const BlockVector<Number> *>(&ww) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&ww) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &w =
         dynamic_cast<const BlockVector<Number> &>(ww);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
 
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).add(a, v.block(block), b, w.block(block));
@@ -497,11 +497,11 @@ namespace LinearAlgebra
                               const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).sadd(x, a, v.block(block));
     }
@@ -512,7 +512,7 @@ namespace LinearAlgebra
     void
     BlockVector<Number>::sadd(const Number x, const BlockVector<Number> &v)
     {
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).sadd(x, v.block(block));
     }
@@ -527,8 +527,8 @@ namespace LinearAlgebra
                               const Number               b,
                               const BlockVector<Number> &w)
     {
-      AssertDimension(this->n_blocks(), v.n_blocks());
-      AssertDimension(this->n_blocks(), w.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), w.n_blocks());
       for (unsigned int block = 0; block < this->n_blocks(); ++block)
         this->block(block).sadd(x, a, v.block(block), b, w.block(block));
     }
@@ -562,7 +562,7 @@ namespace LinearAlgebra
     bool
     BlockVector<Number>::all_zero() const
     {
-      Assert(this->n_blocks() > 0, ExcEmptyObject());
+      DEAL_II_Assert(this->n_blocks() > 0, ExcEmptyObject());
 
       // use int instead of bool. in order to make global reduction operations
       // work also when MPI_Init was not called, only call MPI_Allreduce
@@ -588,14 +588,14 @@ namespace LinearAlgebra
     Number BlockVector<Number>::
            operator*(const VectorSpaceVector<Number> &vv) const
     {
-      Assert(this->n_blocks() > 0, ExcEmptyObject());
+      DEAL_II_Assert(this->n_blocks() > 0, ExcEmptyObject());
 
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
 
       Number local_result = Number();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -614,7 +614,7 @@ namespace LinearAlgebra
     inline Number
     BlockVector<Number>::mean_value() const
     {
-      Assert(this->n_blocks() > 0, ExcEmptyObject());
+      DEAL_II_Assert(this->n_blocks() > 0, ExcEmptyObject());
 
       Number local_result = Number();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -635,7 +635,7 @@ namespace LinearAlgebra
     inline typename BlockVector<Number>::real_type
     BlockVector<Number>::l1_norm() const
     {
-      Assert(this->n_blocks() > 0, ExcEmptyObject());
+      DEAL_II_Assert(this->n_blocks() > 0, ExcEmptyObject());
 
       real_type local_result = real_type();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -654,7 +654,7 @@ namespace LinearAlgebra
     inline typename BlockVector<Number>::real_type
     BlockVector<Number>::norm_sqr() const
     {
-      Assert(this->n_blocks() > 0, ExcEmptyObject());
+      DEAL_II_Assert(this->n_blocks() > 0, ExcEmptyObject());
 
       real_type local_result = real_type();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -682,7 +682,7 @@ namespace LinearAlgebra
     inline typename BlockVector<Number>::real_type
     BlockVector<Number>::lp_norm(const real_type p) const
     {
-      Assert(this->n_blocks() > 0, ExcEmptyObject());
+      DEAL_II_Assert(this->n_blocks() > 0, ExcEmptyObject());
 
       real_type local_result = real_type();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -703,7 +703,7 @@ namespace LinearAlgebra
     inline typename BlockVector<Number>::real_type
     BlockVector<Number>::linfty_norm() const
     {
-      Assert(this->n_blocks() > 0, ExcEmptyObject());
+      DEAL_II_Assert(this->n_blocks() > 0, ExcEmptyObject());
 
       real_type local_result = real_type();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -726,18 +726,18 @@ namespace LinearAlgebra
                                      const VectorSpaceVector<Number> &ww)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &v =
         dynamic_cast<const BlockVector<Number> &>(vv);
-      AssertDimension(this->n_blocks(), v.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), v.n_blocks());
 
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const BlockVector<Number> *>(&ww) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const BlockVector<Number> *>(&ww) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const BlockVector<Number> &w =
         dynamic_cast<const BlockVector<Number> &>(ww);
-      AssertDimension(this->n_blocks(), w.n_blocks());
+      DEAL_II_AssertDimension(this->n_blocks(), w.n_blocks());
 
       Number local_result = Number();
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
@@ -757,8 +757,8 @@ namespace LinearAlgebra
     inline void
     BlockVector<Number>::swap(BlockVector<Number> &v)
     {
-      Assert(this->n_blocks() == v.n_blocks(),
-             ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
+      DEAL_II_Assert(this->n_blocks() == v.n_blocks(),
+                     ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
       for (size_type i = 0; i < this->n_blocks(); ++i)
         dealii::swap(this->components[i], v.components[i]);
@@ -782,7 +782,7 @@ namespace LinearAlgebra
                                 VectorOperation::values,
                                 std::shared_ptr<const CommunicationPatternBase>)
     {
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
     }
 
 
@@ -866,8 +866,8 @@ namespace LinearAlgebra
       if (n == 0 || m == 0)
         return;
 
-      Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
-      Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
+      DEAL_II_Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
+      DEAL_II_Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
 
       // reset the matrix
       matrix = typename FullMatrixType::value_type(0.0);
@@ -875,7 +875,7 @@ namespace LinearAlgebra
       internal::set_symmetric(matrix, symmetric);
       if (symmetric)
         {
-          Assert(m == n, ExcDimensionMismatch(m, n));
+          DEAL_II_Assert(m == n, ExcDimensionMismatch(m, n));
 
           for (unsigned int i = 0; i < m; i++)
             for (unsigned int j = i; j < n; j++)
@@ -919,12 +919,12 @@ namespace LinearAlgebra
       if (n == 0 || m == 0)
         return res;
 
-      Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
-      Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
+      DEAL_II_Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
+      DEAL_II_Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
 
       if (symmetric)
         {
-          Assert(m == n, ExcDimensionMismatch(m, n));
+          DEAL_II_Assert(m == n, ExcDimensionMismatch(m, n));
 
           for (unsigned int i = 0; i < m; i++)
             {
@@ -966,8 +966,8 @@ namespace LinearAlgebra
       if (n == 0 || m == 0)
         return;
 
-      Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
-      Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
+      DEAL_II_Assert(matrix.m() == m, ExcDimensionMismatch(matrix.m(), m));
+      DEAL_II_Assert(matrix.n() == n, ExcDimensionMismatch(matrix.n(), n));
 
       for (unsigned int i = 0; i < n; i++)
         {
@@ -984,9 +984,10 @@ namespace LinearAlgebra
       if (V.block(0).vector_is_ghosted)
         {
           for (unsigned int i = 0; i < n; i++)
-            Assert(V.block(i).vector_is_ghosted,
-                   ExcMessage(
-                     "All blocks should be either in ghosted state or not."));
+            DEAL_II_Assert(
+              V.block(i).vector_is_ghosted,
+              ExcMessage(
+                "All blocks should be either in ghosted state or not."));
 
           V.update_ghost_values();
         }

@@ -413,7 +413,7 @@ template <typename ElementType>
 inline typename ArrayView<ElementType>::value_type &ArrayView<ElementType>::
                                                     operator[](const std::size_t i) const
 {
-  Assert(i < n_elements, ExcIndexRange(i, 0, n_elements));
+  DEAL_II_Assert(i < n_elements, ExcIndexRange(i, 0, n_elements));
 
   return *(starting_element + i);
 }
@@ -490,11 +490,11 @@ make_array_view(const Iterator begin, const Iterator end)
     std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
                  typename std::random_access_iterator_tag>::value,
     "The provided iterator should be a random access iterator.");
-  Assert(begin <= end,
-         ExcMessage(
-           "The beginning of the array view should be before the end."));
-  Assert(internal::ArrayViewHelper::is_contiguous(begin, end),
-         ExcMessage("The provided range isn't contiguous in memory!"));
+  DEAL_II_Assert(
+    begin <= end,
+    ExcMessage("The beginning of the array view should be before the end."));
+  DEAL_II_Assert(internal::ArrayViewHelper::is_contiguous(begin, end),
+                 ExcMessage("The provided range isn't contiguous in memory!"));
   // the reference type, not the value type, knows the constness of the iterator
   return ArrayView<typename std::remove_reference<
     typename std::iterator_traits<Iterator>::reference>::type>(
@@ -516,9 +516,9 @@ template <typename ElementType>
 ArrayView<ElementType>
 make_array_view(ElementType *const begin, ElementType *const end)
 {
-  Assert(begin <= end,
-         ExcMessage(
-           "The beginning of the array view should be before the end."));
+  DEAL_II_Assert(
+    begin <= end,
+    ExcMessage("The beginning of the array view should be before the end."));
   return ArrayView<ElementType>(begin, end - begin);
 }
 
@@ -801,10 +801,11 @@ make_array_view(std::vector<ElementType> &vector,
                 const std::size_t         starting_index,
                 const std::size_t         size_of_view)
 {
-  Assert(starting_index + size_of_view <= vector.size(),
-         ExcMessage("The starting index and size of the view you want to "
-                    "create would lead to a view that extends beyond the end "
-                    "of the given vector."));
+  DEAL_II_Assert(starting_index + size_of_view <= vector.size(),
+                 ExcMessage(
+                   "The starting index and size of the view you want to "
+                   "create would lead to a view that extends beyond the end "
+                   "of the given vector."));
   return ArrayView<ElementType>(&vector[starting_index], size_of_view);
 }
 
@@ -835,10 +836,11 @@ make_array_view(const std::vector<ElementType> &vector,
                 const std::size_t               starting_index,
                 const std::size_t               size_of_view)
 {
-  Assert(starting_index + size_of_view <= vector.size(),
-         ExcMessage("The starting index and size of the view you want to "
-                    "create would lead to a view that extends beyond the end "
-                    "of the given vector."));
+  DEAL_II_Assert(starting_index + size_of_view <= vector.size(),
+                 ExcMessage(
+                   "The starting index and size of the view you want to "
+                   "create would lead to a view that extends beyond the end "
+                   "of the given vector."));
   return ArrayView<const ElementType>(&vector[starting_index], size_of_view);
 }
 
@@ -865,7 +867,7 @@ inline ArrayView<ElementType>
   make_array_view(Table<2, ElementType> &                         table,
                   const typename Table<2, ElementType>::size_type row)
 {
-  AssertIndexRange(row, table.size()[0]);
+  DEAL_II_AssertIndexRange(row, table.size()[0]);
   return ArrayView<ElementType>(&table[row][0], table.size()[1]);
 }
 
@@ -991,7 +993,7 @@ inline ArrayView<const ElementType>
 make_array_view(const Table<2, ElementType> &                   table,
                 const typename Table<2, ElementType>::size_type row)
 {
-  AssertIndexRange(row, table.size()[0]);
+  DEAL_II_AssertIndexRange(row, table.size()[0]);
   return ArrayView<const ElementType>(&table[row][0], table.size()[1]);
 }
 
@@ -1023,12 +1025,13 @@ inline ArrayView<ElementType> make_array_view(
   const typename Table<2, ElementType>::size_type starting_column,
   const std::size_t                               size_of_view)
 {
-  AssertIndexRange(row, table.size()[0]);
-  AssertIndexRange(starting_column, table.size()[1]);
-  Assert(starting_column + size_of_view <= table.size()[1],
-         ExcMessage("The starting index and size of the view you want to "
-                    "create would lead to a view that extends beyond the end "
-                    "of a column of the given table."));
+  DEAL_II_AssertIndexRange(row, table.size()[0]);
+  DEAL_II_AssertIndexRange(starting_column, table.size()[1]);
+  DEAL_II_Assert(starting_column + size_of_view <= table.size()[1],
+                 ExcMessage(
+                   "The starting index and size of the view you want to "
+                   "create would lead to a view that extends beyond the end "
+                   "of a column of the given table."));
   return ArrayView<ElementType>(&table[row][starting_column], size_of_view);
 }
 
@@ -1060,12 +1063,13 @@ make_array_view(const Table<2, ElementType> &                   table,
                 const typename Table<2, ElementType>::size_type starting_column,
                 const std::size_t                               size_of_view)
 {
-  AssertIndexRange(row, table.size()[0]);
-  AssertIndexRange(starting_column, table.size()[1]);
-  Assert(starting_column + size_of_view <= table.size()[1],
-         ExcMessage("The starting index and size of the view you want to "
-                    "create would lead to a view that extends beyond the end "
-                    "of a column of the given table."));
+  DEAL_II_AssertIndexRange(row, table.size()[0]);
+  DEAL_II_AssertIndexRange(starting_column, table.size()[1]);
+  DEAL_II_Assert(starting_column + size_of_view <= table.size()[1],
+                 ExcMessage(
+                   "The starting index and size of the view you want to "
+                   "create would lead to a view that extends beyond the end "
+                   "of a column of the given table."));
   return ArrayView<const ElementType>(&table[row][starting_column],
                                       size_of_view);
 }

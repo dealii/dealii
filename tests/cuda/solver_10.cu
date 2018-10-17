@@ -58,7 +58,7 @@ public:
   void
   Tstep(VectorType &u, const VectorType &v) const
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
   }
 
 private:
@@ -115,8 +115,8 @@ test(Utilities::CUDA::Handle &cuda_handle)
   // Check the result
   rw_vector.import(sol_dev, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(std::fabs(rw_vector[i] - sol_host[i]) < 1e-8,
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(rw_vector[i] - sol_host[i]) < 1e-8,
+                        ExcInternalError());
 }
 
 int

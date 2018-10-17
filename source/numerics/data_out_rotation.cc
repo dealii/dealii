@@ -111,11 +111,11 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
     {
       // would this function make any sense after all? who would want to
       // output/compute in four space dimensions?
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return;
     }
 
-  Assert((*cell)->is_locally_owned(), ExcNotImplemented());
+  DEAL_II_Assert((*cell)->is_locally_owned(), ExcNotImplemented());
 
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;
 
@@ -146,8 +146,8 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
             {
               const double r1 = (*cell)->vertex(0)(0),
                            r2 = (*cell)->vertex(1)(0);
-              Assert(r1 >= 0, ExcRadialVariableHasNegativeValues(r1));
-              Assert(r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
+              DEAL_II_Assert(r1 >= 0, ExcRadialVariableHasNegativeValues(r1));
+              DEAL_II_Assert(r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
 
               my_patches[angle].vertices[0] = r1 * angle_directions[angle];
               my_patches[angle].vertices[1] = r2 * angle_directions[angle];
@@ -166,7 +166,8 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                   const Point<dimension> v = (*cell)->vertex(vertex);
 
                   // make sure that the radial variable is nonnegative
-                  Assert(v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
+                  DEAL_II_Assert(v(0) >= 0,
+                                 ExcRadialVariableHasNegativeValues(v(0)));
 
                   // now set the vertices of the patch
                   my_patches[angle].vertices[vertex] =
@@ -187,7 +188,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
             };
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         };
 
       // then fill in data
@@ -325,7 +326,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                             break;
 
                           default:
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_Assert(false, ExcNotImplemented());
                         }
                     }
                 }
@@ -358,7 +359,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                         break;
 
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_Assert(false, ExcNotImplemented());
                     }
                 }
               else
@@ -399,7 +400,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                             break;
 
                           default:
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_Assert(false, ExcNotImplemented());
                         }
                     }
                 }
@@ -413,8 +414,8 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
               // we need to get at the number of the cell to which this face
               // belongs in order to access the cell data. this is not readily
               // available, so choose the following rather inefficient way:
-              Assert((*cell)->active(),
-                     ExcMessage("Cell must be active for cell data"));
+              DEAL_II_Assert((*cell)->active(),
+                             ExcMessage("Cell must be active for cell data"));
               const unsigned int cell_number = std::distance(
                 this->triangulation->begin_active(),
                 typename Triangulation<dimension, space_dimension>::
@@ -443,7 +444,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                     break;
 
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_Assert(false, ExcNotImplemented());
                 }
             }
         }
@@ -460,15 +461,17 @@ DataOutRotation<dim, DoFHandlerType>::build_patches(
 {
   // Check consistency of redundant
   // template parameter
-  Assert(dim == dimension, ExcDimensionMismatch(dim, dimension));
-  Assert(this->triangulation != nullptr,
-         Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
+  DEAL_II_Assert(dim == dimension, ExcDimensionMismatch(dim, dimension));
+  DEAL_II_Assert(
+    this->triangulation != nullptr,
+    Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions =
     (nnnn_subdivisions != 0) ? nnnn_subdivisions : this->default_subdivisions;
-  Assert(n_subdivisions >= 1,
-         Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(
-           n_subdivisions));
+  DEAL_II_Assert(
+    n_subdivisions >= 1,
+    Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(
+      n_subdivisions));
 
   this->validate_dataset_names();
 
@@ -484,9 +487,10 @@ DataOutRotation<dim, DoFHandlerType>::build_patches(
   // perhaps update_normal_vectors is present,
   // which would only be useful on faces, but
   // we may not use it here.
-  Assert(!(update_flags & update_normal_vectors),
-         ExcMessage("The update of normal vectors may not be requested for "
-                    "evaluation of data on cells via DataPostprocessor."));
+  DEAL_II_Assert(!(update_flags & update_normal_vectors),
+                 ExcMessage(
+                   "The update of normal vectors may not be requested for "
+                   "evaluation of data on cells via DataPostprocessor."));
 
   // first count the cells we want to
   // create patches of and make sure

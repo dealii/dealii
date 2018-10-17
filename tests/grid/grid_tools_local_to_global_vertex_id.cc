@@ -82,8 +82,8 @@ test()
       for (unsigned int i = 0; i < 31; ++i)
         reference.push_back(i);
       for (unsigned int i = 0; i < vertex_global_index.size(); ++i)
-        AssertThrow(reference[i] == vertex_global_index[i],
-                    ExcMessage("Wrong global index"));
+        DEAL_II_AssertThrow(reference[i] == vertex_global_index[i],
+                            ExcMessage("Wrong global index"));
     }
   if (rank == 1)
     {
@@ -98,8 +98,8 @@ test()
       for (unsigned int i = 27; i < 55; ++i)
         reference.push_back(i);
       for (unsigned int i = 0; i < vertex_global_index.size(); ++i)
-        AssertThrow(reference[i] == vertex_global_index[i],
-                    ExcMessage("Wrong global index"));
+        DEAL_II_AssertThrow(reference[i] == vertex_global_index[i],
+                            ExcMessage("Wrong global index"));
     }
 }
 

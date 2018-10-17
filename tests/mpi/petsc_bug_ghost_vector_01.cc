@@ -234,14 +234,14 @@ test()
     // zero. check this first for the locally owned elements...
     for (unsigned int i = 0; i < handler.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
-        AssertThrow(get_real_assert_zero_imag(vector(i)) == 0,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(get_real_assert_zero_imag(vector(i)) == 0,
+                            ExcInternalError());
     // ...end then also for the ghost elements
     for (unsigned int i = 0; i < handler.n_dofs(); ++i)
       if (locally_relevant_dofs.is_element(i) &&
           !locally_owned_dofs.is_element(i))
-        AssertThrow(get_real_assert_zero_imag(vector(i)) == 0,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(get_real_assert_zero_imag(vector(i)) == 0,
+                            ExcInternalError());
   }
 }
 

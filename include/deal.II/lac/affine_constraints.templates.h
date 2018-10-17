@@ -237,11 +237,11 @@ AffineConstraints<number>::add_entries(
   const size_type                                  line_n,
   const std::vector<std::pair<size_type, number>> &col_val_pairs)
 {
-  Assert(sorted == false, ExcMatrixIsClosed());
-  Assert(is_constrained(line_n), ExcLineInexistant(line_n));
+  DEAL_II_Assert(sorted == false, ExcMatrixIsClosed());
+  DEAL_II_Assert(is_constrained(line_n), ExcLineInexistant(line_n));
 
   ConstraintLine &line = lines[lines_cache[calculate_line_index(line_n)]];
-  Assert(line.index == line_n, ExcInternalError());
+  DEAL_II_Assert(line.index == line_n, ExcInternalError());
 
   // if in debug mode, check whether an entry for this column already
   // exists and if its the same as the one entered at present
@@ -250,18 +250,19 @@ AffineConstraints<number>::add_entries(
   // exists, since we don't want to enter it twice
   for (const std::pair<size_type, number> &col_val_pair : col_val_pairs)
     {
-      Assert(line_n != col_val_pair.first,
-             ExcMessage("Can't constrain a degree of freedom to itself"));
+      DEAL_II_Assert(line_n != col_val_pair.first,
+                     ExcMessage(
+                       "Can't constrain a degree of freedom to itself"));
       bool entry_exists = false;
       for (const std::pair<size_type, number> &entry : line.entries)
         if (entry.first == col_val_pair.first)
           {
             // entry exists, break innermost loop
-            Assert(entry.second == col_val_pair.second,
-                   ExcEntryAlreadyExists(line_n,
-                                         col_val_pair.first,
-                                         entry.second,
-                                         col_val_pair.second));
+            DEAL_II_Assert(entry.second == col_val_pair.second,
+                           ExcEntryAlreadyExists(line_n,
+                                                 col_val_pair.first,
+                                                 entry.second,
+                                                 col_val_pair.second));
             entry_exists = true;
             break;
           }
@@ -282,9 +283,9 @@ AffineConstraints<number>::add_selected_constraints(
   if (constraints.n_constraints() == 0)
     return;
 
-  Assert(filter.size() > constraints.lines.back().index,
-         ExcMessage(
-           "The filter must be larger than the given constraints object."));
+  DEAL_II_Assert(
+    filter.size() > constraints.lines.back().index,
+    ExcMessage("The filter must be larger than the given constraints object."));
   for (const ConstraintLine &line : constraints.lines)
     if (filter.is_element(line.index))
       {
@@ -326,8 +327,8 @@ AffineConstraints<number>::close()
   // in debug mode: check whether we really set the pointers correctly.
   for (size_type i = 0; i < lines_cache.size(); ++i)
     if (lines_cache[i] != numbers::invalid_size_type)
-      Assert(i == calculate_line_index(lines[lines_cache[i]].index),
-             ExcInternalError());
+      DEAL_II_Assert(i == calculate_line_index(lines[lines_cache[i]].index),
+                     ExcInternalError());
 
   // first, strip zero entries, as we have to do that only once
   for (ConstraintLine &line : lines)
@@ -401,12 +402,13 @@ AffineConstraints<number>::close()
                 const size_type dof_index = line.entries[entry].first;
                 const number    weight    = line.entries[entry].second;
 
-                Assert(dof_index != line.index,
-                       ExcMessage("Cycle in constraints detected!"));
+                DEAL_II_Assert(dof_index != line.index,
+                               ExcMessage("Cycle in constraints detected!"));
 
                 const ConstraintLine &constrained_line =
                   lines[lines_cache[calculate_line_index(dof_index)]];
-                Assert(constrained_line.index == dof_index, ExcInternalError());
+                DEAL_II_Assert(constrained_line.index == dof_index,
+                               ExcInternalError());
 
                 // now we have to replace an entry by its expansion. we do
                 // that by overwriting the entry by the first entry of the
@@ -420,8 +422,9 @@ AffineConstraints<number>::close()
                   {
                     for (size_type i = 0; i < constrained_line.entries.size();
                          ++i)
-                      Assert(dof_index != constrained_line.entries[i].first,
-                             ExcMessage("Cycle in constraints detected!"));
+                      DEAL_II_Assert(
+                        dof_index != constrained_line.entries[i].first,
+                        ExcMessage("Cycle in constraints detected!"));
 
                     // replace first entry, then tack the rest to the end
                     // of the list
@@ -440,8 +443,9 @@ AffineConstraints<number>::close()
                     // line. If we do more than there are constraints or
                     // dofs in our system, we must have a cycle.
                     ++n_replacements;
-                    Assert(n_replacements / 2 < largest_idx,
-                           ExcMessage("Cycle in constraints detected!"));
+                    DEAL_II_Assert(n_replacements / 2 < largest_idx,
+                                   ExcMessage(
+                                     "Cycle in constraints detected!"));
                     if (n_replacements / 2 >= largest_idx)
                       return; // this enables us to test for this Exception.
 #endif
@@ -477,7 +481,7 @@ AffineConstraints<number>::close()
       // times than there are constraints, since this puts a natural upper
       // bound on the length of constraint chains
       ++iteration;
-      Assert(iteration <= lines.size(), ExcInternalError());
+      DEAL_II_Assert(iteration <= lines.size(), ExcInternalError());
     }
 
   // finally sort the entries and re-scale them if necessary. in this step,
@@ -523,24 +527,28 @@ AffineConstraints<number>::close()
               for (size_type j = 1; j < line.entries.size(); ++j)
                 if (line.entries[j].first == line.entries[j - 1].first)
                   {
-                    Assert(new_entries.back().first == line.entries[j].first,
-                           ExcInternalError());
+                    DEAL_II_Assert(new_entries.back().first ==
+                                     line.entries[j].first,
+                                   ExcInternalError());
                     new_entries.back().second += line.entries[j].second;
                   }
                 else
                   new_entries.push_back(line.entries[j]);
 
-              Assert(new_entries.size() == line.entries.size() - duplicates,
-                     ExcInternalError());
+              DEAL_II_Assert(new_entries.size() ==
+                               line.entries.size() - duplicates,
+                             ExcInternalError());
 
               // make sure there are really no duplicates left and that the
               // list is still sorted
               for (size_type j = 1; j < new_entries.size(); ++j)
                 {
-                  Assert(new_entries[j].first != new_entries[j - 1].first,
-                         ExcInternalError());
-                  Assert(new_entries[j].first > new_entries[j - 1].first,
-                         ExcInternalError());
+                  DEAL_II_Assert(new_entries[j].first !=
+                                   new_entries[j - 1].first,
+                                 ExcInternalError());
+                  DEAL_II_Assert(new_entries[j].first >
+                                   new_entries[j - 1].first,
+                                 ExcInternalError());
                 }
             }
 
@@ -579,8 +587,9 @@ AffineConstraints<number>::close()
         {
           // make sure that entry->first is not the index of a line itself
           const bool is_circle = is_constrained(entry.first);
-          Assert(is_circle == false,
-                 ExcDoFConstrainedToConstrainedDoF(line.index, entry.first));
+          DEAL_II_Assert(is_circle == false,
+                         ExcDoFConstrainedToConstrainedDoF(line.index,
+                                                           entry.first));
         }
 #endif
 
@@ -597,11 +606,10 @@ AffineConstraints<number>::merge(
   const bool                       allow_different_local_lines)
 {
   (void)allow_different_local_lines;
-  Assert(allow_different_local_lines ||
-           local_lines == other_constraints.local_lines,
-         ExcMessage(
-           "local_lines for this and the other objects are not the same "
-           "although allow_different_local_lines is false."));
+  DEAL_II_Assert(
+    allow_different_local_lines || local_lines == other_constraints.local_lines,
+    ExcMessage("local_lines for this and the other objects are not the same "
+               "although allow_different_local_lines is false."));
 
   // store the previous state with respect to sorting
   const bool object_was_sorted = sorted;
@@ -639,7 +647,7 @@ AffineConstraints<number>::merge(
             {
               const typename ConstraintLine::Entries *other_entries =
                 other_constraints.get_constraint_entries(entry.first);
-              Assert(other_entries != nullptr, ExcInternalError());
+              DEAL_II_Assert(other_entries != nullptr, ExcInternalError());
 
               const number weight = entry.second;
 
@@ -690,7 +698,7 @@ AffineConstraints<number>::merge(
           {
             // there are no constraints for that line yet
             lines.push_back(line);
-            AssertIndexRange(local_line_no, lines_cache.size());
+            DEAL_II_AssertIndexRange(local_line_no, lines_cache.size());
             lines_cache[local_line_no] = index++;
           }
         else
@@ -699,8 +707,8 @@ AffineConstraints<number>::merge(
             switch (merge_conflict_behavior)
               {
                 case no_conflicts_allowed:
-                  AssertThrow(false,
-                              ExcDoFIsConstrainedFromBothObjects(line.index));
+                  DEAL_II_AssertThrow(
+                    false, ExcDoFIsConstrainedFromBothObjects(line.index));
                   break;
 
                 case left_object_wins:
@@ -708,12 +716,12 @@ AffineConstraints<number>::merge(
                   break;
 
                 case right_object_wins:
-                  AssertIndexRange(local_line_no, lines_cache.size());
+                  DEAL_II_AssertIndexRange(local_line_no, lines_cache.size());
                   lines[lines_cache[local_line_no]] = line;
                   break;
 
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
           }
       }
@@ -721,8 +729,8 @@ AffineConstraints<number>::merge(
     // check that we set the pointers correctly
     for (size_type i = 0; i < lines_cache.size(); ++i)
       if (lines_cache[i] != numbers::invalid_size_type)
-        Assert(i == calculate_line_index(lines[lines_cache[i]].index),
-               ExcInternalError());
+        DEAL_II_Assert(i == calculate_line_index(lines[lines_cache[i]].index),
+                       ExcInternalError());
   }
 
   // if the object was sorted before, then make sure it is so afterward as
@@ -758,9 +766,10 @@ AffineConstraints<number>::shift(const size_type offset)
   // make sure that lines, lines_cache and local_lines
   // are still linked correctly
   for (size_type index = 0; index < lines_cache.size(); ++index)
-    Assert(lines_cache[index] == numbers::invalid_size_type ||
-             calculate_line_index(lines[lines_cache[index]].index) == index,
-           ExcInternalError());
+    DEAL_II_Assert(lines_cache[index] == numbers::invalid_size_type ||
+                     calculate_line_index(lines[lines_cache[index]].index) ==
+                       index,
+                   ExcInternalError());
 #endif
 }
 
@@ -809,7 +818,7 @@ AffineConstraints<number>::is_identity_constrained(const size_type line_n) const
     return false;
 
   const ConstraintLine &line = lines[lines_cache[calculate_line_index(line_n)]];
-  Assert(line.index == line_n, ExcInternalError());
+  DEAL_II_Assert(line.index == line_n, ExcInternalError());
 
   // return if an entry for this line was found and if it has only one
   // entry equal to 1.0
@@ -827,7 +836,7 @@ AffineConstraints<number>::are_identity_constrained(
     {
       const ConstraintLine &line =
         lines[lines_cache[calculate_line_index(line_n_1)]];
-      Assert(line.index == line_n_1, ExcInternalError());
+      DEAL_II_Assert(line.index == line_n_1, ExcInternalError());
 
       // return if an entry for this line was found and if it has only one
       // entry equal to 1.0 and that one is index2
@@ -839,7 +848,7 @@ AffineConstraints<number>::are_identity_constrained(
     {
       const ConstraintLine &line =
         lines[lines_cache[calculate_line_index(line_n_2)]];
-      Assert(line.index == line_n_2, ExcInternalError());
+      DEAL_II_Assert(line.index == line_n_2, ExcInternalError());
 
       // return if an entry for this line was found and if it has only one
       // entry equal to 1.0 and that one is line_n_1
@@ -911,7 +920,7 @@ AffineConstraints<number>::print(std::ostream &out) const
         }
     }
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -981,9 +990,9 @@ template <typename number>
 void
 AffineConstraints<number>::condense(SparsityPattern &sparsity) const
 {
-  Assert(sorted == true, ExcMatrixNotClosed());
-  Assert(sparsity.is_compressed() == false, ExcMatrixIsClosed());
-  Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sparsity.is_compressed() == false, ExcMatrixIsClosed());
+  DEAL_II_Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
 
   // store for each index whether it must be distributed or not. If entry
   // is numbers::invalid_unsigned_int, no distribution is necessary.
@@ -1069,12 +1078,13 @@ template <typename number>
 void
 AffineConstraints<number>::condense(BlockSparsityPattern &sparsity) const
 {
-  Assert(sorted == true, ExcMatrixNotClosed());
-  Assert(sparsity.is_compressed() == false, ExcMatrixIsClosed());
-  Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
-  Assert(sparsity.n_block_rows() == sparsity.n_block_cols(), ExcNotQuadratic());
-  Assert(sparsity.get_column_indices() == sparsity.get_row_indices(),
-         ExcNotQuadratic());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sparsity.is_compressed() == false, ExcMatrixIsClosed());
+  DEAL_II_Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
+  DEAL_II_Assert(sparsity.n_block_rows() == sparsity.n_block_cols(),
+                 ExcNotQuadratic());
+  DEAL_II_Assert(sparsity.get_column_indices() == sparsity.get_row_indices(),
+                 ExcNotQuadratic());
 
   const BlockIndices &index_mapping = sparsity.get_column_indices();
 
@@ -1187,8 +1197,8 @@ template <typename number>
 void
 AffineConstraints<number>::condense(DynamicSparsityPattern &sparsity) const
 {
-  Assert(sorted == true, ExcMatrixNotClosed());
-  Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
 
   // store for each index whether it must be distributed or not. If entry
   // is numbers::invalid_unsigned_int, no distribution is necessary.
@@ -1280,11 +1290,12 @@ template <typename number>
 void
 AffineConstraints<number>::condense(BlockDynamicSparsityPattern &sparsity) const
 {
-  Assert(sorted == true, ExcMatrixNotClosed());
-  Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
-  Assert(sparsity.n_block_rows() == sparsity.n_block_cols(), ExcNotQuadratic());
-  Assert(sparsity.get_column_indices() == sparsity.get_row_indices(),
-         ExcNotQuadratic());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
+  DEAL_II_Assert(sparsity.n_block_rows() == sparsity.n_block_cols(),
+                 ExcNotQuadratic());
+  DEAL_II_Assert(sparsity.get_column_indices() == sparsity.get_row_indices(),
+                 ExcNotQuadratic());
 
   const BlockIndices &index_mapping = sparsity.get_column_indices();
 
@@ -1419,7 +1430,7 @@ void
 AffineConstraints<number>::condense(const VectorType &vec_ghosted,
                                     VectorType &      vec) const
 {
-  Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
 
   // if this is called with different arguments, we need to copy the data
   // over:
@@ -1435,9 +1446,9 @@ AffineConstraints<number>::condense(const VectorType &vec_ghosted,
     {
       // in case the constraint is inhomogeneous, this function is not
       // appropriate. Throw an exception.
-      Assert(line.inhomogeneity == number(0.),
-             ExcMessage("Inhomogeneous constraint cannot be condensed "
-                        "without any matrix specified."));
+      DEAL_II_Assert(line.inhomogeneity == number(0.),
+                     ExcMessage("Inhomogeneous constraint cannot be condensed "
+                                "without any matrix specified."));
 
       const typename VectorType::value_type old_value = vec_ghosted(line.index);
       for (const std::pair<size_type, number> &entry : line.entries)
@@ -1480,11 +1491,11 @@ AffineConstraints<number>::condense(SparseMatrix<number> &uncondensed,
 
   const SparsityPattern &sparsity = uncondensed.get_sparsity_pattern();
 
-  Assert(sorted == true, ExcMatrixNotClosed());
-  Assert(sparsity.is_compressed() == true, ExcMatrixNotClosed());
-  Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sparsity.is_compressed() == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
   if (use_vectors == true)
-    AssertDimension(vec.size(), sparsity.n_rows());
+    DEAL_II_AssertDimension(vec.size(), sparsity.n_rows());
 
   number average_diagonal = 0.;
   for (size_type i = 0; i < uncondensed.m(); ++i)
@@ -1515,8 +1526,8 @@ AffineConstraints<number>::condense(SparseMatrix<number> &uncondensed,
 
               // end of row reached? this should not happen, since we only
               // operate on compressed matrices!
-              Assert(column != SparsityPattern::invalid_entry,
-                     ExcMatrixNotClosed());
+              DEAL_II_Assert(column != SparsityPattern::invalid_entry,
+                             ExcMatrixNotClosed());
 
               if (distribute[column] != numbers::invalid_size_type)
                 // distribute entry at regular row @p row and irregular
@@ -1562,8 +1573,8 @@ AffineConstraints<number>::condense(SparseMatrix<number> &uncondensed,
 
               // end of row reached? this should not happen, since we only
               // operate on compressed matrices!
-              Assert(column != SparsityPattern::invalid_entry,
-                     ExcMatrixNotClosed());
+              DEAL_II_Assert(column != SparsityPattern::invalid_entry,
+                             ExcMatrixNotClosed());
 
               if (distribute[column] == numbers::invalid_size_type)
                 // distribute entry at irregular row @p row and regular
@@ -1655,18 +1666,20 @@ AffineConstraints<number>::condense(BlockSparseMatrix<number> &uncondensed,
 
   const BlockSparsityPattern &sparsity = uncondensed.get_sparsity_pattern();
 
-  Assert(sorted == true, ExcMatrixNotClosed());
-  Assert(sparsity.is_compressed() == true, ExcMatrixNotClosed());
-  Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
-  Assert(sparsity.n_block_rows() == sparsity.n_block_cols(), ExcNotQuadratic());
-  Assert(sparsity.n_block_rows() == sparsity.n_block_cols(), ExcNotQuadratic());
-  Assert(sparsity.get_column_indices() == sparsity.get_row_indices(),
-         ExcNotQuadratic());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sparsity.is_compressed() == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
+  DEAL_II_Assert(sparsity.n_block_rows() == sparsity.n_block_cols(),
+                 ExcNotQuadratic());
+  DEAL_II_Assert(sparsity.n_block_rows() == sparsity.n_block_cols(),
+                 ExcNotQuadratic());
+  DEAL_II_Assert(sparsity.get_column_indices() == sparsity.get_row_indices(),
+                 ExcNotQuadratic());
 
   if (use_vectors == true)
     {
-      AssertDimension(vec.size(), sparsity.n_rows());
-      AssertDimension(vec.n_blocks(), sparsity.n_block_rows());
+      DEAL_II_AssertDimension(vec.size(), sparsity.n_rows());
+      DEAL_II_AssertDimension(vec.n_blocks(), sparsity.n_block_rows());
     }
 
   number average_diagonal = 0.;
@@ -1844,7 +1857,7 @@ namespace internal
                       VectorType &                  vec,
                       size_type                     shift = 0)
     {
-      Assert(!vec.has_ghost_elements(), ExcInternalError());
+      DEAL_II_Assert(!vec.has_ghost_elements(), ExcInternalError());
       IndexSet locally_owned = vec.locally_owned_elements();
       for (const size_type index : cm)
         {
@@ -1984,10 +1997,10 @@ AffineConstraints<number>::distribute_local_to_global(
   const FullMatrix<number> &    local_matrix,
   bool                          diagonal) const
 {
-  Assert(sorted == true, ExcMatrixNotClosed());
-  AssertDimension(local_vector.size(), local_dof_indices_row.size());
-  AssertDimension(local_matrix.m(), local_dof_indices_row.size());
-  AssertDimension(local_matrix.n(), local_dof_indices_col.size());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_AssertDimension(local_vector.size(), local_dof_indices_row.size());
+  DEAL_II_AssertDimension(local_matrix.m(), local_dof_indices_row.size());
+  DEAL_II_AssertDimension(local_matrix.n(), local_dof_indices_col.size());
 
   // diagonal checks if we have only one index set (if both are equal
   // diagonal should be set to true).
@@ -2022,8 +2035,8 @@ AffineConstraints<number>::distribute_local_to_global(
         // global dof index
         const size_type line_index =
           calculate_line_index(local_dof_indices_col[i]);
-        AssertIndexRange(line_index, lines_cache.size());
-        AssertIndexRange(lines_cache[line_index], lines.size());
+        DEAL_II_AssertIndexRange(line_index, lines_cache.size());
+        DEAL_II_AssertIndexRange(lines_cache[line_index], lines.size());
         const ConstraintLine &position = lines[lines_cache[line_index]];
 
         // Gauss elimination of the matrix columns with the inhomogeneity.
@@ -2051,11 +2064,11 @@ AffineConstraints<number>::distribute_local_to_global(
 
               for (size_type q = 0; q < position_j.entries.size(); ++q)
                 {
-                  Assert(!(!local_lines.size() ||
-                           local_lines.is_element(
-                             position_j.entries[q].first)) ||
-                           is_constrained(position_j.entries[q].first) == false,
-                         ExcMessage("Tried to distribute to a fixed dof."));
+                  DEAL_II_Assert(
+                    !(!local_lines.size() ||
+                      local_lines.is_element(position_j.entries[q].first)) ||
+                      is_constrained(position_j.entries[q].first) == false,
+                    ExcMessage("Tried to distribute to a fixed dof."));
                   global_vector(position_j.entries[q].first) -=
                     val * position_j.entries[q].second * matrix_entry;
                 }
@@ -2068,10 +2081,11 @@ AffineConstraints<number>::distribute_local_to_global(
           {
             for (size_type j = 0; j < position.entries.size(); ++j)
               {
-                Assert(!(!local_lines.size() ||
-                         local_lines.is_element(position.entries[j].first)) ||
-                         is_constrained(position.entries[j].first) == false,
-                       ExcMessage("Tried to distribute to a fixed dof."));
+                DEAL_II_Assert(
+                  !(!local_lines.size() ||
+                    local_lines.is_element(position.entries[j].first)) ||
+                    is_constrained(position.entries[j].first) == false,
+                  ExcMessage("Tried to distribute to a fixed dof."));
                 global_vector(position.entries[j].first) +=
                   local_vector(i) * position.entries[j].second;
               }
@@ -2095,12 +2109,12 @@ namespace internal
     TrilinosWrappers::MPI::Vector &output,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
-    Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
+    DEAL_II_Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
 #  ifdef DEAL_II_WITH_MPI
     const Epetra_MpiComm *mpi_comm =
       dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
 
-    Assert(mpi_comm != nullptr, ExcInternalError());
+    DEAL_II_Assert(mpi_comm != nullptr, ExcInternalError());
     output.reinit(needed_elements, mpi_comm->GetMpiComm());
 #  else
     output.reinit(needed_elements, MPI_COMM_SELF);
@@ -2156,7 +2170,7 @@ namespace internal
     Vector & /*output*/,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
-    Assert(false, ExcMessage("We shouldn't even get here!"));
+    DEAL_II_Assert(false, ExcMessage("We shouldn't even get here!"));
   }
 
   // for block vectors, simply dispatch to the individual blocks
@@ -2194,7 +2208,7 @@ template <class VectorType>
 void
 AffineConstraints<number>::distribute(VectorType &vec) const
 {
-  Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
 
   // if the vector type supports parallel storage and if the vector actually
   // does store only part of the vector, distributing is slightly more
@@ -2250,7 +2264,7 @@ AffineConstraints<number>::distribute(VectorType &vec) const
                    internal::ElementAccess<VectorType>::get(ghosted_vector,
                                                             entry.first)) *
                  entry.second);
-            AssertIsFinite(new_value);
+            DEAL_II_AssertIsFinite(new_value);
             internal::ElementAccess<VectorType>::set(new_value,
                                                      line.index,
                                                      vec);
@@ -2281,7 +2295,7 @@ AffineConstraints<number>::distribute(VectorType &vec) const
               (static_cast<typename VectorType::value_type>(
                  internal::ElementAccess<VectorType>::get(vec, entry.first)) *
                entry.second);
-          AssertIsFinite(new_value);
+          DEAL_II_AssertIsFinite(new_value);
           internal::ElementAccess<VectorType>::set(new_value,
                                                    next_constraint.index,
                                                    vec);
@@ -2346,8 +2360,8 @@ namespace internals
     global_row = in.global_row;
     local_row  = in.local_row;
     // the constraints pointer should not contain any data here.
-    Assert(constraint_position == numbers::invalid_size_type,
-           ExcInternalError());
+    DEAL_II_Assert(constraint_position == numbers::invalid_size_type,
+                   ExcInternalError());
 
     if (in.constraint_position != numbers::invalid_size_type)
       {
@@ -2383,7 +2397,7 @@ namespace internals
     size_type
     insert_new_index(const std::pair<size_type, number> &pair)
     {
-      Assert(row_length > 0, ExcInternalError());
+      DEAL_II_Assert(row_length > 0, ExcInternalError());
       const unsigned int index = individual_size.size();
       individual_size.push_back(1);
       data.resize(individual_size.size() * row_length);
@@ -2396,11 +2410,12 @@ namespace internals
     append_index(const size_type                     index,
                  const std::pair<size_type, number> &pair)
     {
-      AssertIndexRange(index, individual_size.size());
+      DEAL_II_AssertIndexRange(index, individual_size.size());
       const size_type my_length = individual_size[index];
       if (my_length == row_length)
         {
-          AssertDimension(data.size(), individual_size.size() * row_length);
+          DEAL_II_AssertDimension(data.size(),
+                                  individual_size.size() * row_length);
           // no space left in this row, need to double row_length and
           // rearrange the data items. Move all items to the right except the
           // first one, starting at the back. Since individual_size contains
@@ -2626,7 +2641,7 @@ namespace internals
     void
     set_ith_constraint_inhomogeneous(const size_type i)
     {
-      Assert(i >= n_inhomogeneous_rows, ExcInternalError());
+      DEAL_II_Assert(i >= n_inhomogeneous_rows, ExcInternalError());
       std::swap(total_row_indices[n_active_rows + i],
                 total_row_indices[n_active_rows + n_inhomogeneous_rows]);
       n_inhomogeneous_rows++;
@@ -2674,8 +2689,8 @@ namespace internals
 
     // check whether the list was really sorted before entering here
     for (size_type i = 1; i < n_active_rows; ++i)
-      Assert(total_row_indices[i - 1] < total_row_indices[i],
-             ExcInternalError());
+      DEAL_II_Assert(total_row_indices[i - 1] < total_row_indices[i],
+                     ExcInternalError());
 
     pos = Utilities::lower_bound(total_row_indices.begin(),
                                  total_row_indices.begin() + n_active_rows,
@@ -2711,11 +2726,11 @@ namespace internals
     const size_type length = size();
 
     // make sure that we are in the range of the vector
-    AssertIndexRange(length, total_row_indices.size() + 1);
+    DEAL_II_AssertIndexRange(length, total_row_indices.size() + 1);
     for (size_type i = 0; i < length; ++i)
-      Assert(total_row_indices[i].constraint_position ==
-               numbers::invalid_size_type,
-             ExcInternalError());
+      DEAL_II_Assert(total_row_indices[i].constraint_position ==
+                       numbers::invalid_size_type,
+                     ExcInternalError());
 
     step = length / 2;
     while (step > 0)
@@ -2840,10 +2855,11 @@ namespace internals
       ScratchDataAccessor()
         : my_scratch_data(&AffineConstraintsData::scratch_data.get())
       {
-        Assert(my_scratch_data->in_use == false,
-               ExcMessage(
-                 "Access to thread-local scratch data tried, but it is already "
-                 "in use"));
+        DEAL_II_Assert(
+          my_scratch_data->in_use == false,
+          ExcMessage(
+            "Access to thread-local scratch data tried, but it is already "
+            "in use"));
         my_scratch_data->in_use = true;
       }
 
@@ -2895,7 +2911,8 @@ namespace internals
                     GlobalRowsFromLocal<number> &global_rows,
                     std::vector<size_type> &     block_starts)
   {
-    AssertDimension(block_starts.size(), block_object.n_block_rows() + 1);
+    DEAL_II_AssertDimension(block_starts.size(),
+                            block_object.n_block_rows() + 1);
 
     using row_iterator         = std::vector<Distributing>::iterator;
     row_iterator block_indices = global_rows.total_row_indices.begin();
@@ -2931,7 +2948,8 @@ namespace internals
                     std::vector<size_type> &row_indices,
                     std::vector<size_type> &block_starts)
   {
-    AssertDimension(block_starts.size(), block_object.n_block_rows() + 1);
+    DEAL_II_AssertDimension(block_starts.size(),
+                            block_object.n_block_rows() + 1);
 
     using row_iterator       = std::vector<size_type>::iterator;
     row_iterator col_indices = row_indices.begin();
@@ -3024,7 +3042,7 @@ namespace internals
     if (column_end == column_start)
       return;
 
-    AssertIndexRange(column_end - 1, global_cols.size());
+    DEAL_II_AssertIndexRange(column_end - 1, global_cols.size());
     const size_type loc_row = global_rows.local_row(i);
 
     // fast function if there are no indirect references to any of the local
@@ -3033,13 +3051,13 @@ namespace internals
     if (global_rows.have_indirect_rows() == false &&
         global_cols.have_indirect_rows() == false)
       {
-        AssertIndexRange(loc_row, local_matrix.m());
+        DEAL_II_AssertIndexRange(loc_row, local_matrix.m());
         const number *matrix_ptr = &local_matrix(loc_row, 0);
 
         for (size_type j = column_start; j < column_end; ++j)
           {
             const size_type loc_col = global_cols.local_row(j);
-            AssertIndexRange(loc_col, local_matrix.n());
+            DEAL_II_AssertIndexRange(loc_col, local_matrix.n());
             const number col_val = matrix_ptr[loc_col];
             if (col_val != number())
               {
@@ -3085,10 +3103,10 @@ namespace internals
         {
           while (matrix_values->column() < column)
             ++matrix_values;
-          Assert(matrix_values->column() == column,
-                 typename SparseMatrix<
-                   typename SparseMatrixIterator::MatrixType::value_type>::
-                   ExcInvalidIndex(row, column));
+          DEAL_II_Assert(
+            matrix_values->column() == column,
+            typename SparseMatrix<typename SparseMatrixIterator::MatrixType::
+                                    value_type>::ExcInvalidIndex(row, column));
           matrix_values->value() += value;
         }
     }
@@ -3109,7 +3127,7 @@ namespace internals
     if (column_end == column_start)
       return;
 
-    AssertIndexRange(column_end - 1, global_rows.size());
+    DEAL_II_AssertIndexRange(column_end - 1, global_rows.size());
     const SparsityPattern &sparsity = sparse_matrix->get_sparsity_pattern();
 
     if (sparsity.n_nonzero_elements() == 0)
@@ -3130,7 +3148,7 @@ namespace internals
       {
         if (global_rows.have_indirect_rows() == false)
           {
-            AssertIndexRange(loc_row, local_matrix.m());
+            DEAL_II_AssertIndexRange(loc_row, local_matrix.m());
             const number *matrix_ptr = &local_matrix(loc_row, 0);
 
             for (size_type j = column_start; j < column_end; ++j)
@@ -3161,7 +3179,7 @@ namespace internals
         ++matrix_values; // jump over diagonal element
         if (global_rows.have_indirect_rows() == false)
           {
-            AssertIndexRange(loc_row, local_matrix.m());
+            DEAL_II_AssertIndexRange(loc_row, local_matrix.m());
             const number *matrix_ptr = &local_matrix(loc_row, 0);
 
             sparse_matrix->begin(row)->value() += matrix_ptr[loc_row];
@@ -3212,7 +3230,7 @@ namespace internals
     else if (global_rows.have_indirect_rows() == false)
       {
         ++matrix_values; // jump over diagonal element
-        AssertIndexRange(loc_row, local_matrix.m());
+        DEAL_II_AssertIndexRange(loc_row, local_matrix.m());
         const number *matrix_ptr = &local_matrix(loc_row, 0);
 
         for (size_type j = column_start; j < column_end; ++j)
@@ -3266,12 +3284,12 @@ namespace internals
     // rows at all on this set of dofs
     if (global_rows.have_indirect_rows() == false)
       {
-        Assert(loc_row < dof_mask.n_rows(), ExcInternalError());
+        DEAL_II_Assert(loc_row < dof_mask.n_rows(), ExcInternalError());
 
         for (size_type j = column_start; j < column_end; ++j)
           {
             const size_type loc_col = global_rows.local_row(j);
-            Assert(loc_col < dof_mask.n_cols(), ExcInternalError());
+            DEAL_II_Assert(loc_col < dof_mask.n_cols(), ExcInternalError());
 
             if (dof_mask(loc_row, loc_col) == true)
               *col_ptr++ = global_rows.global_row(j);
@@ -3287,10 +3305,11 @@ namespace internals
             const size_type loc_col = global_rows.local_row(j);
             if (loc_row != numbers::invalid_size_type)
               {
-                Assert(loc_row < dof_mask.n_rows(), ExcInternalError());
+                DEAL_II_Assert(loc_row < dof_mask.n_rows(), ExcInternalError());
                 if (loc_col != numbers::invalid_size_type)
                   {
-                    Assert(loc_col < dof_mask.n_cols(), ExcInternalError());
+                    DEAL_II_Assert(loc_col < dof_mask.n_cols(),
+                                   ExcInternalError());
                     if (dof_mask(loc_row, loc_col) == true)
                       goto add_this_index;
                   }
@@ -3304,7 +3323,8 @@ namespace internals
               {
                 if (loc_col != numbers::invalid_size_type)
                   {
-                    Assert(loc_col < dof_mask.n_cols(), ExcInternalError());
+                    DEAL_II_Assert(loc_col < dof_mask.n_cols(),
+                                   ExcInternalError());
                     if (dof_mask(global_rows.local_row(i, q), loc_col) == true)
                       goto add_this_index;
                   }
@@ -3431,7 +3451,7 @@ AffineConstraints<number>::make_sorted_row_list(
   internals::GlobalRowsFromLocal<number> &global_rows) const
 {
   const size_type n_local_dofs = local_dof_indices.size();
-  AssertDimension(n_local_dofs, global_rows.size());
+  DEAL_II_AssertDimension(n_local_dofs, global_rows.size());
 
   // when distributing the local data to the global matrix, we can quite
   // cheaply sort the indices (obviously, this introduces the need for
@@ -3471,9 +3491,9 @@ AffineConstraints<number>::make_sorted_row_list(
   for (size_type i = 0; i < n_constrained_rows; ++i)
     {
       const size_type local_row = global_rows.constraint_origin(i);
-      AssertIndexRange(local_row, n_local_dofs);
+      DEAL_II_AssertIndexRange(local_row, n_local_dofs);
       const size_type global_row = local_dof_indices[local_row];
-      Assert(is_constrained(global_row), ExcInternalError());
+      DEAL_II_Assert(is_constrained(global_row), ExcInternalError());
       const ConstraintLine &position =
         lines[lines_cache[calculate_line_index(global_row)]];
       if (position.inhomogeneity != number(0.))
@@ -3606,15 +3626,15 @@ AffineConstraints<number>::distribute_local_to_global(
   const bool use_dealii_matrix =
     std::is_same<MatrixType, SparseMatrix<number>>::value;
 
-  AssertDimension(local_matrix.n(), local_dof_indices.size());
-  AssertDimension(local_matrix.m(), local_dof_indices.size());
-  Assert(global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
+  DEAL_II_AssertDimension(local_matrix.n(), local_dof_indices.size());
+  DEAL_II_AssertDimension(local_matrix.m(), local_dof_indices.size());
+  DEAL_II_Assert(global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
   if (use_vectors == true)
     {
-      AssertDimension(local_matrix.m(), local_vector.size());
-      AssertDimension(global_matrix.m(), global_vector.size());
+      DEAL_II_AssertDimension(local_matrix.m(), local_vector.size());
+      DEAL_II_AssertDimension(global_matrix.m(), global_vector.size());
     }
-  Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
 
   const size_type n_local_dofs = local_dof_indices.size();
 
@@ -3650,7 +3670,7 @@ AffineConstraints<number>::distribute_local_to_global(
       vals.resize(n_actual_dofs);
     }
   else
-    Assert(sparse_matrix != nullptr, ExcInternalError());
+    DEAL_II_Assert(sparse_matrix != nullptr, ExcInternalError());
 
   // now do the actual job. go through all the global rows that we will touch
   // and call resolve_matrix_row for each of those.
@@ -3691,7 +3711,7 @@ AffineConstraints<number>::distribute_local_to_global(
         {
           const typename VectorType::value_type val = resolve_vector_entry(
             i, global_rows, local_vector, local_dof_indices, local_matrix);
-          AssertIsFinite(val);
+          DEAL_II_AssertIsFinite(val);
 
           if (val != typename VectorType::value_type())
             {
@@ -3755,17 +3775,17 @@ AffineConstraints<number>::distribute_local_to_global(
   const bool use_dealii_matrix =
     std::is_same<MatrixType, BlockSparseMatrix<number>>::value;
 
-  AssertDimension(local_matrix.n(), local_dof_indices.size());
-  AssertDimension(local_matrix.m(), local_dof_indices.size());
-  Assert(global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
-  Assert(global_matrix.n_block_rows() == global_matrix.n_block_cols(),
-         ExcNotQuadratic());
+  DEAL_II_AssertDimension(local_matrix.n(), local_dof_indices.size());
+  DEAL_II_AssertDimension(local_matrix.m(), local_dof_indices.size());
+  DEAL_II_Assert(global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
+  DEAL_II_Assert(global_matrix.n_block_rows() == global_matrix.n_block_cols(),
+                 ExcNotQuadratic());
   if (use_vectors == true)
     {
-      AssertDimension(local_matrix.m(), local_vector.size());
-      AssertDimension(global_matrix.m(), global_vector.size());
+      DEAL_II_AssertDimension(local_matrix.m(), local_vector.size());
+      DEAL_II_AssertDimension(global_matrix.m(), global_vector.size());
     }
-  Assert(sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(sorted == true, ExcMatrixNotClosed());
 
   typename internals::AffineConstraintsData<number>::ScratchDataAccessor
     scratch_data;
@@ -3836,7 +3856,7 @@ AffineConstraints<number>::distribute_local_to_global(
                   SparseMatrix<number> *sparse_matrix =
                     dynamic_cast<SparseMatrix<number> *>(
                       &global_matrix.block(block, block_col));
-                  Assert(sparse_matrix != nullptr, ExcInternalError());
+                  DEAL_II_Assert(sparse_matrix != nullptr, ExcInternalError());
                   internals::resolve_matrix_row(global_rows,
                                                 i,
                                                 start_block,
@@ -3892,8 +3912,8 @@ AffineConstraints<number>::distribute_local_to_global(
   const std::vector<size_type> &   col_indices,
   MatrixType &                     global_matrix) const
 {
-  AssertDimension(local_matrix.m(), row_indices.size());
-  AssertDimension(local_matrix.n(), col_indices.size());
+  DEAL_II_AssertDimension(local_matrix.m(), row_indices.size());
+  DEAL_II_AssertDimension(local_matrix.n(), col_indices.size());
 
   const size_type n_local_row_dofs = row_indices.size();
   const size_type n_local_col_dofs = col_indices.size();
@@ -3954,15 +3974,15 @@ AffineConstraints<number>::add_entries_local_to_global(
   const Table<2, bool> &        dof_mask,
   std::integral_constant<bool, false>) const
 {
-  Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
-         ExcNotQuadratic());
+  DEAL_II_Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
+                 ExcNotQuadratic());
 
   const size_type n_local_dofs       = local_dof_indices.size();
   bool            dof_mask_is_active = false;
   if (dof_mask.n_rows() == n_local_dofs)
     {
       dof_mask_is_active = true;
-      AssertDimension(dof_mask.n_cols(), n_local_dofs);
+      DEAL_II_AssertDimension(dof_mask.n_cols(), n_local_dofs);
     }
 
   typename internals::AffineConstraintsData<number>::ScratchDataAccessor
@@ -4094,7 +4114,7 @@ AffineConstraints<number>::add_entries_local_to_global(
     }
 
   // TODO: implement this
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 template <typename number>
@@ -4109,10 +4129,11 @@ AffineConstraints<number>::add_entries_local_to_global(
 {
   // just as the other add_entries_local_to_global function, but now
   // specialized for block matrices.
-  Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
-         ExcNotQuadratic());
-  Assert(sparsity_pattern.n_block_rows() == sparsity_pattern.n_block_cols(),
-         ExcNotQuadratic());
+  DEAL_II_Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
+                 ExcNotQuadratic());
+  DEAL_II_Assert(sparsity_pattern.n_block_rows() ==
+                   sparsity_pattern.n_block_cols(),
+                 ExcNotQuadratic());
 
   const size_type n_local_dofs = local_dof_indices.size();
   const size_type num_blocks   = sparsity_pattern.n_block_rows();
@@ -4124,7 +4145,7 @@ AffineConstraints<number>::add_entries_local_to_global(
   if (dof_mask.n_rows() == n_local_dofs)
     {
       dof_mask_is_active = true;
-      AssertDimension(dof_mask.n_cols(), n_local_dofs);
+      DEAL_II_AssertDimension(dof_mask.n_cols(), n_local_dofs);
     }
 
   if (dof_mask_is_active == false)
@@ -4147,10 +4168,10 @@ AffineConstraints<number>::add_entries_local_to_global(
           const size_type next_block = block_starts[block + 1];
           for (size_type i = block_starts[block]; i < next_block; ++i)
             {
-              Assert(i < n_actual_dofs, ExcInternalError());
+              DEAL_II_Assert(i < n_actual_dofs, ExcInternalError());
               const size_type row = actual_dof_indices[i];
-              Assert(row < sparsity_pattern.block(block, 0).n_rows(),
-                     ExcInternalError());
+              DEAL_II_Assert(row < sparsity_pattern.block(block, 0).n_rows(),
+                             ExcInternalError());
               std::vector<size_type>::iterator index_it =
                 actual_dof_indices.begin();
               for (size_type block_col = 0; block_col < num_blocks; ++block_col)

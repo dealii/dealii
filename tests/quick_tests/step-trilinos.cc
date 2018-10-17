@@ -162,7 +162,7 @@ LaplaceProblem::solve()
 
   TrilinosWrappers::MPI::Vector res(x);
   A.residual(res, x, b);
-  AssertThrow(res.l2_norm() < 1e-3, ExcInternalError());
+  DEAL_II_AssertThrow(res.l2_norm() < 1e-3, ExcInternalError());
 }
 
 void

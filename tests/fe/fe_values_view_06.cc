@@ -73,9 +73,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
         {
           deallog << scalar_values[q] << std::endl;
-          Assert((scalar_values[q] - vector_values[q][c]).norm() <=
-                   1e-12 * scalar_values[q].norm(),
-                 ExcInternalError());
+          DEAL_II_Assert((scalar_values[q] - vector_values[q][c]).norm() <=
+                           1e-12 * scalar_values[q].norm(),
+                         ExcInternalError());
         }
     }
 }

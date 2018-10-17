@@ -65,9 +65,9 @@ namespace TrilinosWrappers
   PreconditionAMGMueLu::PreconditionAMGMueLu()
   {
 #    ifdef DEAL_II_WITH_64BIT_INDICES
-    AssertThrow(false,
-                ExcMessage(
-                  "PreconditionAMGMueLu does not support 64bit-indices!"));
+    DEAL_II_AssertThrow(
+      false,
+      ExcMessage("PreconditionAMGMueLu does not support 64bit-indices!"));
 #    endif
   }
 
@@ -151,13 +151,14 @@ namespace TrilinosWrappers
                                       additional_data.constant_modes[0].size();
         const size_type my_size = domain_map.NumMyElements();
         if (constant_modes_are_global == false)
-          Assert(n_relevant_rows == my_size,
-                 ExcDimensionMismatch(n_relevant_rows, my_size));
-        Assert(n_rows == static_cast<size_type>(TrilinosWrappers::global_length(
+          DEAL_II_Assert(n_relevant_rows == my_size,
+                         ExcDimensionMismatch(n_relevant_rows, my_size));
+        DEAL_II_Assert(n_rows ==
+                         static_cast<size_type>(TrilinosWrappers::global_length(
                            distributed_constant_modes)),
-               ExcDimensionMismatch(n_rows,
-                                    TrilinosWrappers::global_length(
-                                      distributed_constant_modes)));
+                       ExcDimensionMismatch(n_rows,
+                                            TrilinosWrappers::global_length(
+                                              distributed_constant_modes)));
 
         (void)n_relevant_rows;
         (void)global_length;

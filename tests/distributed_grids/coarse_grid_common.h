@@ -69,7 +69,7 @@ template <int dim>
 void
 assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
 {
-  Assert(a.n_active_cells() == b.n_active_cells(), ExcInternalError());
+  DEAL_II_Assert(a.n_active_cells() == b.n_active_cells(), ExcInternalError());
 
   std::string file1 = "tmp_grid1";
   std::string file2 = "tmp_grid2";
@@ -84,7 +84,7 @@ assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
 
   // compare the two files
   std::string cmd = std::string("diff -q ") + file1 + std::string(" ") + file2;
-  Assert(system(cmd.c_str()) == 0, ExcInternalError());
+  DEAL_II_Assert(system(cmd.c_str()) == 0, ExcInternalError());
 
   // and delete them
   std::remove(file1.c_str());

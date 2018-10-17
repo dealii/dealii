@@ -32,7 +32,8 @@ test()
     for (unsigned int j = i; j < dim; ++j)
       t[i][j] = (1. + (i + 1) * (j * 2));
 
-  AssertThrow(trace(deviator(t)) < 1e-15 * t.norm(), ExcInternalError());
+  DEAL_II_AssertThrow(trace(deviator(t)) < 1e-15 * t.norm(),
+                      ExcInternalError());
 }
 
 

@@ -241,7 +241,8 @@ SolverRichardson<VectorType>::solve(const MatrixType &        A,
 
   // in case of failure: throw exception
   if (conv != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence(iter, last_criterion));
+    DEAL_II_AssertThrow(false,
+                        SolverControl::NoConvergence(iter, last_criterion));
   // otherwise exit as normal
 }
 
@@ -295,7 +296,8 @@ SolverRichardson<VectorType>::Tsolve(const MatrixType &        A,
 
   // in case of failure: throw exception
   if (conv != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence(iter, last_criterion));
+    DEAL_II_AssertThrow(false,
+                        SolverControl::NoConvergence(iter, last_criterion));
 
   // otherwise exit as normal
 }

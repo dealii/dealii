@@ -28,8 +28,9 @@ template <typename T, typename U, typename CompareType>
 void
 check()
 {
-  AssertThrow(typeid(typename ProductType<T, U>::type) == typeid(CompareType),
-              ExcInternalError());
+  DEAL_II_AssertThrow(typeid(typename ProductType<T, U>::type) ==
+                        typeid(CompareType),
+                      ExcInternalError());
 }
 
 

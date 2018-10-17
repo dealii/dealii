@@ -138,9 +138,10 @@ FE_DGPNonparametric<dim, spacedim>::shape_value(const unsigned int i,
 {
   (void)i;
   (void)p;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  AssertThrow(false,
-              (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_AssertThrow(
+    false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return 0;
 }
 
@@ -156,10 +157,11 @@ FE_DGPNonparametric<dim, spacedim>::shape_value_component(
   (void)i;
   (void)p;
   (void)component;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
-  AssertThrow(false,
-              (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_AssertThrow(
+    false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return 0;
 }
 
@@ -172,9 +174,10 @@ FE_DGPNonparametric<dim, spacedim>::shape_grad(const unsigned int i,
 {
   (void)i;
   (void)p;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  AssertThrow(false,
-              (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_AssertThrow(
+    false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return Tensor<1, dim>();
 }
 
@@ -189,10 +192,11 @@ FE_DGPNonparametric<dim, spacedim>::shape_grad_component(
   (void)i;
   (void)p;
   (void)component;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
-  AssertThrow(false,
-              (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_AssertThrow(
+    false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return Tensor<1, dim>();
 }
 
@@ -205,9 +209,10 @@ FE_DGPNonparametric<dim, spacedim>::shape_grad_grad(const unsigned int i,
 {
   (void)i;
   (void)p;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  AssertThrow(false,
-              (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_AssertThrow(
+    false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return Tensor<2, dim>();
 }
 
@@ -223,10 +228,11 @@ FE_DGPNonparametric<dim, spacedim>::shape_grad_grad_component(
   (void)i;
   (void)p;
   (void)component;
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
-  AssertThrow(false,
-              (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_AssertThrow(
+    false, (typename FiniteElement<dim>::ExcUnitShapeValuesDoNotExist()));
   return Tensor<2, dim>();
 }
 
@@ -314,8 +320,8 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_values(
                                                                      spacedim>
     &output_data) const
 {
-  Assert(fe_internal.update_each & update_quadrature_points,
-         ExcInternalError());
+  DEAL_II_Assert(fe_internal.update_each & update_quadrature_points,
+                 ExcInternalError());
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
@@ -370,8 +376,8 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_face_values(
                                                                      spacedim>
     &output_data) const
 {
-  Assert(fe_internal.update_each & update_quadrature_points,
-         ExcInternalError());
+  DEAL_II_Assert(fe_internal.update_each & update_quadrature_points,
+                 ExcInternalError());
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
@@ -427,8 +433,8 @@ FE_DGPNonparametric<dim, spacedim>::fill_fe_subface_values(
                                                                      spacedim>
     &output_data) const
 {
-  Assert(fe_internal.update_each & update_quadrature_points,
-         ExcInternalError());
+  DEAL_II_Assert(fe_internal.update_each & update_quadrature_points,
+                 ExcInternalError());
 
   const unsigned int n_q_points = mapping_data.quadrature_points.size();
 
@@ -480,16 +486,16 @@ FE_DGPNonparametric<dim, spacedim>::get_face_interpolation_matrix(
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  AssertThrow(
+  DEAL_II_AssertThrow(
     (x_source_fe.get_name().find("FE_DGPNonparametric<") == 0) ||
       (dynamic_cast<const FE_DGPNonparametric<dim, spacedim> *>(&x_source_fe) !=
        nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -508,16 +514,16 @@ FE_DGPNonparametric<dim, spacedim>::get_subface_interpolation_matrix(
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  AssertThrow(
+  DEAL_II_AssertThrow(
     (x_source_fe.get_name().find("FE_DGPNonparametric<") == 0) ||
       (dynamic_cast<const FE_DGPNonparametric<dim, spacedim> *>(&x_source_fe) !=
        nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -543,7 +549,7 @@ FE_DGPNonparametric<dim, spacedim>::hp_vertex_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -562,7 +568,7 @@ FE_DGPNonparametric<dim, spacedim>::hp_line_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -581,7 +587,7 @@ FE_DGPNonparametric<dim, spacedim>::hp_quad_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -600,7 +606,7 @@ FE_DGPNonparametric<dim, spacedim>::compare_for_face_domination(
       nullptr)
     return FiniteElementDomination::no_requirements;
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -621,7 +627,7 @@ template <int dim, int spacedim>
 std::size_t
 FE_DGPNonparametric<dim, spacedim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 

@@ -86,14 +86,14 @@ void check_this(Triangulation<3> &tria)
                         << "  " << fe_face_values1.quadrature_point(q) << ", "
                         << fe_face_values1.JxW(q) << std::endl;
 
-              Assert((fe_face_values1.quadrature_point(q) -
-                      fe_face_values2.quadrature_point(q))
-                         .norm_square() < 1e-20,
-                     ExcInternalError());
+              DEAL_II_Assert((fe_face_values1.quadrature_point(q) -
+                              fe_face_values2.quadrature_point(q))
+                                 .norm_square() < 1e-20,
+                             ExcInternalError());
 
-              Assert(std::fabs(fe_face_values1.JxW(q) -
-                               fe_face_values2.JxW(q)) < 1e-15,
-                     ExcInternalError());
+              DEAL_II_Assert(std::fabs(fe_face_values1.JxW(q) -
+                                       fe_face_values2.JxW(q)) < 1e-15,
+                             ExcInternalError());
             }
         }
 }

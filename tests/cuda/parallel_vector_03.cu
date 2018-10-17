@@ -59,8 +59,9 @@ test()
   v *= 2.0;
 
   rw_vector.import(v, VectorOperation::insert);
-  AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
-  AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0,
+                      ExcInternalError());
 
   // set ghost dof on all processors, compress
   // (insert mode)
@@ -80,7 +81,7 @@ test()
   v.update_ghost_values();
   rw_ghost_entry(1) = 0.;
   rw_ghost_entry.import(v, VectorOperation::insert);
-  AssertThrow(rw_ghost_entry(1) == 7.0, ExcInternalError());
+  DEAL_II_AssertThrow(rw_ghost_entry(1) == 7.0, ExcInternalError());
 
   // check l2 norm
   const double l2_norm = v.l2_norm();
@@ -109,10 +110,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   if (myid == 0)
     {

@@ -58,8 +58,8 @@ const unsigned int MANIFOLD_ID = 1;
 
 void create_triangulation(Triangulation<2> &tria)
 {
-  AssertThrow(std::abs((X_2 - X_1) - 2.0 * (X_C - X_1)) < 1.0e-12,
-              ExcMessage("Geometry parameters X_1,X_2,X_C invalid!"));
+  DEAL_II_AssertThrow(std::abs((X_2 - X_1) - 2.0 * (X_C - X_1)) < 1.0e-12,
+                      ExcMessage("Geometry parameters X_1,X_2,X_C invalid!"));
   SphericalManifold<2> spherical_manifold(Point<2>(X_C, Y_C));
 
   Triangulation<2> circle_1, circle_2, circle_tmp, middle, middle_tmp,

@@ -43,9 +43,10 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree)
                              FiniteElementData<dim>::L2),
       get_riaf_vector(degree))
 {
-  Assert(degree > 0,
-         ExcMessage("This element can only be used for polynomial degrees "
-                    "greater than zero"));
+  DEAL_II_Assert(degree > 0,
+                 ExcMessage(
+                   "This element can only be used for polynomial degrees "
+                   "greater than zero"));
 
   this->initialize(QGaussLobatto<1>(degree + 1).get_points());
 
@@ -54,7 +55,8 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const unsigned int degree)
   for (unsigned int d = 0; d < dim; ++d)
     point[d] = 0.5;
   this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell,
+                          this->unit_support_points.size());
 }
 
 
@@ -73,9 +75,10 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
   const int degree = points.size() - 1;
   (void)degree;
 
-  Assert(degree > 0,
-         ExcMessage("This element can only be used for polynomial degrees "
-                    "at least zero"));
+  DEAL_II_Assert(degree > 0,
+                 ExcMessage(
+                   "This element can only be used for polynomial degrees "
+                   "at least zero"));
 
   this->initialize(points.get_points());
 
@@ -84,7 +87,8 @@ FE_Q_DG0<dim, spacedim>::FE_Q_DG0(const Quadrature<1> &points)
   for (unsigned int d = 0; d < dim; ++d)
     point[d] = 0.5;
   this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell,
+                          this->unit_support_points.size());
 }
 
 
@@ -124,9 +128,9 @@ FE_Q_DG0<dim, spacedim>::get_name() const
         }
     }
   // Do not consider the discontinuous node for dimension 1
-  Assert(index == n_points || (dim == 1 && index == n_points + 1),
-         ExcMessage(
-           "Could not decode support points in one coordinate direction."));
+  DEAL_II_Assert(
+    index == n_points || (dim == 1 && index == n_points + 1),
+    ExcMessage("Could not decode support points in one coordinate direction."));
 
   // Check whether the support points are equidistant.
   for (unsigned int j = 0; j < n_points; j++)
@@ -183,14 +187,15 @@ FE_Q_DG0<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_dofs) const
 {
-  Assert(support_point_values.size() == this->unit_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->unit_support_points.size()));
-  Assert(nodal_dofs.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_dofs.size(), this->dofs_per_cell));
-  Assert(support_point_values[0].size() == this->n_components(),
-         ExcDimensionMismatch(support_point_values[0].size(),
-                              this->n_components()));
+  DEAL_II_Assert(support_point_values.size() ==
+                   this->unit_support_points.size(),
+                 ExcDimensionMismatch(support_point_values.size(),
+                                      this->unit_support_points.size()));
+  DEAL_II_Assert(nodal_dofs.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(nodal_dofs.size(), this->dofs_per_cell));
+  DEAL_II_Assert(support_point_values[0].size() == this->n_components(),
+                 ExcDimensionMismatch(support_point_values[0].size(),
+                                      this->n_components()));
 
   for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
     {
@@ -214,16 +219,17 @@ FE_Q_DG0<dim, spacedim>::get_interpolation_matrix(
   // this is only implemented, if the source FE is also a Q_DG0 element
   using FEQDG0 = FE_Q_DG0<dim, spacedim>;
 
-  AssertThrow(
+  DEAL_II_AssertThrow(
     (x_source_fe.get_name().find("FE_Q_DG0<") == 0) ||
       (dynamic_cast<const FEQDG0 *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 
-  Assert(interpolation_matrix.m() == this->dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_cell));
+  DEAL_II_Assert(interpolation_matrix.m() == this->dofs_per_cell,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      x_source_fe.dofs_per_cell));
 
   this->FE_Q_Base<TensorProductPolynomialsConst<dim>, dim, spacedim>::
     get_interpolation_matrix(x_source_fe, interpolation_matrix);

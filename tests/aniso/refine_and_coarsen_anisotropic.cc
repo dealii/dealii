@@ -16,7 +16,7 @@
 
 // simply perform some random refinement and coarsening operations. if we do
 // this for several cycles chances are high, that any error in the refinement
-// and coarsening procedure will show up in an Assert at one place or
+// and coarsening procedure will show up in an DEAL_II_Assert at one place or
 // another. This is especially true because of the totally random refinement and
 // coarsening flags which also produce unrealistic situations which were not
 // correctly accounted for in the implementation phase...

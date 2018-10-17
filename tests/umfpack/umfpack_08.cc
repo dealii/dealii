@@ -108,8 +108,9 @@ test()
     // check that we've done it right
     for (SparseMatrix<double>::iterator p = xB.begin(); p != xB.end(); ++p)
       if (p->column() != p->row())
-        AssertThrow(xB(p->row(), p->column()) != xB(p->column(), p->row()),
-                    ExcInternalError());
+        DEAL_II_AssertThrow(xB(p->row(), p->column()) !=
+                              xB(p->column(), p->row()),
+                            ExcInternalError());
 
     // now copy stuff over
     for (SparseMatrix<double>::const_iterator i = xB.begin(); i != xB.end();
@@ -149,7 +150,8 @@ test()
               << std::endl;
       deallog << "absolute norms = " << x.l2_norm() << ' ' << solution.l2_norm()
               << std::endl;
-      Assert(x.l2_norm() / solution.l2_norm() < 1e-8, ExcInternalError());
+      DEAL_II_Assert(x.l2_norm() / solution.l2_norm() < 1e-8,
+                     ExcInternalError());
     }
 }
 

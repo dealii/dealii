@@ -95,7 +95,7 @@ main()
     {
       SparsityPattern::const_iterator p3 = sp3.begin(row), p4 = sp4.begin(row);
       for (; p3 != sp3.end(row); ++p3, ++p4)
-        AssertThrow(p3->column() == p4->column(), ExcInternalError());
+        DEAL_II_AssertThrow(p3->column() == p4->column(), ExcInternalError());
     };
 
 
@@ -112,15 +112,15 @@ main()
       const SparsityPattern &sp =
         (loop == 1 ? sp1 : (loop == 2 ? sp2 : (loop == 3 ? sp3 : sp4)));
       for (unsigned int i = 0; i < sp.n_nonzero_elements(); ++i)
-        AssertThrow(sp(sp.matrix_position(i).first,
-                       sp.matrix_position(i).second) == i,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(sp(sp.matrix_position(i).first,
+                               sp.matrix_position(i).second) == i,
+                            ExcInternalError());
       for (types::global_dof_index row = 0; row < sp.n_rows(); ++row)
         for (types::global_dof_index col = 0; col < sp.n_cols(); ++col)
           if (sp(row, col) != SparsityPattern::invalid_entry)
-            AssertThrow(sp.matrix_position(sp(row, col)) ==
-                          std::make_pair(row, col),
-                        ExcInternalError());
+            DEAL_II_AssertThrow(sp.matrix_position(sp(row, col)) ==
+                                  std::make_pair(row, col),
+                                ExcInternalError());
     };
 
 
@@ -150,6 +150,6 @@ main()
     {
       SparsityPattern::const_iterator p3 = sp3.begin(row), p5 = sp5.begin(row);
       for (; p3 != sp3.end(row); ++p3, ++p5)
-        AssertThrow(p3->column() == p5->column(), ExcInternalError());
+        DEAL_II_AssertThrow(p3->column() == p5->column(), ExcInternalError());
     }
 }

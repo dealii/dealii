@@ -55,13 +55,14 @@ check()
       const Tensor<1, dim> dy  = cspline.gradient(Point<dim>(xi));
       const double         ddy = cspline.laplacian(Point<dim>(xi));
 
-      AssertThrow(std::fabs(f - y) <= std::fabs(f) * 1e-10, ExcInternalError());
+      DEAL_II_AssertThrow(std::fabs(f - y) <= std::fabs(f) * 1e-10,
+                          ExcInternalError());
 
-      AssertThrow(std::fabs(df - dy[0]) <= std::fabs(df) * 1e-10,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::fabs(df - dy[0]) <= std::fabs(df) * 1e-10,
+                          ExcInternalError());
 
-      AssertThrow(std::fabs(ddf - ddy) <= std::fabs(ddf) * 1e-10,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::fabs(ddf - ddy) <= std::fabs(ddf) * 1e-10,
+                          ExcInternalError());
     }
   gsl_spline_free(spline);
   gsl_interp_accel_free(acc);

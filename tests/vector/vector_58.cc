@@ -52,17 +52,17 @@ test(const std::vector<unsigned int> &size_sequence)
           const unsigned int check_s = (s > v.size() ? v.size() : s);
           v.grow_or_shrink(s);
           for (unsigned int i = 0; i < check_s; ++i)
-            AssertThrow(v(i) == v_old(i),
-                        ExcMessage("s=" + std::to_string(s) +
-                                   " i=" + std::to_string(i) + " " +
-                                   std::to_string(v(i)) +
-                                   "!=" + std::to_string(v_old(i))));
+            DEAL_II_AssertThrow(v(i) == v_old(i),
+                                ExcMessage("s=" + std::to_string(s) +
+                                           " i=" + std::to_string(i) + " " +
+                                           std::to_string(v(i)) +
+                                           "!=" + std::to_string(v_old(i))));
 
           for (unsigned int i = check_s; i < s; ++i)
-            AssertThrow(v(i) == 0.,
-                        ExcMessage("s=" + std::to_string(s) +
-                                   " i=" + std::to_string(i) + " " +
-                                   std::to_string(v(i)) + "!=0"));
+            DEAL_II_AssertThrow(v(i) == 0.,
+                                ExcMessage("s=" + std::to_string(s) +
+                                           " i=" + std::to_string(i) + " " +
+                                           std::to_string(v(i)) + "!=0"));
         }
 
       fill(v);

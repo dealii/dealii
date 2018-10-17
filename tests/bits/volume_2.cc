@@ -107,7 +107,7 @@ check(const Triangulation<dim> &tria, const unsigned int order)
   deallog << " subface integration: " << v2 / dim << std::endl;
   const double relative_error = std::fabs(v1 - v2) / v1;
   deallog << " relative error: " << relative_error << std::endl;
-  Assert(relative_error < 5e-4, ExcInternalError());
+  DEAL_II_Assert(relative_error < 5e-4, ExcInternalError());
 }
 
 

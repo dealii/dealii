@@ -92,7 +92,8 @@ check()
       deallog << "cell=" << cell << std::endl;
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
-          Assert(local_dof_indices[i] < dof.n_dofs(), ExcInternalError());
+          DEAL_II_Assert(local_dof_indices[i] < dof.n_dofs(),
+                         ExcInternalError());
           touched[local_dof_indices[i]] = true;
           deallog << local_dof_indices[i] << ' ';
         }
@@ -102,7 +103,7 @@ check()
   // make sure all dof indices have
   // actually been used
   for (unsigned int i = 0; i < touched.size(); ++i)
-    AssertThrow(touched[i] == true, ExcInternalError());
+    DEAL_II_AssertThrow(touched[i] == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

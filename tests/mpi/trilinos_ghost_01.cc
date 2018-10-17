@@ -63,15 +63,15 @@ test()
       deallog << myid * 2 + 1 << ":" << v(myid * 2 + 1) << std::endl;
     }
 
-  Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   v_tmp.reinit(v, false, true);
 
   // check ghost values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << v_tmp(1) << std::endl;
-  Assert(v_tmp(1) == 2.0, ExcInternalError());
+  DEAL_II_Assert(v_tmp(1) == 2.0, ExcInternalError());
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;

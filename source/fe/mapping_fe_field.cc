@@ -76,7 +76,7 @@ std::size_t
 MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData::
   memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -88,10 +88,10 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::shape(
   const unsigned int qpoint,
   const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_values.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_values.size()));
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -101,10 +101,11 @@ const Tensor<1, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   derivative(const unsigned int qpoint, const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_derivatives.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr <
+                   shape_derivatives.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_derivatives.size()));
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -115,10 +116,11 @@ Tensor<1, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_derivatives.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr <
+                   shape_derivatives.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_derivatives.size()));
   return shape_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -129,11 +131,11 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   second_derivative(const unsigned int qpoint,
                     const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_second_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_second_derivatives.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr <
+                   shape_second_derivatives.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_second_derivatives.size()));
   return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -144,11 +146,11 @@ Tensor<2, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   second_derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_second_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_second_derivatives.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr <
+                   shape_second_derivatives.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_second_derivatives.size()));
   return shape_second_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -158,10 +160,11 @@ const Tensor<3, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   third_derivative(const unsigned int qpoint, const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_third_derivatives.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr <
+                   shape_third_derivatives.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_third_derivatives.size()));
   return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -172,10 +175,11 @@ Tensor<3, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   third_derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_third_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_third_derivatives.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr <
+                   shape_third_derivatives.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_third_derivatives.size()));
   return shape_third_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -186,11 +190,11 @@ MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   fourth_derivative(const unsigned int qpoint,
                     const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_fourth_derivatives.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr <
+                   shape_fourth_derivatives.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_fourth_derivatives.size()));
   return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -201,11 +205,11 @@ Tensor<4, dim> &
 MappingFEField<dim, spacedim, DoFHandlerType, VectorType>::InternalData::
   fourth_derivative(const unsigned int qpoint, const unsigned int shape_nr)
 {
-  Assert(qpoint * n_shape_functions + shape_nr <
-           shape_fourth_derivatives.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_fourth_derivatives.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr <
+                   shape_fourth_derivatives.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_fourth_derivatives.size()));
   return shape_fourth_derivatives[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -256,7 +260,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::MappingFEField(
       if (fe_mask[i])
         fe_to_real[i] = size++;
     }
-  AssertDimension(size, spacedim);
+  DEAL_II_AssertDimension(size, spacedim);
 }
 
 
@@ -280,10 +284,10 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData::shape(
   const unsigned int qpoint,
   const unsigned int shape_nr) const
 {
-  Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
-         ExcIndexRange(qpoint * n_shape_functions + shape_nr,
-                       0,
-                       shape_values.size()));
+  DEAL_II_Assert(qpoint * n_shape_functions + shape_nr < shape_values.size(),
+                 ExcIndexRange(qpoint * n_shape_functions + shape_nr,
+                               0,
+                               shape_values.size()));
   return shape_values[qpoint * n_shape_functions + shape_nr];
 }
 
@@ -309,11 +313,11 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_vertices(
   const typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
     *cell, euler_dof_handler);
 
-  Assert(dof_cell->active() == true, ExcInactiveCell());
-  AssertDimension(GeometryInfo<dim>::vertices_per_cell,
-                  fe_values.n_quadrature_points);
-  AssertDimension(fe_to_real.size(),
-                  euler_dof_handler->get_fe().n_components());
+  DEAL_II_Assert(dof_cell->active() == true, ExcInactiveCell());
+  DEAL_II_AssertDimension(GeometryInfo<dim>::vertices_per_cell,
+                          fe_values.n_quadrature_points);
+  DEAL_II_AssertDimension(fe_to_real.size(),
+                          euler_dof_handler->get_fe().n_components());
 
   std::vector<Vector<typename VectorType::value_type>> values(
     fe_values.n_quadrature_points,
@@ -687,7 +691,7 @@ namespace internal
               {
                 const unsigned int n_q_points = data.contravariant.size();
 
-                Assert(data.n_shape_functions > 0, ExcInternalError());
+                DEAL_II_Assert(data.n_shape_functions > 0, ExcInternalError());
 
                 for (unsigned int point = 0; point < n_q_points; ++point)
                   {
@@ -716,7 +720,8 @@ namespace internal
 
         if (update_flags & update_covariant_transformation)
           {
-            AssertDimension(data.covariant.size(), data.contravariant.size());
+            DEAL_II_AssertDimension(data.covariant.size(),
+                                    data.contravariant.size());
             if (cell_similarity != CellSimilarity::translation)
               for (unsigned int point = 0; point < data.contravariant.size();
                    ++point)
@@ -726,7 +731,8 @@ namespace internal
 
         if (update_flags & update_volume_elements)
           {
-            AssertDimension(data.covariant.size(), data.volume_elements.size());
+            DEAL_II_AssertDimension(data.covariant.size(),
+                                    data.volume_elements.size());
             if (cell_similarity != CellSimilarity::translation)
               for (unsigned int point = 0; point < data.contravariant.size();
                    ++point)
@@ -1273,19 +1279,21 @@ namespace internal
           {
             const unsigned int n_q_points = output_data.boundary_forms.size();
             if (update_flags & update_normal_vectors)
-              AssertDimension(output_data.normal_vectors.size(), n_q_points);
+              DEAL_II_AssertDimension(output_data.normal_vectors.size(),
+                                      n_q_points);
             if (update_flags & update_JxW_values)
-              AssertDimension(output_data.JxW_values.size(), n_q_points);
+              DEAL_II_AssertDimension(output_data.JxW_values.size(),
+                                      n_q_points);
 
             // map the unit tangentials to the real cell. checking for d!=dim-1
             // eliminates compiler warnings regarding unsigned int expressions <
             // 0.
             for (unsigned int d = 0; d != dim - 1; ++d)
               {
-                Assert(face_no + GeometryInfo<dim>::faces_per_cell * d <
-                         data.unit_tangentials.size(),
-                       ExcInternalError());
-                Assert(
+                DEAL_II_Assert(face_no + GeometryInfo<dim>::faces_per_cell * d <
+                                 data.unit_tangentials.size(),
+                               ExcInternalError());
+                DEAL_II_Assert(
                   data.aux[d].size() <=
                     data
                       .unit_tangentials[face_no +
@@ -1327,7 +1335,7 @@ namespace internal
                           cross_product_3d(data.aux[0][i], data.aux[1][i]);
                         break;
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_Assert(false, ExcNotImplemented());
                     }
               }
             else //(dim < spacedim)
@@ -1338,7 +1346,7 @@ namespace internal
                 //
                 // to compute the cell normal, use the same method used in
                 // fill_fe_values for cells above
-                AssertDimension(data.contravariant.size(), n_q_points);
+                DEAL_II_AssertDimension(data.contravariant.size(), n_q_points);
 
                 for (unsigned int point = 0; point < n_q_points; ++point)
                   {
@@ -1540,8 +1548,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   const unsigned int               n_q_points = quadrature.size();
@@ -1576,12 +1584,12 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
 
   if (update_flags & (update_normal_vectors | update_JxW_values))
     {
-      AssertDimension(output_data.JxW_values.size(), n_q_points);
+      DEAL_II_AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(!(update_flags & update_normal_vectors) ||
-               (output_data.normal_vectors.size() == n_q_points),
-             ExcDimensionMismatch(output_data.normal_vectors.size(),
-                                  n_q_points));
+      DEAL_II_Assert(!(update_flags & update_normal_vectors) ||
+                       (output_data.normal_vectors.size() == n_q_points),
+                     ExcDimensionMismatch(output_data.normal_vectors.size(),
+                                          n_q_points));
 
 
       if (cell_similarity != CellSimilarity::translation)
@@ -1596,11 +1604,11 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
                 // TODO: this allows for anisotropies of up to 1e6 in 3D and
                 // 1e12 in 2D. might want to find a finer
                 // (dimension-independent) criterion
-                Assert(det >
-                         1e-12 * Utilities::fixed_power<dim>(
-                                   cell->diameter() / std::sqrt(double(dim))),
-                       (typename Mapping<dim, spacedim>::ExcDistortedMappedCell(
-                         cell->center(), det, point)));
+                DEAL_II_Assert(
+                  det > 1e-12 * Utilities::fixed_power<dim>(
+                                  cell->diameter() / std::sqrt(double(dim))),
+                  (typename Mapping<dim, spacedim>::ExcDistortedMappedCell(
+                    cell->center(), det, point)));
                 output_data.JxW_values[point] = weights[point] * det;
               }
             // if dim==spacedim, then there is no cell normal to
@@ -1631,9 +1639,9 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
                   {
                     if (update_flags & update_normal_vectors)
                       {
-                        Assert(spacedim - dim == 1,
-                               ExcMessage(
-                                 "There is no cell normal in codim 2."));
+                        DEAL_II_Assert(
+                          spacedim - dim == 1,
+                          ExcMessage("There is no cell normal in codim 2."));
 
                         if (dim == 1)
                           output_data.normal_vectors[point] =
@@ -1656,7 +1664,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
   // copy values from InternalData to vector given by reference
   if (update_flags & update_jacobians)
     {
-      AssertDimension(output_data.jacobians.size(), n_q_points);
+      DEAL_II_AssertDimension(output_data.jacobians.size(), n_q_points);
       if (cell_similarity != CellSimilarity::translation)
         for (unsigned int point = 0; point < n_q_points; ++point)
           output_data.jacobians[point] = data.contravariant[point];
@@ -1665,7 +1673,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_values(
   // copy values from InternalData to vector given by reference
   if (update_flags & update_inverse_jacobians)
     {
-      AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
+      DEAL_II_AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       if (cell_similarity != CellSimilarity::translation)
         for (unsigned int point = 0; point < n_q_points; ++point)
           output_data.inverse_jacobians[point] =
@@ -1770,8 +1778,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::fill_fe_face_values(
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   update_internal_dofs(cell, data);
@@ -1810,8 +1818,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   update_internal_dofs(cell, data);
@@ -1857,12 +1865,13 @@ namespace internal
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
-        AssertDimension(input.size(), output.size());
-        Assert((dynamic_cast<
-                  const typename dealii::
-                    MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
-                      InternalData *>(&mapping_data) != nullptr),
-               ExcInternalError());
+        DEAL_II_AssertDimension(input.size(), output.size());
+        DEAL_II_Assert(
+          (dynamic_cast<
+             const typename dealii::
+               MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
+                 InternalData *>(&mapping_data) != nullptr),
+          ExcInternalError());
         const typename dealii::MappingFEField<dim,
                                               spacedim,
                                               VectorType,
@@ -1876,7 +1885,7 @@ namespace internal
           {
             case mapping_contravariant:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
@@ -1890,15 +1899,15 @@ namespace internal
 
             case mapping_piola:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
-                Assert(rank == 1, ExcMessage("Only for rank 1"));
+                DEAL_II_Assert(rank == 1, ExcMessage("Only for rank 1"));
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
                     output[i] =
@@ -1914,7 +1923,7 @@ namespace internal
             // rather than DerivativeForm
             case mapping_covariant:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
@@ -1926,7 +1935,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
 
@@ -1943,12 +1952,13 @@ namespace internal
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank + 1, spacedim>> &            output)
       {
-        AssertDimension(input.size(), output.size());
-        Assert((dynamic_cast<
-                  const typename dealii::
-                    MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
-                      InternalData *>(&mapping_data) != nullptr),
-               ExcInternalError());
+        DEAL_II_AssertDimension(input.size(), output.size());
+        DEAL_II_Assert(
+          (dynamic_cast<
+             const typename dealii::
+               MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
+                 InternalData *>(&mapping_data) != nullptr),
+          ExcInternalError());
         const typename dealii::MappingFEField<dim,
                                               spacedim,
                                               VectorType,
@@ -1962,7 +1972,7 @@ namespace internal
           {
             case mapping_covariant:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
@@ -1973,7 +1983,7 @@ namespace internal
                 return;
               }
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
     } // namespace
@@ -1990,7 +2000,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
+  DEAL_II_AssertDimension(input.size(), output.size());
 
   internal::MappingFEFieldImplementation::
     transform_fields<dim, spacedim, 1, VectorType, DoFHandlerType>(input,
@@ -2009,7 +2019,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
+  DEAL_II_AssertDimension(input.size(), output.size());
 
   internal::MappingFEFieldImplementation::
     transform_differential_forms<dim, spacedim, 1, VectorType, DoFHandlerType>(
@@ -2029,9 +2039,9 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   (void)input;
   (void)output;
   (void)mapping_data;
-  AssertDimension(input.size(), output.size());
+  DEAL_II_AssertDimension(input.size(), output.size());
 
-  AssertThrow(false, ExcNotImplemented());
+  DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 
@@ -2044,18 +2054,19 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
-  Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_AssertDimension(input.size(), output.size());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
   switch (mapping_type)
     {
       case mapping_covariant_gradient:
         {
-          Assert(data.update_each & update_contravariant_transformation,
-                 typename FEValuesBase<dim>::ExcAccessToUninitializedField(
-                   "update_covariant_transformation"));
+          DEAL_II_Assert(
+            data.update_each & update_contravariant_transformation,
+            typename FEValuesBase<dim>::ExcAccessToUninitializedField(
+              "update_covariant_transformation"));
 
           for (unsigned int q = 0; q < output.size(); ++q)
             for (unsigned int i = 0; i < spacedim; ++i)
@@ -2078,7 +2089,7 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -2095,9 +2106,9 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::transform(
   (void)input;
   (void)output;
   (void)mapping_data;
-  AssertDimension(input.size(), output.size());
+  DEAL_II_AssertDimension(input.size(), output.size());
 
-  AssertThrow(false, ExcNotImplemented());
+  DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 
@@ -2115,8 +2126,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
   const Quadrature<dim> point_quadrature(p);
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> mdata(
     get_data(update_quadrature_points | update_jacobians, point_quadrature));
-  Assert(dynamic_cast<InternalData *>(mdata.get()) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<InternalData *>(mdata.get()) != nullptr,
+                 ExcInternalError());
 
   update_internal_dofs(cell, dynamic_cast<InternalData &>(*mdata));
 
@@ -2182,8 +2193,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
     update_flags |= update_jacobian_grads;
   std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> mdata(
     get_data(update_flags, point_quadrature));
-  Assert(dynamic_cast<InternalData *>(mdata.get()) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<InternalData *>(mdata.get()) != nullptr,
+                 ExcInternalError());
 
   update_internal_dofs(cell, dynamic_cast<InternalData &>(*mdata));
 
@@ -2205,8 +2216,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
 {
   const unsigned int n_shapes = mdata.shape_values.size();
   (void)n_shapes;
-  Assert(n_shapes != 0, ExcInternalError());
-  AssertDimension(mdata.shape_derivatives.size(), n_shapes);
+  DEAL_II_Assert(n_shapes != 0, ExcInternalError());
+  DEAL_II_AssertDimension(mdata.shape_derivatives.size(), n_shapes);
 
 
   // Newton iteration to solve
@@ -2298,8 +2309,8 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
   // in either case, we need to give up, so throw an exception that
   // can then be caught
 failure:
-  AssertThrow(false,
-              (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
+  DEAL_II_AssertThrow(
+    false, (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
   // ...the compiler wants us to return something, though we can
   // of course never get here...
   return Point<dim>();
@@ -2339,11 +2350,11 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::update_internal_dofs(
   const typename MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::
     InternalData &data) const
 {
-  Assert(euler_dof_handler != nullptr,
-         ExcMessage("euler_dof_handler is empty"));
+  DEAL_II_Assert(euler_dof_handler != nullptr,
+                 ExcMessage("euler_dof_handler is empty"));
 
   typename DoFHandlerType::cell_iterator dof_cell(*cell, euler_dof_handler);
-  Assert(dof_cell->active() == true, ExcInactiveCell());
+  DEAL_II_Assert(dof_cell->active() == true, ExcInactiveCell());
 
   dof_cell->get_dof_indices(data.local_dof_indices);
 

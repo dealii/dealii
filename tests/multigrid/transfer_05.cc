@@ -184,8 +184,8 @@ check(const unsigned int fe_degree)
           for (unsigned int b = 0; b < nb; ++b)
             total_size += lbv2[l].block(b).size();
 
-          AssertThrow(total_size == lbv2[l].size(),
-                      ExcDimensionMismatch(total_size, lbv2[l].size()));
+          DEAL_II_AssertThrow(total_size == lbv2[l].size(),
+                              ExcDimensionMismatch(total_size, lbv2[l].size()));
         }
 
       // Finally check the difference:

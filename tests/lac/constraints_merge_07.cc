@@ -80,7 +80,7 @@ merge_check()
         }
       catch (...)
         {
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       c1.print(logfile);

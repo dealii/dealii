@@ -266,7 +266,7 @@ public:
   /**
    * Exception
    */
-  DeclException1(
+  DEAL_II_DeclException1(
     ExcVectorNotDeclared,
     std::string,
     << "The data vector for which the first component has the name " << arg1
@@ -274,13 +274,14 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcDataNotCleared,
-                   "You cannot start a new time/parameter step before calling "
-                   "finish_parameter_value() on the previous step.");
+  DEAL_II_DeclExceptionMsg(
+    ExcDataNotCleared,
+    "You cannot start a new time/parameter step before calling "
+    "finish_parameter_value() on the previous step.");
   /**
    * Exception
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcDataAlreadyAdded,
     "You cannot declare additional vectors after already calling "
     "build_patches(). All data vectors need to be declared "
@@ -288,11 +289,11 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcNameAlreadyUsed,
-                 std::string,
-                 << "You tried to declare a component of a data vector with "
-                 << "the name <" << arg1
-                 << ">, but that name is already used.");
+  DEAL_II_DeclException1(
+    ExcNameAlreadyUsed,
+    std::string,
+    << "You tried to declare a component of a data vector with "
+    << "the name <" << arg1 << ">, but that name is already used.");
 
 private:
   /**

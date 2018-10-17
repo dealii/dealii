@@ -47,8 +47,10 @@ test()
   for (unsigned int i = 0; i < m; ++i)
     for (unsigned int j = 0; j < n; ++j)
       {
-        Assert(std::abs(C(i, j) - CL(i, j)) < 1e-13, ExcInternalError());
-        Assert(std::abs(C(i, j) - OC(i, j)) < 1e-13, ExcInternalError());
+        DEAL_II_Assert(std::abs(C(i, j) - CL(i, j)) < 1e-13,
+                       ExcInternalError());
+        DEAL_II_Assert(std::abs(C(i, j) - OC(i, j)) < 1e-13,
+                       ExcInternalError());
       }
 
   deallog << "OK" << std::endl;

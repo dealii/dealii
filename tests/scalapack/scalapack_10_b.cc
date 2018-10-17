@@ -70,7 +70,7 @@ test(const std::pair<unsigned int, unsigned int> &size,
         << chunk_size.first << "x" << chunk_size.second << " & "
         << grid->get_process_grid_rows() << "x"
         << grid->get_process_grid_columns() << std::endl;
-  AssertThrow(copy.frobenius_norm() < 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(copy.frobenius_norm() < 1e-12, ExcInternalError());
   std::remove(filename.c_str());
 }
 

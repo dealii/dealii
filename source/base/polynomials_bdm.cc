@@ -44,7 +44,7 @@ PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
           monomials[i] = Polynomials::Monomial<double>(i);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -60,22 +60,24 @@ PolynomialsBDM<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  DEAL_II_Assert(values.size() == n_pols || values.size() == 0,
+                 ExcDimensionMismatch(values.size(), n_pols));
+  DEAL_II_Assert(grads.size() == n_pols || grads.size() == 0,
+                 ExcDimensionMismatch(grads.size(), n_pols));
+  DEAL_II_Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
+                 ExcDimensionMismatch(grad_grads.size(), n_pols));
+  DEAL_II_Assert(third_derivatives.size() == n_pols ||
+                   third_derivatives.size() == 0,
+                 ExcDimensionMismatch(third_derivatives.size(), n_pols));
+  DEAL_II_Assert(fourth_derivatives.size() == n_pols ||
+                   fourth_derivatives.size() == 0,
+                 ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
   // third and fourth derivatives not implemented
   (void)third_derivatives;
-  Assert(third_derivatives.size() == 0, ExcNotImplemented());
+  DEAL_II_Assert(third_derivatives.size() == 0, ExcNotImplemented());
   (void)fourth_derivatives;
-  Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
+  DEAL_II_Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
 
   const unsigned int n_sub = polynomial_space.n();
 
@@ -353,7 +355,7 @@ PolynomialsBDM<dim>::compute(
               grad_grads[start + 2][2][2][2] = 0.;
             }
         }
-      Assert(start == n_pols, ExcInternalError());
+      DEAL_II_Assert(start == n_pols, ExcInternalError());
     }
 }
 
@@ -420,7 +422,7 @@ square for (unsigned int j=0;j<moment_weight.size();++j)
                                    // Volume integrals are missing
                                    //
                                    // This degree is one larger
-  Assert (polynomial_space.degree() <= 2,
+  DEAL_II_Assert (polynomial_space.degree() <= 2,
           ExcNotImplemented());
 }
 */
@@ -435,7 +437,7 @@ PolynomialsBDM<dim>::compute_n_pols(unsigned int k)
     return (k + 1) * (k + 2) + 2;
   if (dim == 3)
     return ((k + 1) * (k + 2) * (k + 3)) / 2 + 3 * (k + 1);
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 

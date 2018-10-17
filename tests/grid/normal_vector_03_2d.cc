@@ -52,7 +52,7 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     };
 }
 
@@ -100,8 +100,9 @@ main()
               deallog << "p=" << p << ", n=" << boundary.normal_vector(face, p)
                       << std::endl;
 
-              Assert((boundary.normal_vector(face, p) - normal).norm() < 1e-10,
-                     ExcInternalError());
+              DEAL_II_Assert((boundary.normal_vector(face, p) - normal).norm() <
+                               1e-10,
+                             ExcInternalError());
             }
         }
 

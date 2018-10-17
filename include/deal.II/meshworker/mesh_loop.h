@@ -160,35 +160,36 @@ namespace MeshWorker
             const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
             const unsigned int chunk_size   = 8)
   {
-    Assert(
+    DEAL_II_Assert(
       (!cell_worker) == !(flags & work_on_cells),
       ExcMessage(
         "If you specify a cell_worker, you need to set assemble_own_cells or assemble_ghost_cells."));
 
-    Assert(
+    DEAL_II_Assert(
       (flags &
        (assemble_own_interior_faces_once | assemble_own_interior_faces_both)) !=
         (assemble_own_interior_faces_once | assemble_own_interior_faces_both),
       ExcMessage(
         "You can only specify assemble_own_interior_faces_once OR assemble_own_interior_faces_both."));
 
-    Assert(
+    DEAL_II_Assert(
       (flags & (assemble_ghost_faces_once | assemble_ghost_faces_both)) !=
         (assemble_ghost_faces_once | assemble_ghost_faces_both),
       ExcMessage(
         "You can only specify assemble_ghost_faces_once OR assemble_ghost_faces_both."));
 
-    Assert(
+    DEAL_II_Assert(
       !(flags & cells_after_faces) ||
         (flags & (assemble_own_cells | assemble_ghost_cells)),
       ExcMessage(
         "The option cells_after_faces only makes sense if you assemble on cells."));
 
-    Assert((!face_worker) == !(flags & work_on_faces),
-           ExcMessage(
-             "If you specify a face_worker, assemble_face_* needs to be set."));
+    DEAL_II_Assert(
+      (!face_worker) == !(flags & work_on_faces),
+      ExcMessage(
+        "If you specify a face_worker, assemble_face_* needs to be set."));
 
-    Assert(
+    DEAL_II_Assert(
       (!boundary_worker) == !(flags & assemble_boundary_faces),
       ExcMessage(
         "If you specify a boundary_worker, assemble_boundary_faces needs to be set."));
@@ -281,8 +282,9 @@ namespace MeshWorker
                     (periodic_neighbor &&
                      cell->periodic_neighbor_is_coarser(face_no)))
                   {
-                    Assert(!cell->has_children(), ExcInternalError());
-                    Assert(!neighbor->has_children(), ExcInternalError());
+                    DEAL_II_Assert(!cell->has_children(), ExcInternalError());
+                    DEAL_II_Assert(!neighbor->has_children(),
+                                   ExcInternalError());
 
                     // skip if only one processor needs to assemble the face
                     // to a ghost cell and the fine cell is not ours.
@@ -330,8 +332,8 @@ namespace MeshWorker
                       continue;
 
                     // Now neighbor is on same level, double-check this:
-                    Assert(cell->level() == neighbor->level(),
-                           ExcInternalError());
+                    DEAL_II_Assert(cell->level() == neighbor->level(),
+                                   ExcInternalError());
 
                     // If we own both cells only do faces from one side (unless
                     // AssembleFlags says otherwise). Here, we rely on cell
@@ -358,10 +360,10 @@ namespace MeshWorker
                       periodic_neighbor ?
                         cell->periodic_neighbor_face_no(face_no) :
                         cell->neighbor_face_no(face_no);
-                    Assert(periodic_neighbor ||
-                             neighbor->face(neighbor_face_no) ==
-                               cell->face(face_no),
-                           ExcInternalError());
+                    DEAL_II_Assert(periodic_neighbor ||
+                                     neighbor->face(neighbor_face_no) ==
+                                       cell->face(face_no),
+                                   ExcInternalError());
 
                     face_worker(cell,
                                 face_no,

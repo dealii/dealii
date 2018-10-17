@@ -60,8 +60,9 @@ test()
 
   new_tr.copy_triangulation(tr);
 
-  Assert(tr.n_active_cells() == new_tr.n_active_cells(), ExcInternalError());
-  Assert(tr.n_levels() == new_tr.n_levels(), ExcInternalError());
+  DEAL_II_Assert(tr.n_active_cells() == new_tr.n_active_cells(),
+                 ExcInternalError());
+  DEAL_II_Assert(tr.n_levels() == new_tr.n_levels(), ExcInternalError());
 
   typename Triangulation<dim, dim>::active_cell_iterator cell1, cell2;
 
@@ -81,17 +82,17 @@ test()
                       << cell2->subdomain_id() << std::endl;
             };
 
-          Assert(cell2->is_locally_owned(), ExcInternalError());
-          Assert(cell1->subdomain_id() == cell2->subdomain_id(),
-                 ExcInternalError());
+          DEAL_II_Assert(cell2->is_locally_owned(), ExcInternalError());
+          DEAL_II_Assert(cell1->subdomain_id() == cell2->subdomain_id(),
+                         ExcInternalError());
 
           for (unsigned int vertex = 0;
                vertex < GeometryInfo<dim>::vertices_per_cell;
                ++vertex)
             {
-              Assert(cell1->vertex(vertex).distance(cell2->vertex(vertex)) <
-                       1.e-14,
-                     ExcInternalError());
+              DEAL_II_Assert(cell1->vertex(vertex).distance(
+                               cell2->vertex(vertex)) < 1.e-14,
+                             ExcInternalError());
 
               if (myid == 0)
                 deallog << "  vertices " << vertex << " coincide" << std::endl;
@@ -109,7 +110,7 @@ test()
                       << std::endl;
             };
 
-          Assert(cell2->is_ghost(), ExcInternalError());
+          DEAL_II_Assert(cell2->is_ghost(), ExcInternalError());
         }
       else if (cell1->is_artificial())
         {
@@ -121,10 +122,10 @@ test()
                       << std::endl;
             };
 
-          Assert(cell2->is_artificial(), ExcInternalError());
+          DEAL_II_Assert(cell2->is_artificial(), ExcInternalError());
         }
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     };
 }
 

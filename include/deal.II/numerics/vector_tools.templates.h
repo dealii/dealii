@@ -282,19 +282,19 @@ namespace VectorTools
                 VectorType &                         vec,
                 const ComponentMask &                component_mask)
     {
-      Assert(component_mask.represents_n_components(
-               dof_handler.get_fe().n_components()),
-             ExcMessage(
-               "The number of components in the mask has to be either "
-               "zero or equal to the number of components in the finite "
-               "element."));
+      DEAL_II_Assert(
+        component_mask.represents_n_components(
+          dof_handler.get_fe().n_components()),
+        ExcMessage("The number of components in the mask has to be either "
+                   "zero or equal to the number of components in the finite "
+                   "element."));
 
-      Assert(vec.size() == dof_handler.n_dofs(),
-             ExcDimensionMismatch(vec.size(), dof_handler.n_dofs()));
+      DEAL_II_Assert(vec.size() == dof_handler.n_dofs(),
+                     ExcDimensionMismatch(vec.size(), dof_handler.n_dofs()));
 
-      Assert(component_mask.n_selected_components(
-               dof_handler.get_fe().n_components()) > 0,
-             ComponentMask::ExcNoComponentSelected());
+      DEAL_II_Assert(component_mask.n_selected_components(
+                       dof_handler.get_fe().n_components()) > 0,
+                     ComponentMask::ExcNoComponentSelected());
 
       //
       // Computing the generalized interpolant isn't quite as straightforward
@@ -424,9 +424,10 @@ namespace VectorTools
           dof_values.resize(n_dofs);
 
           // Get all function values:
-          Assert(n_components == function(cell)->n_components,
-                 ExcDimensionMismatch(dof_handler.get_fe().n_components(),
-                                      function(cell)->n_components));
+          DEAL_II_Assert(
+            n_components == function(cell)->n_components,
+            ExcDimensionMismatch(dof_handler.get_fe().n_components(),
+                                 function(cell)->n_components));
           function(cell)->vector_value_list(generalized_support_points,
                                             function_values);
 
@@ -443,7 +444,7 @@ namespace VectorTools
                               fe_values,
                               function_values);
             (void)offset;
-            Assert(offset == n_components, ExcInternalError());
+            DEAL_II_Assert(offset == n_components, ExcInternalError());
           }
 
           FETools::convert_generalized_support_point_values_to_dof_values(
@@ -473,11 +474,12 @@ namespace VectorTools
                     {
                       const auto index =
                         fe_system->system_to_base_index(i).first.first;
-                      Assert(fe_system->base_element(index)
-                               .has_generalized_support_points(),
-                             ExcMessage("The component mask supplied to "
-                                        "VectorTools::interpolate selects a "
-                                        "non-interpolatory element."));
+                      DEAL_II_Assert(fe_system->base_element(index)
+                                       .has_generalized_support_points(),
+                                     ExcMessage(
+                                       "The component mask supplied to "
+                                       "VectorTools::interpolate selects a "
+                                       "non-interpolatory element."));
                     }
 #endif
 
@@ -543,9 +545,9 @@ namespace VectorTools
     VectorType &                                               vec,
     const ComponentMask &                                      component_mask)
   {
-    Assert(dof_handler.get_fe().n_components() == function.n_components,
-           ExcDimensionMismatch(dof_handler.get_fe().n_components(),
-                                function.n_components));
+    DEAL_II_Assert(dof_handler.get_fe().n_components() == function.n_components,
+                   ExcDimensionMismatch(dof_handler.get_fe().n_components(),
+                                        function.n_components));
 
     // Create a small lambda capture wrapping function and call the
     // internal implementation
@@ -620,7 +622,7 @@ namespace VectorTools
 
             // count, how often we have
             // added to this dof
-            Assert(
+            DEAL_II_Assert(
               touch_count[local_dof_indices[j]] <
                 std::numeric_limits<decltype(touch_count)::value_type>::max(),
               ExcInternalError());
@@ -633,7 +635,7 @@ namespace VectorTools
     // entry of the output vector
     for (unsigned int i = 0; i < dof_2.n_dofs(); ++i)
       {
-        Assert(touch_count[i] != 0, ExcInternalError());
+        DEAL_II_Assert(touch_count[i] != 0, ExcInternalError());
         using value_type = typename OutVector::value_type;
         const value_type val =
           ::dealii::internal::ElementAccess<OutVector>::get(data_2, i);
@@ -748,9 +750,10 @@ namespace VectorTools
                                 const DoFHandlerType<dim, spacedim> &dof2,
                                 VectorType &                         u2)
   {
-    Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
-           ExcMessage("The two DoF handlers must represent triangulations that "
-                      "have the same coarse meshes"));
+    DEAL_II_Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
+                   ExcMessage(
+                     "The two DoF handlers must represent triangulations that "
+                     "have the same coarse meshes"));
 
     InterGridMap<DoFHandlerType<dim, spacedim>> intergridmap;
     intergridmap.make_mapping(dof1, dof2);
@@ -775,9 +778,10 @@ namespace VectorTools
     const AffineConstraints<typename VectorType::value_type> &constraints,
     VectorType &                                              u2)
   {
-    Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
-           ExcMessage("The two DoF handlers must represent triangulations that "
-                      "have the same coarse meshes"));
+    DEAL_II_Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
+                   ExcMessage(
+                     "The two DoF handlers must represent triangulations that "
+                     "have the same coarse meshes"));
 
     InterGridMap<DoFHandlerType<dim, spacedim>> intergridmap;
     intergridmap.make_mapping(dof1, dof2);
@@ -822,10 +826,10 @@ namespace VectorTools
       intergridmap.get_destination_grid();
     (void)dof2;
 
-    Assert(u1.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
-           ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
+    DEAL_II_Assert(u1.size() == dof1.n_dofs(),
+                   ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    DEAL_II_Assert(u2.size() == dof2.n_dofs(),
+                   ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
     Vector<typename VectorType::value_type> cache;
 
@@ -855,7 +859,7 @@ namespace VectorTools
         if (!cell1->active() && !cell2->active())
           continue;
 
-        Assert(
+        DEAL_II_Assert(
           internal::is_locally_owned(cell1) ==
             internal::is_locally_owned(cell2),
           ExcMessage(
@@ -867,7 +871,7 @@ namespace VectorTools
         if (cell2->active() && !cell2->is_locally_owned())
           continue;
 
-        Assert(
+        DEAL_II_Assert(
           cell1->get_fe().get_name() == cell2->get_fe().get_name(),
           ExcMessage(
             "Source and destination cells need to use the same finite element"));
@@ -991,7 +995,7 @@ namespace VectorTools
                        const Vector<std::complex<number>> & /*rhs*/,
                        Vector<std::complex<number>> & /*solution*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -1018,11 +1022,11 @@ namespace VectorTools
       const bool              project_to_boundary_first)
     {
       using number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == function.n_components,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                  function.n_components));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      DEAL_II_Assert(dof.get_fe(0).n_components() == function.n_components,
+                     ExcDimensionMismatch(dof.get_fe(0).n_components(),
+                                          function.n_components));
+      DEAL_II_Assert(vec_result.size() == dof.n_dofs(),
+                     ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
 
       // make up boundary values
       std::map<types::global_dof_index, number> boundary_values;
@@ -1122,20 +1126,21 @@ namespace VectorTools
       const Quadrature<dim - 1> &                 q_boundary,
       const bool                                  project_to_boundary_first)
     {
-      Assert(project_to_boundary_first == false, ExcNotImplemented());
-      Assert(enforce_zero_boundary == false, ExcNotImplemented());
+      DEAL_II_Assert(project_to_boundary_first == false, ExcNotImplemented());
+      DEAL_II_Assert(enforce_zero_boundary == false, ExcNotImplemented());
       (void)enforce_zero_boundary;
       (void)project_to_boundary_first;
       (void)q_boundary;
 
-      Assert(dof.get_fe(0).n_components() == function.n_components,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                  function.n_components));
-      Assert(fe_degree == -1 ||
-               dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
-             ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
-      Assert(dof.get_fe(0).n_components() == components,
-             ExcDimensionMismatch(components, dof.get_fe(0).n_components()));
+      DEAL_II_Assert(dof.get_fe(0).n_components() == function.n_components,
+                     ExcDimensionMismatch(dof.get_fe(0).n_components(),
+                                          function.n_components));
+      DEAL_II_Assert(fe_degree == -1 || dof.get_fe().degree ==
+                                          static_cast<unsigned int>(fe_degree),
+                     ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
+      DEAL_II_Assert(dof.get_fe(0).n_components() == components,
+                     ExcDimensionMismatch(components,
+                                          dof.get_fe(0).n_components()));
 
       // set up mass matrix and right hand side
       typename MatrixFree<dim, Number>::AdditionalData additional_data;
@@ -1350,7 +1355,7 @@ namespace VectorTools
             break;
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
         }
     }
 
@@ -1374,8 +1379,8 @@ namespace VectorTools
       const Quadrature<dim - 1> &q_boundary,
       const bool                 project_to_boundary_first)
     {
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      DEAL_II_Assert(vec_result.size() == dof.n_dofs(),
+                     ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
 
       LinearAlgebra::distributed::Vector<typename VectorType::value_type>
         work_result;
@@ -1443,9 +1448,9 @@ namespace VectorTools
                                         project_to_boundary_first);
       else
         {
-          Assert((dynamic_cast<const parallel::Triangulation<dim> *>(
-                    &(dof.get_triangulation())) == nullptr),
-                 ExcNotImplemented());
+          DEAL_II_Assert((dynamic_cast<const parallel::Triangulation<dim> *>(
+                            &(dof.get_triangulation())) == nullptr),
+                         ExcNotImplemented());
           do_project(mapping,
                      dof,
                      constraints,
@@ -1473,13 +1478,13 @@ namespace VectorTools
       VectorType &                                              vec_result)
     {
       using Number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == 1,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
-      Assert(fe_degree == -1 ||
-               dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
-             ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
+      DEAL_II_Assert(dof.get_fe(0).n_components() == 1,
+                     ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
+      DEAL_II_Assert(vec_result.size() == dof.n_dofs(),
+                     ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      DEAL_II_Assert(fe_degree == -1 || dof.get_fe().degree ==
+                                          static_cast<unsigned int>(fe_degree),
+                     ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
       // set up mass matrix and right hand side
       typename MatrixFree<dim, Number>::AdditionalData additional_data;
@@ -1595,13 +1600,13 @@ namespace VectorTools
         matrix_free->get_dof_handler(fe_component);
 
       using Number = typename VectorType::value_type;
-      Assert(dof.get_fe(0).n_components() == 1,
-             ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
-      Assert(vec_result.size() == dof.n_dofs(),
-             ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
-      Assert(fe_degree == -1 ||
-               dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
-             ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
+      DEAL_II_Assert(dof.get_fe(0).n_components() == 1,
+                     ExcDimensionMismatch(dof.get_fe(0).n_components(), 1));
+      DEAL_II_Assert(vec_result.size() == dof.n_dofs(),
+                     ExcDimensionMismatch(vec_result.size(), dof.n_dofs()));
+      DEAL_II_Assert(fe_degree == -1 || dof.get_fe().degree ==
+                                          static_cast<unsigned int>(fe_degree),
+                     ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
 
       using MatrixType = MatrixFreeOperators::MassOperator<
         dim,
@@ -1786,8 +1791,8 @@ namespace VectorTools
                        typename VectorType::value_type> *const function_ptr =
           dynamic_cast<const Function<dim, typename VectorType::value_type> *>(
             &function);
-        Assert(mapping_ptr != nullptr, ExcInternalError());
-        Assert(dof_ptr != nullptr, ExcInternalError());
+        DEAL_II_Assert(mapping_ptr != nullptr, ExcInternalError());
+        DEAL_II_Assert(dof_ptr != nullptr, ExcInternalError());
         internal::project<VectorType, dim>(*mapping_ptr,
                                            *dof_ptr,
                                            constraints,
@@ -1800,9 +1805,10 @@ namespace VectorTools
       }
     else
       {
-        Assert((dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-                  &(dof.get_triangulation())) == nullptr),
-               ExcNotImplemented());
+        DEAL_II_Assert(
+          (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+             &(dof.get_triangulation())) == nullptr),
+          ExcNotImplemented());
         internal::do_project(mapping,
                              dof,
                              constraints,
@@ -1829,9 +1835,9 @@ namespace VectorTools
           const bool                 project_to_boundary_first)
   {
 #ifdef _MSC_VER
-    Assert(false,
-           ExcMessage("Please specify the mapping explicitly "
-                      "when building with MSVC!"));
+    DEAL_II_Assert(false,
+                   ExcMessage("Please specify the mapping explicitly "
+                              "when building with MSVC!"));
 #else
     project(StaticMappingQ1<dim, spacedim>::mapping,
             dof,
@@ -1859,9 +1865,10 @@ namespace VectorTools
           const hp::QCollection<dim - 1> &q_boundary,
           const bool                      project_to_boundary_first)
   {
-    Assert((dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-              &(dof.get_triangulation())) == nullptr),
-           ExcNotImplemented());
+    DEAL_II_Assert(
+      (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+         &(dof.get_triangulation())) == nullptr),
+      ExcNotImplemented());
 
     internal::do_project(mapping,
                          dof,
@@ -1912,10 +1919,12 @@ namespace VectorTools
     using Number = typename VectorType::value_type;
 
     const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
-    Assert(fe.n_components() == rhs_function.n_components,
-           ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+    DEAL_II_Assert(fe.n_components() == rhs_function.n_components,
+                   ExcDimensionMismatch(fe.n_components(),
+                                        rhs_function.n_components));
+    DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(rhs_vector.size(),
+                                        dof_handler.n_dofs()));
     rhs_vector = typename VectorType::value_type(0.);
 
     UpdateFlags update_flags =
@@ -2052,10 +2061,12 @@ namespace VectorTools
     using Number = typename VectorType::value_type;
 
     const hp::FECollection<dim, spacedim> &fe = dof_handler.get_fe_collection();
-    Assert(fe.n_components() == rhs_function.n_components,
-           ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+    DEAL_II_Assert(fe.n_components() == rhs_function.n_components,
+                   ExcDimensionMismatch(fe.n_components(),
+                                        rhs_function.n_components));
+    DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(rhs_vector.size(),
+                                        dof_handler.n_dofs()));
     rhs_vector = 0;
 
     UpdateFlags update_flags =
@@ -2206,10 +2217,12 @@ namespace VectorTools
                              const Point<spacedim> &          p,
                              Vector<double> &                 rhs_vector)
   {
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert(dof_handler.get_fe(0).n_components() == 1,
-           ExcMessage("This function only works for scalar finite elements"));
+    DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(rhs_vector.size(),
+                                        dof_handler.n_dofs()));
+    DEAL_II_Assert(dof_handler.get_fe(0).n_components() == 1,
+                   ExcMessage(
+                     "This function only works for scalar finite elements"));
 
     rhs_vector = 0;
 
@@ -2259,10 +2272,12 @@ namespace VectorTools
     const Point<spacedim> &                     p,
     Vector<double> &                            rhs_vector)
   {
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert(dof_handler.get_fe(0).n_components() == 1,
-           ExcMessage("This function only works for scalar finite elements"));
+    DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(rhs_vector.size(),
+                                        dof_handler.n_dofs()));
+    DEAL_II_Assert(dof_handler.get_fe(0).n_components() == 1,
+                   ExcMessage(
+                     "This function only works for scalar finite elements"));
 
     rhs_vector = 0;
 
@@ -2313,11 +2328,13 @@ namespace VectorTools
                              const Point<dim> &               orientation,
                              Vector<double> &                 rhs_vector)
   {
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert(dof_handler.get_fe(0).n_components() == dim,
-           ExcMessage(
-             "This function only works for vector-valued finite elements."));
+    DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(rhs_vector.size(),
+                                        dof_handler.n_dofs()));
+    DEAL_II_Assert(
+      dof_handler.get_fe(0).n_components() == dim,
+      ExcMessage(
+        "This function only works for vector-valued finite elements."));
 
     rhs_vector = 0;
 
@@ -2372,11 +2389,13 @@ namespace VectorTools
     const Point<dim> &                          orientation,
     Vector<double> &                            rhs_vector)
   {
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert(dof_handler.get_fe(0).n_components() == dim,
-           ExcMessage(
-             "This function only works for vector-valued finite elements."));
+    DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(rhs_vector.size(),
+                                        dof_handler.n_dofs()));
+    DEAL_II_Assert(
+      dof_handler.get_fe(0).n_components() == dim,
+      ExcMessage(
+        "This function only works for vector-valued finite elements."));
 
     rhs_vector = 0;
 
@@ -2434,10 +2453,12 @@ namespace VectorTools
     const std::set<types::boundary_id> &                       boundary_ids)
   {
     const FiniteElement<dim> &fe = dof_handler.get_fe();
-    Assert(fe.n_components() == rhs_function.n_components,
-           ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+    DEAL_II_Assert(fe.n_components() == rhs_function.n_components,
+                   ExcDimensionMismatch(fe.n_components(),
+                                        rhs_function.n_components));
+    DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(rhs_vector.size(),
+                                        dof_handler.n_dofs()));
 
     rhs_vector = 0;
 
@@ -2583,10 +2604,12 @@ namespace VectorTools
     const std::set<types::boundary_id> &                       boundary_ids)
   {
     const hp::FECollection<dim> &fe = dof_handler.get_fe_collection();
-    Assert(fe.n_components() == rhs_function.n_components,
-           ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
-    Assert(rhs_vector.size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+    DEAL_II_Assert(fe.n_components() == rhs_function.n_components,
+                   ExcDimensionMismatch(fe.n_components(),
+                                        rhs_function.n_components));
+    DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(rhs_vector.size(),
+                                        dof_handler.n_dofs()));
 
     rhs_vector = 0;
 
@@ -2752,7 +2775,7 @@ namespace VectorTools
       std::map<types::global_dof_index, number> &boundary_values,
       const ComponentMask &                      component_mask)
     {
-      Assert(
+      DEAL_II_Assert(
         component_mask.represents_n_components(dof.get_fe(0).n_components()),
         ExcMessage("The number of components in the mask has to be either "
                    "zero or equal to the number of components in the finite "
@@ -2764,10 +2787,11 @@ namespace VectorTools
       if (function_map.size() == 0)
         return;
 
-      Assert(function_map.find(numbers::internal_face_boundary_id) ==
-               function_map.end(),
-             ExcMessage("You cannot specify the special boundary indicator "
-                        "for interior faces in your function map."));
+      DEAL_II_Assert(function_map.find(numbers::internal_face_boundary_id) ==
+                       function_map.end(),
+                     ExcMessage(
+                       "You cannot specify the special boundary indicator "
+                       "for interior faces in your function map."));
 
       const unsigned int n_components = DoFTools::n_components(dof);
       for (typename std::map<types::boundary_id,
@@ -2775,8 +2799,9 @@ namespace VectorTools
              i = function_map.begin();
            i != function_map.end();
            ++i)
-        Assert(n_components == i->second->n_components,
-               ExcDimensionMismatch(n_components, i->second->n_components));
+        DEAL_II_Assert(n_components == i->second->n_components,
+                       ExcDimensionMismatch(n_components,
+                                            i->second->n_components));
 
 
       // interpolate boundary values in 1d. in higher dimensions, we
@@ -2802,13 +2827,14 @@ namespace VectorTools
 
                   // get the FE corresponding to this cell
                   const FiniteElement<dim, spacedim> &fe = cell->get_fe();
-                  Assert(fe.n_components() == boundary_function.n_components,
-                         ExcDimensionMismatch(fe.n_components(),
-                                              boundary_function.n_components));
+                  DEAL_II_Assert(
+                    fe.n_components() == boundary_function.n_components,
+                    ExcDimensionMismatch(fe.n_components(),
+                                         boundary_function.n_components));
 
-                  Assert(component_mask.n_selected_components(
-                           fe.n_components()) > 0,
-                         ComponentMask::ExcNoComponentSelected());
+                  DEAL_II_Assert(component_mask.n_selected_components(
+                                   fe.n_components()) > 0,
+                                 ComponentMask::ExcNoComponentSelected());
 
                   // now set the value of the vertex degree of
                   // freedom. setting also creates the entry in the
@@ -2935,7 +2961,7 @@ namespace VectorTools
                       for (unsigned int c = 0; c < n_components; ++c)
                         if ((nonzero_component_array[c] == true) &&
                             (component_mask[c] == true))
-                          Assert(
+                          DEAL_II_Assert(
                             cell->get_fe().is_primitive(i),
                             ExcMessage(
                               "This function can only deal with requested boundary "
@@ -3015,8 +3041,8 @@ namespace VectorTools
                                                    i + 4 * fe.dofs_per_vertex +
                                                      8 * fe.dofs_per_line)) :
                                              numbers::invalid_unsigned_int)));
-                                  Assert(cell_i < fe.dofs_per_cell,
-                                         ExcInternalError());
+                                  DEAL_II_Assert(cell_i < fe.dofs_per_cell,
+                                                 ExcInternalError());
 
                                   // make sure that if this is not a primitive
                                   // shape function, then all the corresponding
@@ -3025,8 +3051,9 @@ namespace VectorTools
                                     for (unsigned int c = 0; c < n_components;
                                          ++c)
                                       if (fe.get_nonzero_components(cell_i)[c])
-                                        Assert(component_mask[c] == false,
-                                               FETools::ExcFENotPrimitive());
+                                        DEAL_II_Assert(
+                                          component_mask[c] == false,
+                                          FETools::ExcFENotPrimitive());
 
                                   // let's pick the first of possibly more than
                                   // one non-zero components. if shape function
@@ -3286,7 +3313,8 @@ namespace VectorTools
     bool
     real_part_bigger_than(const number1 a, const std::complex<number2> b)
     {
-      Assert(std::abs(b.imag()) <= 1e-15 * std::abs(b), ExcInternalError());
+      DEAL_II_Assert(std::abs(b.imag()) <= 1e-15 * std::abs(b),
+                     ExcInternalError());
       return a > b.real();
     }
 
@@ -3294,7 +3322,8 @@ namespace VectorTools
     bool
     real_part_bigger_than(const std::complex<number1> a, const number2 b)
     {
-      Assert(std::abs(a.imag()) <= 1e-15 * std::abs(a), ExcInternalError());
+      DEAL_II_Assert(std::abs(a.imag()) <= 1e-15 * std::abs(a),
+                     ExcInternalError());
       return a.real() > b;
     }
 
@@ -3303,8 +3332,10 @@ namespace VectorTools
     real_part_bigger_than(const std::complex<number1> a,
                           const std::complex<number2> b)
     {
-      Assert(std::abs(a.imag()) <= 1e-15 * std::abs(a), ExcInternalError());
-      Assert(std::abs(b.imag()) <= 1e-15 * std::abs(b), ExcInternalError());
+      DEAL_II_Assert(std::abs(a.imag()) <= 1e-15 * std::abs(a),
+                     ExcInternalError());
+      DEAL_II_Assert(std::abs(b.imag()) <= 1e-15 * std::abs(b),
+                     ExcInternalError());
       return a.real() > b.real();
     }
 
@@ -3416,7 +3447,7 @@ namespace VectorTools
       // in 1d, projection onto the 0d end points == interpolation
       if (dim == 1)
         {
-          Assert(component_mapping.size() == 0, ExcNotImplemented());
+          DEAL_II_Assert(component_mapping.size() == 0, ExcNotImplemented());
           interpolate_boundary_values(
             mapping, dof, boundary_functions, boundary_values, ComponentMask());
           return;
@@ -3430,8 +3461,9 @@ namespace VectorTools
 
       if (component_mapping.size() == 0)
         {
-          AssertDimension(dof.get_fe(0).n_components(),
-                          boundary_functions.begin()->second->n_components);
+          DEAL_II_AssertDimension(
+            dof.get_fe(0).n_components(),
+            boundary_functions.begin()->second->n_components);
           // I still do not see why i
           // should create another copy
           // here
@@ -3440,7 +3472,8 @@ namespace VectorTools
             component_mapping[i] = i;
         }
       else
-        AssertDimension(dof.get_fe(0).n_components(), component_mapping.size());
+        DEAL_II_AssertDimension(dof.get_fe(0).n_components(),
+                                component_mapping.size());
 
       std::vector<types::global_dof_index> dof_to_boundary_mapping;
       std::set<types::boundary_id>         selected_boundary_components;
@@ -3488,7 +3521,7 @@ namespace VectorTools
       if (dim >= 3)
         {
 #ifdef DEBUG
-          // Assert that there are no hanging nodes at the boundary
+          // DEAL_II_Assert that there are no hanging nodes at the boundary
           int level = -1;
           for (typename DoFHandlerType<dim, spacedim>::active_cell_iterator
                  cell = dof.begin_active();
@@ -3502,7 +3535,7 @@ namespace VectorTools
                       level = cell->level();
                     else
                       {
-                        Assert(
+                        DEAL_II_Assert(
                           level == cell->level(),
                           ExcMessage(
                             "The mesh you use in projecting boundary values "
@@ -3589,7 +3622,8 @@ namespace VectorTools
         if (dof_to_boundary_mapping[i] != numbers::invalid_dof_index &&
             !excluded_dofs[dof_to_boundary_mapping[i]])
           {
-            AssertIsFinite(boundary_projection(dof_to_boundary_mapping[i]));
+            DEAL_II_AssertIsFinite(
+              boundary_projection(dof_to_boundary_mapping[i]));
 
             // this dof is on one of the
             // interesting boundary parts
@@ -3995,7 +4029,7 @@ namespace VectorTools
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 
@@ -4149,9 +4183,9 @@ namespace VectorTools
 
               // make sure the two vectors
               // are indeed not collinear
-              Assert(std::fabs(vector * tmp / vector.norm() / tmp.norm()) <
-                       (1 - 1e-12),
-                     ExcInternalError());
+              DEAL_II_Assert(std::fabs(vector * tmp / vector.norm() /
+                                       tmp.norm()) < (1 - 1e-12),
+                             ExcInternalError());
 
               // now compute the
               // two normals
@@ -4162,7 +4196,7 @@ namespace VectorTools
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
   } // namespace internal
@@ -4343,7 +4377,7 @@ namespace VectorTools
                             std::vector<double> &,
                             std::vector<bool> &)
     {
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
     }
 
     // This function computes the
@@ -4810,7 +4844,7 @@ namespace VectorTools
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
   } // namespace internals
@@ -4893,7 +4927,7 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
-                          AssertThrow(
+                          DEAL_II_AssertThrow(
                             dynamic_cast<const FE_Nedelec<dim> *>(
                               &cell->get_fe()) != nullptr,
                             (typename FiniteElement<
@@ -4991,10 +5025,11 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
-                          AssertThrow(dynamic_cast<const FE_Nedelec<dim> *>(
-                                        &cell->get_fe()) != nullptr,
-                                      typename FiniteElement<
-                                        dim>::ExcInterpolationNotImplemented());
+                          DEAL_II_AssertThrow(
+                            dynamic_cast<const FE_Nedelec<dim> *>(
+                              &cell->get_fe()) != nullptr,
+                            typename FiniteElement<
+                              dim>::ExcInterpolationNotImplemented());
                         }
 
                       for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
@@ -5058,7 +5093,7 @@ namespace VectorTools
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 
@@ -5122,10 +5157,11 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
-                          AssertThrow(dynamic_cast<const FE_Nedelec<dim> *>(
-                                        &cell->get_fe()) != nullptr,
-                                      typename FiniteElement<
-                                        dim>::ExcInterpolationNotImplemented());
+                          DEAL_II_AssertThrow(
+                            dynamic_cast<const FE_Nedelec<dim> *>(
+                              &cell->get_fe()) != nullptr,
+                            typename FiniteElement<
+                              dim>::ExcInterpolationNotImplemented());
                         }
 
                       const unsigned int dofs_per_face =
@@ -5216,10 +5252,11 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
-                          AssertThrow(dynamic_cast<const FE_Nedelec<dim> *>(
-                                        &cell->get_fe()) != nullptr,
-                                      typename FiniteElement<
-                                        dim>::ExcInterpolationNotImplemented());
+                          DEAL_II_AssertThrow(
+                            dynamic_cast<const FE_Nedelec<dim> *>(
+                              &cell->get_fe()) != nullptr,
+                            typename FiniteElement<
+                              dim>::ExcInterpolationNotImplemented());
                         }
 
                       const unsigned int superdegree = cell->get_fe().degree;
@@ -5284,7 +5321,7 @@ namespace VectorTools
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 
@@ -5427,8 +5464,8 @@ namespace VectorTools
         }
       // Sanity check:
       const unsigned int associated_edge_dofs = associated_edge_dof_index;
-      Assert(associated_edge_dofs == degree + 1,
-             ExcMessage("Error: Unexpected number of 3D edge DoFs"));
+      DEAL_II_Assert(associated_edge_dofs == degree + 1,
+                     ExcMessage("Error: Unexpected number of 3D edge DoFs"));
 
       // Matrix and RHS vectors to store linear system:
       // We have (degree+1) basis functions for an edge
@@ -5549,7 +5586,7 @@ namespace VectorTools
     {
       // dummy implementation of above function
       // for all other dimensions
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
     }
 
     template <int dim, typename cell_iterator>
@@ -5661,8 +5698,9 @@ namespace VectorTools
               // Sanity check:
               const unsigned int associated_edge_dofs =
                 associated_edge_dof_index;
-              Assert(associated_edge_dofs == degree + 1,
-                     ExcMessage("Error: Unexpected number of 2D edge DoFs"));
+              DEAL_II_Assert(associated_edge_dofs == degree + 1,
+                             ExcMessage(
+                               "Error: Unexpected number of 2D edge DoFs"));
 
               // Matrix and RHS vectors to store:
               // We have (degree+1) edge basis functions
@@ -5817,9 +5855,9 @@ namespace VectorTools
                     }
                   // Sanity check:
                   associated_edge_dofs[line] = associated_edge_dof_index;
-                  Assert(associated_edge_dofs[line] == degree + 1,
-                         ExcMessage(
-                           "Error: Unexpected number of 3D edge DoFs"));
+                  DEAL_II_Assert(associated_edge_dofs[line] == degree + 1,
+                                 ExcMessage(
+                                   "Error: Unexpected number of 3D edge DoFs"));
                 }
 
               // Next find the face DoFs associated with the vector components
@@ -5862,8 +5900,9 @@ namespace VectorTools
               // Sanity check:
               const unsigned int associated_face_dofs =
                 associated_face_dof_index;
-              Assert(associated_face_dofs == 2 * degree * (degree + 1),
-                     ExcMessage("Error: Unexpected number of 3D face DoFs"));
+              DEAL_II_Assert(associated_face_dofs == 2 * degree * (degree + 1),
+                             ExcMessage(
+                               "Error: Unexpected number of 3D face DoFs"));
 
               // Storage for the linear system.
               // There are 2*degree*(degree+1) DoFs associated with a face in
@@ -5989,7 +6028,7 @@ namespace VectorTools
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 
@@ -6089,7 +6128,7 @@ namespace VectorTools
                               if (dynamic_cast<const FESystem<dim> *>(
                                     &cell->get_fe()) == nullptr)
                                 {
-                                  AssertThrow(
+                                  DEAL_II_AssertThrow(
                                     (dynamic_cast<const FE_Nedelec<dim> *>(
                                        &cell->get_fe()) != nullptr) ||
                                       (dynamic_cast<const FE_NedelecSZ<dim> *>(
@@ -6215,7 +6254,7 @@ namespace VectorTools
                               if (dynamic_cast<const FESystem<dim> *>(
                                     &cell->get_fe()) == nullptr)
                                 {
-                                  AssertThrow(
+                                  DEAL_II_AssertThrow(
                                     (dynamic_cast<const FE_Nedelec<dim> *>(
                                        &cell->get_fe()) != nullptr) ||
                                       (dynamic_cast<const FE_NedelecSZ<dim> *>(
@@ -6301,7 +6340,7 @@ namespace VectorTools
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 
@@ -6456,7 +6495,7 @@ namespace VectorTools
       const std::vector<DerivativeForm<1, dim, dim>> &,
       AffineConstraints<double> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
     // This function computes the projection of the boundary function on the
@@ -6564,7 +6603,7 @@ namespace VectorTools
       std::vector<double> &,
       std::vector<types::global_dof_index> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
   } // namespace internals
 
@@ -6644,7 +6683,7 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
-                          AssertThrow(
+                          DEAL_II_AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
                               &cell->get_fe()) != nullptr,
                             typename FiniteElement<
@@ -6706,7 +6745,7 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
-                          AssertThrow(
+                          DEAL_II_AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
                               &cell->get_fe()) != nullptr,
                             typename FiniteElement<
@@ -6748,7 +6787,7 @@ namespace VectorTools
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 
@@ -6816,7 +6855,7 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
-                          AssertThrow(
+                          DEAL_II_AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
                               &cell->get_fe()) != nullptr,
                             typename FiniteElement<
@@ -6874,7 +6913,7 @@ namespace VectorTools
                       if (dynamic_cast<const FESystem<dim> *>(
                             &cell->get_fe()) == nullptr)
                         {
-                          AssertThrow(
+                          DEAL_II_AssertThrow(
                             dynamic_cast<const FE_RaviartThomas<dim> *>(
                               &cell->get_fe()) != nullptr,
                             typename FiniteElement<
@@ -6916,7 +6955,7 @@ namespace VectorTools
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 
@@ -6955,10 +6994,11 @@ namespace VectorTools
     AffineConstraints<double> &   constraints,
     const Mapping<dim, spacedim> &mapping)
   {
-    Assert(dim > 1,
-           ExcMessage("This function is not useful in 1d because it amounts "
-                      "to imposing Dirichlet values on the vector-valued "
-                      "quantity."));
+    DEAL_II_Assert(dim > 1,
+                   ExcMessage(
+                     "This function is not useful in 1d because it amounts "
+                     "to imposing Dirichlet values on the vector-valued "
+                     "quantity."));
 
     std::vector<types::global_dof_index> face_dofs;
 
@@ -6979,8 +7019,9 @@ namespace VectorTools
         const std::vector<Point<dim - 1>> &unit_support_points =
           fe_collection[i].get_unit_face_support_points();
 
-        Assert(unit_support_points.size() == fe_collection[i].dofs_per_face,
-               ExcInternalError());
+        DEAL_II_Assert(unit_support_points.size() ==
+                         fe_collection[i].dofs_per_face,
+                       ExcInternalError());
 
         face_quadrature_collection.push_back(
           Quadrature<dim - 1>(unit_support_points));
@@ -7048,7 +7089,7 @@ namespace VectorTools
                     internal::VectorDoFTuple<dim> vector_dofs;
                     vector_dofs.dof_indices[0] = face_dofs[i];
 
-                    Assert(
+                    DEAL_II_Assert(
                       first_vector_component + dim <= fe.n_components(),
                       ExcMessage(
                         "Error: the finite element does not have enough components "
@@ -7069,8 +7110,9 @@ namespace VectorTools
                            first_vector_component] = face_dofs[k];
 
                     for (unsigned int d = 0; d < dim; ++d)
-                      Assert(vector_dofs.dof_indices[d] < dof_handler.n_dofs(),
-                             ExcInternalError());
+                      DEAL_II_Assert(vector_dofs.dof_indices[d] <
+                                       dof_handler.n_dofs(),
+                                     ExcInternalError());
 
                     // we need the normal vector on this face. we know that it
                     // is a vector of length 1 but at least with higher order
@@ -7123,8 +7165,8 @@ namespace VectorTools
                         cell->face(face_no), fe_values.quadrature_point(i)));
                     if (normal_vector * fe_values.normal_vector(i) < 0)
                       normal_vector *= -1;
-                    Assert(std::fabs(normal_vector.norm() - 1) < 1e-14,
-                           ExcInternalError());
+                    DEAL_II_Assert(std::fabs(normal_vector.norm() - 1) < 1e-14,
+                                   ExcInternalError());
                     for (unsigned int d = 0; d < dim; ++d)
                       if (std::fabs(normal_vector[d]) < 1e-13)
                         normal_vector[d] = 0;
@@ -7208,7 +7250,7 @@ namespace VectorTools
               const unsigned int old_count =
                 cell_to_normals_map[q->second.second].second;
 
-              Assert(old_count > 0, ExcInternalError());
+              DEAL_II_Assert(old_count > 0, ExcInternalError());
 
               // in the same entry, store again the now averaged normal vector
               // and the new count
@@ -7217,7 +7259,7 @@ namespace VectorTools
                                  (old_count + 1),
                                old_count + 1);
             }
-        Assert(cell_to_normals_map.size() >= 1, ExcInternalError());
+        DEAL_II_Assert(cell_to_normals_map.size() >= 1, ExcInternalError());
 
 #ifdef DEBUG_NO_NORMAL_FLUX
         std::cout << "   cell_to_normals_map:" << std::endl;
@@ -7241,7 +7283,7 @@ namespace VectorTools
         // verify that each cell can have only contributed at most dim times,
         // since that is the maximum number of faces that come together at a
         // single place
-        Assert(max_n_contributions_per_cell <= dim, ExcInternalError());
+        DEAL_II_Assert(max_n_contributions_per_cell <= dim, ExcInternalError());
 
         switch (max_n_contributions_per_cell)
           {
@@ -7304,7 +7346,8 @@ namespace VectorTools
             case dim:
               {
                 // assert that indeed only a single cell has contributed
-                Assert(cell_to_normals_map.size() == 1, ExcInternalError());
+                DEAL_II_Assert(cell_to_normals_map.size() == 1,
+                               ExcInternalError());
 
                 // check linear independence by computing the determinant of the
                 // matrix created from all the normal vectors. if they are
@@ -7321,7 +7364,7 @@ namespace VectorTools
                     for (unsigned int j = 0; j < dim; ++j)
                       t[i][j] = x->second.first[j];
 
-                  Assert(
+                  DEAL_II_Assert(
                     std::fabs(determinant(t)) > 1e-3,
                     ExcMessage(
                       "Found a set of normal vectors that are nearly collinear."));
@@ -7357,8 +7400,9 @@ namespace VectorTools
             // is constrained in two directions but not the third.
             default:
               {
-                Assert(dim >= 3, ExcNotImplemented());
-                Assert(max_n_contributions_per_cell == 2, ExcInternalError());
+                DEAL_II_Assert(dim >= 3, ExcNotImplemented());
+                DEAL_II_Assert(max_n_contributions_per_cell == 2,
+                               ExcInternalError());
 
                 // as described in the documentation, let us first collect what
                 // each of the cells contributed at the current point. we use a
@@ -7376,7 +7420,8 @@ namespace VectorTools
                      ++q)
                   cell_contributions[q->second.second].push_back(
                     q->second.first);
-                Assert(cell_contributions.size() >= 1, ExcInternalError());
+                DEAL_II_Assert(cell_contributions.size() >= 1,
+                               ExcInternalError());
 
                 // now for each cell that has contributed determine the number
                 // of normal vectors it has contributed. we currently only
@@ -7434,7 +7479,7 @@ namespace VectorTools
                            t != contribution->second.end();
                            ++t, ++index)
                         normals[index] = *t;
-                      Assert(index == dim - 1, ExcInternalError());
+                      DEAL_II_Assert(index == dim - 1, ExcInternalError());
                     }
 
                     // calculate the tangent as the outer product of the normal
@@ -7459,10 +7504,10 @@ namespace VectorTools
                             cross_product_3d(normals[0], normals[dim - 2]);
                           break;
                         default:
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_Assert(false, ExcNotImplemented());
                       }
 
-                    Assert(
+                    DEAL_II_Assert(
                       std::fabs(tangent.norm()) > 1e-12,
                       ExcMessage(
                         "Two normal vectors from adjacent faces are almost "
@@ -7589,8 +7634,9 @@ namespace VectorTools
         const std::vector<Point<dim - 1>> &unit_support_points =
           fe_collection[i].get_unit_face_support_points();
 
-        Assert(unit_support_points.size() == fe_collection[i].dofs_per_face,
-               ExcInternalError());
+        DEAL_II_Assert(unit_support_points.size() ==
+                         fe_collection[i].dofs_per_face,
+                       ExcInternalError());
 
         face_quadrature_collection.push_back(
           Quadrature<dim - 1>(unit_support_points));
@@ -7732,20 +7778,20 @@ namespace VectorTools
                   constrained_index = d;
                   normal[d]         = 1.;
                 }
-            AssertIndexRange(constrained_index, dim);
+            DEAL_II_AssertIndexRange(constrained_index, dim);
             const std::vector<std::pair<types::global_dof_index, double>>
               *constrained = no_normal_flux_constraints.get_constraint_entries(
                 (*it)[constrained_index]);
             // find components to which this index is constrained to
-            Assert(constrained != nullptr, ExcInternalError());
-            Assert(constrained->size() < dim, ExcInternalError());
+            DEAL_II_Assert(constrained != nullptr, ExcInternalError());
+            DEAL_II_Assert(constrained->size() < dim, ExcInternalError());
             for (unsigned int c = 0; c < constrained->size(); ++c)
               {
                 int index = -1;
                 for (unsigned int d = 0; d < dim; ++d)
                   if ((*constrained)[c].first == (*it)[d])
                     index = d;
-                Assert(index != -1, ExcInternalError());
+                DEAL_II_Assert(index != -1, ExcInternalError());
                 normal[index] = (*constrained)[c].second;
               }
             Vector<double> boundary_value = dof_vector_to_b_values[*it];
@@ -7766,8 +7812,8 @@ namespace VectorTools
               }
           }
       }
-    AssertDimension(n_total_constraints_found,
-                    no_normal_flux_constraints.n_constraints());
+    DEAL_II_AssertDimension(n_total_constraints_found,
+                            no_normal_flux_constraints.n_constraints());
   }
 
 
@@ -7865,7 +7911,7 @@ namespace VectorTools
         // we need to return double as a norm, but mean value is a complex
         // number. Panic and return real-part while warning the user that
         // he shall never do that.
-        Assert(
+        DEAL_II_Assert(
           false,
           ExcMessage(
             "Mean value norm is not implemented for complex-valued vectors"));
@@ -8069,7 +8115,7 @@ namespace VectorTools
             break;
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             break;
         }
 
@@ -8114,7 +8160,7 @@ namespace VectorTools
                     if (data.weight_vectors[0](idx) > 0)
                       break;
 
-                Assert(
+                DEAL_II_Assert(
                   n_components >= idx + dim,
                   ExcMessage(
                     "You can only ask for the Hdiv norm for a finite element "
@@ -8159,7 +8205,7 @@ namespace VectorTools
         diff = internal::mean_to_double(diff_mean);
 
       // append result of this cell to the end of the vector
-      AssertIsFinite(diff);
+      DEAL_II_AssertIsFinite(diff);
       return diff;
     }
 
@@ -8190,14 +8236,16 @@ namespace VectorTools
 
       const unsigned int n_components = dof.get_fe(0).n_components();
 
-      Assert(exact_solution.n_components == n_components,
-             ExcDimensionMismatch(exact_solution.n_components, n_components));
+      DEAL_II_Assert(exact_solution.n_components == n_components,
+                     ExcDimensionMismatch(exact_solution.n_components,
+                                          n_components));
 
       if (weight != nullptr)
         {
-          Assert((weight->n_components == 1) ||
-                   (weight->n_components == n_components),
-                 ExcDimensionMismatch(weight->n_components, n_components));
+          DEAL_II_Assert((weight->n_components == 1) ||
+                           (weight->n_components == n_components),
+                         ExcDimensionMismatch(weight->n_components,
+                                              n_components));
         }
 
       difference.reinit(dof.get_triangulation().n_active_cells());
@@ -8399,8 +8447,8 @@ namespace VectorTools
                        const NormType &                    norm,
                        const double                        exponent)
   {
-    Assert(cellwise_error.size() == tria.n_active_cells(),
-           ExcMessage("input vector cell_error has invalid size!"));
+    DEAL_II_Assert(cellwise_error.size() == tria.n_active_cells(),
+                   ExcMessage("input vector cell_error has invalid size!"));
 #ifdef DEBUG
     {
       // check that off-processor entries are zero. Otherwise we will compute
@@ -8410,7 +8458,7 @@ namespace VectorTools
         tria.begin_active();
       for (; i < cellwise_error.size(); ++i, ++it)
         if (!it->is_locally_owned())
-          Assert(
+          DEAL_II_Assert(
             std::fabs(cellwise_error[i]) < 1e-20,
             ExcMessage(
               "cellwise_error of cells that are not locally owned need to be zero!"));
@@ -8450,11 +8498,11 @@ namespace VectorTools
 
         case W1infty_norm:
           {
-            AssertThrow(false,
-                        ExcMessage(
-                          "compute_global_error() is impossible for "
-                          "the W1infty_norm. See the documentation for "
-                          "NormType::W1infty_norm for more information."));
+            DEAL_II_AssertThrow(
+              false,
+              ExcMessage("compute_global_error() is impossible for "
+                         "the W1infty_norm. See the documentation for "
+                         "NormType::W1infty_norm for more information."));
             return std::numeric_limits<double>::infinity();
           }
 
@@ -8484,7 +8532,7 @@ namespace VectorTools
           }
 
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
           break;
       }
     return 0.0;
@@ -8521,8 +8569,8 @@ namespace VectorTools
     using Number                 = typename VectorType::value_type;
     const FiniteElement<dim> &fe = dof.get_fe();
 
-    Assert(difference.size() == fe.n_components(),
-           ExcDimensionMismatch(difference.size(), fe.n_components()));
+    DEAL_II_Assert(difference.size() == fe.n_components(),
+                   ExcDimensionMismatch(difference.size(), fe.n_components()));
 
     // first find the cell in which this point
     // is, initialize a quadrature rule with
@@ -8532,10 +8580,11 @@ namespace VectorTools
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof, point);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
+    DEAL_II_AssertThrow(cell_point.first->is_locally_owned(),
+                        ExcPointNotAvailableHere());
+    DEAL_II_Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) <
+                     1e-10,
+                   ExcInternalError());
 
     const Quadrature<dim> quadrature(
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
@@ -8621,8 +8670,8 @@ namespace VectorTools
     using Number                 = typename VectorType::value_type;
     const FiniteElement<dim> &fe = dof.get_fe();
 
-    Assert(value.size() == fe.n_components(),
-           ExcDimensionMismatch(value.size(), fe.n_components()));
+    DEAL_II_Assert(value.size() == fe.n_components(),
+                   ExcDimensionMismatch(value.size(), fe.n_components()));
 
     // first find the cell in which this point
     // is, initialize a quadrature rule with
@@ -8632,10 +8681,11 @@ namespace VectorTools
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof, point);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
+    DEAL_II_AssertThrow(cell_point.first->is_locally_owned(),
+                        ExcPointNotAvailableHere());
+    DEAL_II_Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) <
+                     1e-10,
+                   ExcInternalError());
 
     const Quadrature<dim> quadrature(
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
@@ -8663,8 +8713,8 @@ namespace VectorTools
     using Number                              = typename VectorType::value_type;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
 
-    Assert(value.size() == fe.n_components(),
-           ExcDimensionMismatch(value.size(), fe.n_components()));
+    DEAL_II_Assert(value.size() == fe.n_components(),
+                   ExcDimensionMismatch(value.size(), fe.n_components()));
 
     // first find the cell in which this point
     // is, initialize a quadrature rule with
@@ -8675,10 +8725,11 @@ namespace VectorTools
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof, point);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
+    DEAL_II_AssertThrow(cell_point.first->is_locally_owned(),
+                        ExcPointNotAvailableHere());
+    DEAL_II_Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) <
+                     1e-10,
+                   ExcInternalError());
 
     const Quadrature<dim> quadrature(
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
@@ -8706,9 +8757,10 @@ namespace VectorTools
               const VectorType &               fe_function,
               const Point<spacedim> &          point)
   {
-    Assert(dof.get_fe(0).n_components() == 1,
-           ExcMessage(
-             "Finite element is not scalar as is necessary for this function"));
+    DEAL_II_Assert(
+      dof.get_fe(0).n_components() == 1,
+      ExcMessage(
+        "Finite element is not scalar as is necessary for this function"));
 
     Vector<typename VectorType::value_type> value(1);
     point_value(mapping, dof, fe_function, point, value);
@@ -8724,9 +8776,10 @@ namespace VectorTools
               const VectorType &                          fe_function,
               const Point<spacedim> &                     point)
   {
-    Assert(dof.get_fe(0).n_components() == 1,
-           ExcMessage(
-             "Finite element is not scalar as is necessary for this function"));
+    DEAL_II_Assert(
+      dof.get_fe(0).n_components() == 1,
+      ExcMessage(
+        "Finite element is not scalar as is necessary for this function"));
 
     Vector<typename VectorType::value_type> value(1);
     point_value(mapping, dof, fe_function, point, value);
@@ -8808,8 +8861,8 @@ namespace VectorTools
   {
     const FiniteElement<dim> &fe = dof.get_fe();
 
-    Assert(gradient.size() == fe.n_components(),
-           ExcDimensionMismatch(gradient.size(), fe.n_components()));
+    DEAL_II_Assert(gradient.size() == fe.n_components(),
+                   ExcDimensionMismatch(gradient.size(), fe.n_components()));
 
     // first find the cell in which this point
     // is, initialize a quadrature rule with
@@ -8819,10 +8872,11 @@ namespace VectorTools
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof, point);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
+    DEAL_II_AssertThrow(cell_point.first->is_locally_owned(),
+                        ExcPointNotAvailableHere());
+    DEAL_II_Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) <
+                     1e-10,
+                   ExcInternalError());
 
     const Quadrature<dim> quadrature(
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
@@ -8853,8 +8907,8 @@ namespace VectorTools
     using Number                              = typename VectorType::value_type;
     const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
 
-    Assert(gradient.size() == fe.n_components(),
-           ExcDimensionMismatch(gradient.size(), fe.n_components()));
+    DEAL_II_Assert(gradient.size() == fe.n_components(),
+                   ExcDimensionMismatch(gradient.size(), fe.n_components()));
 
     // first find the cell in which this point
     // is, initialize a quadrature rule with
@@ -8865,10 +8919,11 @@ namespace VectorTools
       cell_point =
         GridTools::find_active_cell_around_point(mapping, dof, point);
 
-    AssertThrow(cell_point.first->is_locally_owned(),
-                ExcPointNotAvailableHere());
-    Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
-           ExcInternalError());
+    DEAL_II_AssertThrow(cell_point.first->is_locally_owned(),
+                        ExcPointNotAvailableHere());
+    DEAL_II_Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) <
+                     1e-10,
+                   ExcInternalError());
 
     const Quadrature<dim> quadrature(
       GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
@@ -8895,9 +8950,10 @@ namespace VectorTools
                  const VectorType &               fe_function,
                  const Point<spacedim> &          point)
   {
-    Assert(dof.get_fe(0).n_components() == 1,
-           ExcMessage(
-             "Finite element is not scalar as is necessary for this function"));
+    DEAL_II_Assert(
+      dof.get_fe(0).n_components() == 1,
+      ExcMessage(
+        "Finite element is not scalar as is necessary for this function"));
 
     std::vector<Tensor<1, dim, typename VectorType::value_type>> gradient(1);
     point_gradient(mapping, dof, fe_function, point, gradient);
@@ -8914,9 +8970,10 @@ namespace VectorTools
                  const VectorType &                          fe_function,
                  const Point<spacedim> &                     point)
   {
-    Assert(dof.get_fe(0).n_components() == 1,
-           ExcMessage(
-             "Finite element is not scalar as is necessary for this function"));
+    DEAL_II_Assert(
+      dof.get_fe(0).n_components() == 1,
+      ExcMessage(
+        "Finite element is not scalar as is necessary for this function"));
 
     std::vector<Tensor<1, dim, typename VectorType::value_type>> gradient(1);
     point_gradient(mapping, dof, fe_function, point, gradient);
@@ -8940,8 +8997,8 @@ namespace VectorTools
         {
           const unsigned int n = v.size();
 
-          Assert(p_select.size() == n,
-                 ExcDimensionMismatch(p_select.size(), n));
+          DEAL_II_Assert(p_select.size() == n,
+                         ExcDimensionMismatch(p_select.size(), n));
 
           typename VectorType::value_type s       = 0.;
           unsigned int                    counter = 0;
@@ -8954,8 +9011,8 @@ namespace VectorTools
               }
           // Error out if we have not constrained anything. Note that in this
           // case the vector v is always nonempty.
-          Assert(n == 0 || counter > 0,
-                 ComponentMask::ExcNoComponentSelected());
+          DEAL_II_Assert(n == 0 || counter > 0,
+                         ComponentMask::ExcNoComponentSelected());
 
           s /= counter;
 
@@ -8973,7 +9030,7 @@ namespace VectorTools
     subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
     {
       (void)p_select;
-      Assert(p_select.size() == 0, ExcNotImplemented());
+      DEAL_II_Assert(p_select.size() == 0, ExcNotImplemented());
       // In case of an empty boolean mask operate on the whole vector:
       v.add(-v.mean_value());
     }
@@ -9018,10 +9075,10 @@ namespace VectorTools
                      const unsigned int               component)
   {
     using Number = typename VectorType::value_type;
-    Assert(v.size() == dof.n_dofs(),
-           ExcDimensionMismatch(v.size(), dof.n_dofs()));
-    Assert(component < dof.get_fe(0).n_components(),
-           ExcIndexRange(component, 0, dof.get_fe(0).n_components()));
+    DEAL_II_Assert(v.size() == dof.n_dofs(),
+                   ExcDimensionMismatch(v.size(), dof.n_dofs()));
+    DEAL_II_Assert(component < dof.get_fe(0).n_components(),
+                   ExcIndexRange(component, 0, dof.get_fe(0).n_components()));
 
     FEValues<dim, spacedim> fe(mapping,
                                dof.get_fe(),
@@ -9069,7 +9126,7 @@ namespace VectorTools
                                        MPI_DOUBLE,
                                        MPI_SUM,
                                        p_triangulation->get_communicator());
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         internal::set_possibly_complex_number(global_values[0],
                                               global_values[1],
@@ -9103,7 +9160,7 @@ namespace VectorTools
                       VectorType &                         vector,
                       const ComponentMask &                mask)
   {
-    AssertDimension(vector.size(), dh.n_dofs());
+    DEAL_II_AssertDimension(vector.size(), dh.n_dofs());
     const FiniteElement<dim, spacedim> &fe = dh.get_fe();
 
     // Construct default fe_mask;
@@ -9111,7 +9168,8 @@ namespace VectorTools
       mask.size() ? mask :
                     ComponentMask(fe.get_nonzero_components(0).size(), true));
 
-    AssertDimension(fe_mask.size(), fe.get_nonzero_components(0).size());
+    DEAL_II_AssertDimension(fe_mask.size(),
+                            fe.get_nonzero_components(0).size());
 
     std::vector<unsigned int> fe_to_real(fe_mask.size(),
                                          numbers::invalid_unsigned_int);
@@ -9121,7 +9179,7 @@ namespace VectorTools
         if (fe_mask[i])
           fe_to_real[i] = size++;
       }
-    Assert(
+    DEAL_II_Assert(
       size == spacedim,
       ExcMessage(
         "The Component Mask you provided is invalid. It has to select exactly spacedim entries."));
@@ -9135,9 +9193,10 @@ namespace VectorTools
         FEValues<dim, spacedim> fe_v(map_q, fe, quad, update_quadrature_points);
         std::vector<types::global_dof_index> dofs(fe.dofs_per_cell);
 
-        AssertDimension(fe.dofs_per_cell, fe.get_unit_support_points().size());
-        Assert(fe.is_primitive(),
-               ExcMessage("FE is not Primitive! This won't work."));
+        DEAL_II_AssertDimension(fe.dofs_per_cell,
+                                fe.get_unit_support_points().size());
+        DEAL_II_Assert(fe.is_primitive(),
+                       ExcMessage("FE is not Primitive! This won't work."));
 
         for (const auto &cell : dh.active_cell_iterators())
           if (cell->is_locally_owned())
@@ -9166,7 +9225,7 @@ namespace VectorTools
         // of FE_Q(fe.degree())
         const FESystem<dim, spacedim> *fe_system =
           dynamic_cast<const FESystem<dim, spacedim> *>(&fe);
-        Assert(fe_system, ExcNotImplemented());
+        DEAL_II_Assert(fe_system, ExcNotImplemented());
         unsigned int degree = numbers::invalid_unsigned_int;
 
         // Get information about the blocks
@@ -9175,11 +9234,11 @@ namespace VectorTools
             {
               const unsigned int base_i =
                 fe_system->component_to_base_index(i).first;
-              Assert(degree == numbers::invalid_unsigned_int ||
-                       degree == fe_system->base_element(base_i).degree,
-                     ExcNotImplemented());
-              Assert(fe_system->base_element(base_i).is_primitive(),
-                     ExcNotImplemented());
+              DEAL_II_Assert(degree == numbers::invalid_unsigned_int ||
+                               degree == fe_system->base_element(base_i).degree,
+                             ExcNotImplemented());
+              DEAL_II_Assert(fe_system->base_element(base_i).is_primitive(),
+                             ExcNotImplemented());
               degree = fe_system->base_element(base_i).degree;
             }
 
@@ -9239,7 +9298,7 @@ namespace VectorTools
 
         // If index is not the same as feq.dofs_per_cell, we won't
         // know how to invert the resulting matrix. Bail out.
-        Assert(index == feq.dofs_per_cell, ExcNotImplemented());
+        DEAL_II_Assert(index == feq.dofs_per_cell, ExcNotImplemented());
 
         for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
           {

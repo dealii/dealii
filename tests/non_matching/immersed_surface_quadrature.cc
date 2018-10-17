@@ -48,7 +48,7 @@ check_get_normals(const NonMatching::ImmersedSurfaceQuadrature<dim> &quadrature)
 {
   const std::vector<Point<dim>> &    points  = quadrature.get_points();
   const std::vector<Tensor<1, dim>> &normals = quadrature.get_normal_vectors();
-  AssertThrow(points.size() == normals.size(), ExcInternalError())
+  DEAL_II_AssertThrow(points.size() == normals.size(), ExcInternalError())
 }
 
 

@@ -61,10 +61,10 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::initialize(
   const MatrixType &    M,
   const AdditionalData &parameters)
 {
-  Assert(parameters.invert_diagonal, ExcNotImplemented());
+  DEAL_II_Assert(parameters.invert_diagonal, ExcNotImplemented());
 
   clear();
-  //  Assert (M.m() == M.n(), ExcNotQuadratic());
+  //  DEAL_II_Assert (M.m() == M.n(), ExcNotQuadratic());
   A               = &M;
   additional_data = &parameters;
   this->inversion = parameters.inversion;
@@ -95,7 +95,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::invert_diagblocks()
 {
   if (this->same_diagonal())
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
   else
     {
@@ -172,7 +172,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::block_kernel(
                 this->additional_data->threshold);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -187,10 +187,11 @@ namespace internal
   const VectorType &
   prepare_ghost_vector(const VectorType &prev, VectorType *other)
   {
-    // If the following Assertion triggers, you either set temp_ghost_vector
-    // for a serial computation (don't!), or nobody implemented, instantiated,
-    // and tested the parallel version for your vector type.
-    Assert(other == nullptr, ExcNotImplemented());
+    // If the following DEAL_II_Assertion triggers, you either set
+    // temp_ghost_vector for a serial computation (don't!), or nobody
+    // implemented, instantiated, and tested the parallel version for your
+    // vector type.
+    DEAL_II_Assert(other == nullptr, ExcNotImplemented());
     (void)other;
     return prev;
   }
@@ -204,11 +205,11 @@ namespace internal
   prepare_ghost_vector(const TrilinosWrappers::MPI::Vector &prev,
                        TrilinosWrappers::MPI::Vector *      other)
   {
-    Assert(
+    DEAL_II_Assert(
       other != nullptr,
       ExcMessage(
         "You need to provide a ghosted vector in RelaxationBlock::AdditionalData::temp_trilinos_ghost_vector."));
-    Assert(other->size() == prev.size(), ExcInternalError());
+    DEAL_II_Assert(other->size() == prev.size(), ExcInternalError());
 
     // import ghost values:
     *other = prev;
@@ -225,7 +226,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
   const VectorType &src,
   const bool        backward) const
 {
-  Assert(additional_data->invert_diagonal, ExcNotImplemented());
+  DEAL_II_Assert(additional_data->invert_diagonal, ExcNotImplemented());
 
   const VectorType &ghosted_prev =
     internal::prepare_ghost_vector(prev, additional_data->temp_ghost_vector);
@@ -240,7 +241,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
 
   if (!permutation_empty)
     for (unsigned int i = 0; i < additional_data->order.size(); ++i)
-      AssertDimension(additional_data->order[i].size(), this->size());
+      DEAL_II_AssertDimension(additional_data->order[i].size(), this->size());
 
   for (unsigned int perm = 0; perm < n_permutations; ++perm)
     {
@@ -276,7 +277,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
 #ifdef DEBUG
           for (unsigned int i = 0; i < x_cell.size(); ++i)
             {
-              AssertIsFinite(x_cell(i));
+              DEAL_II_AssertIsFinite(x_cell(i));
             }
 #endif
           // Store in result vector

@@ -68,9 +68,10 @@ distribute_constraints_linear_operator(
   LinearOperator<Range, Domain, Payload> return_op = exemplar;
 
   return_op.vmult_add = [&constraints](Range &v, const Domain &u) {
-    Assert(!dealii::PointerComparison::equal(&v, &u),
-           dealii::ExcMessage("The domain and range vectors must be different "
-                              "storage locations"));
+    DEAL_II_Assert(!dealii::PointerComparison::equal(&v, &u),
+                   dealii::ExcMessage(
+                     "The domain and range vectors must be different "
+                     "storage locations"));
 
     // First, add vector u to v unconditionally and clean up constrained
     // degrees of freedom later.
@@ -96,9 +97,10 @@ distribute_constraints_linear_operator(
   };
 
   return_op.Tvmult_add = [&constraints](Domain &v, const Range &u) {
-    Assert(!dealii::PointerComparison::equal(&v, &u),
-           dealii::ExcMessage("The domain and range vectors must be different "
-                              "storage locations"));
+    DEAL_II_Assert(!dealii::PointerComparison::equal(&v, &u),
+                   dealii::ExcMessage(
+                     "The domain and range vectors must be different "
+                     "storage locations"));
 
     // First, add vector u to v unconditionally and clean up constrained
     // degrees of freedom later.

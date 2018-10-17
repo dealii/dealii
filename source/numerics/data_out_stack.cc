@@ -64,11 +64,11 @@ DataOutStack<dim, spacedim, DoFHandlerType>::new_parameter_value(
   for (typename std::vector<DataVector>::const_iterator i = dof_data.begin();
        i != dof_data.end();
        ++i)
-    Assert(i->data.size() == 0, ExcDataNotCleared());
+    DEAL_II_Assert(i->data.size() == 0, ExcDataNotCleared());
   for (typename std::vector<DataVector>::const_iterator i = cell_data.begin();
        i != cell_data.end();
        ++i)
-    Assert(i->data.size() == 0, ExcDataNotCleared());
+    DEAL_II_Assert(i->data.size() == 0, ExcDataNotCleared());
 }
 
 
@@ -79,8 +79,8 @@ DataOutStack<dim, spacedim, DoFHandlerType>::attach_dof_handler(
 {
   // Check consistency of redundant
   // template parameter
-  Assert(dim == DoFHandlerType::dimension,
-         ExcDimensionMismatch(dim, DoFHandlerType::dimension));
+  DEAL_II_Assert(dim == DoFHandlerType::dimension,
+                 ExcDimensionMismatch(dim, DoFHandlerType::dimension));
 
   dof_handler = &dof;
 }
@@ -108,7 +108,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::declare_data_vector(
   // not called after some parameter
   // values have already been
   // processed
-  Assert(patches.size() == 0, ExcDataAlreadyAdded());
+  DEAL_II_Assert(patches.size() == 0, ExcDataAlreadyAdded());
 
   // also make sure that no name is
   // used twice
@@ -121,14 +121,16 @@ DataOutStack<dim, spacedim, DoFHandlerType>::declare_data_vector(
            data_set != dof_data.end();
            ++data_set)
         for (unsigned int i = 0; i < data_set->names.size(); ++i)
-          Assert(*name != data_set->names[i], ExcNameAlreadyUsed(*name));
+          DEAL_II_Assert(*name != data_set->names[i],
+                         ExcNameAlreadyUsed(*name));
 
       for (typename std::vector<DataVector>::const_iterator data_set =
              cell_data.begin();
            data_set != cell_data.end();
            ++data_set)
         for (unsigned int i = 0; i < data_set->names.size(); ++i)
-          Assert(*name != data_set->names[i], ExcNameAlreadyUsed(*name));
+          DEAL_II_Assert(*name != data_set->names[i],
+                         ExcNameAlreadyUsed(*name));
     };
 
   switch (vector_type)
@@ -188,25 +190,27 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
   const Vector<number> &          vec,
   const std::vector<std::string> &names)
 {
-  Assert(dof_handler != nullptr,
-         Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
+  DEAL_II_Assert(dof_handler != nullptr,
+                 Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
   // either cell data and one name,
   // or dof data and n_components names
-  Assert(((vec.size() == dof_handler->get_triangulation().n_active_cells()) &&
-          (names.size() == 1)) ||
-           ((vec.size() == dof_handler->n_dofs()) &&
-            (names.size() == dof_handler->get_fe(0).n_components())),
-         Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
-           names.size(), dof_handler->get_fe(0).n_components()));
+  DEAL_II_Assert(((vec.size() ==
+                   dof_handler->get_triangulation().n_active_cells()) &&
+                  (names.size() == 1)) ||
+                   ((vec.size() == dof_handler->n_dofs()) &&
+                    (names.size() == dof_handler->get_fe(0).n_components())),
+                 Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
+                   names.size(), dof_handler->get_fe(0).n_components()));
   for (unsigned int i = 0; i < names.size(); ++i)
-    Assert(names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                      "0123456789_<>()") == std::string::npos,
-           Exceptions::DataOutImplementation::ExcInvalidCharacter(
-             names[i],
-             names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "0123456789_<>()")));
+    DEAL_II_Assert(names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                              "0123456789_<>()") ==
+                     std::string::npos,
+                   Exceptions::DataOutImplementation::ExcInvalidCharacter(
+                     names[i],
+                     names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                "0123456789_<>()")));
 
   if (vec.size() == dof_handler->n_dofs())
     {
@@ -226,7 +230,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
       // statement will not be run
       if (dof_handler->n_dofs() !=
           dof_handler->get_triangulation().n_active_cells())
-        Assert(false, ExcVectorNotDeclared(names[0]));
+        DEAL_II_Assert(false, ExcVectorNotDeclared(names[0]));
     }
 
   // search cell data
@@ -243,13 +247,13 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
             std::copy(vec.begin(), vec.end(), data_vector->data.begin());
             return;
           };
-      Assert(false, ExcVectorNotDeclared(names[0]));
+      DEAL_II_Assert(false, ExcVectorNotDeclared(names[0]));
     };
 
-  // we have either return or Assert
+  // we have either return or DEAL_II_Assert
   // statements above, so shouldn't
   // get here!
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
 }
 
 
@@ -263,11 +267,12 @@ DataOutStack<dim, spacedim, DoFHandlerType>::build_patches(
   unsigned int n_subdivisions =
     (nnnn_subdivisions != 0) ? nnnn_subdivisions : this->default_subdivisions;
 
-  Assert(n_subdivisions >= 1,
-         Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(
-           n_subdivisions));
-  Assert(dof_handler != nullptr,
-         Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
+  DEAL_II_Assert(
+    n_subdivisions >= 1,
+    Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(
+      n_subdivisions));
+  DEAL_II_Assert(dof_handler != nullptr,
+                 Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
 
   this->validate_dataset_names();
 
@@ -334,9 +339,9 @@ DataOutStack<dim, spacedim, DoFHandlerType>::build_patches(
        cell != dof_handler->end();
        ++cell, ++patch, ++cell_number)
     {
-      Assert(cell->is_locally_owned(), ExcNotImplemented());
+      DEAL_II_Assert(cell->is_locally_owned(), ExcNotImplemented());
 
-      Assert(patch != patches.end(), ExcInternalError());
+      DEAL_II_Assert(patch != patches.end(), ExcInternalError());
 
       // first fill in the vertices of the patch
 
@@ -382,7 +387,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::build_patches(
             break;
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         };
 
 

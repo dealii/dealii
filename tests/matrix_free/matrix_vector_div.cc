@@ -94,7 +94,7 @@ public:
   void
   vmult(VectorType &dst, const VectorType &src) const
   {
-    AssertDimension(dst.size(), dim);
+    DEAL_II_AssertDimension(dst.size(), dim);
     for (unsigned int d = 0; d < dim; ++d)
       dst[d] = 0;
     data.cell_loop(&MatrixFreeTest<dim, degree, VectorType>::local_apply,

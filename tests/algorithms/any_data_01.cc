@@ -65,12 +65,12 @@ extract(const AnyData &data)
   if (data.try_read<char *>(" d  17.") == nullptr)
     deallog << "(nil)" << std::endl;
   else
-    AssertThrow(false, ExcInternalError());
+    DEAL_II_AssertThrow(false, ExcInternalError());
 
   if (data.try_read<double>("does not exist") == nullptr)
     deallog << "(nil)" << std::endl;
   else
-    AssertThrow(false, ExcInternalError());
+    DEAL_II_AssertThrow(false, ExcInternalError());
 
   // try
   //   {

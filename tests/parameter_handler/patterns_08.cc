@@ -43,8 +43,8 @@ main()
   // started out with
   std::unique_ptr<Patterns::Tuple> pattern2 = Patterns::Tuple::create(desc);
 
-  AssertThrow(pattern2 != nullptr, ExcInternalError());
-  AssertThrow(desc == pattern2->description(), ExcInternalError());
+  DEAL_II_AssertThrow(pattern2 != nullptr, ExcInternalError());
+  DEAL_II_AssertThrow(desc == pattern2->description(), ExcInternalError());
 
   deallog << desc << std::endl;
 }

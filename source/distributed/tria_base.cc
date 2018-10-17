@@ -52,9 +52,10 @@ namespace parallel
     , n_subdomains(Utilities::MPI::n_mpi_processes(this->mpi_communicator))
   {
 #ifndef DEAL_II_WITH_MPI
-    Assert(false,
-           ExcMessage("You compiled deal.II without MPI support, for "
-                      "which parallel::Triangulation is not available."));
+    DEAL_II_Assert(false,
+                   ExcMessage(
+                     "You compiled deal.II without MPI support, for "
+                     "which parallel::Triangulation is not available."));
 #endif
     number_cache.n_locally_owned_active_cells.resize(n_subdomains);
   }
@@ -68,9 +69,10 @@ namespace parallel
   {
 #ifndef DEAL_II_WITH_MPI
     (void)other_tria;
-    Assert(false,
-           ExcMessage("You compiled deal.II without MPI support, for "
-                      "which parallel::Triangulation is not available."));
+    DEAL_II_Assert(false,
+                   ExcMessage(
+                     "You compiled deal.II without MPI support, for "
+                     "which parallel::Triangulation is not available."));
 #else
     dealii::Triangulation<dim, spacedim>::copy_triangulation(other_tria);
 
@@ -162,9 +164,9 @@ namespace parallel
   void
   Triangulation<dim, spacedim>::update_number_cache()
   {
-    Assert(number_cache.n_locally_owned_active_cells.size() ==
-             Utilities::MPI::n_mpi_processes(this->mpi_communicator),
-           ExcInternalError());
+    DEAL_II_Assert(number_cache.n_locally_owned_active_cells.size() ==
+                     Utilities::MPI::n_mpi_processes(this->mpi_communicator),
+                   ExcInternalError());
 
     std::fill(number_cache.n_locally_owned_active_cells.begin(),
               number_cache.n_locally_owned_active_cells.end(),
@@ -195,9 +197,9 @@ namespace parallel
         if (cell->is_ghost())
           number_cache.ghost_owners.insert(cell->subdomain_id());
 
-      Assert(number_cache.ghost_owners.size() <
-               Utilities::MPI::n_mpi_processes(mpi_communicator),
-             ExcInternalError());
+      DEAL_II_Assert(number_cache.ghost_owners.size() <
+                       Utilities::MPI::n_mpi_processes(mpi_communicator),
+                     ExcInternalError());
     }
 
     if (this->n_levels() > 0)
@@ -218,7 +220,7 @@ namespace parallel
                     1,
                     MPI_UNSIGNED,
                     this->mpi_communicator);
-    AssertThrowMPI(ierr);
+    DEAL_II_AssertThrowMPI(ierr);
 
     number_cache.n_global_active_cells =
       std::accumulate(number_cache.n_locally_owned_active_cells.begin(),
@@ -256,7 +258,7 @@ namespace parallel
     // everyone
     {
       int ierr = MPI_Barrier(this->mpi_communicator);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // important: preallocate to avoid (re)allocation:
       std::vector<MPI_Request> requests(
@@ -276,7 +278,7 @@ namespace parallel
                            9001,
                            this->mpi_communicator,
                            &requests[req_counter]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
 
       for (std::set<types::subdomain_id>::iterator it =
@@ -292,24 +294,24 @@ namespace parallel
                           9001,
                           this->mpi_communicator,
                           MPI_STATUS_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
 
       if (requests.size() > 0)
         {
           ierr =
             MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
 
       ierr = MPI_Barrier(this->mpi_communicator);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
     }
 #  endif
 
-    Assert(this->number_cache.level_ghost_owners.size() <
-             Utilities::MPI::n_mpi_processes(this->mpi_communicator),
-           ExcInternalError());
+    DEAL_II_Assert(this->number_cache.level_ghost_owners.size() <
+                     Utilities::MPI::n_mpi_processes(this->mpi_communicator),
+                   ExcInternalError());
   }
 
 #else
@@ -318,14 +320,14 @@ namespace parallel
   void
   Triangulation<dim, spacedim>::update_number_cache()
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
   template <int dim, int spacedim>
   void
   Triangulation<dim, spacedim>::fill_level_ghost_owners()
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 #endif
@@ -365,7 +367,8 @@ namespace parallel
     // we can remove the overriding implementation for p::d::Triangulation
     // that is currently using a p4est callback to get correct ghost neighbors
     // over periodic faces.
-    Assert(this->get_periodic_face_map().size() == 0, ExcNotImplemented());
+    DEAL_II_Assert(this->get_periodic_face_map().size() == 0,
+                   ExcNotImplemented());
 
 
     std::vector<bool> vertex_of_own_cell(this->n_vertices(), false);

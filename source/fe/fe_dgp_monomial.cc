@@ -87,7 +87,8 @@ namespace internal
       void
       generate_unit_points(const unsigned int k, std::vector<Point<1>> &p)
       {
-        Assert(p.size() == k + 1, ExcDimensionMismatch(p.size(), k + 1));
+        DEAL_II_Assert(p.size() == k + 1,
+                       ExcDimensionMismatch(p.size(), k + 1));
         const double h = 1. / k;
         for (unsigned int i = 0; i < p.size(); ++i)
           p[i](0) = i * h;
@@ -97,9 +98,9 @@ namespace internal
       void
       generate_unit_points(const unsigned int k, std::vector<Point<2>> &p)
       {
-        Assert(k <= 4, ExcNotImplemented());
-        Assert(p.size() == start_index2d[k + 1] - start_index2d[k],
-               ExcInternalError());
+        DEAL_II_Assert(k <= 4, ExcNotImplemented());
+        DEAL_II_Assert(p.size() == start_index2d[k + 1] - start_index2d[k],
+                       ExcInternalError());
         for (unsigned int i = 0; i < p.size(); ++i)
           {
             p[i](0) = points2d[start_index2d[k] + i][0];
@@ -111,9 +112,9 @@ namespace internal
       void
       generate_unit_points(const unsigned int k, std::vector<Point<3>> &p)
       {
-        Assert(k <= 2, ExcNotImplemented());
-        Assert(p.size() == start_index3d[k + 1] - start_index3d[k],
-               ExcInternalError());
+        DEAL_II_Assert(k <= 2, ExcNotImplemented());
+        DEAL_II_Assert(p.size() == start_index3d[k + 1] - start_index3d[k],
+                       ExcInternalError());
         for (unsigned int i = 0; i < p.size(); ++i)
           {
             p[i](0) = points3d[start_index3d[k] + i][0];
@@ -142,8 +143,9 @@ FE_DGPMonomial<dim>::FE_DGPMonomial(const unsigned int degree)
         FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,
         std::vector<bool>(1, true)))
 {
-  Assert(this->poly_space.n() == this->dofs_per_cell, ExcInternalError());
-  Assert(this->poly_space.degree() == this->degree, ExcInternalError());
+  DEAL_II_Assert(this->poly_space.n() == this->dofs_per_cell,
+                 ExcInternalError());
+  DEAL_II_Assert(this->poly_space.degree() == this->degree, ExcInternalError());
 
   // DG doesn't have constraints, so
   // leave them empty
@@ -207,10 +209,11 @@ FE_DGPMonomial<dim>::get_interpolation_matrix(
       const unsigned int n = interpolation_matrix.n();
       (void)m;
       (void)n;
-      Assert(m == this->dofs_per_cell,
-             ExcDimensionMismatch(m, this->dofs_per_cell));
-      Assert(n == source_dgp_monomial->dofs_per_cell,
-             ExcDimensionMismatch(n, source_dgp_monomial->dofs_per_cell));
+      DEAL_II_Assert(m == this->dofs_per_cell,
+                     ExcDimensionMismatch(m, this->dofs_per_cell));
+      DEAL_II_Assert(n == source_dgp_monomial->dofs_per_cell,
+                     ExcDimensionMismatch(n,
+                                          source_dgp_monomial->dofs_per_cell));
 
       const unsigned int min_mn =
         interpolation_matrix.m() < interpolation_matrix.n() ?
@@ -248,7 +251,7 @@ template <int dim>
 void
 FE_DGPMonomial<dim>::initialize_restriction()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -285,15 +288,15 @@ FE_DGPMonomial<dim>::get_face_interpolation_matrix(
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  AssertThrow((x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
-                (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) !=
-                 nullptr),
-              typename FiniteElement<dim>::ExcInterpolationNotImplemented());
+  DEAL_II_AssertThrow(
+    (x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
+      (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) != nullptr),
+    typename FiniteElement<dim>::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -312,15 +315,15 @@ FE_DGPMonomial<dim>::get_subface_interpolation_matrix(
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  AssertThrow((x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
-                (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) !=
-                 nullptr),
-              typename FiniteElement<dim>::ExcInterpolationNotImplemented());
+  DEAL_II_AssertThrow(
+    (x_source_fe.get_name().find("FE_DGPMonomial<") == 0) ||
+      (dynamic_cast<const FE_DGPMonomial<dim> *>(&x_source_fe) != nullptr),
+    typename FiniteElement<dim>::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -345,7 +348,7 @@ FE_DGPMonomial<dim>::hp_vertex_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -363,7 +366,7 @@ FE_DGPMonomial<dim>::hp_line_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -381,7 +384,7 @@ FE_DGPMonomial<dim>::hp_quad_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -400,7 +403,7 @@ FE_DGPMonomial<dim>::compare_for_face_domination(
   if (dynamic_cast<const FE_DGPMonomial<dim> *>(&fe_other) != nullptr)
     return FiniteElementDomination::no_requirements;
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -465,7 +468,7 @@ template <int dim>
 std::size_t
 FE_DGPMonomial<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 

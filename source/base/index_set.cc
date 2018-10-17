@@ -43,9 +43,10 @@ IndexSet::IndexSet(const Epetra_Map &map)
   , index_space_size(1 + map.MaxAllGID64())
   , largest_range(numbers::invalid_unsigned_int)
 {
-  Assert(map.MinAllGID64() == 0,
-         ExcMessage("The Epetra_Map does not contain the global index 0, which "
-                    "means some entries are not present on any processor."));
+  DEAL_II_Assert(map.MinAllGID64() == 0,
+                 ExcMessage(
+                   "The Epetra_Map does not contain the global index 0, which "
+                   "means some entries are not present on any processor."));
 
   // For a contiguous map, we do not need to go through the whole data...
   if (map.LinearMap())
@@ -69,9 +70,10 @@ IndexSet::IndexSet(const Epetra_Map &map)
   , index_space_size(1 + map.MaxAllGID())
   , largest_range(numbers::invalid_unsigned_int)
 {
-  Assert(map.MinAllGID() == 0,
-         ExcMessage("The Epetra_Map does not contain the global index 0, which "
-                    "means some entries are not present on any processor."));
+  DEAL_II_Assert(map.MinAllGID() == 0,
+                 ExcMessage(
+                   "The Epetra_Map does not contain the global index 0, which "
+                   "means some entries are not present on any processor."));
 
   // For a contiguous map, we do not need to go through the whole data...
   if (map.LinearMap())
@@ -95,12 +97,12 @@ IndexSet::IndexSet(const Epetra_Map &map)
 void
 IndexSet::add_range(const size_type begin, const size_type end)
 {
-  Assert((begin < index_space_size) ||
-           ((begin == index_space_size) && (end == index_space_size)),
-         ExcIndexRangeType<size_type>(begin, 0, index_space_size));
-  Assert(end <= index_space_size,
-         ExcIndexRangeType<size_type>(end, 0, index_space_size + 1));
-  Assert(begin <= end, ExcIndexRangeType<size_type>(begin, 0, end));
+  DEAL_II_Assert((begin < index_space_size) ||
+                   ((begin == index_space_size) && (end == index_space_size)),
+                 ExcIndexRangeType<size_type>(begin, 0, index_space_size));
+  DEAL_II_Assert(end <= index_space_size,
+                 ExcIndexRangeType<size_type>(end, 0, index_space_size + 1));
+  DEAL_II_Assert(begin <= end, ExcIndexRangeType<size_type>(begin, 0, end));
 
   if (begin != end)
     {
@@ -167,7 +169,7 @@ IndexSet::do_compress() const
   size_type next_index = 0, largest_range_size = 0;
   for (std::vector<Range>::iterator i = ranges.begin(); i != ranges.end(); ++i)
     {
-      Assert(i->begin < i->end, ExcInternalError());
+      DEAL_II_Assert(i->begin < i->end, ExcInternalError());
 
       i->nth_index_in_set = next_index;
       next_index += (i->end - i->begin);
@@ -181,14 +183,14 @@ IndexSet::do_compress() const
 
   // check that next_index is correct. needs to be after the previous
   // statement because we otherwise will get into an endless loop
-  Assert(next_index == n_elements(), ExcInternalError());
+  DEAL_II_Assert(next_index == n_elements(), ExcInternalError());
 }
 
 
 
 IndexSet IndexSet::operator&(const IndexSet &is) const
 {
-  Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
+  DEAL_II_Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
 
   compress();
   is.compress();
@@ -208,9 +210,9 @@ IndexSet IndexSet::operator&(const IndexSet &is) const
       else
         {
           // the ranges must overlap somehow
-          Assert(((r1->begin <= r2->begin) && (r1->end > r2->begin)) ||
-                   ((r2->begin <= r1->begin) && (r2->end > r1->begin)),
-                 ExcInternalError());
+          DEAL_II_Assert(((r1->begin <= r2->begin) && (r1->end > r2->begin)) ||
+                           ((r2->begin <= r1->begin) && (r2->end > r1->begin)),
+                         ExcInternalError());
 
           // add the overlapping range to the result
           result.add_range(std::max(r1->begin, r2->begin),
@@ -235,9 +237,11 @@ IndexSet IndexSet::operator&(const IndexSet &is) const
 IndexSet
 IndexSet::get_view(const size_type begin, const size_type end) const
 {
-  Assert(begin <= end,
-         ExcMessage("End index needs to be larger or equal to begin index!"));
-  Assert(end <= size(), ExcMessage("Given range exceeds index set dimension"));
+  DEAL_II_Assert(begin <= end,
+                 ExcMessage(
+                   "End index needs to be larger or equal to begin index!"));
+  DEAL_II_Assert(end <= size(),
+                 ExcMessage("Given range exceeds index set dimension"));
 
   IndexSet                           result(end - begin);
   std::vector<Range>::const_iterator r1 = ranges.begin();
@@ -336,9 +340,10 @@ IndexSet::subtract_set(const IndexSet &other)
 IndexSet::size_type
 IndexSet::pop_back()
 {
-  Assert(is_empty() == false,
-         ExcMessage(
-           "pop_back() failed, because this IndexSet contains no entries."));
+  DEAL_II_Assert(
+    is_empty() == false,
+    ExcMessage(
+      "pop_back() failed, because this IndexSet contains no entries."));
 
   const size_type index = ranges.back().end - 1;
   --ranges.back().end;
@@ -354,9 +359,10 @@ IndexSet::pop_back()
 IndexSet::size_type
 IndexSet::pop_front()
 {
-  Assert(is_empty() == false,
-         ExcMessage(
-           "pop_front() failed, because this IndexSet contains no entries."));
+  DEAL_II_Assert(
+    is_empty() == false,
+    ExcMessage(
+      "pop_front() failed, because this IndexSet contains no entries."));
 
   const size_type index = ranges.front().begin;
   ++ranges.front().begin;
@@ -379,11 +385,11 @@ IndexSet::add_indices(const IndexSet &other, const unsigned int offset)
   if ((this == &other) && (offset == 0))
     return;
 
-  Assert(other.ranges.size() == 0 ||
-           other.ranges.back().end - 1 < index_space_size,
-         ExcIndexRangeType<size_type>(other.ranges.back().end - 1,
-                                      0,
-                                      index_space_size));
+  DEAL_II_Assert(other.ranges.size() == 0 ||
+                   other.ranges.back().end - 1 < index_space_size,
+                 ExcIndexRangeType<size_type>(other.ranges.back().end - 1,
+                                              0,
+                                              index_space_size));
 
   compress();
   other.compress();
@@ -446,7 +452,7 @@ IndexSet::write(std::ostream &out) const
 void
 IndexSet::read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   size_type    s;
   unsigned int n_ranges;
@@ -456,7 +462,7 @@ IndexSet::read(std::istream &in)
   set_size(s);
   for (unsigned int i = 0; i < n_ranges; ++i)
     {
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
 
       size_type b, e;
       in >> b >> e;
@@ -468,7 +474,7 @@ IndexSet::read(std::istream &in)
 void
 IndexSet::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
   out.write(reinterpret_cast<const char *>(&index_space_size),
             sizeof(index_space_size));
   size_t n_ranges = ranges.size();
@@ -476,7 +482,7 @@ IndexSet::block_write(std::ostream &out) const
   if (ranges.empty() == false)
     out.write(reinterpret_cast<const char *>(&*ranges.begin()),
               ranges.size() * sizeof(Range));
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 void
@@ -512,7 +518,7 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
     for (size_type i = it->begin; i < it->end; ++i)
       indices.push_back(i);
 
-  Assert(indices.size() == n_elements(), ExcInternalError());
+  DEAL_II_Assert(indices.size() == n_elements(), ExcInternalError());
 }
 
 
@@ -531,22 +537,23 @@ IndexSet::make_trilinos_map(const MPI_Comm &communicator,
     {
       const size_type n_global_elements =
         Utilities::MPI::sum(n_elements(), communicator);
-      Assert(n_global_elements == size(),
-             ExcMessage("You are trying to create an Epetra_Map object "
-                        "that partitions elements of an index set "
-                        "between processors. However, the union of the "
-                        "index sets on different processors does not "
-                        "contain all indices exactly once: the sum of "
-                        "the number of entries the various processors "
-                        "want to store locally is " +
-                        Utilities::to_string(n_global_elements) +
-                        " whereas the total size of the object to be "
-                        "allocated is " +
-                        Utilities::to_string(size()) +
-                        ". In other words, there are "
-                        "either indices that are not spoken for "
-                        "by any processor, or there are indices that are "
-                        "claimed by multiple processors."));
+      DEAL_II_Assert(n_global_elements == size(),
+                     ExcMessage(
+                       "You are trying to create an Epetra_Map object "
+                       "that partitions elements of an index set "
+                       "between processors. However, the union of the "
+                       "index sets on different processors does not "
+                       "contain all indices exactly once: the sum of "
+                       "the number of entries the various processors "
+                       "want to store locally is " +
+                       Utilities::to_string(n_global_elements) +
+                       " whereas the total size of the object to be "
+                       "allocated is " +
+                       Utilities::to_string(size()) +
+                       ". In other words, there are "
+                       "either indices that are not spoken for "
+                       "by any processor, or there are indices that are "
+                       "claimed by multiple processors."));
     }
 #  endif
 
@@ -642,7 +649,7 @@ IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
   // now broadcast the result
   int is_ascending = is_globally_ascending ? 1 : 0;
   int ierr         = MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 
   return (is_ascending == 1);
 #else

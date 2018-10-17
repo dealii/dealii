@@ -57,7 +57,7 @@ check_parallelepiped(bool colorize, bool log)
         break;
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
   Triangulation<dim> triangulation;

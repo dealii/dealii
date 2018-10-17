@@ -49,7 +49,7 @@ main()
     for (unsigned int j = 0; j < N; ++j)
       {
         deallog << i << ' ' << j << ' ' << f(i, j) << std::endl;
-        AssertThrow(f(i, j) == sm(i, j), ExcInternalError());
+        DEAL_II_AssertThrow(f(i, j) == sm(i, j), ExcInternalError());
       }
 
   deallog << "OK" << std::endl;

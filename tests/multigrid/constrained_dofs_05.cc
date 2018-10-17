@@ -31,7 +31,7 @@ template <typename FaceType>
 void
 print_face(const FaceType &face, const unsigned int level)
 {
-  AssertThrow(
+  DEAL_II_AssertThrow(
     face->get_fe(0).n_dofs_per_face() > 0,
     ExcMessage(
       "Please use a finite element with at least 1 DoF for this test"));

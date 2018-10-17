@@ -64,8 +64,8 @@ main(void)
 
   deallog << "Error (function 1): " << error_func_1 << std::endl;
   deallog << "Error (function 2): " << error_func_2 << std::endl;
-  Assert(error_func_1 < tol, ExcMessage("Should be zero!"));
-  Assert(error_func_2 < tol, ExcMessage("Should be zero!"));
+  DEAL_II_Assert(error_func_1 < tol, ExcMessage("Should be zero!"));
+  DEAL_II_Assert(error_func_2 < tol, ExcMessage("Should be zero!"));
 
   // --- Gradient ---
 
@@ -77,7 +77,7 @@ main(void)
     err_grad += std::abs(g[i] - yp / xp[i]);
 
   deallog << "Error (gradient): " << err_grad << std::endl;
-  Assert(err_grad < tol, ExcMessage("Should be zero!"));
+  DEAL_II_Assert(err_grad < tol, ExcMessage("Should be zero!"));
 
   // --- Hessian ---
 
@@ -94,7 +94,7 @@ main(void)
         error_hess += std::abs(H[i][j] - g[i] / xp[j]);
 
   deallog << "Error (hessian): " << error_hess << std::endl;
-  Assert(error_hess < tol, ExcMessage("Should be zero!"));
+  DEAL_II_Assert(error_hess < tol, ExcMessage("Should be zero!"));
 
   // -- Cleanup ---
 

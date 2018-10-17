@@ -45,9 +45,10 @@ FE_Q_iso_Q1<dim, spacedim>::FE_Q_iso_Q1(const unsigned int subdivisions)
                              FiniteElementData<dim>::H1),
       std::vector<bool>(1, false))
 {
-  Assert(subdivisions > 0,
-         ExcMessage("This element can only be used with a positive number of "
-                    "subelements"));
+  DEAL_II_Assert(subdivisions > 0,
+                 ExcMessage(
+                   "This element can only be used with a positive number of "
+                   "subelements"));
 
   QTrapez<1>   trapez;
   QIterated<1> points(trapez, subdivisions);
@@ -80,14 +81,14 @@ FE_Q_iso_Q1<dim, spacedim>::
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const
 {
-  AssertDimension(support_point_values.size(),
-                  this->get_unit_support_points().size());
-  AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  DEAL_II_AssertDimension(support_point_values.size(),
+                          this->get_unit_support_points().size());
+  DEAL_II_AssertDimension(support_point_values.size(), nodal_values.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell, nodal_values.size());
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      AssertDimension(support_point_values[i].size(), 1);
+      DEAL_II_AssertDimension(support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
     }
@@ -142,7 +143,7 @@ FE_Q_iso_Q1<dim, spacedim>::compare_for_face_domination(
         }
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 

@@ -54,7 +54,7 @@ test()
             << "Particle reference location: "
             << particle.get_reference_location() << std::endl
             << "Particle index: " << particle.get_id() << std::endl;
-    Assert(!particle.has_properties(), ExcInternalError());
+    DEAL_II_Assert(!particle.has_properties(), ExcInternalError());
 
     std::vector<char> data(particle.serialized_size_in_bytes());
     void *            write_pointer = static_cast<void *>(&data.front());
@@ -69,7 +69,7 @@ test()
             << "Copy particle reference location: "
             << new_particle.get_reference_location() << std::endl
             << "Copy particle index: " << new_particle.get_id() << std::endl;
-    Assert(!new_particle.has_properties(), ExcInternalError());
+    DEAL_II_Assert(!new_particle.has_properties(), ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

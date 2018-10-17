@@ -1256,14 +1256,14 @@ PreconditionIdentity::Tvmult_add(VectorType &dst, const VectorType &src) const
 inline PreconditionIdentity::size_type
 PreconditionIdentity::m() const
 {
-  Assert(n_rows != 0, ExcNotInitialized());
+  DEAL_II_Assert(n_rows != 0, ExcNotInitialized());
   return n_rows;
 }
 
 inline PreconditionIdentity::size_type
 PreconditionIdentity::n() const
 {
-  Assert(n_columns != 0, ExcNotInitialized());
+  DEAL_II_Assert(n_columns != 0, ExcNotInitialized());
   return n_columns;
 }
 
@@ -1359,14 +1359,14 @@ PreconditionRichardson::Tvmult_add(VectorType &dst, const VectorType &src) const
 inline PreconditionRichardson::size_type
 PreconditionRichardson::m() const
 {
-  Assert(n_rows != 0, ExcNotInitialized());
+  DEAL_II_Assert(n_rows != 0, ExcNotInitialized());
   return n_rows;
 }
 
 inline PreconditionRichardson::size_type
 PreconditionRichardson::n() const
 {
-  Assert(n_columns != 0, ExcNotInitialized());
+  DEAL_II_Assert(n_columns != 0, ExcNotInitialized());
   return n_columns;
 }
 
@@ -1393,7 +1393,7 @@ template <typename MatrixType>
 inline typename PreconditionRelaxation<MatrixType>::size_type
 PreconditionRelaxation<MatrixType>::m() const
 {
-  Assert(A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(A != nullptr, ExcNotInitialized());
   return A->m();
 }
 
@@ -1401,7 +1401,7 @@ template <typename MatrixType>
 inline typename PreconditionRelaxation<MatrixType>::size_type
 PreconditionRelaxation<MatrixType>::n() const
 {
-  Assert(A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(A != nullptr, ExcNotInitialized());
   return A->n();
 }
 
@@ -1418,7 +1418,7 @@ PreconditionJacobi<MatrixType>::vmult(VectorType &      dst,
                  typename VectorType::size_type>::value,
     "PreconditionJacobi and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_Jacobi(dst, src, this->relaxation);
 }
 
@@ -1435,7 +1435,7 @@ PreconditionJacobi<MatrixType>::Tvmult(VectorType &      dst,
                  typename VectorType::size_type>::value,
     "PreconditionJacobi and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_Jacobi(dst, src, this->relaxation);
 }
 
@@ -1452,7 +1452,7 @@ PreconditionJacobi<MatrixType>::step(VectorType &      dst,
                  typename VectorType::size_type>::value,
     "PreconditionJacobi and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->Jacobi_step(dst, src, this->relaxation);
 }
 
@@ -1485,7 +1485,7 @@ PreconditionSOR<MatrixType>::vmult(VectorType &dst, const VectorType &src) const
                              typename VectorType::size_type>::value,
                 "PreconditionSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_SOR(dst, src, this->relaxation);
 }
 
@@ -1501,7 +1501,7 @@ PreconditionSOR<MatrixType>::Tvmult(VectorType &      dst,
                              typename VectorType::size_type>::value,
                 "PreconditionSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_TSOR(dst, src, this->relaxation);
 }
 
@@ -1516,7 +1516,7 @@ PreconditionSOR<MatrixType>::step(VectorType &dst, const VectorType &src) const
                              typename VectorType::size_type>::value,
                 "PreconditionSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->SOR_step(dst, src, this->relaxation);
 }
 
@@ -1531,7 +1531,7 @@ PreconditionSOR<MatrixType>::Tstep(VectorType &dst, const VectorType &src) const
                              typename VectorType::size_type>::value,
                 "PreconditionSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->TSOR_step(dst, src, this->relaxation);
 }
 
@@ -1586,7 +1586,7 @@ PreconditionSSOR<MatrixType>::vmult(VectorType &      dst,
                  typename VectorType::size_type>::value,
     "PreconditionSSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_SSOR(dst, src, this->relaxation, pos_right_of_diagonal);
 }
 
@@ -1603,7 +1603,7 @@ PreconditionSSOR<MatrixType>::Tvmult(VectorType &      dst,
                  typename VectorType::size_type>::value,
     "PreconditionSSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->precondition_SSOR(dst, src, this->relaxation, pos_right_of_diagonal);
 }
 
@@ -1619,7 +1619,7 @@ PreconditionSSOR<MatrixType>::step(VectorType &dst, const VectorType &src) const
                  typename VectorType::size_type>::value,
     "PreconditionSSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   this->A->SSOR_step(dst, src, this->relaxation);
 }
 
@@ -1680,7 +1680,7 @@ PreconditionPSOR<MatrixType>::vmult(VectorType &      dst,
                  typename VectorType::size_type>::value,
     "PreconditionPSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   dst = src;
   this->A->PSOR(dst, *permutation, *inverse_permutation, this->relaxation);
 }
@@ -1698,7 +1698,7 @@ PreconditionPSOR<MatrixType>::Tvmult(VectorType &      dst,
                  typename VectorType::size_type>::value,
     "PreconditionPSOR and VectorType must have the same size_type.");
 
-  Assert(this->A != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(this->A != nullptr, ExcNotInitialized());
   dst = src;
   this->A->TPSOR(dst, *permutation, *inverse_permutation, this->relaxation);
 }
@@ -1952,7 +1952,7 @@ namespace internal
     {
       (void)matrix;
       (void)preconditioner;
-      AssertThrow(preconditioner.get() != nullptr, ExcNotInitialized());
+      DEAL_II_AssertThrow(preconditioner.get() != nullptr, ExcNotInitialized());
     }
 
     template <typename MatrixType, typename VectorType>
@@ -1967,7 +1967,7 @@ namespace internal
           if (preconditioner.get() == nullptr)
             preconditioner = std::make_shared<DiagonalMatrix<VectorType>>();
 
-          Assert(
+          DEAL_II_Assert(
             preconditioner->m() == 0,
             ExcMessage(
               "Preconditioner appears to be initialized but not sized correctly"));
@@ -2126,8 +2126,8 @@ inline void
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   estimate_eigenvalues(const VectorType &src) const
 {
-  Assert(eigenvalues_are_initialized == false, ExcInternalError());
-  Assert(data.preconditioner.get() != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(eigenvalues_are_initialized == false, ExcInternalError());
+  DEAL_II_Assert(data.preconditioner.get() != nullptr, ExcNotInitialized());
 
   update1.reinit(src);
   update2.reinit(src, true);
@@ -2138,9 +2138,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   double max_eigenvalue, min_eigenvalue;
   if (data.eig_cg_n_iterations > 0)
     {
-      Assert(data.eig_cg_n_iterations > 2,
-             ExcMessage(
-               "Need to set at least two iterations to find eigenvalues."));
+      DEAL_II_Assert(
+        data.eig_cg_n_iterations > 2,
+        ExcMessage("Need to set at least two iterations to find eigenvalues."));
 
       // set a very strict tolerance to force at least two iterations
       ReductionControl control(
@@ -2414,7 +2414,7 @@ inline typename PreconditionChebyshev<MatrixType,
                                       PreconditionerType>::size_type
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::m() const
 {
-  Assert(matrix_ptr != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(matrix_ptr != nullptr, ExcNotInitialized());
   return matrix_ptr->m();
 }
 
@@ -2426,7 +2426,7 @@ inline typename PreconditionChebyshev<MatrixType,
                                       PreconditionerType>::size_type
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::n() const
 {
-  Assert(matrix_ptr != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(matrix_ptr != nullptr, ExcNotInitialized());
   return matrix_ptr->n();
 }
 

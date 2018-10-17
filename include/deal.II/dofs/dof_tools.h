@@ -2598,33 +2598,33 @@ namespace DoFTools
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcFiniteElementsDontMatch);
+  DEAL_II_DeclException0(ExcFiniteElementsDontMatch);
   /**
    * @todo Write description
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcGridNotCoarser);
+  DEAL_II_DeclException0(ExcGridNotCoarser);
   /**
    * @todo Write description
    *
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0(ExcGridsDontMatch);
+  DEAL_II_DeclException0(ExcGridsDontMatch);
   /**
    * The ::DoFHandler or hp::DoFHandler was not initialized with a finite
    * element. Please call DoFHandler::distribute_dofs() etc. first.
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcNoFESelected);
+  DEAL_II_DeclException0(ExcNoFESelected);
   /**
    * @todo Write description
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcInvalidBoundaryIndicator);
+  DEAL_II_DeclException0(ExcInvalidBoundaryIndicator);
   /**
    * @}
    */

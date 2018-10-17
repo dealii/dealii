@@ -125,33 +125,35 @@ test()
 
       {
         Point<dim> p = cell->center();
-        Assert(std::abs(field_function.value(p) - (p[0] + 2.)) < 1e-10,
-               ExcInternalError());
+        DEAL_II_Assert(std::abs(field_function.value(p) - (p[0] + 2.)) < 1e-10,
+                       ExcInternalError());
 
         Tensor<1, dim> gradient = field_function.gradient(p);
         Tensor<1, dim> exact_gradient;
         exact_gradient[0] = 1.0;
-        Assert((gradient - exact_gradient).norm() < 1e-10, ExcInternalError());
+        DEAL_II_Assert((gradient - exact_gradient).norm() < 1e-10,
+                       ExcInternalError());
 
-        Assert(std::abs(field_function.laplacian(p)) < 1e-10,
-               ExcInternalError());
+        DEAL_II_Assert(std::abs(field_function.laplacian(p)) < 1e-10,
+                       ExcInternalError());
       }
 
       if (cell->is_locally_owned())
         {
           // more evil: use a corner so we can end up in a different cell
           Point<dim> p = cell->vertex(0);
-          Assert(std::abs(field_function.value(p) - (p[0] + 2.)) < 1e-10,
-                 ExcInternalError());
+          DEAL_II_Assert(std::abs(field_function.value(p) - (p[0] + 2.)) <
+                           1e-10,
+                         ExcInternalError());
 
           Tensor<1, dim> gradient = field_function.gradient(p);
           Tensor<1, dim> exact_gradient;
           exact_gradient[0] = 1.0;
-          Assert((gradient - exact_gradient).norm() < 1e-10,
-                 ExcInternalError());
+          DEAL_II_Assert((gradient - exact_gradient).norm() < 1e-10,
+                         ExcInternalError());
 
-          Assert(std::abs(field_function.laplacian(p)) < 1e-10,
-                 ExcInternalError());
+          DEAL_II_Assert(std::abs(field_function.laplacian(p)) < 1e-10,
+                         ExcInternalError());
         }
     }
 

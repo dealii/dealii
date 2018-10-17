@@ -87,7 +87,7 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
 
               this->unit_face_support_points[k++] = p;
             }
-      AssertDimension(k, this->unit_face_support_points.size());
+      DEAL_II_AssertDimension(k, this->unit_face_support_points.size());
     }
 
   // initialize unit support points (this makes it possible to assign initial
@@ -164,11 +164,12 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
 {
   // this function is similar to the respective method in FE_Q
 
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.n() == this->dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.n(),
+                                      this->dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      x_source_fe.dofs_per_face));
 
   // see if source is a FaceQ element
   if (const FE_FaceQ<dim, spacedim> *source_fe =
@@ -179,7 +180,7 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
       // will work also if this assertion is not satisfied. But the matrices
       // produced in that case might lead to problems in the hp procedures,
       // which use this method.
-      Assert(
+      DEAL_II_Assert(
         this->dofs_per_face <= source_fe->dofs_per_face,
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
@@ -228,7 +229,7 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
           for (unsigned int i = 0; i < this->dofs_per_face; ++i)
             sum += interpolation_matrix(j, i);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+          DEAL_II_Assert(std::fabs(sum - 1) < eps, ExcInternalError());
         }
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
@@ -236,7 +237,7 @@ FE_FaceQ<dim, spacedim>::get_subface_interpolation_matrix(
       // nothing to do here, the FE_Nothing has no degrees of freedom anyway
     }
   else
-    AssertThrow(
+    DEAL_II_AssertThrow(
       false,
       (typename FiniteElement<dim,
                               spacedim>::ExcInterpolationNotImplemented()));
@@ -293,7 +294,7 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_FaceQ<dim, spacedim>::hp_line_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
-  Assert(dim >= 2, ExcInternalError());
+  DEAL_II_Assert(dim >= 2, ExcInternalError());
 
   // this element is continuous only for the highest dimensional bounding object
   if (dim > 2)
@@ -349,7 +350,7 @@ FE_FaceQ<dim, spacedim>::hp_line_dof_identities(
         }
       else
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return std::vector<std::pair<unsigned int, unsigned int>>();
         }
     }
@@ -362,7 +363,7 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_FaceQ<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
-  Assert(dim >= 3, ExcInternalError());
+  DEAL_II_Assert(dim >= 3, ExcInternalError());
 
   // this element is continuous only for the highest dimensional bounding object
   if (dim > 3)
@@ -426,7 +427,7 @@ FE_FaceQ<dim, spacedim>::hp_quad_dof_identities(
         }
       else
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return std::vector<std::pair<unsigned int, unsigned int>>();
         }
     }
@@ -465,7 +466,7 @@ FE_FaceQ<dim, spacedim>::compare_for_face_domination(
         }
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -488,14 +489,14 @@ FE_FaceQ<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  AssertDimension(support_point_values.size(),
-                  this->get_unit_support_points().size());
-  AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  DEAL_II_AssertDimension(support_point_values.size(),
+                          this->get_unit_support_points().size());
+  DEAL_II_AssertDimension(support_point_values.size(), nodal_values.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell, nodal_values.size());
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      AssertDimension(support_point_values[i].size(), 1);
+      DEAL_II_AssertDimension(support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
     }
@@ -569,11 +570,12 @@ FE_FaceQ<1, spacedim>::get_subface_interpolation_matrix(
   FullMatrix<double> &interpolation_matrix) const
 {
   (void)x_source_fe;
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.n() == this->dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.n(),
+                                      this->dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      x_source_fe.dofs_per_face));
   interpolation_matrix(0, 0) = 1.;
 }
 
@@ -584,7 +586,7 @@ bool
 FE_FaceQ<1, spacedim>::has_support_on_face(const unsigned int shape_index,
                                            const unsigned int face_index) const
 {
-  AssertIndexRange(shape_index, 2);
+  DEAL_II_AssertIndexRange(shape_index, 2);
   return (face_index == shape_index);
 }
 
@@ -746,7 +748,8 @@ FE_FaceQ<1, spacedim>::fill_fe_subface_values(
                                                                      spacedim>
     &) const
 {
-  Assert(false, ExcMessage("There are no sub-face values to fill in 1D!"));
+  DEAL_II_Assert(false,
+                 ExcMessage("There are no sub-face values to fill in 1D!"));
 }
 
 
@@ -859,7 +862,7 @@ FE_FaceP<dim, spacedim>::compare_for_face_domination(
         }
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -887,11 +890,12 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
 {
   // this function is similar to the respective method in FE_Q
 
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.n() == this->dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.n(),
+                                      this->dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      x_source_fe.dofs_per_face));
 
   // see if source is a FaceP element
   if (const FE_FaceP<dim, spacedim> *source_fe =
@@ -902,7 +906,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
       // will work also if this assertion is not satisfied. But the matrices
       // produced in that case might lead to problems in the hp procedures,
       // which use this method.
-      Assert(
+      DEAL_II_Assert(
         this->dofs_per_face <= source_fe->dofs_per_face,
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
@@ -951,7 +955,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
             }
           const double result = H.least_squares(v_out, v_in);
           (void)result;
-          Assert(result < 1e-12, FETools::ExcLeastSquaresError(result));
+          DEAL_II_Assert(result < 1e-12, FETools::ExcLeastSquaresError(result));
 
           for (unsigned int j = 0; j < source_fe->dofs_per_face; ++j)
             {
@@ -974,7 +978,7 @@ FE_FaceP<dim, spacedim>::get_subface_interpolation_matrix(
       // nothing to do here, the FE_Nothing has no degrees of freedom anyway
     }
   else
-    AssertThrow(
+    DEAL_II_AssertThrow(
       false,
       (typename FiniteElement<dim,
                               spacedim>::ExcInterpolationNotImplemented()));

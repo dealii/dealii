@@ -95,8 +95,8 @@ test(Utilities::CUDA::Handle &cuda_handle)
 
       // Check the result
       for (unsigned int i = 0; i < size; ++i)
-        AssertThrow(std::abs(solution_host[i] - sol_ref[i]) < 1e-12,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(std::abs(solution_host[i] - sol_ref[i]) < 1e-12,
+                            ExcInternalError());
       deallog << solver_type << std::endl;
     }
 }

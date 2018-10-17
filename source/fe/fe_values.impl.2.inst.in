@@ -21,6 +21,6 @@ for (VEC : VECTOR_TYPES)
     FEValuesBase<dim, spacedim>::TriaCellIterator::get_interpolated_dof_values(
       const VEC &, Vector<VEC::value_type> &) const
     { //
-      Assert(false, ExcMessage(message_string));
+      DEAL_II_Assert(false, ExcMessage(message_string));
     \}
   }

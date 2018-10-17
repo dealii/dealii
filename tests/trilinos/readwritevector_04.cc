@@ -35,7 +35,7 @@ test()
   else if (rank == 1)
     is.add_range(4, 8);
   else
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
 
   is.compress();
 

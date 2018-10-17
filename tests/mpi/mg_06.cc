@@ -140,16 +140,17 @@ test()
                     // deallog << cell->neighbor(f)->level_subdomain_id() <<
                     // std::endl;
                     // is cell level-artificial?
-                    Assert(cell->neighbor(f)->level_subdomain_id() < 100,
-                           ExcInternalError());
+                    DEAL_II_Assert(cell->neighbor(f)->level_subdomain_id() <
+                                     100,
+                                   ExcInternalError());
 
                     std::vector<types::global_dof_index> dofs(
                       fe.n_dofs_per_cell());
                     cell->neighbor(f)->get_mg_dof_indices(dofs);
                     for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
                       {
-                        Assert(dofs[i] != numbers::invalid_dof_index,
-                               ExcInternalError());
+                        DEAL_II_Assert(dofs[i] != numbers::invalid_dof_index,
+                                       ExcInternalError());
                       }
                   }
               }

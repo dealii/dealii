@@ -297,23 +297,24 @@ namespace DerivativeApproximation
   /**
    * Exception
    */
-  DeclException2(ExcVectorLengthVsNActiveCells,
-                 int,
-                 int,
-                 << "The output vector needs to have a size equal "
-                    "to the number of active cells of your triangulation "
-                    "but has length "
-                 << arg1 << "There are " << arg2
-                 << " active cells in your triangulation.");
+  DEAL_II_DeclException2(
+    ExcVectorLengthVsNActiveCells,
+    int,
+    int,
+    << "The output vector needs to have a size equal "
+       "to the number of active cells of your triangulation "
+       "but has length "
+    << arg1 << "There are " << arg2 << " active cells in your triangulation.");
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcInsufficientDirections,
-                   "We have encountered a cell on which the number of linearly "
-                   "independent directions that span the matrix Y (discussed "
-                   "in the documentation of the DerivativeApproximation "
-                   "class) is not equal to dim. The matrix Y then is "
-                   "rank deficient and can not be inverted.");
+  DEAL_II_DeclExceptionMsg(
+    ExcInsufficientDirections,
+    "We have encountered a cell on which the number of linearly "
+    "independent directions that span the matrix Y (discussed "
+    "in the documentation of the DerivativeApproximation "
+    "class) is not equal to dim. The matrix Y then is "
+    "rank deficient and can not be inverted.");
 } // namespace DerivativeApproximation
 
 

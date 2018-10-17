@@ -48,6 +48,6 @@ main()
   A.mTmult(C, B);
 
   D.add(-1, C);
-  AssertThrow(D.frobenius_norm() < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(D.frobenius_norm() < 1e-15, ExcInternalError());
   deallog << "OK" << std::endl;
 }

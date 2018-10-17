@@ -288,8 +288,9 @@ inline SparseMatrixEZ<Number> &
 BlockSparseMatrixEZ<Number>::block(const unsigned int row,
                                    const unsigned int column)
 {
-  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(column < n_block_cols(), ExcIndexRange(column, 0, n_block_cols()));
+  DEAL_II_Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
+  DEAL_II_Assert(column < n_block_cols(),
+                 ExcIndexRange(column, 0, n_block_cols()));
 
   return blocks[row][column];
 }
@@ -301,8 +302,9 @@ inline const SparseMatrixEZ<Number> &
 BlockSparseMatrixEZ<Number>::block(const unsigned int row,
                                    const unsigned int column) const
 {
-  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(column < n_block_cols(), ExcIndexRange(column, 0, n_block_cols()));
+  DEAL_II_Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
+  DEAL_II_Assert(column < n_block_cols(),
+                 ExcIndexRange(column, 0, n_block_cols()));
 
   return blocks[row][column];
 }
@@ -333,7 +335,7 @@ BlockSparseMatrixEZ<Number>::set(const size_type i,
                                  const size_type j,
                                  const Number    value)
 {
-  AssertIsFinite(value);
+  DEAL_II_AssertIsFinite(value);
 
   const std::pair<size_type, size_type> row_index =
                                           row_indices.global_to_local(i),
@@ -351,7 +353,7 @@ BlockSparseMatrixEZ<Number>::add(const size_type i,
                                  const size_type j,
                                  const Number    value)
 {
-  AssertIsFinite(value);
+  DEAL_II_AssertIsFinite(value);
 
   const std::pair<unsigned int, size_type> row_index =
                                              row_indices.global_to_local(i),
@@ -368,10 +370,10 @@ void
 BlockSparseMatrixEZ<Number>::vmult(BlockVector<somenumber> &      dst,
                                    const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+  DEAL_II_Assert(dst.n_blocks() == n_block_rows(),
+                 ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+  DEAL_II_Assert(src.n_blocks() == n_block_cols(),
+                 ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   dst = 0.;
 
@@ -388,10 +390,10 @@ void
 BlockSparseMatrixEZ<Number>::vmult_add(BlockVector<somenumber> &      dst,
                                        const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+  DEAL_II_Assert(dst.n_blocks() == n_block_rows(),
+                 ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+  DEAL_II_Assert(src.n_blocks() == n_block_cols(),
+                 ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)
     for (unsigned int col = 0; col < n_block_cols(); ++col)
@@ -406,10 +408,10 @@ void
 BlockSparseMatrixEZ<Number>::Tvmult(BlockVector<somenumber> &      dst,
                                     const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
+  DEAL_II_Assert(dst.n_blocks() == n_block_cols(),
+                 ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
+  DEAL_II_Assert(src.n_blocks() == n_block_rows(),
+                 ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   dst = 0.;
 
@@ -427,10 +429,10 @@ BlockSparseMatrixEZ<Number>::Tvmult_add(
   BlockVector<somenumber> &      dst,
   const BlockVector<somenumber> &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
+  DEAL_II_Assert(dst.n_blocks() == n_block_cols(),
+                 ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
+  DEAL_II_Assert(src.n_blocks() == n_block_rows(),
+                 ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   for (unsigned int row = 0; row < n_block_rows(); ++row)
     for (unsigned int col = 0; col < n_block_cols(); ++col)

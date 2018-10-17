@@ -314,23 +314,25 @@ public:
   /**
    * Exception
    */
-  DeclException4(ExcIncompatibleRowNumbers,
-                 int,
-                 int,
-                 int,
-                 int,
-                 << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
-                 << ',' << arg4 << "] have differing row numbers.");
+  DEAL_II_DeclException4(ExcIncompatibleRowNumbers,
+                         int,
+                         int,
+                         int,
+                         int,
+                         << "The blocks [" << arg1 << ',' << arg2 << "] and ["
+                         << arg3 << ',' << arg4
+                         << "] have differing row numbers.");
   /**
    * Exception
    */
-  DeclException4(ExcIncompatibleColNumbers,
-                 int,
-                 int,
-                 int,
-                 int,
-                 << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
-                 << ',' << arg4 << "] have differing column numbers.");
+  DEAL_II_DeclException4(ExcIncompatibleColNumbers,
+                         int,
+                         int,
+                         int,
+                         int,
+                         << "The blocks [" << arg1 << ',' << arg2 << "] and ["
+                         << arg3 << ',' << arg4
+                         << "] have differing column numbers.");
   //@}
 
 protected:
@@ -767,8 +769,8 @@ inline SparsityPatternType &
 BlockSparsityPatternBase<SparsityPatternType>::block(const size_type row,
                                                      const size_type column)
 {
-  Assert(row < rows, ExcIndexRange(row, 0, rows));
-  Assert(column < columns, ExcIndexRange(column, 0, columns));
+  DEAL_II_Assert(row < rows, ExcIndexRange(row, 0, rows));
+  DEAL_II_Assert(column < columns, ExcIndexRange(column, 0, columns));
   return *sub_objects[row][column];
 }
 
@@ -780,8 +782,8 @@ BlockSparsityPatternBase<SparsityPatternType>::block(
   const size_type row,
   const size_type column) const
 {
-  Assert(row < rows, ExcIndexRange(row, 0, rows));
-  Assert(column < columns, ExcIndexRange(column, 0, columns));
+  DEAL_II_Assert(row < rows, ExcIndexRange(row, 0, rows));
+  DEAL_II_Assert(column < columns, ExcIndexRange(column, 0, columns));
   return *sub_objects[row][column];
 }
 
@@ -887,7 +889,7 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
   size_type length = 0;
   for (size_type i = 0; i < this->n_block_cols(); ++i)
     length += counter_within_block[i];
-  Assert(length == n_cols, ExcInternalError());
+  DEAL_II_Assert(length == n_cols, ExcInternalError());
 #endif
 
   // Now we found out about where the
@@ -973,7 +975,8 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
   const std::pair<size_type, size_type> row_index =
     row_indices.global_to_local(row);
 
-  Assert(index < row_length(row), ExcIndexRange(index, 0, row_length(row)));
+  DEAL_II_Assert(index < row_length(row),
+                 ExcIndexRange(index, 0, row_length(row)));
 
   size_type c             = 0;
   size_type block_columns = 0; // sum of n_cols for all blocks to the left
@@ -989,7 +992,7 @@ BlockDynamicSparsityPattern::column_number(const size_type    row,
       block_columns += sub_objects[row_index.first][b]->n_cols();
     }
 
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
   return 0;
 }
 

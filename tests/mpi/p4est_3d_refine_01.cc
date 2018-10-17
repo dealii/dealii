@@ -99,7 +99,7 @@ test()
 
 
 
-          Assert(index == tr.n_active_cells(), ExcInternalError());
+          DEAL_II_Assert(index == tr.n_active_cells(), ExcInternalError());
           tr.execute_coarsening_and_refinement();
 
           unsigned int checksum = tr.get_checksum();

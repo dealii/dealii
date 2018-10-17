@@ -38,7 +38,7 @@ test(PETScWrappers::VectorBase &v, PETScWrappers::MPI::Vector &w)
     w(k) = v(k);
 
   // check that they're equal
-  AssertThrow(v == w, ExcInternalError());
+  DEAL_II_AssertThrow(v == w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -54,7 +54,7 @@ main(int argc, char **argv)
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       Vec                              vpetsc;
       int ierr = VecCreateSeq(PETSC_COMM_SELF, 100, &vpetsc);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
       {
         PETScWrappers::VectorBase  v(vpetsc);
         PETScWrappers::MPI::Vector w(PETSC_COMM_SELF, 100, 100);
@@ -67,7 +67,7 @@ main(int argc, char **argv)
       ierr = VecDestroy(&vpetsc);
 #endif
 
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
   catch (std::exception &exc)
     {

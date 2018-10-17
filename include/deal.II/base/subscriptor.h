@@ -97,7 +97,7 @@ public:
   /**
    * Move assignment operator.
    *
-   * Asserts that the counter for the moved object is zero.
+   * DEAL_II_Asserts that the counter for the moved object is zero.
    */
   Subscriptor &
   operator=(Subscriptor &&) noexcept;
@@ -147,29 +147,30 @@ public:
   /**
    * Exception: Object may not be deleted, since it is used.
    */
-  DeclException3(ExcInUse,
-                 int,
-                 std::string,
-                 std::string,
-                 << "Object of class " << arg2 << " is still used by " << arg1
-                 << " other objects."
-                 << "\n\n"
-                 << "(Additional information: " << arg3 << ")\n\n"
-                 << "See the entry in the Frequently Asked Questions of "
-                 << "deal.II (linked to from http://www.dealii.org/) for "
-                 << "a lot more information on what this error means and "
-                 << "how to fix programs in which it happens.");
+  DEAL_II_DeclException3(
+    ExcInUse,
+    int,
+    std::string,
+    std::string,
+    << "Object of class " << arg2 << " is still used by " << arg1
+    << " other objects."
+    << "\n\n"
+    << "(Additional information: " << arg3 << ")\n\n"
+    << "See the entry in the Frequently Asked Questions of "
+    << "deal.II (linked to from http://www.dealii.org/) for "
+    << "a lot more information on what this error means and "
+    << "how to fix programs in which it happens.");
 
   /**
    * A subscriber with the identification string given to
    * Subscriptor::unsubscribe() did not subscribe to the object.
    */
-  DeclException2(ExcNoSubscriber,
-                 std::string,
-                 std::string,
-                 << "No subscriber with identifier <" << arg2
-                 << "> subscribes to this object of class " << arg1
-                 << ". Consequently, it cannot be unsubscribed.");
+  DEAL_II_DeclException2(ExcNoSubscriber,
+                         std::string,
+                         std::string,
+                         << "No subscriber with identifier <" << arg2
+                         << "> subscribes to this object of class " << arg1
+                         << ". Consequently, it cannot be unsubscribed.");
   //@}
 
   /**
@@ -235,7 +236,8 @@ private:
    * Check that there are no objects subscribing to this object. If this check
    * passes then it is safe to destroy the current object. It this check fails
    * then this function will either abort or print an error message to deallog
-   * (by using the AssertNothrow mechanism), but will not throw an exception.
+   * (by using the DEAL_II_AssertNothrow mechanism), but will not throw an
+   * exception.
    *
    * @note Since this function is just a consistency check it does nothing in
    * release mode.

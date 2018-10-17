@@ -34,18 +34,18 @@ check(const unsigned int                                myid,
 {
   if (myid == 0)
     {
-      AssertThrow(v(10) == 10.0, ExcInternalError());
-      AssertThrow(v(11) == 0., ExcInternalError());
-      AssertThrow(v(12) == 0., ExcInternalError());
-      AssertThrow(v(14) == 14., ExcInternalError());
+      DEAL_II_AssertThrow(v(10) == 10.0, ExcInternalError());
+      DEAL_II_AssertThrow(v(11) == 0., ExcInternalError());
+      DEAL_II_AssertThrow(v(12) == 0., ExcInternalError());
+      DEAL_II_AssertThrow(v(14) == 14., ExcInternalError());
 
-      AssertThrow(v(5) == 55., ExcInternalError());
+      DEAL_II_AssertThrow(v(5) == 55., ExcInternalError());
     }
   else
     {
-      AssertThrow(v(4) == 0., ExcInternalError());
-      AssertThrow(v(5) == 55., ExcInternalError());
-      AssertThrow(v(6) == 66., ExcInternalError());
+      DEAL_II_AssertThrow(v(4) == 0., ExcInternalError());
+      DEAL_II_AssertThrow(v(5) == 55., ExcInternalError());
+      DEAL_II_AssertThrow(v(6) == 66., ExcInternalError());
     }
 }
 
@@ -56,7 +56,7 @@ test()
   unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  Assert(numproc == 2, ExcNotImplemented());
+  DEAL_II_Assert(numproc == 2, ExcNotImplemented());
 
   const unsigned int size = 20;
   IndexSet           local_owned(size);

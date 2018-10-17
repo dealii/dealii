@@ -232,15 +232,15 @@ main()
 
         // Ensure that the point we found is both on the manifold and (up to
         // error in the polynomial approximation of the mapping) on the cell.
-        Assert((torus_manifold.push_forward(
-                  torus_manifold.pull_back(projected_point)) -
-                projected_point)
-                   .norm() < 1e-14,
-               ExcInternalError());
+        DEAL_II_Assert((torus_manifold.push_forward(
+                          torus_manifold.pull_back(projected_point)) -
+                        projected_point)
+                           .norm() < 1e-14,
+                       ExcInternalError());
         const Point<2> unit_point =
           mapping.transform_real_to_unit_cell(cell, projected_point);
-        Assert(GeometryInfo<2>::is_inside_unit_cell(unit_point, 1.0e-5),
-               ExcInternalError());
+        DEAL_II_Assert(GeometryInfo<2>::is_inside_unit_cell(unit_point, 1.0e-5),
+                       ExcInternalError());
       }
   }
 

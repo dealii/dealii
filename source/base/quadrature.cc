@@ -50,7 +50,7 @@ void
 Quadrature<dim>::initialize(const std::vector<Point<dim>> &p,
                             const std::vector<double> &    w)
 {
-  AssertDimension(w.size(), p.size());
+  DEAL_II_AssertDimension(w.size(), p.size());
   quadrature_points = p;
   weights           = w;
 }
@@ -64,8 +64,8 @@ Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points,
   , weights(weights)
   , is_tensor_product_flag(dim == 1)
 {
-  Assert(weights.size() == points.size(),
-         ExcDimensionMismatch(weights.size(), points.size()));
+  DEAL_II_Assert(weights.size() == points.size(),
+                 ExcDimensionMismatch(weights.size(), points.size()));
 }
 
 
@@ -76,8 +76,8 @@ Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points)
   , weights(points.size(), std::numeric_limits<double>::infinity())
   , is_tensor_product_flag(dim == 1)
 {
-  Assert(weights.size() == points.size(),
-         ExcDimensionMismatch(weights.size(), points.size()));
+  DEAL_II_Assert(weights.size() == points.size(),
+                 ExcDimensionMismatch(weights.size(), points.size()));
 }
 
 
@@ -110,7 +110,7 @@ Quadrature<1>::Quadrature(const Point<1> &point)
 template <>
 Quadrature<0>::Quadrature(const SubQuadrature &, const Quadrature<1> &)
 {
-  Assert(false, ExcImpossibleInDim(0));
+  DEAL_II_Assert(false, ExcImpossibleInDim(0));
 }
 
 
@@ -146,7 +146,7 @@ Quadrature<dim>::Quadrature(const SubQuadrature &q1, const Quadrature<1> &q2)
       // we cannot guarantee the sum of weights
       // to be exactly one, but it should be
       // near that.
-      Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+      DEAL_II_Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
     }
 #endif
 
@@ -189,7 +189,7 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
       // we cannot guarantee the sum of weights
       // to be exactly one, but it should be
       // near that.
-      Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
+      DEAL_II_Assert((sum > 0.999999) && (sum < 1.000001), ExcInternalError());
     }
 #endif
 }
@@ -213,7 +213,7 @@ Quadrature<1>::Quadrature(const Quadrature<0> &)
   // this function should never be
   // called -- this should be the
   // copy constructor in 1d...
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
 }
 
 
@@ -225,7 +225,7 @@ Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
   , weights(Utilities::fixed_power<dim>(q.size()))
   , is_tensor_product_flag(true)
 {
-  Assert(dim <= 3, ExcNotImplemented());
+  DEAL_II_Assert(dim <= 3, ExcNotImplemented());
 
   const unsigned int n0 = q.size();
   const unsigned int n1 = (dim > 1) ? n0 : 1;
@@ -315,10 +315,10 @@ typename std::conditional<dim == 1,
                           const std::array<Quadrature<1>, dim> &>::type
 Quadrature<dim>::get_tensor_basis() const
 {
-  Assert(this->is_tensor_product_flag == true,
-         ExcMessage("This function only makes sense if "
-                    "this object represents a tensor product!"));
-  Assert(tensor_basis != nullptr, ExcInternalError());
+  DEAL_II_Assert(this->is_tensor_product_flag == true,
+                 ExcMessage("This function only makes sense if "
+                            "this object represents a tensor product!"));
+  DEAL_II_Assert(tensor_basis != nullptr, ExcInternalError());
 
   return *tensor_basis;
 }
@@ -329,9 +329,9 @@ template <>
 std::array<Quadrature<1>, 1>
 Quadrature<1>::get_tensor_basis() const
 {
-  Assert(this->is_tensor_product_flag == true,
-         ExcMessage("This function only makes sense if "
-                    "this object represents a tensor product!"));
+  DEAL_II_Assert(this->is_tensor_product_flag == true,
+                 ExcMessage("This function only makes sense if "
+                            "this object represents a tensor product!"));
 
   return std::array<Quadrature<1>, 1>{{*this}};
 }
@@ -343,14 +343,14 @@ template <int dim>
 QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx)
   : Quadrature<dim>(qx.size())
 {
-  Assert(dim == 1, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim == 1, ExcImpossibleInDim(dim));
   unsigned int k = 0;
   for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
     {
       this->quadrature_points[k](0) = qx.point(k1)(0);
       this->weights[k++]            = qx.weight(k1);
     }
-  Assert(k == this->size(), ExcInternalError());
+  DEAL_II_Assert(k == this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
 }
 
@@ -361,7 +361,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
                                 const Quadrature<1> &qy)
   : Quadrature<dim>(qx.size() * qy.size())
 {
-  Assert(dim == 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim == 2, ExcImpossibleInDim(dim));
 }
 
 
@@ -378,7 +378,7 @@ QAnisotropic<2>::QAnisotropic(const Quadrature<1> &qx, const Quadrature<1> &qy)
         this->quadrature_points[k](1) = qy.point(k2)(0);
         this->weights[k++]            = qx.weight(k1) * qy.weight(k2);
       }
-  Assert(k == this->size(), ExcInternalError());
+  DEAL_II_Assert(k == this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
   const std::array<Quadrature<1>, 2> q_array{{qx, qy}};
   this->tensor_basis =
@@ -393,7 +393,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
                                 const Quadrature<1> &qz)
   : Quadrature<dim>(qx.size() * qy.size() * qz.size())
 {
-  Assert(dim == 3, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim == 3, ExcImpossibleInDim(dim));
 }
 
 
@@ -414,7 +414,7 @@ QAnisotropic<3>::QAnisotropic(const Quadrature<1> &qx,
           this->quadrature_points[k](2) = qz.point(k3)(0);
           this->weights[k++] = qx.weight(k1) * qy.weight(k2) * qz.weight(k3);
         }
-  Assert(k == this->size(), ExcInternalError());
+  DEAL_II_Assert(k == this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
   const std::array<Quadrature<1>, 3> q_array{{qx, qy, qz}};
   this->tensor_basis =
@@ -491,8 +491,8 @@ QProjector<1>::project_to_face(const Quadrature<0> &,
                                std::vector<Point<1>> &q_points)
 {
   const unsigned int dim = 1;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  AssertDimension(q_points.size(), 1);
+  DEAL_II_AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertDimension(q_points.size(), 1);
 
   q_points[0] = Point<dim>((double)face_no);
 }
@@ -506,9 +506,9 @@ QProjector<2>::project_to_face(const Quadrature<1> &  quadrature,
                                std::vector<Point<2>> &q_points)
 {
   const unsigned int dim = 2;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  Assert(q_points.size() == quadrature.size(),
-         ExcDimensionMismatch(q_points.size(), quadrature.size()));
+  DEAL_II_AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_Assert(q_points.size() == quadrature.size(),
+                 ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
   for (unsigned int p = 0; p < quadrature.size(); ++p)
     switch (face_no)
@@ -526,7 +526,7 @@ QProjector<2>::project_to_face(const Quadrature<1> &  quadrature,
           q_points[p] = Point<dim>(quadrature.point(p)(0), 1);
           break;
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
       };
 }
 
@@ -539,9 +539,9 @@ QProjector<3>::project_to_face(const Quadrature<2> &  quadrature,
                                std::vector<Point<3>> &q_points)
 {
   const unsigned int dim = 3;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  Assert(q_points.size() == quadrature.size(),
-         ExcDimensionMismatch(q_points.size(), quadrature.size()));
+  DEAL_II_AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_Assert(q_points.size() == quadrature.size(),
+                 ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
   for (unsigned int p = 0; p < quadrature.size(); ++p)
     switch (face_no)
@@ -572,7 +572,7 @@ QProjector<3>::project_to_face(const Quadrature<2> &  quadrature,
           break;
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
       };
 }
 
@@ -587,8 +587,8 @@ QProjector<1>::project_to_subface(const Quadrature<0> &,
                                   const RefinementCase<0> &)
 {
   const unsigned int dim = 1;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  AssertDimension(q_points.size(), 1);
+  DEAL_II_AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertDimension(q_points.size(), 1);
 
   q_points[0] = Point<dim>((double)face_no);
 }
@@ -604,11 +604,12 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                                   const RefinementCase<1> &)
 {
   const unsigned int dim = 2;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  AssertIndexRange(subface_no, GeometryInfo<dim>::max_children_per_face);
+  DEAL_II_AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(subface_no,
+                           GeometryInfo<dim>::max_children_per_face);
 
-  Assert(q_points.size() == quadrature.size(),
-         ExcDimensionMismatch(q_points.size(), quadrature.size()));
+  DEAL_II_Assert(q_points.size() == quadrature.size(),
+                 ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
   for (unsigned int p = 0; p < quadrature.size(); ++p)
     switch (face_no)
@@ -623,7 +624,7 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                 q_points[p] = Point<dim>(0, quadrature.point(p)(0) / 2 + 0.5);
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             };
           break;
         case 1:
@@ -636,7 +637,7 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                 q_points[p] = Point<dim>(1, quadrature.point(p)(0) / 2 + 0.5);
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             };
           break;
         case 2:
@@ -649,7 +650,7 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                 q_points[p] = Point<dim>(quadrature.point(p)(0) / 2 + 0.5, 0);
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             };
           break;
         case 3:
@@ -662,12 +663,12 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                 q_points[p] = Point<dim>(quadrature.point(p)(0) / 2 + 0.5, 1);
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             };
           break;
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
       };
 }
 
@@ -682,10 +683,11 @@ QProjector<3>::project_to_subface(const Quadrature<2> &    quadrature,
                                   const RefinementCase<2> &ref_case)
 {
   const unsigned int dim = 3;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  AssertIndexRange(subface_no, GeometryInfo<dim>::max_children_per_face);
-  Assert(q_points.size() == quadrature.size(),
-         ExcDimensionMismatch(q_points.size(), quadrature.size()));
+  DEAL_II_AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(subface_no,
+                           GeometryInfo<dim>::max_children_per_face);
+  DEAL_II_Assert(q_points.size() == quadrature.size(),
+                 ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
   // one coordinate is at a const value. for
   // faces 0, 2 and 4 this value is 0.0, for
@@ -743,7 +745,7 @@ QProjector<3>::project_to_subface(const Quadrature<2> &    quadrature,
         eta_translation = int(subface_no / 2) * 0.5;
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
         break;
     }
   // finally, compute the scaled, translated,
@@ -789,8 +791,8 @@ QProjector<1>::project_to_all_faces(const Quadrature<0> &quadrature)
               quadrature.get_weights().end(),
               std::back_inserter(weights));
 
-  Assert(q_points.size() == n_points * n_faces, ExcInternalError());
-  Assert(weights.size() == n_points * n_faces, ExcInternalError());
+  DEAL_II_Assert(q_points.size() == n_points * n_faces, ExcInternalError());
+  DEAL_II_Assert(weights.size() == n_points * n_faces, ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -827,8 +829,8 @@ QProjector<2>::project_to_all_faces(const SubQuadrature &quadrature)
               quadrature.get_weights().end(),
               std::back_inserter(weights));
 
-  Assert(q_points.size() == n_points * n_faces, ExcInternalError());
-  Assert(weights.size() == n_points * n_faces, ExcInternalError());
+  DEAL_II_Assert(q_points.size() == n_points * n_faces, ExcInternalError());
+  DEAL_II_Assert(weights.size() == n_points * n_faces, ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -886,8 +888,8 @@ QProjector<3>::project_to_all_faces(const SubQuadrature &quadrature)
     }
 
 
-  Assert(q_points.size() == n_points * n_faces * 8, ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * 8, ExcInternalError());
+  DEAL_II_Assert(q_points.size() == n_points * n_faces * 8, ExcInternalError());
+  DEAL_II_Assert(weights.size() == n_points * n_faces * 8, ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -927,10 +929,10 @@ QProjector<1>::project_to_all_subfaces(const Quadrature<0> &quadrature)
                 quadrature.get_weights().end(),
                 std::back_inserter(weights));
 
-  Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
+  DEAL_II_Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
+                 ExcInternalError());
+  DEAL_II_Assert(weights.size() == n_points * n_faces * subfaces_per_face,
+                 ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -971,10 +973,10 @@ QProjector<2>::project_to_all_subfaces(const SubQuadrature &quadrature)
                 quadrature.get_weights().end(),
                 std::back_inserter(weights));
 
-  Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * subfaces_per_face,
-         ExcInternalError());
+  DEAL_II_Assert(q_points.size() == n_points * n_faces * subfaces_per_face,
+                 ExcInternalError());
+  DEAL_II_Assert(weights.size() == n_points * n_faces * subfaces_per_face,
+                 ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -1047,10 +1049,12 @@ QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
                       std::back_inserter(weights));
     }
 
-  Assert(q_points.size() == n_points * n_faces * total_subfaces_per_face * 8,
-         ExcInternalError());
-  Assert(weights.size() == n_points * n_faces * total_subfaces_per_face * 8,
-         ExcInternalError());
+  DEAL_II_Assert(q_points.size() ==
+                   n_points * n_faces * total_subfaces_per_face * 8,
+                 ExcInternalError());
+  DEAL_II_Assert(weights.size() ==
+                   n_points * n_faces * total_subfaces_per_face * 8,
+                 ExcInternalError());
 
   return Quadrature<dim>(q_points, weights);
 }
@@ -1063,8 +1067,10 @@ Quadrature<dim>
 QProjector<dim>::project_to_child(const Quadrature<dim> &quadrature,
                                   const unsigned int     child_no)
 {
-  Assert(child_no < GeometryInfo<dim>::max_children_per_cell,
-         ExcIndexRange(child_no, 0, GeometryInfo<dim>::max_children_per_cell));
+  DEAL_II_Assert(child_no < GeometryInfo<dim>::max_children_per_cell,
+                 ExcIndexRange(child_no,
+                               0,
+                               GeometryInfo<dim>::max_children_per_cell));
 
   const unsigned int n_q_points = quadrature.size();
 
@@ -1142,7 +1148,8 @@ QProjector<dim>::DataSetDescriptor::face(const unsigned int face_no,
                                          const bool         face_rotation,
                                          const unsigned int n_quadrature_points)
 {
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
+  DEAL_II_Assert(face_no < GeometryInfo<dim>::faces_per_cell,
+                 ExcInternalError());
 
   switch (dim)
     {
@@ -1197,7 +1204,7 @@ QProjector<dim>::DataSetDescriptor::face(const unsigned int face_no,
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
   return numbers::invalid_unsigned_int;
 }
@@ -1215,9 +1222,9 @@ QProjector<1>::DataSetDescriptor::subface(
   const unsigned int n_quadrature_points,
   const internal::SubfaceCase<1>)
 {
-  Assert(face_no < GeometryInfo<1>::faces_per_cell, ExcInternalError());
-  Assert(subface_no < GeometryInfo<1>::max_children_per_face,
-         ExcInternalError());
+  DEAL_II_Assert(face_no < GeometryInfo<1>::faces_per_cell, ExcInternalError());
+  DEAL_II_Assert(subface_no < GeometryInfo<1>::max_children_per_face,
+                 ExcInternalError());
 
   return ((face_no * GeometryInfo<1>::max_children_per_face + subface_no) *
           n_quadrature_points);
@@ -1236,9 +1243,9 @@ QProjector<2>::DataSetDescriptor::subface(
   const unsigned int n_quadrature_points,
   const internal::SubfaceCase<2>)
 {
-  Assert(face_no < GeometryInfo<2>::faces_per_cell, ExcInternalError());
-  Assert(subface_no < GeometryInfo<2>::max_children_per_face,
-         ExcInternalError());
+  DEAL_II_Assert(face_no < GeometryInfo<2>::faces_per_cell, ExcInternalError());
+  DEAL_II_Assert(subface_no < GeometryInfo<2>::max_children_per_face,
+                 ExcInternalError());
 
   return ((face_no * GeometryInfo<2>::max_children_per_face + subface_no) *
           n_quadrature_points);
@@ -1258,9 +1265,10 @@ QProjector<3>::DataSetDescriptor::subface(
 {
   const unsigned int dim = 3;
 
-  Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
-  Assert(subface_no < GeometryInfo<dim>::max_children_per_face,
-         ExcInternalError());
+  DEAL_II_Assert(face_no < GeometryInfo<dim>::faces_per_cell,
+                 ExcInternalError());
+  DEAL_II_Assert(subface_no < GeometryInfo<dim>::max_children_per_face,
+                 ExcInternalError());
 
   // As the quadrature points created by
   // QProjector are on subfaces in their
@@ -1448,9 +1456,9 @@ QProjector<3>::DataSetDescriptor::subface(
   const unsigned int equ_subface_no =
     equivalent_subface_number[ref_case][subface_no];
   // make sure, that we got a valid subface and RefineCase
-  Assert(equ_ref_case != RefinementCase<dim>::no_refinement,
-         ExcInternalError());
-  Assert(equ_subface_no != e, ExcInternalError());
+  DEAL_II_Assert(equ_ref_case != RefinementCase<dim>::no_refinement,
+                 ExcInternalError());
+  DEAL_II_Assert(equ_subface_no != e, ExcInternalError());
   // now, finally respect non-standard faces
   const RefinementCase<dim - 1> final_ref_case =
     (face_orientation == face_rotation ? ref_case_permutation[equ_ref_case] :
@@ -1555,8 +1563,8 @@ namespace internal
 //                 const Quadrature<1> &base_quadrature,
 //                 const unsigned int   n_copies)
 // {
-//   Assert (n_copies > 0, ExcZero());
-//   Assert (base_quadrature.size() > 0, ExcZero());
+//   DEAL_II_Assert (n_copies > 0, ExcZero());
+//   DEAL_II_Assert (base_quadrature.size() > 0, ExcZero());
 
 //   const unsigned int np =
 //     uses_both_endpoints(base_quadrature)
@@ -1609,7 +1617,7 @@ namespace internal
 //                                     // make sure the base quadrature formula
 //                                     // has only one quadrature point
 //                                     // per end point
-//       Assert (n_end_points == 2, ExcInvalidQuadratureFormula());
+//       DEAL_II_Assert (n_end_points == 2, ExcInvalidQuadratureFormula());
 
 
 //       for (unsigned int copy=0; copy<n_copies; ++copy)
@@ -1646,7 +1654,7 @@ namespace internal
 //   double sum_of_weights = 0;
 //   for (unsigned int i=0; i<dst.size(); ++i)
 //     sum_of_weights += dst.weight(i);
-//   Assert (std::fabs(sum_of_weights-1) < 1e-15,
+//   DEAL_II_Assert (std::fabs(sum_of_weights-1) < 1e-15,
 //        ExcInternalError());
 // #endif
 
@@ -1657,7 +1665,7 @@ template <>
 QIterated<0>::QIterated(const Quadrature<1> &, const unsigned int)
   : Quadrature<0>()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1671,8 +1679,8 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
         base_quadrature.size() * n_copies)
 {
   //  fill(*this, base_quadrature, n_copies);
-  Assert(base_quadrature.size() > 0, ExcNotInitialized());
-  Assert(n_copies > 0, ExcZero());
+  DEAL_II_Assert(base_quadrature.size() > 0, ExcNotInitialized());
+  DEAL_II_Assert(n_copies > 0, ExcZero());
 
   if (!internal::QIteratedImplementation::uses_both_endpoints(base_quadrature))
     // we don't have to skip some
@@ -1720,7 +1728,7 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
       // make sure the base quadrature formula
       // has only one quadrature point
       // per end point
-      Assert(n_end_points == 2, ExcInvalidQuadratureFormula());
+      DEAL_II_Assert(n_end_points == 2, ExcInvalidQuadratureFormula());
 
 
       for (unsigned int copy = 0; copy < n_copies; ++copy)
@@ -1758,7 +1766,7 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
   double sum_of_weights = 0;
   for (unsigned int i = 0; i < this->size(); ++i)
     sum_of_weights += this->weight(i);
-  Assert(std::fabs(sum_of_weights - 1) < 1e-13, ExcInternalError());
+  DEAL_II_Assert(std::fabs(sum_of_weights - 1) < 1e-13, ExcInternalError());
 #endif
 }
 
@@ -1767,7 +1775,7 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
 // void
 // QIterated<dim>::fill(Quadrature<dim>&, const Quadrature<1>&, unsigned int)
 // {
-//   Assert(false, ExcNotImplemented());
+//   DEAL_II_Assert(false, ExcNotImplemented());
 // }
 
 

@@ -58,7 +58,8 @@ test()
 
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
                                              MPI_COMM_WORLD);
-  AssertThrow(interpolated.has_ghost_elements() == false, ExcInternalError());
+  DEAL_II_AssertThrow(interpolated.has_ghost_elements() == false,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

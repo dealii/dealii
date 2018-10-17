@@ -68,8 +68,8 @@ test()
         {
           if (cell->subdomain_id() != (unsigned int)myid)
             {
-              AssertThrow(cell->is_ghost() || cell->is_artificial(),
-                          ExcInternalError());
+              DEAL_II_AssertThrow(cell->is_ghost() || cell->is_artificial(),
+                                  ExcInternalError());
               continue;
             }
 
@@ -77,24 +77,26 @@ test()
             {
               if (cell->at_boundary(n))
                 continue;
-              AssertThrow(cell->neighbor(n).state() == IteratorState::valid,
-                          ExcInternalError());
+              DEAL_II_AssertThrow(cell->neighbor(n).state() ==
+                                    IteratorState::valid,
+                                  ExcInternalError());
 
-              AssertThrow(cell->neighbor(n)->level() == cell->level(),
-                          ExcInternalError());
+              DEAL_II_AssertThrow(cell->neighbor(n)->level() == cell->level(),
+                                  ExcInternalError());
 
-              AssertThrow(!cell->neighbor(n)->has_children(),
-                          ExcInternalError());
-              AssertThrow(cell->neighbor(n)->subdomain_id() < numprocs,
-                          ExcInternalError());
+              DEAL_II_AssertThrow(!cell->neighbor(n)->has_children(),
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(cell->neighbor(n)->subdomain_id() < numprocs,
+                                  ExcInternalError());
 
               // all neighbors of
               // locally owned cells
               // must be ghosts but
               // can't be artificial
-              AssertThrow(cell->neighbor(n)->is_ghost(), ExcInternalError());
-              AssertThrow(!cell->neighbor(n)->is_artificial(),
-                          ExcInternalError());
+              DEAL_II_AssertThrow(cell->neighbor(n)->is_ghost(),
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(!cell->neighbor(n)->is_artificial(),
+                                  ExcInternalError());
             }
         }
 

@@ -197,7 +197,7 @@ TensorProductPolynomialsConst<dim>::compute_derivative(
   const Point<dim> & p) const
 {
   const unsigned int max_indices = this->n_tensor_pols;
-  Assert(i <= max_indices, ExcInternalError());
+  DEAL_II_Assert(i <= max_indices, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_indices)

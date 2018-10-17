@@ -37,9 +37,9 @@ test(Vector<std::complex<double>> &v)
   v.compress();
 
   // then check the norm
-  AssertThrow(std::abs(v.mean_value() - sum / (1. * v.size())) <
-                1e-14 * std::abs(sum) / v.size(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(v.mean_value() - sum / (1. * v.size())) <
+                        1e-14 * std::abs(sum) / v.size(),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -106,8 +106,8 @@ test(Triangulation<dim> &triangulation)
                   << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
                   << std::endl;
           if (q <= p)
-            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
-                   ExcInternalError());
+            DEAL_II_Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
+                           ExcInternalError());
         }
     }
 }

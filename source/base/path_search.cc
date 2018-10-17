@@ -76,8 +76,8 @@ PathSearch::get_path_list(const std::string &cls)
   if (path_lists.count(cls) == 0)
     add_class(cls);
 
-  // Assert(path_lists.count(cls) != 0, ExcNoClass(cls));
-  Assert(path_lists.count(cls) != 0, ExcInternalError());
+  // DEAL_II_Assert(path_lists.count(cls) != 0, ExcNoClass(cls));
+  DEAL_II_Assert(path_lists.count(cls) != 0, ExcInternalError());
 
   return path_lists.find(cls)->second;
 }
@@ -93,8 +93,8 @@ PathSearch::get_suffix_list(const std::string &cls)
   if (suffix_lists.count(cls) == 0)
     add_class(cls);
 
-  // Assert(suffix_lists.count(cls) != 0, ExcNoClass(cls));
-  Assert(suffix_lists.count(cls) != 0, ExcInternalError());
+  // DEAL_II_Assert(suffix_lists.count(cls) != 0, ExcNoClass(cls));
+  DEAL_II_Assert(suffix_lists.count(cls) != 0, ExcInternalError());
 
   return suffix_lists.find(cls)->second;
 }
@@ -163,7 +163,7 @@ PathSearch::find(const std::string &filename,
             }
         }
     }
-  AssertThrow(false, ExcFileNotFound(filename, cls));
+  DEAL_II_AssertThrow(false, ExcFileNotFound(filename, cls));
   return std::string("");
 }
 
@@ -189,7 +189,7 @@ PathSearch::find(const std::string &filename, const char *open_mode)
           continue;
         }
     }
-  AssertThrow(false, ExcFileNotFound(filename, cls));
+  DEAL_II_AssertThrow(false, ExcFileNotFound(filename, cls));
   return std::string("");
 }
 

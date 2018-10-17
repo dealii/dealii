@@ -37,11 +37,12 @@ check_this(const DoFHandler<dim> &dof_handler)
 
   for (types::global_dof_index dof = 0; dof < n_dofs; ++dof)
     if (hanging_node_dofs[dof])
-      AssertThrow(constraints.is_constrained(dof), ExcInternalError());
+      DEAL_II_AssertThrow(constraints.is_constrained(dof), ExcInternalError());
 
-  AssertThrow((unsigned int)std::count(hanging_node_dofs.begin(),
-                                       hanging_node_dofs.end(),
-                                       true) == constraints.n_constraints(),
-              ExcInternalError());
+  DEAL_II_AssertThrow((unsigned int)std::count(hanging_node_dofs.begin(),
+                                               hanging_node_dofs.end(),
+                                               true) ==
+                        constraints.n_constraints(),
+                      ExcInternalError());
   output_bool_vector(hanging_node_dofs);
 }

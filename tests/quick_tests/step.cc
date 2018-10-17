@@ -215,7 +215,8 @@ LaplaceProblem<dim>::run()
       assemble_and_solve();
     };
 
-  AssertThrow(last_error < 1e-3, ExcMessage("solution is not converging"));
+  DEAL_II_AssertThrow(last_error < 1e-3,
+                      ExcMessage("solution is not converging"));
 
 
 

@@ -66,10 +66,10 @@ void
 TimeDependent::insert_timestep(const TimeStepBase *position,
                                TimeStepBase *      new_timestep)
 {
-  Assert((std::find(timesteps.begin(), timesteps.end(), position) !=
-          timesteps.end()) ||
-           (position == nullptr),
-         ExcInvalidPosition());
+  DEAL_II_Assert((std::find(timesteps.begin(), timesteps.end(), position) !=
+                  timesteps.end()) ||
+                   (position == nullptr),
+                 ExcInvalidPosition());
   // first insert the new time step
   // into the doubly linked list
   // of timesteps
@@ -105,9 +105,9 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
           std::find(timesteps.begin(), timesteps.end(), position);
       // check iterators again to satisfy coverity: both insert_position and
       // insert_position - 1 must be valid iterators
-      Assert(insert_position != timesteps.begin() &&
-               insert_position != timesteps.end(),
-             ExcInternalError());
+      DEAL_II_Assert(insert_position != timesteps.begin() &&
+                       insert_position != timesteps.end(),
+                     ExcInternalError());
 
       (*(insert_position - 1))->set_next_timestep(new_timestep);
       new_timestep->set_previous_timestep(*(insert_position - 1));
@@ -134,7 +134,7 @@ TimeDependent::add_timestep(TimeStepBase *new_timestep)
 void
 TimeDependent::delete_timestep(const unsigned int position)
 {
-  Assert(position < timesteps.size(), ExcInvalidPosition());
+  DEAL_II_Assert(position < timesteps.size(), ExcInvalidPosition());
 
   // Remember time step object for
   // later deletion and unlock
@@ -328,7 +328,7 @@ TimeStepBase::init_for_postprocessing()
 void
 TimeStepBase::solve_dual_problem()
 {
-  Assert(false, ExcPureFunctionCalled());
+  DEAL_II_Assert(false, ExcPureFunctionCalled());
 }
 
 
@@ -336,7 +336,7 @@ TimeStepBase::solve_dual_problem()
 void
 TimeStepBase::postprocess_timestep()
 {
-  Assert(false, ExcPureFunctionCalled());
+  DEAL_II_Assert(false, ExcPureFunctionCalled());
 }
 
 
@@ -360,9 +360,9 @@ TimeStepBase::get_timestep_no() const
 double
 TimeStepBase::get_backward_timestep() const
 {
-  Assert(previous_timestep != nullptr,
-         ExcMessage("The backward time step cannot be computed because "
-                    "there is no previous time step."));
+  DEAL_II_Assert(previous_timestep != nullptr,
+                 ExcMessage("The backward time step cannot be computed because "
+                            "there is no previous time step."));
   return time - previous_timestep->time;
 }
 
@@ -371,9 +371,9 @@ TimeStepBase::get_backward_timestep() const
 double
 TimeStepBase::get_forward_timestep() const
 {
-  Assert(next_timestep != nullptr,
-         ExcMessage("The forward time step cannot be computed because "
-                    "there is no next time step."));
+  DEAL_II_Assert(next_timestep != nullptr,
+                 ExcMessage("The forward time step cannot be computed because "
+                            "there is no next time step."));
   return next_timestep->time - time;
 }
 
@@ -428,7 +428,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria()
   , flags()
   , refinement_flags(0)
 {
-  Assert(false, ExcPureFunctionCalled());
+  DEAL_II_Assert(false, ExcPureFunctionCalled());
 }
 
 
@@ -458,7 +458,7 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria()
       delete t;
     }
   else
-    AssertNothrow(tria == nullptr, ExcInternalError());
+    DEAL_II_AssertNothrow(tria == nullptr, ExcInternalError());
 
   coarse_grid = nullptr;
 }
@@ -484,7 +484,7 @@ TimeStepBase_Tria<dim>::sleep(const unsigned int sleep_level)
 {
   if (sleep_level == flags.sleep_level_to_delete_grid)
     {
-      Assert(tria != nullptr, ExcInternalError());
+      DEAL_II_Assert(tria != nullptr, ExcInternalError());
 
       if (flags.delete_and_rebuild_tria)
         {
@@ -517,8 +517,9 @@ template <int dim>
 void
 TimeStepBase_Tria<dim>::restore_grid()
 {
-  Assert(tria == nullptr, ExcGridNotDeleted());
-  Assert(refine_flags.size() == coarsen_flags.size(), ExcInternalError());
+  DEAL_II_Assert(tria == nullptr, ExcGridNotDeleted());
+  DEAL_II_Assert(refine_flags.size() == coarsen_flags.size(),
+                 ExcInternalError());
 
   // create a virgin triangulation and
   // set it to a copy of the coarse grid
@@ -599,8 +600,8 @@ namespace
 
     if (old_cell->has_children() && new_cell->has_children())
       {
-        Assert(old_cell->n_children() == new_cell->n_children(),
-               ExcNotImplemented());
+        DEAL_II_Assert(old_cell->n_children() == new_cell->n_children(),
+                       ExcNotImplemented());
         for (unsigned int c = 0; c < new_cell->n_children(); ++c)
           dealii::mirror_refinement_flags<dim>(new_cell->child(c),
                                                old_cell->child(c));
@@ -618,7 +619,8 @@ namespace
       {
         bool grids_changed = false;
 
-        Assert(cell2->n_children() == cell1->n_children(), ExcNotImplemented());
+        DEAL_II_Assert(cell2->n_children() == cell1->n_children(),
+                       ExcNotImplemented());
         for (unsigned int c = 0; c < cell1->n_children(); ++c)
           grids_changed |=
             dealii::adapt_grid_cells<dim>(cell1->child(c), cell2->child(c));
@@ -707,7 +709,7 @@ namespace
         return changed_grid;
       };
 
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
     return false;
   }
 
@@ -877,9 +879,10 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
         // new. but since we loop over flagged
         // cells, we have to subtract 3/4 of
         // a cell for each flagged cell
-        Assert(!tria->get_anisotropic_refinement_flag(), ExcNotImplemented());
-        Assert(!previous_tria->get_anisotropic_refinement_flag(),
-               ExcNotImplemented());
+        DEAL_II_Assert(!tria->get_anisotropic_refinement_flag(),
+                       ExcNotImplemented());
+        DEAL_II_Assert(!previous_tria->get_anisotropic_refinement_flag(),
+                       ExcNotImplemented());
         double previous_cells = previous_tria->n_active_cells();
         typename Triangulation<dim>::active_cell_iterator cell, endc;
         cell = previous_tria->begin_active();
@@ -1058,8 +1061,8 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
 
         if (p_refinement_threshold == sorted_criteria.end())
           {
-            Assert(p_coarsening_threshold != p_refinement_threshold,
-                   ExcInternalError());
+            DEAL_II_Assert(p_coarsening_threshold != p_refinement_threshold,
+                           ExcInternalError());
             --p_refinement_threshold;
           };
 
@@ -1098,7 +1101,7 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
     {
       Triangulation<dim> *previous_tria =
         dynamic_cast<const TimeStepBase_Tria<dim> *>(previous_timestep)->tria;
-      Assert(previous_tria != nullptr, ExcInternalError());
+      DEAL_II_Assert(previous_tria != nullptr, ExcInternalError());
 
       // if we used the dual estimator, we
       // computed the error information on
@@ -1165,7 +1168,7 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags()
   , wakeup_level_to_build_grid(0)
   , sleep_level_to_delete_grid(0)
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
 }
 
 
@@ -1179,9 +1182,11 @@ TimeStepBase_Tria_Flags::Flags<dim>::Flags(
   , wakeup_level_to_build_grid(wakeup_level_to_build_grid)
   , sleep_level_to_delete_grid(sleep_level_to_delete_grid)
 {
-  //   Assert (!delete_and_rebuild_tria || (wakeup_level_to_build_grid>=1),
+  //   DEAL_II_Assert (!delete_and_rebuild_tria ||
+  //   (wakeup_level_to_build_grid>=1),
   //        ExcInvalidParameter(wakeup_level_to_build_grid));
-  //   Assert (!delete_and_rebuild_tria || (sleep_level_to_delete_grid>=1),
+  //   DEAL_II_Assert (!delete_and_rebuild_tria ||
+  //   (sleep_level_to_delete_grid>=1),
   //        ExcInvalidParameter(sleep_level_to_delete_grid));
 }
 
@@ -1219,12 +1224,12 @@ TimeStepBase_Tria_Flags::RefinementFlags<dim>::RefinementFlags(
   , mirror_flags_to_previous_grid(mirror_flags_to_previous_grid)
   , adapt_grids(adapt_grids)
 {
-  Assert(cell_number_corridor_top >= 0,
-         ExcInvalidValue(cell_number_corridor_top));
-  Assert(cell_number_corridor_bottom >= 0,
-         ExcInvalidValue(cell_number_corridor_bottom));
-  Assert(cell_number_corridor_bottom <= 1,
-         ExcInvalidValue(cell_number_corridor_bottom));
+  DEAL_II_Assert(cell_number_corridor_top >= 0,
+                 ExcInvalidValue(cell_number_corridor_top));
+  DEAL_II_Assert(cell_number_corridor_bottom >= 0,
+                 ExcInvalidValue(cell_number_corridor_bottom));
+  DEAL_II_Assert(cell_number_corridor_bottom <= 1,
+                 ExcInvalidValue(cell_number_corridor_bottom));
 }
 
 
@@ -1256,14 +1261,16 @@ TimeStepBase_Tria_Flags::RefinementData<dim>::RefinementData(
                           _coarsening_threshold :
                           0.999 * _coarsening_threshold))
 {
-  Assert(refinement_threshold >= 0, ExcInvalidValue(refinement_threshold));
-  Assert(coarsening_threshold >= 0, ExcInvalidValue(coarsening_threshold));
+  DEAL_II_Assert(refinement_threshold >= 0,
+                 ExcInvalidValue(refinement_threshold));
+  DEAL_II_Assert(coarsening_threshold >= 0,
+                 ExcInvalidValue(coarsening_threshold));
   // allow both thresholds to be zero,
   // since this is needed in case all indicators
   // are zero
-  Assert((coarsening_threshold < refinement_threshold) ||
-           ((coarsening_threshold == 0) && (refinement_threshold == 0)),
-         ExcInvalidValue(coarsening_threshold));
+  DEAL_II_Assert((coarsening_threshold < refinement_threshold) ||
+                   ((coarsening_threshold == 0) && (refinement_threshold == 0)),
+                 ExcInvalidValue(coarsening_threshold));
 }
 
 

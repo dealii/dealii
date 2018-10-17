@@ -173,7 +173,7 @@ public:
   /**
    * Exception.
    */
-  DeclException0(ExcNoMatrixGivenToUse);
+  DEAL_II_DeclException0(ExcNoMatrixGivenToUse);
 
   //@}
 protected:
@@ -229,7 +229,7 @@ template <typename MatrixType, typename VectorType>
 inline typename PreconditionSelector<MatrixType, VectorType>::size_type
 PreconditionSelector<MatrixType, VectorType>::m() const
 {
-  Assert(A != nullptr, ExcNoMatrixGivenToUse());
+  DEAL_II_Assert(A != nullptr, ExcNoMatrixGivenToUse());
   return A->m();
 }
 
@@ -238,7 +238,7 @@ template <typename MatrixType, typename VectorType>
 inline typename PreconditionSelector<MatrixType, VectorType>::size_type
 PreconditionSelector<MatrixType, VectorType>::n() const
 {
-  Assert(A != nullptr, ExcNoMatrixGivenToUse());
+  DEAL_II_Assert(A != nullptr, ExcNoMatrixGivenToUse());
   return A->n();
 }
 
@@ -255,7 +255,7 @@ PreconditionSelector<MatrixType, VectorType>::vmult(VectorType &      dst,
     }
   else
     {
-      Assert(A != nullptr, ExcNoMatrixGivenToUse());
+      DEAL_II_Assert(A != nullptr, ExcNoMatrixGivenToUse());
 
       if (preconditioning == "jacobi")
         {
@@ -270,7 +270,7 @@ PreconditionSelector<MatrixType, VectorType>::vmult(VectorType &      dst,
           A->precondition_SSOR(dst, src, omega);
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -287,7 +287,7 @@ PreconditionSelector<MatrixType, VectorType>::Tvmult(
     }
   else
     {
-      Assert(A != nullptr, ExcNoMatrixGivenToUse());
+      DEAL_II_Assert(A != nullptr, ExcNoMatrixGivenToUse());
 
       if (preconditioning == "jacobi")
         {
@@ -302,7 +302,7 @@ PreconditionSelector<MatrixType, VectorType>::Tvmult(
           A->precondition_SSOR(dst, src, omega); // Symmetric operation
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 

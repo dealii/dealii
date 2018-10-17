@@ -179,8 +179,8 @@ namespace internal
                   for (; fe < dof_handler.fe_collection.size(); ++fe)
                     if (vertex_fe_association[fe][v] == true)
                       break;
-                  Assert(fe != dof_handler.fe_collection.size(),
-                         ExcInternalError());
+                  DEAL_II_Assert(fe != dof_handler.fe_collection.size(),
+                                 ExcInternalError());
                 }
 #endif
 
@@ -308,8 +308,9 @@ namespace internal
                 if (!cell->has_children() && !cell->is_artificial())
                   counter += cell->get_fe().template n_dofs_per_object<dim>();
 
-              Assert(dof_handler.levels[level]->dof_indices.size() == counter,
-                     ExcInternalError());
+              DEAL_II_Assert(dof_handler.levels[level]->dof_indices.size() ==
+                               counter,
+                             ExcInternalError());
 
               // also check that the number of unassigned slots in the
               // dof_offsets equals the number of cells on that level minus the
@@ -320,13 +321,13 @@ namespace internal
                 if (!cell->has_children() && !cell->is_artificial())
                   ++n_active_non_artificial_cells;
 
-              Assert(static_cast<unsigned int>(std::count(
-                       dof_handler.levels[level]->dof_offsets.begin(),
-                       dof_handler.levels[level]->dof_offsets.end(),
-                       (DoFLevel::offset_type)(-1))) ==
-                       dof_handler.tria->n_raw_cells(level) -
-                         n_active_non_artificial_cells,
-                     ExcInternalError());
+              DEAL_II_Assert(static_cast<unsigned int>(std::count(
+                               dof_handler.levels[level]->dof_offsets.begin(),
+                               dof_handler.levels[level]->dof_offsets.end(),
+                               (DoFLevel::offset_type)(-1))) ==
+                               dof_handler.tria->n_raw_cells(level) -
+                                 n_active_non_artificial_cells,
+                             ExcInternalError());
             }
 #endif
         }
@@ -407,7 +408,7 @@ namespace internal
                   }
 
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
 
             // An array to hold how many slots (see the hp::DoFLevel
@@ -501,7 +502,7 @@ namespace internal
                   }
 
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
 
             unsigned int next_free_face_slot = 0;
@@ -622,7 +623,8 @@ namespace internal
 
             // we should have moved the cursor for each level to the
             // total number of dofs on that level. check that
-            Assert(next_free_face_slot == n_face_slots, ExcInternalError());
+            DEAL_II_Assert(next_free_face_slot == n_face_slots,
+                           ExcInternalError());
 
             // at the end, restore the user flags for the faces
             switch (dim)
@@ -646,7 +648,7 @@ namespace internal
                   }
 
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
           }
         }
@@ -661,12 +663,14 @@ namespace internal
         template <int spacedim>
         static void reserve_space(DoFHandler<1, spacedim> &dof_handler)
         {
-          Assert(dof_handler.fe_collection.size() > 0,
-                 (typename DoFHandler<1, spacedim>::ExcNoFESelected()));
-          Assert(dof_handler.tria->n_levels() > 0,
-                 ExcMessage("The current Triangulation must not be empty."));
-          Assert(dof_handler.tria->n_levels() == dof_handler.levels.size(),
-                 ExcInternalError());
+          DEAL_II_Assert(dof_handler.fe_collection.size() > 0,
+                         (typename DoFHandler<1, spacedim>::ExcNoFESelected()));
+          DEAL_II_Assert(dof_handler.tria->n_levels() > 0,
+                         ExcMessage(
+                           "The current Triangulation must not be empty."));
+          DEAL_II_Assert(dof_handler.tria->n_levels() ==
+                           dof_handler.levels.size(),
+                         ExcInternalError());
 
           reserve_space_release_space(dof_handler);
 
@@ -683,12 +687,14 @@ namespace internal
         template <int spacedim>
         static void reserve_space(DoFHandler<2, spacedim> &dof_handler)
         {
-          Assert(dof_handler.fe_collection.size() > 0,
-                 (typename DoFHandler<2, spacedim>::ExcNoFESelected()));
-          Assert(dof_handler.tria->n_levels() > 0,
-                 ExcMessage("The current Triangulation must not be empty."));
-          Assert(dof_handler.tria->n_levels() == dof_handler.levels.size(),
-                 ExcInternalError());
+          DEAL_II_Assert(dof_handler.fe_collection.size() > 0,
+                         (typename DoFHandler<2, spacedim>::ExcNoFESelected()));
+          DEAL_II_Assert(dof_handler.tria->n_levels() > 0,
+                         ExcMessage(
+                           "The current Triangulation must not be empty."));
+          DEAL_II_Assert(dof_handler.tria->n_levels() ==
+                           dof_handler.levels.size(),
+                         ExcInternalError());
 
           reserve_space_release_space(dof_handler);
 
@@ -709,12 +715,15 @@ namespace internal
         {
           const unsigned int dim = 3;
 
-          Assert(dof_handler.fe_collection.size() > 0,
-                 (typename DoFHandler<dim, spacedim>::ExcNoFESelected()));
-          Assert(dof_handler.tria->n_levels() > 0,
-                 ExcMessage("The current Triangulation must not be empty."));
-          Assert(dof_handler.tria->n_levels() == dof_handler.levels.size(),
-                 ExcInternalError());
+          DEAL_II_Assert(
+            dof_handler.fe_collection.size() > 0,
+            (typename DoFHandler<dim, spacedim>::ExcNoFESelected()));
+          DEAL_II_Assert(dof_handler.tria->n_levels() > 0,
+                         ExcMessage(
+                           "The current Triangulation must not be empty."));
+          DEAL_II_Assert(dof_handler.tria->n_levels() ==
+                           dof_handler.levels.size(),
+                         ExcInternalError());
 
           reserve_space_release_space(dof_handler);
 
@@ -898,7 +907,7 @@ namespace internal
                   16 * dof_handler.fe_collection.max_dofs_per_quad();
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
                 max_couplings = 0;
             };
           return std::min(max_couplings, dof_handler.n_dofs());
@@ -930,7 +939,7 @@ namespace internal
               27 * dof_handler.fe_collection.max_dofs_per_hex();
           else
             {
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
               max_couplings = 0;
             }
 
@@ -1025,7 +1034,7 @@ namespace internal
           else
             {
               // a sequential triangulation. there is nothing we need to do here
-              Assert(
+              DEAL_II_Assert(
                 (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
                    &dof_handler.get_triangulation()) == nullptr),
                 ExcInternalError());
@@ -1192,7 +1201,7 @@ namespace hp
   types::global_dof_index
   DoFHandler<dim, spacedim>::n_boundary_dofs() const
   {
-    Assert(fe_collection.size() > 0, ExcNoFESelected());
+    DEAL_II_Assert(fe_collection.size() > 0, ExcNoFESelected());
 
     std::set<types::global_dof_index>    boundary_dofs;
     std::vector<types::global_dof_index> dofs_on_face;
@@ -1228,10 +1237,10 @@ namespace hp
   DoFHandler<dim, spacedim>::n_boundary_dofs(
     const std::set<types::boundary_id> &boundary_ids) const
   {
-    Assert(fe_collection.size() > 0, ExcNoFESelected());
-    Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
-             boundary_ids.end(),
-           ExcInvalidBoundaryIndicator());
+    DEAL_II_Assert(fe_collection.size() > 0, ExcNoFESelected());
+    DEAL_II_Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
+                     boundary_ids.end(),
+                   ExcInvalidBoundaryIndicator());
 
     // same as above, but with additional checks for set of boundary
     // indicators
@@ -1265,7 +1274,7 @@ namespace hp
   types::global_dof_index
   DoFHandler<2, 3>::n_boundary_dofs() const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return 0;
   }
 
@@ -1277,7 +1286,7 @@ namespace hp
   DoFHandler<2, 3>::n_boundary_dofs(
     const std::map<types::boundary_id, const Function<3, number> *> &) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return 0;
   }
 
@@ -1287,7 +1296,7 @@ namespace hp
   types::global_dof_index
   DoFHandler<2, 3>::n_boundary_dofs(const std::set<types::boundary_id> &) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return 0;
   }
 
@@ -1321,9 +1330,10 @@ namespace hp
   DoFHandler<dim, spacedim>::set_active_fe_indices(
     const std::vector<unsigned int> &active_fe_indices)
   {
-    Assert(active_fe_indices.size() == get_triangulation().n_active_cells(),
-           ExcDimensionMismatch(active_fe_indices.size(),
-                                get_triangulation().n_active_cells()));
+    DEAL_II_Assert(active_fe_indices.size() ==
+                     get_triangulation().n_active_cells(),
+                   ExcDimensionMismatch(active_fe_indices.size(),
+                                        get_triangulation().n_active_cells()));
 
     create_active_fe_table();
     // we could set the values directly, since they are stored as
@@ -1381,14 +1391,15 @@ namespace hp
   DoFHandler<dim, spacedim>::distribute_dofs(
     const hp::FECollection<dim, spacedim> &ff)
   {
-    Assert(
+    DEAL_II_Assert(
       tria != nullptr,
       ExcMessage(
         "You need to set the Triangulation in the DoFHandler using initialize() or "
         "in the constructor before you can distribute DoFs."));
-    Assert(tria->n_levels() > 0,
-           ExcMessage("The Triangulation you are using is empty!"));
-    Assert(ff.size() > 0, ExcMessage("The hp::FECollection given is empty!"));
+    DEAL_II_Assert(tria->n_levels() > 0,
+                   ExcMessage("The Triangulation you are using is empty!"));
+    DEAL_II_Assert(ff.size() > 0,
+                   ExcMessage("The hp::FECollection given is empty!"));
 
     // don't create a new object if the one we have is already appropriate
     if (fe_collection != ff)
@@ -1433,9 +1444,9 @@ namespace hp
     // cover all fe indices presently in use on the mesh
     for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
       if (cell->is_locally_owned())
-        Assert(cell->active_fe_index() < fe_collection.size(),
-               ExcInvalidFEIndex(cell->active_fe_index(),
-                                 fe_collection.size()));
+        DEAL_II_Assert(cell->active_fe_index() < fe_collection.size(),
+                       ExcInvalidFEIndex(cell->active_fe_index(),
+                                         fe_collection.size()));
 
 
     // then allocate space for all the other tables
@@ -1540,11 +1551,11 @@ namespace hp
   DoFHandler<dim, spacedim>::renumber_dofs(
     const std::vector<types::global_dof_index> &new_numbers)
   {
-    Assert(levels.size() > 0,
-           ExcMessage(
-             "You need to distribute DoFs before you can renumber them."));
+    DEAL_II_Assert(
+      levels.size() > 0,
+      ExcMessage("You need to distribute DoFs before you can renumber them."));
 
-    AssertDimension(new_numbers.size(), n_locally_owned_dofs());
+    DEAL_II_AssertDimension(new_numbers.size(), n_locally_owned_dofs());
 
 #ifdef DEBUG
     // assert that the new indices are
@@ -1563,13 +1574,14 @@ namespace hp
         std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
         types::global_dof_index                              i = 0;
         for (; p != tmp.end(); ++p, ++i)
-          Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+          DEAL_II_Assert(*p == i, ExcNewNumbersNotConsecutive(i));
       }
     else
       for (types::global_dof_index i = 0; i < new_numbers.size(); ++i)
-        Assert(new_numbers[i] < n_dofs(),
-               ExcMessage(
-                 "New DoF index is not less than the total number of dofs."));
+        DEAL_II_Assert(
+          new_numbers[i] < n_dofs(),
+          ExcMessage(
+            "New DoF index is not less than the total number of dofs."));
 #endif
 
     // uncompress the internal storage scheme of dofs on cells so that
@@ -1606,7 +1618,7 @@ namespace hp
   unsigned int
   DoFHandler<dim, spacedim>::max_couplings_between_dofs() const
   {
-    Assert(fe_collection.size() > 0, ExcNoFESelected());
+    DEAL_II_Assert(fe_collection.size() > 0, ExcNoFESelected());
     return dealii::internal::hp::DoFHandlerImplementation::Implementation::
       max_couplings_between_dofs(*this);
   }
@@ -1617,7 +1629,7 @@ namespace hp
   unsigned int
   DoFHandler<dim, spacedim>::max_couplings_between_boundary_dofs() const
   {
-    Assert(fe_collection.size() > 0, ExcNoFESelected());
+    DEAL_II_Assert(fe_collection.size() > 0, ExcNoFESelected());
 
     switch (dim)
       {
@@ -1640,7 +1652,7 @@ namespace hp
                   28 * fe_collection.max_dofs_per_line() +
                   8 * fe_collection.max_dofs_per_quad());
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return 0;
       }
   }
@@ -1666,9 +1678,9 @@ namespace hp
             // Either the active_fe_indices have size zero because
             // they were just created, or the correct size. Other
             // sizes indicate that something went wrong.
-            Assert(levels[level]->active_fe_indices.size() ==
-                     tria->n_raw_cells(level),
-                   ExcInternalError());
+            DEAL_II_Assert(levels[level]->active_fe_indices.size() ==
+                             tria->n_raw_cells(level),
+                           ExcInternalError());
           }
 
         // it may be that the previous table was compressed; in that
@@ -1690,7 +1702,7 @@ namespace hp
 
     // Remember if the cells already have children. That will make the
     // transfer of the active_fe_index to the finer levels easier.
-    Assert(has_children.size() == 0, ExcInternalError());
+    DEAL_II_Assert(has_children.size() == 0, ExcInternalError());
     for (unsigned int i = 0; i < levels.size(); ++i)
       {
         const unsigned int cells_on_level = tria->n_raw_cells(i);
@@ -1726,7 +1738,7 @@ namespace hp
   void
   DoFHandler<dim, spacedim>::post_refinement_action()
   {
-    Assert(has_children.size() == levels.size(), ExcInternalError());
+    DEAL_II_Assert(has_children.size() == levels.size(), ExcInternalError());
 
     // Normally only one level is added, but if this Triangulation
     // is created by copy_triangulation, it can be more than one level.
@@ -1740,7 +1752,7 @@ namespace hp
         levels.pop_back();
       }
 
-    Assert(levels.size() == tria->n_levels(), ExcInternalError());
+    DEAL_II_Assert(levels.size() == tria->n_levels(), ExcInternalError());
 
     // Resize active_fe_indices vectors. use zero indicator to extend
     for (unsigned int i = 0; i < levels.size(); ++i)
@@ -1805,7 +1817,7 @@ namespace hp
                                            const unsigned int,
                                            const unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return numbers::invalid_dof_index;
   }
 
@@ -1819,7 +1831,7 @@ namespace hp
                                            const unsigned int,
                                            const types::global_dof_index) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 

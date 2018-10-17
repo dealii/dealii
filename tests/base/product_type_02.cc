@@ -30,8 +30,10 @@ template <typename T, typename U, typename CompareType>
 void
 check()
 {
-  AssertThrow(typeid(T() * U()) == typeid(CompareType), ExcInternalError());
-  AssertThrow(typeid(T() * U()) == typeid(CompareType), ExcInternalError());
+  DEAL_II_AssertThrow(typeid(T() * U()) == typeid(CompareType),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(typeid(T() * U()) == typeid(CompareType),
+                      ExcInternalError());
 }
 
 

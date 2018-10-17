@@ -57,7 +57,7 @@ FE_ABF<dim>::FE_ABF(const unsigned int deg)
                                  std::vector<bool>(dim, true)))
   , rt_order(deg)
 {
-  Assert(dim >= 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
 
   this->mapping_type = mapping_raviart_thomas;
@@ -189,7 +189,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
 
       boundary_weights.reinit(n_face_points, legendre.n());
 
-      //       Assert (face_points.size() == this->dofs_per_face,
+      //       DEAL_II_Assert (face_points.size() == this->dofs_per_face,
       //            ExcInternalError());
 
       for (unsigned int k = 0; k < n_face_points; ++k)
@@ -300,8 +300,8 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
   for (unsigned int d = 0; d < dim; ++d)
     delete polynomials_abf[d];
 
-  Assert(current == this->generalized_support_points.size(),
-         ExcInternalError());
+  DEAL_II_Assert(current == this->generalized_support_points.size(),
+                 ExcInternalError());
 }
 
 
@@ -459,7 +459,7 @@ FE_ABF<dim>::get_dpo_vector(const unsigned int rt_order)
 {
   if (dim == 1)
     {
-      Assert(false, ExcImpossibleInDim(1));
+      DEAL_II_Assert(false, ExcImpossibleInDim(1));
       return std::vector<unsigned int>();
     }
 
@@ -491,10 +491,12 @@ bool
 FE_ABF<dim>::has_support_on_face(const unsigned int shape_index,
                                  const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  DEAL_II_Assert(shape_index < this->dofs_per_cell,
+                 ExcIndexRange(shape_index, 0, this->dofs_per_cell));
+  DEAL_II_Assert(face_index < GeometryInfo<dim>::faces_per_cell,
+                 ExcIndexRange(face_index,
+                               0,
+                               GeometryInfo<dim>::faces_per_cell));
 
   // Return computed values if we
   // know them easily. Otherwise, it
@@ -536,14 +538,16 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->generalized_support_points.size()));
-  Assert(support_point_values[0].size() == this->n_components(),
-         ExcDimensionMismatch(support_point_values[0].size(),
-                              this->n_components()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  DEAL_II_Assert(support_point_values.size() ==
+                   this->generalized_support_points.size(),
+                 ExcDimensionMismatch(support_point_values.size(),
+                                      this->generalized_support_points.size()));
+  DEAL_II_Assert(support_point_values[0].size() == this->n_components(),
+                 ExcDimensionMismatch(support_point_values[0].size(),
+                                      this->n_components()));
+  DEAL_II_Assert(nodal_values.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(nodal_values.size(),
+                                      this->dofs_per_cell));
 
   std::fill(nodal_values.begin(), nodal_values.end(), 0.);
 
@@ -612,7 +616,7 @@ template <int dim>
 std::size_t
 FE_ABF<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 

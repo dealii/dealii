@@ -28,12 +28,14 @@ void
 Multigrid<VectorType>::reinit(const unsigned int min_level,
                               const unsigned int max_level)
 {
-  Assert(min_level >= matrix->get_minlevel(),
-         ExcLowerRangeType<unsigned int>(min_level, matrix->get_minlevel()));
-  Assert(max_level <= matrix->get_maxlevel(),
-         ExcLowerRangeType<unsigned int>(matrix->get_maxlevel(), max_level));
-  Assert(min_level <= max_level,
-         ExcLowerRangeType<unsigned int>(max_level, min_level));
+  DEAL_II_Assert(min_level >= matrix->get_minlevel(),
+                 ExcLowerRangeType<unsigned int>(min_level,
+                                                 matrix->get_minlevel()));
+  DEAL_II_Assert(max_level <= matrix->get_maxlevel(),
+                 ExcLowerRangeType<unsigned int>(matrix->get_maxlevel(),
+                                                 max_level));
+  DEAL_II_Assert(min_level <= max_level,
+                 ExcLowerRangeType<unsigned int>(max_level, min_level));
   minlevel = min_level;
   maxlevel = max_level;
   // solution, t and defect2 are resized in cycle()
@@ -224,7 +226,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
         cychar = 'W';
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   if (debug > 0)

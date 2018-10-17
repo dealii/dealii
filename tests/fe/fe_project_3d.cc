@@ -133,7 +133,7 @@ template <>
 double
 VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 {
-  Assert(component < 3, ExcIndexRange(component, 0, 2));
+  DEAL_II_Assert(component < 3, ExcIndexRange(component, 0, 2));
 
   const double PI  = numbers::PI;
   double       val = 0.0;

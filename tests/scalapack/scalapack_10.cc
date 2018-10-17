@@ -72,7 +72,7 @@ test(const unsigned int size, const unsigned int block_size)
   if (copy.frobenius_norm() > 1e-12)
     pcout << "norm of difference: " << copy.frobenius_norm() << std::endl;
 
-  AssertThrow(copy.frobenius_norm() < 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(copy.frobenius_norm() < 1e-12, ExcInternalError());
   std::remove(filename.c_str());
 }
 

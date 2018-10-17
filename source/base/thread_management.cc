@@ -46,7 +46,7 @@ namespace Threads
     deregister_thread()
     {
       --n_existing_threads_counter;
-      Assert(n_existing_threads_counter >= 1, ExcInternalError());
+      DEAL_II_Assert(n_existing_threads_counter >= 1, ExcInternalError());
     }
 
 
@@ -172,11 +172,12 @@ namespace Threads
     // then waiting for a barrier is
     // a no-op, and we don't need the
     // POSIX functionality
-    AssertThrow(count == 1,
-                ExcMessage("Your local POSIX installation does not support\n"
-                           "POSIX barriers. You will not be able to use\n"
-                           "this class, but the rest of the threading\n"
-                           "functionality is available."));
+    DEAL_II_AssertThrow(count == 1,
+                        ExcMessage(
+                          "Your local POSIX installation does not support\n"
+                          "POSIX barriers. You will not be able to use\n"
+                          "this class, but the rest of the threading\n"
+                          "functionality is available."));
   }
 #  endif
 
@@ -228,7 +229,7 @@ namespace Threads
                  const unsigned int end,
                  const unsigned int n_intervals)
   {
-    Assert(end >= begin, ExcInternalError());
+    DEAL_II_Assert(end >= begin, ExcInternalError());
 
     const unsigned int n_elements              = end - begin;
     const unsigned int n_elements_per_interval = n_elements / n_intervals;

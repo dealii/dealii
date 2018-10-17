@@ -30,7 +30,7 @@
 void
 test_mpi()
 {
-  Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
+  DEAL_II_Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
 
   unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -77,15 +77,15 @@ test_mpi()
       // <<std::endl;
 
       if (myid > 0 && myid < numprocs - 1)
-        Assert(len == 3, ExcInternalError());
+        DEAL_II_Assert(len == 3, ExcInternalError());
       if (myid == 0 || myid == numprocs - 1)
-        Assert(len == 2, ExcInternalError());
+        DEAL_II_Assert(len == 2, ExcInternalError());
 
-      Assert(csp.exists(indx, myid), ExcInternalError());
+      DEAL_II_Assert(csp.exists(indx, myid), ExcInternalError());
       if (myid > 0)
-        Assert(csp.exists(indx, myid - 1), ExcInternalError());
+        DEAL_II_Assert(csp.exists(indx, myid - 1), ExcInternalError());
       if (myid < numprocs - 1)
-        Assert(csp.exists(indx, myid + 1), ExcInternalError());
+        DEAL_II_Assert(csp.exists(indx, myid + 1), ExcInternalError());
     }
 
   if (myid == 0)

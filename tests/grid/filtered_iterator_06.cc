@@ -66,12 +66,12 @@ test()
          [=](const typename Triangulation<dim, spacedim>::active_face_iterator
                &face) { return face->manifold_id() == manifold_id; }))
     {
-      AssertThrow(face_set.count(filtered_cell) == 1,
-                  ExcMessage("Wrong cell filtered."));
+      DEAL_II_AssertThrow(face_set.count(filtered_cell) == 1,
+                          ExcMessage("Wrong cell filtered."));
       ++n_filtered_cells;
     }
-  AssertThrow(n_filtered_cells == face_set.size(),
-              ExcMessage("Filtered cells missing."));
+  DEAL_II_AssertThrow(n_filtered_cells == face_set.size(),
+                      ExcMessage("Filtered cells missing."));
 }
 
 int

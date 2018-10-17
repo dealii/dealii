@@ -112,8 +112,9 @@ main(int argc, char *argv[])
   // still one place that doesn't work perfectly in parallel. Now the sorting of
   // final cell centers is just a local operation and won't produce any
   // reasonable result in parallel.
-  AssertThrow(I_am_host,
-              ExcMessage("Current code works properly only with one process."));
+  DEAL_II_AssertThrow(I_am_host,
+                      ExcMessage(
+                        "Current code works properly only with one process."));
 
   const unsigned int dim = 3;
   if (I_am_host)

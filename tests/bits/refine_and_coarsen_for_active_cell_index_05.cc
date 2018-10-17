@@ -47,7 +47,7 @@ check(const Triangulation<dim> &tria)
          tria.begin_active();
        cell != tria.end();
        ++cell, ++index)
-    Assert(cell->active_cell_index() == index, ExcInternalError());
+    DEAL_II_Assert(cell->active_cell_index() == index, ExcInternalError());
 }
 
 

@@ -46,7 +46,7 @@ test(Vector<double> &v, Vector<double> &w)
   w.compress();
 
   // make sure the scalar product is zero
-  AssertThrow(v * w == product, ExcInternalError());
+  DEAL_II_AssertThrow(v * w == product, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

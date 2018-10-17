@@ -49,7 +49,7 @@ test()
   Threads::Thread<int> t;
   t = Threads::new_thread(&X::f, x);
 
-  AssertThrow(t.return_value() == 42, ExcInternalError());
+  DEAL_II_AssertThrow(t.return_value() == 42, ExcInternalError());
 }
 
 

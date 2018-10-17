@@ -47,10 +47,11 @@ test(Vector<std::complex<double>> &v)
   // check that they are ok, and this time
   // all of them
   for (unsigned int i = 0; i < v.size(); ++i)
-    AssertThrow(((pattern[i] == true) &&
-                 (v(i) == std::complex<double>(i + 1., i + 2.))) ||
-                  ((pattern[i] == false) && (v(i) == std::complex<double>(0))),
-                ExcInternalError());
+    DEAL_II_AssertThrow(((pattern[i] == true) &&
+                         (v(i) == std::complex<double>(i + 1., i + 2.))) ||
+                          ((pattern[i] == false) &&
+                           (v(i) == std::complex<double>(0))),
+                        ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

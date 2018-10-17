@@ -97,7 +97,7 @@ test()
           test_failed = true;
       }
 
-  Assert(!test_failed, ExcInternalError());
+  DEAL_II_Assert(!test_failed, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

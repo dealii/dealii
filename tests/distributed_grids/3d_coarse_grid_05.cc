@@ -76,7 +76,7 @@ create_disconnected_mesh(Triangulation<dim> &tria)
 
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // Prepare cell data
@@ -128,7 +128,7 @@ create_disconnected_mesh(Triangulation<dim> &tria)
 
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // Prepare cell data

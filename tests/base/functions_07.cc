@@ -31,7 +31,7 @@ public:
   double
   laplacian(const Point<dim> &p, const unsigned int c) const
   {
-    Assert(c == 0, ExcInternalError());
+    DEAL_II_Assert(c == 0, ExcInternalError());
     return p.norm();
   }
 };
@@ -55,7 +55,7 @@ check()
   f.laplacian_list(points, laplacians);
 
   for (unsigned int i = 0; i < 10; ++i)
-    AssertThrow(points[i].norm() == laplacians[i], ExcInternalError());
+    DEAL_II_AssertThrow(points[i].norm() == laplacians[i], ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -49,7 +49,7 @@ PersistentTriangulation<dim, spacedim>::PersistentTriangulation(
   , refine_flags(old_tria.refine_flags)
   , coarsen_flags(old_tria.coarsen_flags)
 {
-  Assert(old_tria.n_levels() == 0, ExcTriaNotEmpty());
+  DEAL_II_Assert(old_tria.n_levels() == 0, ExcTriaNotEmpty());
 }
 
 
@@ -99,8 +99,8 @@ PersistentTriangulation<dim, spacedim>::restore(const unsigned int step)
     // for each of the previous
     // refinement sweeps
     {
-      Assert(step < refine_flags.size() + 1,
-             ExcDimensionMismatch(step, refine_flags.size() + 1));
+      DEAL_II_Assert(step < refine_flags.size() + 1,
+                     ExcDimensionMismatch(step, refine_flags.size() + 1));
 
       this->load_refine_flags(refine_flags[step - 1]);
       this->load_coarsen_flags(coarsen_flags[step - 1]);
@@ -140,7 +140,7 @@ PersistentTriangulation<dim, spacedim>::create_triangulation(
   const std::vector<CellData<dim>> &,
   const SubCellData &)
 {
-  Assert(false, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(false, ExcImpossibleInDim(dim));
 }
 
 
@@ -152,7 +152,7 @@ PersistentTriangulation<dim, spacedim>::create_triangulation_compatibility(
   const std::vector<CellData<dim>> &,
   const SubCellData &)
 {
-  Assert(false, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(false, ExcImpossibleInDim(dim));
 }
 
 
@@ -163,7 +163,7 @@ PersistentTriangulation<dim, spacedim>::write_flags(std::ostream &out) const
 {
   const unsigned int n_flag_levels = refine_flags.size();
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   out << mn_persistent_tria_flags_begin << ' ' << n_flag_levels << std::endl;
 
@@ -181,7 +181,7 @@ PersistentTriangulation<dim, spacedim>::write_flags(std::ostream &out) const
 
   out << mn_persistent_tria_flags_end << std::endl;
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -190,14 +190,14 @@ template <int dim, int spacedim>
 void
 PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
 {
-  Assert(refine_flags.size() == 0 && coarsen_flags.size() == 0,
-         ExcFlagsNotCleared());
-  AssertThrow(in, ExcIO());
+  DEAL_II_Assert(refine_flags.size() == 0 && coarsen_flags.size() == 0,
+                 ExcFlagsNotCleared());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   unsigned int magic_number;
   in >> magic_number;
-  AssertThrow(magic_number == mn_persistent_tria_flags_begin,
-              typename Triangulation<dim>::ExcGridReadError());
+  DEAL_II_AssertThrow(magic_number == mn_persistent_tria_flags_begin,
+                      typename Triangulation<dim>::ExcGridReadError());
 
   unsigned int n_flag_levels;
   in >> n_flag_levels;
@@ -216,10 +216,10 @@ PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
     }
 
   in >> magic_number;
-  AssertThrow(magic_number == mn_persistent_tria_flags_end,
-              typename Triangulation<dim>::ExcGridReadError());
+  DEAL_II_AssertThrow(magic_number == mn_persistent_tria_flags_end,
+                      typename Triangulation<dim>::ExcGridReadError());
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 }
 
 

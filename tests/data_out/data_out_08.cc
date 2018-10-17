@@ -17,7 +17,7 @@
 // this test documents two unrelated bugs in DataOut when used with a Filter (by
 // deriving from DataOut):
 // 1. The patch index computation in data_out.cc is wrong and causes an SIGV (or
-// an Assert after adding that):
+// an DEAL_II_Assert after adding that):
 /*
 466: --------------------------------------------------------
 466: An error occurred in line <306> of file

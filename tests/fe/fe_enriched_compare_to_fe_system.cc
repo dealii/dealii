@@ -77,8 +77,8 @@ public:
   gradient(const Point<dim> &point, const unsigned int component = 0) const
   {
     Tensor<1, dim> res = point;
-    Assert(point.norm() > 0,
-           dealii::ExcMessage("gradient is not defined at zero"));
+    DEAL_II_Assert(point.norm() > 0,
+                   dealii::ExcMessage("gradient is not defined at zero"));
     res *= -value(point) / point.norm();
     return res;
   }
@@ -88,7 +88,7 @@ public:
   {
     Tensor<1, dim> dir = p;
     const double   r   = dir.norm();
-    Assert(r > 0.0, ExcMessage("r is not positive"));
+    DEAL_II_Assert(r > 0.0, ExcMessage("r is not positive"));
     dir /= r;
     SymmetricTensor<2, dim> dir_x_dir;
     for (unsigned int i = 0; i < dim; i++)
@@ -146,13 +146,13 @@ check_consistency(const Point<dim> &    p,
   const Tensor<2, dim> h_s = h_s0 + h_s1 * v_f + sp + v_s1 * h_f;
 
   const double v_d = v_s - v_e;
-  AssertThrow(std::abs(v_d) < eps, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(v_d) < eps, ExcInternalError());
   const Tensor<1, dim> g_d = g_s - g_e;
-  AssertThrow(g_d.norm() < eps, ExcInternalError());
+  DEAL_II_AssertThrow(g_d.norm() < eps, ExcInternalError());
 
   // see note above.
   const Tensor<2, dim> h_d = h_s - h_e;
-  AssertThrow(h_d.norm() < eps, ExcInternalError());
+  DEAL_II_AssertThrow(h_d.norm() < eps, ExcInternalError());
 }
 
 template <int dim>
@@ -212,8 +212,8 @@ test(const FiniteElement<dim> & fe1,
                                             update_quadrature_points);
 
   const unsigned int dofs_per_cell = fe_enriched.dofs_per_cell;
-  Assert(fe_enriched.dofs_per_cell == fe_system.dofs_per_cell,
-         ExcInternalError());
+  DEAL_II_Assert(fe_enriched.dofs_per_cell == fe_system.dofs_per_cell,
+                 ExcInternalError());
 
   typename DoFHandler<dim>::active_cell_iterator
     cell_enriched = dof_handler_enriched.begin_active(),

@@ -117,7 +117,7 @@ test(const unsigned int size,
          &lwork,
          &info);
 
-    AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("syev", info));
+    DEAL_II_AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("syev", info));
     for (unsigned int i = 0; i < max_n_eigenvalues; ++i)
       for (unsigned int j = 0; j < size; ++j)
         s_eigenvectors_[i][j] = lapack_A[(size - 1 - i) * size + j];
@@ -148,7 +148,7 @@ test(const unsigned int size,
                     << std::endl;
         }
 
-      AssertThrow(
+      DEAL_II_AssertThrow(
         std::abs(eigenvalues_psyevx[i] -
                  eigenvalues_Lapack[size - eigenvalues_psyevx.size() + i]) /
             std::abs(eigenvalues_Lapack[size - eigenvalues_psyevx.size() + i]) <
@@ -178,8 +178,8 @@ test(const unsigned int size,
 
       // the requirement for alignment of the eigenvectors has to be released
       // (primarily for floats)
-      AssertThrow(std::abs(std::abs(product) - 1) < tol * 10,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(std::abs(product) - 1) < tol * 10,
+                          ExcInternalError());
     }
   pcout
     << "   with respect to the given tolerance also the eigenvectors coincide"

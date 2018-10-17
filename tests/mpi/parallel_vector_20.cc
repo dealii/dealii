@@ -44,8 +44,8 @@ test()
 
   v.import(read_write_vector, VectorOperation::insert);
 
-  AssertThrow(v.local_element(0) == 1., ExcInternalError());
-  AssertThrow(v.local_element(1) == 2., ExcInternalError());
+  DEAL_II_AssertThrow(v.local_element(0) == 1., ExcInternalError());
+  DEAL_II_AssertThrow(v.local_element(1) == 2., ExcInternalError());
 
   read_write_owned.clear();
   read_write_owned.add_index(1);
@@ -56,8 +56,8 @@ test()
 
   v.import(read_write_vector, VectorOperation::insert);
 
-  AssertThrow(v.local_element(0) == my_id + 1, ExcInternalError());
-  AssertThrow(v.local_element(1) == my_id + 1, ExcInternalError());
+  DEAL_II_AssertThrow(v.local_element(0) == my_id + 1, ExcInternalError());
+  DEAL_II_AssertThrow(v.local_element(1) == my_id + 1, ExcInternalError());
 
   if (my_id == 0)
     deallog << "OK" << std::endl;

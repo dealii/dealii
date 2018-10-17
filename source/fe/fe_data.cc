@@ -55,8 +55,8 @@ FiniteElementData<dim>::FiniteElementData(
                          BlockIndices(1, dofs_per_cell) :
                          block_indices)
 {
-  Assert(dofs_per_object.size() == dim + 1,
-         ExcDimensionMismatch(dofs_per_object.size() - 1, dim));
+  DEAL_II_Assert(dofs_per_object.size() == dim + 1,
+                 ExcDimensionMismatch(dofs_per_object.size() - 1, dim));
 }
 
 

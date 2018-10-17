@@ -593,27 +593,27 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcInvalidObject,
-                   "This accessor object has not been "
-                   "associated with any DoFHandler object.");
+  DEAL_II_DeclExceptionMsg(ExcInvalidObject,
+                           "This accessor object has not been "
+                           "associated with any DoFHandler object.");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcVectorNotEmpty);
+  DEAL_II_DeclException0(ExcVectorNotEmpty);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcVectorDoesNotMatch);
+  DEAL_II_DeclException0(ExcVectorDoesNotMatch);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcMatrixDoesNotMatch);
+  DEAL_II_DeclException0(ExcMatrixDoesNotMatch);
   /**
    * A function has been called for a cell which should be
    * @ref GlossActive "active",
@@ -621,13 +621,13 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcNotActive);
+  DEAL_II_DeclException0(ExcNotActive);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcCantCompareIterators);
+  DEAL_II_DeclException0(ExcCantCompareIterators);
 
 protected:
   /**
@@ -1096,27 +1096,27 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcInvalidObject,
-                   "This accessor object has not been "
-                   "associated with any DoFHandler object.");
+  DEAL_II_DeclExceptionMsg(ExcInvalidObject,
+                           "This accessor object has not been "
+                           "associated with any DoFHandler object.");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcVectorNotEmpty);
+  DEAL_II_DeclException0(ExcVectorNotEmpty);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcVectorDoesNotMatch);
+  DEAL_II_DeclException0(ExcVectorDoesNotMatch);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcMatrixDoesNotMatch);
+  DEAL_II_DeclException0(ExcMatrixDoesNotMatch);
   /**
    * A function has been called for a cell which should be
    * @ref GlossActive "active",
@@ -1124,13 +1124,13 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcNotActive);
+  DEAL_II_DeclException0(ExcNotActive);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcCantCompareIterators);
+  DEAL_II_DeclException0(ExcCantCompareIterators);
 
 protected:
   /**
@@ -1970,12 +1970,13 @@ template <typename OtherAccessor>
 DoFInvalidAccessor<structdim, dim, spacedim>::DoFInvalidAccessor(
   const OtherAccessor &)
 {
-  Assert(false,
-         ExcMessage("You are attempting an illegal conversion between "
-                    "iterator/accessor types. The constructor you call "
-                    "only exists to make certain template constructs "
-                    "easier to write as dimension independent code but "
-                    "the conversion is not valid in the current context."));
+  DEAL_II_Assert(false,
+                 ExcMessage(
+                   "You are attempting an illegal conversion between "
+                   "iterator/accessor types. The constructor you call "
+                   "only exists to make certain template constructs "
+                   "easier to write as dimension independent code but "
+                   "the conversion is not valid in the current context."));
 }
 
 

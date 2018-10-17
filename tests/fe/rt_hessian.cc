@@ -63,9 +63,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   // values are NaN's which the
   // Hessian consists of at the
   // time this test is written
-  Assert(fe_values.shape_hessian_component(0, 0, 0) ==
-           fe_values.shape_hessian_component(0, 0, 0),
-         ExcInternalError());
+  DEAL_II_Assert(fe_values.shape_hessian_component(0, 0, 0) ==
+                   fe_values.shape_hessian_component(0, 0, 0),
+                 ExcInternalError());
 }
 
 

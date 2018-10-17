@@ -29,8 +29,8 @@ test()
 
   unsigned int minima[2] = {1 + myid, numprocs + myid};
   Utilities::MPI::min(minima, MPI_COMM_WORLD, minima);
-  Assert(minima[0] == 1, ExcInternalError());
-  Assert(minima[1] == numprocs, ExcInternalError());
+  DEAL_II_Assert(minima[0] == 1, ExcInternalError());
+  DEAL_II_Assert(minima[1] == numprocs, ExcInternalError());
 
   if (myid == 0)
     deallog << minima[0] << ' ' << minima[1] << std::endl;

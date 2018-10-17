@@ -171,21 +171,22 @@ public:
   /**
    * Exception.
    */
-  DeclException0(ExcSizeZero);
+  DEAL_II_DeclException0(ExcSizeZero);
   /**
    * Exception.
    */
-  DeclException0(ExcSizeNonzero);
+  DEAL_II_DeclException0(ExcSizeNonzero);
   /**
    * Exception.
    */
-  DeclException1(ExcInvalidFilename,
-                 std::string,
-                 << "The filename <" << arg1 << "> is not a valid one here.");
+  DEAL_II_DeclException1(ExcInvalidFilename,
+                         std::string,
+                         << "The filename <" << arg1
+                         << "> is not a valid one here.");
   /**
    * Exception.
    */
-  DeclException0(ExcInvalidCopyOperation);
+  DEAL_II_DeclException0(ExcInvalidCopyOperation);
   //@}
 private:
   /**

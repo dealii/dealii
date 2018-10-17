@@ -172,12 +172,13 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
   const size_type m = M.n_rows(), n = M.n_cols();
   storage.reinit(m, n);
   storage.fill(M);
-  Assert(!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
+  DEAL_II_Assert(!storage.empty(),
+                 typename FullMatrix<number2>::ExcEmptyMatrix());
   diagonal.resize(m);
 
   // m > n, src.n() = m
-  Assert(storage.n_cols() <= storage.n_rows(),
-         ExcDimensionMismatch(storage.n_cols(), storage.n_rows()));
+  DEAL_II_Assert(storage.n_cols() <= storage.n_rows(),
+                 ExcDimensionMismatch(storage.n_cols(), storage.n_rows()));
 
   for (size_type j = 0; j < n; ++j)
     {
@@ -237,9 +238,10 @@ double
 Householder<number>::least_squares(Vector<number2> &      dst,
                                    const Vector<number2> &src) const
 {
-  Assert(!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
-  AssertDimension(dst.size(), storage.n());
-  AssertDimension(src.size(), storage.m());
+  DEAL_II_Assert(!storage.empty(),
+                 typename FullMatrix<number2>::ExcEmptyMatrix());
+  DEAL_II_AssertDimension(dst.size(), storage.n());
+  DEAL_II_AssertDimension(src.size(), storage.m());
 
   const size_type m = storage.m(), n = storage.n();
 
@@ -266,7 +268,7 @@ Householder<number>::least_squares(Vector<number2> &      dst,
   number2 sum = 0.;
   for (size_type i = n; i < m; ++i)
     sum += (*aux)(i) * (*aux)(i);
-  AssertIsFinite(sum);
+  DEAL_II_AssertIsFinite(sum);
 
   // Compute solution
   storage.backward(dst, *aux);
@@ -282,9 +284,10 @@ double
 Householder<number>::least_squares(BlockVector<number2> &      dst,
                                    const BlockVector<number2> &src) const
 {
-  Assert(!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
-  AssertDimension(dst.size(), storage.n());
-  AssertDimension(src.size(), storage.m());
+  DEAL_II_Assert(!storage.empty(),
+                 typename FullMatrix<number2>::ExcEmptyMatrix());
+  DEAL_II_AssertDimension(dst.size(), storage.n());
+  DEAL_II_AssertDimension(src.size(), storage.m());
 
   const size_type m = storage.m(), n = storage.n();
 
@@ -311,7 +314,7 @@ Householder<number>::least_squares(BlockVector<number2> &      dst,
   number2 sum = 0.;
   for (size_type i = n; i < m; ++i)
     sum += (*aux)(i) * (*aux)(i);
-  AssertIsFinite(sum);
+  DEAL_II_AssertIsFinite(sum);
 
   // backward works for
   // Vectors only, so copy
@@ -343,7 +346,7 @@ template <class VectorType>
 void
 Householder<number>::Tvmult(VectorType &, const VectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 

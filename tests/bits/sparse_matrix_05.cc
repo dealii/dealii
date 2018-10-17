@@ -55,7 +55,7 @@ test()
     }
 
   deallog << m.n_nonzero_elements() << std::endl;
-  Assert(m.n_nonzero_elements() == counter, ExcInternalError());
+  DEAL_II_Assert(m.n_nonzero_elements() == counter, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

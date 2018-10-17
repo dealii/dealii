@@ -354,7 +354,7 @@ MGMatrixSelect<MatrixType, number>::vmult(const unsigned int    level,
                                           Vector<number> &      dst,
                                           const Vector<number> &src) const
 {
-  Assert(matrix != 0, ExcNotInitialized());
+  DEAL_II_Assert(matrix != 0, ExcNotInitialized());
 
   const MGLevelObject<MatrixType> &m = *matrix;
   m[level].block(row, col).vmult(dst, src);
@@ -368,7 +368,7 @@ MGMatrixSelect<MatrixType, number>::vmult_add(const unsigned int    level,
                                               Vector<number> &      dst,
                                               const Vector<number> &src) const
 {
-  Assert(matrix != 0, ExcNotInitialized());
+  DEAL_II_Assert(matrix != 0, ExcNotInitialized());
 
   const MGLevelObject<MatrixType> &m = *matrix;
   m[level].block(row, col).vmult_add(dst, src);
@@ -382,7 +382,7 @@ MGMatrixSelect<MatrixType, number>::Tvmult(const unsigned int    level,
                                            Vector<number> &      dst,
                                            const Vector<number> &src) const
 {
-  Assert(matrix != 0, ExcNotInitialized());
+  DEAL_II_Assert(matrix != 0, ExcNotInitialized());
 
   const MGLevelObject<MatrixType> &m = *matrix;
   m[level].block(row, col).Tvmult(dst, src);
@@ -396,7 +396,7 @@ MGMatrixSelect<MatrixType, number>::Tvmult_add(const unsigned int    level,
                                                Vector<number> &      dst,
                                                const Vector<number> &src) const
 {
-  Assert(matrix != 0, ExcNotInitialized());
+  DEAL_II_Assert(matrix != 0, ExcNotInitialized());
 
   const MGLevelObject<MatrixType> &m = *matrix;
   m[level].block(row, col).Tvmult_add(dst, src);

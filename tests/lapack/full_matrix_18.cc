@@ -55,7 +55,7 @@ test(const unsigned int size)
       std::cout << "FullMatrix:" << std::endl;
       invF.print_formatted(std::cout);
       std::cout << std::flush;
-      AssertThrow(false, ExcInternalError());
+      DEAL_II_AssertThrow(false, ExcInternalError());
     }
 }
 

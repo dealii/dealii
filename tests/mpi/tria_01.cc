@@ -59,7 +59,7 @@ test()
   deallog << "subdomainid = " << tr.begin_active()->subdomain_id() << std::endl;
 
   // if (myid!=0)
-  //   Assert(tr.begin(1)==tr.end(1), ExcInternalError());
+  //   DEAL_II_Assert(tr.begin(1)==tr.end(1), ExcInternalError());
 
   const unsigned int checksum = tr.get_checksum();
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

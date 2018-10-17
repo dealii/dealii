@@ -55,8 +55,8 @@ test()
   vb *= 2.0;
   v = vb;
 
-  Assert(!vb.has_ghost_elements(), ExcInternalError());
-  Assert(v.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(!vb.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v.has_ghost_elements(), ExcInternalError());
 
   try
     {

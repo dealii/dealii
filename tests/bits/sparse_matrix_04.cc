@@ -34,8 +34,8 @@ test()
 
   SparseMatrix<double> m(sp);
 
-  AssertThrow(m.m() == 5, ExcInternalError());
-  AssertThrow(m.n() == 5, ExcInternalError());
+  DEAL_II_AssertThrow(m.m() == 5, ExcInternalError());
+  DEAL_II_AssertThrow(m.n() == 5, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

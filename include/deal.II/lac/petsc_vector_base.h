@@ -167,25 +167,26 @@ namespace PETScWrappers
       /**
        * Exception
        */
-      DeclException3(ExcAccessToNonlocalElement,
-                     int,
-                     int,
-                     int,
-                     << "You tried to access element " << arg1
-                     << " of a distributed vector, but only elements " << arg2
-                     << " through " << arg3
-                     << " are stored locally and can be accessed.");
+      DEAL_II_DeclException3(ExcAccessToNonlocalElement,
+                             int,
+                             int,
+                             int,
+                             << "You tried to access element " << arg1
+                             << " of a distributed vector, but only elements "
+                             << arg2 << " through " << arg3
+                             << " are stored locally and can be accessed.");
       /**
        * Exception.
        */
-      DeclException2(ExcWrongMode,
-                     int,
-                     int,
-                     << "You tried to do a "
-                     << (arg1 == 1 ? "'set'" : (arg1 == 2 ? "'add'" : "???"))
-                     << " operation but the vector is currently in "
-                     << (arg2 == 1 ? "'set'" : (arg2 == 2 ? "'add'" : "???"))
-                     << " mode. You first have to call 'compress()'.");
+      DEAL_II_DeclException2(
+        ExcWrongMode,
+        int,
+        int,
+        << "You tried to do a "
+        << (arg1 == 1 ? "'set'" : (arg1 == 2 ? "'add'" : "???"))
+        << " operation but the vector is currently in "
+        << (arg2 == 1 ? "'set'" : (arg2 == 2 ? "'add'" : "???"))
+        << " mode. You first have to call 'compress()'.");
 
     private:
       /**
@@ -876,17 +877,17 @@ namespace PETScWrappers
     inline const VectorReference &
     VectorReference::operator=(const PetscScalar &value) const
     {
-      Assert((vector.last_action == VectorOperation::insert) ||
-               (vector.last_action == VectorOperation::unknown),
-             ExcWrongMode(VectorOperation::insert, vector.last_action));
+      DEAL_II_Assert((vector.last_action == VectorOperation::insert) ||
+                       (vector.last_action == VectorOperation::unknown),
+                     ExcWrongMode(VectorOperation::insert, vector.last_action));
 
-      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+      DEAL_II_Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
 
       const PetscInt petsc_i = index;
 
       const PetscErrorCode ierr =
         VecSetValues(vector, 1, &petsc_i, &value, INSERT_VALUES);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       vector.last_action = VectorOperation::insert;
 
@@ -898,11 +899,11 @@ namespace PETScWrappers
     inline const VectorReference &
     VectorReference::operator+=(const PetscScalar &value) const
     {
-      Assert((vector.last_action == VectorOperation::add) ||
-               (vector.last_action == VectorOperation::unknown),
-             ExcWrongMode(VectorOperation::add, vector.last_action));
+      DEAL_II_Assert((vector.last_action == VectorOperation::add) ||
+                       (vector.last_action == VectorOperation::unknown),
+                     ExcWrongMode(VectorOperation::add, vector.last_action));
 
-      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+      DEAL_II_Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::add;
 
@@ -920,7 +921,7 @@ namespace PETScWrappers
       const PetscInt       petsc_i = index;
       const PetscErrorCode ierr =
         VecSetValues(vector, 1, &petsc_i, &value, ADD_VALUES);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
 
       return *this;
@@ -931,11 +932,11 @@ namespace PETScWrappers
     inline const VectorReference &
     VectorReference::operator-=(const PetscScalar &value) const
     {
-      Assert((vector.last_action == VectorOperation::add) ||
-               (vector.last_action == VectorOperation::unknown),
-             ExcWrongMode(VectorOperation::add, vector.last_action));
+      DEAL_II_Assert((vector.last_action == VectorOperation::add) ||
+                       (vector.last_action == VectorOperation::unknown),
+                     ExcWrongMode(VectorOperation::add, vector.last_action));
 
-      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+      DEAL_II_Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::add;
 
@@ -955,7 +956,7 @@ namespace PETScWrappers
       const PetscScalar    subtractand = -value;
       const PetscErrorCode ierr =
         VecSetValues(vector, 1, &petsc_i, &subtractand, ADD_VALUES);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       return *this;
     }
@@ -965,11 +966,11 @@ namespace PETScWrappers
     inline const VectorReference &
     VectorReference::operator*=(const PetscScalar &value) const
     {
-      Assert((vector.last_action == VectorOperation::insert) ||
-               (vector.last_action == VectorOperation::unknown),
-             ExcWrongMode(VectorOperation::insert, vector.last_action));
+      DEAL_II_Assert((vector.last_action == VectorOperation::insert) ||
+                       (vector.last_action == VectorOperation::unknown),
+                     ExcWrongMode(VectorOperation::insert, vector.last_action));
 
-      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+      DEAL_II_Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::insert;
 
@@ -988,7 +989,7 @@ namespace PETScWrappers
 
       const PetscErrorCode ierr =
         VecSetValues(vector, 1, &petsc_i, &new_value, INSERT_VALUES);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       return *this;
     }
@@ -998,11 +999,11 @@ namespace PETScWrappers
     inline const VectorReference &
     VectorReference::operator/=(const PetscScalar &value) const
     {
-      Assert((vector.last_action == VectorOperation::insert) ||
-               (vector.last_action == VectorOperation::unknown),
-             ExcWrongMode(VectorOperation::insert, vector.last_action));
+      DEAL_II_Assert((vector.last_action == VectorOperation::insert) ||
+                       (vector.last_action == VectorOperation::unknown),
+                     ExcWrongMode(VectorOperation::insert, vector.last_action));
 
-      Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
+      DEAL_II_Assert(!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::insert;
 
@@ -1021,7 +1022,7 @@ namespace PETScWrappers
 
       const PetscErrorCode ierr =
         VecSetValues(vector, 1, &petsc_i, &new_value, INSERT_VALUES);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       return *this;
     }
@@ -1058,7 +1059,7 @@ namespace PETScWrappers
     PetscInt             begin, end;
     const PetscErrorCode ierr =
       VecGetOwnershipRange(static_cast<const Vec &>(vector), &begin, &end);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
@@ -1170,19 +1171,19 @@ namespace PETScWrappers
         // an index set
         PetscInt       begin, end;
         PetscErrorCode ierr = VecGetOwnershipRange(vector, &begin, &end);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         Vec locally_stored_elements = nullptr;
         ierr = VecGhostGetLocalForm(vector, &locally_stored_elements);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         PetscInt lsize;
         ierr = VecGetSize(locally_stored_elements, &lsize);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         PetscScalar *ptr;
         ierr = VecGetArray(locally_stored_elements, &ptr);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         for (PetscInt i = 0; i < n_idx; ++i)
           {
@@ -1199,17 +1200,17 @@ namespace PETScWrappers
                 const unsigned int ghostidx =
                   ghost_indices.index_within_set(index);
 
-                Assert(ghostidx + end - begin < (unsigned int)lsize,
-                       ExcInternalError());
+                DEAL_II_Assert(ghostidx + end - begin < (unsigned int)lsize,
+                               ExcInternalError());
                 *(values_begin + i) = *(ptr + ghostidx + end - begin);
               }
           }
 
         ierr = VecRestoreArray(locally_stored_elements, &ptr);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         ierr = VecGhostRestoreLocalForm(vector, &locally_stored_elements);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
     // if the vector is local or the
     // caller, then simply access the
@@ -1218,25 +1219,25 @@ namespace PETScWrappers
       {
         PetscInt       begin, end;
         PetscErrorCode ierr = VecGetOwnershipRange(vector, &begin, &end);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         PetscScalar *ptr;
         ierr = VecGetArray(vector, &ptr);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         for (PetscInt i = 0; i < n_idx; ++i)
           {
             const unsigned int index = *(indices_begin + i);
 
-            Assert(index >= static_cast<unsigned int>(begin) &&
-                     index < static_cast<unsigned int>(end),
-                   ExcInternalError());
+            DEAL_II_Assert(index >= static_cast<unsigned int>(begin) &&
+                             index < static_cast<unsigned int>(end),
+                           ExcInternalError());
 
             *(values_begin + i) = *(ptr + index - begin);
           }
 
         ierr = VecRestoreArray(vector, &ptr);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
   }
 

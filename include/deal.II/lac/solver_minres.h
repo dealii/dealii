@@ -116,7 +116,7 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcPreconditionerNotDefinite);
+  DEAL_II_DeclException0(ExcPreconditionerNotDefinite);
   //@}
 
 protected:
@@ -254,7 +254,7 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
 
   delta[1] = v * (*u[1]);
   // Preconditioner positive
-  Assert(delta[1] >= 0, ExcPreconditionerNotDefinite());
+  DEAL_II_Assert(delta[1] >= 0, ExcPreconditionerNotDefinite());
 
   r0   = std::sqrt(delta[1]);
   r_l2 = r0;
@@ -288,7 +288,7 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
 
       delta[2] = v * (*u[2]);
 
-      Assert(delta[2] >= 0, ExcPreconditionerNotDefinite());
+      DEAL_II_Assert(delta[2] >= 0, ExcPreconditionerNotDefinite());
 
       if (j == 1)
         {
@@ -347,8 +347,8 @@ SolverMinRes<VectorType>::solve(const MatrixType &        A,
     }
 
   // in case of failure: throw exception
-  AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence(j, r_l2));
+  DEAL_II_AssertThrow(conv == SolverControl::success,
+                      SolverControl::NoConvergence(j, r_l2));
 
   // otherwise exit as normal
 }

@@ -83,7 +83,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
   deallog << get_name() << std::endl;
 #endif
 
-  Assert(dim >= 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim >= 2, ExcImpossibleInDim(dim));
 
   const unsigned int n_dofs = this->dofs_per_cell;
 
@@ -196,7 +196,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -243,7 +243,7 @@ template <>
 void
 FE_Nedelec<1>::initialize_support_points(const unsigned int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1989,7 +1989,7 @@ FE_Nedelec<dim>::initialize_restriction()
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -2036,10 +2036,12 @@ bool
 FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
                                      const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  DEAL_II_Assert(shape_index < this->dofs_per_cell,
+                 ExcIndexRange(shape_index, 0, this->dofs_per_cell));
+  DEAL_II_Assert(face_index < GeometryInfo<dim>::faces_per_cell,
+                 ExcIndexRange(face_index,
+                               0,
+                               GeometryInfo<dim>::faces_per_cell));
 
   const unsigned int deg = this->degree - 1;
   switch (dim)
@@ -2080,7 +2082,7 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
 
             default:
               {
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
                 return false;
               }
           }
@@ -2259,14 +2261,14 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
 
             default:
               {
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
                 return false;
               }
           }
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return false;
         }
     }
@@ -2315,7 +2317,7 @@ FE_Nedelec<dim>::compare_for_face_domination(
         }
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -2372,7 +2374,7 @@ FE_Nedelec<dim>::hp_line_dof_identities(
 
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -2419,7 +2421,7 @@ FE_Nedelec<dim>::hp_quad_dof_identities(
 
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -2440,13 +2442,16 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // Nedelec element
-  AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
-                (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
-              (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
-  Assert(interpolation_matrix.m() == source.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(), source.dofs_per_face));
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+  DEAL_II_AssertThrow(
+    (source.get_name().find("FE_Nedelec<") == 0) ||
+      (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
+    (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
+  DEAL_II_Assert(interpolation_matrix.m() == source.dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      source.dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.n() == this->dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.n(),
+                                      this->dofs_per_face));
 
   // ok, source is a Nedelec element, so
   // we will be able to do the work
@@ -2464,8 +2469,9 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
   // lead to problems in the
   // hp procedures, which use this
   // method.
-  Assert(this->dofs_per_face <= source_fe.dofs_per_face,
-         (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
+  DEAL_II_Assert(
+    this->dofs_per_face <= source_fe.dofs_per_face,
+    (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
   interpolation_matrix = 0;
 
   // On lines we can just identify
@@ -2512,7 +2518,7 @@ FE_Nedelec<1>::get_subface_interpolation_matrix(const FiniteElement<1, 1> &,
                                                 const unsigned int,
                                                 FullMatrix<double> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2543,13 +2549,16 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // Nedelec element
-  AssertThrow((source.get_name().find("FE_Nedelec<") == 0) ||
-                (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
-              typename FiniteElement<dim>::ExcInterpolationNotImplemented());
-  Assert(interpolation_matrix.m() == source.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(), source.dofs_per_face));
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
+  DEAL_II_AssertThrow(
+    (source.get_name().find("FE_Nedelec<") == 0) ||
+      (dynamic_cast<const FE_Nedelec<dim> *>(&source) != nullptr),
+    typename FiniteElement<dim>::ExcInterpolationNotImplemented());
+  DEAL_II_Assert(interpolation_matrix.m() == source.dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      source.dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.n() == this->dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.n(),
+                                      this->dofs_per_face));
 
   // ok, source is a Nedelec element, so
   // we will be able to do the work
@@ -2567,8 +2576,9 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   // lead to problems in the
   // hp procedures, which use this
   // method.
-  Assert(this->dofs_per_face <= source_fe.dofs_per_face,
-         (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
+  DEAL_II_Assert(
+    this->dofs_per_face <= source_fe.dofs_per_face,
+    (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
   interpolation_matrix = 0.0;
   // Perform projection-based interpolation
   // as usual.
@@ -2960,7 +2970,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -2970,17 +2980,18 @@ FE_Nedelec<dim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(refinement_case != RefinementCase<dim>::no_refinement,
-         ExcMessage(
-           "Prolongation matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  DEAL_II_Assert(refinement_case <
+                   RefinementCase<dim>::isotropic_refinement + 1,
+                 ExcIndexRange(refinement_case,
+                               0,
+                               RefinementCase<dim>::isotropic_refinement + 1));
+  DEAL_II_Assert(
+    refinement_case != RefinementCase<dim>::no_refinement,
+    ExcMessage("Prolongation matrices are only available for refined cells!"));
+  DEAL_II_Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+                 ExcIndexRange(child,
+                               0,
+                               GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -3030,19 +3041,20 @@ FE_Nedelec<dim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(refinement_case != RefinementCase<dim>::no_refinement,
-         ExcMessage(
-           "Restriction matrices are only available for refined cells!"));
-  Assert(child <
-           GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(
-                         RefinementCase<dim>(refinement_case))));
+  DEAL_II_Assert(refinement_case <
+                   RefinementCase<dim>::isotropic_refinement + 1,
+                 ExcIndexRange(refinement_case,
+                               0,
+                               RefinementCase<dim>::isotropic_refinement + 1));
+  DEAL_II_Assert(
+    refinement_case != RefinementCase<dim>::no_refinement,
+    ExcMessage("Restriction matrices are only available for refined cells!"));
+  DEAL_II_Assert(child < GeometryInfo<dim>::n_children(
+                           RefinementCase<dim>(refinement_case)),
+                 ExcIndexRange(child,
+                               0,
+                               GeometryInfo<dim>::n_children(
+                                 RefinementCase<dim>(refinement_case))));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -3100,14 +3112,16 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
   std::vector<double> &              nodal_values) const
 {
   const unsigned int deg = this->degree - 1;
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->generalized_support_points.size()));
-  Assert(support_point_values[0].size() == this->n_components(),
-         ExcDimensionMismatch(support_point_values[0].size(),
-                              this->n_components()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  DEAL_II_Assert(support_point_values.size() ==
+                   this->generalized_support_points.size(),
+                 ExcDimensionMismatch(support_point_values.size(),
+                                      this->generalized_support_points.size()));
+  DEAL_II_Assert(support_point_values[0].size() == this->n_components(),
+                 ExcDimensionMismatch(support_point_values[0].size(),
+                                      this->n_components()));
+  DEAL_II_Assert(nodal_values.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(nodal_values.size(),
+                                      this->dofs_per_cell));
   std::fill(nodal_values.begin(), nodal_values.end(), 0.0);
 
   switch (dim)
@@ -4035,7 +4049,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -4061,7 +4075,7 @@ template <int dim>
 std::size_t
 FE_Nedelec<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 

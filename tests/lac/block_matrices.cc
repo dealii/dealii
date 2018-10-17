@@ -111,12 +111,12 @@ test()
       deallog << "Row=" << row << ": expected length=" << c
               << ", actual length=" << ac << std::endl;
       total_nonzero_elements += ac;
-      AssertThrow(c == ac, ExcInternalError());
+      DEAL_II_AssertThrow(c == ac, ExcInternalError());
     };
   deallog << total_nonzero_elements << "==" << bsp.n_nonzero_elements()
           << std::endl;
-  AssertThrow(total_nonzero_elements == bsp.n_nonzero_elements(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(total_nonzero_elements == bsp.n_nonzero_elements(),
+                      ExcInternalError());
 
 
 
@@ -125,8 +125,8 @@ test()
   BlockSparseMatrix<double> bsm(bsp);
   deallog << total_nonzero_elements << "==" << bsm.n_nonzero_elements()
           << std::endl;
-  AssertThrow(total_nonzero_elements == bsm.n_nonzero_elements(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(total_nonzero_elements == bsm.n_nonzero_elements(),
+                      ExcInternalError());
 
   // try to write something into it,
   // set entry (i,j) to i*j
@@ -186,7 +186,7 @@ test()
         row_sum += t[i] * i;
 
       // compare to vmult result
-      Assert(row_sum == dst(row), ExcInternalError());
+      DEAL_II_Assert(row_sum == dst(row), ExcInternalError());
       deallog << "vmult " << row << ' ' << row_sum << ' ' << dst(row)
               << std::endl;
     };
@@ -195,7 +195,7 @@ test()
   // test matrix_scalar_product. note that dst=M*src
   const double msp1 = dst.norm_sqr();
   const double msp2 = bsm.matrix_scalar_product(dst, src);
-  Assert(msp1 == msp2, ExcInternalError());
+  DEAL_II_Assert(msp1 == msp2, ExcInternalError());
   deallog << "matrix_scalar_product " << msp1 << ' ' << msp2 << std::endl;
 }
 

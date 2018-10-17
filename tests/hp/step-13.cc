@@ -103,10 +103,11 @@ namespace Evaluation
     operator()(const hp::DoFHandler<dim> &dof_handler,
                const Vector<double> &     solution) const;
 
-    DeclException1(ExcEvaluationPointNotFound,
-                   Point<dim>,
-                   << "The evaluation point " << arg1
-                   << " was not found among the vertices of the present grid.");
+    DEAL_II_DeclException1(
+      ExcEvaluationPointNotFound,
+      Point<dim>,
+      << "The evaluation point " << arg1
+      << " was not found among the vertices of the present grid.");
 
   private:
     const Point<dim> evaluation_point;
@@ -148,8 +149,8 @@ namespace Evaluation
             break;
           };
 
-    AssertThrow(evaluation_point_found,
-                ExcEvaluationPointNotFound(evaluation_point));
+    DEAL_II_AssertThrow(evaluation_point_found,
+                        ExcEvaluationPointNotFound(evaluation_point));
 
     results_table.add_value("DoFs", dof_handler.n_dofs());
     results_table.add_value("u(x_0)", point_value);
@@ -779,7 +780,7 @@ solve_problem(const std::string &solver_name)
     solver = new LaplaceSolver::RefinementKelly<dim>(
       triangulation, fe, quadrature, rhs_function, boundary_values);
   else
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
 
   TableHandler                          results_table;
   Evaluation::PointValueEvaluation<dim> postprocessor1(Point<dim>(0.5, 0.5),

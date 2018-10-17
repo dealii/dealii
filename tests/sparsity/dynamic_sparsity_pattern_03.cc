@@ -41,9 +41,10 @@ test()
       for (unsigned int j = 0; j < 40; ++j)
         xx[(i + (i + 1) * (j * j + i)) % N] = true;
 
-      Assert(static_cast<unsigned int>(
-               std::count(xx.begin(), xx.end(), true)) == csp.row_length(i),
-             ExcInternalError());
+      DEAL_II_Assert(static_cast<unsigned int>(
+                       std::count(xx.begin(), xx.end(), true)) ==
+                       csp.row_length(i),
+                     ExcInternalError());
 
       deallog << i << ' ' << csp.row_length(i) << std::endl;
     }

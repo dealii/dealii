@@ -55,7 +55,7 @@ test(std::ostream & /*out*/)
 
       deallog << i << ' ' << tr.n_active_cells() << std::endl;
 
-      Assert(tr.n_active_cells() == 4, ExcInternalError());
+      DEAL_II_Assert(tr.n_active_cells() == 4, ExcInternalError());
 
       typename Triangulation<dim>::active_cell_iterator cell =
         tr.begin_active();
@@ -65,7 +65,7 @@ test(std::ostream & /*out*/)
 
       deallog << i << ' ' << tr.n_active_cells() << std::endl;
 
-      Assert(tr.n_active_cells() == 7, ExcInternalError());
+      DEAL_II_Assert(tr.n_active_cells() == 7, ExcInternalError());
     }
 }
 

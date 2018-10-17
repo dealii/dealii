@@ -94,10 +94,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = my_id % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   MPILogInitAll log;
   test();

@@ -138,7 +138,7 @@ test()
   // their difference should be zero
   deallog << "|A| = " << A.l1_norm() << std::endl;
   deallog << "|B| = " << B.l1_norm() << std::endl;
-  Assert(A.l1_norm() - B.l1_norm() == 0, ExcInternalError());
+  DEAL_II_Assert(A.l1_norm() - B.l1_norm() == 0, ExcInternalError());
 }
 
 int

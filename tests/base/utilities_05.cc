@@ -35,12 +35,12 @@ test()
       std::ostringstream s;
       s << "test test" << number << "test test";
 
-      AssertThrow(Utilities::get_integer_at_position(s.str(), 9).first ==
-                    number,
-                  ExcInternalError());
-      AssertThrow(Utilities::get_integer_at_position(s.str(), 9).second ==
-                    i + 1,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(
+        Utilities::get_integer_at_position(s.str(), 9).first == number,
+        ExcInternalError());
+      DEAL_II_AssertThrow(
+        Utilities::get_integer_at_position(s.str(), 9).second == i + 1,
+        ExcInternalError());
 
       deallog << i << ' '
               << Utilities::get_integer_at_position(s.str(), 9).first

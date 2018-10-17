@@ -29,7 +29,7 @@ template <int dim>
 void
 check(const FE_Q<dim> &fe)
 {
-  Assert(fe.n_components() == 1, ExcInternalError());
+  DEAL_II_Assert(fe.n_components() == 1, ExcInternalError());
 
   std::vector<unsigned int> hierarchic_to_lexicographic_numbering(
     fe.dofs_per_cell);
@@ -93,14 +93,15 @@ check(const FE_Q<dim> &fe)
               n * (n - 1) + i + 1;
 
           // inside quad
-          Assert(fe.dofs_per_quad == fe.dofs_per_line * fe.dofs_per_line,
-                 ExcInternalError());
+          DEAL_II_Assert(fe.dofs_per_quad ==
+                           fe.dofs_per_line * fe.dofs_per_line,
+                         ExcInternalError());
           for (unsigned int i = 0; i < fe.dofs_per_line; ++i)
             for (unsigned int j = 0; j < fe.dofs_per_line; ++j)
               hierarchic_to_lexicographic_numbering[next_index++] =
                 n * (i + 1) + j + 1;
 
-          Assert(next_index == fe.dofs_per_cell, ExcInternalError());
+          DEAL_II_Assert(next_index == fe.dofs_per_cell, ExcInternalError());
 
           break;
         }
@@ -175,8 +176,9 @@ check(const FE_Q<dim> &fe)
 
 
           // inside quads
-          Assert(fe.dofs_per_quad == fe.dofs_per_line * fe.dofs_per_line,
-                 ExcInternalError());
+          DEAL_II_Assert(fe.dofs_per_quad ==
+                           fe.dofs_per_line * fe.dofs_per_line,
+                         ExcInternalError());
           // face 0
           for (unsigned int i = 0; i < fe.dofs_per_line; ++i)
             for (unsigned int j = 0; j < fe.dofs_per_line; ++j)
@@ -209,21 +211,23 @@ check(const FE_Q<dim> &fe)
                 (n - 1) * n * n + n * (i + 1) + j + 1;
 
           // inside hex
-          AssertThrow(fe.dofs_per_hex == fe.dofs_per_quad * fe.dofs_per_line,
-                      ExcInternalError());
+          DEAL_II_AssertThrow(fe.dofs_per_hex ==
+                                fe.dofs_per_quad * fe.dofs_per_line,
+                              ExcInternalError());
           for (unsigned int i = 0; i < fe.dofs_per_line; ++i)
             for (unsigned int j = 0; j < fe.dofs_per_line; ++j)
               for (unsigned int k = 0; k < fe.dofs_per_line; ++k)
                 hierarchic_to_lexicographic_numbering[next_index++] =
                   n * n * (i + 1) + n * (j + 1) + k + 1;
 
-          AssertThrow(next_index == fe.dofs_per_cell, ExcInternalError());
+          DEAL_II_AssertThrow(next_index == fe.dofs_per_cell,
+                              ExcInternalError());
 
           break;
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   // now check with data from the
@@ -238,8 +242,8 @@ check(const FE_Q<dim> &fe)
   FETools::lexicographic_to_hierarchic_numbering(fe, l2h);
   for (unsigned int i = 0; i < dofs_per_cell; ++i)
     {
-      Assert(l2h[hierarchic_to_lexicographic_numbering[i]] == i,
-             ExcInternalError());
+      DEAL_II_Assert(l2h[hierarchic_to_lexicographic_numbering[i]] == i,
+                     ExcInternalError());
       logfile << dim << "d, degree=" << degree << ": " << l2h[i] << ' '
               << hierarchic_to_lexicographic_numbering[i] << std::endl;
     };
@@ -249,7 +253,8 @@ check(const FE_Q<dim> &fe)
   // for equality
   std::vector<unsigned int> h2l(fe.dofs_per_cell);
   FETools::hierarchic_to_lexicographic_numbering(fe, h2l);
-  AssertThrow(hierarchic_to_lexicographic_numbering == h2l, ExcInternalError());
+  DEAL_II_AssertThrow(hierarchic_to_lexicographic_numbering == h2l,
+                      ExcInternalError());
 }
 
 

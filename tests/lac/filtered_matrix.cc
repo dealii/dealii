@@ -36,7 +36,7 @@ test(const FilteredMatrix<VectorType> &M)
        i != M.end();
        ++i)
     {
-      Assert(i->row() == i->column(), ExcInternalError());
+      DEAL_II_Assert(i->row() == i->column(), ExcInternalError());
       deallog << ' ' << i->row() << ':' << i->value();
       max = i->row();
     }

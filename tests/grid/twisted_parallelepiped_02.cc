@@ -58,7 +58,7 @@ check_parallelepiped()
         break;
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
   Point<dim> origin;

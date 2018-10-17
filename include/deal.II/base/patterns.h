@@ -530,11 +530,11 @@ namespace Patterns
     /**
      * Exception.
      */
-    DeclException2(ExcInvalidRange,
-                   int,
-                   int,
-                   << "The values " << arg1 << " and " << arg2
-                   << " do not form a valid range.");
+    DEAL_II_DeclException2(ExcInvalidRange,
+                           int,
+                           int,
+                           << "The values " << arg1 << " and " << arg2
+                           << " do not form a valid range.");
     //@}
   private:
     /**
@@ -677,11 +677,11 @@ namespace Patterns
     /**
      * Exception.
      */
-    DeclException2(ExcInvalidRange,
-                   int,
-                   int,
-                   << "The values " << arg1 << " and " << arg2
-                   << " do not form a valid range.");
+    DEAL_II_DeclException2(ExcInvalidRange,
+                           int,
+                           int,
+                           << "The values " << arg1 << " and " << arg2
+                           << " do not form a valid range.");
     //@}
   private:
     /**
@@ -954,7 +954,7 @@ namespace Patterns
     /**
      * Exception.
      */
-    DeclException1(
+    DEAL_II_DeclException1(
       ExcCommasNotAllowed,
       int,
       << "A comma was found at position " << arg1
@@ -1405,11 +1405,12 @@ namespace Patterns
     /**
      * Exception.
      */
-    DeclException2(ExcNoMatch,
-                   std::string,
-                   const Patterns::PatternBase *,
-                   << "The string " << arg1 << " does not match the pattern \""
-                   << arg2->description() << "\"");
+    DEAL_II_DeclException2(ExcNoMatch,
+                           std::string,
+                           const Patterns::PatternBase *,
+                           << "The string " << arg1
+                           << " does not match the pattern \""
+                           << arg2->description() << "\"");
     //@}
   } // namespace Tools
 } // namespace Patterns
@@ -1505,7 +1506,7 @@ namespace Patterns
           return std_cxx14::make_unique<Patterns::Double>(
             -std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
 
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         // the following line should never be invoked
         return nullptr;
       }
@@ -1523,7 +1524,8 @@ namespace Patterns
           str << (value ? "true" : "false");
         else
           str << value;
-        AssertThrow(p->match(str.str()), ExcNoMatch(str.str(), p.get()));
+        DEAL_II_AssertThrow(p->match(str.str()),
+                            ExcNoMatch(str.str(), p.get()));
         return str.str();
       }
 
@@ -1532,7 +1534,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &p =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(p->match(s), ExcNoMatch(s, p.get()));
+        DEAL_II_AssertThrow(p->match(s), ExcNoMatch(s, p.get()));
         T value;
         if (std::is_same<T, bool>::value)
           value = (s == "true");
@@ -1557,7 +1559,7 @@ namespace Patterns
             // function, and would throw earlier. Here it is safe to assume that
             // if we didn't fail the conversion with the operator >>, then we
             // are good to go.
-            AssertThrow(
+            DEAL_II_AssertThrow(
               !is.fail(),
               ExcMessage("Failed to convert from \"" + s + "\" to the type \"" +
                          boost::core::demangle(typeid(T).name()) + "\""));
@@ -1779,9 +1781,9 @@ namespace Patterns
                   Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a List pattern to convert a "
-                               "string to a List type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage("I need a List pattern to convert a "
+                                       "string to a List type."));
         auto                     base_p = p->get_base_pattern().clone();
         std::vector<std::string> vec(t.size());
 
@@ -1795,7 +1797,7 @@ namespace Patterns
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
 
-        AssertThrow(pattern->match(s), ExcNoMatch(s, p));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, p));
         return s;
       }
 
@@ -1804,12 +1806,13 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a List pattern to convert a string "
-                               "to a List type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a List pattern to convert a string "
+                              "to a List type."));
 
         auto base_p = p->get_base_pattern().clone();
         T    t;
@@ -1851,9 +1854,10 @@ namespace Patterns
                   Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a Map pattern to convert a string to "
-                               "a Map compatible type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a Map pattern to convert a string to "
+                              "a Map compatible type."));
         auto                     key_p = p->get_key_pattern().clone();
         auto                     val_p = p->get_value_pattern().clone();
         std::vector<std::string> vec(t.size());
@@ -1871,7 +1875,7 @@ namespace Patterns
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
 
-        AssertThrow(p->match(s), ExcNoMatch(s, p));
+        DEAL_II_AssertThrow(p->match(s), ExcNoMatch(s, p));
         return s;
       }
 
@@ -1880,12 +1884,12 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
 
         auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a Map pattern to convert a "
-                               "string to a Map compatible type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage("I need a Map pattern to convert a "
+                                       "string to a Map compatible type."));
 
         auto key_p = p->get_key_pattern().clone();
         auto val_p = p->get_value_pattern().clone();
@@ -1896,7 +1900,7 @@ namespace Patterns
           {
             auto key_val =
               Utilities::split_string_list(str, p->get_key_value_separator());
-            AssertDimension(key_val.size(), 2);
+            DEAL_II_AssertDimension(key_val.size(), 2);
             t.insert(std::make_pair(
               Convert<typename T::key_type>::to_value(key_val[0], key_p),
               Convert<typename T::mapped_type>::to_value(key_val[1])));
@@ -1930,9 +1934,10 @@ namespace Patterns
                   Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatible type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a List pattern to convert a string "
+                              "to a List compatible type."));
         auto                     base_p = p->get_base_pattern().clone();
         std::vector<std::string> vec(dim);
 
@@ -1945,7 +1950,7 @@ namespace Patterns
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
 
-        AssertThrow(p->match(s), ExcNoMatch(s, p));
+        DEAL_II_AssertThrow(p->match(s), ExcNoMatch(s, p));
         return s;
       }
 
@@ -1954,12 +1959,13 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatible type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a List pattern to convert a string "
+                              "to a List compatible type."));
 
         auto base_p = p->get_base_pattern().clone();
         T    t;
@@ -2029,9 +2035,10 @@ namespace Patterns
                   Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatible type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a List pattern to convert a string "
+                              "to a List compatible type."));
 
         const auto &expressions = t->get_expressions();
         if (expressions.size() == 0)
@@ -2041,7 +2048,7 @@ namespace Patterns
         for (unsigned int i = 1; i < expressions.size(); ++i)
           s = s + p->get_separator() + expressions[i];
 
-        AssertThrow(pattern->match(s), ExcNoMatch(s, p));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, p));
         return s;
       }
 
@@ -2050,12 +2057,13 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatible type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a List pattern to convert a string "
+                              "to a List compatible type."));
 
         const auto expressions =
           Utilities::split_string_list(s, p->get_separator());
@@ -2128,9 +2136,10 @@ namespace Patterns
                   Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatible type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a List pattern to convert a string "
+                              "to a List compatible type."));
 
         auto        base_p = p->get_base_pattern().clone();
         std::string s =
@@ -2138,7 +2147,7 @@ namespace Patterns
           p->get_separator() + " " +
           Convert<typename T::value_type>::to_string(t.imag(), base_p);
 
-        AssertThrow(pattern->match(s), ExcNoMatch(s, p));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, p));
         return s;
       }
 
@@ -2150,17 +2159,18 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a List pattern to convert a string "
-                               "to a List compatible type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a List pattern to convert a string "
+                              "to a List compatible type."));
 
         auto base_p = p->get_base_pattern().clone();
 
         auto v = Utilities::split_string_list(s, p->get_separator());
-        AssertDimension(v.size(), 2);
+        DEAL_II_AssertDimension(v.size(), 2);
         T t(Convert<typename T::value_type>::to_value(v[0], base_p),
             Convert<typename T::value_type>::to_value(v[1], base_p));
         return t;
@@ -2184,7 +2194,7 @@ namespace Patterns
                 const std::unique_ptr<Patterns::PatternBase> &pattern =
                   Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(t), ExcNoMatch(t, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(t), ExcNoMatch(t, pattern.get()));
         return t;
       }
 
@@ -2193,7 +2203,7 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
         return s;
       }
     };
@@ -2228,7 +2238,7 @@ namespace Patterns
         std::unordered_map<Key, Value> m;
         m.insert(t);
         std::string s = Convert<decltype(m)>::to_string(m, pattern);
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
         return s;
       }
 
@@ -2265,15 +2275,16 @@ namespace Patterns
                   Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a Tuple pattern to convert a tuple "
-                               "to a string."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a Tuple pattern to convert a tuple "
+                              "to a string."));
 
         const auto  string_array = Convert<T>::to_string_internal_2(t, *p);
         std::string str;
         for (unsigned int i = 0; i < string_array.size(); ++i)
           str += (i ? " " + p->get_separator() + " " : "") + string_array[i];
-        AssertThrow(p->match(str), ExcNoMatch(str, p));
+        DEAL_II_AssertThrow(p->match(str), ExcNoMatch(str, p));
         return str;
       }
 
@@ -2282,12 +2293,13 @@ namespace Patterns
                const std::unique_ptr<Patterns::PatternBase> &pattern =
                  Convert<T>::to_pattern())
       {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
+        DEAL_II_AssertThrow(pattern->match(s), ExcNoMatch(s, pattern.get()));
 
         auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
-        AssertThrow(p,
-                    ExcMessage("I need a Tuple pattern to convert a string "
-                               "to a tuple type."));
+        DEAL_II_AssertThrow(p,
+                            ExcMessage(
+                              "I need a Tuple pattern to convert a string "
+                              "to a tuple type."));
 
         auto v = Utilities::split_string_list(s, p->get_separator());
 

@@ -93,7 +93,8 @@ test()
         deallog << "i = " << i << " , j = " << i << " , el = " << el
                 << std::endl;
 
-      AssertThrow(el == dealii::numbers::PI, dealii::ExcInternalError());
+      DEAL_II_AssertThrow(el == dealii::numbers::PI,
+                          dealii::ExcInternalError());
     }
 
   if (MyPID == 0)

@@ -361,21 +361,22 @@ namespace internal
                             const unsigned int local_index) const
     {
       (void)fe_index;
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      DEAL_II_Assert(obj_index < dof_offsets.size(),
+                     ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
       // make sure we are on an object for which DoFs have been
       // allocated at all
-      Assert(dof_offsets[obj_index] != (offset_type)(-1),
-             ExcMessage("You are trying to access degree of freedom "
-                        "information for an object on which no such "
-                        "information is available"));
+      DEAL_II_Assert(dof_offsets[obj_index] != (offset_type)(-1),
+                     ExcMessage("You are trying to access degree of freedom "
+                                "information for an object on which no such "
+                                "information is available"));
 
-      Assert(fe_index ==
-               (is_compressed_entry(active_fe_indices[obj_index]) == false ?
-                  active_fe_indices[obj_index] :
-                  get_toggled_compression_state(active_fe_indices[obj_index])),
-             ExcMessage("FE index does not match that of the present cell"));
+      DEAL_II_Assert(
+        fe_index ==
+          (is_compressed_entry(active_fe_indices[obj_index]) == false ?
+             active_fe_indices[obj_index] :
+             get_toggled_compression_state(active_fe_indices[obj_index])),
+        ExcMessage("FE index does not match that of the present cell"));
 
       // see if the dof_indices array has been compressed for this
       // particular cell
@@ -394,22 +395,23 @@ namespace internal
                             const types::global_dof_index global_index)
     {
       (void)fe_index;
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      DEAL_II_Assert(obj_index < dof_offsets.size(),
+                     ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert(dof_offsets[obj_index] != (offset_type)(-1),
-             ExcMessage("You are trying to access degree of freedom "
-                        "information for an object on which no such "
-                        "information is available"));
-      Assert(
+      DEAL_II_Assert(dof_offsets[obj_index] != (offset_type)(-1),
+                     ExcMessage("You are trying to access degree of freedom "
+                                "information for an object on which no such "
+                                "information is available"));
+      DEAL_II_Assert(
         is_compressed_entry(active_fe_indices[obj_index]) == false,
         ExcMessage(
           "This function can no longer be called after compressing the dof_indices array"));
-      Assert(fe_index == active_fe_indices[obj_index],
-             ExcMessage("FE index does not match that of the present cell"));
+      DEAL_II_Assert(fe_index == active_fe_indices[obj_index],
+                     ExcMessage(
+                       "FE index does not match that of the present cell"));
       dof_indices[dof_offsets[obj_index] + local_index] = global_index;
     }
 
@@ -418,8 +420,8 @@ namespace internal
     inline unsigned int
     DoFLevel::active_fe_index(const unsigned int obj_index) const
     {
-      Assert(obj_index < active_fe_indices.size(),
-             ExcIndexRange(obj_index, 0, active_fe_indices.size()));
+      DEAL_II_Assert(obj_index < active_fe_indices.size(),
+                     ExcIndexRange(obj_index, 0, active_fe_indices.size()));
 
       if (is_compressed_entry(active_fe_indices[obj_index]) == false)
         return active_fe_indices[obj_index];
@@ -442,19 +444,19 @@ namespace internal
     DoFLevel::set_active_fe_index(const unsigned int obj_index,
                                   const unsigned int fe_index)
     {
-      Assert(obj_index < active_fe_indices.size(),
-             ExcIndexRange(obj_index, 0, active_fe_indices.size()));
+      DEAL_II_Assert(obj_index < active_fe_indices.size(),
+                     ExcIndexRange(obj_index, 0, active_fe_indices.size()));
 
       // check whether the given fe_index is within the range of
       // values that we interpret as "not compressed". if not, then
       // the index is so large that we cannot accept it. (but this
       // will not likely happen because it requires someone using an
       // FECollection that has more than 32k entries.)
-      Assert(is_compressed_entry(fe_index) == false,
-             ExcMessage(
-               "You are using an active_fe_index that is larger than an "
-               "internal limitation for these objects. Try to work with "
-               "hp::FECollection objects that have a more modest size."));
+      DEAL_II_Assert(
+        is_compressed_entry(fe_index) == false,
+        ExcMessage("You are using an active_fe_index that is larger than an "
+                   "internal limitation for these objects. Try to work with "
+                   "hp::FECollection objects that have a more modest size."));
 
       active_fe_indices[obj_index] = fe_index;
     }
@@ -466,7 +468,7 @@ namespace internal
                                    const unsigned int dofs_per_cell) const
     {
       (void)dofs_per_cell;
-      Assert(
+      DEAL_II_Assert(
         (obj_index < cell_cache_offsets.size()) &&
           (cell_cache_offsets[obj_index] + dofs_per_cell <=
            cell_dof_indices_cache.size()),

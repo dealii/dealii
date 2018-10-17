@@ -52,7 +52,7 @@ main()
                        boost::lambda::_3),
                       10);
 
-  AssertThrow(a.l2_norm() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(a.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

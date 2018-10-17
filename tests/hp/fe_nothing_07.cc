@@ -156,7 +156,7 @@ test()
   // the FE assignment is entirely
   // symmetric, so the number of
   // constraints must be even
-  Assert(constraints.n_constraints() % 2 == 0, ExcInternalError());
+  DEAL_II_Assert(constraints.n_constraints() % 2 == 0, ExcInternalError());
 
   {
     typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler

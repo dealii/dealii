@@ -45,12 +45,13 @@ test(Vector<std::complex<double>> &v,
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(w(i) == std::complex<double>(i + 1., i + 2.),
-                  ExcInternalError());
-      AssertThrow(x(i) == i + 2., ExcInternalError());
-      AssertThrow(v(i) == 1. * i + 2. * std::complex<double>(i + 1., i + 2.) +
-                            3 * (i + 2.),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == std::complex<double>(i + 1., i + 2.),
+                          ExcInternalError());
+      DEAL_II_AssertThrow(x(i) == i + 2., ExcInternalError());
+      DEAL_II_AssertThrow(v(i) == 1. * i +
+                                    2. * std::complex<double>(i + 1., i + 2.) +
+                                    3 * (i + 2.),
+                          ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

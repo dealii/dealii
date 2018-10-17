@@ -56,7 +56,7 @@ namespace MeshWorker
     const unsigned int,
     const unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -74,7 +74,7 @@ namespace MeshWorker
     const unsigned int,
     const unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -124,9 +124,9 @@ namespace MeshWorker
     const unsigned int                          start,
     const unsigned int                          size) const
   {
-    AssertDimension(values.size(), this->n_values());
-    AssertDimension(gradients.size(), this->n_gradients());
-    AssertDimension(hessians.size(), this->n_hessians());
+    DEAL_II_AssertDimension(values.size(), this->n_values());
+    DEAL_II_AssertDimension(gradients.size(), this->n_gradients());
+    DEAL_II_AssertDimension(hessians.size(), this->n_hessians());
 
     const AnyData &data = this->data;
     for (unsigned int i = 0; i < this->n_values(); ++i)
@@ -224,9 +224,9 @@ namespace MeshWorker
     const unsigned int                          start,
     const unsigned int                          size) const
   {
-    AssertDimension(values.size(), this->n_values());
-    AssertDimension(gradients.size(), this->n_gradients());
-    AssertDimension(hessians.size(), this->n_hessians());
+    DEAL_II_AssertDimension(values.size(), this->n_values());
+    DEAL_II_AssertDimension(gradients.size(), this->n_gradients());
+    DEAL_II_AssertDimension(hessians.size(), this->n_hessians());
 
     const AnyData &data = this->data;
     for (unsigned int i = 0; i < this->n_values(); ++i)

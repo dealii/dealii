@@ -28,8 +28,9 @@ test()
 
   index_set.compress();
 
-  AssertThrow(index_set.index_within_set(2) == numbers::invalid_dof_index,
-              ExcInternalError());
+  DEAL_II_AssertThrow(index_set.index_within_set(2) ==
+                        numbers::invalid_dof_index,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

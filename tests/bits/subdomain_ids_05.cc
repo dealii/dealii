@@ -59,7 +59,7 @@ test()
       for (unsigned int d = 0; d < dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1 << d);
-      AssertThrow(subdomain < (1 << dim), ExcInternalError());
+      DEAL_II_AssertThrow(subdomain < (1 << dim), ExcInternalError());
 
       cell->set_subdomain_id(subdomain);
     };
@@ -77,7 +77,7 @@ test()
     // check that the number of dofs
     // associated is also what the respective
     // function returns
-    AssertThrow(
+    DEAL_II_AssertThrow(
       static_cast<unsigned int>(std::count(subdomain_association.begin(),
                                            subdomain_association.end(),
                                            subdomain)) ==

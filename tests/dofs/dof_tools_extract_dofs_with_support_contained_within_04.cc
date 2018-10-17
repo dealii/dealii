@@ -303,12 +303,12 @@ test()
     {
       const unsigned int ind = locally_owned_set.nth_index_in_set(i);
       const double       v   = rhs[ind];
-      AssertThrow(std::abs(v) < 1e-12,
-                  ExcMessage(
-                    "Element " + std::to_string(ind) + " has an error " +
-                    std::to_string(v) + " on the process " +
-                    std::to_string(dealii::Utilities::MPI::this_mpi_process(
-                      MPI_COMM_WORLD))));
+      DEAL_II_AssertThrow(
+        std::abs(v) < 1e-12,
+        ExcMessage("Element " + std::to_string(ind) + " has an error " +
+                   std::to_string(v) + " on the process " +
+                   std::to_string(dealii::Utilities::MPI::this_mpi_process(
+                     MPI_COMM_WORLD))));
     }
 
   if (dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

@@ -71,9 +71,10 @@ test()
       exc = true;
     }
 
-  Assert(exc == false, ExcInternalError());
-  Assert(norm == 2. * Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) - 1,
-         ExcInternalError());
+  DEAL_II_Assert(exc == false, ExcInternalError());
+  DEAL_II_Assert(norm ==
+                   2. * Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) - 1,
+                 ExcInternalError());
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       deallog << norm << std::endl;

@@ -36,8 +36,9 @@ main()
   Tensor<2, dim, float> t(a);
   Tensor<2, dim, float> tt;
   Tensor<2, dim, float> result(b);
-  AssertThrow(transpose(transpose(t)) == t, ExcInternalError());
-  AssertThrow(transpose(transpose(result)) == result, ExcInternalError());
+  DEAL_II_AssertThrow(transpose(transpose(t)) == t, ExcInternalError());
+  DEAL_II_AssertThrow(transpose(transpose(result)) == result,
+                      ExcInternalError());
 
   Vector<float> unrolled(9);
 

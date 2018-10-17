@@ -120,7 +120,7 @@ test()
         deallog << "Exception: " << e.get_exc_name() << std::endl;
       throwing = true;
     }
-  Assert(throwing, ExcInternalError());
+  DEAL_II_Assert(throwing, ExcInternalError());
 
   cm.distribute(x);
   x_rel = x;
@@ -132,7 +132,7 @@ test()
   /*    if (myid==0)
         deallog << a << " vs " << b << std::endl;
   */
-  /*    Assert (x_test.l2_norm() == x_rel.l2_norm(),
+  /*    DEAL_II_Assert (x_test.l2_norm() == x_rel.l2_norm(),
         ExcInternalError());
   */
 }

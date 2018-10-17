@@ -178,20 +178,22 @@ public:
    * This class was not registered in the path search mechanism.
    * @ingroup Exceptions
    */
-  DeclException1(ExcNoClass,
-                 std::string,
-                 << "The class " << arg1
-                 << " must be registered before referring it in PathSearch.");
+  DEAL_II_DeclException1(
+    ExcNoClass,
+    std::string,
+    << "The class " << arg1
+    << " must be registered before referring it in PathSearch.");
   /**
    * The PathSearch class could not find a file with this name in its path
    * list.
    * @ingroup Exceptions
    */
-  DeclException2(ExcFileNotFound,
-                 std::string,
-                 std::string,
-                 << "The file \"" << arg1 << "\" was not found in the path for "
-                 << "files of class " << arg2 << ".");
+  DEAL_II_DeclException2(ExcFileNotFound,
+                         std::string,
+                         std::string,
+                         << "The file \"" << arg1
+                         << "\" was not found in the path for "
+                         << "files of class " << arg2 << ".");
 
 private:
   /**

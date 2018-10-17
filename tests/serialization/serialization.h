@@ -67,6 +67,6 @@ verify(const T &t1, T &t2)
 
     ia >> t2;
 
-    AssertThrow(compare(t1, t2), ExcInternalError());
+    DEAL_II_AssertThrow(compare(t1, t2), ExcInternalError());
   }
 }

@@ -70,7 +70,7 @@ namespace MatrixFreeOperators
                             const typename VectorType::BlockType &>::type
     subblock(const VectorType &vector, unsigned int block_no)
     {
-      AssertIndexRange(block_no, vector.n_blocks());
+      DEAL_II_AssertIndexRange(block_no, vector.n_blocks());
       return vector.block(block_no);
     }
 
@@ -947,9 +947,9 @@ namespace MatrixFreeOperators
       AlignedVector<VectorizedArray<Number>> &inverse_jxw) const
   {
     constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
-    Assert(inverse_jxw.size() > 0 && inverse_jxw.size() % dofs_per_cell == 0,
-           ExcMessage(
-             "Expected diagonal to be a multiple of scalar dof per cells"));
+    DEAL_II_Assert(
+      inverse_jxw.size() > 0 && inverse_jxw.size() % dofs_per_cell == 0,
+      ExcMessage("Expected diagonal to be a multiple of scalar dof per cells"));
 
     // temporarily reduce size of inverse_jxw to dofs_per_cell to get JxW values
     // from fe_eval (will not reallocate any memory)
@@ -979,15 +979,15 @@ namespace MatrixFreeOperators
   {
     constexpr unsigned int dofs_per_component =
       Utilities::pow(fe_degree + 1, dim);
-    Assert(inverse_coefficients.size() > 0 &&
-             inverse_coefficients.size() % dofs_per_component == 0,
-           ExcMessage(
-             "Expected diagonal to be a multiple of scalar dof per cells"));
+    DEAL_II_Assert(
+      inverse_coefficients.size() > 0 &&
+        inverse_coefficients.size() % dofs_per_component == 0,
+      ExcMessage("Expected diagonal to be a multiple of scalar dof per cells"));
     if (inverse_coefficients.size() != dofs_per_component)
-      AssertDimension(n_actual_components * dofs_per_component,
-                      inverse_coefficients.size());
+      DEAL_II_AssertDimension(n_actual_components * dofs_per_component,
+                              inverse_coefficients.size());
 
-    Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
+    DEAL_II_Assert(dim >= 1 || dim <= 3, ExcNotImplemented());
 
     internal::EvaluatorTensorProduct<internal::evaluate_evenodd,
                                      dim,
@@ -1092,7 +1092,7 @@ namespace MatrixFreeOperators
   typename Base<dim, VectorType>::size_type
   Base<dim, VectorType>::m() const
   {
-    Assert(data.get() != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(data.get() != nullptr, ExcNotInitialized());
     typename Base<dim, VectorType>::size_type total_size = 0;
     for (unsigned int i = 0; i < selected_rows.size(); ++i)
       total_size += data->get_vector_partitioner(selected_rows[i])->size();
@@ -1105,7 +1105,7 @@ namespace MatrixFreeOperators
   typename Base<dim, VectorType>::size_type
   Base<dim, VectorType>::n() const
   {
-    Assert(data.get() != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(data.get() != nullptr, ExcNotInitialized());
     typename Base<dim, VectorType>::size_type total_size = 0;
     for (unsigned int i = 0; i < selected_columns.size(); ++i)
       total_size += data->get_vector_partitioner(selected_columns[i])->size();
@@ -1130,10 +1130,10 @@ namespace MatrixFreeOperators
                             const unsigned int col) const
   {
     (void)col;
-    Assert(row == col, ExcNotImplemented());
-    Assert(inverse_diagonal_entries.get() != nullptr &&
-             inverse_diagonal_entries->m() > 0,
-           ExcNotInitialized());
+    DEAL_II_Assert(row == col, ExcNotImplemented());
+    DEAL_II_Assert(inverse_diagonal_entries.get() != nullptr &&
+                     inverse_diagonal_entries->m() > 0,
+                   ExcNotInitialized());
     return 1.0 / (*inverse_diagonal_entries)(row, row);
   }
 
@@ -1143,8 +1143,8 @@ namespace MatrixFreeOperators
   void
   Base<dim, VectorType>::initialize_dof_vector(VectorType &vec) const
   {
-    Assert(data.get() != nullptr, ExcNotInitialized());
-    AssertDimension(BlockHelper::n_blocks(vec), selected_rows.size());
+    DEAL_II_Assert(data.get() != nullptr, ExcNotInitialized());
+    DEAL_II_AssertDimension(BlockHelper::n_blocks(vec), selected_rows.size());
     for (unsigned int i = 0; i < BlockHelper::n_blocks(vec); ++i)
       {
         const unsigned int index = selected_rows[i];
@@ -1153,10 +1153,10 @@ namespace MatrixFreeOperators
                  *data->get_dof_info(index).vector_partitioner))
           data->initialize_dof_vector(BlockHelper::subblock(vec, index), index);
 
-        Assert(BlockHelper::subblock(vec, index)
-                 .partitioners_are_globally_compatible(
-                   *data->get_dof_info(index).vector_partitioner),
-               ExcInternalError());
+        DEAL_II_Assert(BlockHelper::subblock(vec, index)
+                         .partitioners_are_globally_compatible(
+                           *data->get_dof_info(index).vector_partitioner),
+                       ExcInternalError());
       }
     BlockHelper::collect_sizes(vec);
   }
@@ -1182,11 +1182,12 @@ namespace MatrixFreeOperators
       {
         for (unsigned int i = 0; i < given_row_selection.size(); ++i)
           {
-            AssertIndexRange(given_row_selection[i], data_->n_components());
+            DEAL_II_AssertIndexRange(given_row_selection[i],
+                                     data_->n_components());
             for (unsigned int j = 0; j < given_row_selection.size(); ++j)
               if (j != i)
-                Assert(given_row_selection[j] != given_row_selection[i],
-                       ExcMessage("Given row indices must be unique"));
+                DEAL_II_Assert(given_row_selection[j] != given_row_selection[i],
+                               ExcMessage("Given row indices must be unique"));
 
             selected_rows.push_back(given_row_selection[i]);
           }
@@ -1197,11 +1198,13 @@ namespace MatrixFreeOperators
       {
         for (unsigned int i = 0; i < given_column_selection.size(); ++i)
           {
-            AssertIndexRange(given_column_selection[i], data_->n_components());
+            DEAL_II_AssertIndexRange(given_column_selection[i],
+                                     data_->n_components());
             for (unsigned int j = 0; j < given_column_selection.size(); ++j)
               if (j != i)
-                Assert(given_column_selection[j] != given_column_selection[i],
-                       ExcMessage("Given column indices must be unique"));
+                DEAL_II_Assert(
+                  given_column_selection[j] != given_column_selection[i],
+                  ExcMessage("Given column indices must be unique"));
 
             selected_columns.push_back(given_column_selection[i]);
           }
@@ -1240,8 +1243,8 @@ namespace MatrixFreeOperators
     const unsigned int                                 level,
     const std::vector<unsigned int> &                  given_row_selection)
   {
-    AssertThrow(level != numbers::invalid_unsigned_int,
-                ExcMessage("level is not set"));
+    DEAL_II_AssertThrow(level != numbers::invalid_unsigned_int,
+                        ExcMessage("level is not set"));
 
     selected_rows.clear();
     selected_columns.clear();
@@ -1252,18 +1255,19 @@ namespace MatrixFreeOperators
       {
         for (unsigned int i = 0; i < given_row_selection.size(); ++i)
           {
-            AssertIndexRange(given_row_selection[i], data_->n_components());
+            DEAL_II_AssertIndexRange(given_row_selection[i],
+                                     data_->n_components());
             for (unsigned int j = 0; j < given_row_selection.size(); ++j)
               if (j != i)
-                Assert(given_row_selection[j] != given_row_selection[i],
-                       ExcMessage("Given row indices must be unique"));
+                DEAL_II_Assert(given_row_selection[j] != given_row_selection[i],
+                               ExcMessage("Given row indices must be unique"));
 
             selected_rows.push_back(given_row_selection[i]);
           }
       }
     selected_columns = selected_rows;
 
-    AssertDimension(mg_constrained_dofs.size(), selected_rows.size());
+    DEAL_II_AssertDimension(mg_constrained_dofs.size(), selected_rows.size());
     edge_constrained_indices.clear();
     edge_constrained_indices.resize(selected_rows.size());
     edge_constrained_values.clear();
@@ -1275,8 +1279,8 @@ namespace MatrixFreeOperators
       {
         if (data_->n_macro_cells() > 0)
           {
-            AssertDimension(static_cast<int>(level),
-                            data_->get_cell_iterator(0, 0, j)->level());
+            DEAL_II_AssertDimension(static_cast<int>(level),
+                                    data_->get_cell_iterator(0, 0, j)->level());
           }
 
         // setup edge_constrained indices
@@ -1368,7 +1372,7 @@ namespace MatrixFreeOperators
 
         // If not, assert that the local ranges are the same and reset to the
         // current partitioner
-        Assert(
+        DEAL_II_Assert(
           BlockHelper::subblock(src, i).get_partitioner()->local_size() ==
             data->get_dof_info(mf_component).vector_partitioner->local_size(),
           ExcMessage("The vector passed to the vmult() function does not have "
@@ -1421,9 +1425,10 @@ namespace MatrixFreeOperators
                                   const VectorType &src,
                                   const bool        transpose) const
   {
-    AssertDimension(dst.size(), src.size());
-    AssertDimension(BlockHelper::n_blocks(dst), BlockHelper::n_blocks(src));
-    AssertDimension(BlockHelper::n_blocks(dst), selected_rows.size());
+    DEAL_II_AssertDimension(dst.size(), src.size());
+    DEAL_II_AssertDimension(BlockHelper::n_blocks(dst),
+                            BlockHelper::n_blocks(src));
+    DEAL_II_AssertDimension(BlockHelper::n_blocks(dst), selected_rows.size());
     preprocess_constraints(dst, src);
     if (transpose)
       Tapply_add(dst, src);
@@ -1473,7 +1478,7 @@ namespace MatrixFreeOperators
                                               const VectorType &src) const
   {
     using Number = typename Base<dim, VectorType>::value_type;
-    AssertDimension(dst.size(), src.size());
+    DEAL_II_AssertDimension(dst.size(), src.size());
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
 
@@ -1525,7 +1530,7 @@ namespace MatrixFreeOperators
                                             const VectorType &src) const
   {
     using Number = typename Base<dim, VectorType>::value_type;
-    AssertDimension(dst.size(), src.size());
+    DEAL_II_AssertDimension(dst.size(), src.size());
     adjust_ghost_range_if_necessary(src, false);
     adjust_ghost_range_if_necessary(dst, true);
 
@@ -1594,9 +1599,9 @@ namespace MatrixFreeOperators
   const std::shared_ptr<DiagonalMatrix<VectorType>> &
   Base<dim, VectorType>::get_matrix_diagonal_inverse() const
   {
-    Assert(inverse_diagonal_entries.get() != nullptr &&
-             inverse_diagonal_entries->m() > 0,
-           ExcNotInitialized());
+    DEAL_II_Assert(inverse_diagonal_entries.get() != nullptr &&
+                     inverse_diagonal_entries->m() > 0,
+                   ExcNotInitialized());
     return inverse_diagonal_entries;
   }
 
@@ -1606,8 +1611,9 @@ namespace MatrixFreeOperators
   const std::shared_ptr<DiagonalMatrix<VectorType>> &
   Base<dim, VectorType>::get_matrix_diagonal() const
   {
-    Assert(diagonal_entries.get() != nullptr && diagonal_entries->m() > 0,
-           ExcNotInitialized());
+    DEAL_II_Assert(diagonal_entries.get() != nullptr &&
+                     diagonal_entries->m() > 0,
+                   ExcNotInitialized());
     return diagonal_entries;
   }
 
@@ -1630,8 +1636,9 @@ namespace MatrixFreeOperators
     const VectorType &                               src,
     const typename Base<dim, VectorType>::value_type omega) const
   {
-    Assert(inverse_diagonal_entries.get() && inverse_diagonal_entries->m() > 0,
-           ExcNotInitialized());
+    DEAL_II_Assert(inverse_diagonal_entries.get() &&
+                     inverse_diagonal_entries->m() > 0,
+                   ExcNotInitialized());
     inverse_diagonal_entries->vmult(dst, src);
     dst *= omega;
   }
@@ -1679,7 +1686,7 @@ namespace MatrixFreeOperators
       "operator");
 #endif
 
-    Assert(mf_base_operator != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(mf_base_operator != nullptr, ExcNotInitialized());
 
     mf_base_operator->vmult_interface_down(dst, src);
   }
@@ -1699,7 +1706,7 @@ namespace MatrixFreeOperators
       "operator");
 #endif
 
-    Assert(mf_base_operator != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(mf_base_operator != nullptr, ExcNotInitialized());
 
     mf_base_operator->vmult_interface_up(dst, src);
   }
@@ -1712,7 +1719,7 @@ namespace MatrixFreeOperators
   MGInterfaceOperator<OperatorType>::initialize_dof_vector(
     VectorType &vec) const
   {
-    Assert(mf_base_operator != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(mf_base_operator != nullptr, ExcNotInitialized());
 
     mf_base_operator->initialize_dof_vector(vec);
   }
@@ -1743,7 +1750,8 @@ namespace MatrixFreeOperators
     compute_diagonal()
   {
     using Number = typename Base<dim, VectorType>::value_type;
-    Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
+    DEAL_II_Assert((Base<dim, VectorType>::data.get() != nullptr),
+                   ExcNotInitialized());
 
     this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
     this->diagonal_entries.reset(new DiagonalMatrix<VectorType>());
@@ -1876,7 +1884,7 @@ namespace MatrixFreeOperators
   LaplaceOperator<dim, fe_degree, n_q_points_1d, n_components, VectorType>::
     get_coefficient()
   {
-    Assert(scalar_coefficient.get(), ExcNotInitialized());
+    DEAL_II_Assert(scalar_coefficient.get(), ExcNotInitialized());
     return scalar_coefficient;
   }
 
@@ -1892,7 +1900,8 @@ namespace MatrixFreeOperators
     compute_diagonal()
   {
     using Number = typename Base<dim, VectorType>::value_type;
-    Assert((Base<dim, VectorType>::data.get() != nullptr), ExcNotInitialized());
+    DEAL_II_Assert((Base<dim, VectorType>::data.get() != nullptr),
+                   ExcNotInitialized());
 
     this->inverse_diagonal_entries.reset(new DiagonalMatrix<VectorType>());
     this->diagonal_entries.reset(new DiagonalMatrix<VectorType>());
@@ -1976,8 +1985,9 @@ namespace MatrixFreeOperators
       {
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
-            Assert(Implementation::non_negative((*scalar_coefficient)(cell, q)),
-                   ExcMessage("Coefficient must be non-negative"));
+            DEAL_II_Assert(Implementation::non_negative(
+                             (*scalar_coefficient)(cell, q)),
+                           ExcMessage("Coefficient must be non-negative"));
             phi.submit_gradient((*scalar_coefficient)(cell, q) *
                                   phi.get_gradient(q),
                                 q);

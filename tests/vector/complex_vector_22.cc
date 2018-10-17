@@ -39,7 +39,7 @@ test(Vector<std::complex<double>> &v, Vector<std::complex<double>> &w)
   w.compress();
 
   // make sure the scalar product is zero
-  AssertThrow(v * w == std::complex<double>(0), ExcInternalError());
+  DEAL_II_AssertThrow(v * w == std::complex<double>(0), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

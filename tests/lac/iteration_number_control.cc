@@ -43,10 +43,10 @@ check()
     IterationNumberControl control(5);
     SolverCG<>             solver(control);
     solver.solve(A, out, in, PreconditionIdentity());
-    AssertThrow(control.last_step() == 1, ExcInternalError());
+    DEAL_II_AssertThrow(control.last_step() == 1, ExcInternalError());
   }
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(std::abs(out(i) - 0.5) < 1e-12, ExcInternalError());
+    DEAL_II_AssertThrow(std::abs(out(i) - 0.5) < 1e-12, ExcInternalError());
 
   // Check 2: should only do 5 iterations but the solution should not be exact
   for (unsigned int i = 0; i < size; ++i)
@@ -57,13 +57,13 @@ check()
     IterationNumberControl control(5);
     SolverCG<>             solver(control);
     solver.solve(A, out, in, PreconditionIdentity());
-    AssertThrow(control.last_step() == 5, ExcInternalError());
+    DEAL_II_AssertThrow(control.last_step() == 5, ExcInternalError());
   }
   bool solved_exactly = true;
   for (unsigned int i = 0; i < size; ++i)
     if (std::abs(out(i) - 1. / (1 + size)) > 1e-8)
       solved_exactly = false;
-  AssertThrow(solved_exactly == false, ExcInternalError());
+  DEAL_II_AssertThrow(solved_exactly == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -70,7 +70,7 @@ test(const unsigned int n)
   A.vmult(z, tmp);
 
   y -= z;
-  AssertThrow(y.l2_norm() <= 1e-12 * z.l2_norm(), ExcInternalError());
+  DEAL_II_AssertThrow(y.l2_norm() <= 1e-12 * z.l2_norm(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

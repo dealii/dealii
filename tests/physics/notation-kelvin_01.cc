@@ -127,10 +127,10 @@ test_scalars()
   const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
   const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-  Assert(std::abs(vA_conv - A) < 1e-12,
-         ExcMessage("Different result for vector conversion"));
-  Assert(std::abs(mA_conv - A) < 1e-12,
-         ExcMessage("Different result for matrix conversion"));
+  DEAL_II_Assert(std::abs(vA_conv - A) < 1e-12,
+                 ExcMessage("Different result for vector conversion"));
+  DEAL_II_Assert(std::abs(mA_conv - A) < 1e-12,
+                 ExcMessage("Different result for matrix conversion"));
 }
 
 template <int dim>
@@ -146,10 +146,10 @@ test_rank_0_tensors()
   const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
   const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-  Assert(std::abs(vA_conv - A) < 1e-12,
-         ExcMessage("Different result for vector conversion"));
-  Assert(std::abs(mA_conv - A) < 1e-12,
-         ExcMessage("Different result for matrix conversion"));
+  DEAL_II_Assert(std::abs(vA_conv - A) < 1e-12,
+                 ExcMessage("Different result for vector conversion"));
+  DEAL_II_Assert(std::abs(mA_conv - A) < 1e-12,
+                 ExcMessage("Different result for matrix conversion"));
 }
 
 template <int dim>
@@ -164,8 +164,8 @@ test_rank_1_tensors()
   typedef typename std::decay<decltype(A)>::type InpType;
   const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
 
-  Assert((vA_conv - A).norm() < 1e-12,
-         ExcMessage("Different result for vector conversion"));
+  DEAL_II_Assert((vA_conv - A).norm() < 1e-12,
+                 ExcMessage("Different result for vector conversion"));
 }
 
 template <int dim>
@@ -184,10 +184,10 @@ test_rank_2_tensors()
     const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
     const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-    Assert((vA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for vector conversion"));
-    Assert((mA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for matrix conversion"));
+    DEAL_II_Assert((vA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for vector conversion"));
+    DEAL_II_Assert((mA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for matrix conversion"));
   }
 
   // Symmetric tensor
@@ -202,10 +202,10 @@ test_rank_2_tensors()
     const auto vA_conv = Notation::Kelvin::to_tensor<InpType>(vA);
     const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-    Assert((vA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for vector conversion"));
-    Assert((mA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for matrix conversion"));
+    DEAL_II_Assert((vA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for vector conversion"));
+    DEAL_II_Assert((mA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for matrix conversion"));
   }
 }
 
@@ -224,8 +224,8 @@ test_rank_3_tensors()
     typedef typename std::decay<decltype(A)>::type InpType;
     const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-    Assert((mA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for matrix conversion"));
+    DEAL_II_Assert((mA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for matrix conversion"));
   }
 
   // Non-symmetric tensor: Version 2
@@ -239,8 +239,8 @@ test_rank_3_tensors()
     typedef typename std::decay<decltype(A)>::type InpType;
     const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-    Assert((mA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for matrix conversion"));
+    DEAL_II_Assert((mA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for matrix conversion"));
   }
 
   // Symmetric tensor: Version 1
@@ -255,8 +255,8 @@ test_rank_3_tensors()
     typedef typename std::decay<decltype(A)>::type InpType;
     const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-    Assert((mA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for matrix conversion"));
+    DEAL_II_Assert((mA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for matrix conversion"));
   }
 
   // Symmetric tensor: Version 2
@@ -271,8 +271,8 @@ test_rank_3_tensors()
     typedef typename std::decay<decltype(A)>::type InpType;
     const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-    Assert((mA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for matrix conversion"));
+    DEAL_II_Assert((mA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for matrix conversion"));
   }
 }
 
@@ -290,8 +290,8 @@ test_rank_4_tensors()
     typedef typename std::decay<decltype(A)>::type InpType;
     const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-    Assert((mA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for matrix conversion"));
+    DEAL_II_Assert((mA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for matrix conversion"));
   }
 
   // Symmetric tensor
@@ -304,8 +304,8 @@ test_rank_4_tensors()
     typedef typename std::decay<decltype(A)>::type InpType;
     const auto mA_conv = Notation::Kelvin::to_tensor<InpType>(mA);
 
-    Assert((mA_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for matrix conversion"));
+    DEAL_II_Assert((mA_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for matrix conversion"));
   }
 }
 

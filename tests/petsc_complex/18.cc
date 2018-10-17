@@ -44,7 +44,7 @@ test(PETScWrappers::MPI::Vector &v)
 
   // then check the l2-norm
   PetscReal l2_norm = v.l2_norm();
-  AssertThrow(l2_norm == std::sqrt(norm), ExcInternalError());
+  DEAL_II_AssertThrow(l2_norm == std::sqrt(norm), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

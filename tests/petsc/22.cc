@@ -40,7 +40,7 @@ test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w)
   w.compress(VectorOperation::insert);
 
   // make sure the scalar product is zero
-  AssertThrow(v * w == 0, ExcInternalError());
+  DEAL_II_AssertThrow(v * w == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

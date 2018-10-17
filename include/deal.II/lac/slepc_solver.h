@@ -271,24 +271,24 @@ namespace SLEPcWrappers
     /**
      * Exception. Standard exception.
      */
-    DeclException0(ExcSLEPcWrappersUsageError);
+    DEAL_II_DeclException0(ExcSLEPcWrappersUsageError);
 
     /**
      * Exception. SLEPc error with error number.
      */
-    DeclException1(ExcSLEPcError,
-                   int,
-                   << "    An error with error number " << arg1
-                   << " occurred while calling a SLEPc function");
+    DEAL_II_DeclException1(ExcSLEPcError,
+                           int,
+                           << "    An error with error number " << arg1
+                           << " occurred while calling a SLEPc function");
 
     /**
      * Exception. Convergence failure on the number of eigenvectors.
      */
-    DeclException2(ExcSLEPcEigenvectorConvergenceMismatchError,
-                   int,
-                   int,
-                   << "    The number of converged eigenvectors is " << arg1
-                   << " but " << arg2 << " were requested. ");
+    DEAL_II_DeclException2(ExcSLEPcEigenvectorConvergenceMismatchError,
+                           int,
+                           int,
+                           << "    The number of converged eigenvectors is "
+                           << arg1 << " but " << arg2 << " were requested. ");
 
     /**
      * Access to the object that controls convergence.
@@ -671,8 +671,8 @@ namespace SLEPcWrappers
                     const unsigned int               n_eigenpairs)
   {
     // Panic if the number of eigenpairs wanted is out of bounds.
-    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
-                ExcSLEPcWrappersUsageError());
+    DEAL_II_AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
+                        ExcSLEPcWrappersUsageError());
 
     // Set the matrices of the problem
     set_matrices(A);
@@ -683,11 +683,11 @@ namespace SLEPcWrappers
 
     if (n_converged > n_eigenpairs)
       n_converged = n_eigenpairs;
-    AssertThrow(n_converged == n_eigenpairs,
-                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged,
-                                                            n_eigenpairs));
+    DEAL_II_AssertThrow(
+      n_converged == n_eigenpairs,
+      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
 
-    AssertThrow(eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
+    DEAL_II_AssertThrow(eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
     eigenvectors.resize(n_converged, eigenvectors.front());
     eigenvalues.resize(n_converged);
 
@@ -704,12 +704,12 @@ namespace SLEPcWrappers
                     const unsigned int               n_eigenpairs)
   {
     // Guard against incompatible matrix sizes:
-    AssertThrow(A.m() == B.m(), ExcDimensionMismatch(A.m(), B.m()));
-    AssertThrow(A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
+    DEAL_II_AssertThrow(A.m() == B.m(), ExcDimensionMismatch(A.m(), B.m()));
+    DEAL_II_AssertThrow(A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
 
     // Panic if the number of eigenpairs wanted is out of bounds.
-    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
-                ExcSLEPcWrappersUsageError());
+    DEAL_II_AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
+                        ExcSLEPcWrappersUsageError());
 
     // Set the matrices of the problem
     set_matrices(A, B);
@@ -721,10 +721,10 @@ namespace SLEPcWrappers
     if (n_converged >= n_eigenpairs)
       n_converged = n_eigenpairs;
 
-    AssertThrow(n_converged == n_eigenpairs,
-                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged,
-                                                            n_eigenpairs));
-    AssertThrow(eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
+    DEAL_II_AssertThrow(
+      n_converged == n_eigenpairs,
+      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
+    DEAL_II_AssertThrow(eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
 
     eigenvectors.resize(n_converged, eigenvectors.front());
     eigenvalues.resize(n_converged);
@@ -744,20 +744,20 @@ namespace SLEPcWrappers
                     const unsigned int               n_eigenpairs)
   {
     // Guard against incompatible matrix sizes:
-    AssertThrow(A.m() == B.m(), ExcDimensionMismatch(A.m(), B.m()));
-    AssertThrow(A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
+    DEAL_II_AssertThrow(A.m() == B.m(), ExcDimensionMismatch(A.m(), B.m()));
+    DEAL_II_AssertThrow(A.n() == B.n(), ExcDimensionMismatch(A.n(), B.n()));
 
     // and incompatible eigenvalue/eigenvector sizes
-    AssertThrow(real_eigenvalues.size() == imag_eigenvalues.size(),
-                ExcDimensionMismatch(real_eigenvalues.size(),
-                                     imag_eigenvalues.size()));
-    AssertThrow(real_eigenvectors.size() == imag_eigenvectors.size(),
-                ExcDimensionMismatch(real_eigenvectors.size(),
-                                     imag_eigenvectors.size()));
+    DEAL_II_AssertThrow(real_eigenvalues.size() == imag_eigenvalues.size(),
+                        ExcDimensionMismatch(real_eigenvalues.size(),
+                                             imag_eigenvalues.size()));
+    DEAL_II_AssertThrow(real_eigenvectors.size() == imag_eigenvectors.size(),
+                        ExcDimensionMismatch(real_eigenvectors.size(),
+                                             imag_eigenvectors.size()));
 
     // Panic if the number of eigenpairs wanted is out of bounds.
-    AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
-                ExcSLEPcWrappersUsageError());
+    DEAL_II_AssertThrow((n_eigenpairs > 0) && (n_eigenpairs <= A.m()),
+                        ExcSLEPcWrappersUsageError());
 
     // Set the matrices of the problem
     set_matrices(A, B);
@@ -769,12 +769,12 @@ namespace SLEPcWrappers
     if (n_converged >= n_eigenpairs)
       n_converged = n_eigenpairs;
 
-    AssertThrow(n_converged == n_eigenpairs,
-                ExcSLEPcEigenvectorConvergenceMismatchError(n_converged,
-                                                            n_eigenpairs));
-    AssertThrow((real_eigenvectors.size() != 0) &&
-                  (imag_eigenvectors.size() != 0),
-                ExcSLEPcWrappersUsageError());
+    DEAL_II_AssertThrow(
+      n_converged == n_eigenpairs,
+      ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenpairs));
+    DEAL_II_AssertThrow((real_eigenvectors.size() != 0) &&
+                          (imag_eigenvectors.size() != 0),
+                        ExcSLEPcWrappersUsageError());
 
     real_eigenvectors.resize(n_converged, real_eigenvectors.front());
     imag_eigenvectors.resize(n_converged, imag_eigenvectors.front());
@@ -797,8 +797,8 @@ namespace SLEPcWrappers
 
     for (unsigned int i = 0; i < this_initial_space.size(); i++)
       {
-        Assert(this_initial_space[i].l2_norm() > 0.0,
-               ExcMessage("Initial vectors should be nonzero."));
+        DEAL_II_Assert(this_initial_space[i].l2_norm() > 0.0,
+                       ExcMessage("Initial vectors should be nonzero."));
         vecs[i] = this_initial_space[i];
       }
 
@@ -810,7 +810,7 @@ namespace SLEPcWrappers
 
     const PetscErrorCode ierr =
       EPSSetInitialSpace(eps, vecs.size(), vecs.data());
-    AssertThrow(ierr == 0, ExcSLEPcError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcSLEPcError(ierr));
   }
 
 } // namespace SLEPcWrappers

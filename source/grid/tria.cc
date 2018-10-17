@@ -138,7 +138,7 @@ namespace
   cell_is_patch_level_1(
     const TriaIterator<dealii::CellAccessor<dim, spacedim>> &cell)
   {
-    Assert(cell->active() == false, ExcInternalError());
+    DEAL_II_Assert(cell->active() == false, ExcInternalError());
 
     unsigned int n_active_children = 0;
     for (unsigned int i = 0; i < cell->n_children(); ++i)
@@ -187,7 +187,7 @@ namespace
     // false or true?
     // make sure we do not have to do this at
     // all...
-    Assert(cell->has_children(), ExcInternalError());
+    DEAL_II_Assert(cell->has_children(), ExcInternalError());
     // ... and then simply return false
     return false;
   }
@@ -330,7 +330,7 @@ namespace
                           // opposite refine case
                           // that the face has
                           // now...
-                          Assert(
+                          DEAL_II_Assert(
                             face_ref_case ==
                               RefinementCase<dim - 1>::isotropic_refinement,
                             ExcInternalError());
@@ -344,7 +344,7 @@ namespace
                 // one of the children, but a
                 // grandchild. This is only
                 // possible in 3d.
-                Assert(dim == 3, ExcInternalError());
+                DEAL_II_Assert(dim == 3, ExcInternalError());
                 // In that case, however, no
                 // matter what the neighbor
                 // does, he won't be finer
@@ -687,7 +687,7 @@ namespace
     std::integral_constant<int, dim>,
     std::integral_constant<int, dim>)
   {
-    Assert(cell->has_children(), ExcInternalError());
+    DEAL_II_Assert(cell->has_children(), ExcInternalError());
 
     for (unsigned int c = 0; c < cell->n_children(); ++c)
       {
@@ -934,23 +934,26 @@ namespace
     const bool face_flip        = orientation[1];
     const bool face_rotation    = orientation[2];
 
-    Assert((dim != 1) || (face_orientation == true && face_flip == false &&
-                          face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 1D"));
+    DEAL_II_Assert((dim != 1) || (face_orientation == true &&
+                                  face_flip == false && face_rotation == false),
+                   ExcMessage("The supplied orientation "
+                              "(face_orientation, face_flip, face_rotation) "
+                              "is invalid for 1D"));
 
-    Assert((dim != 2) || (face_orientation == true && face_rotation == false),
-           ExcMessage("The supplied orientation "
-                      "(face_orientation, face_flip, face_rotation) "
-                      "is invalid for 2D"));
+    DEAL_II_Assert((dim != 2) ||
+                     (face_orientation == true && face_rotation == false),
+                   ExcMessage("The supplied orientation "
+                              "(face_orientation, face_flip, face_rotation) "
+                              "is invalid for 2D"));
 
-    Assert(face_1 != face_2, ExcMessage("face_1 and face_2 are equal!"));
+    DEAL_II_Assert(face_1 != face_2,
+                   ExcMessage("face_1 and face_2 are equal!"));
 
-    Assert(face_1->at_boundary() && face_2->at_boundary(),
-           ExcMessage("Periodic faces must be on the boundary"));
+    DEAL_II_Assert(face_1->at_boundary() && face_2->at_boundary(),
+                   ExcMessage("Periodic faces must be on the boundary"));
 
-    Assert(std::abs(cell_1->level() - cell_2->level()) < 2, ExcInternalError());
+    DEAL_II_Assert(std::abs(cell_1->level() - cell_2->level()) < 2,
+                   ExcInternalError());
 
     // insert periodic face pair for both cells
     using CellFace =
@@ -965,7 +968,8 @@ namespace
       periodic_faces(cell_face_1, cell_face_orientation_2);
 
     // Only one periodic neighbor is allowed
-    Assert(periodic_face_map.count(cell_face_1) == 0, ExcInternalError());
+    DEAL_II_Assert(periodic_face_map.count(cell_face_1) == 0,
+                   ExcInternalError());
     periodic_face_map.insert(periodic_faces);
 
     // A lookup table on how to go through the child cells depending on the
@@ -1006,11 +1010,11 @@ namespace
             // children and apply update_periodic_face_map_recursively
             // recursively:
 
-            Assert(face_1->n_children() ==
-                       GeometryInfo<dim>::max_children_per_face &&
-                     face_2->n_children() ==
-                       GeometryInfo<dim>::max_children_per_face,
-                   ExcNotImplemented());
+            DEAL_II_Assert(face_1->n_children() ==
+                               GeometryInfo<dim>::max_children_per_face &&
+                             face_2->n_children() ==
+                               GeometryInfo<dim>::max_children_per_face,
+                           ExcNotImplemented());
 
             for (unsigned int i = 0;
                  i < GeometryInfo<dim>::max_children_per_face;
@@ -1028,7 +1032,7 @@ namespace
                                          [face_rotation][i];
                       break;
                     default:
-                      AssertThrow(false, ExcNotImplemented());
+                      DEAL_II_AssertThrow(false, ExcNotImplemented());
                   }
 
                 // find subcell ids that belong to the subface indices
@@ -1051,12 +1055,12 @@ namespace
                     cell_2->face_rotation(n_face_2),
                     face_2->refinement_case());
 
-                Assert(cell_1->child(child_cell_1)->face(n_face_1) ==
-                         face_1->child(i),
-                       ExcInternalError());
-                Assert(cell_2->child(child_cell_2)->face(n_face_2) ==
-                         face_2->child(j),
-                       ExcInternalError());
+                DEAL_II_Assert(cell_1->child(child_cell_1)->face(n_face_1) ==
+                                 face_1->child(i),
+                               ExcInternalError());
+                DEAL_II_Assert(cell_2->child(child_cell_2)->face(n_face_2) ==
+                                 face_2->child(j),
+                               ExcInternalError());
 
                 // precondition: subcell has the same orientation as cell (so
                 // that the face numbers coincide) recursive call
@@ -1119,19 +1123,19 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException1(ExcGridHasInvalidCell,
-                   int,
-                   << "Something went wrong when making cell " << arg1
-                   << ". Read the docs and the source code "
-                   << "for more information.");
+    DEAL_II_DeclException1(ExcGridHasInvalidCell,
+                           int,
+                           << "Something went wrong when making cell " << arg1
+                           << ". Read the docs and the source code "
+                           << "for more information.");
     /**
      * Exception
      * @ingroup Exceptions
      */
-    DeclException1(ExcInternalErrorOnCell,
-                   int,
-                   << "Something went wrong upon construction of cell "
-                   << arg1);
+    DEAL_II_DeclException1(ExcInternalErrorOnCell,
+                           int,
+                           << "Something went wrong upon construction of cell "
+                           << arg1);
     /**
      * A cell was entered which has
      * negative measure. In most
@@ -1141,13 +1145,13 @@ namespace internal
      *
      * @ingroup Exceptions
      */
-    DeclException1(ExcCellHasNegativeMeasure,
-                   int,
-                   << "Cell " << arg1
-                   << " has negative measure. This typically "
-                   << "indicates some distortion in the cell, or a mistakenly "
-                   << "swapped pair of vertices in the input to "
-                   << "Triangulation::create_triangulation().");
+    DEAL_II_DeclException1(
+      ExcCellHasNegativeMeasure,
+      int,
+      << "Cell " << arg1 << " has negative measure. This typically "
+      << "indicates some distortion in the cell, or a mistakenly "
+      << "swapped pair of vertices in the input to "
+      << "Triangulation::create_triangulation().");
     /**
      * A cell is created with a
      * vertex number exceeding the
@@ -1155,40 +1159,42 @@ namespace internal
      *
      * @ingroup Exceptions
      */
-    DeclException3(ExcInvalidVertexIndex,
-                   int,
-                   int,
-                   int,
-                   << "Error while creating cell " << arg1
-                   << ": the vertex index " << arg2 << " must be between 0 and "
-                   << arg3 << ".");
+    DEAL_II_DeclException3(ExcInvalidVertexIndex,
+                           int,
+                           int,
+                           int,
+                           << "Error while creating cell " << arg1
+                           << ": the vertex index " << arg2
+                           << " must be between 0 and " << arg3 << ".");
     /**
      * Exception
      * @ingroup Exceptions
      */
-    DeclException2(ExcLineInexistant,
-                   int,
-                   int,
-                   << "While trying to assign a boundary indicator to a line: "
-                   << "the line with end vertices " << arg1 << " and " << arg2
-                   << " does not exist.");
+    DEAL_II_DeclException2(
+      ExcLineInexistant,
+      int,
+      int,
+      << "While trying to assign a boundary indicator to a line: "
+      << "the line with end vertices " << arg1 << " and " << arg2
+      << " does not exist.");
     /**
      * Exception
      * @ingroup Exceptions
      */
-    DeclException4(ExcQuadInexistant,
-                   int,
-                   int,
-                   int,
-                   int,
-                   << "While trying to assign a boundary indicator to a quad: "
-                   << "the quad with bounding lines " << arg1 << ", " << arg2
-                   << ", " << arg3 << ", " << arg4 << " does not exist.");
+    DEAL_II_DeclException4(
+      ExcQuadInexistant,
+      int,
+      int,
+      int,
+      int,
+      << "While trying to assign a boundary indicator to a quad: "
+      << "the quad with bounding lines " << arg1 << ", " << arg2 << ", " << arg3
+      << ", " << arg4 << " does not exist.");
     /**
      * Exception
      * @ingroup Exceptions
      */
-    DeclException3(
+    DEAL_II_DeclException3(
       ExcInteriorLineCantBeBoundary,
       int,
       int,
@@ -1218,7 +1224,7 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException5(
+    DEAL_II_DeclException5(
       ExcInteriorQuadCantBeBoundary,
       int,
       int,
@@ -1251,7 +1257,7 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException2(
+    DEAL_II_DeclException2(
       ExcMultiplySetLineInfoOfLine,
       int,
       int,
@@ -1262,7 +1268,7 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException3(
+    DEAL_II_DeclException3(
       ExcInconsistentLineInfoOfLine,
       int,
       int,
@@ -1274,7 +1280,7 @@ namespace internal
      * Exception
      * @ingroup Exceptions
      */
-    DeclException5(
+    DEAL_II_DeclException5(
       ExcInconsistentQuadInfoOfQuad,
       int,
       int,
@@ -1412,7 +1418,7 @@ namespace internal
               number_cache.n_levels = level + 1;
 
         // no cells at all?
-        Assert(number_cache.n_levels > 0, ExcInternalError());
+        DEAL_II_Assert(number_cache.n_levels > 0, ExcInternalError());
 
         ///////////////////////////////////
         // update the number of lines on the different levels in the
@@ -1694,8 +1700,8 @@ namespace internal
                            const SubCellData & /*subcelldata*/,
                            Triangulation<1, spacedim> &triangulation)
       {
-        AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
-        AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
+        DEAL_II_AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
+        DEAL_II_AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
 
         // note: since no boundary
         // information can be given in one
@@ -1728,8 +1734,8 @@ namespace internal
                     const double cell_measure =
                       GridTools::cell_measure<1>(triangulation.vertices,
                                                  cells[cell_no].vertices);
-                    AssertThrow(cell_measure > 0,
-                                ExcGridHasInvalidCell(cell_no));
+                    DEAL_II_AssertThrow(cell_measure > 0,
+                                        ExcGridHasInvalidCell(cell_no));
                   }
               }
           }
@@ -1786,7 +1792,7 @@ namespace internal
                 case 2:
                   break;
                 default:
-                  AssertThrow(
+                  DEAL_II_AssertThrow(
                     false,
                     ExcMessage(
                       "You have a vertex in your triangulation "
@@ -1821,9 +1827,9 @@ namespace internal
           // nodes (for example a
           // ring of cells -- no end
           // points at all)
-          AssertThrow(((spacedim == 1) && (boundary_nodes == 2)) ||
-                        (spacedim > 1),
-                      ExcMessage("The Triangulation has too many end points"));
+          DEAL_II_AssertThrow(
+            ((spacedim == 1) && (boundary_nodes == 2)) || (spacedim > 1),
+            ExcMessage("The Triangulation has too many end points"));
         }
 
 
@@ -1904,8 +1910,8 @@ namespace internal
                            const SubCellData &                 subcelldata,
                            Triangulation<2, spacedim> &        triangulation)
       {
-        AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
-        AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
+        DEAL_II_AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
+        DEAL_II_AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
 
         const unsigned int dim = 2;
 
@@ -1929,8 +1935,8 @@ namespace internal
                     const double cell_measure =
                       GridTools::cell_measure<2>(triangulation.vertices,
                                                  cells[cell_no].vertices);
-                    AssertThrow(cell_measure > 0,
-                                ExcGridHasInvalidCell(cell_no));
+                    DEAL_II_AssertThrow(cell_measure > 0,
+                                        ExcGridHasInvalidCell(cell_no));
                   }
               }
           }
@@ -1955,11 +1961,11 @@ namespace internal
         for (unsigned int cell = 0; cell < cells.size(); ++cell)
           {
             for (unsigned int vertex = 0; vertex < 4; ++vertex)
-              AssertThrow(cells[cell].vertices[vertex] <
-                            triangulation.vertices.size(),
-                          ExcInvalidVertexIndex(cell,
-                                                cells[cell].vertices[vertex],
-                                                triangulation.vertices.size()));
+              DEAL_II_AssertThrow(
+                cells[cell].vertices[vertex] < triangulation.vertices.size(),
+                ExcInvalidVertexIndex(cell,
+                                      cells[cell].vertices[vertex],
+                                      triangulation.vertices.size()));
 
             for (unsigned int line = 0;
                  line < GeometryInfo<dim>::faces_per_cell;
@@ -1990,10 +1996,11 @@ namespace internal
                 // the middle line would have direction 1->4, while in
                 // the second it would be 4->1.  This will cause the
                 // exception.
-                AssertThrow(needed_lines.find(std::make_pair(
-                              line_vertices.second, line_vertices.first)) ==
-                              needed_lines.end(),
-                            ExcGridHasInvalidCell(cell));
+                DEAL_II_AssertThrow(needed_lines.find(
+                                      std::make_pair(line_vertices.second,
+                                                     line_vertices.first)) ==
+                                      needed_lines.end(),
+                                    ExcGridHasInvalidCell(cell));
 
                 // insert line, with
                 // invalid iterator if line
@@ -2023,13 +2030,13 @@ namespace internal
           // is at least two. if not so,
           // then clean triangulation and
           // exit with an exception
-          AssertThrow(*(std::min_element(vertex_touch_count.begin(),
-                                         vertex_touch_count.end())) >= 2,
-                      ExcMessage(
-                        "During creation of a triangulation, a part of the "
-                        "algorithm encountered a vertex that is part of only "
-                        "a single adjacent line. However, in 2d, every vertex "
-                        "needs to be at least part of two lines."));
+          DEAL_II_AssertThrow(
+            *(std::min_element(vertex_touch_count.begin(),
+                               vertex_touch_count.end())) >= 2,
+            ExcMessage("During creation of a triangulation, a part of the "
+                       "algorithm encountered a vertex that is part of only "
+                       "a single adjacent line. However, in 2d, every vertex "
+                       "needs to be at least part of two lines."));
         }
 
         // reserve enough space
@@ -2123,12 +2130,12 @@ namespace internal
             // implemented
             if (spacedim == 2)
               {
-                AssertThrow((n_adj_cells >= 1) && (n_adj_cells <= 2),
-                            ExcInternalError());
+                DEAL_II_AssertThrow((n_adj_cells >= 1) && (n_adj_cells <= 2),
+                                    ExcInternalError());
               }
             else
               {
-                AssertThrow(
+                DEAL_II_AssertThrow(
                   (n_adj_cells >= 1) && (n_adj_cells <= 2),
                   ExcMessage("You have a line in your triangulation at which "
                              "more than two cells come together."
@@ -2176,32 +2183,33 @@ namespace internal
                   line = needed_lines[line_vertices];
                 else
                   // line does not exist
-                  AssertThrow(false,
-                              ExcLineInexistant(line_vertices.first,
-                                                line_vertices.second));
+                  DEAL_II_AssertThrow(false,
+                                      ExcLineInexistant(line_vertices.first,
+                                                        line_vertices.second));
               }
 
             // assert that we only set boundary info once
-            AssertThrow(!(line->boundary_id() != 0 &&
-                          line->boundary_id() !=
-                            numbers::internal_face_boundary_id),
-                        ExcMultiplySetLineInfoOfLine(line_vertices.first,
-                                                     line_vertices.second));
+            DEAL_II_AssertThrow(
+              !(line->boundary_id() != 0 &&
+                line->boundary_id() != numbers::internal_face_boundary_id),
+              ExcMultiplySetLineInfoOfLine(line_vertices.first,
+                                           line_vertices.second));
 
             // assert that the manifold id is not yet set or consistent
             // with the previous id
-            AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
-                          line->manifold_id() == subcell_line.manifold_id,
-                        ExcInconsistentLineInfoOfLine(line_vertices.first,
-                                                      line_vertices.second,
-                                                      "manifold ids"));
+            DEAL_II_AssertThrow(
+              line->manifold_id() == numbers::flat_manifold_id ||
+                line->manifold_id() == subcell_line.manifold_id,
+              ExcInconsistentLineInfoOfLine(line_vertices.first,
+                                            line_vertices.second,
+                                            "manifold ids"));
             line->set_manifold_id(subcell_line.manifold_id);
 
             // assert that only exterior lines are given a boundary
             // indicator
             if (subcell_line.boundary_id != numbers::internal_face_boundary_id)
               {
-                AssertThrow(
+                DEAL_II_AssertThrow(
                   line->boundary_id() != numbers::internal_face_boundary_id,
                   ExcInteriorLineCantBeBoundary(line->vertex_index(0),
                                                 line->vertex_index(1),
@@ -2287,8 +2295,8 @@ namespace internal
                            const SubCellData &                 subcelldata,
                            Triangulation<3, spacedim> &        triangulation)
       {
-        AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
-        AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
+        DEAL_II_AssertThrow(v.size() > 0, ExcMessage("No vertices given"));
+        DEAL_II_AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
 
         const unsigned int dim = 3;
 
@@ -2308,7 +2316,8 @@ namespace internal
                 const double cell_measure =
                   GridTools::cell_measure<3>(triangulation.vertices,
                                              cells[cell_no].vertices);
-                AssertThrow(cell_measure > 0, ExcGridHasInvalidCell(cell_no));
+                DEAL_II_AssertThrow(cell_measure > 0,
+                                    ExcGridHasInvalidCell(cell_no));
               }
           }
 #endif
@@ -2342,11 +2351,11 @@ namespace internal
             for (unsigned int vertex = 0;
                  vertex < GeometryInfo<dim>::vertices_per_cell;
                  ++vertex)
-              AssertThrow(cells[cell].vertices[vertex] <
-                            triangulation.vertices.size(),
-                          ExcInvalidVertexIndex(cell,
-                                                cells[cell].vertices[vertex],
-                                                triangulation.vertices.size()));
+              DEAL_II_AssertThrow(
+                cells[cell].vertices[vertex] < triangulation.vertices.size(),
+                ExcInvalidVertexIndex(cell,
+                                      cells[cell].vertices[vertex],
+                                      triangulation.vertices.size()));
 
             for (unsigned int line = 0;
                  line < GeometryInfo<dim>::lines_per_cell;
@@ -2403,7 +2412,7 @@ namespace internal
           // is at least three. if not so,
           // then clean triangulation and
           // exit with an exception
-          AssertThrow(
+          DEAL_II_AssertThrow(
             *(std::min_element(vertex_touch_count.begin(),
                                vertex_touch_count.end())) >= 3,
             ExcMessage(
@@ -2893,7 +2902,7 @@ namespace internal
                         // face in any direction,
                         // so something went
                         // wrong above
-                        Assert(false, ExcInternalError());
+                        DEAL_II_Assert(false, ExcInternalError());
                     }
                 } // for all faces
 
@@ -2972,10 +2981,10 @@ namespace internal
                   const unsigned int face1     = map_iter->second.first;
                   const unsigned int line1     = map_iter->second.second;
                   ++map_iter;
-                  Assert(map_iter != cell_to_face_lines.end(),
-                         ExcInternalErrorOnCell(c));
-                  Assert(map_iter->first == cell_line,
-                         ExcInternalErrorOnCell(c));
+                  DEAL_II_Assert(map_iter != cell_to_face_lines.end(),
+                                 ExcInternalErrorOnCell(c));
+                  DEAL_II_Assert(map_iter->first == cell_line,
+                                 ExcInternalErrorOnCell(c));
                   const unsigned int face2 = map_iter->second.first;
                   const unsigned int line2 = map_iter->second.second;
 
@@ -2984,19 +2993,20 @@ namespace internal
                   // coincide. Take care
                   // about the face
                   // orientation;
-                  Assert(face_iterator[face1]->line(
-                           GeometryInfo<dim>::standard_to_real_face_line(
-                             line1,
-                             face_orientation[face1],
-                             face_flip[face1],
-                             face_rotation[face1])) ==
-                           face_iterator[face2]->line(
-                             GeometryInfo<dim>::standard_to_real_face_line(
-                               line2,
-                               face_orientation[face2],
-                               face_flip[face2],
-                               face_rotation[face2])),
-                         ExcInternalErrorOnCell(c));
+                  DEAL_II_Assert(
+                    face_iterator[face1]->line(
+                      GeometryInfo<dim>::standard_to_real_face_line(
+                        line1,
+                        face_orientation[face1],
+                        face_flip[face1],
+                        face_rotation[face1])) ==
+                      face_iterator[face2]->line(
+                        GeometryInfo<dim>::standard_to_real_face_line(
+                          line2,
+                          face_orientation[face2],
+                          face_flip[face2],
+                          face_rotation[face2])),
+                    ExcInternalErrorOnCell(c));
                 }
 #endif
             }
@@ -3015,8 +3025,8 @@ namespace internal
               adjacent_cells[quad->index()].size();
             // assert that every quad has
             // one or two adjacent cells
-            AssertThrow((n_adj_cells >= 1) && (n_adj_cells <= 2),
-                        ExcInternalError());
+            DEAL_II_AssertThrow((n_adj_cells >= 1) && (n_adj_cells <= 2),
+                                ExcInternalError());
 
             // if only one cell: quad is at boundary -> give it the boundary
             // indicator zero by default
@@ -3100,29 +3110,31 @@ namespace internal
                   line = needed_lines[line_vertices];
                 else
                   // line does not exist
-                  AssertThrow(false,
-                              ExcLineInexistant(line_vertices.first,
-                                                line_vertices.second));
+                  DEAL_II_AssertThrow(false,
+                                      ExcLineInexistant(line_vertices.first,
+                                                        line_vertices.second));
               }
             // Only exterior lines can be given a boundary indicator
             if (line->at_boundary())
               {
                 // make sure that we don't attempt to reset the boundary
                 // indicator to a different than the previously set value
-                AssertThrow(line->boundary_id() == 0 ||
-                              line->boundary_id() == subcell_line.boundary_id,
-                            ExcInconsistentLineInfoOfLine(line_vertices.first,
-                                                          line_vertices.second,
-                                                          "boundary ids"));
+                DEAL_II_AssertThrow(
+                  line->boundary_id() == 0 ||
+                    line->boundary_id() == subcell_line.boundary_id,
+                  ExcInconsistentLineInfoOfLine(line_vertices.first,
+                                                line_vertices.second,
+                                                "boundary ids"));
 
                 line->set_boundary_id_internal(subcell_line.boundary_id);
               }
             // Set manifold id if given
-            AssertThrow(line->manifold_id() == numbers::flat_manifold_id ||
-                          line->manifold_id() == subcell_line.manifold_id,
-                        ExcInconsistentLineInfoOfLine(line_vertices.first,
-                                                      line_vertices.second,
-                                                      "manifold ids"));
+            DEAL_II_AssertThrow(
+              line->manifold_id() == numbers::flat_manifold_id ||
+                line->manifold_id() == subcell_line.manifold_id,
+              ExcInconsistentLineInfoOfLine(line_vertices.first,
+                                            line_vertices.second,
+                                            "manifold ids"));
             line->set_manifold_id(subcell_line.manifold_id);
           }
 
@@ -3164,9 +3176,10 @@ namespace internal
                     else
                       // line does
                       // not exist
-                      AssertThrow(false,
-                                  ExcLineInexistant(line_vertices.first,
-                                                    line_vertices.second));
+                      DEAL_II_AssertThrow(
+                        false,
+                        ExcLineInexistant(line_vertices.first,
+                                          line_vertices.second));
                   }
               }
 
@@ -3241,11 +3254,11 @@ namespace internal
                 ++n_rotations;
               }
 
-            AssertThrow(n_rotations != 4,
-                        ExcQuadInexistant(line[0]->index(),
-                                          line[1]->index(),
-                                          line[2]->index(),
-                                          line[3]->index()));
+            DEAL_II_AssertThrow(n_rotations != 4,
+                                ExcQuadInexistant(line[0]->index(),
+                                                  line[1]->index(),
+                                                  line[2]->index(),
+                                                  line[3]->index()));
 
             if (not_found_quad_1)
               quad = needed_quads[quad_compare_2].first;
@@ -3258,24 +3271,26 @@ namespace internal
               {
                 // and make sure that we don't attempt to reset the boundary
                 // indicator to a different than the previously set value
-                AssertThrow(quad->boundary_id() == 0 ||
-                              quad->boundary_id() == subcell_quad.boundary_id,
-                            ExcInconsistentQuadInfoOfQuad(line[0]->index(),
-                                                          line[1]->index(),
-                                                          line[2]->index(),
-                                                          line[3]->index(),
-                                                          "boundary ids"));
+                DEAL_II_AssertThrow(
+                  quad->boundary_id() == 0 ||
+                    quad->boundary_id() == subcell_quad.boundary_id,
+                  ExcInconsistentQuadInfoOfQuad(line[0]->index(),
+                                                line[1]->index(),
+                                                line[2]->index(),
+                                                line[3]->index(),
+                                                "boundary ids"));
 
                 quad->set_boundary_id_internal(subcell_quad.boundary_id);
               }
             // Set manifold id if given
             if (quad->manifold_id() != numbers::flat_manifold_id)
-              AssertThrow(quad->manifold_id() == subcell_quad.manifold_id,
-                          ExcInconsistentQuadInfoOfQuad(line[0]->index(),
-                                                        line[1]->index(),
-                                                        line[2]->index(),
-                                                        line[3]->index(),
-                                                        "manifold ids"));
+              DEAL_II_AssertThrow(
+                quad->manifold_id() == subcell_quad.manifold_id,
+                ExcInconsistentQuadInfoOfQuad(line[0]->index(),
+                                              line[1]->index(),
+                                              line[2]->index(),
+                                              line[3]->index(),
+                                              "manifold ids"));
 
             quad->set_manifold_id(subcell_quad.manifold_id);
           }
@@ -3341,9 +3356,9 @@ namespace internal
         // that of this cell's children by
         // more than one level.
 
-        Assert(!cell->child(0)->has_children() &&
-                 !cell->child(1)->has_children(),
-               ExcInternalError());
+        DEAL_II_Assert(!cell->child(0)->has_children() &&
+                         !cell->child(1)->has_children(),
+                       ExcInternalError());
 
         // first do it for the cells to the
         // left
@@ -3352,14 +3367,15 @@ namespace internal
             {
               typename Triangulation<dim, spacedim>::cell_iterator neighbor =
                 cell->neighbor(0);
-              Assert(neighbor->level() == cell->level(), ExcInternalError());
+              DEAL_II_Assert(neighbor->level() == cell->level(),
+                             ExcInternalError());
 
               // right child
               neighbor = neighbor->child(1);
               while (true)
                 {
-                  Assert(neighbor->neighbor(1) == cell->child(0),
-                         ExcInternalError());
+                  DEAL_II_Assert(neighbor->neighbor(1) == cell->child(0),
+                                 ExcInternalError());
                   neighbor->set_neighbor(1, cell);
 
                   // move on to further
@@ -3380,14 +3396,15 @@ namespace internal
             {
               typename Triangulation<dim, spacedim>::cell_iterator neighbor =
                 cell->neighbor(1);
-              Assert(neighbor->level() == cell->level(), ExcInternalError());
+              DEAL_II_Assert(neighbor->level() == cell->level(),
+                             ExcInternalError());
 
               // left child
               neighbor = neighbor->child(0);
               while (true)
                 {
-                  Assert(neighbor->neighbor(0) == cell->child(1),
-                         ExcInternalError());
+                  DEAL_II_Assert(neighbor->neighbor(0) == cell->child(1),
+                                 ExcInternalError());
                   neighbor->set_neighbor(0, cell);
 
                   // move on to further
@@ -3436,8 +3453,8 @@ namespace internal
         const unsigned int        dim      = 2;
         const RefinementCase<dim> ref_case = cell->refinement_case();
 
-        Assert(line_cell_count.size() == triangulation.n_raw_lines(),
-               ExcInternalError());
+        DEAL_II_Assert(line_cell_count.size() == triangulation.n_raw_lines(),
+                       ExcInternalError());
 
         // vectors to hold all lines which
         // may be deleted
@@ -3516,17 +3533,17 @@ namespace internal
                 // if one of the cell counters is
                 // zero, the other has to be as well
 
-                Assert((line_cell_count[line->child_index(0)] == 0 &&
-                        line_cell_count[line->child_index(1)] == 0) ||
-                         (line_cell_count[line->child_index(0)] > 0 &&
-                          line_cell_count[line->child_index(1)] > 0),
-                       ExcInternalError());
+                DEAL_II_Assert((line_cell_count[line->child_index(0)] == 0 &&
+                                line_cell_count[line->child_index(1)] == 0) ||
+                                 (line_cell_count[line->child_index(0)] > 0 &&
+                                  line_cell_count[line->child_index(1)] > 0),
+                               ExcInternalError());
 
                 if (line_cell_count[line->child_index(0)] == 0)
                   {
                     for (unsigned int c = 0; c < 2; ++c)
-                      Assert(!line->child(c)->has_children(),
-                             ExcInternalError());
+                      DEAL_II_Assert(!line->child(c)->has_children(),
+                                     ExcInternalError());
 
                     // we may delete the line's
                     // children and the middle vertex
@@ -3573,10 +3590,10 @@ namespace internal
       {
         const unsigned int dim = 3;
 
-        Assert(line_cell_count.size() == triangulation.n_raw_lines(),
-               ExcInternalError());
-        Assert(quad_cell_count.size() == triangulation.n_raw_quads(),
-               ExcInternalError());
+        DEAL_II_Assert(line_cell_count.size() == triangulation.n_raw_lines(),
+                       ExcInternalError());
+        DEAL_II_Assert(quad_cell_count.size() == triangulation.n_raw_quads(),
+                       ExcInternalError());
 
         // first of all, we store the RefineCase of
         // this cell
@@ -3679,7 +3696,7 @@ namespace internal
             default:
               // only remaining case is
               // no_refinement, thus an error
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
               break;
           }
 
@@ -3724,7 +3741,7 @@ namespace internal
             typename Triangulation<dim, spacedim>::quad_iterator quad =
               cell->face(quad_no);
 
-            Assert(
+            DEAL_II_Assert(
               (GeometryInfo<dim>::face_refinement_case(ref_case, quad_no) &&
                quad->has_children()) ||
                 GeometryInfo<dim>::face_refinement_case(ref_case, quad_no) ==
@@ -3743,11 +3760,12 @@ namespace internal
                     // if one of the cell counters is
                     // zero, the other has to be as
                     // well
-                    Assert((quad_cell_count[quad->child_index(0)] == 0 &&
-                            quad_cell_count[quad->child_index(1)] == 0) ||
-                             (quad_cell_count[quad->child_index(0)] > 0 &&
-                              quad_cell_count[quad->child_index(1)] > 0),
-                           ExcInternalError());
+                    DEAL_II_Assert(
+                      (quad_cell_count[quad->child_index(0)] == 0 &&
+                       quad_cell_count[quad->child_index(1)] == 0) ||
+                        (quad_cell_count[quad->child_index(0)] > 0 &&
+                         quad_cell_count[quad->child_index(1)] > 0),
+                      ExcInternalError());
                     // it might be, that the quad is
                     // refined twice anisotropically,
                     // first check, whether we may
@@ -3762,7 +3780,7 @@ namespace internal
                           // if one of the cell counters is
                           // zero, the other has to be as
                           // well
-                          Assert(
+                          DEAL_II_Assert(
                             (quad_cell_count[quad->child(c)->child_index(0)] ==
                                0 &&
                              quad_cell_count[quad->child(c)->child_index(1)] ==
@@ -3775,14 +3793,15 @@ namespace internal
                           if (quad_cell_count[quad->child(c)->child_index(0)] ==
                               0)
                             {
-                              // Assert, that the two
+                              // DEAL_II_Assert, that the two
                               // anisotropic
                               // refinements add up to
                               // isotropic refinement
-                              Assert(quad->refinement_case() +
-                                         quad->child(c)->refinement_case() ==
-                                       RefinementCase<dim>::cut_xy,
-                                     ExcInternalError());
+                              DEAL_II_Assert(
+                                quad->refinement_case() +
+                                    quad->child(c)->refinement_case() ==
+                                  RefinementCase<dim>::cut_xy,
+                                ExcInternalError());
                               // we may delete the
                               // quad's children and
                               // the inner line as no
@@ -3900,10 +3919,10 @@ namespace internal
                                               switch_2 =
                                                 quad->child(1)->child(0);
 
-                              Assert(!switch_1->has_children(),
-                                     ExcInternalError());
-                              Assert(!switch_2->has_children(),
-                                     ExcInternalError());
+                              DEAL_II_Assert(!switch_1->has_children(),
+                                             ExcInternalError());
+                              DEAL_II_Assert(!switch_2->has_children(),
+                                             ExcInternalError());
 
                               const int switch_1_index = switch_1->index();
                               const int switch_2_index = switch_2->index();
@@ -4053,15 +4072,16 @@ namespace internal
                     // zero, the others have to be as
                     // well
 
-                    Assert((quad_cell_count[quad->child_index(0)] == 0 &&
-                            quad_cell_count[quad->child_index(1)] == 0 &&
-                            quad_cell_count[quad->child_index(2)] == 0 &&
-                            quad_cell_count[quad->child_index(3)] == 0) ||
-                             (quad_cell_count[quad->child_index(0)] > 0 &&
-                              quad_cell_count[quad->child_index(1)] > 0 &&
-                              quad_cell_count[quad->child_index(2)] > 0 &&
-                              quad_cell_count[quad->child_index(3)] > 0),
-                           ExcInternalError());
+                    DEAL_II_Assert(
+                      (quad_cell_count[quad->child_index(0)] == 0 &&
+                       quad_cell_count[quad->child_index(1)] == 0 &&
+                       quad_cell_count[quad->child_index(2)] == 0 &&
+                       quad_cell_count[quad->child_index(3)] == 0) ||
+                        (quad_cell_count[quad->child_index(0)] > 0 &&
+                         quad_cell_count[quad->child_index(1)] > 0 &&
+                         quad_cell_count[quad->child_index(2)] > 0 &&
+                         quad_cell_count[quad->child_index(3)] > 0),
+                      ExcInternalError());
 
                     if (quad_cell_count[quad->child_index(0)] == 0)
                       {
@@ -4089,7 +4109,7 @@ namespace internal
                   break;
 
                 default:
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
                   break;
               }
           }
@@ -4109,7 +4129,7 @@ namespace internal
             typename Triangulation<dim, spacedim>::line_iterator line =
               cell->line(line_no);
 
-            Assert(
+            DEAL_II_Assert(
               (GeometryInfo<dim>::line_refinement_case(ref_case, line_no) &&
                line->has_children()) ||
                 GeometryInfo<dim>::line_refinement_case(ref_case, line_no) ==
@@ -4121,17 +4141,17 @@ namespace internal
                 // if one of the cell counters is
                 // zero, the other has to be as well
 
-                Assert((line_cell_count[line->child_index(0)] == 0 &&
-                        line_cell_count[line->child_index(1)] == 0) ||
-                         (line_cell_count[line->child_index(0)] > 0 &&
-                          line_cell_count[line->child_index(1)] > 0),
-                       ExcInternalError());
+                DEAL_II_Assert((line_cell_count[line->child_index(0)] == 0 &&
+                                line_cell_count[line->child_index(1)] == 0) ||
+                                 (line_cell_count[line->child_index(0)] > 0 &&
+                                  line_cell_count[line->child_index(1)] > 0),
+                               ExcInternalError());
 
                 if (line_cell_count[line->child_index(0)] == 0)
                   {
                     for (unsigned int c = 0; c < 2; ++c)
-                      Assert(!line->child(c)->has_children(),
-                             ExcInternalError());
+                      DEAL_II_Assert(!line->child(c)->has_children(),
+                                     ExcInternalError());
 
                     // we may delete the line's
                     // children and the middle vertex
@@ -4325,7 +4345,7 @@ namespace internal
             // need here
             while (triangulation.vertices_used[next_unused_vertex] == true)
               ++next_unused_vertex;
-            Assert(
+            DEAL_II_Assert(
               next_unused_vertex < triangulation.vertices.size(),
               ExcMessage(
                 "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
@@ -4394,7 +4414,7 @@ namespace internal
             new_lines[l] = next_unused_line;
             ++next_unused_line;
 
-            Assert(
+            DEAL_II_Assert(
               new_lines[l]->used() == false,
               ExcMessage(
                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -4416,7 +4436,7 @@ namespace internal
                  ++face_no)
               for (unsigned int c = 0; c < 2; ++c, ++l)
                 new_lines[l] = cell->line(face_no)->child(c);
-            Assert(l == 8, ExcInternalError());
+            DEAL_II_Assert(l == 8, ExcInternalError());
 
             new_lines[8]->set(
               internal::TriangulationImplementation::TriaObject<1>(
@@ -4450,7 +4470,8 @@ namespace internal
           }
         else
           {
-            Assert(ref_case == RefinementCase<dim>::cut_y, ExcInternalError());
+            DEAL_II_Assert(ref_case == RefinementCase<dim>::cut_y,
+                           ExcInternalError());
             //   .---5---.
             //   1       3
             //   .---6---.
@@ -4489,7 +4510,7 @@ namespace internal
         const unsigned int n_children = GeometryInfo<dim>::n_children(ref_case);
         for (unsigned int i = 0; i < n_children; ++i)
           {
-            Assert(
+            DEAL_II_Assert(
               next_unused_cell->used() == false,
               ExcMessage(
                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -4568,7 +4589,8 @@ namespace internal
           }
         else
           {
-            Assert(ref_case == RefinementCase<dim>::cut_y, ExcInternalError());
+            DEAL_II_Assert(ref_case == RefinementCase<dim>::cut_y,
+                           ExcInternalError());
             // children:
             //   .-----.
             //   |  1  |
@@ -4749,7 +4771,7 @@ namespace internal
                   while (triangulation.vertices_used[next_unused_vertex] ==
                          true)
                     ++next_unused_vertex;
-                  Assert(
+                  DEAL_II_Assert(
                     next_unused_vertex < triangulation.vertices.size(),
                     ExcMessage(
                       "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
@@ -4773,7 +4795,7 @@ namespace internal
                   first_child->set_used_flag();
                   first_child->clear_user_data();
                   ++next_unused_cell;
-                  Assert(
+                  DEAL_II_Assert(
                     next_unused_cell->used() == false,
                     ExcMessage(
                       "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -4812,8 +4834,9 @@ namespace internal
                       // if the cell is active, then there are no
                       // cells to the left which may want to know
                       // about this new child cell.
-                      Assert(cell->neighbor(0)->level() <= cell->level(),
-                             ExcInternalError());
+                      DEAL_II_Assert(cell->neighbor(0)->level() <=
+                                       cell->level(),
+                                     ExcInternalError());
                       first_child->set_neighbor(0, cell->neighbor(0));
                     }
                   else
@@ -4850,8 +4873,9 @@ namespace internal
                     second_child->set_neighbor(1, cell->neighbor(1));
                   else if (cell->neighbor(1)->active())
                     {
-                      Assert(cell->neighbor(1)->level() <= cell->level(),
-                             ExcInternalError());
+                      DEAL_II_Assert(cell->neighbor(1)->level() <=
+                                       cell->level(),
+                                     ExcInternalError());
                       second_child->set_neighbor(1, cell->neighbor(1));
                     }
                   else
@@ -5042,7 +5066,7 @@ namespace internal
              ++line)
           if (line->user_flag_set())
             {
-              Assert(line->has_children() == false, ExcInternalError());
+              DEAL_II_Assert(line->has_children() == false, ExcInternalError());
               n_lines_in_pairs += 2;
               needed_vertices += 1;
             }
@@ -5096,7 +5120,7 @@ namespace internal
                 // appropriately
                 while (triangulation.vertices_used[next_unused_vertex] == true)
                   ++next_unused_vertex;
-                Assert(
+                DEAL_II_Assert(
                   next_unused_vertex < triangulation.vertices.size(),
                   ExcMessage(
                     "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
@@ -5141,7 +5165,7 @@ namespace internal
                       pair_found = true;
                       break;
                     }
-                Assert(pair_found, ExcInternalError());
+                DEAL_II_Assert(pair_found, ExcInternalError());
 
                 // there are now two consecutive unused lines, such
                 // that the children of a line will be consecutive.
@@ -5153,11 +5177,11 @@ namespace internal
                   children[2] = {next_unused_line, ++next_unused_line};
                 // some tests; if any of the iterators should be
                 // invalid, then already dereferencing will fail
-                Assert(
+                DEAL_II_Assert(
                   children[0]->used() == false,
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
-                Assert(
+                DEAL_II_Assert(
                   children[1]->used() == false,
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -5270,7 +5294,7 @@ namespace internal
         // isn't tested. it will probably be necessary to pull new
         // vertices onto the manifold just as we do for the other
         // functions above.
-        Assert(spacedim == 3, ExcNotImplemented());
+        DEAL_II_Assert(spacedim == 3, ExcNotImplemented());
 
         // check whether a new level is needed we have to check for
         // this on the highest level only (on this, all used cells are
@@ -5375,7 +5399,7 @@ namespace internal
                   else
                     {
                       // we should never get here
-                      Assert(false, ExcInternalError());
+                      DEAL_II_Assert(false, ExcInternalError());
                     }
 
                   // mark all faces for refinement; checking locally
@@ -5421,12 +5445,13 @@ namespace internal
                             // face. therefore we set the user_index
                             // uniquely
                             {
-                              Assert(aface->refinement_case() ==
-                                         RefinementCase<
-                                           dim - 1>::isotropic_refinement ||
-                                       aface->refinement_case() ==
-                                         RefinementCase<dim - 1>::no_refinement,
-                                     ExcInternalError());
+                              DEAL_II_Assert(
+                                aface->refinement_case() ==
+                                    RefinementCase<dim -
+                                                   1>::isotropic_refinement ||
+                                  aface->refinement_case() ==
+                                    RefinementCase<dim - 1>::no_refinement,
+                                ExcInternalError());
                               aface->set_user_index(face_ref_case);
                             }
                         }
@@ -5497,9 +5522,10 @@ namespace internal
                 // in case we need them...
                 if (quad->has_children())
                   {
-                    Assert(quad->refinement_case() ==
-                             RefinementCase<dim - 1>::isotropic_refinement,
-                           ExcInternalError());
+                    DEAL_II_Assert(
+                      quad->refinement_case() ==
+                        RefinementCase<dim - 1>::isotropic_refinement,
+                      ExcInternalError());
                     if ((face_refinement_cases[quad->user_index()] ==
                            RefinementCase<dim - 1>::cut_x &&
                          (quad->child(0)->line_index(1) + 1 !=
@@ -5568,8 +5594,9 @@ namespace internal
                  ++line)
               if (cell->line(line)->has_children())
                 for (unsigned int c = 0; c < 2; ++c)
-                  Assert(cell->line(line)->child(c)->user_flag_set() == false,
-                         ExcInternalError());
+                  DEAL_II_Assert(cell->line(line)->child(c)->user_flag_set() ==
+                                   false,
+                                 ExcInternalError());
 #endif
 
         ///////////////////////////////////////////
@@ -5600,7 +5627,7 @@ namespace internal
                 // appropriately
                 while (triangulation.vertices_used[next_unused_vertex] == true)
                   ++next_unused_vertex;
-                Assert(
+                DEAL_II_Assert(
                   next_unused_vertex < triangulation.vertices.size(),
                   ExcMessage(
                     "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
@@ -5614,8 +5641,8 @@ namespace internal
                 next_unused_line =
                   triangulation.faces->lines.next_free_pair_object(
                     triangulation);
-                Assert(next_unused_line.state() == IteratorState::valid,
-                       ExcInternalError());
+                DEAL_II_Assert(next_unused_line.state() == IteratorState::valid,
+                               ExcInternalError());
 
                 // now we found two consecutive unused lines, such
                 // that the children of a line will be consecutive.
@@ -5628,11 +5655,11 @@ namespace internal
 
                 // some tests; if any of the iterators should be
                 // invalid, then already dereferencing will fail
-                Assert(
+                DEAL_II_Assert(
                   children[0]->used() == false,
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
-                Assert(
+                DEAL_II_Assert(
                   children[1]->used() == false,
                   ExcMessage(
                     "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -5722,18 +5749,18 @@ namespace internal
                     if (aniso_quad_ref_case == quad->refinement_case())
                       continue;
 
-                    Assert(quad->refinement_case() ==
-                               RefinementCase<dim - 1>::cut_xy ||
-                             quad->refinement_case() ==
-                               RefinementCase<dim - 1>::no_refinement,
-                           ExcInternalError());
+                    DEAL_II_Assert(quad->refinement_case() ==
+                                       RefinementCase<dim - 1>::cut_xy ||
+                                     quad->refinement_case() ==
+                                       RefinementCase<dim - 1>::no_refinement,
+                                   ExcInternalError());
 
                     // this quad needs to be refined anisotropically
-                    Assert(quad->user_index() ==
-                               RefinementCase<dim - 1>::cut_x ||
-                             quad->user_index() ==
-                               RefinementCase<dim - 1>::cut_y,
-                           ExcInternalError());
+                    DEAL_II_Assert(quad->user_index() ==
+                                       RefinementCase<dim - 1>::cut_x ||
+                                     quad->user_index() ==
+                                       RefinementCase<dim - 1>::cut_y,
+                                   ExcInternalError());
 
                     // make the new line interior to the quad
                     typename Triangulation<dim, spacedim>::raw_line_iterator
@@ -5742,7 +5769,7 @@ namespace internal
                     new_line =
                       triangulation.faces->lines.next_free_single_object(
                         triangulation);
-                    Assert(
+                    DEAL_II_Assert(
                       new_line->used() == false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -5805,14 +5832,14 @@ namespace internal
                       triangulation.faces->quads.next_free_pair_object(
                         triangulation);
                     new_quads[0] = next_unused_quad;
-                    Assert(
+                    DEAL_II_Assert(
                       new_quads[0]->used() == false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[1] = next_unused_quad;
-                    Assert(
+                    DEAL_II_Assert(
                       new_quads[1]->used() == false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -5943,9 +5970,9 @@ namespace internal
                           }
                         else
                           {
-                            Assert(aniso_quad_ref_case ==
-                                     RefinementCase<dim - 1>::cut_y,
-                                   ExcInternalError());
+                            DEAL_II_Assert(aniso_quad_ref_case ==
+                                             RefinementCase<dim - 1>::cut_y,
+                                           ExcInternalError());
 
                             old_child[0] = quad->child(0)->line(3);
                             old_child[1] = quad->child(1)->line(3);
@@ -5995,8 +6022,8 @@ namespace internal
                             // the two lines
                             for (unsigned int i = 0; i < 2; ++i)
                               {
-                                Assert(!old_child[i]->has_children(),
-                                       ExcInternalError());
+                                DEAL_II_Assert(!old_child[i]->has_children(),
+                                               ExcInternalError());
 
                                 new_child[i]->set(
                                   internal::TriangulationImplementation::
@@ -6029,9 +6056,9 @@ namespace internal
                           {
                             new_line->set_children(
                               0, quad->child(0)->line_index(1));
-                            Assert(new_line->child(1) ==
-                                     quad->child(2)->line(1),
-                                   ExcInternalError());
+                            DEAL_II_Assert(new_line->child(1) ==
+                                             quad->child(2)->line(1),
+                                           ExcInternalError());
                             // now evereything is quite
                             // complicated. we have the children
                             // numbered according to
@@ -6208,9 +6235,9 @@ namespace internal
                             new_quads[1]->set_children(0, quad->child_index(2));
                             new_line->set_children(
                               0, quad->child(0)->line_index(3));
-                            Assert(new_line->child(1) ==
-                                     quad->child(1)->line(3),
-                                   ExcInternalError());
+                            DEAL_II_Assert(new_line->child(1) ==
+                                             quad->child(1)->line(3),
+                                           ExcInternalError());
                           }
                         quad->clear_children();
                       }
@@ -6231,14 +6258,14 @@ namespace internal
 
                     // first of all: we only get here in the first run
                     // of the loop
-                    Assert(loop == 0, ExcInternalError());
+                    DEAL_II_Assert(loop == 0, ExcInternalError());
 
                     // find the next unused vertex. we'll need this in
                     // any case
                     while (triangulation.vertices_used[next_unused_vertex] ==
                            true)
                       ++next_unused_vertex;
-                    Assert(
+                    DEAL_II_Assert(
                       next_unused_vertex < triangulation.vertices.size(),
                       ExcMessage(
                         "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
@@ -6303,11 +6330,11 @@ namespace internal
                             // some tests; if any of the iterators
                             // should be invalid, then already
                             // dereferencing will fail
-                            Assert(
+                            DEAL_II_Assert(
                               children[0]->used() == false,
                               ExcMessage(
                                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
-                            Assert(
+                            DEAL_II_Assert(
                               children[1]->used() == false,
                               ExcMessage(
                                 "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -6351,9 +6378,9 @@ namespace internal
                     // if we got here, we have an unrefined quad and
                     // have to do the usual work like in an purely
                     // isotropic refinement
-                    Assert(quad_ref_case ==
-                             RefinementCase<dim - 1>::no_refinement,
-                           ExcInternalError());
+                    DEAL_II_Assert(quad_ref_case ==
+                                     RefinementCase<dim - 1>::no_refinement,
+                                   ExcInternalError());
 
                     // set the middle vertex appropriately: it might be that
                     // the quad itself is not at the boundary, but that one of
@@ -6399,7 +6426,7 @@ namespace internal
                         new_lines[i] = next_unused_line;
                         ++next_unused_line;
 
-                        Assert(
+                        DEAL_II_Assert(
                           new_lines[i]->used() == false,
                           ExcMessage(
                             "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -6514,14 +6541,14 @@ namespace internal
                         triangulation);
 
                     new_quads[0] = next_unused_quad;
-                    Assert(
+                    DEAL_II_Assert(
                       new_quads[0]->used() == false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[1] = next_unused_quad;
-                    Assert(
+                    DEAL_II_Assert(
                       new_quads[1]->used() == false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -6530,14 +6557,14 @@ namespace internal
                       triangulation.faces->quads.next_free_pair_object(
                         triangulation);
                     new_quads[2] = next_unused_quad;
-                    Assert(
+                    DEAL_II_Assert(
                       new_quads[2]->used() == false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
 
                     ++next_unused_quad;
                     new_quads[3] = next_unused_quad;
-                    Assert(
+                    DEAL_II_Assert(
                       new_quads[3]->used() == false,
                       ExcMessage(
                         "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -6689,7 +6716,7 @@ namespace internal
                         n_new_hexes = 8;
                         break;
                       default:
-                        Assert(false, ExcInternalError());
+                        DEAL_II_Assert(false, ExcInternalError());
                         break;
                     }
 
@@ -6704,7 +6731,7 @@ namespace internal
                         triangulation.faces->lines.next_free_single_object(
                           triangulation);
 
-                      Assert(
+                      DEAL_II_Assert(
                         new_lines[i]->used() == false,
                         ExcMessage(
                           "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -6731,7 +6758,7 @@ namespace internal
                         triangulation.faces->quads.next_free_single_object(
                           triangulation);
 
-                      Assert(
+                      DEAL_II_Assert(
                         new_quads[i]->used() == false,
                         ExcMessage(
                           "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -6771,7 +6798,7 @@ namespace internal
 
                       new_hexes[i] = next_unused_hex;
 
-                      Assert(
+                      DEAL_II_Assert(
                         new_hexes[i]->used() == false,
                         ExcMessage(
                           "Internal error: We want to use a cell during refinement that should be unused, but turns out not to be."));
@@ -6984,9 +7011,10 @@ namespace internal
                               {
                                 // it must be the other
                                 // way round then
-                                Assert(lines[i]->vertex_index((i + 1) % 2) ==
-                                         middle_vertices[i % 2],
-                                       ExcInternalError());
+                                DEAL_II_Assert(lines[i]->vertex_index((i + 1) %
+                                                                      2) ==
+                                                 middle_vertices[i % 2],
+                                               ExcInternalError());
                                 line_orientation[i] = false;
                               }
 
@@ -7213,9 +7241,10 @@ namespace internal
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index((i + 1) % 2) ==
-                                         middle_vertices[i % 2],
-                                       ExcInternalError());
+                                DEAL_II_Assert(lines[i]->vertex_index((i + 1) %
+                                                                      2) ==
+                                                 middle_vertices[i % 2],
+                                               ExcInternalError());
                                 line_orientation[i] = false;
                               }
 
@@ -7444,9 +7473,10 @@ namespace internal
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index((i + 1) % 2) ==
-                                         middle_vertices[i % 2],
-                                       ExcInternalError());
+                                DEAL_II_Assert(lines[i]->vertex_index((i + 1) %
+                                                                      2) ==
+                                                 middle_vertices[i % 2],
+                                               ExcInternalError());
                                 line_orientation[i] = false;
                               }
 
@@ -7766,9 +7796,9 @@ namespace internal
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index(1) ==
-                                         middle_vertices[i],
-                                       ExcInternalError());
+                                DEAL_II_Assert(lines[i]->vertex_index(1) ==
+                                                 middle_vertices[i],
+                                               ExcInternalError());
                                 line_orientation[i] = false;
                               }
 
@@ -7787,10 +7817,11 @@ namespace internal
                               {
                                 // it must be the other way
                                 // round then
-                                Assert(lines[i]->vertex_index(i % 2) ==
-                                         (middle_vertex_index<dim, spacedim>(
-                                           hex->face(3 + i / 4))),
-                                       ExcInternalError());
+                                DEAL_II_Assert(
+                                  lines[i]->vertex_index(i % 2) ==
+                                    (middle_vertex_index<dim, spacedim>(
+                                      hex->face(3 + i / 4))),
+                                  ExcInternalError());
                                 line_orientation[i] = false;
                               }
                           // for the last line the line orientation is
@@ -8210,9 +8241,9 @@ namespace internal
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index(1) ==
-                                         middle_vertices[i],
-                                       ExcInternalError());
+                                DEAL_II_Assert(lines[i]->vertex_index(1) ==
+                                                 middle_vertices[i],
+                                               ExcInternalError());
                                 line_orientation[i] = false;
                               }
 
@@ -8231,10 +8262,11 @@ namespace internal
                               {
                                 // it must be the other way
                                 // round then
-                                Assert(lines[i]->vertex_index(i % 2) ==
-                                         (middle_vertex_index<dim, spacedim>(
-                                           hex->face(1 + i / 4))),
-                                       ExcInternalError());
+                                DEAL_II_Assert(
+                                  lines[i]->vertex_index(i % 2) ==
+                                    (middle_vertex_index<dim, spacedim>(
+                                      hex->face(1 + i / 4))),
+                                  ExcInternalError());
                                 line_orientation[i] = false;
                               }
                           // for the last line the line orientation is
@@ -8668,9 +8700,9 @@ namespace internal
                             else
                               {
                                 // it must be the other way round then
-                                Assert(lines[i]->vertex_index(1) ==
-                                         middle_vertices[i],
-                                       ExcInternalError());
+                                DEAL_II_Assert(lines[i]->vertex_index(1) ==
+                                                 middle_vertices[i],
+                                               ExcInternalError());
                                 line_orientation[i] = false;
                               }
 
@@ -8689,10 +8721,11 @@ namespace internal
                               {
                                 // it must be the other way
                                 // round then
-                                Assert(lines[i]->vertex_index(i % 2) ==
-                                         (middle_vertex_index<dim, spacedim>(
-                                           hex->face(i / 4 - 1))),
-                                       ExcInternalError());
+                                DEAL_II_Assert(
+                                  lines[i]->vertex_index(i % 2) ==
+                                    (middle_vertex_index<dim, spacedim>(
+                                      hex->face(i / 4 - 1))),
+                                  ExcInternalError());
                                 line_orientation[i] = false;
                               }
                           // for the last line the line orientation is
@@ -8931,7 +8964,7 @@ namespace internal
                             triangulation.vertices_used[next_unused_vertex] ==
                             true)
                             ++next_unused_vertex;
-                          Assert(
+                          DEAL_II_Assert(
                             next_unused_vertex < triangulation.vertices.size(),
                             ExcMessage(
                               "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
@@ -9269,9 +9302,9 @@ namespace internal
                               {
                                 // it must be the other way
                                 // round then
-                                Assert(lines[i]->vertex_index(i % 2) ==
-                                         vertex_indices[i / 4],
-                                       ExcInternalError());
+                                DEAL_II_Assert(lines[i]->vertex_index(i % 2) ==
+                                                 vertex_indices[i / 4],
+                                               ExcInternalError());
                                 line_orientation[i] = false;
                               }
                           // for the last 6 lines the line orientation is
@@ -9653,7 +9686,7 @@ namespace internal
                         // untreated enumeration value. However, in that
                         // case we should have aborted much
                         // earlier. thus we should never get here
-                        Assert(false, ExcInternalError());
+                        DEAL_II_Assert(false, ExcInternalError());
                         break;
                     } // switch (ref_case)
 
@@ -9836,9 +9869,9 @@ namespace internal
       static void
       prepare_refinement_dim_dependent(const Triangulation<dim, spacedim> &)
       {
-        Assert(dim < 3,
-               ExcMessage("Wrong function called -- there should "
-                          "be a specialization."));
+        DEAL_II_Assert(dim < 3,
+                       ExcMessage("Wrong function called -- there should "
+                                  "be a specialization."));
       }
 
 
@@ -9931,9 +9964,9 @@ namespace internal
 
                       for (unsigned int c = 0; c < 2; ++c)
                         {
-                          Assert(cell->line(line)->child(c)->has_children() ==
-                                   false,
-                                 ExcInternalError());
+                          DEAL_II_Assert(
+                            cell->line(line)->child(c)->has_children() == false,
+                            ExcInternalError());
 
                           if (cell->line(line)->child(c)->user_flag_set() &&
                               (GeometryInfo<dim>::line_refinement_case(
@@ -10216,13 +10249,13 @@ Triangulation<dim, spacedim>::~Triangulation()
   // 1d. double check this here, as destruction is a good place to
   // ensure that what we've done over the course of the lifetime of
   // this object makes sense
-  AssertNothrow((dim == 1) || (vertex_to_boundary_id_map_1d == nullptr),
-                ExcInternalError());
+  DEAL_II_AssertNothrow((dim == 1) || (vertex_to_boundary_id_map_1d == nullptr),
+                        ExcInternalError());
 
   // the vertex_to_manifold_id_map_1d field should be also unused
   // except in 1d. check this as well
-  AssertNothrow((dim == 1) || (vertex_to_manifold_id_map_1d == nullptr),
-                ExcInternalError());
+  DEAL_II_AssertNothrow((dim == 1) || (vertex_to_manifold_id_map_1d == nullptr),
+                        ExcInternalError());
 }
 
 
@@ -10247,8 +10280,8 @@ void
 Triangulation<dim, spacedim>::set_mesh_smoothing(
   const MeshSmoothing mesh_smoothing)
 {
-  Assert(n_levels() == 0,
-         ExcTriangulationNotEmpty(vertices.size(), levels.size()));
+  DEAL_II_Assert(n_levels() == 0,
+                 ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   smooth_grid = mesh_smoothing;
 }
 
@@ -10269,8 +10302,8 @@ Triangulation<dim, spacedim>::set_manifold(
   const types::manifold_id       m_number,
   const Manifold<dim, spacedim> &manifold_object)
 {
-  Assert(m_number < numbers::flat_manifold_id,
-         ExcIndexRange(m_number, 0, numbers::flat_manifold_id));
+  DEAL_II_Assert(m_number < numbers::flat_manifold_id,
+                 ExcIndexRange(m_number, 0, numbers::flat_manifold_id));
 
   manifold[m_number] = manifold_object.clone();
 }
@@ -10289,8 +10322,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
 {
-  Assert(m_number < numbers::flat_manifold_id,
-         ExcIndexRange(m_number, 0, numbers::flat_manifold_id));
+  DEAL_II_Assert(m_number < numbers::flat_manifold_id,
+                 ExcIndexRange(m_number, 0, numbers::flat_manifold_id));
 
   // delete the entry located at number.
   manifold.erase(m_number);
@@ -10310,7 +10343,7 @@ void
 Triangulation<dim, spacedim>::set_all_manifold_ids(
   const types::manifold_id m_number)
 {
-  Assert(
+  DEAL_II_Assert(
     n_cells() > 0,
     ExcMessage(
       "Error: set_all_manifold_ids() can not be called on an empty Triangulation."));
@@ -10329,7 +10362,7 @@ void
 Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
   const types::manifold_id m_number)
 {
-  Assert(
+  DEAL_II_Assert(
     n_cells() > 0,
     ExcMessage(
       "Error: set_all_manifold_ids_on_boundary() can not be called on an empty Triangulation."));
@@ -10351,7 +10384,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
   const types::boundary_id b_id,
   const types::manifold_id m_number)
 {
-  Assert(
+  DEAL_II_Assert(
     n_cells() > 0,
     ExcMessage(
       "Error: set_all_manifold_ids_on_boundary() can not be called on an empty Triangulation."));
@@ -10384,7 +10417,7 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
     }
 
   (void)boundary_found;
-  Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
+  DEAL_II_Assert(boundary_found, ExcBoundaryIdNotFound(b_id));
 }
 
 
@@ -10473,16 +10506,18 @@ void
 Triangulation<dim, spacedim>::copy_triangulation(
   const Triangulation<dim, spacedim> &other_tria)
 {
-  Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
-         ExcTriangulationNotEmpty(vertices.size(), levels.size()));
-  Assert((other_tria.levels.size() != 0) && (other_tria.vertices.size() != 0) &&
-           (dim == 1 || other_tria.faces != nullptr),
-         ExcMessage(
-           "When calling Triangulation::copy_triangulation(), "
-           "the target triangulation must be empty but the source "
-           "triangulation (the argument to this function) must contain "
-           "something. Here, it seems like the source does not "
-           "contain anything at all."));
+  DEAL_II_Assert((vertices.size() == 0) && (levels.size() == 0) &&
+                   (faces == nullptr),
+                 ExcTriangulationNotEmpty(vertices.size(), levels.size()));
+  DEAL_II_Assert((other_tria.levels.size() != 0) &&
+                   (other_tria.vertices.size() != 0) &&
+                   (dim == 1 || other_tria.faces != nullptr),
+                 ExcMessage(
+                   "When calling Triangulation::copy_triangulation(), "
+                   "the target triangulation must be empty but the source "
+                   "triangulation (the argument to this function) must contain "
+                   "something. Here, it seems like the source does not "
+                   "contain anything at all."));
 
 
   // copy normal elements
@@ -10558,11 +10593,12 @@ Triangulation<dim, spacedim>::create_triangulation(
   const std::vector<CellData<dim>> &  cells,
   const SubCellData &                 subcelldata)
 {
-  Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
-         ExcTriangulationNotEmpty(vertices.size(), levels.size()));
+  DEAL_II_Assert((vertices.size() == 0) && (levels.size() == 0) &&
+                   (faces == nullptr),
+                 ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   // check that no forbidden arrays
   // are used
-  Assert(subcelldata.check_consistency(dim), ExcInternalError());
+  DEAL_II_Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
   // try to create a triangulation; if this fails, we still want to
   // throw an exception but if we just do so we'll get into trouble
@@ -10593,7 +10629,8 @@ Triangulation<dim, spacedim>::create_triangulation(
       // throw the array (and fill the various location fields) if
       // there are distorted cells. otherwise, just fall off the end
       // of the function
-      AssertThrow(distorted_cells.distorted_cells.size() == 0, distorted_cells);
+      DEAL_II_AssertThrow(distorted_cells.distorted_cells.size() == 0,
+                          distorted_cells);
     }
 
 
@@ -10656,7 +10693,7 @@ Triangulation<dim, spacedim>::create_triangulation(
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
 
@@ -10695,10 +10732,10 @@ Triangulation<dim, spacedim>::create_triangulation(
                         {
                           // If we have visited this guy, then the ordering and
                           // the orientation should agree
-                          Assert(!(correct(i, j) ^
-                                   (neighbor->direction_flag() ==
-                                    (*cell)->direction_flag())),
-                                 ExcNonOrientableTriangulation());
+                          DEAL_II_Assert(!(correct(i, j) ^
+                                           (neighbor->direction_flag() ==
+                                            (*cell)->direction_flag())),
+                                         ExcNonOrientableTriangulation());
                         }
                       else
                         {
@@ -10743,8 +10780,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::flip_all_direction_flags()
 {
-  AssertThrow(dim + 1 == spacedim,
-              ExcMessage("Only works for dim == spacedim-1"));
+  DEAL_II_AssertThrow(dim + 1 == spacedim,
+                      ExcMessage("Only works for dim == spacedim-1"));
   for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
     cell->set_direction_flag(!cell->direction_flag());
 }
@@ -10755,8 +10792,9 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::set_all_refine_flags()
 {
-  Assert(n_cells() > 0,
-         ExcMessage("Error: An empty Triangulation can not be refined."));
+  DEAL_II_Assert(n_cells() > 0,
+                 ExcMessage(
+                   "Error: An empty Triangulation can not be refined."));
   active_cell_iterator cell = begin_active(), endc = end();
 
   for (; cell != endc; ++cell)
@@ -10797,7 +10835,7 @@ Triangulation<dim, spacedim>::save_refine_flags(std::vector<bool> &v) const
       if (cell->refine_flag_set() & (1 << j))
         *i = true;
 
-  Assert(i == v.end(), ExcInternalError());
+  DEAL_II_Assert(i == v.end(), ExcInternalError());
 }
 
 
@@ -10831,7 +10869,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
 {
-  AssertThrow(v.size() == dim * n_active_cells(), ExcGridReadError());
+  DEAL_II_AssertThrow(v.size() == dim * n_active_cells(), ExcGridReadError());
 
   active_cell_iterator              cell = begin_active(), endc = end();
   std::vector<bool>::const_iterator i = v.begin();
@@ -10842,15 +10880,15 @@ Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
       for (unsigned int j = 0; j < dim; ++j, ++i)
         if (*i == true)
           ref_case += 1 << j;
-      Assert(ref_case < RefinementCase<dim>::isotropic_refinement + 1,
-             ExcGridReadError());
+      DEAL_II_Assert(ref_case < RefinementCase<dim>::isotropic_refinement + 1,
+                     ExcGridReadError());
       if (ref_case > 0)
         cell->set_refine_flag(RefinementCase<dim>(ref_case));
       else
         cell->clear_refine_flag();
     }
 
-  Assert(i == v.end(), ExcInternalError());
+  DEAL_II_Assert(i == v.end(), ExcInternalError());
 }
 
 
@@ -10865,7 +10903,7 @@ Triangulation<dim, spacedim>::save_coarsen_flags(std::vector<bool> &v) const
   for (; cell != endc; ++cell, ++i)
     *i = cell->coarsen_flag_set();
 
-  Assert(i == v.end(), ExcInternalError());
+  DEAL_II_Assert(i == v.end(), ExcInternalError());
 }
 
 
@@ -10902,7 +10940,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_coarsen_flags(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_active_cells(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_active_cells(), ExcGridReadError());
 
   active_cell_iterator              cell = begin_active(), endc = end();
   std::vector<bool>::const_iterator i = v.begin();
@@ -10912,7 +10950,7 @@ Triangulation<dim, spacedim>::load_coarsen_flags(const std::vector<bool> &v)
     else
       cell->clear_coarsen_flag();
 
-  Assert(i == v.end(), ExcInternalError());
+  DEAL_II_Assert(i == v.end(), ExcInternalError());
 }
 
 
@@ -11115,7 +11153,7 @@ Triangulation<dim, spacedim>::save_user_flags(std::ostream &out) const
     save_user_flags_hex(out);
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -11146,7 +11184,7 @@ Triangulation<dim, spacedim>::save_user_flags(std::vector<bool> &v) const
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -11164,7 +11202,7 @@ Triangulation<dim, spacedim>::load_user_flags(std::istream &in)
     load_user_flags_hex(in);
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -11173,7 +11211,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_flags(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
+  DEAL_II_Assert(v.size() == n_lines() + n_quads() + n_hexs(),
+                 ExcInternalError());
   std::vector<bool> tmp;
 
   // first extract the flags
@@ -11201,7 +11240,7 @@ Triangulation<dim, spacedim>::load_user_flags(const std::vector<bool> &v)
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -11216,7 +11255,7 @@ Triangulation<dim, spacedim>::save_user_flags_line(std::vector<bool> &v) const
   for (; line != endl; ++line, ++i)
     *i = line->user_flag_set();
 
-  Assert(i == v.end(), ExcInternalError());
+  DEAL_II_Assert(i == v.end(), ExcInternalError());
 }
 
 
@@ -11253,7 +11292,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_flags_line(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_lines(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_lines(), ExcGridReadError());
 
   line_iterator                     line = begin_line(), endl = end_line();
   std::vector<bool>::const_iterator i = v.begin();
@@ -11263,7 +11302,7 @@ Triangulation<dim, spacedim>::load_user_flags_line(const std::vector<bool> &v)
     else
       line->clear_user_flag();
 
-  Assert(i == v.end(), ExcInternalError());
+  DEAL_II_Assert(i == v.end(), ExcInternalError());
 }
 
 
@@ -11282,7 +11321,7 @@ namespace
   bool
   get_user_flag(const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
     return false;
   }
 
@@ -11301,7 +11340,7 @@ namespace
   void
   set_user_flag(const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
   }
 
 
@@ -11320,7 +11359,7 @@ namespace
   clear_user_flag(
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
   }
 } // namespace
 
@@ -11338,7 +11377,7 @@ Triangulation<dim, spacedim>::save_user_flags_quad(std::vector<bool> &v) const
       for (; quad != endq; ++quad, ++i)
         *i = get_user_flag(quad);
 
-      Assert(i == v.end(), ExcInternalError());
+      DEAL_II_Assert(i == v.end(), ExcInternalError());
     }
 }
 
@@ -11376,7 +11415,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_flags_quad(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_quads(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_quads(), ExcGridReadError());
 
   if (dim >= 2)
     {
@@ -11388,7 +11427,7 @@ Triangulation<dim, spacedim>::load_user_flags_quad(const std::vector<bool> &v)
         else
           clear_user_flag(quad);
 
-      Assert(i == v.end(), ExcInternalError());
+      DEAL_II_Assert(i == v.end(), ExcInternalError());
     }
 }
 
@@ -11407,7 +11446,7 @@ Triangulation<dim, spacedim>::save_user_flags_hex(std::vector<bool> &v) const
       for (; hex != endh; ++hex, ++i)
         *i = get_user_flag(hex);
 
-      Assert(i == v.end(), ExcInternalError());
+      DEAL_II_Assert(i == v.end(), ExcInternalError());
     }
 }
 
@@ -11445,7 +11484,7 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_flags_hex(const std::vector<bool> &v)
 {
-  Assert(v.size() == n_hexs(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_hexs(), ExcGridReadError());
 
   if (dim >= 3)
     {
@@ -11457,7 +11496,7 @@ Triangulation<dim, spacedim>::load_user_flags_hex(const std::vector<bool> &v)
         else
           clear_user_flag(hex);
 
-      Assert(i == v.end(), ExcInternalError());
+      DEAL_II_Assert(i == v.end(), ExcInternalError());
     }
 }
 
@@ -11490,7 +11529,7 @@ Triangulation<dim, spacedim>::save_user_indices(
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -11500,7 +11539,8 @@ void
 Triangulation<dim, spacedim>::load_user_indices(
   const std::vector<unsigned int> &v)
 {
-  Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
+  DEAL_II_Assert(v.size() == n_lines() + n_quads() + n_hexs(),
+                 ExcInternalError());
   std::vector<unsigned int> tmp;
 
   // first extract the indices
@@ -11528,7 +11568,7 @@ Triangulation<dim, spacedim>::load_user_indices(
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -11549,7 +11589,7 @@ namespace
   get_user_index(
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
     return numbers::invalid_unsigned_int;
   }
 
@@ -11570,7 +11610,7 @@ namespace
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &,
     const unsigned int)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
   }
 } // namespace
 
@@ -11594,7 +11634,7 @@ void
 Triangulation<dim, spacedim>::load_user_indices_line(
   const std::vector<unsigned int> &v)
 {
-  Assert(v.size() == n_lines(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_lines(), ExcGridReadError());
 
   line_iterator line = begin_line(), endl = end_line();
   std::vector<unsigned int>::const_iterator i = v.begin();
@@ -11626,7 +11666,7 @@ void
 Triangulation<dim, spacedim>::load_user_indices_quad(
   const std::vector<unsigned int> &v)
 {
-  Assert(v.size() == n_quads(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_quads(), ExcGridReadError());
 
   if (dim >= 2)
     {
@@ -11661,7 +11701,7 @@ void
 Triangulation<dim, spacedim>::load_user_indices_hex(
   const std::vector<unsigned int> &v)
 {
-  Assert(v.size() == n_hexs(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_hexs(), ExcGridReadError());
 
   if (dim >= 3)
     {
@@ -11693,7 +11733,7 @@ namespace
   get_user_pointer(
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
     return nullptr;
   }
 
@@ -11714,7 +11754,7 @@ namespace
     const TriaIterator<InvalidAccessor<structdim, dim, spacedim>> &,
     void *)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
   }
 } // namespace
 
@@ -11745,7 +11785,7 @@ Triangulation<dim, spacedim>::save_user_pointers(std::vector<void *> &v) const
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -11754,7 +11794,8 @@ template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::load_user_pointers(const std::vector<void *> &v)
 {
-  Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
+  DEAL_II_Assert(v.size() == n_lines() + n_quads() + n_hexs(),
+                 ExcInternalError());
   std::vector<void *> tmp;
 
   // first extract the pointers
@@ -11782,7 +11823,7 @@ Triangulation<dim, spacedim>::load_user_pointers(const std::vector<void *> &v)
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -11806,7 +11847,7 @@ void
 Triangulation<dim, spacedim>::load_user_pointers_line(
   const std::vector<void *> &v)
 {
-  Assert(v.size() == n_lines(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_lines(), ExcGridReadError());
 
   line_iterator                       line = begin_line(), endl = end_line();
   std::vector<void *>::const_iterator i = v.begin();
@@ -11839,7 +11880,7 @@ void
 Triangulation<dim, spacedim>::load_user_pointers_quad(
   const std::vector<void *> &v)
 {
-  Assert(v.size() == n_quads(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_quads(), ExcGridReadError());
 
   if (dim >= 2)
     {
@@ -11874,7 +11915,7 @@ void
 Triangulation<dim, spacedim>::load_user_pointers_hex(
   const std::vector<void *> &v)
 {
-  Assert(v.size() == n_hexs(), ExcGridReadError());
+  DEAL_II_Assert(v.size() == n_hexs(), ExcGridReadError());
 
   if (dim >= 3)
     {
@@ -11903,7 +11944,7 @@ Triangulation<dim, spacedim>::begin_raw(const unsigned int level) const
       case 3:
         return begin_raw_hex(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return raw_cell_iterator();
     }
 }
@@ -11923,7 +11964,7 @@ Triangulation<dim, spacedim>::begin(const unsigned int level) const
       case 3:
         return begin_hex(level);
       default:
-        Assert(false, ExcImpossibleInDim(dim));
+        DEAL_II_Assert(false, ExcImpossibleInDim(dim));
         return cell_iterator();
     }
 }
@@ -11943,7 +11984,7 @@ Triangulation<dim, spacedim>::begin_active(const unsigned int level) const
       case 3:
         return begin_active_hex(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return active_cell_iterator();
     }
 }
@@ -11956,8 +11997,8 @@ Triangulation<dim, spacedim>::last() const
 {
   const unsigned int level = levels.size() - 1;
 
-  Assert(level < n_global_levels() || level < levels.size(),
-         ExcInvalidLevel(level));
+  DEAL_II_Assert(level < n_global_levels() || level < levels.size(),
+                 ExcInvalidLevel(level));
   if (levels[level]->cells.cells.size() == 0)
     return end(level);
 
@@ -12014,7 +12055,7 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::raw_cell_iterator
 Triangulation<dim, spacedim>::end_raw(const unsigned int level) const
 {
-  Assert(level < n_global_levels(), ExcInvalidLevel(level));
+  DEAL_II_Assert(level < n_global_levels(), ExcInvalidLevel(level));
   if (level < levels.size() - 1)
     return begin_raw(level + 1);
   else
@@ -12028,8 +12069,8 @@ Triangulation<dim, spacedim>::end(const unsigned int level) const
 {
   if (level < levels.size() - 1)
     return begin(level + 1);
-  Assert(level < n_global_levels() || level < levels.size(),
-         ExcInvalidLevel(level));
+  DEAL_II_Assert(level < n_global_levels() || level < levels.size(),
+                 ExcInvalidLevel(level));
   return end();
 }
 
@@ -12038,8 +12079,8 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::active_cell_iterator
 Triangulation<dim, spacedim>::end_active(const unsigned int level) const
 {
-  Assert(level < n_global_levels() || level < levels.size(),
-         ExcInvalidLevel(level));
+  DEAL_II_Assert(level < n_global_levels() || level < levels.size(),
+                 ExcInvalidLevel(level));
   return (level >= levels.size() - 1 ? active_cell_iterator(end()) :
                                        begin_active(level + 1));
 }
@@ -12098,14 +12139,14 @@ Triangulation<dim, spacedim>::begin_face() const
   switch (dim)
     {
       case 1:
-        Assert(false, ExcImpossibleInDim(1));
+        DEAL_II_Assert(false, ExcImpossibleInDim(1));
         return raw_face_iterator();
       case 2:
         return begin_line();
       case 3:
         return begin_quad();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return face_iterator();
     }
 }
@@ -12119,14 +12160,14 @@ Triangulation<dim, spacedim>::begin_active_face() const
   switch (dim)
     {
       case 1:
-        Assert(false, ExcImpossibleInDim(1));
+        DEAL_II_Assert(false, ExcImpossibleInDim(1));
         return raw_face_iterator();
       case 2:
         return begin_active_line();
       case 3:
         return begin_active_quad();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return active_face_iterator();
     }
 }
@@ -12140,14 +12181,14 @@ Triangulation<dim, spacedim>::end_face() const
   switch (dim)
     {
       case 1:
-        Assert(false, ExcImpossibleInDim(1));
+        DEAL_II_Assert(false, ExcImpossibleInDim(1));
         return raw_face_iterator();
       case 2:
         return end_line();
       case 3:
         return end_quad();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return raw_face_iterator();
     }
 }
@@ -12215,8 +12256,8 @@ Triangulation<dim, spacedim>::begin_raw_line(const unsigned int level) const
   switch (dim)
     {
       case 1:
-        Assert(level < n_global_levels() || level < levels.size(),
-               ExcInvalidLevel(level));
+        DEAL_II_Assert(level < n_global_levels() || level < levels.size(),
+                       ExcInvalidLevel(level));
 
         if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
           return end_line();
@@ -12225,7 +12266,7 @@ Triangulation<dim, spacedim>::begin_raw_line(const unsigned int level) const
           const_cast<Triangulation<dim, spacedim> *>(this), level, 0);
 
       default:
-        Assert(level == 0, ExcFacesHaveNoLevel());
+        DEAL_II_Assert(level == 0, ExcFacesHaveNoLevel());
         return raw_line_iterator(
           const_cast<Triangulation<dim, spacedim> *>(this), 0, 0);
     }
@@ -12285,12 +12326,12 @@ Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
   switch (dim)
     {
       case 1:
-        Assert(false, ExcImpossibleInDim(1));
+        DEAL_II_Assert(false, ExcImpossibleInDim(1));
         return raw_hex_iterator();
       case 2:
         {
-          Assert(level < n_global_levels() || level < levels.size(),
-                 ExcInvalidLevel(level));
+          DEAL_II_Assert(level < n_global_levels() || level < levels.size(),
+                         ExcInvalidLevel(level));
 
           if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
             return end_quad();
@@ -12301,7 +12342,7 @@ Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
 
       case 3:
         {
-          Assert(level == 0, ExcFacesHaveNoLevel());
+          DEAL_II_Assert(level == 0, ExcFacesHaveNoLevel());
 
           return raw_quad_iterator(
             const_cast<Triangulation<dim, spacedim> *>(this), 0, 0);
@@ -12309,7 +12350,7 @@ Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
 
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return raw_hex_iterator();
     }
 }
@@ -12369,12 +12410,12 @@ Triangulation<dim, spacedim>::begin_raw_hex(const unsigned int level) const
     {
       case 1:
       case 2:
-        Assert(false, ExcImpossibleInDim(1));
+        DEAL_II_Assert(false, ExcImpossibleInDim(1));
         return raw_hex_iterator();
       case 3:
         {
-          Assert(level < n_global_levels() || level < levels.size(),
-                 ExcInvalidLevel(level));
+          DEAL_II_Assert(level < n_global_levels() || level < levels.size(),
+                         ExcInvalidLevel(level));
 
           if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
             return end_hex();
@@ -12384,7 +12425,7 @@ Triangulation<dim, spacedim>::begin_raw_hex(const unsigned int level) const
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return raw_hex_iterator();
     }
 }
@@ -12526,7 +12567,7 @@ Triangulation<dim, spacedim>::n_faces() const
       case 3:
         return n_quads();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return 0;
 }
@@ -12543,7 +12584,7 @@ Triangulation<dim, spacedim>::n_raw_faces() const
       case 3:
         return n_raw_quads();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return 0;
 }
@@ -12562,7 +12603,7 @@ Triangulation<dim, spacedim>::n_active_faces() const
       case 3:
         return n_active_quads();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return 0;
 }
@@ -12581,7 +12622,7 @@ Triangulation<dim, spacedim>::n_raw_cells(const unsigned int level) const
       case 3:
         return n_raw_hexs(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return 0;
 }
@@ -12601,7 +12642,7 @@ Triangulation<dim, spacedim>::n_cells(const unsigned int level) const
       case 3:
         return n_hexs(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return 0;
 }
@@ -12621,7 +12662,7 @@ Triangulation<dim, spacedim>::n_active_cells(const unsigned int level) const
       case 3:
         return n_active_hexs(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return 0;
 }
@@ -12652,7 +12693,7 @@ template <>
 unsigned int
 Triangulation<1, 1>::n_raw_lines(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  DEAL_II_Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
   return levels[level]->cells.cells.size();
 }
 
@@ -12661,7 +12702,7 @@ template <>
 unsigned int
 Triangulation<1, 1>::n_raw_lines() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -12671,7 +12712,7 @@ template <>
 unsigned int
 Triangulation<1, 2>::n_raw_lines(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  DEAL_II_Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
   return levels[level]->cells.cells.size();
 }
 
@@ -12680,7 +12721,7 @@ template <>
 unsigned int
 Triangulation<1, 2>::n_raw_lines() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -12689,7 +12730,7 @@ template <>
 unsigned int
 Triangulation<1, 3>::n_raw_lines(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  DEAL_II_Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
   return levels[level]->cells.cells.size();
 }
 
@@ -12697,7 +12738,7 @@ template <>
 unsigned int
 Triangulation<1, 3>::n_raw_lines() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -12707,7 +12748,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_raw_lines(const unsigned int) const
 {
-  Assert(false, ExcFacesHaveNoLevel());
+  DEAL_II_Assert(false, ExcFacesHaveNoLevel());
   return 0;
 }
 
@@ -12724,9 +12765,9 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_lines(const unsigned int level) const
 {
-  Assert(level < number_cache.n_lines_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_lines_level.size()));
-  Assert(dim == 1, ExcFacesHaveNoLevel());
+  DEAL_II_Assert(level < number_cache.n_lines_level.size(),
+                 ExcIndexRange(level, 0, number_cache.n_lines_level.size()));
+  DEAL_II_Assert(dim == 1, ExcFacesHaveNoLevel());
   return number_cache.n_lines_level[level];
 }
 
@@ -12743,9 +12784,9 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_active_lines(const unsigned int level) const
 {
-  Assert(level < number_cache.n_lines_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_lines_level.size()));
-  Assert(dim == 1, ExcFacesHaveNoLevel());
+  DEAL_II_Assert(level < number_cache.n_lines_level.size(),
+                 ExcIndexRange(level, 0, number_cache.n_lines_level.size()));
+  DEAL_II_Assert(dim == 1, ExcFacesHaveNoLevel());
 
   return number_cache.n_active_lines_level[level];
 }
@@ -12909,9 +12950,9 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_quads(const unsigned int level) const
 {
-  Assert(dim == 2, ExcFacesHaveNoLevel());
-  Assert(level < number_cache.n_quads_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_quads_level.size()));
+  DEAL_II_Assert(dim == 2, ExcFacesHaveNoLevel());
+  DEAL_II_Assert(level < number_cache.n_quads_level.size(),
+                 ExcIndexRange(level, 0, number_cache.n_quads_level.size()));
   return number_cache.n_quads_level[level];
 }
 
@@ -12921,7 +12962,7 @@ template <>
 unsigned int
 Triangulation<2, 2>::n_raw_quads(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  DEAL_II_Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
   return levels[level]->cells.cells.size();
 }
 
@@ -12931,7 +12972,7 @@ template <>
 unsigned int
 Triangulation<2, 3>::n_raw_quads(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  DEAL_II_Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
   return levels[level]->cells.cells.size();
 }
 
@@ -12940,7 +12981,7 @@ template <>
 unsigned int
 Triangulation<3, 3>::n_raw_quads(const unsigned int) const
 {
-  Assert(false, ExcFacesHaveNoLevel());
+  DEAL_II_Assert(false, ExcFacesHaveNoLevel());
   return 0;
 }
 
@@ -12950,7 +12991,7 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_raw_quads() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -12977,9 +13018,9 @@ template <int dim, int spacedim>
 unsigned int
 Triangulation<dim, spacedim>::n_active_quads(const unsigned int level) const
 {
-  Assert(level < number_cache.n_quads_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_quads_level.size()));
-  Assert(dim == 2, ExcFacesHaveNoLevel());
+  DEAL_II_Assert(level < number_cache.n_quads_level.size(),
+                 ExcIndexRange(level, 0, number_cache.n_quads_level.size()));
+  DEAL_II_Assert(dim == 2, ExcFacesHaveNoLevel());
 
   return number_cache.n_active_quads_level[level];
 }
@@ -13041,8 +13082,8 @@ template <>
 unsigned int
 Triangulation<3, 3>::n_hexs(const unsigned int level) const
 {
-  Assert(level < number_cache.n_hexes_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_hexes_level.size()));
+  DEAL_II_Assert(level < number_cache.n_hexes_level.size(),
+                 ExcIndexRange(level, 0, number_cache.n_hexes_level.size()));
 
   return number_cache.n_hexes_level[level];
 }
@@ -13053,7 +13094,7 @@ template <>
 unsigned int
 Triangulation<3, 3>::n_raw_hexs(const unsigned int level) const
 {
-  Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
+  DEAL_II_Assert(level < n_levels(), ExcIndexRange(level, 0, n_levels()));
   return levels[level]->cells.cells.size();
 }
 
@@ -13071,8 +13112,8 @@ template <>
 unsigned int
 Triangulation<3, 3>::n_active_hexs(const unsigned int level) const
 {
-  Assert(level < number_cache.n_hexes_level.size(),
-         ExcIndexRange(level, 0, number_cache.n_hexes_level.size()));
+  DEAL_II_Assert(level < number_cache.n_hexes_level.size(),
+                 ExcIndexRange(level, 0, number_cache.n_hexes_level.size()));
 
   return number_cache.n_active_hexes_level[level];
 }
@@ -13227,7 +13268,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // some difficulty in the past (see the
   // deal.II/coarsening_* tests)
   if (smooth_grid & limit_level_difference_at_vertices)
-    Assert(satisfies_level1_at_vertex_rule(*this) == true, ExcInternalError());
+    DEAL_II_Assert(satisfies_level1_at_vertex_rule(*this) == true,
+                   ExcInternalError());
 
   // Inform all listeners about beginning of refinement.
   signals.pre_refinement();
@@ -13240,7 +13282,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // some difficulty in the past (see the
   // deal.II/coarsening_* tests)
   if (smooth_grid & limit_level_difference_at_vertices)
-    Assert(satisfies_level1_at_vertex_rule(*this) == true, ExcInternalError());
+    DEAL_II_Assert(satisfies_level1_at_vertex_rule(*this) == true,
+                   ExcInternalError());
 
   // finally build up neighbor connectivity information, and set
   // active cell indices
@@ -13250,8 +13293,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // Inform all listeners about end of refinement.
   signals.post_refinement();
 
-  AssertThrow(cells_with_distorted_children.distorted_cells.size() == 0,
-              cells_with_distorted_children);
+  DEAL_II_AssertThrow(cells_with_distorted_children.distorted_cells.size() == 0,
+                      cells_with_distorted_children);
 
   update_periodic_face_map();
 }
@@ -13272,7 +13315,7 @@ Triangulation<dim, spacedim>::reset_active_cell_indices()
         ++active_cell_index;
       }
 
-  Assert(active_cell_index == n_active_cells(), ExcInternalError());
+  DEAL_II_Assert(active_cell_index == n_active_cells(), ExcInternalError());
 }
 
 
@@ -13330,9 +13373,9 @@ Triangulation<dim, spacedim>::update_periodic_face_map()
         {
           // if both cells have the same neighbor, then the same pair
           // order swapped has to be in the map
-          Assert(periodic_face_map[it_test->second.first].first ==
-                   it_test->first,
-                 ExcInternalError());
+          DEAL_II_Assert(periodic_face_map[it_test->second.first].first ==
+                           it_test->first,
+                         ExcInternalError());
         }
     }
 }
@@ -13379,7 +13422,7 @@ Triangulation<dim, spacedim>::execute_refinement()
   // since the cell-accessors should have caught this)
   cell_iterator cell = begin(), endc = end();
   while (cell != endc)
-    Assert(!(cell++)->refine_flag_set(), ExcInternalError());
+    DEAL_II_Assert(!(cell++)->refine_flag_set(), ExcInternalError());
 #endif
 
   return cells_with_distorted_children;
@@ -13420,8 +13463,8 @@ Triangulation<dim, spacedim>::execute_coarsening()
           cell->set_user_flag();
           for (unsigned int child = 0; child < cell->n_children(); ++child)
             {
-              Assert(cell->child(child)->coarsen_flag_set(),
-                     ExcInternalError());
+              DEAL_II_Assert(cell->child(child)->coarsen_flag_set(),
+                             ExcInternalError());
               cell->child(child)->clear_coarsen_flag();
             }
         }
@@ -13456,7 +13499,7 @@ Triangulation<dim, spacedim>::execute_coarsening()
   // in principle no user flags should be set any more at this point
 #if DEBUG
   for (cell = begin(); cell != endc; ++cell)
-    Assert(cell->user_flag_set() == false, ExcInternalError());
+    DEAL_II_Assert(cell->user_flag_set() == false, ExcInternalError());
 #endif
 }
 
@@ -13490,10 +13533,11 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
     {
       if (smooth_grid & limit_level_difference_at_vertices)
         {
-          Assert(!anisotropic_refinement,
-                 ExcMessage("In case of anisotropic refinement the "
-                            "limit_level_difference_at_vertices flag for "
-                            "mesh smoothing must not be set!"));
+          DEAL_II_Assert(!anisotropic_refinement,
+                         ExcMessage(
+                           "In case of anisotropic refinement the "
+                           "limit_level_difference_at_vertices flag for "
+                           "mesh smoothing must not be set!"));
 
           // store highest level one of the cells adjacent to a vertex
           // belongs to
@@ -13523,7 +13567,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
                   // again) and so we may make an error here. we try
                   // to correct this by iterating over the entire
                   // process until we are converged
-                  Assert(cell->coarsen_flag_set(), ExcInternalError());
+                  DEAL_II_Assert(cell->coarsen_flag_set(), ExcInternalError());
                   for (unsigned int vertex = 0;
                        vertex < GeometryInfo<dim>::vertices_per_cell;
                        ++vertex)
@@ -13625,7 +13669,7 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
         // point
 #if DEBUG
       for (cell = begin(); cell != endc; ++cell)
-        Assert(cell->coarsen_flag_set() == false, ExcInternalError());
+        DEAL_II_Assert(cell->coarsen_flag_set() == false, ExcInternalError());
 #endif
 
       // now loop over all cells which have the user flag set. their
@@ -13653,8 +13697,8 @@ Triangulation<dim, spacedim>::fix_coarsen_flags()
                 template coarsening_allowed<dim, spacedim>(cell))
             for (unsigned int c = 0; c < cell->n_children(); ++c)
               {
-                Assert(cell->child(c)->refine_flag_set() == false,
-                       ExcInternalError());
+                DEAL_II_Assert(cell->child(c)->refine_flag_set() == false,
+                               ExcInternalError());
 
                 cell->child(c)->set_coarsen_flag();
               }
@@ -13746,7 +13790,7 @@ namespace
   possibly_do_not_produce_unrefined_islands(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
-    Assert(cell->has_children(), ExcInternalError());
+    DEAL_II_Assert(cell->has_children(), ExcInternalError());
 
     unsigned int n_neighbors = 0;
     // count all neighbors that will be refined along the face of our
@@ -13799,8 +13843,8 @@ namespace
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const bool allow_anisotropic_smoothing)
   {
-    Assert(cell->has_children() == false, ExcInternalError());
-    Assert(cell->refine_flag_set() == false, ExcInternalError());
+    DEAL_II_Assert(cell->has_children() == false, ExcInternalError());
+    DEAL_II_Assert(cell->refine_flag_set() == false, ExcInternalError());
 
 
     // now we provide two algorithms. the first one is the standard
@@ -13903,9 +13947,9 @@ namespace
             // this to the refine case for smoothing. note: if
             // directional_cell_refinement_case is isotropic still,
             // then something went wrong...
-            Assert(directional_cell_refinement_case <
-                     RefinementCase<dim>::isotropic_refinement,
-                   ExcInternalError());
+            DEAL_II_Assert(directional_cell_refinement_case <
+                             RefinementCase<dim>::isotropic_refinement,
+                           ExcInternalError());
             smoothing_cell_refinement_case =
               smoothing_cell_refinement_case | directional_cell_refinement_case;
           } // for all face_pairs
@@ -14170,14 +14214,15 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       //
       //    in case of anisotropic refinement this does not make
       //    sense. as soon as one cell is anisotropically refined, an
-      //    Assertion is thrown. therefore we can ignore this problem
+      //    DEAL_II_Assertion is thrown. therefore we can ignore this problem
       //    later on
       if (smooth_grid & limit_level_difference_at_vertices)
         {
-          Assert(!anisotropic_refinement,
-                 ExcMessage("In case of anisotropic refinement the "
-                            "limit_level_difference_at_vertices flag for "
-                            "mesh smoothing must not be set!"));
+          DEAL_II_Assert(!anisotropic_refinement,
+                         ExcMessage(
+                           "In case of anisotropic refinement the "
+                           "limit_level_difference_at_vertices flag for "
+                           "mesh smoothing must not be set!"));
 
           // store highest level one of the cells adjacent to a vertex
           // belongs to
@@ -14205,7 +14250,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                   // that the cell will be coarsened. this isn't
                   // always true (the coarsen flag could be removed
                   // again) and so we may make an error here
-                  Assert(cell->coarsen_flag_set(), ExcInternalError());
+                  DEAL_II_Assert(cell->coarsen_flag_set(), ExcInternalError());
                   for (unsigned int vertex = 0;
                        vertex < GeometryInfo<dim>::vertices_per_cell;
                        ++vertex)
@@ -14325,7 +14370,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                 // ensure the invariant. we can then check whether all
                 // of its children are further refined or not by
                 // simply looking at the first child
-                Assert(cell_is_patch_level_1(cell), ExcInternalError());
+                DEAL_II_Assert(cell_is_patch_level_1(cell), ExcInternalError());
                 if (cell->child(0)->has_children() == true)
                   continue;
 
@@ -14957,7 +15002,7 @@ Triangulation<dim, spacedim>::write_bool_vector(
   for (unsigned int position = 0; position < N; ++position)
     flags[position / 8] |= (v[position] ? (1 << (position % 8)) : 0);
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // format:
   // 0. magic number
@@ -14972,7 +15017,7 @@ Triangulation<dim, spacedim>::write_bool_vector(
 
   delete[] flags;
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -14983,11 +15028,11 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
                                                const unsigned int magic_number2,
                                                std::istream &     in)
 {
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   unsigned int magic_number;
   in >> magic_number;
-  AssertThrow(magic_number == magic_number1, ExcGridReadError());
+  DEAL_II_AssertThrow(magic_number == magic_number1, ExcGridReadError());
 
   unsigned int N;
   in >> N;
@@ -15005,11 +15050,11 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
     v[position] = (flags[position / 8] & (1 << (position % 8)));
 
   in >> magic_number;
-  AssertThrow(magic_number == magic_number2, ExcGridReadError());
+  DEAL_II_AssertThrow(magic_number == magic_number2, ExcGridReadError());
 
   delete[] flags;
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 }
 
 

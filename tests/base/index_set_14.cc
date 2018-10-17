@@ -48,16 +48,17 @@ test()
       deallog << i << ' ' << (is3.is_element(i) ? "true" : "false")
               << std::endl;
 
-      AssertThrow((is1.is_element(i) && is2.is_element(i)) == is3.is_element(i),
-                  ExcInternalError());
+      DEAL_II_AssertThrow((is1.is_element(i) && is2.is_element(i)) ==
+                            is3.is_element(i),
+                          ExcInternalError());
     }
 
   // some sanity tests
-  AssertThrow((is1 & is2) == (is2 & is1), ExcInternalError());
-  AssertThrow((is1 & is3) == (is2 & is3), ExcInternalError());
-  AssertThrow((is1 & is3) == is3, ExcInternalError());
-  AssertThrow((is3 & is1) == is3, ExcInternalError());
-  AssertThrow((is3 & is3) == is3, ExcInternalError());
+  DEAL_II_AssertThrow((is1 & is2) == (is2 & is1), ExcInternalError());
+  DEAL_II_AssertThrow((is1 & is3) == (is2 & is3), ExcInternalError());
+  DEAL_II_AssertThrow((is1 & is3) == is3, ExcInternalError());
+  DEAL_II_AssertThrow((is3 & is1) == is3, ExcInternalError());
+  DEAL_II_AssertThrow((is3 & is3) == is3, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

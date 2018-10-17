@@ -48,11 +48,12 @@ test(const unsigned int chunk_size)
       if (((i->row() + 2 * i->column() + 1) % 3 == 0) ||
           (i->row() == i->column()))
         {
-          AssertThrow(std::fabs(i->value() - i->row() * i->column()) < 1e-14,
-                      ExcInternalError());
+          DEAL_II_AssertThrow(std::fabs(i->value() - i->row() * i->column()) <
+                                1e-14,
+                              ExcInternalError());
         }
       else
-        AssertThrow(i->value() == 0, ExcInternalError());
+        DEAL_II_AssertThrow(i->value() == 0, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

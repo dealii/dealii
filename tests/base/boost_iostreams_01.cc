@@ -31,7 +31,7 @@ test()
   in.push(boost::iostreams::basic_gzip_decompressor<>());
   in.push(
     boost::iostreams::file_source(SOURCE_DIR "/boost_iostreams_01.data.gz"));
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // read the two numbers that are in this file
   int    i;
@@ -41,9 +41,9 @@ test()
   deallog << i << ' ' << d << std::endl;
 
   // make sure that we got here just fine but that there is nothing else
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
   in >> i;
-  AssertThrow(!in, ExcIO());
+  DEAL_II_AssertThrow(!in, ExcIO());
 }
 
 

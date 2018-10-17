@@ -177,9 +177,9 @@ public:
             Y   = Yn;
             iter++;
           }
-        AssertThrow(iter < maxiter,
-                    ExcMessage(
-                      "Newton within PullBack did not find the solution. "));
+        DEAL_II_AssertThrow(
+          iter < maxiter,
+          ExcMessage("Newton within PullBack did not find the solution. "));
         xi[1] = Y;
       }
     else if (x[0] > x_max / 2.0)
@@ -206,9 +206,9 @@ public:
             Y   = Yn;
             iter++;
           }
-        AssertThrow(iter < maxiter,
-                    ExcMessage(
-                      "Newton within PullBack did not find the solution. "));
+        DEAL_II_AssertThrow(
+          iter < maxiter,
+          ExcMessage("Newton within PullBack did not find the solution. "));
         xi[1] = Y;
       }
     return xi;

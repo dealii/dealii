@@ -27,7 +27,7 @@ DataPostprocessor<dim>::evaluate_scalar_field(
   const DataPostprocessorInputs::Scalar<dim> &,
   std::vector<Vector<double>> &) const
 {
-  AssertThrow(false, ExcPureFunctionCalled());
+  DEAL_II_AssertThrow(false, ExcPureFunctionCalled());
 }
 
 
@@ -38,7 +38,7 @@ DataPostprocessor<dim>::evaluate_vector_field(
   const DataPostprocessorInputs::Vector<dim> &,
   std::vector<Vector<double>> &) const
 {
-  AssertThrow(false, ExcPureFunctionCalled());
+  DEAL_II_AssertThrow(false, ExcPureFunctionCalled());
 }
 
 

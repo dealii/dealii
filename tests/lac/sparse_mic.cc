@@ -81,7 +81,7 @@ main()
                 break;
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             };
           mic_pattern.compress();
           SparseMIC<double>::AdditionalData data;

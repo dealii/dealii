@@ -75,8 +75,8 @@ test()
               << ". component for hp FE: " << dofs_per_component_hp.at(i)
               << std::endl;
 
-      Assert(dofs_per_component.at(i) == dofs_per_component_hp.at(i),
-             ExcInternalError());
+      DEAL_II_Assert(dofs_per_component.at(i) == dofs_per_component_hp.at(i),
+                     ExcInternalError());
     }
 }
 

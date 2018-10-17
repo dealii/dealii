@@ -65,7 +65,7 @@ test(const unsigned int degree)
   const unsigned int dofs_per_cell = fe_rt.dofs_per_cell;
   FullMatrix<double> mass_matrix(dofs_per_cell, dofs_per_cell);
 
-  Assert(fe.get_fe().n_components() == dim, ExcInternalError());
+  DEAL_II_Assert(fe.get_fe().n_components() == dim, ExcInternalError());
 
 
   for (unsigned int q_point = 0; q_point < q.size(); ++q_point)

@@ -78,13 +78,13 @@ namespace
     // finally, get the rows:
     int n_process_rows = Np / n_process_columns;
 
-    Assert(n_process_columns >= 1 && n_process_rows >= 1 &&
-             n_processes >= n_process_rows * n_process_columns,
-           ExcMessage(
-             "error in process grid: " + std::to_string(n_process_rows) + "x" +
-             std::to_string(n_process_columns) + "=" +
-             std::to_string(n_process_rows * n_process_columns) + " out of " +
-             std::to_string(n_processes)));
+    DEAL_II_Assert(
+      n_process_columns >= 1 && n_process_rows >= 1 &&
+        n_processes >= n_process_rows * n_process_columns,
+      ExcMessage("error in process grid: " + std::to_string(n_process_rows) +
+                 "x" + std::to_string(n_process_columns) + "=" +
+                 std::to_string(n_process_rows * n_process_columns) +
+                 " out of " + std::to_string(n_processes)));
 
     return std::make_pair(n_process_rows, n_process_columns);
 
@@ -109,12 +109,14 @@ namespace Utilities
       , n_process_rows(grid_dimensions.first)
       , n_process_columns(grid_dimensions.second)
     {
-      Assert(grid_dimensions.first > 0,
-             ExcMessage("Number of process grid rows has to be positive."));
-      Assert(grid_dimensions.second > 0,
-             ExcMessage("Number of process grid columns has to be positive."));
+      DEAL_II_Assert(grid_dimensions.first > 0,
+                     ExcMessage(
+                       "Number of process grid rows has to be positive."));
+      DEAL_II_Assert(grid_dimensions.second > 0,
+                     ExcMessage(
+                       "Number of process grid columns has to be positive."));
 
-      Assert(
+      DEAL_II_Assert(
         grid_dimensions.first * grid_dimensions.second <= n_mpi_processes,
         ExcMessage(
           "Size of process grid is larger than number of available MPI processes."));
@@ -153,9 +155,9 @@ namespace Utilities
       // id=n_process_rows*n_process_columns
       const unsigned int n_active_mpi_processes =
         n_process_rows * n_process_columns;
-      Assert(mpi_process_is_active ||
-               this_mpi_process >= n_active_mpi_processes,
-             ExcInternalError());
+      DEAL_II_Assert(mpi_process_is_active ||
+                       this_mpi_process >= n_active_mpi_processes,
+                     ExcInternalError());
 
       std::vector<int> inactive_with_root_ranks;
       inactive_with_root_ranks.push_back(0);
@@ -166,7 +168,7 @@ namespace Utilities
       int       ierr = 0;
       MPI_Group all_group;
       ierr = MPI_Comm_group(mpi_communicator, &all_group);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // Construct the group containing all ranks we need:
       MPI_Group inactive_with_root_group;
@@ -175,7 +177,7 @@ namespace Utilities
                             n,
                             inactive_with_root_ranks.data(),
                             &inactive_with_root_group);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // Create the communicator based on inactive_with_root_group.
       // Note that on all the active MPI processes (except for the one with
@@ -185,19 +187,19 @@ namespace Utilities
                                           inactive_with_root_group,
                                           55,
                                           &mpi_communicator_inactive_with_root);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       ierr = MPI_Group_free(&all_group);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
       ierr = MPI_Group_free(&inactive_with_root_group);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // Double check that the process with rank 0 in subgroup is active:
 #  ifdef DEBUG
       if (mpi_communicator_inactive_with_root != MPI_COMM_NULL &&
           Utilities::MPI::this_mpi_process(
             mpi_communicator_inactive_with_root) == 0)
-        Assert(mpi_process_is_active, ExcInternalError());
+        DEAL_II_Assert(mpi_process_is_active, ExcInternalError());
 #  endif
     }
 
@@ -241,7 +243,7 @@ namespace Utilities
     void
     ProcessGrid::send_to_inactive(NumberType *value, const int count) const
     {
-      Assert(count > 0, ExcInternalError());
+      DEAL_II_Assert(count > 0, ExcInternalError());
       if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
         {
           const int ierr =
@@ -250,7 +252,7 @@ namespace Utilities
                       Utilities::MPI::internal::mpi_type_id(value),
                       0 /*from root*/,
                       mpi_communicator_inactive_with_root);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
     }
 

@@ -127,7 +127,7 @@ namespace Step48
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    AssertDimension(src.size(), 2);
+    DEAL_II_AssertDimension(src.size(), 2);
     FEEvaluation<dim, fe_degree> current(data), old(data);
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {

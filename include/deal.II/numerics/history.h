@@ -148,7 +148,7 @@ template <typename T>
 void
 FiniteSizeHistory<T>::remove(const std::size_t ind)
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  DEAL_II_Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
   auto el = std::move(data[ind]);
   data.erase(data.begin() + ind);
 
@@ -156,7 +156,8 @@ FiniteSizeHistory<T>::remove(const std::size_t ind)
 
   // whatever we do, we shall not store more than the maximum number of
   // elements
-  Assert(data.size() + cache.size() <= max_n_elements, ExcInternalError());
+  DEAL_II_Assert(data.size() + cache.size() <= max_n_elements,
+                 ExcInternalError());
 }
 
 
@@ -199,7 +200,8 @@ FiniteSizeHistory<T>::add(const T &element)
 
   // whatever we do, we shall not store more than the maximum number of
   // elements
-  Assert(data.size() + cache.size() <= max_n_elements, ExcInternalError());
+  DEAL_II_Assert(data.size() + cache.size() <= max_n_elements,
+                 ExcInternalError());
 }
 
 
@@ -207,7 +209,7 @@ FiniteSizeHistory<T>::add(const T &element)
 template <typename T>
 T &FiniteSizeHistory<T>::operator[](const std::size_t ind)
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  DEAL_II_Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
   return *data[ind];
 }
 
@@ -216,7 +218,7 @@ T &FiniteSizeHistory<T>::operator[](const std::size_t ind)
 template <typename T>
 const T &FiniteSizeHistory<T>::operator[](const std::size_t ind) const
 {
-  Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
+  DEAL_II_Assert(ind < data.size(), ExcIndexRange(ind, 0, data.size()));
   return *data[ind];
 }
 

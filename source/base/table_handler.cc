@@ -70,9 +70,9 @@ namespace internal
       }
     catch (...)
       {
-        Assert(false,
-               ExcMessage("The number stored by this element of the "
-                          "table is not a number."))
+        DEAL_II_Assert(false,
+                       ExcMessage("The number stored by this element of the "
+                                  "table is not a number."))
       }
 
     return 0;
@@ -160,7 +160,7 @@ TableHandler::Column::pad_column_below(const unsigned int size)
 {
   // we should never have a column that is completely
   // empty and that needs to be padded
-  Assert(entries.size() > 0, ExcInternalError());
+  DEAL_II_Assert(entries.size() > 0, ExcInternalError());
 
   // add as many elements as necessary
   while (entries.size() < size)
@@ -205,9 +205,9 @@ void
 TableHandler::declare_column(const std::string &key)
 {
   // see if the column already exists; insert it if not
-  Assert(columns.find(key) == columns.end(),
-         ExcMessage("You are trying to declare a column with key <" + key +
-                    "> but such a column already exists."));
+  DEAL_II_Assert(columns.find(key) == columns.end(),
+                 ExcMessage("You are trying to declare a column with key <" +
+                            key + "> but such a column already exists."));
 
   columns.insert(std::make_pair(key, Column(key)));
   column_order.push_back(key);
@@ -257,7 +257,7 @@ void
 TableHandler::add_column_to_supercolumn(const std::string &key,
                                         const std::string &superkey)
 {
-  Assert(columns.count(key), ExcColumnNotExistent(key));
+  DEAL_II_Assert(columns.count(key), ExcColumnNotExistent(key));
 
   if (!supercolumns.count(superkey))
     {
@@ -297,7 +297,7 @@ TableHandler::add_column_to_supercolumn(const std::string &key,
       tex_supercaptions.insert(new_tex_supercaption);
     }
   else
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
 }
 
 
@@ -306,8 +306,9 @@ void
 TableHandler::set_column_order(const std::vector<std::string> &new_order)
 {
   for (unsigned int j = 0; j < new_order.size(); ++j)
-    Assert(supercolumns.count(new_order[j]) || columns.count(new_order[j]),
-           ExcColumnOrSuperColumnNotExistent(new_order[j]));
+    DEAL_II_Assert(supercolumns.count(new_order[j]) ||
+                     columns.count(new_order[j]),
+                   ExcColumnOrSuperColumnNotExistent(new_order[j]));
 
   column_order = new_order;
 }
@@ -317,7 +318,7 @@ void
 TableHandler::set_tex_caption(const std::string &key,
                               const std::string &tex_caption)
 {
-  Assert(columns.count(key), ExcColumnNotExistent(key));
+  DEAL_II_Assert(columns.count(key), ExcColumnNotExistent(key));
   columns[key].tex_caption = tex_caption;
 }
 
@@ -343,8 +344,9 @@ void
 TableHandler::set_tex_supercaption(const std::string &superkey,
                                    const std::string &tex_supercaption)
 {
-  Assert(supercolumns.count(superkey), ExcSuperColumnNotExistent(superkey));
-  Assert(tex_supercaptions.count(superkey), ExcInternalError());
+  DEAL_II_Assert(supercolumns.count(superkey),
+                 ExcSuperColumnNotExistent(superkey));
+  DEAL_II_Assert(tex_supercaptions.count(superkey), ExcInternalError());
   tex_supercaptions[superkey] = tex_supercaption;
 }
 
@@ -354,9 +356,9 @@ void
 TableHandler::set_tex_format(const std::string &key,
                              const std::string &tex_format)
 {
-  Assert(columns.count(key), ExcColumnNotExistent(key));
-  Assert(tex_format == "l" || tex_format == "c" || tex_format == "r",
-         ExcUndefinedTexFormat(tex_format));
+  DEAL_II_Assert(columns.count(key), ExcColumnNotExistent(key));
+  DEAL_II_Assert(tex_format == "l" || tex_format == "c" || tex_format == "r",
+                 ExcUndefinedTexFormat(tex_format));
   columns[key].tex_format = tex_format;
 }
 
@@ -366,7 +368,7 @@ void
 TableHandler::set_precision(const std::string &key,
                             const unsigned int precision)
 {
-  Assert(columns.count(key), ExcColumnNotExistent(key));
+  DEAL_II_Assert(columns.count(key), ExcColumnNotExistent(key));
   if (columns[key].precision != precision)
     {
       columns[key].precision = precision;
@@ -378,7 +380,7 @@ TableHandler::set_precision(const std::string &key,
 void
 TableHandler::set_scientific(const std::string &key, const bool scientific)
 {
-  Assert(columns.count(key), ExcColumnNotExistent(key));
+  DEAL_II_Assert(columns.count(key), ExcColumnNotExistent(key));
   if (columns[key].scientific != scientific)
     {
       columns[key].scientific = scientific;
@@ -390,7 +392,7 @@ TableHandler::set_scientific(const std::string &key, const bool scientific)
 void
 TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
   boost::io::ios_flags_saver restore_flags(out);
 
   // first pad the table from below if necessary
@@ -422,7 +424,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
       std::string                                         key = sel_columns[j];
       const std::map<std::string, Column>::const_iterator col_iter =
         columns.find(key);
-      Assert(col_iter != columns.end(), ExcInternalError());
+      DEAL_II_Assert(col_iter != columns.end(), ExcInternalError());
       cols.push_back(&(col_iter->second));
 
       column_widths[j] = col_iter->second.max_length;
@@ -522,7 +524,8 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
                       {
                         const std::map<std::string, Column>::const_iterator
                           col_iter = columns.find(super_iter->second[k]);
-                        Assert(col_iter != columns.end(), ExcInternalError());
+                        DEAL_II_Assert(col_iter != columns.end(),
+                                       ExcInternalError());
 
                         width += col_iter->second.max_length;
                       }
@@ -582,7 +585,7 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
 
@@ -610,7 +613,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
 {
   // TODO[TH]: update code similar to
   // write_text() to use the cache
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
   if (with_header)
     out << "\\documentclass[10pt]{report}" << std::endl
         << "\\usepackage{float}" << std::endl
@@ -656,7 +659,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
               // avoid `columns[supercolumns[key]]'
               const std::map<std::string, Column>::const_iterator col_iter =
                 columns.find(super_iter->second[k]);
-              Assert(col_iter != columns.end(), ExcInternalError());
+              DEAL_II_Assert(col_iter != columns.end(), ExcInternalError());
 
               out << col_iter->second.tex_format << "|";
             }
@@ -666,7 +669,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           // avoid `columns[key]';
           const std::map<std::string, Column>::const_iterator col_iter =
             columns.find(key);
-          Assert(col_iter != columns.end(), ExcInternalError());
+          DEAL_II_Assert(col_iter != columns.end(), ExcInternalError());
           out << col_iter->second.tex_format << "|";
         }
     }
@@ -695,7 +698,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           // col_iter->second=columns[col];
           const std::map<std::string, Column>::const_iterator col_iter =
             columns.find(key);
-          Assert(col_iter != columns.end(), ExcInternalError());
+          DEAL_II_Assert(col_iter != columns.end(), ExcInternalError());
           out << col_iter->second.tex_caption;
         }
       if (j < column_order.size() - 1)
@@ -715,7 +718,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           // avoid `column[key]'
           const std::map<std::string, Column>::const_iterator col_iter =
             columns.find(key);
-          Assert(col_iter != columns.end(), ExcInternalError());
+          DEAL_II_Assert(col_iter != columns.end(), ExcInternalError());
 
           const Column &column = col_iter->second;
 
@@ -769,9 +772,11 @@ TableHandler::n_rows() const
   std::string  first_name = col_iter->first;
 
   for (++col_iter; col_iter != columns.end(); ++col_iter)
-    Assert(col_iter->second.entries.size() == n,
-           ExcWrongNumberOfDataEntries(
-             col_iter->first, col_iter->second.entries.size(), first_name, n));
+    DEAL_II_Assert(col_iter->second.entries.size() == n,
+                   ExcWrongNumberOfDataEntries(col_iter->first,
+                                               col_iter->second.entries.size(),
+                                               first_name,
+                                               n));
 
   return n;
 }
@@ -795,13 +800,13 @@ TableHandler::get_selected_columns(std::vector<std::string> &sel_columns) const
           for (unsigned int k = 0; k < n_subcolumns; ++k)
             {
               const std::string subkey = super_iter->second[k];
-              Assert(columns.count(subkey), ExcInternalError());
+              DEAL_II_Assert(columns.count(subkey), ExcInternalError());
               sel_columns.push_back(subkey);
             }
         }
       else
         {
-          Assert(columns.count(key), ExcInternalError());
+          DEAL_II_Assert(columns.count(key), ExcInternalError());
           // i.e. key is a column key
           sel_columns.push_back(key);
         }

@@ -33,9 +33,9 @@ check()
     {
       deallog << i << "  --  " << S::unrolled_to_component_indices(i)
               << std::endl;
-      Assert(S::component_to_unrolled_index(
-               S::unrolled_to_component_indices(i)) == i,
-             ExcInternalError());
+      DEAL_II_Assert(S::component_to_unrolled_index(
+                       S::unrolled_to_component_indices(i)) == i,
+                     ExcInternalError());
     }
 }
 

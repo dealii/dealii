@@ -81,7 +81,8 @@ test()
            ++cell, ++index)
         if (flags[index])
           cell->set_refine_flag();
-      AssertThrow(index == triangulation.n_active_cells(), ExcInternalError());
+      DEAL_II_AssertThrow(index == triangulation.n_active_cells(),
+                          ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
@@ -104,14 +105,16 @@ test()
       IndexSet all(N);
       all.add_range(0, N);
 
-      AssertThrow(dof_handler.n_locally_owned_dofs() == N, ExcInternalError());
-      AssertThrow(dof_handler.locally_owned_dofs() == all, ExcInternalError());
-      AssertThrow(dof_handler.n_locally_owned_dofs_per_processor() ==
-                    std::vector<types::global_dof_index>(1, N),
-                  ExcInternalError());
-      AssertThrow(dof_handler.locally_owned_dofs_per_processor() ==
-                    std::vector<IndexSet>(1, all),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(dof_handler.n_locally_owned_dofs() == N,
+                          ExcInternalError());
+      DEAL_II_AssertThrow(dof_handler.locally_owned_dofs() == all,
+                          ExcInternalError());
+      DEAL_II_AssertThrow(dof_handler.n_locally_owned_dofs_per_processor() ==
+                            std::vector<types::global_dof_index>(1, N),
+                          ExcInternalError());
+      DEAL_II_AssertThrow(dof_handler.locally_owned_dofs_per_processor() ==
+                            std::vector<IndexSet>(1, all),
+                          ExcInternalError());
     }
 }
 

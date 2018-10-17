@@ -50,7 +50,8 @@ namespace internal
     bool
     is_non_negative(const std::complex<T> &)
     {
-      Assert(false, ExcMessage("Complex numbers do not have an ordering."));
+      DEAL_II_Assert(false,
+                     ExcMessage("Complex numbers do not have an ordering."));
 
       return false;
     }
@@ -102,9 +103,9 @@ namespace internal
     void
     copy(const std::complex<T> *, const std::complex<T> *, U *)
     {
-      Assert(false,
-             ExcMessage("Can't convert a vector of complex numbers "
-                        "into a vector of reals/doubles"));
+      DEAL_II_Assert(false,
+                     ExcMessage("Can't convert a vector of complex numbers "
+                                "into a vector of reals/doubles"));
     }
 
 
@@ -144,8 +145,8 @@ namespace internal
         if (chunk_size > 512)
           chunk_size = ((chunk_size + 511) / 512) * 512;
         n_chunks = (vec_size + chunk_size - 1) / chunk_size;
-        AssertIndexRange((n_chunks - 1) * chunk_size, vec_size);
-        AssertIndexRange(vec_size, n_chunks * chunk_size + 1);
+        DEAL_II_AssertIndexRange((n_chunks - 1) * chunk_size, vec_size);
+        DEAL_II_AssertIndexRange(vec_size, n_chunks * chunk_size + 1);
       }
 
       void
@@ -180,10 +181,10 @@ namespace internal
             4 * internal::VectorImplementation::minimum_parallel_grain_size &&
           MultithreadInfo::n_threads() > 1)
         {
-          Assert(partitioner.get() != nullptr,
-                 ExcInternalError(
-                   "Unexpected initialization of Vector that does "
-                   "not set the TBB partitioner to a usable state."));
+          DEAL_II_Assert(partitioner.get() != nullptr,
+                         ExcInternalError(
+                           "Unexpected initialization of Vector that does "
+                           "not set the TBB partitioner to a usable state."));
           std::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
             partitioner->acquire_one_partitioner();
 
@@ -213,13 +214,13 @@ namespace internal
         : value(value)
         , dst(dst)
       {
-        Assert(dst != nullptr, ExcInternalError());
+        DEAL_II_Assert(dst != nullptr, ExcInternalError());
       }
 
       void
       operator()(const size_type begin, const size_type end) const
       {
-        Assert(end >= begin, ExcInternalError());
+        DEAL_II_Assert(end >= begin, ExcInternalError());
 
         if (value == Number())
           {
@@ -247,14 +248,14 @@ namespace internal
         : src(src)
         , dst(dst)
       {
-        Assert(src != nullptr, ExcInternalError());
-        Assert(dst != nullptr, ExcInternalError());
+        DEAL_II_Assert(src != nullptr, ExcInternalError());
+        DEAL_II_Assert(dst != nullptr, ExcInternalError());
       }
 
       void
       operator()(const size_type begin, const size_type end) const
       {
-        Assert(end >= begin, ExcInternalError());
+        DEAL_II_Assert(end >= begin, ExcInternalError());
 
 #if __GNUG__ && __GNUC__ < 5
         if (__has_trivial_copy(Number) &&
@@ -1017,9 +1018,9 @@ namespace internal
           // accumulate_regular() is executed.
           size_type       n_chunks  = vec_size / 32;
           const size_type remainder = vec_size % 32;
-          Assert(remainder == 0 ||
-                   n_chunks < vector_accumulation_recursion_threshold,
-                 ExcInternalError());
+          DEAL_II_Assert(remainder == 0 ||
+                           n_chunks < vector_accumulation_recursion_threshold,
+                         ExcInternalError());
 
           // Select between the regular version and vectorized version based
           // on the number types we are given. To choose the vectorized
@@ -1040,14 +1041,15 @@ namespace internal
               // vector_accumulation_recursion_threshold * 32), which is to say
               // that the domain can be split into n_chunks <=
               // vector_accumulation_recursion_threshold:
-              AssertIndexRange(n_chunks,
-                               vector_accumulation_recursion_threshold + 1);
+              DEAL_II_AssertIndexRange(n_chunks,
+                                       vector_accumulation_recursion_threshold +
+                                         1);
               // split the remainder into chunks of 8, there could be up to 3
               // such chunks since remainder < 32.
               // Work on those chunks without any SIMD, that is we call
               // op(index).
               const size_type inner_chunks = remainder / 8;
-              Assert(inner_chunks <= 3, ExcInternalError());
+              DEAL_II_Assert(inner_chunks <= 3, ExcInternalError());
               const size_type remainder_inner = remainder % 8;
               ResultType      r0 = ResultType(), r1 = ResultType(),
                          r2 = ResultType();
@@ -1086,7 +1088,7 @@ namespace internal
                 }
             }
           // make sure we worked through all indices
-          AssertDimension(index, last);
+          DEAL_II_AssertDimension(index, last);
 
           // now sum the results from the chunks stored in
           // outer_results[0,n_chunks) recursively
@@ -1108,7 +1110,7 @@ namespace internal
           const size_type new_size =
             (vec_size / (vector_accumulation_recursion_threshold * 32)) *
             vector_accumulation_recursion_threshold * 8;
-          Assert(first + 3 * new_size < last, ExcInternalError());
+          DEAL_II_Assert(first + 3 * new_size < last, ExcInternalError());
           ResultType r0, r1, r2, r3;
           accumulate_recursive(op, first, first + new_size, r0);
           accumulate_recursive(op, first + new_size, first + 2 * new_size, r1);
@@ -1210,8 +1212,8 @@ namespace internal
       // regular_chunks * nvecs; We do as much as possible with 2 SIMD
       // operations within each chunk. Here we assume that nvecs < 32/2 = 16 as
       // well as 16%nvecs==0.
-      AssertIndexRange(VectorizedArray<Number>::n_array_elements, 17);
-      Assert(16 % nvecs == 0, ExcInternalError());
+      DEAL_II_AssertIndexRange(VectorizedArray<Number>::n_array_elements, 17);
+      DEAL_II_Assert(16 % nvecs == 0, ExcInternalError());
       if (n_chunks % VectorizedArray<Number>::n_array_elements != 0)
         {
           VectorizedArray<Number> r0  = VectorizedArray<Number>(),
@@ -1290,8 +1292,8 @@ namespace internal
         if (chunk_size > 512)
           chunk_size = ((chunk_size + 511) / 512) * 512;
         n_chunks = (vec_size + chunk_size - 1) / chunk_size;
-        AssertIndexRange((n_chunks - 1) * chunk_size, vec_size);
-        AssertIndexRange(vec_size, n_chunks * chunk_size + 1);
+        DEAL_II_AssertIndexRange((n_chunks - 1) * chunk_size, vec_size);
+        DEAL_II_AssertIndexRange(vec_size, n_chunks * chunk_size + 1);
 
         if (n_chunks > threshold_array_allocate)
           {
@@ -1369,10 +1371,10 @@ namespace internal
             4 * internal::VectorImplementation::minimum_parallel_grain_size &&
           MultithreadInfo::n_threads() > 1)
         {
-          Assert(partitioner.get() != nullptr,
-                 ExcInternalError(
-                   "Unexpected initialization of Vector that does "
-                   "not set the TBB partitioner to a usable state."));
+          DEAL_II_Assert(partitioner.get() != nullptr,
+                         ExcInternalError(
+                           "Unexpected initialization of Vector that does "
+                           "not set the TBB partitioner to a usable state."));
           std::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
             partitioner->acquire_one_partitioner();
 
@@ -1888,7 +1890,7 @@ namespace internal
           data.values.get(), v_data.values.get());
         dealii::internal::VectorOperations::parallel_reduce(
           dot, 0, size, sum, thread_loop_partitioner);
-        AssertIsFinite(sum);
+        DEAL_II_AssertIsFinite(sum);
 
         return sum;
       }
@@ -2001,7 +2003,7 @@ namespace internal
                                                  v_data.values_dev.get(),
                                                  size * sizeof(Number),
                                                  cudaMemcpyDeviceToDevice);
-        AssertCuda(cuda_error_code);
+        DEAL_II_AssertCuda(cuda_error_code);
       }
 
       static void
@@ -2017,9 +2019,9 @@ namespace internal
           <<<n_blocks, block_size>>>(data.values_dev.get(), s, size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2040,9 +2042,9 @@ namespace internal
                                      size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2063,9 +2065,9 @@ namespace internal
                                      size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2082,9 +2084,9 @@ namespace internal
           <<<n_blocks, block_size>>>(data.values_dev.get(), a, size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2106,9 +2108,9 @@ namespace internal
                                      size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2135,9 +2137,9 @@ namespace internal
                                                     size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2157,9 +2159,9 @@ namespace internal
             x, data.values_dev.get(), 1., v_data.values_dev.get(), size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2180,9 +2182,9 @@ namespace internal
             x, data.values_dev.get(), a, v_data.values_dev.get(), size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2211,9 +2213,9 @@ namespace internal
                                                     size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2230,9 +2232,9 @@ namespace internal
           <<<n_blocks, block_size>>>(data.values_dev.get(), factor, size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2252,9 +2254,9 @@ namespace internal
                                                     size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2276,9 +2278,9 @@ namespace internal
                                                     size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static void
@@ -2305,9 +2307,9 @@ namespace internal
                                                     size);
 
         // Check that the kernel was launched correctly
-        AssertCuda(cudaGetLastError());
+        DEAL_II_AssertCuda(cudaGetLastError());
         // Check that there was no problem during the execution of the kernel
-        AssertCuda(cudaDeviceSynchronize());
+        DEAL_II_AssertCuda(cudaDeviceSynchronize());
       }
 
       static Number
@@ -2322,7 +2324,7 @@ namespace internal
         Number *    result_device;
         cudaError_t error_code =
           cudaMalloc(&result_device, size * sizeof(Number));
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
         error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
@@ -2341,12 +2343,12 @@ namespace internal
                                 result_device,
                                 sizeof(Number),
                                 cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
         // Free the memory on the device
         error_code = cudaFree(result_device);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
 
-        AssertIsFinite(result);
+        DEAL_II_AssertIsFinite(result);
 
         return result;
       }
@@ -2373,7 +2375,7 @@ namespace internal
       {
         Number *    result_device;
         cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
         error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
@@ -2390,10 +2392,10 @@ namespace internal
                                 result_device,
                                 sizeof(Number),
                                 cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
         // Free the memory on the device
         error_code = cudaFree(result_device);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
 
         return result;
       }
@@ -2410,7 +2412,7 @@ namespace internal
       {
         Number *    result_device;
         cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
         error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
@@ -2426,10 +2428,10 @@ namespace internal
                                 result_device,
                                 sizeof(Number),
                                 cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
         // Free the memory on the device
         error_code = cudaFree(result_device);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
       }
 
       template <typename real_type>
@@ -2442,7 +2444,7 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number,
                                                ::dealii::MemorySpace::CUDA> &)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
       }
 
       static Number
@@ -2460,9 +2462,9 @@ namespace internal
       {
         Number *    res_d;
         cudaError_t error_code = cudaMalloc(&res_d, sizeof(Number));
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
         error_code = cudaMemset(res_d, 0., sizeof(Number));
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
 
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_and_dot<Number>
@@ -2476,7 +2478,7 @@ namespace internal
         Number res;
         error_code =
           cudaMemcpy(&res, res_d, sizeof(Number), cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
         error_code = cudaFree(res_d);
 
         return res;

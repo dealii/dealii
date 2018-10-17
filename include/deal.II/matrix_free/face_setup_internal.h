@@ -178,7 +178,7 @@ namespace internal
           {
             typename dealii::Triangulation<dim>::cell_iterator dcell(
               &triangulation, cell_levels[i].first, cell_levels[i].second);
-            Assert(dcell->active(), ExcInternalError());
+            DEAL_II_Assert(dcell->active(), ExcInternalError());
           }
 #  endif
 
@@ -278,8 +278,9 @@ namespace internal
                it != inner_faces_at_proc_boundary.end();
                ++it)
             {
-              Assert(it->first != my_domain,
-                     ExcInternalError("Should not send info to myself"));
+              DEAL_II_Assert(it->first != my_domain,
+                             ExcInternalError(
+                               "Should not send info to myself"));
               std::sort(it->second.shared_faces.begin(),
                         it->second.shared_faces.end());
               it->second.shared_faces.erase(
@@ -312,7 +313,7 @@ namespace internal
                            600 + it->first,
                            comm,
                            &status);
-              AssertDimension(mysize, othersize);
+              DEAL_II_AssertDimension(mysize, othersize);
               mysize = it->second.n_hanging_faces_smaller_subdomain;
               MPI_Sendrecv(&mysize,
                            1,
@@ -326,7 +327,7 @@ namespace internal
                            700 + it->first,
                            comm,
                            &status);
-              AssertDimension(mysize, othersize);
+              DEAL_II_AssertDimension(mysize, othersize);
               mysize = it->second.n_hanging_faces_larger_subdomain;
               MPI_Sendrecv(&mysize,
                            1,
@@ -340,7 +341,7 @@ namespace internal
                            800 + it->first,
                            comm,
                            &status);
-              AssertDimension(mysize, othersize);
+              DEAL_II_AssertDimension(mysize, othersize);
 #  endif
 
               // Arrange the face "ownership" such that cells that are access
@@ -387,7 +388,8 @@ namespace internal
                       ++count;
                     else
                       {
-                        AssertThrow(count < 2 * dim, ExcInternalError());
+                        DEAL_II_AssertThrow(count < 2 * dim,
+                                            ExcInternalError());
                         if (count > 0)
                           {
                             for (unsigned int k = 0; k <= count; ++k)
@@ -408,20 +410,21 @@ namespace internal
                       ++count;
                     else
                       {
-                        AssertThrow(count < 2 * dim, ExcInternalError());
+                        DEAL_II_AssertThrow(count < 2 * dim,
+                                            ExcInternalError());
                         if (count > 0)
                           {
                             for (unsigned int k = 0; k <= count; ++k)
                               {
-                                Assert(it->second
-                                           .shared_faces[std::get<2>(
-                                             other_range[i - 1])]
-                                           .second ==
-                                         it->second
-                                           .shared_faces[std::get<2>(
-                                             other_range[i - 1 - k])]
-                                           .second,
-                                       ExcInternalError());
+                                DEAL_II_Assert(it->second
+                                                   .shared_faces[std::get<2>(
+                                                     other_range[i - 1])]
+                                                   .second ==
+                                                 it->second
+                                                   .shared_faces[std::get<2>(
+                                                     other_range[i - 1 - k])]
+                                                   .second,
+                                               ExcInternalError());
                                 // only assign to -1 if higher rank was not
                                 // yet set
                                 if (assignment[std::get<2>(
@@ -475,7 +478,7 @@ namespace internal
                            900 + it->first,
                            comm,
                            &status);
-              AssertDimension(split_index, othersize);
+              DEAL_II_AssertDimension(split_index, othersize);
               MPI_Sendrecv(&n_faces_lower_proc,
                            1,
                            MPI_UNSIGNED,
@@ -488,7 +491,7 @@ namespace internal
                            1000 + it->first,
                            comm,
                            &status);
-              AssertDimension(n_faces_lower_proc, othersize);
+              DEAL_II_AssertDimension(n_faces_lower_proc, othersize);
               MPI_Sendrecv(&n_faces_higher_proc,
                            1,
                            MPI_UNSIGNED,
@@ -501,7 +504,7 @@ namespace internal
                            1100 + it->first,
                            comm,
                            &status);
-              AssertDimension(n_faces_higher_proc, othersize);
+              DEAL_II_AssertDimension(n_faces_higher_proc, othersize);
 #  endif
 
               // collect the faces on both sides
@@ -512,10 +515,10 @@ namespace internal
                   owned_faces_lower.push_back(it->second.shared_faces[i]);
                 else if (assignment[i] > 0)
                   owned_faces_higher.push_back(it->second.shared_faces[i]);
-              AssertIndexRange(split_index,
-                               it->second.shared_faces.size() + 1 -
-                                 owned_faces_lower.size() -
-                                 owned_faces_higher.size());
+              DEAL_II_AssertIndexRange(split_index,
+                                       it->second.shared_faces.size() + 1 -
+                                         owned_faces_lower.size() -
+                                         owned_faces_higher.size());
 
               unsigned int i = 0, c = 0;
               for (; i < assignment.size() && c < split_index; ++i)
@@ -540,11 +543,11 @@ namespace internal
                                  owned_faces_higher.begin(),
                                  owned_faces_higher.end());
               std::sort(check_faces.begin(), check_faces.end());
-              AssertDimension(check_faces.size(),
-                              it->second.shared_faces.size());
+              DEAL_II_AssertDimension(check_faces.size(),
+                                      it->second.shared_faces.size());
               for (unsigned int i = 0; i < check_faces.size(); ++i)
-                Assert(check_faces[i] == it->second.shared_faces[i],
-                       ExcInternalError());
+                DEAL_II_Assert(check_faces[i] == it->second.shared_faces[i],
+                               ExcInternalError());
 #  endif
 
               // now only set half of the faces as the ones to keep
@@ -566,7 +569,7 @@ namespace internal
           typename dealii::Triangulation<dim>::cell_iterator dcell(
             &triangulation, cell_levels[i].first, cell_levels[i].second);
           if (use_active_cells)
-            Assert(dcell->active(), ExcNotImplemented());
+            DEAL_II_Assert(dcell->active(), ExcNotImplemented());
           for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
             {
               if (dcell->at_boundary(f) && !dcell->has_periodic_neighbor(f))
@@ -772,7 +775,8 @@ namespace internal
                     if (face_is_owned[dcell->face(f)->index()] ==
                         FaceCategory::locally_active_at_boundary)
                       {
-                        Assert(dcell->at_boundary(f), ExcInternalError());
+                        DEAL_II_Assert(dcell->at_boundary(f),
+                                       ExcInternalError());
                         ++boundary_counter;
                         FaceToCellTopology<1> info;
                         info.cells_interior[0] = cell;
@@ -842,11 +846,12 @@ namespace internal
                                           cell));
                                       }
                                     else
-                                      Assert(face_is_owned[dcell->face(f)
-                                                             ->index()] ==
-                                               FaceCategory::
-                                                 locally_active_done_elsewhere,
-                                             ExcInternalError());
+                                      DEAL_II_Assert(
+                                        face_is_owned[dcell->face(f)
+                                                        ->index()] ==
+                                          FaceCategory::
+                                            locally_active_done_elsewhere,
+                                        ExcInternalError());
                                   }
                                 else
                                   {
@@ -951,7 +956,7 @@ namespace internal
         info.exterior_face_no = cell->neighbor_face_no(face_no);
 
       info.subface_index = GeometryInfo<dim>::max_children_per_cell;
-      Assert(neighbor->level() <= cell->level(), ExcInternalError());
+      DEAL_II_Assert(neighbor->level() <= cell->level(), ExcInternalError());
       if (cell->level() > neighbor->level())
         {
           if (cell->has_periodic_neighbor(face_no))
@@ -974,9 +979,9 @@ namespace internal
       if (left_face_orientation != 0)
         {
           info.face_orientation = 8 + left_face_orientation;
-          Assert(right_face_orientation == 0,
-                 ExcMessage(
-                   "Face seems to be wrongly oriented from both sides"));
+          DEAL_II_Assert(
+            right_face_orientation == 0,
+            ExcMessage("Face seems to be wrongly oriented from both sides"));
         }
       else
         info.face_orientation = right_face_orientation;
@@ -1043,8 +1048,8 @@ namespace internal
         // we do not need to check for subface_index and orientation because
         // those cannot be different if when all the other values are the
         // same.
-        AssertDimension(face1.subface_index, face2.subface_index);
-        AssertDimension(face1.face_orientation, face2.face_orientation);
+        DEAL_II_AssertDimension(face1.subface_index, face2.subface_index);
+        DEAL_II_AssertDimension(face1.face_orientation, face2.face_orientation);
 
         return false;
       }
@@ -1137,9 +1142,9 @@ namespace internal
                           is_contiguous = false;
                     if (is_contiguous)
                       {
-                        AssertIndexRange(f,
-                                         faces_type[type].size() -
-                                           vectorization_width + 1);
+                        DEAL_II_AssertIndexRange(f,
+                                                 faces_type[type].size() -
+                                                   vectorization_width + 1);
                         for (unsigned int v = 0; v < vectorization_width; ++v)
                           {
                             macro_face.cells_interior[v] =
@@ -1215,9 +1220,9 @@ namespace internal
 #  ifdef DEBUG
       // final safety checks
       for (unsigned int i = 0; i < faces_type.size(); ++i)
-        AssertDimension(faces_type[i].size(), 0U);
+        DEAL_II_AssertDimension(faces_type[i].size(), 0U);
 
-      AssertDimension(faces_out.size(), face_partition_data.back());
+      DEAL_II_AssertDimension(faces_out.size(), face_partition_data.back());
       unsigned int nfaces = 0;
       for (unsigned int i = face_partition_data[0];
            i < face_partition_data.back();
@@ -1225,7 +1230,7 @@ namespace internal
         for (unsigned int v = 0; v < vectorization_width; ++v)
           nfaces +=
             (faces_out[i].cells_interior[v] != numbers::invalid_unsigned_int);
-      AssertDimension(nfaces, faces_in.size());
+      DEAL_II_AssertDimension(nfaces, faces_in.size());
 
       std::vector<std::pair<unsigned int, unsigned int>> in_faces, out_faces;
       for (unsigned int i = 0; i < faces_in.size(); ++i)
@@ -1242,11 +1247,11 @@ namespace internal
                                  faces_out[i].cells_exterior[v]);
       std::sort(in_faces.begin(), in_faces.end());
       std::sort(out_faces.begin(), out_faces.end());
-      AssertDimension(in_faces.size(), out_faces.size());
+      DEAL_II_AssertDimension(in_faces.size(), out_faces.size());
       for (unsigned int i = 0; i < in_faces.size(); ++i)
         {
-          AssertDimension(in_faces[i].first, out_faces[i].first);
-          AssertDimension(in_faces[i].second, out_faces[i].second);
+          DEAL_II_AssertDimension(in_faces[i].first, out_faces[i].first);
+          DEAL_II_AssertDimension(in_faces[i].second, out_faces[i].second);
         }
 #  endif
     }

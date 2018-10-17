@@ -34,8 +34,8 @@ template <int dim>
 void
 test_cell(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
 {
-  AssertDimension(fev.get_fe().n_components(), dim);
-  AssertDimension(fes.get_fe().n_components(), 1);
+  DEAL_II_AssertDimension(fev.get_fe().n_components(), dim);
+  DEAL_II_AssertDimension(fes.get_fe().n_components(), 1);
 
   const unsigned int nv = fev.dofs_per_cell;
   const unsigned int ns = fes.dofs_per_cell;
@@ -101,8 +101,8 @@ template <int dim>
 void
 test_boundary(const FEValuesBase<dim> &fev, const FEValuesBase<dim> &fes)
 {
-  AssertDimension(fev.get_fe().n_components(), dim);
-  AssertDimension(fes.get_fe().n_components(), 1);
+  DEAL_II_AssertDimension(fev.get_fe().n_components(), dim);
+  DEAL_II_AssertDimension(fes.get_fe().n_components(), 1);
 
   const unsigned int nv = fev.dofs_per_cell;
   const unsigned int ns = fes.dofs_per_cell;
@@ -143,10 +143,10 @@ test_face(const FEValuesBase<dim> &fev1,
           const FEValuesBase<dim> &fes1,
           const FEValuesBase<dim> &fes2)
 {
-  AssertDimension(fev1.get_fe().n_components(), dim);
-  AssertDimension(fes1.get_fe().n_components(), 1);
-  AssertDimension(fev2.get_fe().n_components(), dim);
-  AssertDimension(fes2.get_fe().n_components(), 1);
+  DEAL_II_AssertDimension(fev1.get_fe().n_components(), dim);
+  DEAL_II_AssertDimension(fes1.get_fe().n_components(), 1);
+  DEAL_II_AssertDimension(fev2.get_fe().n_components(), dim);
+  DEAL_II_AssertDimension(fes2.get_fe().n_components(), 1);
 
   const unsigned int nv1 = fev1.dofs_per_cell;
   const unsigned int nv2 = fev1.dofs_per_cell;

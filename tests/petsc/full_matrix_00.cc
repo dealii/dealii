@@ -39,8 +39,8 @@ test(PETScWrappers::FullMatrix &m)
   m.compress(VectorOperation::insert);
 
   // things we know
-  AssertThrow(m.m() == 3, ExcInternalError());
-  AssertThrow(m.n() == 3, ExcInternalError());
+  DEAL_II_AssertThrow(m.m() == 3, ExcInternalError());
+  DEAL_II_AssertThrow(m.n() == 3, ExcInternalError());
 
   // Generate some output
   deallog << "initial matrix: " << std::endl;
@@ -62,8 +62,8 @@ test(PETScWrappers::FullMatrix &m)
   m.compress(VectorOperation::insert);
 
   // things we know
-  AssertThrow(m.m() == 5, ExcInternalError());
-  AssertThrow(m.n() == 5, ExcInternalError());
+  DEAL_II_AssertThrow(m.m() == 5, ExcInternalError());
+  DEAL_II_AssertThrow(m.n() == 5, ExcInternalError());
 
   // Generate some output
   deallog << "after reinit: " << std::endl;

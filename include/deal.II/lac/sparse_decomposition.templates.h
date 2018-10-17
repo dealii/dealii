@@ -123,10 +123,10 @@ SparseLUDecomposition<number>::initialize(
     }
 
   // now use this sparsity pattern
-  Assert(sparsity_pattern_to_use->n_rows() == sparsity_pattern_to_use->n_cols(),
-         ExcMessage(
-           "It is not possible to compute this matrix decomposition for "
-           "matrices that are not square."));
+  DEAL_II_Assert(
+    sparsity_pattern_to_use->n_rows() == sparsity_pattern_to_use->n_cols(),
+    ExcMessage("It is not possible to compute this matrix decomposition for "
+               "matrices that are not square."));
   {
     std::vector<const size_type *> tmp;
     tmp.swap(prebuilt_lower_bound);
@@ -215,7 +215,7 @@ SparseLUDecomposition<number>::strengthen_diagonal_impl()
     {
       // get the global index of the first
       // non-diagonal element in this row
-      Assert(this->m() == this->n(), ExcNotImplemented());
+      DEAL_II_Assert(this->m() == this->n(), ExcNotImplemented());
       typename SparseMatrix<number>::iterator diagonal_element =
         this->begin(row);
 

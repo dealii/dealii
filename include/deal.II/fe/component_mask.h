@@ -225,9 +225,9 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcNoComponentSelected,
-                   "The number of selected components in a mask "
-                   "must be greater than zero.");
+  DEAL_II_DeclExceptionMsg(ExcNoComponentSelected,
+                           "The number of selected components in a mask "
+                           "must be greater than zero.");
 
 private:
   /**
@@ -279,7 +279,7 @@ ComponentMask::size() const
 inline void
 ComponentMask::set(const unsigned int index, const bool value)
 {
-  AssertIndexRange(index, component_mask.size());
+  DEAL_II_AssertIndexRange(index, component_mask.size());
   component_mask[index] = value;
 }
 
@@ -294,7 +294,7 @@ inline bool ComponentMask::operator[](const unsigned int component_index) const
     {
       // otherwise check the validity of the index and
       // return whatever is appropriate
-      AssertIndexRange(component_index, component_mask.size());
+      DEAL_II_AssertIndexRange(component_index, component_mask.size());
       return component_mask[component_index];
     }
 }
@@ -311,14 +311,14 @@ inline unsigned int
 ComponentMask::n_selected_components(const unsigned int n) const
 {
   if ((n != numbers::invalid_unsigned_int) && (size() > 0))
-    AssertDimension(n, size());
+    DEAL_II_AssertDimension(n, size());
 
   const unsigned int real_n = (n != numbers::invalid_unsigned_int ? n : size());
   if (component_mask.size() == 0)
     return real_n;
   else
     {
-      AssertDimension(real_n, component_mask.size());
+      DEAL_II_AssertDimension(real_n, component_mask.size());
       unsigned int c = 0;
       for (unsigned int i = 0; i < component_mask.size(); ++i)
         if (component_mask[i] == true)
@@ -332,7 +332,7 @@ inline unsigned int
 ComponentMask::first_selected_component(const unsigned int n) const
 {
   if ((n != numbers::invalid_unsigned_int) && (size() > 0))
-    AssertDimension(n, size());
+    DEAL_II_AssertDimension(n, size());
 
   if (component_mask.size() == 0)
     return 0;
@@ -342,7 +342,7 @@ ComponentMask::first_selected_component(const unsigned int n) const
         if (component_mask[c] == true)
           return c;
 
-      Assert(false, ExcMessage("No component is selected at all!"));
+      DEAL_II_Assert(false, ExcMessage("No component is selected at all!"));
       return numbers::invalid_unsigned_int;
     }
 }
@@ -370,7 +370,8 @@ ComponentMask::operator|(const ComponentMask &mask) const
     {
       // if both masks have individual entries set, form
       // the combination of the two
-      AssertDimension(component_mask.size(), mask.component_mask.size());
+      DEAL_II_AssertDimension(component_mask.size(),
+                              mask.component_mask.size());
       std::vector<bool> new_mask(component_mask.size());
       for (unsigned int i = 0; i < component_mask.size(); ++i)
         new_mask[i] = (component_mask[i] || mask.component_mask[i]);
@@ -392,7 +393,8 @@ inline ComponentMask ComponentMask::operator&(const ComponentMask &mask) const
     {
       // if both masks have individual entries set, form
       // the combination of the two
-      AssertDimension(component_mask.size(), mask.component_mask.size());
+      DEAL_II_AssertDimension(component_mask.size(),
+                              mask.component_mask.size());
       std::vector<bool> new_mask(component_mask.size());
       for (unsigned int i = 0; i < component_mask.size(); ++i)
         new_mask[i] = (component_mask[i] && mask.component_mask[i]);

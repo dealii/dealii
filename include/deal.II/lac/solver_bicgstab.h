@@ -515,9 +515,9 @@ SolverBicgstab<VectorType>::solve(const MatrixType &        A,
   while (state.breakdown == true);
 
   // in case of failure: throw exception
-  AssertThrow(state.state == SolverControl::success,
-              SolverControl::NoConvergence(state.last_step,
-                                           state.last_residual));
+  DEAL_II_AssertThrow(state.state == SolverControl::success,
+                      SolverControl::NoConvergence(state.last_step,
+                                                   state.last_residual));
   // otherwise exit as normal
 }
 

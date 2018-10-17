@@ -118,9 +118,9 @@ namespace internal
     DoFLevel<dim>::get_cell_cache_start(const unsigned int obj_index,
                                         const unsigned int dofs_per_cell) const
     {
-      Assert(obj_index * dofs_per_cell + dofs_per_cell <=
-               cell_dof_indices_cache.size(),
-             ExcInternalError());
+      DEAL_II_Assert(obj_index * dofs_per_cell + dofs_per_cell <=
+                       cell_dof_indices_cache.size(),
+                     ExcInternalError());
 
       return cell_dof_indices_cache.data() + (obj_index * dofs_per_cell);
     }

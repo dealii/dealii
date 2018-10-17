@@ -1335,44 +1335,47 @@ public:
   /**
    * Exception
    */
-  DeclException2(ExcInvalidIndex,
-                 int,
-                 int,
-                 << "You are trying to access the matrix entry with index <"
-                 << arg1 << ',' << arg2
-                 << ">, but this entry does not exist in the sparsity pattern"
-                    "of this matrix."
-                    "\n\n"
-                    "The most common cause for this problem is that you used "
-                    "a method to build the sparsity pattern that did not "
-                    "(completely) take into account all of the entries you "
-                    "will later try to write into. An example would be "
-                    "building a sparsity pattern that does not include "
-                    "the entries you will write into due to constraints "
-                    "on degrees of freedom such as hanging nodes or periodic "
-                    "boundary conditions. In such cases, building the "
-                    "sparsity pattern will succeed, but you will get errors "
-                    "such as the current one at one point or other when "
-                    "trying to write into the entries of the matrix.");
+  DEAL_II_DeclException2(
+    ExcInvalidIndex,
+    int,
+    int,
+    << "You are trying to access the matrix entry with index <" << arg1 << ','
+    << arg2
+    << ">, but this entry does not exist in the sparsity pattern"
+       "of this matrix."
+       "\n\n"
+       "The most common cause for this problem is that you used "
+       "a method to build the sparsity pattern that did not "
+       "(completely) take into account all of the entries you "
+       "will later try to write into. An example would be "
+       "building a sparsity pattern that does not include "
+       "the entries you will write into due to constraints "
+       "on degrees of freedom such as hanging nodes or periodic "
+       "boundary conditions. In such cases, building the "
+       "sparsity pattern will succeed, but you will get errors "
+       "such as the current one at one point or other when "
+       "trying to write into the entries of the matrix.");
   /**
    * Exception
    */
-  DeclException0(ExcDifferentChunkSparsityPatterns);
+  DEAL_II_DeclException0(ExcDifferentChunkSparsityPatterns);
   /**
    * Exception
    */
-  DeclException2(ExcIteratorRange,
-                 int,
-                 int,
-                 << "The iterators denote a range of " << arg1
-                 << " elements, but the given number of rows was " << arg2);
+  DEAL_II_DeclException2(ExcIteratorRange,
+                         int,
+                         int,
+                         << "The iterators denote a range of " << arg1
+                         << " elements, but the given number of rows was "
+                         << arg2);
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcSourceEqualsDestination,
-                   "You are attempting an operation on two matrices that "
-                   "are the same object, but the operation requires that the "
-                   "two objects are in fact different.");
+  DEAL_II_DeclExceptionMsg(
+    ExcSourceEqualsDestination,
+    "You are attempting an operation on two matrices that "
+    "are the same object, but the operation requires that the "
+    "two objects are in fact different.");
   //@}
 private:
   /**
@@ -1429,7 +1432,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::m() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
   return cols->rows;
 }
 
@@ -1438,7 +1441,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::n() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
   return cols->cols;
 }
 
@@ -1448,7 +1451,7 @@ template <typename number>
 inline const ChunkSparsityPattern &
 ChunkSparseMatrix<number>::get_sparsity_pattern() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
   return *cols;
 }
 
@@ -1479,14 +1482,14 @@ ChunkSparseMatrix<number>::set(const size_type i,
                                const size_type j,
                                const number    value)
 {
-  AssertIsFinite(value);
+  DEAL_II_AssertIsFinite(value);
 
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
   // it is allowed to set elements of the matrix that are not part of the
   // sparsity pattern, if the value to which we set it is zero
   const size_type index = compute_location(i, j);
-  Assert((index != SparsityPattern::invalid_entry) || (value == 0.),
-         ExcInvalidIndex(i, j));
+  DEAL_II_Assert((index != SparsityPattern::invalid_entry) || (value == 0.),
+                 ExcInvalidIndex(i, j));
 
   if (index != SparsityPattern::invalid_entry)
     val[index] = value;
@@ -1500,15 +1503,15 @@ ChunkSparseMatrix<number>::add(const size_type i,
                                const size_type j,
                                const number    value)
 {
-  AssertIsFinite(value);
+  DEAL_II_AssertIsFinite(value);
 
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
 
   if (std::abs(value) != 0.)
     {
       const size_type index = compute_location(i, j);
-      Assert((index != ChunkSparsityPattern::invalid_entry),
-             ExcInvalidIndex(i, j));
+      DEAL_II_Assert((index != ChunkSparsityPattern::invalid_entry),
+                     ExcInvalidIndex(i, j));
 
       val[index] += value;
     }
@@ -1537,8 +1540,8 @@ template <typename number>
 inline ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator*=(const number factor)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(val != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(val != nullptr, ExcNotInitialized());
 
   const size_type chunk_size = cols->get_chunk_size();
 
@@ -1562,9 +1565,9 @@ template <typename number>
 inline ChunkSparseMatrix<number> &
 ChunkSparseMatrix<number>::operator/=(const number factor)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(val != nullptr, ExcNotInitialized());
-  Assert(std::abs(factor) != 0, ExcDivideByZero());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(val != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(std::abs(factor) != 0, ExcDivideByZero());
 
   const number factor_inv = 1. / factor;
 
@@ -1592,9 +1595,9 @@ inline number
 ChunkSparseMatrix<number>::operator()(const size_type i,
                                       const size_type j) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  AssertThrow(compute_location(i, j) != SparsityPattern::invalid_entry,
-              ExcInvalidIndex(i, j));
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_AssertThrow(compute_location(i, j) != SparsityPattern::invalid_entry,
+                      ExcInvalidIndex(i, j));
   return val[compute_location(i, j)];
 }
 
@@ -1604,7 +1607,7 @@ template <typename number>
 inline number
 ChunkSparseMatrix<number>::el(const size_type i, const size_type j) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
   const size_type index = compute_location(i, j);
 
   if (index != ChunkSparsityPattern::invalid_entry)
@@ -1619,9 +1622,9 @@ template <typename number>
 inline number
 ChunkSparseMatrix<number>::diag_element(const size_type i) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(m() == n(), ExcNotQuadratic());
-  AssertIndexRange(i, m());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal of the chunk sparsity pattern
@@ -1639,8 +1642,8 @@ inline void
 ChunkSparseMatrix<number>::copy_from(const ForwardIterator begin,
                                      const ForwardIterator end)
 {
-  Assert(static_cast<size_type>(std::distance(begin, end)) == m(),
-         ExcIteratorRange(std::distance(begin, end), m()));
+  DEAL_II_Assert(static_cast<size_type>(std::distance(begin, end)) == m(),
+                 ExcIteratorRange(std::distance(begin, end), m()));
 
   // for use in the inner loop, we define an alias to the type of the inner
   // iterators
@@ -1914,8 +1917,8 @@ namespace ChunkSparseMatrixIterators
   inline bool
   Iterator<number, Constness>::operator<(const Iterator &other) const
   {
-    Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
-           ExcInternalError());
+    DEAL_II_Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+                   ExcInternalError());
 
     return (accessor < other.accessor);
   }
@@ -1933,8 +1936,8 @@ namespace ChunkSparseMatrixIterators
   inline int
   Iterator<number, Constness>::operator-(const Iterator &other) const
   {
-    Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
-           ExcInternalError());
+    DEAL_II_Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+                   ExcInternalError());
 
     // TODO: can be optimized
     int difference = 0;
@@ -2012,7 +2015,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::const_iterator
 ChunkSparseMatrix<number>::begin(const unsigned int r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
   return const_iterator(this, r);
 }
 
@@ -2022,7 +2025,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::const_iterator
 ChunkSparseMatrix<number>::end(const unsigned int r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
   return const_iterator(this, r + 1);
 }
 
@@ -2032,7 +2035,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::iterator
 ChunkSparseMatrix<number>::begin(const unsigned int r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
   return iterator(this, r);
 }
 
@@ -2042,7 +2045,7 @@ template <typename number>
 inline typename ChunkSparseMatrix<number>::iterator
 ChunkSparseMatrix<number>::end(const unsigned int r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
   return iterator(this, r + 1);
 }
 

@@ -36,11 +36,11 @@ check_norms()
         vec(i) = random_value<number>();
       const typename Vector<number>::real_type norm = vec.l2_norm();
       for (unsigned int i = 0; i < 30; ++i)
-        AssertThrow(vec.l2_norm() == norm, ExcInternalError());
+        DEAL_II_AssertThrow(vec.l2_norm() == norm, ExcInternalError());
 
       Vector<number> vec2(vec);
       for (unsigned int i = 0; i < 10; ++i)
-        AssertThrow(vec2.l2_norm() == norm, ExcInternalError());
+        DEAL_II_AssertThrow(vec2.l2_norm() == norm, ExcInternalError());
     }
 }
 

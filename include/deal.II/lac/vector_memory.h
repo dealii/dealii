@@ -160,7 +160,7 @@ public:
   /**
    * Vector was not allocated from this memory pool.
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcNotAllocatedHere,
     "You are trying to deallocate a vector from a memory pool, but this "
     "vector has not actually been allocated by the same pool before.");

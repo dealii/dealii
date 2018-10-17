@@ -61,8 +61,9 @@ check(const FiniteElement<dim> &fe)
 
       for (unsigned int j = 0; j < fe.n_components(); ++j)
         {
-          Assert(fe.get_nonzero_components(i).size() == fe.n_components(),
-                 ExcInternalError());
+          DEAL_II_Assert(fe.get_nonzero_components(i).size() ==
+                           fe.n_components(),
+                         ExcInternalError());
           deallog << (fe.get_nonzero_components(i)[j] ? 1 : 0);
         };
       deallog << std::endl;

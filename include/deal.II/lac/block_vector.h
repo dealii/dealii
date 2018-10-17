@@ -367,7 +367,7 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
+  DEAL_II_DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
   //@}
 };
 
@@ -397,7 +397,7 @@ BlockVector<Number>::BlockVector(const std::vector<size_type> &block_sizes,
       std::copy(start, end, this->block(b).begin());
       start = end;
     };
-  Assert(start == end, ExcIteratorRangeDoesNotMatchVectorSize());
+  DEAL_II_Assert(start == end, ExcIteratorRangeDoesNotMatchVectorSize());
 }
 
 
@@ -406,7 +406,7 @@ template <typename Number>
 inline BlockVector<Number> &
 BlockVector<Number>::operator=(const value_type s)
 {
-  AssertIsFinite(s);
+  DEAL_II_AssertIsFinite(s);
 
   BaseClass::operator=(s);
   return *this;

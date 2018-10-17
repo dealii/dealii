@@ -57,7 +57,7 @@ test()
   v.update_ghost_values();
 
   // check that the value of the ghost is 1.0
-  AssertThrow(v(1) == 1., ExcInternalError());
+  DEAL_II_AssertThrow(v(1) == 1., ExcInternalError());
 
   // copy vector
   w = v;
@@ -65,8 +65,8 @@ test()
 
   v.update_ghost_values();
   w.update_ghost_values();
-  AssertThrow(v(1) == 2., ExcInternalError());
-  AssertThrow(w(1) == 1., ExcInternalError());
+  DEAL_II_AssertThrow(v(1) == 2., ExcInternalError());
+  DEAL_II_AssertThrow(w(1) == 1., ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;

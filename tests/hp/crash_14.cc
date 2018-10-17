@@ -78,9 +78,9 @@ test()
              ++face)
           if (!cell->at_boundary(face))
             {
-              Assert(cell->get_fe().dofs_per_face ==
-                       cell->neighbor(face)->get_fe().dofs_per_face,
-                     ExcInternalError());
+              DEAL_II_Assert(cell->get_fe().dofs_per_face ==
+                               cell->neighbor(face)->get_fe().dofs_per_face,
+                             ExcInternalError());
 
               face_dof_indices.resize(cell->get_fe().dofs_per_face);
               neighbor_face_dof_indices.resize(
@@ -101,8 +101,9 @@ test()
                 {
                   deallog << face_dof_indices[i] << std::endl;
 
-                  Assert(face_dof_indices[i] == neighbor_face_dof_indices[i],
-                         ExcInternalError());
+                  DEAL_II_Assert(face_dof_indices[i] ==
+                                   neighbor_face_dof_indices[i],
+                                 ExcInternalError());
                 }
 
               deallog << std::endl;

@@ -91,7 +91,7 @@ double
 RightHandSide<dim>::value(const Point<dim> & p,
                           const unsigned int component) const
 {
-  Assert(component == 0, ExcNotImplemented());
+  DEAL_II_Assert(component == 0, ExcNotImplemented());
 
   double val = 1; // f = 1
   return val;
@@ -118,7 +118,7 @@ double
 BoundaryValues<dim>::value(const Point<dim> & p,
                            const unsigned int component) const
 {
-  Assert(component == 0, ExcNotImplemented());
+  DEAL_II_Assert(component == 0, ExcNotImplemented());
 
   double val = 1; // u_D = 1
   return val;

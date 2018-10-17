@@ -106,18 +106,18 @@ namespace internal
 
     PetscErrorCode ierr =
       VecScatterCreateToAll(v, &scatter_context, &sequential_vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = VecScatterBegin(
       scatter_context, v, sequential_vector, INSERT_VALUES, SCATTER_FORWARD);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
     ierr = VecScatterEnd(
       scatter_context, v, sequential_vector, INSERT_VALUES, SCATTER_FORWARD);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     PetscScalar *start_ptr;
     ierr = VecGetArray(sequential_vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     const PETScWrappers::VectorBase::size_type v_size = v.size();
     if (out.size() != v_size)
@@ -127,12 +127,12 @@ namespace internal
                                      start_ptr + out.size(),
                                      out.begin());
     ierr = VecRestoreArray(sequential_vector, &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = VecScatterDestroy(&scatter_context);
-    AssertNothrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertNothrow(ierr == 0, ExcPETScError(ierr));
     ierr = VecDestroy(&sequential_vector);
-    AssertNothrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertNothrow(ierr == 0, ExcPETScError(ierr));
   }
 } // namespace internal
 
@@ -178,15 +178,15 @@ Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
                               v.get_mpi_communicator());
       localized_vector.reinit(v, false, true);
 
-      Assert(localized_vector.size() == vec_size,
-             ExcDimensionMismatch(localized_vector.size(), vec_size));
+      DEAL_II_Assert(localized_vector.size() == vec_size,
+                     ExcDimensionMismatch(localized_vector.size(), vec_size));
 
       // get a representation of the vector
       // and copy it
       TrilinosScalar **start_ptr;
 
       int ierr = localized_vector.trilinos_vector().ExtractView(&start_ptr);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
       std::copy(start_ptr[0], start_ptr[0] + vec_size, begin());
     }
@@ -368,7 +368,7 @@ template <typename Number>
 bool
 Vector<Number>::all_zero() const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   for (size_type i = 0; i < vec_size; ++i)
     if (values[i] != Number())
@@ -382,7 +382,7 @@ template <typename Number>
 bool
 Vector<Number>::is_non_negative() const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   for (size_type i = 0; i < vec_size; ++i)
     if (!internal::VectorOperations::is_non_negative(values[i]))
@@ -397,9 +397,9 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator=(const Number s)
 {
-  AssertIsFinite(s);
+  DEAL_II_AssertIsFinite(s);
   if (s != Number())
-    Assert(vec_size != 0, ExcEmptyObject());
+    DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   if (vec_size > 0)
     {
@@ -419,9 +419,9 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator*=(const Number factor)
 {
-  AssertIsFinite(factor);
+  DEAL_II_AssertIsFinite(factor);
 
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   internal::VectorOperations::Vectorization_multiply_factor<Number>
     vector_multiply(values.get(), factor);
@@ -440,10 +440,11 @@ template <typename Number>
 void
 Vector<Number>::add(const Number a, const Vector<Number> &v)
 {
-  AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(a);
 
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == v.vec_size,
+                 ExcDimensionMismatch(vec_size, v.vec_size));
 
   internal::VectorOperations::Vectorization_add_av<Number> vector_add_av(
     values.get(), v.values.get(), a);
@@ -459,11 +460,12 @@ template <typename Number>
 void
 Vector<Number>::sadd(const Number x, const Number a, const Vector<Number> &v)
 {
-  AssertIsFinite(x);
-  AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(x);
+  DEAL_II_AssertIsFinite(a);
 
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == v.vec_size,
+                 ExcDimensionMismatch(vec_size, v.vec_size));
 
   internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd_xav(
     values.get(), v.values.get(), a, x);
@@ -479,19 +481,20 @@ template <typename Number>
 template <typename Number2>
 Number Vector<Number>::operator*(const Vector<Number2> &v) const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   if (PointerComparison::equal(this, &v))
     return norm_sqr();
 
-  Assert(vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
+  DEAL_II_Assert(vec_size == v.size(),
+                 ExcDimensionMismatch(vec_size, v.size()));
 
   Number                                           sum;
   internal::VectorOperations::Dot<Number, Number2> dot(values.get(),
                                                        v.values.get());
   internal::VectorOperations::parallel_reduce(
     dot, 0, vec_size, sum, thread_loop_partitioner);
-  AssertIsFinite(sum);
+  DEAL_II_AssertIsFinite(sum);
 
   return sum;
 }
@@ -502,14 +505,14 @@ template <typename Number>
 typename Vector<Number>::real_type
 Vector<Number>::norm_sqr() const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   real_type                                            sum;
   internal::VectorOperations::Norm2<Number, real_type> norm2(values.get());
   internal::VectorOperations::parallel_reduce(
     norm2, 0, vec_size, sum, thread_loop_partitioner);
 
-  AssertIsFinite(sum);
+  DEAL_II_AssertIsFinite(sum);
 
   return sum;
 }
@@ -520,7 +523,7 @@ template <typename Number>
 Number
 Vector<Number>::mean_value() const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   Number                                        sum;
   internal::VectorOperations::MeanValue<Number> mean(values.get());
@@ -536,7 +539,7 @@ template <typename Number>
 typename Vector<Number>::real_type
 Vector<Number>::l1_norm() const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   real_type                                            sum;
   internal::VectorOperations::Norm1<Number, real_type> norm1(values.get());
@@ -557,7 +560,7 @@ Vector<Number>::l2_norm() const
   // might still be finite. In that case, recompute it (this is a rare case,
   // so working on the vector twice is uncritical and paid off by the extended
   // precision) using the BLAS approach with a weight, see e.g. dnrm2.f.
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   real_type                                            norm_square;
   internal::VectorOperations::Norm2<Number, real_type> norm2(values.get());
@@ -585,7 +588,7 @@ Vector<Number>::l2_norm() const
                 sum += (abs_x / scale) * (abs_x / scale);
             }
         }
-      AssertIsFinite(scale * std::sqrt(sum));
+      DEAL_II_AssertIsFinite(scale * std::sqrt(sum));
       return scale * std::sqrt(sum);
     }
 }
@@ -596,7 +599,7 @@ template <typename Number>
 typename Vector<Number>::real_type
 Vector<Number>::lp_norm(const real_type p) const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   if (p == 1.)
     return l1_norm();
@@ -639,7 +642,7 @@ template <typename Number>
 typename Vector<Number>::real_type
 Vector<Number>::linfty_norm() const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   real_type max = 0.;
 
@@ -657,9 +660,9 @@ Vector<Number>::add_and_dot(const Number          a,
                             const Vector<Number> &V,
                             const Vector<Number> &W)
 {
-  Assert(vec_size != 0, ExcEmptyObject());
-  AssertDimension(vec_size, V.size());
-  AssertDimension(vec_size, W.size());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_AssertDimension(vec_size, V.size());
+  DEAL_II_AssertDimension(vec_size, W.size());
 
   Number                                        sum;
   internal::VectorOperations::AddAndDot<Number> adder(this->values.get(),
@@ -668,7 +671,7 @@ Vector<Number>::add_and_dot(const Number          a,
                                                       a);
   internal::VectorOperations::parallel_reduce(
     adder, 0, vec_size, sum, thread_loop_partitioner);
-  AssertIsFinite(sum);
+  DEAL_II_AssertIsFinite(sum);
 
   return sum;
 }
@@ -679,8 +682,9 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator+=(const Vector<Number> &v)
 {
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == v.vec_size,
+                 ExcDimensionMismatch(vec_size, v.vec_size));
 
   internal::VectorOperations::Vectorization_add_v<Number> vector_add(
     values.get(), v.values.get());
@@ -697,8 +701,9 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator-=(const Vector<Number> &v)
 {
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == v.vec_size,
+                 ExcDimensionMismatch(vec_size, v.vec_size));
 
   internal::VectorOperations::Vectorization_subtract_v<Number> vector_subtract(
     values.get(), v.values.get());
@@ -716,7 +721,7 @@ template <typename Number>
 void
 Vector<Number>::add(const Number v)
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   internal::VectorOperations::Vectorization_add_factor<Number> vector_add(
     values.get(), v);
@@ -735,12 +740,14 @@ Vector<Number>::add(const Number          a,
                     const Number          b,
                     const Vector<Number> &w)
 {
-  AssertIsFinite(a);
-  AssertIsFinite(b);
+  DEAL_II_AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(b);
 
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  Assert(vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == v.vec_size,
+                 ExcDimensionMismatch(vec_size, v.vec_size));
+  DEAL_II_Assert(vec_size == w.vec_size,
+                 ExcDimensionMismatch(vec_size, w.vec_size));
 
   internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(
     values.get(), v.values.get(), w.values.get(), a, b);
@@ -756,10 +763,11 @@ template <typename Number>
 void
 Vector<Number>::sadd(const Number x, const Vector<Number> &v)
 {
-  AssertIsFinite(x);
+  DEAL_II_AssertIsFinite(x);
 
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == v.vec_size,
+                 ExcDimensionMismatch(vec_size, v.vec_size));
 
   internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(
     values.get(), v.values.get(), x);
@@ -775,8 +783,9 @@ template <typename Number>
 void
 Vector<Number>::scale(const Vector<Number> &s)
 {
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == s.vec_size,
+                 ExcDimensionMismatch(vec_size, s.vec_size));
 
   internal::VectorOperations::Vectorization_scale<Number> vector_scale(
     values.get(), s.values.get());
@@ -793,8 +802,9 @@ template <typename Number2>
 void
 Vector<Number>::scale(const Vector<Number2> &s)
 {
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == s.vec_size,
+                 ExcDimensionMismatch(vec_size, s.vec_size));
 
   for (size_type i = 0; i < vec_size; ++i)
     values[i] *= Number(s.values[i]);
@@ -806,10 +816,11 @@ template <typename Number>
 void
 Vector<Number>::equ(const Number a, const Vector<Number> &u)
 {
-  AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(a);
 
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == u.vec_size,
+                 ExcDimensionMismatch(vec_size, u.vec_size));
 
   internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(
     values.get(), u.values.get(), a);
@@ -826,10 +837,11 @@ template <typename Number2>
 void
 Vector<Number>::equ(const Number a, const Vector<Number2> &u)
 {
-  AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(a);
 
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == u.vec_size,
+                 ExcDimensionMismatch(vec_size, u.vec_size));
 
   // set the result vector to a*u. we have to
   // convert the elements of u to the type of
@@ -847,9 +859,9 @@ template <typename Number>
 void
 Vector<Number>::ratio(const Vector<Number> &a, const Vector<Number> &b)
 {
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(a.vec_size == b.vec_size,
-         ExcDimensionMismatch(a.vec_size, b.vec_size));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(a.vec_size == b.vec_size,
+                 ExcDimensionMismatch(a.vec_size, b.vec_size));
 
   // no need to reinit with zeros, since
   // we overwrite them anyway
@@ -915,15 +927,15 @@ Vector<Number>::operator=(const TrilinosWrappers::MPI::Vector &v)
                               v.get_mpi_communicator());
       localized_vector.reinit(v, false, true);
 
-      Assert(localized_vector.size() == vec_size,
-             ExcDimensionMismatch(localized_vector.size(), vec_size));
+      DEAL_II_Assert(localized_vector.size() == vec_size,
+                     ExcDimensionMismatch(localized_vector.size(), vec_size));
 
       // get a representation of the vector
       // and copy it
       TrilinosScalar **start_ptr;
 
       int ierr = localized_vector.trilinos_vector().ExtractView(&start_ptr);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
       std::copy(start_ptr[0], start_ptr[0] + vec_size, begin());
     }
@@ -938,8 +950,9 @@ template <typename Number2>
 bool
 Vector<Number>::operator==(const Vector<Number2> &v) const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
-  Assert(vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size == v.size(),
+                 ExcDimensionMismatch(vec_size, v.size()));
 
   // compare the two vector. we have to
   // convert the elements of v to the type of
@@ -960,7 +973,7 @@ template <typename Number>
 void
 Vector<Number>::print(const char *format) const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   for (size_type j = 0; j < size(); ++j)
     internal::VectorOperations::print(values[j], format);
@@ -976,8 +989,8 @@ Vector<Number>::print(std::ostream &     out,
                       const bool         scientific,
                       const bool         across) const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
-  AssertThrow(out, ExcIO());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   std::ios::fmtflags old_flags     = out.flags();
   unsigned int       old_precision = out.precision(precision);
@@ -996,7 +1009,7 @@ Vector<Number>::print(std::ostream &     out,
       out << values[i] << std::endl;
   out << std::endl;
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
   // reset output format
   out.flags(old_flags);
   out.precision(old_precision);
@@ -1010,7 +1023,7 @@ Vector<Number>::print(LogStream &        out,
                       const unsigned int width,
                       const bool         across) const
 {
-  Assert(vec_size != 0, ExcEmptyObject());
+  DEAL_II_Assert(vec_size != 0, ExcEmptyObject());
 
   if (across)
     for (size_type i = 0; i < size(); ++i)
@@ -1026,7 +1039,7 @@ template <typename Number>
 void
 Vector<Number>::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // other version of the following
   //  out << size() << std::endl << '[';
@@ -1053,7 +1066,7 @@ Vector<Number>::block_write(std::ostream &out) const
   const char outro = ']';
   out.write(&outro, 1);
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -1062,7 +1075,7 @@ template <typename Number>
 void
 Vector<Number>::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   size_type sz;
 
@@ -1079,7 +1092,7 @@ Vector<Number>::block_read(std::istream &in)
   char c;
   //  in >> c;
   in.read(&c, 1);
-  AssertThrow(c == '[', ExcIO());
+  DEAL_II_AssertThrow(c == '[', ExcIO());
 
   in.read(reinterpret_cast<char *>(begin()),
           reinterpret_cast<const char *>(end()) -
@@ -1087,7 +1100,7 @@ Vector<Number>::block_read(std::istream &in)
 
   //  in >> c;
   in.read(&c, 1);
-  AssertThrow(c == ']', ExcIO());
+  DEAL_II_AssertThrow(c == ']', ExcIO());
 }
 
 

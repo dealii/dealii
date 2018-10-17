@@ -87,9 +87,11 @@ main()
   const double df_dy_ad = f_fad.dx(1); // df/dy
 
   const double tol = 1.0e-14;
-  Assert(std::fabs(f - f_ad) < tol, ExcMessage("Computation incorrect: Value"));
-  Assert(std::fabs(df_dx - df_dx_ad) < tol && std::fabs(df_dy - df_dy_ad) < tol,
-         ExcMessage("Computation incorrect: First derivative"));
+  DEAL_II_Assert(std::fabs(f - f_ad) < tol,
+                 ExcMessage("Computation incorrect: Value"));
+  DEAL_II_Assert(std::fabs(df_dx - df_dx_ad) < tol &&
+                   std::fabs(df_dy - df_dy_ad) < tol,
+                 ExcMessage("Computation incorrect: First derivative"));
 
   deallog << "OK" << std::endl;
 }

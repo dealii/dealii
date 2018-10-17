@@ -30,8 +30,8 @@ test()
   unsigned int              values_[2] = {1, 2};
   std::vector<unsigned int> sums(&values_[0], &values_[2]);
   Utilities::MPI::sum(sums, MPI_COMM_WORLD, sums);
-  Assert(sums[0] == numprocs, ExcInternalError());
-  Assert(sums[1] == 2 * numprocs, ExcInternalError());
+  DEAL_II_Assert(sums[0] == numprocs, ExcInternalError());
+  DEAL_II_Assert(sums[1] == 2 * numprocs, ExcInternalError());
 
   if (myid == 0)
     deallog << sums[0] << ' ' << sums[1] << std::endl;

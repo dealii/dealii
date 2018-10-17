@@ -325,7 +325,7 @@ public:
    * data of a SolverControl object id called, but storage of history data was
    * not enabled by enable_history_data().
    */
-  DeclException0(ExcHistoryDataRequired);
+  DEAL_II_DeclException0(ExcHistoryDataRequired);
 
 protected:
   /**

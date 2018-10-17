@@ -401,36 +401,37 @@ namespace OpenCASCADE
    * between @p tolerance from the given TopoDS_Shape.
    */
   template <int dim>
-  DeclException1(ExcPointNotOnManifold,
-                 Point<dim>,
-                 << "The point [ " << arg1 << " ] is not on the manifold.");
+  DEAL_II_DeclException1(ExcPointNotOnManifold,
+                         Point<dim>,
+                         << "The point [ " << arg1
+                         << " ] is not on the manifold.");
 
   /**
    * Exception thrown when the point specified as argument cannot be projected
    * to the manifold.
    */
   template <int dim>
-  DeclException1(ExcProjectionFailed,
-                 Point<dim>,
-                 << "Projection of point [ " << arg1 << " ] failed.");
+  DEAL_II_DeclException1(ExcProjectionFailed,
+                         Point<dim>,
+                         << "Projection of point [ " << arg1 << " ] failed.");
 
   /**
    * Thrown when internal OpenCASCADE utilities fail to return the OK status.
    */
-  DeclException1(ExcOCCError,
-                 IFSelect_ReturnStatus,
-                 << "An OpenCASCADE routine failed with return status "
-                 << arg1);
+  DEAL_II_DeclException1(ExcOCCError,
+                         IFSelect_ReturnStatus,
+                         << "An OpenCASCADE routine failed with return status "
+                         << arg1);
 
   /**
    * Trying to make curve operations on a degenerate edge.
    */
-  DeclException0(ExcEdgeIsDegenerate);
+  DEAL_II_DeclException0(ExcEdgeIsDegenerate);
 
   /**
    * Trying to make operations on the wrong type of shapes.
    */
-  DeclException0(ExcUnsupportedShape);
+  DEAL_II_DeclException0(ExcUnsupportedShape);
 } // namespace OpenCASCADE
 
 

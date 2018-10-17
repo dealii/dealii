@@ -352,18 +352,18 @@ public:
    * @addtogroup Exceptions
    * @{
    */
-  DeclException2(ExcParseError,
-                 int,
-                 std::string,
-                 << "Parsing Error at Column " << arg1
-                 << ". The parser said: " << arg2);
+  DEAL_II_DeclException2(ExcParseError,
+                         int,
+                         std::string,
+                         << "Parsing Error at Column " << arg1
+                         << ". The parser said: " << arg2);
 
-  DeclException2(ExcInvalidExpressionSize,
-                 int,
-                 int,
-                 << "The number of components (" << arg1
-                 << ") is not equal to the number of expressions (" << arg2
-                 << ").");
+  DEAL_II_DeclException2(ExcInvalidExpressionSize,
+                         int,
+                         int,
+                         << "The number of components (" << arg1
+                         << ") is not equal to the number of expressions ("
+                         << arg2 << ").");
 
   //@}
 
@@ -448,7 +448,7 @@ FunctionParser<dim>::default_variable_names()
       case 3:
         return "x,y,z";
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return "";
 }

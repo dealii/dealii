@@ -84,7 +84,7 @@ template <int dim, typename DoFHandlerType>
 DataOutFaces<dim, DoFHandlerType>::DataOutFaces(const bool so)
   : surface_only(so)
 {
-  Assert(dim == DoFHandlerType::dimension, ExcNotImplemented());
+  DEAL_II_Assert(dim == DoFHandlerType::dimension, ExcNotImplemented());
 }
 
 
@@ -97,7 +97,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
     &                                                 data,
   DataOutBase::Patch<dimension - 1, space_dimension> &patch)
 {
-  Assert(cell_and_face->first->is_locally_owned(), ExcNotImplemented());
+  DEAL_II_Assert(cell_and_face->first->is_locally_owned(), ExcNotImplemented());
 
   // we use the mapping to transform the vertices. However, the mapping works
   // on cells, not faces, so transform the face vertex to a cell vertex, that
@@ -128,7 +128,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
       const unsigned int n_q_points = fe_patch_values.n_quadrature_points;
 
       // store the intermediate points
-      Assert(patch.space_dim == dimension, ExcInternalError());
+      DEAL_II_Assert(patch.space_dim == dimension, ExcInternalError());
       const std::vector<Point<dimension>> &q_points =
         fe_patch_values.get_quadrature_points();
       // resize the patch.data member in order to have enough memory for the
@@ -294,7 +294,7 @@ DataOutFaces<dim, DoFHandlerType>::build_one_patch(
           // we need to get at the number of the cell to which this face
           // belongs in order to access the cell data. this is not readily
           // available, so choose the following rather inefficient way:
-          Assert(
+          DEAL_II_Assert(
             cell_and_face->first->active(),
             ExcMessage(
               "The current function is trying to generate cell-data output "
@@ -333,17 +333,19 @@ DataOutFaces<dim, DoFHandlerType>::build_patches(
   const unsigned int        n_subdivisions_)
 {
   // Check consistency of redundant template parameter
-  Assert(dim == dimension, ExcDimensionMismatch(dim, dimension));
+  DEAL_II_Assert(dim == dimension, ExcDimensionMismatch(dim, dimension));
 
   const unsigned int n_subdivisions =
     (n_subdivisions_ != 0) ? n_subdivisions_ : this->default_subdivisions;
 
-  Assert(n_subdivisions >= 1,
-         Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(
-           n_subdivisions));
+  DEAL_II_Assert(
+    n_subdivisions >= 1,
+    Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(
+      n_subdivisions));
 
-  Assert(this->triangulation != nullptr,
-         Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
+  DEAL_II_Assert(
+    this->triangulation != nullptr,
+    Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 
   this->validate_dataset_names();
 
@@ -365,7 +367,7 @@ DataOutFaces<dim, DoFHandlerType>::build_patches(
   // clear the patches array and allocate the right number of elements
   this->patches.clear();
   this->patches.reserve(all_faces.size());
-  Assert(this->patches.size() == 0, ExcInternalError());
+  DEAL_II_Assert(this->patches.size() == 0, ExcInternalError());
 
 
   std::vector<unsigned int> n_postprocessor_outputs(this->dof_data.size());
@@ -442,7 +444,7 @@ DataOutFaces<dim, DoFHandlerType>::next_face(const FaceDescriptor &old_face)
 
   // first check whether the present cell has more faces on the boundary. since
   // we started with this face, its cell must clearly be locally owned
-  Assert(face.first->is_locally_owned(), ExcInternalError());
+  DEAL_II_Assert(face.first->is_locally_owned(), ExcInternalError());
   for (unsigned int f = face.second + 1;
        f < GeometryInfo<dimension>::faces_per_cell;
        ++f)

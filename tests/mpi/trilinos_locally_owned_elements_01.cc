@@ -36,7 +36,7 @@ test()
 
   // create non-contiguous index set
   {
-    AssertThrow(n_processes == 2, ExcNotImplemented());
+    DEAL_II_AssertThrow(n_processes == 2, ExcNotImplemented());
     IndexSet index(10);
     for (unsigned int i = 0; i < 10; i += 2)
       index.add_range(i + myid, i + myid + 1);
@@ -45,7 +45,7 @@ test()
     TrilinosWrappers::MPI::Vector vec(index, MPI_COMM_WORLD);
 
     IndexSet index2 = vec.locally_owned_elements();
-    AssertThrow(index == index2, ExcInternalError());
+    DEAL_II_AssertThrow(index == index2, ExcInternalError());
   }
 
   // create contiguous index set
@@ -57,7 +57,7 @@ test()
     TrilinosWrappers::MPI::Vector vec(index, MPI_COMM_WORLD);
 
     IndexSet index2 = vec.locally_owned_elements();
-    AssertThrow(index == index2, ExcInternalError());
+    DEAL_II_AssertThrow(index == index2, ExcInternalError());
   }
 
   if (myid == 0)

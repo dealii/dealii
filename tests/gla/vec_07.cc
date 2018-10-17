@@ -58,7 +58,7 @@ test()
   vb.compress(VectorOperation::insert);
   vb *= 2.0;
   v = vb;
-  Assert(v.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v.has_ghost_elements(), ExcInternalError());
 
   deallog << "ghosted value: " << get_real_assert_zero_imag(v(1))
           << " (should be 2.0)" << std::endl;

@@ -76,8 +76,9 @@ test()
   std::vector<DerivativeForm<1, dim, spacedim>> jac_from_mapping_q =
     fe_values_q.get_jacobians();
 
-  AssertThrow(jac_from_mapping_q.size() == jac_from_mapping_manifold.size(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(jac_from_mapping_q.size() ==
+                        jac_from_mapping_manifold.size(),
+                      ExcInternalError());
 
   for (unsigned int q = 0; q < jac_from_mapping_q.size(); ++q)
     {

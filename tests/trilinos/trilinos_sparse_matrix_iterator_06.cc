@@ -48,8 +48,8 @@ test()
       if (((i + 2 * j + 1) % 3 == 0) || (i == j))
         {
           deallog << i << ' ' << j << ' ' << m.el(i, j) << std::endl;
-          Assert(std::fabs(m.el(i, j) - (1. - i * j)) < 1e-14,
-                 ExcInternalError());
+          DEAL_II_Assert(std::fabs(m.el(i, j) - (1. - i * j)) < 1e-14,
+                         ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

@@ -36,7 +36,7 @@ namespace Functions
   ParsedFunction<dim>::declare_parameters(ParameterHandler & prm,
                                           const unsigned int n_components)
   {
-    Assert(n_components > 0, ExcZero());
+    DEAL_II_Assert(n_components > 0, ExcZero());
 
     std::string vnames;
     switch (dim)
@@ -51,7 +51,7 @@ namespace Functions
           vnames = "x,y,z,t";
           break;
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
           break;
       }
     prm.declare_entry(
@@ -125,10 +125,10 @@ namespace Functions
       {
         std::vector<std::string> this_c =
           Utilities::split_string_list(const_list[i], '=');
-        AssertThrow(this_c.size() == 2, ExcMessage("Invalid format"));
+        DEAL_II_AssertThrow(this_c.size() == 2, ExcMessage("Invalid format"));
         double tmp;
-        AssertThrow(std::sscanf(this_c[1].c_str(), "%lf", &tmp),
-                    ExcMessage("Double number?"));
+        DEAL_II_AssertThrow(std::sscanf(this_c[1].c_str(), "%lf", &tmp),
+                            ExcMessage("Double number?"));
         constants[this_c[0]] = tmp;
       }
 
@@ -149,14 +149,14 @@ namespace Functions
           function_object.initialize(vnames, expression, constants, true);
           break;
         default:
-          AssertThrow(false,
-                      ExcMessage(
-                        "The list of variables specified is <" + vnames +
-                        "> which is a list of length " +
-                        Utilities::int_to_string(nn) +
-                        " but it has to be a list of length equal to" +
-                        " either dim (for a time-independent function)" +
-                        " or dim+1 (for a time-dependent function)."));
+          DEAL_II_AssertThrow(
+            false,
+            ExcMessage("The list of variables specified is <" + vnames +
+                       "> which is a list of length " +
+                       Utilities::int_to_string(nn) +
+                       " but it has to be a list of length equal to" +
+                       " either dim (for a time-independent function)" +
+                       " or dim+1 (for a time-dependent function)."));
       }
   }
 

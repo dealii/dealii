@@ -84,7 +84,7 @@ test()
           << ' ' << begin->block_column() << std::endl;
 
   // this matrix certainly has entries
-  Assert(begin != end, ExcInternalError());
+  DEAL_II_Assert(begin != end, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

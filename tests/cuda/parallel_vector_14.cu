@@ -84,9 +84,10 @@ test()
       rw_vector.import(v, VectorOperation::insert);
       if (myid < 2)
         {
-          Assert(rw_vector(myid * 2) == myid * 4.0 + 1, ExcInternalError());
-          Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 3.0,
-                 ExcInternalError());
+          DEAL_II_Assert(rw_vector(myid * 2) == myid * 4.0 + 1,
+                         ExcInternalError());
+          DEAL_II_Assert(rw_vector(myid * 2 + 1) == myid * 4.0 + 3.0,
+                         ExcInternalError());
         }
 
       // copy vector content to non-ghosted vectors, manually created.
@@ -107,17 +108,19 @@ test()
       rw_vector.import(u_dist, VectorOperation::insert);
       if (myid < 2)
         {
-          Assert(rw_vector(myid * 2) == myid * 2.0 + 1, ExcInternalError());
-          Assert(rw_vector(myid * 2 + 1) == myid * 2.0 + 2.0,
-                 ExcInternalError());
+          DEAL_II_Assert(rw_vector(myid * 2) == myid * 2.0 + 1,
+                         ExcInternalError());
+          DEAL_II_Assert(rw_vector(myid * 2 + 1) == myid * 2.0 + 2.0,
+                         ExcInternalError());
         }
 
       rw_vector.import(u, VectorOperation::insert);
       if (myid < 2)
         {
-          Assert(rw_vector(myid * 2) == myid * 2.0 + 1, ExcInternalError());
-          Assert(rw_vector(myid * 2 + 1) == myid * 2.0 + 2.0,
-                 ExcInternalError());
+          DEAL_II_Assert(rw_vector(myid * 2) == myid * 2.0 + 1,
+                         ExcInternalError());
+          DEAL_II_Assert(rw_vector(myid * 2 + 1) == myid * 2.0 + 2.0,
+                         ExcInternalError());
         }
 
       IndexSet u_ghost_set(local_owned.size());
@@ -125,7 +128,7 @@ test()
       u_ghost_set.add_index(3);
       LinearAlgebra::ReadWriteVector<double> u_ghost_vector(u_ghost_set);
       u_ghost_vector.import(u, VectorOperation::insert);
-      Assert(u_ghost_vector(1) == 2., ExcInternalError());
+      DEAL_II_Assert(u_ghost_vector(1) == 2., ExcInternalError());
       if (numproc > 1)
         {
           if (run == 1)
@@ -135,9 +138,9 @@ test()
               LinearAlgebra::ReadWriteVector<double> v_ghost_vector(
                 v_ghost_set);
               v_ghost_vector.import(v, VectorOperation::insert);
-              Assert(v_ghost_vector(3) == 7., ExcInternalError());
+              DEAL_II_Assert(v_ghost_vector(3) == 7., ExcInternalError());
             }
-          Assert(u_ghost_vector(3) == 4., ExcInternalError());
+          DEAL_II_Assert(u_ghost_vector(3) == 4., ExcInternalError());
         }
 
       // check l2 norm
@@ -168,10 +171,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   if (myid == 0)
     {

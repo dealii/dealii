@@ -65,7 +65,7 @@ main(int argc, char **argv)
       {
         const double est = Utilities::LinearAlgebra::lanczos_largest_eigenvalue(
           A, v0, k, vector_memory);
-        Assert(est > 3.98974, ExcInternalError());
+        DEAL_II_Assert(est > 3.98974, ExcInternalError());
         deallog << k << std::endl << "Lanczos " << est << std::endl;
 
         // estimate from CG

@@ -162,7 +162,8 @@ namespace internal
     {
       if (data.x_fe_values.empty() == false)
         {
-          Assert(data.x_fe_face_values.empty() == true, ExcInternalError());
+          DEAL_II_Assert(data.x_fe_face_values.empty() == true,
+                         ExcInternalError());
           dealii::hp::QCollection<dim> quadrature(
             QIterated<dim>(QTrapez<1>(), n_subdivisions));
           x_fe_values.resize(this->finite_elements.size());
@@ -238,7 +239,8 @@ namespace internal
                 dof_data[dataset]->dof_handler);
               if (x_fe_values.empty())
                 {
-                  AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
+                  DEAL_II_AssertIndexRange(face,
+                                           GeometryInfo<dim>::faces_per_cell);
                   x_fe_face_values[dataset]->reinit(dh_cell, face);
                 }
               else
@@ -249,7 +251,7 @@ namespace internal
         {
           if (x_fe_values.empty())
             {
-              AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
+              DEAL_II_AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
               x_fe_face_values[0]->reinit(cell, face);
             }
           else
@@ -264,7 +266,7 @@ namespace internal
     ParallelDataBase<dim, spacedim>::get_present_fe_values(
       const unsigned int dataset) const
     {
-      AssertIndexRange(dataset, finite_elements.size());
+      DEAL_II_AssertIndexRange(dataset, finite_elements.size());
       if (x_fe_values.empty())
         return x_fe_face_values[dataset]->get_present_fe_values();
       else
@@ -278,12 +280,12 @@ namespace internal
     ParallelDataBase<dim, spacedim>::resize_system_vectors(
       const unsigned int n_components)
     {
-      Assert(patch_values_system.solution_values.size() > 0,
-             ExcInternalError());
-      AssertDimension(patch_values_system.solution_values.size(),
-                      patch_values_system.solution_gradients.size());
-      AssertDimension(patch_values_system.solution_values.size(),
-                      patch_values_system.solution_hessians.size());
+      DEAL_II_Assert(patch_values_system.solution_values.size() > 0,
+                     ExcInternalError());
+      DEAL_II_AssertDimension(patch_values_system.solution_values.size(),
+                              patch_values_system.solution_gradients.size());
+      DEAL_II_AssertDimension(patch_values_system.solution_values.size(),
+                              patch_values_system.solution_hessians.size());
       if (patch_values_system.solution_values[0].size() == n_components)
         return;
       for (unsigned int k = 0; k < patch_values_system.solution_values.size();
@@ -331,9 +333,10 @@ namespace internal
       static_assert(
         numbers::NumberTraits<NumberType>::is_complex == false,
         "This function must not be called for complex-valued data types.");
-      Assert(extract_component == ComponentExtractor::real_part,
-             ExcMessage("You cannot extract anything other than the real "
-                        "part from a real number."));
+      DEAL_II_Assert(extract_component == ComponentExtractor::real_part,
+                     ExcMessage(
+                       "You cannot extract anything other than the real "
+                       "part from a real number."));
       return value;
     }
 
@@ -357,7 +360,7 @@ namespace internal
             return value.imag();
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
         }
 
       return numbers::signaling_nan<double>();
@@ -370,9 +373,10 @@ namespace internal
     get_component(const Tensor<rank, dim, NumberType> &value,
                   const ComponentExtractor             extract_component)
     {
-      Assert(extract_component == ComponentExtractor::real_part,
-             ExcMessage("You cannot extract anything other than the real "
-                        "part from a real number."));
+      DEAL_II_Assert(extract_component == ComponentExtractor::real_part,
+                     ExcMessage(
+                       "You cannot extract anything other than the real "
+                       "part from a real number."));
 
       Tensor<rank, dim, double> t;
       for (unsigned int d = 0; d < dim; ++d)
@@ -400,21 +404,21 @@ namespace internal
       , postprocessor(nullptr, typeid(*this).name())
       , n_output_variables(names.size())
     {
-      Assert(names.size() == data_component_interpretation.size(),
-             ExcDimensionMismatch(data_component_interpretation.size(),
-                                  names.size()));
+      DEAL_II_Assert(names.size() == data_component_interpretation.size(),
+                     ExcDimensionMismatch(data_component_interpretation.size(),
+                                          names.size()));
 
       // check that the names use only allowed characters
       for (unsigned int i = 0; i < names.size(); ++i)
-        Assert(names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                          "0123456789_<>()") ==
-                 std::string::npos,
-               Exceptions::DataOutImplementation::ExcInvalidCharacter(
-                 names[i],
-                 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                            "0123456789_<>()")));
+        DEAL_II_Assert(names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                  "0123456789_<>()") ==
+                         std::string::npos,
+                       Exceptions::DataOutImplementation::ExcInvalidCharacter(
+                         names[i],
+                         names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                    "0123456789_<>()")));
     }
 
 
@@ -436,23 +440,24 @@ namespace internal
       , postprocessor(data_postprocessor, typeid(*this).name())
       , n_output_variables(names.size())
     {
-      Assert(data_postprocessor->get_names().size() ==
-               data_postprocessor->get_data_component_interpretation().size(),
-             ExcDimensionMismatch(
-               data_postprocessor->get_names().size(),
-               data_postprocessor->get_data_component_interpretation().size()));
+      DEAL_II_Assert(
+        data_postprocessor->get_names().size() ==
+          data_postprocessor->get_data_component_interpretation().size(),
+        ExcDimensionMismatch(
+          data_postprocessor->get_names().size(),
+          data_postprocessor->get_data_component_interpretation().size()));
 
       // check that the names use only allowed characters
       for (unsigned int i = 0; i < names.size(); ++i)
-        Assert(names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                          "0123456789_<>()") ==
-                 std::string::npos,
-               Exceptions::DataOutImplementation::ExcInvalidCharacter(
-                 names[i],
-                 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                            "0123456789_<>()")));
+        DEAL_II_Assert(names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                  "0123456789_<>()") ==
+                         std::string::npos,
+                       Exceptions::DataOutImplementation::ExcInvalidCharacter(
+                         names[i],
+                         names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                                    "0123456789_<>()")));
     }
 
 
@@ -667,9 +672,10 @@ namespace internal
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
-                 ExcMessage("You cannot extract anything other than the real "
-                            "part from a real number."));
+          DEAL_II_Assert(extract_component == ComponentExtractor::real_part,
+                         ExcMessage(
+                           "You cannot extract anything other than the real "
+                           "part from a real number."));
 
           fe_patch_values.get_function_values(
             *vector,
@@ -700,10 +706,11 @@ namespace internal
 
           fe_patch_values.get_function_values(*vector, tmp);
 
-          AssertDimension(patch_values_system.size(), n_eval_points);
+          DEAL_II_AssertDimension(patch_values_system.size(), n_eval_points);
           for (unsigned int i = 0; i < n_eval_points; i++)
             {
-              AssertDimension(patch_values_system[i].size(), n_components);
+              DEAL_II_AssertDimension(patch_values_system[i].size(),
+                                      n_components);
 
               for (unsigned int j = 0; j < n_components; ++j)
                 patch_values_system[i](j) =
@@ -724,9 +731,10 @@ namespace internal
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
-                 ExcMessage("You cannot extract anything other than the real "
-                            "part from a real number."));
+          DEAL_II_Assert(extract_component == ComponentExtractor::real_part,
+                         ExcMessage(
+                           "You cannot extract anything other than the real "
+                           "part from a real number."));
 
           fe_patch_values.get_function_values(
             *vector,
@@ -761,9 +769,10 @@ namespace internal
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
-                 ExcMessage("You cannot extract anything other than the real "
-                            "part from a real number."));
+          DEAL_II_Assert(extract_component == ComponentExtractor::real_part,
+                         ExcMessage(
+                           "You cannot extract anything other than the real "
+                           "part from a real number."));
 
           fe_patch_values.get_function_gradients(
             *vector,
@@ -798,10 +807,11 @@ namespace internal
 
           fe_patch_values.get_function_gradients(*vector, tmp);
 
-          AssertDimension(patch_gradients_system.size(), n_eval_points);
+          DEAL_II_AssertDimension(patch_gradients_system.size(), n_eval_points);
           for (unsigned int i = 0; i < n_eval_points; i++)
             {
-              AssertDimension(patch_gradients_system[i].size(), n_components);
+              DEAL_II_AssertDimension(patch_gradients_system[i].size(),
+                                      n_components);
 
               for (unsigned int j = 0; j < n_components; j++)
                 patch_gradients_system[i][j] =
@@ -823,9 +833,10 @@ namespace internal
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
-                 ExcMessage("You cannot extract anything other than the real "
-                            "part from a real number."));
+          DEAL_II_Assert(extract_component == ComponentExtractor::real_part,
+                         ExcMessage(
+                           "You cannot extract anything other than the real "
+                           "part from a real number."));
 
           fe_patch_values.get_function_gradients(
             *vector,
@@ -867,9 +878,10 @@ namespace internal
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
-                 ExcMessage("You cannot extract anything other than the real "
-                            "part from a real number."));
+          DEAL_II_Assert(extract_component == ComponentExtractor::real_part,
+                         ExcMessage(
+                           "You cannot extract anything other than the real "
+                           "part from a real number."));
 
           fe_patch_values.get_function_hessians(
             *vector,
@@ -904,10 +916,11 @@ namespace internal
 
           fe_patch_values.get_function_hessians(*vector, tmp);
 
-          AssertDimension(patch_hessians_system.size(), n_eval_points);
+          DEAL_II_AssertDimension(patch_hessians_system.size(), n_eval_points);
           for (unsigned int i = 0; i < n_eval_points; i++)
             {
-              AssertDimension(patch_hessians_system[i].size(), n_components);
+              DEAL_II_AssertDimension(patch_hessians_system[i].size(),
+                                      n_components);
 
               for (unsigned int j = 0; j < n_components; j++)
                 patch_hessians_system[i][j] =
@@ -929,9 +942,10 @@ namespace internal
     {
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
-          Assert(extract_component == ComponentExtractor::real_part,
-                 ExcMessage("You cannot extract anything other than the real "
-                            "part from a real number."));
+          DEAL_II_Assert(extract_component == ComponentExtractor::real_part,
+                         ExcMessage(
+                           "You cannot extract anything other than the real "
+                           "part from a real number."));
 
           fe_patch_values.get_function_hessians(
             *vector,
@@ -1016,10 +1030,10 @@ void
 DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::attach_dof_handler(
   const DoFHandlerType &d)
 {
-  Assert(dof_data.size() == 0,
-         Exceptions::DataOutImplementation::ExcOldDataStillPresent());
-  Assert(cell_data.size() == 0,
-         Exceptions::DataOutImplementation::ExcOldDataStillPresent());
+  DEAL_II_Assert(dof_data.size() == 0,
+                 Exceptions::DataOutImplementation::ExcOldDataStillPresent());
+  DEAL_II_Assert(cell_data.size() == 0,
+                 Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
     SmartPointer<const Triangulation<DoFHandlerType::dimension,
@@ -1037,10 +1051,10 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
     const Triangulation<DoFHandlerType::dimension,
                         DoFHandlerType::space_dimension> &tria)
 {
-  Assert(dof_data.size() == 0,
-         Exceptions::DataOutImplementation::ExcOldDataStillPresent());
-  Assert(cell_data.size() == 0,
-         Exceptions::DataOutImplementation::ExcOldDataStillPresent());
+  DEAL_II_Assert(dof_data.size() == 0,
+                 Exceptions::DataOutImplementation::ExcOldDataStillPresent());
+  DEAL_II_Assert(cell_data.size() == 0,
+                 Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
     SmartPointer<const Triangulation<DoFHandlerType::dimension,
@@ -1064,9 +1078,10 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   // stuff and use a different constructor of DataEntry
   if (triangulation != nullptr)
     {
-      Assert(&dof_handler.get_triangulation() == triangulation,
-             ExcMessage("The triangulation attached to the DoFHandler does not "
-                        "match with the one set previously"));
+      DEAL_II_Assert(&dof_handler.get_triangulation() == triangulation,
+                     ExcMessage(
+                       "The triangulation attached to the DoFHandler does not "
+                       "match with the one set previously"));
     }
   else
     {
@@ -1076,11 +1091,11 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
           &dof_handler.get_triangulation(), typeid(*this).name());
     }
 
-  Assert(vec.size() == dof_handler.n_dofs(),
-         Exceptions::DataOutImplementation::ExcInvalidVectorSize(
-           vec.size(),
-           dof_handler.n_dofs(),
-           dof_handler.get_triangulation().n_active_cells()));
+  DEAL_II_Assert(vec.size() == dof_handler.n_dofs(),
+                 Exceptions::DataOutImplementation::ExcInvalidVectorSize(
+                   vec.size(),
+                   dof_handler.n_dofs(),
+                   dof_handler.get_triangulation().n_active_cells()));
 
 
   auto new_entry = std_cxx14::make_unique<
@@ -1107,7 +1122,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
   // Check available mesh information:
   if (triangulation == nullptr)
     {
-      Assert(dof_handler != nullptr, ExcInternalError());
+      DEAL_II_Assert(dof_handler != nullptr, ExcInternalError());
       triangulation =
         SmartPointer<const Triangulation<DoFHandlerType::dimension,
                                          DoFHandlerType::space_dimension>>(
@@ -1116,16 +1131,17 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
 
   if (dof_handler != nullptr)
     {
-      Assert(&dof_handler->get_triangulation() == triangulation,
-             ExcMessage("The triangulation attached to the DoFHandler does not "
-                        "match with the one set previously"));
+      DEAL_II_Assert(&dof_handler->get_triangulation() == triangulation,
+                     ExcMessage(
+                       "The triangulation attached to the DoFHandler does not "
+                       "match with the one set previously"));
     }
 
   // Figure out the data type:
   DataVectorType actual_type = type;
   if (type == type_automatic)
     {
-      Assert(
+      DEAL_II_Assert(
         (dof_handler == nullptr) ||
           (triangulation->n_active_cells() != dof_handler->n_dofs()),
         ExcMessage(
@@ -1137,19 +1153,20 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
       else
         actual_type = type_dof_data;
     }
-  Assert(actual_type == type_cell_data || actual_type == type_dof_data,
-         ExcInternalError());
+  DEAL_II_Assert(actual_type == type_cell_data || actual_type == type_dof_data,
+                 ExcInternalError());
 
   // If necessary, append '_1', '_2', etc. to component names:
   std::vector<std::string> deduced_names;
   if (deduce_output_names && actual_type == type_dof_data)
     {
-      Assert(names.size() == 1, ExcInternalError());
-      Assert(dof_handler != nullptr, ExcInternalError());
-      Assert(dof_handler->n_dofs() > 0,
-             ExcMessage("The DoF handler attached to the current output vector "
-                        "does not have any degrees of freedom, so it is not "
-                        "possible to output DoF data in this context."));
+      DEAL_II_Assert(names.size() == 1, ExcInternalError());
+      DEAL_II_Assert(dof_handler != nullptr, ExcInternalError());
+      DEAL_II_Assert(dof_handler->n_dofs() > 0,
+                     ExcMessage(
+                       "The DoF handler attached to the current output vector "
+                       "does not have any degrees of freedom, so it is not "
+                       "possible to output DoF data in this context."));
       const std::string  name         = names[0];
       const unsigned int n_components = dof_handler->get_fe(0).n_components();
       deduced_names.resize(n_components);
@@ -1174,27 +1191,30 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
   switch (actual_type)
     {
       case type_cell_data:
-        Assert(data_vector.size() == triangulation->n_active_cells(),
-               ExcDimensionMismatch(data_vector.size(),
-                                    triangulation->n_active_cells()));
-        Assert(deduced_names.size() == 1,
-               Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
-                 deduced_names.size(), 1));
+        DEAL_II_Assert(data_vector.size() == triangulation->n_active_cells(),
+                       ExcDimensionMismatch(data_vector.size(),
+                                            triangulation->n_active_cells()));
+        DEAL_II_Assert(
+          deduced_names.size() == 1,
+          Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
+            deduced_names.size(), 1));
         break;
       case type_dof_data:
-        Assert(dof_handler != nullptr,
-               Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
-        Assert(data_vector.size() == dof_handler->n_dofs(),
-               Exceptions::DataOutImplementation::ExcInvalidVectorSize(
-                 data_vector.size(),
-                 dof_handler->n_dofs(),
-                 triangulation->n_active_cells()));
-        Assert(deduced_names.size() == dof_handler->get_fe(0).n_components(),
-               Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
-                 deduced_names.size(), dof_handler->get_fe(0).n_components()));
+        DEAL_II_Assert(
+          dof_handler != nullptr,
+          Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
+        DEAL_II_Assert(data_vector.size() == dof_handler->n_dofs(),
+                       Exceptions::DataOutImplementation::ExcInvalidVectorSize(
+                         data_vector.size(),
+                         dof_handler->n_dofs(),
+                         triangulation->n_active_cells()));
+        DEAL_II_Assert(
+          deduced_names.size() == dof_handler->get_fe(0).n_components(),
+          Exceptions::DataOutImplementation::ExcInvalidNumberOfNames(
+            deduced_names.size(), dof_handler->get_fe(0).n_components()));
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
   const auto &data_component_interpretation =
@@ -1214,33 +1234,35 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
       // output vectors for which at least part of the data is to be interpreted
       // as vector or tensor fields cannot be complex-valued, because we cannot
       // visualize complex-valued vector fields
-      Assert(!((std::find(
-                  data_component_interpretation.begin(),
-                  data_component_interpretation.end(),
-                  DataComponentInterpretation::component_is_part_of_vector) !=
-                data_component_interpretation.end()) &&
-               new_entry->is_complex_valued()),
-             ExcMessage(
-               "Complex-valued vectors added to a DataOut-like object "
-               "cannot contain components that shall be interpreted as "
-               "vector fields because one can not visualize complex-valued "
-               "vector fields. However, you may want to try to output "
-               "this vector as a collection of scalar fields that can then "
-               "be visualized by their real and imaginary parts separately."));
+      DEAL_II_Assert(
+        !((std::find(
+             data_component_interpretation.begin(),
+             data_component_interpretation.end(),
+             DataComponentInterpretation::component_is_part_of_vector) !=
+           data_component_interpretation.end()) &&
+          new_entry->is_complex_valued()),
+        ExcMessage(
+          "Complex-valued vectors added to a DataOut-like object "
+          "cannot contain components that shall be interpreted as "
+          "vector fields because one can not visualize complex-valued "
+          "vector fields. However, you may want to try to output "
+          "this vector as a collection of scalar fields that can then "
+          "be visualized by their real and imaginary parts separately."));
 
-      Assert(!((std::find(
-                  data_component_interpretation.begin(),
-                  data_component_interpretation.end(),
-                  DataComponentInterpretation::component_is_part_of_tensor) !=
-                data_component_interpretation.end()) &&
-               new_entry->is_complex_valued()),
-             ExcMessage(
-               "Complex-valued vectors added to a DataOut-like object "
-               "cannot contain components that shall be interpreted as "
-               "tensor fields because one can not visualize complex-valued "
-               "tensor fields. However, you may want to try to output "
-               "this vector as a collection of scalar fields that can then "
-               "be visualized by their real and imaginary parts separately."));
+      DEAL_II_Assert(
+        !((std::find(
+             data_component_interpretation.begin(),
+             data_component_interpretation.end(),
+             DataComponentInterpretation::component_is_part_of_tensor) !=
+           data_component_interpretation.end()) &&
+          new_entry->is_complex_valued()),
+        ExcMessage(
+          "Complex-valued vectors added to a DataOut-like object "
+          "cannot contain components that shall be interpreted as "
+          "tensor fields because one can not visualize complex-valued "
+          "tensor fields. However, you may want to try to output "
+          "this vector as a collection of scalar fields that can then "
+          "be visualized by their real and imaginary parts separately."));
 
       dof_data.emplace_back(std::move(new_entry));
     }
@@ -1321,7 +1343,7 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_dataset_names()
         }
   for (data_iterator d = cell_data.begin(); d != cell_data.end(); ++d)
     {
-      Assert((*d)->names.size() == 1, ExcInternalError());
+      DEAL_II_Assert((*d)->names.size() == 1, ExcInternalError());
       if ((*d)->is_complex_valued() == false)
         names.push_back((*d)->names[0]);
       else
@@ -1367,11 +1389,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
         {
           // ensure that there is a continuous number of next space_dim
           // components that all deal with vectors
-          Assert(i + patch_space_dim <= (*d)->n_output_variables,
-                 Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
-                   i, (*d)->names[i]));
+          DEAL_II_Assert(
+            i + patch_space_dim <= (*d)->n_output_variables,
+            Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
+              i, (*d)->names[i]));
           for (unsigned int dd = 1; dd < patch_space_dim; ++dd)
-            Assert(
+            DEAL_II_Assert(
               (*d)->data_component_interpretation[i + dd] ==
                 DataComponentInterpretation::component_is_part_of_vector,
               Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration(
@@ -1406,11 +1429,12 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::
           const unsigned int size = patch_space_dim * patch_space_dim;
           // ensure that there is a continuous number of next
           // space_dim*space_dim components that all deal with tensors
-          Assert(i + size <= (*d)->n_output_variables,
-                 Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
-                   i, (*d)->names[i]));
+          DEAL_II_Assert(
+            i + size <= (*d)->n_output_variables,
+            Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
+              i, (*d)->names[i]));
           for (unsigned int dd = 1; dd < size; ++dd)
-            Assert(
+            DEAL_II_Assert(
               (*d)->data_component_interpretation[i + dd] ==
                 DataComponentInterpretation::component_is_part_of_tensor,
               Exceptions::DataOutImplementation::ExcInvalidTensorDeclaration(
@@ -1476,8 +1500,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::get_fes() const
     finite_elements(this->dof_data.size());
   for (unsigned int i = 0; i < this->dof_data.size(); ++i)
     {
-      Assert(dof_data[i]->dof_handler != nullptr,
-             Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
+      DEAL_II_Assert(
+        dof_data[i]->dof_handler != nullptr,
+        Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
 
       // avoid creating too many finite elements and doing a lot of work on
       // initializing FEValues downstream: if two DoFHandlers are the same

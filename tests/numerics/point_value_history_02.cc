@@ -101,16 +101,17 @@ Postprocess<dim>::evaluate_vector_field(
   const DataPostprocessorInputs::Vector<dim> &inputs,
   std::vector<Vector<double>> &               computed_quantities) const
 {
-  Assert(computed_quantities.size() == inputs.solution_values.size(),
-         ExcDimensionMismatch(computed_quantities.size(),
-                              inputs.solution_values.size()));
+  DEAL_II_Assert(computed_quantities.size() == inputs.solution_values.size(),
+                 ExcDimensionMismatch(computed_quantities.size(),
+                                      inputs.solution_values.size()));
 
   for (unsigned int i = 0; i < computed_quantities.size(); i++)
     {
-      Assert(computed_quantities[i].size() == 4,
-             ExcDimensionMismatch(computed_quantities[i].size(), 3));
-      Assert(inputs.solution_values[i].size() == dim + 1,
-             ExcDimensionMismatch(inputs.solution_values[i].size(), dim + 1));
+      DEAL_II_Assert(computed_quantities[i].size() == 4,
+                     ExcDimensionMismatch(computed_quantities[i].size(), 3));
+      DEAL_II_Assert(inputs.solution_values[i].size() == dim + 1,
+                     ExcDimensionMismatch(inputs.solution_values[i].size(),
+                                          dim + 1));
 
       computed_quantities[i](0) =
         inputs.solution_gradients[i][0].norm(); // norm of x gradient
@@ -392,7 +393,7 @@ TestPointValueHistory<dim>::run()
       deallog << "Copying output file " << filenames[i] << std::endl;
 
       std::ifstream in(filenames[i].c_str());
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
 
       std::string s;
       while (in)

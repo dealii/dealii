@@ -133,8 +133,8 @@ namespace internal
 
       // we want to store the result as a short variable, so we have to make
       // sure that the result does not exceed the limits when casting.
-      Assert(insert_position < (1 << (8 * sizeof(unsigned short))),
-             ExcInternalError());
+      DEAL_II_Assert(insert_position < (1 << (8 * sizeof(unsigned short))),
+                     ExcInternalError());
       return static_cast<unsigned short>(insert_position);
     }
 
@@ -193,21 +193,22 @@ namespace internal
       ConstraintValues<double> &                  constraint_values,
       bool &                                      cell_at_subdomain_boundary)
     {
-      Assert(vector_partitioner.get() != nullptr, ExcInternalError());
+      DEAL_II_Assert(vector_partitioner.get() != nullptr, ExcInternalError());
       const unsigned int n_mpi_procs = vector_partitioner->n_mpi_processes();
       const types::global_dof_index first_owned =
         vector_partitioner->local_range().first;
       const types::global_dof_index last_owned =
         vector_partitioner->local_range().second;
-      Assert(last_owned - first_owned <
-               std::numeric_limits<unsigned int>::max(),
-             ExcMessage("The size local range of owned indices must not "
-                        "exceed the size of unsigned int"));
+      DEAL_II_Assert(last_owned - first_owned <
+                       std::numeric_limits<unsigned int>::max(),
+                     ExcMessage(
+                       "The size local range of owned indices must not "
+                       "exceed the size of unsigned int"));
       const unsigned int n_owned = last_owned - first_owned;
 
-      Assert(dofs_per_cell.size() == 1 ||
-               cell_number < cell_active_fe_index.size(),
-             ExcInternalError());
+      DEAL_II_Assert(dofs_per_cell.size() == 1 ||
+                       cell_number < cell_active_fe_index.size(),
+                     ExcInternalError());
       const unsigned int fe_index =
         dofs_per_cell.size() == 1 ? 0 : cell_active_fe_index[cell_number];
       const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
@@ -308,9 +309,9 @@ namespace internal
 
                   // make sure constraint_iterator.first is always within the
                   // bounds of unsigned short
-                  Assert(constraint_iterator.first <
-                           (1 << (8 * sizeof(unsigned short))) - 1,
-                         ExcInternalError());
+                  DEAL_II_Assert(constraint_iterator.first <
+                                   (1 << (8 * sizeof(unsigned short))) - 1,
+                                 ExcInternalError());
                   constraint_iterator.first++;
                 }
             }
@@ -358,7 +359,8 @@ namespace internal
     void
     DoFInfo ::assign_ghosts(const std::vector<unsigned int> &boundary_cells)
     {
-      Assert(boundary_cells.size() < row_starts.size(), ExcInternalError());
+      DEAL_II_Assert(boundary_cells.size() < row_starts.size(),
+                     ExcInternalError());
 
       // sort ghost dofs and compress out duplicates
       const unsigned int n_owned  = (vector_partitioner->local_range().second -
@@ -368,7 +370,7 @@ namespace internal
       for (std::vector<unsigned int>::iterator dof = dof_indices.begin();
            dof != dof_indices.end();
            ++dof)
-        AssertIndexRange(*dof, n_owned + n_ghosts);
+        DEAL_II_AssertIndexRange(*dof, n_owned + n_ghosts);
 #endif
 
       const unsigned int        n_components = start_components.back();
@@ -411,11 +413,12 @@ namespace internal
           // make sure that we got the correct local numbering of the ghost
           // dofs. the ghost index set should store the same number
           {
-            AssertDimension(n_unique_ghosts, ghost_indices.n_elements());
+            DEAL_II_AssertDimension(n_unique_ghosts,
+                                    ghost_indices.n_elements());
             for (std::size_t i = 0; i < n_ghosts; ++i)
-              Assert(ghost_numbering[i] ==
-                       ghost_indices.index_within_set(ghost_dofs[i]),
-                     ExcInternalError());
+              DEAL_II_Assert(ghost_numbering[i] ==
+                               ghost_indices.index_within_set(ghost_dofs[i]),
+                             ExcInternalError());
           }
 
           // apply correct numbering for ghost indices: We previously just
@@ -450,7 +453,7 @@ namespace internal
                          dofs_per_cell.size() == 1) ?
                           0 :
                           cell_active_fe_index[i];
-                      AssertIndexRange(fe_index, dofs_per_cell.size());
+                      DEAL_II_AssertIndexRange(fe_index, dofs_per_cell.size());
                       const unsigned int *row_end =
                         data_ptr + dofs_per_cell[fe_index];
                       for (; data_ptr != row_end; ++data_ptr)
@@ -515,8 +518,8 @@ namespace internal
           std::swap(new_active_fe_index, cell_active_fe_index);
         }
       if (have_hp)
-        AssertDimension(cell_active_fe_index.size(),
-                        task_info.cell_partition_data.back());
+        DEAL_II_AssertDimension(cell_active_fe_index.size(),
+                                task_info.cell_partition_data.back());
 
       const unsigned int n_components = start_components.back();
 
@@ -605,9 +608,10 @@ namespace internal
               }
           position_cell += n_vect;
         }
-      AssertDimension(position_cell * n_components + 1, row_starts.size());
+      DEAL_II_AssertDimension(position_cell * n_components + 1,
+                              row_starts.size());
 
-      AssertDimension(dof_indices.size(), new_dof_indices.size());
+      DEAL_II_AssertDimension(dof_indices.size(), new_dof_indices.size());
       new_row_starts[task_info.cell_partition_data.back() *
                      vectorization_length * n_components]
         .first = new_dof_indices.size();
@@ -615,8 +619,8 @@ namespace internal
                      vectorization_length * n_components]
         .second = new_constraint_indicator.size();
 
-      AssertDimension(constraint_indicator.size(),
-                      new_constraint_indicator.size());
+      DEAL_II_AssertDimension(constraint_indicator.size(),
+                              new_constraint_indicator.size());
 
       new_row_starts.swap(row_starts);
       new_dof_indices.swap(dof_indices);
@@ -632,7 +636,7 @@ namespace internal
          vector_partitioner->local_range().first) +
         vector_partitioner->ghost_indices().n_elements();
       for (std::size_t i = 0; i < dof_indices.size(); ++i)
-        AssertIndexRange(dof_indices[i], index_range);
+        DEAL_II_AssertIndexRange(dof_indices[i], index_range);
 
       // sanity check 2: for the constraint indicators, the first index should
       // be smaller than the number of indices in the row, and the second
@@ -644,7 +648,7 @@ namespace internal
           const unsigned int row_length_ind =
             row_starts[(row * vectorization_length + 1) * n_components].first -
             row_starts[row * vectorization_length * n_components].first;
-          AssertIndexRange(
+          DEAL_II_AssertIndexRange(
             row_starts[(row * vectorization_length + 1) * n_components].second,
             constraint_indicator.size() + 1);
           const std::pair<unsigned short, unsigned short> *
@@ -656,9 +660,9 @@ namespace internal
              row_starts[(row * vectorization_length + 1) * n_components].second;
           for (; con_it != end_con; ++con_it)
             {
-              AssertIndexRange(con_it->first, row_length_ind + 1);
-              AssertIndexRange(con_it->second,
-                               constraint_pool_row_index.size() - 1);
+              DEAL_II_AssertIndexRange(con_it->first, row_length_ind + 1);
+              DEAL_II_AssertIndexRange(con_it->second,
+                                       constraint_pool_row_index.size() - 1);
             }
         }
 
@@ -670,7 +674,7 @@ namespace internal
           n_active_cells += irregular_cells[c];
         else
           n_active_cells += vectorization_length;
-      AssertDimension(n_active_cells, task_info.n_active_cells);
+      DEAL_II_AssertDimension(n_active_cells, task_info.n_active_cells);
 #endif
 
       compute_cell_index_compression(irregular_cells);
@@ -685,12 +689,13 @@ namespace internal
       const bool         have_hp      = dofs_per_cell.size() > 1;
       const unsigned int n_components = start_components.back();
 
-      Assert(vectorization_length == 1 ||
-               row_starts.size() % vectorization_length == 1,
-             ExcInternalError());
+      DEAL_II_Assert(vectorization_length == 1 ||
+                       row_starts.size() % vectorization_length == 1,
+                     ExcInternalError());
       if (vectorization_length > 1)
-        AssertDimension(row_starts.size() / vectorization_length / n_components,
-                        irregular_cells.size());
+        DEAL_II_AssertDimension(row_starts.size() / vectorization_length /
+                                  n_components,
+                                irregular_cells.size());
       index_storage_variants[dof_access_cell].resize(
         irregular_cells.size(), IndexStorageVariants::full);
       n_vectorization_lanes_filled[dof_access_cell].resize(
@@ -747,7 +752,7 @@ namespace internal
                   const unsigned int *dof_indices =
                     this->dof_indices.data() +
                     row_starts[cell_no * n_components].first;
-                  AssertDimension(
+                  DEAL_II_AssertDimension(
                     ndofs,
                     row_starts[(cell_no + 1) * n_components].first -
                       row_starts[cell_no * n_components].first);
@@ -790,7 +795,8 @@ namespace internal
 
               if (indices_are_interleaved_and_contiguous)
                 {
-                  Assert(n_comp == vectorization_length, ExcInternalError());
+                  DEAL_II_Assert(n_comp == vectorization_length,
+                                 ExcInternalError());
                   index_storage_variants[dof_access_cell][i] =
                     IndexStorageVariants::interleaved_contiguous;
                   for (unsigned int j = 0; j < n_comp; ++j)
@@ -985,14 +991,15 @@ namespace internal
             unsigned int *interleaved_dof_indices =
               &this->dof_indices_interleaved
                  [row_starts[i * vectorization_length * n_components].first];
-            AssertDimension(this->dof_indices.size(),
-                            this->dof_indices_interleaved.size());
-            AssertDimension(n_vectorization_lanes_filled[dof_access_cell][i],
-                            vectorization_length);
-            AssertIndexRange(
+            DEAL_II_AssertDimension(this->dof_indices.size(),
+                                    this->dof_indices_interleaved.size());
+            DEAL_II_AssertDimension(
+              n_vectorization_lanes_filled[dof_access_cell][i],
+              vectorization_length);
+            DEAL_II_AssertIndexRange(
               row_starts[i * vectorization_length * n_components].first,
               this->dof_indices_interleaved.size());
-            AssertIndexRange(
+            DEAL_II_AssertIndexRange(
               row_starts[i * vectorization_length * n_components].first +
                 ndofs * vectorization_length,
               this->dof_indices_interleaved.size() + 1);
@@ -1010,7 +1017,7 @@ namespace internal
     DoFInfo::compute_face_index_compression(
       const std::vector<FaceToCellTopology<length>> &faces)
     {
-      AssertDimension(length, vectorization_length);
+      DEAL_II_AssertDimension(length, vectorization_length);
 
       index_storage_variants[dof_access_face_interior].resize(
         faces.size(), IndexStorageVariants::full);
@@ -1069,8 +1076,8 @@ namespace internal
                     IndexStorageVariants::contiguous)
                   needs_full_storage = true;
               }
-            Assert(!(is_interleaved && is_contiguous),
-                   ExcMessage("Unsupported index compression found"));
+            DEAL_II_Assert(!(is_interleaved && is_contiguous),
+                           ExcMessage("Unsupported index compression found"));
 
             if (is_interleaved || is_contiguous)
               for (unsigned int v = 0;
@@ -1142,7 +1149,7 @@ namespace internal
     {
       // compute a list that tells us the first time a degree of freedom is
       // touched by a cell
-      AssertDimension(length, vectorization_length);
+      DEAL_II_AssertDimension(length, vectorization_length);
       const unsigned int n_components = start_components.back();
       const unsigned int n_dofs       = vector_partitioner->local_size() +
                                   vector_partitioner->n_ghost_indices();
@@ -1256,9 +1263,11 @@ namespace internal
         insert(const unsigned int                              entry,
                std::vector<types::global_dof_index>::iterator &dat)
         {
-          AssertIndexRange(static_cast<std::size_t>(dat - begin()), size() + 1);
-          AssertIndexRange(static_cast<std::size_t>(end() - dat), size() + 1);
-          AssertIndexRange(size(), capacity());
+          DEAL_II_AssertIndexRange(static_cast<std::size_t>(dat - begin()),
+                                   size() + 1);
+          DEAL_II_AssertIndexRange(static_cast<std::size_t>(end() - dat),
+                                   size() + 1);
+          DEAL_II_AssertIndexRange(size(), capacity());
           while (dat != end() && *dat < entry)
             ++dat;
 
@@ -1317,7 +1326,7 @@ namespace internal
                   mutexes[*it / bucket_size_threading]);
                 for (; it != end_unique && *it < next_bucket; ++it)
                   {
-                    AssertIndexRange(*it, row_lengths.size());
+                    DEAL_II_AssertIndexRange(*it, row_lengths.size());
                     row_lengths[*it]++;
                   }
               }
@@ -1484,9 +1493,9 @@ namespace internal
       const unsigned int      n_components = start_components.back();
       const unsigned int      n_macro_cells =
         n_vectorization_lanes_filled[dof_access_cell].size();
-      Assert(n_macro_cells <=
-               (row_starts.size() - 1) / vectorization_length / n_components,
-             ExcInternalError());
+      DEAL_II_Assert(n_macro_cells <= (row_starts.size() - 1) /
+                                        vectorization_length / n_components,
+                     ExcInternalError());
       for (unsigned int cell_no = 0; cell_no < n_macro_cells; ++cell_no)
         {
           // do not renumber in case we have constraints
@@ -1515,7 +1524,7 @@ namespace internal
             }
         }
 
-      AssertIndexRange(counter, local_size + 1);
+      DEAL_II_AssertIndexRange(counter, local_size + 1);
       for (std::size_t i = 0; i < renumbering.size(); ++i)
         if (renumbering[i] == numbers::invalid_dof_index)
           renumbering[i] = counter++;
@@ -1524,7 +1533,7 @@ namespace internal
       for (std::size_t i = 0; i < renumbering.size(); ++i)
         renumbering[i] = vector_partitioner->local_to_global(renumbering[i]);
 
-      AssertDimension(counter, renumbering.size());
+      DEAL_II_AssertDimension(counter, renumbering.size());
     }
 
 
@@ -1595,7 +1604,8 @@ namespace internal
             {
               for (unsigned int j = 0; j < con_it->first; ++j, ++index)
                 {
-                  Assert(glob_indices + index != end_row, ExcInternalError());
+                  DEAL_II_Assert(glob_indices + index != end_row,
+                                 ExcInternalError());
                   out << glob_indices[index] << " ";
                 }
 
@@ -1604,7 +1614,8 @@ namespace internal
                    k < constraint_pool_row_index[con_it->second + 1];
                    k++, index++)
                 {
-                  Assert(glob_indices + index != end_row, ExcInternalError());
+                  DEAL_II_Assert(glob_indices + index != end_row,
+                                 ExcInternalError());
                   out << glob_indices[index] << "/" << constraint_pool_data[k]
                       << " ";
                 }

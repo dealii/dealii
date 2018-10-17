@@ -350,10 +350,11 @@ namespace internal
        * Exception thrown when one performs arithmetical comparisons on
        * iterators belonging to two different block vectors.
        */
-      DeclExceptionMsg(ExcPointerToDifferentVectors,
-                       "Your program tried to compare iterators pointing to "
-                       "different block vectors. There is no reasonable way "
-                       "to do this.");
+      DEAL_II_DeclExceptionMsg(
+        ExcPointerToDifferentVectors,
+        "Your program tried to compare iterators pointing to "
+        "different block vectors. There is no reasonable way "
+        "to do this.");
 
       //@}
     private:
@@ -1141,7 +1142,7 @@ namespace internal
     Iterator<BlockVectorType, Constness>::
     operator==(const Iterator<BlockVectorType, OtherConstness> &i) const
     {
-      Assert(parent == i.parent, ExcPointerToDifferentVectors());
+      DEAL_II_Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
       return (global_index == i.global_index);
     }
@@ -1154,7 +1155,7 @@ namespace internal
     Iterator<BlockVectorType, Constness>::
     operator!=(const Iterator<BlockVectorType, OtherConstness> &i) const
     {
-      Assert(parent == i.parent, ExcPointerToDifferentVectors());
+      DEAL_II_Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
       return (global_index != i.global_index);
     }
@@ -1167,7 +1168,7 @@ namespace internal
     Iterator<BlockVectorType, Constness>::
     operator<(const Iterator<BlockVectorType, OtherConstness> &i) const
     {
-      Assert(parent == i.parent, ExcPointerToDifferentVectors());
+      DEAL_II_Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
       return (global_index < i.global_index);
     }
@@ -1180,7 +1181,7 @@ namespace internal
     Iterator<BlockVectorType, Constness>::
     operator<=(const Iterator<BlockVectorType, OtherConstness> &i) const
     {
-      Assert(parent == i.parent, ExcPointerToDifferentVectors());
+      DEAL_II_Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
       return (global_index <= i.global_index);
     }
@@ -1193,7 +1194,7 @@ namespace internal
     Iterator<BlockVectorType, Constness>::
     operator>(const Iterator<BlockVectorType, OtherConstness> &i) const
     {
-      Assert(parent == i.parent, ExcPointerToDifferentVectors());
+      DEAL_II_Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
       return (global_index > i.global_index);
     }
@@ -1206,7 +1207,7 @@ namespace internal
     Iterator<BlockVectorType, Constness>::
     operator>=(const Iterator<BlockVectorType, OtherConstness> &i) const
     {
-      Assert(parent == i.parent, ExcPointerToDifferentVectors());
+      DEAL_II_Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
       return (global_index >= i.global_index);
     }
@@ -1219,7 +1220,7 @@ namespace internal
     Iterator<BlockVectorType, Constness>::
     operator-(const Iterator<BlockVectorType, OtherConstness> &i) const
     {
-      Assert(parent == i.parent, ExcPointerToDifferentVectors());
+      DEAL_II_Assert(parent == i.parent, ExcPointerToDifferentVectors());
 
       return (static_cast<signed int>(global_index) -
               static_cast<signed int>(i.global_index));
@@ -1489,7 +1490,7 @@ template <class VectorType>
 inline typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block(const unsigned int i)
 {
-  Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
+  DEAL_II_Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
 
   return components[i];
 }
@@ -1500,7 +1501,7 @@ template <class VectorType>
 inline const typename BlockVectorBase<VectorType>::BlockType &
 BlockVectorBase<VectorType>::block(const unsigned int i) const
 {
-  Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
+  DEAL_II_Assert(i < n_blocks(), ExcIndexRange(i, 0, n_blocks()));
 
   return components[i];
 }
@@ -1615,8 +1616,8 @@ template <class VectorType>
 typename BlockVectorBase<VectorType>::value_type BlockVectorBase<VectorType>::
                                                  operator*(const BlockVectorBase<VectorType> &v) const
 {
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   value_type sum = 0.;
   for (size_type i = 0; i < n_blocks(); ++i)
@@ -1701,8 +1702,8 @@ BlockVectorBase<VectorType>::add_and_dot(
   const BlockVectorBase<VectorType> &                    V,
   const BlockVectorBase<VectorType> &                    W)
 {
-  AssertDimension(n_blocks(), V.n_blocks());
-  AssertDimension(n_blocks(), W.n_blocks());
+  DEAL_II_AssertDimension(n_blocks(), V.n_blocks());
+  DEAL_II_AssertDimension(n_blocks(), W.n_blocks());
 
   value_type sum = 0.;
   for (size_type i = 0; i < n_blocks(); ++i)
@@ -1717,8 +1718,8 @@ template <class VectorType>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator+=(const BlockVectorBase<VectorType> &v)
 {
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1734,8 +1735,8 @@ template <class VectorType>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator-=(const BlockVectorBase<VectorType> &v)
 {
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1752,8 +1753,8 @@ inline void
 BlockVectorBase<VectorType>::add(const std::vector<size_type> &indices,
                                  const std::vector<Number> &   values)
 {
-  Assert(indices.size() == values.size(),
-         ExcDimensionMismatch(indices.size(), values.size()));
+  DEAL_II_Assert(indices.size() == values.size(),
+                 ExcDimensionMismatch(indices.size(), values.size()));
   add(indices.size(), indices.data(), values.data());
 }
 
@@ -1765,8 +1766,8 @@ inline void
 BlockVectorBase<VectorType>::add(const std::vector<size_type> &indices,
                                  const Vector<Number> &        values)
 {
-  Assert(indices.size() == values.size(),
-         ExcDimensionMismatch(indices.size(), values.size()));
+  DEAL_II_Assert(indices.size() == values.size(),
+                 ExcDimensionMismatch(indices.size(), values.size()));
   const size_type n_indices = indices.size();
   for (size_type i = 0; i < n_indices; ++i)
     (*this)(indices[i]) += values(i);
@@ -1791,7 +1792,7 @@ template <class VectorType>
 void
 BlockVectorBase<VectorType>::add(const value_type a)
 {
-  AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(a);
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1806,10 +1807,10 @@ void
 BlockVectorBase<VectorType>::add(const value_type                   a,
                                  const BlockVectorBase<VectorType> &v)
 {
-  AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(a);
 
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1826,13 +1827,13 @@ BlockVectorBase<VectorType>::add(const value_type                   a,
                                  const value_type                   b,
                                  const BlockVectorBase<VectorType> &w)
 {
-  AssertIsFinite(a);
-  AssertIsFinite(b);
+  DEAL_II_AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(b);
 
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  Assert(n_blocks() == w.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == w.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), w.n_blocks()));
 
 
   for (size_type i = 0; i < n_blocks(); ++i)
@@ -1848,10 +1849,10 @@ void
 BlockVectorBase<VectorType>::sadd(const value_type                   x,
                                   const BlockVectorBase<VectorType> &v)
 {
-  AssertIsFinite(x);
+  DEAL_II_AssertIsFinite(x);
 
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1867,11 +1868,11 @@ BlockVectorBase<VectorType>::sadd(const value_type                   x,
                                   const value_type                   a,
                                   const BlockVectorBase<VectorType> &v)
 {
-  AssertIsFinite(x);
-  AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(x);
+  DEAL_II_AssertIsFinite(a);
 
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1889,14 +1890,14 @@ BlockVectorBase<VectorType>::sadd(const value_type                   x,
                                   const value_type                   b,
                                   const BlockVectorBase<VectorType> &w)
 {
-  AssertIsFinite(x);
-  AssertIsFinite(a);
-  AssertIsFinite(b);
+  DEAL_II_AssertIsFinite(x);
+  DEAL_II_AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(b);
 
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  Assert(n_blocks() == w.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == w.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), w.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1916,17 +1917,17 @@ BlockVectorBase<VectorType>::sadd(const value_type                   x,
                                   const value_type                   c,
                                   const BlockVectorBase<VectorType> &y)
 {
-  AssertIsFinite(x);
-  AssertIsFinite(a);
-  AssertIsFinite(b);
-  AssertIsFinite(c);
+  DEAL_II_AssertIsFinite(x);
+  DEAL_II_AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(b);
+  DEAL_II_AssertIsFinite(c);
 
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  Assert(n_blocks() == w.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), w.n_blocks()));
-  Assert(n_blocks() == y.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), y.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == w.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+  DEAL_II_Assert(n_blocks() == y.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), y.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1942,8 +1943,8 @@ template <class BlockVector2>
 void
 BlockVectorBase<VectorType>::scale(const BlockVector2 &v)
 {
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   for (size_type i = 0; i < n_blocks(); ++i)
     components[i].scale(v.block(i));
 }
@@ -1957,13 +1958,13 @@ BlockVectorBase<VectorType>::equ(const value_type                   a,
                                  const value_type                   b,
                                  const BlockVectorBase<VectorType> &w)
 {
-  AssertIsFinite(a);
-  AssertIsFinite(b);
+  DEAL_II_AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(b);
 
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
-  Assert(n_blocks() == w.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), w.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == w.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), w.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     {
@@ -1988,10 +1989,10 @@ template <class BlockVector2>
 void
 BlockVectorBase<VectorType>::equ(const value_type a, const BlockVector2 &v)
 {
-  AssertIsFinite(a);
+  DEAL_II_AssertIsFinite(a);
 
-  Assert(n_blocks() == v.n_blocks(),
-         ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  DEAL_II_Assert(n_blocks() == v.n_blocks(),
+                 ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
   for (size_type i = 0; i < n_blocks(); ++i)
     components[i].equ(a, v.components[i]);
@@ -2013,7 +2014,7 @@ template <class VectorType>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator=(const value_type s)
 {
-  AssertIsFinite(s);
+  DEAL_II_AssertIsFinite(s);
 
   for (size_type i = 0; i < n_blocks(); ++i)
     components[i] = s;
@@ -2026,7 +2027,7 @@ template <class VectorType>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator=(const BlockVectorBase<VectorType> &v)
 {
-  AssertDimension(n_blocks(), v.n_blocks());
+  DEAL_II_AssertDimension(n_blocks(), v.n_blocks());
 
   for (size_type i = 0; i < n_blocks(); ++i)
     components[i] = v.components[i];
@@ -2040,7 +2041,7 @@ template <class VectorType2>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator=(const BlockVectorBase<VectorType2> &v)
 {
-  AssertDimension(n_blocks(), v.n_blocks());
+  DEAL_II_AssertDimension(n_blocks(), v.n_blocks());
 
   for (size_type i = 0; i < n_blocks(); ++i)
     components[i] = v.components[i];
@@ -2054,7 +2055,7 @@ template <class VectorType>
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator=(const VectorType &v)
 {
-  Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+  DEAL_II_Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
   size_type index_v = 0;
   for (size_type b = 0; b < n_blocks(); ++b)
@@ -2072,7 +2073,7 @@ inline bool
 BlockVectorBase<VectorType>::
 operator==(const BlockVectorBase<VectorType2> &v) const
 {
-  Assert(block_indices == v.block_indices, ExcDifferentBlockIndices());
+  DEAL_II_Assert(block_indices == v.block_indices, ExcDifferentBlockIndices());
 
   for (size_type i = 0; i < n_blocks(); ++i)
     if (!(components[i] == v.components[i]))
@@ -2087,7 +2088,7 @@ template <class VectorType>
 inline BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator*=(const value_type factor)
 {
-  AssertIsFinite(factor);
+  DEAL_II_AssertIsFinite(factor);
 
   for (size_type i = 0; i < n_blocks(); ++i)
     components[i] *= factor;
@@ -2101,8 +2102,8 @@ template <class VectorType>
 inline BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator/=(const value_type factor)
 {
-  AssertIsFinite(factor);
-  Assert(factor != 0., ExcDivideByZero());
+  DEAL_II_AssertIsFinite(factor);
+  DEAL_II_Assert(factor != 0., ExcDivideByZero());
 
   for (size_type i = 0; i < n_blocks(); ++i)
     components[i] /= factor;

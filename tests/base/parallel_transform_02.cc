@@ -48,7 +48,7 @@ main()
                       (boost::lambda::_1 + 2 * boost::lambda::_2),
                       10);
 
-  Assert(z.l2_norm() == 0, ExcInternalError());
+  DEAL_II_Assert(z.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

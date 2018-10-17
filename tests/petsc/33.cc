@@ -40,8 +40,8 @@ test(PETScWrappers::MPI::Vector &v)
   // then check the norm
   const double eps = typeid(PetscScalar) == typeid(double) ? 1e-14 : 1e-5;
   const double true_value = std::pow(sum, static_cast<PetscScalar>(1. / 3.));
-  AssertThrow(std::fabs(v.lp_norm(3) - true_value) < eps * true_value,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(v.lp_norm(3) - true_value) < eps * true_value,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

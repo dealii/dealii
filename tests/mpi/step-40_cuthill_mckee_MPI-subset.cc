@@ -457,7 +457,7 @@ main(int argc, char *argv[])
   // create a group of 4 out of the 7 processes that we want to run
   // this program with
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  Assert(n_procs == 7, ExcInternalError());
+  DEAL_II_Assert(n_procs == 7, ExcInternalError());
 
   MPI_Group whole_group;
   MPI_Comm_group(MPI_COMM_WORLD, &whole_group);
@@ -483,10 +483,10 @@ main(int argc, char *argv[])
           initlog();
 
           // check that creation above worked correctly
-          Assert(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 6,
-                 ExcInternalError());
-          Assert(Utilities::MPI::n_mpi_processes(subset_comm) == 4,
-                 ExcInternalError());
+          DEAL_II_Assert(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 6,
+                         ExcInternalError());
+          DEAL_II_Assert(Utilities::MPI::n_mpi_processes(subset_comm) == 4,
+                         ExcInternalError());
 
           deallog.push("mpi");
           test_mpi(subset_comm);

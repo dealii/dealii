@@ -66,8 +66,8 @@ test_vertices_orientation(
         {
           Point<spacedim> diff(face->vertex(k));
           diff -= cell->vertex(k);
-          AssertThrow(diff.square() < 1.e-15 * face->vertex(k).square(),
-                      ExcInternalError());
+          DEAL_II_AssertThrow(diff.square() < 1.e-15 * face->vertex(k).square(),
+                              ExcInternalError());
         }
     }
 }

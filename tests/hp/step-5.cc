@@ -121,10 +121,10 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
                              std::vector<double> &          values,
                              const unsigned int             component) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
 
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
   const unsigned int n_points = points.size();
 
@@ -304,7 +304,7 @@ LaplaceProblem<dim>::run()
           GridIn<dim> grid_in;
           grid_in.attach_triangulation(triangulation);
           std::ifstream input_file(SOURCE_DIR "/grids/circle-grid.inp");
-          Assert(dim == 2, ExcInternalError());
+          DEAL_II_Assert(dim == 2, ExcInternalError());
 
           grid_in.read_ucd(input_file, true);
           GridTools::copy_boundary_to_manifold_id(triangulation);

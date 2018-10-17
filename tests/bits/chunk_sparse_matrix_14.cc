@@ -46,12 +46,12 @@ test(const unsigned int chunk_size)
   // then extract the elements (note that
   // some may be zero or even outside the
   // matrix
-  AssertDimension(m.end() - m.begin(), m.n_nonzero_elements());
+  DEAL_II_AssertDimension(m.end() - m.begin(), m.n_nonzero_elements());
   for (unsigned int i = 0; i < m.m(); ++i)
     {
       deallog << "row " << i << ": ";
-      AssertDimension(m.end(i) - m.begin(i),
-                      m.get_sparsity_pattern().row_length(i));
+      DEAL_II_AssertDimension(m.end(i) - m.begin(i),
+                              m.get_sparsity_pattern().row_length(i));
       for (ChunkSparseMatrix<double>::const_iterator it = m.begin(i);
            it != m.end(i);
            ++it)

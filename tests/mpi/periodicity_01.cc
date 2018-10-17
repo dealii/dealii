@@ -380,7 +380,7 @@ namespace Step40
                       << "fail" << std::endl;
                 std::cout << point1 << "\t" << value1[0] << std::endl;
                 std::cout << point2 << "\t" << value2[0] << std::endl;
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
               }
             else
               {
@@ -440,7 +440,7 @@ namespace Step40
                   pcout << point1 << "\t fail check 0" << std::endl;
                   std::cout << point1 << "\t" << value1[0] << std::endl;
                   std::cout << point2 << "\t" << value2[0] << std::endl;
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
                 }
               else
                 pcout << point1 << "\t pass check 0" << std::endl;
@@ -450,7 +450,7 @@ namespace Step40
                   pcout << point3 << "\t fail check 1" << std::endl;
                   std::cout << point3 << "\t" << value3[0] << std::endl;
                   std::cout << point4 << "\t" << value4[0] << std::endl;
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
                 }
               else
                 pcout << point3 << "\t pass check 1" << std::endl;

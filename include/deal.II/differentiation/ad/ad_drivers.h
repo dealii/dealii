@@ -60,7 +60,7 @@ namespace Differentiation
      * Exception denoting that a class requires some specialization
      * in order to be used.
      */
-    DeclExceptionMsg(
+    DEAL_II_DeclExceptionMsg(
       ExcRequiresADNumberSpecialization,
       "This function is called in a class that is expected to be specialized "
       "for auto-differentiable numbers.");
@@ -68,7 +68,7 @@ namespace Differentiation
     /**
      * Exception denoting that ADOL-C is a required feature.
      */
-    DeclExceptionMsg(
+    DEAL_II_DeclExceptionMsg(
       ExcRequiresADOLC,
       "This function is only available if deal.II is compiled with ADOL-C.");
 
@@ -80,7 +80,7 @@ namespace Differentiation
      * operations that it provides, and the second is the minimum number that
      * are required. Both parameters are of type <tt>int</tt>.
      */
-    DeclException2(
+    DEAL_II_DeclException2(
       ExcSupportedDerivativeLevels,
       std::size_t,
       std::size_t,
@@ -656,7 +656,7 @@ namespace Differentiation
       const typename Types<ADNumberType>::tape_buffer_sizes,
       const typename Types<ADNumberType>::tape_buffer_sizes)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -666,7 +666,7 @@ namespace Differentiation
       const typename Types<ADNumberType>::tape_index,
       const bool)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -676,7 +676,7 @@ namespace Differentiation
       const typename Types<ADNumberType>::tape_index,
       const bool)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -711,7 +711,7 @@ namespace Differentiation
       const typename Types<ADNumberType>::tape_index,
       std::ostream &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -721,7 +721,7 @@ namespace Differentiation
       const typename Types<ADNumberType>::tape_index,
       const std::vector<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
       return ScalarType(0.0);
     }
 
@@ -733,7 +733,7 @@ namespace Differentiation
       const std::vector<ScalarType> &,
       Vector<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -744,7 +744,7 @@ namespace Differentiation
       const std::vector<ScalarType> &,
       FullMatrix<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -756,7 +756,7 @@ namespace Differentiation
       const std::vector<ScalarType> &,
       Vector<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -768,7 +768,7 @@ namespace Differentiation
       const std::vector<ScalarType> &,
       FullMatrix<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -998,7 +998,7 @@ namespace Differentiation
         // and adolc/taping.h
         std::vector<std::size_t> counts(STAT_SIZE);
         ::tapestats(tape_index, counts.data());
-        Assert(counts.size() >= 18, ExcInternalError());
+        DEAL_II_Assert(counts.size() >= 18, ExcInternalError());
         stream
           << "Tape index: " << tape_index << "\n"
           << "Number of independent variables: " << counts[0] << "\n"
@@ -1049,14 +1049,14 @@ namespace Differentiation
                const std::vector<scalar_type> &independent_variables,
                Vector<scalar_type> &           gradient)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 1,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             1));
-        Assert(gradient.size() == independent_variables.size(),
-               ExcDimensionMismatch(gradient.size(),
-                                    independent_variables.size()));
+        DEAL_II_Assert(gradient.size() == independent_variables.size(),
+                       ExcDimensionMismatch(gradient.size(),
+                                            independent_variables.size()));
 
         // Note: ADOL-C's ::gradient function expects a *double as the last
         // parameter. Here we take advantage of the fact that the data in the
@@ -1072,15 +1072,17 @@ namespace Differentiation
               const std::vector<scalar_type> &independent_variables,
               FullMatrix<scalar_type> &       hessian)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 2,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             2));
-        Assert(hessian.m() == independent_variables.size(),
-               ExcDimensionMismatch(hessian.m(), independent_variables.size()));
-        Assert(hessian.n() == independent_variables.size(),
-               ExcDimensionMismatch(hessian.n(), independent_variables.size()));
+        DEAL_II_Assert(hessian.m() == independent_variables.size(),
+                       ExcDimensionMismatch(hessian.m(),
+                                            independent_variables.size()));
+        DEAL_II_Assert(hessian.n() == independent_variables.size(),
+                       ExcDimensionMismatch(hessian.n(),
+                                            independent_variables.size()));
 
         const unsigned int n_independent_variables =
           independent_variables.size();
@@ -1109,8 +1111,9 @@ namespace Differentiation
              const std::vector<scalar_type> &independent_variables,
              Vector<scalar_type> &           values)
       {
-        Assert(values.size() == n_dependent_variables,
-               ExcDimensionMismatch(values.size(), n_dependent_variables));
+        DEAL_II_Assert(values.size() == n_dependent_variables,
+                       ExcDimensionMismatch(values.size(),
+                                            n_dependent_variables));
 
         // Note: ADOL-C's ::function function expects a *double as the last
         // parameter. Here we take advantage of the fact that the data in the
@@ -1128,16 +1131,17 @@ namespace Differentiation
                const std::vector<scalar_type> &independent_variables,
                FullMatrix<scalar_type> &       jacobian)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 1,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             1));
-        Assert(jacobian.m() == n_dependent_variables,
-               ExcDimensionMismatch(jacobian.m(), n_dependent_variables));
-        Assert(jacobian.n() == independent_variables.size(),
-               ExcDimensionMismatch(jacobian.n(),
-                                    independent_variables.size()));
+        DEAL_II_Assert(jacobian.m() == n_dependent_variables,
+                       ExcDimensionMismatch(jacobian.m(),
+                                            n_dependent_variables));
+        DEAL_II_Assert(jacobian.n() == independent_variables.size(),
+                       ExcDimensionMismatch(jacobian.n(),
+                                            independent_variables.size()));
 
         std::vector<scalar_type *> J(n_dependent_variables);
         for (unsigned int i = 0; i < n_dependent_variables; ++i)
@@ -1245,14 +1249,14 @@ namespace Differentiation
       bool
       is_recording() const
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
         return false;
       }
 
       typename Types<ADNumberType>::tape_index
       active_tape_index() const
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
         return Numbers<ADNumberType>::invalid_tape_index;
       }
 
@@ -1295,26 +1299,26 @@ namespace Differentiation
       void
       activate_tape(const typename Types<ADNumberType>::tape_index)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       reset(const bool)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       print(std::ostream &) const
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       static void
       print_tape_stats(const typename Types<ADNumberType>::tape_index,
                        std::ostream &)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
 
@@ -1324,7 +1328,7 @@ namespace Differentiation
       value(const typename Types<ADNumberType>::tape_index,
             const std::vector<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
         return 0.0;
       }
 
@@ -1333,7 +1337,7 @@ namespace Differentiation
                const std::vector<scalar_type> &,
                Vector<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       static void
@@ -1341,7 +1345,7 @@ namespace Differentiation
               const std::vector<scalar_type> &,
               FullMatrix<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       // === Vector drivers ===
@@ -1352,7 +1356,7 @@ namespace Differentiation
              const std::vector<scalar_type> &,
              Vector<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       static void
@@ -1361,7 +1365,7 @@ namespace Differentiation
                const std::vector<scalar_type> &,
                FullMatrix<scalar_type> &)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
     };
 
@@ -1586,7 +1590,7 @@ namespace Differentiation
     TapelessDrivers<ADNumberType, ScalarType, T>::initialize_global_environment(
       const unsigned int)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
     template <typename ADNumberType, typename ScalarType, typename T>
@@ -1620,7 +1624,7 @@ namespace Differentiation
     TapelessDrivers<ADNumberType, ScalarType, T>::value(
       const std::vector<ADNumberType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
       return ScalarType(0.0);
     }
 
@@ -1632,7 +1636,7 @@ namespace Differentiation
       const std::vector<ADNumberType> &,
       Vector<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -1643,7 +1647,7 @@ namespace Differentiation
       const std::vector<ADNumberType> &,
       FullMatrix<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -1653,7 +1657,7 @@ namespace Differentiation
       const std::vector<ADNumberType> &,
       Vector<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -1664,7 +1668,7 @@ namespace Differentiation
       const std::vector<ADNumberType> &,
       FullMatrix<ScalarType> &)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -1770,7 +1774,7 @@ namespace Differentiation
             // so.
             const std::size_t n_set_directional_derivatives = adtl::getNumDir();
             if (n_directional_derivatives > n_set_directional_derivatives)
-              AssertThrow(
+              DEAL_II_AssertThrow(
                 n_live_variables == 0,
                 ExcMessage(
                   "There are currently " +
@@ -1802,7 +1806,7 @@ namespace Differentiation
                               NumberTypes::adolc_tapeless>::type
       configure_tapeless_mode(const unsigned int /*n_directional_derivatives*/)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
 #  endif
@@ -1861,8 +1865,8 @@ namespace Differentiation
       static ScalarType
       value(const std::vector<ADNumberType> &dependent_variables)
       {
-        Assert(dependent_variables.size() == 1,
-               ExcDimensionMismatch(dependent_variables.size(), 1));
+        DEAL_II_Assert(dependent_variables.size() == 1,
+                       ExcDimensionMismatch(dependent_variables.size(), 1));
         return ADNumberTraits<ADNumberType>::get_scalar_value(
           dependent_variables[0]);
       }
@@ -1872,16 +1876,16 @@ namespace Differentiation
                const std::vector<ADNumberType> &dependent_variables,
                Vector<ScalarType> &             gradient)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 1,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             1));
-        Assert(dependent_variables.size() == 1,
-               ExcDimensionMismatch(dependent_variables.size(), 1));
-        Assert(gradient.size() == independent_variables.size(),
-               ExcDimensionMismatch(gradient.size(),
-                                    independent_variables.size()));
+        DEAL_II_Assert(dependent_variables.size() == 1,
+                       ExcDimensionMismatch(dependent_variables.size(), 1));
+        DEAL_II_Assert(gradient.size() == independent_variables.size(),
+                       ExcDimensionMismatch(gradient.size(),
+                                            independent_variables.size()));
 
         // In reverse mode, the gradients are computed from the
         // independent variables (i.e. the adjoint)
@@ -1901,17 +1905,19 @@ namespace Differentiation
               const std::vector<ADNumberType> &dependent_variables,
               FullMatrix<ScalarType> &         hessian)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 2,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             2));
-        Assert(dependent_variables.size() == 1,
-               ExcDimensionMismatch(dependent_variables.size(), 1));
-        Assert(hessian.m() == independent_variables.size(),
-               ExcDimensionMismatch(hessian.m(), independent_variables.size()));
-        Assert(hessian.n() == independent_variables.size(),
-               ExcDimensionMismatch(hessian.n(), independent_variables.size()));
+        DEAL_II_Assert(dependent_variables.size() == 1,
+                       ExcDimensionMismatch(dependent_variables.size(), 1));
+        DEAL_II_Assert(hessian.m() == independent_variables.size(),
+                       ExcDimensionMismatch(hessian.m(),
+                                            independent_variables.size()));
+        DEAL_II_Assert(hessian.n() == independent_variables.size(),
+                       ExcDimensionMismatch(hessian.n(),
+                                            independent_variables.size()));
 
         // In reverse mode, the gradients are computed from the
         // independent variables (i.e. the adjoint)
@@ -1949,8 +1955,9 @@ namespace Differentiation
       values(const std::vector<ADNumberType> &dependent_variables,
              Vector<ScalarType> &             values)
       {
-        Assert(values.size() == dependent_variables.size(),
-               ExcDimensionMismatch(values.size(), dependent_variables.size()));
+        DEAL_II_Assert(values.size() == dependent_variables.size(),
+                       ExcDimensionMismatch(values.size(),
+                                            dependent_variables.size()));
 
         const std::size_t n_dependent_variables = dependent_variables.size();
         for (unsigned int i = 0; i < n_dependent_variables; i++)
@@ -1963,16 +1970,17 @@ namespace Differentiation
                const std::vector<ADNumberType> &dependent_variables,
                FullMatrix<ScalarType> &         jacobian)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 1,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             1));
-        Assert(jacobian.m() == dependent_variables.size(),
-               ExcDimensionMismatch(jacobian.m(), dependent_variables.size()));
-        Assert(jacobian.n() == independent_variables.size(),
-               ExcDimensionMismatch(jacobian.n(),
-                                    independent_variables.size()));
+        DEAL_II_Assert(jacobian.m() == dependent_variables.size(),
+                       ExcDimensionMismatch(jacobian.m(),
+                                            dependent_variables.size()));
+        DEAL_II_Assert(jacobian.n() == independent_variables.size(),
+                       ExcDimensionMismatch(jacobian.n(),
+                                            independent_variables.size()));
 
         const std::size_t n_independent_variables =
           independent_variables.size();
@@ -2073,8 +2081,8 @@ namespace Differentiation
       static ScalarType
       value(const std::vector<ADNumberType> &dependent_variables)
       {
-        Assert(dependent_variables.size() == 1,
-               ExcDimensionMismatch(dependent_variables.size(), 1));
+        DEAL_II_Assert(dependent_variables.size() == 1,
+                       ExcDimensionMismatch(dependent_variables.size(), 1));
         return ADNumberTraits<ADNumberType>::get_scalar_value(
           dependent_variables[0]);
       }
@@ -2084,16 +2092,16 @@ namespace Differentiation
                const std::vector<ADNumberType> &dependent_variables,
                Vector<ScalarType> &             gradient)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 1,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             1));
-        Assert(dependent_variables.size() == 1,
-               ExcDimensionMismatch(dependent_variables.size(), 1));
-        Assert(gradient.size() == independent_variables.size(),
-               ExcDimensionMismatch(gradient.size(),
-                                    independent_variables.size()));
+        DEAL_II_Assert(dependent_variables.size() == 1,
+                       ExcDimensionMismatch(dependent_variables.size(), 1));
+        DEAL_II_Assert(gradient.size() == independent_variables.size(),
+                       ExcDimensionMismatch(gradient.size(),
+                                            independent_variables.size()));
 
         // In forward mode, the gradients are computed from the
         // dependent variables
@@ -2110,17 +2118,19 @@ namespace Differentiation
               const std::vector<ADNumberType> &dependent_variables,
               FullMatrix<ScalarType> &         hessian)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 2,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             2));
-        Assert(dependent_variables.size() == 1,
-               ExcDimensionMismatch(dependent_variables.size(), 1));
-        Assert(hessian.m() == independent_variables.size(),
-               ExcDimensionMismatch(hessian.m(), independent_variables.size()));
-        Assert(hessian.n() == independent_variables.size(),
-               ExcDimensionMismatch(hessian.n(), independent_variables.size()));
+        DEAL_II_Assert(dependent_variables.size() == 1,
+                       ExcDimensionMismatch(dependent_variables.size(), 1));
+        DEAL_II_Assert(hessian.m() == independent_variables.size(),
+                       ExcDimensionMismatch(hessian.m(),
+                                            independent_variables.size()));
+        DEAL_II_Assert(hessian.n() == independent_variables.size(),
+                       ExcDimensionMismatch(hessian.n(),
+                                            independent_variables.size()));
 
         // In forward mode, the gradients are computed from the
         // dependent variables
@@ -2156,8 +2166,9 @@ namespace Differentiation
       values(const std::vector<ADNumberType> &dependent_variables,
              Vector<ScalarType> &             values)
       {
-        Assert(values.size() == dependent_variables.size(),
-               ExcDimensionMismatch(values.size(), dependent_variables.size()));
+        DEAL_II_Assert(values.size() == dependent_variables.size(),
+                       ExcDimensionMismatch(values.size(),
+                                            dependent_variables.size()));
 
         const std::size_t n_dependent_variables = dependent_variables.size();
         for (unsigned int i = 0; i < n_dependent_variables; i++)
@@ -2170,16 +2181,17 @@ namespace Differentiation
                const std::vector<ADNumberType> &dependent_variables,
                FullMatrix<ScalarType> &         jacobian)
       {
-        Assert(
+        DEAL_II_Assert(
           AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 1,
           ExcSupportedDerivativeLevels(
             AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels,
             1));
-        Assert(jacobian.m() == dependent_variables.size(),
-               ExcDimensionMismatch(jacobian.m(), dependent_variables.size()));
-        Assert(jacobian.n() == independent_variables.size(),
-               ExcDimensionMismatch(jacobian.n(),
-                                    independent_variables.size()));
+        DEAL_II_Assert(jacobian.m() == dependent_variables.size(),
+                       ExcDimensionMismatch(jacobian.m(),
+                                            dependent_variables.size()));
+        DEAL_II_Assert(jacobian.n() == independent_variables.size(),
+                       ExcDimensionMismatch(jacobian.n(),
+                                            independent_variables.size()));
 
         const std::size_t n_independent_variables =
           independent_variables.size();

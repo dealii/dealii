@@ -26,12 +26,12 @@ QuadratureSelector<dim>::create_quadrature(const std::string &s,
 {
   if (s == "gauss")
     {
-      AssertThrow(order >= 1, ExcInvalidQGaussOrder(order));
+      DEAL_II_AssertThrow(order >= 1, ExcInvalidQGaussOrder(order));
       return QGauss<dim>(order);
     }
   else
     {
-      AssertThrow(order == 0, ExcInvalidOrder(s, order));
+      DEAL_II_AssertThrow(order == 0, ExcInvalidOrder(s, order));
 
       if (s == "midpoint")
         return QMidpoint<dim>();
@@ -46,7 +46,7 @@ QuadratureSelector<dim>::create_quadrature(const std::string &s,
     }
 
   // we didn't find this name
-  AssertThrow(false, ExcInvalidQuadrature(s));
+  DEAL_II_AssertThrow(false, ExcInvalidQuadrature(s));
   // return something to suppress
   // stupid warnings by some
   // compilers

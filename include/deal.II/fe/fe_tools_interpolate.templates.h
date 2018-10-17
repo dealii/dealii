@@ -90,13 +90,13 @@ namespace FETools
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2)
   {
-    Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
-           ExcTriangulationMismatch());
+    DEAL_II_Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
+                   ExcTriangulationMismatch());
 
-    Assert(u1.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
-           ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
+    DEAL_II_Assert(u1.size() == dof1.n_dofs(),
+                   ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    DEAL_II_Assert(u2.size() == dof2.n_dofs(),
+                   ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
 
     const IndexSet u2_elements = u2.locally_owned_elements();
@@ -104,12 +104,14 @@ namespace FETools
     const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
     const IndexSet &dof2_local_dofs = dof2.locally_owned_dofs();
     const IndexSet  u1_elements     = u1.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u2_elements == dof2_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
+    DEAL_II_Assert(u1_elements == dof1_local_dofs,
+                   ExcMessage(
+                     "The provided vector and DoF handler should have the same"
+                     " index sets."));
+    DEAL_II_Assert(u2_elements == dof2_local_dofs,
+                   ExcMessage(
+                     "The provided vector and DoF handler should have the same"
+                     " index sets."));
 #endif
 
     // allocate vectors at maximal
@@ -156,10 +158,10 @@ namespace FETools
       if ((cell1->subdomain_id() == subdomain_id) ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-          Assert(cell1->get_fe().n_components() ==
-                   cell2->get_fe().n_components(),
-                 ExcDimensionMismatch(cell1->get_fe().n_components(),
-                                      cell2->get_fe().n_components()));
+          DEAL_II_Assert(cell1->get_fe().n_components() ==
+                           cell2->get_fe().n_components(),
+                         ExcDimensionMismatch(cell1->get_fe().n_components(),
+                                              cell2->get_fe().n_components()));
 
           // for continuous elements on
           // grids with hanging nodes we
@@ -176,9 +178,9 @@ namespace FETools
             for (unsigned int face = 0;
                  face < GeometryInfo<dim>::faces_per_cell;
                  ++face)
-              Assert(cell1->at_boundary(face) ||
-                       cell1->neighbor(face)->level() == cell1->level(),
-                     ExcHangingNodesNotAllowed());
+              DEAL_II_Assert(cell1->at_boundary(face) ||
+                               cell1->neighbor(face)->level() == cell1->level(),
+                             ExcHangingNodesNotAllowed());
 
 
           const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
@@ -228,7 +230,7 @@ namespace FETools
         }
     // cell1 is at the end, so should
     // be cell2
-    Assert(cell2 == endc2, ExcInternalError());
+    DEAL_II_Assert(cell2 == endc2, ExcInternalError());
 
     u2.compress(VectorOperation::add);
     touch_count.compress(VectorOperation::add);
@@ -247,10 +249,11 @@ namespace FETools
     for (types::global_dof_index i = 0; i < dof2.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
         {
-          Assert(static_cast<typename OutVector::value_type>(
-                   ::dealii::internal::ElementAccess<OutVector>::get(
-                     touch_count, i)) != typename OutVector::value_type(0),
-                 ExcInternalError());
+          DEAL_II_Assert(static_cast<typename OutVector::value_type>(
+                           ::dealii::internal::ElementAccess<OutVector>::get(
+                             touch_count, i)) !=
+                           typename OutVector::value_type(0),
+                         ExcInternalError());
 
 
           const typename OutVector::value_type val =
@@ -281,25 +284,27 @@ namespace FETools
                    const FiniteElement<dim, spacedim> & fe2,
                    OutVector &                          u1_interpolated)
   {
-    Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
-           ExcDimensionMismatch(dof1.get_fe(0).n_components(),
-                                fe2.n_components()));
-    Assert(u1.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u1_interpolated.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
+    DEAL_II_Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
+                   ExcDimensionMismatch(dof1.get_fe(0).n_components(),
+                                        fe2.n_components()));
+    DEAL_II_Assert(u1.size() == dof1.n_dofs(),
+                   ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    DEAL_II_Assert(u1_interpolated.size() == dof1.n_dofs(),
+                   ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
 #ifdef DEBUG
     const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
     const IndexSet  u1_elements     = u1.locally_owned_elements();
     const IndexSet  u1_interpolated_elements =
       u1_interpolated.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u1_interpolated_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
+    DEAL_II_Assert(u1_elements == dof1_local_dofs,
+                   ExcMessage(
+                     "The provided vector and DoF handler should have the same"
+                     " index sets."));
+    DEAL_II_Assert(u1_interpolated_elements == dof1_local_dofs,
+                   ExcMessage(
+                     "The provided vector and DoF handler should have the same"
+                     " index sets."));
 #endif
 
     Vector<typename OutVector::value_type> u1_local(
@@ -334,9 +339,9 @@ namespace FETools
             for (unsigned int face = 0;
                  face < GeometryInfo<dim>::faces_per_cell;
                  ++face)
-              Assert(cell->at_boundary(face) ||
-                       cell->neighbor(face)->level() == cell->level(),
-                     ExcHangingNodesNotAllowed());
+              DEAL_II_Assert(cell->at_boundary(face) ||
+                               cell->neighbor(face)->level() == cell->level(),
+                             ExcHangingNodesNotAllowed());
 
           const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
 
@@ -427,7 +432,7 @@ namespace FETools
       const AffineConstraints<PETScWrappers::MPI::BlockVector::value_type> &,
       PETScWrappers::MPI::BlockVector &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 #endif
 
@@ -509,7 +514,7 @@ namespace FETools
         typename LinearAlgebra::EpetraWrappers::Vector::value_type> &,
       LinearAlgebra::EpetraWrappers::Vector &)
     {
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
     }
 #endif
 
@@ -551,7 +556,7 @@ namespace FETools
                      const AffineConstraints<Number> &,
                      LinearAlgebra::distributed::BlockVector<Number> &)
     {
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
     }
   } // namespace internal
 
@@ -575,13 +580,15 @@ namespace FETools
       back_interpolate(dof1, u1, dof2.get_fe(), u1_interpolated);
     else
       {
-        Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
-               ExcDimensionMismatch(dof1.get_fe(0).n_components(),
-                                    dof2.get_fe(0).n_components()));
-        Assert(u1.size() == dof1.n_dofs(),
-               ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-        Assert(u1_interpolated.size() == dof1.n_dofs(),
-               ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
+        DEAL_II_Assert(dof1.get_fe(0).n_components() ==
+                         dof2.get_fe(0).n_components(),
+                       ExcDimensionMismatch(dof1.get_fe(0).n_components(),
+                                            dof2.get_fe(0).n_components()));
+        DEAL_II_Assert(u1.size() == dof1.n_dofs(),
+                       ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+        DEAL_II_Assert(u1_interpolated.size() == dof1.n_dofs(),
+                       ExcDimensionMismatch(u1_interpolated.size(),
+                                            dof1.n_dofs()));
 
         // For continuous elements first interpolate to dof2, taking into
         // account constraints2, and then interpolate back to dof1 taking into
@@ -600,25 +607,27 @@ namespace FETools
                            const FiniteElement<dim, spacedim> &fe2,
                            OutVector &                         u1_difference)
   {
-    Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
-           ExcDimensionMismatch(dof1.get_fe(0).n_components(),
-                                fe2.n_components()));
-    Assert(u1.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u1_difference.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
+    DEAL_II_Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
+                   ExcDimensionMismatch(dof1.get_fe(0).n_components(),
+                                        fe2.n_components()));
+    DEAL_II_Assert(u1.size() == dof1.n_dofs(),
+                   ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    DEAL_II_Assert(u1_difference.size() == dof1.n_dofs(),
+                   ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
 
 #ifdef DEBUG
     const IndexSet &dof1_local_dofs = dof1.locally_owned_dofs();
     const IndexSet  u1_elements     = u1.locally_owned_elements();
     const IndexSet  u1_difference_elements =
       u1_difference.locally_owned_elements();
-    Assert(u1_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
-    Assert(u1_difference_elements == dof1_local_dofs,
-           ExcMessage("The provided vector and DoF handler should have the same"
-                      " index sets."));
+    DEAL_II_Assert(u1_elements == dof1_local_dofs,
+                   ExcMessage(
+                     "The provided vector and DoF handler should have the same"
+                     " index sets."));
+    DEAL_II_Assert(u1_difference_elements == dof1_local_dofs,
+                   ExcMessage(
+                     "The provided vector and DoF handler should have the same"
+                     " index sets."));
 #endif
 
     // For continuous elements on grids
@@ -654,9 +663,9 @@ namespace FETools
             for (unsigned int face = 0;
                  face < GeometryInfo<dim>::faces_per_cell;
                  ++face)
-              Assert(cell->at_boundary(face) ||
-                       cell->neighbor(face)->level() == cell->level(),
-                     ExcHangingNodesNotAllowed());
+              DEAL_II_Assert(cell->at_boundary(face) ||
+                               cell->neighbor(face)->level() == cell->level(),
+                             ExcHangingNodesNotAllowed());
 
           cell->get_dof_values(u1, u1_local);
           difference_matrix.vmult(u1_diff_local, u1_local);
@@ -754,15 +763,16 @@ namespace FETools
              const DoFHandler<dim, spacedim> &dof2,
              OutVector &                      u2)
   {
-    Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
-           ExcTriangulationMismatch());
-    Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
-           ExcDimensionMismatch(dof1.get_fe(0).n_components(),
-                                dof2.get_fe(0).n_components()));
-    Assert(u1.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
-           ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
+    DEAL_II_Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
+                   ExcTriangulationMismatch());
+    DEAL_II_Assert(dof1.get_fe(0).n_components() ==
+                     dof2.get_fe(0).n_components(),
+                   ExcDimensionMismatch(dof1.get_fe(0).n_components(),
+                                        dof2.get_fe(0).n_components()));
+    DEAL_II_Assert(u1.size() == dof1.n_dofs(),
+                   ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    DEAL_II_Assert(u2.size() == dof2.n_dofs(),
+                   ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
     typename DoFHandler<dim, spacedim>::active_cell_iterator cell1 =
       dof1.begin_active();

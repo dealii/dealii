@@ -118,7 +118,7 @@ test()
               {
                 types::global_dof_index invalid_dofindex =
                   numbers::invalid_dof_index;
-                Assert(*it != invalid_dofindex, ExcInternalError());
+                DEAL_II_Assert(*it != invalid_dofindex, ExcInternalError());
                 control_dof_set.insert(*it);
               }
           }

@@ -52,11 +52,13 @@ test(const unsigned int chunk_size)
 
   if (chunk_size == 1)
     {
-      AssertThrow(m.n_nonzero_elements() == counter, ExcInternalError());
+      DEAL_II_AssertThrow(m.n_nonzero_elements() == counter,
+                          ExcInternalError());
     }
   else
     {
-      AssertThrow(m.n_nonzero_elements() >= counter, ExcInternalError());
+      DEAL_II_AssertThrow(m.n_nonzero_elements() >= counter,
+                          ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

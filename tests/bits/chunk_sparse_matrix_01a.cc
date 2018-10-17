@@ -47,8 +47,8 @@ test(const unsigned int chunk_size)
     for (unsigned int j = 0; j < m.n(); ++j)
       if ((i + 2 * j + 1) % 3 == 0)
         {
-          Assert(m(i, j) == i * j * .5 + .5, ExcInternalError());
-          Assert(m.el(i, j) == i * j * .5 + .5, ExcInternalError());
+          DEAL_II_Assert(m(i, j) == i * j * .5 + .5, ExcInternalError());
+          DEAL_II_Assert(m.el(i, j) == i * j * .5 + .5, ExcInternalError());
         }
       else
         {
@@ -56,7 +56,7 @@ test(const unsigned int chunk_size)
           // sparsity pattern should return
           // zero
           const double x = m.el(i, j);
-          Assert(x == 0, ExcInternalError());
+          DEAL_II_Assert(x == 0, ExcInternalError());
 
           // if this is a sparsity_pattern
           // with chunk_size==1, then we need
@@ -76,8 +76,8 @@ test(const unsigned int chunk_size)
             {
               exc_thrown = true;
             }
-          Assert((exc_thrown == true) || (chunk_size > 1) || (i == j),
-                 ExcInternalError());
+          DEAL_II_Assert((exc_thrown == true) || (chunk_size > 1) || (i == j),
+                         ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

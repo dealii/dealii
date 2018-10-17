@@ -30,8 +30,8 @@ test()
   unsigned int              values_[2] = {myid, numprocs + myid};
   std::vector<unsigned int> inout(&values_[0], &values_[2]);
   Utilities::MPI::min(inout, MPI_COMM_WORLD, inout);
-  Assert(inout[0] == 0, ExcInternalError());
-  Assert(inout[1] == numprocs, ExcInternalError());
+  DEAL_II_Assert(inout[0] == 0, ExcInternalError());
+  DEAL_II_Assert(inout[1] == numprocs, ExcInternalError());
 
   if (myid == 0)
     deallog << inout[0] << ' ' << inout[1] << std::endl;

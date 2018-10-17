@@ -60,7 +60,7 @@ check_solve(SolverControl &     solver_control,
 
   deallog << "Solver history data: " << solver_control.get_history_data()
           << std::endl;
-  Assert(success == expected_result, ExcMessage("Incorrect result."));
+  DEAL_II_Assert(success == expected_result, ExcMessage("Incorrect result."));
 }
 
 

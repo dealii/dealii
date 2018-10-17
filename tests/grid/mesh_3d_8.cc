@@ -46,8 +46,8 @@ void check_this(Triangulation<3> &tria)
       std::set<Triangulation<3>::line_iterator> lines;
       for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
         {
-          AssertThrow(lines.find(cell->line(l)) == lines.end(),
-                      ExcInternalError());
+          DEAL_II_AssertThrow(lines.find(cell->line(l)) == lines.end(),
+                              ExcInternalError());
           lines.insert(cell->line(l));
         }
     }

@@ -77,8 +77,8 @@ void check(Triangulation<2> &tria)
     deallog << "<" << cell->vertex(v) << "> ";
   deallog << std::endl;
 
-  AssertThrow(p.distance(cell->center()) < cell->diameter() / 2,
-              ExcInternalError());
+  DEAL_II_AssertThrow(p.distance(cell->center()) < cell->diameter() / 2,
+                      ExcInternalError());
 }
 
 

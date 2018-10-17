@@ -129,7 +129,7 @@ namespace Utilities
                  const MPI_Comm &          mpi_communicator,
                  const ArrayView<T> &      output)
       {
-        AssertDimension(values.size(), output.size());
+        DEAL_II_AssertDimension(values.size(), output.size());
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
@@ -147,7 +147,7 @@ namespace Utilities
                                  MPI_MIN,
                                  0,
                                  mpi_communicator);
-              AssertThrowMPI(ierr2);
+              DEAL_II_AssertThrowMPI(ierr2);
               ierr2 = MPI_Reduce(&size,
                                  &size_max,
                                  1,
@@ -155,11 +155,12 @@ namespace Utilities
                                  MPI_MAX,
                                  0,
                                  mpi_communicator);
-              AssertThrowMPI(ierr2);
+              DEAL_II_AssertThrowMPI(ierr2);
               if (rank == 0)
-                Assert(size_min == size_max,
-                       ExcMessage(
-                         "values has different size across MPI processes."));
+                DEAL_II_Assert(
+                  size_min == size_max,
+                  ExcMessage(
+                    "values has different size across MPI processes."));
             }
 #  endif
             const int ierr =
@@ -171,7 +172,7 @@ namespace Utilities
                             internal::mpi_type_id(values.data()),
                             mpi_op,
                             mpi_communicator);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
           }
         else
 #endif
@@ -192,7 +193,7 @@ namespace Utilities
                  const MPI_Comm &                        mpi_communicator,
                  const ArrayView<std::complex<T>> &      output)
       {
-        AssertDimension(values.size(), output.size());
+        DEAL_II_AssertDimension(values.size(), output.size());
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
@@ -211,7 +212,7 @@ namespace Utilities
                             internal::mpi_type_id(static_cast<T *>(nullptr)),
                             mpi_op,
                             mpi_communicator);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
           }
         else
 #endif
@@ -312,7 +313,7 @@ namespace Utilities
         const MPI_Comm &            mpi_communicator,
         SparseMatrix<Number> &      global)
     {
-      Assert(
+      DEAL_II_Assert(
         local.get_sparsity_pattern() == global.get_sparsity_pattern(),
         ExcMessage(
           "The sparsity pattern of the local and the global matrices should match."));

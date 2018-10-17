@@ -37,7 +37,7 @@ test()
     deallog << "numproc=" << numproc << std::endl;
 
   const unsigned int set = 200;
-  AssertIndexRange(numproc, set - 2);
+  DEAL_II_AssertIndexRange(numproc, set - 2);
   const unsigned int local_size  = set - myid;
   unsigned int       global_size = 0;
   unsigned int       my_start    = 0;
@@ -73,8 +73,8 @@ test()
   // check locally owned range
   for (unsigned int i = my_start; i < my_start + local_size; ++i)
     {
-      AssertDimension(v.global_to_local(i), i - my_start);
-      AssertDimension(v.local_to_global(i - my_start), i);
+      DEAL_II_AssertDimension(v.global_to_local(i), i - my_start);
+      DEAL_II_AssertDimension(v.local_to_global(i - my_start), i);
     }
 
   // check ghost indices
@@ -82,17 +82,17 @@ test()
     if (ghost_indices[i] < my_start ||
         ghost_indices[i] >= my_start + local_size)
       {
-        AssertDimension(local_size + count,
-                        v.global_to_local(ghost_indices[i]));
-        AssertDimension(ghost_indices[i],
-                        v.local_to_global(local_size + count));
+        DEAL_II_AssertDimension(local_size + count,
+                                v.global_to_local(ghost_indices[i]));
+        DEAL_II_AssertDimension(ghost_indices[i],
+                                v.local_to_global(local_size + count));
         ++count;
       }
 
   // check that loc->glob and glob->loc form an
   // identity operation
   for (unsigned int i = 0; i < local_size + v.n_ghost_indices(); ++i)
-    AssertDimension(i, v.global_to_local(v.local_to_global(i)));
+    DEAL_II_AssertDimension(i, v.global_to_local(v.local_to_global(i)));
 
   if (myid == 0)
     deallog << "OK" << std::endl;

@@ -286,10 +286,11 @@ public:
    * The block number computed from an index by using BlockIndices does not
    * match the block coordinates stored in this object.
    */
-  DeclException2(ExcBlockIndexMismatch,
-                 size_type,
-                 size_type,
-                 << "Block index " << arg1 << " does not match " << arg2);
+  DEAL_II_DeclException2(ExcBlockIndexMismatch,
+                         size_type,
+                         size_type,
+                         << "Block index " << arg1 << " does not match "
+                         << arg2);
 
   /**
    * Row coordinate.  This is the position of the data member matrix on the
@@ -681,15 +682,15 @@ MatrixBlock<MatrixType>::add(const size_type                       gi,
                              const size_type                       gj,
                              const typename MatrixType::value_type value)
 {
-  Assert(row_indices.size() != 0, ExcNotInitialized());
-  Assert(column_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(row_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(column_indices.size() != 0, ExcNotInitialized());
 
   const std::pair<unsigned int, size_type> bi = row_indices.global_to_local(gi);
   const std::pair<unsigned int, size_type> bj =
     column_indices.global_to_local(gj);
 
-  Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
-  Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
+  DEAL_II_Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
+  DEAL_II_Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
 
   matrix.add(bi.second, bj.second, value);
 }
@@ -703,11 +704,11 @@ MatrixBlock<MatrixType>::add(const std::vector<size_type> &r_indices,
                              const FullMatrix<number> &    values,
                              const bool                    elide_zero_values)
 {
-  Assert(row_indices.size() != 0, ExcNotInitialized());
-  Assert(column_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(row_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(column_indices.size() != 0, ExcNotInitialized());
 
-  AssertDimension(r_indices.size(), values.m());
-  AssertDimension(c_indices.size(), values.n());
+  DEAL_II_AssertDimension(r_indices.size(), values.m());
+  DEAL_II_AssertDimension(c_indices.size(), values.n());
 
   for (size_type i = 0; i < row_indices.size(); ++i)
     add(r_indices[i],
@@ -728,8 +729,8 @@ MatrixBlock<MatrixType>::add(const size_type  b_row,
                              const bool,
                              const bool)
 {
-  Assert(row_indices.size() != 0, ExcNotInitialized());
-  Assert(column_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(row_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(column_indices.size() != 0, ExcNotInitialized());
 
   const std::pair<unsigned int, size_type> bi =
     row_indices.global_to_local(b_row);
@@ -743,13 +744,14 @@ MatrixBlock<MatrixType>::add(const size_type  b_row,
   // not be the most efficient way,
   // it is at least thread safe.
   //#ifdef DEBUG
-  Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
+  DEAL_II_Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
 
   for (size_type j = 0; j < n_cols; ++j)
     {
       const std::pair<unsigned int, size_type> bj =
         column_indices.global_to_local(col_indices[j]);
-      Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
+      DEAL_II_Assert(bj.first == column,
+                     ExcBlockIndexMismatch(bj.first, column));
 
       matrix.add(bi.second, bj.second, values[j]);
     }
@@ -764,11 +766,11 @@ MatrixBlock<MatrixType>::add(const std::vector<size_type> &indices,
                              const FullMatrix<number> &    values,
                              const bool                    elide_zero_values)
 {
-  Assert(row_indices.size() != 0, ExcNotInitialized());
-  Assert(column_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(row_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(column_indices.size() != 0, ExcNotInitialized());
 
-  AssertDimension(indices.size(), values.m());
-  Assert(values.n() == values.m(), ExcNotQuadratic());
+  DEAL_II_AssertDimension(indices.size(), values.m());
+  DEAL_II_Assert(values.n() == values.m(), ExcNotQuadratic());
 
   for (size_type i = 0; i < indices.size(); ++i)
     add(indices[i],
@@ -788,10 +790,10 @@ MatrixBlock<MatrixType>::add(const size_type               row,
                              const std::vector<number> &   values,
                              const bool                    elide_zero_values)
 {
-  Assert(row_indices.size() != 0, ExcNotInitialized());
-  Assert(column_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(row_indices.size() != 0, ExcNotInitialized());
+  DEAL_II_Assert(column_indices.size() != 0, ExcNotInitialized());
 
-  AssertDimension(col_indices.size(), values.size());
+  DEAL_II_AssertDimension(col_indices.size(), values.size());
   add(row,
       col_indices.size(),
       col_indices.data(),
@@ -874,7 +876,7 @@ MatrixBlockVector<MatrixType>::clear(bool really_clean)
 {
   if (really_clean)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
   else
     {
@@ -1126,7 +1128,7 @@ MGMatrixBlockVector<MatrixType>::clear(bool really_clean)
 {
   if (really_clean)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
   else
     {

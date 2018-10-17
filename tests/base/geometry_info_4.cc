@@ -37,7 +37,7 @@ test()
           GeometryInfo<dim>::unit_cell_vertex(v), i);
 
         deallog << phi_i << std::endl;
-        AssertThrow(phi_i == (i == v ? 1 : 0), ExcInternalError());
+        DEAL_II_AssertThrow(phi_i == (i == v ? 1 : 0), ExcInternalError());
       }
 
   // check that
@@ -50,7 +50,7 @@ test()
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
         s += GeometryInfo<dim>::d_linear_shape_function(
           GeometryInfo<dim>::unit_cell_vertex(v), i);
-      AssertThrow(s == 1, ExcInternalError());
+      DEAL_II_AssertThrow(s == 1, ExcInternalError());
 
       deallog << "Sum of shape functions: " << s << std::endl;
     }
@@ -62,7 +62,7 @@ test()
     double s = 0;
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
       s += GeometryInfo<dim>::d_linear_shape_function(center, i);
-    AssertThrow(s == 1, ExcInternalError());
+    DEAL_II_AssertThrow(s == 1, ExcInternalError());
 
     deallog << "Sum of shape functions: " << s << std::endl;
   }

@@ -150,7 +150,7 @@ BEM<spacedim>::run()
         }
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 
   table.set_scientific("L^2 norm error", true);
   table.evaluate_convergence_rates("L^2 norm error",

@@ -212,8 +212,9 @@ namespace MeshWorker
       const unsigned int row_length2 =
         (patch_dim == 1) ? row_length : (row_length * row_length);
 
-      //      AssertDimension(np, Utilities::fixed_power<dim>(n_points));
-      AssertDimension(nv, n_vectors + dim);
+      //      DEAL_II_AssertDimension(np,
+      //      Utilities::fixed_power<dim>(n_points));
+      DEAL_II_AssertDimension(nv, n_vectors + dim);
 
 
       for (unsigned int k = 0; k < np; ++k)

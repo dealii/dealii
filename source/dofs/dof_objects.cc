@@ -47,20 +47,20 @@ namespace internal
       const types::global_dof_index               global_index)
     {
       (void)fe_index;
-      Assert(
+      DEAL_II_Assert(
         (fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
         ExcMessage(
           "Only the default FE index is allowed for non-hp DoFHandler objects"));
-      Assert(
+      DEAL_II_Assert(
         local_index < dof_handler.get_fe().template n_dofs_per_object<dim>(),
         ExcIndexRange(local_index,
                       0,
                       dof_handler.get_fe().template n_dofs_per_object<dim>()));
-      Assert(obj_index *
-                   dof_handler.get_fe().template n_dofs_per_object<dim>() +
-                 local_index <
-               dofs.size(),
-             ExcInternalError());
+      DEAL_II_Assert(
+        obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>() +
+            local_index <
+          dofs.size(),
+        ExcInternalError());
 
       dofs[obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>() +
            local_index] = global_index;

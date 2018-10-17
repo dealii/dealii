@@ -76,7 +76,7 @@ main()
   // flags set
   tria.prepare_coarsening_and_refinement();
   for (cell = tria.begin_active(); cell != endc; ++cell)
-    AssertThrow(!cell->refine_flag_set(), ExcInternalError());
+    DEAL_II_AssertThrow(!cell->refine_flag_set(), ExcInternalError());
 
   tria.execute_coarsening_and_refinement();
 

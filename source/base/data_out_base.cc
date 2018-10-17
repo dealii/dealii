@@ -68,11 +68,11 @@ DEAL_II_NAMESPACE_OPEN
 // in the usual way inside a class
 namespace
 {
-  DeclException2(ExcUnexpectedInput,
-                 std::string,
-                 std::string,
-                 << "Unexpected input: expected line\n  <" << arg1
-                 << ">\nbut got\n  <" << arg2 << ">");
+  DEAL_II_DeclException2(ExcUnexpectedInput,
+                         std::string,
+                         std::string,
+                         << "Unexpected input: expected line\n  <" << arg1
+                         << ">\nbut got\n  <" << arg2 << ">");
 }
 
 
@@ -245,7 +245,7 @@ namespace
         case (DataOutBase::VtkFlags::default_compression):
           return Z_DEFAULT_COMPRESSION;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return Z_NO_COMPRESSION;
       }
   }
@@ -272,7 +272,7 @@ namespace
                     data.size() * sizeof(T),
                     get_zlib_compression_level(flags.compression_level));
         (void)err;
-        Assert(err == Z_OK, ExcInternalError());
+        DEAL_II_Assert(err == Z_OK, ExcInternalError());
 
         // now encode the compression header
         const uint32_t compression_header[4] = {
@@ -416,7 +416,7 @@ namespace DataOutBase
                                          (patches[0].data.n_rows() - spacedim) :
                                          patches[0].data.n_rows();
 
-      Assert(data_vectors.size()[0] == n_data_sets, ExcInternalError());
+      DEAL_II_Assert(data_vectors.size()[0] == n_data_sets, ExcInternalError());
 
       // loop over all patches
       unsigned int next_value = 0;
@@ -428,19 +428,19 @@ namespace DataOutBase
           const unsigned int n_subdivisions = patch->n_subdivisions;
           (void)n_subdivisions;
 
-          Assert((patch->data.n_rows() == n_data_sets &&
-                  !patch->points_are_available) ||
-                   (patch->data.n_rows() == n_data_sets + spacedim &&
-                    patch->points_are_available),
-                 ExcDimensionMismatch(patch->points_are_available ?
-                                        (n_data_sets + spacedim) :
-                                        n_data_sets,
-                                      patch->data.n_rows()));
-          Assert((n_data_sets == 0) ||
-                   (patch->data.n_cols() ==
-                    Utilities::fixed_power<dim>(n_subdivisions + 1)),
-                 ExcInvalidDatasetSize(patch->data.n_cols(),
-                                       n_subdivisions + 1));
+          DEAL_II_Assert((patch->data.n_rows() == n_data_sets &&
+                          !patch->points_are_available) ||
+                           (patch->data.n_rows() == n_data_sets + spacedim &&
+                            patch->points_are_available),
+                         ExcDimensionMismatch(patch->points_are_available ?
+                                                (n_data_sets + spacedim) :
+                                                n_data_sets,
+                                              patch->data.n_rows()));
+          DEAL_II_Assert((n_data_sets == 0) ||
+                           (patch->data.n_cols() ==
+                            Utilities::fixed_power<dim>(n_subdivisions + 1)),
+                         ExcInvalidDatasetSize(patch->data.n_cols(),
+                                               n_subdivisions + 1));
 
           for (unsigned int i = 0; i < patch->data.n_cols(); ++i, ++next_value)
             for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -448,7 +448,8 @@ namespace DataOutBase
         }
 
       for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-        Assert(data_vectors[data_set].size() == next_value, ExcInternalError());
+        DEAL_II_Assert(data_vectors[data_set].size() == next_value,
+                       ExcInternalError());
     }
   } // namespace
 
@@ -731,18 +732,18 @@ namespace
         switch (dim)
           {
             case 3:
-              Assert(zstep < n_subdivisions + 1,
-                     ExcIndexRange(zstep, 0, n_subdivisions + 1));
+              DEAL_II_Assert(zstep < n_subdivisions + 1,
+                             ExcIndexRange(zstep, 0, n_subdivisions + 1));
               point_no += (n_subdivisions + 1) * (n_subdivisions + 1) * zstep;
               DEAL_II_FALLTHROUGH;
             case 2:
-              Assert(ystep < n_subdivisions + 1,
-                     ExcIndexRange(ystep, 0, n_subdivisions + 1));
+              DEAL_II_Assert(ystep < n_subdivisions + 1,
+                             ExcIndexRange(ystep, 0, n_subdivisions + 1));
               point_no += (n_subdivisions + 1) * ystep;
               DEAL_II_FALLTHROUGH;
             case 1:
-              Assert(xstep < n_subdivisions + 1,
-                     ExcIndexRange(xstep, 0, n_subdivisions + 1));
+              DEAL_II_Assert(xstep < n_subdivisions + 1,
+                             ExcIndexRange(xstep, 0, n_subdivisions + 1));
               point_no += xstep;
               DEAL_II_FALLTHROUGH;
             case 0:
@@ -750,7 +751,7 @@ namespace
               break;
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
         for (unsigned int d = 0; d < spacedim; ++d)
           node[d] = patch->data(patch->data.size(0) - spacedim + d, point_no);
@@ -913,7 +914,7 @@ namespace
                            const unsigned,
                            const std::array<unsigned, 0> &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return 0;
   }
 
@@ -923,7 +924,7 @@ namespace
                            const unsigned,
                            const std::array<unsigned, 1> &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return 0;
   }
 
@@ -972,10 +973,10 @@ namespace
     void
     write_point(const unsigned int, const Point<dim> &)
     {
-      Assert(false,
-             ExcMessage("The derived class you are using needs to "
-                        "reimplement this function if you want to call "
-                        "it."));
+      DEAL_II_Assert(false,
+                     ExcMessage("The derived class you are using needs to "
+                                "reimplement this function if you want to call "
+                                "it."));
     }
 
     /**
@@ -1000,10 +1001,10 @@ namespace
                const unsigned int /*y_offset*/,
                const unsigned int /*z_offset*/)
     {
-      Assert(false,
-             ExcMessage("The derived class you are using needs to "
-                        "reimplement this function if you want to call "
-                        "it."));
+      DEAL_II_Assert(false,
+                     ExcMessage("The derived class you are using needs to "
+                                "reimplement this function if you want to call "
+                                "it."));
     }
 
     /**
@@ -1404,8 +1405,8 @@ namespace
   void
   GmvStream::write_point(const unsigned int, const Point<dim> &p)
   {
-    Assert(selected_component != numbers::invalid_unsigned_int,
-           ExcNotInitialized());
+    DEAL_II_Assert(selected_component != numbers::invalid_unsigned_int,
+                   ExcNotInitialized());
     stream << p(selected_component) << ' ';
   }
 
@@ -1452,8 +1453,8 @@ namespace
   void
   TecplotStream::write_point(const unsigned int, const Point<dim> &p)
   {
-    Assert(selected_component != numbers::invalid_unsigned_int,
-           ExcNotInitialized());
+    DEAL_II_Assert(selected_component != numbers::invalid_unsigned_int,
+                   ExcNotInitialized());
     stream << p(selected_component) << '\n';
   }
 
@@ -1773,8 +1774,8 @@ namespace DataOutBase
     for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
       neighbors[i] = no_neighbor;
 
-    Assert(dim <= spacedim, ExcIndexRange(dim, 0, spacedim));
-    Assert(spacedim <= 3, ExcNotImplemented());
+    DEAL_II_Assert(dim <= spacedim, ExcIndexRange(dim, 0, spacedim));
+    DEAL_II_Assert(spacedim <= 3, ExcNotImplemented());
   }
 
 
@@ -1868,7 +1869,7 @@ namespace DataOutBase
     : patch_index(no_neighbor)
     , points_are_available(false)
   {
-    Assert(spacedim <= 3, ExcNotImplemented());
+    DEAL_II_Assert(spacedim <= 3, ExcNotImplemented());
   }
 
 
@@ -2390,7 +2391,7 @@ namespace DataOutBase
     else
       // we shouldn't get here, since the parameter object should already have
       // checked that the given value is valid
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
   }
 
 
@@ -2471,9 +2472,10 @@ namespace DataOutBase
     if (format_name == "hdf5")
       return hdf5;
 
-    AssertThrow(false,
-                ExcMessage("The given file format name is not recognized: <" +
-                           format_name + ">"));
+    DEAL_II_AssertThrow(false,
+                        ExcMessage(
+                          "The given file format name is not recognized: <" +
+                          format_name + ">"));
 
     // return something invalid
     return OutputFormat(-1);
@@ -2523,7 +2525,7 @@ namespace DataOutBase
         case svg:
           return ".svg";
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return "";
       }
   }
@@ -2535,7 +2537,7 @@ namespace DataOutBase
   void
   write_nodes(const std::vector<Patch<dim, spacedim>> &patches, StreamType &out)
   {
-    Assert(dim <= 3, ExcNotImplemented());
+    DEAL_II_Assert(dim <= 3, ExcNotImplemented());
     unsigned int count = 0;
     // We only need this point below, but it does not harm to declare it here.
     Point<spacedim> node;
@@ -2568,7 +2570,7 @@ namespace DataOutBase
   void
   write_cells(const std::vector<Patch<dim, spacedim>> &patches, StreamType &out)
   {
-    Assert(dim <= 3, ExcNotImplemented());
+    DEAL_II_Assert(dim <= 3, ExcNotImplemented());
     unsigned int count                 = 0;
     unsigned int first_vertex_of_patch = 0;
     for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
@@ -2608,7 +2610,7 @@ namespace DataOutBase
   write_high_order_cells(const std::vector<Patch<dim, spacedim>> &patches,
                          StreamType &                             out)
   {
-    Assert(dim <= 3 && dim > 1, ExcNotImplemented());
+    DEAL_II_Assert(dim <= 3 && dim > 1, ExcNotImplemented());
     unsigned int first_vertex_of_patch = 0;
     unsigned int count                 = 0;
     // Array to hold all the node numbers of a cell
@@ -2664,7 +2666,7 @@ namespace DataOutBase
              const bool                               double_precision,
              StreamType &                             out)
   {
-    Assert(dim <= 3, ExcNotImplemented());
+    DEAL_II_Assert(dim <= 3, ExcNotImplemented());
     unsigned int count = 0;
 
     for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
@@ -2675,16 +2677,16 @@ namespace DataOutBase
         const unsigned int n_subdivisions = patch->n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
         // Length of loops in all dimensions
-        Assert((patch->data.n_rows() == n_data_sets &&
-                !patch->points_are_available) ||
-                 (patch->data.n_rows() == n_data_sets + spacedim &&
-                  patch->points_are_available),
-               ExcDimensionMismatch(patch->points_are_available ?
-                                      (n_data_sets + spacedim) :
-                                      n_data_sets,
-                                    patch->data.n_rows()));
-        Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
-               ExcInvalidDatasetSize(patch->data.n_cols(), n));
+        DEAL_II_Assert((patch->data.n_rows() == n_data_sets &&
+                        !patch->points_are_available) ||
+                         (patch->data.n_rows() == n_data_sets + spacedim &&
+                          patch->points_are_available),
+                       ExcDimensionMismatch(patch->points_are_available ?
+                                              (n_data_sets + spacedim) :
+                                              n_data_sets,
+                                            patch->data.n_rows()));
+        DEAL_II_Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
+                       ExcInvalidDatasetSize(patch->data.n_cols(), n));
 
         std::vector<float>  floats(n_data_sets);
         std::vector<double> doubles(n_data_sets);
@@ -3044,9 +3046,9 @@ namespace DataOutBase
   {
     // Note that while in theory dim==0 should be implemented, this is not
     // tested, therefore currently not allowed.
-    AssertThrow(dim > 0, ExcNotImplemented());
+    DEAL_II_AssertThrow(dim > 0, ExcNotImplemented());
 
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -3055,7 +3057,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       return;
@@ -3116,7 +3118,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -3158,9 +3160,9 @@ namespace DataOutBase
     std::ostream & out)
   {
     // Point output is currently not implemented.
-    AssertThrow(dim > 0, ExcNotImplemented());
+    DEAL_II_AssertThrow(dim > 0, ExcNotImplemented());
 
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -3169,7 +3171,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       return;
@@ -3266,8 +3268,9 @@ namespace DataOutBase
                     const unsigned int nz = i3 * dz;
 
                     // There are no neighbors for dim==0. Note that this case is
-                    // caught by the AssertThrow at the beginning of this
-                    // function anyway. This condition avoids compiler warnings.
+                    // caught by the DEAL_II_AssertThrow at the beginning of
+                    // this function anyway. This condition avoids compiler
+                    // warnings.
                     if (dim < 1)
                       continue;
 
@@ -3425,7 +3428,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -3466,7 +3469,7 @@ namespace DataOutBase
     const GnuplotFlags &flags,
     std::ostream &      out)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most
@@ -3476,7 +3479,7 @@ namespace DataOutBase
     // happen that on the coarsest mesh, a processor simply has no
     // cells it actually owns, and in that case it is legit if there
     // are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       return;
@@ -3495,8 +3498,8 @@ namespace DataOutBase
           << "#" << '\n'
           << "# ";
 
-      AssertThrow(spacedim <= flags.space_dimension_labels.size(),
-                  GnuplotFlags::ExcNotEnoughSpaceDimensionLabels());
+      DEAL_II_AssertThrow(spacedim <= flags.space_dimension_labels.size(),
+                          GnuplotFlags::ExcNotEnoughSpaceDimensionLabels());
       for (unsigned int spacedim_n = 0; spacedim_n < spacedim; ++spacedim_n)
         {
           out << '<' << flags.space_dimension_labels.at(spacedim_n) << "> ";
@@ -3524,16 +3527,17 @@ namespace DataOutBase
         unsigned int       d2 = n;
         unsigned int       d3 = n * n;
 
-        Assert((patch->data.n_rows() == n_data_sets &&
-                !patch->points_are_available) ||
-                 (patch->data.n_rows() == n_data_sets + spacedim &&
-                  patch->points_are_available),
-               ExcDimensionMismatch(patch->points_are_available ?
-                                      (n_data_sets + spacedim) :
-                                      n_data_sets,
-                                    patch->data.n_rows()));
-        Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
-               ExcInvalidDatasetSize(patch->data.n_cols(), n_subdivisions + 1));
+        DEAL_II_Assert((patch->data.n_rows() == n_data_sets &&
+                        !patch->points_are_available) ||
+                         (patch->data.n_rows() == n_data_sets + spacedim &&
+                          patch->points_are_available),
+                       ExcDimensionMismatch(patch->points_are_available ?
+                                              (n_data_sets + spacedim) :
+                                              n_data_sets,
+                                            patch->data.n_rows()));
+        DEAL_II_Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
+                       ExcInvalidDatasetSize(patch->data.n_cols(),
+                                             n_subdivisions + 1));
 
         Point<spacedim> this_point;
         Point<spacedim> node;
@@ -3657,12 +3661,12 @@ namespace DataOutBase
                   }
           }
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     // make sure everything now gets to disk
     out.flush();
 
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -3703,7 +3707,7 @@ namespace DataOutBase
     const PovrayFlags &flags,
     std::ostream &     out)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most
@@ -3712,14 +3716,14 @@ namespace DataOutBase
     // assertion is disabled if we support MPI since then it can
     // happen that on the coarsest mesh, a processor simply has no cells it
     // actually owns, and in that case it is legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       return;
 #endif
-    Assert(dim == 2,
-           ExcNotImplemented()); // only for 2-D surfaces on a 2-D plane
-    Assert(spacedim == 2, ExcNotImplemented());
+    DEAL_II_Assert(dim == 2,
+                   ExcNotImplemented()); // only for 2-D surfaces on a 2-D plane
+    DEAL_II_Assert(spacedim == 2, ExcNotImplemented());
 
     const unsigned int n_data_sets = data_names.size();
     (void)n_data_sets;
@@ -3768,7 +3772,7 @@ namespace DataOutBase
     }
 
     // max. and min. height of solution
-    Assert(patches.size() > 0, ExcInternalError());
+    DEAL_II_Assert(patches.size() > 0, ExcInternalError());
     double hmin = patches[0].data(0, 0);
     double hmax = patches[0].data(0, 0);
 
@@ -3779,17 +3783,18 @@ namespace DataOutBase
       {
         const unsigned int n_subdivisions = patch->n_subdivisions;
 
-        Assert((patch->data.n_rows() == n_data_sets &&
-                !patch->points_are_available) ||
-                 (patch->data.n_rows() == n_data_sets + spacedim &&
-                  patch->points_are_available),
-               ExcDimensionMismatch(patch->points_are_available ?
-                                      (n_data_sets + spacedim) :
-                                      n_data_sets,
-                                    patch->data.n_rows()));
-        Assert(patch->data.n_cols() ==
-                 Utilities::fixed_power<dim>(n_subdivisions + 1),
-               ExcInvalidDatasetSize(patch->data.n_cols(), n_subdivisions + 1));
+        DEAL_II_Assert((patch->data.n_rows() == n_data_sets &&
+                        !patch->points_are_available) ||
+                         (patch->data.n_rows() == n_data_sets + spacedim &&
+                          patch->points_are_available),
+                       ExcDimensionMismatch(patch->points_are_available ?
+                                              (n_data_sets + spacedim) :
+                                              n_data_sets,
+                                            patch->data.n_rows()));
+        DEAL_II_Assert(patch->data.n_cols() ==
+                         Utilities::fixed_power<dim>(n_subdivisions + 1),
+                       ExcInvalidDatasetSize(patch->data.n_cols(),
+                                             n_subdivisions + 1));
 
         for (unsigned int i = 0; i < n_subdivisions + 1; ++i)
           for (unsigned int j = 0; j < n_subdivisions + 1; ++j)
@@ -3838,16 +3843,17 @@ namespace DataOutBase
         const unsigned int d1             = 1;
         const unsigned int d2             = n;
 
-        Assert((patch->data.n_rows() == n_data_sets &&
-                !patch->points_are_available) ||
-                 (patch->data.n_rows() == n_data_sets + spacedim &&
-                  patch->points_are_available),
-               ExcDimensionMismatch(patch->points_are_available ?
-                                      (n_data_sets + spacedim) :
-                                      n_data_sets,
-                                    patch->data.n_rows()));
-        Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
-               ExcInvalidDatasetSize(patch->data.n_cols(), n_subdivisions + 1));
+        DEAL_II_Assert((patch->data.n_rows() == n_data_sets &&
+                        !patch->points_are_available) ||
+                         (patch->data.n_rows() == n_data_sets + spacedim &&
+                          patch->points_are_available),
+                       ExcDimensionMismatch(patch->points_are_available ?
+                                              (n_data_sets + spacedim) :
+                                              n_data_sets,
+                                            patch->data.n_rows()));
+        DEAL_II_Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
+                       ExcInvalidDatasetSize(patch->data.n_cols(),
+                                             n_subdivisions + 1));
 
 
         std::vector<Point<spacedim>> ver(n * n);
@@ -3989,8 +3995,8 @@ namespace DataOutBase
         else
           {
             // writing bicubic_patch
-            Assert(n_subdivisions == 3,
-                   ExcDimensionMismatch(n_subdivisions, 3));
+            DEAL_II_Assert(n_subdivisions == 3,
+                           ExcDimensionMismatch(n_subdivisions, 3));
             out << '\n'
                 << "bicubic_patch {" << '\n'
                 << "  type 0" << '\n'
@@ -4018,7 +4024,7 @@ namespace DataOutBase
     // make sure everything now gets to disk
     out.flush();
 
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -4033,7 +4039,7 @@ namespace DataOutBase
     std::ostream & /*out*/)
   {
     // not implemented, see the documentation of the function
-    AssertThrow(dim == 2, ExcNotImplemented());
+    DEAL_II_AssertThrow(dim == 2, ExcNotImplemented());
   }
 
 
@@ -4052,7 +4058,7 @@ namespace DataOutBase
     std::ostream & /*out*/)
   {
     // not implemented, see the documentation of the function
-    AssertThrow(dim == 2, ExcNotImplemented());
+    DEAL_II_AssertThrow(dim == 2, ExcNotImplemented());
   }
 
 
@@ -4093,7 +4099,7 @@ namespace DataOutBase
     const EpsFlags &flags,
     std::ostream &  out)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -4102,7 +4108,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       return;
@@ -4151,11 +4157,12 @@ namespace DataOutBase
               switch (spacedim)
                 {
                   case 2:
-                    Assert((flags.height_vector < patch->data.n_rows()) ||
-                             patch->data.n_rows() == 0,
-                           ExcIndexRange(flags.height_vector,
-                                         0,
-                                         patch->data.n_rows()));
+                    DEAL_II_Assert((flags.height_vector <
+                                    patch->data.n_rows()) ||
+                                     patch->data.n_rows() == 0,
+                                   ExcIndexRange(flags.height_vector,
+                                                 0,
+                                                 patch->data.n_rows()));
                     heights[0] =
                       patch->data.n_rows() != 0 ?
                         patch->data(flags.height_vector, i1 * d1 + i2 * d2) *
@@ -4184,7 +4191,7 @@ namespace DataOutBase
                       heights[i] = points[i](2);
                     break;
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_Assert(false, ExcNotImplemented());
                 }
 
 
@@ -4247,11 +4254,11 @@ namespace DataOutBase
 
               if (flags.draw_cells && flags.shade_cells)
                 {
-                  Assert((flags.color_vector < patch->data.n_rows()) ||
-                           patch->data.n_rows() == 0,
-                         ExcIndexRange(flags.color_vector,
-                                       0,
-                                       patch->data.n_rows()));
+                  DEAL_II_Assert((flags.color_vector < patch->data.n_rows()) ||
+                                   patch->data.n_rows() == 0,
+                                 ExcIndexRange(flags.color_vector,
+                                               0,
+                                               patch->data.n_rows()));
                   const double color_values[4] = {
                     patch->data.n_rows() != 0 ?
                       patch->data(flags.color_vector, i1 * d1 + i2 * d2) :
@@ -4406,7 +4413,7 @@ namespace DataOutBase
 
     out.flush();
 
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -4451,10 +4458,10 @@ namespace DataOutBase
     // point. It does support the output of point data using the keyword
     // 'tracers' instead of 'nodes' and 'cells', but this output format is
     // currently not implemented.
-    AssertThrow(dim > 0, ExcNotImplemented());
+    DEAL_II_AssertThrow(dim > 0, ExcNotImplemented());
 
-    Assert(dim <= 3, ExcNotImplemented());
-    AssertThrow(out, ExcIO());
+    DEAL_II_Assert(dim <= 3, ExcNotImplemented());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -4463,7 +4470,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       return;
@@ -4473,14 +4480,14 @@ namespace DataOutBase
     const unsigned int n_data_sets = data_names.size();
     // check against # of data sets in first patch. checks against all other
     // patches are made in write_gmv_reorder_data_vectors
-    Assert((patches[0].data.n_rows() == n_data_sets &&
-            !patches[0].points_are_available) ||
-             (patches[0].data.n_rows() == n_data_sets + spacedim &&
-              patches[0].points_are_available),
-           ExcDimensionMismatch(patches[0].points_are_available ?
-                                  (n_data_sets + spacedim) :
-                                  n_data_sets,
-                                patches[0].data.n_rows()));
+    DEAL_II_Assert((patches[0].data.n_rows() == n_data_sets &&
+                    !patches[0].points_are_available) ||
+                     (patches[0].data.n_rows() == n_data_sets + spacedim &&
+                      patches[0].points_are_available),
+                   ExcDimensionMismatch(patches[0].points_are_available ?
+                                          (n_data_sets + spacedim) :
+                                          n_data_sets,
+                                        patches[0].data.n_rows()));
 
     ///////////////////////
     // preamble
@@ -4566,7 +4573,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -4607,12 +4614,12 @@ namespace DataOutBase
     const TecplotFlags &flags,
     std::ostream &      out)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
     // The FEBLOCK or FEPOINT formats of tecplot only allows full elements (e.g.
     // triangles), not single points. Other tecplot format allow point output,
     // but they are currently not implemented.
-    AssertThrow(dim > 0, ExcNotImplemented());
+    DEAL_II_AssertThrow(dim > 0, ExcNotImplemented());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -4621,7 +4628,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       return;
@@ -4632,14 +4639,14 @@ namespace DataOutBase
     const unsigned int n_data_sets = data_names.size();
     // check against # of data sets in first patch. checks against all other
     // patches are made in write_gmv_reorder_data_vectors
-    Assert((patches[0].data.n_rows() == n_data_sets &&
-            !patches[0].points_are_available) ||
-             (patches[0].data.n_rows() == n_data_sets + spacedim &&
-              patches[0].points_are_available),
-           ExcDimensionMismatch(patches[0].points_are_available ?
-                                  (n_data_sets + spacedim) :
-                                  n_data_sets,
-                                patches[0].data.n_rows()));
+    DEAL_II_Assert((patches[0].data.n_rows() == n_data_sets &&
+                    !patches[0].points_are_available) ||
+                     (patches[0].data.n_rows() == n_data_sets + spacedim &&
+                      patches[0].points_are_available),
+                   ExcDimensionMismatch(patches[0].points_are_available ?
+                                          (n_data_sets + spacedim) :
+                                          n_data_sets,
+                                        patches[0].data.n_rows()));
 
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
@@ -4673,7 +4680,7 @@ namespace DataOutBase
             out << "\"x\", \"y\", \"z\"";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
       for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -4748,7 +4755,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -4878,7 +4885,7 @@ namespace DataOutBase
     // The FEBLOCK or FEPOINT formats of tecplot only allows full elements (e.g.
     // triangles), not single points. Other tecplot format allow point output,
     // but they are currently not implemented.
-    AssertThrow(dim > 0, ExcNotImplemented());
+    DEAL_II_AssertThrow(dim > 0, ExcNotImplemented());
 
 #ifndef DEAL_II_HAVE_TECPLOT
 
@@ -4904,15 +4911,15 @@ namespace DataOutBase
       {
         // At least in debug mode we should tell users why they don't get
         // tecplot binary output
-        Assert(false,
-               ExcMessage("Specify the name of the tecplot_binary"
-                          " file through the TecplotFlags interface."));
+        DEAL_II_Assert(false,
+                       ExcMessage("Specify the name of the tecplot_binary"
+                                  " file through the TecplotFlags interface."));
         write_tecplot(patches, data_names, nonscalar_data_ranges, flags, out);
         return;
       }
 
 
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #  ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -4921,7 +4928,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #  else
     if (patches.size() == 0)
       return;
@@ -4930,14 +4937,14 @@ namespace DataOutBase
     const unsigned int n_data_sets = data_names.size();
     // check against # of data sets in first patch. checks against all other
     // patches are made in write_gmv_reorder_data_vectors
-    Assert((patches[0].data.n_rows() == n_data_sets &&
-            !patches[0].points_are_available) ||
-             (patches[0].data.n_rows() == n_data_sets + spacedim &&
-              patches[0].points_are_available),
-           ExcDimensionMismatch(patches[0].points_are_available ?
-                                  (n_data_sets + spacedim) :
-                                  n_data_sets,
-                                patches[0].data.n_rows()));
+    DEAL_II_Assert((patches[0].data.n_rows() == n_data_sets &&
+                    !patches[0].points_are_available) ||
+                     (patches[0].data.n_rows() == n_data_sets + spacedim &&
+                      patches[0].points_are_available),
+                   ExcDimensionMismatch(patches[0].points_are_available ?
+                                          (n_data_sets + spacedim) :
+                                          n_data_sets,
+                                        patches[0].data.n_rows()));
 
     // first count the number of cells and cells for later use
     unsigned int n_nodes;
@@ -4961,7 +4968,7 @@ namespace DataOutBase
           tec_var_names = "x y z";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -5056,7 +5063,7 @@ namespace DataOutBase
                   }
 
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
           }
       }
@@ -5145,7 +5152,7 @@ namespace DataOutBase
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
 
 
@@ -5165,26 +5172,26 @@ namespace DataOutBase
       char *var_names = const_cast<char *>(tec_var_names.c_str());
       ierr = TECINI(NULL, var_names, file_name, dot, &tec_debug, &is_double);
 
-      Assert(ierr == 0, ExcErrorOpeningTecplotFile(file_name));
+      DEAL_II_Assert(ierr == 0, ExcErrorOpeningTecplotFile(file_name));
 
       char FEBLOCK[] = {'F', 'E', 'B', 'L', 'O', 'C', 'K', 0};
       ierr = TECZNE(NULL, &num_nodes, &num_cells, &cell_type, FEBLOCK, NULL);
 
-      Assert(ierr == 0, ExcTecplotAPIError());
+      DEAL_II_Assert(ierr == 0, ExcTecplotAPIError());
 
       int total = (vars_per_node * num_nodes);
 
       ierr = TECDAT(&total, &tm.nodalData[0], &is_double);
 
-      Assert(ierr == 0, ExcTecplotAPIError());
+      DEAL_II_Assert(ierr == 0, ExcTecplotAPIError());
 
       ierr = TECNOD(&tm.connData[0]);
 
-      Assert(ierr == 0, ExcTecplotAPIError());
+      DEAL_II_Assert(ierr == 0, ExcTecplotAPIError());
 
       ierr = TECEND();
 
-      Assert(ierr == 0, ExcTecplotAPIError());
+      DEAL_II_Assert(ierr == 0, ExcTecplotAPIError());
     }
 #endif
   }
@@ -5240,7 +5247,7 @@ namespace DataOutBase
     const VtkFlags &flags,
     std::ostream &  out)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -5249,7 +5256,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       return;
@@ -5261,11 +5268,12 @@ namespace DataOutBase
     // check against # of data sets in first patch.
     if (patches[0].points_are_available)
       {
-        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows())
+        DEAL_II_AssertDimension(n_data_sets + spacedim,
+                                patches[0].data.n_rows())
       }
     else
       {
-        AssertDimension(n_data_sets, patches[0].data.n_rows())
+        DEAL_II_AssertDimension(n_data_sets, patches[0].data.n_rows())
       }
 
     ///////////////////////
@@ -5386,22 +5394,22 @@ namespace DataOutBase
          n_th_vector < nonscalar_data_ranges.size();
          ++n_th_vector)
       {
-        AssertThrow(
+        DEAL_II_AssertThrow(
           std::get<1>(nonscalar_data_ranges[n_th_vector]) >=
             std::get<0>(nonscalar_data_ranges[n_th_vector]),
           ExcLowerRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
                         std::get<0>(nonscalar_data_ranges[n_th_vector])));
-        AssertThrow(
+        DEAL_II_AssertThrow(
           std::get<1>(nonscalar_data_ranges[n_th_vector]) < n_data_sets,
           ExcIndexRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
                         0,
                         n_data_sets));
-        AssertThrow(std::get<1>(nonscalar_data_ranges[n_th_vector]) + 1 -
-                        std::get<0>(nonscalar_data_ranges[n_th_vector]) <=
-                      3,
-                    ExcMessage(
-                      "Can't declare a vector with more than 3 components "
-                      "in VTK"));
+        DEAL_II_AssertThrow(
+          std::get<1>(nonscalar_data_ranges[n_th_vector]) + 1 -
+              std::get<0>(nonscalar_data_ranges[n_th_vector]) <=
+            3,
+          ExcMessage("Can't declare a vector with more than 3 components "
+                     "in VTK"));
 
         // mark these components as already written:
         for (unsigned int i = std::get<0>(nonscalar_data_ranges[n_th_vector]);
@@ -5465,7 +5473,7 @@ namespace DataOutBase
                 default:
                   // VTK doesn't support anything else than vectors with 1, 2,
                   // or 3 components
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
               }
           }
       }
@@ -5486,14 +5494,14 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
   void
   write_vtu_header(std::ostream &out, const VtkFlags &flags)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
     out << "<?xml version=\"1.0\" ?> \n";
     out << "<!-- \n";
     out << "# vtk DataFile Version 3.0" << '\n'
@@ -5526,7 +5534,7 @@ namespace DataOutBase
   void
   write_vtu_footer(std::ostream &out)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
     out << " </UnstructuredGrid>\n";
     out << "</VTKFile>\n";
   }
@@ -5624,7 +5632,7 @@ namespace DataOutBase
     const VtkFlags &flags,
     std::ostream &  out)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed patches to be written out. most of the
@@ -5633,7 +5641,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
     if (patches.size() == 0)
       {
@@ -5731,11 +5739,12 @@ namespace DataOutBase
     // patches are made in write_gmv_reorder_data_vectors
     if (patches[0].points_are_available)
       {
-        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows())
+        DEAL_II_AssertDimension(n_data_sets + spacedim,
+                                patches[0].data.n_rows())
       }
     else
       {
-        AssertDimension(n_data_sets, patches[0].data.n_rows())
+        DEAL_II_AssertDimension(n_data_sets, patches[0].data.n_rows())
       }
 
 #ifdef DEAL_II_WITH_ZLIB
@@ -5867,23 +5876,23 @@ namespace DataOutBase
           (std::get<3>(range) ==
            DataComponentInterpretation::component_is_part_of_tensor);
         const unsigned int n_components = (is_tensor ? 9 : 3);
-        AssertThrow(last_component >= first_component,
-                    ExcLowerRange(last_component, first_component));
-        AssertThrow(last_component < n_data_sets,
-                    ExcIndexRange(last_component, 0, n_data_sets));
+        DEAL_II_AssertThrow(last_component >= first_component,
+                            ExcLowerRange(last_component, first_component));
+        DEAL_II_AssertThrow(last_component < n_data_sets,
+                            ExcIndexRange(last_component, 0, n_data_sets));
         if (is_tensor)
           {
-            AssertThrow((last_component + 1 - first_component <= 9),
-                        ExcMessage(
-                          "Can't declare a tensor with more than 9 components "
-                          "in VTK"));
+            DEAL_II_AssertThrow(
+              (last_component + 1 - first_component <= 9),
+              ExcMessage("Can't declare a tensor with more than 9 components "
+                         "in VTK"));
           }
         else
           {
-            AssertThrow((last_component + 1 - first_component <= 3),
-                        ExcMessage(
-                          "Can't declare a vector with more than 3 components "
-                          "in VTK"));
+            DEAL_II_AssertThrow(
+              (last_component + 1 - first_component <= 3),
+              ExcMessage("Can't declare a vector with more than 3 components "
+                         "in VTK"));
           }
 
         // mark these components as already written:
@@ -5936,7 +5945,7 @@ namespace DataOutBase
 
                     default:
                       // Anything else is not yet implemented
-                      Assert(false, ExcInternalError());
+                      DEAL_II_Assert(false, ExcInternalError());
                   }
               }
             else
@@ -5963,7 +5972,7 @@ namespace DataOutBase
                   }
                 else
                   {
-                    Assert(false, ExcInternalError());
+                    DEAL_II_Assert(false, ExcInternalError());
                   }
 
                 // now put the tensor into data
@@ -6003,7 +6012,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -6053,7 +6062,7 @@ namespace DataOutBase
                  DataComponentInterpretation::DataComponentInterpretation>>
       &nonscalar_data_ranges)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
     const unsigned int n_data_sets = data_names.size();
 
@@ -6075,22 +6084,22 @@ namespace DataOutBase
          n_th_vector < nonscalar_data_ranges.size();
          ++n_th_vector)
       {
-        AssertThrow(
+        DEAL_II_AssertThrow(
           std::get<1>(nonscalar_data_ranges[n_th_vector]) >=
             std::get<0>(nonscalar_data_ranges[n_th_vector]),
           ExcLowerRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
                         std::get<0>(nonscalar_data_ranges[n_th_vector])));
-        AssertThrow(
+        DEAL_II_AssertThrow(
           std::get<1>(nonscalar_data_ranges[n_th_vector]) < n_data_sets,
           ExcIndexRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
                         0,
                         n_data_sets));
-        AssertThrow(std::get<1>(nonscalar_data_ranges[n_th_vector]) + 1 -
-                        std::get<0>(nonscalar_data_ranges[n_th_vector]) <=
-                      3,
-                    ExcMessage(
-                      "Can't declare a vector with more than 3 components "
-                      "in VTK"));
+        DEAL_II_AssertThrow(
+          std::get<1>(nonscalar_data_ranges[n_th_vector]) + 1 -
+              std::get<0>(nonscalar_data_ranges[n_th_vector]) <=
+            3,
+          ExcMessage("Can't declare a vector with more than 3 components "
+                     "in VTK"));
 
         // mark these components as already written:
         for (unsigned int i = std::get<0>(nonscalar_data_ranges[n_th_vector]);
@@ -6139,7 +6148,7 @@ namespace DataOutBase
     out.flush();
 
     // assert the stream is still ok
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -6149,7 +6158,7 @@ namespace DataOutBase
     std::ostream &                                     out,
     const std::vector<std::pair<double, std::string>> &times_and_names)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
     out << "<?xml version=\"1.0\"?>\n";
 
@@ -6176,7 +6185,7 @@ namespace DataOutBase
     out.flush();
     out.precision(ss);
 
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 
@@ -6198,21 +6207,22 @@ namespace DataOutBase
   write_visit_record(std::ostream &                               out,
                      const std::vector<std::vector<std::string>> &piece_names)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
     if (piece_names.size() == 0)
       return;
 
     const double nblocks = piece_names[0].size();
-    Assert(nblocks > 0,
-           ExcMessage("piece_names should be a vector of nonempty vectors."));
+    DEAL_II_Assert(nblocks > 0,
+                   ExcMessage(
+                     "piece_names should be a vector of nonempty vectors."));
 
     out << "!NBLOCKS " << nblocks << '\n';
     for (const auto &domain : piece_names)
       {
-        Assert(domain.size() == nblocks,
-               ExcMessage(
-                 "piece_names should be a vector of equal sized vectors."));
+        DEAL_II_Assert(
+          domain.size() == nblocks,
+          ExcMessage("piece_names should be a vector of equal sized vectors."));
         for (const auto &subdomain : domain)
           out << subdomain << '\n';
       }
@@ -6228,13 +6238,13 @@ namespace DataOutBase
     const std::vector<std::pair<double, std::vector<std::string>>>
       &times_and_piece_names)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
     if (times_and_piece_names.size() == 0)
       return;
 
     const double nblocks = times_and_piece_names[0].second.size();
-    Assert(
+    DEAL_II_Assert(
       nblocks > 0,
       ExcMessage(
         "time_and_piece_names should contain nonempty vectors of filenames for every timestep."));
@@ -6245,9 +6255,9 @@ namespace DataOutBase
     out << "!NBLOCKS " << nblocks << '\n';
     for (const auto &domain : times_and_piece_names)
       {
-        Assert(domain.second.size() == nblocks,
-               ExcMessage(
-                 "piece_names should be a vector of equal sized vectors."));
+        DEAL_II_Assert(
+          domain.second.size() == nblocks,
+          ExcMessage("piece_names should be a vector of equal sized vectors."));
         for (const auto &subdomain : domain.second)
           out << subdomain << '\n';
       }
@@ -6266,7 +6276,7 @@ namespace DataOutBase
     const SvgFlags &,
     std::ostream &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -6284,7 +6294,7 @@ namespace DataOutBase
     const SvgFlags &,
     std::ostream &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -6356,9 +6366,9 @@ namespace DataOutBase
 
     compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);
 
-    Assert((flags.height_vector < patch->data.n_rows()) ||
-             patch->data.n_rows() == 0,
-           ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
+    DEAL_II_Assert((flags.height_vector < patch->data.n_rows()) ||
+                     patch->data.n_rows() == 0,
+                   ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
 
     double x_min = projected_point[0];
     double x_max = x_min;
@@ -6411,11 +6421,11 @@ namespace DataOutBase
                 y_max = std::max(y_max, (double)projected_points[2][1]);
                 y_max = std::max(y_max, (double)projected_points[3][1]);
 
-                Assert((flags.height_vector < patch->data.n_rows()) ||
-                         patch->data.n_rows() == 0,
-                       ExcIndexRange(flags.height_vector,
-                                     0,
-                                     patch->data.n_rows()));
+                DEAL_II_Assert((flags.height_vector < patch->data.n_rows()) ||
+                                 patch->data.n_rows() == 0,
+                               ExcIndexRange(flags.height_vector,
+                                             0,
+                                             patch->data.n_rows()));
 
                 z_min = std::min(z_min,
                                  (double)patch->data(flags.height_vector,
@@ -6568,9 +6578,9 @@ namespace DataOutBase
 
     compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);
 
-    Assert((flags.height_vector < patch->data.n_rows()) ||
-             patch->data.n_rows() == 0,
-           ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
+    DEAL_II_Assert((flags.height_vector < patch->data.n_rows()) ||
+                     patch->data.n_rows() == 0,
+                   ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
 
     point[0] = projected_point[0];
     point[1] = projected_point[1];
@@ -6620,11 +6630,11 @@ namespace DataOutBase
                              0,
                              n_subdivisions);
 
-                Assert((flags.height_vector < patch->data.n_rows()) ||
-                         patch->data.n_rows() == 0,
-                       ExcIndexRange(flags.height_vector,
-                                     0,
-                                     patch->data.n_rows()));
+                DEAL_II_Assert((flags.height_vector < patch->data.n_rows()) ||
+                                 patch->data.n_rows() == 0,
+                               ExcIndexRange(flags.height_vector,
+                                             0,
+                                             patch->data.n_rows()));
 
                 vertices[0][0] = projected_vertices[0][0];
                 vertices[0][1] = projected_vertices[0][1];
@@ -6769,11 +6779,11 @@ namespace DataOutBase
                              0,
                              n_subdivisions);
 
-                Assert((flags.height_vector < patch->data.n_rows()) ||
-                         patch->data.n_rows() == 0,
-                       ExcIndexRange(flags.height_vector,
-                                     0,
-                                     patch->data.n_rows()));
+                DEAL_II_Assert((flags.height_vector < patch->data.n_rows()) ||
+                                 patch->data.n_rows() == 0,
+                               ExcIndexRange(flags.height_vector,
+                                             0,
+                                             patch->data.n_rows()));
 
                 cell.vertices[0][0] = projected_vertices[0][0];
                 cell.vertices[0][1] = projected_vertices[0][1];
@@ -7353,7 +7363,7 @@ namespace DataOutBase
     const Deal_II_IntermediateFlags & /*flags*/,
     std::ostream &out)
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
     // first write tokens indicating the template parameters. we need this in
     // here because we may want to read in data again even if we don't know in
@@ -7391,7 +7401,7 @@ namespace DataOutBase
   std::pair<unsigned int, unsigned int>
   determine_intermediate_format_dimensions(std::istream &input)
   {
-    AssertThrow(input, ExcIO());
+    DEAL_II_AssertThrow(input, ExcIO());
 
     unsigned int dim, spacedim;
     input >> dim >> spacedim;
@@ -7567,23 +7577,23 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
 
   MPI_Info info;
   int ierr = MPI_Info_create(&info);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
   MPI_File fh;
   ierr = MPI_File_open(comm,
                        const_cast<char *>(filename),
                        MPI_MODE_CREATE | MPI_MODE_WRONLY,
                        info,
                        &fh);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 
   ierr = MPI_File_set_size(fh, 0); // delete the file contents
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
   // this barrier is necessary, because otherwise others might already write
   // while one core is still setting the size to zero.
   ierr = MPI_Barrier(comm);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
   ierr = MPI_Info_free(&info);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 
   unsigned int header_size;
 
@@ -7598,14 +7608,14 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
                             header_size,
                             MPI_CHAR,
                             MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
     }
 
   ierr = MPI_Bcast(&header_size, 1, MPI_UNSIGNED, 0, comm);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 
   ierr = MPI_File_seek_shared(fh, header_size, MPI_SEEK_SET);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
   {
     std::stringstream ss;
     DataOutBase::write_vtu_main(get_patches(),
@@ -7618,7 +7628,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
                                   ss.str().size(),
                                   MPI_CHAR,
                                   MPI_STATUS_IGNORE);
-    AssertThrowMPI(ierr);
+    DEAL_II_AssertThrowMPI(ierr);
   }
 
   // write footer
@@ -7632,10 +7642,10 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
                                    footer_size,
                                    MPI_CHAR,
                                    MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
     }
   ierr = MPI_File_close(&fh);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 #endif
 }
 
@@ -7700,10 +7710,12 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   (void)h5_solution_filename;
   (void)cur_time;
   (void)comm;
-  AssertThrow(false, ExcMessage("XDMF support requires HDF5 to be turned on."));
+  DEAL_II_AssertThrow(
+    false, ExcMessage("XDMF support requires HDF5 to be turned on."));
 #endif
-  AssertThrow(spacedim == 2 || spacedim == 3,
-              ExcMessage("XDMF only supports 2 or 3 space dimensions."));
+  DEAL_II_AssertThrow(spacedim == 2 || spacedim == 3,
+                      ExcMessage(
+                        "XDMF only supports 2 or 3 space dimensions."));
 
   local_node_cell_count[0] = data_filter.n_nodes();
   local_node_cell_count[1] = data_filter.n_cells();
@@ -7717,7 +7729,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
                            MPI_UNSIGNED,
                            MPI_SUM,
                            comm);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 #else
   (void)comm;
   const int myrank = 0;
@@ -7874,7 +7886,7 @@ DataOutBase::write_filtered_data(
   // since then it can happen that on the coarsest mesh, a processor simply has
   // no cells it actually owns, and in that case it is legit if there are no
   // patches
-  Assert(patches.size() > 0, ExcNoPatches());
+  DEAL_II_Assert(patches.size() > 0, ExcNoPatches());
 #else
   if (patches.size() == 0)
     return;
@@ -7916,12 +7928,12 @@ DataOutBase::write_filtered_data(
                                1;
 
           // Ensure the dimensionality of the data is correct
-          AssertThrow(
+          DEAL_II_AssertThrow(
             std::get<1>(nonscalar_data_ranges[n_th_vector]) >=
               std::get<0>(nonscalar_data_ranges[n_th_vector]),
             ExcLowerRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
                           std::get<0>(nonscalar_data_ranges[n_th_vector])));
-          AssertThrow(
+          DEAL_II_AssertThrow(
             std::get<1>(nonscalar_data_ranges[n_th_vector]) < n_data_sets,
             ExcIndexRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
                           0,
@@ -8018,7 +8030,7 @@ DataOutBase::write_hdf5_parallel(
   const std::string &               solution_filename,
   MPI_Comm                          comm)
 {
-  AssertThrow(
+  DEAL_II_AssertThrow(
     spacedim >= 2,
     ExcMessage(
       "DataOutBase was asked to write HDF5 output for a space dimension of 1. "
@@ -8034,7 +8046,7 @@ DataOutBase::write_hdf5_parallel(
   (void)mesh_filename;
   (void)solution_filename;
   (void)comm;
-  AssertThrow(false, ExcMessage("HDF5 support is disabled."));
+  DEAL_II_AssertThrow(false, ExcMessage("HDF5 support is disabled."));
 #else
 #  ifndef DEAL_II_WITH_MPI
   // verify that there are indeed patches to be written out. most of the times,
@@ -8043,7 +8055,7 @@ DataOutBase::write_hdf5_parallel(
   // since then it can happen that on the coarsest mesh, a processor simply has
   // no cells it actually owns, and in that case it is legit if there are no
   // patches
-  Assert(data_filter.n_nodes() > 0, ExcNoPatches());
+  DEAL_II_Assert(data_filter.n_nodes() > 0, ExcNoPatches());
   (void)comm;
 #  endif
 
@@ -8065,7 +8077,7 @@ DataOutBase::write_hdf5_parallel(
 #  ifndef H5_HAVE_PARALLEL
 #    ifdef DEAL_II_WITH_MPI
   int world_size = Utilities::MPI::n_mpi_processes(comm);
-  AssertThrow(
+  DEAL_II_AssertThrow(
     world_size <= 1,
     ExcMessage(
       "Serial HDF5 output on multiple processes is not yet supported."));
@@ -8077,13 +8089,13 @@ DataOutBase::write_hdf5_parallel(
 
   // Create file access properties
   file_plist_id = H5Pcreate(H5P_FILE_ACCESS);
-  AssertThrow(file_plist_id != -1, ExcIO());
+  DEAL_II_AssertThrow(file_plist_id != -1, ExcIO());
   // If MPI is enabled *and* HDF5 is parallel, we can do parallel output
 #  ifdef DEAL_II_WITH_MPI
 #    ifdef H5_HAVE_PARALLEL
   // Set the access to use the specified MPI_Comm object
   status = H5Pset_fapl_mpio(file_plist_id, comm, MPI_INFO_NULL);
-  AssertThrow(status >= 0, ExcIO());
+  DEAL_II_AssertThrow(status >= 0, ExcIO());
 #    endif
 #  endif
 
@@ -8096,14 +8108,14 @@ DataOutBase::write_hdf5_parallel(
                        MPI_UNSIGNED,
                        MPI_SUM,
                        comm);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
   ierr = MPI_Scan(local_node_cell_count,
                   global_node_cell_offsets,
                   2,
                   MPI_UNSIGNED,
                   MPI_SUM,
                   comm);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
   global_node_cell_offsets[0] -= local_node_cell_count[0];
   global_node_cell_offsets[1] -= local_node_cell_count[1];
 #  else
@@ -8114,11 +8126,11 @@ DataOutBase::write_hdf5_parallel(
 
   // Create the property list for a collective write
   plist_id = H5Pcreate(H5P_DATASET_XFER);
-  AssertThrow(plist_id >= 0, ExcIO());
+  DEAL_II_AssertThrow(plist_id >= 0, ExcIO());
 #  ifdef DEAL_II_WITH_MPI
 #    ifdef H5_HAVE_PARALLEL
   status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-  AssertThrow(status >= 0, ExcIO());
+  DEAL_II_AssertThrow(status >= 0, ExcIO());
 #    endif
 #  endif
 
@@ -8129,19 +8141,19 @@ DataOutBase::write_hdf5_parallel(
                                   H5F_ACC_TRUNC,
                                   H5P_DEFAULT,
                                   file_plist_id);
-      AssertThrow(h5_mesh_file_id >= 0, ExcIO());
+      DEAL_II_AssertThrow(h5_mesh_file_id >= 0, ExcIO());
 
       // Create the dataspace for the nodes and cells. HDF5 only supports 2- or
       // 3-dimensional coordinates
       node_ds_dim[0] = global_node_cell_count[0];
       node_ds_dim[1] = (spacedim < 2) ? 2 : spacedim;
       node_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
-      AssertThrow(node_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(node_dataspace >= 0, ExcIO());
 
       cell_ds_dim[0] = global_node_cell_count[1];
       cell_ds_dim[1] = GeometryInfo<dim>::vertices_per_cell;
       cell_dataspace = H5Screate_simple(2, cell_ds_dim, nullptr);
-      AssertThrow(cell_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(cell_dataspace >= 0, ExcIO());
 
       // Create the dataset for the nodes and cells
 #  if H5Gcreate_vers == 1
@@ -8159,7 +8171,7 @@ DataOutBase::write_hdf5_parallel(
                                H5P_DEFAULT,
                                H5P_DEFAULT);
 #  endif
-      AssertThrow(node_dataset >= 0, ExcIO());
+      DEAL_II_AssertThrow(node_dataset >= 0, ExcIO());
 #  if H5Gcreate_vers == 1
       cell_dataset = H5Dcreate(
         h5_mesh_file_id, "cells", H5T_NATIVE_UINT, cell_dataspace, H5P_DEFAULT);
@@ -8172,13 +8184,13 @@ DataOutBase::write_hdf5_parallel(
                                H5P_DEFAULT,
                                H5P_DEFAULT);
 #  endif
-      AssertThrow(cell_dataset >= 0, ExcIO());
+      DEAL_II_AssertThrow(cell_dataset >= 0, ExcIO());
 
       // Close the node and cell dataspaces since we're done with them
       status = H5Sclose(node_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       status = H5Sclose(cell_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // Create the data subset we'll use to read from memory. HDF5 only
       // supports 2- or 3-dimensional coordinates
@@ -8189,14 +8201,14 @@ DataOutBase::write_hdf5_parallel(
       offset[1] = 0;
 
       node_memory_dataspace = H5Screate_simple(2, count, nullptr);
-      AssertThrow(node_memory_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(node_memory_dataspace >= 0, ExcIO());
 
       // Select the hyperslab in the file
       node_file_dataspace = H5Dget_space(node_dataset);
-      AssertThrow(node_file_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(node_file_dataspace >= 0, ExcIO());
       status = H5Sselect_hyperslab(
         node_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // And repeat for cells
       count[0] = local_node_cell_count[1];
@@ -8204,13 +8216,13 @@ DataOutBase::write_hdf5_parallel(
       offset[0] = global_node_cell_offsets[1];
       offset[1] = 0;
       cell_memory_dataspace = H5Screate_simple(2, count, nullptr);
-      AssertThrow(cell_memory_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(cell_memory_dataspace >= 0, ExcIO());
 
       cell_file_dataspace = H5Dget_space(cell_dataset);
-      AssertThrow(cell_file_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(cell_file_dataspace >= 0, ExcIO());
       status = H5Sselect_hyperslab(
         cell_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // And finally, write the node data
       data_filter.fill_node_data(node_data_vec);
@@ -8220,7 +8232,7 @@ DataOutBase::write_hdf5_parallel(
                         node_file_dataspace,
                         plist_id,
                         node_data_vec.data());
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       node_data_vec.clear();
 
       // And the cell data
@@ -8231,32 +8243,32 @@ DataOutBase::write_hdf5_parallel(
                         cell_file_dataspace,
                         plist_id,
                         cell_data_vec.data());
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       cell_data_vec.clear();
 
       // Close the file dataspaces
       status = H5Sclose(node_file_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       status = H5Sclose(cell_file_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // Close the memory dataspaces
       status = H5Sclose(node_memory_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       status = H5Sclose(cell_memory_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // Close the datasets
       status = H5Dclose(node_dataset);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       status = H5Dclose(cell_dataset);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // If the filenames are different, we need to close the mesh file
       if (mesh_filename != solution_filename)
         {
           status = H5Fclose(h5_mesh_file_id);
-          AssertThrow(status >= 0, ExcIO());
+          DEAL_II_AssertThrow(status >= 0, ExcIO());
         }
     }
 
@@ -8272,7 +8284,7 @@ DataOutBase::write_hdf5_parallel(
                                       H5F_ACC_TRUNC,
                                       H5P_DEFAULT,
                                       file_plist_id);
-      AssertThrow(h5_solution_file_id >= 0, ExcIO());
+      DEAL_II_AssertThrow(h5_solution_file_id >= 0, ExcIO());
     }
 
   // when writing, first write out all vector data, then handle the scalar data
@@ -8290,7 +8302,7 @@ DataOutBase::write_hdf5_parallel(
       node_ds_dim[0] = global_node_cell_count[0];
       node_ds_dim[1] = pt_data_vector_dim;
       pt_data_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
-      AssertThrow(pt_data_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(pt_data_dataspace >= 0, ExcIO());
 
 #  if H5Gcreate_vers == 1
       pt_data_dataset = H5Dcreate(h5_solution_file_id,
@@ -8307,7 +8319,7 @@ DataOutBase::write_hdf5_parallel(
                                   H5P_DEFAULT,
                                   H5P_DEFAULT);
 #  endif
-      AssertThrow(pt_data_dataset >= 0, ExcIO());
+      DEAL_II_AssertThrow(pt_data_dataset >= 0, ExcIO());
 
       // Create the data subset we'll use to read from memory
       count[0] = local_node_cell_count[0];
@@ -8315,18 +8327,18 @@ DataOutBase::write_hdf5_parallel(
       offset[0] = global_node_cell_offsets[0];
       offset[1] = 0;
       pt_data_memory_dataspace = H5Screate_simple(2, count, nullptr);
-      AssertThrow(pt_data_memory_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(pt_data_memory_dataspace >= 0, ExcIO());
 
       // Select the hyperslab in the file
       pt_data_file_dataspace = H5Dget_space(pt_data_dataset);
-      AssertThrow(pt_data_file_dataspace >= 0, ExcIO());
+      DEAL_II_AssertThrow(pt_data_file_dataspace >= 0, ExcIO());
       status = H5Sselect_hyperslab(pt_data_file_dataspace,
                                    H5S_SELECT_SET,
                                    offset,
                                    nullptr,
                                    count,
                                    nullptr);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // And finally, write the data
       status = H5Dwrite(pt_data_dataset,
@@ -8335,31 +8347,31 @@ DataOutBase::write_hdf5_parallel(
                         pt_data_file_dataspace,
                         plist_id,
                         data_filter.get_data_set(i));
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // Close the dataspaces
       status = H5Sclose(pt_data_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       status = H5Sclose(pt_data_memory_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       status = H5Sclose(pt_data_file_dataspace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       // Close the dataset
       status = H5Dclose(pt_data_dataset);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
     }
 
   // Close the file property list
   status = H5Pclose(file_plist_id);
-  AssertThrow(status >= 0, ExcIO());
+  DEAL_II_AssertThrow(status >= 0, ExcIO());
 
   // Close the parallel access
   status = H5Pclose(plist_id);
-  AssertThrow(status >= 0, ExcIO());
+  DEAL_II_AssertThrow(status >= 0, ExcIO());
 
   // Close the file
   status = H5Fclose(h5_solution_file_id);
-  AssertThrow(status >= 0, ExcIO());
+  DEAL_II_AssertThrow(status >= 0, ExcIO());
 #endif
 }
 
@@ -8429,7 +8441,7 @@ DataOutInterface<dim, spacedim>::write(
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -8440,7 +8452,7 @@ void
 DataOutInterface<dim, spacedim>::set_default_format(
   const DataOutBase::OutputFormat fmt)
 {
-  Assert(fmt != DataOutBase::default_format, ExcNotImplemented());
+  DEAL_II_Assert(fmt != DataOutBase::default_format, ExcNotImplemented());
   default_fmt = fmt;
 }
 
@@ -8475,7 +8487,7 @@ DataOutInterface<dim, spacedim>::set_flags(const FlagType &flags)
     deal_II_intermediate_flags =
       *reinterpret_cast<const DataOutBase::Deal_II_IntermediateFlags *>(&flags);
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -8677,11 +8689,11 @@ DataOutInterface<dim, spacedim>::validate_dataset_names() const
         const std::string &name = std::get<2>(ranges[n_th_vector]);
         if (name != "")
           {
-            Assert(all_names.find(name) == all_names.end(),
-                   ExcMessage(
-                     "Error: names of fields in DataOut need to be unique, "
-                     "but '" +
-                     name + "' is used more than once."));
+            DEAL_II_Assert(
+              all_names.find(name) == all_names.end(),
+              ExcMessage("Error: names of fields in DataOut need to be unique, "
+                         "but '" +
+                         name + "' is used more than once."));
             all_names.insert(name);
             for (unsigned int i = std::get<0>(ranges[n_th_vector]);
                  i <= std::get<1>(ranges[n_th_vector]);
@@ -8694,11 +8706,11 @@ DataOutInterface<dim, spacedim>::validate_dataset_names() const
       if (data_set_written[data_set] == false)
         {
           const std::string &name = data_names[data_set];
-          Assert(all_names.find(name) == all_names.end(),
-                 ExcMessage(
-                   "Error: names of fields in DataOut need to be unique, "
-                   "but '" +
-                   name + "' is used more than once."));
+          DEAL_II_Assert(
+            all_names.find(name) == all_names.end(),
+            ExcMessage("Error: names of fields in DataOut need to be unique, "
+                       "but '" +
+                       name + "' is used more than once."));
           all_names.insert(name);
         }
   }
@@ -8713,7 +8725,7 @@ template <int dim, int spacedim>
 void
 DataOutReader<dim, spacedim>::read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   // first empty previous content
   {
@@ -8740,10 +8752,12 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
   {
     std::pair<unsigned int, unsigned int> dimension_info =
       DataOutBase::determine_intermediate_format_dimensions(in);
-    AssertThrow((dimension_info.first == dim) &&
-                  (dimension_info.second == spacedim),
-                ExcIncompatibleDimensions(
-                  dimension_info.first, dim, dimension_info.second, spacedim));
+    DEAL_II_AssertThrow((dimension_info.first == dim) &&
+                          (dimension_info.second == spacedim),
+                        ExcIncompatibleDimensions(dimension_info.first,
+                                                  dim,
+                                                  dimension_info.second,
+                                                  spacedim));
 
     // read to the end of the line
     std::string tmp;
@@ -8757,7 +8771,7 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
     std::ostringstream s;
     s << "[deal.II intermediate format graphics data]";
 
-    Assert(header == s.str(), ExcUnexpectedInput(s.str(), header));
+    DEAL_II_Assert(header == s.str(), ExcUnexpectedInput(s.str(), header));
   }
   {
     std::string header;
@@ -8767,7 +8781,7 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
     s << "[written by " << DEAL_II_PACKAGE_NAME << " "
       << DEAL_II_PACKAGE_VERSION << "]";
 
-    Assert(header == s.str(), ExcUnexpectedInput(s.str(), header));
+    DEAL_II_Assert(header == s.str(), ExcUnexpectedInput(s.str(), header));
   }
   {
     std::string header;
@@ -8777,11 +8791,11 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
     s << "[Version: "
       << dealii::DataOutBase::Deal_II_IntermediateFlags::format_version << "]";
 
-    Assert(header == s.str(),
-           ExcMessage(
-             "Invalid or incompatible file format. Intermediate format "
-             "files can only be read by the same deal.II version as they "
-             "are written by."));
+    DEAL_II_Assert(
+      header == s.str(),
+      ExcMessage("Invalid or incompatible file format. Intermediate format "
+                 "files can only be read by the same deal.II version as they "
+                 "are written by."));
   }
 
   // then read the rest of the data
@@ -8815,7 +8829,7 @@ DataOutReader<dim, spacedim>::read(std::istream &in)
       std::get<2>(nonscalar_data_ranges[i]) = name;
     }
 
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 }
 
 
@@ -8828,40 +8842,43 @@ DataOutReader<dim, spacedim>::merge(const DataOutReader<dim, spacedim> &source)
 
 
   const std::vector<Patch> &source_patches = source.get_patches();
-  Assert(patches.size() != 0, DataOutBase::ExcNoPatches());
-  Assert(source_patches.size() != 0, DataOutBase::ExcNoPatches());
+  DEAL_II_Assert(patches.size() != 0, DataOutBase::ExcNoPatches());
+  DEAL_II_Assert(source_patches.size() != 0, DataOutBase::ExcNoPatches());
   // check equality of component names
-  Assert(get_dataset_names() == source.get_dataset_names(),
-         ExcIncompatibleDatasetNames());
+  DEAL_II_Assert(get_dataset_names() == source.get_dataset_names(),
+                 ExcIncompatibleDatasetNames());
 
   // check equality of the vector data specifications
-  Assert(get_nonscalar_data_ranges().size() ==
-           source.get_nonscalar_data_ranges().size(),
-         ExcMessage("Both sources need to declare the same components "
-                    "as vectors."));
+  DEAL_II_Assert(get_nonscalar_data_ranges().size() ==
+                   source.get_nonscalar_data_ranges().size(),
+                 ExcMessage("Both sources need to declare the same components "
+                            "as vectors."));
   for (unsigned int i = 0; i < get_nonscalar_data_ranges().size(); ++i)
     {
-      Assert(std::get<0>(get_nonscalar_data_ranges()[i]) ==
-               std::get<0>(source.get_nonscalar_data_ranges()[i]),
-             ExcMessage("Both sources need to declare the same components "
-                        "as vectors."));
-      Assert(std::get<1>(get_nonscalar_data_ranges()[i]) ==
-               std::get<1>(source.get_nonscalar_data_ranges()[i]),
-             ExcMessage("Both sources need to declare the same components "
-                        "as vectors."));
-      Assert(std::get<2>(get_nonscalar_data_ranges()[i]) ==
-               std::get<2>(source.get_nonscalar_data_ranges()[i]),
-             ExcMessage("Both sources need to declare the same components "
-                        "as vectors."));
+      DEAL_II_Assert(std::get<0>(get_nonscalar_data_ranges()[i]) ==
+                       std::get<0>(source.get_nonscalar_data_ranges()[i]),
+                     ExcMessage(
+                       "Both sources need to declare the same components "
+                       "as vectors."));
+      DEAL_II_Assert(std::get<1>(get_nonscalar_data_ranges()[i]) ==
+                       std::get<1>(source.get_nonscalar_data_ranges()[i]),
+                     ExcMessage(
+                       "Both sources need to declare the same components "
+                       "as vectors."));
+      DEAL_II_Assert(std::get<2>(get_nonscalar_data_ranges()[i]) ==
+                       std::get<2>(source.get_nonscalar_data_ranges()[i]),
+                     ExcMessage(
+                       "Both sources need to declare the same components "
+                       "as vectors."));
     }
 
   // make sure patches are compatible
-  Assert(patches[0].n_subdivisions == source_patches[0].n_subdivisions,
-         ExcIncompatiblePatchLists());
-  Assert(patches[0].data.n_rows() == source_patches[0].data.n_rows(),
-         ExcIncompatiblePatchLists());
-  Assert(patches[0].data.n_cols() == source_patches[0].data.n_cols(),
-         ExcIncompatiblePatchLists());
+  DEAL_II_Assert(patches[0].n_subdivisions == source_patches[0].n_subdivisions,
+                 ExcIncompatiblePatchLists());
+  DEAL_II_Assert(patches[0].data.n_rows() == source_patches[0].data.n_rows(),
+                 ExcIncompatiblePatchLists());
+  DEAL_II_Assert(patches[0].data.n_cols() == source_patches[0].data.n_cols(),
+                 ExcIncompatiblePatchLists());
 
   // merge patches. store old number of elements, since we need to adjust patch
   // numbers, etc afterwards
@@ -9114,7 +9131,7 @@ namespace DataOutBase
   std::istream &
   operator>>(std::istream &in, Patch<dim, spacedim> &patch)
   {
-    AssertThrow(in, ExcIO());
+    DEAL_II_AssertThrow(in, ExcIO());
 
     // read a header line and compare it to what we usually write. skip all
     // lines that contain only blanks at the start
@@ -9131,7 +9148,7 @@ namespace DataOutBase
       std::ostringstream s;
       s << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]";
 
-      Assert(header == s.str(), ExcUnexpectedInput(s.str(), header));
+      DEAL_II_Assert(header == s.str(), ExcUnexpectedInput(s.str(), header));
     }
 
 
@@ -9153,7 +9170,7 @@ namespace DataOutBase
       for (unsigned int j = 0; j < patch.data.n_cols(); ++j)
         in >> patch.data[i][j];
 
-    AssertThrow(in, ExcIO());
+    DEAL_II_AssertThrow(in, ExcIO());
 
     return in;
   }

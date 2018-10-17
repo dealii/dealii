@@ -106,7 +106,7 @@ main()
                       face->set_manifold_id(1);
                     }
                   else
-                    Assert(false, ExcInternalError());
+                    DEAL_II_Assert(false, ExcInternalError());
                 }
           }
     }

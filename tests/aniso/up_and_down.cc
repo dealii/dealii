@@ -61,7 +61,7 @@ transform(const Point<dim> p)
                           p(1) * (1 + p(0)) * (1 + p(2)),
                           p(2) * (1 + p(0)) * (1 + p(1)));
       default:
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
         return Point<dim>();
     };
 }
@@ -98,7 +98,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
         // to be active, not only
         // some of them
         for (unsigned int c = 0; c < cell->n_children(); ++c)
-          AssertThrow(cell->child(c)->active(), ExcInternalError());
+          DEAL_II_AssertThrow(cell->child(c)->active(), ExcInternalError());
 
         // then restrict and prolongate
         cell->get_interpolated_dof_values(tmp, v);

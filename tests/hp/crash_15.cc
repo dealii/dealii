@@ -117,8 +117,8 @@ test()
                 cell->line(line)->get_dof_indices(
                   line_dof_indices_2, cell->line(line)->nth_active_fe_index(j));
 
-                AssertThrow(line_dof_indices_1 == line_dof_indices_2,
-                            ExcInternalError());
+                DEAL_II_AssertThrow(line_dof_indices_1 == line_dof_indices_2,
+                                    ExcInternalError());
               }
         }
 }

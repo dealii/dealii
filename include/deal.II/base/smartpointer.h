@@ -351,7 +351,7 @@ inline SmartPointer<T, P>::operator T *() const
 template <typename T, typename P>
 inline T &SmartPointer<T, P>::operator*() const
 {
-  Assert(t != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(t != nullptr, ExcNotInitialized());
   return *t;
 }
 
@@ -360,7 +360,7 @@ inline T &SmartPointer<T, P>::operator*() const
 template <typename T, typename P>
 inline T *SmartPointer<T, P>::operator->() const
 {
-  Assert(t != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(t != nullptr, ExcNotInitialized());
   return t;
 }
 

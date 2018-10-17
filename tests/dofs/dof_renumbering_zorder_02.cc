@@ -104,7 +104,7 @@ check()
   if (o1.str() != o2.str())
     deallog << "OK" << std::endl;
   else
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
 
   DoFRenumbering::hierarchical(dof);
   print_dofs(dof, o3);
@@ -114,7 +114,7 @@ check()
   if (o2.str() == o3.str())
     deallog << "OK" << std::endl;
   else
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
 }
 
 int

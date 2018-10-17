@@ -199,7 +199,7 @@ test()
                                   26);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   SolverCG<Vector<double>> cg(control,
@@ -226,7 +226,7 @@ test()
                                   26);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   deallog << "Sparse Factorization" << std::endl;
@@ -239,7 +239,7 @@ test()
 
   deallog << "relative norm distance = " << x.l2_norm() / ub.l2_norm()
           << std::endl;
-  Assert(x.l2_norm() / ub.l2_norm() < 1e-12, ExcInternalError());
+  DEAL_II_Assert(x.l2_norm() / ub.l2_norm() < 1e-12, ExcInternalError());
 
   deallog << "Block Sparse Factorization" << std::endl;
   umfpackb.factorize(Bb);
@@ -252,7 +252,7 @@ test()
 
   deallog << "relative norm distance = " << b.l2_norm() / ubb.l2_norm()
           << std::endl;
-  Assert(b.l2_norm() / ubb.l2_norm() < 1e-12, ExcInternalError());
+  DEAL_II_Assert(b.l2_norm() / ubb.l2_norm() < 1e-12, ExcInternalError());
 }
 
 

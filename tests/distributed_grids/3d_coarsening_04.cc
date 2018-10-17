@@ -58,7 +58,8 @@ test(std::ostream & /*out*/)
     // tr2.refine_global (1);
   }
 
-  Assert(tr.n_active_cells() == tr2.n_active_cells(), ExcInternalError());
+  DEAL_II_Assert(tr.n_active_cells() == tr2.n_active_cells(),
+                 ExcInternalError());
   deallog << " Number of cells: " << tr.n_active_cells() << ' '
           << tr2.n_active_cells() << std::endl;
 
@@ -87,7 +88,7 @@ test(std::ostream & /*out*/)
             cell->set_refine_flag();
             intergrid_map[cell]->set_refine_flag();
           }
-      Assert(index == tr.n_active_cells(), ExcInternalError());
+      DEAL_II_Assert(index == tr.n_active_cells(), ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least

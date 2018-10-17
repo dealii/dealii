@@ -38,7 +38,7 @@ test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w)
     w(k) += v(k);
 
   // check that they're equal
-  AssertThrow(v == w, ExcInternalError());
+  DEAL_II_AssertThrow(v == w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

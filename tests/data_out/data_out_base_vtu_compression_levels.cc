@@ -74,7 +74,7 @@ check_all(std::ostream &log)
               DataOutBase::VtkFlags::default_compression;
             break;
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
         }
       log << "==============================\n"
           << dim << spacedim << "-" << flags.compression_level << ".vtu"

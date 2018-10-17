@@ -61,9 +61,9 @@ test()
   v *= 2.0;
   {
     rw_vector.import(v, VectorOperation::insert);
-    AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
-    AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0,
-                ExcInternalError());
+    DEAL_II_AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
+    DEAL_II_AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0,
+                        ExcInternalError());
   }
 
   // check l2 norm
@@ -95,16 +95,18 @@ test()
     if (myid == 0)
       deallog << "Mean value: " << mean << std::endl;
 
-    Assert(std::fabs(mean * v.size() - v.l1_norm()) < 1e-15,
-           ExcInternalError());
+    DEAL_II_Assert(std::fabs(mean * v.size() - v.l1_norm()) < 1e-15,
+                   ExcInternalError());
   }
   // check inner product
   {
     const double norm_sqr = v.l2_norm() * v.l2_norm();
-    AssertThrow(std::fabs(v * v - norm_sqr) < 1e-15, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(v * v - norm_sqr) < 1e-15,
+                        ExcInternalError());
     LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v2;
     v2 = v;
-    AssertThrow(std::fabs(v2 * v - norm_sqr) < 1e-15, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(v2 * v - norm_sqr) < 1e-15,
+                        ExcInternalError());
 
     const double inner_prod = v * v2;
     if (myid == 0)
@@ -150,10 +152,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
 
   if (myid == 0)

@@ -42,7 +42,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Shorthand notation for KINSOL error codes.
-#  define AssertKINSOL(code) Assert(code >= 0, ExcKINSOLError(code))
+#  define DEAL_II_AssertKINSOL(code) \
+    DEAL_II_Assert(code >= 0, ExcKINSOLError(code))
 
 namespace SUNDIALS
 {
@@ -337,7 +338,7 @@ namespace SUNDIALS
           else if (value == "picard")
             strategy = picard;
           else
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
         });
         prm.add_parameter("Maximum number of nonlinear iterations",
                           maximum_non_linear_iterations);
@@ -614,11 +615,11 @@ namespace SUNDIALS
     /**
      * Handle KINSOL exceptions.
      */
-    DeclException1(ExcKINSOLError,
-                   int,
-                   << "One of the SUNDIALS KINSOL internal functions "
-                   << " returned a negative error code: " << arg1
-                   << ". Please consult SUNDIALS manual.");
+    DEAL_II_DeclException1(ExcKINSOLError,
+                           int,
+                           << "One of the SUNDIALS KINSOL internal functions "
+                           << " returned a negative error code: " << arg1
+                           << ". Please consult SUNDIALS manual.");
 
 
   private:
@@ -626,10 +627,11 @@ namespace SUNDIALS
      * Throw an exception when a function with the given name is not
      * implemented.
      */
-    DeclException1(ExcFunctionNotProvided,
-                   std::string,
-                   << "Please provide an implementation for the function \""
-                   << arg1 << "\"");
+    DEAL_II_DeclException1(
+      ExcFunctionNotProvided,
+      std::string,
+      << "Please provide an implementation for the function \"" << arg1
+      << "\"");
 
     /**
      * This function is executed at construction time to set the

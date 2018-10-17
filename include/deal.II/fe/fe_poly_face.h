@@ -147,7 +147,7 @@ protected:
     if (data->update_each & update_gradients ||
         data->update_each & update_hessians)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     return std::move(data);

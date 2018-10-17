@@ -37,7 +37,7 @@ test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w)
         w(k) = std::complex<double>(k + 1., k + 1.);
     }
 
-  AssertThrow(!(v == w), ExcInternalError());
+  DEAL_II_AssertThrow(!(v == w), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

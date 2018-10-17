@@ -55,9 +55,9 @@ namespace LinearAlgebra
       std::complex<Number>
       get_min(const std::complex<Number> a, const std::complex<Number>)
       {
-        AssertThrow(false,
-                    ExcMessage("VectorOperation::min not "
-                               "implemented for complex numbers"));
+        DEAL_II_AssertThrow(false,
+                            ExcMessage("VectorOperation::min not "
+                                       "implemented for complex numbers"));
         return a;
       }
 
@@ -72,9 +72,9 @@ namespace LinearAlgebra
       std::complex<Number>
       get_max(const std::complex<Number> a, const std::complex<Number>)
       {
-        AssertThrow(false,
-                    ExcMessage("VectorOperation::max not "
-                               "implemented for complex numbers"));
+        DEAL_II_AssertThrow(false,
+                            ExcMessage("VectorOperation::max not "
+                                       "implemented for complex numbers"));
         return a;
       }
 
@@ -131,9 +131,9 @@ namespace LinearAlgebra
         {
           if (new_alloc_size > allocated_size)
             {
-              Assert(((allocated_size > 0 && data.values != nullptr) ||
-                      data.values == nullptr),
-                     ExcInternalError());
+              DEAL_II_Assert(((allocated_size > 0 && data.values != nullptr) ||
+                              data.values == nullptr),
+                             ExcInternalError());
 
               Number *new_val;
               Utilities::System::posix_memalign(
@@ -158,7 +158,7 @@ namespace LinearAlgebra
                ::dealii::MemorySpace::
                  MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
         {
-          Assert(
+          DEAL_II_Assert(
             (operation == ::dealii::VectorOperation::add) ||
               (operation == ::dealii::VectorOperation::insert),
             ExcMessage(
@@ -234,9 +234,10 @@ namespace LinearAlgebra
 
           if (new_alloc_size > allocated_size)
             {
-              Assert(((allocated_size > 0 && data.values_dev != nullptr) ||
-                      data.values_dev == nullptr),
-                     ExcInternalError());
+              DEAL_II_Assert(((allocated_size > 0 &&
+                               data.values_dev != nullptr) ||
+                              data.values_dev == nullptr),
+                             ExcInternalError());
 
               Number *new_val_dev;
               Utilities::CUDA::malloc(new_val_dev, new_alloc_size);
@@ -260,7 +261,7 @@ namespace LinearAlgebra
                ::dealii::MemorySpace::
                  MemorySpaceData<Number, ::dealii::MemorySpace::CUDA> &data)
         {
-          Assert(
+          DEAL_II_Assert(
             (operation == ::dealii::VectorOperation::add) ||
               (operation == ::dealii::VectorOperation::insert),
             ExcMessage(
@@ -291,7 +292,7 @@ namespace LinearAlgebra
                                                    V.begin(),
                                                    n_elements * sizeof(Number),
                                                    cudaMemcpyHostToDevice);
-          AssertCuda(cuda_error_code);
+          DEAL_II_AssertCuda(cuda_error_code);
 
           // Set the values in tmp_vector
           const int n_blocks =
@@ -346,7 +347,7 @@ namespace LinearAlgebra
 
           Number *    result_device;
           cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-          AssertCuda(error_code);
+          DEAL_II_AssertCuda(error_code);
           error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
           const int n_blocks =
@@ -363,10 +364,10 @@ namespace LinearAlgebra
                                   result_device,
                                   sizeof(Number),
                                   cudaMemcpyDeviceToHost);
-          AssertCuda(error_code);
+          DEAL_II_AssertCuda(error_code);
           // Free the memory on the device
           error_code = cudaFree(result_device);
-          AssertCuda(error_code);
+          DEAL_II_AssertCuda(error_code);
         }
       };
 #endif
@@ -381,13 +382,13 @@ namespace LinearAlgebra
       for (size_type j = 0; j < compress_requests.size(); j++)
         {
           const int ierr = MPI_Request_free(&compress_requests[j]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
       compress_requests.clear();
       for (size_type j = 0; j < update_ghost_values_requests.size(); j++)
         {
           const int ierr = MPI_Request_free(&update_ghost_values_requests[j]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
       update_ghost_values_requests.clear();
 #endif
@@ -440,7 +441,7 @@ namespace LinearAlgebra
                                         const bool omit_zeroing_entries)
     {
       clear_mpi_requests();
-      Assert(v.partitioner.get() != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(v.partitioner.get() != nullptr, ExcNotInitialized());
 
       // check whether the partitioners are
       // different (check only if the are allocated
@@ -634,7 +635,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::
     operator=(const Vector<Number2, MemorySpace> &c)
     {
-      Assert(c.partitioner.get() != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(c.partitioner.get() != nullptr, ExcNotInitialized());
 
       // we update ghost values whenever one of the input or output vector
       // already held ghost values or when we import data from a vector with
@@ -703,7 +704,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::copy_locally_owned_data_from(
       const Vector<Number2, MemorySpace> &src)
     {
-      AssertDimension(partitioner->local_size(), src.partitioner->local_size());
+      DEAL_II_AssertDimension(partitioner->local_size(),
+                              src.partitioner->local_size());
       if (partitioner->local_size() > 0)
         {
           dealii::internal::VectorOperations::
@@ -745,7 +747,7 @@ namespace LinearAlgebra
                         const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
                         Number * /*ptr*/)
       {
-        AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
+        DEAL_II_AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
       }
     } // namespace petsc_helpers
 
@@ -759,14 +761,15 @@ namespace LinearAlgebra
       // not support overlapping (ghosted) PETSc vectors, which we need for
       // backward compatibility.
 
-      Assert(petsc_vec.locally_owned_elements() == locally_owned_elements(),
-             StandardExceptions::ExcInvalidState());
+      DEAL_II_Assert(petsc_vec.locally_owned_elements() ==
+                       locally_owned_elements(),
+                     StandardExceptions::ExcInvalidState());
 
       // get a representation of the vector and copy it
       PetscScalar *  start_ptr;
       PetscErrorCode ierr =
         VecGetArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       const size_type vec_size = local_size();
       petsc_helpers::copy_petsc_vector(start_ptr,
@@ -775,7 +778,7 @@ namespace LinearAlgebra
 
       // restore the representation of the vector
       ierr = VecRestoreArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
       // spread ghost values between processes?
       if (vector_is_ghosted || petsc_vec.has_ghost_elements())
@@ -807,7 +810,7 @@ namespace LinearAlgebra
       if (vector_is_ghosted || trilinos_vec.has_ghost_elements())
         update_ghost_values();
 #  else
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
 #  endif
 
       return *this;
@@ -853,7 +856,7 @@ namespace LinearAlgebra
             cudaMemset(data.values_dev.get() + partitioner->local_size(),
                        0,
                        partitioner->n_ghost_indices() * sizeof(Number));
-          AssertCuda(cuda_error_code);
+          DEAL_II_AssertCuda(cuda_error_code);
         }
 #endif
 
@@ -870,8 +873,8 @@ namespace LinearAlgebra
     {
       (void)counter;
       (void)operation;
-      Assert(vector_is_ghosted == false,
-             ExcMessage("Cannot call compress() on a ghosted vector"));
+      DEAL_II_Assert(vector_is_ghosted == false,
+                     ExcMessage("Cannot call compress() on a ghosted vector"));
 
 #ifdef DEAL_II_WITH_MPI
       // make this function thread safe
@@ -900,7 +903,7 @@ namespace LinearAlgebra
                        data.values_dev.get(),
                        allocated_size * sizeof(Number),
                        cudaMemcpyDeviceToHost);
-          AssertCuda(cuda_error_code);
+          DEAL_II_AssertCuda(cuda_error_code);
         }
 #  endif
       partitioner->import_from_ghosted_array_start(
@@ -930,8 +933,9 @@ namespace LinearAlgebra
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
 
-      Assert(partitioner->n_import_indices() == 0 || import_data != nullptr,
-             ExcNotInitialized());
+      DEAL_II_Assert(partitioner->n_import_indices() == 0 ||
+                       import_data != nullptr,
+                     ExcNotInitialized());
       partitioner->import_from_ghosted_array_finish(
         operation,
         ArrayView<const Number>(import_data.get(),
@@ -951,7 +955,7 @@ namespace LinearAlgebra
                        data.values.get(),
                        allocated_size * sizeof(Number),
                        cudaMemcpyHostToDevice);
-          AssertCuda(cuda_error_code);
+          DEAL_II_AssertCuda(cuda_error_code);
 
           data.values.reset();
         }
@@ -1001,7 +1005,7 @@ namespace LinearAlgebra
                        data.values_dev.get(),
                        allocated_size * sizeof(Number),
                        cudaMemcpyDeviceToHost);
-          AssertCuda(cuda_error_code);
+          DEAL_II_AssertCuda(cuda_error_code);
         }
 #  endif
 
@@ -1027,9 +1031,9 @@ namespace LinearAlgebra
 #ifdef DEAL_II_WITH_MPI
       // wait for both sends and receives to complete, even though only
       // receives are really necessary. this gives (much) better performance
-      AssertDimension(partitioner->ghost_targets().size() +
-                        partitioner->import_targets().size(),
-                      update_ghost_values_requests.size());
+      DEAL_II_AssertDimension(partitioner->ghost_targets().size() +
+                                partitioner->import_targets().size(),
+                              update_ghost_values_requests.size());
       if (update_ghost_values_requests.size() > 0)
         {
           // make this function thread safe
@@ -1050,7 +1054,7 @@ namespace LinearAlgebra
                        data.values.get() + partitioner->local_size(),
                        partitioner->n_ghost_indices() * sizeof(Number),
                        cudaMemcpyHostToDevice);
-          AssertCuda(cuda_error_code);
+          DEAL_II_AssertCuda(cuda_error_code);
 
           data.values.reset();
         }
@@ -1086,9 +1090,10 @@ namespace LinearAlgebra
           comm_pattern =
             std::dynamic_pointer_cast<const Utilities::MPI::Partitioner>(
               communication_pattern);
-          AssertThrow(comm_pattern != nullptr,
-                      ExcMessage("The communication pattern is not of type "
-                                 "Utilities::MPI::Partitioner."));
+          DEAL_II_AssertThrow(comm_pattern != nullptr,
+                              ExcMessage(
+                                "The communication pattern is not of type "
+                                "Utilities::MPI::Partitioner."));
         }
       Vector<Number> tmp_vector(comm_pattern);
 
@@ -1136,7 +1141,8 @@ namespace LinearAlgebra
             }
           default:
             {
-              Assert(false, ExcMessage("This operation is not supported."));
+              DEAL_II_Assert(false,
+                             ExcMessage("This operation is not supported."));
             }
         }
       tmp_vector.compress(operation);
@@ -1162,11 +1168,11 @@ namespace LinearAlgebra
                                            update_ghost_values_requests.data(),
                                            &flag,
                                            MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-              Assert(flag == 1,
-                     ExcMessage(
-                       "MPI found unfinished update_ghost_values() requests"
-                       "when calling swap, which is not allowed"));
+              DEAL_II_AssertThrowMPI(ierr);
+              DEAL_II_Assert(
+                flag == 1,
+                ExcMessage("MPI found unfinished update_ghost_values() requests"
+                           "when calling swap, which is not allowed"));
             }
           if (compress_requests.size() > 0)
             {
@@ -1174,10 +1180,11 @@ namespace LinearAlgebra
                                            compress_requests.data(),
                                            &flag,
                                            MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
-              Assert(flag == 1,
-                     ExcMessage("MPI found unfinished compress() requests "
-                                "when calling swap, which is not allowed"));
+              DEAL_II_AssertThrowMPI(ierr);
+              DEAL_II_Assert(flag == 1,
+                             ExcMessage(
+                               "MPI found unfinished compress() requests "
+                               "when calling swap, which is not allowed"));
             }
         }
 #  endif
@@ -1227,8 +1234,8 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert(dynamic_cast<const VectorType *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const VectorType *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const VectorType &down_V = dynamic_cast<const VectorType &>(V);
 
       reinit(down_V, omit_zeroing_entries);
@@ -1242,11 +1249,11 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::add_vector(
@@ -1266,11 +1273,11 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::subtract_vector(
@@ -1288,7 +1295,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpace>::add(const Number a)
     {
-      AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(a);
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::add_factor(
@@ -1307,12 +1314,12 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertIsFinite(a);
-      AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertIsFinite(a);
+      DEAL_II_AssertDimension(local_size(), v.local_size());
 
       // nothing to do if a is zero
       if (a == Number(0.))
@@ -1347,18 +1354,18 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
-      Assert(dynamic_cast<const VectorType *>(&ww) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const VectorType *>(&ww) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const VectorType &w = dynamic_cast<const VectorType &>(ww);
 
-      AssertIsFinite(a);
-      AssertIsFinite(b);
+      DEAL_II_AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(b);
 
-      AssertDimension(local_size(), v.local_size());
-      AssertDimension(local_size(), w.local_size());
+      DEAL_II_AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertDimension(local_size(), w.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::add_avpbw(
@@ -1394,8 +1401,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::sadd(const Number                       x,
                                       const Vector<Number, MemorySpace> &v)
     {
-      AssertIsFinite(x);
-      AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertIsFinite(x);
+      DEAL_II_AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::sadd_xv(
@@ -1415,13 +1422,13 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertIsFinite(x);
-      AssertIsFinite(a);
-      AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertIsFinite(x);
+      DEAL_II_AssertIsFinite(a);
+      DEAL_II_AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::sadd_xav(
@@ -1457,12 +1464,12 @@ namespace LinearAlgebra
                                       const Number                       b,
                                       const Vector<Number, MemorySpace> &w)
     {
-      AssertIsFinite(x);
-      AssertIsFinite(a);
-      AssertIsFinite(b);
+      DEAL_II_AssertIsFinite(x);
+      DEAL_II_AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(b);
 
-      AssertDimension(local_size(), v.local_size());
-      AssertDimension(local_size(), w.local_size());
+      DEAL_II_AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertDimension(local_size(), w.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::sadd_xavbw(
@@ -1485,7 +1492,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator*=(const Number factor)
     {
-      AssertIsFinite(factor);
+      DEAL_II_AssertIsFinite(factor);
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::multiply_factor(
@@ -1515,11 +1522,11 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::scale(thread_loop_partitioner,
@@ -1540,12 +1547,12 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
-      AssertIsFinite(a);
-      AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertIsFinite(a);
+      DEAL_II_AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::equ_au(
@@ -1565,11 +1572,11 @@ namespace LinearAlgebra
                                      const Number                       b,
                                      const Vector<Number, MemorySpace> &w)
     {
-      AssertIsFinite(a);
-      AssertIsFinite(b);
+      DEAL_II_AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(b);
 
-      AssertDimension(local_size(), v.local_size());
-      AssertDimension(local_size(), w.local_size());
+      DEAL_II_AssertDimension(local_size(), v.local_size());
+      DEAL_II_AssertDimension(local_size(), w.local_size());
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::equ_aubv(
@@ -1605,7 +1612,8 @@ namespace LinearAlgebra
       if (PointerComparison::equal(this, &v))
         return norm_sqr_local();
 
-      AssertDimension(partitioner->local_size(), v.partitioner->local_size());
+      DEAL_II_AssertDimension(partitioner->local_size(),
+                              v.partitioner->local_size());
 
       return dealii::internal::VectorOperations::
         functions<Number, Number2, MemorySpace>::dot(thread_loop_partitioner,
@@ -1622,8 +1630,8 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
 
       Number local_result = inner_product_local(v);
@@ -1647,7 +1655,7 @@ namespace LinearAlgebra
         functions<Number, Number, MemorySpace>::norm_2(
           thread_loop_partitioner, partitioner->local_size(), sum, data);
 
-      AssertIsFinite(sum);
+      DEAL_II_AssertIsFinite(sum);
 
       return sum;
     }
@@ -1658,7 +1666,7 @@ namespace LinearAlgebra
     Number
     Vector<Number, MemorySpace>::mean_value_local() const
     {
-      Assert(size() != 0, ExcEmptyObject());
+      DEAL_II_Assert(size() != 0, ExcEmptyObject());
 
       if (partitioner->local_size() == 0)
         return Number();
@@ -1808,14 +1816,14 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpace> &w)
     {
       const size_type vec_size = partitioner->local_size();
-      AssertDimension(vec_size, v.local_size());
-      AssertDimension(vec_size, w.local_size());
+      DEAL_II_AssertDimension(vec_size, v.local_size());
+      DEAL_II_AssertDimension(vec_size, w.local_size());
 
       Number sum = dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpace>::add_and_dot(
           thread_loop_partitioner, vec_size, a, v.data, w.data, data);
 
-      AssertIsFinite(sum);
+      DEAL_II_AssertIsFinite(sum);
 
       return sum;
     }
@@ -1831,11 +1839,11 @@ namespace LinearAlgebra
     {
       // Downcast. Throws an exception if invalid.
       using VectorType = Vector<Number, MemorySpace>;
-      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
+                     ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
-      Assert((dynamic_cast<const VectorType *>(&ww) != nullptr),
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert((dynamic_cast<const VectorType *>(&ww) != nullptr),
+                     ExcVectorTypeNotCompatible());
       const VectorType &w = dynamic_cast<const VectorType &>(ww);
 
       Number local_result = add_and_dot_local(a, v, w);
@@ -1896,8 +1904,8 @@ namespace LinearAlgebra
                                        const bool         scientific,
                                        const bool         across) const
     {
-      Assert(partitioner.get() != nullptr, ExcInternalError());
-      AssertThrow(out, ExcIO());
+      DEAL_II_Assert(partitioner.get() != nullptr, ExcInternalError());
+      DEAL_II_AssertThrow(out, ExcIO());
       std::ios::fmtflags old_flags     = out.flags();
       unsigned int       old_precision = out.precision(precision);
 
@@ -1915,7 +1923,7 @@ namespace LinearAlgebra
         for (unsigned int i = 0; i < partitioner->this_mpi_process(); i++)
           {
             const int ierr = MPI_Barrier(partitioner->get_mpi_communicator());
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
           }
 #endif
 
@@ -1956,19 +1964,19 @@ namespace LinearAlgebra
       if (partitioner->n_mpi_processes() > 1)
         {
           int ierr = MPI_Barrier(partitioner->get_mpi_communicator());
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           for (unsigned int i = partitioner->this_mpi_process() + 1;
                i < partitioner->n_mpi_processes();
                i++)
             {
               ierr = MPI_Barrier(partitioner->get_mpi_communicator());
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
         }
 #endif
 
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
       // reset output format
       out.flags(old_flags);
       out.precision(old_precision);

@@ -43,10 +43,10 @@ test(Vector<double> &v, Vector<double> &w, Vector<double> &x)
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      Assert(w(i) == i + 1., ExcInternalError());
-      Assert(x(i) == i + 2., ExcInternalError());
-      Assert(std::fabs(v(i) - (i + 1.) / (i + 2.)) < 1e-14 * v(i),
-             ExcInternalError());
+      DEAL_II_Assert(w(i) == i + 1., ExcInternalError());
+      DEAL_II_Assert(x(i) == i + 2., ExcInternalError());
+      DEAL_II_Assert(std::fabs(v(i) - (i + 1.) / (i + 2.)) < 1e-14 * v(i),
+                     ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

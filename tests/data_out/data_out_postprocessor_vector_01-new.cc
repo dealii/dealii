@@ -114,7 +114,7 @@ public:
         case 1:
           return std::cos(p.norm());
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return 0;
       }
   }
@@ -147,15 +147,16 @@ public:
   {
     for (unsigned int q = 0; q < input_data.solution_values.size(); ++q)
       {
-        Assert(computed_quantities[q].size() == dim, ExcInternalError());
+        DEAL_II_Assert(computed_quantities[q].size() == dim,
+                       ExcInternalError());
 
         for (unsigned int d = 0; d < dim; ++d)
           computed_quantities[q](d) =
             input_data.solution_values[q](0) *
               input_data.solution_values[q](0) +
             input_data.solution_values[q](1) * input_data.solution_values[q](1);
-        AssertThrow(std::fabs(computed_quantities[q](0) - 1) < 1e-12,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(std::fabs(computed_quantities[q](0) - 1) < 1e-12,
+                            ExcInternalError());
       }
   }
 };

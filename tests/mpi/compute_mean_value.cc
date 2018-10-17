@@ -84,7 +84,7 @@ test()
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "mean=" << mean << std::endl;
 
-  Assert(std::fabs(mean - 2) < 1e-3, ExcInternalError());
+  DEAL_II_Assert(std::fabs(mean - 2) < 1e-3, ExcInternalError());
 }
 
 

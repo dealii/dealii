@@ -106,10 +106,11 @@ namespace Evaluation
     operator()(const hp::DoFHandler<dim> &dof_handler,
                const Vector<double> &     solution) const;
 
-    DeclException1(ExcEvaluationPointNotFound,
-                   Point<dim>,
-                   << "The evaluation point " << arg1
-                   << " was not found among the vertices of the present grid.");
+    DEAL_II_DeclException1(
+      ExcEvaluationPointNotFound,
+      Point<dim>,
+      << "The evaluation point " << arg1
+      << " was not found among the vertices of the present grid.");
 
   private:
     const Point<dim> evaluation_point;
@@ -148,8 +149,8 @@ namespace Evaluation
             break;
           };
 
-    AssertThrow(evaluation_point_found,
-                ExcEvaluationPointNotFound(evaluation_point));
+    DEAL_II_AssertThrow(evaluation_point_found,
+                        ExcEvaluationPointNotFound(evaluation_point));
 
     deallog << "   Point value=" << point_value << std::endl;
   }
@@ -166,10 +167,11 @@ namespace Evaluation
     operator()(const hp::DoFHandler<dim> &dof_handler,
                const Vector<double> &     solution) const;
 
-    DeclException1(ExcEvaluationPointNotFound,
-                   Point<dim>,
-                   << "The evaluation point " << arg1
-                   << " was not found among the vertices of the present grid.");
+    DEAL_II_DeclException1(
+      ExcEvaluationPointNotFound,
+      Point<dim>,
+      << "The evaluation point " << arg1
+      << " was not found among the vertices of the present grid.");
 
   private:
     const Point<dim> evaluation_point;
@@ -217,15 +219,16 @@ namespace Evaluation
                   evaluation_point)
                 break;
 
-            Assert(q_point < solution_gradients.size(), ExcInternalError());
+            DEAL_II_Assert(q_point < solution_gradients.size(),
+                           ExcInternalError());
             point_derivative += solution_gradients[q_point][0];
             ++evaluation_point_hits;
 
             break;
           };
 
-    AssertThrow(evaluation_point_hits > 0,
-                ExcEvaluationPointNotFound(evaluation_point));
+    DEAL_II_AssertThrow(evaluation_point_hits > 0,
+                        ExcEvaluationPointNotFound(evaluation_point));
 
     point_derivative /= evaluation_point_hits;
     deallog << "   Point x-derivative=" << point_derivative << std::endl;
@@ -1132,10 +1135,11 @@ namespace DualFunctional
     assemble_rhs(const hp::DoFHandler<dim> &dof_handler,
                  Vector<double> &           rhs) const;
 
-    DeclException1(ExcEvaluationPointNotFound,
-                   Point<dim>,
-                   << "The evaluation point " << arg1
-                   << " was not found among the vertices of the present grid.");
+    DEAL_II_DeclException1(
+      ExcEvaluationPointNotFound,
+      Point<dim>,
+      << "The evaluation point " << arg1
+      << " was not found among the vertices of the present grid.");
 
   protected:
     const Point<dim> evaluation_point;
@@ -1171,7 +1175,7 @@ namespace DualFunctional
             return;
           };
 
-    AssertThrow(false, ExcEvaluationPointNotFound(evaluation_point));
+    DEAL_II_AssertThrow(false, ExcEvaluationPointNotFound(evaluation_point));
   }
 
 
@@ -1186,10 +1190,11 @@ namespace DualFunctional
     assemble_rhs(const hp::DoFHandler<dim> &dof_handler,
                  Vector<double> &           rhs) const;
 
-    DeclException1(ExcEvaluationPointNotFound,
-                   Point<dim>,
-                   << "The evaluation point " << arg1
-                   << " was not found among the vertices of the present grid.");
+    DEAL_II_DeclException1(
+      ExcEvaluationPointNotFound,
+      Point<dim>,
+      << "The evaluation point " << arg1
+      << " was not found among the vertices of the present grid.");
 
   protected:
     const Point<dim> evaluation_point;
@@ -1248,7 +1253,8 @@ namespace DualFunctional
             rhs(local_dof_indices[i]) += cell_rhs(i);
         };
 
-    AssertThrow(total_volume > 0, ExcEvaluationPointNotFound(evaluation_point));
+    DEAL_II_AssertThrow(total_volume > 0,
+                        ExcEvaluationPointNotFound(evaluation_point));
 
     rhs /= total_volume;
   }
@@ -1688,9 +1694,9 @@ namespace LaplaceSolver
            face_no < GeometryInfo<dim>::faces_per_cell;
            ++face_no)
         {
-          Assert(face_integrals.find(cell->face(face_no)) !=
-                   face_integrals.end(),
-                 ExcInternalError());
+          DEAL_II_Assert(face_integrals.find(cell->face(face_no)) !=
+                           face_integrals.end(),
+                         ExcInternalError());
           error_indicators(present_cell) -=
             0.5 * face_integrals[cell->face(face_no)];
         };
@@ -1834,8 +1840,8 @@ namespace LaplaceSolver
     face_data.fe_face_values_cell.get_present_fe_values()
       .get_function_gradients(primal_solution, face_data.cell_grads);
 
-    Assert(cell->neighbor(face_no).state() == IteratorState::valid,
-           ExcInternalError());
+    DEAL_II_Assert(cell->neighbor(face_no).state() == IteratorState::valid,
+                   ExcInternalError());
     const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor(face_no);
     const active_cell_iterator neighbor  = cell->neighbor(face_no);
     face_data.fe_face_values_neighbor.reinit(neighbor, neighbor_neighbor);
@@ -1857,9 +1863,11 @@ namespace LaplaceSolver
         (face_data.jump_residual[p] * face_data.dual_weights[p] *
          face_data.fe_face_values_cell.get_present_fe_values().JxW(p));
 
-    Assert(face_integrals.find(cell->face(face_no)) != face_integrals.end(),
-           ExcInternalError());
-    Assert(face_integrals[cell->face(face_no)] == -1e20, ExcInternalError());
+    DEAL_II_Assert(face_integrals.find(cell->face(face_no)) !=
+                     face_integrals.end(),
+                   ExcInternalError());
+    DEAL_II_Assert(face_integrals[cell->face(face_no)] == -1e20,
+                   ExcInternalError());
 
     face_integrals[cell->face(face_no)] = face_integral;
   }
@@ -1883,8 +1891,9 @@ namespace LaplaceSolver
       cell->face(face_no);
     const typename hp::DoFHandler<dim>::cell_iterator neighbor =
       cell->neighbor(face_no);
-    Assert(neighbor.state() == IteratorState::valid, ExcInternalError());
-    Assert(neighbor->has_children(), ExcInternalError());
+    DEAL_II_Assert(neighbor.state() == IteratorState::valid,
+                   ExcInternalError());
+    DEAL_II_Assert(neighbor->has_children(), ExcInternalError());
 
     const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor(face_no);
 
@@ -1893,9 +1902,9 @@ namespace LaplaceSolver
       {
         const active_cell_iterator neighbor_child =
           cell->neighbor_child_on_subface(face_no, subface_no);
-        Assert(neighbor_child->face(neighbor_neighbor) ==
-                 cell->face(face_no)->child(subface_no),
-               ExcInternalError());
+        DEAL_II_Assert(neighbor_child->face(neighbor_neighbor) ==
+                         cell->face(face_no)->child(subface_no),
+                       ExcInternalError());
 
         face_data.fe_subface_values_cell.reinit(cell, face_no, subface_no);
         face_data.fe_subface_values_cell.get_present_fe_values()
@@ -1926,11 +1935,11 @@ namespace LaplaceSolver
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
       {
-        Assert(face_integrals.find(face->child(subface_no)) !=
-                 face_integrals.end(),
-               ExcInternalError());
-        Assert(face_integrals[face->child(subface_no)] != -1e20,
-               ExcInternalError());
+        DEAL_II_Assert(face_integrals.find(face->child(subface_no)) !=
+                         face_integrals.end(),
+                       ExcInternalError());
+        DEAL_II_Assert(face_integrals[face->child(subface_no)] != -1e20,
+                       ExcInternalError());
 
         sum += face_integrals[face->child(subface_no)];
       };
@@ -2061,7 +2070,7 @@ Framework<dim>::run(const ProblemDescription &descriptor)
         };
 
       default:
-        AssertThrow(false, ExcInternalError());
+        DEAL_II_AssertThrow(false, ExcInternalError());
     };
 
   for (unsigned int step = 0; true; ++step)

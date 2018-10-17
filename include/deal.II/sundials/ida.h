@@ -57,7 +57,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Shorthand notation for IDA error codes.
-#  define AssertIDA(code) Assert(code >= 0, ExcIDAError(code))
+#  define DEAL_II_AssertIDA(code) DEAL_II_Assert(code >= 0, ExcIDAError(code))
 
 namespace SUNDIALS
 {
@@ -76,7 +76,7 @@ namespace SUNDIALS
    *
    * Optionally, also the following functions could be rewritten. By default
    * they do nothing, or are not required. If you call the constructor in a way
-   * that requires a not-implemented function, an Assertion will be
+   * that requires a not-implemented function, an DEAL_II_Assertion will be
    * thrown.
    *  - solver_should_restart;
    *  - differential_components;
@@ -425,7 +425,7 @@ namespace SUNDIALS
                          else if (value == "none")
                            ic_type = none;
                          else
-                           AssertThrow(false, ExcInternalError());
+                           DEAL_II_AssertThrow(false, ExcInternalError());
                        });
 
         static std::string reset_type_str = "use_y_diff";
@@ -450,7 +450,7 @@ namespace SUNDIALS
                          else if (value == "none")
                            reset_type = none;
                          else
-                           AssertThrow(false, ExcInternalError());
+                           DEAL_II_AssertThrow(false, ExcInternalError());
                        });
         prm.add_parameter("Maximum number of nonlinear iterations",
                           maximum_non_linear_iterations_ic);
@@ -769,11 +769,11 @@ namespace SUNDIALS
     /**
      * Handle IDA exceptions.
      */
-    DeclException1(ExcIDAError,
-                   int,
-                   << "One of the SUNDIALS IDA internal functions "
-                   << " returned a negative error code: " << arg1
-                   << ". Please consult SUNDIALS manual.");
+    DEAL_II_DeclException1(ExcIDAError,
+                           int,
+                           << "One of the SUNDIALS IDA internal functions "
+                           << " returned a negative error code: " << arg1
+                           << ". Please consult SUNDIALS manual.");
 
 
   private:
@@ -781,10 +781,11 @@ namespace SUNDIALS
      * Throw an exception when a function with the given name is not
      * implemented.
      */
-    DeclException1(ExcFunctionNotProvided,
-                   std::string,
-                   << "Please provide an implementation for the function \""
-                   << arg1 << "\"");
+    DEAL_II_DeclException1(
+      ExcFunctionNotProvided,
+      std::string,
+      << "Please provide an implementation for the function \"" << arg1
+      << "\"");
 
     /**
      * This function is executed at construction time to set the

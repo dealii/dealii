@@ -53,7 +53,7 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
 
   IndexSet shared_dofs      = shared_dof_handler.locally_owned_dofs();
   IndexSet distributed_dofs = distributed_dof_handler.locally_owned_dofs();
-  Assert(shared_dofs == distributed_dofs, ExcInternalError());
+  DEAL_II_Assert(shared_dofs == distributed_dofs, ExcInternalError());
   shared_dofs.print(deallog.get_file_stream());
 
   std::vector<IndexSet> shared_dofs_per_proc =
@@ -62,8 +62,8 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
     distributed_dof_handler.locally_owned_dofs_per_processor();
   for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
        ++i)
-    Assert(shared_dofs_per_proc[i] == distributed_dofs_per_proc[i],
-           ExcInternalError());
+    DEAL_II_Assert(shared_dofs_per_proc[i] == distributed_dofs_per_proc[i],
+                   ExcInternalError());
 
   typename DoFHandler<dim>::active_cell_iterator
     cell = distributed_dof_handler.begin_active(),
@@ -87,8 +87,8 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
       cell->get_dof_indices(distributed_cell_dofs);
       dof_shared_cell->get_dof_indices(shared_cell_dofs);
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-        Assert(distributed_cell_dofs[i] == shared_cell_dofs[i],
-               ExcInternalError());
+        DEAL_II_Assert(distributed_cell_dofs[i] == shared_cell_dofs[i],
+                       ExcInternalError());
     }
 }
 

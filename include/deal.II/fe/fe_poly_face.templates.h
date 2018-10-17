@@ -37,7 +37,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::FE_PolyFace(
       std::vector<ComponentMask>(1, ComponentMask(1, true)))
   , poly_space(poly_space)
 {
-  AssertDimension(dim, PolynomialType::dimension + 1);
+  DEAL_II_AssertDimension(dim, PolynomialType::dimension + 1);
 }
 
 
@@ -125,8 +125,8 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   if (fe_data.update_each & update_values)
@@ -216,8 +216,8 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_subface_values(
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   const unsigned int foffset = fe_data.shape_values.size() * face_no;
@@ -234,8 +234,9 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_subface_values(
             fe_data.shape_values[k][i + offset];
     }
 
-  Assert(!(fe_data.update_each & update_gradients), ExcNotImplemented());
-  Assert(!(fe_data.update_each & update_hessians), ExcNotImplemented());
+  DEAL_II_Assert(!(fe_data.update_each & update_gradients),
+                 ExcNotImplemented());
+  DEAL_II_Assert(!(fe_data.update_each & update_hessians), ExcNotImplemented());
 }
 
 DEAL_II_NAMESPACE_CLOSE

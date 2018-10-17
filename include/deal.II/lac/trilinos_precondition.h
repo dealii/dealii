@@ -218,11 +218,12 @@ namespace TrilinosWrappers
     /**
      * Exception.
      */
-    DeclException1(ExcNonMatchingMaps,
-                   std::string,
-                   << "The sparse matrix the preconditioner is based on "
-                   << "uses a map that is not compatible to the one in vector "
-                   << arg1 << ". Check preconditioner and matrix setup.");
+    DEAL_II_DeclException1(
+      ExcNonMatchingMaps,
+      std::string,
+      << "The sparse matrix the preconditioner is based on "
+      << "uses a map that is not compatible to the one in vector " << arg1
+      << ". Check preconditioner and matrix setup.");
     //@}
 
     friend class SolverBase;
@@ -1963,12 +1964,12 @@ namespace TrilinosWrappers
     if (!preconditioner->UseTranspose())
       {
         ierr = preconditioner->SetUseTranspose(true);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
     else
       {
         ierr = preconditioner->SetUseTranspose(false);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
   }
 
@@ -1976,28 +1977,32 @@ namespace TrilinosWrappers
   inline void
   PreconditionBase::vmult(MPI::Vector &dst, const MPI::Vector &src) const
   {
-    Assert(dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
-           ExcNonMatchingMaps("dst"));
-    Assert(src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
-           ExcNonMatchingMaps("src"));
+    DEAL_II_Assert(dst.vector_partitioner().SameAs(
+                     preconditioner->OperatorRangeMap()),
+                   ExcNonMatchingMaps("dst"));
+    DEAL_II_Assert(src.vector_partitioner().SameAs(
+                     preconditioner->OperatorDomainMap()),
+                   ExcNonMatchingMaps("src"));
 
     const int ierr = preconditioner->ApplyInverse(src.trilinos_vector(),
                                                   dst.trilinos_vector());
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
   inline void
   PreconditionBase::Tvmult(MPI::Vector &dst, const MPI::Vector &src) const
   {
-    Assert(dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
-           ExcNonMatchingMaps("dst"));
-    Assert(src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
-           ExcNonMatchingMaps("src"));
+    DEAL_II_Assert(dst.vector_partitioner().SameAs(
+                     preconditioner->OperatorRangeMap()),
+                   ExcNonMatchingMaps("dst"));
+    DEAL_II_Assert(src.vector_partitioner().SameAs(
+                     preconditioner->OperatorDomainMap()),
+                   ExcNonMatchingMaps("src"));
 
     preconditioner->SetUseTranspose(true);
     const int ierr = preconditioner->ApplyInverse(src.trilinos_vector(),
                                                   dst.trilinos_vector());
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
   }
 
@@ -2015,10 +2020,12 @@ namespace TrilinosWrappers
   PreconditionBase::vmult(dealii::Vector<double> &      dst,
                           const dealii::Vector<double> &src) const
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(dst.size()),
-                    preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(src.size()),
-                    preconditioner->OperatorRangeMap().NumMyElements());
+    DEAL_II_AssertDimension(
+      static_cast<TrilinosWrappers::types::int_type>(dst.size()),
+      preconditioner->OperatorDomainMap().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              src.size()),
+                            preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),
                            dst.begin());
@@ -2027,7 +2034,7 @@ namespace TrilinosWrappers
                            const_cast<double *>(src.begin()));
 
     const int ierr = preconditioner->ApplyInverse(tril_src, tril_dst);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -2035,10 +2042,12 @@ namespace TrilinosWrappers
   PreconditionBase::Tvmult(dealii::Vector<double> &      dst,
                            const dealii::Vector<double> &src) const
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(dst.size()),
-                    preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(src.size()),
-                    preconditioner->OperatorRangeMap().NumMyElements());
+    DEAL_II_AssertDimension(
+      static_cast<TrilinosWrappers::types::int_type>(dst.size()),
+      preconditioner->OperatorDomainMap().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              src.size()),
+                            preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),
                            dst.begin());
@@ -2048,7 +2057,7 @@ namespace TrilinosWrappers
 
     preconditioner->SetUseTranspose(true);
     const int ierr = preconditioner->ApplyInverse(tril_src, tril_dst);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
   }
 
@@ -2059,12 +2068,12 @@ namespace TrilinosWrappers
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      dst.local_size()),
-                    preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      src.local_size()),
-                    preconditioner->OperatorRangeMap().NumMyElements());
+    DEAL_II_AssertDimension(
+      static_cast<TrilinosWrappers::types::int_type>(dst.local_size()),
+      preconditioner->OperatorDomainMap().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              src.local_size()),
+                            preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),
                            dst.begin());
@@ -2073,7 +2082,7 @@ namespace TrilinosWrappers
                            const_cast<double *>(src.begin()));
 
     const int ierr = preconditioner->ApplyInverse(tril_src, tril_dst);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
   inline void
@@ -2081,12 +2090,12 @@ namespace TrilinosWrappers
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      dst.local_size()),
-                    preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      src.local_size()),
-                    preconditioner->OperatorRangeMap().NumMyElements());
+    DEAL_II_AssertDimension(
+      static_cast<TrilinosWrappers::types::int_type>(dst.local_size()),
+      preconditioner->OperatorDomainMap().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              src.local_size()),
+                            preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),
                            dst.begin());
@@ -2096,7 +2105,7 @@ namespace TrilinosWrappers
 
     preconditioner->SetUseTranspose(true);
     const int ierr = preconditioner->ApplyInverse(tril_src, tril_dst);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
     preconditioner->SetUseTranspose(false);
   }
 

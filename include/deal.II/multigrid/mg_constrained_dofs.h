@@ -225,7 +225,7 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                 {
                   if (cell->is_locally_owned_on_level())
                     {
-                      Assert(
+                      DEAL_II_Assert(
                         cell->periodic_neighbor(f)->level_subdomain_id() !=
                           numbers::artificial_subdomain_id,
                         ExcMessage(
@@ -236,8 +236,8 @@ MGConstrainedDoFs::initialize(const DoFHandler<dim, spacedim> &dof)
                   else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
                            numbers::artificial_subdomain_id)
                     {
-                      Assert(cell->is_locally_owned_on_level() == false,
-                             ExcInternalError());
+                      DEAL_II_Assert(cell->is_locally_owned_on_level() == false,
+                                     ExcInternalError());
                       continue;
                     }
 
@@ -310,8 +310,9 @@ MGConstrainedDoFs::make_zero_boundary_constraints(
   // allocate an IndexSet for each global level. Contents will be
   // overwritten inside make_boundary_list.
   const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  Assert(boundary_indices.size() == 0 || boundary_indices.size() == n_levels,
-         ExcInternalError());
+  DEAL_II_Assert(boundary_indices.size() == 0 ||
+                   boundary_indices.size() == n_levels,
+                 ExcInternalError());
   boundary_indices.resize(n_levels);
 
   MGTools::make_boundary_list(dof,
@@ -336,7 +337,7 @@ MGConstrainedDoFs::is_boundary_index(const unsigned int            level,
   if (boundary_indices.size() == 0)
     return false;
 
-  AssertIndexRange(level, boundary_indices.size());
+  DEAL_II_AssertIndexRange(level, boundary_indices.size());
   return boundary_indices[level].is_element(index);
 }
 
@@ -344,7 +345,7 @@ inline bool
 MGConstrainedDoFs::at_refinement_edge(const unsigned int            level,
                                       const types::global_dof_index index) const
 {
-  AssertIndexRange(level, refinement_edge_indices.size());
+  DEAL_II_AssertIndexRange(level, refinement_edge_indices.size());
 
   return refinement_edge_indices[level].is_element(index);
 }
@@ -369,7 +370,7 @@ MGConstrainedDoFs::is_interface_matrix_entry(
 inline const IndexSet &
 MGConstrainedDoFs::get_boundary_indices(const unsigned int level) const
 {
-  AssertIndexRange(level, boundary_indices.size());
+  DEAL_II_AssertIndexRange(level, boundary_indices.size());
   return boundary_indices[level];
 }
 
@@ -378,7 +379,7 @@ MGConstrainedDoFs::get_boundary_indices(const unsigned int level) const
 inline const IndexSet &
 MGConstrainedDoFs::get_refinement_edge_indices(unsigned int level) const
 {
-  AssertIndexRange(level, refinement_edge_indices.size());
+  DEAL_II_AssertIndexRange(level, refinement_edge_indices.size());
   return refinement_edge_indices[level];
 }
 
@@ -395,7 +396,7 @@ MGConstrainedDoFs::have_boundary_indices() const
 inline const AffineConstraints<double> &
 MGConstrainedDoFs::get_level_constraints(const unsigned int level) const
 {
-  AssertIndexRange(level, level_constraints.size());
+  DEAL_II_AssertIndexRange(level, level_constraints.size());
   return level_constraints[level];
 }
 

@@ -67,7 +67,8 @@ public:
   virtual double
   value(const Point<dim> &p, const unsigned int component = 0) const
   {
-    Assert((component == 0) && (this->n_components == 1), ExcInternalError());
+    DEAL_II_Assert((component == 0) && (this->n_components == 1),
+                   ExcInternalError());
     double val = 0;
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int i = 0; i <= q; ++i)
@@ -108,7 +109,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
            const unsigned int                               fe_index = 0)
 {
   // we only project scalar value function
-  AssertThrow(fes[fe_index]->n_components() == 1, ExcNotImplemented());
+  DEAL_II_AssertThrow(fes[fe_index]->n_components() == 1, ExcNotImplemented());
 
   deallog << "n_cells=" << triangulation.n_global_active_cells() << std::endl;
 

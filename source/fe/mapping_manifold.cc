@@ -177,7 +177,7 @@ MappingManifold<dim, spacedim>::InternalData::initialize_face(
                   break;
                 }
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
     }
@@ -207,7 +207,7 @@ MappingManifold<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
   const Point<spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return Point<dim>();
 }
 
@@ -299,10 +299,11 @@ MappingManifold<dim, spacedim>::requires_update_flags(
 
   // Now throw an exception if we stumble upon something that was not
   // implemented yet
-  Assert(!(out & (update_jacobian_grads | update_jacobian_pushed_forward_grads |
-                  update_jacobian_pushed_forward_2nd_derivatives |
-                  update_jacobian_pushed_forward_3rd_derivatives)),
-         ExcNotImplemented());
+  DEAL_II_Assert(!(out & (update_jacobian_grads |
+                          update_jacobian_pushed_forward_grads |
+                          update_jacobian_pushed_forward_2nd_derivatives |
+                          update_jacobian_pushed_forward_3rd_derivatives)),
+                 ExcNotImplemented());
 
   return out;
 }
@@ -376,8 +377,8 @@ namespace internal
       {
         const UpdateFlags update_flags = data.update_each;
 
-        AssertDimension(data.vertices.size(),
-                        GeometryInfo<dim>::vertices_per_cell);
+        DEAL_II_AssertDimension(data.vertices.size(),
+                                GeometryInfo<dim>::vertices_per_cell);
 
         if (update_flags & update_quadrature_points)
           {
@@ -417,8 +418,8 @@ namespace internal
                       data.contravariant.end(),
                       DerivativeForm<1, dim, spacedim>());
 
-            AssertDimension(GeometryInfo<dim>::vertices_per_cell,
-                            data.vertices.size());
+            DEAL_II_AssertDimension(GeometryInfo<dim>::vertices_per_cell,
+                                    data.vertices.size());
             for (unsigned int point = 0; point < n_q_points; ++point)
               {
                 // Start by figuring out how to compute the direction in
@@ -442,10 +443,10 @@ namespace internal
                   {
                     const Point<dim> ei = Point<dim>::unit_vector(i);
                     const double     pi = p[i];
-                    Assert(pi >= 0 && pi <= 1.0,
-                           ExcInternalError(
-                             "Was expecting a quadrature point "
-                             "inside the unit reference element."));
+                    DEAL_II_Assert(pi >= 0 && pi <= 1.0,
+                                   ExcInternalError(
+                                     "Was expecting a quadrature point "
+                                     "inside the unit reference element."));
 
                     // In the length L, we store also the direction sign,
                     // which is positive, if the coordinate is < .5,
@@ -508,8 +509,8 @@ MappingManifold<dim, spacedim>::fill_fe_values(
     &output_data) const
 {
   // ensure that the following static_cast is really correct:
-  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   const unsigned int n_q_points = quadrature.size();
@@ -535,12 +536,12 @@ MappingManifold<dim, spacedim>::fill_fe_values(
 
   if (update_flags & (update_normal_vectors | update_JxW_values))
     {
-      AssertDimension(output_data.JxW_values.size(), n_q_points);
+      DEAL_II_AssertDimension(output_data.JxW_values.size(), n_q_points);
 
-      Assert(!(update_flags & update_normal_vectors) ||
-               (output_data.normal_vectors.size() == n_q_points),
-             ExcDimensionMismatch(output_data.normal_vectors.size(),
-                                  n_q_points));
+      DEAL_II_Assert(!(update_flags & update_normal_vectors) ||
+                       (output_data.normal_vectors.size() == n_q_points),
+                     ExcDimensionMismatch(output_data.normal_vectors.size(),
+                                          n_q_points));
 
 
       for (unsigned int point = 0; point < n_q_points; ++point)
@@ -554,10 +555,11 @@ MappingManifold<dim, spacedim>::fill_fe_values(
               // TODO: this allows for anisotropies of up to 1e6 in 3D and
               // 1e12 in 2D. might want to find a finer
               // (dimension-independent) criterion
-              Assert(det > 1e-12 * Utilities::fixed_power<dim>(
-                                     cell->diameter() / std::sqrt(double(dim))),
-                     (typename Mapping<dim, spacedim>::ExcDistortedMappedCell(
-                       cell->center(), det, point)));
+              DEAL_II_Assert(
+                det > 1e-12 * Utilities::fixed_power<dim>(
+                                cell->diameter() / std::sqrt(double(dim))),
+                (typename Mapping<dim, spacedim>::ExcDistortedMappedCell(
+                  cell->center(), det, point)));
 
               output_data.JxW_values[point] = weights[point] * det;
             }
@@ -589,15 +591,15 @@ MappingManifold<dim, spacedim>::fill_fe_values(
                 {
                   if (update_flags & update_normal_vectors)
                     {
-                      Assert(spacedim == dim + 1,
-                             ExcMessage(
-                               "There is no (unique) cell normal for " +
-                               Utilities::int_to_string(dim) +
-                               "-dimensional cells in " +
-                               Utilities::int_to_string(spacedim) +
-                               "-dimensional space. This only works if the "
-                               "space dimension is one greater than the "
-                               "dimensionality of the mesh cells."));
+                      DEAL_II_Assert(
+                        spacedim == dim + 1,
+                        ExcMessage("There is no (unique) cell normal for " +
+                                   Utilities::int_to_string(dim) +
+                                   "-dimensional cells in " +
+                                   Utilities::int_to_string(spacedim) +
+                                   "-dimensional space. This only works if the "
+                                   "space dimension is one greater than the "
+                                   "dimensionality of the mesh cells."));
 
                       if (dim == 1)
                         output_data.normal_vectors[point] =
@@ -622,7 +624,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
   // copy values from InternalData to vector given by reference
   if (update_flags & update_jacobians)
     {
-      AssertDimension(output_data.jacobians.size(), n_q_points);
+      DEAL_II_AssertDimension(output_data.jacobians.size(), n_q_points);
       if (cell_similarity != CellSimilarity::translation)
         for (unsigned int point = 0; point < n_q_points; ++point)
           output_data.jacobians[point] = data.contravariant[point];
@@ -631,7 +633,7 @@ MappingManifold<dim, spacedim>::fill_fe_values(
   // copy values from InternalData to vector given by reference
   if (update_flags & update_inverse_jacobians)
     {
-      AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
+      DEAL_II_AssertDimension(output_data.inverse_jacobians.size(), n_q_points);
       if (cell_similarity != CellSimilarity::translation)
         for (unsigned int point = 0; point < n_q_points; ++point)
           output_data.inverse_jacobians[point] =
@@ -677,21 +679,24 @@ namespace internal
 
         if (update_flags & update_boundary_forms)
           {
-            AssertDimension(output_data.boundary_forms.size(), n_q_points);
+            DEAL_II_AssertDimension(output_data.boundary_forms.size(),
+                                    n_q_points);
             if (update_flags & update_normal_vectors)
-              AssertDimension(output_data.normal_vectors.size(), n_q_points);
+              DEAL_II_AssertDimension(output_data.normal_vectors.size(),
+                                      n_q_points);
             if (update_flags & update_JxW_values)
-              AssertDimension(output_data.JxW_values.size(), n_q_points);
+              DEAL_II_AssertDimension(output_data.JxW_values.size(),
+                                      n_q_points);
 
             // map the unit tangentials to the real cell. checking for d!=dim-1
             // eliminates compiler warnings regarding unsigned int expressions <
             // 0.
             for (unsigned int d = 0; d != dim - 1; ++d)
               {
-                Assert(face_no + GeometryInfo<dim>::faces_per_cell * d <
-                         data.unit_tangentials.size(),
-                       ExcInternalError());
-                Assert(
+                DEAL_II_Assert(face_no + GeometryInfo<dim>::faces_per_cell * d <
+                                 data.unit_tangentials.size(),
+                               ExcInternalError());
+                DEAL_II_Assert(
                   data.aux[d].size() <=
                     data
                       .unit_tangentials[face_no +
@@ -733,7 +738,7 @@ namespace internal
                           cross_product_3d(data.aux[0][i], data.aux[1][i]);
                         break;
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_Assert(false, ExcNotImplemented());
                     }
               }
             else //(dim < spacedim)
@@ -744,7 +749,7 @@ namespace internal
                 //
                 // to compute the cell normal, use the same method used in
                 // fill_fe_values for cells above
-                AssertDimension(data.contravariant.size(), n_q_points);
+                DEAL_II_AssertDimension(data.contravariant.size(), n_q_points);
 
                 for (unsigned int point = 0; point < n_q_points; ++point)
                   {
@@ -780,7 +785,7 @@ namespace internal
                           }
 
                         default:
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_Assert(false, ExcNotImplemented());
                       }
                   }
               }
@@ -869,11 +874,11 @@ namespace internal
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
-        AssertDimension(input.size(), output.size());
-        Assert((dynamic_cast<const typename dealii::
-                               MappingManifold<dim, spacedim>::InternalData *>(
-                  &mapping_data) != nullptr),
-               ExcInternalError());
+        DEAL_II_AssertDimension(input.size(), output.size());
+        DEAL_II_Assert(
+          (dynamic_cast<const typename dealii::MappingManifold<dim, spacedim>::
+                          InternalData *>(&mapping_data) != nullptr),
+          ExcInternalError());
         const typename dealii::MappingManifold<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
@@ -883,7 +888,7 @@ namespace internal
           {
             case mapping_contravariant:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
@@ -897,15 +902,15 @@ namespace internal
 
             case mapping_piola:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
-                Assert(rank == 1, ExcMessage("Only for rank 1"));
+                DEAL_II_Assert(rank == 1, ExcMessage("Only for rank 1"));
                 if (rank != 1)
                   return;
 
@@ -922,7 +927,7 @@ namespace internal
             // rather than DerivativeForm
             case mapping_covariant:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
@@ -934,7 +939,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
 
@@ -947,11 +952,11 @@ namespace internal
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank, spacedim>> &                output)
       {
-        AssertDimension(input.size(), output.size());
-        Assert((dynamic_cast<const typename dealii::
-                               MappingManifold<dim, spacedim>::InternalData *>(
-                  &mapping_data) != nullptr),
-               ExcInternalError());
+        DEAL_II_AssertDimension(input.size(), output.size());
+        DEAL_II_Assert(
+          (dynamic_cast<const typename dealii::MappingManifold<dim, spacedim>::
+                          InternalData *>(&mapping_data) != nullptr),
+          ExcInternalError());
         const typename dealii::MappingManifold<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
@@ -961,15 +966,15 @@ namespace internal
           {
             case mapping_contravariant_gradient:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_covariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                DEAL_II_Assert(rank == 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
@@ -985,11 +990,11 @@ namespace internal
 
             case mapping_covariant_gradient:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_covariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                DEAL_II_Assert(rank == 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
@@ -1005,19 +1010,19 @@ namespace internal
 
             case mapping_piola_gradient:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_covariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
-                Assert(rank == 2, ExcMessage("Only for rank 2"));
+                DEAL_II_Assert(rank == 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
                   {
@@ -1035,7 +1040,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
 
@@ -1049,11 +1054,11 @@ namespace internal
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<3, spacedim>> &                   output)
       {
-        AssertDimension(input.size(), output.size());
-        Assert((dynamic_cast<const typename dealii::
-                               MappingManifold<dim, spacedim>::InternalData *>(
-                  &mapping_data) != nullptr),
-               ExcInternalError());
+        DEAL_II_AssertDimension(input.size(), output.size());
+        DEAL_II_Assert(
+          (dynamic_cast<const typename dealii::MappingManifold<dim, spacedim>::
+                          InternalData *>(&mapping_data) != nullptr),
+          ExcInternalError());
         const typename dealii::MappingManifold<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
@@ -1063,11 +1068,11 @@ namespace internal
           {
             case mapping_contravariant_hessian:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_covariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
@@ -1109,7 +1114,7 @@ namespace internal
 
             case mapping_covariant_hessian:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_covariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
@@ -1152,15 +1157,15 @@ namespace internal
 
             case mapping_piola_hessian:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_covariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_contravariant_transformation"));
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_volume_elements,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_volume_elements"));
@@ -1204,7 +1209,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
 
@@ -1218,11 +1223,11 @@ namespace internal
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
         const ArrayView<Tensor<rank + 1, spacedim>> &            output)
       {
-        AssertDimension(input.size(), output.size());
-        Assert((dynamic_cast<const typename dealii::
-                               MappingManifold<dim, spacedim>::InternalData *>(
-                  &mapping_data) != nullptr),
-               ExcInternalError());
+        DEAL_II_AssertDimension(input.size(), output.size());
+        DEAL_II_Assert(
+          (dynamic_cast<const typename dealii::MappingManifold<dim, spacedim>::
+                          InternalData *>(&mapping_data) != nullptr),
+          ExcInternalError());
         const typename dealii::MappingManifold<dim, spacedim>::InternalData
           &data =
             static_cast<const typename dealii::MappingManifold<dim, spacedim>::
@@ -1232,7 +1237,7 @@ namespace internal
           {
             case mapping_covariant:
               {
-                Assert(
+                DEAL_II_Assert(
                   data.update_each & update_contravariant_transformation,
                   typename FEValuesBase<dim>::ExcAccessToUninitializedField(
                     "update_covariant_transformation"));
@@ -1243,7 +1248,7 @@ namespace internal
                 return;
               }
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
     } // namespace
@@ -1263,8 +1268,9 @@ MappingManifold<dim, spacedim>::fill_fe_face_values(
     &output_data) const
 {
   // ensure that the following cast is really correct:
-  Assert((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
-         ExcInternalError());
+  DEAL_II_Assert((dynamic_cast<const InternalData *>(&internal_data) !=
+                  nullptr),
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   internal::MappingManifoldImplementation::do_fill_fe_face_values(
@@ -1296,8 +1302,9 @@ MappingManifold<dim, spacedim>::fill_fe_subface_values(
     &output_data) const
 {
   // ensure that the following cast is really correct:
-  Assert((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
-         ExcInternalError());
+  DEAL_II_Assert((dynamic_cast<const InternalData *>(&internal_data) !=
+                  nullptr),
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   internal::MappingManifoldImplementation::do_fill_fe_face_values(
@@ -1373,7 +1380,7 @@ MappingManifold<dim, spacedim>::transform(
           input, mapping_type, mapping_data, output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -1387,18 +1394,19 @@ MappingManifold<dim, spacedim>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
-  Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_AssertDimension(input.size(), output.size());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(mapping_data);
 
   switch (mapping_type)
     {
       case mapping_covariant_gradient:
         {
-          Assert(data.update_each & update_contravariant_transformation,
-                 typename FEValuesBase<dim>::ExcAccessToUninitializedField(
-                   "update_covariant_transformation"));
+          DEAL_II_Assert(
+            data.update_each & update_contravariant_transformation,
+            typename FEValuesBase<dim>::ExcAccessToUninitializedField(
+              "update_covariant_transformation"));
 
           for (unsigned int q = 0; q < output.size(); ++q)
             for (unsigned int i = 0; i < spacedim; ++i)
@@ -1422,7 +1430,7 @@ MappingManifold<dim, spacedim>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -1445,7 +1453,7 @@ MappingManifold<dim, spacedim>::transform(
           input, mapping_type, mapping_data, output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 

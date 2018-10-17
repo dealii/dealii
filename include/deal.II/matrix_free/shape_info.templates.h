@@ -77,8 +77,9 @@ namespace internal
     {
       const FiniteElement<dim> *fe = &fe_in.base_element(base_element_number);
 
-      Assert(fe->n_components() == 1,
-             ExcMessage("FEEvaluation only works for scalar finite elements."));
+      DEAL_II_Assert(fe->n_components() == 1,
+                     ExcMessage(
+                       "FEEvaluation only works for scalar finite elements."));
 
       fe_degree     = fe->degree;
       n_q_points_1d = quad.size();
@@ -92,8 +93,8 @@ namespace internal
       Point<dim>                unit_point;
       {
         // find numbering to lexicographic
-        Assert(fe->n_components() == 1,
-               ExcMessage("Expected a scalar element"));
+        DEAL_II_Assert(fe->n_components() == 1,
+                       ExcMessage("Expected a scalar element"));
 
         const FE_Poly<TensorProductPolynomials<dim>, dim, dim> *fe_poly =
           dynamic_cast<
@@ -137,7 +138,7 @@ namespace internal
             // FE_Nothing case -> nothing to do here
           }
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
 
         // Finally store the renumbering into the member variable of this
         // class
@@ -172,8 +173,8 @@ namespace internal
             for (unsigned int i = 0; i < lexicographic.size(); ++i)
               if (lexicographic[i] != numbers::invalid_unsigned_int)
                 {
-                  AssertIndexRange(lexicographic[i],
-                                   lexicographic_numbering.size());
+                  DEAL_II_AssertIndexRange(lexicographic[i],
+                                           lexicographic_numbering.size());
                   lexicographic_numbering[lexicographic[i]] = i;
                 }
           }
@@ -184,12 +185,13 @@ namespace internal
         // by reading the name, as done before r29356)
         if (fe->has_support_points())
           unit_point = fe->get_unit_support_points()[scalar_lexicographic[0]];
-        Assert(fe->dofs_per_cell == 0 ||
-                 std::abs(fe->shape_value(scalar_lexicographic[0], unit_point) -
-                          1) < 1e-13,
-               ExcInternalError("Could not decode 1D shape functions for the "
-                                "element " +
-                                fe->get_name()));
+        DEAL_II_Assert(
+          fe->dofs_per_cell == 0 ||
+            std::abs(fe->shape_value(scalar_lexicographic[0], unit_point) - 1) <
+              1e-13,
+          ExcInternalError("Could not decode 1D shape functions for the "
+                           "element " +
+                           fe->get_name()));
       }
 
       n_q_points = Utilities::fixed_power<dim>(n_q_points_1d);
@@ -363,7 +365,7 @@ namespace internal
                     {
                       const unsigned int ind =
                         offset + j * dofs_per_component_on_face + i;
-                      AssertIndexRange(ind, dofs_per_component_on_cell);
+                      DEAL_II_AssertIndexRange(ind, dofs_per_component_on_cell);
                       const unsigned int l           = i * (fe_degree + 1) + j;
                       face_to_cell_index_nodal(f, l) = ind;
                     }
@@ -402,7 +404,7 @@ namespace internal
                     {
                       const unsigned int ind =
                         offset + j * dofs_per_component_on_face + i;
-                      AssertIndexRange(ind, dofs_per_component_on_cell);
+                      DEAL_II_AssertIndexRange(ind, dofs_per_component_on_cell);
                       const unsigned int l = i * (fe_degree + 1) + j;
                       face_to_cell_index_hermite(f, 2 * l)     = ind;
                       face_to_cell_index_hermite(f, 2 * l + 1) = ind + shift;

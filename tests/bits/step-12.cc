@@ -90,8 +90,8 @@ RHS<dim>::value_list(const std::vector<Point<dim>> &points,
                      std::vector<double> &          values,
                      const unsigned int) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < values.size(); ++i)
     values[i] = 0;
@@ -103,8 +103,8 @@ void
 Beta<dim>::value_list(const std::vector<Point<dim>> &points,
                       std::vector<Point<dim>> &      values) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     {
@@ -124,8 +124,8 @@ BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
                                 std::vector<double> &          values,
                                 const unsigned int) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < values.size(); ++i)
     {
@@ -496,11 +496,11 @@ DGMethod<dim>::assemble_system1()
                         neighbor_child =
                           cell->neighbor_child_on_subface(face_no, subface_no);
 
-                      Assert(neighbor_child->face(neighbor2) ==
-                               face->child(subface_no),
-                             ExcInternalError());
-                      Assert(!neighbor_child->has_children(),
-                             ExcInternalError());
+                      DEAL_II_Assert(neighbor_child->face(neighbor2) ==
+                                       face->child(subface_no),
+                                     ExcInternalError());
+                      DEAL_II_Assert(!neighbor_child->has_children(),
+                                     ExcInternalError());
 
                       ue_vi_matrix = 0;
 
@@ -538,8 +538,8 @@ DGMethod<dim>::assemble_system1()
                     }
                   else
                     {
-                      Assert(neighbor->level() < cell->level(),
-                             ExcInternalError());
+                      DEAL_II_Assert(neighbor->level() < cell->level(),
+                                     ExcInternalError());
 
                       const std::pair<unsigned int, unsigned int>
                         faceno_subfaceno =
@@ -549,9 +549,10 @@ DGMethod<dim>::assemble_system1()
                                          neighbor_subface_no =
                                            faceno_subfaceno.second;
 
-                      Assert(neighbor->neighbor_child_on_subface(
-                               neighbor_face_no, neighbor_subface_no) == cell,
-                             ExcInternalError());
+                      DEAL_II_Assert(neighbor->neighbor_child_on_subface(
+                                       neighbor_face_no, neighbor_subface_no) ==
+                                       cell,
+                                     ExcInternalError());
 
                       fe_v_face.reinit(cell, face_no);
                       fe_v_subface_neighbor.reinit(neighbor,
@@ -651,8 +652,9 @@ DGMethod<dim>::assemble_system2()
             }
           else
             {
-              Assert(cell->neighbor(face_no).state() == IteratorState::valid,
-                     ExcInternalError());
+              DEAL_II_Assert(cell->neighbor(face_no).state() ==
+                               IteratorState::valid,
+                             ExcInternalError());
               typename DoFHandler<dim>::cell_iterator neighbor =
                 cell->neighbor(face_no);
               if (face->has_children())
@@ -666,11 +668,11 @@ DGMethod<dim>::assemble_system2()
                     {
                       typename DoFHandler<dim>::cell_iterator neighbor_child =
                         cell->neighbor_child_on_subface(face_no, subface_no);
-                      Assert(neighbor_child->face(neighbor2) ==
-                               face->child(subface_no),
-                             ExcInternalError());
-                      Assert(!neighbor_child->has_children(),
-                             ExcInternalError());
+                      DEAL_II_Assert(neighbor_child->face(neighbor2) ==
+                                       face->child(subface_no),
+                                     ExcInternalError());
+                      DEAL_II_Assert(!neighbor_child->has_children(),
+                                     ExcInternalError());
 
                       ue_vi_matrix = 0;
                       ui_ve_matrix = 0;
@@ -803,7 +805,7 @@ DGMethod<dim>::output_results(const unsigned int cycle) const
 {
   std::string filename = "grid-";
   filename += ('0' + cycle);
-  Assert(cycle < 10, ExcInternalError());
+  DEAL_II_Assert(cycle < 10, ExcInternalError());
 
   filename += ".eps";
   deallog << "Writing grid to <" << filename << ">..." << std::endl;
@@ -813,7 +815,7 @@ DGMethod<dim>::output_results(const unsigned int cycle) const
 
   filename = "sol-";
   filename += ('0' + cycle);
-  Assert(cycle < 10, ExcInternalError());
+  DEAL_II_Assert(cycle < 10, ExcInternalError());
 
   filename += ".gnuplot";
   deallog << "Writing solution to <" << filename << ">..." << std::endl

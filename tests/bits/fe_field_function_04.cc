@@ -90,10 +90,10 @@ test()
   fe_function.value_list(points, m);
 
   for (unsigned int i = 0; i < m.size(); ++i)
-    AssertThrow(std::fabs(m[i] - points[i].square()) <
-                    1e-10 * std::fabs(m[i] + points[i].square()) ||
-                  std::fabs(m[i] + points[i].square()) < 1e-30,
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(m[i] - points[i].square()) <
+                            1e-10 * std::fabs(m[i] + points[i].square()) ||
+                          std::fabs(m[i] + points[i].square()) < 1e-30,
+                        ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

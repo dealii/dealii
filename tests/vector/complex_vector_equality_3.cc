@@ -37,7 +37,7 @@ test(Vector<std::complex<double>> &v, Vector<std::complex<double>> &w)
         w(i) = std::complex<double>(i + 1., i + 2.);
     }
 
-  AssertThrow(v.operator!=(w), ExcInternalError());
+  DEAL_II_AssertThrow(v.operator!=(w), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

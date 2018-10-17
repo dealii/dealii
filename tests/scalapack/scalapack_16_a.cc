@@ -107,7 +107,7 @@ test(const unsigned int size_1,
     {
       std::cout << "rank=" << rank << "/" << std::min(size_1, size_2)
                 << std::endl;
-      AssertThrow(norm < tol, ExcInternalError());
+      DEAL_II_AssertThrow(norm < tol, ExcInternalError());
     }
   pcout << std::endl;
 }

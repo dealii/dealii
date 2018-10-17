@@ -38,7 +38,7 @@ test(PETScWrappers::MPI::Vector &v)
   v.compress(VectorOperation::insert);
 
   // then check the norm
-  AssertThrow(v.l1_norm() == norm, ExcInternalError());
+  DEAL_II_AssertThrow(v.l1_norm() == norm, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

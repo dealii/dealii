@@ -51,24 +51,24 @@ test_vertices_orientation(
   for (; cell != endc; ++cell)
     {
       face = surface_to_volume_mapping[cell];
-      Assert(face->at_boundary(), ExcInternalError());
+      DEAL_II_Assert(face->at_boundary(), ExcInternalError());
 
       deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
       for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
         {
           deallog << "  " << cell->vertex(k) << std::endl;
-          Assert(std::fabs(cell->vertex(k).distance(Point<spacedim>()) - 1) <
-                   1e-12,
-                 ExcInternalError());
+          DEAL_II_Assert(std::fabs(cell->vertex(k).distance(Point<spacedim>()) -
+                                   1) < 1e-12,
+                         ExcInternalError());
         }
 
       deallog << "Volume face: " << face << " with vertices:" << std::endl;
       for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
         {
           deallog << "  " << face->vertex(k) << std::endl;
-          Assert(std::fabs(face->vertex(k).distance(Point<spacedim>()) - 1) <
-                   1e-12,
-                 ExcInternalError());
+          DEAL_II_Assert(std::fabs(face->vertex(k).distance(Point<spacedim>()) -
+                                   1) < 1e-12,
+                         ExcInternalError());
         }
 
 
@@ -76,8 +76,8 @@ test_vertices_orientation(
         {
           Point<spacedim> diff(face->vertex(k));
           diff -= cell->vertex(k);
-          AssertThrow(diff.square() < 1.e-15 * face->vertex(k).square(),
-                      ExcInternalError());
+          DEAL_II_AssertThrow(diff.square() < 1.e-15 * face->vertex(k).square(),
+                              ExcInternalError());
         }
     }
 }

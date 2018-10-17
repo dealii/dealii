@@ -85,7 +85,7 @@ struct MyData : public MyDataBase
   virtual void
   pack_values(std::vector<double> &scalars) const
   {
-    Assert(scalars.size() == 2, ExcInternalError());
+    DEAL_II_Assert(scalars.size() == 2, ExcInternalError());
     scalars[0] = value1;
     scalars[1] = value2;
   }
@@ -93,18 +93,18 @@ struct MyData : public MyDataBase
   virtual void
   unpack_values(const std::vector<double> &scalars)
   {
-    Assert(scalars.size() == 2, ExcInternalError());
+    DEAL_II_Assert(scalars.size() == 2, ExcInternalError());
     value1 = scalars[0];
     value2 = scalars[1];
   }
 };
 
 const double eps = 1e-10;
-DeclException3(ExcWrongValue,
-               double,
-               double,
-               double,
-               << arg1 << " != " << arg2 << " with delta = " << arg3);
+DEAL_II_DeclException3(ExcWrongValue,
+                       double,
+                       double,
+                       double,
+                       << arg1 << " != " << arg2 << " with delta = " << arg3);
 
 
 /**
@@ -140,10 +140,10 @@ check_qph(parallel::distributed::Triangulation<dim> &tr,
             const double f_2 = func.value(q_points[q], 1);
             const double d_1 = qpd[q]->value1;
             const double d_2 = qpd[q]->value2;
-            AssertThrow(std::fabs(f_1 - d_1) < eps,
-                        ExcWrongValue(f_1, d_1, f_1 - d_1));
-            AssertThrow(std::fabs(f_2 - d_2) < eps,
-                        ExcWrongValue(f_2, d_2, f_2 - d_2));
+            DEAL_II_AssertThrow(std::fabs(f_1 - d_1) < eps,
+                                ExcWrongValue(f_1, d_1, f_1 - d_1));
+            DEAL_II_AssertThrow(std::fabs(f_2 - d_2) < eps,
+                                ExcWrongValue(f_2, d_2, f_2 - d_2));
           }
       }
   dof_handler.clear();

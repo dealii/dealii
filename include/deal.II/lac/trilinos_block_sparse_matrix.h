@@ -367,24 +367,26 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException4(ExcIncompatibleRowNumbers,
-                   int,
-                   int,
-                   int,
-                   int,
-                   << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
-                   << ',' << arg4 << "] have differing row numbers.");
+    DEAL_II_DeclException4(ExcIncompatibleRowNumbers,
+                           int,
+                           int,
+                           int,
+                           int,
+                           << "The blocks [" << arg1 << ',' << arg2 << "] and ["
+                           << arg3 << ',' << arg4
+                           << "] have differing row numbers.");
 
     /**
      * Exception
      */
-    DeclException4(ExcIncompatibleColNumbers,
-                   int,
-                   int,
-                   int,
-                   int,
-                   << "The blocks [" << arg1 << ',' << arg2 << "] and [" << arg3
-                   << ',' << arg4 << "] have differing column numbers.");
+    DEAL_II_DeclException4(ExcIncompatibleColNumbers,
+                           int,
+                           int,
+                           int,
+                           int,
+                           << "The blocks [" << arg1 << ',' << arg2 << "] and ["
+                           << arg3 << ',' << arg4
+                           << "] have differing column numbers.");
     ///@}
 
   private:
@@ -448,7 +450,7 @@ namespace TrilinosWrappers
   inline BlockSparseMatrix &
   BlockSparseMatrix::operator=(const double d)
   {
-    Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+    DEAL_II_Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
     for (size_type r = 0; r < this->n_block_rows(); ++r)
       for (size_type c = 0; c < this->n_block_cols(); ++c)
@@ -569,8 +571,8 @@ namespace TrilinosWrappers
   inline std::vector<IndexSet>
   BlockSparseMatrix::locally_owned_domain_indices() const
   {
-    Assert(this->n_block_cols() != 0, ExcNotInitialized());
-    Assert(this->n_block_rows() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_cols() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
     std::vector<IndexSet> domain_indices;
     for (size_type c = 0; c < this->n_block_cols(); ++c)
@@ -585,8 +587,8 @@ namespace TrilinosWrappers
   inline std::vector<IndexSet>
   BlockSparseMatrix::locally_owned_range_indices() const
   {
-    Assert(this->n_block_cols() != 0, ExcNotInitialized());
-    Assert(this->n_block_rows() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_cols() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
     std::vector<IndexSet> range_indices;
     for (size_type r = 0; r < this->n_block_rows(); ++r)

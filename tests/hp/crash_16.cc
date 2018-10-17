@@ -127,7 +127,7 @@ test()
                       2 * fe[line->nth_active_fe_index(g)].dofs_per_vertex);
                     line->get_dof_indices(indices_2,
                                           line->nth_active_fe_index(g));
-                    Assert(indices_1 == indices_2, ExcInternalError());
+                    DEAL_II_Assert(indices_1 == indices_2, ExcInternalError());
                   }
             }
         }

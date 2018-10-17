@@ -244,11 +244,11 @@ public:
   /**
    * Exception.
    */
-  DeclException0(ExcTriaNotEmpty);
+  DEAL_II_DeclException0(ExcTriaNotEmpty);
   /**
    * Exception.
    */
-  DeclException0(ExcFlagsNotCleared);
+  DEAL_II_DeclException0(ExcFlagsNotCleared);
 
 private:
   /**

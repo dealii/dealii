@@ -33,11 +33,11 @@
 #include "../tests.h"
 
 
-DeclException2(ExcNumberMismatch,
-               int,
-               int,
-               << "The numbers " << arg1 << " and " << arg2
-               << " should be equal, but are not.");
+DEAL_II_DeclException2(ExcNumberMismatch,
+                       int,
+                       int,
+                       << "The numbers " << arg1 << " and " << arg2
+                       << " should be equal, but are not.");
 
 
 template <int dim>
@@ -51,7 +51,7 @@ test()
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
                                                     endc = tria.end();
   for (; cell != endc; ++cell)
-    AssertThrow(cell->subdomain_id() == 42, ExcInternalError());
+    DEAL_II_AssertThrow(cell->subdomain_id() == 42, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

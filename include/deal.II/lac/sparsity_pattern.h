@@ -992,18 +992,18 @@ public:
   /**
    * You tried to add an element to a row, but there was no space left.
    */
-  DeclException2(ExcNotEnoughSpace,
-                 int,
-                 int,
-                 << "Upon entering a new entry to row " << arg1
-                 << ": there was no free entry any more. " << std::endl
-                 << "(Maximum number of entries for this row: " << arg2
-                 << "; maybe the matrix is already compressed?)");
+  DEAL_II_DeclException2(ExcNotEnoughSpace,
+                         int,
+                         int,
+                         << "Upon entering a new entry to row " << arg1
+                         << ": there was no free entry any more. " << std::endl
+                         << "(Maximum number of entries for this row: " << arg2
+                         << "; maybe the matrix is already compressed?)");
   /**
    * The operation is only allowed after the SparsityPattern has been set up
    * and compress() was called.
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcNotCompressed,
     "The operation you attempted is only allowed after the SparsityPattern "
     "has been set up and compress() was called.");
@@ -1011,25 +1011,26 @@ public:
    * This operation changes the structure of the SparsityPattern and is not
    * possible after compress() has been called.
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcMatrixIsCompressed,
     "The operation you attempted changes the structure of the SparsityPattern "
     "and is not possible after compress() has been called.");
   /**
    * Exception
    */
-  DeclException2(ExcIteratorRange,
-                 int,
-                 int,
-                 << "The iterators denote a range of " << arg1
-                 << " elements, but the given number of rows was " << arg2);
+  DEAL_II_DeclException2(ExcIteratorRange,
+                         int,
+                         int,
+                         << "The iterators denote a range of " << arg1
+                         << " elements, but the given number of rows was "
+                         << arg2);
   /**
    * Exception
    */
-  DeclException1(ExcInvalidNumberOfPartitions,
-                 int,
-                 << "The number of partitions you gave is " << arg1
-                 << ", but must be greater than zero.");
+  DEAL_II_DeclException1(ExcInvalidNumberOfPartitions,
+                         int,
+                         << "The number of partitions you gave is " << arg1
+                         << ", but must be greater than zero.");
   //@}
 private:
   /**
@@ -1175,7 +1176,7 @@ namespace SparsityPatternIterators
   inline size_type
   Accessor::row() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    DEAL_II_Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     const std::size_t *insert_point =
       std::upper_bound(container->rowstart.get(),
@@ -1189,7 +1190,7 @@ namespace SparsityPatternIterators
   inline size_type
   Accessor::column() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    DEAL_II_Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     return (container->colnums[linear_index]);
   }
@@ -1199,7 +1200,7 @@ namespace SparsityPatternIterators
   inline size_type
   Accessor::index() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    DEAL_II_Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     return linear_index - container->rowstart[row()];
   }
@@ -1209,7 +1210,7 @@ namespace SparsityPatternIterators
   inline size_type
   Accessor::global_index() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    DEAL_II_Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     return linear_index;
   }
@@ -1227,7 +1228,7 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator<(const Accessor &other) const
   {
-    Assert(container == other.container, ExcInternalError());
+    DEAL_II_Assert(container == other.container, ExcInternalError());
 
     return linear_index < other.linear_index;
   }
@@ -1237,8 +1238,8 @@ namespace SparsityPatternIterators
   inline void
   Accessor::advance()
   {
-    Assert(linear_index < container->rowstart[container->rows],
-           ExcIteratorPastEnd());
+    DEAL_II_Assert(linear_index < container->rowstart[container->rows],
+                   ExcIteratorPastEnd());
     ++linear_index;
   }
 
@@ -1270,7 +1271,7 @@ SparsityPattern::end() const
 inline SparsityPattern::iterator
 SparsityPattern::begin(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+  DEAL_II_Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
 
   return iterator(this, rowstart[r]);
 }
@@ -1280,7 +1281,7 @@ SparsityPattern::begin(const size_type r) const
 inline SparsityPattern::iterator
 SparsityPattern::end(const size_type r) const
 {
-  Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+  DEAL_II_Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
 
   return iterator(this, rowstart[r + 1]);
 }
@@ -1322,7 +1323,7 @@ SparsityPattern::stores_only_added_elements() const
 inline unsigned int
 SparsityPattern::row_length(const size_type row) const
 {
-  Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
+  DEAL_II_Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
   return rowstart[row + 1] - rowstart[row];
 }
 
@@ -1332,8 +1333,9 @@ inline SparsityPattern::size_type
 SparsityPattern::column_number(const size_type    row,
                                const unsigned int index) const
 {
-  Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
-  Assert(index < row_length(row), ExcIndexRange(index, 0, row_length(row)));
+  DEAL_II_Assert(row < rows, ExcIndexRangeType<size_type>(row, 0, rows));
+  DEAL_II_Assert(index < row_length(row),
+                 ExcIndexRange(index, 0, row_length(row)));
 
   return colnums[rowstart[row] + index];
 }
@@ -1343,7 +1345,7 @@ SparsityPattern::column_number(const size_type    row,
 inline std::size_t
 SparsityPattern::n_nonzero_elements() const
 {
-  Assert(compressed, ExcNotCompressed());
+  DEAL_II_Assert(compressed, ExcNotCompressed());
 
   if ((rowstart != nullptr) && (colnums != nullptr))
     return rowstart[rows] - rowstart[0];
@@ -1457,8 +1459,8 @@ SparsityPattern::copy_from(const size_type       n_rows,
                            const ForwardIterator begin,
                            const ForwardIterator end)
 {
-  Assert(static_cast<size_type>(std::distance(begin, end)) == n_rows,
-         ExcIteratorRange(std::distance(begin, end), n_rows));
+  DEAL_II_Assert(static_cast<size_type>(std::distance(begin, end)) == n_rows,
+                 ExcIteratorRange(std::distance(begin, end), n_rows));
 
   // first determine row lengths for each row. if the matrix is quadratic,
   // then we might have to add an additional entry for the diagonal, if that
@@ -1488,7 +1490,7 @@ SparsityPattern::copy_from(const size_type       n_rows,
         {
           const size_type col =
             internal::SparsityPatternTools::get_column_index_from_iterator(*j);
-          Assert(col < n_cols, ExcIndexRange(col, 0, n_cols));
+          DEAL_II_Assert(col < n_cols, ExcIndexRange(col, 0, n_cols));
 
           if ((col != row) || !is_square)
             *cols++ = col;

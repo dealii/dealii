@@ -145,7 +145,7 @@ namespace LAPACKSupport
           return "Hessenberg";
       }
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return "invalid";
   }
 
@@ -185,18 +185,18 @@ namespace LAPACKSupport
   /**
    * A LAPACK function returned an error code.
    */
-  DeclException2(ExcErrorCode,
-                 std::string,
-                 types::blas_int,
-                 << "The function " << arg1 << " returned with an error code "
-                 << arg2);
+  DEAL_II_DeclException2(ExcErrorCode,
+                         std::string,
+                         types::blas_int,
+                         << "The function " << arg1
+                         << " returned with an error code " << arg2);
 
   /**
    * Exception thrown when a matrix is not in a suitable state for an
    * operation. For instance, a LAPACK routine may have left the matrix in an
    * unusable state, then vmult does not make sense anymore.
    */
-  DeclException1(
+  DEAL_II_DeclException1(
     ExcState,
     State,
     << "The function cannot be called while the matrix is in state "
@@ -206,16 +206,16 @@ namespace LAPACKSupport
    * Exception thrown when a matrix does not have suitable properties for an
    * operation.
    */
-  DeclException1(ExcProperty,
-                 Property,
-                 << "The function cannot be called with a "
-                 << property_name(arg1) << " matrix.");
+  DEAL_II_DeclException1(ExcProperty,
+                         Property,
+                         << "The function cannot be called with a "
+                         << property_name(arg1) << " matrix.");
 
   /**
    * This exception is thrown if a certain LAPACK function is not available
    * because no LAPACK installation was detected during configuration.
    */
-  DeclException1(
+  DEAL_II_DeclException1(
     ExcMissing,
     std::string,
     << "When you ran 'cmake' during installation of deal.II, "

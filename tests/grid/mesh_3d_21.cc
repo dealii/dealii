@@ -76,8 +76,9 @@ void check_this(Triangulation<3> &tria)
                     ->neighbor_of_coarser_neighbor(neighbor_neighbor)
                     .second;
 
-                AssertThrow(our_face_no == face_no, ExcInternalError());
-                AssertThrow(our_subface_no == subface_no, ExcInternalError());
+                DEAL_II_AssertThrow(our_face_no == face_no, ExcInternalError());
+                DEAL_II_AssertThrow(our_subface_no == subface_no,
+                                    ExcInternalError());
                 deallog << "from coarse to fine and back: OK" << std::endl;
               }
           else if (cell->neighbor(face_no)->level() < cell->level())
@@ -92,7 +93,7 @@ void check_this(Triangulation<3> &tria)
               const DoFHandler<3>::active_cell_iterator our_cell =
                 cell->neighbor(face_no)->neighbor_child_on_subface(
                   neighbor_face_no, neighbor_subface_no);
-              AssertThrow(our_cell == cell, ExcInternalError());
+              DEAL_II_AssertThrow(our_cell == cell, ExcInternalError());
               deallog << "from fine to coarse and back: OK" << std::endl;
             }
         }

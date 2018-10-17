@@ -79,10 +79,10 @@ void check_this(Triangulation<3> &tria)
           // in opposite directions,
           // so their sum should be
           // close to zero
-          Assert((fe_face_values1.normal_vector(0) +
-                  fe_face_values2.normal_vector(0))
-                     .norm_square() < 1e-20,
-                 ExcInternalError());
+          DEAL_II_Assert((fe_face_values1.normal_vector(0) +
+                          fe_face_values2.normal_vector(0))
+                             .norm_square() < 1e-20,
+                         ExcInternalError());
         }
 }
 

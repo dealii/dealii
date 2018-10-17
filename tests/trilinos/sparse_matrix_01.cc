@@ -59,8 +59,8 @@ main(int argc, char **argv)
   // indeed what we expect. verify
   // that both methods of accessing
   // the entry work
-  AssertThrow(A.el(2, 3) == 2, ExcInternalError());
-  AssertThrow(A(2, 3) == 2, ExcInternalError());
+  DEAL_II_AssertThrow(A.el(2, 3) == 2, ExcInternalError());
+  DEAL_II_AssertThrow(A(2, 3) == 2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

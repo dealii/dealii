@@ -44,12 +44,12 @@ SparseMatrixEZ<number>::SparseMatrixEZ(const SparseMatrixEZ<number> &m)
   , increment(m.increment)
   , saved_default_row_length(m.saved_default_row_length)
 {
-  Assert(m.m() == 0 && m.n() == 0,
-         ExcMessage(
-           "This constructor can only be called if the provided argument "
-           "is an empty matrix. This constructor can not be used to "
-           "copy-construct a non-empty matrix. Use the "
-           "SparseMatrixEZ::copy_from() function for that purpose."));
+  DEAL_II_Assert(
+    m.m() == 0 && m.n() == 0,
+    ExcMessage("This constructor can only be called if the provided argument "
+               "is an empty matrix. This constructor can not be used to "
+               "copy-construct a non-empty matrix. Use the "
+               "SparseMatrixEZ::copy_from() function for that purpose."));
 }
 
 
@@ -69,11 +69,12 @@ SparseMatrixEZ<number> &
 SparseMatrixEZ<number>::operator=(const SparseMatrixEZ<number> &m)
 {
   (void)m;
-  Assert(m.empty(),
-         ExcMessage("This operator can only be called if the provided right "
-                    "hand side is an empty matrix. This operator can not be "
-                    "used to copy a non-empty matrix. Use the "
-                    "SparseMatrixEZ::copy_from() function for that purpose."));
+  DEAL_II_Assert(m.empty(),
+                 ExcMessage(
+                   "This operator can only be called if the provided right "
+                   "hand side is an empty matrix. This operator can not be "
+                   "used to copy a non-empty matrix. Use the "
+                   "SparseMatrixEZ::copy_from() function for that purpose."));
   return *this;
 }
 
@@ -83,7 +84,7 @@ SparseMatrixEZ<number> &
 SparseMatrixEZ<number>::operator=(const double d)
 {
   (void)d;
-  Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+  DEAL_II_Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
   typename std::vector<Entry>::iterator       e   = data.begin();
   const typename std::vector<Entry>::iterator end = data.end();
@@ -146,8 +147,8 @@ void
 SparseMatrixEZ<number>::vmult(Vector<somenumber> &      dst,
                               const Vector<somenumber> &src) const
 {
-  Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
-  Assert(n() == src.size(), ExcDimensionMismatch(n(), src.size()));
+  DEAL_II_Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
+  DEAL_II_Assert(n() == src.size(), ExcDimensionMismatch(n(), src.size()));
 
   const size_type end_row = row_info.size();
   for (size_type row = 0; row < end_row; ++row)
@@ -158,7 +159,7 @@ SparseMatrixEZ<number>::vmult(Vector<somenumber> &      dst,
       double s = 0.;
       for (unsigned short i = 0; i < ri.length; ++i, ++entry)
         {
-          Assert(entry->column != Entry::invalid, ExcInternalError());
+          DEAL_II_Assert(entry->column != Entry::invalid, ExcInternalError());
           s += entry->value * src(entry->column);
         }
       dst(row) = s;
@@ -202,8 +203,8 @@ void
 SparseMatrixEZ<number>::vmult_add(Vector<somenumber> &      dst,
                                   const Vector<somenumber> &src) const
 {
-  Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
-  Assert(n() == src.size(), ExcDimensionMismatch(n(), src.size()));
+  DEAL_II_Assert(m() == dst.size(), ExcDimensionMismatch(m(), dst.size()));
+  DEAL_II_Assert(n() == src.size(), ExcDimensionMismatch(n(), src.size()));
 
   const size_type end_row = row_info.size();
   for (size_type row = 0; row < end_row; ++row)
@@ -214,7 +215,7 @@ SparseMatrixEZ<number>::vmult_add(Vector<somenumber> &      dst,
       double s = 0.;
       for (unsigned short i = 0; i < ri.length; ++i, ++entry)
         {
-          Assert(entry->column != Entry::invalid, ExcInternalError());
+          DEAL_II_Assert(entry->column != Entry::invalid, ExcInternalError());
           s += entry->value * src(entry->column);
         }
       dst(row) += s;
@@ -227,8 +228,8 @@ void
 SparseMatrixEZ<number>::Tvmult_add(Vector<somenumber> &      dst,
                                    const Vector<somenumber> &src) const
 {
-  Assert(n() == dst.size(), ExcDimensionMismatch(n(), dst.size()));
-  Assert(m() == src.size(), ExcDimensionMismatch(m(), src.size()));
+  DEAL_II_Assert(n() == dst.size(), ExcDimensionMismatch(n(), dst.size()));
+  DEAL_II_Assert(m() == src.size(), ExcDimensionMismatch(m(), src.size()));
 
   const size_type end_row = row_info.size();
   for (size_type row = 0; row < end_row; ++row)
@@ -238,7 +239,7 @@ SparseMatrixEZ<number>::Tvmult_add(Vector<somenumber> &      dst,
         data.begin() + ri.start;
       for (unsigned short i = 0; i < ri.length; ++i, ++entry)
         {
-          Assert(entry->column != Entry::invalid, ExcInternalError());
+          DEAL_II_Assert(entry->column != Entry::invalid, ExcInternalError());
           dst(entry->column) += entry->value * src(row);
         }
     }
@@ -252,9 +253,9 @@ SparseMatrixEZ<number>::precondition_Jacobi(Vector<somenumber> &      dst,
                                             const Vector<somenumber> &src,
                                             const number              om) const
 {
-  Assert(m() == n(), ExcNotQuadratic());
-  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  DEAL_II_Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   somenumber *                                        dst_ptr = dst.begin();
   const somenumber *                                  src_ptr = src.begin();
@@ -263,7 +264,8 @@ SparseMatrixEZ<number>::precondition_Jacobi(Vector<somenumber> &      dst,
 
   for (; ri != end; ++dst_ptr, ++src_ptr, ++ri)
     {
-      Assert(ri->diagonal != RowInfo::invalid_diagonal, ExcNoDiagonal());
+      DEAL_II_Assert(ri->diagonal != RowInfo::invalid_diagonal,
+                     ExcNoDiagonal());
       *dst_ptr = om * *src_ptr / data[ri->start + ri->diagonal].value;
     }
 }
@@ -277,9 +279,9 @@ SparseMatrixEZ<number>::precondition_SOR(Vector<somenumber> &      dst,
                                          const Vector<somenumber> &src,
                                          const number              om) const
 {
-  Assert(m() == n(), ExcNotQuadratic());
-  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  DEAL_II_Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   somenumber *                                        dst_ptr = dst.begin();
   const somenumber *                                  src_ptr = src.begin();
@@ -288,7 +290,8 @@ SparseMatrixEZ<number>::precondition_SOR(Vector<somenumber> &      dst,
 
   for (; ri != end; ++dst_ptr, ++src_ptr, ++ri)
     {
-      Assert(ri->diagonal != RowInfo::invalid_diagonal, ExcNoDiagonal());
+      DEAL_II_Assert(ri->diagonal != RowInfo::invalid_diagonal,
+                     ExcNoDiagonal());
       number          s       = *src_ptr;
       const size_type end_row = ri->start + ri->diagonal;
       for (size_type i = ri->start; i < end_row; ++i)
@@ -307,9 +310,9 @@ SparseMatrixEZ<number>::precondition_TSOR(Vector<somenumber> &      dst,
                                           const Vector<somenumber> &src,
                                           const number              om) const
 {
-  Assert(m() == n(), ExcNotQuadratic());
-  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  DEAL_II_Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   somenumber *      dst_ptr = dst.begin() + dst.size() - 1;
   const somenumber *src_ptr = src.begin() + src.size() - 1;
@@ -319,7 +322,8 @@ SparseMatrixEZ<number>::precondition_TSOR(Vector<somenumber> &      dst,
 
   for (; ri != end; --dst_ptr, --src_ptr, ++ri)
     {
-      Assert(ri->diagonal != RowInfo::invalid_diagonal, ExcNoDiagonal());
+      DEAL_II_Assert(ri->diagonal != RowInfo::invalid_diagonal,
+                     ExcNoDiagonal());
       number          s       = *src_ptr;
       const size_type end_row = ri->start + ri->length;
       for (size_type i = ri->start + ri->diagonal + 1; i < end_row; ++i)
@@ -340,9 +344,9 @@ SparseMatrixEZ<number>::precondition_SSOR(
   const number              om,
   const std::vector<std::size_t> &) const
 {
-  Assert(m() == n(), ExcNotQuadratic());
-  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  DEAL_II_Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   somenumber *                                        dst_ptr = dst.begin();
   const somenumber *                                  src_ptr = src.begin();
@@ -352,7 +356,8 @@ SparseMatrixEZ<number>::precondition_SSOR(
   // Forward
   for (ri = row_info.begin(); ri != end; ++dst_ptr, ++src_ptr, ++ri)
     {
-      Assert(ri->diagonal != RowInfo::invalid_diagonal, ExcNoDiagonal());
+      DEAL_II_Assert(ri->diagonal != RowInfo::invalid_diagonal,
+                     ExcNoDiagonal());
       number          s       = 0;
       const size_type end_row = ri->start + ri->diagonal;
       for (size_type i = ri->start; i < end_row; ++i)
@@ -464,7 +469,7 @@ template <typename number>
 void
 SparseMatrixEZ<number>::print(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   const_iterator       i = begin();
   const const_iterator e = end();
@@ -485,9 +490,9 @@ SparseMatrixEZ<number>::print_formatted(std::ostream &     out,
                                         const char *       zero_string,
                                         const double       denominator) const
 {
-  AssertThrow(out, ExcIO());
-  Assert(m() != 0, ExcNotInitialized());
-  Assert(n() != 0, ExcNotInitialized());
+  DEAL_II_AssertThrow(out, ExcIO());
+  DEAL_II_Assert(m() != 0, ExcNotInitialized());
+  DEAL_II_Assert(n() != 0, ExcNotInitialized());
 
   unsigned int width = width_;
 
@@ -531,7 +536,7 @@ template <typename number>
 void
 SparseMatrixEZ<number>::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // first the simple objects,
   // bracketed in [...]
@@ -549,21 +554,22 @@ SparseMatrixEZ<number>::block_write(std::ostream &out) const
 
   out << ']';
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
 #define DEAL_II_CHECK_INPUT(in, a, c)                                        \
   {                                                                          \
     in >> c;                                                                 \
-    AssertThrow(c == a, ExcMessage("Unexpected character in input stream")); \
+    DEAL_II_AssertThrow(c == a,                                              \
+                        ExcMessage("Unexpected character in input stream")); \
   }
 
 template <typename number>
 void
 SparseMatrixEZ<number>::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   char c;
   int  n;

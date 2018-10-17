@@ -142,7 +142,7 @@ protected:
   /**
    * Call build_matrices() function first.
    */
-  DeclException0(ExcMatricesNotBuilt);
+  DEAL_II_DeclException0(ExcMatricesNotBuilt);
 
 private:
   std::vector<std::shared_ptr<BlockSparsityPattern>> prolongation_sparsities;

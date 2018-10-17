@@ -41,11 +41,11 @@ namespace TimeStepping
     double      delta_t,
     VectorType &y)
   {
-    AssertThrow(
+    DEAL_II_AssertThrow(
       F.size() == 0,
       ExcMessage(
         "RungeKutta methods cannot handle more that one function to integate."));
-    AssertThrow(
+    DEAL_II_AssertThrow(
       J_inverse.size() == 0,
       ExcMessage(
         "RungeKutta methods cannot handle more that one function to integate."));
@@ -141,7 +141,7 @@ namespace TimeStepping
           }
         default:
           {
-            AssertThrow(
+            DEAL_II_AssertThrow(
               false, ExcMessage("Unimplemented explicit Runge-Kutta method."));
           }
       }
@@ -295,7 +295,7 @@ namespace TimeStepping
           }
         default:
           {
-            AssertThrow(
+            DEAL_II_AssertThrow(
               false, ExcMessage("Unimplemented implicit Runge-Kutta method."));
           }
       }
@@ -706,7 +706,7 @@ namespace TimeStepping
           }
         default:
           {
-            AssertThrow(
+            DEAL_II_AssertThrow(
               false, ExcMessage("Unimplemented Embedded Runge-Kutta method."));
           }
       }

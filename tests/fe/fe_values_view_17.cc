@@ -85,9 +85,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
             for (unsigned int d = 0; d < dim; ++d)
               grad[d] = vector_values[q][c + d];
 
-            Assert((selected_vector_values[q] - symmetrize(grad)).norm() <=
-                     1e-12 * selected_vector_values[q].norm(),
-                   ExcInternalError());
+            DEAL_II_Assert(
+              (selected_vector_values[q] - symmetrize(grad)).norm() <=
+                1e-12 * selected_vector_values[q].norm(),
+              ExcInternalError());
           }
       }
 }

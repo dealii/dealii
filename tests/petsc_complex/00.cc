@@ -41,11 +41,11 @@ multiply_petsc_complex_by_a_number()
   const PetscScalar gamma = alpha * beta;
 
   // Check real access
-  AssertThrow(PetscRealPart(gamma) == 0., ExcInternalError());
-  AssertThrow(PetscImaginaryPart(gamma) == 5., ExcInternalError());
+  DEAL_II_AssertThrow(PetscRealPart(gamma) == 0., ExcInternalError());
+  DEAL_II_AssertThrow(PetscImaginaryPart(gamma) == 5., ExcInternalError());
 
   // This is legal too!
-  AssertThrow(gamma == std::complex<double>(0., 5), ExcInternalError());
+  DEAL_II_AssertThrow(gamma == std::complex<double>(0., 5), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -63,18 +63,18 @@ divide_petsc_complex_by_a_number()
   const PetscScalar beta = alpha / 2.;
 
   // Check real access
-  AssertThrow(PetscRealPart(alpha) == 1., ExcInternalError());
-  AssertThrow(PetscRealPart(beta) == 0.5, ExcInternalError());
+  DEAL_II_AssertThrow(PetscRealPart(alpha) == 1., ExcInternalError());
+  DEAL_II_AssertThrow(PetscRealPart(beta) == 0.5, ExcInternalError());
 
   // operate on alpha (now alpha==beta)
   alpha /= 2.;
 
   // Check complex access
-  AssertThrow(PetscImaginaryPart(alpha) == 1., ExcInternalError());
-  AssertThrow(PetscImaginaryPart(beta) == 1., ExcInternalError());
+  DEAL_II_AssertThrow(PetscImaginaryPart(alpha) == 1., ExcInternalError());
+  DEAL_II_AssertThrow(PetscImaginaryPart(beta) == 1., ExcInternalError());
 
   // This is legal too!
-  AssertThrow(alpha == beta, ExcInternalError());
+  DEAL_II_AssertThrow(alpha == beta, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -88,7 +88,7 @@ make_std_complex_from_petsc_complex()
   const std::complex<double> beta  = alpha;
 
   // These should be the same of course
-  AssertThrow(alpha == beta, ExcInternalError());
+  DEAL_II_AssertThrow(alpha == beta, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -102,7 +102,7 @@ make_petsc_complex_from_std_complex()
   const PetscScalar          alpha = beta;
 
   // These should be the same of course
-  AssertThrow(alpha == beta, ExcInternalError());
+  DEAL_II_AssertThrow(alpha == beta, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -117,7 +117,8 @@ make_petsc_complex()
   const PetscScalar alpha = 1.0 + 2.0 * PETSC_i;
 
   // Test if PetscScalar is an std::complex.
-  AssertThrow(alpha == std::complex<double>(1., 2.), ExcInternalError());
+  DEAL_II_AssertThrow(alpha == std::complex<double>(1., 2.),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -131,18 +132,19 @@ init_petsc_complex()
 
   // Initialise (no argument) to zero.
   const PetscScalar alpha;
-  AssertThrow(alpha == std::complex<double>(0., 0.), ExcInternalError());
+  DEAL_II_AssertThrow(alpha == std::complex<double>(0., 0.),
+                      ExcInternalError());
 
   // Initialise (real argument) to zero.
   const PetscScalar beta = 0.;
-  AssertThrow(beta == alpha, ExcInternalError());
+  DEAL_II_AssertThrow(beta == alpha, ExcInternalError());
 
   // Initialise (real+complex argument) to zero.
   const PetscScalar gamma = 0. + 0. * PETSC_i;
-  AssertThrow(gamma == beta, ExcInternalError());
+  DEAL_II_AssertThrow(gamma == beta, ExcInternalError());
 
   // If alpha==beta==gamma, then:
-  AssertThrow(alpha == gamma, ExcInternalError());
+  DEAL_II_AssertThrow(alpha == gamma, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

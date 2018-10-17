@@ -37,7 +37,7 @@ main(int argc, char *argv[])
   // Get the group of processes in MPI_COMM_WORLD
   MPI_Group world_group;
   int       ierr = MPI_Comm_group(MPI_COMM_WORLD, &world_group);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 
   const int        n = n_ranks / 2;
   std::vector<int> ranks;
@@ -47,14 +47,14 @@ main(int argc, char *argv[])
   // Construct a group containing all of the even ranks in world_group
   MPI_Group even_group;
   ierr = MPI_Group_incl(world_group, n, ranks.data(), &even_group);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 
   if (my_id % 2 == 0)
     {
       MPI_Comm group_comm;
       ierr =
         Utilities::MPI::create_group(global_comm, even_group, 0, &group_comm);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
     }
   deallog << "OK" << std::endl;
 }

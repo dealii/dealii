@@ -155,7 +155,7 @@ test(const unsigned int size,
           &liwork,
           &info);
 
-    AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("syevr", info));
+    DEAL_II_AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("syevr", info));
     for (int i = 0; i < max_n_eigenvalues; ++i)
       for (int j = 0; j < size; ++j)
         s_eigenvectors_[i][j] =
@@ -173,11 +173,12 @@ test(const unsigned int size,
       std::make_pair(size - max_n_eigenvalues, size - 1), true);
   scalapack_syevr.copy_to(p_eigenvectors);
   for (unsigned int i = 0; i < max_n_eigenvalues; ++i)
-    AssertThrow(std::abs(eigenvalues_psyer[max_n_eigenvalues - i - 1] -
-                         eigenvalues_Lapack[max_n_eigenvalues - i - 1]) /
-                    std::abs(eigenvalues_Lapack[max_n_eigenvalues - i - 1]) <
-                  tol,
-                ExcInternalError());
+    DEAL_II_AssertThrow(
+      std::abs(eigenvalues_psyer[max_n_eigenvalues - i - 1] -
+               eigenvalues_Lapack[max_n_eigenvalues - i - 1]) /
+          std::abs(eigenvalues_Lapack[max_n_eigenvalues - i - 1]) <
+        tol,
+      ExcInternalError());
 
   pcout << "   with respect to the given tolerance the eigenvalues coincide"
         << std::endl;
@@ -192,8 +193,8 @@ test(const unsigned int size,
     {
       const NumberType product = p_eigenvectors_[i] * s_eigenvectors_[i];
       // the requirement for alignment of the eigenvectors has to be released
-      AssertThrow(std::abs(std::abs(product) - 1) < tol * 10,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(std::abs(product) - 1) < tol * 10,
+                          ExcInternalError());
     }
   pcout
     << "   with respect to the given tolerance also the eigenvectors coincide"

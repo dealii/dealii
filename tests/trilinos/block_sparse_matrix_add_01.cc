@@ -130,7 +130,7 @@ test()
         // elements really are zero
         norm += m2.block(block_row, block_col).frobenius_norm();
       }
-  AssertThrow(norm == 0, ExcInternalError());
+  DEAL_II_AssertThrow(norm == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

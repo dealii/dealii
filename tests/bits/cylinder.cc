@@ -60,7 +60,7 @@ main()
 
   deallog << "External faces: " << external_faces << std::endl;
 
-  Assert(external_faces == 18, ExcInternalError());
+  DEAL_II_Assert(external_faces == 18, ExcInternalError());
 
   return 0;
 }

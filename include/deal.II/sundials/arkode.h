@@ -51,7 +51,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Shorthand notation for ARKODE error codes.
-#  define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
+#  define DEAL_II_AssertARKode(code) \
+    DEAL_II_Assert(code >= 0, ExcARKodeError(code))
 
 /**
  * A namespace for dealing with ODE solvers through the SUNDIALS package.
@@ -838,11 +839,11 @@ namespace SUNDIALS
     /**
      * Handle ARKode exceptions.
      */
-    DeclException1(ExcARKodeError,
-                   int,
-                   << "One of the SUNDIALS ARKode internal functions "
-                   << " returned a negative error code: " << arg1
-                   << ". Please consult SUNDIALS manual.");
+    DEAL_II_DeclException1(ExcARKodeError,
+                           int,
+                           << "One of the SUNDIALS ARKode internal functions "
+                           << " returned a negative error code: " << arg1
+                           << ". Please consult SUNDIALS manual.");
 
 
   private:
@@ -850,10 +851,11 @@ namespace SUNDIALS
      * Throw an exception when a function with the given name is not
      * implemented.
      */
-    DeclException1(ExcFunctionNotProvided,
-                   std::string,
-                   << "Please provide an implementation for the function \""
-                   << arg1 << "\"");
+    DEAL_II_DeclException1(
+      ExcFunctionNotProvided,
+      std::string,
+      << "Please provide an implementation for the function \"" << arg1
+      << "\"");
 
     /**
      * This function is executed at construction time to set the

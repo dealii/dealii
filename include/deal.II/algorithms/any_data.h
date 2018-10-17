@@ -191,26 +191,27 @@ public:
   list(StreamType &os) const;
 
   /// An entry with this name does not exist in the AnyData object.
-  DeclException1(ExcNameNotFound,
-                 std::string,
-                 << "No entry with the name " << arg1 << " exists.");
+  DEAL_II_DeclException1(ExcNameNotFound,
+                         std::string,
+                         << "No entry with the name " << arg1 << " exists.");
 
   /// The requested type and the stored type are different
-  DeclException2(ExcTypeMismatch,
-                 std::string,
-                 std::string,
-                 << "The requested type " << arg1 << " and the stored type "
-                 << arg2 << " must coincide.");
+  DEAL_II_DeclException2(ExcTypeMismatch,
+                         std::string,
+                         std::string,
+                         << "The requested type " << arg1
+                         << " and the stored type " << arg2
+                         << " must coincide.");
 
   /**
    * Exception indicating that a function expected a vector to have a certain
    * name, but we store a different name in that position.
    */
-  DeclException2(ExcNameMismatch,
-                 int,
-                 std::string,
-                 << "Name at position " << arg1 << " is not equal to " << arg2
-                 << ".");
+  DEAL_II_DeclException2(ExcNameMismatch,
+                         int,
+                         std::string,
+                         << "Name at position " << arg1 << " is not equal to "
+                         << arg2 << ".");
 
 private:
   /// The stored data
@@ -222,7 +223,7 @@ private:
 
 unsigned int inline AnyData::size() const
 {
-  AssertDimension(data.size(), names.size());
+  DEAL_II_AssertDimension(data.size(), names.size());
   return data.size();
 }
 
@@ -231,10 +232,10 @@ template <typename type>
 inline type
 AnyData::entry(const unsigned int i)
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   type *p = boost::any_cast<type>(&data[i]);
-  Assert(p != nullptr,
-         ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
+  DEAL_II_Assert(p != nullptr,
+                 ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
 }
 
@@ -243,12 +244,12 @@ template <typename type>
 inline const type
 AnyData::entry(const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   const type *p = boost::any_cast<type>(&data[i]);
   if (p == nullptr)
     p = boost::any_cast<const type>(&data[i]);
-  Assert(p != nullptr,
-         ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
+  DEAL_II_Assert(p != nullptr,
+                 ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
 }
 
@@ -257,12 +258,12 @@ template <typename type>
 inline const type
 AnyData::read(const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   const type *p = boost::any_cast<type>(&data[i]);
   if (p == nullptr)
     p = boost::any_cast<const type>(&data[i]);
-  Assert(p != nullptr,
-         ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
+  DEAL_II_Assert(p != nullptr,
+                 ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
 }
 
@@ -271,12 +272,12 @@ template <typename type>
 inline const type *
 AnyData::read_ptr(const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   const type *const *p = boost::any_cast<type *>(&data[i]);
   if (p == nullptr)
     p = boost::any_cast<const type *>(&data[i]);
-  Assert(p != nullptr,
-         ExcTypeMismatch(typeid(type *).name(), data[i].type().name()));
+  DEAL_II_Assert(p != nullptr,
+                 ExcTypeMismatch(typeid(type *).name(), data[i].type().name()));
   return *p;
 }
 
@@ -285,7 +286,7 @@ template <typename type>
 inline const type *
 AnyData::try_read_ptr(const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   const type *const *p = boost::any_cast<type *>(&data[i]);
   if (p == nullptr)
     p = boost::any_cast<const type *>(&data[i]);
@@ -299,7 +300,7 @@ template <typename type>
 inline const type *
 AnyData::try_read(const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   const type *p = boost::any_cast<type>(&data[i]);
   if (p == 0)
     p = boost::any_cast<const type>(&data[i]);
@@ -310,7 +311,7 @@ AnyData::try_read(const unsigned int i) const
 inline const std::string &
 AnyData::name(const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   return names[i];
 }
 
@@ -332,7 +333,7 @@ inline unsigned int
 AnyData::find(const std::string &n) const
 {
   const unsigned int i = try_find(n);
-  Assert(i != numbers::invalid_unsigned_int, ExcNameNotFound(n));
+  DEAL_II_Assert(i != numbers::invalid_unsigned_int, ExcNameNotFound(n));
 
   return i;
 }
@@ -352,7 +353,8 @@ AnyData::entry(const std::string &n)
 {
   const unsigned int i = find(n);
   type *             p = boost::any_cast<type>(&data[i]);
-  Assert(p != 0, ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
+  DEAL_II_Assert(p != 0,
+                 ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
 }
 
@@ -363,8 +365,8 @@ AnyData::entry(const std::string &n) const
 {
   const unsigned int i = find(n);
   const type *       p = boost::any_cast<type>(&data[i]);
-  Assert(p != nullptr,
-         ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
+  DEAL_II_Assert(p != nullptr,
+                 ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
 }
 
@@ -375,7 +377,8 @@ AnyData::read(const std::string &n) const
 {
   const unsigned int i = find(n);
   const type *       p = boost::any_cast<type>(&data[i]);
-  Assert(p != 0, ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
+  DEAL_II_Assert(p != 0,
+                 ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
 }
 
@@ -388,8 +391,8 @@ AnyData::read_ptr(const std::string &n) const
   const type *const *p = boost::any_cast<type *>(&data[i]);
   if (p == nullptr)
     p = boost::any_cast<const type *>(&data[i]);
-  Assert(p != nullptr,
-         ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
+  DEAL_II_Assert(p != nullptr,
+                 ExcTypeMismatch(typeid(type).name(), data[i].type().name()));
   return *p;
 }
 

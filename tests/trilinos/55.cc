@@ -47,9 +47,9 @@ test(TrilinosWrappers::MPI::Vector &v)
   // check that they are ok, and this time
   // all of them
   for (unsigned int i = 0; i < v.size(); ++i)
-    AssertThrow((((pattern[i] == true) && (v(i) == 2 * i)) ||
-                 ((pattern[i] == false) && (v(i) == 0))),
-                ExcInternalError());
+    DEAL_II_AssertThrow((((pattern[i] == true) && (v(i) == 2 * i)) ||
+                         ((pattern[i] == false) && (v(i) == 0))),
+                        ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

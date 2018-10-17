@@ -368,7 +368,7 @@ namespace Differentiation
         static void
         dependent_variable(ADNumberType &, const ScalarType &)
         {
-          AssertThrow(
+          DEAL_II_AssertThrow(
             false,
             ExcMessage(
               "Floating point numbers cannot be marked as dependent variables."));
@@ -394,7 +394,7 @@ namespace Differentiation
                              const unsigned int,
                              ADNumberType &out)
         {
-          AssertThrow(
+          DEAL_II_AssertThrow(
             false,
             ExcMessage(
               "Marking for complex numbers has not yet been implemented."));
@@ -408,7 +408,7 @@ namespace Differentiation
         static void
         dependent_variable(ADNumberType &, const ScalarType &)
         {
-          AssertThrow(
+          DEAL_II_AssertThrow(
             false,
             ExcMessage(
               "Marking for complex numbers has not yet been implemented."));
@@ -1104,7 +1104,7 @@ namespace Differentiation
         // the original AD number (from which one is getting a derivative >= 2)
         // is one that specified ADOL-C taped and tapeless numbers, or a
         // non-nested Sacado number.
-        AssertThrow(
+        DEAL_II_AssertThrow(
           false,
           ExcMessage(
             "Floating point numbers have no directional derivatives."));

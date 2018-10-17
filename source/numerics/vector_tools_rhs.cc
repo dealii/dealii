@@ -32,7 +32,7 @@ namespace VectorTools
                                   Vector<double> &,
                                   const std::set<types::boundary_id> &)
   {
-    Assert(false, ExcImpossibleInDim(1));
+    DEAL_II_Assert(false, ExcImpossibleInDim(1));
   }
 
 
@@ -46,7 +46,7 @@ namespace VectorTools
                                   Vector<double> &,
                                   const std::set<types::boundary_id> &)
   {
-    Assert(false, ExcImpossibleInDim(1));
+    DEAL_II_Assert(false, ExcImpossibleInDim(1));
   }
 
 
@@ -60,7 +60,7 @@ namespace VectorTools
                                   Vector<double> &,
                                   const std::set<types::boundary_id> &)
   {
-    Assert(false, ExcImpossibleInDim(1));
+    DEAL_II_Assert(false, ExcImpossibleInDim(1));
   }
 
 
@@ -74,7 +74,7 @@ namespace VectorTools
                                   Vector<double> &,
                                   const std::set<types::boundary_id> &)
   {
-    Assert(false, ExcImpossibleInDim(1));
+    DEAL_II_Assert(false, ExcImpossibleInDim(1));
   }
 } // namespace VectorTools
 

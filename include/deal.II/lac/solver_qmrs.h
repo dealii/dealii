@@ -319,8 +319,8 @@ SolverQMRS<VectorType>::solve(const MatrixType &        A,
 
 
   // in case of failure: throw exception
-  AssertThrow(state.state == SolverControl::success,
-              SolverControl::NoConvergence(step, state.last_residual));
+  DEAL_II_AssertThrow(state.state == SolverControl::success,
+                      SolverControl::NoConvergence(step, state.last_residual));
   // otherwise exit as normal
 }
 

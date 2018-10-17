@@ -55,9 +55,10 @@ check(TRIA &tr)
 
   CellId empty;
 
-  Assert(tr.begin()->id() != tr.begin_active()->id(), ExcInternalError());
-  Assert(tr.begin()->id() != empty, ExcInternalError());
-  Assert(tr.begin()->id() == tr.begin()->id(), ExcInternalError());
+  DEAL_II_Assert(tr.begin()->id() != tr.begin_active()->id(),
+                 ExcInternalError());
+  DEAL_II_Assert(tr.begin()->id() != empty, ExcInternalError());
+  DEAL_II_Assert(tr.begin()->id() == tr.begin()->id(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

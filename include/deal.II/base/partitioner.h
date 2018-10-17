@@ -548,25 +548,26 @@ namespace Utilities
       /**
        * Exception
        */
-      DeclException2(ExcIndexNotPresent,
-                     types::global_dof_index,
-                     unsigned int,
-                     << "Global index " << arg1
-                     << " neither owned nor ghost on proc " << arg2 << ".");
+      DEAL_II_DeclException2(ExcIndexNotPresent,
+                             types::global_dof_index,
+                             unsigned int,
+                             << "Global index " << arg1
+                             << " neither owned nor ghost on proc " << arg2
+                             << ".");
 
       /**
        * Exception
        */
-      DeclException3(ExcGhostIndexArrayHasWrongSize,
-                     unsigned int,
-                     unsigned int,
-                     unsigned int,
-                     << "The size of the ghost index array (" << arg1
-                     << ") must either equal the number of ghost in the "
-                     << "partitioner (" << arg2
-                     << ") or be equal in size to a more comprehensive index"
-                     << "set which contains " << arg3
-                     << " elements for this partitioner.");
+      DEAL_II_DeclException3(
+        ExcGhostIndexArrayHasWrongSize,
+        unsigned int,
+        unsigned int,
+        unsigned int,
+        << "The size of the ghost index array (" << arg1
+        << ") must either equal the number of ghost in the "
+        << "partitioner (" << arg2
+        << ") or be equal in size to a more comprehensive index"
+        << "set which contains " << arg3 << " elements for this partitioner.");
 
     private:
       /**
@@ -706,8 +707,8 @@ namespace Utilities
     {
       types::global_dof_index size =
         local_range_data.second - local_range_data.first;
-      Assert(size <= std::numeric_limits<unsigned int>::max(),
-             ExcNotImplemented());
+      DEAL_II_Assert(size <= std::numeric_limits<unsigned int>::max(),
+                     ExcNotImplemented());
       return static_cast<unsigned int>(size);
     }
 
@@ -740,8 +741,9 @@ namespace Utilities
     Partitioner::global_to_local(
       const types::global_dof_index global_index) const
     {
-      Assert(in_local_range(global_index) || is_ghost_entry(global_index),
-             ExcIndexNotPresent(global_index, my_pid));
+      DEAL_II_Assert(in_local_range(global_index) ||
+                       is_ghost_entry(global_index),
+                     ExcIndexNotPresent(global_index, my_pid));
       if (in_local_range(global_index))
         return static_cast<unsigned int>(global_index - local_range_data.first);
       else if (is_ghost_entry(global_index))
@@ -760,7 +762,8 @@ namespace Utilities
     inline types::global_dof_index
     Partitioner::local_to_global(const unsigned int local_index) const
     {
-      AssertIndexRange(local_index, local_size() + n_ghost_indices_data);
+      DEAL_II_AssertIndexRange(local_index,
+                               local_size() + n_ghost_indices_data);
       if (local_index < local_size())
         return local_range_data.first + types::global_dof_index(local_index);
       else

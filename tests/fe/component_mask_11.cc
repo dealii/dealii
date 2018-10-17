@@ -45,10 +45,10 @@ test()
   ComponentMask m = m1 | m2;
 
   // verify equality
-  AssertThrow(m == ComponentMask(v), ExcInternalError());
-  AssertThrow(!(m == m1), ExcInternalError());
-  AssertThrow(!(m == ComponentMask(v1)), ExcInternalError());
-  AssertThrow(!(m == ComponentMask(v2)), ExcInternalError());
+  DEAL_II_AssertThrow(m == ComponentMask(v), ExcInternalError());
+  DEAL_II_AssertThrow(!(m == m1), ExcInternalError());
+  DEAL_II_AssertThrow(!(m == ComponentMask(v1)), ExcInternalError());
+  DEAL_II_AssertThrow(!(m == ComponentMask(v2)), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

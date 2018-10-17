@@ -38,7 +38,7 @@ template <int dim, int spacedim>
 MappingC1<dim, spacedim>::MappingC1()
   : MappingQ<dim, spacedim>(3)
 {
-  Assert(dim > 1, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim > 1, ExcImpossibleInDim(dim));
 
   // replace the mapping_qp objects of the base class by something
   // that knows about generating data points based on the geometry
@@ -59,7 +59,7 @@ MappingC1<1>::MappingC1Generic::add_line_support_points(
 {
   const unsigned int dim = 1;
   (void)dim;
-  Assert(dim > 1, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim > 1, ExcImpossibleInDim(dim));
 }
 
 
@@ -176,7 +176,7 @@ MappingC1<dim, spacedim>::MappingC1Generic::add_line_support_points(
   const typename Triangulation<dim>::cell_iterator &,
   std::vector<Point<dim>> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -189,7 +189,7 @@ MappingC1<1>::MappingC1Generic::add_quad_support_points(
 {
   const unsigned int dim = 1;
   (void)dim;
-  Assert(dim > 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim > 2, ExcImpossibleInDim(dim));
 }
 
 
@@ -202,7 +202,7 @@ MappingC1<2>::MappingC1Generic::add_quad_support_points(
 {
   const unsigned int dim = 2;
   (void)dim;
-  Assert(dim > 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim > 2, ExcImpossibleInDim(dim));
 }
 
 
@@ -213,7 +213,7 @@ MappingC1<dim, spacedim>::MappingC1Generic::add_quad_support_points(
   const typename Triangulation<dim>::cell_iterator &,
   std::vector<Point<dim>> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 

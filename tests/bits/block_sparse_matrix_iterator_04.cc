@@ -46,7 +46,7 @@ test()
   BlockSparseMatrix<double>::const_iterator it2 = m.end();
 
   // make sure that the two of them match
-  AssertThrow(it == it2, ExcInternalError());
+  DEAL_II_AssertThrow(it == it2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

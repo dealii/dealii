@@ -75,16 +75,16 @@ test()
     for (unsigned int j = 0; j < local_owned.size(); ++j)
       if ((i + j) % 2 == 1 && j % 2 == 0)
         {
-          Assert(m1.el(i, j) == (double)i + j + 2 * i + 4 * j + 2,
-                 ExcInternalError());
+          DEAL_II_Assert(m1.el(i, j) == (double)i + j + 2 * i + 4 * j + 2,
+                         ExcInternalError());
         }
       else if ((i + j) % 2 == 1)
         {
-          Assert(m1.el(i, j) == (double)i + j, ExcInternalError());
+          DEAL_II_Assert(m1.el(i, j) == (double)i + j, ExcInternalError());
         }
       else
         {
-          Assert(m1.el(i, j) == 0., ExcInternalError());
+          DEAL_II_Assert(m1.el(i, j) == 0., ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

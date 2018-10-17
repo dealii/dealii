@@ -123,7 +123,7 @@ test()
     // also ensure that we indeed get the
     // same value on every cell
     diff.add(-1);
-    AssertThrow(diff.l2_norm() == 0, ExcInternalError());
+    DEAL_II_AssertThrow(diff.l2_norm() == 0, ExcInternalError());
   }
 }
 

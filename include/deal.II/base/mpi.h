@@ -720,11 +720,11 @@ namespace Utilities
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
-      Assert(objects_to_send.size() == 0,
-             ExcMessage("Cannot send to more than one processor."));
-      Assert(objects_to_send.find(0) != objects_to_send.end() ||
-               objects_to_send.size() == 0,
-             ExcMessage("Can only send to myself or to nobody."));
+      DEAL_II_Assert(objects_to_send.size() == 0,
+                     ExcMessage("Cannot send to more than one processor."));
+      DEAL_II_Assert(objects_to_send.find(0) != objects_to_send.end() ||
+                       objects_to_send.size() == 0,
+                     ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
 #  else
 
@@ -734,7 +734,7 @@ namespace Utilities
         for (const auto &m : objects_to_send)
           send_to[i++] = m.first;
       }
-      AssertDimension(send_to.size(), objects_to_send.size());
+      DEAL_II_AssertDimension(send_to.size(), objects_to_send.size());
 
       const auto receive_from =
         Utilities::MPI::compute_point_to_point_communication_pattern(comm,
@@ -756,7 +756,7 @@ namespace Utilities
                                        21,
                                        comm,
                                        &buffer_send_requests[i]);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
             ++i;
           }
       }
@@ -771,12 +771,12 @@ namespace Utilities
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;
             int        ierr = MPI_Probe(MPI_ANY_SOURCE, 21, comm, &status);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
 
             // Length of the message
             int len;
             ierr = MPI_Get_count(&status, MPI_CHAR, &len);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
             buffer.resize(len);
 
             // Source rank
@@ -785,10 +785,10 @@ namespace Utilities
             // Actually receive the message
             ierr = MPI_Recv(
               buffer.data(), len, MPI_CHAR, rank, 21, comm, MPI_STATUS_IGNORE);
-            AssertThrowMPI(ierr);
-            Assert(received_objects.find(rank) == received_objects.end(),
-                   ExcInternalError(
-                     "I should not receive again from this rank"));
+            DEAL_II_AssertThrowMPI(ierr);
+            DEAL_II_Assert(
+              received_objects.find(rank) == received_objects.end(),
+              ExcInternalError("I should not receive again from this rank"));
             received_objects[rank] = Utilities::unpack<T>(buffer);
           }
       }
@@ -873,7 +873,8 @@ namespace Utilities
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
       const auto my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
 
-      Assert(root_process < n_procs, ExcIndexRange(root_process, 0, n_procs));
+      DEAL_II_Assert(root_process < n_procs,
+                     ExcIndexRange(root_process, 0, n_procs));
 
       std::vector<char> buffer       = Utilities::pack(object_to_send);
       int               n_local_data = buffer.size();
@@ -893,7 +894,7 @@ namespace Utilities
                             MPI_INT,
                             root_process,
                             comm);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer; only for root
@@ -918,7 +919,7 @@ namespace Utilities
                          MPI_CHAR,
                          root_process,
                          comm);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       std::vector<T> received_objects;
 

@@ -77,7 +77,8 @@ test()
   const unsigned int expected_neighbor_count =
     Utilities::pow(2, (dim - 1) * (n_refinements - 1)) +
     Utilities::pow(2, (dim - 1) * n_refinements);
-  AssertThrow(neighbor_count == expected_neighbor_count, ExcInternalError());
+  DEAL_II_AssertThrow(neighbor_count == expected_neighbor_count,
+                      ExcInternalError());
 }
 
 

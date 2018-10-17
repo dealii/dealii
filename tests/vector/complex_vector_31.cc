@@ -38,8 +38,8 @@ test(Vector<std::complex<double>> &v)
   v.compress();
 
   // then check the norm
-  AssertThrow(std::abs(v.norm_sqr() - norm) < 1e-14 * std::abs(norm),
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(v.norm_sqr() - norm) < 1e-14 * std::abs(norm),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -2715,55 +2715,55 @@ namespace GridTools
   /**
    * Exception
    */
-  DeclException1(ExcInvalidNumberOfPartitions,
-                 int,
-                 << "The number of partitions you gave is " << arg1
-                 << ", but must be greater than zero.");
+  DEAL_II_DeclException1(ExcInvalidNumberOfPartitions,
+                         int,
+                         << "The number of partitions you gave is " << arg1
+                         << ", but must be greater than zero.");
   /**
    * Exception
    */
-  DeclException1(ExcNonExistentSubdomain,
-                 int,
-                 << "The subdomain id " << arg1
-                 << " has no cells associated with it.");
+  DEAL_II_DeclException1(ExcNonExistentSubdomain,
+                         int,
+                         << "The subdomain id " << arg1
+                         << " has no cells associated with it.");
   /**
    * Exception
    */
-  DeclException0(ExcTriangulationHasBeenRefined);
+  DEAL_II_DeclException0(ExcTriangulationHasBeenRefined);
 
   /**
    * Exception
    */
-  DeclException1(ExcScalingFactorNotPositive,
-                 double,
-                 << "The scaling factor must be positive, but it is " << arg1
-                 << ".");
+  DEAL_II_DeclException1(ExcScalingFactorNotPositive,
+                         double,
+                         << "The scaling factor must be positive, but it is "
+                         << arg1 << ".");
   /**
    * Exception
    */
   template <int N>
-  DeclException1(ExcPointNotFoundInCoarseGrid,
-                 Point<N>,
-                 << "The point <" << arg1
-                 << "> could not be found inside any of the "
-                 << "coarse grid cells.");
+  DEAL_II_DeclException1(ExcPointNotFoundInCoarseGrid,
+                         Point<N>,
+                         << "The point <" << arg1
+                         << "> could not be found inside any of the "
+                         << "coarse grid cells.");
   /**
    * Exception
    */
   template <int N>
-  DeclException1(ExcPointNotFound,
-                 Point<N>,
-                 << "The point <" << arg1
-                 << "> could not be found inside any of the "
-                 << "subcells of a coarse grid cell.");
+  DEAL_II_DeclException1(ExcPointNotFound,
+                         Point<N>,
+                         << "The point <" << arg1
+                         << "> could not be found inside any of the "
+                         << "subcells of a coarse grid cell.");
 
   /**
    * Exception
    */
-  DeclException1(ExcVertexNotUsed,
-                 unsigned int,
-                 << "The given vertex with index " << arg1
-                 << " is not used in the given triangulation.");
+  DEAL_II_DeclException1(ExcVertexNotUsed,
+                         unsigned int,
+                         << "The given vertex with index " << arg1
+                         << " is not used in the given triangulation.");
 
 
   /*@}*/
@@ -2782,7 +2782,7 @@ namespace GridTools
   double
   cell_measure(const T &, ...)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return std::numeric_limits<double>::quiet_NaN();
   }
 
@@ -2922,8 +2922,9 @@ namespace GridTools
                   while (neighbor_child->has_children())
                     neighbor_child = neighbor_child->child(n == 0 ? 1 : 0);
 
-                  Assert(neighbor_child->neighbor(n == 0 ? 1 : 0) == cell,
-                         ExcInternalError());
+                  DEAL_II_Assert(neighbor_child->neighbor(n == 0 ? 1 : 0) ==
+                                   cell,
+                                 ExcInternalError());
                 }
               active_neighbors.push_back(neighbor_child);
             }
@@ -2942,7 +2943,8 @@ namespace GridTools
                 {
                   // the neighbor must be active
                   // himself
-                  Assert(cell->neighbor(n)->active(), ExcInternalError());
+                  DEAL_II_Assert(cell->neighbor(n)->active(),
+                                 ExcInternalError());
                   active_neighbors.push_back(cell->neighbor(n));
                 }
             }
@@ -3058,16 +3060,17 @@ namespace GridTools
         const double                                                 step,
         const F &                                                    f)
       {
-        Assert(row_n < GeometryInfo<structdim>::vertices_per_cell &&
-                 dependent_direction <
-                   GeometryInfo<structdim>::vertices_per_cell,
-               ExcMessage("This function assumes that the last weight is a "
-                          "dependent variable (and hence we cannot take its "
-                          "derivative directly)."));
-        Assert(row_n != dependent_direction,
-               ExcMessage(
-                 "We cannot differentiate with respect to the variable "
-                 "that is assumed to be dependent."));
+        DEAL_II_Assert(row_n < GeometryInfo<structdim>::vertices_per_cell &&
+                         dependent_direction <
+                           GeometryInfo<structdim>::vertices_per_cell,
+                       ExcMessage(
+                         "This function assumes that the last weight is a "
+                         "dependent variable (and hence we cannot take its "
+                         "derivative directly)."));
+        DEAL_II_Assert(row_n != dependent_direction,
+                       ExcMessage(
+                         "We cannot differentiate with respect to the variable "
+                         "that is assumed to be dependent."));
 
         const Point<spacedim>     manifold_point = f(center);
         const Tensor<1, spacedim> stencil_value  = cross_stencil<structdim>(
@@ -3323,8 +3326,8 @@ namespace GridTools
                   }
               }
             guess_weights /= guess_weights_sum;
-            Assert(internal::weights_are_ok<structdim>(guess_weights),
-                   ExcInternalError());
+            DEAL_II_Assert(internal::weights_are_ok<structdim>(guess_weights),
+                           ExcInternalError());
 
             // The optimization algorithm consists of two parts:
             //
@@ -3455,11 +3458,12 @@ namespace GridTools
                   guess_weights = tentative_weights;
                 else
                   break;
-                Assert(internal::weights_are_ok<structdim>(guess_weights),
-                       ExcInternalError());
+                DEAL_II_Assert(internal::weights_are_ok<structdim>(
+                                 guess_weights),
+                               ExcInternalError());
               }
-            Assert(internal::weights_are_ok<structdim>(guess_weights),
-                   ExcInternalError());
+            DEAL_II_Assert(internal::weights_are_ok<structdim>(guess_weights),
+                           ExcInternalError());
             projected_point = get_point_from_weights(guess_weights);
           }
 
@@ -3490,7 +3494,7 @@ namespace GridTools
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return projected_point;
       }
 
@@ -3505,8 +3509,8 @@ namespace GridTools
   CellDataTransferBuffer<dim, T>::save(Archive &ar,
                                        const unsigned int /*version*/) const
   {
-    Assert(cell_ids.size() == data.size(),
-           ExcDimensionMismatch(cell_ids.size(), data.size()));
+    DEAL_II_Assert(cell_ids.size() == data.size(),
+                   ExcDimensionMismatch(cell_ids.size(), data.size()));
     // archive the cellids in an efficient binary format
     const size_t n_cells = cell_ids.size();
     ar &         n_cells;
@@ -3555,15 +3559,15 @@ namespace GridTools
     (void)mesh;
     (void)pack;
     (void)unpack;
-    Assert(false,
-           ExcMessage(
-             "GridTools::exchange_cell_data_to_ghosts() requires MPI."));
+    DEAL_II_Assert(
+      false,
+      ExcMessage("GridTools::exchange_cell_data_to_ghosts() requires MPI."));
 #    else
     constexpr int dim      = MeshType::dimension;
     constexpr int spacedim = MeshType::space_dimension;
     auto tria = static_cast<const parallel::Triangulation<dim, spacedim> *>(
       &mesh.get_triangulation());
-    Assert(
+    DEAL_II_Assert(
       tria != nullptr,
       ExcMessage(
         "The function exchange_cell_data_to_ghosts() only works with parallel triangulations."));
@@ -3594,8 +3598,8 @@ namespace GridTools
                   vertices_with_ghost_neighbors.end())
                 continue;
 
-              Assert(neighbor_subdomains_of_vertex->second.size() != 0,
-                     ExcInternalError());
+              DEAL_II_Assert(neighbor_subdomains_of_vertex->second.size() != 0,
+                             ExcInternalError());
 
               send_to.insert(neighbor_subdomains_of_vertex->second.begin(),
                              neighbor_subdomains_of_vertex->second.end());
@@ -3658,7 +3662,7 @@ namespace GridTools
                                    786,
                                    tria->get_communicator(),
                                    &requests[idx]);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
 
     // 3. receive messages
@@ -3669,9 +3673,9 @@ namespace GridTools
         int        len;
         int        ierr =
           MPI_Probe(MPI_ANY_SOURCE, 786, tria->get_communicator(), &status);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
         ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         receive.resize(len);
 
@@ -3683,7 +3687,7 @@ namespace GridTools
                         status.MPI_TAG,
                         tria->get_communicator(),
                         &status);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         auto cellinfo =
           Utilities::unpack<CellDataTransferBuffer<dim, DataType>>(receive);
@@ -3707,7 +3711,7 @@ namespace GridTools
       {
         const int ierr =
           MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
 #    endif // DEAL_II_WITH_MPI
   }

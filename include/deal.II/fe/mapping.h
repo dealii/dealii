@@ -432,7 +432,7 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcInvalidData);
+  DEAL_II_DeclException0(ExcInvalidData);
 
 
   /**
@@ -442,7 +442,7 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcTransformationFailed,
     "Computing the mapping between a real space point and a point in reference "
     "space failed, typically because the given point lies outside the cell "
@@ -455,15 +455,15 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException3(ExcDistortedMappedCell,
-                 Point<spacedim>,
-                 double,
-                 int,
-                 << "The image of the mapping applied to cell with center ["
-                 << arg1 << "] is distorted. The cell geometry or the "
-                 << "mapping are invalid, giving a non-positive volume "
-                 << "fraction of " << arg2 << " in quadrature point " << arg3
-                 << ".");
+  DEAL_II_DeclException3(
+    ExcDistortedMappedCell,
+    Point<spacedim>,
+    double,
+    int,
+    << "The image of the mapping applied to cell with center [" << arg1
+    << "] is distorted. The cell geometry or the "
+    << "mapping are invalid, giving a non-positive volume "
+    << "fraction of " << arg2 << " in quadrature point " << arg3 << ".");
 
   /**
    * @}

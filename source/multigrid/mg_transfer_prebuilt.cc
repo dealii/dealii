@@ -103,8 +103,8 @@ MGTransferPrebuilt<VectorType>::prolongate(const unsigned int to_level,
                                            VectorType &       dst,
                                            const VectorType & src) const
 {
-  Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
-         ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
+  DEAL_II_Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
+                 ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
   prolongation_matrices[to_level - 1]->vmult(dst, src);
 }
@@ -117,8 +117,9 @@ MGTransferPrebuilt<VectorType>::restrict_and_add(const unsigned int from_level,
                                                  VectorType &       dst,
                                                  const VectorType & src) const
 {
-  Assert((from_level >= 1) && (from_level <= prolongation_matrices.size()),
-         ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
+  DEAL_II_Assert(
+    (from_level >= 1) && (from_level <= prolongation_matrices.size()),
+    ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
   (void)from_level;
 
   prolongation_matrices[from_level - 1]->Tvmult_add(dst, src);
@@ -142,10 +143,10 @@ namespace
         if (mg_constrained_dofs->get_level_constraints(level)
               .is_identity_constrained(ind))
           {
-            Assert(mg_constrained_dofs->get_level_constraints(level)
-                       .get_constraint_entries(ind)
-                       ->size() == 1,
-                   ExcInternalError());
+            DEAL_II_Assert(mg_constrained_dofs->get_level_constraints(level)
+                               .get_constraint_entries(ind)
+                               ->size() == 1,
+                           ExcInternalError());
             ind = mg_constrained_dofs->get_level_constraints(level)
                     .get_constraint_entries(ind)
                     ->front()
@@ -230,9 +231,9 @@ MGTransferPrebuilt<VectorType>::build_matrices(
 
             replace(this->mg_constrained_dofs, level, dof_indices_parent);
 
-            Assert(cell->n_children() ==
-                     GeometryInfo<dim>::max_children_per_cell,
-                   ExcNotImplemented());
+            DEAL_II_Assert(cell->n_children() ==
+                             GeometryInfo<dim>::max_children_per_cell,
+                           ExcNotImplemented());
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
                 // set an alias to the prolongation matrix for this child
@@ -240,7 +241,7 @@ MGTransferPrebuilt<VectorType>::build_matrices(
                   mg_dof.get_fe().get_prolongation_matrix(
                     child, cell->refinement_case());
 
-                Assert(prolongation.n() != 0, ExcNoProlongation());
+                DEAL_II_Assert(prolongation.n() != 0, ExcNoProlongation());
 
                 cell->child(child)->get_mg_dof_indices(dof_indices_child);
 
@@ -336,9 +337,9 @@ MGTransferPrebuilt<VectorType>::build_matrices(
 
             replace(this->mg_constrained_dofs, level, dof_indices_parent);
 
-            Assert(cell->n_children() ==
-                     GeometryInfo<dim>::max_children_per_cell,
-                   ExcNotImplemented());
+            DEAL_II_Assert(cell->n_children() ==
+                             GeometryInfo<dim>::max_children_per_cell,
+                           ExcNotImplemented());
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
                 // set an alias to the prolongation matrix for this child

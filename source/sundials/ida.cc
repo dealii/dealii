@@ -178,7 +178,7 @@ namespace SUNDIALS
       {
         const int ierr = MPI_Comm_free(&communicator);
         (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
+        DEAL_II_AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
       }
 #  endif
   }
@@ -219,9 +219,10 @@ namespace SUNDIALS
     else
 #  endif
       {
-        Assert(is_serial_vector<VectorType>::value,
-               ExcInternalError(
-                 "Trying to use a serial code with a parallel vector."));
+        DEAL_II_Assert(
+          is_serial_vector<VectorType>::value,
+          ExcInternalError(
+            "Trying to use a serial code with a parallel vector."));
         yy        = N_VNew_Serial(system_size);
         yp        = N_VNew_Serial(system_size);
         diff_id   = N_VNew_Serial(system_size);
@@ -238,10 +239,10 @@ namespace SUNDIALS
         next_time += data.output_period;
 
         status = IDASolve(ida_mem, next_time, &t, yy, yp, IDA_NORMAL);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
 
         status = IDAGetLastStep(ida_mem, &h);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
 
         copy(solution, yy);
         copy(solution_dot, yp);
@@ -343,27 +344,27 @@ namespace SUNDIALS
     copy(yp, solution_dot);
 
     status = IDAInit(ida_mem, t_dae_residual<VectorType>, current_time, yy, yp);
-    AssertIDA(status);
+    DEAL_II_AssertIDA(status);
 
     if (get_local_tolerances)
       {
         copy(abs_tolls, get_local_tolerances());
         status = IDASVtolerances(ida_mem, data.relative_tolerance, abs_tolls);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
       }
     else
       {
         status = IDASStolerances(ida_mem,
                                  data.relative_tolerance,
                                  data.absolute_tolerance);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
       }
 
     status = IDASetInitStep(ida_mem, current_time_step);
-    AssertIDA(status);
+    DEAL_II_AssertIDA(status);
 
     status = IDASetUserData(ida_mem, (void *)this);
-    AssertIDA(status);
+    DEAL_II_AssertIDA(status);
 
     if (data.ic_type == AdditionalData::use_y_diff ||
         data.reset_type == AdditionalData::use_y_diff ||
@@ -377,18 +378,18 @@ namespace SUNDIALS
 
         copy(diff_id, diff_comp_vector);
         status = IDASetId(ida_mem, diff_id);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
       }
 
     status = IDASetSuppressAlg(ida_mem, data.ignore_algebraic_terms_for_errors);
-    AssertIDA(status);
+    DEAL_II_AssertIDA(status);
 
     //  status = IDASetMaxNumSteps(ida_mem, max_steps);
     status = IDASetStopTime(ida_mem, data.final_time);
-    AssertIDA(status);
+    DEAL_II_AssertIDA(status);
 
     status = IDASetMaxNonlinIters(ida_mem, data.maximum_non_linear_iterations);
-    AssertIDA(status);
+    DEAL_II_AssertIDA(status);
 
     // Initialize solver
     IDAMem IDA_mem;
@@ -401,7 +402,7 @@ namespace SUNDIALS
 #  endif
 
     status = IDASetMaxOrd(ida_mem, data.maximum_order);
-    AssertIDA(status);
+    DEAL_II_AssertIDA(status);
 
     typename AdditionalData::InitialConditionCorrection type;
     if (first_step)
@@ -411,17 +412,17 @@ namespace SUNDIALS
 
     status =
       IDASetMaxNumItersIC(ida_mem, data.maximum_non_linear_iterations_ic);
-    AssertIDA(status);
+    DEAL_II_AssertIDA(status);
 
     if (type == AdditionalData::use_y_dot)
       {
         // (re)initialization of the vectors
         status =
           IDACalcIC(ida_mem, IDA_Y_INIT, current_time + current_time_step);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
 
         status = IDAGetConsistentIC(ida_mem, yy, yp);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
 
         copy(solution, yy);
         copy(solution_dot, yp);
@@ -430,10 +431,10 @@ namespace SUNDIALS
       {
         status =
           IDACalcIC(ida_mem, IDA_YA_YDP_INIT, current_time + current_time_step);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
 
         status = IDAGetConsistentIC(ida_mem, yy, yp);
-        AssertIDA(status);
+        DEAL_II_AssertIDA(status);
 
         copy(solution, yy);
         copy(solution_dot, yp);
@@ -445,7 +446,7 @@ namespace SUNDIALS
   IDA<VectorType>::set_functions_to_trigger_an_assert()
   {
     reinit_vector = [](VectorType &) {
-      AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
+      DEAL_II_AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
 
     residual = [](const double,
@@ -453,7 +454,7 @@ namespace SUNDIALS
                   const VectorType &,
                   VectorType &) -> int {
       int ret = 0;
-      AssertThrow(false, ExcFunctionNotProvided("residual"));
+      DEAL_II_AssertThrow(false, ExcFunctionNotProvided("residual"));
       return ret;
     };
 
@@ -462,13 +463,14 @@ namespace SUNDIALS
                         const VectorType &,
                         const double) -> int {
       int ret = 0;
-      AssertThrow(false, ExcFunctionNotProvided("setup_jacobian"));
+      DEAL_II_AssertThrow(false, ExcFunctionNotProvided("setup_jacobian"));
       return ret;
     };
 
     solve_jacobian_system = [](const VectorType &, VectorType &) -> int {
       int ret = 0;
-      AssertThrow(false, ExcFunctionNotProvided("solve_jacobian_system"));
+      DEAL_II_AssertThrow(false,
+                          ExcFunctionNotProvided("solve_jacobian_system"));
       return ret;
     };
 

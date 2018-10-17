@@ -42,8 +42,8 @@ test(TrilinosWrappers::MPI::Vector &v)
   // vector is really empty
   const unsigned int sz = v.size();
   v                     = 0;
-  AssertThrow(v.size() == sz, ExcInternalError());
-  AssertThrow(v.l2_norm() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == sz, ExcInternalError());
+  DEAL_II_AssertThrow(v.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -94,9 +94,9 @@ namespace polytest
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(dim == 2, ExcNotImplemented());
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<dim> &p = points[i];
@@ -112,9 +112,9 @@ namespace polytest
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(dim == 2, ExcNotImplemented());
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {

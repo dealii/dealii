@@ -90,7 +90,7 @@ check_this(const DoFHandler<dim> &dof_handler)
                                     VectorTools::L2_norm);
   const double p_l2_error = cellwise_errors.l2_norm();
 
-  Assert(p_l2_error < 1e-11, ExcInternalError());
+  DEAL_II_Assert(p_l2_error < 1e-11, ExcInternalError());
 
   deallog << "L2_Error : " << p_l2_error << std::endl;
 }

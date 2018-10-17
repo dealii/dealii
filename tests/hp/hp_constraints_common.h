@@ -310,7 +310,7 @@ test_with_2d_deformed_refined_mesh(const hp::FECollection<dim> &fe)
             (++(++(triangulation.begin_active())))->set_refine_flag();
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
       triangulation.execute_coarsening_and_refinement();
 
@@ -431,8 +431,8 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
                                               hp::QCollection<dim>(
                                                 QGauss<dim>(min_degree + 2)),
                                               VectorTools::L2_norm);
-            Assert(error.l2_norm() < 1e-12 * interpolant_1.l2_norm(),
-                   ExcInternalError());
+            DEAL_II_Assert(error.l2_norm() < 1e-12 * interpolant_1.l2_norm(),
+                           ExcInternalError());
             deallog << "  Relative interpolation error before constraints: "
                     << error.l2_norm() / interpolant_1.l2_norm() << std::endl;
 
@@ -447,8 +447,9 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
 
             interpolant_2 -= interpolant_1;
 
-            Assert(interpolant_2.l2_norm() < 1e-12 * interpolant_1.l2_norm(),
-                   ExcInternalError());
+            DEAL_II_Assert(interpolant_2.l2_norm() <
+                             1e-12 * interpolant_1.l2_norm(),
+                           ExcInternalError());
 
             deallog << "  Relative difference after constraints: "
                     << interpolant_2.l2_norm() / interpolant_1.l2_norm()

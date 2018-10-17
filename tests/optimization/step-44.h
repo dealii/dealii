@@ -442,7 +442,7 @@ namespace Step44
       , J_tilde(1.0)
       , b_bar(StandardTensors<dim>::I)
     {
-      Assert(kappa > 0, ExcInternalError());
+      DEAL_II_Assert(kappa > 0, ExcInternalError());
     }
     ~Material_Compressible_Neo_Hook_Three_Field()
     {}
@@ -455,7 +455,7 @@ namespace Step44
       b_bar   = std::pow(det_F, -2.0 / dim) * symmetrize(F * transpose(F));
       p_tilde = p_tilde_in;
       J_tilde = J_tilde_in;
-      Assert(det_F > 0, ExcInternalError());
+      DEAL_II_Assert(det_F > 0, ExcInternalError());
     }
     SymmetricTensor<2, dim>
     get_tau()
@@ -811,8 +811,9 @@ namespace Step44
     , n_q_points(qf_cell.size())
     , n_q_points_f(qf_face.size())
   {
-    Assert(dim == 2 || dim == 3,
-           ExcMessage("This problem only works in 2 or 3 space dimensions."));
+    DEAL_II_Assert(dim == 2 || dim == 3,
+                   ExcMessage(
+                     "This problem only works in 2 or 3 space dimensions."));
     determine_component_extractors();
   }
   template <int dim>
@@ -919,11 +920,12 @@ namespace Step44
       const unsigned int n_dofs_per_cell = Nx[0].size();
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
         {
-          Assert(Nx[q_point].size() == n_dofs_per_cell, ExcInternalError());
-          Assert(grad_Nx[q_point].size() == n_dofs_per_cell,
-                 ExcInternalError());
-          Assert(symm_grad_Nx[q_point].size() == n_dofs_per_cell,
-                 ExcInternalError());
+          DEAL_II_Assert(Nx[q_point].size() == n_dofs_per_cell,
+                         ExcInternalError());
+          DEAL_II_Assert(grad_Nx[q_point].size() == n_dofs_per_cell,
+                         ExcInternalError());
+          DEAL_II_Assert(symm_grad_Nx[q_point].size() == n_dofs_per_cell,
+                         ExcInternalError());
           for (unsigned int k = 0; k < n_dofs_per_cell; ++k)
             {
               Nx[q_point][k]           = 0.0;
@@ -987,9 +989,10 @@ namespace Step44
       const unsigned int n_dofs_per_cell = Nx[0].size();
       for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
         {
-          Assert(Nx[q_point].size() == n_dofs_per_cell, ExcInternalError());
-          Assert(symm_grad_Nx[q_point].size() == n_dofs_per_cell,
-                 ExcInternalError());
+          DEAL_II_Assert(Nx[q_point].size() == n_dofs_per_cell,
+                         ExcInternalError());
+          DEAL_II_Assert(symm_grad_Nx[q_point].size() == n_dofs_per_cell,
+                         ExcInternalError());
           for (unsigned int k = 0; k < n_dofs_per_cell; ++k)
             {
               Nx[q_point][k]           = 0.0;
@@ -1198,7 +1201,7 @@ namespace Step44
           element_indices_J.push_back(k);
         else
           {
-            Assert(k_group <= J_dof, ExcInternalError());
+            DEAL_II_Assert(k_group <= J_dof, ExcInternalError());
           }
       }
   }
@@ -1217,7 +1220,7 @@ namespace Step44
       {
         const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        DEAL_II_Assert(lqph.size() == n_q_points, ExcInternalError());
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           lqph[q_point]->setup_lqp(parameters);
       }
@@ -1253,13 +1256,13 @@ namespace Step44
   {
     const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
-    Assert(lqph.size() == n_q_points, ExcInternalError());
-    Assert(scratch.solution_grads_u_total.size() == n_q_points,
-           ExcInternalError());
-    Assert(scratch.solution_values_p_total.size() == n_q_points,
-           ExcInternalError());
-    Assert(scratch.solution_values_J_total.size() == n_q_points,
-           ExcInternalError());
+    DEAL_II_Assert(lqph.size() == n_q_points, ExcInternalError());
+    DEAL_II_Assert(scratch.solution_grads_u_total.size() == n_q_points,
+                   ExcInternalError());
+    DEAL_II_Assert(scratch.solution_values_p_total.size() == n_q_points,
+                   ExcInternalError());
+    DEAL_II_Assert(scratch.solution_values_J_total.size() == n_q_points,
+                   ExcInternalError());
     scratch.reset();
     scratch.fe_values_ref.reinit(cell);
     scratch.fe_values_ref[u_fe].get_function_gradients(
@@ -1351,8 +1354,8 @@ namespace Step44
 
             (void)tang_mtrx_norm_new;
             if (ss != 0.0)
-              Assert(tang_mtrx_norm_new != tang_mtrx_norm_old,
-                     ExcInternalError());
+              DEAL_II_Assert(tang_mtrx_norm_new != tang_mtrx_norm_old,
+                             ExcInternalError());
 
             // Negelect the constrained entries in the consideration
             this->constraints.set_zero(residual_trial);
@@ -1390,9 +1393,10 @@ namespace Step44
                                    &use_ptrb]() {
           const auto res_0 = (use_ptrb ? ls_minimization_function_ptrb(0.0) :
                                          ls_minimization_function(0.0));
-          Assert(res_0.second < 0.0,
-                 ExcMessage("Gradient should be negative. Current value: " +
-                            std::to_string(res_0.second)));
+          DEAL_II_Assert(res_0.second < 0.0,
+                         ExcMessage(
+                           "Gradient should be negative. Current value: " +
+                           std::to_string(res_0.second)));
           const auto res_1 = (use_ptrb ? ls_minimization_function_ptrb(1.0) :
                                          ls_minimization_function(1.0));
 
@@ -1455,8 +1459,8 @@ namespace Step44
                   << "  " << error_update_norm.p << "  " << error_update_norm.J
                   << "  " << std::endl;
       }
-    AssertThrow(newton_iteration <= parameters.max_iterations_NR,
-                ExcMessage("No convergence in nonlinear solver!"));
+    DEAL_II_AssertThrow(newton_iteration <= parameters.max_iterations_NR,
+                        ExcMessage("No convergence in nonlinear solver!"));
   }
   template <int dim>
   void
@@ -1506,7 +1510,7 @@ namespace Step44
         fe_values_ref.reinit(cell);
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        DEAL_II_Assert(lqph.size() == n_q_points, ExcInternalError());
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const double det_F_qp = lqph[q_point]->get_det_F();
@@ -1514,7 +1518,7 @@ namespace Step44
             vol_current += det_F_qp * JxW;
           }
       }
-    Assert(vol_current > 0.0, ExcInternalError());
+    DEAL_II_Assert(vol_current > 0.0, ExcInternalError());
     return vol_current;
   }
   template <int dim>
@@ -1531,7 +1535,7 @@ namespace Step44
         fe_values_ref.reinit(cell);
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
-        Assert(lqph.size() == n_q_points, ExcInternalError());
+        DEAL_II_Assert(lqph.size() == n_q_points, ExcInternalError());
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const double det_F_qp   = lqph[q_point]->get_det_F();
@@ -1632,7 +1636,7 @@ namespace Step44
     cell->get_dof_indices(data.local_dof_indices);
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
-    Assert(lqph.size() == n_q_points, ExcInternalError());
+    DEAL_II_Assert(lqph.size() == n_q_points, ExcInternalError());
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
@@ -1653,7 +1657,7 @@ namespace Step44
               scratch.Nx[q_point][k] =
                 scratch.fe_values_ref[J_fe].value(k, q_point);
             else
-              Assert(k_group <= J_dof, ExcInternalError());
+              DEAL_II_Assert(k_group <= J_dof, ExcInternalError());
           }
       }
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
@@ -1699,8 +1703,8 @@ namespace Step44
                 else if ((i_group == j_group) && (i_group == J_dof))
                   data.cell_matrix(i, j) += N[i] * d2Psi_vol_dJ2 * N[j] * JxW;
                 else
-                  Assert((i_group <= J_dof) && (j_group <= J_dof),
-                         ExcInternalError());
+                  DEAL_II_Assert((i_group <= J_dof) && (j_group <= J_dof),
+                                 ExcInternalError());
               }
           }
       }
@@ -1759,7 +1763,7 @@ namespace Step44
     cell->get_dof_indices(data.local_dof_indices);
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
       quadrature_point_history.get_data(cell);
-    Assert(lqph.size() == n_q_points, ExcInternalError());
+    DEAL_II_Assert(lqph.size() == n_q_points, ExcInternalError());
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       {
         const Tensor<2, dim> F_inv = lqph[q_point]->get_F_inv();
@@ -1776,7 +1780,7 @@ namespace Step44
               scratch.Nx[q_point][k] =
                 scratch.fe_values_ref[J_fe].value(k, q_point);
             else
-              Assert(k_group <= J_dof, ExcInternalError());
+              DEAL_II_Assert(k_group <= J_dof, ExcInternalError());
           }
       }
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
@@ -1800,7 +1804,7 @@ namespace Step44
             else if (i_group == J_dof)
               data.cell_rhs(i) -= N[i] * (dPsi_vol_dJ - p_tilde) * JxW;
             else
-              Assert(i_group <= J_dof, ExcInternalError());
+              DEAL_II_Assert(i_group <= J_dof, ExcInternalError());
           }
       }
     for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
@@ -2100,7 +2104,8 @@ namespace Step44
               lin_res = 0.0;
             }
           else
-            Assert(false, ExcMessage("Linear solver type not implemented"));
+            DEAL_II_Assert(false,
+                           ExcMessage("Linear solver type not implemented"));
           timer.leave_subsection();
         }
         constraints.distribute(newton_update);
@@ -2204,7 +2209,8 @@ namespace Step44
             std::cout << " -- " << std::flush;
           }
         else
-          Assert(false, ExcMessage("Linear solver type not implemented"));
+          DEAL_II_Assert(false,
+                         ExcMessage("Linear solver type not implemented"));
         timer.leave_subsection();
         constraints.distribute(newton_update);
       }

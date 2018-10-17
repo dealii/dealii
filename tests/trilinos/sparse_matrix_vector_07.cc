@@ -54,17 +54,17 @@ test(TrilinosWrappers::MPI::Vector &v,
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(v(i) == i, ExcInternalError());
-      AssertThrow(w(i) == i + 1, ExcInternalError());
+      DEAL_II_AssertThrow(v(i) == i, ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == i + 1, ExcInternalError());
 
       double result = i + 1;
       for (unsigned int j = 0; j < m.m(); ++j)
         result -= (i + 2 * j) * j;
 
-      AssertThrow(x(i) == result, ExcInternalError());
+      DEAL_II_AssertThrow(x(i) == result, ExcInternalError());
     }
 
-  AssertThrow(s == x.l2_norm(), ExcInternalError());
+  DEAL_II_AssertThrow(s == x.l2_norm(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

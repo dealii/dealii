@@ -52,7 +52,7 @@ test(LinearAlgebra::distributed::Vector<double> &v,
       double result = 0;
       for (unsigned int j = 0; j < m.n(); ++j)
         result += (i + 2 * j) * j;
-      AssertThrow(w(i) == result, ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == result, ExcInternalError());
     }
 
   m.vmult_add(w, v);
@@ -62,7 +62,7 @@ test(LinearAlgebra::distributed::Vector<double> &v,
       double result = 0;
       for (unsigned int j = 0; j < m.n(); ++j)
         result += (i + 2 * j) * j;
-      AssertThrow(w(i) == result + result, ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == result + result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

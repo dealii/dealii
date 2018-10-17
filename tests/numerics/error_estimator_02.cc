@@ -334,8 +334,9 @@ test_neumann(const NeumanBC<dim> &func)
   dealii::deallog << "expected:" << std::endl
                   << " " << std::sqrt(expected_value_squared) << std::endl;
 
-  AssertThrow(std::fabs(std::sqrt(expected_value_squared) - error[0]) < 1e-5,
-              dealii::ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(std::sqrt(expected_value_squared) - error[0]) <
+                        1e-5,
+                      dealii::ExcInternalError());
 
   dof_handler.clear();
 }
@@ -448,8 +449,9 @@ test_regular(const MyFunction<dim> &func)
   dealii::deallog << "expected:" << std::endl
                   << " " << std::sqrt(expected_value_squared) << std::endl;
   for (unsigned int i = 0; i < error.size(); i++)
-    AssertThrow(std::fabs(std::sqrt(expected_value_squared) - error[i]) < 1e-6,
-                dealii::ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(std::sqrt(expected_value_squared) -
+                                  error[i]) < 1e-6,
+                        dealii::ExcInternalError());
 
   dof_handler.clear();
 }
@@ -600,8 +602,8 @@ test_irregular(const MyFunction<dim> &func)
   deallog << std::endl;
 
   for (unsigned int i = 0; i < expected_error.size(); i++)
-    AssertThrow(std::fabs(expected_error[i] - error[i]) < 1e-6,
-                dealii::ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(expected_error[i] - error[i]) < 1e-6,
+                        dealii::ExcInternalError());
 
   dof_handler.clear();
 }
@@ -629,7 +631,7 @@ MySecondFunction<dim>::value(const dealii::Point<dim> &point,
 {
   double        f = 0.0;
   const double &x = point[0];
-  Assert(dim > 1, dealii::ExcNotImplemented());
+  DEAL_II_Assert(dim > 1, dealii::ExcNotImplemented());
   const double &y = point[1];
 
   return (1. - x) * (1. - y) * (1. - y) + std::pow(1.0 - y, 4) * std::exp(-x);

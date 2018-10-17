@@ -83,11 +83,11 @@ namespace
     // compute the minimum on processor zero
     const int ierr =
       MPI_Reduce(comp, result, 2, MPI_DOUBLE, MPI_MIN, 0, mpi_communicator);
-    AssertThrowMPI(ierr);
+    DEAL_II_AssertThrowMPI(ierr);
 
     // make sure only processor zero got something
     if (Utilities::MPI::this_mpi_process(mpi_communicator) != 0)
-      Assert((result[0] == 0) && (result[1] == 0), ExcInternalError());
+      DEAL_II_Assert((result[0] == 0) && (result[1] == 0), ExcInternalError());
 
     return std::make_pair(result[0], -result[1]);
   }
@@ -114,11 +114,11 @@ namespace
     // compute the minimum on processor zero
     const int ierr =
       MPI_Reduce(&my_sum, &result, 1, MPI_DOUBLE, MPI_SUM, 0, mpi_communicator);
-    AssertThrowMPI(ierr);
+    DEAL_II_AssertThrowMPI(ierr);
 
     // make sure only processor zero got something
     if (Utilities::MPI::this_mpi_process(mpi_communicator) != 0)
-      Assert(result == 0, ExcInternalError());
+      DEAL_II_Assert(result == 0, ExcInternalError());
 
     return result;
   }
@@ -136,9 +136,9 @@ namespace
     const dealii::Vector<Number> &                             criteria,
     Vector<Number> &locally_owned_indicators)
   {
-    Assert(locally_owned_indicators.size() ==
-             tria.n_locally_owned_active_cells(),
-           ExcInternalError());
+    DEAL_II_Assert(locally_owned_indicators.size() ==
+                     tria.n_locally_owned_active_cells(),
+                   ExcInternalError());
 
     unsigned int owned_index = 0;
     for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
@@ -151,8 +151,8 @@ namespace
             criteria(cell->active_cell_index());
           ++owned_index;
         }
-    Assert(owned_index == tria.n_locally_owned_active_cells(),
-           ExcInternalError());
+    DEAL_II_Assert(owned_index == tria.n_locally_owned_active_cells(),
+                   ExcInternalError());
   }
 
 
@@ -166,9 +166,10 @@ namespace
   void
   adjust_interesting_range(double (&interesting_range)[2])
   {
-    Assert(interesting_range[0] <= interesting_range[1], ExcInternalError());
+    DEAL_II_Assert(interesting_range[0] <= interesting_range[1],
+                   ExcInternalError());
 
-    Assert(interesting_range[0] >= 0, ExcInternalError());
+    DEAL_II_Assert(interesting_range[0] >= 0, ExcInternalError());
 
     // adjust the lower bound only if the end point is not equal to zero,
     // otherwise it could happen, that the result becomes negative
@@ -241,7 +242,7 @@ namespace
                                MPI_DOUBLE,
                                master_mpi_rank,
                                mpi_communicator);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           if (interesting_range[0] == interesting_range[1])
             return interesting_range[0];
@@ -268,7 +269,7 @@ namespace
                             MPI_SUM,
                             master_mpi_rank,
                             mpi_communicator);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           // now adjust the range. if we have to many cells, we take the upper
           // half of the previous range, otherwise the lower half. if we have
@@ -298,7 +299,7 @@ namespace
         }
       while (true);
 
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
       return -1;
     }
   } // namespace RefineAndCoarsenFixedNumber
@@ -334,7 +335,7 @@ namespace
                                MPI_DOUBLE,
                                master_mpi_rank,
                                mpi_communicator);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           if (interesting_range[0] == interesting_range[1])
             {
@@ -352,7 +353,7 @@ namespace
                                MPI_DOUBLE,
                                master_mpi_rank,
                                mpi_communicator);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
 
               return final_threshold;
             }
@@ -377,7 +378,7 @@ namespace
                             MPI_SUM,
                             master_mpi_rank,
                             mpi_communicator);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           // now adjust the range. if we have to many cells, we take the upper
           // half of the previous range, otherwise the lower half. if we have
@@ -408,7 +409,7 @@ namespace
         }
       while (true);
 
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
       return -1;
     }
   } // namespace RefineAndCoarsenFixedFraction
@@ -431,17 +432,19 @@ namespace parallel
         const double       bottom_fraction_of_cells,
         const unsigned int max_n_cells)
       {
-        Assert(criteria.size() == tria.n_active_cells(),
-               ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-        Assert((top_fraction_of_cells >= 0) && (top_fraction_of_cells <= 1),
-               dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert((bottom_fraction_of_cells >= 0) &&
-                 (bottom_fraction_of_cells <= 1),
-               dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert(top_fraction_of_cells + bottom_fraction_of_cells <= 1,
-               dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert(criteria.is_non_negative(),
-               dealii::GridRefinement::ExcNegativeCriteria());
+        DEAL_II_Assert(criteria.size() == tria.n_active_cells(),
+                       ExcDimensionMismatch(criteria.size(),
+                                            tria.n_active_cells()));
+        DEAL_II_Assert((top_fraction_of_cells >= 0) &&
+                         (top_fraction_of_cells <= 1),
+                       dealii::GridRefinement::ExcInvalidParameterValue());
+        DEAL_II_Assert((bottom_fraction_of_cells >= 0) &&
+                         (bottom_fraction_of_cells <= 1),
+                       dealii::GridRefinement::ExcInvalidParameterValue());
+        DEAL_II_Assert(top_fraction_of_cells + bottom_fraction_of_cells <= 1,
+                       dealii::GridRefinement::ExcInvalidParameterValue());
+        DEAL_II_Assert(criteria.is_non_negative(),
+                       dealii::GridRefinement::ExcNegativeCriteria());
 
         const std::pair<double, double> adjusted_fractions =
           dealii::GridRefinement::adjust_refine_and_coarsen_number_fraction<
@@ -502,17 +505,19 @@ namespace parallel
         const double top_fraction_of_error,
         const double bottom_fraction_of_error)
       {
-        Assert(criteria.size() == tria.n_active_cells(),
-               ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-        Assert((top_fraction_of_error >= 0) && (top_fraction_of_error <= 1),
-               dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert((bottom_fraction_of_error >= 0) &&
-                 (bottom_fraction_of_error <= 1),
-               dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert(top_fraction_of_error + bottom_fraction_of_error <= 1,
-               dealii::GridRefinement::ExcInvalidParameterValue());
-        Assert(criteria.is_non_negative(),
-               dealii::GridRefinement::ExcNegativeCriteria());
+        DEAL_II_Assert(criteria.size() == tria.n_active_cells(),
+                       ExcDimensionMismatch(criteria.size(),
+                                            tria.n_active_cells()));
+        DEAL_II_Assert((top_fraction_of_error >= 0) &&
+                         (top_fraction_of_error <= 1),
+                       dealii::GridRefinement::ExcInvalidParameterValue());
+        DEAL_II_Assert((bottom_fraction_of_error >= 0) &&
+                         (bottom_fraction_of_error <= 1),
+                       dealii::GridRefinement::ExcInvalidParameterValue());
+        DEAL_II_Assert(top_fraction_of_error + bottom_fraction_of_error <= 1,
+                       dealii::GridRefinement::ExcInvalidParameterValue());
+        DEAL_II_Assert(criteria.is_non_negative(),
+                       dealii::GridRefinement::ExcNegativeCriteria());
 
         // first extract from the vector of indicators the ones that correspond
         // to cells that we locally own

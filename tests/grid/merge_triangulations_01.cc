@@ -54,7 +54,7 @@ test(const int testcase)
           shift[d] = 1;
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   GridTools::shift(shift, tria_2);
 

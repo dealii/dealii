@@ -71,9 +71,9 @@ test()
   deallog << "v(42) = " << v(min_index + 42) << std::endl;
   v.update_ghost_values();
   deallog << "v(42) = " << v(min_index + 42) << std::endl;
-  Assert(v(min_index + 41) == min_index + 41, ExcInternalError());
-  Assert(v(min_index + 39) == min_index + 39, ExcInternalError());
-  Assert(v(min_index + 38) == min_index + 38, ExcInternalError());
+  DEAL_II_Assert(v(min_index + 41) == min_index + 41, ExcInternalError());
+  DEAL_II_Assert(v(min_index + 39) == min_index + 39, ExcInternalError());
+  DEAL_II_Assert(v(min_index + 38) == min_index + 38, ExcInternalError());
 
   v.zero_out_ghosts();
   v(min_index + 38) = min_index;

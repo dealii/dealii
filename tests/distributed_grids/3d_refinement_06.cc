@@ -63,7 +63,7 @@ test(std::ostream & /*out*/)
     //    write_vtk(tr, "1");
     deallog << "cells test1: " << tr.n_active_cells() << std::endl;
 
-    Assert(tr.n_active_cells() == 120, ExcInternalError());
+    DEAL_II_Assert(tr.n_active_cells() == 120, ExcInternalError());
   }
   {
     parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -78,7 +78,7 @@ test(std::ostream & /*out*/)
     //    write_vtk(tr, "2");
     deallog << "cells test2: " << tr.n_active_cells() << std::endl;
 
-    Assert(tr.n_active_cells() == 120, ExcInternalError());
+    DEAL_II_Assert(tr.n_active_cells() == 120, ExcInternalError());
   }
 }
 

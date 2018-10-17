@@ -75,7 +75,7 @@ check(bool subdivide)
         break;
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
 

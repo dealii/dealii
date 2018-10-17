@@ -47,9 +47,9 @@ FE_TraceQ<dim, spacedim>::FE_TraceQ(const unsigned int degree)
       std::vector<bool>(1, true))
   , fe_q(degree)
 {
-  Assert(degree > 0,
-         ExcMessage("FE_Trace can only be used for polynomial degrees "
-                    "greater than zero"));
+  DEAL_II_Assert(degree > 0,
+                 ExcMessage("FE_Trace can only be used for polynomial degrees "
+                            "greater than zero"));
   std::vector<unsigned int> renumber(this->dofs_per_face);
   FETools::hierarchic_to_lexicographic_numbering<dim - 1>(degree, renumber);
   this->poly_space.set_numbering(renumber);
@@ -102,10 +102,12 @@ FE_TraceQ<dim, spacedim>::has_support_on_face(
   const unsigned int shape_index,
   const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  DEAL_II_Assert(shape_index < this->dofs_per_cell,
+                 ExcIndexRange(shape_index, 0, this->dofs_per_cell));
+  DEAL_II_Assert(face_index < GeometryInfo<dim>::faces_per_cell,
+                 ExcIndexRange(face_index,
+                               0,
+                               GeometryInfo<dim>::faces_per_cell));
 
   // FE_TraceQ shares the numbering of elemental degrees of freedom with FE_Q
   // except for the missing interior ones (quad dofs in 2D and hex dofs in
@@ -135,14 +137,14 @@ FE_TraceQ<dim, spacedim>::
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const
 {
-  AssertDimension(support_point_values.size(),
-                  this->get_unit_support_points().size());
-  AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  DEAL_II_AssertDimension(support_point_values.size(),
+                          this->get_unit_support_points().size());
+  DEAL_II_AssertDimension(support_point_values.size(), nodal_values.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell, nodal_values.size());
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      AssertDimension(support_point_values[i].size(), 1);
+      DEAL_II_AssertDimension(support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
     }
@@ -156,7 +158,8 @@ FE_TraceQ<dim, spacedim>::get_dpo_vector(const unsigned int deg)
   // This constructs FE_TraceQ in exactly the same way as FE_Q except for the
   // interior degrees of freedom that are not present here (line in 1D, quad
   // in 2D, hex in 3D).
-  AssertThrow(deg > 0, ExcMessage("FE_TraceQ needs to be of degree > 0."));
+  DEAL_II_AssertThrow(deg > 0,
+                      ExcMessage("FE_TraceQ needs to be of degree > 0."));
   std::vector<unsigned int> dpo(dim + 1, 1U);
   dpo[dim] = 0;
   dpo[0]   = 1;
@@ -206,7 +209,7 @@ FE_TraceQ<dim, spacedim>::compare_for_face_domination(
         }
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -233,11 +236,12 @@ FE_TraceQ<dim, spacedim>::get_subface_interpolation_matrix(
   FullMatrix<double> &                interpolation_matrix) const
 {
   // this is the code from FE_FaceQ
-  Assert(interpolation_matrix.n() == this->dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.n(), this->dofs_per_face));
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.n() == this->dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.n(),
+                                      this->dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      x_source_fe.dofs_per_face));
 
   // see if source is a FaceQ element
   if (const FE_TraceQ<dim, spacedim> *source_fe =
@@ -252,7 +256,7 @@ FE_TraceQ<dim, spacedim>::get_subface_interpolation_matrix(
       // nothing to do here, the FE_Nothing has no degrees of freedom anyway
     }
   else
-    AssertThrow(
+    DEAL_II_AssertThrow(
       false,
       (typename FiniteElement<dim,
                               spacedim>::ExcInterpolationNotImplemented()));

@@ -92,10 +92,12 @@ public:
                d < VectorizedArray<Number>::n_array_elements;
                ++d)
             {
-              Assert(fe_eval.get_value(q)[d] == 1., ExcInternalError());
+              DEAL_II_Assert(fe_eval.get_value(q)[d] == 1., ExcInternalError());
               for (unsigned int e = 0; e < dim; ++e)
-                Assert(fe_eval.get_gradient(q)[e][d] == 0., ExcInternalError());
-              Assert(fe_eval.get_laplacian(q)[d] == 0., ExcInternalError());
+                DEAL_II_Assert(fe_eval.get_gradient(q)[e][d] == 0.,
+                               ExcInternalError());
+              DEAL_II_Assert(fe_eval.get_laplacian(q)[d] == 0.,
+                             ExcInternalError());
             }
       }
   }

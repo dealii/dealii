@@ -33,7 +33,7 @@ test(Vector<std::complex<double>> &v)
     v(i) = std::complex<double>(i + 1., i + 2.);
   Vector<std::complex<float>> w(v);
 
-  AssertThrow(w == v, ExcInternalError());
+  DEAL_II_AssertThrow(w == v, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

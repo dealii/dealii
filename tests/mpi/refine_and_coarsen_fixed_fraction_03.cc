@@ -74,7 +74,7 @@ test()
           ++my_cell_index;
           indicators(cell_index) = my_cell_index + 1;
         }
-    AssertThrow(my_cell_index == 20, ExcInternalError());
+    DEAL_II_AssertThrow(my_cell_index == 20, ExcInternalError());
   }
 
   parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_fraction(

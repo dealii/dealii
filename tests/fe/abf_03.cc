@@ -59,7 +59,7 @@ test(const unsigned int degree)
       {
         deallog << i << ": " << dof_values[i] << " vs. " << compare_values[i]
                 << std::endl;
-        AssertThrow(false, ExcInternalError());
+        DEAL_II_AssertThrow(false, ExcInternalError());
       }
   deallog << "OK" << std::endl;
 }

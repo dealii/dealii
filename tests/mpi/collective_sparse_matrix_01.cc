@@ -68,10 +68,11 @@ test()
     {
       const auto i = (*it).row();
       const auto j = (*it).column();
-      AssertThrow(matrix(i, j) == full(i, j),
-                  ExcMessage(std::to_string(matrix(i, j)) +
-                             " != " + std::to_string(full(i, j)) + " for i=" +
-                             std::to_string(i) + " j=" + std::to_string(j)));
+      DEAL_II_AssertThrow(matrix(i, j) == full(i, j),
+                          ExcMessage(std::to_string(matrix(i, j)) +
+                                     " != " + std::to_string(full(i, j)) +
+                                     " for i=" + std::to_string(i) +
+                                     " j=" + std::to_string(j)));
     }
 
   deallog << "Ok" << std::endl;

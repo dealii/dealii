@@ -112,16 +112,17 @@ test(const Triangulation<dim> &tr,
     {
       deallog << "  curls[q]= " << curls[q] << std::endl
               << "  grads[q]= " << grads[q] << std::endl;
-      Assert((curl(grads[q]) - curls[q]).norm() <= 1e-10, ExcInternalError());
+      DEAL_II_Assert((curl(grads[q]) - curls[q]).norm() <= 1e-10,
+                     ExcInternalError());
 
       // we know the function F=(0,x^2) and we chose an element with
       // high enough degree to exactly represent this function, so the
       // curl of this function should be
       //   curl F = d_x F_y - d_y F_x = 2x
       // verify that this is true
-      AssertThrow(std::fabs(curls[q][0] -
-                            2 * fe_values.quadrature_point(q)[0]) <= 1e-10,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(
+        std::fabs(curls[q][0] - 2 * fe_values.quadrature_point(q)[0]) <= 1e-10,
+        ExcInternalError());
     }
 }
 

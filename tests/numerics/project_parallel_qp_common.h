@@ -65,7 +65,8 @@ public:
   virtual double
   value(const Point<dim> &p, const unsigned int component = 0) const
   {
-    Assert((component == 0) && (this->n_components == 1), ExcInternalError());
+    DEAL_II_Assert((component == 0) && (this->n_components == 1),
+                   ExcInternalError());
     double val = 0;
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int i = 0; i <= q; ++i)
@@ -104,7 +105,7 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
            const FiniteElement<dim> &                       fe,
            const unsigned int                               p)
 {
-  AssertThrow(fe.n_components() == 1, ExcNotImplemented());
+  DEAL_II_AssertThrow(fe.n_components() == 1, ExcNotImplemented());
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 

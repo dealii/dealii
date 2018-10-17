@@ -161,24 +161,25 @@ public:
   /**
    * Exception.
    */
-  DeclExceptionMsg(ExcEmptyData,
-                   "Your input argument to this function does not appear to "
-                   "have any data in it.");
+  DEAL_II_DeclExceptionMsg(
+    ExcEmptyData,
+    "Your input argument to this function does not appear to "
+    "have any data in it.");
   /**
    * Exception.
    */
-  DeclException2(ExcIncompatibleArraySize,
-                 int,
-                 int,
-                 << "The two array sizes " << arg1 << " and " << arg2
-                 << " must match, but don't.");
+  DEAL_II_DeclException2(ExcIncompatibleArraySize,
+                         int,
+                         int,
+                         << "The two array sizes " << arg1 << " and " << arg2
+                         << " must match, but don't.");
   /**
    * Exception.
    */
-  DeclException1(ExcInvalidName,
-                 std::string,
-                 << "The given name <" << arg1
-                 << "> does not match any of the known formats.");
+  DEAL_II_DeclException1(ExcInvalidName,
+                         std::string,
+                         << "The given name <" << arg1
+                         << "> does not match any of the known formats.");
 
 private:
   /**

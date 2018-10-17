@@ -36,8 +36,8 @@ test(Vector<std::complex<double>> &v)
 
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
-    AssertThrow(v(i) == std::complex<double>(i + 2., i + 2.),
-                ExcInternalError());
+    DEAL_II_AssertThrow(v(i) == std::complex<double>(i + 2., i + 2.),
+                        ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

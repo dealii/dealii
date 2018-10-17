@@ -98,7 +98,7 @@ namespace internal
           const unsigned int     new_index,
           const unsigned int     position)
     {
-      Assert(position < 2, ExcIndexRange(position, 0, 2));
+      DEAL_II_Assert(position < 2, ExcIndexRange(position, 0, 2));
 
       if (position == 0)
         return TableIndices<2>(new_index, numbers::invalid_unsigned_int);
@@ -119,7 +119,7 @@ namespace internal
           const unsigned int     new_index,
           const unsigned int     position)
     {
-      Assert(position < 4, ExcIndexRange(position, 0, 4));
+      DEAL_II_Assert(position < 4, ExcIndexRange(position, 0, 4));
 
       switch (position)
         {
@@ -144,7 +144,7 @@ namespace internal
                                    previous_indices[2],
                                    new_index);
         }
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
       return TableIndices<4>();
     }
 
@@ -1036,11 +1036,11 @@ template <typename OtherNumber>
 inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
   const Tensor<2, dim, OtherNumber> &t)
 {
-  Assert(rank == 2, ExcNotImplemented());
+  DEAL_II_Assert(rank == 2, ExcNotImplemented());
   switch (dim)
     {
       case 2:
-        Assert(t[0][1] == t[1][0], ExcInternalError());
+        DEAL_II_Assert(t[0][1] == t[1][0], ExcInternalError());
 
         data[0] = t[0][0];
         data[1] = t[1][1];
@@ -1048,9 +1048,9 @@ inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
 
         break;
       case 3:
-        Assert(t[0][1] == t[1][0], ExcInternalError());
-        Assert(t[0][2] == t[2][0], ExcInternalError());
-        Assert(t[1][2] == t[2][1], ExcInternalError());
+        DEAL_II_Assert(t[0][1] == t[1][0], ExcInternalError());
+        DEAL_II_Assert(t[0][2] == t[2][0], ExcInternalError());
+        DEAL_II_Assert(t[1][2] == t[2][1], ExcInternalError());
 
         data[0] = t[0][0];
         data[1] = t[1][1];
@@ -1063,7 +1063,7 @@ inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
       default:
         for (unsigned int d = 0; d < dim; ++d)
           for (unsigned int e = 0; e < d; ++e)
-            Assert(t[d][e] == t[e][d], ExcInternalError());
+            DEAL_II_Assert(t[d][e] == t[e][d], ExcInternalError());
 
         for (unsigned int d = 0; d < dim; ++d)
           data[d] = t[d][d];
@@ -1096,8 +1096,8 @@ inline SymmetricTensor<rank_, dim, Number>::SymmetricTensor(
       *reinterpret_cast<const typename base_tensor_type::array_type *>(array))
 {
   // ensure that the reinterpret_cast above actually works
-  Assert(sizeof(typename base_tensor_type::array_type) == sizeof(array),
-         ExcInternalError());
+  DEAL_II_Assert(sizeof(typename base_tensor_type::array_type) == sizeof(array),
+                 ExcInternalError());
 }
 
 
@@ -1119,8 +1119,8 @@ template <int rank_, int dim, typename Number>
 inline SymmetricTensor<rank_, dim, Number> &
 SymmetricTensor<rank_, dim, Number>::operator=(const Number &d)
 {
-  Assert(numbers::value_is_zero(d),
-         ExcMessage("Only assignment with zero is allowed"));
+  DEAL_II_Assert(numbers::value_is_zero(d),
+                 ExcMessage("Only assignment with zero is allowed"));
   (void)d;
 
   data = internal::NumberType<Number>::value(0.0);
@@ -1408,8 +1408,8 @@ namespace internal
                 }
 
             // Check whether the pivot is too small
-            Assert(max > 1.e-16 * typical_diagonal_element,
-                   ExcMessage("This tensor seems to be noninvertible"));
+            DEAL_II_Assert(max > 1.e-16 * typical_diagonal_element,
+                           ExcMessage("This tensor seems to be noninvertible"));
 
             // Row interchange
             if (r > j)
@@ -1783,9 +1783,9 @@ namespace internal
       {
         case 2:
           // at least for the 2x2 case it is reasonably simple
-          Assert(((indices[0] == 1) && (indices[1] == 0)) ||
-                   ((indices[0] == 0) && (indices[1] == 1)),
-                 ExcInternalError());
+          DEAL_II_Assert(((indices[0] == 1) && (indices[1] == 0)) ||
+                           ((indices[0] == 0) && (indices[1] == 1)),
+                         ExcInternalError());
           return data[2];
 
         default:
@@ -1798,7 +1798,7 @@ namespace internal
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
                 if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
                   return data[dim + c];
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
           }
       }
 
@@ -1828,9 +1828,9 @@ namespace internal
       {
         case 2:
           // at least for the 2x2 case it is reasonably simple
-          Assert(((indices[0] == 1) && (indices[1] == 0)) ||
-                   ((indices[0] == 0) && (indices[1] == 1)),
-                 ExcInternalError());
+          DEAL_II_Assert(((indices[0] == 1) && (indices[1] == 0)) ||
+                           ((indices[0] == 0) && (indices[1] == 1)),
+                         ExcInternalError());
           return data[2];
 
         default:
@@ -1843,7 +1843,7 @@ namespace internal
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
                 if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
                   return data[dim + c];
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
           }
       }
 
@@ -1919,9 +1919,9 @@ namespace internal
               base_index[0] = 4;
             else
               {
-                Assert(((indices[0] == 1) && (indices[1] == 2)) ||
-                         ((indices[0] == 2) && (indices[1] == 1)),
-                       ExcInternalError());
+                DEAL_II_Assert(((indices[0] == 1) && (indices[1] == 2)) ||
+                                 ((indices[0] == 2) && (indices[1] == 1)),
+                               ExcInternalError());
                 base_index[0] = 5;
               }
 
@@ -1939,9 +1939,9 @@ namespace internal
               base_index[1] = 4;
             else
               {
-                Assert(((indices[2] == 1) && (indices[3] == 2)) ||
-                         ((indices[2] == 2) && (indices[3] == 1)),
-                       ExcInternalError());
+                DEAL_II_Assert(((indices[2] == 1) && (indices[3] == 2)) ||
+                                 ((indices[2] == 2) && (indices[3] == 1)),
+                               ExcInternalError());
                 base_index[1] = 5;
               }
 
@@ -1949,7 +1949,7 @@ namespace internal
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     static Number dummy;
@@ -2023,9 +2023,9 @@ namespace internal
               base_index[0] = 4;
             else
               {
-                Assert(((indices[0] == 1) && (indices[1] == 2)) ||
-                         ((indices[0] == 2) && (indices[1] == 1)),
-                       ExcInternalError());
+                DEAL_II_Assert(((indices[0] == 1) && (indices[1] == 2)) ||
+                                 ((indices[0] == 2) && (indices[1] == 1)),
+                               ExcInternalError());
                 base_index[0] = 5;
               }
 
@@ -2043,9 +2043,9 @@ namespace internal
               base_index[1] = 4;
             else
               {
-                Assert(((indices[2] == 1) && (indices[3] == 2)) ||
-                         ((indices[2] == 2) && (indices[3] == 1)),
-                       ExcInternalError());
+                DEAL_II_Assert(((indices[2] == 1) && (indices[3] == 2)) ||
+                                 ((indices[2] == 2) && (indices[3] == 1)),
+                               ExcInternalError());
                 base_index[1] = 5;
               }
 
@@ -2053,7 +2053,7 @@ namespace internal
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     static Number dummy;
@@ -2070,7 +2070,8 @@ SymmetricTensor<rank_, dim, Number>::
 operator()(const TableIndices<rank_> &indices)
 {
   for (unsigned int r = 0; r < rank; ++r)
-    Assert(indices[r] < dimension, ExcIndexRange(indices[r], 0, dimension));
+    DEAL_II_Assert(indices[r] < dimension,
+                   ExcIndexRange(indices[r], 0, dimension));
   return internal::symmetric_tensor_access<dim, Number>(indices, data);
 }
 
@@ -2082,7 +2083,8 @@ SymmetricTensor<rank_, dim, Number>::
 operator()(const TableIndices<rank_> &indices) const
 {
   for (unsigned int r = 0; r < rank; ++r)
-    Assert(indices[r] < dimension, ExcIndexRange(indices[r], 0, dimension));
+    DEAL_II_Assert(indices[r] < dimension,
+                   ExcIndexRange(indices[r], 0, dimension));
   return internal::symmetric_tensor_access<dim, Number>(indices, data);
 }
 
@@ -2230,7 +2232,7 @@ inline const Number &
 SymmetricTensor<rank_, dim, Number>::access_raw_entry(
   const unsigned int index) const
 {
-  AssertIndexRange(index, n_independent_components);
+  DEAL_II_AssertIndexRange(index, n_independent_components);
   return data[internal::SymmetricTensorImplementation::entry_to_indices(*this,
                                                                         index)];
 }
@@ -2241,7 +2243,7 @@ template <int rank_, int dim, typename Number>
 inline Number &
 SymmetricTensor<rank_, dim, Number>::access_raw_entry(const unsigned int index)
 {
-  AssertIndexRange(index, n_independent_components);
+  DEAL_II_AssertIndexRange(index, n_independent_components);
   return data[internal::SymmetricTensorImplementation::entry_to_indices(*this,
                                                                         index)];
 }
@@ -2359,8 +2361,8 @@ namespace internal
     inline unsigned int
     component_to_unrolled_index(const TableIndices<2> &indices)
     {
-      Assert(indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
-      Assert(indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
+      DEAL_II_Assert(indices[0] < dim, ExcIndexRange(indices[0], 0, dim));
+      DEAL_II_Assert(indices[1] < dim, ExcIndexRange(indices[1], 0, dim));
 
       switch (dim)
         {
@@ -2407,7 +2409,7 @@ namespace internal
                     return dim + c;
 
               // should never get here:
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
               return 0;
             }
         }
@@ -2424,7 +2426,7 @@ namespace internal
     component_to_unrolled_index(const TableIndices<rank_> &indices)
     {
       (void)indices;
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return numbers::invalid_unsigned_int;
     }
   } // namespace SymmetricTensorImplementation
@@ -2458,7 +2460,7 @@ namespace internal
     unrolled_to_component_indices(const unsigned int i,
                                   const std::integral_constant<int, 2> &)
     {
-      Assert(
+      DEAL_II_Assert(
         (i < dealii::SymmetricTensor<2, dim, double>::n_independent_components),
         ExcIndexRange(
           i,
@@ -2500,7 +2502,7 @@ namespace internal
                   return TableIndices<2>(d, e);
 
             // should never get here:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
             return TableIndices<2>(0, 0);
         }
     }
@@ -2519,14 +2521,14 @@ namespace internal
                                   const std::integral_constant<int, rank_> &)
     {
       (void)i;
-      Assert(
+      DEAL_II_Assert(
         (i <
          dealii::SymmetricTensor<rank_, dim, double>::n_independent_components),
         ExcIndexRange(i,
                       0,
                       dealii::SymmetricTensor<rank_, dim, double>::
                         n_independent_components));
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return TableIndices<rank_>();
     }
 
@@ -2710,7 +2712,7 @@ determinant(const SymmetricTensor<2, dim, Number> &t)
                   t.data[2] * t.data[3] * t.data[3]);
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return internal::NumberType<Number>::value(0.0);
     }
 }

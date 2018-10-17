@@ -192,7 +192,7 @@ namespace Polynomials
   inline number
   PiecewisePolynomial<number>::value(const number x) const
   {
-    AssertIndexRange(interval, n_intervals);
+    DEAL_II_AssertIndexRange(interval, n_intervals);
     number y = x;
     // shift polynomial if necessary
     if (n_intervals > 1)

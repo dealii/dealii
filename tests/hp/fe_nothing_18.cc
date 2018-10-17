@@ -206,10 +206,11 @@ inline void
 ConstrainValues<dim>::vector_value(const Point<dim> &p,
                                    Vector<double> &  values) const
 {
-  Assert(values.size() == dim,
-         ExcDimensionMismatch(values.size(),
-                              dim)); // check is the size of "values" is correct
-  // Assert (dim >= 2, ExcNotImplemented());//not implemented for 1d
+  DEAL_II_Assert(
+    values.size() == dim,
+    ExcDimensionMismatch(values.size(),
+                         dim)); // check is the size of "values" is correct
+  // DEAL_II_Assert (dim >= 2, ExcNotImplemented());//not implemented for 1d
   values[0] = 0.0;
 }
 
@@ -219,7 +220,7 @@ ConstrainValues<dim>::vector_value_list(
   const std::vector<Point<dim>> &points,
   std::vector<Vector<double>> &  value_list) const
 {
-  Assert(
+  DEAL_II_Assert(
     value_list.size() == points.size(),
     ExcDimensionMismatch(value_list.size(),
                          points.size())); // check if input-output is consistent
@@ -342,9 +343,10 @@ ElasticProblem<dim>::setup_system()
     }
   deallog << " number of cells (L/E): " << n_lagrange_cells << "; "
           << n_elasticity_cells << std::endl;
-  Assert(n_lagrange_cells > 0,
-         ExcInternalError()); // there should be at least 1 cell! Otherwise
-                              // DoFHanlder crashes with 0 dofs for block 2!
+  DEAL_II_Assert(
+    n_lagrange_cells > 0,
+    ExcInternalError()); // there should be at least 1 cell! Otherwise
+                         // DoFHanlder crashes with 0 dofs for block 2!
   //
   //(2) distribute DoFs
   dof_handler.distribute_dofs(

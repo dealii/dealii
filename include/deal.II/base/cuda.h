@@ -76,7 +76,7 @@ namespace Utilities
     {
       cudaError_t cuda_error_code =
         cudaMalloc(&pointer, n_elements * sizeof(T));
-      AssertCuda(cuda_error_code);
+      DEAL_II_AssertCuda(cuda_error_code);
     }
 
     /**
@@ -87,7 +87,7 @@ namespace Utilities
     free(T *&pointer)
     {
       cudaError_t cuda_error_code = cudaFree(pointer);
-      AssertCuda(cuda_error_code);
+      DEAL_II_AssertCuda(cuda_error_code);
       pointer = nullptr;
     }
 
@@ -111,7 +111,7 @@ namespace Utilities
     delete_device_data(Number *device_ptr) noexcept
     {
       const cudaError_t error_code = cudaFree(device_ptr);
-      AssertNothrowCuda(error_code);
+      DEAL_II_AssertNothrowCuda(error_code);
     }
 
     /**
@@ -125,7 +125,7 @@ namespace Utilities
                                                pointer_dev,
                                                vector_host.size() * sizeof(T),
                                                cudaMemcpyDeviceToHost);
-      AssertCuda(cuda_error_code);
+      DEAL_II_AssertCuda(cuda_error_code);
     }
 
     /**
@@ -140,7 +140,7 @@ namespace Utilities
                                                vector_host.data(),
                                                vector_host.size() * sizeof(T),
                                                cudaMemcpyHostToDevice);
-      AssertCuda(cuda_error_code);
+      DEAL_II_AssertCuda(cuda_error_code);
     }
   } // namespace CUDA
 } // namespace Utilities

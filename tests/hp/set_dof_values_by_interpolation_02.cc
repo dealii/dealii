@@ -98,7 +98,7 @@ test()
                                             cell->active_fe_index());
 
       // now verify correctness
-      AssertThrow(solution1 == solution2, ExcInternalError());
+      DEAL_II_AssertThrow(solution1 == solution2, ExcInternalError());
     }
   deallog << "OK" << std::endl;
 }

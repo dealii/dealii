@@ -82,7 +82,7 @@ test(std::ostream & /*out*/)
             cell->set_refine_flag();
             intergrid_map[cell]->set_refine_flag();
           }
-      Assert(index == tr.n_active_cells(), ExcInternalError());
+      DEAL_II_Assert(index == tr.n_active_cells(), ExcInternalError());
       tr.execute_coarsening_and_refinement();
       tr2.execute_coarsening_and_refinement();
 

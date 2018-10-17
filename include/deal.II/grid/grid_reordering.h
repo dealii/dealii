@@ -29,8 +29,9 @@ DEAL_II_NAMESPACE_OPEN
  * An exception that is thrown whenever the edges of a mesh are not
  * orientable.
  */
-DeclExceptionMsg(ExcMeshNotOrientable,
-                 "The edges of the mesh are not consistently orientable.");
+DEAL_II_DeclExceptionMsg(
+  ExcMeshNotOrientable,
+  "The edges of the mesh are not consistently orientable.");
 
 
 /**

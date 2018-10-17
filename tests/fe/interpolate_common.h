@@ -109,8 +109,8 @@ public:
              std::vector<double> &          values,
              const unsigned int             c) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -127,10 +127,10 @@ public:
   vector_value_list(const std::vector<Point<dim>> &points,
                     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(values[0].size() == this->n_components,
-           ExcDimensionMismatch(values.size(), this->n_components));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values[0].size() == this->n_components,
+                   ExcDimensionMismatch(values.size(), this->n_components));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {

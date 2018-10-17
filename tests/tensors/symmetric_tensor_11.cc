@@ -34,7 +34,8 @@ test()
       t[i][j] = (1. + (i + 1) * (j * 2));
 
   SymmetricTensor<2, dim> x = deviator_tensor<dim>() * t;
-  AssertThrow((x - deviator(t)).norm() < 1e-15 * t.norm(), ExcInternalError());
+  DEAL_II_AssertThrow((x - deviator(t)).norm() < 1e-15 * t.norm(),
+                      ExcInternalError());
 
   deallog << "x=" << std::endl;
   for (unsigned int i = 0; i < dim; ++i)

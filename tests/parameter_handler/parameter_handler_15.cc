@@ -54,8 +54,8 @@ test(std::string content)
   double v3, v4;
   check(content.c_str(), v3, v4);
 
-  Assert(v1 == v3, ExcInternalError());
-  Assert(v2 == v4, ExcInternalError());
+  DEAL_II_Assert(v1 == v3, ExcInternalError());
+  DEAL_II_Assert(v2 == v4, ExcInternalError());
 }
 
 int

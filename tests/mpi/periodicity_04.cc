@@ -220,12 +220,12 @@ check(const unsigned int orientation, bool reverse)
         {
           const std::vector<std::pair<types::global_dof_index, double>>
             *entries = constraints.get_constraint_entries(line);
-          Assert(entries->size() == 1, ExcInternalError());
+          DEAL_II_Assert(entries->size() == 1, ExcInternalError());
           const Point<dim> point1     = support_points[line];
           const Point<dim> point2     = support_points[(*entries)[0].first];
           Tensor<1, dim>   difference = point1 - point2;
           difference[dim - 1]         = 0.;
-          AssertThrow(difference.norm() < 1.e-9, ExcInternalError());
+          DEAL_II_AssertThrow(difference.norm() < 1.e-9, ExcInternalError());
           if (locally_owned_dofs.is_element(line))
             ++n_local_constraints;
         }
@@ -237,8 +237,9 @@ check(const unsigned int orientation, bool reverse)
     deallog << "n_constraints: " << n_constraints
             << " n_expected_constraints: " << n_expected_constraints
             << std::endl;
-  AssertThrow(n_constraints == n_expected_constraints,
-              ExcDimensionMismatch(n_constraints, n_expected_constraints));
+  DEAL_II_AssertThrow(n_constraints == n_expected_constraints,
+                      ExcDimensionMismatch(n_constraints,
+                                           n_expected_constraints));
 
   // now refine and check if the neighboring faces are correctly found
   typename Triangulation<dim>::active_cell_iterator cell;
@@ -262,7 +263,7 @@ check(const unsigned int orientation, bool reverse)
                 MPI_INT,
                 MPI_SUM,
                 triangulation.get_communicator());
-  Assert(sum_of_pairs_global > 0, ExcInternalError());
+  DEAL_II_Assert(sum_of_pairs_global > 0, ExcInternalError());
   for (it = face_map.begin(); it != face_map.end(); ++it)
     {
       const typename Triangulation<dim>::cell_iterator cell_1 = it->first.first;
@@ -272,12 +273,12 @@ check(const unsigned int orientation, bool reverse)
       const unsigned int face_no_2     = it->second.first.second;
       const Point<dim>   face_center_1 = cell_1->face(face_no_1)->center();
       const Point<dim>   face_center_2 = cell_2->face(face_no_2)->center();
-      Assert(std::min(std::abs(face_center_1(dim - 1) - 3.),
-                      std::abs(face_center_1(dim - 1) + 3.)) < 1.e-8,
-             ExcInternalError());
-      Assert(std::min(std::abs(face_center_2(dim - 1) - 3.),
-                      std::abs(face_center_2(dim - 1) + 3.)) < 1.e-8,
-             ExcInternalError());
+      DEAL_II_Assert(std::min(std::abs(face_center_1(dim - 1) - 3.),
+                              std::abs(face_center_1(dim - 1) + 3.)) < 1.e-8,
+                     ExcInternalError());
+      DEAL_II_Assert(std::min(std::abs(face_center_2(dim - 1) - 3.),
+                              std::abs(face_center_2(dim - 1) + 3.)) < 1.e-8,
+                     ExcInternalError());
       if (cell_1->level() == cell_2->level())
         for (unsigned int c = 0; c < dim - 1; ++c)
           if (std::abs(face_center_1(c) - face_center_2(c)) > 1.e-8)
@@ -297,7 +298,7 @@ check(const unsigned int orientation, bool reverse)
                             << it->second.first.first->center() << " on face "
                             << it->second.first.second << std::endl;
                 }
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
             }
     }
 }

@@ -158,7 +158,7 @@ namespace Functions
     : Function<dim>(n_components)
     , coordinate_system_offset(p)
   {
-    AssertThrow(dim == 3, ExcNotImplemented());
+    DEAL_II_AssertThrow(dim == 3, ExcNotImplemented());
   }
 
 
@@ -182,7 +182,7 @@ namespace Functions
                            const unsigned int /*component*/) const
 
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return {};
   }
 
@@ -217,13 +217,13 @@ namespace Functions
 
     if (sg[1] * sin_phi != 0.)
       {
-        Assert(sp[0] != 0., ExcDivideByZero());
+        DEAL_II_Assert(sp[0] != 0., ExcDivideByZero());
         res += unit_theta * sg[1] / (sp[0] * sin_phi);
       }
 
     if (sg[2] != 0.)
       {
-        Assert(sp[0] != 0., ExcDivideByZero());
+        DEAL_II_Assert(sp[0] != 0., ExcDivideByZero());
         res += unit_phi * sg[2] / sp[0];
       }
 
@@ -237,7 +237,7 @@ namespace Functions
   Spherical<dim>::hessian(const Point<dim> & /*p*/,
                           const unsigned int /*component*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return {};
   }
 
@@ -268,7 +268,7 @@ namespace Functions
 
     const double sin_phi2 = sin_phi * sin_phi;
     const double r2       = r * r;
-    Assert(r != 0., ExcDivideByZero());
+    DEAL_II_Assert(r != 0., ExcDivideByZero());
 
     const double c_utheta2 =
       sg[0] / r + ((sin_phi != 0.) ? (cos_phi * sg[2]) / (r2 * sin_phi) +
@@ -317,7 +317,7 @@ namespace Functions
   Spherical<dim>::svalue(const std::array<double, dim> & /* sp */,
                          const unsigned int /*component*/) const
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return 0.;
   }
 
@@ -328,7 +328,7 @@ namespace Functions
   Spherical<dim>::sgradient(const std::array<double, dim> & /* sp */,
                             const unsigned int /*component*/) const
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return std::array<double, dim>();
   }
 
@@ -339,7 +339,7 @@ namespace Functions
   Spherical<dim>::shessian(const std::array<double, dim> & /* sp */,
                            const unsigned int /*component*/) const
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return std::array<double, 6>();
   }
 

@@ -534,7 +534,7 @@ public:
 
   /**
    * Check the internal data sizes to test for a loss of data sync. This is
-   * often used in @p Assert statements with the @p ExcDataLostSync exception.
+   * often used in @p DEAL_II_Assert statements with the @p ExcDataLostSync exception.
    * If @p strict is @p false this method returns @p true if all sizes are
    * within 1 of each other (needed to allow data to be added), with @p strict
    * = @p true they must be exactly equal.
@@ -546,14 +546,15 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcNoIndependent,
-                   "A call has been made to push_back_independent() when "
-                   "no independent values were requested.");
+  DEAL_II_DeclExceptionMsg(
+    ExcNoIndependent,
+    "A call has been made to push_back_independent() when "
+    "no independent values were requested.");
 
   /**
    * Exception
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcDataLostSync,
     "This error is thrown to indicate that the data sets appear to be out of "
     "sync. The class requires that the number of dataset keys is the same as "
@@ -567,7 +568,7 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcDoFHandlerRequired,
     "A method which requires access to a @p DoFHandler to be meaningful has "
     "been called when have_dof_handler is false (most likely due to default "
@@ -577,7 +578,7 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcDoFHandlerChanged,
     "The triangulation has been refined or coarsened in some way. This "
     "suggests that the internal DoF indices stored by the current "

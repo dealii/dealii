@@ -61,8 +61,8 @@ main(int argc, char *argv[])
 
   out_matrix_size(AB, "A.B");
 
-  Assert(AB.m() == A.m(), ExcInternalError());
-  Assert(AB.n() == B.n(), ExcInternalError());
+  DEAL_II_Assert(AB.m() == A.m(), ExcInternalError());
+  DEAL_II_Assert(AB.n() == B.n(), ExcInternalError());
 
   TrilinosWrappers::SparsityPattern P_C;
   TrilinosWrappers::SparseMatrix    C;
@@ -77,6 +77,6 @@ main(int argc, char *argv[])
 
   out_matrix_size(AtC, "At.C");
 
-  Assert(AtC.m() == A.n(), ExcInternalError());
-  Assert(AtC.n() == C.n(), ExcInternalError());
+  DEAL_II_Assert(AtC.m() == A.n(), ExcInternalError());
+  DEAL_II_Assert(AtC.n() == C.n(), ExcInternalError());
 }

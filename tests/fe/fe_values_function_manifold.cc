@@ -145,7 +145,7 @@ public:
             return point[1] + 0.25 * (2 * x - 1.0) * (x - 1.0) * x;
           }
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return std::numeric_limits<double>::quiet_NaN();
   }
@@ -172,7 +172,7 @@ public:
             return point[1] - 0.25 * (2 * x - 1.0) * (x - 1.0) * x;
           }
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return std::numeric_limits<double>::quiet_NaN();
   }

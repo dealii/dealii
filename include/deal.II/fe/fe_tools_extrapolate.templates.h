@@ -54,7 +54,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
       };
 
       template <class InVector>
@@ -63,7 +63,7 @@ namespace FETools
                            const DoFHandler<dim, spacedim> & /*dof2*/,
                            OutVector & /*u2*/)
       {
-        Assert(false, ExcNotImplemented())
+        DEAL_II_Assert(false, ExcNotImplemented())
       }
     };
 #else
@@ -172,7 +172,8 @@ namespace FETools
             sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
           ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
 
-          Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+          DEAL_II_Assert(ptr == buffer.data() + buffer.size(),
+                         ExcInternalError());
         }
 
         void
@@ -196,7 +197,8 @@ namespace FETools
             sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
           ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
 
-          Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+          DEAL_II_Assert(ptr == buffer.data() + buffer.size(),
+                         ExcInternalError());
         }
       };
 
@@ -419,7 +421,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        DEAL_II_AssertThrow(false, ExcNotImplemented())
       }
 
       template <class InVector>
@@ -436,7 +438,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        DEAL_II_AssertThrow(false, ExcNotImplemented())
       }
 
       template <class InVector>
@@ -453,7 +455,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        DEAL_II_AssertThrow(false, ExcNotImplemented())
       }
 
       template <class InVector>
@@ -527,7 +529,7 @@ namespace FETools
       bool locally_owned_children = false;
       if (p4est_has_children)
         {
-          Assert(dealii_cell->has_children(), ExcInternalError());
+          DEAL_II_Assert(dealii_cell->has_children(), ExcInternalError());
 
           // check if at least one child is locally owned on our process
           for (unsigned int child_n = 0; child_n < dealii_cell->n_children();
@@ -562,7 +564,7 @@ namespace FETools
           // at this point of
           // the procedure no new
           // needs should come up
-          Assert(new_needs.size() == 0, ExcInternalError());
+          DEAL_II_Assert(new_needs.size() == 0, ExcInternalError());
 
           set_dof_values_by_interpolation(dealii_cell,
                                           p4est_cell,
@@ -608,12 +610,12 @@ namespace FETools
             dealii_cell->get_dof_handler().get_fe();
           const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-          Assert(interpolated_values.size() == dofs_per_cell,
-                 ExcDimensionMismatch(interpolated_values.size(),
-                                      dofs_per_cell));
-          Assert(u.size() == dealii_cell->get_dof_handler().n_dofs(),
-                 ExcDimensionMismatch(u.size(),
-                                      dealii_cell->get_dof_handler().n_dofs()));
+          DEAL_II_Assert(interpolated_values.size() == dofs_per_cell,
+                         ExcDimensionMismatch(interpolated_values.size(),
+                                              dofs_per_cell));
+          DEAL_II_Assert(u.size() == dealii_cell->get_dof_handler().n_dofs(),
+                         ExcDimensionMismatch(
+                           u.size(), dealii_cell->get_dof_handler().n_dofs()));
 
           Vector<value_type> tmp1(dofs_per_cell);
           Vector<value_type> tmp2(dofs_per_cell);
@@ -664,11 +666,11 @@ namespace FETools
                     }
                   else
                     {
-                      Assert(available_cells[pos].dof_values.size() ==
-                               dofs_per_cell,
-                             ExcDimensionMismatch(
-                               available_cells[pos].dof_values.size(),
-                               dofs_per_cell));
+                      DEAL_II_Assert(available_cells[pos].dof_values.size() ==
+                                       dofs_per_cell,
+                                     ExcDimensionMismatch(
+                                       available_cells[pos].dof_values.size(),
+                                       dofs_per_cell));
 
                       tmp1 = available_cells[pos].dof_values;
                     }
@@ -751,11 +753,12 @@ namespace FETools
         }
       else
         {
-          Assert(local_values.size() == dofs_per_cell,
-                 ExcDimensionMismatch(local_values.size(), dofs_per_cell));
-          Assert(u.size() == dealii_cell->get_dof_handler().n_dofs(),
-                 ExcDimensionMismatch(u.size(),
-                                      dealii_cell->get_dof_handler().n_dofs()));
+          DEAL_II_Assert(local_values.size() == dofs_per_cell,
+                         ExcDimensionMismatch(local_values.size(),
+                                              dofs_per_cell));
+          DEAL_II_Assert(u.size() == dealii_cell->get_dof_handler().n_dofs(),
+                         ExcDimensionMismatch(
+                           u.size(), dealii_cell->get_dof_handler().n_dofs()));
 
           Vector<value_type> tmp(dofs_per_cell);
 
@@ -792,7 +795,7 @@ namespace FETools
         (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                         *>(&dof2.get_triangulation()));
 
-      Assert(tr != nullptr, ExcInternalError());
+      DEAL_II_Assert(tr != nullptr, ExcInternalError());
 
       typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
                                                         endc = dof2.end(0);
@@ -824,7 +827,7 @@ namespace FETools
               &p4est_coarse_cell,
               dealii::internal::p4est::functions<dim>::quadrant_compare);
 
-            AssertThrow(idx == -1, ExcGridNotRefinedAtLeastOnce());
+            DEAL_II_AssertThrow(idx == -1, ExcGridNotRefinedAtLeastOnce());
           }
 
           traverse_tree_recursively(*tr->parallel_forest,
@@ -874,7 +877,7 @@ namespace FETools
       bool locally_owned_children = false;
       if (p4est_has_children)
         {
-          Assert(dealii_cell->has_children(), ExcInternalError());
+          DEAL_II_Assert(dealii_cell->has_children(), ExcInternalError());
 
           for (unsigned int child_n = 0; child_n < dealii_cell->n_children();
                ++child_n)
@@ -933,7 +936,7 @@ namespace FETools
     {
       if (dealii_cell->has_children())
         {
-          Assert(dealii_cell->has_children(), ExcInternalError());
+          DEAL_II_Assert(dealii_cell->has_children(), ExcInternalError());
 
           typename dealii::internal::p4est::types<dim>::quadrant
             p4est_child[GeometryInfo<dim>::max_children_per_cell];
@@ -995,7 +998,7 @@ namespace FETools
         (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                         *>(&dof2.get_triangulation()));
 
-      Assert(tr != nullptr, ExcInternalError());
+      DEAL_II_Assert(tr != nullptr, ExcInternalError());
 
       // collect in a set all trees this
       // process has to compute cells on
@@ -1165,10 +1168,11 @@ namespace FETools
                                      round,
                                      communicator,
                                      &requests[idx]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
 
-      Assert(destinations.size() == cells_to_send.size(), ExcInternalError());
+      DEAL_II_Assert(destinations.size() == cells_to_send.size(),
+                     ExcInternalError());
 
       const unsigned int n_senders =
         Utilities::MPI::compute_n_point_to_point_communications(communicator,
@@ -1182,9 +1186,9 @@ namespace FETools
           MPI_Status status;
           int        len;
           int ierr = MPI_Probe(MPI_ANY_SOURCE, round, communicator, &status);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           receive.resize(len);
 
           char *buf = receive.data();
@@ -1195,7 +1199,7 @@ namespace FETools
                           status.MPI_TAG,
                           communicator,
                           &status);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           cell_data.unpack_data(receive);
 
@@ -1211,7 +1215,7 @@ namespace FETools
         {
           const int ierr =
             MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
 
       // finally sort the list of cells
@@ -1391,7 +1395,7 @@ namespace FETools
         (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                         *>(&dof2.get_triangulation()));
 
-      Assert(
+      DEAL_II_Assert(
         tr != nullptr,
         ExcMessage(
           "Extrapolate in parallel only works for parallel distributed triangulations!"));
@@ -1497,7 +1501,7 @@ namespace FETools
           // traverse recursively over this tree
           if (dealii_cell->has_children())
             {
-              Assert(dealii_cell->has_children(), ExcInternalError());
+              DEAL_II_Assert(dealii_cell->has_children(), ExcInternalError());
               typename dealii::internal::p4est::types<dim>::quadrant
                 p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
@@ -1555,7 +1559,7 @@ namespace FETools
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
+      DEAL_II_Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
@@ -1572,7 +1576,7 @@ namespace FETools
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
+      DEAL_II_Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
@@ -1590,7 +1594,7 @@ namespace FETools
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
+      DEAL_II_Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
@@ -1607,7 +1611,7 @@ namespace FETools
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
+      DEAL_II_Assert(parallel_tria != nullptr, ExcNotImplemented());
 
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
@@ -1619,7 +1623,7 @@ namespace FETools
     void
     reinit_ghosted(const DH & /*dh*/, VectorType & /*vector*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 #ifdef DEAL_II_WITH_PETSC
@@ -1632,7 +1636,7 @@ namespace FETools
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
+      DEAL_II_Assert(parallel_tria != nullptr, ExcNotImplemented());
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       IndexSet        locally_relevant_dofs;
       DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
@@ -1652,7 +1656,7 @@ namespace FETools
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
+      DEAL_II_Assert(parallel_tria != nullptr, ExcNotImplemented());
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       IndexSet        locally_relevant_dofs;
       DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
@@ -1671,7 +1675,7 @@ namespace FETools
         dynamic_cast<
           const parallel::distributed::Triangulation<dim, spacedim> *>(
           &dh.get_triangulation());
-      Assert(parallel_tria != nullptr, ExcNotImplemented());
+      DEAL_II_Assert(parallel_tria != nullptr, ExcNotImplemented());
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       IndexSet        locally_relevant_dofs;
       DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
@@ -1756,15 +1760,16 @@ namespace FETools
     const AffineConstraints<typename OutVector::value_type> &constraints,
     OutVector &                                              u2)
   {
-    Assert(dof1.get_fe(0).n_components() == dof2.get_fe(0).n_components(),
-           ExcDimensionMismatch(dof1.get_fe(0).n_components(),
-                                dof2.get_fe(0).n_components()));
-    Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
-           ExcTriangulationMismatch());
-    Assert(u1.size() == dof1.n_dofs(),
-           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-    Assert(u2.size() == dof2.n_dofs(),
-           ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
+    DEAL_II_Assert(dof1.get_fe(0).n_components() ==
+                     dof2.get_fe(0).n_components(),
+                   ExcDimensionMismatch(dof1.get_fe(0).n_components(),
+                                        dof2.get_fe(0).n_components()));
+    DEAL_II_Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
+                   ExcTriangulationMismatch());
+    DEAL_II_Assert(u1.size() == dof1.n_dofs(),
+                   ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    DEAL_II_Assert(u2.size() == dof2.n_dofs(),
+                   ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
     // make sure that each cell on the coarsest level is at least once refined,
     // otherwise, these cells can't be treated and would generate a bogus result
@@ -1772,8 +1777,8 @@ namespace FETools
       typename DoFHandler<dim, spacedim>::cell_iterator cell = dof2.begin(0),
                                                         endc = dof2.end(0);
       for (; cell != endc; ++cell)
-        Assert(cell->has_children() || cell->is_artificial(),
-               ExcGridNotRefinedAtLeastOnce());
+        DEAL_II_Assert(cell->has_children() || cell->is_artificial(),
+                       ExcGridNotRefinedAtLeastOnce());
     }
 
 

@@ -55,21 +55,22 @@ void check(Triangulation<3> &tria)
       tria.refine_global(1);
       const unsigned int count = count_wrong_faces(tria);
       deallog << "'Wrong' faces = " << count << std::endl;
-      Assert(count == initial_count * (4 << (2 * r)), ExcInternalError());
+      DEAL_II_Assert(count == initial_count * (4 << (2 * r)),
+                     ExcInternalError());
     }
 
   {
     coarsen_global(tria);
     const unsigned int count = count_wrong_faces(tria);
     deallog << "'Wrong' faces = " << count << std::endl;
-    Assert(count == initial_count * (4 << (2 * 1)), ExcInternalError());
+    DEAL_II_Assert(count == initial_count * (4 << (2 * 1)), ExcInternalError());
   }
 
   {
     tria.refine_global(1);
     const unsigned int count = count_wrong_faces(tria);
     deallog << "'Wrong' faces = " << count << std::endl;
-    Assert(count == initial_count * (4 << (2 * 2)), ExcInternalError());
+    DEAL_II_Assert(count == initial_count * (4 << (2 * 2)), ExcInternalError());
   }
 }
 

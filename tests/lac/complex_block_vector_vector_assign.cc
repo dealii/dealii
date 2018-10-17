@@ -54,12 +54,12 @@ test()
     v1(i) = 1 + i * i;
 
   v2 = v1;
-  AssertThrow(v1 == v2, ExcInternalError());
+  DEAL_II_AssertThrow(v1 == v2, ExcInternalError());
 
   BlockVector<std::complex<double>> v3(ivector);
   v3 = v2;
-  AssertThrow(v3 == v2, ExcInternalError());
-  AssertThrow(v3 == v1, ExcInternalError());
+  DEAL_II_AssertThrow(v3 == v2, ExcInternalError());
+  DEAL_II_AssertThrow(v3 == v1, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

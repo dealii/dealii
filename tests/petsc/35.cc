@@ -47,13 +47,13 @@ test(PETScWrappers::MPI::Vector &v, PETScWrappers::MPI::Vector &w)
     {
       if (i % 3 == 0)
         {
-          AssertThrow(w(i) == i + 1., ExcInternalError());
-          AssertThrow(v(i) == i + i + 1., ExcInternalError());
+          DEAL_II_AssertThrow(w(i) == i + 1., ExcInternalError());
+          DEAL_II_AssertThrow(v(i) == i + i + 1., ExcInternalError());
         }
       else
         {
-          AssertThrow(w(i) == 0, ExcInternalError());
-          AssertThrow(v(i) == i, ExcInternalError());
+          DEAL_II_AssertThrow(w(i) == 0, ExcInternalError());
+          DEAL_II_AssertThrow(v(i) == i, ExcInternalError());
         }
     }
 

@@ -95,7 +95,7 @@ test(const unsigned int size,
       double norm = full_pseudo_inverse.frobenius_norm();
       full_inverse.add(-1, full_pseudo_inverse);
       norm = full_inverse.frobenius_norm() / norm;
-      AssertThrow(norm < tol, ExcInternalError());
+      DEAL_II_AssertThrow(norm < tol, ExcInternalError());
     }
   pcout << std::endl;
 }

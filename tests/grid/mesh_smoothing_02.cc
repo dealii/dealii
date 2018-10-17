@@ -58,7 +58,7 @@ template <int dim>
 bool
 cell_is_patch_level_1(const typename Triangulation<dim>::cell_iterator &cell)
 {
-  Assert(cell->active() == false, ExcInternalError());
+  DEAL_II_Assert(cell->active() == false, ExcInternalError());
 
   unsigned int n_active_children = 0;
   for (unsigned int i = 0; i < cell->n_children(); ++i)
@@ -115,11 +115,11 @@ test()
        cell != triangulation.end();
        ++cell)
     {
-      AssertThrow((cell->refine_flag_set() == false) &&
-                    (cell->coarsen_flag_set() == false),
-                  ExcInternalError());
+      DEAL_II_AssertThrow((cell->refine_flag_set() == false) &&
+                            (cell->coarsen_flag_set() == false),
+                          ExcInternalError());
       if (!cell->active())
-        AssertThrow(cell_is_patch_level_1<2>(cell), ExcInternalError());
+        DEAL_II_AssertThrow(cell_is_patch_level_1<2>(cell), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

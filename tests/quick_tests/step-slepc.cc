@@ -172,16 +172,18 @@ LaplaceEigenspectrumProblem::solve()
 
         for (unsigned int j = 0; j < x.size(); j++)
           if (j != i)
-            Assert(std::abs(x[j] * Bx) < precision,
-                   ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
-                              " and " + Utilities::int_to_string(j) +
-                              " are not orthogonal!"));
+            DEAL_II_Assert(std::abs(x[j] * Bx) < precision,
+                           ExcMessage("Eigenvectors " +
+                                      Utilities::int_to_string(i) + " and " +
+                                      Utilities::int_to_string(j) +
+                                      " are not orthogonal!"));
 
         A.vmult(Ax, x[i]);
         Ax.add(-1.0 * lambda[i], Bx);
-        Assert(Ax.l2_norm() < precision,
-               ExcMessage("Returned vector " + Utilities::int_to_string(i) +
-                          " is not an eigenvector!"));
+        DEAL_II_Assert(Ax.l2_norm() < precision,
+                       ExcMessage("Returned vector " +
+                                  Utilities::int_to_string(i) +
+                                  " is not an eigenvector!"));
       }
   }
 
@@ -209,8 +211,8 @@ LaplaceEigenspectrumProblem::run()
       solve();
 
       // check energy convergence with previous result
-      AssertThrow(std::abs(lambda[0]) < old_lambda,
-                  ExcMessage("solution is not converging"));
+      DEAL_II_AssertThrow(std::abs(lambda[0]) < old_lambda,
+                          ExcMessage("solution is not converging"));
       old_lambda = std::abs(lambda[0]);
     }
 

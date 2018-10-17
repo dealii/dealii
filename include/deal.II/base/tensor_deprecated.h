@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @deprecated
  */
-DeclException1(
+DEAL_II_DeclException1(
   ExcInvalidTensorContractionIndex,
   int,
   << "You have requested contraction of tensors over index " << arg1
@@ -276,7 +276,7 @@ inline void contract(Tensor<2, dim, Number> &      dest,
               break;
 
             default:
-              Assert(false, (ExcInvalidTensorContractionIndex(index2)));
+              DEAL_II_Assert(false, (ExcInvalidTensorContractionIndex(index2)));
           };
         break;
       case 2:
@@ -296,12 +296,12 @@ inline void contract(Tensor<2, dim, Number> &      dest,
               break;
 
             default:
-              Assert(false, (ExcInvalidTensorContractionIndex(index2)));
+              DEAL_II_Assert(false, (ExcInvalidTensorContractionIndex(index2)));
           };
         break;
 
       default:
-        Assert(false, (ExcInvalidTensorContractionIndex(index1)));
+        DEAL_II_Assert(false, (ExcInvalidTensorContractionIndex(index1)));
     };
 }
 
@@ -337,7 +337,7 @@ inline void contract(Tensor<2, dim, Number> &      dest,
         break;
 
       default:
-        Assert(false, (ExcInvalidTensorContractionIndex(index1)));
+        DEAL_II_Assert(false, (ExcInvalidTensorContractionIndex(index1)));
     };
 }
 
@@ -370,7 +370,7 @@ inline void contract(Tensor<3, dim, Number> &      dest,
                       dest[i][j][k] += src1[l][i][j] * src2[k][l];
               break;
             default:
-              Assert(false, (ExcInvalidTensorContractionIndex(index2)));
+              DEAL_II_Assert(false, (ExcInvalidTensorContractionIndex(index2)));
           }
 
         break;
@@ -392,7 +392,7 @@ inline void contract(Tensor<3, dim, Number> &      dest,
                       dest[i][j][k] += src1[i][l][j] * src2[k][l];
               break;
             default:
-              Assert(false, (ExcInvalidTensorContractionIndex(index2)));
+              DEAL_II_Assert(false, (ExcInvalidTensorContractionIndex(index2)));
           }
 
         break;
@@ -414,12 +414,12 @@ inline void contract(Tensor<3, dim, Number> &      dest,
                       dest[i][j][k] += src1[i][j][l] * src2[k][l];
               break;
             default:
-              Assert(false, (ExcInvalidTensorContractionIndex(index2)));
+              DEAL_II_Assert(false, (ExcInvalidTensorContractionIndex(index2)));
           }
 
         break;
       default:
-        Assert(false, (ExcInvalidTensorContractionIndex(index1)));
+        DEAL_II_Assert(false, (ExcInvalidTensorContractionIndex(index1)));
     }
 }
 

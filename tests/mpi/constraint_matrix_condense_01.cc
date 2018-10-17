@@ -54,7 +54,7 @@ test()
 
   PETScWrappers::MPI::Vector force;
   force.reinit(locally_owned_dofs, mpi_communicator);
-  Assert(!force.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(!force.has_ghost_elements(), ExcInternalError());
 
   AffineConstraints<PetscScalar> constraints(locally_relevant_dofs);
   constraints.clear();

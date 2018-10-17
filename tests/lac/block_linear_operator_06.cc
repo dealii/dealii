@@ -143,7 +143,7 @@ main()
     result -= u;
     u = u_copy;
 
-    AssertThrow(result.linfty_norm() < 1.e-10, ExcInternalError());
+    DEAL_II_AssertThrow(result.linfty_norm() < 1.e-10, ExcInternalError());
   }
 
   {
@@ -157,7 +157,7 @@ main()
     result -= u;
     u = u_copy;
 
-    AssertThrow(result.linfty_norm() < 1.e-10, ExcInternalError());
+    DEAL_II_AssertThrow(result.linfty_norm() < 1.e-10, ExcInternalError());
   }
 
   {
@@ -173,7 +173,7 @@ main()
     result -= u;
     u = u_copy;
 
-    AssertThrow(result.linfty_norm() < 1.e-10, ExcInternalError());
+    DEAL_II_AssertThrow(result.linfty_norm() < 1.e-10, ExcInternalError());
   }
 
   {
@@ -186,6 +186,6 @@ main()
     PRINTME("B.Tvmult_add", u);
     result -= u;
 
-    AssertThrow(result.linfty_norm() < 1.e-10, ExcInternalError());
+    DEAL_II_AssertThrow(result.linfty_norm() < 1.e-10, ExcInternalError());
   }
 }

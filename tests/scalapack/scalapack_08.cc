@@ -87,8 +87,9 @@ test(const unsigned int size,
   pcout << "comparing the SVD and Eigendecomposition of a s.p.d matrix"
         << std::endl;
   for (unsigned i = 0; i < max_num_values; ++i)
-    AssertThrow(std::abs(eigenvalues[size - 1 - i] - singular_values[i]) < tol,
-                ExcMessage("singular and eigenvalues do not match"));
+    DEAL_II_AssertThrow(std::abs(eigenvalues[size - 1 - i] -
+                                 singular_values[i]) < tol,
+                        ExcMessage("singular and eigenvalues do not match"));
   pcout
     << "   with respect to the given tolerance the singular and eigenvalues coincide"
     << std::endl;
@@ -106,12 +107,12 @@ test(const unsigned int size,
       NumberType product_1 = eigenvector * l_singular_vector;
       NumberType product_2 = eigenvector * r_singular_vector;
       // the tolerance is reduced for the singular vectors
-      AssertThrow((std::abs(product_1) - 1) < tol * 10,
-                  ExcMessage(
-                    "left singular vectors and eigenvectors do not coincide"));
-      AssertThrow((std::abs(product_2) - 1) < tol * 10,
-                  ExcMessage(
-                    "right singular vectors and eigenvectors do not coincide"));
+      DEAL_II_AssertThrow(
+        (std::abs(product_1) - 1) < tol * 10,
+        ExcMessage("left singular vectors and eigenvectors do not coincide"));
+      DEAL_II_AssertThrow(
+        (std::abs(product_2) - 1) < tol * 10,
+        ExcMessage("right singular vectors and eigenvectors do not coincide"));
     }
   pcout
     << "   with respect to the given tolerance the right and left singular vectors coincide with the eigenvectors"

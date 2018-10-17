@@ -34,11 +34,12 @@ ChunkSparsityPattern::ChunkSparsityPattern(const ChunkSparsityPattern &s)
   , chunk_size(s.chunk_size)
   , sparsity_pattern(s.sparsity_pattern)
 {
-  Assert(s.rows == 0 && s.cols == 0,
-         ExcMessage(
-           "This constructor can only be called if the provided argument "
-           "is the sparsity pattern for an empty matrix. This constructor can "
-           "not be used to copy-construct a non-empty sparsity pattern."));
+  DEAL_II_Assert(
+    s.rows == 0 && s.cols == 0,
+    ExcMessage(
+      "This constructor can only be called if the provided argument "
+      "is the sparsity pattern for an empty matrix. This constructor can "
+      "not be used to copy-construct a non-empty sparsity pattern."));
 
   reinit(0, 0, 0, chunk_size);
 }
@@ -50,7 +51,7 @@ ChunkSparsityPattern::ChunkSparsityPattern(const size_type m,
                                            const size_type max_per_row,
                                            const size_type chunk_size)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  DEAL_II_Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
 
   reinit(m, n, max_per_row, chunk_size);
 }
@@ -63,7 +64,7 @@ ChunkSparsityPattern::ChunkSparsityPattern(
   const std::vector<size_type> &row_lengths,
   const size_type               chunk_size)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  DEAL_II_Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
 
   reinit(m, n, row_lengths, chunk_size);
 }
@@ -84,7 +85,7 @@ ChunkSparsityPattern::ChunkSparsityPattern(
   const std::vector<size_type> &row_lengths,
   const size_type               chunk_size)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  DEAL_II_Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
 
   reinit(m, m, row_lengths, chunk_size);
 }
@@ -94,15 +95,16 @@ ChunkSparsityPattern::ChunkSparsityPattern(
 ChunkSparsityPattern &
 ChunkSparsityPattern::operator=(const ChunkSparsityPattern &s)
 {
-  Assert(s.rows == 0 && s.cols == 0,
-         ExcMessage(
-           "This operator can only be called if the provided argument "
-           "is the sparsity pattern for an empty matrix. This operator can "
-           "not be used to copy a non-empty sparsity pattern."));
+  DEAL_II_Assert(
+    s.rows == 0 && s.cols == 0,
+    ExcMessage("This operator can only be called if the provided argument "
+               "is the sparsity pattern for an empty matrix. This operator can "
+               "not be used to copy a non-empty sparsity pattern."));
 
-  Assert(rows == 0 && cols == 0,
-         ExcMessage("This operator can only be called if the current object is "
-                    "empty."));
+  DEAL_II_Assert(rows == 0 && cols == 0,
+                 ExcMessage(
+                   "This operator can only be called if the current object is "
+                   "empty."));
 
   // perform the checks in the underlying object as well
   sparsity_pattern = s.sparsity_pattern;
@@ -118,7 +120,7 @@ ChunkSparsityPattern::reinit(const size_type m,
                              const size_type max_per_row,
                              const size_type chunk_size)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  DEAL_II_Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
 
   // simply map this function to the other @p{reinit} function
   const std::vector<size_type> row_lengths(m, max_per_row);
@@ -134,8 +136,8 @@ ChunkSparsityPattern::reinit(
   const VectorSlice<const std::vector<size_type>> &row_lengths,
   const size_type                                  chunk_size)
 {
-  Assert(row_lengths.size() == m, ExcInvalidNumber(m));
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  DEAL_II_Assert(row_lengths.size() == m, ExcInvalidNumber(m));
+  DEAL_II_Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
 
   rows = m;
   cols = n;
@@ -184,7 +186,7 @@ void
 ChunkSparsityPattern::copy_from(const SparsityPatternType &dsp,
                                 const size_type            chunk_size)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  DEAL_II_Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
   this->chunk_size = chunk_size;
   rows             = dsp.n_rows();
   cols             = dsp.n_cols();
@@ -226,7 +228,7 @@ void
 ChunkSparsityPattern::copy_from(const FullMatrix<number> &matrix,
                                 const size_type           chunk_size)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  DEAL_II_Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
 
   // count number of entries per row, then initialize the underlying sparsity
   // pattern. remember to also allocate space for the diagonal entry (if that
@@ -263,7 +265,7 @@ ChunkSparsityPattern::reinit(const size_type               m,
                              const std::vector<size_type> &row_lengths,
                              const size_type               chunk_size)
 {
-  Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
+  DEAL_II_Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
 
   reinit(m, n, make_slice(row_lengths), chunk_size);
 }
@@ -299,15 +301,16 @@ ChunkSparsityPattern::create_from(const unsigned int m,
                                   const unsigned int chunk_size_in,
                                   const bool)
 {
-  Assert(m > (sparsity_pattern_for_chunks.n_rows() - 1) * chunk_size_in &&
-           m <= sparsity_pattern_for_chunks.n_rows() * chunk_size_in,
-         ExcMessage("Number of rows m is not compatible with chunk size "
-                    "and number of rows in sparsity pattern for the chunks."));
-  Assert(n > (sparsity_pattern_for_chunks.n_cols() - 1) * chunk_size_in &&
-           n <= sparsity_pattern_for_chunks.n_cols() * chunk_size_in,
-         ExcMessage(
-           "Number of columns m is not compatible with chunk size "
-           "and number of columns in sparsity pattern for the chunks."));
+  DEAL_II_Assert(
+    m > (sparsity_pattern_for_chunks.n_rows() - 1) * chunk_size_in &&
+      m <= sparsity_pattern_for_chunks.n_rows() * chunk_size_in,
+    ExcMessage("Number of rows m is not compatible with chunk size "
+               "and number of rows in sparsity pattern for the chunks."));
+  DEAL_II_Assert(
+    n > (sparsity_pattern_for_chunks.n_cols() - 1) * chunk_size_in &&
+      n <= sparsity_pattern_for_chunks.n_cols() * chunk_size_in,
+    ExcMessage("Number of columns m is not compatible with chunk size "
+               "and number of columns in sparsity pattern for the chunks."));
 
   internal::copy_sparsity(sparsity_pattern_for_chunks, sparsity_pattern);
   chunk_size = chunk_size_in;
@@ -336,8 +339,8 @@ ChunkSparsityPattern::max_entries_per_row() const
 void
 ChunkSparsityPattern::add(const size_type i, const size_type j)
 {
-  Assert(i < rows, ExcInvalidIndex(i, rows));
-  Assert(j < cols, ExcInvalidIndex(j, cols));
+  DEAL_II_Assert(i < rows, ExcInvalidIndex(i, rows));
+  DEAL_II_Assert(j < cols, ExcInvalidIndex(j, cols));
 
   sparsity_pattern.add(i / chunk_size, j / chunk_size);
 }
@@ -346,8 +349,8 @@ ChunkSparsityPattern::add(const size_type i, const size_type j)
 bool
 ChunkSparsityPattern::exists(const size_type i, const size_type j) const
 {
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
+  DEAL_II_Assert(i < rows, ExcIndexRange(i, 0, rows));
+  DEAL_II_Assert(j < cols, ExcIndexRange(j, 0, cols));
 
   return sparsity_pattern.exists(i / chunk_size, j / chunk_size);
 }
@@ -360,7 +363,7 @@ ChunkSparsityPattern::symmetrize()
   // matrix must be square. note that the for some matrix sizes, the current
   // sparsity pattern may not be square even if the underlying sparsity
   // pattern is (e.g. a 10x11 matrix with chunk_size 4)
-  Assert(rows == cols, ExcNotQuadratic());
+  DEAL_II_Assert(rows == cols, ExcNotQuadratic());
 
   sparsity_pattern.symmetrize();
 }
@@ -370,7 +373,7 @@ ChunkSparsityPattern::symmetrize()
 ChunkSparsityPattern::size_type
 ChunkSparsityPattern::row_length(const size_type i) const
 {
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
+  DEAL_II_Assert(i < rows, ExcIndexRange(i, 0, rows));
 
   // find out if we did padding and if this row is affected by it
   if (n_cols() % chunk_size == 0)
@@ -455,11 +458,11 @@ ChunkSparsityPattern::n_nonzero_elements() const
 void
 ChunkSparsityPattern::print(std::ostream &out) const
 {
-  Assert((sparsity_pattern.rowstart != nullptr) &&
-           (sparsity_pattern.colnums != nullptr),
-         ExcEmptyObject());
+  DEAL_II_Assert((sparsity_pattern.rowstart != nullptr) &&
+                   (sparsity_pattern.colnums != nullptr),
+                 ExcEmptyObject());
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   for (size_type i = 0; i < sparsity_pattern.rows; ++i)
     for (size_type d = 0; (d < chunk_size) && (i * chunk_size + d < n_rows());
@@ -478,7 +481,7 @@ ChunkSparsityPattern::print(std::ostream &out) const
         out << ']' << std::endl;
       }
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -486,11 +489,11 @@ ChunkSparsityPattern::print(std::ostream &out) const
 void
 ChunkSparsityPattern::print_gnuplot(std::ostream &out) const
 {
-  Assert((sparsity_pattern.rowstart != nullptr) &&
-           (sparsity_pattern.colnums != nullptr),
-         ExcEmptyObject());
+  DEAL_II_Assert((sparsity_pattern.rowstart != nullptr) &&
+                   (sparsity_pattern.colnums != nullptr),
+                 ExcEmptyObject());
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // for each entry in the underlying sparsity pattern, repeat everything
   // chunk_size x chunk_size times
@@ -512,7 +515,7 @@ ChunkSparsityPattern::print_gnuplot(std::ostream &out) const
             out << sparsity_pattern.colnums[j] * chunk_size + d << " "
                 << -static_cast<signed int>(i * chunk_size + e) << std::endl;
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -546,7 +549,7 @@ ChunkSparsityPattern::stores_only_added_elements() const
 void
 ChunkSparsityPattern::block_write(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // first the simple objects, bracketed in [...]
   out << '[' << rows << ' ' << cols << ' ' << chunk_size << ' ' << "][";
@@ -554,7 +557,7 @@ ChunkSparsityPattern::block_write(std::ostream &out) const
   sparsity_pattern.block_write(out);
   out << ']';
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -562,25 +565,25 @@ ChunkSparsityPattern::block_write(std::ostream &out) const
 void
 ChunkSparsityPattern::block_read(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   char c;
 
   // first read in simple data
   in >> c;
-  AssertThrow(c == '[', ExcIO());
+  DEAL_II_AssertThrow(c == '[', ExcIO());
   in >> rows >> cols >> chunk_size;
 
   in >> c;
-  AssertThrow(c == ']', ExcIO());
+  DEAL_II_AssertThrow(c == ']', ExcIO());
   in >> c;
-  AssertThrow(c == '[', ExcIO());
+  DEAL_II_AssertThrow(c == '[', ExcIO());
 
   // then read the underlying sparsity pattern
   sparsity_pattern.block_read(in);
 
   in >> c;
-  AssertThrow(c == ']', ExcIO());
+  DEAL_II_AssertThrow(c == ']', ExcIO());
 }
 
 

@@ -109,7 +109,7 @@ test()
           {
             std::cout << v1_interpolated(el) << " should be " << v1(el)
                       << std::endl;
-            AssertThrow(false, ExcInternalError());
+            DEAL_II_AssertThrow(false, ExcInternalError());
           }
       }
     deallog << "TrilinosWrappers::MPI::Vector: OK" << std::endl;
@@ -134,7 +134,7 @@ test()
           {
             std::cout << v1_interpolated(el) << " should be " << v1(el)
                       << std::endl;
-            AssertThrow(false, ExcInternalError());
+            DEAL_II_AssertThrow(false, ExcInternalError());
           }
       }
     deallog << "TrilinosWrappers::MPI::BlockVector: OK" << std::endl;

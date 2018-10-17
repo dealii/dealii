@@ -225,7 +225,7 @@ namespace internal
                 for (unsigned int c = 0; c < n_components; ++c)
                   values_dofs_tmp[c * dofs_per_comp + count_q] = Number();
           }
-        AssertDimension(count_q, dofs_per_comp);
+        DEAL_II_AssertDimension(count_q, dofs_per_comp);
         values_dofs = values_dofs_tmp;
       }
 
@@ -390,7 +390,7 @@ namespace internal
           break;
 
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
 
     // case additional dof for FE_Q_DG0: add values; gradients and second
@@ -581,7 +581,7 @@ namespace internal
           break;
 
         default:
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
 
     // case FE_Q_DG0: add values, gradients and second derivatives are zero
@@ -628,8 +628,8 @@ namespace internal
               }
             count_q += i * (degree + 1);
           }
-        AssertDimension(count_q,
-                        Utilities::fixed_power<dim>(shape_info.fe_degree + 1));
+        DEAL_II_AssertDimension(
+          count_q, Utilities::fixed_power<dim>(shape_info.fe_degree + 1));
       }
   }
 
@@ -690,7 +690,7 @@ namespace internal
       const unsigned int basis_size_1_variable = numbers::invalid_unsigned_int,
       const unsigned int basis_size_2_variable = numbers::invalid_unsigned_int)
     {
-      Assert(
+      DEAL_II_Assert(
         basis_size_1 != 0 || basis_size_1_variable <= basis_size_2_variable,
         ExcMessage("The second dimension must not be smaller than the first"));
 
@@ -719,10 +719,10 @@ namespace internal
         basis_size_1 > 0 ? basis_size_1 : basis_size_1_variable;
       const unsigned int np_2 =
         basis_size_1 > 0 ? basis_size_2 : basis_size_2_variable;
-      Assert(np_1 > 0 && np_1 != numbers::invalid_unsigned_int,
-             ExcMessage("Cannot transform with 0-point basis"));
-      Assert(np_2 > 0 && np_2 != numbers::invalid_unsigned_int,
-             ExcMessage("Cannot transform with 0-point basis"));
+      DEAL_II_Assert(np_1 > 0 && np_1 != numbers::invalid_unsigned_int,
+                     ExcMessage("Cannot transform with 0-point basis"));
+      DEAL_II_Assert(np_2 > 0 && np_2 != numbers::invalid_unsigned_int,
+                     ExcMessage("Cannot transform with 0-point basis"));
 
       // run loop backwards to ensure correctness if values_in aliases with
       // values_out in case with basis_size_1 < basis_size_2
@@ -810,13 +810,13 @@ namespace internal
       const unsigned int basis_size_1_variable = numbers::invalid_unsigned_int,
       const unsigned int basis_size_2_variable = numbers::invalid_unsigned_int)
     {
-      Assert(
+      DEAL_II_Assert(
         basis_size_1 != 0 || basis_size_1_variable <= basis_size_2_variable,
         ExcMessage("The second dimension must not be smaller than the first"));
-      Assert(add_into_result == false || values_in != values_out,
-             ExcMessage(
-               "Input and output cannot alias with each other when "
-               "adding the result of the basis change to existing data"));
+      DEAL_II_Assert(
+        add_into_result == false || values_in != values_out,
+        ExcMessage("Input and output cannot alias with each other when "
+                   "adding the result of the basis change to existing data"));
 
       constexpr int next_dim =
         (dim > 2 ||
@@ -838,10 +838,10 @@ namespace internal
         basis_size_1 > 0 ? basis_size_1 : basis_size_1_variable;
       const unsigned int np_2 =
         basis_size_1 > 0 ? basis_size_2 : basis_size_2_variable;
-      Assert(np_1 > 0 && np_1 != numbers::invalid_unsigned_int,
-             ExcMessage("Cannot transform with 0-point basis"));
-      Assert(np_2 > 0 && np_2 != numbers::invalid_unsigned_int,
-             ExcMessage("Cannot transform with 0-point basis"));
+      DEAL_II_Assert(np_1 > 0 && np_1 != numbers::invalid_unsigned_int,
+                     ExcMessage("Cannot transform with 0-point basis"));
+      DEAL_II_Assert(np_2 > 0 && np_2 != numbers::invalid_unsigned_int,
+                     ExcMessage("Cannot transform with 0-point basis"));
 
       for (unsigned int c = 0; c < n_components; ++c)
         {
@@ -919,9 +919,10 @@ namespace internal
         basis_size_1 != basis_size_2 ? scratch_data : values_out;
 
       const unsigned int size_per_component = Utilities::pow(basis_size_2, dim);
-      Assert(coefficients.size() == size_per_component ||
-               coefficients.size() == n_components * size_per_component,
-             ExcDimensionMismatch(coefficients.size(), size_per_component));
+      DEAL_II_Assert(coefficients.size() == size_per_component ||
+                       coefficients.size() == n_components * size_per_component,
+                     ExcDimensionMismatch(coefficients.size(),
+                                          size_per_component));
       const unsigned int stride =
         coefficients.size() == size_per_component ? 0 : 1;
 
@@ -1038,8 +1039,8 @@ namespace internal
     const bool evaluate_gradients,
     const bool evaluate_hessians)
   {
-    AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
-                    (fe_degree + 2) / 2 * (fe_degree + 1));
+    DEAL_II_AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
+                            (fe_degree + 2) / 2 * (fe_degree + 1));
 
     EvaluatorTensorProduct<evaluate_evenodd,
                            dim,
@@ -1114,8 +1115,8 @@ namespace internal
     const bool integrate_gradients,
     const bool add_into_values_array)
   {
-    AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
-                    (fe_degree + 2) / 2 * (fe_degree + 1));
+    DEAL_II_AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
+                            (fe_degree + 2) / 2 * (fe_degree + 1));
 
     EvaluatorTensorProduct<evaluate_evenodd,
                            dim,
@@ -1224,11 +1225,12 @@ namespace internal
                       const bool evaluate_gradients,
                       const bool evaluate_hessians)
   {
-    Assert(n_q_points_1d > fe_degree,
-           ExcMessage("You lose information when going to a collocation space "
-                      "of lower degree, so the evaluation results would be "
-                      "wrong. Thus, this class does not permit the desired "
-                      "operation."));
+    DEAL_II_Assert(n_q_points_1d > fe_degree,
+                   ExcMessage(
+                     "You lose information when going to a collocation space "
+                     "of lower degree, so the evaluation results would be "
+                     "wrong. Thus, this class does not permit the desired "
+                     "operation."));
     constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
     for (unsigned int c = 0; c < n_components; c++)
@@ -1286,13 +1288,14 @@ namespace internal
                        const bool integrate_gradients,
                        const bool add_into_values_array)
   {
-    Assert(n_q_points_1d > fe_degree,
-           ExcMessage("You lose information when going to a collocation space "
-                      "of lower degree, so the evaluation results would be "
-                      "wrong. Thus, this class does not permit the desired "
-                      "operation."));
-    AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
-                    (n_q_points_1d + 1) / 2 * n_q_points_1d);
+    DEAL_II_Assert(n_q_points_1d > fe_degree,
+                   ExcMessage(
+                     "You lose information when going to a collocation space "
+                     "of lower degree, so the evaluation results would be "
+                     "wrong. Thus, this class does not permit the desired "
+                     "operation."));
+    DEAL_II_AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
+                            (n_q_points_1d + 1) / 2 * n_q_points_1d);
     constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
     for (unsigned int c = 0; c < n_components; c++)
@@ -1420,7 +1423,7 @@ namespace internal
                   values_quad[0] = values_dofs[0];
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
             values_dofs += 2 * size_deg;
             values_quad += n_q_points;
@@ -1490,7 +1493,7 @@ namespace internal
                   gradients_quad[0] = values_dofs[1];
                   break;
                 default:
-                  AssertThrow(false, ExcNotImplemented());
+                  DEAL_II_AssertThrow(false, ExcNotImplemented());
               }
             values_dofs += 2 * size_deg;
             values_quad += n_q_points;
@@ -1573,7 +1576,7 @@ namespace internal
                   values_dofs[0] = values_quad[0];
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
             values_dofs += 2 * size_deg;
             values_quad += n_q_points;
@@ -1649,7 +1652,7 @@ namespace internal
                   values_dofs[1] = gradients_quad[0];
                   break;
                 default:
-                  AssertThrow(false, ExcNotImplemented());
+                  DEAL_II_AssertThrow(false, ExcNotImplemented());
               }
             values_dofs += 2 * size_deg;
             values_quad += n_q_points;

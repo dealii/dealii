@@ -27,7 +27,7 @@
 void
 test_mpi()
 {
-  Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
+  DEAL_II_Assert(Utilities::MPI::job_supports_mpi(), ExcInternalError());
 
 
   unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -47,7 +47,7 @@ test_mpi()
           MPI_Recv(&buf, 1, MPI_UNSIGNED, i, 1, MPI_COMM_WORLD, &status);
           deallog << "got message '" << buf << "' from CPU " << i + 1 << "!"
                   << std::endl;
-          Assert(buf == i, ExcInternalError());
+          DEAL_II_Assert(buf == i, ExcInternalError());
         }
       else if (myid == i)
         {

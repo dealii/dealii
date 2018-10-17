@@ -243,8 +243,9 @@ test(const unsigned int n_ref = 0)
       FEEvaluation<dim, fe_degree, n_q_points, 1, NumberType> fe_eval(
         matrix_free);
       const unsigned int n_cells = matrix_free_euler.n_macro_cells();
-      Assert(matrix_free_euler.n_macro_cells() == matrix_free.n_macro_cells(),
-             ExcInternalError());
+      DEAL_II_Assert(matrix_free_euler.n_macro_cells() ==
+                       matrix_free.n_macro_cells(),
+                     ExcInternalError());
       const unsigned int nqp = fe_eval.n_q_points;
       for (unsigned int cell = 0; cell < n_cells; ++cell)
         {
@@ -259,8 +260,9 @@ test(const unsigned int n_ref = 0)
               for (unsigned int v = 0;
                    v < VectorizedArray<NumberType>::n_array_elements;
                    ++v)
-                AssertThrow(dist[v] < 1e-8,
-                            ExcMessage("distance: " + std::to_string(dist[v])));
+                DEAL_II_AssertThrow(dist[v] < 1e-8,
+                                    ExcMessage("distance: " +
+                                               std::to_string(dist[v])));
             }
         }
     }
@@ -322,8 +324,9 @@ test(const unsigned int n_ref = 0)
         FEEvaluation<dim, fe_degree, n_q_points, 1, NumberType> fe_eval(
           mg_level);
         const unsigned int n_cells = mg_level_euler.n_macro_cells();
-        Assert(mg_level_euler.n_macro_cells() == mg_level.n_macro_cells(),
-               ExcInternalError());
+        DEAL_II_Assert(mg_level_euler.n_macro_cells() ==
+                         mg_level.n_macro_cells(),
+                       ExcInternalError());
         const unsigned int nqp = fe_eval.n_q_points;
         for (unsigned int cell = 0; cell < n_cells; ++cell)
           {
@@ -338,10 +341,10 @@ test(const unsigned int n_ref = 0)
                 for (unsigned int v = 0;
                      v < VectorizedArray<NumberType>::n_array_elements;
                      ++v)
-                  AssertThrow(dist[v] < 1e-8,
-                              ExcMessage(
-                                "Level " + std::to_string(level) +
-                                " distance: " + std::to_string(dist[v])));
+                  DEAL_II_AssertThrow(
+                    dist[v] < 1e-8,
+                    ExcMessage("Level " + std::to_string(level) +
+                               " distance: " + std::to_string(dist[v])));
               }
           }
       }

@@ -53,7 +53,7 @@ test_tensor()
     std::complex<double>(1, 2) * t;
 
   // they should yield the same result
-  Assert(left == right, ExcInternalError());
+  DEAL_II_Assert(left == right, ExcInternalError());
 
   deallog << "dim = " << dim << std::endl
           << left << " : " << right << std::endl;

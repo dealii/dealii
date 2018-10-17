@@ -79,7 +79,7 @@ namespace Algorithms
   void
   ThetaTimestepping<VectorType>::operator()(AnyData &out, const AnyData &in)
   {
-    Assert(!adaptive, ExcNotImplemented());
+    DEAL_II_Assert(!adaptive, ExcNotImplemented());
 
     LogStream::Prefix prefix("Theta");
 

@@ -35,18 +35,19 @@ test()
   BlockMask m(v);
 
   // test for an initialized mask
-  Assert(m.first_selected_block() == 3, ExcInternalError());
-  Assert(BlockMask(12, true).first_selected_block() == 0, ExcInternalError());
+  DEAL_II_Assert(m.first_selected_block() == 3, ExcInternalError());
+  DEAL_II_Assert(BlockMask(12, true).first_selected_block() == 0,
+                 ExcInternalError());
   // test for an empty mask
-  Assert(BlockMask().first_selected_block(12) == 0, ExcInternalError());
+  DEAL_II_Assert(BlockMask().first_selected_block(12) == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 
   // the following should yield an exception:
   try
     {
-      Assert(BlockMask(12, true).first_selected_block(13) == 0,
-             ExcInternalError());
+      DEAL_II_Assert(BlockMask(12, true).first_selected_block(13) == 0,
+                     ExcInternalError());
     }
   catch (ExceptionBase &e)
     {
@@ -56,8 +57,8 @@ test()
   // as should this:
   try
     {
-      Assert(BlockMask(12, false).first_selected_block() == 0,
-             ExcInternalError());
+      DEAL_II_Assert(BlockMask(12, false).first_selected_block() == 0,
+                     ExcInternalError());
     }
   catch (ExceptionBase &e)
     {

@@ -545,9 +545,9 @@ namespace GraphColoring
     const std::function<std::vector<types::global_dof_index>(
       const typename identity<Iterator>::type &)> &get_conflict_indices)
   {
-    Assert(begin != end,
-           ExcMessage(
-             "GraphColoring is not prepared to deal with empty ranges!"));
+    DEAL_II_Assert(
+      begin != end,
+      ExcMessage("GraphColoring is not prepared to deal with empty ranges!"));
 
     // Create the partitioning.
     std::vector<std::vector<Iterator>> partitioning =

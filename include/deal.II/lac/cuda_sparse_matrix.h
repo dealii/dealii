@@ -407,9 +407,9 @@ namespace CUDAWrappers
                               const bool  across,
                               const bool  diagonal_first) const
   {
-    Assert(column_index_dev != nullptr, ExcNotInitialized());
-    Assert(val_dev != nullptr, ExcNotInitialized());
-    Assert(row_ptr_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(column_index_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(val_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(row_ptr_dev != nullptr, ExcNotInitialized());
 
     std::vector<int>    rows(n_rows + 1);
     std::vector<int>    cols(nnz);
@@ -466,9 +466,9 @@ namespace CUDAWrappers
                                         const char *       zero_string,
                                         const double       denominator) const
   {
-    Assert(column_index_dev != nullptr, ExcNotInitialized());
-    Assert(val_dev != nullptr, ExcNotInitialized());
-    Assert(row_ptr_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(column_index_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(val_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(row_ptr_dev != nullptr, ExcNotInitialized());
 
     std::vector<int>    rows(n_rows + 1);
     std::vector<int>    cols(nnz);
@@ -510,7 +510,7 @@ namespace CUDAWrappers
           }
         out << std::endl;
       };
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
 
     // reset output format
     out.precision(old_precision);

@@ -56,20 +56,20 @@ test()
     typename LA::MPI::Vector v1;
 
     v1.reinit(something, MPI_COMM_WORLD);
-    Assert(!v1.has_ghost_elements(), ExcInternalError());
-    Assert(v1.size() == 100, ExcInternalError());
+    DEAL_II_Assert(!v1.has_ghost_elements(), ExcInternalError());
+    DEAL_II_Assert(v1.size() == 100, ExcInternalError());
 
     typename LA::MPI::Vector v2(local_active, local_relevant, MPI_COMM_WORLD);
-    Assert(v2.has_ghost_elements(), ExcInternalError());
-    Assert(v2.size() == numproc * 2, ExcInternalError());
+    DEAL_II_Assert(v2.has_ghost_elements(), ExcInternalError());
+    DEAL_II_Assert(v2.size() == numproc * 2, ExcInternalError());
 
     v2.reinit(local_active, MPI_COMM_WORLD);
-    Assert(!v2.has_ghost_elements(), ExcInternalError());
-    Assert(v2.size() == numproc * 2, ExcInternalError());
+    DEAL_II_Assert(!v2.has_ghost_elements(), ExcInternalError());
+    DEAL_II_Assert(v2.size() == numproc * 2, ExcInternalError());
 
     v2.reinit(local_active, local_relevant, MPI_COMM_WORLD);
-    Assert(v2.has_ghost_elements(), ExcInternalError());
-    Assert(v2.size() == numproc * 2, ExcInternalError());
+    DEAL_II_Assert(v2.has_ghost_elements(), ExcInternalError());
+    DEAL_II_Assert(v2.size() == numproc * 2, ExcInternalError());
   }
 
   // done

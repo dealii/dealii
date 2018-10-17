@@ -378,9 +378,9 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcInvalidQuadratureFormula,
-                   "The quadrature formula you provided cannot be used "
-                   "as the basis for iteration.");
+  DEAL_II_DeclExceptionMsg(ExcInvalidQuadratureFormula,
+                           "The quadrature formula you provided cannot be used "
+                           "as the basis for iteration.");
 };
 
 
@@ -404,7 +404,7 @@ template <int dim>
 inline const Point<dim> &
 Quadrature<dim>::point(const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   return quadrature_points[i];
 }
 
@@ -414,7 +414,7 @@ template <int dim>
 double
 Quadrature<dim>::weight(const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   return weights[i];
 }
 

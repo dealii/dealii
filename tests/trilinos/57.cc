@@ -43,12 +43,12 @@ test(TrilinosWrappers::MPI::Vector &v)
 
   // check that the vector is really
   // non-negative
-  AssertThrow(v.is_non_negative() == true, ExcInternalError());
+  DEAL_II_AssertThrow(v.is_non_negative() == true, ExcInternalError());
 
   // then set a single element to a negative
   // value and check again
   v(v.size() / 2) = -1;
-  AssertThrow(v.is_non_negative() == false, ExcInternalError());
+  DEAL_II_AssertThrow(v.is_non_negative() == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

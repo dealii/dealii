@@ -556,7 +556,7 @@ HelmholtzProblem<dim>::refine_grid()
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 }

@@ -48,8 +48,8 @@ test(PETScWrappers::MPI::Vector &v)
 
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(w1(i) == w(i), ExcInternalError());
-      AssertThrow(x1(i) == x(i), ExcInternalError());
+      DEAL_II_AssertThrow(w1(i) == w(i), ExcInternalError());
+      DEAL_II_AssertThrow(x1(i) == x(i), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

@@ -40,7 +40,7 @@ test()
          volume_mesh.begin_active();
        cell != volume_mesh.end();
        ++cell)
-    AssertThrow(cell->direction_flag() == true, ExcInternalError());
+    DEAL_II_AssertThrow(cell->direction_flag() == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -576,7 +576,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return derivative;
         }
     }
@@ -694,7 +694,7 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return derivative;
         }
     }

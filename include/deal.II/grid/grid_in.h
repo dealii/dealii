@@ -537,37 +537,37 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcUnknownSectionType,
-                 int,
-                 << "The section type <" << arg1 << "> in an UNV "
-                 << "input file is not implemented.");
+  DEAL_II_DeclException1(ExcUnknownSectionType,
+                         int,
+                         << "The section type <" << arg1 << "> in an UNV "
+                         << "input file is not implemented.");
 
   /**
    * Exception
    */
-  DeclException1(ExcUnknownElementType,
-                 int,
-                 << "The element type <" << arg1 << "> in an UNV "
-                 << "input file is not implemented.");
+  DEAL_II_DeclException1(ExcUnknownElementType,
+                         int,
+                         << "The element type <" << arg1 << "> in an UNV "
+                         << "input file is not implemented.");
 
   /**
    * Exception
    */
-  DeclException1(ExcUnknownIdentifier,
-                 std::string,
-                 << "The identifier <" << arg1 << "> as name of a "
-                 << "part in an UCD input file is unknown or the "
-                 << "respective input routine is not implemented."
-                 << "(Maybe the space dimension of triangulation and "
-                 << "input file do not match?");
+  DEAL_II_DeclException1(ExcUnknownIdentifier,
+                         std::string,
+                         << "The identifier <" << arg1 << "> as name of a "
+                         << "part in an UCD input file is unknown or the "
+                         << "respective input routine is not implemented."
+                         << "(Maybe the space dimension of triangulation and "
+                         << "input file do not match?");
   /**
    * Exception
    */
-  DeclException0(ExcNoTriangulationSelected);
+  DEAL_II_DeclException0(ExcNoTriangulationSelected);
   /**
    * Exception
    */
-  DeclException2(
+  DEAL_II_DeclException2(
     ExcInvalidVertexIndex,
     int,
     int,
@@ -577,7 +577,7 @@ public:
   /**
    * Exception
    */
-  DeclException3(
+  DEAL_II_DeclException3(
     ExcInvalidVertexIndexGmsh,
     int,
     int,
@@ -588,45 +588,46 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcInvalidDBMeshFormat);
+  DEAL_II_DeclException0(ExcInvalidDBMeshFormat);
   /**
    * Exception
    */
-  DeclException1(ExcInvalidDBMESHInput,
-                 std::string,
-                 << "The string <" << arg1
-                 << "> is not recognized at the present"
-                 << " position of a DB Mesh file.");
+  DEAL_II_DeclException1(ExcInvalidDBMESHInput,
+                         std::string,
+                         << "The string <" << arg1
+                         << "> is not recognized at the present"
+                         << " position of a DB Mesh file.");
 
   /**
    * Exception
    */
-  DeclException1(
+  DEAL_II_DeclException1(
     ExcDBMESHWrongDimension,
     int,
     << "The specified dimension " << arg1
     << " is not the same as that of the triangulation to be created.");
 
-  DeclException1(ExcInvalidGMSHInput,
-                 std::string,
-                 << "The string <" << arg1
-                 << "> is not recognized at the present"
-                 << " position of a Gmsh Mesh file.");
+  DEAL_II_DeclException1(ExcInvalidGMSHInput,
+                         std::string,
+                         << "The string <" << arg1
+                         << "> is not recognized at the present"
+                         << " position of a Gmsh Mesh file.");
 
-  DeclException1(ExcGmshUnsupportedGeometry,
-                 int,
-                 << "The Element Identifier <" << arg1 << "> is not "
-                 << "supported in the deal.II library when "
-                 << "reading meshes in " << dim << " dimensions.\n"
-                 << "Supported elements are: \n"
-                 << "ELM-TYPE\n"
-                 << "1 Line (2 nodes, 1 edge).\n"
-                 << "3 Quadrilateral (4 nodes, 4 edges).\n"
-                 << "5 Hexahedron (8 nodes, 12 edges, 6 faces) when in 3d.\n"
-                 << "15 Point (1 node, ignored when read)");
+  DEAL_II_DeclException1(
+    ExcGmshUnsupportedGeometry,
+    int,
+    << "The Element Identifier <" << arg1 << "> is not "
+    << "supported in the deal.II library when "
+    << "reading meshes in " << dim << " dimensions.\n"
+    << "Supported elements are: \n"
+    << "ELM-TYPE\n"
+    << "1 Line (2 nodes, 1 edge).\n"
+    << "3 Quadrilateral (4 nodes, 4 edges).\n"
+    << "5 Hexahedron (8 nodes, 12 edges, 6 faces) when in 3d.\n"
+    << "15 Point (1 node, ignored when read)");
 
 
-  DeclException0(ExcGmshNoCellInformation);
+  DEAL_II_DeclException0(ExcGmshNoCellInformation);
 
 protected:
   /**

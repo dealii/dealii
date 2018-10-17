@@ -106,19 +106,19 @@ namespace TrilinosWrappers
       /**
        * Exception
        */
-      DeclException0(ExcBeyondEndOfSparsityPattern);
+      DEAL_II_DeclException0(ExcBeyondEndOfSparsityPattern);
 
       /**
        * Exception
        */
-      DeclException3(ExcAccessToNonlocalRow,
-                     size_type,
-                     size_type,
-                     size_type,
-                     << "You tried to access row " << arg1
-                     << " of a distributed sparsity pattern, "
-                     << " but only rows " << arg2 << " through " << arg3
-                     << " are stored locally and can be accessed.");
+      DEAL_II_DeclException3(ExcAccessToNonlocalRow,
+                             size_type,
+                             size_type,
+                             size_type,
+                             << "You tried to access row " << arg1
+                             << " of a distributed sparsity pattern, "
+                             << " but only rows " << arg2 << " through " << arg3
+                             << " are stored locally and can be accessed.");
 
     private:
       /**
@@ -236,11 +236,12 @@ namespace TrilinosWrappers
       /**
        * Exception
        */
-      DeclException2(ExcInvalidIndexWithinRow,
-                     size_type,
-                     size_type,
-                     << "Attempt to access element " << arg2 << " of row "
-                     << arg1 << " which doesn't have that many elements.");
+      DEAL_II_DeclException2(ExcInvalidIndexWithinRow,
+                             size_type,
+                             size_type,
+                             << "Attempt to access element " << arg2
+                             << " of row " << arg1
+                             << " which doesn't have that many elements.");
 
     private:
       /**
@@ -1167,24 +1168,24 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException1(ExcTrilinosError,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while calling a Trilinos function");
+    DEAL_II_DeclException1(ExcTrilinosError,
+                           int,
+                           << "An error with error number " << arg1
+                           << " occurred while calling a Trilinos function");
 
     /**
      * Exception
      */
-    DeclException2(ExcInvalidIndex,
-                   size_type,
-                   size_type,
-                   << "The entry with index <" << arg1 << ',' << arg2
-                   << "> does not exist.");
+    DEAL_II_DeclException2(ExcInvalidIndex,
+                           size_type,
+                           size_type,
+                           << "The entry with index <" << arg1 << ',' << arg2
+                           << "> does not exist.");
 
     /**
      * Exception
      */
-    DeclExceptionMsg(
+    DEAL_II_DeclExceptionMsg(
       ExcSourceEqualsDestination,
       "You are attempting an operation on two sparsity patterns that "
       "are the same object, but the operation requires that the "
@@ -1193,27 +1194,27 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException4(ExcAccessToNonLocalElement,
-                   size_type,
-                   size_type,
-                   size_type,
-                   size_type,
-                   << "You tried to access element (" << arg1 << "/" << arg2
-                   << ")"
-                   << " of a distributed matrix, but only rows " << arg3
-                   << " through " << arg4
-                   << " are stored locally and can be accessed.");
+    DEAL_II_DeclException4(ExcAccessToNonLocalElement,
+                           size_type,
+                           size_type,
+                           size_type,
+                           size_type,
+                           << "You tried to access element (" << arg1 << "/"
+                           << arg2 << ")"
+                           << " of a distributed matrix, but only rows " << arg3
+                           << " through " << arg4
+                           << " are stored locally and can be accessed.");
 
     /**
      * Exception
      */
-    DeclException2(ExcAccessToNonPresentElement,
-                   size_type,
-                   size_type,
-                   << "You tried to access element (" << arg1 << "/" << arg2
-                   << ")"
-                   << " of a sparse matrix, but it appears to not"
-                   << " exist in the Trilinos sparsity pattern.");
+    DEAL_II_DeclException2(ExcAccessToNonPresentElement,
+                           size_type,
+                           size_type,
+                           << "You tried to access element (" << arg1 << "/"
+                           << arg2 << ")"
+                           << " of a sparse matrix, but it appears to not"
+                           << " exist in the Trilinos sparsity pattern.");
     //@}
   private:
     /**
@@ -1266,8 +1267,8 @@ namespace TrilinosWrappers
     inline Accessor::size_type
     Accessor::row() const
     {
-      Assert(a_row < sparsity_pattern->n_rows(),
-             ExcBeyondEndOfSparsityPattern());
+      DEAL_II_Assert(a_row < sparsity_pattern->n_rows(),
+                     ExcBeyondEndOfSparsityPattern());
       return a_row;
     }
 
@@ -1276,8 +1277,8 @@ namespace TrilinosWrappers
     inline Accessor::size_type
     Accessor::column() const
     {
-      Assert(a_row < sparsity_pattern->n_rows(),
-             ExcBeyondEndOfSparsityPattern());
+      DEAL_II_Assert(a_row < sparsity_pattern->n_rows(),
+                     ExcBeyondEndOfSparsityPattern());
       return (*colnum_cache)[a_index];
     }
 
@@ -1286,8 +1287,8 @@ namespace TrilinosWrappers
     inline Accessor::size_type
     Accessor::index() const
     {
-      Assert(a_row < sparsity_pattern->n_rows(),
-             ExcBeyondEndOfSparsityPattern());
+      DEAL_II_Assert(a_row < sparsity_pattern->n_rows(),
+                     ExcBeyondEndOfSparsityPattern());
       return a_index;
     }
 
@@ -1308,8 +1309,8 @@ namespace TrilinosWrappers
     inline Iterator &
     Iterator::operator++()
     {
-      Assert(accessor.a_row < accessor.sparsity_pattern->n_rows(),
-             ExcIteratorPastEnd());
+      DEAL_II_Assert(accessor.a_row < accessor.sparsity_pattern->n_rows(),
+                     ExcIteratorPastEnd());
 
       ++accessor.a_index;
 
@@ -1412,7 +1413,7 @@ namespace TrilinosWrappers
   inline SparsityPattern::const_iterator
   SparsityPattern::begin(const size_type r) const
   {
-    Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+    DEAL_II_Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
     if (row_length(r) > 0)
       return const_iterator(this, r, 0);
     else
@@ -1424,7 +1425,7 @@ namespace TrilinosWrappers
   inline SparsityPattern::const_iterator
   SparsityPattern::end(const size_type r) const
   {
-    Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
+    DEAL_II_Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
 
     // place the iterator on the first entry
     // past this line, or at the end of the
@@ -1500,8 +1501,9 @@ namespace TrilinosWrappers
     // accessor class. consequently, we need to somehow get an actual value
     // from it which we can by evaluating an expression such as when
     // multiplying the value produced by 2
-    Assert(sizeof(TrilinosWrappers::types::int_type) == sizeof((*begin) * 2),
-           ExcNotImplemented());
+    DEAL_II_Assert(sizeof(TrilinosWrappers::types::int_type) ==
+                     sizeof((*begin) * 2),
+                   ExcNotImplemented());
 
     TrilinosWrappers::types::int_type *col_index_ptr =
       (TrilinosWrappers::types::int_type *)(&*begin);
@@ -1515,18 +1517,20 @@ namespace TrilinosWrappers
         // this is the case when we have explicitly set the off-processor rows
         // and want to create a separate matrix object for them (to retain
         // thread-safety)
-        Assert(nonlocal_graph->RowMap().LID(
-                 static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
-               ExcMessage("Attempted to write into off-processor matrix row "
-                          "that has not be specified as being writable upon "
-                          "initialization"));
+        DEAL_II_Assert(nonlocal_graph->RowMap().LID(
+                         static_cast<TrilinosWrappers::types::int_type>(row)) !=
+                         -1,
+                       ExcMessage(
+                         "Attempted to write into off-processor matrix row "
+                         "that has not be specified as being writable upon "
+                         "initialization"));
         ierr = nonlocal_graph->InsertGlobalIndices(row, n_cols, col_index_ptr);
       }
     else
       ierr = graph->InsertGlobalIndices(
         1, (TrilinosWrappers::types::int_type *)&row, n_cols, col_index_ptr);
 
-    AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
   }
 
 

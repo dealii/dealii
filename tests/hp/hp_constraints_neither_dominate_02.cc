@@ -297,7 +297,7 @@ test2cells(const FiniteElement<dim> &fe_0,
       const Point<dim> &    pt  = pairs_point_value[p].first;
       const Vector<double> &val = pairs_point_value[p].second;
 
-      Assert(val.size() == n_comp, ExcInternalError());
+      DEAL_II_Assert(val.size() == n_comp, ExcInternalError());
       deallog << "@" << pt << " u = {" << val[0];
       for (unsigned int c = 1; c < n_comp; c++)
         deallog << "," << val[c];

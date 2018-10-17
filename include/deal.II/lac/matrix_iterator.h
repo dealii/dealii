@@ -197,8 +197,8 @@ template <class ACCESSOR>
 inline bool
 MatrixIterator<ACCESSOR>::operator<(const MatrixIterator &other) const
 {
-  Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
-         ExcInternalError());
+  DEAL_II_Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+                 ExcInternalError());
 
   return (accessor < other.accessor);
 }

@@ -199,7 +199,7 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
   const unsigned int max_q_indices = this->n_tensor_pols;
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
   (void)n_bubbles;
-  Assert(i < max_q_indices + n_bubbles, ExcInternalError());
+  DEAL_II_Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_q_indices)
@@ -333,7 +333,7 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return derivative;
         }
     }

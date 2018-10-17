@@ -186,14 +186,14 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   (void)n_dofs;
   (void)vector_size;
 
-  AssertDimension(vector_size, n_dofs);
+  DEAL_II_AssertDimension(vector_size, n_dofs);
 
   // we then transform our tria iterator into a dof iterator so we can access
   // data not associated with triangulations
   typename DoFHandler<dim, spacedim>::cell_iterator dof_cell(
     *cell, mapping_q_eulerian.euler_dof_handler);
 
-  Assert(mg_vector || dof_cell->active() == true, ExcInactiveCell());
+  DEAL_II_Assert(mg_vector || dof_cell->active() == true, ExcInactiveCell());
 
   // our quadrature rule is chosen so that each quadrature point corresponds
   // to a support point in the undeformed configuration. We can then query
@@ -210,8 +210,8 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
   const unsigned int n_components =
     mapping_q_eulerian.euler_dof_handler->get_fe(0).n_components();
 
-  Assert(n_components >= spacedim,
-         ExcDimensionMismatch(n_components, spacedim));
+  DEAL_II_Assert(n_components >= spacedim,
+                 ExcDimensionMismatch(n_components, spacedim));
 
   std::vector<Vector<typename VectorType::value_type>> shift_vector(
     n_support_pts, Vector<typename VectorType::value_type>(n_components));

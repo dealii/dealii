@@ -42,7 +42,7 @@ main()
         for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
              ++face_n)
           manifold_ids_are_zero &= cell->face(face_n)->manifold_id() == 0;
-        AssertThrow(manifold_ids_are_zero, ExcInternalError());
+        DEAL_II_AssertThrow(manifold_ids_are_zero, ExcInternalError());
 
         for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
              ++face_n)
@@ -74,7 +74,7 @@ main()
         for (unsigned int face_n = 0; face_n < GeometryInfo<3>::faces_per_cell;
              ++face_n)
           manifold_ids_are_zero &= cell->face(face_n)->manifold_id() == 0;
-        AssertThrow(manifold_ids_are_zero, ExcInternalError());
+        DEAL_II_AssertThrow(manifold_ids_are_zero, ExcInternalError());
 
         for (unsigned int face_n = 0; face_n < GeometryInfo<3>::faces_per_cell;
              ++face_n)

@@ -178,23 +178,23 @@ check()
           VectorTools::point_value(mapping_1, dof_handler, v, p[i], value);
           deallog << -value(0) << std::endl;
 
-          Assert(std::abs(value(0) - function.value(p[i])) < 1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(std::abs(value(0) - function.value(p[i])) < 1e-4,
+                         ExcInternalError());
           VectorTools::point_value(mapping_2, dof_handler, v, p[i], value);
           deallog << -value(0) << std::endl;
 
-          Assert(std::abs(value(0) - function.value(p[i])) < 1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(std::abs(value(0) - function.value(p[i])) < 1e-4,
+                         ExcInternalError());
 
           const double scalar_value_1 =
             VectorTools::point_value(mapping_1, dof_handler, v, p[i]);
-          Assert(std::abs(value(0) - scalar_value_1) < 1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(std::abs(value(0) - scalar_value_1) < 1e-4,
+                         ExcInternalError());
 
           const double scalar_value_2 =
             VectorTools::point_value(mapping_2, dof_handler, v, p[i]);
-          Assert(std::abs(value(0) - scalar_value_2) < 1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(std::abs(value(0) - scalar_value_2) < 1e-4,
+                         ExcInternalError());
         }
     }
 

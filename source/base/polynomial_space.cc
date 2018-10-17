@@ -46,7 +46,7 @@ template <>
 std::array<unsigned int, 1>
 PolynomialSpace<1>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  DEAL_II_Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
   return {{index_map[i]}};
 }
 
@@ -56,7 +56,7 @@ template <>
 std::array<unsigned int, 2>
 PolynomialSpace<2>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  DEAL_II_Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
   const unsigned int n = index_map[i];
   // there should be a better way to
   // write this function (not
@@ -72,7 +72,7 @@ PolynomialSpace<2>::compute_index(const unsigned int i) const
     else
       k += n_1d - iy;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
   return {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}};
 }
 
@@ -82,7 +82,7 @@ template <>
 std::array<unsigned int, 3>
 PolynomialSpace<3>::compute_index(const unsigned int i) const
 {
-  Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
+  DEAL_II_Assert(i < index_map.size(), ExcIndexRange(i, 0, index_map.size()));
   const unsigned int n = index_map[i];
   // there should be a better way to
   // write this function (not
@@ -102,7 +102,7 @@ PolynomialSpace<3>::compute_index(const unsigned int i) const
       else
         k += n_1d - iy - iz;
 
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
   return {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}};
 }
 
@@ -111,8 +111,8 @@ template <int dim>
 void
 PolynomialSpace<dim>::set_numbering(const std::vector<unsigned int> &renumber)
 {
-  Assert(renumber.size() == index_map.size(),
-         ExcDimensionMismatch(renumber.size(), index_map.size()));
+  DEAL_II_Assert(renumber.size() == index_map.size(),
+                 ExcDimensionMismatch(renumber.size(), index_map.size()));
 
   index_map = renumber;
   for (unsigned int i = 0; i < index_map.size(); ++i)
@@ -210,16 +210,18 @@ PolynomialSpace<dim>::compute(
 {
   const unsigned int n_1d = polynomials.size();
 
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch2(values.size(), n_pols, 0));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch2(grads.size(), n_pols, 0));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch2(grad_grads.size(), n_pols, 0));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch2(third_derivatives.size(), n_pols, 0));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(fourth_derivatives.size(), n_pols, 0));
+  DEAL_II_Assert(values.size() == n_pols || values.size() == 0,
+                 ExcDimensionMismatch2(values.size(), n_pols, 0));
+  DEAL_II_Assert(grads.size() == n_pols || grads.size() == 0,
+                 ExcDimensionMismatch2(grads.size(), n_pols, 0));
+  DEAL_II_Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
+                 ExcDimensionMismatch2(grad_grads.size(), n_pols, 0));
+  DEAL_II_Assert(third_derivatives.size() == n_pols ||
+                   third_derivatives.size() == 0,
+                 ExcDimensionMismatch2(third_derivatives.size(), n_pols, 0));
+  DEAL_II_Assert(fourth_derivatives.size() == n_pols ||
+                   fourth_derivatives.size() == 0,
+                 ExcDimensionMismatch2(fourth_derivatives.size(), n_pols, 0));
 
   unsigned int v_size = 0;
   bool update_values = false, update_grads = false, update_grad_grads = false;

@@ -59,8 +59,8 @@ test()
       deallog << myid * 2 + 1 << ":" << v(myid * 2 + 1) << std::endl;
     }
 
-  Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   // check l2 norm
   const double l2_norm = v.l2_norm();

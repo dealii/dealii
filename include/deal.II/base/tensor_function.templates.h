@@ -38,7 +38,7 @@ template <int rank, int dim, typename Number>
 typename TensorFunction<rank, dim, Number>::value_type
 TensorFunction<rank, dim, Number>::value(const Point<dim> &) const
 {
-  Assert(false, ExcPureFunctionCalled());
+  DEAL_II_Assert(false, ExcPureFunctionCalled());
   return Tensor<rank, dim, Number>();
 }
 
@@ -49,8 +49,8 @@ TensorFunction<rank, dim, Number>::value_list(
   const std::vector<Point<dim>> &points,
   std::vector<value_type> &      values) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     values[i] = this->value(points[i]);
@@ -61,7 +61,7 @@ template <int rank, int dim, typename Number>
 typename TensorFunction<rank, dim, Number>::gradient_type
 TensorFunction<rank, dim, Number>::gradient(const Point<dim> &) const
 {
-  Assert(false, ExcPureFunctionCalled());
+  DEAL_II_Assert(false, ExcPureFunctionCalled());
   return Tensor<rank + 1, dim, Number>();
 }
 
@@ -72,8 +72,8 @@ TensorFunction<rank, dim, Number>::gradient_list(
   const std::vector<Point<dim>> &points,
   std::vector<gradient_type> &   gradients) const
 {
-  Assert(gradients.size() == points.size(),
-         ExcDimensionMismatch(gradients.size(), points.size()));
+  DEAL_II_Assert(gradients.size() == points.size(),
+                 ExcDimensionMismatch(gradients.size(), points.size()));
 
   for (unsigned int i = 0; i < points.size(); ++i)
     gradients[i] = gradient(points[i]);
@@ -108,8 +108,8 @@ ConstantTensorFunction<rank, dim, Number>::value_list(
   const
 {
   (void)points;
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i = 0; i < values.size(); ++i)
     values[i] = _value;
@@ -134,8 +134,8 @@ ConstantTensorFunction<rank, dim, Number>::gradient_list(
     &gradients) const
 {
   (void)points;
-  Assert(gradients.size() == points.size(),
-         ExcDimensionMismatch(gradients.size(), points.size()));
+  DEAL_II_Assert(gradients.size() == points.size(),
+                 ExcDimensionMismatch(gradients.size(), points.size()));
 
   static const Tensor<rank + 1, dim, Number> zero;
 

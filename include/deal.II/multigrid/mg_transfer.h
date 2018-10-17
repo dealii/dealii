@@ -183,7 +183,7 @@ namespace internal
            const SparsityPatternType &,
            const DoFHandlerType &)
     {
-      AssertThrow(
+      DEAL_II_AssertThrow(
         false,
         ExcNotImplemented(
           "ERROR: MGTransferPrebuilt with LinearAlgebra::distributed::Vector currently "
@@ -722,12 +722,12 @@ public:
   /**
    * Finite element does not provide prolongation matrices.
    */
-  DeclException0(ExcNoProlongation);
+  DEAL_II_DeclException0(ExcNoProlongation);
 
   /**
    * You have to call build_matrices() before using this object.
    */
-  DeclException0(ExcMatricesNotBuilt);
+  DEAL_II_DeclException0(ExcMatricesNotBuilt);
 
   /**
    * Memory used by this object.

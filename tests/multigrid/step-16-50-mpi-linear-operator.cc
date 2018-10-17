@@ -167,10 +167,10 @@ namespace Step50
   {
     const unsigned int n_points = points.size();
 
-    Assert(values.size() == n_points,
-           ExcDimensionMismatch(values.size(), n_points));
+    DEAL_II_Assert(values.size() == n_points,
+                   ExcDimensionMismatch(values.size(), n_points));
 
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     for (unsigned int i = 0; i < n_points; ++i)
       values[i] = Coefficient<dim>::value(points[i]);
@@ -487,7 +487,7 @@ namespace Step50
 
     // compare:
     output_1 -= output_2;
-    AssertThrow(output_1.l2_norm() == 0., ExcInternalError());
+    DEAL_II_AssertThrow(output_1.l2_norm() == 0., ExcInternalError());
 
     deallog << "Ok." << std::endl;
   }

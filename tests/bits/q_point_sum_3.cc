@@ -89,9 +89,9 @@ check(const Triangulation<dim> &tria)
             }
     }
 
-  Assert(n1 * n1 < 1e-24, ExcInternalError());
+  DEAL_II_Assert(n1 * n1 < 1e-24, ExcInternalError());
   deallog << " face integration is ok: " << std::sqrt(n1 * n1) << std::endl;
-  Assert(n2 * n2 < 1e-24, ExcInternalError());
+  DEAL_II_Assert(n2 * n2 < 1e-24, ExcInternalError());
   deallog << " subface integration is ok: " << std::sqrt(n2 * n2) << std::endl;
 }
 

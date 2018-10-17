@@ -54,7 +54,7 @@ public:
   value(const Point<dim> & point,
         const unsigned int component = 0) const override
   {
-    Assert(component < dim, ExcNotImplemented());
+    DEAL_II_Assert(component < dim, ExcNotImplemented());
     return std::sin(10 * point[component] +
                     point[component == 0 ? 1 : component - 1]);
   }
@@ -72,7 +72,7 @@ public:
   value(const Point<dim> & point,
         const unsigned int component = 0) const override
   {
-    Assert(component < dim, ExcNotImplemented());
+    DEAL_II_Assert(component < dim, ExcNotImplemented());
     return std::cos(10 * point[component] +
                     point[component == 0 ? 1 : component - 1]);
   }

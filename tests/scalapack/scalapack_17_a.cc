@@ -105,7 +105,7 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
             (full(i, j) - comparison(i, j)) * (full(i, j) - comparison(i, j));
       diff = sqrt(diff);
 
-      AssertThrow(diff < 1e-12, ExcInternalError());
+      DEAL_II_AssertThrow(diff < 1e-12, ExcInternalError());
     }
 }
 

@@ -38,8 +38,8 @@ test()
         copied[i].load(&values[i * n_vectors + shift]);
       for (unsigned int i = 0; i < 4; ++i)
         for (unsigned int v = 0; v < n_vectors; ++v)
-          AssertThrow(copied[i][v] == values[i * n_vectors + v + shift],
-                      ExcInternalError());
+          DEAL_II_AssertThrow(copied[i][v] == values[i * n_vectors + v + shift],
+                              ExcInternalError());
     }
   deallog << "load OK" << std::endl;
 
@@ -54,7 +54,7 @@ test()
           tmp.store(&stored[i * n_vectors + shift]);
         }
       for (unsigned int i = 0; i < 4 * n_vectors; ++i)
-        AssertThrow(stored[i + shift] == i, ExcInternalError());
+        DEAL_II_AssertThrow(stored[i + shift] == i, ExcInternalError());
     }
   deallog << "store OK" << std::endl;
 }

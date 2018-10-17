@@ -75,9 +75,9 @@ test()
   deallog << "local_range_end_distributed: " << local_range_end_distributed
           << std::endl;
 
-  AssertThrow(locally_owned_elements_distributed ==
-                locally_owned_elements_ghosted,
-              ExcInternalError());
+  DEAL_II_AssertThrow(locally_owned_elements_distributed ==
+                        locally_owned_elements_ghosted,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

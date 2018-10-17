@@ -49,8 +49,8 @@ test()
   // compare against the exact value of the
   // l2-norm (max row-sum)
   deallog << m.frobenius_norm() << std::endl;
-  AssertThrow(std::fabs((m.frobenius_norm() - norm) / norm) < 1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs((m.frobenius_norm() - norm) / norm) < 1e-14,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

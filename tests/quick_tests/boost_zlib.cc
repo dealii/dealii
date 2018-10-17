@@ -48,7 +48,7 @@ test(const unsigned int &size)
         ok = false;
       }
 
-  AssertThrow(ok, ExcInternalError());
+  DEAL_II_AssertThrow(ok, ExcInternalError());
 }
 
 int

@@ -37,7 +37,7 @@ template <int dim>
 void
 test()
 {
-  Assert(dim == 2 || dim == 3, ExcNotImplemented());
+  DEAL_II_Assert(dim == 2 || dim == 3, ExcNotImplemented());
 
   std::vector<Point<dim>> vertices(GeometryInfo<dim>::vertices_per_cell);
   vertices[0](0) = 0;

@@ -39,7 +39,7 @@ namespace
                     cusparseSolvePolicy_t    policy,
                     void *                   pBuffer)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -166,7 +166,7 @@ namespace
                              cusparseSolvePolicy_t /*policy*/,
                              void * /*pBuffer*/)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -292,7 +292,7 @@ namespace
                                csrilu02Info_t /*info*/,
                                int * /*pBufferSizeInBytes*/)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -409,7 +409,7 @@ namespace
                    cusparseSolvePolicy_t /*policy*/,
                    void * /*pBuffer*/)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -540,7 +540,7 @@ namespace
                         cusparseSolvePolicy_t /*policy*/,
                         void * /*pBuffer*/)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -700,7 +700,7 @@ namespace
                            cusparseSolvePolicy_t /*policy*/,
                            void * /*pBuffer*/)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -834,7 +834,7 @@ namespace
                             cusparseSolvePolicy_t /*policy*/,
                             void * /*pBuffer*/)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -961,7 +961,7 @@ namespace
                              csrsv2Info_t /*info*/,
                              int * /*pBufferSizeInBytes*/)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -1087,7 +1087,7 @@ namespace
                               csric02Info_t /*info*/,
                               int * /*pBufferSizeInBytes*/)
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return CUSPARSE_STATUS_INVALID_VALUE;
   }
 
@@ -1216,31 +1216,31 @@ namespace CUDAWrappers
     // - matrix L is lower triangular
     // - matrix L has non-unit diagonal
     cusparseStatus_t status = cusparseCreateMatDescr(&descr_M);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatIndexBase(descr_M, CUSPARSE_INDEX_BASE_ZERO);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatType(descr_M, CUSPARSE_MATRIX_TYPE_GENERAL);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     status = cusparseCreateMatDescr(&descr_L);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatIndexBase(descr_L, CUSPARSE_INDEX_BASE_ZERO);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatType(descr_L, CUSPARSE_MATRIX_TYPE_GENERAL);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatFillMode(descr_L, CUSPARSE_FILL_MODE_LOWER);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatDiagType(descr_L, CUSPARSE_DIAG_TYPE_NON_UNIT);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     // step 2: create a empty info structure
     // we need one info for csric02 and two info's for csrsv2
     status = cusparseCreateCsric02Info(&info_M);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseCreateCsrsv2Info(&info_L);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseCreateCsrsv2Info(&info_Lt);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
   }
 
 
@@ -1250,19 +1250,19 @@ namespace CUDAWrappers
   {
     // step 8: free resources
     cusparseStatus_t status = cusparseDestroyMatDescr(descr_M);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyMatDescr(descr_L);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyCsric02Info(info_M);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyCsrsv2Info(info_L);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyCsrsv2Info(info_Lt);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
   }
 
 
@@ -1287,7 +1287,7 @@ namespace CUDAWrappers
 
     n_rows             = A.m();
     n_nonzero_elements = A.n_nonzero_elements();
-    AssertDimension(A.m(), A.n());
+    DEAL_II_AssertDimension(A.m(), A.n());
 
     matrix_pointer                      = &A;
     const auto          cusparse_matrix = A.get_cusparse_matrix();
@@ -1320,7 +1320,7 @@ namespace CUDAWrappers
                                                           P_column_index_dev,
                                                           info_M,
                                                           &BufferSize_M);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     int BufferSize_L;
     status = cusparseXcsrsv2_bufferSize(cusparse_handle,
@@ -1333,7 +1333,7 @@ namespace CUDAWrappers
                                         P_column_index_dev,
                                         info_L,
                                         &BufferSize_L);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     int BufferSize_Lt;
     status = cusparseXcsrsv2_bufferSize(cusparse_handle,
@@ -1346,7 +1346,7 @@ namespace CUDAWrappers
                                         P_column_index_dev,
                                         info_Lt,
                                         &BufferSize_Lt);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     const int BufferSize =
       std::max(BufferSize_M, std::max(BufferSize_L, BufferSize_Lt));
@@ -1371,12 +1371,12 @@ namespace CUDAWrappers
                                        info_M,
                                        policy_M,
                                        buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     int structural_zero;
     status =
       cusparseXcsric02_zeroPivot(cusparse_handle, info_M, &structural_zero);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     status = cusparseXcsrsv2_analysis(cusparse_handle,
                                       CUSPARSE_OPERATION_TRANSPOSE,
@@ -1389,7 +1389,7 @@ namespace CUDAWrappers
                                       info_Lt,
                                       policy_Lt,
                                       buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     status = cusparseXcsrsv2_analysis(cusparse_handle,
                                       CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -1402,7 +1402,7 @@ namespace CUDAWrappers
                                       info_L,
                                       policy_L,
                                       buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     // step 5: M = L * L'
     status = cusparseXcsric02(cusparse_handle,
@@ -1415,12 +1415,12 @@ namespace CUDAWrappers
                               info_M,
                               policy_M,
                               buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     int numerical_zero;
     status =
       cusparseXcsric02_zeroPivot(cusparse_handle, info_M, &numerical_zero);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
   }
 
 
@@ -1431,12 +1431,12 @@ namespace CUDAWrappers
     LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
     const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
   {
-    Assert(P_val_dev != nullptr, ExcNotInitialized());
-    Assert(P_row_ptr_dev != nullptr, ExcNotInitialized());
-    Assert(P_column_index_dev != nullptr, ExcNotInitialized());
-    AssertDimension(dst.size(), static_cast<unsigned int>(n_rows));
-    AssertDimension(src.size(), static_cast<unsigned int>(n_rows));
-    Assert(tmp_dev != nullptr, ExcInternalError());
+    DEAL_II_Assert(P_val_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(P_row_ptr_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(P_column_index_dev != nullptr, ExcNotInitialized());
+    DEAL_II_AssertDimension(dst.size(), static_cast<unsigned int>(n_rows));
+    DEAL_II_AssertDimension(src.size(), static_cast<unsigned int>(n_rows));
+    DEAL_II_Assert(tmp_dev != nullptr, ExcInternalError());
 
     const Number *const src_dev = src.get_values();
     Number *const       dst_dev = dst.get_values();
@@ -1457,7 +1457,7 @@ namespace CUDAWrappers
                             tmp_dev.get(),
                             policy_L,
                             buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     // step 7: solve L'*y = alpha*z
     status = cusparseXcsrsv2_solve(cusparse_handle,
@@ -1474,7 +1474,7 @@ namespace CUDAWrappers
                                    dst_dev,
                                    policy_Lt,
                                    buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
   }
 
 
@@ -1523,42 +1523,42 @@ namespace CUDAWrappers
     // - matrix U is upper triangular
     // - matrix U has non-unit diagonal
     cusparseStatus_t status = cusparseCreateMatDescr(&descr_M);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatIndexBase(descr_M, CUSPARSE_INDEX_BASE_ZERO);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatType(descr_M, CUSPARSE_MATRIX_TYPE_GENERAL);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     status = cusparseCreateMatDescr(&descr_L);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatIndexBase(descr_L, CUSPARSE_INDEX_BASE_ZERO);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatType(descr_L, CUSPARSE_MATRIX_TYPE_GENERAL);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatFillMode(descr_L, CUSPARSE_FILL_MODE_LOWER);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatDiagType(descr_L, CUSPARSE_DIAG_TYPE_UNIT);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     status = cusparseCreateMatDescr(&descr_U);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatIndexBase(descr_U, CUSPARSE_INDEX_BASE_ZERO);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatType(descr_U, CUSPARSE_MATRIX_TYPE_GENERAL);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatFillMode(descr_U, CUSPARSE_FILL_MODE_UPPER);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseSetMatDiagType(descr_U, CUSPARSE_DIAG_TYPE_NON_UNIT);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     // step 2: create a empty info structure
     // we need one info for csrilu02 and two info's for csrsv2
     status = cusparseCreateCsrilu02Info(&info_M);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseCreateCsrsv2Info(&info_L);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
     status = cusparseCreateCsrsv2Info(&info_U);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
   }
 
 
@@ -1568,22 +1568,22 @@ namespace CUDAWrappers
   {
     // step 8: free resources
     cusparseStatus_t status = cusparseDestroyMatDescr(descr_M);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyMatDescr(descr_L);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyMatDescr(descr_U);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyCsrilu02Info(info_M);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyCsrsv2Info(info_L);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
 
     status = cusparseDestroyCsrsv2Info(info_U);
-    AssertNothrowCusparse(status);
+    DEAL_II_AssertNothrowCusparse(status);
   }
 
 
@@ -1609,7 +1609,7 @@ namespace CUDAWrappers
     matrix_pointer     = &A;
     n_rows             = A.m();
     n_nonzero_elements = A.n_nonzero_elements();
-    AssertDimension(A.m(), A.n());
+    DEAL_II_AssertDimension(A.m(), A.n());
 
     const auto          cusparse_matrix = A.get_cusparse_matrix();
     const Number *const A_val_dev       = std::get<0>(cusparse_matrix);
@@ -1641,7 +1641,7 @@ namespace CUDAWrappers
                                                            P_column_index_dev,
                                                            info_M,
                                                            &BufferSize_M);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     int BufferSize_L;
     status = cusparseXcsrsv2_bufferSize(cusparse_handle,
@@ -1654,7 +1654,7 @@ namespace CUDAWrappers
                                         P_column_index_dev,
                                         info_L,
                                         &BufferSize_L);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     int BufferSize_U;
     status = cusparseXcsrsv2_bufferSize(cusparse_handle,
@@ -1667,7 +1667,7 @@ namespace CUDAWrappers
                                         P_column_index_dev,
                                         info_U,
                                         &BufferSize_U);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     const int BufferSize =
       std::max(BufferSize_M, std::max(BufferSize_L, BufferSize_U));
@@ -1692,12 +1692,12 @@ namespace CUDAWrappers
                                         info_M,
                                         policy_M,
                                         buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     int structural_zero;
     status =
       cusparseXcsrilu02_zeroPivot(cusparse_handle, info_M, &structural_zero);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     status = cusparseXcsrsv2_analysis(cusparse_handle,
                                       CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -1710,7 +1710,7 @@ namespace CUDAWrappers
                                       info_L,
                                       policy_L,
                                       buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     status = cusparseXcsrsv2_analysis(cusparse_handle,
                                       CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -1735,12 +1735,12 @@ namespace CUDAWrappers
                                info_M,
                                policy_M,
                                buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     int numerical_zero;
     status =
       cusparseXcsrilu02_zeroPivot(cusparse_handle, info_M, &numerical_zero);
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
   }
 
 
@@ -1751,12 +1751,12 @@ namespace CUDAWrappers
     LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
     const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
   {
-    Assert(P_val_dev != nullptr, ExcNotInitialized());
-    Assert(P_row_ptr_dev != nullptr, ExcNotInitialized());
-    Assert(P_column_index_dev != nullptr, ExcNotInitialized());
-    AssertDimension(dst.size(), static_cast<unsigned int>(n_rows));
-    AssertDimension(src.size(), static_cast<unsigned int>(n_rows));
-    Assert(tmp_dev != nullptr, ExcInternalError());
+    DEAL_II_Assert(P_val_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(P_row_ptr_dev != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(P_column_index_dev != nullptr, ExcNotInitialized());
+    DEAL_II_AssertDimension(dst.size(), static_cast<unsigned int>(n_rows));
+    DEAL_II_AssertDimension(src.size(), static_cast<unsigned int>(n_rows));
+    DEAL_II_Assert(tmp_dev != nullptr, ExcInternalError());
 
     const Number *const src_dev = src.get_values();
     Number *const       dst_dev = dst.get_values();
@@ -1778,7 +1778,7 @@ namespace CUDAWrappers
                             tmp_dev.get(),
                             policy_L,
                             buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
 
     // step 7: solve U*y = alpha*z
     status = cusparseXcsrsv2_solve(cusparse_handle,
@@ -1795,7 +1795,7 @@ namespace CUDAWrappers
                                    dst_dev,
                                    policy_U,
                                    buffer_dev.get());
-    AssertCusparse(status);
+    DEAL_II_AssertCusparse(status);
   }
 
 
@@ -1806,7 +1806,7 @@ namespace CUDAWrappers
     LinearAlgebra::CUDAWrappers::Vector<Number> & /*dst*/,
     const LinearAlgebra::CUDAWrappers::Vector<Number> & /*src*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 

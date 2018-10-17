@@ -146,8 +146,8 @@ SolverRelaxation<VectorType>::solve(const MatrixType &    A,
     }
 
   // in case of failure: throw exception
-  AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence(iter, r.l2_norm()));
+  DEAL_II_AssertThrow(conv == SolverControl::success,
+                      SolverControl::NoConvergence(iter, r.l2_norm()));
   // otherwise exit as normal
 }
 

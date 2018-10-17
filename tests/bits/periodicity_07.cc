@@ -172,7 +172,7 @@ check_periodicity(const DoFHandler<3> &dof_handler,
                       << "fail" << std::endl;
             std::cout << point1 << "\t" << value1[0] << std::endl;
             std::cout << point2 << "\t" << value2[0] << std::endl;
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
           }
         else
           {
@@ -205,7 +205,7 @@ check_periodicity(const DoFHandler<3> &dof_handler,
                       << "fail" << std::endl;
             std::cout << point1 << "\t" << value1[0] << std::endl;
             std::cout << point2 << "\t" << value2[0] << std::endl;
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
           }
         else
           {
@@ -238,7 +238,7 @@ check_periodicity(const DoFHandler<3> &dof_handler,
                       << "fail" << std::endl;
             std::cout << point1 << "\t" << value1[0] << std::endl;
             std::cout << point2 << "\t" << value2[0] << std::endl;
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
           }
         else
           {

@@ -300,12 +300,12 @@ namespace TrilinosWrappers
       /**
        * Exception
        */
-      DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
+      DEAL_II_DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
 
       /**
        * Exception
        */
-      DeclException0(ExcNonMatchingBlockVectors);
+      DEAL_II_DeclException0(ExcNonMatchingBlockVectors);
     };
 
 
@@ -390,7 +390,8 @@ namespace TrilinosWrappers
       bool ghosted = block(0).has_ghost_elements();
 #  ifdef DEBUG
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        Assert(block(i).has_ghost_elements() == ghosted, ExcInternalError());
+        DEAL_II_Assert(block(i).has_ghost_elements() == ghosted,
+                       ExcInternalError());
 #  endif
       return ghosted;
     }

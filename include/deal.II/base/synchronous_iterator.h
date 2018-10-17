@@ -130,8 +130,8 @@ inline std::size_t
 operator-(const SynchronousIterators<Iterators> &a,
           const SynchronousIterators<Iterators> &b)
 {
-  Assert(std::distance(std::get<0>(*b), std::get<0>(*a)) >= 0,
-         ExcInternalError());
+  DEAL_II_Assert(std::distance(std::get<0>(*b), std::get<0>(*a)) >= 0,
+                 ExcInternalError());
   return std::distance(std::get<0>(*b), std::get<0>(*a));
 }
 

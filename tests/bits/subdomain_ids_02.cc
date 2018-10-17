@@ -59,7 +59,7 @@ test()
       for (unsigned int d = 0; d < dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1 << d);
-      AssertThrow(subdomain < (1 << dim), ExcInternalError());
+      DEAL_II_AssertThrow(subdomain < (1 << dim), ExcInternalError());
 
       cell->set_subdomain_id(subdomain);
     };
@@ -92,7 +92,8 @@ test()
   // since every dof is assigned a valid
   // subdomain id
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
-    AssertThrow(subdomain_association[i] < (1 << dim), ExcInternalError());
+    DEAL_II_AssertThrow(subdomain_association[i] < (1 << dim),
+                        ExcInternalError());
 }
 
 

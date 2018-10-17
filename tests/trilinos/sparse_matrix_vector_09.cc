@@ -50,7 +50,7 @@ test(Vector<double> &v, Vector<double> &w)
       double result = 0;
       for (unsigned int j = 0; j < m.m(); ++j)
         result += (j + 2 * i) * j;
-      AssertThrow(w(i) == result, ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == result, ExcInternalError());
     }
 
   m.Tvmult_add(w, v);
@@ -60,7 +60,7 @@ test(Vector<double> &v, Vector<double> &w)
       double result = 0;
       for (unsigned int j = 0; j < m.m(); ++j)
         result += (j + 2 * i) * j;
-      AssertThrow(w(i) == result + result, ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == result + result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

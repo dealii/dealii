@@ -43,7 +43,7 @@ test(TrilinosWrappers::MPI::Vector &v)
   v = 0;
 
   // then check all_zero
-  AssertThrow(v.all_zero() == true, ExcInternalError());
+  DEAL_II_AssertThrow(v.all_zero() == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

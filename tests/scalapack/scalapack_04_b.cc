@@ -81,12 +81,13 @@ test(const unsigned int size,
         << linfty << " " << s_linfty << " " << as_linfty << std::endl
         << frobenius << " " << s_frobenius << " " << as_frobenius << std::endl;
 
-  AssertThrow(std::abs(l1 - as_l1) < tol * std::abs(l1),
-              dealii::ExcInternalError());
-  AssertThrow(std::abs(linfty - as_linfty) < tol * std::abs(linfty),
-              dealii::ExcInternalError());
-  AssertThrow(std::abs(frobenius - as_frobenius) < tol * std::abs(frobenius),
-              dealii::ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(l1 - as_l1) < tol * std::abs(l1),
+                      dealii::ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(linfty - as_linfty) < tol * std::abs(linfty),
+                      dealii::ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(frobenius - as_frobenius) <
+                        tol * std::abs(frobenius),
+                      dealii::ExcInternalError());
 }
 
 

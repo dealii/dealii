@@ -74,7 +74,7 @@ test(const unsigned int size, const unsigned int block_size)
       full_in.print_formatted(std::cout);
       std::cout << "but got:" << std::endl;
       full_out.print_formatted(std::cout);
-      AssertThrow(false, dealii::ExcInternalError());
+      DEAL_II_AssertThrow(false, dealii::ExcInternalError());
     }
   else
     pcout << "Ok" << std::endl;

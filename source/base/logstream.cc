@@ -64,9 +64,9 @@ LogStream::Prefix::~Prefix()
     }
   catch (...)
     {
-      AssertNothrow(false,
-                    ExcMessage(
-                      "An exception occurred in LogStream::Prefix::~Prefix."));
+      DEAL_II_AssertNothrow(
+        false,
+        ExcMessage("An exception occurred in LogStream::Prefix::~Prefix."));
     }
 }
 
@@ -103,9 +103,9 @@ LogStream::~LogStream()
         // to write to a file that doesn't exist any more, and we're likely
         // going to crash (this is tested by base/log_crash_01). rather
         // than letting it come to this, print a message to the screen
-        // (note that we can't issue an assertion here either since Assert
-        // may want to write to 'deallog' itself, and AssertThrow will
-        // throw an exception that can't be caught)
+        // (note that we can't issue an assertion here either since
+        // DEAL_II_Assert may want to write to 'deallog' itself, and
+        // DEAL_II_AssertThrow will throw an exception that can't be caught)
         if ((this == &deallog) && file)
           *std_out << ("You still have content that was written to 'deallog' "
                        "but not flushed to the screen or a file while the "
@@ -269,9 +269,10 @@ LogStream::get_stream()
 std::ostream &
 LogStream::get_file_stream()
 {
-  Assert(file,
-         ExcMessage("You can't ask for the std::ostream object for the output "
-                    "file if none had been set before."));
+  DEAL_II_Assert(file,
+                 ExcMessage(
+                   "You can't ask for the std::ostream object for the output "
+                   "file if none had been set before."));
   return *file;
 }
 

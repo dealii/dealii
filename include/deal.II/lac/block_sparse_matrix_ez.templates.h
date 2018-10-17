@@ -48,10 +48,10 @@ template <typename number>
 BlockSparseMatrixEZ<number> &
 BlockSparseMatrixEZ<number>::operator=(const BlockSparseMatrixEZ<number> &m)
 {
-  Assert(n_block_rows() == m.n_block_rows(),
-         ExcDimensionMismatch(n_block_rows(), m.n_block_rows()));
-  Assert(n_block_cols() == m.n_block_cols(),
-         ExcDimensionMismatch(n_block_cols(), m.n_block_cols()));
+  DEAL_II_Assert(n_block_rows() == m.n_block_rows(),
+                 ExcDimensionMismatch(n_block_rows(), m.n_block_rows()));
+  DEAL_II_Assert(n_block_cols() == m.n_block_cols(),
+                 ExcDimensionMismatch(n_block_cols(), m.n_block_cols()));
   // this operator does not do
   // anything except than checking
   // whether the base objects want to
@@ -69,7 +69,7 @@ BlockSparseMatrixEZ<number> &
 BlockSparseMatrixEZ<number>::operator=(const double d)
 {
   (void)d;
-  Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+  DEAL_II_Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
   for (unsigned int r = 0; r < n_block_rows(); ++r)
     for (unsigned int c = 0; c < n_block_cols(); ++c)
@@ -145,8 +145,8 @@ BlockSparseMatrixEZ<number>::collect_sizes()
   // sizes
   for (unsigned int c = 1; c < columns; ++c)
     for (unsigned int r = 0; r < rows; ++r)
-      Assert(row_sizes[r] == blocks[r][c].m(),
-             ExcDimensionMismatch(row_sizes[r], blocks[r][c].m()));
+      DEAL_II_Assert(row_sizes[r] == blocks[r][c].m(),
+                     ExcDimensionMismatch(row_sizes[r], blocks[r][c].m()));
 
   // finally initialize the row
   // indices with this array
@@ -158,8 +158,8 @@ BlockSparseMatrixEZ<number>::collect_sizes()
     col_sizes[c] = blocks[0][c].n();
   for (unsigned int r = 1; r < rows; ++r)
     for (unsigned int c = 0; c < columns; ++c)
-      Assert(col_sizes[c] == blocks[r][c].n(),
-             ExcDimensionMismatch(col_sizes[c], blocks[r][c].n()));
+      DEAL_II_Assert(col_sizes[c] == blocks[r][c].n(),
+                     ExcDimensionMismatch(col_sizes[c], blocks[r][c].n()));
 
   // finally initialize the row
   // indices with this array

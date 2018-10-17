@@ -96,7 +96,7 @@ check()
          stokes_dof_handler.begin_active();
        cell != stokes_dof_handler.end();
        ++cell)
-    AssertThrow(cell->user_flag_set() == true, ExcInternalError());
+    DEAL_II_AssertThrow(cell->user_flag_set() == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

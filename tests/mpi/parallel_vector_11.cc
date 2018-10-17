@@ -56,7 +56,8 @@ test()
   LinearAlgebra::distributed::Vector<double> v(local_owned,
                                                local_relevant,
                                                MPI_COMM_WORLD);
-  AssertDimension(static_cast<unsigned int>(actual_local_size), v.local_size());
+  DEAL_II_AssertDimension(static_cast<unsigned int>(actual_local_size),
+                          v.local_size());
   LinearAlgebra::distributed::Vector<double> w(v), x(v), y(v);
 
   // set local elements
@@ -69,13 +70,14 @@ test()
 
   y = v;
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == i + my_start, ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == i + my_start, ExcInternalError());
 
   if (myid == 0)
     deallog << "Check add (scalar): ";
   y.add(42);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == i + my_start + 42, ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == i + my_start + 42,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -83,8 +85,8 @@ test()
     deallog << "Check add (vector): ";
   y.add(1., w);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 3 * (i + my_start) + 1042,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 3 * (i + my_start) + 1042,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -92,7 +94,8 @@ test()
     deallog << "Check add (factor, vector): ";
   y.add(-1., w);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == i + my_start + 42, ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == i + my_start + 42,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -100,8 +103,8 @@ test()
     deallog << "Check add (factor, vector, factor, vector): ";
   y.add(2., w, -0.5, x);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 5 * (i + my_start) + 2042 - 5000,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 5 * (i + my_start) + 2042 - 5000,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -110,7 +113,8 @@ test()
   y = v;
   y.sadd(-3., 2., v);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == (-i - my_start), ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == (-i - my_start),
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -118,8 +122,8 @@ test()
     deallog << "Check sadd (factor, factor, vector, factor, vector): ";
   y.sadd(2., 3., v, 2., w);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 5 * (i + my_start) + 2000,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 5 * (i + my_start) + 2000,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -129,7 +133,7 @@ test()
   y.sadd(-1., 1., v, 2., w);
   y.add(2., x);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 20000, ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 20000, ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -138,7 +142,8 @@ test()
   y = 0;
   y.add(1., v, 3., v);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 4 * (i + my_start), ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 4 * (i + my_start),
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -146,7 +151,7 @@ test()
     deallog << "Check operator * (scalar): ";
   x *= 2.;
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(x.local_element(i) == 20000., ExcInternalError());
+    DEAL_II_AssertThrow(x.local_element(i) == 20000., ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -154,7 +159,7 @@ test()
     deallog << "Check operator / (scalar): ";
   x /= 2.;
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(x.local_element(i) == 10000., ExcInternalError());
+    DEAL_II_AssertThrow(x.local_element(i) == 10000., ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -162,8 +167,8 @@ test()
     deallog << "Check scale (vector): ";
   y.scale(x);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 40000. * (i + my_start),
-                ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 40000. * (i + my_start),
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -171,7 +176,7 @@ test()
     deallog << "Check equ (factor, vector): ";
   y.equ(10., x);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 100000., ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 100000., ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -179,8 +184,8 @@ test()
     deallog << "Check equ (factor, vector, factor, vector): ";
   y.equ(10., v, -2., w);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 6. * (i + my_start) - 2000,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 6. * (i + my_start) - 2000,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -189,8 +194,8 @@ test()
   y.equ(10., v, -2., w);
   y.add(3., x);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == 6. * (i + my_start) + 28000,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == 6. * (i + my_start) + 28000,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -200,7 +205,7 @@ test()
   z = v;
   y = z;
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y.local_element(i) == i + my_start, ExcInternalError());
+    DEAL_II_AssertThrow(y.local_element(i) == i + my_start, ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 }

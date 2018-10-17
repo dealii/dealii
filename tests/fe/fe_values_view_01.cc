@@ -70,17 +70,17 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                 deallog << fe_values[single_component].hessian(i, q)[k][l]
                         << std::endl;
 
-            Assert(fe_values[single_component].value(i, q) ==
-                     fe_values.shape_value_component(i, q, c),
-                   ExcInternalError());
+            DEAL_II_Assert(fe_values[single_component].value(i, q) ==
+                             fe_values.shape_value_component(i, q, c),
+                           ExcInternalError());
 
-            Assert(fe_values[single_component].gradient(i, q) ==
-                     fe_values.shape_grad_component(i, q, c),
-                   ExcInternalError());
+            DEAL_II_Assert(fe_values[single_component].gradient(i, q) ==
+                             fe_values.shape_grad_component(i, q, c),
+                           ExcInternalError());
 
-            Assert(fe_values[single_component].hessian(i, q) ==
-                     fe_values.shape_hessian_component(i, q, c),
-                   ExcInternalError());
+            DEAL_II_Assert(fe_values[single_component].hessian(i, q) ==
+                             fe_values.shape_hessian_component(i, q, c),
+                           ExcInternalError());
           }
     }
 }

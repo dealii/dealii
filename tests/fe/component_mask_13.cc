@@ -47,9 +47,10 @@ test()
         block_mask[c] = (int_mask & (1 << c));
 
       // make sure that the round-trip works
-      AssertThrow(BlockMask(block_mask) ==
-                    fe.block_mask(fe.component_mask(BlockMask(block_mask))),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(BlockMask(block_mask) ==
+                            fe.block_mask(
+                              fe.component_mask(BlockMask(block_mask))),
+                          ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

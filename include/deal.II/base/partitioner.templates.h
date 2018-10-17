@@ -44,22 +44,23 @@ namespace Utilities
       const ArrayView<Number> &      ghost_array,
       std::vector<MPI_Request> &     requests) const
     {
-      AssertDimension(temporary_storage.size(), n_import_indices());
-      Assert(ghost_array.size() == n_ghost_indices() ||
-               ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
-                                            n_ghost_indices(),
-                                            n_ghost_indices_in_larger_set));
+      DEAL_II_AssertDimension(temporary_storage.size(), n_import_indices());
+      DEAL_II_Assert(
+        ghost_array.size() == n_ghost_indices() ||
+          ghost_array.size() == n_ghost_indices_in_larger_set,
+        ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
+                                       n_ghost_indices(),
+                                       n_ghost_indices_in_larger_set));
 
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
       if (n_import_targets > 0)
-        AssertDimension(locally_owned_array.size(), local_size());
+        DEAL_II_AssertDimension(locally_owned_array.size(), local_size());
 
-      Assert(requests.size() == 0,
-             ExcMessage("Another operation seems to still be running. "
-                        "Call update_ghost_values_finish() first."));
+      DEAL_II_Assert(requests.size() == 0,
+                     ExcMessage("Another operation seems to still be running. "
+                                "Call update_ghost_values_finish() first."));
 
       // Need to send and receive the data. Use non-blocking communication,
       // where it is usually less overhead to first initiate the receive and
@@ -70,7 +71,8 @@ namespace Utilities
       // array in case we want to fill only a subset of the ghosts so that we
       // can move data to the right position in a forward loop in the _finish
       // function.
-      AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set + 1);
+      DEAL_II_AssertIndexRange(n_ghost_indices(),
+                               n_ghost_indices_in_larger_set + 1);
       const bool use_larger_set =
         (n_ghost_indices_in_larger_set > n_ghost_indices() &&
          ghost_array.size() == n_ghost_indices_in_larger_set);
@@ -91,7 +93,7 @@ namespace Utilities
                       ghost_targets_data[i].first + communication_channel,
                       communicator,
                       &requests[i]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           ghost_array_ptr += ghost_targets()[i].second;
         }
 
@@ -109,7 +111,7 @@ namespace Utilities
             for (unsigned int j = my_imports->first; j < my_imports->second;
                  j++)
               temp_array_ptr[index++] = locally_owned_array[j];
-          AssertDimension(index, import_targets_data[i].second);
+          DEAL_II_AssertDimension(index, import_targets_data[i].second);
 
           // start the send operations
           const int ierr =
@@ -120,7 +122,7 @@ namespace Utilities
                       my_pid + communication_channel,
                       communicator,
                       &requests[n_ghost_targets + i]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           temp_array_ptr += import_targets_data[i].second;
         }
     }
@@ -133,21 +135,22 @@ namespace Utilities
       const ArrayView<Number> & ghost_array,
       std::vector<MPI_Request> &requests) const
     {
-      Assert(ghost_array.size() == n_ghost_indices() ||
-               ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
-                                            n_ghost_indices(),
-                                            n_ghost_indices_in_larger_set));
+      DEAL_II_Assert(
+        ghost_array.size() == n_ghost_indices() ||
+          ghost_array.size() == n_ghost_indices_in_larger_set,
+        ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
+                                       n_ghost_indices(),
+                                       n_ghost_indices_in_larger_set));
 
       // wait for both sends and receives to complete, even though only
       // receives are really necessary. this gives (much) better performance
-      AssertDimension(ghost_targets().size() + import_targets().size(),
-                      requests.size());
+      DEAL_II_AssertDimension(ghost_targets().size() + import_targets().size(),
+                              requests.size());
       if (requests.size() > 0)
         {
           const int ierr =
             MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
       requests.resize(0);
 
@@ -172,7 +175,7 @@ namespace Utilities
                 }
             else
               {
-                AssertDimension(offset, my_ghosts->first);
+                DEAL_II_AssertDimension(offset, my_ghosts->first);
                 break;
               }
         }
@@ -189,12 +192,13 @@ namespace Utilities
       const ArrayView<Number> &     temporary_storage,
       std::vector<MPI_Request> &    requests) const
     {
-      AssertDimension(temporary_storage.size(), n_import_indices());
-      Assert(ghost_array.size() == n_ghost_indices() ||
-               ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
-                                            n_ghost_indices(),
-                                            n_ghost_indices_in_larger_set));
+      DEAL_II_AssertDimension(temporary_storage.size(), n_import_indices());
+      DEAL_II_Assert(
+        ghost_array.size() == n_ghost_indices() ||
+          ghost_array.size() == n_ghost_indices_in_larger_set,
+        ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
+                                       n_ghost_indices(),
+                                       n_ghost_indices_in_larger_set));
 
       (void)vector_operation;
 
@@ -216,9 +220,10 @@ namespace Utilities
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
-      Assert(requests.size() == 0,
-             ExcMessage("Another compress operation seems to still be running. "
-                        "Call compress_finish() first."));
+      DEAL_II_Assert(requests.size() == 0,
+                     ExcMessage(
+                       "Another compress operation seems to still be running. "
+                       "Call compress_finish() first."));
 
       // Need to send and receive the data. Use non-blocking communication,
       // where it is generally less overhead to first initiate the receive and
@@ -232,7 +237,7 @@ namespace Utilities
       Number *temp_array_ptr = temporary_storage.data();
       for (unsigned int i = 0; i < n_import_targets; i++)
         {
-          AssertThrow(
+          DEAL_II_AssertThrow(
             static_cast<std::size_t>(import_targets_data[i].second) *
                 sizeof(Number) <
               static_cast<std::size_t>(std::numeric_limits<int>::max()),
@@ -247,7 +252,7 @@ namespace Utilities
                       import_targets_data[i].first + channel,
                       communicator,
                       &requests[i]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           temp_array_ptr += import_targets_data[i].second;
         }
 
@@ -255,7 +260,8 @@ namespace Utilities
 
       // in case we want to import only from a subset of the ghosts we want to
       // move the data to send to the front of the array
-      AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set + 1);
+      DEAL_II_AssertIndexRange(n_ghost_indices(),
+                               n_ghost_indices_in_larger_set + 1);
       Number *ghost_array_ptr = ghost_array.data();
       for (unsigned int i = 0; i < n_ghost_targets; i++)
         {
@@ -281,10 +287,10 @@ namespace Utilities
                     }
                 else
                   offset += my_ghosts->second - my_ghosts->first;
-              AssertDimension(offset, ghost_targets_data[i].second);
+              DEAL_II_AssertDimension(offset, ghost_targets_data[i].second);
             }
 
-          AssertThrow(
+          DEAL_II_AssertThrow(
             static_cast<std::size_t>(ghost_targets_data[i].second) *
                 sizeof(Number) <
               static_cast<std::size_t>(std::numeric_limits<int>::max()),
@@ -299,7 +305,7 @@ namespace Utilities
                       this_mpi_process() + channel,
                       communicator,
                       &requests[n_import_targets + i]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           ghost_array_ptr += ghost_targets_data[i].second;
         }
@@ -344,9 +350,9 @@ namespace Utilities
       std::complex<Number>
       get_min(const std::complex<Number> a, const std::complex<Number>)
       {
-        AssertThrow(false,
-                    ExcMessage("VectorOperation::min not "
-                               "implemented for complex numbers"));
+        DEAL_II_AssertThrow(false,
+                            ExcMessage("VectorOperation::min not "
+                                       "implemented for complex numbers"));
         return a;
       }
 
@@ -361,9 +367,9 @@ namespace Utilities
       std::complex<Number>
       get_max(const std::complex<Number> a, const std::complex<Number>)
       {
-        AssertThrow(false,
-                    ExcMessage("VectorOperation::max not "
-                               "implemented for complex numbers"));
+        DEAL_II_AssertThrow(false,
+                            ExcMessage("VectorOperation::max not "
+                                       "implemented for complex numbers"));
         return a;
       }
     } // namespace internal
@@ -379,25 +385,26 @@ namespace Utilities
       const ArrayView<Number> &      ghost_array,
       std::vector<MPI_Request> &     requests) const
     {
-      AssertDimension(temporary_storage.size(), n_import_indices());
-      Assert(ghost_array.size() == n_ghost_indices() ||
-               ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
-                                            n_ghost_indices(),
-                                            n_ghost_indices_in_larger_set));
+      DEAL_II_AssertDimension(temporary_storage.size(), n_import_indices());
+      DEAL_II_Assert(
+        ghost_array.size() == n_ghost_indices() ||
+          ghost_array.size() == n_ghost_indices_in_larger_set,
+        ExcGhostIndexArrayHasWrongSize(ghost_array.size(),
+                                       n_ghost_indices(),
+                                       n_ghost_indices_in_larger_set));
 
       // in optimized mode, no communication was started, so leave the
       // function directly (and only clear ghosts)
 #    ifndef DEBUG
       if (vector_operation == VectorOperation::insert)
         {
-          Assert(requests.empty(),
-                 ExcInternalError(
-                   "Did not expect a non-empty communication "
-                   "request when inserting. Check that the same "
-                   "vector_operation argument was passed to "
-                   "import_from_ghosted_array_start as is passed "
-                   "to import_from_ghosted_array_finish."));
+          DEAL_II_Assert(requests.empty(),
+                         ExcInternalError(
+                           "Did not expect a non-empty communication "
+                           "request when inserting. Check that the same "
+                           "vector_operation argument was passed to "
+                           "import_from_ghosted_array_start as is passed "
+                           "to import_from_ghosted_array_finish."));
 #      ifdef DEAL_II_WITH_CXX17
           if constexpr (std::is_trivial<Number>::value)
 #      else
@@ -422,15 +429,16 @@ namespace Utilities
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
       if (vector_operation != dealii::VectorOperation::insert)
-        AssertDimension(n_ghost_targets + n_import_targets, requests.size());
+        DEAL_II_AssertDimension(n_ghost_targets + n_import_targets,
+                                requests.size());
 
       // first wait for the receive to complete
       if (requests.size() > 0 && n_import_targets > 0)
         {
-          AssertDimension(locally_owned_array.size(), local_size());
+          DEAL_II_AssertDimension(locally_owned_array.size(), local_size());
           const int ierr =
             MPI_Waitall(n_import_targets, requests.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           const Number *read_position = temporary_storage.data();
           std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
@@ -468,25 +476,26 @@ namespace Utilities
               for (unsigned int j = my_imports->first; j < my_imports->second;
                    j++, read_position++)
                 // Below we use relatively large precision in units in the last
-                // place (ULP) as this Assert can be easily triggered in
+                // place (ULP) as this DEAL_II_Assert can be easily triggered in
                 // p::d::SolutionTransfer. The rationale is that during
                 // interpolation on two elements sharing the face, values on
                 // this face obtained from each side might be different due to
                 // additions being done in different order.
-                Assert(*read_position == Number() ||
-                         internal::get_abs(locally_owned_array[j] -
-                                           *read_position) <=
-                           internal::get_abs(locally_owned_array[j] +
-                                             *read_position) *
-                             100000. *
-                             std::numeric_limits<typename numbers::NumberTraits<
-                               Number>::real_type>::epsilon(),
-                       typename LinearAlgebra::distributed::Vector<
-                         Number>::ExcNonMatchingElements(*read_position,
-                                                         locally_owned_array[j],
-                                                         my_pid));
-          AssertDimension(read_position - temporary_storage.data(),
-                          n_import_indices());
+                DEAL_II_Assert(
+                  *read_position == Number() ||
+                    internal::get_abs(locally_owned_array[j] -
+                                      *read_position) <=
+                      internal::get_abs(locally_owned_array[j] +
+                                        *read_position) *
+                        100000. *
+                        std::numeric_limits<typename numbers::NumberTraits<
+                          Number>::real_type>::epsilon(),
+                  typename LinearAlgebra::distributed::Vector<
+                    Number>::ExcNonMatchingElements(*read_position,
+                                                    locally_owned_array[j],
+                                                    my_pid));
+          DEAL_II_AssertDimension(read_position - temporary_storage.data(),
+                                  n_import_indices());
         }
 
       // wait for the send operations to complete
@@ -495,16 +504,16 @@ namespace Utilities
           const int ierr = MPI_Waitall(n_ghost_targets,
                                        &requests[n_import_targets],
                                        MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
       else
-        AssertDimension(n_ghost_indices(), 0);
+        DEAL_II_AssertDimension(n_ghost_indices(), 0);
 
       // clear the ghost array in case we did not yet do that in the _start
       // function
       if (ghost_array.size() > 0)
         {
-          Assert(ghost_array.begin() != nullptr, ExcInternalError());
+          DEAL_II_Assert(ghost_array.begin() != nullptr, ExcInternalError());
 #    ifdef DEAL_II_WITH_CXX17
           if constexpr (std::is_trivial<Number>::value)
 #    else

@@ -418,9 +418,10 @@ inline
   LinearIndexIterator<DerivedIterator, AccessorType>::
   operator-(const DerivedIterator &other) const
 {
-  Assert(this->accessor.container == other.accessor.container,
-         ExcMessage(
-           "Only iterators pointing to the same container can be compared."));
+  DEAL_II_Assert(
+    this->accessor.container == other.accessor.container,
+    ExcMessage(
+      "Only iterators pointing to the same container can be compared."));
   return this->accessor.linear_index - other.accessor.linear_index;
 }
 
@@ -491,9 +492,10 @@ inline bool
 LinearIndexIterator<DerivedIterator, AccessorType>::
 operator<(const DerivedIterator &other) const
 {
-  Assert(this->accessor.container == other.accessor.container,
-         ExcMessage(
-           "Only iterators pointing to the same container can be compared."));
+  DEAL_II_Assert(
+    this->accessor.container == other.accessor.container,
+    ExcMessage(
+      "Only iterators pointing to the same container can be compared."));
   return this->accessor.linear_index < other.accessor.linear_index;
 }
 

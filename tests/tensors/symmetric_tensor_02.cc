@@ -35,28 +35,28 @@ main()
   t[0][2] = 5;
   t[1][2] = 6;
 
-  AssertThrow(t[0][1] == t[1][0], ExcInternalError());
+  DEAL_II_AssertThrow(t[0][1] == t[1][0], ExcInternalError());
 
   // check that if a single element is
   // accessed, its transpose element gets the
   // same value
   t[1][0] = 14;
-  AssertThrow(t[0][1] == 14, ExcInternalError());
+  DEAL_II_AssertThrow(t[0][1] == 14, ExcInternalError());
 
   // make sure transposition doesn't change
   // anything
-  AssertThrow(t == transpose(t), ExcInternalError());
+  DEAL_II_AssertThrow(t == transpose(t), ExcInternalError());
 
   // check norm of tensor
-  AssertThrow(std::fabs(t.norm() -
-                        std::sqrt(1. * 1 + 2 * 2 + 3 * 3 + 2 * 14 * 14 +
-                                  2 * 5 * 5 + 2 * 6 * 6)) < 1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(t.norm() -
+                                std::sqrt(1. * 1 + 2 * 2 + 3 * 3 + 2 * 14 * 14 +
+                                          2 * 5 * 5 + 2 * 6 * 6)) < 1e-14,
+                      ExcInternalError());
 
   // make sure norm is induced by scalar
   // product
-  AssertThrow(std::fabs(t.norm() * t.norm() - t * t) < 1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(t.norm() * t.norm() - t * t) < 1e-14,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

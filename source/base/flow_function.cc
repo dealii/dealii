@@ -52,8 +52,8 @@ namespace Functions
     std::vector<Vector<double>> &  values) const
   {
     const unsigned int n_points = points.size();
-    Assert(values.size() == n_points,
-           ExcDimensionMismatch(values.size(), n_points));
+    DEAL_II_Assert(values.size() == n_points,
+                   ExcDimensionMismatch(values.size(), n_points));
 
     // guard access to the aux_*
     // variables in multithread mode
@@ -65,8 +65,8 @@ namespace Functions
 
     for (unsigned int k = 0; k < n_points; ++k)
       {
-        Assert(values[k].size() == dim + 1,
-               ExcDimensionMismatch(values[k].size(), dim + 1));
+        DEAL_II_Assert(values[k].size() == dim + 1,
+                       ExcDimensionMismatch(values[k].size(), dim + 1));
         for (unsigned int d = 0; d < dim + 1; ++d)
           values[k](d) = aux_values[d][k];
       }
@@ -78,8 +78,8 @@ namespace Functions
   FlowFunction<dim>::vector_value(const Point<dim> &point,
                                   Vector<double> &  value) const
   {
-    Assert(value.size() == dim + 1,
-           ExcDimensionMismatch(value.size(), dim + 1));
+    DEAL_II_Assert(value.size() == dim + 1,
+                   ExcDimensionMismatch(value.size(), dim + 1));
 
     const unsigned int      n_points = 1;
     std::vector<Point<dim>> points(1);
@@ -103,7 +103,7 @@ namespace Functions
   FlowFunction<dim>::value(const Point<dim> & point,
                            const unsigned int comp) const
   {
-    Assert(comp < dim + 1, ExcIndexRange(comp, 0, dim + 1));
+    DEAL_II_Assert(comp < dim + 1, ExcIndexRange(comp, 0, dim + 1));
     const unsigned int      n_points = 1;
     std::vector<Point<dim>> points(1);
     points[0] = point;
@@ -127,8 +127,8 @@ namespace Functions
     std::vector<std::vector<Tensor<1, dim>>> &values) const
   {
     const unsigned int n_points = points.size();
-    Assert(values.size() == n_points,
-           ExcDimensionMismatch(values.size(), n_points));
+    DEAL_II_Assert(values.size() == n_points,
+                   ExcDimensionMismatch(values.size(), n_points));
 
     // guard access to the aux_*
     // variables in multithread mode
@@ -140,8 +140,8 @@ namespace Functions
 
     for (unsigned int k = 0; k < n_points; ++k)
       {
-        Assert(values[k].size() == dim + 1,
-               ExcDimensionMismatch(values[k].size(), dim + 1));
+        DEAL_II_Assert(values[k].size() == dim + 1,
+                       ExcDimensionMismatch(values[k].size(), dim + 1));
         for (unsigned int d = 0; d < dim + 1; ++d)
           values[k][d] = aux_gradients[d][k];
       }
@@ -155,8 +155,8 @@ namespace Functions
     std::vector<Vector<double>> &  values) const
   {
     const unsigned int n_points = points.size();
-    Assert(values.size() == n_points,
-           ExcDimensionMismatch(values.size(), n_points));
+    DEAL_II_Assert(values.size() == n_points,
+                   ExcDimensionMismatch(values.size(), n_points));
 
     // guard access to the aux_*
     // variables in multithread mode
@@ -168,8 +168,8 @@ namespace Functions
 
     for (unsigned int k = 0; k < n_points; ++k)
       {
-        Assert(values[k].size() == dim + 1,
-               ExcDimensionMismatch(values[k].size(), dim + 1));
+        DEAL_II_Assert(values[k].size() == dim + 1,
+                       ExcDimensionMismatch(values[k].size(), dim + 1));
         for (unsigned int d = 0; d < dim + 1; ++d)
           values[k](d) = aux_values[d][k];
       }
@@ -180,7 +180,7 @@ namespace Functions
   std::size_t
   FlowFunction<dim>::memory_consumption() const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return 0;
   }
 
@@ -192,7 +192,8 @@ namespace Functions
     : radius(r)
     , Reynolds(Re)
   {
-    Assert(Reynolds != 0., ExcMessage("Reynolds number cannot be zero"));
+    DEAL_II_Assert(Reynolds != 0.,
+                   ExcMessage("Reynolds number cannot be zero"));
   }
 
 
@@ -206,10 +207,11 @@ namespace Functions
     unsigned int n       = points.size();
     double       stretch = 1. / radius;
 
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
+    DEAL_II_Assert(values.size() == dim + 1,
+                   ExcDimensionMismatch(values.size(), dim + 1));
     for (unsigned int d = 0; d < dim + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int k = 0; k < n; ++k)
       {
@@ -244,10 +246,11 @@ namespace Functions
     unsigned int n       = points.size();
     double       stretch = 1. / radius;
 
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
+    DEAL_II_Assert(values.size() == dim + 1,
+                   ExcDimensionMismatch(values.size(), dim + 1));
     for (unsigned int d = 0; d < dim + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int k = 0; k < n; ++k)
       {
@@ -276,10 +279,11 @@ namespace Functions
   {
     unsigned int n = points.size();
     (void)n;
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
+    DEAL_II_Assert(values.size() == dim + 1,
+                   ExcDimensionMismatch(values.size(), dim + 1));
     for (unsigned int d = 0; d < dim + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int d = 0; d < values.size(); ++d)
       for (unsigned int k = 0; k < values[d].size(); ++k)
@@ -313,10 +317,11 @@ namespace Functions
   {
     unsigned int n = points.size();
 
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
+    DEAL_II_Assert(values.size() == dim + 1,
+                   ExcDimensionMismatch(values.size(), dim + 1));
     for (unsigned int d = 0; d < dim + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int k = 0; k < n; ++k)
       {
@@ -347,7 +352,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -362,10 +367,11 @@ namespace Functions
   {
     unsigned int n = points.size();
 
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
+    DEAL_II_Assert(values.size() == dim + 1,
+                   ExcDimensionMismatch(values.size(), dim + 1));
     for (unsigned int d = 0; d < dim + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int k = 0; k < n; ++k)
       {
@@ -413,7 +419,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -428,10 +434,11 @@ namespace Functions
   {
     unsigned int n = points.size();
 
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
+    DEAL_II_Assert(values.size() == dim + 1,
+                   ExcDimensionMismatch(values.size(), dim + 1));
     for (unsigned int d = 0; d < dim + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     if (reaction != 0.)
       {
@@ -485,7 +492,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -554,9 +561,11 @@ namespace Functions
   {
     unsigned int n = points.size();
 
-    Assert(values.size() == 2 + 1, ExcDimensionMismatch(values.size(), 2 + 1));
+    DEAL_II_Assert(values.size() == 2 + 1,
+                   ExcDimensionMismatch(values.size(), 2 + 1));
     for (unsigned int d = 0; d < 2 + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int k = 0; k < n; ++k)
       {
@@ -594,9 +603,11 @@ namespace Functions
   {
     unsigned int n = points.size();
 
-    Assert(values.size() == 2 + 1, ExcDimensionMismatch(values.size(), 2 + 1));
+    DEAL_II_Assert(values.size() == 2 + 1,
+                   ExcDimensionMismatch(values.size(), 2 + 1));
     for (unsigned int d = 0; d < 2 + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int k = 0; k < n; ++k)
       {
@@ -654,9 +665,11 @@ namespace Functions
   {
     unsigned int n = points.size();
     (void)n;
-    Assert(values.size() == 2 + 1, ExcDimensionMismatch(values.size(), 2 + 1));
+    DEAL_II_Assert(values.size() == 2 + 1,
+                   ExcDimensionMismatch(values.size(), 2 + 1));
     for (unsigned int d = 0; d < 2 + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int d = 0; d < values.size(); ++d)
       for (unsigned int k = 0; k < values[d].size(); ++k)
@@ -688,9 +701,11 @@ namespace Functions
   {
     unsigned int n = points.size();
 
-    Assert(values.size() == 2 + 1, ExcDimensionMismatch(values.size(), 2 + 1));
+    DEAL_II_Assert(values.size() == 2 + 1,
+                   ExcDimensionMismatch(values.size(), 2 + 1));
     for (unsigned int d = 0; d < 2 + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     for (unsigned int k = 0; k < n; ++k)
       {
@@ -713,9 +728,10 @@ namespace Functions
   {
     unsigned int n = points.size();
 
-    Assert(gradients.size() == 3, ExcDimensionMismatch(gradients.size(), 3));
-    Assert(gradients[0].size() == n,
-           ExcDimensionMismatch(gradients[0].size(), n));
+    DEAL_II_Assert(gradients.size() == 3,
+                   ExcDimensionMismatch(gradients.size(), 3));
+    DEAL_II_Assert(gradients[0].size() == n,
+                   ExcDimensionMismatch(gradients[0].size(), n));
 
     for (unsigned int i = 0; i < n; ++i)
       {
@@ -744,9 +760,11 @@ namespace Functions
                                std::vector<std::vector<double>> &values) const
   {
     unsigned int n = points.size();
-    Assert(values.size() == 2 + 1, ExcDimensionMismatch(values.size(), 2 + 1));
+    DEAL_II_Assert(values.size() == 2 + 1,
+                   ExcDimensionMismatch(values.size(), 2 + 1));
     for (unsigned int d = 0; d < 2 + 1; ++d)
-      Assert(values[d].size() == n, ExcDimensionMismatch(values[d].size(), n));
+      DEAL_II_Assert(values[d].size() == n,
+                     ExcDimensionMismatch(values[d].size(), n));
 
     if (stokes)
       {

@@ -69,9 +69,9 @@ test_gpu()
 
   // Allocate objects on the device
   cudaError_t cuda_error = cudaMalloc(&t_dev, sizeof(Tensor<2, dim>));
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
   cuda_error = cudaMalloc(&norm_dev, sizeof(double));
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
 
   // Launch the kernels.
   dim3 block_dim(dim, dim);
@@ -81,13 +81,13 @@ test_gpu()
   // Copy the result to the device
   cuda_error =
     cudaMemcpy(&norm_host, norm_dev, sizeof(double), cudaMemcpyDeviceToHost);
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
 
   // Free memory
   cuda_error = cudaFree(t_dev);
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
   cuda_error = cudaFree(norm_dev);
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
 
   // Output result
   deallog.push("norm_square GPU");

@@ -106,7 +106,7 @@ private:
       }
     else
       {
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
   }
 

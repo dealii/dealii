@@ -313,7 +313,8 @@ template <typename Number>
 inline void
 VectorView<Number>::swap(Vector<Number> &)
 {
-  AssertThrow(false, ExcMessage("Can't swap a VectorView with a Vector!"));
+  DEAL_II_AssertThrow(false,
+                      ExcMessage("Can't swap a VectorView with a Vector!"));
 }
 
 #endif

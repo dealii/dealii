@@ -52,7 +52,7 @@ mpi_check(const std::set<types::subdomain_id> &s)
         nullptr, 0, MPI_INT, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
       if ((s.end() == s.find(status.MPI_SOURCE)))
         deallog << status.MPI_SOURCE << " NOTOKAY" << std::endl;
-      Assert(s.end() != s.find(status.MPI_SOURCE), ExcInternalError());
+      DEAL_II_Assert(s.end() != s.find(status.MPI_SOURCE), ExcInternalError());
     }
   MPI_Barrier(MPI_COMM_WORLD);
 }
@@ -110,7 +110,7 @@ test()
                                      level_ghost_owners.end(),
                                      ghost_owners.begin(),
                                      ghost_owners.end());
-      Assert(is_subset, ExcInternalError());
+      DEAL_II_Assert(is_subset, ExcInternalError());
 
       Vector<float>                 indicators(tr.n_active_cells());
       std::set<types::subdomain_id> neighbors;
@@ -127,7 +127,7 @@ test()
             }
       }
 
-      Assert(neighbors == ghost_owners, ExcInternalError());
+      DEAL_II_Assert(neighbors == ghost_owners, ExcInternalError());
 
       parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_number(
         tr, indicators, 0.3, 0.0);

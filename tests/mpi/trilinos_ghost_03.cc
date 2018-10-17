@@ -59,7 +59,7 @@ test()
 
   v_tmp.reinit(v, false, true);
 
-  Assert(v_tmp.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v_tmp.has_ghost_elements(), ExcInternalError());
 
   try
     {

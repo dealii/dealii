@@ -32,8 +32,8 @@ test()
                                 outer_product(unit_symmetric_tensor<dim>(),
                                               unit_symmetric_tensor<dim>()));
 
-  AssertThrow((T - deviator_tensor<dim>()).norm() <= 1e-15 * T.norm(),
-              ExcInternalError());
+  DEAL_II_AssertThrow((T - deviator_tensor<dim>()).norm() <= 1e-15 * T.norm(),
+                      ExcInternalError());
 }
 
 

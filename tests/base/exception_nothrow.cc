@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test that AssertNothrow is printing what we expect.
+// test that DEAL_II_AssertNothrow is printing what we expect.
 
 #include "../tests.h"
 
@@ -23,5 +23,5 @@ main()
 {
   initlog();
   deal_II_exceptions::disable_abort_on_exception();
-  AssertNothrow(1 == 2, ExcInternalError());
+  DEAL_II_AssertNothrow(1 == 2, ExcInternalError());
 }

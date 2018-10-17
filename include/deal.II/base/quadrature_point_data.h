@@ -281,14 +281,14 @@ namespace parallel
      *   // a function to pack scalars into a vector
      *   void pack_values(std::vector<double> &values) const
      *   {
-     *     Assert (scalars.size()==2, ExcInternalError());
+     *     DEAL_II_Assert (scalars.size()==2, ExcInternalError());
      *     scalars[0] = elasticity_parameter_lambda;
      *     scalars[1] = elasticity_parameter_mu;
      *   }
      *
      *   void unpack_values(const std::vector<double> &values)
      *   {
-     *     Assert (scalars.size() ==2, ExcInternalError());
+     *     DEAL_II_Assert (scalars.size() ==2, ExcInternalError());
      *     elasticity_parameter_lambda = scalars[0];
      *     elasticity_parameter_mu     = scalars[1];
      *   }
@@ -558,7 +558,7 @@ CellDataStorage<CellIteratorType, DataType>::erase(const CellIteratorType &cell)
   const auto it = map.find(cell);
   for (unsigned int i = 0; i < it->second.size(); i++)
     {
-      Assert(
+      DEAL_II_Assert(
         it->second[i].unique(),
         ExcMessage(
           "Can not erase the cell data multiple objects reference its data."));
@@ -582,7 +582,7 @@ CellDataStorage<CellIteratorType, DataType>::clear()
       // loop over all objects and see if no one is using them
       for (unsigned int i = 0; i < it->second.size(); i++)
         {
-          Assert(
+          DEAL_II_Assert(
             it->second[i].unique(),
             ExcMessage(
               "Can not erase the cell data, multiple objects reference it."));
@@ -603,7 +603,8 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
                 "User's T class should be derived from user's DataType class");
 
   auto it = map.find(cell);
-  Assert(it != map.end(), ExcMessage("Could not find data for the cell"));
+  DEAL_II_Assert(it != map.end(),
+                 ExcMessage("Could not find data for the cell"));
 
   // It would be nice to have a specialized version of this function for
   // T==DataType. However explicit (i.e full) specialization of a member
@@ -628,7 +629,8 @@ CellDataStorage<CellIteratorType, DataType>::get_data(
                 "User's T class should be derived from user's DataType class");
 
   auto it = map.find(cell);
-  Assert(it != map.end(), ExcMessage("Could not find QP data for the cell"));
+  DEAL_II_Assert(it != map.end(),
+                 ExcMessage("Could not find QP data for the cell"));
 
   // Cast base class to the desired class. This has to be done irrespectively of
   // T==DataType as we need to return shared_ptr<const T> to make sure the user
@@ -667,13 +669,13 @@ pack_cell_data(const CellIteratorType &                           cell,
   const unsigned int n = matrix_data.n();
 
   std::vector<double> single_qp_data(n);
-  Assert(qpd.size() == matrix_data.m(),
-         ExcDimensionMismatch(qpd.size(), matrix_data.m()));
+  DEAL_II_Assert(qpd.size() == matrix_data.m(),
+                 ExcDimensionMismatch(qpd.size(), matrix_data.m()));
   for (unsigned int q = 0; q < qpd.size(); q++)
     {
       qpd[q]->pack_values(single_qp_data);
-      Assert(single_qp_data.size() == n,
-             ExcDimensionMismatch(single_qp_data.size(), n));
+      DEAL_II_Assert(single_qp_data.size() == n,
+                     ExcDimensionMismatch(single_qp_data.size(), n));
 
       for (unsigned int i = 0; i < n; i++)
         matrix_data(q, i) = single_qp_data[i];
@@ -700,8 +702,8 @@ unpack_to_cell_data(const CellIteratorType &                     cell,
   const unsigned int n = values_at_qp.n();
 
   std::vector<double> single_qp_data(n);
-  Assert(qpd.size() == values_at_qp.m(),
-         ExcDimensionMismatch(qpd.size(), values_at_qp.m()));
+  DEAL_II_Assert(qpd.size() == values_at_qp.m(),
+                 ExcDimensionMismatch(qpd.size(), values_at_qp.m()));
 
   for (unsigned int q = 0; q < qpd.size(); q++)
     {
@@ -733,7 +735,7 @@ namespace parallel
       , data_storage(nullptr)
       , triangulation(nullptr)
     {
-      Assert(
+      DEAL_II_Assert(
         projection_fe->n_components() == 1,
         ExcMessage(
           "ContinuousQuadratureDataTransfer requires scalar FiniteElement"));
@@ -764,8 +766,8 @@ namespace parallel
         parallel::distributed::Triangulation<dim> &  tr_,
         CellDataStorage<CellIteratorType, DataType> &data_storage_)
     {
-      Assert(data_storage == nullptr,
-             ExcMessage("This function can be called only once"));
+      DEAL_II_Assert(data_storage == nullptr,
+                     ExcMessage("This function can be called only once"));
       triangulation = &tr_;
       data_storage  = &data_storage_;
       // get the number from the first active cell
@@ -788,7 +790,7 @@ namespace parallel
       // processors:
       number_of_values = Utilities::MPI::max(number_of_values,
                                              triangulation->get_communicator());
-      Assert(number_of_values > 0, ExcInternalError());
+      DEAL_II_Assert(number_of_values > 0, ExcInternalError());
       const unsigned int dofs_per_cell = projection_fe->dofs_per_cell;
       matrix_dofs.reinit(dofs_per_cell, number_of_values);
       matrix_dofs_child.reinit(dofs_per_cell, number_of_values);
@@ -855,9 +857,10 @@ namespace parallel
       const boost::iterator_range<std::vector<char>::const_iterator>
         &data_range)
     {
-      Assert((status !=
-              parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN),
-             ExcNotImplemented());
+      DEAL_II_Assert(
+        (status !=
+         parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN),
+        ExcNotImplemented());
       (void)status;
 
       matrix_dofs =

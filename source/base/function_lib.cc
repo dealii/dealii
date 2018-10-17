@@ -42,7 +42,7 @@ namespace Functions
   SquareFunction<dim>::vector_value(const Point<dim> &p,
                                     Vector<double> &  values) const
   {
-    AssertDimension(values.size(), 1);
+    DEAL_II_AssertDimension(values.size(), 1);
     values(0) = p.square();
   }
 
@@ -53,8 +53,8 @@ namespace Functions
                                   std::vector<double> &          values,
                                   const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -78,8 +78,8 @@ namespace Functions
                                       std::vector<double> &          values,
                                       const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = 2 * dim;
@@ -101,7 +101,7 @@ namespace Functions
     const Point<dim> &           p,
     std::vector<Tensor<1, dim>> &values) const
   {
-    AssertDimension(values.size(), 1);
+    DEAL_II_AssertDimension(values.size(), 1);
     values[0] = p * 2.;
   }
 
@@ -113,8 +113,8 @@ namespace Functions
                                      std::vector<Tensor<1, dim>> &  gradients,
                                      const unsigned int) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       gradients[i] = static_cast<Tensor<1, dim>>(points[i]) * 2;
@@ -128,7 +128,7 @@ namespace Functions
   double
   Q1WedgeFunction<dim>::value(const Point<dim> &p, const unsigned int) const
   {
-    Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
     return p(0) * p(1);
   }
 
@@ -140,9 +140,9 @@ namespace Functions
                                    std::vector<double> &          values,
                                    const unsigned int) const
   {
-    Assert(dim >= 2, ExcInternalError());
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -158,10 +158,11 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(dim >= 2, ExcInternalError());
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(values[0].size() == 1, ExcDimensionMismatch(values[0].size(), 1));
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values[0].size() == 1,
+                   ExcDimensionMismatch(values[0].size(), 1));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -175,7 +176,7 @@ namespace Functions
   double
   Q1WedgeFunction<dim>::laplacian(const Point<dim> &, const unsigned int) const
   {
-    Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
     return 0.;
   }
 
@@ -186,9 +187,9 @@ namespace Functions
                                        std::vector<double> &          values,
                                        const unsigned int) const
   {
-    Assert(dim >= 2, ExcInternalError());
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = 0.;
@@ -200,7 +201,7 @@ namespace Functions
   Tensor<1, dim>
   Q1WedgeFunction<dim>::gradient(const Point<dim> &p, const unsigned int) const
   {
-    Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
     Tensor<1, dim> erg;
     erg[0] = p(1);
     erg[1] = p(0);
@@ -215,9 +216,9 @@ namespace Functions
                                       std::vector<Tensor<1, dim>> &  gradients,
                                       const unsigned int) const
   {
-    Assert(dim >= 2, ExcInternalError());
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -233,11 +234,11 @@ namespace Functions
     const std::vector<Point<dim>> &           points,
     std::vector<std::vector<Tensor<1, dim>>> &gradients) const
   {
-    Assert(dim >= 2, ExcInternalError());
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
-    Assert(gradients[0].size() == 1,
-           ExcDimensionMismatch(gradients[0].size(), 1));
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients[0].size() == 1,
+                   ExcDimensionMismatch(gradients[0].size(), 1));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -270,7 +271,7 @@ namespace Functions
           return (1. - p(0) * p(0)) * (1. - p(1) * p(1)) * (1. - p(2) * p(2)) +
                  offset;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -281,8 +282,8 @@ namespace Functions
                                   std::vector<double> &          values,
                                   const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -301,7 +302,7 @@ namespace Functions
                 offset;
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -323,7 +324,7 @@ namespace Functions
                         (1. - p(1) * p(1)) * (1. - p(2) * p(2)) +
                         (1. - p(2) * p(2)) * (1. - p(0) * p(0)));
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -334,8 +335,8 @@ namespace Functions
                                       std::vector<double> &          values,
                                       const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -354,7 +355,7 @@ namespace Functions
                                  (1. - p(2) * p(2)) * (1. - p(0) * p(0)));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -379,7 +380,7 @@ namespace Functions
           result[2] = -2. * p(2) * (1. - p(0) * p(0)) * (1. - p(1) * p(1));
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -390,8 +391,8 @@ namespace Functions
                                      std::vector<Tensor<1, dim>> &  gradients,
                                      const unsigned int) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -414,7 +415,7 @@ namespace Functions
                 -2. * p(2) * (1. - p(0) * p(0)) * (1. - p(1) * p(1));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -444,7 +445,7 @@ namespace Functions
                  std::cos(numbers::PI_2 * p(1)) *
                  std::cos(numbers::PI_2 * p(2));
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -455,8 +456,8 @@ namespace Functions
                                   std::vector<double> &          values,
                                   const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = value(points[i]);
@@ -469,8 +470,8 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -500,7 +501,7 @@ namespace Functions
                  std::cos(numbers::PI_2 * p(1)) *
                  std::cos(numbers::PI_2 * p(2));
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -511,8 +512,8 @@ namespace Functions
                                       std::vector<double> &          values,
                                       const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = laplacian(points[i]);
@@ -546,7 +547,7 @@ namespace Functions
                       std::sin(numbers::PI_2 * p(2));
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -557,8 +558,8 @@ namespace Functions
                                      std::vector<Tensor<1, dim>> &  gradients,
                                      const unsigned int) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -588,7 +589,7 @@ namespace Functions
                 std::cos(numbers::PI_2 * p(1)) * std::sin(numbers::PI_2 * p(2));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -642,7 +643,7 @@ namespace Functions
           }
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -654,8 +655,8 @@ namespace Functions
     std::vector<SymmetricTensor<2, dim>> &hessians,
     const unsigned int) const
   {
-    Assert(hessians.size() == points.size(),
-           ExcDimensionMismatch(hessians.size(), points.size()));
+    DEAL_II_Assert(hessians.size() == points.size(),
+                   ExcDimensionMismatch(hessians.size(), points.size()));
 
     const double pi2 = numbers::PI_2 * numbers::PI_2;
 
@@ -704,7 +705,7 @@ namespace Functions
               }
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -722,7 +723,7 @@ namespace Functions
   CosineGradFunction<dim>::value(const Point<dim> & p,
                                  const unsigned int d) const
   {
-    AssertIndexRange(d, dim);
+    DEAL_II_AssertIndexRange(d, dim);
     const unsigned int d1 = (d + 1) % dim;
     const unsigned int d2 = (d + 2) % dim;
     switch (dim)
@@ -737,7 +738,7 @@ namespace Functions
                   std::cos(numbers::PI_2 * p(d1)) *
                   std::cos(numbers::PI_2 * p(d2)));
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -748,7 +749,7 @@ namespace Functions
   CosineGradFunction<dim>::vector_value(const Point<dim> &p,
                                         Vector<double> &  result) const
   {
-    AssertDimension(result.size(), dim);
+    DEAL_II_AssertDimension(result.size(), dim);
     switch (dim)
       {
         case 1:
@@ -772,7 +773,7 @@ namespace Functions
                       std::sin(numbers::PI_2 * p(2));
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 
@@ -783,9 +784,9 @@ namespace Functions
                                       std::vector<double> &          values,
                                       const unsigned int             d) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    AssertIndexRange(d, dim);
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_AssertIndexRange(d, dim);
     const unsigned int d1 = (d + 1) % dim;
     const unsigned int d2 = (d + 2) % dim;
 
@@ -807,7 +808,7 @@ namespace Functions
                           std::cos(numbers::PI_2 * p(d2));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -819,8 +820,8 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -848,7 +849,7 @@ namespace Functions
                              std::sin(numbers::PI_2 * p(2));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -868,7 +869,7 @@ namespace Functions
   CosineGradFunction<dim>::gradient(const Point<dim> & p,
                                     const unsigned int d) const
   {
-    AssertIndexRange(d, dim);
+    DEAL_II_AssertIndexRange(d, dim);
     const unsigned int d1  = (d + 1) % dim;
     const unsigned int d2  = (d + 2) % dim;
     const double       pi2 = numbers::PI_2 * numbers::PI_2;
@@ -897,7 +898,7 @@ namespace Functions
                        std::sin(numbers::PI_2 * p(d2));
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -909,13 +910,13 @@ namespace Functions
                                          std::vector<Tensor<1, dim>> &gradients,
                                          const unsigned int           d) const
   {
-    AssertIndexRange(d, dim);
+    DEAL_II_AssertIndexRange(d, dim);
     const unsigned int d1  = (d + 1) % dim;
     const unsigned int d2  = (d + 2) % dim;
     const double       pi2 = numbers::PI_2 * numbers::PI_2;
 
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<dim> &p      = points[i];
@@ -944,7 +945,7 @@ namespace Functions
                            std::sin(numbers::PI_2 * p(d2));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -956,7 +957,7 @@ namespace Functions
     const std::vector<Point<dim>> &           points,
     std::vector<std::vector<Tensor<1, dim>>> &gradients) const
   {
-    AssertVectorVectorDimension(gradients, points.size(), dim);
+    DEAL_II_AssertVectorVectorDimension(gradients, points.size(), dim);
     const double pi2 = numbers::PI_2 * numbers::PI_2;
 
     for (unsigned int i = 0; i < points.size(); ++i)
@@ -1006,7 +1007,7 @@ namespace Functions
               }
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -1027,7 +1028,7 @@ namespace Functions
         case 3:
           return std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -1038,8 +1039,8 @@ namespace Functions
                                std::vector<double> &          values,
                                const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1056,7 +1057,7 @@ namespace Functions
               values[i] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -1074,7 +1075,7 @@ namespace Functions
         case 3:
           return 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return 0.;
   }
@@ -1085,8 +1086,8 @@ namespace Functions
                                    std::vector<double> &          values,
                                    const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1103,7 +1104,7 @@ namespace Functions
               values[i] = 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -1128,7 +1129,7 @@ namespace Functions
           result[2] = result[0];
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return result;
   }
@@ -1139,8 +1140,8 @@ namespace Functions
                                   std::vector<Tensor<1, dim>> &  gradients,
                                   const unsigned int) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1161,7 +1162,7 @@ namespace Functions
               gradients[i][2] = gradients[i][0];
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -1190,8 +1191,8 @@ namespace Functions
                                    std::vector<double> &        values,
                                    const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1216,13 +1217,13 @@ namespace Functions
     const std::vector<Point<2>> &points,
     std::vector<Vector<double>> &values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(values[i].size() == 1,
-               ExcDimensionMismatch(values[i].size(), 1));
+        DEAL_II_Assert(values[i].size() == 1,
+                       ExcDimensionMismatch(values[i].size(), 1));
         double x = points[i](0);
         double y = points[i](1);
 
@@ -1251,8 +1252,8 @@ namespace Functions
                                        std::vector<double> &        values,
                                        const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = 0.;
@@ -1283,8 +1284,8 @@ namespace Functions
                                       std::vector<Tensor<1, 2>> &  gradients,
                                       const unsigned int) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1309,13 +1310,13 @@ namespace Functions
     const std::vector<Point<2>> &           points,
     std::vector<std::vector<Tensor<1, 2>>> &gradients) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(gradients[i].size() == 1,
-               ExcDimensionMismatch(gradients[i].size(), 1));
+        DEAL_II_Assert(gradients[i].size() == 1,
+                       ExcDimensionMismatch(gradients[i].size(), 1));
         const Point<2> &p   = points[i];
         double          x   = p(0);
         double          y   = p(1);
@@ -1341,7 +1342,7 @@ namespace Functions
   double
   LSingularityGradFunction::value(const Point<2> &p, const unsigned int d) const
   {
-    AssertIndexRange(d, 2);
+    DEAL_II_AssertIndexRange(d, 2);
 
     const double x   = p(0);
     const double y   = p(1);
@@ -1361,8 +1362,8 @@ namespace Functions
                                        std::vector<double> &        values,
                                        const unsigned int           d) const
   {
-    AssertIndexRange(d, 2);
-    AssertDimension(values.size(), points.size());
+    DEAL_II_AssertIndexRange(d, 2);
+    DEAL_II_AssertDimension(values.size(), points.size());
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1386,12 +1387,12 @@ namespace Functions
     const std::vector<Point<2>> &points,
     std::vector<Vector<double>> &values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        AssertDimension(values[i].size(), 2);
+        DEAL_II_AssertDimension(values[i].size(), 2);
         const Point<2> &p   = points[i];
         const double    x   = p(0);
         const double    y   = p(1);
@@ -1421,8 +1422,8 @@ namespace Functions
                                            std::vector<double> &        values,
                                            const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = 0.;
@@ -1434,7 +1435,7 @@ namespace Functions
   LSingularityGradFunction::gradient(const Point<2> & /*p*/,
                                      const unsigned int /*component*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return Tensor<1, 2>();
   }
 
@@ -1445,7 +1446,7 @@ namespace Functions
     std::vector<Tensor<1, 2>> & /*gradients*/,
     const unsigned int /*component*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -1454,7 +1455,7 @@ namespace Functions
     const std::vector<Point<2>> & /*points*/,
     std::vector<std::vector<Tensor<1, 2>>> & /*gradients*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -1481,8 +1482,8 @@ namespace Functions
     std::vector<double> &          values,
     const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1503,13 +1504,13 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(values[i].size() == 1,
-               ExcDimensionMismatch(values[i].size(), 1));
+        DEAL_II_Assert(values[i].size() == 1,
+                       ExcDimensionMismatch(values[i].size(), 1));
 
         double x = points[i](0);
         double y = points[i](1);
@@ -1538,8 +1539,8 @@ namespace Functions
     std::vector<double> &          values,
     const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = 0.;
@@ -1574,8 +1575,8 @@ namespace Functions
     std::vector<Tensor<1, dim>> &  gradients,
     const unsigned int) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1602,13 +1603,13 @@ namespace Functions
     const std::vector<Point<dim>> &           points,
     std::vector<std::vector<Tensor<1, dim>>> &gradients) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(gradients[i].size() == 1,
-               ExcDimensionMismatch(gradients[i].size(), 1));
+        DEAL_II_Assert(gradients[i].size() == 1,
+                       ExcDimensionMismatch(gradients[i].size(), 1));
 
         const Point<dim> &p   = points[i];
         double            x   = p(0);
@@ -1649,8 +1650,8 @@ namespace Functions
                                            std::vector<double> &        values,
                                            const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1670,13 +1671,13 @@ namespace Functions
     const std::vector<Point<2>> &points,
     std::vector<Vector<double>> &values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(values[i].size() == 1,
-               ExcDimensionMismatch(values[i].size(), 1));
+        DEAL_II_Assert(values[i].size() == 1,
+                       ExcDimensionMismatch(values[i].size(), 1));
 
         double x = points[i](0);
         double y = points[i](1);
@@ -1703,8 +1704,8 @@ namespace Functions
     std::vector<double> &        values,
     const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = 0.;
@@ -1738,8 +1739,8 @@ namespace Functions
     std::vector<Tensor<1, 2>> &  gradients,
     const unsigned int) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -1764,13 +1765,13 @@ namespace Functions
     const std::vector<Point<2>> &           points,
     std::vector<std::vector<Tensor<1, 2>>> &gradients) const
   {
-    Assert(gradients.size() == points.size(),
-           ExcDimensionMismatch(gradients.size(), points.size()));
+    DEAL_II_Assert(gradients.size() == points.size(),
+                   ExcDimensionMismatch(gradients.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        Assert(gradients[i].size() == 1,
-               ExcDimensionMismatch(gradients[i].size(), 1));
+        DEAL_II_Assert(gradients[i].size() == 1,
+                       ExcDimensionMismatch(gradients[i].size(), 1));
 
         const Point<2> &p   = points[i];
         double          x   = p(0);
@@ -1804,7 +1805,7 @@ namespace Functions
           angle = std::atan2(direction(0), direction(1));
           break;
         case 3:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     sine   = std::sin(angle);
     cosine = std::cos(angle);
@@ -1828,8 +1829,8 @@ namespace Functions
                                 std::vector<double> &          values,
                                 const unsigned int) const
   {
-    Assert(values.size() == p.size(),
-           ExcDimensionMismatch(values.size(), p.size()));
+    DEAL_II_Assert(values.size() == p.size(),
+                   ExcDimensionMismatch(values.size(), p.size()));
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
@@ -1855,8 +1856,8 @@ namespace Functions
                                     std::vector<double> &          values,
                                     const unsigned int) const
   {
-    Assert(values.size() == p.size(),
-           ExcDimensionMismatch(values.size(), p.size()));
+    DEAL_II_Assert(values.size() == p.size(),
+                   ExcDimensionMismatch(values.size(), p.size()));
 
     double f = 2 * steepness * steepness;
 
@@ -1890,8 +1891,8 @@ namespace Functions
                                    std::vector<Tensor<1, dim>> &  gradients,
                                    const unsigned int) const
   {
-    Assert(gradients.size() == p.size(),
-           ExcDimensionMismatch(gradients.size(), p.size()));
+    DEAL_II_Assert(gradients.size() == p.size(),
+                   ExcDimensionMismatch(gradients.size(), p.size()));
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
@@ -1933,7 +1934,7 @@ namespace Functions
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return std::cos(fourier_coefficients * p);
   }
 
@@ -1945,7 +1946,7 @@ namespace Functions
                                        const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return -fourier_coefficients * std::sin(fourier_coefficients * p);
   }
 
@@ -1957,7 +1958,7 @@ namespace Functions
                                         const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return (fourier_coefficients * fourier_coefficients) *
            (-std::cos(fourier_coefficients * p));
   }
@@ -1983,7 +1984,7 @@ namespace Functions
                                   const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return std::sin(fourier_coefficients * p);
   }
 
@@ -1995,7 +1996,7 @@ namespace Functions
                                      const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return fourier_coefficients * std::cos(fourier_coefficients * p);
   }
 
@@ -2007,7 +2008,7 @@ namespace Functions
                                       const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return (fourier_coefficients * fourier_coefficients) *
            (-std::sin(fourier_coefficients * p));
   }
@@ -2026,9 +2027,10 @@ namespace Functions
     , fourier_coefficients(fourier_coefficients)
     , weights(weights)
   {
-    Assert(fourier_coefficients.size() > 0, ExcZero());
-    Assert(fourier_coefficients.size() == weights.size(),
-           ExcDimensionMismatch(fourier_coefficients.size(), weights.size()));
+    DEAL_II_Assert(fourier_coefficients.size() > 0, ExcZero());
+    DEAL_II_Assert(fourier_coefficients.size() == weights.size(),
+                   ExcDimensionMismatch(fourier_coefficients.size(),
+                                        weights.size()));
   }
 
 
@@ -2039,7 +2041,7 @@ namespace Functions
                              const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2057,7 +2059,7 @@ namespace Functions
                                 const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const unsigned int n = weights.size();
     Tensor<1, dim>     sum;
@@ -2075,7 +2077,7 @@ namespace Functions
                                  const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2100,9 +2102,10 @@ namespace Functions
     , fourier_coefficients(fourier_coefficients)
     , weights(weights)
   {
-    Assert(fourier_coefficients.size() > 0, ExcZero());
-    Assert(fourier_coefficients.size() == weights.size(),
-           ExcDimensionMismatch(fourier_coefficients.size(), weights.size()));
+    DEAL_II_Assert(fourier_coefficients.size() > 0, ExcZero());
+    DEAL_II_Assert(fourier_coefficients.size() == weights.size(),
+                   ExcDimensionMismatch(fourier_coefficients.size(),
+                                        weights.size()));
   }
 
 
@@ -2113,7 +2116,7 @@ namespace Functions
                                const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2131,7 +2134,7 @@ namespace Functions
                                   const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const unsigned int n = weights.size();
     Tensor<1, dim>     sum;
@@ -2149,7 +2152,7 @@ namespace Functions
                                    const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const unsigned int n   = weights.size();
     double             sum = 0;
@@ -2180,16 +2183,17 @@ namespace Functions
   Monomial<dim>::value(const Point<dim> &p, const unsigned int component) const
   {
     (void)component;
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
 
     double prod = 1;
     for (unsigned int s = 0; s < dim; ++s)
       {
         if (p[s] < 0)
-          Assert(std::floor(exponents[s]) == exponents[s],
-                 ExcMessage("Exponentiation of a negative base number with "
-                            "a real exponent can't be performed."));
+          DEAL_II_Assert(std::floor(exponents[s]) == exponents[s],
+                         ExcMessage(
+                           "Exponentiation of a negative base number with "
+                           "a real exponent can't be performed."));
         prod *= std::pow(p[s], exponents[s]);
       }
     return prod;
@@ -2201,8 +2205,8 @@ namespace Functions
   void
   Monomial<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
   {
-    Assert(values.size() == this->n_components,
-           ExcDimensionMismatch(values.size(), this->n_components));
+    DEAL_II_Assert(values.size() == this->n_components,
+                   ExcDimensionMismatch(values.size(), this->n_components));
 
     for (unsigned int i = 0; i < values.size(); ++i)
       values(i) = Monomial<dim>::value(p, i);
@@ -2216,7 +2220,7 @@ namespace Functions
                           const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     Tensor<1, dim> r;
     for (unsigned int d = 0; d < dim; ++d)
@@ -2232,10 +2236,10 @@ namespace Functions
             else
               {
                 if (p[s] < 0)
-                  Assert(std::floor(exponents[s]) == exponents[s],
-                         ExcMessage(
-                           "Exponentiation of a negative base number with "
-                           "a real exponent can't be performed."));
+                  DEAL_II_Assert(
+                    std::floor(exponents[s]) == exponents[s],
+                    ExcMessage("Exponentiation of a negative base number with "
+                               "a real exponent can't be performed."));
                 prod *=
                   (s == d ? exponents[s] * std::pow(p[s], exponents[s] - 1) :
                             std::pow(p[s], exponents[s]));
@@ -2255,8 +2259,8 @@ namespace Functions
                             std::vector<double> &          values,
                             const unsigned int             component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = Monomial<dim>::value(points[i], component);
@@ -2271,14 +2275,15 @@ namespace Functions
     , wave_number(wave_number)
     , center(center)
   {
-    Assert(wave_number >= 0., ExcMessage("wave_number must be nonnegative!"));
+    DEAL_II_Assert(wave_number >= 0.,
+                   ExcMessage("wave_number must be nonnegative!"));
   }
 
   template <int dim>
   double
   Bessel1<dim>::value(const Point<dim> &p, const unsigned int) const
   {
-    Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
     const double r = p.distance(center);
     return std_cxx17::cyl_bessel_j(order, r * wave_number);
   }
@@ -2290,8 +2295,8 @@ namespace Functions
                            std::vector<double> &          values,
                            const unsigned int) const
   {
-    Assert(dim == 2, ExcNotImplemented());
-    AssertDimension(points.size(), values.size());
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_AssertDimension(points.size(), values.size());
     for (unsigned int k = 0; k < points.size(); ++k)
       {
         const double r = points[k].distance(center);
@@ -2304,7 +2309,7 @@ namespace Functions
   Tensor<1, dim>
   Bessel1<dim>::gradient(const Point<dim> &p, const unsigned int) const
   {
-    Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
     const double r  = p.distance(center);
     const double co = (r == 0.) ? 0. : (p(0) - center(0)) / r;
     const double si = (r == 0.) ? 0. : (p(1) - center(1)) / r;
@@ -2328,8 +2333,8 @@ namespace Functions
                               std::vector<Tensor<1, dim>> &  gradients,
                               const unsigned int) const
   {
-    Assert(dim == 2, ExcNotImplemented());
-    AssertDimension(points.size(), gradients.size());
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_AssertDimension(points.size(), gradients.size());
     for (unsigned int k = 0; k < points.size(); ++k)
       {
         const Point<dim> &p  = points[k];
@@ -2484,19 +2489,19 @@ namespace Functions
   {
     for (unsigned int d = 0; d < dim; ++d)
       {
-        Assert(
+        DEAL_II_Assert(
           coordinate_values[d].size() >= 2,
           ExcMessage(
             "Coordinate arrays must have at least two coordinate values!"));
         for (unsigned int i = 0; i < coordinate_values[d].size() - 1; ++i)
-          Assert(
+          DEAL_II_Assert(
             coordinate_values[d][i] < coordinate_values[d][i + 1],
             ExcMessage(
               "Coordinate arrays must be sorted in strictly ascending order."));
 
-        Assert(data_values.size()[d] == coordinate_values[d].size(),
-               ExcMessage(
-                 "Data and coordinate tables do not have the same size."));
+        DEAL_II_Assert(
+          data_values.size()[d] == coordinate_values[d].size(),
+          ExcMessage("Data and coordinate tables do not have the same size."));
       }
   }
 
@@ -2546,7 +2551,7 @@ namespace Functions
     const unsigned int component) const
   {
     (void)component;
-    Assert(
+    DEAL_II_Assert(
       component == 0,
       ExcMessage(
         "This is a scalar function object, the component can only be zero."));
@@ -2577,7 +2582,7 @@ namespace Functions
     const unsigned int component) const
   {
     (void)component;
-    Assert(
+    DEAL_II_Assert(
       component == 0,
       ExcMessage(
         "This is a scalar function object, the component can only be zero."));
@@ -2611,14 +2616,18 @@ namespace Functions
   {
     for (unsigned int d = 0; d < dim; ++d)
       {
-        Assert(n_subintervals[d] >= 1,
-               ExcMessage("There needs to be at least one subinterval in each "
-                          "coordinate direction."));
-        Assert(interval_endpoints[d].first < interval_endpoints[d].second,
-               ExcMessage("The interval in each coordinate direction needs "
-                          "to have positive size"));
-        Assert(data_values.size()[d] == n_subintervals[d] + 1,
-               ExcMessage("The data table does not have the correct size."));
+        DEAL_II_Assert(n_subintervals[d] >= 1,
+                       ExcMessage(
+                         "There needs to be at least one subinterval in each "
+                         "coordinate direction."));
+        DEAL_II_Assert(interval_endpoints[d].first <
+                         interval_endpoints[d].second,
+                       ExcMessage(
+                         "The interval in each coordinate direction needs "
+                         "to have positive size"));
+        DEAL_II_Assert(data_values.size()[d] == n_subintervals[d] + 1,
+                       ExcMessage(
+                         "The data table does not have the correct size."));
       }
   }
 
@@ -2629,7 +2638,7 @@ namespace Functions
                                           const unsigned int component) const
   {
     (void)component;
-    Assert(
+    DEAL_II_Assert(
       component == 0,
       ExcMessage(
         "This is a scalar function object, the component can only be zero."));
@@ -2681,10 +2690,11 @@ namespace Functions
     , exponents(exponents)
     , coefficients(coefficients)
   {
-    Assert(exponents.n_rows() == coefficients.size(),
-           ExcDimensionMismatch(exponents.n_rows(), coefficients.size()));
-    Assert(exponents.n_cols() == dim,
-           ExcDimensionMismatch(exponents.n_cols(), dim));
+    DEAL_II_Assert(exponents.n_rows() == coefficients.size(),
+                   ExcDimensionMismatch(exponents.n_rows(),
+                                        coefficients.size()));
+    DEAL_II_Assert(exponents.n_cols() == dim,
+                   ExcDimensionMismatch(exponents.n_cols(), dim));
   }
 
 
@@ -2695,7 +2705,7 @@ namespace Functions
                          const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     double sum = 0;
     for (unsigned int monom = 0; monom < exponents.n_rows(); ++monom)
@@ -2704,9 +2714,11 @@ namespace Functions
         for (unsigned int s = 0; s < dim; ++s)
           {
             if (p[s] < 0)
-              Assert(std::floor(exponents[monom][s]) == exponents[monom][s],
-                     ExcMessage("Exponentiation of a negative base number with "
-                                "a real exponent can't be performed."));
+              DEAL_II_Assert(std::floor(exponents[monom][s]) ==
+                               exponents[monom][s],
+                             ExcMessage(
+                               "Exponentiation of a negative base number with "
+                               "a real exponent can't be performed."));
             prod *= std::pow(p[s], exponents[monom][s]);
           }
         sum += coefficients[monom] * prod;
@@ -2722,8 +2734,8 @@ namespace Functions
                               std::vector<double> &          values,
                               const unsigned int             component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       values[i] = Polynomial<dim>::value(points[i], component);
@@ -2737,7 +2749,7 @@ namespace Functions
                             const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     Tensor<1, dim> r;
 
@@ -2758,11 +2770,11 @@ namespace Functions
                 else
                   {
                     if (p[s] < 0)
-                      Assert(std::floor(exponents[monom][s]) ==
-                               exponents[monom][s],
-                             ExcMessage(
-                               "Exponentiation of a negative base number with "
-                               "a real exponent can't be performed."));
+                      DEAL_II_Assert(
+                        std::floor(exponents[monom][s]) == exponents[monom][s],
+                        ExcMessage(
+                          "Exponentiation of a negative base number with "
+                          "a real exponent can't be performed."));
                     prod *=
                       (s == d ? exponents[monom][s] *
                                   std::pow(p[s], exponents[monom][s] - 1) :

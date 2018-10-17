@@ -1356,10 +1356,10 @@ namespace FETools
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcInvalidFEName,
-                 std::string,
-                 << "Can't re-generate a finite element from the string '"
-                 << arg1 << "'.");
+  DEAL_II_DeclException1(
+    ExcInvalidFEName,
+    std::string,
+    << "Can't re-generate a finite element from the string '" << arg1 << "'.");
 
   /**
    * The string used for get_fe_by_name() cannot be translated to a finite
@@ -1372,19 +1372,19 @@ namespace FETools
    *
    * @ingroup Exceptions
    */
-  DeclException2(ExcInvalidFEDimension,
-                 char,
-                 int,
-                 << "The dimension " << arg1
-                 << " in the finite element string must match "
-                 << "the space dimension " << arg2 << ".");
+  DEAL_II_DeclException2(ExcInvalidFEDimension,
+                         char,
+                         int,
+                         << "The dimension " << arg1
+                         << " in the finite element string must match "
+                         << "the space dimension " << arg2 << ".");
 
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcInvalidFE);
+  DEAL_II_DeclException0(ExcInvalidFE);
 
   /**
    * The finite element must be
@@ -1392,13 +1392,13 @@ namespace FETools
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcFENotPrimitive);
+  DEAL_II_DeclException0(ExcFENotPrimitive);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcTriangulationMismatch);
+  DEAL_II_DeclException0(ExcTriangulationMismatch);
 
   /**
    * A continuous element is used on a mesh with hanging nodes, but the
@@ -1406,48 +1406,50 @@ namespace FETools
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcHangingNodesNotAllowed,
-                   "You are using continuous elements on a grid with "
-                   "hanging nodes but without providing hanging node "
-                   "constraints. Use the respective function with "
-                   "additional AffineConstraints argument(s), instead.");
+  DEAL_II_DeclExceptionMsg(
+    ExcHangingNodesNotAllowed,
+    "You are using continuous elements on a grid with "
+    "hanging nodes but without providing hanging node "
+    "constraints. Use the respective function with "
+    "additional AffineConstraints argument(s), instead.");
   /**
    * You need at least two grid levels.
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcGridNotRefinedAtLeastOnce);
+  DEAL_II_DeclException0(ExcGridNotRefinedAtLeastOnce);
   /**
    * The dimensions of the matrix used did not match the expected dimensions.
    *
    * @ingroup Exceptions
    */
-  DeclException4(ExcMatrixDimensionMismatch,
-                 int,
-                 int,
-                 int,
-                 int,
-                 << "This is a " << arg1 << "x" << arg2 << " matrix, "
-                 << "but should be a " << arg3 << "x" << arg4 << " matrix.");
+  DEAL_II_DeclException4(ExcMatrixDimensionMismatch,
+                         int,
+                         int,
+                         int,
+                         int,
+                         << "This is a " << arg1 << "x" << arg2 << " matrix, "
+                         << "but should be a " << arg3 << "x" << arg4
+                         << " matrix.");
 
   /**
    * Exception thrown if an embedding matrix was computed inaccurately.
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcLeastSquaresError,
-                 double,
-                 << "Least squares fit leaves a gap of " << arg1);
+  DEAL_II_DeclException1(ExcLeastSquaresError,
+                         double,
+                         << "Least squares fit leaves a gap of " << arg1);
 
   /**
    * Exception thrown if one variable may not be greater than another.
    *
    * @ingroup Exceptions
    */
-  DeclException2(ExcNotGreaterThan,
-                 int,
-                 int,
-                 << arg1 << " must be greater than " << arg2);
+  DEAL_II_DeclException2(ExcNotGreaterThan,
+                         int,
+                         int,
+                         << arg1 << " must be greater than " << arg2);
 } // namespace FETools
 
 

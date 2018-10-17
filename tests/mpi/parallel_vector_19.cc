@@ -70,8 +70,9 @@ test()
   v *= 2.0;
   if (myid < 8)
     {
-      AssertThrow(v(myid * 2) == myid * 4.0, ExcInternalError());
-      AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+      DEAL_II_AssertThrow(v(myid * 2) == myid * 4.0, ExcInternalError());
+      DEAL_II_AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 2.0,
+                          ExcInternalError());
     }
 
   if (myid == 0)

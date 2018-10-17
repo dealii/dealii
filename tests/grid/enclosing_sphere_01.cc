@@ -38,7 +38,7 @@ template <int dim>
 void
 create_triangulation(const unsigned int, Triangulation<dim> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -101,7 +101,7 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
           //   *------------>x
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     };
 }
 
@@ -165,12 +165,12 @@ create_triangulation(const unsigned int case_no, Triangulation<3> &tria)
           v6 += Point<3>(-0.2, 0.2, 0.2); // v7 was (1.,3.,3.)
           const Point<3> &v0 = tria.begin_active()->vertex(0);
           const Point<3> &v7 = tria.begin_active()->vertex(7);
-          AssertThrow(v1.distance(v6) < v0.distance(v7),
-                      ExcMessage("Vertices not moved as drawn above"));
+          DEAL_II_AssertThrow(v1.distance(v6) < v0.distance(v7),
+                              ExcMessage("Vertices not moved as drawn above"));
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     };
 }
 
@@ -194,9 +194,10 @@ test()
       // Check that all the vertices are within the sphere
       // (sphere with thickness 100. *std::numeric_limits<double>::epsilon())
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-        AssertThrow(std::fabs(center.distance(tria.begin_active()->vertex(v))) <
-                      radius + 100. * std::numeric_limits<double>::epsilon(),
-                    ExcInternalError());
+        DEAL_II_AssertThrow(
+          std::fabs(center.distance(tria.begin_active()->vertex(v))) <
+            radius + 100. * std::numeric_limits<double>::epsilon(),
+          ExcInternalError());
 
       tria.clear();
     }

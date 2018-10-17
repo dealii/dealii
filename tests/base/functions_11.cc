@@ -102,8 +102,8 @@ check()
       for (unsigned int d = 0; d < dim; ++d)
         exact_value *= p[d];
 
-      AssertThrow(std::fabs(exact_value - f.value(p)) < 1e-12,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::fabs(exact_value - f.value(p)) < 1e-12,
+                          ExcInternalError());
     }
 
   // now also verify that it computes values outside the box correctly, as
@@ -112,8 +112,9 @@ check()
   for (unsigned int d = 0; d < dim; ++d)
     value_at_bottom_left *= coordinates[d][0];
 
-  AssertThrow(std::fabs(f.value(Point<dim>()) - value_at_bottom_left) < 1e-12,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(f.value(Point<dim>()) - value_at_bottom_left) <
+                        1e-12,
+                      ExcInternalError());
 
   Point<dim> top_right;
   double     value_at_top_right = 1;
@@ -122,8 +123,9 @@ check()
       top_right[d] = 1000;
       value_at_top_right *= coordinates[d].back();
     }
-  AssertThrow(std::fabs(f.value(top_right) - value_at_top_right) < 1e-12,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(f.value(top_right) - value_at_top_right) <
+                        1e-12,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -794,7 +794,8 @@ namespace MeshWorker
       MatrixPtrVector &m)
     {
       block_info = b;
-      AssertDimension(block_info->local().size(), block_info->global().size());
+      DEAL_II_AssertDimension(block_info->local().size(),
+                              block_info->global().size());
       matrices = &m;
     }
 
@@ -1131,8 +1132,8 @@ namespace MeshWorker
       const unsigned int                          level1,
       const unsigned int                          level2)
     {
-      //      AssertDimension(local.n(), dof1.size());
-      //      AssertDimension(local.m(), dof2.size());
+      //      DEAL_II_AssertDimension(local.n(), dof1.size());
+      //      DEAL_II_AssertDimension(local.m(), dof2.size());
 
       for (unsigned int j = 0; j < local.n_rows(); ++j)
         for (unsigned int k = 0; k < local.n_cols(); ++k)
@@ -1206,8 +1207,8 @@ namespace MeshWorker
       const unsigned int                          level1,
       const unsigned int                          level2)
     {
-      //      AssertDimension(local.n(), dof1.size());
-      //      AssertDimension(local.m(), dof2.size());
+      //      DEAL_II_AssertDimension(local.n(), dof1.size());
+      //      DEAL_II_AssertDimension(local.m(), dof2.size());
 
       for (unsigned int j = 0; j < local.n_rows(); ++j)
         for (unsigned int k = 0; k < local.n_cols(); ++k)
@@ -1429,7 +1430,7 @@ namespace MeshWorker
             }
           else
             {
-              Assert(level1 > level2, ExcNotImplemented());
+              DEAL_II_Assert(level1 > level2, ExcNotImplemented());
               if (flux_up->size() != 0)
                 {
                   // Do not add M22,

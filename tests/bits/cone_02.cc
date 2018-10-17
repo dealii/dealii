@@ -40,7 +40,7 @@ template <int dim>
 void
 check()
 {
-  AssertThrow(false, ExcNotImplemented());
+  DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 template <>

@@ -2303,26 +2303,27 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcShapeFunctionNotPrimitive,
-                 int,
-                 << "The shape function with index " << arg1
-                 << " is not primitive, i.e. it is vector-valued and "
-                 << "has more than one non-zero vector component. This "
-                 << "function cannot be called for these shape functions. "
-                 << "Maybe you want to use the same function with the "
-                 << "_component suffix?");
+  DEAL_II_DeclException1(
+    ExcShapeFunctionNotPrimitive,
+    int,
+    << "The shape function with index " << arg1
+    << " is not primitive, i.e. it is vector-valued and "
+    << "has more than one non-zero vector component. This "
+    << "function cannot be called for these shape functions. "
+    << "Maybe you want to use the same function with the "
+    << "_component suffix?");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcFENotPrimitive);
+  DEAL_II_DeclException0(ExcFENotPrimitive);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcUnitShapeValuesDoNotExist,
     "You are trying to access the values or derivatives of shape functions "
     "on the reference cell of an element that does not define its shape "
@@ -2336,10 +2337,11 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcFEHasNoSupportPoints,
-                   "You are trying to access the support points of a finite "
-                   "element that either has no support points at all, or for "
-                   "which the corresponding tables have not been implemented.");
+  DEAL_II_DeclExceptionMsg(
+    ExcFEHasNoSupportPoints,
+    "You are trying to access the support points of a finite "
+    "element that either has no support points at all, or for "
+    "which the corresponding tables have not been implemented.");
 
   /**
    * Attempt to access embedding matrices of a finite element that did not
@@ -2347,13 +2349,14 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcEmbeddingVoid,
-                   "You are trying to access the matrices that describe how "
-                   "to embed a finite element function on one cell into the "
-                   "finite element space on one of its children (i.e., the "
-                   "'embedding' or 'prolongation' matrices). However, the "
-                   "current finite element can either not define this sort of "
-                   "operation, or it has not yet been implemented.");
+  DEAL_II_DeclExceptionMsg(
+    ExcEmbeddingVoid,
+    "You are trying to access the matrices that describe how "
+    "to embed a finite element function on one cell into the "
+    "finite element space on one of its children (i.e., the "
+    "'embedding' or 'prolongation' matrices). However, the "
+    "current finite element can either not define this sort of "
+    "operation, or it has not yet been implemented.");
 
   /**
    * Attempt to access restriction matrices of a finite element that did not
@@ -2362,30 +2365,32 @@ public:
    * Exception
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcProjectionVoid,
-                   "You are trying to access the matrices that describe how "
-                   "to restrict a finite element function from the children "
-                   "of one cell to the finite element space defined on their "
-                   "parent (i.e., the 'restriction' or 'projection' matrices). "
-                   "However, the current finite element can either not define "
-                   "this sort of operation, or it has not yet been "
-                   "implemented.");
+  DEAL_II_DeclExceptionMsg(
+    ExcProjectionVoid,
+    "You are trying to access the matrices that describe how "
+    "to restrict a finite element function from the children "
+    "of one cell to the finite element space defined on their "
+    "parent (i.e., the 'restriction' or 'projection' matrices). "
+    "However, the current finite element can either not define "
+    "this sort of operation, or it has not yet been "
+    "implemented.");
 
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException2(ExcWrongInterfaceMatrixSize,
-                 int,
-                 int,
-                 << "The interface matrix has a size of " << arg1 << "x" << arg2
-                 << ", which is not reasonable for the current element "
-                    "in the present dimension.");
+  DEAL_II_DeclException2(ExcWrongInterfaceMatrixSize,
+                         int,
+                         int,
+                         << "The interface matrix has a size of " << arg1 << "x"
+                         << arg2
+                         << ", which is not reasonable for the current element "
+                            "in the present dimension.");
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0(ExcInterpolationNotImplemented);
+  DEAL_II_DeclException0(ExcInterpolationNotImplemented);
 
 protected:
   /**
@@ -3077,8 +3082,9 @@ inline const FiniteElement<dim, spacedim> &FiniteElement<dim, spacedim>::
                                            operator[](const unsigned int fe_index) const
 {
   (void)fe_index;
-  Assert(fe_index == 0,
-         ExcMessage("A fe_index of zero is the only index allowed here"));
+  DEAL_II_Assert(fe_index == 0,
+                 ExcMessage(
+                   "A fe_index of zero is the only index allowed here"));
   return *this;
 }
 
@@ -3089,11 +3095,12 @@ inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::system_to_component_index(
   const unsigned int index) const
 {
-  Assert(index < system_to_component_table.size(),
-         ExcIndexRange(index, 0, system_to_component_table.size()));
-  Assert(is_primitive(index),
-         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
-           index)));
+  DEAL_II_Assert(index < system_to_component_table.size(),
+                 ExcIndexRange(index, 0, system_to_component_table.size()));
+  DEAL_II_Assert(
+    is_primitive(index),
+    (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+      index)));
   return system_to_component_table[index];
 }
 
@@ -3124,22 +3131,23 @@ FiniteElement<dim, spacedim>::component_to_system_index(
   const unsigned int component,
   const unsigned int index) const
 {
-  AssertIndexRange(component, this->n_components());
+  DEAL_II_AssertIndexRange(component, this->n_components());
   const std::vector<std::pair<unsigned int, unsigned int>>::const_iterator it =
     std::find(system_to_component_table.begin(),
               system_to_component_table.end(),
               std::pair<unsigned int, unsigned int>(component, index));
 
-  Assert(it != system_to_component_table.end(),
-         ExcMessage("You are asking for the number of the shape function "
-                    "within a system element that corresponds to vector "
-                    "component " +
-                    Utilities::int_to_string(component) +
-                    " and within this to "
-                    "index " +
-                    Utilities::int_to_string(index) +
-                    ". But no such "
-                    "shape function exists."));
+  DEAL_II_Assert(it != system_to_component_table.end(),
+                 ExcMessage(
+                   "You are asking for the number of the shape function "
+                   "within a system element that corresponds to vector "
+                   "component " +
+                   Utilities::int_to_string(component) +
+                   " and within this to "
+                   "index " +
+                   Utilities::int_to_string(index) +
+                   ". But no such "
+                   "shape function exists."));
   return std::distance(system_to_component_table.begin(), it);
 }
 
@@ -3150,8 +3158,10 @@ inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_component_index(
   const unsigned int index) const
 {
-  Assert(index < face_system_to_component_table.size(),
-         ExcIndexRange(index, 0, face_system_to_component_table.size()));
+  DEAL_II_Assert(index < face_system_to_component_table.size(),
+                 ExcIndexRange(index,
+                               0,
+                               face_system_to_component_table.size()));
 
   // in debug mode, check whether the
   // function is primitive, since
@@ -3166,9 +3176,10 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
   //
   // in 1d, the face index is equal
   // to the cell index
-  Assert(is_primitive(this->face_to_cell_index(index, 0)),
-         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
-           index)));
+  DEAL_II_Assert(
+    is_primitive(this->face_to_cell_index(index, 0)),
+    (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+      index)));
 
   return face_system_to_component_table[index];
 }
@@ -3180,8 +3191,8 @@ inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
 FiniteElement<dim, spacedim>::system_to_base_index(
   const unsigned int index) const
 {
-  Assert(index < system_to_base_table.size(),
-         ExcIndexRange(index, 0, system_to_base_table.size()));
+  DEAL_II_Assert(index < system_to_base_table.size(),
+                 ExcIndexRange(index, 0, system_to_base_table.size()));
   return system_to_base_table[index];
 }
 
@@ -3192,8 +3203,8 @@ inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
 FiniteElement<dim, spacedim>::face_system_to_base_index(
   const unsigned int index) const
 {
-  Assert(index < face_system_to_base_table.size(),
-         ExcIndexRange(index, 0, face_system_to_base_table.size()));
+  DEAL_II_Assert(index < face_system_to_base_table.size(),
+                 ExcIndexRange(index, 0, face_system_to_base_table.size()));
   return face_system_to_base_table[index];
 }
 
@@ -3214,8 +3225,8 @@ inline std::pair<unsigned int, unsigned int>
 FiniteElement<dim, spacedim>::component_to_base_index(
   const unsigned int index) const
 {
-  Assert(index < component_to_base_table.size(),
-         ExcIndexRange(index, 0, component_to_base_table.size()));
+  DEAL_II_Assert(index < component_to_base_table.size(),
+                 ExcIndexRange(index, 0, component_to_base_table.size()));
 
   return component_to_base_table[index].first;
 }
@@ -3237,8 +3248,8 @@ inline std::pair<unsigned int, types::global_dof_index>
 FiniteElement<dim, spacedim>::system_to_block_index(
   const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
+  DEAL_II_Assert(index < this->dofs_per_cell,
+                 ExcIndexRange(index, 0, this->dofs_per_cell));
   // The block is computed simply as
   // first block of this base plus
   // the index within the base blocks
@@ -3255,8 +3266,8 @@ inline bool
 FiniteElement<dim, spacedim>::restriction_is_additive(
   const unsigned int index) const
 {
-  Assert(index < this->dofs_per_cell,
-         ExcIndexRange(index, 0, this->dofs_per_cell));
+  DEAL_II_Assert(index < this->dofs_per_cell,
+                 ExcIndexRange(index, 0, this->dofs_per_cell));
   return restriction_is_additive_flags[index];
 }
 
@@ -3266,7 +3277,8 @@ template <int dim, int spacedim>
 inline const ComponentMask &
 FiniteElement<dim, spacedim>::get_nonzero_components(const unsigned int i) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
   return nonzero_components[i];
 }
 
@@ -3276,7 +3288,8 @@ template <int dim, int spacedim>
 inline unsigned int
 FiniteElement<dim, spacedim>::n_nonzero_components(const unsigned int i) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
   return n_nonzero_components_table[i];
 }
 
@@ -3295,7 +3308,8 @@ template <int dim, int spacedim>
 inline bool
 FiniteElement<dim, spacedim>::is_primitive(const unsigned int i) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
 
   // return primitivity of a shape
   // function by checking whether it
@@ -3319,8 +3333,8 @@ inline GeometryPrimitive
 FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
   const unsigned int cell_dof_index) const
 {
-  Assert(cell_dof_index < this->dofs_per_cell,
-         ExcIndexRange(cell_dof_index, 0, this->dofs_per_cell));
+  DEAL_II_Assert(cell_dof_index < this->dofs_per_cell,
+                 ExcIndexRange(cell_dof_index, 0, this->dofs_per_cell));
 
   // just go through the usual cases, taking into account how DoFs
   // are enumerated on the reference cell

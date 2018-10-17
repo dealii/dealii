@@ -133,8 +133,8 @@ void EvaluateDerivative(DoFHandler<3> &dof_handler, Vector<double> &solution)
         }
     }
 
-  AssertThrow(err_l2 < 1.e-20, ExcInternalError());
-  AssertThrow(err_hdiv < 1.e-20, ExcInternalError());
+  DEAL_II_AssertThrow(err_l2 < 1.e-20, ExcInternalError());
+  DEAL_II_AssertThrow(err_hdiv < 1.e-20, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -162,9 +162,9 @@ create_mass_matrix(const Mapping<dim> &       mapping,
   const FiniteElement<dim> &fe           = fe_values.get_fe();
   const unsigned int        n_components = fe.n_components();
 
-  Assert(coefficient == nullptr || coefficient->n_components == 1 ||
-           coefficient->n_components == n_components,
-         ExcInternalError());
+  DEAL_II_Assert(coefficient == nullptr || coefficient->n_components == 1 ||
+                   coefficient->n_components == n_components,
+                 ExcInternalError());
 
   FullMatrix<double>          cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>              cell_vector(dofs_per_cell);
@@ -317,9 +317,10 @@ create_right_hand_side(const Mapping<dim> &   mapping,
                        Vector<double> &       rhs_vector)
 {
   const FiniteElement<dim> &fe = dof_handler.get_fe();
-  Assert(fe.n_components() == rhs_function.n_components, ExcInternalError());
-  Assert(rhs_vector.size() == dof_handler.n_dofs(),
-         ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+  DEAL_II_Assert(fe.n_components() == rhs_function.n_components,
+                 ExcInternalError());
+  DEAL_II_Assert(rhs_vector.size() == dof_handler.n_dofs(),
+                 ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
   rhs_vector = 0;
 
   UpdateFlags update_flags =
@@ -417,8 +418,8 @@ project(const Mapping<dim> &             mapping,
         const Quadrature<dim - 1> &          = QGauss<dim - 1>(2),
         const bool project_to_boundary_first = false)
 {
-  Assert(dof.get_fe().n_components() == function.n_components,
-         ExcInternalError());
+  DEAL_II_Assert(dof.get_fe().n_components() == function.n_components,
+                 ExcInternalError());
 
   const FiniteElement<dim> &fe = dof.get_fe();
 

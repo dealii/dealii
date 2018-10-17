@@ -355,7 +355,7 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcBlockDimensionMismatch);
+  DEAL_II_DeclException0(ExcBlockDimensionMismatch);
   //@}
 
 private:
@@ -379,7 +379,7 @@ template <typename number>
 inline BlockSparseMatrix<number> &
 BlockSparseMatrix<number>::operator=(const double d)
 {
-  Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+  DEAL_II_Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
   for (size_type r = 0; r < this->n_block_rows(); ++r)
     for (size_type c = 0; c < this->n_block_cols(); ++c)
@@ -485,11 +485,12 @@ BlockSparseMatrix<number>::precondition_Jacobi(BlockVectorType &      dst,
                                                const BlockVectorType &src,
                                                const number omega) const
 {
-  Assert(this->n_block_rows() == this->n_block_cols(), ExcNotQuadratic());
-  Assert(dst.n_blocks() == this->n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), this->n_block_rows()));
-  Assert(src.n_blocks() == this->n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), this->n_block_cols()));
+  DEAL_II_Assert(this->n_block_rows() == this->n_block_cols(),
+                 ExcNotQuadratic());
+  DEAL_II_Assert(dst.n_blocks() == this->n_block_rows(),
+                 ExcDimensionMismatch(dst.n_blocks(), this->n_block_rows()));
+  DEAL_II_Assert(src.n_blocks() == this->n_block_cols(),
+                 ExcDimensionMismatch(src.n_blocks(), this->n_block_cols()));
 
   // do a diagonal preconditioning. uses only
   // the diagonal blocks of the matrix
@@ -509,12 +510,12 @@ BlockSparseMatrix<number>::precondition_Jacobi(Vector<number2> &      dst,
   // check number of blocks. the sizes of the
   // single block is checked in the function
   // we call
-  Assert(this->n_block_cols() == 1,
-         ExcMessage("This function only works if the matrix has "
-                    "a single block"));
-  Assert(this->n_block_rows() == 1,
-         ExcMessage("This function only works if the matrix has "
-                    "a single block"));
+  DEAL_II_Assert(this->n_block_cols() == 1,
+                 ExcMessage("This function only works if the matrix has "
+                            "a single block"));
+  DEAL_II_Assert(this->n_block_rows() == 1,
+                 ExcMessage("This function only works if the matrix has "
+                            "a single block"));
 
   // do a diagonal preconditioning. uses only
   // the diagonal blocks of the matrix

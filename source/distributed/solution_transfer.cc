@@ -52,7 +52,7 @@ namespace parallel
       : dof_handler(&dof, typeid(*this).name())
       , handle(numbers::invalid_unsigned_int)
     {
-      Assert(
+      DEAL_II_Assert(
         (dynamic_cast<const parallel::distributed::
                         Triangulation<dim, DoFHandlerType::space_dimension> *>(
            &dof_handler->get_triangulation()) != nullptr),
@@ -85,7 +85,7 @@ namespace parallel
                    DoFHandlerType::space_dimension> *>(
           const_cast<dealii::Triangulation<dim, DoFHandlerType::space_dimension>
                        *>(&dof_handler->get_triangulation())));
-      Assert(tria != nullptr, ExcInternalError());
+      DEAL_II_Assert(tria != nullptr, ExcInternalError());
 
       handle = tria->register_data_attach(
         std::bind(
@@ -160,8 +160,9 @@ namespace parallel
     SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
       std::vector<VectorType *> &all_out)
     {
-      Assert(input_vectors.size() == all_out.size(),
-             ExcDimensionMismatch(input_vectors.size(), all_out.size()));
+      DEAL_II_Assert(input_vectors.size() == all_out.size(),
+                     ExcDimensionMismatch(input_vectors.size(),
+                                          all_out.size()));
 
       // TODO: casting away constness is bad
       parallel::distributed::Triangulation<dim, DoFHandlerType::space_dimension>
@@ -170,7 +171,7 @@ namespace parallel
                    DoFHandlerType::space_dimension> *>(
           const_cast<dealii::Triangulation<dim, DoFHandlerType::space_dimension>
                        *>(&dof_handler->get_triangulation())));
-      Assert(tria != nullptr, ExcInternalError());
+      DEAL_II_Assert(tria != nullptr, ExcInternalError());
 
       tria->notify_ready_to_unpack(
         handle,
@@ -256,7 +257,7 @@ namespace parallel
                                .find_least_face_dominating_fe_in_collection(
                                  fe_indices_children);
 
-                  Assert(
+                  DEAL_II_Assert(
                     fe_index != numbers::invalid_unsigned_int,
                     ExcMessage(
                       "No FiniteElement has been found in your FECollection "
@@ -268,7 +269,7 @@ namespace parallel
                 break;
 
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
                 break;
             }
 
@@ -326,7 +327,7 @@ namespace parallel
           /*allow_compression=*/DoFHandlerType::is_hp_dof_handler);
 
       // check if sizes match
-      Assert(dofvalues.size() == all_out.size(), ExcInternalError());
+      DEAL_II_Assert(dofvalues.size() == all_out.size(), ExcInternalError());
 
       if (DoFHandlerType::is_hp_dof_handler)
         {
@@ -358,14 +359,14 @@ namespace parallel
                   for (unsigned int child_index = 1;
                        child_index < GeometryInfo<dim>::max_children_per_cell;
                        ++child_index)
-                    Assert(cell->child(child_index)->active_fe_index() ==
-                             fe_index,
-                           ExcInternalError());
+                    DEAL_II_Assert(
+                      cell->child(child_index)->active_fe_index() == fe_index,
+                      ExcInternalError());
                   break;
                 }
 
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
                 break;
             }
 
@@ -374,7 +375,7 @@ namespace parallel
           for (auto it_dofvalues = dofvalues.begin();
                it_dofvalues != dofvalues.end();
                ++it_dofvalues)
-            Assert(
+            DEAL_II_Assert(
               dof_handler->get_fe(fe_index).dofs_per_cell ==
                 it_dofvalues->size(),
               ExcMessage(
@@ -396,7 +397,7 @@ namespace parallel
           for (auto it_dofvalues = dofvalues.begin();
                it_dofvalues != dofvalues.end();
                ++it_dofvalues)
-            Assert(
+            DEAL_II_Assert(
               cell->get_fe().dofs_per_cell == it_dofvalues->size(),
               ExcMessage(
                 "The transferred data was packed with a different number of dofs than the"

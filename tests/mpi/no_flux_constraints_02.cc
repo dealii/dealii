@@ -48,7 +48,7 @@ template <int dim>
 void
 test()
 {
-  Assert(dim == 3, ExcNotImplemented());
+  DEAL_II_Assert(dim == 3, ExcNotImplemented());
   unsigned int myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
@@ -207,7 +207,7 @@ test()
   const std::pair<unsigned int, unsigned int> range = vector.local_range();
   for (unsigned int i = range.first; i < range.second; ++i)
     if (constraints.is_constrained(i))
-      AssertThrow(vector(i) == 0, ExcInternalError());
+      DEAL_II_AssertThrow(vector(i) == 0, ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;

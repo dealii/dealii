@@ -50,7 +50,7 @@ void check_this(Triangulation<3> &tria)
           vertices.insert(cell->line(l)->vertex_index(0));
           vertices.insert(cell->line(l)->vertex_index(1));
         }
-      AssertThrow(vertices.size() == 8, ExcInternalError());
+      DEAL_II_AssertThrow(vertices.size() == 8, ExcInternalError());
     }
   deallog << "    ok." << std::endl;
 }

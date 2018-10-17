@@ -36,8 +36,8 @@ void
 PolynomialsP<1>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size() == this->n(),
-         ExcDimensionMismatch(index_map.size(), this->n()));
+  DEAL_II_Assert(index_map.size() == this->n(),
+                 ExcDimensionMismatch(index_map.size(), this->n()));
 
   // identity
   for (unsigned int i = 0; i < this->n(); ++i)
@@ -61,9 +61,9 @@ void
 PolynomialsP<2>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size() == this->n(),
-         ExcDimensionMismatch(index_map.size(), this->n()));
-  Assert(p <= 5, ExcNotImplemented());
+  DEAL_II_Assert(index_map.size() == this->n(),
+                 ExcDimensionMismatch(index_map.size(), this->n()));
+  DEAL_II_Assert(p <= 5, ExcNotImplemented());
 
   // Given the number i of the
   // polynomial in
@@ -90,9 +90,9 @@ void
 PolynomialsP<3>::create_polynomial_ordering(
   std::vector<unsigned int> &index_map) const
 {
-  Assert(index_map.size() == this->n(),
-         ExcDimensionMismatch(index_map.size(), this->n()));
-  Assert(p <= 3, ExcNotImplemented());
+  DEAL_II_Assert(index_map.size() == this->n(),
+                 ExcDimensionMismatch(index_map.size(), this->n()));
+  DEAL_II_Assert(p <= 3, ExcNotImplemented());
 
   // Given the number i of the
   // polynomial in

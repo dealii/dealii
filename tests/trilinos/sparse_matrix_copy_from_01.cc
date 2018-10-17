@@ -74,6 +74,7 @@ main(int argc, char **argv)
   for (SparsityPattern::const_iterator p = sparsity.begin();
        p != sparsity.end();
        ++p)
-    AssertThrow(copy(p->row(), p->column()) == matrix(p->row(), p->column()),
-                ExcInternalError());
+    DEAL_II_AssertThrow(copy(p->row(), p->column()) ==
+                          matrix(p->row(), p->column()),
+                        ExcInternalError());
 }

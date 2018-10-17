@@ -259,7 +259,7 @@ EigenPower<VectorType>::solve(double &value, const MatrixType &A, VectorType &x)
       double    thresh = length / x.size();
       do
         {
-          Assert(i < x.size(), ExcInternalError());
+          DEAL_II_Assert(i < x.size(), ExcInternalError());
           entry = y(i++);
         }
       while (std::fabs(entry) < thresh);
@@ -284,9 +284,9 @@ EigenPower<VectorType>::solve(double &value, const MatrixType &A, VectorType &x)
     }
 
   // in case of failure: throw exception
-  AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence(
-                iter, std::fabs(1. / length - 1. / old_length)));
+  DEAL_II_AssertThrow(conv == SolverControl::success,
+                      SolverControl::NoConvergence(
+                        iter, std::fabs(1. / length - 1. / old_length)));
 
   // otherwise exit as normal
 }
@@ -363,7 +363,7 @@ EigenInverse<VectorType>::solve(double &          value,
       double    thresh = length / x.size();
       do
         {
-          Assert(i < x.size(), ExcInternalError());
+          DEAL_II_Assert(i < x.size(), ExcInternalError());
           entry = y(i++);
         }
       while (std::fabs(entry) < thresh);
@@ -407,8 +407,8 @@ EigenInverse<VectorType>::solve(double &          value,
 
   // in case of failure: throw
   // exception
-  AssertThrow(conv == SolverControl::success,
-              SolverControl::NoConvergence(iter, res));
+  DEAL_II_AssertThrow(conv == SolverControl::success,
+                      SolverControl::NoConvergence(iter, res));
   // otherwise exit as normal
 }
 

@@ -47,7 +47,7 @@ main()
   // The grid created depends on the OpenCASCADE and Gmsh version used.
   // Hence, only check that the resulting mesh is non-empty and the cells
   // are not distorted.
-  AssertThrow(tria.n_cells() > 0, ExcInternalError());
+  DEAL_II_AssertThrow(tria.n_cells() > 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 

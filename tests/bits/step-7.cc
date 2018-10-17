@@ -432,7 +432,7 @@ HelmholtzProblem<dim>::refine_grid()
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -534,7 +534,7 @@ HelmholtzProblem<dim>::run()
             gmv_filename = "solution-adaptive";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
       switch ((*fe).degree)
@@ -547,7 +547,7 @@ HelmholtzProblem<dim>::run()
             break;
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
       gmv_filename += ".gmv";
@@ -592,7 +592,7 @@ HelmholtzProblem<dim>::run()
         error_filename += "-adaptive";
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   switch ((*fe).degree)
@@ -604,7 +604,7 @@ HelmholtzProblem<dim>::run()
         error_filename += "-q2";
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   error_filename += ".tex";
@@ -644,7 +644,7 @@ HelmholtzProblem<dim>::run()
             conv_filename += "-adaptive";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
       switch ((*fe).degree)
         {
@@ -655,7 +655,7 @@ HelmholtzProblem<dim>::run()
             conv_filename += "-q2";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
       conv_filename += ".tex";
 

@@ -28,7 +28,7 @@ test(const unsigned int size, const bool reinit_square)
 {
   // this test can not currently work with matrices smaller than
   // 1\times2.
-  AssertThrow(size > 2, ExcInternalError());
+  DEAL_II_AssertThrow(size > 2, ExcInternalError());
 
   // initialise a first matrix with the standard constructor and fill
   // it with some numbers
@@ -47,8 +47,8 @@ test(const unsigned int size, const bool reinit_square)
       N(i, j) = i + 2. * j;
 
   // clearly, this should be the case
-  AssertThrow(N.m() != M.m(), ExcInternalError());
-  AssertThrow(N.n() != M.n(), ExcInternalError());
+  DEAL_II_AssertThrow(N.m() != M.m(), ExcInternalError());
+  DEAL_II_AssertThrow(N.n() != M.n(), ExcInternalError());
 
   // if reinit_square is true, reinitialise the rectangle matrix to a
   // square matrix (use reinit (const unsigned int))
@@ -75,13 +75,13 @@ test(const unsigned int size, const bool reinit_square)
     }
 
   // and now this should be true
-  AssertThrow(N.m() == M.m(), ExcInternalError());
-  AssertThrow(N.n() == M.n(), ExcInternalError());
+  DEAL_II_AssertThrow(N.m() == M.m(), ExcInternalError());
+  DEAL_II_AssertThrow(N.n() == M.n(), ExcInternalError());
 
   // in fact, this should be true too, so check
   for (unsigned int i = 0; i < M.m(); ++i)
     for (unsigned int j = 0; j < M.n(); ++j)
-      AssertThrow(M(i, j) == N(i, j), ExcInternalError());
+      DEAL_II_AssertThrow(M(i, j) == N(i, j), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

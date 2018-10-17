@@ -45,8 +45,8 @@ initialize_node_matrix(const FiniteElement<dim> &other,
                        FullMatrix<double> &      N)
 {
   const unsigned int n_dofs = other.dofs_per_cell;
-  Assert(n_dofs == nodes.dofs_per_cell,
-         ExcDimensionMismatch(n_dofs, nodes.dofs_per_cell));
+  DEAL_II_Assert(n_dofs == nodes.dofs_per_cell,
+                 ExcDimensionMismatch(n_dofs, nodes.dofs_per_cell));
 
   N.reinit(n_dofs, n_dofs);
 
@@ -82,7 +82,7 @@ initialize_node_matrix(const FiniteElement<dim> &other,
             other.shape_value_component(i, unit_support_points[current], d);
         ++current;
       }
-  Assert(current == n_dofs, ExcInternalError());
+  DEAL_II_Assert(current == n_dofs, ExcInternalError());
 }
 
 

@@ -116,7 +116,7 @@ test()
   A -= B;
   deallog << "|A|=" << A.l2_norm() << std::endl;
   deallog << "|B|=" << B.l2_norm() << std::endl;
-  Assert(A.l2_norm() < 1e-12 * B.l2_norm(), ExcInternalError());
+  DEAL_II_Assert(A.l2_norm() < 1e-12 * B.l2_norm(), ExcInternalError());
 }
 
 

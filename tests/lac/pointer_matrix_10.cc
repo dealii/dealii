@@ -39,14 +39,14 @@ checkAssign(FullMatrix<number> &A, FullMatrix<number> &B)
   P.vmult(O, V);
 
   // Check the dimensions of the result vector
-  Assert(A.m() == O.size(), ExcInternalError());
+  DEAL_II_Assert(A.m() == O.size(), ExcInternalError());
   deallog << "Dimensions of result vector verified" << std::endl;
 
   // Verifying results with Method 2: O=A*V
   Vector<number> O_(A.m());
   A.vmult(O_, V);
 
-  Assert(O == O_, ExcInternalError());
+  DEAL_II_Assert(O == O_, ExcInternalError());
   deallog << "Result vector data verified" << std::endl;
 
   for (unsigned int i = 0; i < O.size(); ++i)
@@ -71,14 +71,14 @@ checkAssign(FullMatrix<number> &A, FullMatrix<number> &B)
   P.vmult(OU, V_);
 
   // Check the dimensions of the result vector
-  Assert(B.m() == OU.size(), ExcInternalError());
+  DEAL_II_Assert(B.m() == OU.size(), ExcInternalError());
   deallog << "Dimensions of result vector verified" << std::endl;
 
   // Verifying results with Method 2: O=B*V
   Vector<number> OU_(B.m());
   B.vmult(OU_, V_);
 
-  Assert(OU == OU_, ExcInternalError());
+  DEAL_II_Assert(OU == OU_, ExcInternalError());
   deallog << "Result vector data verified" << std::endl;
 
   for (unsigned int i = 0; i < OU.size(); ++i)

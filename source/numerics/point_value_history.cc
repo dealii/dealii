@@ -188,14 +188,15 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
 {
   // can't be closed to add additional points
   // or vectors
-  AssertThrow(!closed, ExcInvalidState());
-  AssertThrow(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
+  DEAL_II_AssertThrow(!closed, ExcInvalidState());
+  DEAL_II_AssertThrow(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
   // Implementation assumes that support
   // points locations are dofs locations
-  AssertThrow(dof_handler->get_fe().has_support_points(), ExcNotImplemented());
+  DEAL_II_AssertThrow(dof_handler->get_fe().has_support_points(),
+                      ExcNotImplemented());
 
   // While in general quadrature points seems
   // to refer to Gauss quadrature points, in
@@ -332,15 +333,16 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
   // so do not change order added!
 
   // can't be closed to add additional points or vectors
-  AssertThrow(!closed, ExcInvalidState());
-  AssertThrow(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
+  DEAL_II_AssertThrow(!closed, ExcInvalidState());
+  DEAL_II_AssertThrow(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
 
   // Implementation assumes that support
   // points locations are dofs locations
-  AssertThrow(dof_handler->get_fe().has_support_points(), ExcNotImplemented());
+  DEAL_II_AssertThrow(dof_handler->get_fe().has_support_points(),
+                      ExcNotImplemented());
 
   // While in general quadrature points seems
   // to refer to Gauss quadrature points, in
@@ -470,10 +472,10 @@ PointValueHistory<dim>::add_field_name(const std::string &  vector_name,
 {
   // can't be closed to add additional points
   // or vectors
-  AssertThrow(!closed, ExcInvalidState());
-  AssertThrow(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
+  DEAL_II_AssertThrow(!closed, ExcInvalidState());
+  DEAL_II_AssertThrow(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
   // insert a component mask that is always of the right size
   if (mask.represents_the_all_selected_mask() == false)
@@ -527,16 +529,17 @@ PointValueHistory<dim>::add_component_names(
 {
   typename std::map<std::string, std::vector<std::string>>::iterator names =
     component_names_map.find(vector_name);
-  Assert(names != component_names_map.end(),
-         ExcMessage("vector_name not in class"));
+  DEAL_II_Assert(names != component_names_map.end(),
+                 ExcMessage("vector_name not in class"));
 
   typename std::map<std::string, ComponentMask>::iterator mask =
     component_mask.find(vector_name);
-  Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
+  DEAL_II_Assert(mask != component_mask.end(),
+                 ExcMessage("vector_name not in class"));
   unsigned int n_stored = mask->second.n_selected_components();
   (void)n_stored;
-  Assert(component_names.size() == n_stored,
-         ExcDimensionMismatch(component_names.size(), n_stored));
+  DEAL_II_Assert(component_names.size() == n_stored,
+                 ExcDimensionMismatch(component_names.size(), n_stored));
 
   names->second = component_names;
 }
@@ -547,8 +550,8 @@ void
 PointValueHistory<dim>::add_independent_names(
   const std::vector<std::string> &independent_names)
 {
-  Assert(independent_names.size() == n_indep,
-         ExcDimensionMismatch(independent_names.size(), n_indep));
+  DEAL_II_Assert(independent_names.size() == n_indep,
+                 ExcDimensionMismatch(independent_names.size(), n_indep));
 
   indep_names = independent_names;
 }
@@ -579,7 +582,7 @@ PointValueHistory<dim>::clear()
 // of dataset_key. However this leaves the possibility that the user has
 // neglected to call evaluate_field on one vector_name consistently. To catch
 // this case start_new_dataset will call bool deap_check () which will test
-// all vector_names and return a bool. This can be called from an Assert
+// all vector_names and return a bool. This can be called from an DEAL_II_Assert
 // statement.
 
 
@@ -592,17 +595,17 @@ PointValueHistory<dim>::evaluate_field(const std::string &vector_name,
 {
   // must be closed to add data to internal
   // members.
-  Assert(closed, ExcInvalidState());
-  Assert(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
+  DEAL_II_Assert(closed, ExcInvalidState());
+  DEAL_II_Assert(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
   if (n_indep != 0) // hopefully this will get optimized, can't test
                     // independent_values[0] unless n_indep > 0
     {
-      Assert(std::abs((int)dataset_key.size() -
-                      (int)independent_values[0].size()) < 2,
-             ExcDataLostSync());
+      DEAL_II_Assert(std::abs((int)dataset_key.size() -
+                              (int)independent_values[0].size()) < 2,
+                     ExcDataLostSync());
     }
   // Look up the field name and get an
   // iterator for the map. Doing this
@@ -611,12 +614,13 @@ PointValueHistory<dim>::evaluate_field(const std::string &vector_name,
   // to check vector_name is in the map.
   typename std::map<std::string, std::vector<std::vector<double>>>::iterator
     data_store_field = data_store.find(vector_name);
-  Assert(data_store_field != data_store.end(),
-         ExcMessage("vector_name not in class"));
+  DEAL_II_Assert(data_store_field != data_store.end(),
+                 ExcMessage("vector_name not in class"));
   // Repeat for component_mask
   typename std::map<std::string, ComponentMask>::iterator mask =
     component_mask.find(vector_name);
-  Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
+  DEAL_II_Assert(mask != component_mask.end(),
+                 ExcMessage("vector_name not in class"));
 
   unsigned int n_stored =
     mask->second.n_selected_components(dof_handler->get_fe(0).n_components());
@@ -663,21 +667,21 @@ PointValueHistory<dim>::evaluate_field(
 {
   // must be closed to add data to internal
   // members.
-  Assert(closed, ExcInvalidState());
-  Assert(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_Assert(closed, ExcInvalidState());
+  DEAL_II_Assert(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
   if (n_indep != 0) // hopefully this will get optimized, can't test
                     // independent_values[0] unless n_indep > 0
     {
-      Assert(std::abs((int)dataset_key.size() -
-                      (int)independent_values[0].size()) < 2,
-             ExcDataLostSync());
+      DEAL_II_Assert(std::abs((int)dataset_key.size() -
+                              (int)independent_values[0].size()) < 2,
+                     ExcDataLostSync());
     }
 
   // Make an FEValues object
   const UpdateFlags update_flags =
     data_postprocessor.get_needed_update_flags() | update_quadrature_points;
-  Assert(
+  DEAL_II_Assert(
     !(update_flags & update_normal_vectors),
     ExcMessage(
       "The update of normal vectors may not be requested for evaluation of "
@@ -848,13 +852,13 @@ PointValueHistory<dim>::evaluate_field(
           typename std::map<std::string,
                             std::vector<std::vector<double>>>::iterator
             data_store_field = data_store.find(*name);
-          Assert(data_store_field != data_store.end(),
-                 ExcMessage("vector_name not in class"));
+          DEAL_II_Assert(data_store_field != data_store.end(),
+                         ExcMessage("vector_name not in class"));
           // Repeat for component_mask
           typename std::map<std::string, ComponentMask>::iterator mask =
             component_mask.find(*name);
-          Assert(mask != component_mask.end(),
-                 ExcMessage("vector_name not in class"));
+          DEAL_II_Assert(mask != component_mask.end(),
+                         ExcMessage("vector_name not in class"));
 
           unsigned int n_stored =
             mask->second.n_selected_components(n_output_variables);
@@ -905,16 +909,16 @@ PointValueHistory<dim>::evaluate_field_at_requested_location(
   using number = typename VectorType::value_type;
   // must be closed to add data to internal
   // members.
-  Assert(closed, ExcInvalidState());
-  Assert(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_Assert(closed, ExcInvalidState());
+  DEAL_II_Assert(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
 
   if (n_indep != 0) // hopefully this will get optimized, can't test
                     // independent_values[0] unless n_indep > 0
     {
-      Assert(std::abs((int)dataset_key.size() -
-                      (int)independent_values[0].size()) < 2,
-             ExcDataLostSync());
+      DEAL_II_Assert(std::abs((int)dataset_key.size() -
+                              (int)independent_values[0].size()) < 2,
+                     ExcDataLostSync());
     }
   // Look up the field name and get an
   // iterator for the map. Doing this
@@ -923,12 +927,13 @@ PointValueHistory<dim>::evaluate_field_at_requested_location(
   // to check vector_name is in the map.
   typename std::map<std::string, std::vector<std::vector<double>>>::iterator
     data_store_field = data_store.find(vector_name);
-  Assert(data_store_field != data_store.end(),
-         ExcMessage("vector_name not in class"));
+  DEAL_II_Assert(data_store_field != data_store.end(),
+                 ExcMessage("vector_name not in class"));
   // Repeat for component_mask
   typename std::map<std::string, ComponentMask>::iterator mask =
     component_mask.find(vector_name);
-  Assert(mask != component_mask.end(), ExcMessage("vector_name not in class"));
+  DEAL_II_Assert(mask != component_mask.end(),
+                 ExcMessage("vector_name not in class"));
 
   unsigned int n_stored =
     mask->second.n_selected_components(dof_handler->get_fe(0).n_components());
@@ -971,9 +976,9 @@ PointValueHistory<dim>::start_new_dataset(double key)
 {
   // must be closed to add data to internal
   // members.
-  Assert(closed, ExcInvalidState());
-  Assert(!cleared, ExcInvalidState());
-  Assert(deep_check(false), ExcDataLostSync());
+  DEAL_II_Assert(closed, ExcInvalidState());
+  DEAL_II_Assert(!cleared, ExcInvalidState());
+  DEAL_II_Assert(deep_check(false), ExcDataLostSync());
 
   dataset_key.push_back(key);
 }
@@ -987,14 +992,14 @@ PointValueHistory<dim>::push_back_independent(
 {
   // must be closed to add data to internal
   // members.
-  Assert(closed, ExcInvalidState());
-  Assert(!cleared, ExcInvalidState());
-  Assert(indep_values.size() == n_indep,
-         ExcDimensionMismatch(indep_values.size(), n_indep));
-  Assert(n_indep != 0, ExcNoIndependent());
-  Assert(std::abs((int)dataset_key.size() - (int)independent_values[0].size()) <
-           2,
-         ExcDataLostSync());
+  DEAL_II_Assert(closed, ExcInvalidState());
+  DEAL_II_Assert(!cleared, ExcInvalidState());
+  DEAL_II_Assert(indep_values.size() == n_indep,
+                 ExcDimensionMismatch(indep_values.size(), n_indep));
+  DEAL_II_Assert(n_indep != 0, ExcNoIndependent());
+  DEAL_II_Assert(std::abs((int)dataset_key.size() -
+                          (int)independent_values[0].size()) < 2,
+                 ExcDataLostSync());
 
   for (unsigned int component = 0; component < n_indep; component++)
     independent_values[component].push_back(indep_values[component]);
@@ -1008,9 +1013,9 @@ PointValueHistory<dim>::write_gnuplot(
   const std::string &            base_name,
   const std::vector<Point<dim>> &postprocessor_locations)
 {
-  AssertThrow(closed, ExcInvalidState());
-  AssertThrow(!cleared, ExcInvalidState());
-  AssertThrow(deep_check(true), ExcDataLostSync());
+  DEAL_II_AssertThrow(closed, ExcInvalidState());
+  DEAL_II_AssertThrow(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(deep_check(true), ExcDataLostSync());
 
   // write inputs to a file
   if (n_indep != 0)
@@ -1059,12 +1064,12 @@ PointValueHistory<dim>::write_gnuplot(
   // write points to a file
   if (have_dof_handler)
     {
-      AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-      AssertThrow(postprocessor_locations.size() == 0 ||
-                    postprocessor_locations.size() ==
-                      point_geometry_data.size(),
-                  ExcDimensionMismatch(postprocessor_locations.size(),
-                                       point_geometry_data.size()));
+      DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+      DEAL_II_AssertThrow(postprocessor_locations.size() == 0 ||
+                            postprocessor_locations.size() ==
+                              point_geometry_data.size(),
+                          ExcDimensionMismatch(postprocessor_locations.size(),
+                                               point_geometry_data.size()));
       // We previously required the
       // number of dofs to remain the
       // same to provide some sort of
@@ -1077,7 +1082,7 @@ PointValueHistory<dim>::write_gnuplot(
       // method. Note that the support point
       // information is not meaningful if
       // the number of dofs has changed.
-      // AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
+      // DEAL_II_AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
 
       typename std::vector<internal::PointValueHistoryImplementation::
                              PointGeometryData<dim>>::iterator point =
@@ -1155,8 +1160,9 @@ PointValueHistory<dim>::write_gnuplot(
 
               if (names.size() > 0)
                 {
-                  AssertThrow(names.size() == n_stored,
-                              ExcDimensionMismatch(names.size(), n_stored));
+                  DEAL_II_AssertThrow(names.size() == n_stored,
+                                      ExcDimensionMismatch(names.size(),
+                                                           n_stored));
                   for (unsigned int component = 0; component < names.size();
                        component++)
                     {
@@ -1221,9 +1227,9 @@ PointValueHistory<dim>::mark_support_locations()
 {
   // a method to put a one at each point on
   // the grid where a location is defined
-  AssertThrow(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
+  DEAL_II_AssertThrow(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
   Vector<double> dof_vector(dof_handler->n_dofs());
 
@@ -1248,9 +1254,9 @@ void
 PointValueHistory<dim>::get_support_locations(
   std::vector<std::vector<Point<dim>>> &locations)
 {
-  AssertThrow(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-  AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
+  DEAL_II_AssertThrow(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_AssertThrow(!triangulation_changed, ExcDoFHandlerChanged());
 
   std::vector<std::vector<Point<dim>>> actual_points;
   typename std::vector<
@@ -1280,8 +1286,8 @@ PointValueHistory<dim>::get_postprocessor_locations(
   const Quadrature<dim> &  quadrature,
   std::vector<Point<dim>> &locations)
 {
-  Assert(!cleared, ExcInvalidState());
-  AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
+  DEAL_II_Assert(!cleared, ExcInvalidState());
+  DEAL_II_AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
 
   locations = std::vector<Point<dim>>();
 
@@ -1405,12 +1411,12 @@ PointValueHistory<dim>::status(std::ostream &out)
       std::string vector_name = data_store_begin->first;
       typename std::map<std::string, ComponentMask>::iterator mask =
         component_mask.find(vector_name);
-      Assert(mask != component_mask.end(),
-             ExcMessage("vector_name not in class"));
+      DEAL_II_Assert(mask != component_mask.end(),
+                     ExcMessage("vector_name not in class"));
       typename std::map<std::string, std::vector<std::string>>::iterator
         component_names = component_names_map.find(vector_name);
-      Assert(component_names != component_names_map.end(),
-             ExcMessage("vector_name not in class"));
+      DEAL_II_Assert(component_names != component_names_map.end(),
+                     ExcMessage("vector_name not in class"));
 
       if (data_store_begin->second.size() != 0)
         {
@@ -1467,7 +1473,8 @@ PointValueHistory<dim>::deep_check(const bool strict)
         {
           for (; data_store_begin != data_store.end(); ++data_store_begin)
             {
-              Assert(data_store_begin->second.size() > 0, ExcInternalError());
+              DEAL_II_Assert(data_store_begin->second.size() > 0,
+                             ExcInternalError());
               if ((data_store_begin->second)[0].size() != dataset_key.size())
                 return false;
               // this loop only tests one
@@ -1495,7 +1502,8 @@ PointValueHistory<dim>::deep_check(const bool strict)
         data_store_begin = data_store.begin();
       for (; data_store_begin != data_store.end(); ++data_store_begin)
         {
-          Assert(data_store_begin->second.size() > 0, ExcInternalError());
+          DEAL_II_Assert(data_store_begin->second.size() > 0,
+                         ExcInternalError());
 
           if (std::abs((int)(data_store_begin->second)[0].size() -
                        (int)dataset_key.size()) >= 2)

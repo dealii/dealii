@@ -241,7 +241,7 @@ namespace StokesClass
           {
             if (Utilities::MPI::this_mpi_process(
                   src.block(0).get_mpi_communicator()) == 0)
-              AssertThrow(
+              DEAL_II_AssertThrow(
                 false,
                 ExcMessage(
                   std::string(
@@ -268,7 +268,7 @@ namespace StokesClass
       // iterations of our two-stage outer GMRES iteration)
       if (do_solve_A == true)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
       else
         {
@@ -335,9 +335,9 @@ namespace StokesClass
                              std::vector<double> &          values,
                              const unsigned int             component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     const unsigned int n_points = points.size();
     for (unsigned int i = 0; i < n_points; ++i)
       values[i] = value(points[i], component);
@@ -558,7 +558,7 @@ namespace StokesClass
   void
   StokesOperator<dim, degree_v, number>::compute_diagonal()
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -648,8 +648,10 @@ namespace StokesClass
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(one_over_viscosity.size(0), data.n_macro_cells());
-        AssertDimension(one_over_viscosity.size(1), pressure.n_q_points);
+        DEAL_II_AssertDimension(one_over_viscosity.size(0),
+                                data.n_macro_cells());
+        DEAL_II_AssertDimension(one_over_viscosity.size(1),
+                                pressure.n_q_points);
 
         pressure.reinit(cell);
         pressure.read_dof_values(src);
@@ -700,9 +702,10 @@ namespace StokesClass
     const unsigned int local_size = inverse_diagonal.local_size();
     for (unsigned int i = 0; i < local_size; ++i)
       {
-        Assert(inverse_diagonal.local_element(i) > 0.,
-               ExcMessage("No diagonal entry in a positive definite operator "
-                          "should be zero"));
+        DEAL_II_Assert(inverse_diagonal.local_element(i) > 0.,
+                       ExcMessage(
+                         "No diagonal entry in a positive definite operator "
+                         "should be zero"));
         inverse_diagonal.local_element(i) =
           1. / inverse_diagonal.local_element(i);
       }
@@ -830,8 +833,8 @@ namespace StokesClass
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(viscosity_x_2.size(0), data.n_macro_cells());
-        AssertDimension(viscosity_x_2.size(1), velocity.n_q_points);
+        DEAL_II_AssertDimension(viscosity_x_2.size(0), data.n_macro_cells());
+        DEAL_II_AssertDimension(viscosity_x_2.size(1), velocity.n_q_points);
 
         velocity.reinit(cell);
         velocity.read_dof_values(src);
@@ -874,9 +877,10 @@ namespace StokesClass
 
     for (unsigned int i = 0; i < inverse_diagonal.local_size(); ++i)
       {
-        Assert(inverse_diagonal.local_element(i) > 0.,
-               ExcMessage("No diagonal entry in a positive definite operator "
-                          "should be zero"));
+        DEAL_II_Assert(inverse_diagonal.local_element(i) > 0.,
+                       ExcMessage(
+                         "No diagonal entry in a positive definite operator "
+                         "should be zero"));
         inverse_diagonal.local_element(i) =
           1. / inverse_diagonal.local_element(i);
       }

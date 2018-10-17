@@ -1615,27 +1615,29 @@ namespace GridGenerator
   /**
    * Exception
    */
-  DeclException0(ExcInvalidRadii);
+  DEAL_II_DeclException0(ExcInvalidRadii);
   /**
    * Exception
    */
-  DeclException1(ExcInvalidRepetitions,
-                 int,
-                 << "The number of repetitions " << arg1 << " must be >=1.");
+  DEAL_II_DeclException1(ExcInvalidRepetitions,
+                         int,
+                         << "The number of repetitions " << arg1
+                         << " must be >=1.");
   /**
    * Exception
    */
-  DeclException1(ExcInvalidRepetitionsDimension,
-                 int,
-                 << "The vector of repetitions  must have " << arg1
-                 << " elements.");
+  DEAL_II_DeclException1(ExcInvalidRepetitionsDimension,
+                         int,
+                         << "The vector of repetitions  must have " << arg1
+                         << " elements.");
 
   /**
    * Exception for input that is not properly oriented.
    */
-  DeclExceptionMsg(ExcInvalidInputOrientation,
-                   "The input to this function is oriented in a way that will"
-                   " cause all cells to have negative measure.");
+  DEAL_II_DeclExceptionMsg(
+    ExcInvalidInputOrientation,
+    "The input to this function is oriented in a way that will"
+    " cause all cells to have negative measure.");
   ///@}
 
 #ifndef DOXYGEN

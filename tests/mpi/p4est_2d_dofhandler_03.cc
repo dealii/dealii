@@ -112,8 +112,8 @@ test()
             // macros are evil...
             types::global_dof_index invalid_dofindex =
               numbers::invalid_dof_index;
-            Assert((*local_dof_indices.rbegin()) != invalid_dofindex,
-                   ExcInternalError());
+            DEAL_II_Assert((*local_dof_indices.rbegin()) != invalid_dofindex,
+                           ExcInternalError());
           }
     }
 }

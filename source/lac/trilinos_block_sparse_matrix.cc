@@ -59,7 +59,8 @@ namespace TrilinosWrappers
         {
           BlockType *p = new BlockType();
 
-          Assert(this->sub_objects[r][c] == nullptr, ExcInternalError());
+          DEAL_II_Assert(this->sub_objects[r][c] == nullptr,
+                         ExcInternalError());
           this->sub_objects[r][c] = p;
         }
   }
@@ -73,24 +74,24 @@ namespace TrilinosWrappers
     const BlockSparsityPatternType &block_sparsity_pattern,
     const bool                      exchange_data)
   {
-    Assert(parallel_partitioning.size() ==
-             block_sparsity_pattern.n_block_rows(),
-           ExcDimensionMismatch(parallel_partitioning.size(),
-                                block_sparsity_pattern.n_block_rows()));
-    Assert(parallel_partitioning.size() ==
-             block_sparsity_pattern.n_block_cols(),
-           ExcDimensionMismatch(parallel_partitioning.size(),
-                                block_sparsity_pattern.n_block_cols()));
+    DEAL_II_Assert(parallel_partitioning.size() ==
+                     block_sparsity_pattern.n_block_rows(),
+                   ExcDimensionMismatch(parallel_partitioning.size(),
+                                        block_sparsity_pattern.n_block_rows()));
+    DEAL_II_Assert(parallel_partitioning.size() ==
+                     block_sparsity_pattern.n_block_cols(),
+                   ExcDimensionMismatch(parallel_partitioning.size(),
+                                        block_sparsity_pattern.n_block_cols()));
 
     const size_type n_block_rows = parallel_partitioning.size();
     (void)n_block_rows;
 
-    Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
-           ExcDimensionMismatch(n_block_rows,
-                                block_sparsity_pattern.n_block_rows()));
-    Assert(n_block_rows == block_sparsity_pattern.n_block_cols(),
-           ExcDimensionMismatch(n_block_rows,
-                                block_sparsity_pattern.n_block_cols()));
+    DEAL_II_Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
+                   ExcDimensionMismatch(n_block_rows,
+                                        block_sparsity_pattern.n_block_rows()));
+    DEAL_II_Assert(n_block_rows == block_sparsity_pattern.n_block_cols(),
+                   ExcDimensionMismatch(n_block_rows,
+                                        block_sparsity_pattern.n_block_cols()));
 
 
     // Call the other basic reinit function, ...
@@ -182,12 +183,12 @@ namespace TrilinosWrappers
   {
     const size_type n_block_rows = parallel_partitioning.size();
 
-    Assert(n_block_rows == dealii_block_sparse_matrix.n_block_rows(),
-           ExcDimensionMismatch(n_block_rows,
-                                dealii_block_sparse_matrix.n_block_rows()));
-    Assert(n_block_rows == dealii_block_sparse_matrix.n_block_cols(),
-           ExcDimensionMismatch(n_block_rows,
-                                dealii_block_sparse_matrix.n_block_cols()));
+    DEAL_II_Assert(n_block_rows == dealii_block_sparse_matrix.n_block_rows(),
+                   ExcDimensionMismatch(
+                     n_block_rows, dealii_block_sparse_matrix.n_block_rows()));
+    DEAL_II_Assert(n_block_rows == dealii_block_sparse_matrix.n_block_cols(),
+                   ExcDimensionMismatch(
+                     n_block_rows, dealii_block_sparse_matrix.n_block_cols()));
 
     // Call the other basic reinit function ...
     reinit(n_block_rows, n_block_rows);
@@ -214,13 +215,15 @@ namespace TrilinosWrappers
     const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
     const double                               drop_tolerance)
   {
-    Assert(dealii_block_sparse_matrix.n_block_rows() ==
-             dealii_block_sparse_matrix.n_block_cols(),
-           ExcDimensionMismatch(dealii_block_sparse_matrix.n_block_rows(),
-                                dealii_block_sparse_matrix.n_block_cols()));
-    Assert(dealii_block_sparse_matrix.m() == dealii_block_sparse_matrix.n(),
-           ExcDimensionMismatch(dealii_block_sparse_matrix.m(),
-                                dealii_block_sparse_matrix.n()));
+    DEAL_II_Assert(
+      dealii_block_sparse_matrix.n_block_rows() ==
+        dealii_block_sparse_matrix.n_block_cols(),
+      ExcDimensionMismatch(dealii_block_sparse_matrix.n_block_rows(),
+                           dealii_block_sparse_matrix.n_block_cols()));
+    DEAL_II_Assert(dealii_block_sparse_matrix.m() ==
+                     dealii_block_sparse_matrix.n(),
+                   ExcDimensionMismatch(dealii_block_sparse_matrix.m(),
+                                        dealii_block_sparse_matrix.n()));
 
     // produce a dummy local map and pass it
     // off to the other function
@@ -328,8 +331,8 @@ namespace TrilinosWrappers
   std::vector<Epetra_Map>
   BlockSparseMatrix::domain_partitioner() const
   {
-    Assert(this->n_block_cols() != 0, ExcNotInitialized());
-    Assert(this->n_block_rows() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_cols() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
     std::vector<Epetra_Map> domain_partitioner;
     for (size_type c = 0; c < this->n_block_cols(); ++c)
@@ -344,8 +347,8 @@ namespace TrilinosWrappers
   std::vector<Epetra_Map>
   BlockSparseMatrix::range_partitioner() const
   {
-    Assert(this->n_block_cols() != 0, ExcNotInitialized());
-    Assert(this->n_block_rows() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_cols() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
     std::vector<Epetra_Map> range_partitioner;
     for (size_type r = 0; r < this->n_block_rows(); ++r)
@@ -359,8 +362,8 @@ namespace TrilinosWrappers
   MPI_Comm
   BlockSparseMatrix::get_mpi_communicator() const
   {
-    Assert(this->n_block_cols() != 0, ExcNotInitialized());
-    Assert(this->n_block_rows() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_cols() != 0, ExcNotInitialized());
+    DEAL_II_Assert(this->n_block_rows() != 0, ExcNotInitialized());
     return this->sub_objects[0][0]->get_mpi_communicator();
   }
 

@@ -76,11 +76,11 @@ test()
   for (auto cell : dof_handler.active_cell_iterators())
     {
       if (cell->is_locally_owned())
-        Assert(cell->active_fe_index() == cell->subdomain_id(),
-               ExcInternalError());
+        DEAL_II_Assert(cell->active_fe_index() == cell->subdomain_id(),
+                       ExcInternalError());
       if (cell->is_ghost())
-        Assert(cell->active_fe_index() == cell->subdomain_id(),
-               ExcInternalError());
+        DEAL_II_Assert(cell->active_fe_index() == cell->subdomain_id(),
+                       ExcInternalError());
     }
 }
 

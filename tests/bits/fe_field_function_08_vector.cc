@@ -112,11 +112,11 @@ test()
   fe_function.vector_laplacian(point, m);
 
   {
-    AssertThrow(std::fabs(m(0) - point.square() * 4 * 3) <
-                  1e-8 * std::fabs(m(0) + point.square() * 4 * 3),
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(m(0) - point.square() * 4 * 3) <
+                          1e-8 * std::fabs(m(0) + point.square() * 4 * 3),
+                        ExcInternalError());
 
-    AssertThrow(std::fabs(m(1)) < 1e-10, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(m(1)) < 1e-10, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

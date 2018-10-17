@@ -117,12 +117,12 @@ public:
   vmult_add(LinearAlgebra::distributed::Vector<number> &      dst,
             const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
+    DEAL_II_Assert(src.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
+    DEAL_II_Assert(dst.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
     data.loop(&LaplaceOperator::local_apply,
               &LaplaceOperator::local_apply_face,
               &LaplaceOperator::local_apply_boundary,
@@ -146,8 +146,8 @@ public:
   number
   el(const unsigned int row, const unsigned int col) const
   {
-    AssertThrow(false,
-                ExcMessage("Matrix-free does not allow for entry access"));
+    DEAL_II_AssertThrow(
+      false, ExcMessage("Matrix-free does not allow for entry access"));
     return number();
   }
 

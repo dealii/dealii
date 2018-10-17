@@ -63,8 +63,9 @@ test()
   v *= 2.0;
   if (myid < 8)
     {
-      AssertThrow(v(myid * 2) == myid * 4.0, ExcInternalError());
-      AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+      DEAL_II_AssertThrow(v(myid * 2) == myid * 4.0, ExcInternalError());
+      DEAL_II_AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 2.0,
+                          ExcInternalError());
     }
 
   // check l2 norm
@@ -94,7 +95,8 @@ test()
     if (myid == 0)
       deallog << "l2.2 norm: " << lp_norm << std::endl;
 
-    Assert(std::fabs(v.l2_norm() - v.lp_norm(2.0)) < 1e-14, ExcInternalError());
+    DEAL_II_Assert(std::fabs(v.l2_norm() - v.lp_norm(2.0)) < 1e-14,
+                   ExcInternalError());
   }
 
   // check mean value (should be equal to l1
@@ -105,16 +107,18 @@ test()
     if (myid == 0)
       deallog << "Mean value: " << mean << std::endl;
 
-    Assert(std::fabs(mean * v.size() - v.l1_norm()) < 1e-15,
-           ExcInternalError());
+    DEAL_II_Assert(std::fabs(mean * v.size() - v.l1_norm()) < 1e-15,
+                   ExcInternalError());
   }
   // check inner product
   {
     const double norm_sqr = v.l2_norm() * v.l2_norm();
-    AssertThrow(std::fabs(v * v - norm_sqr) < 1e-15, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(v * v - norm_sqr) < 1e-15,
+                        ExcInternalError());
     LinearAlgebra::distributed::Vector<double> v2;
     v2 = v;
-    AssertThrow(std::fabs(v2 * v - norm_sqr) < 1e-15, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(v2 * v - norm_sqr) < 1e-15,
+                        ExcInternalError());
 
     if (myid < 8)
       v2.local_element(0) = -1;

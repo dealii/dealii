@@ -74,7 +74,7 @@ template <int dim>
 double
 LegendreFunction<dim>::value(const Point<dim> &point, const unsigned int) const
 {
-  Assert(dim == 1, dealii::ExcNotImplemented());
+  DEAL_II_Assert(dim == 1, dealii::ExcNotImplemented());
 
   const double &x = point[0];
   return 1.81735e-05 * (1.0 - x) * (0.5 - x) * 2 +
@@ -176,7 +176,7 @@ test_legendre_orthonormal(const unsigned int N)
             const double      m   = 0.5;              // mid-point
             const double      h   = 0.5;              // half-length
             const double      x   = (x_q[0] - m) / h; // 1D only
-            Assert(std::fabs(x) < 1.0, dealii::ExcInternalError());
+            DEAL_II_Assert(std::fabs(x) < 1.0, dealii::ExcInternalError());
             const double L1 = std::sqrt(1.0 / h) * gsl_sf_legendre_Pl(k1, x);
             const double L2 = std::sqrt(1.0 / h) * gsl_sf_legendre_Pl(k2, x);
             ortho += L1 * L2 * quadrature.weight(q);

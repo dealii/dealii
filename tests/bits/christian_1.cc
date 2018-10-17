@@ -88,8 +88,8 @@ DoFToolsEx::transfer(const DoFHandler<dim> &source_dof,
       else
         {
           // the source cell has been coarsened
-          Assert(cell->level() > source2target[cell]->level(),
-                 ExcInternalError());
+          DEAL_II_Assert(cell->level() > source2target[cell]->level(),
+                         ExcInternalError());
           target2source[source2target[cell]]->get_interpolated_dof_values(
             source_vector, local_dofs);
           source2target[cell]->set_dof_values(local_dofs, target_vector);

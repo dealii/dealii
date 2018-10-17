@@ -285,10 +285,10 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException1(ExcTrilinosError,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while calling a Trilinos function");
+    DEAL_II_DeclException1(ExcTrilinosError,
+                           int,
+                           << "An error with error number " << arg1
+                           << " occurred while calling a Trilinos function");
 
   protected:
     /**
@@ -685,10 +685,10 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException1(ExcTrilinosError,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while calling a Trilinos function");
+    DEAL_II_DeclException1(ExcTrilinosError,
+                           int,
+                           << "An error with error number " << arg1
+                           << " occurred while calling a Trilinos function");
 
   private:
     /**

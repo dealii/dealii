@@ -39,18 +39,18 @@ main()
     Tensor<2, dim, float>  t(a);
     Tensor<2, dim, double> dt(t), dt2;
     dt2 = t;
-    AssertThrow(dt2 == dt, ExcInternalError());
-    AssertThrow(dt == dt2, ExcInternalError());
+    DEAL_II_AssertThrow(dt2 == dt, ExcInternalError());
+    DEAL_II_AssertThrow(dt == dt2, ExcInternalError());
 
     Tensor<2, dim, float> ft(dt), ft2;
     ft2 = dt;
-    AssertThrow(ft2 == ft, ExcInternalError());
-    AssertThrow(ft == ft2, ExcInternalError());
+    DEAL_II_AssertThrow(ft2 == ft, ExcInternalError());
+    DEAL_II_AssertThrow(ft == ft2, ExcInternalError());
 
     Tensor<2, dim, std::complex<double>> ct(dt), ct2;
     ct2 = dt;
-    AssertThrow(ct2 == ct, ExcInternalError());
-    AssertThrow(ct == ct2, ExcInternalError());
+    DEAL_II_AssertThrow(ct2 == ct, ExcInternalError());
+    DEAL_II_AssertThrow(ct == ct2, ExcInternalError());
   }
 
   // rank 1
@@ -58,18 +58,18 @@ main()
     Tensor<1, dim, float>  t(b);
     Tensor<1, dim, double> dt(t), dt2;
     dt2 = t;
-    AssertThrow(dt2 == dt, ExcInternalError());
-    AssertThrow(dt == dt2, ExcInternalError());
+    DEAL_II_AssertThrow(dt2 == dt, ExcInternalError());
+    DEAL_II_AssertThrow(dt == dt2, ExcInternalError());
 
     Tensor<1, dim, float> ft(dt), ft2;
     ft2 = dt;
-    AssertThrow(ft2 == ft, ExcInternalError());
-    AssertThrow(ft == ft2, ExcInternalError());
+    DEAL_II_AssertThrow(ft2 == ft, ExcInternalError());
+    DEAL_II_AssertThrow(ft == ft2, ExcInternalError());
 
     Tensor<1, dim, std::complex<double>> ct(dt), ct2;
     ct2 = dt;
-    AssertThrow(ct2 == ct, ExcInternalError());
-    AssertThrow(ct == ct2, ExcInternalError());
+    DEAL_II_AssertThrow(ct2 == ct, ExcInternalError());
+    DEAL_II_AssertThrow(ct == ct2, ExcInternalError());
   }
 
   deallog << "OK." << std::endl;

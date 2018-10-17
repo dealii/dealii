@@ -95,9 +95,9 @@ test_with_wrong_face_orientation()
   // CellAccessor::neighbor_child_on_subface it
   // should work. let's make sure we get the
   // status we expect.
-  AssertThrow(cell->face(3)->child(1) ==
-                neighbor_child->face(cell->neighbor_of_neighbor(3)),
-              ExcInternalError());
+  DEAL_II_AssertThrow(cell->face(3)->child(1) ==
+                        neighbor_child->face(cell->neighbor_of_neighbor(3)),
+                      ExcInternalError());
 }
 
 

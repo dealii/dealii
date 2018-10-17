@@ -67,7 +67,7 @@ check_nd_parallelepiped_by_comparison(bool log)
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     };
 
   Triangulation<dim> triangulation_parallelepiped;

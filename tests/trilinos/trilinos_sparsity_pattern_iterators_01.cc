@@ -47,11 +47,11 @@ test()
 
       // check copy construction
       TrilinosWrappers::SparsityPattern::const_iterator q(p);
-      Assert(p == q, ExcInternalError());
+      DEAL_II_Assert(p == q, ExcInternalError());
 
       // also check copy operation
       q = p;
-      Assert(p == q, ExcInternalError());
+      DEAL_II_Assert(p == q, ExcInternalError());
     }
 }
 

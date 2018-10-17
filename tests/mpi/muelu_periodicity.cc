@@ -124,8 +124,8 @@ namespace Step22
   BoundaryValues<dim>::value(const Point<dim> & p,
                              const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
 
     //    if (component == 0)
     //      return (p[1]-.5)*(1.-p[1]);
@@ -645,13 +645,13 @@ namespace Step22
               {
                 std::cout << point1 << "\t" << value1[1] << std::endl;
                 std::cout << point2 << "\t" << value2[0] << std::endl;
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
               }
             if (std::abs(value2[1] + value1[0]) > 1e-8)
               {
                 std::cout << point1 << "\t" << value1[0] << std::endl;
                 std::cout << point2 << "\t" << value2[1] << std::endl;
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
               }
           }
       }

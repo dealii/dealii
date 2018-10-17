@@ -34,7 +34,7 @@ main()
     t[0][0] = 1;
 
     double x[1] = {1};
-    AssertThrow((t == SymmetricTensor<2, 1>(x)), ExcInternalError());
+    DEAL_II_AssertThrow((t == SymmetricTensor<2, 1>(x)), ExcInternalError());
   }
 
   {
@@ -44,7 +44,7 @@ main()
     t[0][1] = 3;
 
     double x[3] = {1, 2, 3};
-    AssertThrow((t == SymmetricTensor<2, 2>(x)), ExcInternalError());
+    DEAL_II_AssertThrow((t == SymmetricTensor<2, 2>(x)), ExcInternalError());
   }
 
   {
@@ -57,7 +57,7 @@ main()
     t[1][2] = 6;
 
     double x[6] = {1, 2, 3, 4, 5, 6};
-    AssertThrow((t == SymmetricTensor<2, 3>(x)), ExcInternalError());
+    DEAL_II_AssertThrow((t == SymmetricTensor<2, 3>(x)), ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

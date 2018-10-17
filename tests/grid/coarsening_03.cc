@@ -95,8 +95,8 @@ test()
 
   // verify that none of the cells
   // violates the level-1-at-vertex rule
-  AssertThrow(satisfies_level1_at_vertex_rule(triangulation),
-              ExcInternalError());
+  DEAL_II_AssertThrow(satisfies_level1_at_vertex_rule(triangulation),
+                      ExcInternalError());
 }
 
 

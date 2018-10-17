@@ -84,9 +84,10 @@ void check_this(Triangulation<3> &tria)
 
             // make sure, that both ways yield
             // the same result
-            AssertThrow(neighbor_child ==
-                          cell->neighbor_child_on_subface(face_no, subface_no),
-                        ExcInternalError());
+            DEAL_II_AssertThrow(neighbor_child ==
+                                  cell->neighbor_child_on_subface(face_no,
+                                                                  subface_no),
+                                ExcInternalError());
           }
 }
 

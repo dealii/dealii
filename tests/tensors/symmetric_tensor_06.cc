@@ -69,8 +69,8 @@ test()
   for (unsigned int i = 0; i < dim; ++i)
     for (unsigned int j = 0; j < dim; ++j)
       {
-        AssertThrow(as[i][j] == aa[i][j], ExcInternalError());
-        AssertThrow(bs[i][j] == ba[i][j], ExcInternalError());
+        DEAL_II_AssertThrow(as[i][j] == aa[i][j], ExcInternalError());
+        DEAL_II_AssertThrow(bs[i][j] == ba[i][j], ExcInternalError());
       }
 }
 

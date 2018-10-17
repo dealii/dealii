@@ -449,7 +449,7 @@ namespace internal
       get(const MappingInfo<dim, Number> &mapping_info,
           const unsigned int              quad_no)
       {
-        AssertIndexRange(quad_no, mapping_info.cell_data.size());
+        DEAL_II_AssertIndexRange(quad_no, mapping_info.cell_data.size());
         return &mapping_info.cell_data[quad_no];
       }
     };
@@ -461,7 +461,7 @@ namespace internal
       get(const MappingInfo<dim, Number> &mapping_info,
           const unsigned int              quad_no)
       {
-        AssertIndexRange(quad_no, mapping_info.face_data.size());
+        DEAL_II_AssertIndexRange(quad_no, mapping_info.face_data.size());
         return &mapping_info.face_data[quad_no];
       }
     };
@@ -544,7 +544,7 @@ namespace internal
     inline GeometryType
     MappingInfo<dim, Number>::get_cell_type(const unsigned int cell_no) const
     {
-      AssertIndexRange(cell_no, cell_type.size());
+      DEAL_II_AssertIndexRange(cell_no, cell_type.size());
       return cell_type[cell_no];
     }
 

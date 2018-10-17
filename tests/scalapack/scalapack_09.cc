@@ -123,8 +123,8 @@ test(const unsigned int block_size, const NumberType tol)
   scalapack_B.copy_to(result);
 
   result.add(-1, full_X_I);
-  AssertThrow(result.frobenius_norm() < tol,
-              ExcMessage("solution deviates from reference"));
+  DEAL_II_AssertThrow(result.frobenius_norm() < tol,
+                      ExcMessage("solution deviates from reference"));
 }
 
 

@@ -56,7 +56,7 @@ check(const unsigned int testcase)
         std::swap(vertices[0], vertices[1]);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -80,11 +80,11 @@ check(const unsigned int testcase)
       flag = true;
 
       deallog << dcv.distorted_cells.size() << " distorted cells" << std::endl;
-      Assert(dcv.distorted_cells.front() == coarse_grid.begin(0),
-             ExcInternalError());
+      DEAL_II_Assert(dcv.distorted_cells.front() == coarse_grid.begin(0),
+                     ExcInternalError());
     }
 
-  Assert(flag == true, ExcInternalError());
+  DEAL_II_Assert(flag == true, ExcInternalError());
 }
 
 

@@ -50,9 +50,9 @@ namespace OpenCASCADE
     Handle_Adaptor3d_HCurve
     curve_adaptor(const TopoDS_Shape &shape)
     {
-      Assert((shape.ShapeType() == TopAbs_WIRE) ||
-               (shape.ShapeType() == TopAbs_EDGE),
-             ExcUnsupportedShape());
+      DEAL_II_Assert((shape.ShapeType() == TopAbs_WIRE) ||
+                       (shape.ShapeType() == TopAbs_EDGE),
+                     ExcUnsupportedShape());
       if (shape.ShapeType() == TopAbs_WIRE)
         return Handle(BRepAdaptor_HCompCurve)(
           new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)));
@@ -60,7 +60,7 @@ namespace OpenCASCADE
         return Handle(BRepAdaptor_HCurve)(
           new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
 
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
       return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve());
     }
 
@@ -84,7 +84,7 @@ namespace OpenCASCADE
     : sh(sh)
     , tolerance(tolerance)
   {
-    Assert(spacedim == 3, ExcNotImplemented());
+    DEAL_II_Assert(spacedim == 3, ExcNotImplemented());
   }
 
 
@@ -108,10 +108,11 @@ namespace OpenCASCADE
     (void)surrounding_points;
 #  ifdef DEBUG
     for (unsigned int i = 0; i < surrounding_points.size(); ++i)
-      Assert(closest_point(sh, surrounding_points[i], tolerance)
-                 .distance(surrounding_points[i]) <
-               std::max(tolerance * surrounding_points[i].norm(), tolerance),
-             ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
+      DEAL_II_Assert(closest_point(sh, surrounding_points[i], tolerance)
+                         .distance(surrounding_points[i]) <
+                       std::max(tolerance * surrounding_points[i].norm(),
+                                tolerance),
+                     ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
 #  endif
     return closest_point(sh, candidate, tolerance);
   }
@@ -128,7 +129,7 @@ namespace OpenCASCADE
     , direction(direction)
     , tolerance(tolerance)
   {
-    Assert(spacedim == 3, ExcNotImplemented());
+    DEAL_II_Assert(spacedim == 3, ExcNotImplemented());
   }
 
 
@@ -152,10 +153,11 @@ namespace OpenCASCADE
     (void)surrounding_points;
 #  ifdef DEBUG
     for (unsigned int i = 0; i < surrounding_points.size(); ++i)
-      Assert(closest_point(sh, surrounding_points[i], tolerance)
-                 .distance(surrounding_points[i]) <
-               std::max(tolerance * surrounding_points[i].norm(), tolerance),
-             ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
+      DEAL_II_Assert(closest_point(sh, surrounding_points[i], tolerance)
+                         .distance(surrounding_points[i]) <
+                       std::max(tolerance * surrounding_points[i].norm(),
+                                tolerance),
+                     ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
 #  endif
     return line_intersection(sh, candidate, direction, tolerance);
   }
@@ -171,8 +173,8 @@ namespace OpenCASCADE
     : sh(sh)
     , tolerance(tolerance)
   {
-    Assert(spacedim == 3, ExcNotImplemented());
-    Assert(
+    DEAL_II_Assert(spacedim == 3, ExcNotImplemented());
+    DEAL_II_Assert(
       std::get<0>(count_elements(sh)) > 0,
       ExcMessage(
         "NormalToMeshProjectionManifold needs a shape containing faces to operate."));
@@ -198,10 +200,11 @@ namespace OpenCASCADE
 #  ifdef DEBUG
     for (unsigned int i = 0; i < surrounding_points.size(); ++i)
       {
-        Assert(closest_point(sh, surrounding_points[i], tolerance)
-                   .distance(surrounding_points[i]) <
-                 std::max(tolerance * surrounding_points[i].norm(), tolerance),
-               ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
+        DEAL_II_Assert(closest_point(sh, surrounding_points[i], tolerance)
+                           .distance(surrounding_points[i]) <
+                         std::max(tolerance * surrounding_points[i].norm(),
+                                  tolerance),
+                       ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
       }
 #  endif
 
@@ -221,7 +224,7 @@ namespace OpenCASCADE
 
             average_normal /= 2.0;
 
-            Assert(
+            DEAL_II_Assert(
               average_normal.norm() > 1e-4,
               ExcMessage(
                 "Failed to refine cell: the average of the surface normals at the surrounding edge turns out to be a null vector, making the projection direction undetermined."));
@@ -251,7 +254,7 @@ namespace OpenCASCADE
 
             average_normal = (n1 + n2) / 2.0;
 
-            Assert(
+            DEAL_II_Assert(
               average_normal.norm() > tolerance,
               ExcMessage(
                 "Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
@@ -292,7 +295,7 @@ namespace OpenCASCADE
 
             average_normal = (n1 + n2 + n3 + n4) / 4.0;
 
-            Assert(
+            DEAL_II_Assert(
               average_normal.norm() > tolerance,
               ExcMessage(
                 "Failed to refine cell: the normal estimated via the surrounding points turns out to be a null vector, making the projection direction undetermined."));
@@ -302,7 +305,7 @@ namespace OpenCASCADE
           }
         default:
           {
-            AssertThrow(false, ExcNotImplemented());
+            DEAL_II_AssertThrow(false, ExcNotImplemented());
             break;
           }
       }
@@ -326,7 +329,7 @@ namespace OpenCASCADE
     , tolerance(tolerance)
     , length(shape_length(sh))
   {
-    Assert(spacedim >= 2, ExcImpossibleInDimSpacedim(dim, spacedim));
+    DEAL_II_Assert(spacedim >= 2, ExcImpossibleInDimSpacedim(dim, spacedim));
   }
 
 
@@ -351,8 +354,8 @@ namespace OpenCASCADE
     gp_Pnt              proj;
     const double        dist = curve_analysis.Project(
       curve->GetCurve(), point(space_point), tolerance, proj, t, true);
-    Assert(dist < tolerance * length,
-           ExcPointNotOnManifold<spacedim>(space_point));
+    DEAL_II_Assert(dist < tolerance * length,
+                   ExcPointNotOnManifold<spacedim>(space_point));
     (void)dist; // Silence compiler warning in Release mode.
     return Point<1>(GCPnts_AbscissaPoint::Length(
       curve->GetCurve(), curve->GetCurve().FirstParameter(), t));
@@ -434,17 +437,17 @@ namespace OpenCASCADE
     if (spacedim > 2)
       DX[2][0] = Du.Z();
     else
-      Assert(std::abs(Du.Z()) < tolerance,
-             ExcMessage(
-               "Expecting derivative along Z to be zero! Bailing out."));
+      DEAL_II_Assert(
+        std::abs(Du.Z()) < tolerance,
+        ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
     DX[0][1] = Dv.X();
     DX[1][1] = Dv.Y();
     if (spacedim > 2)
       DX[2][1] = Dv.Z();
     else
-      Assert(std::abs(Dv.Z()) < tolerance,
-             ExcMessage(
-               "Expecting derivative along Z to be zero! Bailing out."));
+      DEAL_II_Assert(
+        std::abs(Dv.Z()) < tolerance,
+        ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
     return DX;
   }
 

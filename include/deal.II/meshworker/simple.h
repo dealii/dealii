@@ -633,7 +633,7 @@ namespace MeshWorker
     inline void
     MatrixSimple<MatrixType>::initialize_info(DOFINFO &info, bool face) const
     {
-      Assert(matrix.size() != 0, ExcNotInitialized());
+      DEAL_II_Assert(matrix.size() != 0, ExcNotInitialized());
 
       const unsigned int n = info.indices_by_block.size();
 
@@ -668,8 +668,8 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2)
     {
-      AssertDimension(M.m(), i1.size());
-      AssertDimension(M.n(), i2.size());
+      DEAL_II_AssertDimension(M.m(), i1.size());
+      DEAL_II_AssertDimension(M.n(), i2.size());
 
       if (constraints == nullptr)
         {
@@ -688,7 +688,8 @@ namespace MeshWorker
     inline void
     MatrixSimple<MatrixType>::assemble(const DOFINFO &info)
     {
-      Assert(!info.level_cell, ExcMessage("Cell may not access level dofs"));
+      DEAL_II_Assert(!info.level_cell,
+                     ExcMessage("Cell may not access level dofs"));
       const unsigned int n = info.indices_by_block.size();
 
       if (n == 0)
@@ -716,10 +717,12 @@ namespace MeshWorker
     MatrixSimple<MatrixType>::assemble(const DOFINFO &info1,
                                        const DOFINFO &info2)
     {
-      Assert(!info1.level_cell, ExcMessage("Cell may not access level dofs"));
-      Assert(!info2.level_cell, ExcMessage("Cell may not access level dofs"));
-      AssertDimension(info1.indices_by_block.size(),
-                      info2.indices_by_block.size());
+      DEAL_II_Assert(!info1.level_cell,
+                     ExcMessage("Cell may not access level dofs"));
+      DEAL_II_Assert(!info2.level_cell,
+                     ExcMessage("Cell may not access level dofs"));
+      DEAL_II_AssertDimension(info1.indices_by_block.size(),
+                              info2.indices_by_block.size());
 
       const unsigned int n = info1.indices_by_block.size();
 
@@ -856,9 +859,9 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2)
     {
-      AssertDimension(M.m(), i1.size());
-      AssertDimension(M.n(), i2.size());
-      Assert(mg_constrained_dofs == 0, ExcInternalError());
+      DEAL_II_AssertDimension(M.m(), i1.size());
+      DEAL_II_AssertDimension(M.n(), i2.size());
+      DEAL_II_Assert(mg_constrained_dofs == 0, ExcInternalError());
       // TODO: Possibly remove this function all together
 
       for (unsigned int j = 0; j < i1.size(); ++j)
@@ -877,8 +880,8 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
     {
-      AssertDimension(M.m(), i1.size());
-      AssertDimension(M.n(), i2.size());
+      DEAL_II_AssertDimension(M.m(), i1.size());
+      DEAL_II_AssertDimension(M.n(), i2.size());
 
       if (mg_constrained_dofs == nullptr)
         {
@@ -930,8 +933,8 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
     {
-      AssertDimension(M.n(), i1.size());
-      AssertDimension(M.m(), i2.size());
+      DEAL_II_AssertDimension(M.n(), i1.size());
+      DEAL_II_AssertDimension(M.m(), i2.size());
 
       if (mg_constrained_dofs == nullptr)
         {
@@ -959,8 +962,8 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
     {
-      AssertDimension(M.m(), i1.size());
-      AssertDimension(M.n(), i2.size());
+      DEAL_II_AssertDimension(M.m(), i1.size());
+      DEAL_II_AssertDimension(M.n(), i2.size());
 
       if (mg_constrained_dofs == nullptr)
         {
@@ -988,9 +991,9 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
     {
-      AssertDimension(M.m(), i1.size());
-      AssertDimension(M.n(), i2.size());
-      Assert(mg_constrained_dofs != nullptr, ExcInternalError());
+      DEAL_II_AssertDimension(M.m(), i1.size());
+      DEAL_II_AssertDimension(M.n(), i2.size());
+      DEAL_II_Assert(mg_constrained_dofs != nullptr, ExcInternalError());
 
       for (unsigned int j = 0; j < i1.size(); ++j)
         for (unsigned int k = 0; k < i2.size(); ++k)
@@ -1028,9 +1031,9 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
     {
-      AssertDimension(M.n(), i1.size());
-      AssertDimension(M.m(), i2.size());
-      Assert(mg_constrained_dofs != nullptr, ExcInternalError());
+      DEAL_II_AssertDimension(M.n(), i1.size());
+      DEAL_II_AssertDimension(M.m(), i2.size());
+      DEAL_II_Assert(mg_constrained_dofs != nullptr, ExcInternalError());
 
       for (unsigned int j = 0; j < i1.size(); ++j)
         for (unsigned int k = 0; k < i2.size(); ++k)
@@ -1053,7 +1056,8 @@ namespace MeshWorker
     inline void
     MGMatrixSimple<MatrixType>::assemble(const DOFINFO &info)
     {
-      Assert(info.level_cell, ExcMessage("Cell must access level dofs"));
+      DEAL_II_Assert(info.level_cell,
+                     ExcMessage("Cell must access level dofs"));
       const unsigned int level = info.cell->level();
 
       if (info.indices_by_block.size() == 0)
@@ -1112,8 +1116,10 @@ namespace MeshWorker
     MGMatrixSimple<MatrixType>::assemble(const DOFINFO &info1,
                                          const DOFINFO &info2)
     {
-      Assert(info1.level_cell, ExcMessage("Cell must access level dofs"));
-      Assert(info2.level_cell, ExcMessage("Cell must access level dofs"));
+      DEAL_II_Assert(info1.level_cell,
+                     ExcMessage("Cell must access level dofs"));
+      DEAL_II_Assert(info2.level_cell,
+                     ExcMessage("Cell must access level dofs"));
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
 
@@ -1144,7 +1150,7 @@ namespace MeshWorker
             }
           else
             {
-              Assert(level1 > level2, ExcInternalError());
+              DEAL_II_Assert(level1 > level2, ExcInternalError());
               // Do not add info2.M1,
               // which is done by
               // the coarser cell
@@ -1199,7 +1205,7 @@ namespace MeshWorker
               }
             else
               {
-                Assert(level1 > level2, ExcInternalError());
+                DEAL_II_Assert(level1 > level2, ExcInternalError());
                 // Do not add info2.M1,
                 // which is done by
                 // the coarser cell
@@ -1273,8 +1279,8 @@ namespace MeshWorker
       const unsigned int                          index,
       const std::vector<types::global_dof_index> &indices)
     {
-      AssertDimension(M.m(), indices.size());
-      AssertDimension(M.n(), indices.size());
+      DEAL_II_AssertDimension(M.m(), indices.size());
+      DEAL_II_AssertDimension(M.n(), indices.size());
 
       AnyData     residuals = ResidualSimple<VectorType>::residuals;
       VectorType *v         = residuals.entry<VectorType *>(index);
@@ -1312,8 +1318,8 @@ namespace MeshWorker
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2)
     {
-      AssertDimension(M.m(), i1.size());
-      AssertDimension(M.n(), i2.size());
+      DEAL_II_AssertDimension(M.m(), i1.size());
+      DEAL_II_AssertDimension(M.n(), i2.size());
 
       AnyData     residuals = ResidualSimple<VectorType>::residuals;
       VectorType *v         = residuals.entry<VectorType *>(index);
@@ -1342,9 +1348,10 @@ namespace MeshWorker
     inline void
     SystemSimple<MatrixType, VectorType>::assemble(const DOFINFO &info)
     {
-      AssertDimension(MatrixSimple<MatrixType>::matrix.size(),
-                      ResidualSimple<VectorType>::residuals.size());
-      Assert(!info.level_cell, ExcMessage("Cell may not access level dofs"));
+      DEAL_II_AssertDimension(MatrixSimple<MatrixType>::matrix.size(),
+                              ResidualSimple<VectorType>::residuals.size());
+      DEAL_II_Assert(!info.level_cell,
+                     ExcMessage("Cell may not access level dofs"));
       const unsigned int n = info.indices_by_block.size();
 
       if (n == 0)
@@ -1388,10 +1395,12 @@ namespace MeshWorker
     SystemSimple<MatrixType, VectorType>::assemble(const DOFINFO &info1,
                                                    const DOFINFO &info2)
     {
-      Assert(!info1.level_cell, ExcMessage("Cell may not access level dofs"));
-      Assert(!info2.level_cell, ExcMessage("Cell may not access level dofs"));
-      AssertDimension(info1.indices_by_block.size(),
-                      info2.indices_by_block.size());
+      DEAL_II_Assert(!info1.level_cell,
+                     ExcMessage("Cell may not access level dofs"));
+      DEAL_II_Assert(!info2.level_cell,
+                     ExcMessage("Cell may not access level dofs"));
+      DEAL_II_AssertDimension(info1.indices_by_block.size(),
+                              info2.indices_by_block.size());
 
       const unsigned int n = info1.indices_by_block.size();
 

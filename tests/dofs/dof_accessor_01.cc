@@ -60,8 +60,8 @@ test()
     dof_handler.begin_active()->face(0);
   face = cell->face(0);
   deallog << cell->face(0) << ' ' << face << std::endl;
-  Assert(cell->face(0) == face, ExcInternalError());
-  Assert(!(cell->face(0) != face), ExcInternalError());
+  DEAL_II_Assert(cell->face(0) == face, ExcInternalError());
+  DEAL_II_Assert(!(cell->face(0) != face), ExcInternalError());
 }
 
 

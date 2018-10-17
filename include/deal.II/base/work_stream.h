@@ -329,7 +329,8 @@ namespace WorkStream
           for (unsigned int element = 0; element < item_buffer.size();
                ++element)
             {
-              Assert(item_buffer[element].n_items == 0, ExcInternalError());
+              DEAL_II_Assert(item_buffer[element].n_items == 0,
+                             ExcInternalError());
 
               item_buffer[element].work_items.resize(
                 chunk_size, remaining_iterator_range.second);
@@ -370,8 +371,9 @@ namespace WorkStream
                 current_item                    = &item_buffer[i];
                 break;
               }
-          Assert(current_item != nullptr,
-                 ExcMessage("This can't be. There must be a free item!"));
+          DEAL_II_Assert(current_item != nullptr,
+                         ExcMessage(
+                           "This can't be. There must be a free item!"));
 
           // initialize the next item. it may
           // consist of at most chunk_size
@@ -574,7 +576,8 @@ namespace WorkStream
                  ++p)
               if (p->scratch_data.get() == scratch_data)
                 {
-                  Assert(p->currently_in_use == true, ExcInternalError());
+                  DEAL_II_Assert(p->currently_in_use == true,
+                                 ExcInternalError());
                   p->currently_in_use = false;
                 }
           }
@@ -802,7 +805,7 @@ namespace WorkStream
             // used
             if (scratch_data == nullptr)
               {
-                Assert(copy_data == nullptr, ExcInternalError());
+                DEAL_II_Assert(copy_data == nullptr, ExcInternalError());
                 scratch_data = new ScratchData(sample_scratch_data);
                 copy_data    = new CopyData(sample_copy_data);
 
@@ -847,7 +850,8 @@ namespace WorkStream
                  ++p)
               if (p->scratch_data.get() == scratch_data)
                 {
-                  Assert(p->currently_in_use == true, ExcInternalError());
+                  DEAL_II_Assert(p->currently_in_use == true,
+                                 ExcInternalError());
                   p->currently_in_use = false;
                 }
           }
@@ -990,11 +994,13 @@ namespace WorkStream
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
       const unsigned int chunk_size   = 8)
   {
-    Assert(queue_length > 0,
-           ExcMessage("The queue length must be at least one, and preferably "
-                      "larger than the number of processors on this system."));
+    DEAL_II_Assert(queue_length > 0,
+                   ExcMessage(
+                     "The queue length must be at least one, and preferably "
+                     "larger than the number of processors on this system."));
     (void)queue_length; // removes -Wunused-parameter warning in optimized mode
-    Assert(chunk_size > 0, ExcMessage("The chunk_size must be at least one."));
+    DEAL_II_Assert(chunk_size > 0,
+                   ExcMessage("The chunk_size must be at least one."));
     (void)chunk_size; // removes -Wunused-parameter warning in optimized mode
 
     // if no work then skip. (only use operator!= for iterators since we may
@@ -1104,11 +1110,13 @@ namespace WorkStream
       const unsigned int                        queue_length,
       const unsigned int                        chunk_size)
   {
-    Assert(queue_length > 0,
-           ExcMessage("The queue length must be at least one, and preferably "
-                      "larger than the number of processors on this system."));
+    DEAL_II_Assert(queue_length > 0,
+                   ExcMessage(
+                     "The queue length must be at least one, and preferably "
+                     "larger than the number of processors on this system."));
     (void)queue_length; // removes -Wunused-parameter warning in optimized mode
-    Assert(chunk_size > 0, ExcMessage("The chunk_size must be at least one."));
+    DEAL_II_Assert(chunk_size > 0,
+                   ExcMessage("The chunk_size must be at least one."));
     (void)chunk_size; // removes -Wunused-parameter warning in optimized mode
 
     // we want to use TBB if we have support and if it is not disabled at

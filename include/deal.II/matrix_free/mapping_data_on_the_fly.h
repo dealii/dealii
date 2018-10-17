@@ -185,8 +185,8 @@ namespace internal
           mapping_info_storage.normals_times_jacobians[0].resize(
             fe_values.n_quadrature_points);
         }
-      Assert(!(fe_values.get_update_flags() & update_jacobian_grads),
-             ExcNotImplemented());
+      DEAL_II_Assert(!(fe_values.get_update_flags() & update_jacobian_grads),
+                     ExcNotImplemented());
     }
 
 

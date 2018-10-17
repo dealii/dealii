@@ -123,8 +123,8 @@ inline void
 BoundaryFunction<dim>::vector_value(const Point<dim> &,
                                     Vector<double> &values) const
 {
-  Assert(values.size() == dim + 1,
-         ExcDimensionMismatch(values.size(), dim + 1));
+  DEAL_II_Assert(values.size() == dim + 1,
+                 ExcDimensionMismatch(values.size(), dim + 1));
 
   values      = 0;
   values(dim) = 1.;
@@ -237,9 +237,9 @@ ImposeBC<dim>::test_interpolate_BC()
       // nedelec boundary DoF i has
       // wrongly been set to some
       // value
-      AssertThrow((p_boundary_dofs[i] && boundary_values[i] == 1.) ||
-                    (!(p_boundary_dofs[i]) && boundary_values[i] != 1.),
-                  ExcInternalError());
+      DEAL_II_AssertThrow((p_boundary_dofs[i] && boundary_values[i] == 1.) ||
+                            (!(p_boundary_dofs[i]) && boundary_values[i] != 1.),
+                          ExcInternalError());
 
       deallog << boundary_values[i] << ' ';
     }

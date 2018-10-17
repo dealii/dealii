@@ -1066,12 +1066,12 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcEmptyMatrix);
+  DEAL_II_DeclException0(ExcEmptyMatrix);
 
   /**
    * Exception
    */
-  DeclException1(
+  DEAL_II_DeclException1(
     ExcNotRegular,
     number,
     << "The maximal pivot is " << arg1
@@ -1079,24 +1079,25 @@ public:
   /**
    * Exception
    */
-  DeclException3(ExcInvalidDestination,
-                 size_type,
-                 size_type,
-                 size_type,
-                 << "Target region not in matrix: size in this direction="
-                 << arg1 << ", size of new matrix=" << arg2
-                 << ", offset=" << arg3);
+  DEAL_II_DeclException3(
+    ExcInvalidDestination,
+    size_type,
+    size_type,
+    size_type,
+    << "Target region not in matrix: size in this direction=" << arg1
+    << ", size of new matrix=" << arg2 << ", offset=" << arg3);
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcSourceEqualsDestination,
-                   "You are attempting an operation on two matrices that "
-                   "are the same object, but the operation requires that the "
-                   "two objects are in fact different.");
+  DEAL_II_DeclExceptionMsg(
+    ExcSourceEqualsDestination,
+    "You are attempting an operation on two matrices that "
+    "are the same object, but the operation requires that the "
+    "two objects are in fact different.");
   /**
    * Exception
    */
-  DeclException0(ExcMatrixNotPositiveDefinite);
+  DEAL_II_DeclException0(ExcMatrixNotPositiveDefinite);
   //@}
 };
 
@@ -1129,7 +1130,7 @@ template <typename number>
 FullMatrix<number> &
 FullMatrix<number>::operator=(const number d)
 {
-  Assert(d == number(0), ExcScalarAssignmentOnlyForZeroValue());
+  DEAL_II_Assert(d == number(0), ExcScalarAssignmentOnlyForZeroValue());
   (void)d; // removes -Wunused-parameter warning in optimized mode
 
   if (this->n_elements() != 0)
@@ -1202,8 +1203,8 @@ FullMatrix<number>::extract_submatrix_from(
   const std::vector<index_type> &row_index_set,
   const std::vector<index_type> &column_index_set)
 {
-  AssertDimension(row_index_set.size(), this->n_rows());
-  AssertDimension(column_index_set.size(), this->n_cols());
+  DEAL_II_AssertDimension(row_index_set.size(), this->n_rows());
+  DEAL_II_AssertDimension(column_index_set.size(), this->n_cols());
 
   const size_type n_rows_submatrix = row_index_set.size();
   const size_type n_cols_submatrix = column_index_set.size();
@@ -1224,8 +1225,8 @@ FullMatrix<number>::scatter_matrix_to(
   const std::vector<index_type> &column_index_set,
   MatrixType &                   matrix) const
 {
-  AssertDimension(row_index_set.size(), this->n_rows());
-  AssertDimension(column_index_set.size(), this->n_cols());
+  DEAL_II_AssertDimension(row_index_set.size(), this->n_rows());
+  DEAL_II_AssertDimension(column_index_set.size(), this->n_cols());
 
   const size_type n_rows_submatrix = row_index_set.size();
   const size_type n_cols_submatrix = column_index_set.size();
@@ -1274,7 +1275,7 @@ template <typename number>
 inline typename FullMatrix<number>::iterator
 FullMatrix<number>::begin(const size_type r)
 {
-  AssertIndexRange(r, m());
+  DEAL_II_AssertIndexRange(r, m());
   return iterator(this, r, 0);
 }
 
@@ -1284,7 +1285,7 @@ template <typename number>
 inline typename FullMatrix<number>::iterator
 FullMatrix<number>::end(const size_type r)
 {
-  AssertIndexRange(r, m());
+  DEAL_II_AssertIndexRange(r, m());
   return iterator(this, r + 1, 0);
 }
 
@@ -1294,7 +1295,7 @@ template <typename number>
 inline typename FullMatrix<number>::const_iterator
 FullMatrix<number>::begin(const size_type r) const
 {
-  AssertIndexRange(r, m());
+  DEAL_II_AssertIndexRange(r, m());
   return const_iterator(this, r, 0);
 }
 
@@ -1304,7 +1305,7 @@ template <typename number>
 inline typename FullMatrix<number>::const_iterator
 FullMatrix<number>::end(const size_type r) const
 {
-  AssertIndexRange(r, m());
+  DEAL_II_AssertIndexRange(r, m());
   return const_iterator(this, r + 1, 0);
 }
 
@@ -1314,8 +1315,8 @@ template <typename number>
 inline void
 FullMatrix<number>::add(const size_type r, const size_type c, const number v)
 {
-  AssertIndexRange(r, this->m());
-  AssertIndexRange(c, this->n());
+  DEAL_II_AssertIndexRange(r, this->m());
+  DEAL_II_AssertIndexRange(c, this->n());
 
   this->operator()(r, c) += v;
 }
@@ -1332,10 +1333,10 @@ FullMatrix<number>::add(const size_type   row,
                         const bool,
                         const bool)
 {
-  AssertIndexRange(row, this->m());
+  DEAL_II_AssertIndexRange(row, this->m());
   for (size_type col = 0; col < n_cols; ++col)
     {
-      AssertIndexRange(col_indices[col], this->n());
+      DEAL_II_AssertIndexRange(col_indices[col], this->n());
       this->operator()(row, col_indices[col]) += values[col];
     }
 }
@@ -1348,7 +1349,7 @@ FullMatrix<number>::print(StreamType &       s,
                           const unsigned int w,
                           const unsigned int p) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   // save the state of out stream
   const std::streamsize old_precision = s.precision(p);

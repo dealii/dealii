@@ -509,18 +509,18 @@ public:
    * Each diagonal block must contain one and only one matrix. If this
    * exception is thrown, you did not enter a matrix here.
    */
-  DeclException1(ExcNoDiagonal,
-                 size_type,
-                 << "No diagonal entry was added for block " << arg1);
+  DEAL_II_DeclException1(ExcNoDiagonal,
+                         size_type,
+                         << "No diagonal entry was added for block " << arg1);
 
   /**
    * Each diagonal block must contain one and only one matrix. If this
    * exception is thrown, you entered a second matrix here.
    */
-  DeclException1(ExcMultipleDiagonal,
-                 size_type,
-                 << "Inverse diagonal entries may not be added in block "
-                 << arg1);
+  DEAL_II_DeclException1(
+    ExcMultipleDiagonal,
+    size_type,
+    << "Inverse diagonal entries may not be added in block " << arg1);
   //@}
 private:
   /**
@@ -568,8 +568,8 @@ BlockMatrixArray<number, BlockVectorType>::enter(const MatrixType &matrix,
                                                  number            prefix,
                                                  bool              transpose)
 {
-  Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
-  Assert(col < n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
+  DEAL_II_Assert(row < n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
+  DEAL_II_Assert(col < n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
   entries.push_back(Entry(matrix, row, col, prefix, transpose));
 }
 

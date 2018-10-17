@@ -606,8 +606,9 @@ public:
   /**
    * Exception.
    */
-  DeclExceptionMsg(ExcInvalidPosition,
-                   "You cannot insert a time step at the specified position.");
+  DEAL_II_DeclExceptionMsg(
+    ExcInvalidPosition,
+    "You cannot insert a time step at the specified position.");
 
 protected:
   /**
@@ -1239,11 +1240,11 @@ namespace TimeStepBase_Tria_Flags
     /**
      * Exception
      */
-    DeclException1(ExcInvalidValue,
-                   double,
-                   << "The value " << arg1
-                   << " for the cell number corridor does not fulfill "
-                      "its natural requirements.");
+    DEAL_II_DeclException1(ExcInvalidValue,
+                           double,
+                           << "The value " << arg1
+                           << " for the cell number corridor does not fulfill "
+                              "its natural requirements.");
   };
 
 
@@ -1280,11 +1281,12 @@ namespace TimeStepBase_Tria_Flags
     /**
      * Exception
      */
-    DeclException1(ExcInvalidValue,
-                   double,
-                   << "The value " << arg1
-                   << " for the cell refinement thresholds does not fulfill "
-                      "its natural requirements.");
+    DEAL_II_DeclException1(
+      ExcInvalidValue,
+      double,
+      << "The value " << arg1
+      << " for the cell refinement thresholds does not fulfill "
+         "its natural requirements.");
   };
 } // namespace TimeStepBase_Tria_Flags
 
@@ -1465,9 +1467,10 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcGridNotDeleted,
-                   "When calling restore_grid(), you must have previously "
-                   "deleted the triangulation.");
+  DEAL_II_DeclExceptionMsg(
+    ExcGridNotDeleted,
+    "When calling restore_grid(), you must have previously "
+    "deleted the triangulation.");
 
 protected:
   /**

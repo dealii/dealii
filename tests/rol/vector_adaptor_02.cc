@@ -53,7 +53,7 @@ public:
   Real
   value(const ROL::Vector<Real> &x, Real & /*tol*/)
   {
-    Assert(x.dimension() == 2, ExcInternalError());
+    DEAL_II_Assert(x.dimension() == 2, ExcInternalError());
 
     return x.dot(x);
   }

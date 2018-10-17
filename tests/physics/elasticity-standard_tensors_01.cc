@@ -68,36 +68,40 @@ test_standard_tensors()
       t[i][j] = dim * i + j + 1.0;
 
   // Check second-order identity tensor I:
-  AssertThrow(std::fabs(StandardTensors<dim>::I * t - trace(t)) < 1e-14,
-              ExcInternalError());
-  AssertThrow(std::fabs(t * StandardTensors<dim>::I - trace(t)) < 1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(StandardTensors<dim>::I * t - trace(t)) < 1e-14,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(t * StandardTensors<dim>::I - trace(t)) < 1e-14,
+                      ExcInternalError());
 
   // Check fourth-order identity tensor II:
-  AssertThrow(std::fabs((StandardTensors<dim>::S * t - t).norm()) < 1e-14,
-              ExcInternalError());
-  AssertThrow(std::fabs((t * StandardTensors<dim>::S - t).norm()) < 1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs((StandardTensors<dim>::S * t - t).norm()) <
+                        1e-14,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs((t * StandardTensors<dim>::S - t).norm()) <
+                        1e-14,
+                      ExcInternalError());
 
   // Check fourth-order tensor IxI:
-  AssertThrow(std::fabs((StandardTensors<dim>::IxI * t -
-                         trace(t) * unit_symmetric_tensor<dim>())
-                          .norm()) < 1e-14,
-              ExcInternalError());
-  AssertThrow(std::fabs((t * StandardTensors<dim>::IxI -
-                         trace(t) * unit_symmetric_tensor<dim>())
-                          .norm()) < 1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs((StandardTensors<dim>::IxI * t -
+                                 trace(t) * unit_symmetric_tensor<dim>())
+                                  .norm()) < 1e-14,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs((t * StandardTensors<dim>::IxI -
+                                 trace(t) * unit_symmetric_tensor<dim>())
+                                  .norm()) < 1e-14,
+                      ExcInternalError());
 
   // Check spatial deviatoric tensor dev_P:
-  AssertThrow(std::fabs((StandardTensors<dim>::dev_P * t -
+  DEAL_II_AssertThrow(std::fabs(
+                        (StandardTensors<dim>::dev_P * t -
                          (t - (trace(t) / dim) * unit_symmetric_tensor<dim>()))
                           .norm()) < 1e-14,
-              ExcInternalError());
-  AssertThrow(std::fabs((t * StandardTensors<dim>::dev_P -
+                      ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(
+                        (t * StandardTensors<dim>::dev_P -
                          (t - (trace(t) / dim) * unit_symmetric_tensor<dim>()))
                           .norm()) < 1e-14,
-              ExcInternalError());
+                      ExcInternalError());
 
   // Check referential deviatoric tensor Dev_P:
   Tensor<2, dim> F(unit_symmetric_tensor<dim>());
@@ -119,18 +123,20 @@ test_standard_tensors()
   //       relationship s*Dev_P == dev_P*t. For this we would need S
   //       = 2.dW/dC|_{C=\bar{C}} and t = F.S.F^{T} and \bar{C} =
   //       det(F)^{-2/dim} F^{T}.F .
-  AssertThrow(std::fabs((symmetrize(std::pow(determinant(F), 2.0 / dim) * F *
+  DEAL_II_AssertThrow(std::fabs(
+                        (symmetrize(std::pow(determinant(F), 2.0 / dim) * F *
                                     static_cast<Tensor<2, dim>>(s_x_Dev_P) *
                                     transpose(F)) -
                          StandardTensors<dim>::dev_P * t)
                           .norm()) < 1e-14,
-              ExcInternalError());
-  AssertThrow(std::fabs((symmetrize(std::pow(determinant(F), 2.0 / dim) * F *
+                      ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(
+                        (symmetrize(std::pow(determinant(F), 2.0 / dim) * F *
                                     static_cast<Tensor<2, dim>>(Dev_P_T_x_s) *
                                     transpose(F)) -
                          StandardTensors<dim>::dev_P * t)
                           .norm()) < 1e-14,
-              ExcInternalError());
+                      ExcInternalError());
 
   // Repeat the above exercise for a "real" material response
   const Tensor<2, dim> F_bar = std::pow(determinant(F), -1.0 / dim) * F;
@@ -138,15 +144,16 @@ test_standard_tensors()
   const SymmetricTensor<2, dim> tau_bar =
     symmetrize(F_bar * static_cast<Tensor<2, dim>>(S_bar) *
                transpose(F_bar)); // Note: tau_bar = tau(F) |_{F = F_bar}
-  AssertThrow(std::fabs((tau_bar - get_tau(F_bar)).norm()) < 1e-9,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs((tau_bar - get_tau(F_bar)).norm()) < 1e-9,
+                      ExcInternalError());
   const SymmetricTensor<2, dim> S_iso = S_bar * StandardTensors<dim>::Dev_P(F);
   const SymmetricTensor<2, dim> tau_iso = StandardTensors<dim>::dev_P * tau_bar;
-  AssertThrow(std::fabs((symmetrize(F * static_cast<Tensor<2, dim>>(S_iso) *
+  DEAL_II_AssertThrow(std::fabs(
+                        (symmetrize(F * static_cast<Tensor<2, dim>>(S_iso) *
                                     transpose(F)) -
                          tau_iso)
                           .norm()) < 1e-9,
-              ExcInternalError());
+                      ExcInternalError());
 }
 
 int

@@ -63,10 +63,10 @@
 
 
 typedef parallel::distributed::Triangulation<2, 3>::cell_iterator cell_iterator;
-DeclException1(ExcMissingCell,
-               cell_iterator,
-               << "Trying to find cell " << arg1
-               << " but it doesn't appear to be in the list");
+DEAL_II_DeclException1(ExcMissingCell,
+                       cell_iterator,
+                       << "Trying to find cell " << arg1
+                       << " but it doesn't appear to be in the list");
 
 int
 main(int argc, char *argv[])
@@ -108,7 +108,7 @@ main(int argc, char *argv[])
          triangulation.begin(0);
        cell != triangulation.end(0);
        ++cell)
-    AssertThrow(cells.find(cell) != cells.end(), ExcMissingCell(cell));
+    DEAL_II_AssertThrow(cells.find(cell) != cells.end(), ExcMissingCell(cell));
 
   // refine triangulation and verify that every coarse mesh cell is in there
   triangulation.refine_global(2);
@@ -119,5 +119,5 @@ main(int argc, char *argv[])
          triangulation.begin(0);
        cell != triangulation.end(0);
        ++cell)
-    AssertThrow(cells.find(cell) != cells.end(), ExcMissingCell(cell));
+    DEAL_II_AssertThrow(cells.find(cell) != cells.end(), ExcMissingCell(cell));
 }

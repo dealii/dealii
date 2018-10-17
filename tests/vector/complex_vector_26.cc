@@ -35,8 +35,8 @@ test(Vector<std::complex<double>> &v)
 
   const unsigned int sz = v.size();
   v                     = 2;
-  AssertThrow(v.size() == sz, ExcInternalError());
-  AssertThrow(v.l2_norm() == std::sqrt(4. * sz), ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == sz, ExcInternalError());
+  DEAL_II_AssertThrow(v.l2_norm() == std::sqrt(4. * sz), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

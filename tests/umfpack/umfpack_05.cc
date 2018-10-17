@@ -57,7 +57,7 @@ test()
   umfpackb.solve(ubb);
 
   for (unsigned int i = 0; i < 4; ++i)
-    AssertThrow(std::fabs(ubb(i) - i) < 1e-12, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(ubb(i) - i) < 1e-12, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

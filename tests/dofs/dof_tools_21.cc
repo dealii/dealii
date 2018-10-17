@@ -80,7 +80,7 @@ check_this(const DoFHandler<dim> &dof_handler)
 
   const double p_l2_error = constrained.l2_norm();
 
-  Assert(p_l2_error < 1e-11, ExcInternalError());
+  DEAL_II_Assert(p_l2_error < 1e-11, ExcInternalError());
 
   deallog << "L2_Error : " << p_l2_error << std::endl;
 }

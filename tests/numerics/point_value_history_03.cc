@@ -99,14 +99,14 @@ Postprocess<dim>::evaluate_scalar_field(
   const DataPostprocessorInputs::Scalar<dim> &inputs,
   std::vector<Vector<double>> &               computed_quantities) const
 {
-  Assert(computed_quantities.size() == inputs.solution_values.size(),
-         ExcDimensionMismatch(computed_quantities.size(),
-                              inputs.solution_values.size()));
+  DEAL_II_Assert(computed_quantities.size() == inputs.solution_values.size(),
+                 ExcDimensionMismatch(computed_quantities.size(),
+                                      inputs.solution_values.size()));
 
   for (unsigned int i = 0; i < computed_quantities.size(); i++)
     {
-      Assert(computed_quantities[i].size() == 2,
-             ExcDimensionMismatch(computed_quantities[i].size(), 2));
+      DEAL_II_Assert(computed_quantities[i].size() == 2,
+                     ExcDimensionMismatch(computed_quantities[i].size(), 2));
 
       computed_quantities[i](0) =
         inputs.solution_gradients[i][0]; // norm of x gradient
@@ -351,7 +351,7 @@ TestPointValueHistory<dim>::run()
       deallog << "Copying output file " << filenames[i] << std::endl;
 
       std::ifstream in(filenames[i].c_str());
-      AssertThrow(in, ExcIO());
+      DEAL_II_AssertThrow(in, ExcIO());
 
       std::string s;
       while (in)

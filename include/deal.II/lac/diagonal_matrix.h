@@ -301,7 +301,7 @@ typename VectorType::value_type
 DiagonalMatrix<VectorType>::operator()(const size_type i,
                                        const size_type j) const
 {
-  Assert(i == j, ExcIndexRange(j, i, i + 1));
+  DEAL_II_Assert(i == j, ExcIndexRange(j, i, i + 1));
   (void)j;
   return diagonal(i);
 }
@@ -312,7 +312,7 @@ template <typename VectorType>
 typename VectorType::value_type &
 DiagonalMatrix<VectorType>::operator()(const size_type i, const size_type j)
 {
-  Assert(i == j, ExcIndexRange(j, i, i + 1));
+  DEAL_II_Assert(i == j, ExcIndexRange(j, i, i + 1));
   (void)j;
   return diagonal(i);
 }

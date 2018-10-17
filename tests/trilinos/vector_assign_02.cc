@@ -44,7 +44,7 @@ test(TrilinosWrappers::MPI::Vector &v, TrilinosWrappers::MPI::Vector &w)
     w(i) += v(i);
 
   // check that they're equal
-  AssertThrow(v == w, ExcInternalError());
+  DEAL_II_AssertThrow(v == w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

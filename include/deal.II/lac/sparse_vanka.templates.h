@@ -54,9 +54,9 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
   , _m(M.m())
   , _n(M.n())
 {
-  Assert(M.m() == M.n(), ExcNotQuadratic());
-  Assert(M.m() == selected->size(),
-         ExcDimensionMismatch(M.m(), selected->size()));
+  DEAL_II_Assert(M.m() == M.n(), ExcNotQuadratic());
+  DEAL_II_Assert(M.m() == selected->size(),
+                 ExcDimensionMismatch(M.m(), selected->size()));
 
   if (conserve_mem == false)
     compute_inverses();
@@ -91,9 +91,9 @@ SparseVanka<number>::initialize(const SparseMatrix<number> &M,
   _m = M.m();
   _n = M.n();
 
-  Assert(M.m() == M.n(), ExcNotQuadratic());
-  Assert(M.m() == selected->size(),
-         ExcDimensionMismatch(M.m(), selected->size()));
+  DEAL_II_Assert(M.m() == M.n(), ExcNotQuadratic());
+  DEAL_II_Assert(M.m() == selected->size(),
+                 ExcDimensionMismatch(M.m(), selected->size()));
 
   if (conserve_mem == false)
     compute_inverses();
@@ -103,8 +103,8 @@ template <typename number>
 void
 SparseVanka<number>::compute_inverses()
 {
-  Assert(matrix != nullptr, ExcNotInitialized());
-  Assert(selected != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(matrix != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(selected != nullptr, ExcNotInitialized());
 
 #ifndef DEAL_II_WITH_THREADS
   compute_inverses(0, matrix->m());
@@ -192,8 +192,8 @@ void
 SparseVanka<number>::compute_inverse(const size_type         row,
                                      std::vector<size_type> &local_indices)
 {
-  Assert(matrix != nullptr, ExcNotInitialized());
-  Assert(selected != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(matrix != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(selected != nullptr, ExcNotInitialized());
 
   // first define an alias to the sparsity
   // pattern of the matrix, since this
@@ -224,8 +224,8 @@ void
 SparseVanka<number>::vmult(Vector<number2> &      dst,
                            const Vector<number2> &src) const
 {
-  Assert(matrix != nullptr, ExcNotInitialized());
-  Assert(selected != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(matrix != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(selected != nullptr, ExcNotInitialized());
 
   // first set output vector to zero
   dst = 0;
@@ -243,10 +243,10 @@ SparseVanka<number>::apply_preconditioner(
   const Vector<number2> &        src,
   const std::vector<bool> *const dof_mask) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
-  Assert(dst.size() == matrix->m(),
-         ExcDimensionMismatch(dst.size(), src.size()));
+  DEAL_II_Assert(dst.size() == src.size(),
+                 ExcDimensionMismatch(dst.size(), src.size()));
+  DEAL_II_Assert(dst.size() == matrix->m(),
+                 ExcDimensionMismatch(dst.size(), src.size()));
 
   // first define an alias to the sparsity
   // pattern of the matrix, since this
@@ -449,7 +449,7 @@ SparseBlockVanka<number>::compute_dof_masks(
   const std::vector<bool> &   selected,
   const BlockingStrategy      blocking_strategy)
 {
-  Assert(n_blocks > 0, ExcInternalError());
+  DEAL_II_Assert(n_blocks > 0, ExcInternalError());
 
   const size_type n_inverses =
     std::count(selected.begin(), selected.end(), true);
@@ -544,7 +544,7 @@ SparseBlockVanka<number>::compute_dof_masks(
                 unsigned int block_number = 0;
                 while (row >= intervals[block_number].second)
                   ++block_number;
-                Assert(block_number < n_blocks, ExcInternalError());
+                DEAL_II_Assert(block_number < n_blocks, ExcInternalError());
 
                 // now traverse the
                 // matrix structure to
@@ -598,7 +598,7 @@ SparseBlockVanka<number>::compute_dof_masks(
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 }
 

@@ -136,7 +136,7 @@ namespace GridGenerator
                 // is on the boundary,
                 // but we could not find
                 // on which boundary.
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             }
 
       for (typename Triangulation<dim, spacedim>::cell_iterator cell =
@@ -172,7 +172,7 @@ namespace GridGenerator
            cell != tria.end();
            ++cell)
         {
-          Assert(cell->face(2)->at_boundary(), ExcInternalError());
+          DEAL_II_Assert(cell->face(2)->at_boundary(), ExcInternalError());
           cell->face(2)->set_all_boundary_ids(1);
         }
     }
@@ -195,27 +195,27 @@ namespace GridGenerator
         {
           Triangulation<3>::cell_iterator cell = tria.begin();
 
-          Assert(cell->face(4)->at_boundary(), ExcInternalError());
+          DEAL_II_Assert(cell->face(4)->at_boundary(), ExcInternalError());
           cell->face(4)->set_all_boundary_ids(1);
 
           ++cell;
-          Assert(cell->face(2)->at_boundary(), ExcInternalError());
+          DEAL_II_Assert(cell->face(2)->at_boundary(), ExcInternalError());
           cell->face(2)->set_all_boundary_ids(1);
 
           ++cell;
-          Assert(cell->face(2)->at_boundary(), ExcInternalError());
+          DEAL_II_Assert(cell->face(2)->at_boundary(), ExcInternalError());
           cell->face(2)->set_all_boundary_ids(1);
 
           ++cell;
-          Assert(cell->face(0)->at_boundary(), ExcInternalError());
+          DEAL_II_Assert(cell->face(0)->at_boundary(), ExcInternalError());
           cell->face(0)->set_all_boundary_ids(1);
 
           ++cell;
-          Assert(cell->face(2)->at_boundary(), ExcInternalError());
+          DEAL_II_Assert(cell->face(2)->at_boundary(), ExcInternalError());
           cell->face(2)->set_all_boundary_ids(1);
 
           ++cell;
-          Assert(cell->face(0)->at_boundary(), ExcInternalError());
+          DEAL_II_Assert(cell->face(0)->at_boundary(), ExcInternalError());
           cell->face(0)->set_all_boundary_ids(1);
         }
       else if (tria.n_cells() == 12)
@@ -226,7 +226,7 @@ namespace GridGenerator
                cell != tria.end();
                ++cell)
             {
-              Assert(cell->face(5)->at_boundary(), ExcInternalError());
+              DEAL_II_Assert(cell->face(5)->at_boundary(), ExcInternalError());
               cell->face(5)->set_all_boundary_ids(1);
             }
         }
@@ -252,10 +252,10 @@ namespace GridGenerator
                 cell->face(5)->set_all_boundary_ids(1);
                 ++count;
               }
-          Assert(count == 48, ExcInternalError());
+          DEAL_II_Assert(count == 48, ExcInternalError());
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -271,7 +271,7 @@ namespace GridGenerator
                                       const double      outer_radius)
     {
       if (tria.n_cells() != 3)
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
 
       double middle = (outer_radius - inner_radius) / 2e0 + inner_radius;
       double eps    = 1e-3 * middle;
@@ -343,7 +343,7 @@ namespace GridGenerator
                       cell->face(f)->line(j)->set_boundary_id(1);
               }
             else
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
           }
     }
 
@@ -397,7 +397,7 @@ namespace GridGenerator
 
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // Prepare cell data
@@ -421,8 +421,8 @@ namespace GridGenerator
              const double                  right,
              const bool                    colorize)
   {
-    Assert(left < right,
-           ExcMessage("Invalid left-to-right bounds of hypercube"));
+    DEAL_II_Assert(left < right,
+                   ExcMessage("Invalid left-to-right bounds of hypercube"));
 
     Point<dim> p1, p2;
     for (unsigned int i = 0; i < dim; ++i)
@@ -437,17 +437,18 @@ namespace GridGenerator
   void
   simplex(Triangulation<dim> &tria, const std::vector<Point<dim>> &vertices)
   {
-    AssertDimension(vertices.size(), dim + 1);
-    Assert(dim > 1, ExcNotImplemented());
-    Assert(dim < 4, ExcNotImplemented());
+    DEAL_II_AssertDimension(vertices.size(), dim + 1);
+    DEAL_II_Assert(dim > 1, ExcNotImplemented());
+    DEAL_II_Assert(dim < 4, ExcNotImplemented());
 
 #ifdef DEBUG
     Tensor<2, dim> vector_matrix;
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int c = 1; c <= dim; ++c)
         vector_matrix[c - 1][d] = vertices[c](d) - vertices[0](d);
-    Assert(determinant(vector_matrix) > 0.,
-           ExcMessage("Vertices of simplex must form a right handed system"));
+    DEAL_II_Assert(determinant(vector_matrix) > 0.,
+                   ExcMessage(
+                     "Vertices of simplex must form a right handed system"));
 #endif
 
     // Set up the vertices by first copying into points.
@@ -477,7 +478,7 @@ namespace GridGenerator
     switch (dim)
       {
         case 2:
-          AssertDimension(points.size(), 7);
+          DEAL_II_AssertDimension(points.size(), 7);
           cells[0].vertices[0] = 0;
           cells[0].vertices[1] = 3;
           cells[0].vertices[2] = 5;
@@ -497,7 +498,7 @@ namespace GridGenerator
           cells[2].material_id = 0;
           break;
         case 3:
-          AssertDimension(points.size(), 15);
+          DEAL_II_AssertDimension(points.size(), 15);
           cells[0].vertices[0] = 0;
           cells[0].vertices[1] = 4;
           cells[0].vertices[2] = 8;
@@ -539,7 +540,7 @@ namespace GridGenerator
           cells[3].material_id = 0;
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     tria.create_triangulation(points, cells, SubCellData());
   }
@@ -552,13 +553,13 @@ namespace GridGenerator
                const double       r)
   {
     const unsigned int dim = 3;
-    Assert(n_cells > 4,
-           ExcMessage(
-             "More than 4 cells are needed to create a moebius grid."));
-    Assert(r > 0 && R > 0,
-           ExcMessage("Outer and inner radius must be positive."));
-    Assert(R > r,
-           ExcMessage("Outer radius must be greater than inner radius."));
+    DEAL_II_Assert(n_cells > 4,
+                   ExcMessage(
+                     "More than 4 cells are needed to create a moebius grid."));
+    DEAL_II_Assert(r > 0 && R > 0,
+                   ExcMessage("Outer and inner radius must be positive."));
+    DEAL_II_Assert(
+      R > r, ExcMessage("Outer radius must be greater than inner radius."));
 
 
     std::vector<Point<dim>> vertices(4 * n_cells);
@@ -611,10 +612,10 @@ namespace GridGenerator
   template <>
   void torus<2, 3>(Triangulation<2, 3> &tria, const double R, const double r)
   {
-    Assert(R > r,
-           ExcMessage("Outer radius R must be greater than the inner "
-                      "radius r."));
-    Assert(r > 0.0, ExcMessage("The inner radius r must be positive."));
+    DEAL_II_Assert(R > r,
+                   ExcMessage("Outer radius R must be greater than the inner "
+                              "radius r."));
+    DEAL_II_Assert(r > 0.0, ExcMessage("The inner radius r must be positive."));
 
     const unsigned int           dim      = 2;
     const unsigned int           spacedim = 3;
@@ -748,10 +749,10 @@ namespace GridGenerator
   template <>
   void torus<3, 3>(Triangulation<3, 3> &tria, const double R, const double r)
   {
-    Assert(R > r,
-           ExcMessage("Outer radius R must be greater than the inner "
-                      "radius r."));
-    Assert(r > 0.0, ExcMessage("The inner radius r must be positive."));
+    DEAL_II_Assert(R > r,
+                   ExcMessage("Outer radius R must be greater than the inner "
+                              "radius r."));
+    DEAL_II_Assert(r > 0.0, ExcMessage("The inner radius r must be positive."));
 
     // abuse the moebius function to generate a torus for us
     GridGenerator::moebius(tria, 6 /*n_cells*/, 0 /*n_rotations*/, R, r);
@@ -775,8 +776,9 @@ namespace GridGenerator
                const std::vector<Point<dim>> &vertices,
                const bool                     colorize)
   {
-    Assert(vertices.size() == dealii::GeometryInfo<dim>::vertices_per_cell,
-           ExcMessage("Wrong number of vertices."));
+    DEAL_II_Assert(vertices.size() ==
+                     dealii::GeometryInfo<dim>::vertices_per_cell,
+                   ExcMessage("Wrong number of vertices."));
 
     // First create a hyper_rectangle and then deform it.
     hyper_cube(tria, 0, 1, colorize);
@@ -788,10 +790,10 @@ namespace GridGenerator
 
     // Check that the order of the vertices makes sense, i.e., the volume of the
     // cell is positive.
-    Assert(GridTools::volume(tria) > 0.,
-           ExcMessage(
-             "The volume of the cell is not greater than zero. "
-             "This could be due to the wrong ordering of the vertices."));
+    DEAL_II_Assert(
+      GridTools::volume(tria) > 0.,
+      ExcMessage("The volume of the cell is not greater than zero. "
+                 "This could be due to the wrong ordering of the vertices."));
   }
 
 
@@ -801,7 +803,7 @@ namespace GridGenerator
                      const Point<3> (&/*corners*/)[3],
                      const bool /*colorize*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
   template <>
@@ -809,7 +811,7 @@ namespace GridGenerator
                      const Point<1> (&/*corners*/)[1],
                      const bool /*colorize*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
   // Implementation for 2D only
@@ -906,14 +908,15 @@ namespace GridGenerator
         compute_subdivisions.resize(dim, 1);
       }
 
-    Assert(compute_subdivisions.size() == dim,
-           ExcMessage("One subdivision must be provided for each dimension."));
+    DEAL_II_Assert(compute_subdivisions.size() == dim,
+                   ExcMessage(
+                     "One subdivision must be provided for each dimension."));
     // check subdivisions
     for (unsigned int i = 0; i < dim; ++i)
       {
-        Assert(compute_subdivisions[i] > 0,
-               ExcInvalidRepetitions(subdivisions[i]));
-        Assert(
+        DEAL_II_Assert(compute_subdivisions[i] > 0,
+                       ExcInvalidRepetitions(subdivisions[i]));
+        DEAL_II_Assert(
           edges[i].norm() > 0,
           ExcMessage(
             "Edges in subdivided_parallelepiped() must not be degenerate."));
@@ -946,12 +949,12 @@ namespace GridGenerator
           {
             // Check that the first two vectors are not linear combinations to
             // avoid zero division later on.
-            Assert(std::abs(edges[0] * edges[1] /
-                              (edges[0].norm() * edges[1].norm()) -
-                            1.0) > 1.0e-15,
-                   ExcMessage(
-                     "Edges in subdivided_parallelepiped() must point in"
-                     " different directions."));
+            DEAL_II_Assert(
+              std::abs(edges[0] * edges[1] /
+                         (edges[0].norm() * edges[1].norm()) -
+                       1.0) > 1.0e-15,
+              ExcMessage("Edges in subdivided_parallelepiped() must point in"
+                         " different directions."));
             const Tensor<1, spacedim> plane_normal =
               cross_product_3d(edges[0], edges[1]);
 
@@ -971,10 +974,10 @@ namespace GridGenerator
             break;
           }
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
       }
     (void)twisted_data; // make the static analyzer happy
-    Assert(
+    DEAL_II_Assert(
       !twisted_data,
       ExcInvalidInputOrientation(
         "The triangulation you are trying to create will consist of cells"
@@ -991,9 +994,10 @@ namespace GridGenerator
     // Check corners do not overlap (unique)
     for (unsigned int i = 0; i < dim; ++i)
       for (unsigned int j = i + 1; j < dim; ++j)
-        Assert((edges[i] != edges[j]),
-               ExcMessage(
-                 "Degenerate edges of subdivided_parallelepiped encountered."));
+        DEAL_II_Assert(
+          (edges[i] != edges[j]),
+          ExcMessage(
+            "Degenerate edges of subdivided_parallelepiped encountered."));
 
     // Create a list of points
     std::vector<Point<spacedim>> points;
@@ -1023,7 +1027,7 @@ namespace GridGenerator
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // Prepare cell data
@@ -1104,7 +1108,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // Create triangulation
@@ -1140,9 +1144,9 @@ namespace GridGenerator
                         const double                  left,
                         const double                  right)
   {
-    Assert(repetitions >= 1, ExcInvalidRepetitions(repetitions));
-    Assert(left < right,
-           ExcMessage("Invalid left-to-right bounds of hypercube"));
+    DEAL_II_Assert(repetitions >= 1, ExcInvalidRepetitions(repetitions));
+    DEAL_II_Assert(left < right,
+                   ExcMessage("Invalid left-to-right bounds of hypercube"));
 
     Point<dim> p0, p1;
     for (unsigned int i = 0; i < dim; ++i)
@@ -1165,7 +1169,8 @@ namespace GridGenerator
                              const Point<dim> &               p_2,
                              const bool                       colorize)
   {
-    Assert(repetitions.size() == dim, ExcInvalidRepetitionsDimension(dim));
+    DEAL_II_Assert(repetitions.size() == dim,
+                   ExcInvalidRepetitionsDimension(dim));
 
     // First, extend dimensions from dim to spacedim and
     // normalize such that p1 is lower in all coordinate
@@ -1181,10 +1186,11 @@ namespace GridGenerator
     std::vector<Point<spacedim>> delta(dim);
     for (unsigned int i = 0; i < dim; ++i)
       {
-        Assert(repetitions[i] >= 1, ExcInvalidRepetitions(repetitions[i]));
+        DEAL_II_Assert(repetitions[i] >= 1,
+                       ExcInvalidRepetitions(repetitions[i]));
 
         delta[i][i] = (p2[i] - p1[i]) / repetitions[i];
-        Assert(
+        DEAL_II_Assert(
           delta[i][i] > 0.0,
           ExcMessage(
             "The first dim entries of coordinates of p1 and p2 need to be different."));
@@ -1215,7 +1221,7 @@ namespace GridGenerator
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // next create the cells
@@ -1278,7 +1284,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     tria.create_triangulation(points, cells, SubCellData());
@@ -1296,9 +1302,9 @@ namespace GridGenerator
         double epsilon = 10;
         for (unsigned int i = 0; i < dim; ++i)
           epsilon = std::min(epsilon, 0.01 * delta[i][i]);
-        Assert(epsilon > 0,
-               ExcMessage(
-                 "The distance between corner points must be positive."))
+        DEAL_II_Assert(
+          epsilon > 0,
+          ExcMessage("The distance between corner points must be positive."))
 
           // actual code is external since
           // 1-D is different from 2/3D.
@@ -1316,7 +1322,7 @@ namespace GridGenerator
                              const Point<dim> &                      p_2,
                              const bool                              colorize)
   {
-    Assert(step_sz.size() == dim, ExcInvalidRepetitionsDimension(dim));
+    DEAL_II_Assert(step_sz.size() == dim, ExcInvalidRepetitionsDimension(dim));
 
     // First, normalize input such that
     // p1 is lower in all coordinate
@@ -1339,12 +1345,12 @@ namespace GridGenerator
         double x = 0;
         for (unsigned int j = 0; j < step_sizes.at(i).size(); j++)
           x += step_sizes[i][j];
-        Assert(std::fabs(x - (p2(i) - p1(i))) <= 1e-12 * std::fabs(x),
-               ExcMessage(
-                 "The sequence of step sizes in coordinate direction " +
-                 Utilities::int_to_string(i) +
-                 " must be equal to the distance of the two given "
-                 "points in this coordinate direction."));
+        DEAL_II_Assert(std::fabs(x - (p2(i) - p1(i))) <= 1e-12 * std::fabs(x),
+                       ExcMessage(
+                         "The sequence of step sizes in coordinate direction " +
+                         Utilities::int_to_string(i) +
+                         " must be equal to the distance of the two given "
+                         "points in this coordinate direction."));
       }
 
 
@@ -1429,7 +1435,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // next create the cells
@@ -1497,7 +1503,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     tria.create_triangulation(points, cells, SubCellData());
@@ -1536,16 +1542,17 @@ namespace GridGenerator
                                const Table<1, types::material_id> &material_id,
                                const bool                          colorize)
   {
-    Assert(spacing.size() == 1, ExcInvalidRepetitionsDimension(1));
+    DEAL_II_Assert(spacing.size() == 1, ExcInvalidRepetitionsDimension(1));
 
     const unsigned int n_cells = material_id.size(0);
 
-    Assert(spacing[0].size() == n_cells, ExcInvalidRepetitionsDimension(1));
+    DEAL_II_Assert(spacing[0].size() == n_cells,
+                   ExcInvalidRepetitionsDimension(1));
 
     double delta = std::numeric_limits<double>::max();
     for (unsigned int i = 0; i < n_cells; i++)
       {
-        Assert(spacing[0][i] >= 0, ExcInvalidRepetitions(-1));
+        DEAL_II_Assert(spacing[0][i] >= 0, ExcInvalidRepetitions(-1));
         delta = std::min(delta, spacing[0][i]);
       }
 
@@ -1582,7 +1589,7 @@ namespace GridGenerator
 
     // set boundary indicator
     if (colorize)
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -1594,7 +1601,7 @@ namespace GridGenerator
                                const Table<2, types::material_id> &material_id,
                                const bool                          colorize)
   {
-    Assert(spacing.size() == 2, ExcInvalidRepetitionsDimension(2));
+    DEAL_II_Assert(spacing.size() == 2, ExcInvalidRepetitionsDimension(2));
 
     std::vector<unsigned int> repetitions(2);
     unsigned int              n_cells = 1;
@@ -1605,11 +1612,11 @@ namespace GridGenerator
         n_cells *= repetitions[i];
         for (unsigned int j = 0; j < repetitions[i]; j++)
           {
-            Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
+            DEAL_II_Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
             delta = std::min(delta, spacing[i][j]);
           }
-        Assert(material_id.size(i) == repetitions[i],
-               ExcInvalidRepetitionsDimension(i));
+        DEAL_II_Assert(material_id.size(i) == repetitions[i],
+                       ExcInvalidRepetitionsDimension(i));
       }
 
     // generate the necessary points
@@ -1690,7 +1697,7 @@ namespace GridGenerator
   {
     const unsigned int dim = 3;
 
-    Assert(spacing.size() == dim, ExcInvalidRepetitionsDimension(dim));
+    DEAL_II_Assert(spacing.size() == dim, ExcInvalidRepetitionsDimension(dim));
 
     std::vector<unsigned int> repetitions(dim);
     unsigned int              n_cells = 1;
@@ -1701,11 +1708,11 @@ namespace GridGenerator
         n_cells *= repetitions[i];
         for (unsigned int j = 0; j < repetitions[i]; j++)
           {
-            Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
+            DEAL_II_Assert(spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
             delta = std::min(delta, spacing[i][j]);
           }
-        Assert(material_id.size(i) == repetitions[i],
-               ExcInvalidRepetitionsDimension(i));
+        DEAL_II_Assert(material_id.size(i) == repetitions[i],
+                       ExcInvalidRepetitionsDimension(i));
       }
 
     // generate the necessary points
@@ -1795,7 +1802,7 @@ namespace GridGenerator
   cheese(Triangulation<dim, spacedim> &   tria,
          const std::vector<unsigned int> &holes)
   {
-    AssertDimension(holes.size(), dim);
+    DEAL_II_AssertDimension(holes.size(), dim);
     // The corner points of the first cell. If there is a desire at
     // some point to change the geometry of the cells, they can be
     // made an argument to the function.
@@ -1813,8 +1820,9 @@ namespace GridGenerator
     unsigned int                 repetitions[dim];
     for (unsigned int i = 0; i < dim; ++i)
       {
-        Assert(holes[i] >= 1,
-               ExcMessage("At least one hole needed in each direction"));
+        DEAL_II_Assert(holes[i] >= 1,
+                       ExcMessage(
+                         "At least one hole needed in each direction"));
         repetitions[i] = 2 * holes[i] + 1;
         delta[i][i]    = (p2[i] - p1[i]);
       }
@@ -1845,7 +1853,7 @@ namespace GridGenerator
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // next create the cells
@@ -1862,7 +1870,7 @@ namespace GridGenerator
                 {
                   if ((x % 2 == 1) && (y % 2 == 1))
                     continue;
-                  Assert(c < cells.size(), ExcInternalError());
+                  DEAL_II_Assert(c < cells.size(), ExcInternalError());
                   cells[c].vertices[0] = y * (repetitions[0] + 1) + x;
                   cells[c].vertices[1] = y * (repetitions[0] + 1) + x + 1;
                   cells[c].vertices[2] = (y + 1) * (repetitions[0] + 1) + x;
@@ -1886,7 +1894,7 @@ namespace GridGenerator
               for (unsigned int y = 0; y < repetitions[1]; ++y)
                 for (unsigned int x = 0; x < repetitions[0]; ++x)
                   {
-                    Assert(c < cells.size(), ExcInternalError());
+                    DEAL_II_Assert(c < cells.size(), ExcInternalError());
                     cells[c].vertices[0] = z * n_xy + y * n_x + x;
                     cells[c].vertices[1] = z * n_xy + y * n_x + x + 1;
                     cells[c].vertices[2] = z * n_xy + (y + 1) * n_x + x;
@@ -1903,7 +1911,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     tria.create_triangulation(points, cells, SubCellData());
@@ -1926,7 +1934,7 @@ namespace GridGenerator
                          const unsigned int /*n_slices*/,
                          const bool /*colorize*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -1938,7 +1946,7 @@ namespace GridGenerator
                              const double /*skewness*/,
                              const bool /*colorize*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -1988,12 +1996,13 @@ namespace GridGenerator
                          const unsigned int /*n_slices*/,
                          const bool colorize)
   {
-    Assert((pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0),
-           ExcMessage("At least one padding parameter has to be non-zero."));
-    Assert(pad_bottom >= 0., ExcMessage("Negative bottom padding."));
-    Assert(pad_top >= 0., ExcMessage("Negative top padding."));
-    Assert(pad_left >= 0., ExcMessage("Negative left padding."));
-    Assert(pad_right >= 0., ExcMessage("Negative right padding."));
+    DEAL_II_Assert(
+      (pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0),
+      ExcMessage("At least one padding parameter has to be non-zero."));
+    DEAL_II_Assert(pad_bottom >= 0., ExcMessage("Negative bottom padding."));
+    DEAL_II_Assert(pad_top >= 0., ExcMessage("Negative top padding."));
+    DEAL_II_Assert(pad_left >= 0., ExcMessage("Negative left padding."));
+    DEAL_II_Assert(pad_right >= 0., ExcMessage("Negative right padding."));
 
     const Point<2> center;
 
@@ -2133,8 +2142,8 @@ namespace GridGenerator
                 // cylinder boundary
                 else
                   {
-                    Assert(cell->manifold_id() == tfi_manifold_id,
-                           ExcInternalError());
+                    DEAL_II_Assert(cell->manifold_id() == tfi_manifold_id,
+                                   ExcInternalError());
                     face->set_boundary_id(4);
                   }
               }
@@ -2207,9 +2216,10 @@ namespace GridGenerator
                              const double       skewness,
                              const bool         colorize)
   {
-    Assert(0.0 <= shell_region_width && shell_region_width < 0.05,
-           ExcMessage("The width of the shell region must be less than 0.05 "
-                      "(and preferably close to 0.03)"));
+    DEAL_II_Assert(0.0 <= shell_region_width && shell_region_width < 0.05,
+                   ExcMessage(
+                     "The width of the shell region must be less than 0.05 "
+                     "(and preferably close to 0.03)"));
     const types::manifold_id polar_manifold_id = 0;
     const types::manifold_id tfi_manifold_id   = 1;
 
@@ -2301,9 +2311,9 @@ namespace GridGenerator
       }
     if (0.0 < shell_region_width)
       {
-        Assert(0 < n_shells,
-               ExcMessage("If the shell region has positive width then "
-                          "there must be at least one shell."));
+        DEAL_II_Assert(0 < n_shells,
+                       ExcMessage("If the shell region has positive width then "
+                                  "there must be at least one shell."));
         Triangulation<2> shell_tria;
         GridGenerator::concentric_hyper_shells(shell_tria,
                                                Point<2>(),
@@ -2398,9 +2408,9 @@ namespace GridGenerator
             // sides of channel
             else
               {
-                Assert(std::abs(center[1] - 0.00) < 1.0e-10 ||
-                         std::abs(center[1] - 0.41) < 1.0e-10,
-                       ExcInternalError());
+                DEAL_II_Assert(std::abs(center[1] - 0.00) < 1.0e-10 ||
+                                 std::abs(center[1] - 0.41) < 1.0e-10,
+                               ExcInternalError());
                 face->set_boundary_id(3);
               }
           }
@@ -2426,7 +2436,7 @@ namespace GridGenerator
     const PolarManifold<2> *const m_ptr =
       dynamic_cast<const PolarManifold<2> *>(
         &tria_2.get_manifold(cylindrical_manifold_id));
-    Assert(m_ptr != nullptr, ExcInternalError());
+    DEAL_II_Assert(m_ptr != nullptr, ExcInternalError());
     const Point<3>     axial_point(m_ptr->center[0], m_ptr->center[1], 0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
@@ -2453,9 +2463,9 @@ namespace GridGenerator
               const std::vector<unsigned int> &sizes,
               const bool                       colorize)
   {
-    AssertDimension(sizes.size(), GeometryInfo<dim>::faces_per_cell);
-    Assert(dim > 1, ExcNotImplemented());
-    Assert(dim < 4, ExcNotImplemented());
+    DEAL_II_AssertDimension(sizes.size(), GeometryInfo<dim>::faces_per_cell);
+    DEAL_II_Assert(dim > 1, ExcNotImplemented());
+    DEAL_II_Assert(dim < 4, ExcNotImplemented());
 
     // If there is a desire at some point to change the geometry of
     // the cells, this tensor can be made an argument to the function.
@@ -2526,7 +2536,7 @@ namespace GridGenerator
   void
     hyper_cube_slit(Triangulation<1> &, const double, const double, const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -2538,7 +2548,7 @@ namespace GridGenerator
                            const double,
                            const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -2546,7 +2556,7 @@ namespace GridGenerator
   template <>
   void hyper_L(Triangulation<1> &, const double, const double, const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -2555,7 +2565,7 @@ namespace GridGenerator
   void
     hyper_ball(Triangulation<1> &, const Point<1> &, const double, const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -2563,7 +2573,7 @@ namespace GridGenerator
   template <>
   void cylinder(Triangulation<1> &, const double, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -2572,7 +2582,7 @@ namespace GridGenerator
   void
     truncated_cone(Triangulation<1> &, const double, const double, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -2585,7 +2595,7 @@ namespace GridGenerator
                    const unsigned int,
                    const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -2597,21 +2607,21 @@ namespace GridGenerator
                       const unsigned int,
                       const unsigned int)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
   template <>
   void quarter_hyper_ball(Triangulation<1> &, const Point<1> &, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
   template <>
   void half_hyper_ball(Triangulation<1> &, const Point<1> &, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -2623,7 +2633,7 @@ namespace GridGenerator
                         const unsigned int,
                         const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
   template <>
@@ -2634,7 +2644,7 @@ namespace GridGenerator
                            const unsigned int,
                            const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
   template <>
@@ -2644,8 +2654,9 @@ namespace GridGenerator
                            const double      thickness,
                            const bool        colorize)
   {
-    Assert(left < right,
-           ExcMessage("Invalid left-to-right bounds of enclosed hypercube"));
+    DEAL_II_Assert(left < right,
+                   ExcMessage(
+                     "Invalid left-to-right bounds of enclosed hypercube"));
 
     std::vector<Point<2>> vertices(16);
     double                coords[4];
@@ -2871,8 +2882,8 @@ namespace GridGenerator
                    const unsigned int n_cells,
                    const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
-           ExcInvalidRadii());
+    DEAL_II_Assert((inner_radius > 0) && (inner_radius < outer_radius),
+                   ExcInvalidRadii());
 
     const double pi = numbers::PI;
 
@@ -2973,7 +2984,7 @@ namespace GridGenerator
                       const unsigned int,
                       const unsigned int)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -3115,8 +3126,8 @@ namespace GridGenerator
                         const unsigned int n_cells,
                         const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
-           ExcInvalidRadii());
+    DEAL_II_Assert((inner_radius > 0) && (inner_radius < outer_radius),
+                   ExcInvalidRadii());
 
     const double pi = numbers::PI;
     // determine the number of cells
@@ -3198,8 +3209,8 @@ namespace GridGenerator
                            const unsigned int n_cells,
                            const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
-           ExcInvalidRadii());
+    DEAL_II_Assert((inner_radius > 0) && (inner_radius < outer_radius),
+                   ExcInvalidRadii());
 
     const double pi = numbers::PI;
     // determine the number of cells
@@ -3329,8 +3340,9 @@ namespace GridGenerator
                            const double      thickness,
                            const bool        colorize)
   {
-    Assert(left < right,
-           ExcMessage("Invalid left-to-right bounds of enclosed hypercube"));
+    DEAL_II_Assert(left < right,
+                   ExcMessage(
+                     "Invalid left-to-right bounds of enclosed hypercube"));
 
     std::vector<Point<3>> vertices(64);
     double                coords[4];
@@ -3526,7 +3538,7 @@ namespace GridGenerator
 
     if (colorize)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 
@@ -3945,8 +3957,8 @@ namespace GridGenerator
                    const unsigned int n_cells,
                    const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
-           ExcInvalidRadii());
+    DEAL_II_Assert((inner_radius > 0) && (inner_radius < outer_radius),
+                   ExcInvalidRadii());
 
     const unsigned int n = (n_cells == 0) ? 6 : n_cells;
 
@@ -4054,7 +4066,8 @@ namespace GridGenerator
       }
     else
       {
-        Assert(false, ExcMessage("Invalid number of coarse mesh cells."));
+        DEAL_II_Assert(false,
+                       ExcMessage("Invalid number of coarse mesh cells."));
       }
 
     if (colorize)
@@ -4074,8 +4087,8 @@ namespace GridGenerator
                         const unsigned int n,
                         const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
-           ExcInvalidRadii());
+    DEAL_II_Assert((inner_radius > 0) && (inner_radius < outer_radius),
+                   ExcInvalidRadii());
 
     if (n <= 5)
       {
@@ -4131,7 +4144,7 @@ namespace GridGenerator
       }
     else
       {
-        Assert(false, ExcIndexRange(n, 0, 5));
+        DEAL_II_Assert(false, ExcIndexRange(n, 0, 5));
       }
     if (colorize)
       {
@@ -4180,8 +4193,8 @@ namespace GridGenerator
                            const unsigned int n,
                            const bool         colorize)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
-           ExcInvalidRadii());
+    DEAL_II_Assert((inner_radius > 0) && (inner_radius < outer_radius),
+                   ExcInvalidRadii());
     if (n == 0 || n == 3)
       {
         const double a = inner_radius * std::sqrt(2.0) / 2e0;
@@ -4228,7 +4241,7 @@ namespace GridGenerator
       }
     else
       {
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
 
     if (colorize)
@@ -4248,8 +4261,8 @@ namespace GridGenerator
                       const unsigned int n_radial_cells,
                       const unsigned int n_axial_cells)
   {
-    Assert((inner_radius > 0) && (inner_radius < outer_radius),
-           ExcInvalidRadii());
+    DEAL_II_Assert((inner_radius > 0) && (inner_radius < outer_radius),
+                   ExcInvalidRadii());
 
     const double pi = numbers::PI;
 
@@ -4337,9 +4350,9 @@ namespace GridGenerator
     for (const auto triangulation : triangulations)
       {
         (void)triangulation;
-        Assert(triangulation->n_levels() == 1,
-               ExcMessage("The input triangulations must be non-empty "
-                          "and must not be refined."));
+        DEAL_II_Assert(triangulation->n_levels() == 1,
+                       ExcMessage("The input triangulations must be non-empty "
+                                  "and must not be refined."));
       }
 
     // get the union of the set of vertices
@@ -4501,7 +4514,7 @@ namespace GridGenerator
                 break;
               }
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
 
@@ -4556,18 +4569,18 @@ namespace GridGenerator
     const Triangulation<dim, spacedim> &triangulation_2,
     Triangulation<dim, spacedim> &      result)
   {
-    Assert(GridTools::have_same_coarse_mesh(triangulation_1, triangulation_2),
-           ExcMessage("The two input triangulations are not derived from "
-                      "the same coarse mesh as required."));
-    Assert((dynamic_cast<
-              const parallel::distributed::Triangulation<dim, spacedim> *>(
-              &triangulation_1) == nullptr) &&
-             (dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> *>(
-                &triangulation_2) == nullptr),
-           ExcMessage("The source triangulations for this function must both "
-                      "be available entirely locally, and not be distributed "
-                      "triangulations."));
+    DEAL_II_Assert(
+      GridTools::have_same_coarse_mesh(triangulation_1, triangulation_2),
+      ExcMessage("The two input triangulations are not derived from "
+                 "the same coarse mesh as required."));
+    DEAL_II_Assert(
+      (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                      *>(&triangulation_1) == nullptr) &&
+        (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                        *>(&triangulation_2) == nullptr),
+      ExcMessage("The source triangulations for this function must both "
+                 "be available entirely locally, and not be distributed "
+                 "triangulations."));
 
     // first copy triangulation_1, and
     // then do as many iterations as
@@ -4631,13 +4644,13 @@ namespace GridGenerator
          ++cell)
       if (cells_to_remove.find(cell) == cells_to_remove.end())
         {
-          Assert(static_cast<unsigned int>(cell->level()) ==
-                   input_triangulation.n_levels() - 1,
-                 ExcMessage(
-                   "Your input triangulation appears to have "
-                   "adaptively refined cells. This is not allowed. You can "
-                   "only call this function on a triangulation in which "
-                   "all cells are on the same refinement level."));
+          DEAL_II_Assert(
+            static_cast<unsigned int>(cell->level()) ==
+              input_triangulation.n_levels() - 1,
+            ExcMessage("Your input triangulation appears to have "
+                       "adaptively refined cells. This is not allowed. You can "
+                       "only call this function on a triangulation in which "
+                       "all cells are on the same refinement level."));
 
           CellData<dim> this_cell;
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
@@ -4672,17 +4685,19 @@ namespace GridGenerator
     const bool                             copy_manifold_ids,
     const std::vector<types::manifold_id> &manifold_priorities)
   {
-    Assert(input.n_levels() == 1,
-           ExcMessage(
-             "The input triangulation must be a coarse mesh, i.e., it must "
-             "not have been refined."));
-    Assert(result.n_cells() == 0,
-           ExcMessage("The output triangulation object needs to be empty."));
-    Assert(height > 0,
-           ExcMessage("The given height for extrusion must be positive."));
-    Assert(n_slices >= 2,
-           ExcMessage(
-             "The number of slices for extrusion must be at least 2."));
+    DEAL_II_Assert(
+      input.n_levels() == 1,
+      ExcMessage("The input triangulation must be a coarse mesh, i.e., it must "
+                 "not have been refined."));
+    DEAL_II_Assert(result.n_cells() == 0,
+                   ExcMessage(
+                     "The output triangulation object needs to be empty."));
+    DEAL_II_Assert(height > 0,
+                   ExcMessage(
+                     "The given height for extrusion must be positive."));
+    DEAL_II_Assert(n_slices >= 2,
+                   ExcMessage(
+                     "The number of slices for extrusion must be at least 2."));
 
     const double        delta_h = height / (n_slices - 1);
     std::vector<double> slices_z_values;
@@ -4702,17 +4717,19 @@ namespace GridGenerator
     const bool                             copy_manifold_ids,
     const std::vector<types::manifold_id> &manifold_priorities)
   {
-    Assert(input.n_levels() == 1,
-           ExcMessage(
-             "The input triangulation must be a coarse mesh, i.e., it must "
-             "not have been refined."));
-    Assert(result.n_cells() == 0,
-           ExcMessage("The output triangulation object needs to be empty."));
-    Assert(slice_coordinates.size() >= 2,
-           ExcMessage(
-             "The number of slices for extrusion must be at least 2."));
-    Assert(std::is_sorted(slice_coordinates.begin(), slice_coordinates.end()),
-           ExcMessage("Slice z-coordinates should be in ascending order"));
+    DEAL_II_Assert(
+      input.n_levels() == 1,
+      ExcMessage("The input triangulation must be a coarse mesh, i.e., it must "
+                 "not have been refined."));
+    DEAL_II_Assert(result.n_cells() == 0,
+                   ExcMessage(
+                     "The output triangulation object needs to be empty."));
+    DEAL_II_Assert(slice_coordinates.size() >= 2,
+                   ExcMessage(
+                     "The number of slices for extrusion must be at least 2."));
+    DEAL_II_Assert(
+      std::is_sorted(slice_coordinates.begin(), slice_coordinates.end()),
+      ExcMessage("Slice z-coordinates should be in ascending order"));
 
     const auto priorities = [&]() -> std::vector<types::manifold_id> {
       // if a non-empty (i.e., not the default) vector is given for
@@ -4726,12 +4743,12 @@ namespace GridGenerator
             manifold_priorities;
           std::sort(sorted_manifold_priorities.begin(),
                     sorted_manifold_priorities.end());
-          Assert(std::unique(sorted_manifold_priorities.begin(),
-                             sorted_manifold_priorities.end()) ==
-                   sorted_manifold_priorities.end(),
-                 ExcMessage(
-                   "The given vector of manifold ids may not contain any "
-                   "duplicated entries."));
+          DEAL_II_Assert(
+            std::unique(sorted_manifold_priorities.begin(),
+                        sorted_manifold_priorities.end()) ==
+              sorted_manifold_priorities.end(),
+            ExcMessage("The given vector of manifold ids may not contain any "
+                       "duplicated entries."));
           std::vector<types::manifold_id> sorted_manifold_ids =
             input.get_manifold_ids();
           std::sort(sorted_manifold_ids.begin(), sorted_manifold_ids.end());
@@ -4751,7 +4768,7 @@ namespace GridGenerator
                 << manifold_priorities.back() << "}.\n"
                 << "    These vectors should contain the same elements.\n";
               const std::string m = message.str();
-              Assert(false, ExcMessage(m));
+              DEAL_II_Assert(false, ExcMessage(m));
             }
 #endif
           return manifold_priorities;
@@ -4871,15 +4888,15 @@ namespace GridGenerator
     // then mark the bottom and top boundaries of the extruded mesh
     // with max_boundary_id+1 and max_boundary_id+2. check that this
     // remains valid
-    Assert((max_boundary_id != numbers::invalid_boundary_id) &&
-             (max_boundary_id + 1 != numbers::invalid_boundary_id) &&
-             (max_boundary_id + 2 != numbers::invalid_boundary_id),
-           ExcMessage(
-             "The input triangulation to this function is using boundary "
-             "indicators in a range that do not allow using "
-             "max_boundary_id+1 and max_boundary_id+2 as boundary "
-             "indicators for the bottom and top faces of the "
-             "extruded triangulation."));
+    DEAL_II_Assert(
+      (max_boundary_id != numbers::invalid_boundary_id) &&
+        (max_boundary_id + 1 != numbers::invalid_boundary_id) &&
+        (max_boundary_id + 2 != numbers::invalid_boundary_id),
+      ExcMessage("The input triangulation to this function is using boundary "
+                 "indicators in a range that do not allow using "
+                 "max_boundary_id+1 and max_boundary_id+2 as boundary "
+                 "indicators for the bottom and top faces of the "
+                 "extruded triangulation."));
     const types::boundary_id bottom_boundary_id = max_boundary_id + 1;
     const types::boundary_id top_boundary_id    = max_boundary_id + 2;
     for (const auto &cell : input.active_cell_iterators())
@@ -4934,7 +4951,7 @@ namespace GridGenerator
                                         const unsigned int,
                                         const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -4949,8 +4966,9 @@ namespace GridGenerator
   {
     const int dim = 2;
 
-    Assert(inner_radius < outer_radius,
-           ExcMessage("outer_radius has to be bigger than inner_radius."));
+    DEAL_II_Assert(inner_radius < outer_radius,
+                   ExcMessage(
+                     "outer_radius has to be bigger than inner_radius."));
 
     Point<dim> center;
     // We create an hyper_shell in two dimensions, and then we modify it.
@@ -5051,11 +5069,12 @@ namespace GridGenerator
                           const unsigned int  n_cells,
                           const bool          colorize)
   {
-    Assert(dim == 2 || dim == 3, ExcNotImplemented());
+    DEAL_II_Assert(dim == 2 || dim == 3, ExcNotImplemented());
     (void)colorize;
     (void)n_cells;
-    Assert(inner_radius < outer_radius,
-           ExcMessage("outer_radius has to be bigger than inner_radius."));
+    DEAL_II_Assert(inner_radius < outer_radius,
+                   ExcMessage(
+                     "outer_radius has to be bigger than inner_radius."));
     if (n_shells == 0)
       return; // empty Triangulation
 
@@ -5123,9 +5142,10 @@ namespace GridGenerator
              vertex_n < GeometryInfo<dim>::vertices_per_face;
              ++vertex_n)
           {
-            Assert(std::abs((face->vertex(vertex_n) - center).norm() - radius) <
-                     (center.norm() + radius) * radial_vertex_tolerance,
-                   ExcInternalError());
+            DEAL_II_Assert(std::abs((face->vertex(vertex_n) - center).norm() -
+                                    radius) <
+                             (center.norm() + radius) * radial_vertex_tolerance,
+                           ExcInternalError());
           }
       };
     if (colorize)
@@ -5166,10 +5186,11 @@ namespace GridGenerator
   {
     const int dim = 3;
 
-    Assert(inner_radius < outer_radius,
-           ExcMessage("outer_radius has to be bigger than inner_radius."));
-    Assert(L > 0, ExcMessage("Must give positive extension L"));
-    Assert(Nz >= 1, ExcLowerRange(1, Nz));
+    DEAL_II_Assert(inner_radius < outer_radius,
+                   ExcMessage(
+                     "outer_radius has to be bigger than inner_radius."));
+    DEAL_II_Assert(L > 0, ExcMessage("Must give positive extension L"));
+    DEAL_II_Assert(Nz >= 1, ExcLowerRange(1, Nz));
 
     cylinder_shell(triangulation, L, inner_radius, outer_radius, 8, Nz);
     triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
@@ -5284,7 +5305,7 @@ namespace GridGenerator
         const parallel::distributed::Triangulation<dim, spacedim1> *>(&in_tria);
 
     (void)pt;
-    Assert(
+    DEAL_II_Assert(
       pt == nullptr,
       ExcMessage(
         "Cannot use this function on parallel::distributed::Triangulation."));
@@ -5365,7 +5386,7 @@ namespace GridGenerator
               }
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
           }
       }
     out_tria.create_triangulation(v, cells, subcelldata);
@@ -5384,10 +5405,10 @@ namespace GridGenerator
                         MeshType<dim - 1, spacedim> &       surface_mesh,
                         const std::set<types::boundary_id> &boundary_ids)
   {
-    Assert((dynamic_cast<
-              const parallel::distributed::Triangulation<dim, spacedim> *>(
-              &volume_mesh.get_triangulation()) == nullptr),
-           ExcNotImplemented());
+    DEAL_II_Assert(
+      (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                      *>(&volume_mesh.get_triangulation()) == nullptr),
+      ExcNotImplemented());
 
     // This function works using the following assumption:
     //    Triangulation::create_triangulation(...) will create cells that
@@ -5516,7 +5537,7 @@ namespace GridGenerator
         }
 
     // create level 0 surface triangulation
-    Assert(cells.size() > 0, ExcMessage("No boundary faces selected"));
+    DEAL_II_Assert(cells.size() > 0, ExcMessage("No boundary faces selected"));
     const_cast<Triangulation<dim - 1, spacedim> &>(
       surface_mesh.get_triangulation())
       .create_triangulation(vertices, cells, subcell_data);

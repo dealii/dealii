@@ -43,8 +43,8 @@ test()
     for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
         deallog << "Reference cell: " << determinants[v] << std::endl;
-        AssertThrow(static_cast<double>(determinants[v]) == 1,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(static_cast<double>(determinants[v]) == 1,
+                            ExcInternalError());
       }
   }
 
@@ -63,8 +63,8 @@ test()
     for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
         deallog << "Squashed cell: " << determinants[v] << std::endl;
-        AssertThrow(static_cast<double>(determinants[v]) == 0.1,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(static_cast<double>(determinants[v]) == 0.1,
+                            ExcInternalError());
       }
   }
 
@@ -92,8 +92,8 @@ test()
     for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
       {
         deallog << "Squashed+rotated cell: " << determinants[v] << std::endl;
-        AssertThrow(static_cast<double>(determinants[v]) == 0.1,
-                    ExcInternalError());
+        DEAL_II_AssertThrow(static_cast<double>(determinants[v]) == 0.1,
+                            ExcInternalError());
       }
   }
 

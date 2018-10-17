@@ -465,7 +465,8 @@ namespace PETScWrappers
     inline Vector &
     Vector::operator=(const dealii::Vector<number> &v)
     {
-      Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+      DEAL_II_Assert(size() == v.size(),
+                     ExcDimensionMismatch(size(), v.size()));
 
       // FIXME: the following isn't necessarily fast, but this is due to
       // the fact that PETSc doesn't offer an inlined access operator.

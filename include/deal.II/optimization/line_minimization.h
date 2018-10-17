@@ -262,7 +262,7 @@ namespace LineMinimization
    *   auto perform_linesearch = [&]()
    *   {
    *     const auto res_0 = ls_minimization_function(0.0);
-   *     Assert(res_0.second < 0.0,
+   *     DEAL_II_Assert(res_0.second < 0.0,
    *            ExcMessage("Gradient should be negative. Current value: " +
    *                        std::to_string(res_0.second)));
    *     const auto res_1 = ls_minimization_function(1.0);
@@ -361,7 +361,7 @@ namespace LineMinimization
                 const NumberType x2,
                 const NumberType f2)
   {
-    Assert(x1 != x2, ExcMessage("Point are the same"));
+    DEAL_II_Assert(x1 != x2, ExcMessage("Point are the same"));
     const NumberType denom = (2. * g1 * x2 - 2. * g1 * x1 - 2. * f2 + 2. * f1);
     if (denom == 0)
       return boost::none;
@@ -380,7 +380,7 @@ namespace LineMinimization
             const NumberType f2,
             const NumberType g2)
   {
-    Assert(x1 != x2, ExcMessage("Points are the same"));
+    DEAL_II_Assert(x1 != x2, ExcMessage("Points are the same"));
     const NumberType beta1 = g1 + g2 - 3. * (f1 - f2) / (x1 - x2);
     const NumberType s     = beta1 * beta1 - g1 * g2;
     if (s < 0)
@@ -408,8 +408,8 @@ namespace LineMinimization
                          const NumberType x3,
                          const NumberType f3)
   {
-    Assert(x1 != x2, ExcMessage("Points are the same"));
-    Assert(x1 != x3, ExcMessage("Points are the same"));
+    DEAL_II_Assert(x1 != x2, ExcMessage("Points are the same"));
+    DEAL_II_Assert(x1 != x3, ExcMessage("Points are the same"));
     // f(x) = A *(x-x1)^3 + B*(x-x1)^2 + C*(x-x1) + D
     // =>
     // D = f1
@@ -455,7 +455,8 @@ namespace LineMinimization
            const FiniteSizeHistory<NumberType> &,
            const std::pair<NumberType, NumberType> bounds)
   {
-    Assert(bounds.first < bounds.second, ExcMessage("Incorrect bounds"));
+    DEAL_II_Assert(bounds.first < bounds.second,
+                   ExcMessage("Incorrect bounds"));
 
     // Similar to scipy implementation but we fit based on two points
     // with their gradients and do bisection on bounds.
@@ -491,8 +492,9 @@ namespace LineMinimization
                         const FiniteSizeHistory<NumberType> & /*g_rec*/,
                         const std::pair<NumberType, NumberType> bounds)
   {
-    Assert(bounds.first < bounds.second, ExcMessage("Incorrect bounds"));
-    AssertDimension(x_rec.size(), f_rec.size());
+    DEAL_II_Assert(bounds.first < bounds.second,
+                   ExcMessage("Incorrect bounds"));
+    DEAL_II_AssertDimension(x_rec.size(), f_rec.size());
 
     // Same as scipy implementation where cubic fit is using 3 points
     // https://github.com/scipy/scipy/blob/v1.0.0/scipy/optimize/linesearch.py#L555-L563
@@ -543,11 +545,11 @@ namespace LineMinimization
     const bool         debug_output)
   {
     // Note that scipy use dcsrch() from Minpack2 Fortran lib for line search
-    Assert(mu < 0.5 && mu > 0, ExcMessage("mu is not in (0,1/2)."));
-    Assert(eta < 1. && eta > mu, ExcMessage("eta is not in (mu,1)."));
-    Assert(a_max > 0, ExcMessage("max is not positive."));
-    Assert(a1 > 0 && a1 <= a_max, ExcMessage("a1 is not in (0,max]."));
-    Assert(g0 < 0, ExcMessage("Initial slope is not negative"));
+    DEAL_II_Assert(mu < 0.5 && mu > 0, ExcMessage("mu is not in (0,1/2)."));
+    DEAL_II_Assert(eta < 1. && eta > mu, ExcMessage("eta is not in (mu,1)."));
+    DEAL_II_Assert(a_max > 0, ExcMessage("max is not positive."));
+    DEAL_II_Assert(a1 > 0 && a1 <= a_max, ExcMessage("a1 is not in (0,max]."));
+    DEAL_II_Assert(g0 < 0, ExcMessage("Initial slope is not negative"));
 
     // Growth parameter for bracketing phase:
     // 1 < tau1
@@ -630,7 +632,7 @@ namespace LineMinimization
                 deallog << "Satisfied both Wolfe conditions during Bracketing."
                         << std::endl;
 
-              Assert(w1(ai, fi), ExcInternalError());
+              DEAL_II_Assert(w1(ai, fi), ExcInternalError());
               return std::make_pair(ai, i);
             }
 
@@ -663,7 +665,7 @@ namespace LineMinimization
         }
     }
 
-    AssertThrow(
+    DEAL_II_AssertThrow(
       i < max_evaluations,
       ExcMessage(
         "Could not find the initial bracket within the given number of iterations."));
@@ -675,9 +677,9 @@ namespace LineMinimization
     // More and Thorenton, 94.
 
     /*
-    Assert((f_lo < f_hi) && w1(a_lo, f_lo), ExcInternalError());
-    Assert(((a_hi - a_lo) * g_lo < 0) && !w2(g_lo), ExcInternalError());
-    Assert((w1(a_hi, f_hi) || f_hi >= f_lo), ExcInternalError());
+    DEAL_II_Assert((f_lo < f_hi) && w1(a_lo, f_lo), ExcInternalError());
+    DEAL_II_Assert(((a_hi - a_lo) * g_lo < 0) && !w2(g_lo), ExcInternalError());
+    DEAL_II_Assert((w1(a_hi, f_hi) || f_hi >= f_lo), ExcInternalError());
     */
 
     // keep short history of last points to improve interpolation
@@ -732,7 +734,7 @@ namespace LineMinimization
               {
                 if (debug_output)
                   deallog << "Satisfied both Wolfe conditions." << std::endl;
-                Assert(w1(ai, fi), ExcInternalError());
+                DEAL_II_Assert(w1(ai, fi), ExcInternalError());
                 return std::make_pair(ai, i);
               }
 
@@ -762,7 +764,7 @@ namespace LineMinimization
       }
 
     // if we got here, we could not find the solution
-    AssertThrow(
+    DEAL_II_AssertThrow(
       false,
       ExcMessage(
         "Could not could complete the sectioning phase within the given number of iterations."));

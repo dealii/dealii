@@ -60,7 +60,7 @@ check_solve(SolverControl &     solver_control,
 
   deallog << "Solver stopped after " << solver_control.last_step()
           << " iterations" << std::endl;
-  Assert(success == expected_result, ExcMessage("Incorrect result."));
+  DEAL_II_Assert(success == expected_result, ExcMessage("Incorrect result."));
 }
 
 

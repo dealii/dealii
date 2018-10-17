@@ -97,8 +97,8 @@ MappingQ<dim, spacedim>::MappingQ(const MappingQ<dim, spacedim> &mapping)
     mapping.q1_mapping->clone();
   q1_mapping = std::dynamic_pointer_cast<const MappingQGeneric<dim, spacedim>>(
     other_q1_map);
-  Assert(q1_mapping != nullptr, ExcInternalError());
-  Assert(q1_mapping->get_degree() == 1, ExcInternalError());
+  DEAL_II_Assert(q1_mapping != nullptr, ExcInternalError());
+  DEAL_II_Assert(q1_mapping->get_degree() == 1, ExcInternalError());
 
   // Same as the other constructor: if possible reuse the Q1 mapping
   if (this->polynomial_degree == 1)
@@ -112,7 +112,7 @@ MappingQ<dim, spacedim>::MappingQ(const MappingQ<dim, spacedim> &mapping)
       qp_mapping =
         std::dynamic_pointer_cast<const MappingQGeneric<dim, spacedim>>(
           other_qp_map);
-      Assert(qp_mapping != nullptr, ExcInternalError());
+      DEAL_II_Assert(qp_mapping != nullptr, ExcInternalError());
     }
 }
 
@@ -250,8 +250,8 @@ MappingQ<dim, spacedim>::fill_fe_values(
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   // check whether this cell needs the full mapping or can be treated by a
@@ -304,8 +304,8 @@ MappingQ<dim, spacedim>::fill_fe_face_values(
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   // check whether this cell needs the full mapping or can be treated by a
@@ -341,8 +341,8 @@ MappingQ<dim, spacedim>::fill_fe_subface_values(
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
-  Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&internal_data) != nullptr,
+                 ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
   // check whether this cell needs the full mapping or can be treated by a
@@ -382,10 +382,10 @@ MappingQ<dim, spacedim>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<1, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
+  DEAL_II_AssertDimension(input.size(), output.size());
 
   const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
-  Assert(data != nullptr, ExcInternalError());
+  DEAL_II_Assert(data != nullptr, ExcInternalError());
 
   // check whether we should in fact work on the Q1 portion of it
   if (data->use_mapping_q1_on_current_cell)
@@ -405,10 +405,11 @@ MappingQ<dim, spacedim>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
-  Assert((dynamic_cast<const typename MappingQ<dim, spacedim>::InternalData *>(
-            &mapping_data) != nullptr),
-         ExcInternalError());
+  DEAL_II_AssertDimension(input.size(), output.size());
+  DEAL_II_Assert(
+    (dynamic_cast<const typename MappingQ<dim, spacedim>::InternalData *>(
+       &mapping_data) != nullptr),
+    ExcInternalError());
   const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
   // check whether we should in fact work on the Q1 portion of it
@@ -429,10 +430,11 @@ MappingQ<dim, spacedim>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
-  Assert((dynamic_cast<const typename MappingQ<dim, spacedim>::InternalData *>(
-            &mapping_data) != nullptr),
-         ExcInternalError());
+  DEAL_II_AssertDimension(input.size(), output.size());
+  DEAL_II_Assert(
+    (dynamic_cast<const typename MappingQ<dim, spacedim>::InternalData *>(
+       &mapping_data) != nullptr),
+    ExcInternalError());
   const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
   // check whether we should in fact work on the Q1 portion of it
@@ -453,10 +455,11 @@ MappingQ<dim, spacedim>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
-  Assert((dynamic_cast<const typename MappingQ<dim, spacedim>::InternalData *>(
-            &mapping_data) != nullptr),
-         ExcInternalError());
+  DEAL_II_AssertDimension(input.size(), output.size());
+  DEAL_II_Assert(
+    (dynamic_cast<const typename MappingQ<dim, spacedim>::InternalData *>(
+       &mapping_data) != nullptr),
+    ExcInternalError());
   const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
   // check whether we should in fact work on the Q1 portion of it
@@ -477,10 +480,11 @@ MappingQ<dim, spacedim>::transform(
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<3, spacedim>> &                   output) const
 {
-  AssertDimension(input.size(), output.size());
-  Assert((dynamic_cast<const typename MappingQ<dim, spacedim>::InternalData *>(
-            &mapping_data) != nullptr),
-         ExcInternalError());
+  DEAL_II_AssertDimension(input.size(), output.size());
+  DEAL_II_Assert(
+    (dynamic_cast<const typename MappingQ<dim, spacedim>::InternalData *>(
+       &mapping_data) != nullptr),
+    ExcInternalError());
   const InternalData *data = dynamic_cast<const InternalData *>(&mapping_data);
 
   // check whether we should in fact work on the Q1 portion of it

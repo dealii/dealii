@@ -348,7 +348,7 @@ LaplaceProblem<dim>::estimate_smoothness(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   const unsigned      n_fourier_modes = k_vectors.size();
@@ -520,7 +520,7 @@ template <int dim>
 void
 LaplaceProblem<dim>::output_results(const unsigned int cycle) const
 {
-  Assert(cycle < 10, ExcNotImplemented());
+  DEAL_II_Assert(cycle < 10, ExcNotImplemented());
 
   {
     const std::string filename =

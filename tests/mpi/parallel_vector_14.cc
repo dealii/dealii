@@ -81,8 +81,9 @@ test()
 
       if (myid < 2)
         {
-          Assert(v(myid * 2) == myid * 4.0 + 1, ExcInternalError());
-          Assert(v(myid * 2 + 1) == myid * 4.0 + 3.0, ExcInternalError());
+          DEAL_II_Assert(v(myid * 2) == myid * 4.0 + 1, ExcInternalError());
+          DEAL_II_Assert(v(myid * 2 + 1) == myid * 4.0 + 3.0,
+                         ExcInternalError());
         }
 
       // copy vector content to non-ghosted vectors, manually created.
@@ -102,18 +103,21 @@ test()
 
       if (myid < 2)
         {
-          Assert(u_dist(myid * 2) == myid * 2.0 + 1, ExcInternalError());
-          Assert(u_dist(myid * 2 + 1) == myid * 2.0 + 2.0, ExcInternalError());
-          Assert(u(myid * 2) == myid * 2.0 + 1, ExcInternalError());
-          Assert(u(myid * 2 + 1) == myid * 2.0 + 2.0, ExcInternalError());
+          DEAL_II_Assert(u_dist(myid * 2) == myid * 2.0 + 1,
+                         ExcInternalError());
+          DEAL_II_Assert(u_dist(myid * 2 + 1) == myid * 2.0 + 2.0,
+                         ExcInternalError());
+          DEAL_II_Assert(u(myid * 2) == myid * 2.0 + 1, ExcInternalError());
+          DEAL_II_Assert(u(myid * 2 + 1) == myid * 2.0 + 2.0,
+                         ExcInternalError());
         }
 
-      Assert(u(1) == 2., ExcInternalError());
+      DEAL_II_Assert(u(1) == 2., ExcInternalError());
       if (numproc > 1)
         {
           if (run == 1)
-            Assert(v(3) == 7., ExcInternalError());
-          Assert(u(3) == 4., ExcInternalError());
+            DEAL_II_Assert(v(3) == 7., ExcInternalError());
+          DEAL_II_Assert(u(3) == 4., ExcInternalError());
         }
 
       // check l2 norm

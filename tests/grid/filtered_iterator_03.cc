@@ -29,11 +29,11 @@
 #include "../tests.h"
 
 
-DeclException2(ExcNumberMismatch,
-               int,
-               int,
-               << "The numbers " << arg1 << " and " << arg2
-               << " should be equation, but are not.");
+DEAL_II_DeclException2(ExcNumberMismatch,
+                       int,
+                       int,
+                       << "The numbers " << arg1 << " and " << arg2
+                       << " should be equation, but are not.");
 
 
 
@@ -70,7 +70,7 @@ test()
       for (unsigned int d = 0; d < 2; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1 << d);
-      AssertThrow(subdomain < (1 << 2), ExcInternalError());
+      DEAL_II_AssertThrow(subdomain < (1 << 2), ExcInternalError());
 
       cell->set_subdomain_id(subdomain);
     };
@@ -88,9 +88,9 @@ test()
           make_filtered_iterator(static_cast<active_cell_iterator>(tria.end()),
                                  &always_true<active_cell_iterator>);
 
-      Assert(std::distance(begin, end) ==
-               static_cast<signed int>(tria.n_active_cells()),
-             ExcInternalError());
+      DEAL_II_Assert(std::distance(begin, end) ==
+                       static_cast<signed int>(tria.n_active_cells()),
+                     ExcInternalError());
       deallog << std::distance(begin, end) << ' ' << tria.n_active_cells()
               << std::endl;
       logfile << "Check 1: "

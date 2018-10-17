@@ -73,8 +73,8 @@ namespace Functions
     const Point<dim> &                       p,
     Vector<typename VectorType::value_type> &values) const
   {
-    Assert(values.size() == this->n_components,
-           ExcDimensionMismatch(values.size(), this->n_components));
+    DEAL_II_Assert(values.size() == this->n_components,
+                   ExcDimensionMismatch(values.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
@@ -86,8 +86,8 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        DEAL_II_AssertThrow(!my_pair.first->is_artificial(),
+                            VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp   = my_pair.second;
@@ -96,8 +96,8 @@ namespace Functions
     cell_hint.get() = cell;
 
     // check that the current cell is available:
-    AssertThrow(!cell->is_artificial(),
-                VectorTools::ExcPointNotAvailableHere());
+    DEAL_II_AssertThrow(!cell->is_artificial(),
+                        VectorTools::ExcPointNotAvailableHere());
 
     // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
@@ -132,8 +132,8 @@ namespace Functions
     const
   {
     using number = typename VectorType::value_type;
-    Assert(gradients.size() == this->n_components,
-           ExcDimensionMismatch(gradients.size(), this->n_components));
+    DEAL_II_Assert(gradients.size() == this->n_components,
+                   ExcDimensionMismatch(gradients.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
@@ -145,16 +145,16 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        DEAL_II_AssertThrow(!my_pair.first->is_artificial(),
+                            VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp   = my_pair.second;
       }
 
     // check that the current cell is available:
-    AssertThrow(!cell->is_artificial(),
-                VectorTools::ExcPointNotAvailableHere());
+    DEAL_II_AssertThrow(!cell->is_artificial(),
+                        VectorTools::ExcPointNotAvailableHere());
 
     cell_hint.get() = cell;
 
@@ -205,8 +205,8 @@ namespace Functions
     const Point<dim> &                       p,
     Vector<typename VectorType::value_type> &values) const
   {
-    Assert(values.size() == this->n_components,
-           ExcDimensionMismatch(values.size(), this->n_components));
+    DEAL_II_Assert(values.size() == this->n_components,
+                   ExcDimensionMismatch(values.size(), this->n_components));
     typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
@@ -218,16 +218,16 @@ namespace Functions
                           ActiveCellIterator<dim, dim, DoFHandlerType>::type,
                         Point<dim>>
           my_pair = GridTools::find_active_cell_around_point(mapping, *dh, p);
-        AssertThrow(!my_pair.first->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        DEAL_II_AssertThrow(!my_pair.first->is_artificial(),
+                            VectorTools::ExcPointNotAvailableHere());
 
         cell = my_pair.first;
         qp   = my_pair.second;
       }
 
     // check that the current cell is available:
-    AssertThrow(!cell->is_artificial(),
-                VectorTools::ExcPointNotAvailableHere());
+    DEAL_II_AssertThrow(!cell->is_artificial(),
+                        VectorTools::ExcPointNotAvailableHere());
 
     cell_hint.get() = cell;
 
@@ -264,8 +264,8 @@ namespace Functions
     const std::vector<Point<dim>> &                       points,
     std::vector<Vector<typename VectorType::value_type>> &values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    DEAL_II_Assert(points.size() == values.size(),
+                   ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
     std::vector<std::vector<Point<dim>>>                       qpoints;
@@ -294,8 +294,8 @@ namespace Functions
     // Now gather all the information we need
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        AssertThrow(!cells[i]->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        DEAL_II_AssertThrow(!cells[i]->is_artificial(),
+                            VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector<Vector<typename VectorType::value_type>> vvalues(
@@ -315,8 +315,8 @@ namespace Functions
     std::vector<typename VectorType::value_type> &values,
     const unsigned int                            component) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    DEAL_II_Assert(points.size() == values.size(),
+                   ExcDimensionMismatch(points.size(), values.size()));
     std::vector<Vector<typename VectorType::value_type>> vvalues(
       points.size(),
       Vector<typename VectorType::value_type>(this->n_components));
@@ -334,8 +334,8 @@ namespace Functions
     std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>>
       &values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    DEAL_II_Assert(points.size() == values.size(),
+                   ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
     std::vector<std::vector<Point<dim>>>                       qpoints;
@@ -364,8 +364,8 @@ namespace Functions
     // Now gather all the information we need
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        AssertThrow(!cells[i]->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        DEAL_II_AssertThrow(!cells[i]->is_artificial(),
+                            VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector<
@@ -392,8 +392,8 @@ namespace Functions
     std::vector<Tensor<1, dim, typename VectorType::value_type>> &values,
     const unsigned int component) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    DEAL_II_Assert(points.size() == values.size(),
+                   ExcDimensionMismatch(points.size(), values.size()));
     std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>>
       vvalues(points.size(),
               std::vector<Tensor<1, dim, typename VectorType::value_type>>(
@@ -410,8 +410,8 @@ namespace Functions
     const std::vector<Point<dim>> &                       points,
     std::vector<Vector<typename VectorType::value_type>> &values) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    DEAL_II_Assert(points.size() == values.size(),
+                   ExcDimensionMismatch(points.size(), values.size()));
 
     std::vector<typename DoFHandlerType::active_cell_iterator> cells;
     std::vector<std::vector<Point<dim>>>                       qpoints;
@@ -440,8 +440,8 @@ namespace Functions
     // Now gather all the information we need
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        AssertThrow(!cells[i]->is_artificial(),
-                    VectorTools::ExcPointNotAvailableHere());
+        DEAL_II_AssertThrow(!cells[i]->is_artificial(),
+                            VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector<Vector<typename VectorType::value_type>> vvalues(
@@ -460,8 +460,8 @@ namespace Functions
     std::vector<typename VectorType::value_type> &values,
     const unsigned int                            component) const
   {
-    Assert(points.size() == values.size(),
-           ExcDimensionMismatch(points.size(), values.size()));
+    DEAL_II_Assert(points.size() == values.size(),
+                   ExcDimensionMismatch(points.size(), values.size()));
     std::vector<Vector<typename VectorType::value_type>> vvalues(
       points.size(),
       Vector<typename VectorType::value_type>(this->n_components));

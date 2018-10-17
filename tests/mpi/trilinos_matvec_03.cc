@@ -62,7 +62,7 @@ test()
         }
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 
   TrilinosWrappers::SparsityPattern sp(row_partitioning,
                                        col_partitioning,
@@ -111,7 +111,8 @@ test()
   for (unsigned int i = 0; i < row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
-      AssertThrow(dy(global_index) == y(global_index), ExcInternalError());
+      DEAL_II_AssertThrow(dy(global_index) == y(global_index),
+                          ExcInternalError());
     }
 
   A.vmult_add(y, x);
@@ -122,7 +123,8 @@ test()
   for (unsigned int i = 0; i < row_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
-      AssertThrow(dy(global_index) == y(global_index), ExcInternalError());
+      DEAL_II_AssertThrow(dy(global_index) == y(global_index),
+                          ExcInternalError());
     }
 
   A.Tvmult(x, y);
@@ -130,7 +132,8 @@ test()
   for (unsigned int i = 0; i < col_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = col_partitioning.nth_index_in_set(i);
-      AssertThrow(dx(global_index) == x(global_index), ExcInternalError());
+      DEAL_II_AssertThrow(dx(global_index) == x(global_index),
+                          ExcInternalError());
     }
 
   A.Tvmult_add(x, y);
@@ -138,7 +141,8 @@ test()
   for (unsigned int i = 0; i < col_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = col_partitioning.nth_index_in_set(i);
-      AssertThrow(dx(global_index) == x(global_index), ExcInternalError());
+      DEAL_II_AssertThrow(dx(global_index) == x(global_index),
+                          ExcInternalError());
     }
 
   if (my_id == 0)

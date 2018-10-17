@@ -376,19 +376,20 @@ private:
   /**
    * Exceptions.
    */
-  DeclException2(ArpackExcInvalidNumberofEigenvalues,
-                 int,
-                 int,
-                 << "Number of wanted eigenvalues " << arg1
-                 << " is larger that the size of the matrix " << arg2);
+  DEAL_II_DeclException2(ArpackExcInvalidNumberofEigenvalues,
+                         int,
+                         int,
+                         << "Number of wanted eigenvalues " << arg1
+                         << " is larger that the size of the matrix " << arg2);
 
-  DeclException2(ArpackExcInvalidEigenvectorSize,
-                 int,
-                 int,
-                 << "Number of wanted eigenvalues " << arg1
-                 << " is larger that the size of eigenvectors " << arg2);
+  DEAL_II_DeclException2(ArpackExcInvalidEigenvectorSize,
+                         int,
+                         int,
+                         << "Number of wanted eigenvalues " << arg1
+                         << " is larger that the size of eigenvectors "
+                         << arg2);
 
-  DeclException2(
+  DEAL_II_DeclException2(
     ArpackExcInvalidEigenvectorSizeNonsymmetric,
     int,
     int,
@@ -396,62 +397,64 @@ private:
     << " eigenvectors in real-valued vectors, their size (currently set to "
     << arg2 << ") should be greater than or equal to " << arg1 + 1);
 
-  DeclException2(ArpackExcInvalidEigenvalueSize,
-                 int,
-                 int,
-                 << "Number of wanted eigenvalues " << arg1
-                 << " is larger that the size of eigenvalues " << arg2);
+  DEAL_II_DeclException2(ArpackExcInvalidEigenvalueSize,
+                         int,
+                         int,
+                         << "Number of wanted eigenvalues " << arg1
+                         << " is larger that the size of eigenvalues " << arg2);
 
-  DeclException2(ArpackExcInvalidNumberofArnoldiVectors,
-                 int,
-                 int,
-                 << "Number of Arnoldi vectors " << arg1
-                 << " is larger that the size of the matrix " << arg2);
+  DEAL_II_DeclException2(ArpackExcInvalidNumberofArnoldiVectors,
+                         int,
+                         int,
+                         << "Number of Arnoldi vectors " << arg1
+                         << " is larger that the size of the matrix " << arg2);
 
-  DeclException2(ArpackExcSmallNumberofArnoldiVectors,
-                 int,
-                 int,
-                 << "Number of Arnoldi vectors " << arg1
-                 << " is too small to obtain " << arg2 << " eigenvalues");
+  DEAL_II_DeclException2(ArpackExcSmallNumberofArnoldiVectors,
+                         int,
+                         int,
+                         << "Number of Arnoldi vectors " << arg1
+                         << " is too small to obtain " << arg2
+                         << " eigenvalues");
 
-  DeclException1(ArpackExcArpackIdo,
-                 int,
-                 << "This ido " << arg1
-                 << " is not supported. Check documentation of ARPACK");
+  DEAL_II_DeclException1(ArpackExcArpackIdo,
+                         int,
+                         << "This ido " << arg1
+                         << " is not supported. Check documentation of ARPACK");
 
-  DeclException1(ArpackExcArpackMode,
-                 int,
-                 << "This mode " << arg1
-                 << " is not supported. Check documentation of ARPACK");
+  DEAL_II_DeclException1(ArpackExcArpackMode,
+                         int,
+                         << "This mode " << arg1
+                         << " is not supported. Check documentation of ARPACK");
 
-  DeclException1(ArpackExcArpackInfodsaupd,
-                 int,
-                 << "Error with dsaupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+  DEAL_II_DeclException1(ArpackExcArpackInfodsaupd,
+                         int,
+                         << "Error with dsaupd, info " << arg1
+                         << ". Check documentation of ARPACK");
 
-  DeclException1(ArpackExcArpackInfodnaupd,
-                 int,
-                 << "Error with dnaupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+  DEAL_II_DeclException1(ArpackExcArpackInfodnaupd,
+                         int,
+                         << "Error with dnaupd, info " << arg1
+                         << ". Check documentation of ARPACK");
 
-  DeclException1(ArpackExcArpackInfodseupd,
-                 int,
-                 << "Error with dseupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+  DEAL_II_DeclException1(ArpackExcArpackInfodseupd,
+                         int,
+                         << "Error with dseupd, info " << arg1
+                         << ". Check documentation of ARPACK");
 
-  DeclException1(ArpackExcArpackInfodneupd,
-                 int,
-                 << "Error with dneupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+  DEAL_II_DeclException1(ArpackExcArpackInfodneupd,
+                         int,
+                         << "Error with dneupd, info " << arg1
+                         << ". Check documentation of ARPACK");
 
-  DeclException1(ArpackExcArpackInfoMaxIt,
-                 int,
-                 << "Maximum number " << arg1 << " of iterations reached.");
+  DEAL_II_DeclException1(ArpackExcArpackInfoMaxIt,
+                         int,
+                         << "Maximum number " << arg1
+                         << " of iterations reached.");
 
-  DeclExceptionMsg(ArpackExcArpackNoShifts,
-                   "No shifts could be applied during implicit"
-                   " Arnoldi update, try increasing the number of"
-                   " Arnoldi vectors.");
+  DEAL_II_DeclExceptionMsg(ArpackExcArpackNoShifts,
+                           "No shifts could be applied during implicit"
+                           " Arnoldi update, try increasing the number of"
+                           " Arnoldi vectors.");
 };
 
 
@@ -466,19 +469,19 @@ inline ArpackSolver::AdditionalData::AdditionalData(
   // Check for possible options for symmetric problems
   if (symmetric)
     {
-      Assert(
+      DEAL_II_Assert(
         eigenvalue_of_interest != largest_real_part,
         ExcMessage(
           "'largest real part' can only be used for non-symmetric problems!"));
-      Assert(
+      DEAL_II_Assert(
         eigenvalue_of_interest != smallest_real_part,
         ExcMessage(
           "'smallest real part' can only be used for non-symmetric problems!"));
-      Assert(
+      DEAL_II_Assert(
         eigenvalue_of_interest != largest_imaginary_part,
         ExcMessage(
           "'largest imaginary part' can only be used for non-symmetric problems!"));
-      Assert(
+      DEAL_II_Assert(
         eigenvalue_of_interest != smallest_imaginary_part,
         ExcMessage(
           "'smallest imaginary part' can only be used for non-symmetric problems!"));
@@ -541,28 +544,28 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
   // check input sizes
   if (additional_data.symmetric)
     {
-      Assert(nev <= eigenvectors.size(),
-             ArpackExcInvalidEigenvectorSize(nev, eigenvectors.size()));
+      DEAL_II_Assert(nev <= eigenvectors.size(),
+                     ArpackExcInvalidEigenvectorSize(nev, eigenvectors.size()));
     }
   else
-    Assert(nev + 1 <= eigenvectors.size(),
-           ArpackExcInvalidEigenvectorSizeNonsymmetric(nev,
-                                                       eigenvectors.size()));
+    DEAL_II_Assert(
+      nev + 1 <= eigenvectors.size(),
+      ArpackExcInvalidEigenvectorSizeNonsymmetric(nev, eigenvectors.size()));
 
-  Assert(nev <= eigenvalues.size(),
-         ArpackExcInvalidEigenvalueSize(nev, eigenvalues.size()));
+  DEAL_II_Assert(nev <= eigenvalues.size(),
+                 ArpackExcInvalidEigenvalueSize(nev, eigenvalues.size()));
 
   // check large enough problem size
-  Assert(nev < n, ArpackExcInvalidNumberofEigenvalues(nev, n));
+  DEAL_II_Assert(nev < n, ArpackExcInvalidNumberofEigenvalues(nev, n));
 
-  Assert(additional_data.number_of_arnoldi_vectors < n,
-         ArpackExcInvalidNumberofArnoldiVectors(
-           additional_data.number_of_arnoldi_vectors, n));
+  DEAL_II_Assert(additional_data.number_of_arnoldi_vectors < n,
+                 ArpackExcInvalidNumberofArnoldiVectors(
+                   additional_data.number_of_arnoldi_vectors, n));
 
   // check whether we have enough Arnoldi vectors
-  Assert(additional_data.number_of_arnoldi_vectors > 2 * nev + 1,
-         ArpackExcSmallNumberofArnoldiVectors(
-           additional_data.number_of_arnoldi_vectors, nev));
+  DEAL_II_Assert(additional_data.number_of_arnoldi_vectors > 2 * nev + 1,
+                 ArpackExcSmallNumberofArnoldiVectors(
+                   additional_data.number_of_arnoldi_vectors, nev));
 
   // ARPACK mode for dsaupd/dnaupd, here only mode 3, i.e. shift-invert mode
   int mode = 3;
@@ -754,13 +757,13 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
                     break;
 
                   default:
-                    Assert(false, ArpackExcArpackIdo(ido));
+                    DEAL_II_Assert(false, ArpackExcArpackIdo(ido));
                     break;
                 }
             }
             break;
           default:
-            Assert(false, ArpackExcArpackMode(mode));
+            DEAL_II_Assert(false, ArpackExcArpackMode(mode));
             break;
         }
     }
@@ -769,10 +772,10 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
     {
       if (additional_data.symmetric)
         {
-          Assert(false, ArpackExcArpackInfodsaupd(info));
+          DEAL_II_Assert(false, ArpackExcArpackInfodsaupd(info));
         }
       else
-        Assert(false, ArpackExcArpackInfodnaupd(info));
+        DEAL_II_Assert(false, ArpackExcArpackInfodnaupd(info));
     }
   else
     {
@@ -848,20 +851,21 @@ ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
 
       if (info == 1)
         {
-          Assert(false, ArpackExcArpackInfoMaxIt(control().max_steps()));
+          DEAL_II_Assert(false,
+                         ArpackExcArpackInfoMaxIt(control().max_steps()));
         }
       else if (info == 3)
         {
-          Assert(false, ArpackExcArpackNoShifts());
+          DEAL_II_Assert(false, ArpackExcArpackNoShifts());
         }
       else if (info != 0)
         {
           if (additional_data.symmetric)
             {
-              Assert(false, ArpackExcArpackInfodseupd(info));
+              DEAL_II_Assert(false, ArpackExcArpackInfodseupd(info));
             }
           else
-            Assert(false, ArpackExcArpackInfodneupd(info));
+            DEAL_II_Assert(false, ArpackExcArpackInfodneupd(info));
         }
 
       for (unsigned int i = 0; i < nev; ++i)

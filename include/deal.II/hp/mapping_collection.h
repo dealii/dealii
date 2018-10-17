@@ -164,7 +164,8 @@ namespace hp
   inline const Mapping<dim, spacedim> &MappingCollection<dim, spacedim>::
                                        operator[](const unsigned int index) const
   {
-    Assert(index < mappings.size(), ExcIndexRange(index, 0, mappings.size()));
+    DEAL_II_Assert(index < mappings.size(),
+                   ExcIndexRange(index, 0, mappings.size()));
     return *mappings[index];
   }
 

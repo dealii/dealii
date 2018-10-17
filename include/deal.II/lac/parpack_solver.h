@@ -558,25 +558,26 @@ private:
   /**
    * PArpackExcInfoPdnaupds.
    */
-  DeclException2(PArpackExcConvergedEigenvectors,
-                 int,
-                 int,
-                 << arg1 << " eigenpairs were requested, but only " << arg2
-                 << " converged");
+  DEAL_II_DeclException2(PArpackExcConvergedEigenvectors,
+                         int,
+                         int,
+                         << arg1 << " eigenpairs were requested, but only "
+                         << arg2 << " converged");
 
-  DeclException2(PArpackExcInvalidNumberofEigenvalues,
-                 int,
-                 int,
-                 << "Number of wanted eigenvalues " << arg1
-                 << " is larger that the size of the matrix " << arg2);
+  DEAL_II_DeclException2(PArpackExcInvalidNumberofEigenvalues,
+                         int,
+                         int,
+                         << "Number of wanted eigenvalues " << arg1
+                         << " is larger that the size of the matrix " << arg2);
 
-  DeclException2(PArpackExcInvalidEigenvectorSize,
-                 int,
-                 int,
-                 << "Number of wanted eigenvalues " << arg1
-                 << " is larger that the size of eigenvectors " << arg2);
+  DEAL_II_DeclException2(PArpackExcInvalidEigenvectorSize,
+                         int,
+                         int,
+                         << "Number of wanted eigenvalues " << arg1
+                         << " is larger that the size of eigenvectors "
+                         << arg2);
 
-  DeclException2(
+  DEAL_II_DeclException2(
     PArpackExcInvalidEigenvectorSizeNonsymmetric,
     int,
     int,
@@ -584,53 +585,55 @@ private:
     << " eigenvectors in real-valued vectors, their size (currently set to "
     << arg2 << ") should be greater than or equal to " << arg1 + 1);
 
-  DeclException2(PArpackExcInvalidEigenvalueSize,
-                 int,
-                 int,
-                 << "Number of wanted eigenvalues " << arg1
-                 << " is larger that the size of eigenvalues " << arg2);
+  DEAL_II_DeclException2(PArpackExcInvalidEigenvalueSize,
+                         int,
+                         int,
+                         << "Number of wanted eigenvalues " << arg1
+                         << " is larger that the size of eigenvalues " << arg2);
 
-  DeclException2(PArpackExcInvalidNumberofArnoldiVectors,
-                 int,
-                 int,
-                 << "Number of Arnoldi vectors " << arg1
-                 << " is larger that the size of the matrix " << arg2);
+  DEAL_II_DeclException2(PArpackExcInvalidNumberofArnoldiVectors,
+                         int,
+                         int,
+                         << "Number of Arnoldi vectors " << arg1
+                         << " is larger that the size of the matrix " << arg2);
 
-  DeclException2(PArpackExcSmallNumberofArnoldiVectors,
-                 int,
-                 int,
-                 << "Number of Arnoldi vectors " << arg1
-                 << " is too small to obtain " << arg2 << " eigenvalues");
+  DEAL_II_DeclException2(PArpackExcSmallNumberofArnoldiVectors,
+                         int,
+                         int,
+                         << "Number of Arnoldi vectors " << arg1
+                         << " is too small to obtain " << arg2
+                         << " eigenvalues");
 
-  DeclException1(PArpackExcIdo,
-                 int,
-                 << "This ido " << arg1
-                 << " is not supported. Check documentation of ARPACK");
+  DEAL_II_DeclException1(PArpackExcIdo,
+                         int,
+                         << "This ido " << arg1
+                         << " is not supported. Check documentation of ARPACK");
 
-  DeclException1(PArpackExcMode,
-                 int,
-                 << "This mode " << arg1
-                 << " is not supported. Check documentation of ARPACK");
+  DEAL_II_DeclException1(PArpackExcMode,
+                         int,
+                         << "This mode " << arg1
+                         << " is not supported. Check documentation of ARPACK");
 
-  DeclException1(PArpackExcInfoPdnaupd,
-                 int,
-                 << "Error with Pdnaupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+  DEAL_II_DeclException1(PArpackExcInfoPdnaupd,
+                         int,
+                         << "Error with Pdnaupd, info " << arg1
+                         << ". Check documentation of ARPACK");
 
-  DeclException1(PArpackExcInfoPdneupd,
-                 int,
-                 << "Error with Pdneupd, info " << arg1
-                 << ". Check documentation of ARPACK");
+  DEAL_II_DeclException1(PArpackExcInfoPdneupd,
+                         int,
+                         << "Error with Pdneupd, info " << arg1
+                         << ". Check documentation of ARPACK");
 
-  DeclException1(PArpackExcInfoMaxIt,
-                 int,
-                 << "Maximum number " << arg1 << " of iterations reached.");
+  DEAL_II_DeclException1(PArpackExcInfoMaxIt,
+                         int,
+                         << "Maximum number " << arg1
+                         << " of iterations reached.");
 
-  DeclException1(PArpackExcNoShifts,
-                 int,
-                 << "No shifts could be applied during implicit"
-                 << " Arnoldi update, try increasing the number of"
-                 << " Arnoldi vectors.");
+  DEAL_II_DeclException1(PArpackExcNoShifts,
+                         int,
+                         << "No shifts could be applied during implicit"
+                         << " Arnoldi update, try increasing the number of"
+                         << " Arnoldi vectors.");
 };
 
 
@@ -664,25 +667,25 @@ PArpackSolver<VectorType>::AdditionalData::AdditionalData(
   // Check for possible options for symmetric problems
   if (symmetric)
     {
-      Assert(
+      DEAL_II_Assert(
         eigenvalue_of_interest != largest_real_part,
         ExcMessage(
           "'largest real part' can only be used for non-symmetric problems!"));
-      Assert(
+      DEAL_II_Assert(
         eigenvalue_of_interest != smallest_real_part,
         ExcMessage(
           "'smallest real part' can only be used for non-symmetric problems!"));
-      Assert(
+      DEAL_II_Assert(
         eigenvalue_of_interest != largest_imaginary_part,
         ExcMessage(
           "'largest imaginary part' can only be used for non-symmetric problems!"));
-      Assert(
+      DEAL_II_Assert(
         eigenvalue_of_interest != smallest_imaginary_part,
         ExcMessage(
           "'smallest imaginary part' can only be used for non-symmetric problems!"));
     }
-  Assert(mode >= 1 && mode <= 3,
-         ExcMessage("Currently, only modes 1, 2 and 3 are supported."));
+  DEAL_II_Assert(mode >= 1 && mode <= 3,
+                 ExcMessage("Currently, only modes 1, 2 and 3 are supported."));
 }
 
 
@@ -723,8 +726,8 @@ void
 PArpackSolver<VectorType>::set_initial_vector(const VectorType &vec)
 {
   initial_vector_provided = true;
-  Assert(resid.size() == local_indices.size(),
-         ExcDimensionMismatch(resid.size(), local_indices.size()));
+  DEAL_II_Assert(resid.size() == local_indices.size(),
+                 ExcDimensionMismatch(resid.size(), local_indices.size()));
   vec.extract_subvector_to(local_indices.begin(),
                            local_indices.end(),
                            resid.data());
@@ -743,7 +746,7 @@ PArpackSolver<VectorType>::internal_reinit(const IndexSet &locally_owned_dofs)
   nloc = locally_owned_dofs.n_elements();
   ncv  = additional_data.number_of_arnoldi_vectors;
 
-  Assert((int)local_indices.size() == nloc, ExcInternalError());
+  DEAL_II_Assert((int)local_indices.size() == nloc, ExcInternalError());
 
   // vectors
   ldv = nloc;
@@ -845,32 +848,36 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
 {
   if (additional_data.symmetric)
     {
-      Assert(n_eigenvalues <= eigenvectors.size(),
-             PArpackExcInvalidEigenvectorSize(n_eigenvalues,
-                                              eigenvectors.size()));
+      DEAL_II_Assert(n_eigenvalues <= eigenvectors.size(),
+                     PArpackExcInvalidEigenvectorSize(n_eigenvalues,
+                                                      eigenvectors.size()));
     }
   else
-    Assert(n_eigenvalues + 1 <= eigenvectors.size(),
-           PArpackExcInvalidEigenvectorSizeNonsymmetric(n_eigenvalues,
-                                                        eigenvectors.size()));
+    DEAL_II_Assert(n_eigenvalues + 1 <= eigenvectors.size(),
+                   PArpackExcInvalidEigenvectorSizeNonsymmetric(
+                     n_eigenvalues, eigenvectors.size()));
 
-  Assert(n_eigenvalues <= eigenvalues.size(),
-         PArpackExcInvalidEigenvalueSize(n_eigenvalues, eigenvalues.size()));
+  DEAL_II_Assert(n_eigenvalues <= eigenvalues.size(),
+                 PArpackExcInvalidEigenvalueSize(n_eigenvalues,
+                                                 eigenvalues.size()));
 
 
   // use eigenvectors to get the problem size so that it is possible to
   // employ LinearOperator for mass_matrix.
-  Assert(n_eigenvalues < eigenvectors[0]->size(),
-         PArpackExcInvalidNumberofEigenvalues(n_eigenvalues,
-                                              eigenvectors[0]->size()));
+  DEAL_II_Assert(n_eigenvalues < eigenvectors[0]->size(),
+                 PArpackExcInvalidNumberofEigenvalues(n_eigenvalues,
+                                                      eigenvectors[0]->size()));
 
-  Assert(additional_data.number_of_arnoldi_vectors < eigenvectors[0]->size(),
-         PArpackExcInvalidNumberofArnoldiVectors(
-           additional_data.number_of_arnoldi_vectors, eigenvectors[0]->size()));
+  DEAL_II_Assert(additional_data.number_of_arnoldi_vectors <
+                   eigenvectors[0]->size(),
+                 PArpackExcInvalidNumberofArnoldiVectors(
+                   additional_data.number_of_arnoldi_vectors,
+                   eigenvectors[0]->size()));
 
-  Assert(additional_data.number_of_arnoldi_vectors > 2 * n_eigenvalues + 1,
-         PArpackExcSmallNumberofArnoldiVectors(
-           additional_data.number_of_arnoldi_vectors, n_eigenvalues));
+  DEAL_II_Assert(additional_data.number_of_arnoldi_vectors >
+                   2 * n_eigenvalues + 1,
+                 PArpackExcSmallNumberofArnoldiVectors(
+                   additional_data.number_of_arnoldi_vectors, n_eigenvalues));
 
   int mode = additional_data.mode;
 
@@ -1005,7 +1012,7 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
                  &lworkl,
                  &info);
 
-      AssertThrow(info == 0, PArpackExcInfoPdnaupd(info));
+      DEAL_II_AssertThrow(info == 0, PArpackExcInfoPdnaupd(info));
 
       // if we converge, we shall not modify anything in work arrays!
       if (ido == 99)
@@ -1015,10 +1022,12 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
       // IPNTR(2) is the pointer into WORKD for Y.
       const int shift_x = ipntr[0] - 1;
       const int shift_y = ipntr[1] - 1;
-      Assert(shift_x >= 0, dealii::ExcInternalError());
-      Assert(shift_x + nloc <= (int)workd.size(), dealii::ExcInternalError());
-      Assert(shift_y >= 0, dealii::ExcInternalError());
-      Assert(shift_y + nloc <= (int)workd.size(), dealii::ExcInternalError());
+      DEAL_II_Assert(shift_x >= 0, dealii::ExcInternalError());
+      DEAL_II_Assert(shift_x + nloc <= (int)workd.size(),
+                     dealii::ExcInternalError());
+      DEAL_II_Assert(shift_y >= 0, dealii::ExcInternalError());
+      DEAL_II_Assert(shift_y + nloc <= (int)workd.size(),
+                     dealii::ExcInternalError());
 
       src = 0.;
 
@@ -1050,23 +1059,23 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
               system_matrix.vmult(dst, src);
             }
           else
-            AssertThrow(false, PArpackExcMode(mode));
+            DEAL_II_AssertThrow(false, PArpackExcMode(mode));
         }
       else if (ido == 1 && mode >= 3)
         // compute  Y = OP * X for mode 3, 4 and 5, where
         // the vector B * X is already available in WORKD(ipntr(3)).
         {
           const int shift_b_x = ipntr[2] - 1;
-          Assert(shift_b_x >= 0, dealii::ExcInternalError());
-          Assert(shift_b_x + nloc <= (int)workd.size(),
-                 dealii::ExcInternalError());
+          DEAL_II_Assert(shift_b_x >= 0, dealii::ExcInternalError());
+          DEAL_II_Assert(shift_b_x + nloc <= (int)workd.size(),
+                         dealii::ExcInternalError());
 
           // B*X
           src.add(nloc, local_indices.data(), workd.data() + shift_b_x);
           src.compress(VectorOperation::add);
 
           // solving linear system
-          Assert(mode == 3, ExcNotImplemented());
+          DEAL_II_Assert(mode == 3, ExcNotImplemented());
           inverse.vmult(dst, src);
         }
       else if (ido == 2)
@@ -1087,7 +1096,7 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
             }
         }
       else
-        AssertThrow(false, PArpackExcIdo(ido));
+        DEAL_II_AssertThrow(false, PArpackExcIdo(ido));
       // Note: IDO = 3 does not appear to be required for currently
       // implemented modes
 
@@ -1162,21 +1171,22 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
 
   if (info == 1)
     {
-      AssertThrow(false, PArpackExcInfoMaxIt(control().max_steps()));
+      DEAL_II_AssertThrow(false, PArpackExcInfoMaxIt(control().max_steps()));
     }
   else if (info == 3)
     {
-      AssertThrow(false, PArpackExcNoShifts(1));
+      DEAL_II_AssertThrow(false, PArpackExcNoShifts(1));
     }
   else if (info != 0)
     {
-      AssertThrow(false, PArpackExcInfoPdneupd(info));
+      DEAL_II_AssertThrow(false, PArpackExcInfoPdneupd(info));
     }
 
   for (int i = 0; i < nev; ++i)
     {
       (*eigenvectors[i]) = 0.0;
-      Assert(i * nloc + nloc <= (int)v.size(), dealii::ExcInternalError());
+      DEAL_II_Assert(i * nloc + nloc <= (int)v.size(),
+                     dealii::ExcInternalError());
 
       eigenvectors[i]->add(nloc, local_indices.data(), &v[i * nloc]);
       eigenvectors[i]->compress(VectorOperation::add);
@@ -1187,8 +1197,9 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
       std::complex<double>(eigenvalues_real[i], eigenvalues_im[i]);
 
   // Throw an error if the solver did not converge.
-  AssertThrow(iparam[4] >= (int)n_eigenvalues,
-              PArpackExcConvergedEigenvectors(n_eigenvalues, iparam[4]));
+  DEAL_II_AssertThrow(iparam[4] >= (int)n_eigenvalues,
+                      PArpackExcConvergedEigenvectors(n_eigenvalues,
+                                                      iparam[4]));
 
   // both PDNAUPD and PDSAUPD compute eigenpairs of inv[A - sigma*M]*M
   // with respect to a semi-inner product defined by M.

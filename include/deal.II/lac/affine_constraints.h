@@ -1307,107 +1307,114 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcMatrixIsClosed);
+  DEAL_II_DeclException0(ExcMatrixIsClosed);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcMatrixNotClosed);
+  DEAL_II_DeclException0(ExcMatrixNotClosed);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcLineInexistant,
-                 size_type,
-                 << "The specified line " << arg1 << " does not exist.");
+  DEAL_II_DeclException1(ExcLineInexistant,
+                         size_type,
+                         << "The specified line " << arg1
+                         << " does not exist.");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException4(ExcEntryAlreadyExists,
-                 size_type,
-                 size_type,
-                 number,
-                 number,
-                 << "The entry for the indices " << arg1 << " and " << arg2
-                 << " already exists, but the values " << arg3 << " (old) and "
-                 << arg4 << " (new) differ "
-                 << "by " << (arg4 - arg3) << ".");
+  DEAL_II_DeclException4(ExcEntryAlreadyExists,
+                         size_type,
+                         size_type,
+                         number,
+                         number,
+                         << "The entry for the indices " << arg1 << " and "
+                         << arg2 << " already exists, but the values " << arg3
+                         << " (old) and " << arg4 << " (new) differ "
+                         << "by " << (arg4 - arg3) << ".");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException2(ExcDoFConstrainedToConstrainedDoF,
-                 int,
-                 int,
-                 << "You tried to constrain DoF " << arg1 << " to DoF " << arg2
-                 << ", but that one is also constrained. This is not allowed!");
+  DEAL_II_DeclException2(
+    ExcDoFConstrainedToConstrainedDoF,
+    int,
+    int,
+    << "You tried to constrain DoF " << arg1 << " to DoF " << arg2
+    << ", but that one is also constrained. This is not allowed!");
   /**
    * Exception.
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcDoFIsConstrainedFromBothObjects,
-                 size_type,
-                 << "Degree of freedom " << arg1
-                 << " is constrained from both object in a merge operation.");
+  DEAL_II_DeclException1(
+    ExcDoFIsConstrainedFromBothObjects,
+    size_type,
+    << "Degree of freedom " << arg1
+    << " is constrained from both object in a merge operation.");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcDoFIsConstrainedToConstrainedDoF,
-                 size_type,
-                 << "In the given argument a degree of freedom is constrained "
-                 << "to another DoF with number " << arg1
-                 << ", which however is constrained by this object. This is not"
-                 << " allowed.");
+  DEAL_II_DeclException1(
+    ExcDoFIsConstrainedToConstrainedDoF,
+    size_type,
+    << "In the given argument a degree of freedom is constrained "
+    << "to another DoF with number " << arg1
+    << ", which however is constrained by this object. This is not"
+    << " allowed.");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcRowNotStoredHere,
-                 size_type,
-                 << "The index set given to this constraints object indicates "
-                 << "constraints for degree of freedom " << arg1
-                 << " should not be stored by this object, but a constraint "
-                 << "is being added.");
+  DEAL_II_DeclException1(
+    ExcRowNotStoredHere,
+    size_type,
+    << "The index set given to this constraints object indicates "
+    << "constraints for degree of freedom " << arg1
+    << " should not be stored by this object, but a constraint "
+    << "is being added.");
 
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException2(ExcColumnNotStoredHere,
-                 size_type,
-                 size_type,
-                 << "The index set given to this constraints object indicates "
-                 << "constraints using degree of freedom " << arg2
-                 << " should not be stored by this object, but a constraint "
-                 << "for degree of freedom " << arg1 << " uses it.");
+  DEAL_II_DeclException2(
+    ExcColumnNotStoredHere,
+    size_type,
+    size_type,
+    << "The index set given to this constraints object indicates "
+    << "constraints using degree of freedom " << arg2
+    << " should not be stored by this object, but a constraint "
+    << "for degree of freedom " << arg1 << " uses it.");
 
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException2(ExcIncorrectConstraint,
-                 int,
-                 int,
-                 << "While distributing the constraint for DoF " << arg1
-                 << ", it turns out that one of the processors "
-                 << "who own the " << arg2 << " degrees of freedom that x_"
-                 << arg1 << " is constrained against does not know about "
-                 << "the constraint on x_" << arg1
-                 << ". Did you not initialize the AffineConstraints container "
-                 << "with the appropriate locally_relevant set so "
-                 << "that every processor who owns a DoF that constrains "
-                 << "another DoF also knows about this constraint?");
+  DEAL_II_DeclException2(
+    ExcIncorrectConstraint,
+    int,
+    int,
+    << "While distributing the constraint for DoF " << arg1
+    << ", it turns out that one of the processors "
+    << "who own the " << arg2 << " degrees of freedom that x_" << arg1
+    << " is constrained against does not know about "
+    << "the constraint on x_" << arg1
+    << ". Did you not initialize the AffineConstraints container "
+    << "with the appropriate locally_relevant set so "
+    << "that every processor who owns a DoF that constrains "
+    << "another DoF also knows about this constraint?");
 
 private:
   /**
@@ -1593,13 +1600,13 @@ template <typename number>
 inline void
 AffineConstraints<number>::add_line(const size_type line_n)
 {
-  Assert(sorted == false, ExcMatrixIsClosed());
+  DEAL_II_Assert(sorted == false, ExcMatrixIsClosed());
 
   // the following can happen when we compute with distributed meshes and dof
   // handlers and we constrain a degree of freedom whose number we don't have
   // locally. if we don't abort here the program will try to allocate several
   // terabytes of memory to resize the various arrays below :-)
-  Assert(line_n != numbers::invalid_size_type, ExcInternalError());
+  DEAL_II_Assert(line_n != numbers::invalid_size_type, ExcInternalError());
   const size_type line_index = calculate_line_index(line_n);
 
   // check whether line already exists; it may, in which case we can just quit
@@ -1625,33 +1632,34 @@ AffineConstraints<number>::add_entry(const size_type line_n,
                                      const size_type column,
                                      const number    value)
 {
-  Assert(sorted == false, ExcMatrixIsClosed());
-  Assert(line_n != column,
-         ExcMessage("Can't constrain a degree of freedom to itself"));
+  DEAL_II_Assert(sorted == false, ExcMatrixIsClosed());
+  DEAL_II_Assert(line_n != column,
+                 ExcMessage("Can't constrain a degree of freedom to itself"));
 
   // Ensure that the current line is present in the cache:
   const size_type line_index = calculate_line_index(line_n);
-  Assert(line_index < lines_cache.size(),
-         ExcMessage("The current AffineConstraints does not contain the line "
-                    "for the current entry. Call AffineConstraints::add_line "
-                    "before calling this function."));
+  DEAL_II_Assert(line_index < lines_cache.size(),
+                 ExcMessage(
+                   "The current AffineConstraints does not contain the line "
+                   "for the current entry. Call AffineConstraints::add_line "
+                   "before calling this function."));
 
   // if in debug mode, check whether an entry for this column already exists
   // and if it's the same as the one entered at present
   //
   // in any case: exit the function if an entry for this column already
   // exists, since we don't want to enter it twice
-  Assert(lines_cache[line_index] != numbers::invalid_size_type,
-         ExcInternalError());
-  Assert(!local_lines.size() || local_lines.is_element(column),
-         ExcColumnNotStoredHere(line_n, column));
+  DEAL_II_Assert(lines_cache[line_index] != numbers::invalid_size_type,
+                 ExcInternalError());
+  DEAL_II_Assert(!local_lines.size() || local_lines.is_element(column),
+                 ExcColumnNotStoredHere(line_n, column));
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
-  Assert(line_ptr->index == line_n, ExcInternalError());
+  DEAL_II_Assert(line_ptr->index == line_n, ExcInternalError());
   for (const auto &p : line_ptr->entries)
     if (p.first == column)
       {
-        Assert(std::abs(p.second - value) < 1.e-14,
-               ExcEntryAlreadyExists(line_n, column, p.second, value));
+        DEAL_II_Assert(std::abs(p.second - value) < 1.e-14,
+                       ExcEntryAlreadyExists(line_n, column, p.second, value));
         return;
       }
 
@@ -1664,10 +1672,11 @@ AffineConstraints<number>::set_inhomogeneity(const size_type line_n,
                                              const number    value)
 {
   const size_type line_index = calculate_line_index(line_n);
-  Assert(line_index < lines_cache.size() &&
-           lines_cache[line_index] != numbers::invalid_size_type,
-         ExcMessage("call add_line() before calling set_inhomogeneity()"));
-  Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
+  DEAL_II_Assert(line_index < lines_cache.size() &&
+                   lines_cache[line_index] != numbers::invalid_size_type,
+                 ExcMessage(
+                   "call add_line() before calling set_inhomogeneity()"));
+  DEAL_II_Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
   line_ptr->inhomogeneity  = value;
 }
@@ -1701,7 +1710,8 @@ AffineConstraints<number>::is_inhomogeneously_constrained(
     return false;
   else
     {
-      Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
+      DEAL_II_Assert(lines_cache[line_index] < lines.size(),
+                     ExcInternalError());
       return !(lines[lines_cache[line_index]].inhomogeneity == number(0.));
     }
 }
@@ -1742,7 +1752,7 @@ AffineConstraints<number>::calculate_line_index(const size_type line_n) const
   if (!local_lines.size())
     return line_n;
 
-  Assert(local_lines.is_element(line_n), ExcRowNotStoredHere(line_n));
+  DEAL_II_Assert(local_lines.is_element(line_n), ExcRowNotStoredHere(line_n));
 
   return local_lines.index_within_set(line_n);
 }
@@ -1769,7 +1779,7 @@ AffineConstraints<number>::distribute_local_to_global(
   const number    value,
   VectorType &    global_vector) const
 {
-  Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
 
   if (is_constrained(index) == false)
     global_vector(index) += value;
@@ -1794,7 +1804,7 @@ AffineConstraints<number>::distribute_local_to_global(
   ForwardIteratorInd local_indices_begin,
   VectorType &       global_vector) const
 {
-  Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
   for (; local_vector_begin != local_vector_end;
        ++local_vector_begin, ++local_indices_begin)
     {
@@ -1823,8 +1833,9 @@ AffineConstraints<number>::distribute_local_to_global(
   const std::vector<size_type> &local_dof_indices,
   OutVector &                   global_vector) const
 {
-  Assert(local_vector.size() == local_dof_indices.size(),
-         ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
+  DEAL_II_Assert(local_vector.size() == local_dof_indices.size(),
+                 ExcDimensionMismatch(local_vector.size(),
+                                      local_dof_indices.size()));
   distribute_local_to_global(local_vector.begin(),
                              local_vector.end(),
                              local_dof_indices.begin(),
@@ -1842,7 +1853,7 @@ AffineConstraints<number>::get_dof_values(
   ForwardIteratorVec local_vector_begin,
   ForwardIteratorVec local_vector_end) const
 {
-  Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
+  DEAL_II_Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
   for (; local_vector_begin != local_vector_end;
        ++local_vector_begin, ++local_indices_begin)
     {

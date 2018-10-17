@@ -45,9 +45,10 @@ test(Vector<double> &v)
 
   // check that the entries are ok
   for (unsigned int i = 0; i < v.size(); ++i)
-    AssertThrow(((pattern[i] == true) && (v(i) - (-3. * i / 4.) == 0)) ||
-                  ((pattern[i] == false) && (v(i) == 0)),
-                ExcInternalError());
+    DEAL_II_AssertThrow(((pattern[i] == true) &&
+                         (v(i) - (-3. * i / 4.) == 0)) ||
+                          ((pattern[i] == false) && (v(i) == 0)),
+                        ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

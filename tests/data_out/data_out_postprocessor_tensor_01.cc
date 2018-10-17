@@ -102,9 +102,9 @@ namespace Step8
   right_hand_side(const std::vector<Point<dim>> &points,
                   std::vector<Tensor<1, dim>> &  values)
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(dim >= 2, ExcNotImplemented());
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(dim >= 2, ExcNotImplemented());
 
     Point<dim> point_1, point_2;
     point_1(0) = 0.5;
@@ -329,13 +329,13 @@ namespace Step8
       const DataPostprocessorInputs::Vector<dim> &input_data,
       std::vector<Vector<double>> &               computed_quantities) const
     {
-      AssertDimension(input_data.solution_gradients.size(),
-                      computed_quantities.size());
+      DEAL_II_AssertDimension(input_data.solution_gradients.size(),
+                              computed_quantities.size());
 
       for (unsigned int p = 0; p < input_data.solution_gradients.size(); ++p)
         {
-          AssertDimension(computed_quantities[p].size(),
-                          (Tensor<2, dim>::n_independent_components));
+          DEAL_II_AssertDimension(computed_quantities[p].size(),
+                                  (Tensor<2, dim>::n_independent_components));
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
               computed_quantities[p]
@@ -356,7 +356,7 @@ namespace Step8
   {
     std::string filename = "solution-";
     filename += ('0' + cycle);
-    Assert(cycle < 10, ExcInternalError());
+    DEAL_II_Assert(cycle < 10, ExcInternalError());
 
     StrainPostprocessor<dim> grad_u;
 

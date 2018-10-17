@@ -32,7 +32,7 @@ main()
   t[0][1][0][1] = 3;
   t[1][0][1][0] = 3;
 
-  AssertThrow(t[0][1][0][1] == t[1][0][1][0], ExcInternalError());
+  DEAL_II_AssertThrow(t[0][1][0][1] == t[1][0][1][0], ExcInternalError());
 
   // check norm of tensor
   deallog << t.norm() << std::endl;
@@ -45,8 +45,8 @@ main()
       for (unsigned int k = 0; k < 2; ++k)
         for (unsigned int l = 0; l < 2; ++l)
           norm_sqr += t[i][j][k][l] * t[i][j][k][l];
-  AssertThrow(std::fabs(t.norm() * t.norm() - norm_sqr) < 1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(t.norm() * t.norm() - norm_sqr) < 1e-14,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

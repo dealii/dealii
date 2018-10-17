@@ -75,7 +75,8 @@ public:
   virtual double
   value(const Point<dim> &p, const unsigned int component) const
   {
-    Assert((component == 0) && (this->n_components == 1), ExcInternalError());
+    DEAL_II_Assert((component == 0) && (this->n_components == 1),
+                   ExcInternalError());
     double val = 0;
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int i = 0; i <= q; ++i)
@@ -102,10 +103,11 @@ private:
 
 
 
-DeclException1(ExcFailedProjection,
-               double,
-               << "The projection was supposed to exactly represent the "
-               << "original function, but the relative residual is " << arg1);
+DEAL_II_DeclException1(
+  ExcFailedProjection,
+  double,
+  << "The projection was supposed to exactly represent the "
+  << "original function, but the relative residual is " << arg1);
 
 
 template <int dim>
@@ -151,9 +153,9 @@ do_project(const Triangulation<dim> &triangulation,
               << std::endl;
 
       if (q <= p - order_difference)
-        AssertThrow(error.l2_norm() <= 1e-10 * projection.l2_norm(),
-                    ExcFailedProjection(error.l2_norm() /
-                                        projection.l2_norm()));
+        DEAL_II_AssertThrow(error.l2_norm() <= 1e-10 * projection.l2_norm(),
+                            ExcFailedProjection(error.l2_norm() /
+                                                projection.l2_norm()));
     }
 }
 

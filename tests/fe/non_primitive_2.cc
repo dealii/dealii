@@ -248,7 +248,7 @@ test(const unsigned int p)
     {
       if (i % (dim * dim * dim) == 0)
         deallog << i << ' ' << p2->value() << std::endl;
-      Assert(p3->value() == p2->value(), ExcInternalError());
+      DEAL_II_Assert(p3->value() == p2->value(), ExcInternalError());
     };
 }
 

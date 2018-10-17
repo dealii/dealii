@@ -59,7 +59,7 @@ test()
       for (unsigned int d = 0; d < dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1 << d);
-      AssertThrow(subdomain < (1 << dim), ExcInternalError());
+      DEAL_II_AssertThrow(subdomain < (1 << dim), ExcInternalError());
 
       cell->set_subdomain_id(subdomain);
     };
@@ -84,7 +84,8 @@ test()
 
       for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
         if (subdomain_association[i] == subdomain)
-          AssertThrow(index_set.is_element(i) == true, ExcInternalError());
+          DEAL_II_AssertThrow(index_set.is_element(i) == true,
+                              ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

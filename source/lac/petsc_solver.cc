@@ -60,12 +60,12 @@ namespace PETScWrappers
     MPI_COMM_SELF in, but get something other out when you ask PETSc for the
     communicator. This mainly fails due to the MatrixFree classes, that can not
     ask PETSc for a communicator. //Timo Heister
-    Assert(A.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver
-    and Matrix need to use the same MPI_Comm."));
-    Assert(x.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver
-    and Vector need to use the same MPI_Comm."));
-    Assert(b.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver
-    and Vector need to use the same MPI_Comm."));
+    DEAL_II_Assert(A.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc
+    Solver and Matrix need to use the same MPI_Comm."));
+    DEAL_II_Assert(x.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc
+    Solver and Vector need to use the same MPI_Comm."));
+    DEAL_II_Assert(b.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc
+    Solver and Vector need to use the same MPI_Comm."));
     */
 
     // first create a solver object if this
@@ -75,7 +75,7 @@ namespace PETScWrappers
         solver_data = std_cxx14::make_unique<SolverData>();
 
         PetscErrorCode ierr = KSPCreate(mpi_communicator, &solver_data->ksp);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         // let derived classes set the solver
         // type, and the preconditioning
@@ -84,13 +84,14 @@ namespace PETScWrappers
         set_solver_type(solver_data->ksp);
 
         ierr = KSPSetPC(solver_data->ksp, preconditioner.get_pc());
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         // make sure the preconditioner has an associated matrix set
         const Mat B = preconditioner;
-        AssertThrow(B != nullptr,
-                    ExcMessage("PETSc preconditioner should have an"
-                               "associated matrix set to be used in solver."));
+        DEAL_II_AssertThrow(B != nullptr,
+                            ExcMessage(
+                              "PETSc preconditioner should have an"
+                              "associated matrix set to be used in solver."));
 
         // setting the preconditioner overwrites the used matrices.
         // hence, we need to set the matrices after the preconditioner.
@@ -104,7 +105,7 @@ namespace PETScWrappers
 #  else
         ierr = KSPSetOperators(solver_data->ksp, A, preconditioner);
 #  endif
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         // then a convergence monitor
         // function. that function simply
@@ -115,27 +116,27 @@ namespace PETScWrappers
                                      &convergence_test,
                                      reinterpret_cast<void *>(&solver_control),
                                      nullptr);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
     // set the command line option prefix name
     PetscErrorCode ierr =
       KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // set the command line options provided
     // by the user to override the defaults
     ierr = KSPSetFromOptions(solver_data->ksp);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // then do the real work: set up solver
     // internal data and solve the
     // system.
     ierr = KSPSetUp(solver_data->ksp);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = KSPSolve(solver_data->ksp, b, x);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // do not destroy solver object
     //    solver_data.reset ();
@@ -143,9 +144,10 @@ namespace PETScWrappers
     // in case of failure: throw
     // exception
     if (solver_control.last_check() != SolverControl::success)
-      AssertThrow(false,
-                  SolverControl::NoConvergence(solver_control.last_step(),
-                                               solver_control.last_value()));
+      DEAL_II_AssertThrow(
+        false,
+        SolverControl::NoConvergence(solver_control.last_step(),
+                                     solver_control.last_value()));
     // otherwise exit as normal
   }
 
@@ -202,7 +204,7 @@ namespace PETScWrappers
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // return without failure
@@ -217,7 +219,7 @@ namespace PETScWrappers
     solver_data = std_cxx14::make_unique<SolverData>();
 
     ierr = KSPCreate(mpi_communicator, &solver_data->ksp);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // let derived classes set the solver
     // type, and the preconditioning
@@ -226,7 +228,7 @@ namespace PETScWrappers
     set_solver_type(solver_data->ksp);
 
     ierr = KSPSetPC(solver_data->ksp, preconditioner.get_pc());
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // then a convergence monitor
     // function. that function simply
@@ -237,12 +239,12 @@ namespace PETScWrappers
                                  &convergence_test,
                                  reinterpret_cast<void *>(&solver_control),
                                  nullptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // set the command line options provided
     // by the user to override the defaults
     ierr = KSPSetFromOptions(solver_data->ksp);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -267,17 +269,17 @@ namespace PETScWrappers
   SolverRichardson::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPRICHARDSON);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // set the damping factor from the data
     ierr = KSPRichardsonSetScale(ksp, additional_data.omega);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // Hand over the absolute
     // tolerance and the maximum
@@ -297,7 +299,7 @@ namespace PETScWrappers
                             this->solver_control.tolerance(),
                             PETSC_DEFAULT,
                             this->solver_control.max_steps() + 1);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -315,13 +317,13 @@ namespace PETScWrappers
   SolverChebychev::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPCHEBYSHEV);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -339,13 +341,13 @@ namespace PETScWrappers
   SolverCG::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPCG);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -363,13 +365,13 @@ namespace PETScWrappers
   SolverBiCG::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPBICG);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -396,7 +398,7 @@ namespace PETScWrappers
   SolverGMRES::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPGMRES);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // set the restart parameter from the
     // data. we would like to use the simple
@@ -413,7 +415,7 @@ namespace PETScWrappers
     // like this.
     /*
         ierr = KSPGMRESSetRestart (ksp, additional_data.restart_parameter);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow (ierr == 0, ExcPETScError(ierr));
     */
     // so rather expand their macros by hand,
     // and do some equally nasty stuff that at
@@ -422,24 +424,24 @@ namespace PETScWrappers
     ierr = PetscObjectQueryFunction((PetscObject)(ksp),
                                     "KSPGMRESSetRestart_C",
                                     (void (**)()) & fun_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = (*fun_ptr)(ksp, additional_data.restart_parameter);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // Set preconditioning side to
     // right
     if (additional_data.right_preconditioning)
       {
         ierr = KSPSetPCSide(ksp, PC_RIGHT);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -457,13 +459,13 @@ namespace PETScWrappers
   SolverBicgstab::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPBCGS);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -481,13 +483,13 @@ namespace PETScWrappers
   SolverCGS::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPCGS);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -505,13 +507,13 @@ namespace PETScWrappers
   SolverTFQMR::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPTFQMR);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -529,13 +531,13 @@ namespace PETScWrappers
   SolverTCQMR::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPTCQMR);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -553,13 +555,13 @@ namespace PETScWrappers
   SolverCR::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPCR);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -577,13 +579,13 @@ namespace PETScWrappers
   SolverLSQR::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPLSQR);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // in the deal.II solvers, we always
     // honor the initial guess in the
     // solution vector. do so here as well:
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -601,7 +603,7 @@ namespace PETScWrappers
   SolverPreOnly::set_solver_type(KSP &ksp) const
   {
     PetscErrorCode ierr = KSPSetType(ksp, KSPPREONLY);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // The KSPPREONLY solver of
     // PETSc never calls the convergence
@@ -617,7 +619,7 @@ namespace PETScWrappers
     // a nonzero initial guess leads
     // PETSc to produce some error messages.
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -649,7 +651,7 @@ namespace PETScWrappers
      * (rather than iterative) solver
      */
     PetscErrorCode ierr = KSPSetType(ksp, KSPPREONLY);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     /**
      * The KSPPREONLY solver of PETSc never calls the convergence monitor,
@@ -664,7 +666,7 @@ namespace PETScWrappers
      * produce some error messages.
      */
     ierr = KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
   void
@@ -705,7 +707,7 @@ namespace PETScWrappers
          * solver_data->ksp
          */
         PetscErrorCode ierr = KSPCreate(mpi_communicator, &solver_data->ksp);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * set the matrices involved. the last argument is irrelevant here,
@@ -717,7 +719,7 @@ namespace PETScWrappers
 #    else
         ierr = KSPSetOperators(solver_data->ksp, A, A);
 #    endif
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * setting the solver type
@@ -728,7 +730,7 @@ namespace PETScWrappers
          * getting the associated preconditioner context
          */
         ierr = KSPGetPC(solver_data->ksp, &solver_data->pc);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * build PETSc PC for particular PCLU or PCCHOLESKY preconditioner
@@ -738,7 +740,7 @@ namespace PETScWrappers
           ierr = PCSetType(solver_data->pc, PCCHOLESKY);
         else
           ierr = PCSetType(solver_data->pc, PCLU);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * convergence monitor function that checks with the solver_control
@@ -748,7 +750,7 @@ namespace PETScWrappers
                                      &convergence_test,
                                      reinterpret_cast<void *>(&solver_control),
                                      PETSC_NULL);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * set the software that is to be used to perform the lu
@@ -760,7 +762,7 @@ namespace PETScWrappers
 #    else
         ierr = PCFactorSetMatSolverType(solver_data->pc, MATSOLVERMUMPS);
 #    endif
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * set up the package to call for the factorization
@@ -770,7 +772,7 @@ namespace PETScWrappers
 #    else
         ierr = PCFactorSetUpMatSolverType(solver_data->pc);
 #    endif
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * get the factored matrix F from the preconditioner context.  This
@@ -778,42 +780,43 @@ namespace PETScWrappers
          * Cholesky
          */
         ierr = PCFactorGetMatrix(solver_data->pc, &F);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * Passing the control parameters to MUMPS
          */
         ierr = MatMumpsSetIcntl(F, icntl, ival);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * set the command line option prefix name
          */
         ierr = KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
         /**
          * set the command line options provided by the user to override
          * the defaults
          */
         ierr = KSPSetFromOptions(solver_data->ksp);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
     /**
      * solve the linear system
      */
     PetscErrorCode ierr = KSPSolve(solver_data->ksp, b, x);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     /**
      * in case of failure throw exception
      */
     if (solver_control.last_check() != SolverControl::success)
       {
-        AssertThrow(false,
-                    SolverControl::NoConvergence(solver_control.last_step(),
-                                                 solver_control.last_value()));
+        DEAL_II_AssertThrow(
+          false,
+          SolverControl::NoConvergence(solver_control.last_step(),
+                                       solver_control.last_value()));
       }
     else
       {
@@ -822,13 +825,13 @@ namespace PETScWrappers
          * and residual norm
          */
         ierr = KSPGetIterationNumber(solver_data->ksp, &its);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
         ierr = KSPGetResidualNorm(solver_data->ksp, &rnorm);
-        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
 
 #  else // DEAL_II_PETSC_WITH_MUMPS
-    Assert(
+    DEAL_II_Assert(
       false,
       ExcMessage(
         "Your PETSc installation does not include a copy of "
@@ -874,7 +877,7 @@ namespace PETScWrappers
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     return 0;

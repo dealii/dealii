@@ -27,9 +27,9 @@ namespace
   std::vector<number>
   get_bernstein_coefficients(const unsigned int k, const unsigned int n)
   {
-    Assert(n > 0,
-           ExcMessage("Bernstein polynomial needs to be of degree > 0."));
-    AssertIndexRange(k, n + 1);
+    DEAL_II_Assert(
+      n > 0, ExcMessage("Bernstein polynomial needs to be of degree > 0."));
+    DEAL_II_AssertIndexRange(k, n + 1);
     std::vector<number> coeff(n + 1, number(0.0));
     for (unsigned int i = k; i < n + 1; ++i)
       {

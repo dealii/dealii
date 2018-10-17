@@ -385,7 +385,7 @@ namespace LinearAlgebra
      *
      * @ingroup Exceptions
      */
-    DeclException0(ExcVectorTypeNotCompatible);
+    DEAL_II_DeclException0(ExcVectorTypeNotCompatible);
 
   private:
     /**

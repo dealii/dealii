@@ -79,7 +79,7 @@ do_test(const DoFHandler<dim> &          dof,
         MatrixFree<dim, number>::AdditionalData::color;
     else
       {
-        Assert(parallel_option == 0, ExcInternalError());
+        DEAL_II_Assert(parallel_option == 0, ExcInternalError());
         data.tasks_parallel_scheme =
           MatrixFree<dim, number>::AdditionalData::partition_partition;
       }

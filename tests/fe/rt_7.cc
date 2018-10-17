@@ -59,7 +59,7 @@ plot_shape_functions(const unsigned int degree)
                    update_values | update_gradients | update_quadrature_points);
   fe.reinit(c);
 
-  Assert(fe.get_fe().n_components() == dim, ExcInternalError());
+  DEAL_II_Assert(fe.get_fe().n_components() == dim, ExcInternalError());
 
   for (unsigned int q_point = 0; q_point < q.size(); ++q_point)
     {

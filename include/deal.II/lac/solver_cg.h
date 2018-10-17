@@ -397,7 +397,7 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
       A.vmult(h, d);
 
       number alpha = d * h;
-      Assert(std::abs(alpha) != 0., ExcDivideByZero());
+      DEAL_II_Assert(std::abs(alpha) != 0., ExcDivideByZero());
       alpha = gh / alpha;
 
       x.add(alpha, d);
@@ -415,7 +415,7 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
           preconditioner.vmult(h, g);
 
           beta = gh;
-          Assert(std::abs(beta) != 0., ExcDivideByZero());
+          DEAL_II_Assert(std::abs(beta) != 0., ExcDivideByZero());
           gh   = g * h;
           beta = gh / beta;
           d.sadd(beta, -1., h);
@@ -452,7 +452,7 @@ SolverCG<VectorType>::solve(const MatrixType &        A,
 
   // in case of failure: throw exception
   if (conv != SolverControl::success)
-    AssertThrow(false, SolverControl::NoConvergence(it, res));
+    DEAL_II_AssertThrow(false, SolverControl::NoConvergence(it, res));
   // otherwise exit as normal
 }
 

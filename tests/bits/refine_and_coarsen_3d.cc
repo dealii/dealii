@@ -70,14 +70,14 @@ check()
   // verify that we get the same cells again
   deallog << n_cells << ' ' << tria.n_active_cells() << std::endl;
 
-  Assert(tria.n_active_cells() == n_cells, ExcInternalError());
+  DEAL_II_Assert(tria.n_active_cells() == n_cells, ExcInternalError());
 
   unsigned int index = 0;
   for (typename Triangulation<dim>::active_cell_iterator cell =
          tria.begin_active();
        cell != tria.end();
        ++cell, ++index)
-    AssertThrow(cells[index] == cell, ExcInternalError());
+    DEAL_II_AssertThrow(cells[index] == cell, ExcInternalError());
 }
 
 

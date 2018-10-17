@@ -101,13 +101,13 @@ namespace CUDAWrappers
                    const unsigned int    n)
     {
       cudaError_t error_code = cudaMalloc(array_device, n * sizeof(Number1));
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
 
       error_code = cudaMemcpy(*array_device,
                               array_host.data(),
                               n * sizeof(Number1),
                               cudaMemcpyHostToDevice);
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
     }
 
 
@@ -500,7 +500,7 @@ namespace CUDAWrappers
 
     if (additional_data.parallelization_scheme != parallel_over_elem &&
         additional_data.parallelization_scheme != parallel_in_elem)
-      AssertThrow(false, ExcMessage("Invalid parallelization scheme."));
+      DEAL_II_AssertThrow(false, ExcMessage("Invalid parallelization scheme."));
 
     this->parallelization_scheme = additional_data.parallelization_scheme;
 
@@ -514,8 +514,8 @@ namespace CUDAWrappers
     const unsigned int n_dofs_1d     = fe_degree + 1;
     const unsigned int n_q_points_1d = quad.size();
 
-    Assert(n_dofs_1d == n_q_points_1d,
-           ExcMessage("n_q_points_1d must be equal to fe_degree+1."));
+    DEAL_II_Assert(n_dofs_1d == n_q_points_1d,
+                   ExcMessage("n_q_points_1d must be equal to fe_degree+1."));
 
     // Set padding length to the closest power of two larger than or equal to
     // the number of threads.
@@ -535,7 +535,7 @@ namespace CUDAWrappers
                                                 size_shape_values,
                                                 0,
                                                 cudaMemcpyHostToDevice);
-    AssertCuda(cuda_error);
+    DEAL_II_AssertCuda(cuda_error);
 
     if (update_flags & update_gradients)
       {
@@ -544,7 +544,7 @@ namespace CUDAWrappers
                                         size_shape_values,
                                         0,
                                         cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+        DEAL_II_AssertCuda(cuda_error);
       }
 
     // Setup the number of cells per CUDA thread block
@@ -620,14 +620,14 @@ namespace CUDAWrappers
         cuda_error = cudaMalloc(&constrained_dofs,
                                 n_constrained_dofs *
                                   sizeof(dealii::types::global_dof_index));
-        AssertCuda(cuda_error);
+        DEAL_II_AssertCuda(cuda_error);
 
         cuda_error = cudaMemcpy(constrained_dofs,
                                 constrained_dofs_host.data(),
                                 n_constrained_dofs *
                                   sizeof(dealii::types::global_dof_index),
                                 cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+        DEAL_II_AssertCuda(cuda_error);
       }
   }
 
@@ -661,7 +661,7 @@ namespace CUDAWrappers
         if (q_points[i] != nullptr)
           {
             cudaError_t cuda_error = cudaFree(q_points[i]);
-            AssertCuda(cuda_error);
+            DEAL_II_AssertCuda(cuda_error);
             q_points[i] = nullptr;
           }
       }
@@ -671,7 +671,7 @@ namespace CUDAWrappers
         if (local_to_global[i] != nullptr)
           {
             cudaError_t cuda_error = cudaFree(local_to_global[i]);
-            AssertCuda(cuda_error);
+            DEAL_II_AssertCuda(cuda_error);
             local_to_global[i] = nullptr;
           }
       }
@@ -681,7 +681,7 @@ namespace CUDAWrappers
         if (inv_jacobian[i] != nullptr)
           {
             cudaError_t cuda_error = cudaFree(inv_jacobian[i]);
-            AssertCuda(cuda_error);
+            DEAL_II_AssertCuda(cuda_error);
             inv_jacobian[i] = nullptr;
           }
       }
@@ -691,7 +691,7 @@ namespace CUDAWrappers
         if (JxW[i] != nullptr)
           {
             cudaError_t cuda_error = cudaFree(JxW[i]);
-            AssertCuda(cuda_error);
+            DEAL_II_AssertCuda(cuda_error);
             JxW[i] = nullptr;
           }
       }
@@ -701,7 +701,7 @@ namespace CUDAWrappers
         if (constraint_mask[i] != nullptr)
           {
             cudaError_t cuda_error = cudaFree(constraint_mask[i]);
-            AssertCuda(cuda_error);
+            DEAL_II_AssertCuda(cuda_error);
             constraint_mask[i] = nullptr;
           }
       }
@@ -716,7 +716,7 @@ namespace CUDAWrappers
     if (constrained_dofs != nullptr)
       {
         cudaError_t cuda_error = cudaFree(constrained_dofs);
-        AssertCuda(cuda_error);
+        DEAL_II_AssertCuda(cuda_error);
         constrained_dofs = nullptr;
       }
   }

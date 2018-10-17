@@ -46,7 +46,7 @@ namespace Algorithms
   OutputOperator<VectorType> &
   DoFOutputOperator<VectorType, dim, spacedim>::operator<<(const AnyData &data)
   {
-    Assert((dof != nullptr), ExcNotInitialized());
+    DEAL_II_Assert((dof != nullptr), ExcNotInitialized());
     out.attach_dof_handler(*dof);
     for (unsigned int i = 0; i < data.size(); ++i)
       {

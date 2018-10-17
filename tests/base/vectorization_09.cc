@@ -40,7 +40,7 @@ test()
       tmp.streaming_store(&stored[i * n_vectors]);
     }
   for (unsigned int i = 0; i < n_chunks * n_vectors; ++i)
-    AssertThrow(stored[i] == i, ExcInternalError());
+    DEAL_II_AssertThrow(stored[i] == i, ExcInternalError());
   deallog << "streaming store OK" << std::endl;
 }
 

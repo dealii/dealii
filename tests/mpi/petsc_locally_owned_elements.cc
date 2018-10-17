@@ -45,23 +45,23 @@ test()
   vec.block(0).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.block(1).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.collect_sizes();
-  AssertThrow(vec.block(0).local_size() == 100, ExcInternalError());
-  AssertThrow(vec.block(0).local_range().first == 100 * myid,
-              ExcInternalError());
-  AssertThrow(vec.block(0).local_range().second == 100 * myid + 100,
-              ExcInternalError());
-  AssertThrow(vec.block(1).local_size() == 100, ExcInternalError());
-  AssertThrow(vec.block(1).local_range().first == 100 * myid,
-              ExcInternalError());
-  AssertThrow(vec.block(1).local_range().second == 100 * myid + 100,
-              ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(0).local_size() == 100, ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(0).local_range().first == 100 * myid,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(0).local_range().second == 100 * myid + 100,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(1).local_size() == 100, ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(1).local_range().first == 100 * myid,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(vec.block(1).local_range().second == 100 * myid + 100,
+                      ExcInternalError());
 
   IndexSet locally_owned(vec.size());
   locally_owned.add_range(100 * myid, 100 * myid + 100);
   locally_owned.add_range(vec.block(0).size() + 100 * myid,
                           vec.block(0).size() + 100 * myid + 100);
-  AssertThrow(vec.locally_owned_elements() == locally_owned,
-              ExcInternalError());
+  DEAL_II_AssertThrow(vec.locally_owned_elements() == locally_owned,
+                      ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;

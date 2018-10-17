@@ -47,7 +47,7 @@ test()
   // Check the vector
   double eps = 1e-12;
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(
+    DEAL_II_AssertThrow(
       std::abs(vec[i] - (double)i) < eps,
       ExcMessage(
         "Value in the vector has been changed by block_write or block_read"));
@@ -70,9 +70,9 @@ test()
   }
   // Check the vector
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(std::abs(vec[i] - (double)i) < eps,
-                ExcMessage(
-                  "Value in the vector has been changed by boost archive"));
+    DEAL_II_AssertThrow(
+      std::abs(vec[i] - (double)i) < eps,
+      ExcMessage("Value in the vector has been changed by boost archive"));
 }
 
 

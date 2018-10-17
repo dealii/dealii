@@ -66,9 +66,9 @@ namespace LinearAlgebra
     std::complex<Number>
     get_min(const std::complex<Number> a, const std::complex<Number>)
     {
-      AssertThrow(false,
-                  ExcMessage("VectorOperation::min not "
-                             "implemented for complex numbers"));
+      DEAL_II_AssertThrow(false,
+                          ExcMessage("VectorOperation::min not "
+                                     "implemented for complex numbers"));
       return a;
     }
 
@@ -83,9 +83,9 @@ namespace LinearAlgebra
     std::complex<Number>
     get_max(const std::complex<Number> a, const std::complex<Number>)
     {
-      AssertThrow(false,
-                  ExcMessage("VectorOperation::max not "
-                             "implemented for complex numbers"));
+      DEAL_II_AssertThrow(false,
+                          ExcMessage("VectorOperation::max not "
+                                     "implemented for complex numbers"));
       return a;
     }
 
@@ -179,7 +179,7 @@ namespace LinearAlgebra
                                                  values,
                                                  n_elements * sizeof(Number),
                                                  cudaMemcpyDeviceToHost);
-        AssertCuda(cuda_error_code);
+        DEAL_II_AssertCuda(cuda_error_code);
         tmp_vector.update_ghost_values();
 
         const IndexSet &stored = rw_vector.get_stored_elements();
@@ -315,7 +315,7 @@ namespace LinearAlgebra
     int             leading_dimension;
     int ierr = trilinos_vec.trilinos_vector().ExtractView(&start_ptr,
                                                           &leading_dimension);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     std::copy(start_ptr, start_ptr + leading_dimension, values.get());
 
@@ -389,8 +389,8 @@ namespace LinearAlgebra
   ReadWriteVector<Number> &
   ReadWriteVector<Number>::operator=(const Number s)
   {
-    Assert(s == static_cast<Number>(0),
-           ExcMessage("Only 0 can be assigned to a vector."));
+    DEAL_II_Assert(s == static_cast<Number>(0),
+                   ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
     const size_type this_size = n_elements();
@@ -431,9 +431,10 @@ namespace LinearAlgebra
         comm_pattern =
           std::dynamic_pointer_cast<const Utilities::MPI::Partitioner>(
             communication_pattern);
-        AssertThrow(comm_pattern != nullptr,
-                    ExcMessage("The communication pattern is not of type "
-                               "Utilities::MPI::Partitioner."));
+        DEAL_II_AssertThrow(comm_pattern != nullptr,
+                            ExcMessage(
+                              "The communication pattern is not of type "
+                              "Utilities::MPI::Partitioner."));
       }
 
 
@@ -470,7 +471,7 @@ namespace LinearAlgebra
                       const std::complex<PETSC_Number> * /*petsc_end_ptr*/,
                       Number * /*ptr*/)
     {
-      AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
+      DEAL_II_AssertThrow(false, ExcMessage("Tried to copy complex -> real"));
     }
   } // namespace internal
 
@@ -485,21 +486,21 @@ namespace LinearAlgebra
       & /*communication_pattern*/)
   {
     // TODO: this works only if no communication is needed.
-    Assert(petsc_vec.locally_owned_elements() == stored_elements,
-           StandardExceptions::ExcInvalidState());
+    DEAL_II_Assert(petsc_vec.locally_owned_elements() == stored_elements,
+                   StandardExceptions::ExcInvalidState());
 
     // get a representation of the vector and copy it
     PetscScalar *  start_ptr;
     PetscErrorCode ierr =
       VecGetArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     const size_type vec_size = petsc_vec.local_size();
     internal::copy_petsc_vector(start_ptr, start_ptr + vec_size, begin());
 
     // restore the representation of the vector
     ierr = VecRestoreArray(static_cast<const Vec &>(petsc_vec), &start_ptr);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 #endif
 
@@ -546,10 +547,10 @@ namespace LinearAlgebra
         epetra_comm_pattern =
           std::dynamic_pointer_cast<const EpetraWrappers::CommunicationPattern>(
             communication_pattern);
-        AssertThrow(epetra_comm_pattern != nullptr,
-                    ExcMessage(
-                      std::string("The communication pattern is not of type ") +
-                      "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
+        DEAL_II_AssertThrow(
+          epetra_comm_pattern != nullptr,
+          ExcMessage(std::string("The communication pattern is not of type ") +
+                     "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
       }
 
     Epetra_Import import(epetra_comm_pattern->get_epetra_import());
@@ -559,14 +560,15 @@ namespace LinearAlgebra
     if (operation == VectorOperation::insert)
       {
         const int err = target_vector.Import(multivector, import, Insert);
-        AssertThrow(err == 0,
-                    ExcMessage("Epetra Import() failed with error code: " +
-                               Utilities::to_string(err)));
+        DEAL_II_AssertThrow(err == 0,
+                            ExcMessage(
+                              "Epetra Import() failed with error code: " +
+                              Utilities::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
-               ExcInternalError("Import failed."));
+        DEAL_II_Assert(size == 0 || values != nullptr,
+                       ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
           values[i] = new_values[i];
@@ -574,14 +576,15 @@ namespace LinearAlgebra
     else if (operation == VectorOperation::add)
       {
         const int err = target_vector.Import(multivector, import, Add);
-        AssertThrow(err == 0,
-                    ExcMessage("Epetra Import() failed with error code: " +
-                               Utilities::to_string(err)));
+        DEAL_II_AssertThrow(err == 0,
+                            ExcMessage(
+                              "Epetra Import() failed with error code: " +
+                              Utilities::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
-               ExcInternalError("Import failed."));
+        DEAL_II_Assert(size == 0 || values != nullptr,
+                       ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
           values[i] += new_values[i];
@@ -589,14 +592,15 @@ namespace LinearAlgebra
     else if (operation == VectorOperation::min)
       {
         const int err = target_vector.Import(multivector, import, Add);
-        AssertThrow(err == 0,
-                    ExcMessage("Epetra Import() failed with error code: " +
-                               Utilities::to_string(err)));
+        DEAL_II_AssertThrow(err == 0,
+                            ExcMessage(
+                              "Epetra Import() failed with error code: " +
+                              Utilities::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
-               ExcInternalError("Import failed."));
+        DEAL_II_Assert(size == 0 || values != nullptr,
+                       ExcInternalError("Import failed."));
 
         // To ensure that this code also compiles with complex
         // numbers, we only compare the real part of the
@@ -609,21 +613,22 @@ namespace LinearAlgebra
     else if (operation == VectorOperation::max)
       {
         const int err = target_vector.Import(multivector, import, Add);
-        AssertThrow(err == 0,
-                    ExcMessage("Epetra Import() failed with error code: " +
-                               Utilities::to_string(err)));
+        DEAL_II_AssertThrow(err == 0,
+                            ExcMessage(
+                              "Epetra Import() failed with error code: " +
+                              Utilities::to_string(err)));
 
         const double *new_values = target_vector.Values();
         const int     size       = target_vector.MyLength();
-        Assert(size == 0 || values != nullptr,
-               ExcInternalError("Import failed."));
+        DEAL_II_Assert(size == 0 || values != nullptr,
+                       ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
           if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
             values[i] = new_values[i];
       }
     else
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
   }
 
 
@@ -638,7 +643,7 @@ namespace LinearAlgebra
     // While the import does work with Trilinos 12.8.x, it fails with 12.4.x. To
     // be safe, we disable it here. Note that it would be a useful case, as
     // ReadWriteVector is supposed to replace ghosted vectors anyways.
-    AssertThrow(
+    DEAL_II_AssertThrow(
       !trilinos_vec.has_ghost_elements(),
       ExcMessage(
         "Import() from TrilinosWrappers::MPI::Vector with ghost entries is not supported!"));
@@ -684,7 +689,7 @@ namespace LinearAlgebra
                                             cuda_vec.get_values(),
                                             n_elements * sizeof(Number),
                                             cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
       }
     else if (operation == VectorOperation::add)
       {
@@ -694,7 +699,7 @@ namespace LinearAlgebra
                                             cuda_vec.get_values(),
                                             n_elements * sizeof(Number),
                                             cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
 
         // Add the two vectors
         for (unsigned int i = 0; i < n_elements; ++i)
@@ -708,7 +713,7 @@ namespace LinearAlgebra
                                             cuda_vec.get_values(),
                                             n_elements * sizeof(Number),
                                             cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
 
         // To ensure that this code also compiles with complex
         // numbers, we only compare the real part of the
@@ -726,14 +731,14 @@ namespace LinearAlgebra
                                             cuda_vec.get_values(),
                                             n_elements * sizeof(Number),
                                             cudaMemcpyDeviceToHost);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
 
         for (unsigned int i = 0; i < n_elements; ++i)
           if (std::real(tmp[i]) - std::real(values[i]) > 0.0)
             values[i] = tmp[i];
       }
     else
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
   }
 #endif
 
@@ -769,7 +774,7 @@ namespace LinearAlgebra
                                  const unsigned int precision,
                                  const bool         scientific) const
   {
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
     boost::io::ios_flags_saver restore_flags(out);
 
     out.precision(precision);
@@ -786,7 +791,7 @@ namespace LinearAlgebra
       out << "[" << idx << "]: " << values[i++] << '\n';
     out << std::flush;
 
-    AssertThrow(out, ExcIO());
+    DEAL_II_AssertThrow(out, ExcIO());
   }
 
 

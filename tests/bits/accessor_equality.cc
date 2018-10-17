@@ -46,17 +46,17 @@ test()
   {
     const typename Triangulation<dim>::active_cell_iterator cell =
       tria.begin_active();
-    AssertThrow(cell == cell, ExcInternalError());
-    AssertThrow(!(cell != cell), ExcInternalError());
-    AssertThrow(!(cell < cell), ExcInternalError());
+    DEAL_II_AssertThrow(cell == cell, ExcInternalError());
+    DEAL_II_AssertThrow(!(cell != cell), ExcInternalError());
+    DEAL_II_AssertThrow(!(cell < cell), ExcInternalError());
   }
 
   // same with non-active iterators
   {
     const typename Triangulation<dim>::cell_iterator cell = tria.begin();
-    AssertThrow(cell == cell, ExcInternalError());
-    AssertThrow(!(cell != cell), ExcInternalError());
-    AssertThrow(!(cell < cell), ExcInternalError());
+    DEAL_II_AssertThrow(cell == cell, ExcInternalError());
+    DEAL_II_AssertThrow(!(cell != cell), ExcInternalError());
+    DEAL_II_AssertThrow(!(cell < cell), ExcInternalError());
   }
 
   FE_Q<dim>       fe(1);
@@ -68,15 +68,15 @@ test()
   {
     const typename DoFHandler<dim>::active_cell_iterator cell =
       dof_handler.begin_active();
-    AssertThrow(cell == cell, ExcInternalError());
-    AssertThrow(!(cell != cell), ExcInternalError());
-    AssertThrow(!(cell < cell), ExcInternalError());
+    DEAL_II_AssertThrow(cell == cell, ExcInternalError());
+    DEAL_II_AssertThrow(!(cell != cell), ExcInternalError());
+    DEAL_II_AssertThrow(!(cell < cell), ExcInternalError());
   }
   {
     const typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin();
-    AssertThrow(cell == cell, ExcInternalError());
-    AssertThrow(!(cell != cell), ExcInternalError());
-    AssertThrow(!(cell < cell), ExcInternalError());
+    DEAL_II_AssertThrow(cell == cell, ExcInternalError());
+    DEAL_II_AssertThrow(!(cell != cell), ExcInternalError());
+    DEAL_II_AssertThrow(!(cell < cell), ExcInternalError());
   }
 
   // finally check that two iterators

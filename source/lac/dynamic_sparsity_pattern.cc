@@ -48,7 +48,7 @@ DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
         ForwardIterator test = begin, test1 = begin;
         ++test1;
         for (; test1 != end; ++test, ++test1)
-          Assert(*test1 > *test, ExcInternalError());
+          DEAL_II_Assert(*test1 > *test, ExcInternalError());
       }
 #endif
 
@@ -94,11 +94,11 @@ DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
       // resize vector by just inserting the
       // list
       const size_type pos1 = it - entries.begin();
-      Assert(pos1 <= entries.size(), ExcInternalError());
+      DEAL_II_Assert(pos1 <= entries.size(), ExcInternalError());
       entries.insert(it, my_it, end);
       it = entries.begin() + pos1;
-      Assert(entries.size() >= (size_type)(it - entries.begin()),
-             ExcInternalError());
+      DEAL_II_Assert(entries.size() >= (size_type)(it - entries.begin()),
+                     ExcInternalError());
 
       // now merge the two lists.
       std::vector<size_type>::iterator it2 = it + (end - my_it);
@@ -130,7 +130,7 @@ DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
 
       // resize and return
       const size_type new_size = it - entries.begin();
-      Assert(new_size <= stop_size, ExcInternalError());
+      DEAL_II_Assert(new_size <= stop_size, ExcInternalError());
       entries.resize(new_size);
       return;
     }
@@ -234,11 +234,12 @@ DynamicSparsityPattern::DynamicSparsityPattern(const DynamicSparsityPattern &s)
   , rowset(0)
 {
   (void)s;
-  Assert(s.rows == 0 && s.cols == 0,
-         ExcMessage(
-           "This constructor can only be called if the provided argument "
-           "is the sparsity pattern for an empty matrix. This constructor can "
-           "not be used to copy-construct a non-empty sparsity pattern."));
+  DEAL_II_Assert(
+    s.rows == 0 && s.cols == 0,
+    ExcMessage(
+      "This constructor can only be called if the provided argument "
+      "is the sparsity pattern for an empty matrix. This constructor can "
+      "not be used to copy-construct a non-empty sparsity pattern."));
 }
 
 
@@ -280,15 +281,16 @@ DynamicSparsityPattern &
 DynamicSparsityPattern::operator=(const DynamicSparsityPattern &s)
 {
   (void)s;
-  Assert(s.rows == 0 && s.cols == 0,
-         ExcMessage(
-           "This operator can only be called if the provided argument "
-           "is the sparsity pattern for an empty matrix. This operator can "
-           "not be used to copy a non-empty sparsity pattern."));
+  DEAL_II_Assert(
+    s.rows == 0 && s.cols == 0,
+    ExcMessage("This operator can only be called if the provided argument "
+               "is the sparsity pattern for an empty matrix. This operator can "
+               "not be used to copy a non-empty sparsity pattern."));
 
-  Assert(rows == 0 && cols == 0,
-         ExcMessage("This operator can only be called if the current object is"
-                    "empty."));
+  DEAL_II_Assert(rows == 0 && cols == 0,
+                 ExcMessage(
+                   "This operator can only be called if the current object is"
+                   "empty."));
 
   return *this;
 }
@@ -305,14 +307,14 @@ DynamicSparsityPattern::reinit(const size_type m,
   cols         = n;
   rowset       = rowset_;
 
-  Assert(rowset.size() == 0 || rowset.size() == m,
-         ExcMessage(
-           "The IndexSet argument to this function needs to either "
-           "be empty (indicating the complete set of rows), or have size "
-           "equal to the desired number of rows as specified by the "
-           "first argument to this function. (Of course, the number "
-           "of indices in this IndexSet may be less than the number "
-           "of rows, but the *size* of the IndexSet must be equal.)"));
+  DEAL_II_Assert(
+    rowset.size() == 0 || rowset.size() == m,
+    ExcMessage("The IndexSet argument to this function needs to either "
+               "be empty (indicating the complete set of rows), or have size "
+               "equal to the desired number of rows as specified by the "
+               "first argument to this function. (Of course, the number "
+               "of indices in this IndexSet may be less than the number "
+               "of rows, but the *size* of the IndexSet must be equal.)"));
 
   std::vector<Line> new_lines(rowset.size() == 0 ? rows : rowset.n_elements());
   lines.swap(new_lines);
@@ -354,9 +356,10 @@ DynamicSparsityPattern::max_entries_per_row() const
 bool
 DynamicSparsityPattern::exists(const size_type i, const size_type j) const
 {
-  Assert(i < rows, ExcIndexRange(i, 0, rows));
-  Assert(j < cols, ExcIndexRange(j, 0, cols));
-  Assert(rowset.size() == 0 || rowset.is_element(i), ExcInternalError());
+  DEAL_II_Assert(i < rows, ExcIndexRange(i, 0, rows));
+  DEAL_II_Assert(j < cols, ExcIndexRange(j, 0, cols));
+  DEAL_II_Assert(rowset.size() == 0 || rowset.is_element(i),
+                 ExcInternalError());
 
   if (!have_entries)
     return false;
@@ -374,7 +377,7 @@ DynamicSparsityPattern::exists(const size_type i, const size_type j) const
 void
 DynamicSparsityPattern::symmetrize()
 {
-  Assert(rows == cols, ExcNotQuadratic());
+  DEAL_II_Assert(rows == cols, ExcNotQuadratic());
 
   // loop over all elements presently
   // in the sparsity pattern and add
@@ -409,8 +412,8 @@ void
 DynamicSparsityPattern::compute_Tmmult_pattern(const SparsityPattern &sp_A,
                                                const SparsityPattern &sp_B)
 {
-  Assert(sp_A.n_rows() == sp_B.n_rows(),
-         ExcDimensionMismatch(sp_A.n_rows(), sp_B.n_rows()));
+  DEAL_II_Assert(sp_A.n_rows() == sp_B.n_rows(),
+                 ExcDimensionMismatch(sp_A.n_rows(), sp_B.n_rows()));
 
   this->reinit(sp_A.n_cols(), sp_B.n_cols());
   // we will go through all the
@@ -453,8 +456,8 @@ DynamicSparsityPattern::compute_mmult_pattern(
   const SparsityPatternTypeLeft & left,
   const SparsityPatternTypeRight &right)
 {
-  Assert(left.n_cols() == right.n_rows(),
-         ExcDimensionMismatch(left.n_cols(), right.n_rows()));
+  DEAL_II_Assert(left.n_cols() == right.n_rows(),
+                 ExcDimensionMismatch(left.n_cols(), right.n_rows()));
 
   this->reinit(left.n_rows(), right.n_cols());
 
@@ -493,7 +496,7 @@ DynamicSparsityPattern::print(std::ostream &out) const
       out << ']' << std::endl;
     }
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -519,7 +522,7 @@ DynamicSparsityPattern::print_gnuplot(std::ostream &out) const
     }
 
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 

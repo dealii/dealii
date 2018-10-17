@@ -39,7 +39,7 @@ Manifold<dim, spacedim>::project_to_manifold(
   const ArrayView<const Point<spacedim>> &,
   const Point<spacedim> &) const
 {
-  Assert(false, ExcPureFunctionCalled());
+  DEAL_II_Assert(false, ExcPureFunctionCalled());
   return Point<spacedim>();
 }
 
@@ -67,15 +67,16 @@ Manifold<dim, spacedim>::get_new_point(
   const double       tol      = 1e-10;
   const unsigned int n_points = surrounding_points.size();
 
-  Assert(n_points > 0, ExcMessage("There should be at least one point."));
+  DEAL_II_Assert(n_points > 0,
+                 ExcMessage("There should be at least one point."));
 
-  Assert(n_points == weights.size(),
-         ExcMessage(
-           "There should be as many surrounding points as weights given."));
+  DEAL_II_Assert(
+    n_points == weights.size(),
+    ExcMessage("There should be as many surrounding points as weights given."));
 
-  Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0) - 1.0) <
-           tol,
-         ExcMessage("The weights for the individual points should sum to 1!"));
+  DEAL_II_Assert(
+    std::abs(std::accumulate(weights.begin(), weights.end(), 0.0) - 1.0) < tol,
+    ExcMessage("The weights for the individual points should sum to 1!"));
 
   // First sort points in the order of their weights. This is done to
   // produce unique points even if get_intermediate_points is not
@@ -119,7 +120,7 @@ Manifold<dim, spacedim>::get_new_points(
   const Table<2, double> &                weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
-  AssertDimension(surrounding_points.size(), weights.size(1));
+  DEAL_II_AssertDimension(surrounding_points.size(), weights.size(1));
 
   for (unsigned int row = 0; row < weights.size(0); ++row)
     {
@@ -194,15 +195,16 @@ Manifold<3, 3>::normal_vector(const Triangulation<3, 3>::face_iterator &face,
                 second_index  = j;
               }
           }
-  Assert(first_index != numbers::invalid_unsigned_int,
-         ExcMessage("The search for possible directions did not succeed."));
+  DEAL_II_Assert(first_index != numbers::invalid_unsigned_int,
+                 ExcMessage(
+                   "The search for possible directions did not succeed."));
 
   // Compute tangents and normal for selected vertices
   Tensor<1, spacedim> t1     = get_tangent_vector(p, vertices[first_index]);
   Tensor<1, spacedim> t2     = get_tangent_vector(p, vertices[second_index]);
   Tensor<1, spacedim> normal = cross_product_3d(t1, t2);
 
-  Assert(
+  DEAL_II_Assert(
     normal.norm_square() > 1e4 * std::numeric_limits<double>::epsilon() *
                              t1.norm_square() * t2.norm_square(),
     ExcMessage(
@@ -232,7 +234,7 @@ Manifold<dim, spacedim>::normal_vector(
   const typename Triangulation<dim, spacedim>::face_iterator & /*face*/,
   const Point<spacedim> & /*p*/) const
 {
-  Assert(false, ExcPureFunctionCalled());
+  DEAL_II_Assert(false, ExcPureFunctionCalled());
   return Tensor<1, spacedim>();
 }
 
@@ -250,10 +252,10 @@ Manifold<2, 2>::get_normals_at_vertices(
 
   for (unsigned int i = 0; i < 2; ++i)
     {
-      Assert(n[i].norm() != 0,
-             ExcInternalError("Something went wrong. The "
-                              "computed normals have "
-                              "zero length."));
+      DEAL_II_Assert(n[i].norm() != 0,
+                     ExcInternalError("Something went wrong. The "
+                                      "computed normals have "
+                                      "zero length."));
       n[i] /= n[i].norm();
     }
 }
@@ -280,10 +282,10 @@ Manifold<3, 3>::get_normals_at_vertices(
 
   for (unsigned int i = 0; i < 4; ++i)
     {
-      Assert(n[i].norm() != 0,
-             ExcInternalError("Something went wrong. The "
-                              "computed normals have "
-                              "zero length."));
+      DEAL_II_Assert(n[i].norm() != 0,
+                     ExcInternalError("Something went wrong. The "
+                                      "computed normals have "
+                                      "zero length."));
       n[i] /= n[i].norm();
     }
 }
@@ -338,7 +340,7 @@ Point<spacedim>
 Manifold<dim, spacedim>::get_new_point_on_face(
   const typename Triangulation<dim, spacedim>::face_iterator &face) const
 {
-  Assert(dim > 1, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim > 1, ExcImpossibleInDim(dim));
 
   switch (dim)
     {
@@ -378,7 +380,7 @@ Point<1>
 Manifold<1, 1>::get_new_point_on_face(
   const Triangulation<1, 1>::face_iterator &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
   return Point<1>();
 }
 
@@ -389,7 +391,7 @@ Point<2>
 Manifold<1, 2>::get_new_point_on_face(
   const Triangulation<1, 2>::face_iterator &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
   return Point<2>();
 }
 
@@ -400,7 +402,7 @@ Point<3>
 Manifold<1, 3>::get_new_point_on_face(
   const Triangulation<1, 3>::face_iterator &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
   return Point<3>();
 }
 
@@ -411,7 +413,7 @@ Point<1>
 Manifold<1, 1>::get_new_point_on_quad(
   const Triangulation<1, 1>::quad_iterator &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
   return Point<1>();
 }
 
@@ -422,7 +424,7 @@ Point<2>
 Manifold<1, 2>::get_new_point_on_quad(
   const Triangulation<1, 2>::quad_iterator &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
   return Point<2>();
 }
 
@@ -433,7 +435,7 @@ Point<3>
 Manifold<1, 3>::get_new_point_on_quad(
   const Triangulation<1, 3>::quad_iterator &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
   return Point<3>();
 }
 
@@ -444,7 +446,7 @@ Point<spacedim>
 Manifold<dim, spacedim>::get_new_point_on_hex(
   const typename Triangulation<dim, spacedim>::hex_iterator & /*hex*/) const
 {
-  Assert(false, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(false, ExcImpossibleInDim(dim));
   return Point<spacedim>();
 }
 
@@ -491,7 +493,7 @@ namespace internal
       // we get here from FlatManifold<2,3>::normal_vector, but
       // the implementation below is bogus for this case anyway
       // (see the assert at the beginning of that function).
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return Tensor<1, 3>();
     }
 
@@ -533,9 +535,10 @@ FlatManifold<dim, spacedim>::get_new_point(
   const ArrayView<const Point<spacedim>> &surrounding_points,
   const ArrayView<const double> &         weights) const
 {
-  Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0) - 1.0) <
-           1e-10,
-         ExcMessage("The weights for the individual points should sum to 1!"));
+  DEAL_II_Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0) -
+                          1.0) < 1e-10,
+                 ExcMessage(
+                   "The weights for the individual points should sum to 1!"));
 
   Point<spacedim> p;
 
@@ -554,11 +557,11 @@ FlatManifold<dim, spacedim>::get_new_point(
           for (unsigned int i = 0; i < surrounding_points.size(); ++i)
             {
               minP[d] = std::min(minP[d], surrounding_points[i][d]);
-              Assert((surrounding_points[i][d] <
-                      periodicity[d] + tolerance * periodicity[d]) ||
-                       (surrounding_points[i][d] >=
-                        -tolerance * periodicity[d]),
-                     ExcPeriodicBox(d, surrounding_points[i], periodicity[d]));
+              DEAL_II_Assert(
+                (surrounding_points[i][d] <
+                 periodicity[d] + tolerance * periodicity[d]) ||
+                  (surrounding_points[i][d] >= -tolerance * periodicity[d]),
+                ExcPeriodicBox(d, surrounding_points[i], periodicity[d]));
             }
 
       // compute the weighted average point, possibly taking into account
@@ -595,7 +598,7 @@ FlatManifold<dim, spacedim>::get_new_points(
   const Table<2, double> &                weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
-  AssertDimension(surrounding_points.size(), weights.size(1));
+  DEAL_II_AssertDimension(surrounding_points.size(), weights.size(1));
   if (weights.size(0) == 0)
     return;
 
@@ -607,10 +610,11 @@ FlatManifold<dim, spacedim>::get_new_points(
       for (unsigned int i = 0; i < n_points; ++i)
         {
           minP[d] = std::min(minP[d], surrounding_points[i][d]);
-          Assert((surrounding_points[i][d] <
-                  periodicity[d] + tolerance * periodicity[d]) ||
-                   (surrounding_points[i][d] >= -tolerance * periodicity[d]),
-                 ExcPeriodicBox(d, surrounding_points[i], periodicity[i]));
+          DEAL_II_Assert(
+            (surrounding_points[i][d] <
+             periodicity[d] + tolerance * periodicity[d]) ||
+              (surrounding_points[i][d] >= -tolerance * periodicity[d]),
+            ExcPeriodicBox(d, surrounding_points[i], periodicity[i]));
         }
 
   // check whether periodicity shifts some of the points. Only do this if
@@ -644,7 +648,7 @@ FlatManifold<dim, spacedim>::get_new_points(
   // Now perform the interpolation
   for (unsigned int row = 0; row < weights.size(0); ++row)
     {
-      Assert(
+      DEAL_II_Assert(
         std::abs(
           std::accumulate(&weights(row, 0), &weights(row, 0) + n_points, 0.0) -
           1.0) < 1e-10,
@@ -721,7 +725,7 @@ FlatManifold<1>::get_normals_at_vertices(
   const Triangulation<1>::face_iterator &,
   Manifold<1, 1>::FaceVertexNormals &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
 }
 
 
@@ -732,7 +736,7 @@ FlatManifold<1, 2>::get_normals_at_vertices(
   const Triangulation<1, 2>::face_iterator &,
   Manifold<1, 2>::FaceVertexNormals &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -743,7 +747,7 @@ FlatManifold<1, 3>::get_normals_at_vertices(
   const Triangulation<1, 3>::face_iterator &,
   Manifold<1, 3>::FaceVertexNormals &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -769,7 +773,7 @@ FlatManifold<2, 3>::get_normals_at_vertices(
   const Triangulation<2, 3>::face_iterator & /*face*/,
   Manifold<2, 3>::FaceVertexNormals & /*face_vertex_normals*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -807,7 +811,7 @@ Tensor<1, 1>
 FlatManifold<1, 1>::normal_vector(const Triangulation<1, 1>::face_iterator &,
                                   const Point<1> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return Tensor<1, 1>();
 }
 
@@ -818,7 +822,7 @@ Tensor<1, 2>
 FlatManifold<1, 2>::normal_vector(const Triangulation<1, 2>::face_iterator &,
                                   const Point<2> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return Tensor<1, 2>();
 }
 
@@ -829,7 +833,7 @@ Tensor<1, 3>
 FlatManifold<1, 3>::normal_vector(const Triangulation<1, 3>::face_iterator &,
                                   const Point<3> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return Tensor<1, 3>();
 }
 
@@ -859,7 +863,7 @@ FlatManifold<dim, spacedim>::normal_vector(
   // because we would need to know not only about the tangent vectors
   // of the face, but also of the cell, to compute the normal vector.
   // Someone will have to think about this some more.
-  Assert(dim == spacedim, ExcNotImplemented());
+  DEAL_II_Assert(dim == spacedim, ExcNotImplemented());
 
   // in order to find out what the normal vector is, we first need to
   // find the reference coordinates of the point p on the given face,
@@ -926,12 +930,13 @@ FlatManifold<dim, spacedim>::normal_vector(
       xi += delta_xi;
       ++iteration;
 
-      Assert(iteration < 10,
-             ExcMessage("The Newton iteration to find the reference point "
-                        "did not converge in 10 iterations. Do you have a "
-                        "deformed cell? (See the glossary for a definition "
-                        "of what a deformed cell is. You may want to output "
-                        "the vertices of your cell."));
+      DEAL_II_Assert(iteration < 10,
+                     ExcMessage(
+                       "The Newton iteration to find the reference point "
+                       "did not converge in 10 iterations. Do you have a "
+                       "deformed cell? (See the glossary for a definition "
+                       "of what a deformed cell is. You may want to output "
+                       "the vertices of your cell."));
 
       // It turns out that the check in reference coordinates with an absolute
       // tolerance can cause a convergence failure of the Newton method as
@@ -1006,8 +1011,8 @@ ChartManifold<dim, spacedim, chartdim>::get_new_points(
   const Table<2, double> &                weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
-  Assert(weights.size(0) > 0, ExcEmptyObject());
-  AssertDimension(surrounding_points.size(), weights.size(1));
+  DEAL_II_Assert(weights.size(0) > 0, ExcEmptyObject());
+  DEAL_II_AssertDimension(surrounding_points.size(), weights.size(1));
 
   const std::size_t n_points = surrounding_points.size();
 
@@ -1035,7 +1040,7 @@ ChartManifold<dim, spacedim, chartdim>::push_forward_gradient(
 {
   // function must be implemented in a derived class to be usable,
   // as discussed in this function's documentation
-  Assert(false, ExcPureFunctionCalled());
+  DEAL_II_Assert(false, ExcPureFunctionCalled());
   return DerivativeForm<1, chartdim, spacedim>();
 }
 
@@ -1056,10 +1061,10 @@ ChartManifold<dim, spacedim, chartdim>::get_tangent_vector(
   // determinant is the product of chartdim factors, take the
   // chartdim-th root of it in comparing against the size of the
   // derivative
-  Assert(std::pow(std::abs(F_prime.determinant()), 1. / chartdim) >=
-           1e-12 * F_prime.norm(),
-         ExcMessage(
-           "The derivative of a chart function must not be singular."));
+  DEAL_II_Assert(std::pow(std::abs(F_prime.determinant()), 1. / chartdim) >=
+                   1e-12 * F_prime.norm(),
+                 ExcMessage(
+                   "The derivative of a chart function must not be singular."));
 
   const Tensor<1, chartdim> delta =
     sub_manifold.get_tangent_vector(pull_back(x1), pull_back(x2));

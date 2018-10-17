@@ -55,10 +55,10 @@ test()
   // These should all be ghost cells
   std::vector<cell_iterator> ghost_cell_halo_layer =
     GridTools::compute_ghost_cell_halo_layer(tria);
-  AssertThrow(ghost_cell_halo_layer.size() > 0,
-              ExcMessage("Ghost cell halo layer found."));
-  AssertThrow(ghost_cell_halo_layer.size() == ghost_cells_tria.size(),
-              ExcMessage("Ghost cell halo layer wrong size."));
+  DEAL_II_AssertThrow(ghost_cell_halo_layer.size() > 0,
+                      ExcMessage("Ghost cell halo layer found."));
+  DEAL_II_AssertThrow(ghost_cell_halo_layer.size() == ghost_cells_tria.size(),
+                      ExcMessage("Ghost cell halo layer wrong size."));
   std::sort(ghost_cell_halo_layer.begin(), ghost_cell_halo_layer.end());
 
   for (unsigned int proc = 0;
@@ -76,19 +76,19 @@ test()
             {
               const cell_iterator &cell_1 = *it_1;
               const cell_iterator &cell_2 = *it_2;
-              AssertThrow(cell_1->is_ghost() == true,
-                          ExcMessage("Cell is not a ghost cell!"));
-              AssertThrow(cell_2->is_ghost() == true,
-                          ExcMessage("Halo cell is not a ghost cell!"));
+              DEAL_II_AssertThrow(cell_1->is_ghost() == true,
+                                  ExcMessage("Cell is not a ghost cell!"));
+              DEAL_II_AssertThrow(cell_2->is_ghost() == true,
+                                  ExcMessage("Halo cell is not a ghost cell!"));
               deallog << "Ghost " << cell_1->level() << " " << cell_1->index()
                       << " " << cell_1->id() << " " << cell_1->id().to_string()
                       << " "
                       << "Halo " << cell_2->level() << " " << cell_2->index()
                       << " " << cell_2->id() << " " << cell_2->id().to_string()
                       << std::endl;
-              AssertThrow(cell_2 == cell_1,
-                          ExcMessage(
-                            "Halo cell is not identical to ghost cell."));
+              DEAL_II_AssertThrow(
+                cell_2 == cell_1,
+                ExcMessage("Halo cell is not identical to ghost cell."));
             }
         }
     }

@@ -55,10 +55,11 @@ test()
 
         for (unsigned int k = 0; k < identities.size(); ++k)
           {
-            Assert(identities[k].first < fe_collection[i].dofs_per_quad,
-                   ExcInternalError());
-            Assert(identities[k].second < fe_collection[j].dofs_per_quad,
-                   ExcInternalError());
+            DEAL_II_Assert(identities[k].first < fe_collection[i].dofs_per_quad,
+                           ExcInternalError());
+            DEAL_II_Assert(identities[k].second <
+                             fe_collection[j].dofs_per_quad,
+                           ExcInternalError());
 
             deallog << identities[k].first << ' ' << identities[k].second
                     << std::endl;

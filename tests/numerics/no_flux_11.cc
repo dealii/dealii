@@ -49,7 +49,7 @@ run()
   GridIn<dim> gridin;
   gridin.attach_triangulation(triangulation);
   std::ifstream f(SOURCE_DIR "/no_flux_11.msh");
-  Assert(f, ExcIO());
+  DEAL_II_Assert(f, ExcIO());
   gridin.read_msh(f);
 
   {

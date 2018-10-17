@@ -1122,41 +1122,42 @@ public:
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0(ExcGridsDoNotMatch);
+  DEAL_II_DeclException0(ExcGridsDoNotMatch);
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0(ExcInvalidBoundaryIndicator);
+  DEAL_II_DeclException0(ExcInvalidBoundaryIndicator);
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException1(ExcNewNumbersNotConsecutive,
-                 types::global_dof_index,
-                 << "The given list of new dof indices is not consecutive: "
-                 << "the index " << arg1 << " does not exist.");
+  DEAL_II_DeclException1(
+    ExcNewNumbersNotConsecutive,
+    types::global_dof_index,
+    << "The given list of new dof indices is not consecutive: "
+    << "the index " << arg1 << " does not exist.");
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException1(ExcInvalidLevel,
-                 int,
-                 << "The given level " << arg1
-                 << " is not in the valid range!");
+  DEAL_II_DeclException1(ExcInvalidLevel,
+                         int,
+                         << "The given level " << arg1
+                         << " is not in the valid range!");
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0(ExcFacesHaveNoLevel);
+  DEAL_II_DeclException0(ExcFacesHaveNoLevel);
   /**
    * The triangulation level you accessed is empty.
    * @ingroup Exceptions
    */
-  DeclException1(ExcEmptyLevel,
-                 int,
-                 << "You tried to do something on level " << arg1
-                 << ", but this level is empty.");
+  DEAL_II_DeclException1(ExcEmptyLevel,
+                         int,
+                         << "You tried to do something on level " << arg1
+                         << ", but this level is empty.");
 
 
 private:
@@ -1402,10 +1403,10 @@ template <int dim, int spacedim>
 inline types::global_dof_index
 DoFHandler<dim, spacedim>::n_dofs(const unsigned int level) const
 {
-  Assert(has_level_dofs(),
-         ExcMessage(
-           "n_dofs(level) can only be called after distribute_mg_dofs()"));
-  Assert(level < mg_number_cache.size(), ExcInvalidLevel(level));
+  DEAL_II_Assert(
+    has_level_dofs(),
+    ExcMessage("n_dofs(level) can only be called after distribute_mg_dofs()"));
+  DEAL_II_Assert(level < mg_number_cache.size(), ExcInvalidLevel(level));
   return mg_number_cache[level].n_global_dofs;
 }
 
@@ -1433,9 +1434,9 @@ template <int dim, int spacedim>
 const IndexSet &
 DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 {
-  Assert(level < this->get_triangulation().n_global_levels(),
-         ExcMessage("invalid level in locally_owned_mg_dofs"));
-  Assert(
+  DEAL_II_Assert(level < this->get_triangulation().n_global_levels(),
+                 ExcMessage("invalid level in locally_owned_mg_dofs"));
+  DEAL_II_Assert(
     mg_number_cache.size() == this->get_triangulation().n_global_levels(),
     ExcMessage(
       "The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
@@ -1467,9 +1468,10 @@ const std::vector<IndexSet> &
 DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
   const unsigned int level) const
 {
-  Assert(level < this->get_triangulation().n_global_levels(),
-         ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
-  Assert(
+  DEAL_II_Assert(level < this->get_triangulation().n_global_levels(),
+                 ExcMessage(
+                   "invalid level in locally_owned_mg_dofs_per_processor"));
+  DEAL_II_Assert(
     mg_number_cache.size() == this->get_triangulation().n_global_levels(),
     ExcMessage(
       "The level dofs are not set up properly! Did you call distribute_mg_dofs()?"));
@@ -1483,9 +1485,10 @@ inline const FiniteElement<dim, spacedim> &
 DoFHandler<dim, spacedim>::get_fe(const unsigned int index) const
 {
   (void)index;
-  Assert(index == 0,
-         ExcMessage(
-           "There is only one FiniteElement stored. The index must be zero!"));
+  DEAL_II_Assert(
+    index == 0,
+    ExcMessage(
+      "There is only one FiniteElement stored. The index must be zero!"));
   return get_fe_collection()[0];
 }
 
@@ -1495,7 +1498,7 @@ template <int dim, int spacedim>
 inline const hp::FECollection<dim, spacedim> &
 DoFHandler<dim, spacedim>::get_fe_collection() const
 {
-  Assert(
+  DEAL_II_Assert(
     fe_collection.size() > 0,
     ExcMessage(
       "You are trying to access the DoFHandler's FECollection object before it has been initialized."));
@@ -1508,9 +1511,9 @@ template <int dim, int spacedim>
 inline const Triangulation<dim, spacedim> &
 DoFHandler<dim, spacedim>::get_triangulation() const
 {
-  Assert(tria != nullptr,
-         ExcMessage("This DoFHandler object has not been associated "
-                    "with a triangulation."));
+  DEAL_II_Assert(tria != nullptr,
+                 ExcMessage("This DoFHandler object has not been associated "
+                            "with a triangulation."));
   return *tria;
 }
 
@@ -1645,22 +1648,22 @@ DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
 
   ar &n_cells &fe_name &policy_name;
 
-  AssertThrow(n_cells == tria->n_cells(),
-              ExcMessage(
-                "The object being loaded into does not match the triangulation "
-                "that has been stored previously."));
-  AssertThrow(
+  DEAL_II_AssertThrow(
+    n_cells == tria->n_cells(),
+    ExcMessage("The object being loaded into does not match the triangulation "
+               "that has been stored previously."));
+  DEAL_II_AssertThrow(
     fe_name == this->get_fe(0).get_name(),
     ExcMessage(
       "The finite element associated with this DoFHandler does not match "
       "the one that was associated with the DoFHandler previously stored."));
-  AssertThrow(policy_name == internal::policy_to_string(*policy),
-              ExcMessage(
-                "The policy currently associated with this DoFHandler (" +
-                internal::policy_to_string(*policy) +
-                ") does not match the one that was associated with the "
-                "DoFHandler previously stored (" +
-                policy_name + ")."));
+  DEAL_II_AssertThrow(
+    policy_name == internal::policy_to_string(*policy),
+    ExcMessage("The policy currently associated with this DoFHandler (" +
+               internal::policy_to_string(*policy) +
+               ") does not match the one that was associated with the "
+               "DoFHandler previously stored (" +
+               policy_name + ")."));
 }
 
 
@@ -1672,8 +1675,8 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::get_index(
   const unsigned int dof_number,
   const unsigned int dofs_per_vertex) const
 {
-  Assert((level >= coarsest_level) && (level <= finest_level),
-         ExcInvalidLevel(level));
+  DEAL_II_Assert((level >= coarsest_level) && (level <= finest_level),
+                 ExcInvalidLevel(level));
   return indices[dofs_per_vertex * (level - coarsest_level) + dof_number];
 }
 
@@ -1687,8 +1690,8 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::set_index(
   const unsigned int            dofs_per_vertex,
   const types::global_dof_index index)
 {
-  Assert((level >= coarsest_level) && (level <= finest_level),
-         ExcInvalidLevel(level));
+  DEAL_II_Assert((level >= coarsest_level) && (level <= finest_level),
+                 ExcInvalidLevel(level));
   indices[dofs_per_vertex * (level - coarsest_level) + dof_number] = index;
 }
 

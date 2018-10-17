@@ -220,7 +220,7 @@ create_triangulations(std::vector<Triangulation<dim> *> &,
                       std::vector<Manifold<dim> *> &,
                       std::vector<double> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -466,7 +466,7 @@ mapping_test()
   std::vector<double>               exact_areas;
 
   create_triangulations(tria_ptr, boundary_ptr, exact_areas);
-  Assert(show.size() == tria_ptr.size(), ExcInternalError());
+  DEAL_II_Assert(show.size() == tria_ptr.size(), ExcInternalError());
 
   FE_Q<dim> fe_q4(4);
 

@@ -110,7 +110,8 @@ check_grid()
           deallog << line << ": "
                   << (cell->line_orientation(line) ? "true" : "false")
                   << std::endl;
-          Assert(cell->line_orientation(line) == true, ExcInternalError());
+          DEAL_II_Assert(cell->line_orientation(line) == true,
+                         ExcInternalError());
         }
     }
 }

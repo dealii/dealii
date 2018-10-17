@@ -158,16 +158,19 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == 3 * n_rows,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
+      DEAL_II_Assert(shape_values.size() == 0 ||
+                       shape_values.size() == n_rows * n_columns ||
+                       shape_values.size() == 3 * n_rows,
+                     ExcDimensionMismatch(shape_values.size(),
+                                          n_rows * n_columns));
+      DEAL_II_Assert(shape_gradients.size() == 0 ||
+                       shape_gradients.size() == n_rows * n_columns,
+                     ExcDimensionMismatch(shape_gradients.size(),
+                                          n_rows * n_columns));
+      DEAL_II_Assert(shape_hessians.size() == 0 ||
+                       shape_hessians.size() == n_rows * n_columns,
+                     ExcDimensionMismatch(shape_hessians.size(),
+                                          n_rows * n_columns));
       (void)dummy1;
       (void)dummy2;
     }
@@ -197,7 +200,7 @@ namespace internal
     void
     values_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_values != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_values != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, true>(shape_values, in, out);
     }
 
@@ -205,7 +208,7 @@ namespace internal
     void
     gradients_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_gradients != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, true>(shape_gradients, in, out);
     }
 
@@ -213,7 +216,7 @@ namespace internal
     void
     hessians_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_hessians != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, true>(shape_hessians, in, out);
     }
 
@@ -313,14 +316,15 @@ namespace internal
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    Assert(shape_data != nullptr,
-           ExcMessage(
-             "The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
-    AssertIndexRange(direction, dim);
+    DEAL_II_Assert(
+      shape_data != nullptr,
+      ExcMessage("The given array shape_data must not be the null pointer!"));
+    DEAL_II_Assert(dim == direction + 1 || one_line == true ||
+                     n_rows == n_columns || in != out,
+                   ExcMessage(
+                     "In-place operation only supported for "
+                     "n_rows==n_columns or single-line interpolation"));
+    DEAL_II_AssertIndexRange(direction, dim);
     constexpr int mm = contract_over_rows ? n_rows : n_columns,
                   nn = contract_over_rows ? n_columns : n_rows;
 
@@ -396,14 +400,14 @@ namespace internal
     static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
     static_assert(max_derivative >= 0 && max_derivative < 3,
                   "Only derivative orders 0-2 implemented");
-    Assert(shape_values != nullptr,
-           ExcMessage(
-             "The given array shape_values must not be the null pointer."));
+    DEAL_II_Assert(
+      shape_values != nullptr,
+      ExcMessage("The given array shape_values must not be the null pointer."));
 
     constexpr int n_blocks1 = dim > 1 ? n_rows : 1;
     constexpr int n_blocks2 = dim > 2 ? n_rows : 1;
 
-    AssertIndexRange(face_direction, dim);
+    DEAL_II_AssertIndexRange(face_direction, dim);
     constexpr int stride     = Utilities::pow(n_rows, face_direction);
     constexpr int out_stride = Utilities::pow(n_rows, dim - 1);
     const Number *DEAL_II_RESTRICT shape_values = this->shape_values;
@@ -490,7 +494,7 @@ namespace internal
                   ++out;
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
           }
         if (face_direction == 1 && dim == 3)
@@ -563,16 +567,19 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == n_rows * 3,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
+      DEAL_II_Assert(shape_values.size() == 0 ||
+                       shape_values.size() == n_rows * n_columns ||
+                       shape_values.size() == n_rows * 3,
+                     ExcDimensionMismatch(shape_values.size(),
+                                          n_rows * n_columns));
+      DEAL_II_Assert(shape_gradients.size() == 0 ||
+                       shape_gradients.size() == n_rows * n_columns,
+                     ExcDimensionMismatch(shape_gradients.size(),
+                                          n_rows * n_columns));
+      DEAL_II_Assert(shape_hessians.size() == 0 ||
+                       shape_hessians.size() == n_rows * n_columns,
+                     ExcDimensionMismatch(shape_hessians.size(),
+                                          n_rows * n_columns));
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -600,7 +607,7 @@ namespace internal
     void
     values_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_values != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_values != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, true>(shape_values, in, out);
     }
 
@@ -608,7 +615,7 @@ namespace internal
     void
     gradients_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_gradients != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, true>(shape_gradients, in, out);
     }
 
@@ -616,7 +623,7 @@ namespace internal
     void
     hessians_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_hessians != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, true>(shape_hessians, in, out);
     }
 
@@ -656,14 +663,15 @@ namespace internal
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    Assert(shape_data != nullptr,
-           ExcMessage(
-             "The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
-    AssertIndexRange(direction, dim);
+    DEAL_II_Assert(
+      shape_data != nullptr,
+      ExcMessage("The given array shape_data must not be the null pointer!"));
+    DEAL_II_Assert(dim == direction + 1 || one_line == true ||
+                     n_rows == n_columns || in != out,
+                   ExcMessage(
+                     "In-place operation only supported for "
+                     "n_rows==n_columns or single-line interpolation"));
+    DEAL_II_AssertIndexRange(direction, dim);
     const int mm = contract_over_rows ? n_rows : n_columns,
               nn = contract_over_rows ? n_columns : n_rows;
 
@@ -673,7 +681,7 @@ namespace internal
     const int n_blocks2 = direction >= dim - 1 ?
                             1 :
                             Utilities::fixed_power<dim - direction - 1>(n_rows);
-    Assert(n_rows <= 128, ExcNotImplemented());
+    DEAL_II_Assert(n_rows <= 128, ExcNotImplemented());
 
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
@@ -730,14 +738,14 @@ namespace internal
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT out) const
   {
-    Assert(shape_values != nullptr,
-           ExcMessage(
-             "The given array shape_data must not be the null pointer!"));
+    DEAL_II_Assert(
+      shape_values != nullptr,
+      ExcMessage("The given array shape_data must not be the null pointer!"));
     static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
     const int n_blocks1 = dim > 1 ? n_rows : 1;
     const int n_blocks2 = dim > 2 ? n_rows : 1;
 
-    AssertIndexRange(face_direction, dim);
+    DEAL_II_AssertIndexRange(face_direction, dim);
     const int stride =
       face_direction > 0 ? Utilities::fixed_power<face_direction>(n_rows) : 1;
     const int out_stride =
@@ -825,7 +833,7 @@ namespace internal
                   ++out;
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
           }
         if (face_direction == 1 && dim == 3)
@@ -896,15 +904,18 @@ namespace internal
       , shape_gradients(shape_gradients.begin())
       , shape_hessians(shape_hessians.begin())
     {
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
+      DEAL_II_Assert(shape_values.size() == 0 ||
+                       shape_values.size() == n_rows * n_columns,
+                     ExcDimensionMismatch(shape_values.size(),
+                                          n_rows * n_columns));
+      DEAL_II_Assert(shape_gradients.size() == 0 ||
+                       shape_gradients.size() == n_rows * n_columns,
+                     ExcDimensionMismatch(shape_gradients.size(),
+                                          n_rows * n_columns));
+      DEAL_II_Assert(shape_hessians.size() == 0 ||
+                       shape_hessians.size() == n_rows * n_columns,
+                     ExcDimensionMismatch(shape_hessians.size(),
+                                          n_rows * n_columns));
       (void)dummy1;
       (void)dummy2;
     }
@@ -960,8 +971,8 @@ namespace internal
                          Number,
                          Number2>::values(const Number in[], Number out[]) const
   {
-    Assert(shape_values != nullptr, ExcNotInitialized());
-    AssertIndexRange(direction, dim);
+    DEAL_II_Assert(shape_values != nullptr, ExcNotInitialized());
+    DEAL_II_AssertIndexRange(direction, dim);
     constexpr int mm     = contract_over_rows ? n_rows : n_columns,
                   nn     = contract_over_rows ? n_columns : n_rows;
     constexpr int n_cols = nn / 2;
@@ -1149,8 +1160,8 @@ namespace internal
                          Number2>::gradients(const Number in[],
                                              Number       out[]) const
   {
-    Assert(shape_gradients != nullptr, ExcNotInitialized());
-    AssertIndexRange(direction, dim);
+    DEAL_II_Assert(shape_gradients != nullptr, ExcNotInitialized());
+    DEAL_II_AssertIndexRange(direction, dim);
     constexpr int mm     = contract_over_rows ? n_rows : n_columns,
                   nn     = contract_over_rows ? n_columns : n_rows;
     constexpr int n_cols = nn / 2;
@@ -1285,8 +1296,8 @@ namespace internal
                          Number2>::hessians(const Number in[],
                                             Number       out[]) const
   {
-    Assert(shape_hessians != nullptr, ExcNotInitialized());
-    AssertIndexRange(direction, dim);
+    DEAL_II_Assert(shape_hessians != nullptr, ExcNotInitialized());
+    DEAL_II_AssertIndexRange(direction, dim);
     constexpr int mm     = contract_over_rows ? n_rows : n_columns;
     constexpr int nn     = contract_over_rows ? n_columns : n_rows;
     constexpr int n_cols = nn / 2;
@@ -1484,7 +1495,8 @@ namespace internal
       , shape_gradients(nullptr)
       , shape_hessians(nullptr)
     {
-      AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
+      DEAL_II_AssertDimension(shape_values.size(),
+                              n_rows * ((n_columns + 1) / 2));
     }
 
     /**
@@ -1503,11 +1515,14 @@ namespace internal
       // In this function, we allow for dummy pointers if some of values,
       // gradients or hessians should not be computed
       if (!shape_values.empty())
-        AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
+        DEAL_II_AssertDimension(shape_values.size(),
+                                n_rows * ((n_columns + 1) / 2));
       if (!shape_gradients.empty())
-        AssertDimension(shape_gradients.size(), n_rows * ((n_columns + 1) / 2));
+        DEAL_II_AssertDimension(shape_gradients.size(),
+                                n_rows * ((n_columns + 1) / 2));
       if (!shape_hessians.empty())
-        AssertDimension(shape_hessians.size(), n_rows * ((n_columns + 1) / 2));
+        DEAL_II_AssertDimension(shape_hessians.size(),
+                                n_rows * ((n_columns + 1) / 2));
       (void)dummy1;
       (void)dummy2;
     }
@@ -1516,7 +1531,7 @@ namespace internal
     void
     values(const Number in[], Number out[]) const
     {
-      Assert(shape_values != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_values != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 0>(shape_values, in, out);
     }
 
@@ -1524,7 +1539,7 @@ namespace internal
     void
     gradients(const Number in[], Number out[]) const
     {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_gradients != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 1>(shape_gradients, in, out);
     }
 
@@ -1532,7 +1547,7 @@ namespace internal
     void
     hessians(const Number in[], Number out[]) const
     {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_hessians != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 2>(shape_hessians, in, out);
     }
 
@@ -1540,7 +1555,7 @@ namespace internal
     void
     values_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_values != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_values != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 0, true>(shape_values, in, out);
     }
 
@@ -1548,7 +1563,7 @@ namespace internal
     void
     gradients_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_gradients != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 1, true>(shape_gradients,
                                                          in,
                                                          out);
@@ -1558,7 +1573,7 @@ namespace internal
     void
     hessians_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_hessians != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 2, true>(shape_hessians,
                                                          in,
                                                          out);
@@ -1632,14 +1647,15 @@ namespace internal
     static_assert(type < 3, "Only three variants type=0,1,2 implemented");
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
+    DEAL_II_Assert(dim == direction + 1 || one_line == true ||
+                     n_rows == n_columns || in != out,
+                   ExcMessage(
+                     "In-place operation only supported for "
+                     "n_rows==n_columns or single-line interpolation"));
 
     // We cannot statically assert that direction is less than dim, so must do
     // an additional dynamic check
-    AssertIndexRange(direction, dim);
+    DEAL_II_AssertIndexRange(direction, dim);
 
     constexpr int nn     = contract_over_rows ? n_columns : n_rows;
     constexpr int mm     = contract_over_rows ? n_rows : n_columns;
@@ -1895,7 +1911,7 @@ namespace internal
     void
     values(const Number in[], Number out[]) const
     {
-      Assert(shape_values != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_values != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 0>(shape_values, in, out);
     }
 
@@ -1903,7 +1919,7 @@ namespace internal
     void
     gradients(const Number in[], Number out[]) const
     {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_gradients != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 1>(shape_gradients, in, out);
     }
 
@@ -1911,7 +1927,7 @@ namespace internal
     void
     hessians(const Number in[], Number out[]) const
     {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_hessians != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 0>(shape_hessians, in, out);
     }
 
@@ -1919,7 +1935,7 @@ namespace internal
     void
     values_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_values != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_values != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 0, true>(shape_values, in, out);
     }
 
@@ -1927,7 +1943,7 @@ namespace internal
     void
     gradients_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_gradients != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 1, true>(shape_gradients,
                                                          in,
                                                          out);
@@ -1937,7 +1953,7 @@ namespace internal
     void
     hessians_one_line(const Number in[], Number out[]) const
     {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(shape_hessians != nullptr, ExcNotInitialized());
       apply<direction, contract_over_rows, add, 0, true>(shape_hessians,
                                                          in,
                                                          out);
@@ -2012,14 +2028,15 @@ namespace internal
     static_assert(
       type == 0 || type == 1,
       "Only types 0 and 1 implemented for evaluate_symmetric_hierarchical.");
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
+    DEAL_II_Assert(dim == direction + 1 || one_line == true ||
+                     n_rows == n_columns || in != out,
+                   ExcMessage(
+                     "In-place operation only supported for "
+                     "n_rows==n_columns or single-line interpolation"));
 
     // We cannot statically assert that direction is less than dim, so must do
     // an additional dynamic check
-    AssertIndexRange(direction, dim);
+    DEAL_II_AssertIndexRange(direction, dim);
 
     constexpr int nn     = contract_over_rows ? n_columns : n_rows;
     constexpr int mm     = contract_over_rows ? n_rows : n_columns;

@@ -53,12 +53,13 @@ test()
     for (unsigned int j = 0; j < m.n(); ++j)
       if ((i + 2 * j + 1) % 3 == 0)
         {
-          AssertThrow(m(i, j) == i * j * .5 + .5, ExcInternalError());
-          AssertThrow(m.el(i, j) == i * j * .5 + .5, ExcInternalError());
+          DEAL_II_AssertThrow(m(i, j) == i * j * .5 + .5, ExcInternalError());
+          DEAL_II_AssertThrow(m.el(i, j) == i * j * .5 + .5,
+                              ExcInternalError());
         }
       else
         {
-          AssertThrow(m.el(i, j) == 0, ExcInternalError());
+          DEAL_II_AssertThrow(m.el(i, j) == 0, ExcInternalError());
         }
 
   deallog << "OK" << std::endl;

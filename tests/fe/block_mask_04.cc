@@ -29,8 +29,8 @@
 void
 test()
 {
-  AssertThrow(BlockMask(12, false).size() == 12, ExcInternalError());
-  AssertThrow(BlockMask().size() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(BlockMask(12, false).size() == 12, ExcInternalError());
+  DEAL_II_AssertThrow(BlockMask().size() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -25,22 +25,24 @@ template <typename Number>
 void
 check(const Number &a, const Number &b)
 {
-  AssertThrow((numbers::values_are_equal(a, b)) == (a == b),
-              ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::values_are_not_equal(a, b)) == (a != b),
-              ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_zero(a)) == (a == 0.0),
-              ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_zero(b)) == (b == 0.0),
-              ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_less_than(a, b)) == (a < b),
-              ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_less_than_or_equal_to(a, b)) == (a <= b),
-              ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_greater_than(a, b)) == (a > b),
-              ExcMessage("Comparator is incorrect."));
-  AssertThrow((numbers::value_is_greater_than_or_equal_to(a, b)) == (a >= b),
-              ExcMessage("Comparator is incorrect."));
+  DEAL_II_AssertThrow((numbers::values_are_equal(a, b)) == (a == b),
+                      ExcMessage("Comparator is incorrect."));
+  DEAL_II_AssertThrow((numbers::values_are_not_equal(a, b)) == (a != b),
+                      ExcMessage("Comparator is incorrect."));
+  DEAL_II_AssertThrow((numbers::value_is_zero(a)) == (a == 0.0),
+                      ExcMessage("Comparator is incorrect."));
+  DEAL_II_AssertThrow((numbers::value_is_zero(b)) == (b == 0.0),
+                      ExcMessage("Comparator is incorrect."));
+  DEAL_II_AssertThrow((numbers::value_is_less_than(a, b)) == (a < b),
+                      ExcMessage("Comparator is incorrect."));
+  DEAL_II_AssertThrow((numbers::value_is_less_than_or_equal_to(a, b)) ==
+                        (a <= b),
+                      ExcMessage("Comparator is incorrect."));
+  DEAL_II_AssertThrow((numbers::value_is_greater_than(a, b)) == (a > b),
+                      ExcMessage("Comparator is incorrect."));
+  DEAL_II_AssertThrow((numbers::value_is_greater_than_or_equal_to(a, b)) ==
+                        (a >= b),
+                      ExcMessage("Comparator is incorrect."));
 }
 
 

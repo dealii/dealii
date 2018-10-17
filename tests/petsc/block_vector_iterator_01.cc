@@ -35,9 +35,9 @@ test()
   // iterator
   {
     PETScWrappers::MPI::BlockVector::const_iterator i = v.begin();
-    AssertThrow(*i == 1, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 1, ExcInternalError());
     ++i;
-    AssertThrow(*i == 2, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 2, ExcInternalError());
   }
 
   // same, but create iterator in a different
@@ -45,17 +45,17 @@ test()
   {
     PETScWrappers::MPI::BlockVector::const_iterator i =
       const_cast<const PETScWrappers::MPI::BlockVector &>(v).begin();
-    AssertThrow(*i == 1, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 1, ExcInternalError());
     ++i;
-    AssertThrow(*i == 2, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 2, ExcInternalError());
   }
 
   // read through a read-write iterator
   {
     PETScWrappers::MPI::BlockVector::iterator i = v.begin();
-    AssertThrow(*i == 1, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 1, ExcInternalError());
     ++i;
-    AssertThrow(*i == 2, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 2, ExcInternalError());
   }
 
   // write through a read-write iterator
@@ -70,9 +70,9 @@ test()
   // and read again
   {
     PETScWrappers::MPI::BlockVector::iterator i = v.begin();
-    AssertThrow(*i == 2, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 2, ExcInternalError());
     ++i;
-    AssertThrow(*i == 3, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 3, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

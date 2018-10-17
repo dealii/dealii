@@ -240,8 +240,8 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
-        AssertDimension(coefficient.size(1), phi.n_q_points);
+        DEAL_II_AssertDimension(coefficient.size(0), data.n_macro_cells());
+        DEAL_II_AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
         phi.read_dof_values(src);
@@ -285,9 +285,10 @@ namespace Step37
 
     for (unsigned int i = 0; i < inverse_diagonal.local_size(); ++i)
       {
-        Assert(inverse_diagonal.local_element(i) > 0.,
-               ExcMessage("No diagonal entry in a positive definite operator "
-                          "should be zero"));
+        DEAL_II_Assert(inverse_diagonal.local_element(i) > 0.,
+                       ExcMessage(
+                         "No diagonal entry in a positive definite operator "
+                         "should be zero"));
         inverse_diagonal.local_element(i) =
           1. / inverse_diagonal.local_element(i);
       }
@@ -309,8 +310,8 @@ namespace Step37
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
-        AssertDimension(coefficient.size(0), data.n_macro_cells());
-        AssertDimension(coefficient.size(1), phi.n_q_points);
+        DEAL_II_AssertDimension(coefficient.size(0), data.n_macro_cells());
+        DEAL_II_AssertDimension(coefficient.size(1), phi.n_q_points);
 
         phi.reinit(cell);
         for (unsigned int i = 0; i < phi.dofs_per_cell; ++i)
@@ -603,7 +604,7 @@ namespace Step37
     if (errors.begin() != errors.end())
       max_cell_error = *std::max_element(errors.begin(), errors.end());
     max_cell_error = Utilities::MPI::max(max_cell_error, MPI_COMM_WORLD);
-    Assert(max_cell_error != 0.0, ExcInternalError());
+    DEAL_II_Assert(max_cell_error != 0.0, ExcInternalError());
     pcout << "max error: " << max_cell_error << '\n';
     static double error = max_cell_error;
     pcout << "error ratio: "

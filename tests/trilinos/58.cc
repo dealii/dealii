@@ -47,8 +47,8 @@ test(TrilinosWrappers::MPI::Vector &v)
 
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(v(i) == w(i), ExcInternalError());
-      AssertThrow(v(i) == x(i), ExcInternalError());
+      DEAL_II_AssertThrow(v(i) == w(i), ExcInternalError());
+      DEAL_II_AssertThrow(v(i) == x(i), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

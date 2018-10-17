@@ -91,11 +91,11 @@ test(const unsigned int size, const unsigned int block_size)
 
   if (copy_I.frobenius_norm() > 1e-12)
     pcout << "norm of difference I: " << copy_I.frobenius_norm() << std::endl;
-  AssertThrow(copy_I.frobenius_norm() < 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(copy_I.frobenius_norm() < 1e-12, ExcInternalError());
 
   if (copy_II.frobenius_norm() > 1e-12)
     pcout << "norm of difference II: " << copy_II.frobenius_norm() << std::endl;
-  AssertThrow(copy_II.frobenius_norm() < 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(copy_II.frobenius_norm() < 1e-12, ExcInternalError());
 }
 
 

@@ -33,7 +33,7 @@ test(PETScWrappers::MPI::Vector &v)
 
   v.compress(VectorOperation::insert);
 
-  AssertThrow(v.size() == 100, ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == 100, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

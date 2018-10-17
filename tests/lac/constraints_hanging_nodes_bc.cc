@@ -114,9 +114,9 @@ test()
   deallog << "Check that both constraint matrices are identical... ";
   for (unsigned int i = 0; i < dof.n_dofs(); ++i)
     {
-      AssertThrow(correct_constraints.is_constrained(i) ==
-                    library_constraints.is_constrained(i),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(correct_constraints.is_constrained(i) ==
+                            library_constraints.is_constrained(i),
+                          ExcInternalError());
       typedef const std::vector<std::pair<types::global_dof_index, double>>
         &constraint_format;
       if (correct_constraints.is_constrained(i))
@@ -125,19 +125,20 @@ test()
             *correct_constraints.get_constraint_entries(i);
           constraint_format library =
             *library_constraints.get_constraint_entries(i);
-          AssertThrow(correct.size() == library.size(), ExcInternalError());
+          DEAL_II_AssertThrow(correct.size() == library.size(),
+                              ExcInternalError());
           for (unsigned int q = 0; q < correct.size(); ++q)
             {
-              AssertThrow(correct[q].first == library[q].first,
-                          ExcInternalError());
-              AssertThrow(std::fabs(correct[q].second - library[q].second) <
-                            1e-14,
-                          ExcInternalError());
+              DEAL_II_AssertThrow(correct[q].first == library[q].first,
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(std::fabs(correct[q].second -
+                                            library[q].second) < 1e-14,
+                                  ExcInternalError());
             }
-          AssertThrow(std::fabs(correct_constraints.get_inhomogeneity(i) -
-                                library_constraints.get_inhomogeneity(i)) <
-                        1e-14,
-                      ExcInternalError());
+          DEAL_II_AssertThrow(
+            std::fabs(correct_constraints.get_inhomogeneity(i) -
+                      library_constraints.get_inhomogeneity(i)) < 1e-14,
+            ExcInternalError());
         }
     }
   deallog << "OK." << std::endl;

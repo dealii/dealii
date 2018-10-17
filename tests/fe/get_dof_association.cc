@@ -47,7 +47,7 @@ test(const FiniteElement<dim> &fe)
             deallog << 'h';
             break;
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
         }
     }
   deallog << std::endl;

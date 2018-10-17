@@ -75,7 +75,7 @@ public:
           values[5] = 2 * (p[2] + p[0] * p[1]);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 };
@@ -112,8 +112,8 @@ test(VectorTools::NormType norm, double value)
   const double difference_1 = std::abs(error - value);
   deallog << "computed: " << error << " expected: " << value
           << " difference: " << difference_1 << std::endl;
-  Assert(difference_1 < 1e-10,
-         ExcMessage("Error in integrate_difference, first components"));
+  DEAL_II_Assert(difference_1 < 1e-10,
+                 ExcMessage("Error in integrate_difference, first components"));
 
   VectorTools::integrate_difference(dofh,
                                     solution,
@@ -127,8 +127,9 @@ test(VectorTools::NormType norm, double value)
   const double difference_2 = std::abs(error - 2.0 * value);
   deallog << "computed: " << error << " expected: " << 2.0 * value
           << " difference: " << difference_2 << std::endl;
-  Assert(difference_2 < 1e-10,
-         ExcMessage("Error in integrate_difference, second components"));
+  DEAL_II_Assert(difference_2 < 1e-10,
+                 ExcMessage(
+                   "Error in integrate_difference, second components"));
 }
 
 
@@ -147,7 +148,7 @@ test()
         true_value = std::sqrt(29.0 / 3.0);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   test<dim>(VectorTools::Hdiv_seminorm, true_value);

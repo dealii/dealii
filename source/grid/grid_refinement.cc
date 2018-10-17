@@ -43,9 +43,9 @@ GridRefinement::refine(Triangulation<dim, spacedim> &tria,
                        const double                  threshold,
                        const unsigned int            max_to_mark)
 {
-  Assert(criteria.size() == tria.n_active_cells(),
-         ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-  Assert(criteria.is_non_negative(), ExcNegativeCriteria());
+  DEAL_II_Assert(criteria.size() == tria.n_active_cells(),
+                 ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
+  DEAL_II_Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   // when all indicators are zero we
   // do not need to refine but only
@@ -92,9 +92,9 @@ GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
                         const Vector<Number> &        criteria,
                         const double                  threshold)
 {
-  Assert(criteria.size() == tria.n_active_cells(),
-         ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-  Assert(criteria.is_non_negative(), ExcNegativeCriteria());
+  DEAL_II_Assert(criteria.size() == tria.n_active_cells(),
+                 ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
+  DEAL_II_Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
          tria.begin_active();
@@ -115,13 +115,13 @@ GridRefinement::adjust_refine_and_coarsen_number_fraction(
   const double       top_fraction,
   const double       bottom_fraction)
 {
-  Assert(top_fraction >= 0, ExcInvalidParameterValue());
-  Assert(top_fraction <= 1, ExcInvalidParameterValue());
-  Assert(bottom_fraction >= 0, ExcInvalidParameterValue());
-  Assert(bottom_fraction <= 1, ExcInvalidParameterValue());
-  Assert(top_fraction + bottom_fraction <=
-           1 + 10 * std::numeric_limits<double>::epsilon(),
-         ExcInvalidParameterValue());
+  DEAL_II_Assert(top_fraction >= 0, ExcInvalidParameterValue());
+  DEAL_II_Assert(top_fraction <= 1, ExcInvalidParameterValue());
+  DEAL_II_Assert(bottom_fraction >= 0, ExcInvalidParameterValue());
+  DEAL_II_Assert(bottom_fraction <= 1, ExcInvalidParameterValue());
+  DEAL_II_Assert(top_fraction + bottom_fraction <=
+                   1 + 10 * std::numeric_limits<double>::epsilon(),
+                 ExcInvalidParameterValue());
 
   double refine_cells  = current_n_cells * top_fraction;
   double coarsen_cells = current_n_cells * bottom_fraction;
@@ -201,14 +201,14 @@ GridRefinement::refine_and_coarsen_fixed_number(
 {
   // correct number of cells is
   // checked in @p{refine}
-  Assert((top_fraction >= 0) && (top_fraction <= 1),
-         ExcInvalidParameterValue());
-  Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
-         ExcInvalidParameterValue());
-  Assert(top_fraction + bottom_fraction <=
-           1 + 10 * std::numeric_limits<double>::epsilon(),
-         ExcInvalidParameterValue());
-  Assert(criteria.is_non_negative(), ExcNegativeCriteria());
+  DEAL_II_Assert((top_fraction >= 0) && (top_fraction <= 1),
+                 ExcInvalidParameterValue());
+  DEAL_II_Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
+                 ExcInvalidParameterValue());
+  DEAL_II_Assert(top_fraction + bottom_fraction <=
+                   1 + 10 * std::numeric_limits<double>::epsilon(),
+                 ExcInvalidParameterValue());
+  DEAL_II_Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   const std::pair<double, double> adjusted_fractions =
     adjust_refine_and_coarsen_number_fraction<dim>(criteria.size(),
@@ -269,14 +269,14 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
 {
   // correct number of cells is
   // checked in @p{refine}
-  Assert((top_fraction >= 0) && (top_fraction <= 1),
-         ExcInvalidParameterValue());
-  Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
-         ExcInvalidParameterValue());
-  Assert(top_fraction + bottom_fraction <=
-           1 + 10 * std::numeric_limits<double>::epsilon(),
-         ExcInvalidParameterValue());
-  Assert(criteria.is_non_negative(), ExcNegativeCriteria());
+  DEAL_II_Assert((top_fraction >= 0) && (top_fraction <= 1),
+                 ExcInvalidParameterValue());
+  DEAL_II_Assert((bottom_fraction >= 0) && (bottom_fraction <= 1),
+                 ExcInvalidParameterValue());
+  DEAL_II_Assert(top_fraction + bottom_fraction <=
+                   1 + 10 * std::numeric_limits<double>::epsilon(),
+                 ExcInvalidParameterValue());
+  DEAL_II_Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   // let tmp be the cellwise square of the
   // error, which is what we have to sum
@@ -391,9 +391,9 @@ GridRefinement::refine_and_coarsen_optimize(Triangulation<dim, spacedim> &tria,
                                             const Vector<Number> &criteria,
                                             const unsigned int    order)
 {
-  Assert(criteria.size() == tria.n_active_cells(),
-         ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
-  Assert(criteria.is_non_negative(), ExcNegativeCriteria());
+  DEAL_II_Assert(criteria.size() == tria.n_active_cells(),
+                 ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
+  DEAL_II_Assert(criteria.is_non_negative(), ExcNegativeCriteria());
 
   // get a decreasing order on the error indicator
   std::vector<unsigned int> cell_indices(criteria.size());

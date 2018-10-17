@@ -140,7 +140,7 @@ public:
   /**
    * Exception.
    */
-  DeclException0(ExcInactiveCell);
+  DEAL_II_DeclException0(ExcInactiveCell);
 
 
 

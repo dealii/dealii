@@ -125,7 +125,7 @@ namespace internal
     template <int structdim>
     inline TriaObject<structdim>::TriaObject(const int i0, const int i1)
     {
-      Assert(structdim == 1, ExcImpossibleInDim(structdim));
+      DEAL_II_Assert(structdim == 1, ExcImpossibleInDim(structdim));
       faces[0] = i0;
       faces[1] = i1;
     }
@@ -137,7 +137,7 @@ namespace internal
                                              const int i2,
                                              const int i3)
     {
-      Assert(structdim == 2, ExcImpossibleInDim(structdim));
+      DEAL_II_Assert(structdim == 2, ExcImpossibleInDim(structdim));
       faces[0] = i0;
       faces[1] = i1;
       faces[2] = i2;
@@ -153,7 +153,7 @@ namespace internal
                                              const int i4,
                                              const int i5)
     {
-      Assert(structdim == 3, ExcImpossibleInDim(structdim));
+      DEAL_II_Assert(structdim == 3, ExcImpossibleInDim(structdim));
       faces[0] = i0;
       faces[1] = i1;
       faces[2] = i2;
@@ -167,8 +167,10 @@ namespace internal
     inline int
     TriaObject<structdim>::face(const unsigned int i) const
     {
-      Assert(i < GeometryInfo<structdim>::faces_per_cell,
-             ExcIndexRange(i, 0, GeometryInfo<structdim>::faces_per_cell));
+      DEAL_II_Assert(i < GeometryInfo<structdim>::faces_per_cell,
+                     ExcIndexRange(i,
+                                   0,
+                                   GeometryInfo<structdim>::faces_per_cell));
       return faces[i];
     }
 
@@ -178,8 +180,10 @@ namespace internal
     inline void
     TriaObject<structdim>::set_face(const unsigned int i, const int index)
     {
-      Assert(i < GeometryInfo<structdim>::faces_per_cell,
-             ExcIndexRange(i, 0, GeometryInfo<structdim>::faces_per_cell));
+      DEAL_II_Assert(i < GeometryInfo<structdim>::faces_per_cell,
+                     ExcIndexRange(i,
+                                   0,
+                                   GeometryInfo<structdim>::faces_per_cell));
       faces[i] = index;
     }
 

@@ -60,7 +60,7 @@ test()
         }
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 
   /* A is
 
@@ -90,13 +90,13 @@ test()
 
   if (my_id == 0)
     {
-      Assert(A.el(0, 0) == 0, ExcMessage("Wrong element in A!"));
-      Assert(A.el(0, 1) == 1, ExcMessage("Wrong element in A!"));
+      DEAL_II_Assert(A.el(0, 0) == 0, ExcMessage("Wrong element in A!"));
+      DEAL_II_Assert(A.el(0, 1) == 1, ExcMessage("Wrong element in A!"));
     }
   if ((n_procs == 1) || (my_id == 1))
     {
-      Assert(A.el(1, 0) == 0, ExcMessage("Wrong element in A!"));
-      Assert(A.el(1, 1) == 1, ExcMessage("Wrong element in A!"));
+      DEAL_II_Assert(A.el(1, 0) == 0, ExcMessage("Wrong element in A!"));
+      DEAL_II_Assert(A.el(1, 1) == 1, ExcMessage("Wrong element in A!"));
     }
 
   TrilinosWrappers::SparseMatrix AtA;
@@ -113,17 +113,17 @@ test()
     {
       if (my_id == 0)
         {
-          Assert(AtA.local_range().first == 0,
-                 ExcMessage("AtA Local Range is not as expected."));
-          Assert(AtA.local_range().second == 1,
-                 ExcMessage("AtA Local Range is not as expected."));
+          DEAL_II_Assert(AtA.local_range().first == 0,
+                         ExcMessage("AtA Local Range is not as expected."));
+          DEAL_II_Assert(AtA.local_range().second == 1,
+                         ExcMessage("AtA Local Range is not as expected."));
         }
       if (my_id == 1)
         {
-          Assert(AtA.local_range().first == 1,
-                 ExcMessage("AtA Local Range is not as expected."));
-          Assert(AtA.local_range().second == 2,
-                 ExcMessage("AtA Local Range is not as expected."));
+          DEAL_II_Assert(AtA.local_range().first == 1,
+                         ExcMessage("AtA Local Range is not as expected."));
+          DEAL_II_Assert(AtA.local_range().second == 2,
+                         ExcMessage("AtA Local Range is not as expected."));
         }
     }
 
@@ -137,14 +137,14 @@ test()
   // zero in AtA are indeed zero, but
   // not that the others have the
   // correct value
-  Assert(AtA.el(0, 0) == 0, ExcMessage("Wrong element in AtA!"));
-  Assert(AtA.el(0, 1) == 0, ExcMessage("Wrong element in AtA!"));
-  Assert(AtA.el(1, 0) == 0, ExcMessage("Wrong element in AtA!"));
+  DEAL_II_Assert(AtA.el(0, 0) == 0, ExcMessage("Wrong element in AtA!"));
+  DEAL_II_Assert(AtA.el(0, 1) == 0, ExcMessage("Wrong element in AtA!"));
+  DEAL_II_Assert(AtA.el(1, 0) == 0, ExcMessage("Wrong element in AtA!"));
 
   // now also check the one nonzero
   // element
   if ((n_procs == 1) || (my_id == 1))
-    Assert(AtA.el(1, 1) == 2, ExcMessage("Wrong element in AtA!"));
+    DEAL_II_Assert(AtA.el(1, 1) == 2, ExcMessage("Wrong element in AtA!"));
 
   deallog << "OK" << std::endl;
 }

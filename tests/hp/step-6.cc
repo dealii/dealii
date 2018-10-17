@@ -132,10 +132,10 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 {
   const unsigned int n_points = points.size();
 
-  Assert(values.size() == n_points,
-         ExcDimensionMismatch(values.size(), n_points));
+  DEAL_II_Assert(values.size() == n_points,
+                 ExcDimensionMismatch(values.size(), n_points));
 
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
   for (unsigned int i = 0; i < n_points; ++i)
     {
@@ -317,7 +317,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   if (cycle % 3 != 0)
     return;
 
-  Assert(cycle < 10, ExcNotImplemented());
+  DEAL_II_Assert(cycle < 10, ExcNotImplemented());
 
   std::string filename = "grid-";
   filename += ('0' + cycle);

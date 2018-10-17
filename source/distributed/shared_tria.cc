@@ -53,18 +53,19 @@ namespace parallel
          partition_custom_signal) &
         settings;
       (void)partition_settings;
-      Assert(partition_settings == partition_auto ||
-               partition_settings == partition_metis ||
-               partition_settings == partition_zoltan ||
-               partition_settings == partition_zorder ||
-               partition_settings == partition_custom_signal,
-             ExcMessage("Settings must contain exactly one type of the active "
-                        "cell partitioning scheme."));
+      DEAL_II_Assert(partition_settings == partition_auto ||
+                       partition_settings == partition_metis ||
+                       partition_settings == partition_zoltan ||
+                       partition_settings == partition_zorder ||
+                       partition_settings == partition_custom_signal,
+                     ExcMessage(
+                       "Settings must contain exactly one type of the active "
+                       "cell partitioning scheme."));
 
       if (settings & construct_multigrid_hierarchy)
-        Assert(allow_artificial_cells,
-               ExcMessage("construct_multigrid_hierarchy requires "
-                          "allow_artificial_cells to be set to true."));
+        DEAL_II_Assert(allow_artificial_cells,
+                       ExcMessage("construct_multigrid_hierarchy requires "
+                                  "allow_artificial_cells to be set to true."));
     }
 
 
@@ -78,7 +79,7 @@ namespace parallel
       // total number of active cells):
       const unsigned int max_active_cells =
         Utilities::MPI::max(this->n_active_cells(), this->get_communicator());
-      Assert(
+      DEAL_II_Assert(
         max_active_cells == this->n_active_cells(),
         ExcMessage(
           "A parallel::shared::Triangulation needs to be refined in the same"
@@ -101,13 +102,13 @@ namespace parallel
       if (partition_settings == partition_zoltan)
         {
 #  ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
-          AssertThrow(false,
-                      ExcMessage(
-                        "Choosing 'partition_zoltan' requires the library "
-                        "to be compiled with support for Zoltan! "
-                        "Instead, you might use 'partition_auto' to select "
-                        "a partitioning algorithm that is supported "
-                        "by your current configuration."));
+          DEAL_II_AssertThrow(
+            false,
+            ExcMessage("Choosing 'partition_zoltan' requires the library "
+                       "to be compiled with support for Zoltan! "
+                       "Instead, you might use 'partition_auto' to select "
+                       "a partitioning algorithm that is supported "
+                       "by your current configuration."));
 #  else
           GridTools::partition_triangulation(
             this->n_subdomains, *this, SparsityTools::Partitioner::zoltan);
@@ -116,13 +117,13 @@ namespace parallel
       else if (partition_settings == partition_metis)
         {
 #  ifndef DEAL_II_WITH_METIS
-          AssertThrow(false,
-                      ExcMessage(
-                        "Choosing 'partition_metis' requires the library "
-                        "to be compiled with support for METIS! "
-                        "Instead, you might use 'partition_auto' to select "
-                        "a partitioning algorithm that is supported "
-                        "by your current configuration."));
+          DEAL_II_AssertThrow(
+            false,
+            ExcMessage("Choosing 'partition_metis' requires the library "
+                       "to be compiled with support for METIS! "
+                       "Instead, you might use 'partition_auto' to select "
+                       "a partitioning algorithm that is supported "
+                       "by your current configuration."));
 #  else
           GridTools::partition_triangulation(this->n_subdomains,
                                              *this,
@@ -139,7 +140,7 @@ namespace parallel
         }
       else
         {
-          AssertThrow(false, ExcInternalError())
+          DEAL_II_AssertThrow(false, ExcInternalError())
         }
 
       // do not partition multigrid levels if user is
@@ -272,7 +273,7 @@ namespace parallel
 
 #  ifdef DEBUG
       {
-        // Assert that each cell is owned by a processor
+        // DEAL_II_Assert that each cell is owned by a processor
         unsigned int n_my_cells = 0;
         typename parallel::shared::Triangulation<dim,
                                                  spacedim>::active_cell_iterator
@@ -284,8 +285,9 @@ namespace parallel
 
         const unsigned int total_cells =
           Utilities::MPI::sum(n_my_cells, this->get_communicator());
-        Assert(total_cells == this->n_active_cells(),
-               ExcMessage("Not all cells are assigned to a processor."));
+        DEAL_II_Assert(total_cells == this->n_active_cells(),
+                       ExcMessage(
+                         "Not all cells are assigned to a processor."));
       }
 
       // If running with multigrid, assert that each level
@@ -302,8 +304,9 @@ namespace parallel
 
           const unsigned int total_cells =
             Utilities::MPI::sum(n_my_cells, this->get_communicator());
-          Assert(total_cells == this->n_cells(),
-                 ExcMessage("Not all cells are assigned to a processor."));
+          DEAL_II_Assert(total_cells == this->n_cells(),
+                         ExcMessage(
+                           "Not all cells are assigned to a processor."));
         }
 #  endif
     }
@@ -333,11 +336,11 @@ namespace parallel
     Triangulation<dim, spacedim>::get_true_level_subdomain_ids_of_cells(
       const unsigned int level) const
     {
-      Assert(level < true_level_subdomain_ids_of_cells.size(),
-             ExcInternalError());
-      Assert(true_level_subdomain_ids_of_cells[level].size() ==
-               this->n_cells(level),
-             ExcInternalError());
+      DEAL_II_Assert(level < true_level_subdomain_ids_of_cells.size(),
+                     ExcInternalError());
+      DEAL_II_Assert(true_level_subdomain_ids_of_cells[level].size() ==
+                       this->n_cells(level),
+                     ExcInternalError());
       return true_level_subdomain_ids_of_cells[level];
     }
 
@@ -372,7 +375,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
       partition();
       this->update_number_cache();
@@ -385,7 +388,7 @@ namespace parallel
     Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
-      Assert(
+      DEAL_II_Assert(
         (dynamic_cast<
            const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
            &other_tria) == nullptr),
@@ -422,7 +425,7 @@ namespace parallel
     bool
     Triangulation<dim, spacedim>::with_artificial_cells() const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return true;
     }
 
@@ -432,7 +435,7 @@ namespace parallel
     const std::vector<unsigned int> &
     Triangulation<dim, spacedim>::get_true_subdomain_ids_of_cells() const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return true_subdomain_ids_of_cells;
     }
 
@@ -443,7 +446,7 @@ namespace parallel
     Triangulation<dim, spacedim>::get_true_level_subdomain_ids_of_cells(
       const unsigned int) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return true_level_subdomain_ids_of_cells;
     }
   } // namespace shared

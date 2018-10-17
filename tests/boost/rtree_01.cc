@@ -58,9 +58,9 @@ main(int argc, char **argv)
   RstarPointRtree<2> rstar_tree;
   rstar_tree.insert(points.begin(), points.end());
 
-  AssertDimension(linear_tree.size(), N);
-  AssertDimension(quadratic_tree.size(), N);
-  AssertDimension(rstar_tree.size(), N);
+  DEAL_II_AssertDimension(linear_tree.size(), N);
+  DEAL_II_AssertDimension(quadratic_tree.size(), N);
+  DEAL_II_AssertDimension(rstar_tree.size(), N);
 
   // Now take the middle point, and ask for the k nearest neighbors
   Point<2> p(.5, .5);
@@ -75,9 +75,9 @@ main(int argc, char **argv)
                        std::back_inserter(nearest_quadratic));
   rstar_tree.query(bgi::nearest(p, k), std::back_inserter(nearest_rstar));
 
-  AssertDimension(nearest_linear.size(), k);
-  AssertDimension(nearest_quadratic.size(), k);
-  AssertDimension(nearest_rstar.size(), k);
+  DEAL_II_AssertDimension(nearest_linear.size(), k);
+  DEAL_II_AssertDimension(nearest_quadratic.size(), k);
+  DEAL_II_AssertDimension(nearest_rstar.size(), k);
 
   if (std::equal(nearest_linear.begin(),
                  nearest_linear.end(),

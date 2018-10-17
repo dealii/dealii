@@ -37,7 +37,7 @@ test(Vector<double> &v)
   v.compress();
 
   // then check the norm
-  Assert(v.l1_norm() == norm, ExcInternalError());
+  DEAL_II_Assert(v.l1_norm() == norm, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

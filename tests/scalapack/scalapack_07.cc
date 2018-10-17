@@ -103,9 +103,9 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
   test_1d.add(-1, full);
   test_one.add(-1, full);
 
-  AssertThrow(test_2d.frobenius_norm() < 1e-12, ExcInternalError());
-  AssertThrow(test_1d.frobenius_norm() < 1e-12, ExcInternalError());
-  AssertThrow(test_one.frobenius_norm() < 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(test_2d.frobenius_norm() < 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(test_1d.frobenius_norm() < 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(test_one.frobenius_norm() < 1e-12, ExcInternalError());
 }
 
 

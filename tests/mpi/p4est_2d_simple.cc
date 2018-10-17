@@ -48,7 +48,7 @@ test()
       GridGenerator::hyper_cube(tr);
       // tr.refine_global(1);
 
-      Assert(tr.n_active_cells() == 1, ExcInternalError());
+      DEAL_II_Assert(tr.n_active_cells() == 1, ExcInternalError());
 
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog << "subdomainid = " << tr.begin_active()->subdomain_id()
@@ -56,14 +56,15 @@ test()
 
       if (myid == numproc - 1)
         {
-          Assert(tr.begin_active()->subdomain_id() == (unsigned int)myid,
-                 ExcInternalError());
+          DEAL_II_Assert(tr.begin_active()->subdomain_id() ==
+                           (unsigned int)myid,
+                         ExcInternalError());
         }
       else
         {
-          Assert(tr.begin_active()->subdomain_id() ==
-                   numbers::artificial_subdomain_id,
-                 ExcInternalError());
+          DEAL_II_Assert(tr.begin_active()->subdomain_id() ==
+                           numbers::artificial_subdomain_id,
+                         ExcInternalError());
         }
 
 

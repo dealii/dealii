@@ -191,11 +191,11 @@ public:
   /**
    * Exception.
    */
-  DeclException1(ExcSolverDoesNotExist,
-                 std::string,
-                 << "Solver " << arg1 << " does not exist. Use one of "
-                 << std::endl
-                 << get_solver_names());
+  DEAL_II_DeclException1(ExcSolverDoesNotExist,
+                         std::string,
+                         << "Solver " << arg1 << " does not exist. Use one of "
+                         << std::endl
+                         << get_solver_names());
 
 
 
@@ -310,7 +310,7 @@ SolverSelector<VectorType>::solve(const Matrix &        A,
       solver.solve(A, x, b, precond);
     }
   else
-    Assert(false, ExcSolverDoesNotExist(solver_name));
+    DEAL_II_Assert(false, ExcSolverDoesNotExist(solver_name));
 }
 
 

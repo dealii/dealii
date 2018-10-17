@@ -1,13 +1,13 @@
 
-DEAL::Assertion: cell not active.
+DEAL::DEAL_II_Assertion: cell not active.
 DEAL::Cell = 1.0, DoFs=0 1 
 DEAL::Cell = 1.1, DoFs=1 2 
-DEAL::Assertion: cell not active.
+DEAL::DEAL_II_Assertion: cell not active.
 DEAL::Cell = 1.0, DoFs=0 1 2 3 
 DEAL::Cell = 1.1, DoFs=1 4 3 5 
 DEAL::Cell = 1.2, DoFs=2 3 6 7 
 DEAL::Cell = 1.3, DoFs=3 5 7 8 
-DEAL::Assertion: cell not active.
+DEAL::DEAL_II_Assertion: cell not active.
 DEAL::Cell = 1.0, DoFs=0 1 2 3 4 5 6 7 
 DEAL::Cell = 1.1, DoFs=1 8 3 9 5 10 7 11 
 DEAL::Cell = 1.2, DoFs=2 3 12 13 6 7 14 15 

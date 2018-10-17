@@ -67,11 +67,13 @@ test()
     {
       if (relevant_set.is_element(i))
         {
-          AssertThrow(points.find(i) != points.end(), ExcInternalError());
+          DEAL_II_AssertThrow(points.find(i) != points.end(),
+                              ExcInternalError());
         }
       else
         {
-          AssertThrow(points.find(i) == points.end(), ExcInternalError());
+          DEAL_II_AssertThrow(points.find(i) == points.end(),
+                              ExcInternalError());
         }
     }
 }

@@ -76,7 +76,7 @@ MatrixFree<dim, Number>::create_cell_subrange_hp_by_index(
   const unsigned int                           fe_index,
   const unsigned int                           vector_component) const
 {
-  AssertIndexRange(fe_index, dof_info[vector_component].max_fe_index);
+  DEAL_II_AssertIndexRange(fe_index, dof_info[vector_component].max_fe_index);
   const std::vector<unsigned int> &fe_indices =
     dof_info[vector_component].cell_active_fe_index;
   if (fe_indices.empty() == true)
@@ -87,12 +87,12 @@ MatrixFree<dim, Number>::create_cell_subrange_hp_by_index(
       // got a range that spans over too many cells
 #ifdef DEBUG
       for (unsigned int i = range.first + 1; i < range.second; ++i)
-        Assert(
+        DEAL_II_Assert(
           fe_indices[i] >= fe_indices[i - 1],
           ExcMessage(
             "Cell range must be over sorted range of fe indices in hp case!"));
-      AssertIndexRange(range.first, fe_indices.size() + 1);
-      AssertIndexRange(range.second, fe_indices.size() + 1);
+      DEAL_II_AssertIndexRange(range.first, fe_indices.size() + 1);
+      DEAL_II_AssertIndexRange(range.second, fe_indices.size() + 1);
 #endif
       std::pair<unsigned int, unsigned int> return_range;
       return_range.first = std::lower_bound(&fe_indices[0] + range.first,
@@ -104,9 +104,9 @@ MatrixFree<dim, Number>::create_cell_subrange_hp_by_index(
                          &fe_indices[0] + range.second,
                          fe_index + 1) -
         &fe_indices[0];
-      Assert(return_range.first >= range.first &&
-               return_range.second <= range.second,
-             ExcInternalError());
+      DEAL_II_Assert(return_range.first >= range.first &&
+                       return_range.second <= range.second,
+                     ExcInternalError());
       return return_range;
     }
 }
@@ -119,7 +119,7 @@ MatrixFree<dim, Number>::renumber_dofs(
   std::vector<types::global_dof_index> &renumbering,
   const unsigned int                    vector_component)
 {
-  AssertIndexRange(vector_component, dof_info.size());
+  DEAL_II_AssertIndexRange(vector_component, dof_info.size());
   dof_info[vector_component].compute_dof_renumbering(renumbering);
 }
 
@@ -129,16 +129,16 @@ template <int dim, typename Number>
 const DoFHandler<dim> &
 MatrixFree<dim, Number>::get_dof_handler(const unsigned int dof_index) const
 {
-  AssertIndexRange(dof_index, n_components());
+  DEAL_II_AssertIndexRange(dof_index, n_components());
   if (dof_handlers.active_dof_handler == DoFHandlers::usual)
     {
-      AssertDimension(dof_handlers.dof_handler.size(),
-                      dof_handlers.n_dof_handlers);
+      DEAL_II_AssertDimension(dof_handlers.dof_handler.size(),
+                              dof_handlers.n_dof_handlers);
       return *dof_handlers.dof_handler[dof_index];
     }
   else
     {
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
       // put pseudo return argument to avoid compiler error, but trigger a
       // segfault in case this is only run in optimized mode
       return *dof_handlers.dof_handler[numbers::invalid_unsigned_int];
@@ -155,22 +155,24 @@ MatrixFree<dim, Number>::get_cell_iterator(const unsigned int macro_cell_number,
 {
   const unsigned int vectorization_length =
     VectorizedArray<Number>::n_array_elements;
-  AssertIndexRange(dof_index, dof_handlers.n_dof_handlers);
-  AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
-  AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
+  DEAL_II_AssertIndexRange(dof_index, dof_handlers.n_dof_handlers);
+  DEAL_II_AssertIndexRange(macro_cell_number,
+                           task_info.cell_partition_data.back());
+  DEAL_II_AssertIndexRange(vector_number,
+                           n_components_filled(macro_cell_number));
 
   const DoFHandler<dim> *dofh = nullptr;
   if (dof_handlers.active_dof_handler == DoFHandlers::usual)
     {
-      AssertDimension(dof_handlers.dof_handler.size(),
-                      dof_handlers.n_dof_handlers);
+      DEAL_II_AssertDimension(dof_handlers.dof_handler.size(),
+                              dof_handlers.n_dof_handlers);
       dofh = dof_handlers.dof_handler[dof_index];
     }
   else
     {
-      Assert(false,
-             ExcMessage("Cannot return DoFHandler<dim>::cell_iterator "
-                        "for underlying DoFHandler!"));
+      DEAL_II_Assert(false,
+                     ExcMessage("Cannot return DoFHandler<dim>::cell_iterator "
+                                "for underlying DoFHandler!"));
     }
 
   std::pair<unsigned int, unsigned int> index =
@@ -192,12 +194,14 @@ MatrixFree<dim, Number>::get_hp_cell_iterator(
 {
   constexpr unsigned int vectorization_length =
     VectorizedArray<Number>::n_array_elements;
-  AssertIndexRange(dof_index, dof_handlers.n_dof_handlers);
-  AssertIndexRange(macro_cell_number, task_info.cell_partition_data.back());
-  AssertIndexRange(vector_number, n_components_filled(macro_cell_number));
+  DEAL_II_AssertIndexRange(dof_index, dof_handlers.n_dof_handlers);
+  DEAL_II_AssertIndexRange(macro_cell_number,
+                           task_info.cell_partition_data.back());
+  DEAL_II_AssertIndexRange(vector_number,
+                           n_components_filled(macro_cell_number));
 
-  Assert(dof_handlers.active_dof_handler == DoFHandlers::hp,
-         ExcNotImplemented());
+  DEAL_II_Assert(dof_handlers.active_dof_handler == DoFHandlers::hp,
+                 ExcNotImplemented());
   const hp::DoFHandler<dim> *dofh = dof_handlers.hp_dof_handler[dof_index];
   std::pair<unsigned int, unsigned int> index =
     cell_level_index[macro_cell_number * vectorization_length + vector_number];
@@ -252,7 +256,7 @@ MatrixFree<dim, Number>::internal_reinit(
            ++b, ++c)
         for (unsigned int nq = 0; nq < n_quad; nq++)
           {
-            AssertDimension(quad[nq].size(), 1);
+            DEAL_II_AssertDimension(quad[nq].size(), 1);
             shape_info(c, nq, 0, 0)
               .reinit(quad[nq][0], dof_handler[no]->get_fe(), b);
           }
@@ -261,9 +265,10 @@ MatrixFree<dim, Number>::internal_reinit(
   if (additional_data.initialize_indices == true)
     {
       clear();
-      Assert(dof_handler.size() > 0, ExcMessage("No DoFHandler is given."));
-      AssertDimension(dof_handler.size(), constraint.size());
-      AssertDimension(dof_handler.size(), locally_owned_set.size());
+      DEAL_II_Assert(dof_handler.size() > 0,
+                     ExcMessage("No DoFHandler is given."));
+      DEAL_II_AssertDimension(dof_handler.size(), constraint.size());
+      DEAL_II_AssertDimension(dof_handler.size(), locally_owned_set.size());
 
       // set variables that are independent of FE
       if (Utilities::MPI::job_supports_mpi() == true)
@@ -430,9 +435,10 @@ MatrixFree<dim, Number>::internal_reinit(
   if (additional_data.initialize_indices == true)
     {
       clear();
-      Assert(dof_handler.size() > 0, ExcMessage("No DoFHandler is given."));
-      AssertDimension(dof_handler.size(), constraint.size());
-      AssertDimension(dof_handler.size(), locally_owned_set.size());
+      DEAL_II_Assert(dof_handler.size() > 0,
+                     ExcMessage("No DoFHandler is given."));
+      DEAL_II_AssertDimension(dof_handler.size(), constraint.size());
+      DEAL_II_AssertDimension(dof_handler.size(), locally_owned_set.size());
 
       // set variables that are independent of FE
       if (Utilities::MPI::job_supports_mpi() == true)
@@ -503,8 +509,8 @@ MatrixFree<dim, Number>::internal_reinit(
         dummy, dummy, 1, dummy, false, dummy, dummy2);
       for (unsigned int i = 0; i < dof_info.size(); ++i)
         {
-          Assert(dof_handler[i]->get_fe_collection().size() == 1,
-                 ExcNotImplemented());
+          DEAL_II_Assert(dof_handler[i]->get_fe_collection().size() == 1,
+                         ExcNotImplemented());
           dof_info[i].dimension = dim;
           dof_info[i].n_base_elements =
             dof_handler[i]->get_fe(0).n_base_elements();
@@ -607,7 +613,7 @@ namespace internal
       else if (subdomain_id == numbers::invalid_subdomain_id ||
                cell->subdomain_id() == subdomain_id)
         {
-          Assert(cell->active(), ExcInternalError());
+          DEAL_II_Assert(cell->active(), ExcInternalError());
           cell_its.emplace_back(cell->level(), cell->index());
         }
     }
@@ -661,13 +667,13 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
                                                     cell_level_index,
                                                     subdomain_id);
 
-      Assert(n_mpi_procs > 1 ||
-               cell_level_index.size() == tria.n_active_cells(),
-             ExcInternalError());
+      DEAL_II_Assert(n_mpi_procs > 1 ||
+                       cell_level_index.size() == tria.n_active_cells(),
+                     ExcInternalError());
     }
   else
     {
-      AssertIndexRange(level, tria.n_global_levels());
+      DEAL_II_AssertIndexRange(level, tria.n_global_levels());
       if (level < tria.n_levels())
         {
           cell_level_index.reserve(tria.n_cells(level));
@@ -695,8 +701,8 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
   cell_level_index.clear();
   dof_handlers.active_dof_handler = DoFHandlers::hp;
   dof_handlers.level              = additional_data.level_mg_handler;
-  Assert(dof_handlers.level == numbers::invalid_unsigned_int,
-         ExcNotImplemented());
+  DEAL_II_Assert(dof_handlers.level == numbers::invalid_unsigned_int,
+                 ExcNotImplemented());
   dof_handlers.n_dof_handlers = dof_handler.size();
   dof_handlers.hp_dof_handler.resize(dof_handlers.n_dof_handlers);
   for (unsigned int no = 0; no < dof_handlers.n_dof_handlers; ++no)
@@ -734,8 +740,9 @@ MatrixFree<dim, Number>::initialize_dof_handlers(
                                                 cell_level_index,
                                                 subdomain_id);
 
-  Assert(n_mpi_procs > 1 || cell_level_index.size() == tria.n_active_cells(),
-         ExcInternalError());
+  DEAL_II_Assert(n_mpi_procs > 1 ||
+                   cell_level_index.size() == tria.n_active_cells(),
+                 ExcInternalError());
 
   // All these are cells local to this processor. Therefore, set
   // cell_level_index_end_local to the size of cell_level_index.
@@ -768,9 +775,9 @@ MatrixFree<dim, Number>::initialize_indices(
   const unsigned int n_fe           = dof_handlers.n_dof_handlers;
   const unsigned int n_active_cells = cell_level_index.size();
 
-  AssertDimension(n_active_cells, cell_level_index.size());
-  AssertDimension(n_fe, locally_owned_set.size());
-  AssertDimension(n_fe, constraint.size());
+  DEAL_II_AssertDimension(n_active_cells, cell_level_index.size());
+  DEAL_II_AssertDimension(n_fe, locally_owned_set.size());
+  DEAL_II_AssertDimension(n_fe, constraint.size());
 
   std::vector<types::global_dof_index>                local_dof_indices;
   std::vector<std::vector<std::vector<unsigned int>>> lexicographic(n_fe);
@@ -794,8 +801,8 @@ MatrixFree<dim, Number>::initialize_indices(
             dof_info[no].cell_active_fe_index.resize(
               n_active_cells, numbers::invalid_unsigned_int);
 
-          Assert(additional_data.cell_vectorization_category.empty(),
-                 ExcNotImplemented());
+          DEAL_II_Assert(additional_data.cell_vectorization_category.empty(),
+                         ExcNotImplemented());
         }
       else
         {
@@ -850,18 +857,19 @@ MatrixFree<dim, Number>::initialize_indices(
                   .lexicographic_numbering.end());
             }
 
-          AssertDimension(lexicographic[no][fe_index].size(),
-                          dof_info[no].dofs_per_cell[fe_index]);
-          AssertDimension(
+          DEAL_II_AssertDimension(lexicographic[no][fe_index].size(),
+                                  dof_info[no].dofs_per_cell[fe_index]);
+          DEAL_II_AssertDimension(
             dof_info[no].component_dof_indices_offset[fe_index].size() - 1,
             dof_info[no].start_components.back());
-          AssertDimension(
+          DEAL_II_AssertDimension(
             dof_info[no].component_dof_indices_offset[fe_index].back(),
             dof_info[no].dofs_per_cell[fe_index]);
         }
 
       // set locally owned range for each component
-      Assert(locally_owned_set[no].is_contiguous(), ExcNotImplemented());
+      DEAL_II_Assert(locally_owned_set[no].is_contiguous(),
+                     ExcNotImplemented());
       dof_info[no].vector_partitioner.reset(
         new Utilities::MPI::Partitioner(locally_owned_set[no],
                                         task_info.communicator));
@@ -919,7 +927,7 @@ MatrixFree<dim, Number>::initialize_indices(
                                             cell_at_subdomain_boundary);
               if (cell_categorization_enabled)
                 {
-                  AssertIndexRange(
+                  DEAL_II_AssertIndexRange(
                     cell_it->active_cell_index(),
                     additional_data.cell_vectorization_category.size());
                   dof_info[no].cell_active_fe_index[counter] =
@@ -932,8 +940,8 @@ MatrixFree<dim, Number>::initialize_indices(
                    dof_handlers.level != numbers::invalid_unsigned_int)
             {
               const DoFHandler<dim> *dofh = dof_handlers.dof_handler[no];
-              AssertIndexRange(dof_handlers.level,
-                               dofh->get_triangulation().n_levels());
+              DEAL_II_AssertIndexRange(dof_handlers.level,
+                                       dofh->get_triangulation().n_levels());
               typename DoFHandler<dim>::cell_iterator cell_it(
                 &dofh->get_triangulation(),
                 cell_level_index[counter].first,
@@ -949,7 +957,7 @@ MatrixFree<dim, Number>::initialize_indices(
                                             cell_at_subdomain_boundary);
               if (cell_categorization_enabled)
                 {
-                  AssertIndexRange(
+                  DEAL_II_AssertIndexRange(
                     cell_it->index(),
                     additional_data.cell_vectorization_category.size());
                   dof_info[no].cell_active_fe_index[counter] =
@@ -981,7 +989,7 @@ MatrixFree<dim, Number>::initialize_indices(
             }
           else
             {
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
@@ -1070,8 +1078,8 @@ MatrixFree<dim, Number>::initialize_indices(
       // in order to overlap communication in MPI with computations: Place all
       // cells with ghost indices into one chunk. Also reorder cells so that we
       // can parallelize by threads
-      Assert(additional_data.cell_vectorization_category.empty(),
-             ExcNotImplemented());
+      DEAL_II_Assert(additional_data.cell_vectorization_category.empty(),
+                     ExcNotImplemented());
       task_info.initial_setup_blocks_tasks(subdomain_boundary_cells,
                                            renumbering,
                                            irregular_cells);
@@ -1128,9 +1136,10 @@ MatrixFree<dim, Number>::initialize_indices(
                                       task_info.n_active_cells);
                    counter++)
                 {
-                  AssertIndexRange(counter, renumbering.size());
-                  AssertIndexRange(renumbering[counter],
-                                   dof_info[0].cell_active_fe_index.size());
+                  DEAL_II_AssertIndexRange(counter, renumbering.size());
+                  DEAL_II_AssertIndexRange(
+                    renumbering[counter],
+                    dof_info[0].cell_active_fe_index.size());
                   renumbering_fe_index
                     [dof_info[0].cell_active_fe_index[renumbering[counter]]]
                       .push_back(renumbering[counter]);
@@ -1175,9 +1184,9 @@ MatrixFree<dim, Number>::initialize_indices(
                                            vectorization_length - 1) /
                                           vectorization_length;
                 }
-              AssertIndexRange(n_macro_cells_before,
-                               task_info.cell_partition_data.back() +
-                                 2 * dof_info[0].max_fe_index + 1);
+              DEAL_II_AssertIndexRange(n_macro_cells_before,
+                                       task_info.cell_partition_data.back() +
+                                         2 * dof_info[0].max_fe_index + 1);
               irregular_cells.resize(n_macro_cells_before + n_ghost_slots);
               *(task_info.cell_partition_data.end() - 2) = n_macro_cells_before;
               *(task_info.cell_partition_data.end() - 1) =
@@ -1206,8 +1215,9 @@ MatrixFree<dim, Number>::initialize_indices(
                                   dof_handlers.active_dof_handler ==
                                     DoFHandlers::hp);
 
-      Assert(irregular_cells.size() >= task_info.cell_partition_data.back(),
-             ExcInternalError());
+      DEAL_II_Assert(irregular_cells.size() >=
+                       task_info.cell_partition_data.back(),
+                     ExcInternalError());
 
       irregular_cells.resize(task_info.cell_partition_data.back() +
                              n_ghost_slots);
@@ -1226,14 +1236,14 @@ MatrixFree<dim, Number>::initialize_indices(
         for (unsigned int i = 0; i < task_info.cell_partition_data.back(); ++i)
           n_cells +=
             irregular_cells[i] > 0 ? irregular_cells[i] : vectorization_length;
-        AssertDimension(n_cells, task_info.n_active_cells);
+        DEAL_II_AssertDimension(n_cells, task_info.n_active_cells);
         n_cells = 0;
         for (unsigned int i = task_info.cell_partition_data.back();
              i < n_ghost_slots + task_info.cell_partition_data.back();
              ++i)
           n_cells +=
             irregular_cells[i] > 0 ? irregular_cells[i] : vectorization_length;
-        AssertDimension(n_cells, task_info.n_ghost_cells);
+        DEAL_II_AssertDimension(n_cells, task_info.n_ghost_cells);
       }
 
       task_info.cell_partition_data.push_back(
@@ -1245,12 +1255,12 @@ MatrixFree<dim, Number>::initialize_indices(
     // arithmetic operations of several cells will then be done simultaneously).
 #ifdef DEBUG
   {
-    AssertDimension(renumbering.size(),
-                    task_info.n_active_cells + task_info.n_ghost_cells);
+    DEAL_II_AssertDimension(renumbering.size(),
+                            task_info.n_active_cells + task_info.n_ghost_cells);
     std::vector<unsigned int> sorted_renumbering(renumbering);
     std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
     for (unsigned int i = 0; i < sorted_renumbering.size(); ++i)
-      Assert(sorted_renumbering[i] == i, ExcInternalError());
+      DEAL_II_Assert(sorted_renumbering[i] == i, ExcInternalError());
   }
 #endif
   {
@@ -1276,11 +1286,11 @@ MatrixFree<dim, Number>::initialize_indices(
             cell_level_index_old[renumbering[position_cell + n_comp - 1]]);
         position_cell += n_comp;
       }
-    AssertDimension(position_cell,
-                    task_info.n_active_cells + task_info.n_ghost_cells);
-    AssertDimension(cell_level_index.size(),
-                    task_info.cell_partition_data.back() *
-                      vectorization_length);
+    DEAL_II_AssertDimension(position_cell,
+                            task_info.n_active_cells + task_info.n_ghost_cells);
+    DEAL_II_AssertDimension(cell_level_index.size(),
+                            task_info.cell_partition_data.back() *
+                              vectorization_length);
   }
 
   // set constraint pool from the std::map and reorder the indices
@@ -1294,7 +1304,7 @@ MatrixFree<dim, Number>::initialize_indices(
   unsigned int length = 0;
   for (; it != end; ++it)
     {
-      AssertIndexRange(it->second, constraints.size());
+      DEAL_II_AssertIndexRange(it->second, constraints.size());
       constraints[it->second] = &it->first;
       length += it->first.size();
     }
@@ -1304,14 +1314,14 @@ MatrixFree<dim, Number>::initialize_indices(
   constraint_pool_row_index.resize(1, 0);
   for (unsigned int i = 0; i < constraints.size(); ++i)
     {
-      Assert(constraints[i] != nullptr, ExcInternalError());
+      DEAL_II_Assert(constraints[i] != nullptr, ExcInternalError());
       constraint_pool_data.insert(constraint_pool_data.end(),
                                   constraints[i]->begin(),
                                   constraints[i]->end());
       constraint_pool_row_index.push_back(constraint_pool_data.size());
     }
 
-  AssertDimension(constraint_pool_data.size(), length);
+  DEAL_II_AssertDimension(constraint_pool_data.size(), length);
   for (unsigned int no = 0; no < n_fe; ++no)
     dof_info[no].reorder_cells(task_info,
                                renumbering,
@@ -1410,7 +1420,7 @@ MatrixFree<dim, Number>::initialize_indices(
                                   face_info.faces[f].cells_interior[v] %
                                     VectorizedArray<Number>::n_array_elements);
 
-            // Assert(cell_and_face_to_plain_faces(index) ==
+            // DEAL_II_Assert(cell_and_face_to_plain_faces(index) ==
             // numbers::invalid_unsigned_int,
             //       ExcInternalError("Should only visit each face once"));
             face_info.cell_and_face_to_plain_faces(index) =
@@ -1424,7 +1434,7 @@ MatrixFree<dim, Number>::initialize_indices(
                   face_info.faces[f].exterior_face_no,
                   face_info.faces[f].cells_exterior[v] %
                     VectorizedArray<Number>::n_array_elements);
-                // Assert(cell_and_face_to_plain_faces(index) ==
+                // DEAL_II_Assert(cell_and_face_to_plain_faces(index) ==
                 // numbers::invalid_unsigned_int,
                 //       ExcInternalError("Should only visit each face once"));
                 face_info.cell_and_face_to_plain_faces(index) =
@@ -1525,7 +1535,7 @@ MatrixFree<dim, Number>::initialize_indices(
                          numbers::invalid_unsigned_int;
                        ++v)
                     {
-                      AssertIndexRange(
+                      DEAL_II_AssertIndexRange(
                         face_info.faces[f].cells_interior[v],
                         n_macro_cells_before *
                           VectorizedArray<Number>::n_array_elements);
@@ -1572,9 +1582,8 @@ MatrixFree<dim, Number>::initialize_indices(
                                       stride));
                                 i += shape.dofs_per_component_on_cell * stride;
                               }
-                          AssertDimension(i,
-                                          dof_info[no].dofs_per_cell[0] *
-                                            stride);
+                          DEAL_II_AssertDimension(
+                            i, dof_info[no].dofs_per_cell[0] * stride);
                         }
                       else if (dof_info[no].index_storage_variants
                                  [internal::MatrixFreeFunctions::DoFInfo::
@@ -1641,7 +1650,7 @@ MatrixFree<dim, Number>::initialize_indices(
                          numbers::invalid_unsigned_int;
                        ++v)
                     {
-                      AssertIndexRange(
+                      DEAL_II_AssertIndexRange(
                         face_info.faces[f].cells_interior[v],
                         n_macro_cells_before *
                           VectorizedArray<Number>::n_array_elements);
@@ -1688,9 +1697,8 @@ MatrixFree<dim, Number>::initialize_indices(
                                       stride));
                                 i += shape.dofs_per_component_on_cell * stride;
                               }
-                          AssertDimension(i,
-                                          dof_info[no].dofs_per_cell[0] *
-                                            stride);
+                          DEAL_II_AssertDimension(
+                            i, dof_info[no].dofs_per_cell[0] * stride);
                         }
                     }
                 std::sort(ghost_indices.begin(), ghost_indices.end());

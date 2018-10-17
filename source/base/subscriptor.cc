@@ -102,10 +102,10 @@ Subscriptor::check_no_subscribers() const noexcept
           if (infostring == "")
             infostring = "<none>";
 
-          AssertNothrow(counter == 0,
-                        ExcInUse(counter.load(),
-                                 object_info->name(),
-                                 infostring));
+          DEAL_II_AssertNothrow(counter == 0,
+                                ExcInUse(counter.load(),
+                                         object_info->name(),
+                                         infostring));
         }
       else
         {
@@ -175,7 +175,8 @@ void
 Subscriptor::unsubscribe(const char *id) const
 {
   const char *name = (id != nullptr) ? id : unknown_subscriber;
-  AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
+  DEAL_II_AssertNothrow(counter > 0,
+                        ExcNoSubscriber(object_info->name(), name));
   // This is for the case that we do
   // not abort after the exception
   if (counter == 0)
@@ -186,9 +187,10 @@ Subscriptor::unsubscribe(const char *id) const
   map_iterator it = counter_map.find(name);
   if (it == counter_map.end() || it->second == 0)
     {
-      AssertNothrow(it != counter_map.end(),
-                    ExcNoSubscriber(object_info->name(), name));
-      AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
+      DEAL_II_AssertNothrow(it != counter_map.end(),
+                            ExcNoSubscriber(object_info->name(), name));
+      DEAL_II_AssertNothrow(it->second > 0,
+                            ExcNoSubscriber(object_info->name(), name));
     }
   else
     {

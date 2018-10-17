@@ -77,16 +77,18 @@ namespace internal
           const typename dealii::Triangulation<dim, spacedim>::cell_iterator
             &)>>> &                                              functions)
       {
-        AssertThrow(fes.size() > 0, ExcMessage("FEs size should be >=1"));
-        AssertThrow(fes.size() == multiplicities.size(),
-                    ExcMessage(
-                      "FEs and multiplicities should have the same size"));
+        DEAL_II_AssertThrow(fes.size() > 0,
+                            ExcMessage("FEs size should be >=1"));
+        DEAL_II_AssertThrow(
+          fes.size() == multiplicities.size(),
+          ExcMessage("FEs and multiplicities should have the same size"));
 
-        AssertThrow(functions.size() == fes.size() - 1,
-                    ExcDimensionMismatch(functions.size(), fes.size() - 1));
+        DEAL_II_AssertThrow(functions.size() == fes.size() - 1,
+                            ExcDimensionMismatch(functions.size(),
+                                                 fes.size() - 1));
 
-        AssertThrow(multiplicities[0] == 1,
-                    ExcMessage("First multiplicity should be 1"));
+        DEAL_II_AssertThrow(multiplicities[0] == 1,
+                            ExcMessage("First multiplicity should be 1"));
 
         const unsigned int n_comp_base = fes[0]->n_components();
 
@@ -96,12 +98,12 @@ namespace internal
             const FE_Nothing<dim> *fe_nothing =
               dynamic_cast<const FE_Nothing<dim> *>(fes[fe]);
             if (fe_nothing)
-              AssertThrow(
+              DEAL_II_AssertThrow(
                 fe_nothing->is_dominating(),
                 ExcMessage(
                   "Only dominating FE_Nothing can be used in FE_Enriched"));
 
-            AssertThrow(
+            DEAL_II_AssertThrow(
               fes[fe]->n_components() == n_comp_base,
               ExcMessage(
                 "All elements must have the same number of components"));
@@ -194,10 +196,10 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
       std_cxx14::make_unique<FESystem<dim, spacedim>>(fes, multiplicities))
 {
   // descriptive error are thrown within the function.
-  Assert(internal::FE_Enriched::consistency_check(fes,
-                                                  multiplicities,
-                                                  functions),
-         ExcInternalError());
+  DEAL_II_Assert(internal::FE_Enriched::consistency_check(fes,
+                                                          multiplicities,
+                                                          functions),
+                 ExcInternalError());
 
   initialize(fes, multiplicities);
 
@@ -207,9 +209,10 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
   for (unsigned int fe = 1; fe < fes.size(); fe++)
     base_no_mult_local_enriched_dofs[fe].resize(multiplicities[fe]);
 
-  Assert(base_no_mult_local_enriched_dofs.size() == this->n_base_elements(),
-         ExcDimensionMismatch(base_no_mult_local_enriched_dofs.size(),
-                              this->n_base_elements()));
+  DEAL_II_Assert(base_no_mult_local_enriched_dofs.size() ==
+                   this->n_base_elements(),
+                 ExcDimensionMismatch(base_no_mult_local_enriched_dofs.size(),
+                                      this->n_base_elements()));
 
   // build the map: (base_no, base_m) -> vector of local element DoFs
   for (unsigned int system_index = 0; system_index < this->dofs_per_cell;
@@ -223,18 +226,20 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
       const unsigned int base_m =
         this->system_to_base_table[system_index].first.second;
 
-      Assert(base_m < base_no_mult_local_enriched_dofs[base_no].size(),
-             ExcMessage(
-               "Size mismatch for base_no_mult_local_enriched_dofs: "
-               "base_index = " +
-               std::to_string(this->system_to_base_table[system_index].second) +
-               "; base_no = " + std::to_string(base_no) +
-               "; base_m = " + std::to_string(base_m) +
-               "; system_index = " + std::to_string(system_index)));
+      DEAL_II_Assert(base_m < base_no_mult_local_enriched_dofs[base_no].size(),
+                     ExcMessage(
+                       "Size mismatch for base_no_mult_local_enriched_dofs: "
+                       "base_index = " +
+                       std::to_string(
+                         this->system_to_base_table[system_index].second) +
+                       "; base_no = " + std::to_string(base_no) +
+                       "; base_m = " + std::to_string(base_m) +
+                       "; system_index = " + std::to_string(system_index)));
 
-      Assert(base_m < base_no_mult_local_enriched_dofs[base_no].size(),
-             ExcDimensionMismatch(
-               base_m, base_no_mult_local_enriched_dofs[base_no].size()));
+      DEAL_II_Assert(
+        base_m < base_no_mult_local_enriched_dofs[base_no].size(),
+        ExcDimensionMismatch(base_m,
+                             base_no_mult_local_enriched_dofs[base_no].size()));
 
       base_no_mult_local_enriched_dofs[base_no][base_m].push_back(system_index);
     }
@@ -248,11 +253,11 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
       for (unsigned int m = 0;
            m < base_no_mult_local_enriched_dofs[base_no].size();
            m++)
-        Assert(base_no_mult_local_enriched_dofs[base_no][m].size() ==
-                 fes[base_no]->dofs_per_cell,
-               ExcDimensionMismatch(
-                 base_no_mult_local_enriched_dofs[base_no][m].size(),
-                 fes[base_no]->dofs_per_cell));
+        DEAL_II_Assert(base_no_mult_local_enriched_dofs[base_no][m].size() ==
+                         fes[base_no]->dofs_per_cell,
+                       ExcDimensionMismatch(
+                         base_no_mult_local_enriched_dofs[base_no][m].size(),
+                         fes[base_no]->dofs_per_cell));
     }
 }
 
@@ -271,7 +276,7 @@ double
 FE_Enriched<dim, spacedim>::shape_value(const unsigned int i,
                                         const Point<dim> & p) const
 {
-  Assert(
+  DEAL_II_Assert(
     !is_enriched,
     ExcMessage(
       "For enriched finite elements shape_value() can not be defined on the reference element."));
@@ -314,7 +319,7 @@ FE_Enriched<dim, spacedim>::requires_update_flags(const UpdateFlags flags) const
         out |= update_values;
     }
 
-  Assert(!(flags & update_3rd_derivatives), ExcNotImplemented());
+  DEAL_II_Assert(!(flags & update_3rd_derivatives), ExcNotImplemented());
 
   return out;
 }
@@ -424,8 +429,8 @@ FE_Enriched<dim, spacedim>::initialize(
   const std::vector<const FiniteElement<dim, spacedim> *> &fes,
   const std::vector<unsigned int> &                        multiplicities)
 {
-  Assert(fes.size() == multiplicities.size(),
-         ExcDimensionMismatch(fes.size(), multiplicities.size()));
+  DEAL_II_Assert(fes.size() == multiplicities.size(),
+                 ExcDimensionMismatch(fes.size(), multiplicities.size()));
 
   // Note that we need to skip every fe with multiplicity 0 in the following
   // block of code
@@ -523,8 +528,8 @@ FE_Enriched<dim, spacedim>::fill_fe_values(
   internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
     &output_data) const
 {
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   // call FESystem's method to fill everything without enrichment function
@@ -558,8 +563,8 @@ FE_Enriched<dim, spacedim>::fill_fe_face_values(
   internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
     &output_data) const
 {
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   // call FESystem's method to fill everything without enrichment function
@@ -594,8 +599,8 @@ FE_Enriched<dim, spacedim>::fill_fe_subface_values(
   internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
     &output_data) const
 {
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   // call FESystem's method to fill everything without enrichment function
@@ -634,7 +639,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
   // Either dim_1==dim
   // (fill_fe_values) or dim_1==dim-1
   // (fill_fe_(sub)face_values)
-  Assert(dim_1 == dim || dim_1 == dim - 1, ExcInternalError());
+  DEAL_II_Assert(dim_1 == dim || dim_1 == dim - 1, ExcInternalError());
   const UpdateFlags flags = fe_data.update_each;
 
   const unsigned int n_q_points = quadrature.size();
@@ -664,7 +669,8 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
             {
               const unsigned int base_index =
                 this->system_to_base_table[system_index].second;
-              Assert(base_index < base_fe.dofs_per_cell, ExcInternalError());
+              DEAL_II_Assert(base_index < base_fe.dofs_per_cell,
+                             ExcInternalError());
 
               // now copy. if the shape function is primitive, then there
               // is only one value to be copied, but for non-primitive
@@ -680,9 +686,9 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
                 in_index += base_fe.n_nonzero_components(i);
 
               // then loop over the number of components to be copied
-              Assert(this->n_nonzero_components(system_index) ==
-                       base_fe.n_nonzero_components(base_index),
-                     ExcInternalError());
+              DEAL_II_Assert(this->n_nonzero_components(system_index) ==
+                               base_fe.n_nonzero_components(base_index),
+                             ExcInternalError());
               for (unsigned int s = 0;
                    s < this->n_nonzero_components(system_index);
                    ++s)
@@ -705,13 +711,14 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
             }
       }
 
-  Assert(base_no_mult_local_enriched_dofs.size() == fe_data.enrichment.size(),
-         ExcDimensionMismatch(base_no_mult_local_enriched_dofs.size(),
-                              fe_data.enrichment.size()));
+  DEAL_II_Assert(base_no_mult_local_enriched_dofs.size() ==
+                   fe_data.enrichment.size(),
+                 ExcDimensionMismatch(base_no_mult_local_enriched_dofs.size(),
+                                      fe_data.enrichment.size()));
   // calculate hessians, gradients and values for each function
   for (unsigned int base_no = 1; base_no < this->n_base_elements(); base_no++)
     {
-      Assert(
+      DEAL_II_Assert(
         base_no_mult_local_enriched_dofs[base_no].size() ==
           fe_data.enrichment[base_no].size(),
         ExcDimensionMismatch(base_no_mult_local_enriched_dofs[base_no].size(),
@@ -726,20 +733,21 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
           if (base_no_mult_local_enriched_dofs[base_no][m].size() == 0)
             continue;
 
-          Assert(enrichments[base_no - 1][m](cell) != nullptr,
-                 ExcMessage("The pointer to the enrichment function is NULL"));
+          DEAL_II_Assert(enrichments[base_no - 1][m](cell) != nullptr,
+                         ExcMessage(
+                           "The pointer to the enrichment function is NULL"));
 
-          Assert(enrichments[base_no - 1][m](cell)->n_components == 1,
-                 ExcMessage(
-                   "Only scalar-valued enrichment functions are allowed"));
+          DEAL_II_Assert(
+            enrichments[base_no - 1][m](cell)->n_components == 1,
+            ExcMessage("Only scalar-valued enrichment functions are allowed"));
 
           if (flags & update_hessians)
             {
-              Assert(fe_data.enrichment[base_no][m].hessians.size() ==
-                       n_q_points,
-                     ExcDimensionMismatch(
-                       fe_data.enrichment[base_no][m].hessians.size(),
-                       n_q_points));
+              DEAL_II_Assert(fe_data.enrichment[base_no][m].hessians.size() ==
+                               n_q_points,
+                             ExcDimensionMismatch(
+                               fe_data.enrichment[base_no][m].hessians.size(),
+                               n_q_points));
               for (unsigned int q = 0; q < n_q_points; q++)
                 fe_data.enrichment[base_no][m].hessians[q] =
                   enrichments[base_no - 1][m](cell)->hessian(
@@ -748,11 +756,11 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
           if (flags & update_gradients)
             {
-              Assert(fe_data.enrichment[base_no][m].gradients.size() ==
-                       n_q_points,
-                     ExcDimensionMismatch(
-                       fe_data.enrichment[base_no][m].gradients.size(),
-                       n_q_points));
+              DEAL_II_Assert(fe_data.enrichment[base_no][m].gradients.size() ==
+                               n_q_points,
+                             ExcDimensionMismatch(
+                               fe_data.enrichment[base_no][m].gradients.size(),
+                               n_q_points));
               for (unsigned int q = 0; q < n_q_points; q++)
                 fe_data.enrichment[base_no][m].gradients[q] =
                   enrichments[base_no - 1][m](cell)->gradient(
@@ -761,10 +769,11 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
 
           if (flags & update_values)
             {
-              Assert(fe_data.enrichment[base_no][m].values.size() == n_q_points,
-                     ExcDimensionMismatch(
-                       fe_data.enrichment[base_no][m].values.size(),
-                       n_q_points));
+              DEAL_II_Assert(fe_data.enrichment[base_no][m].values.size() ==
+                               n_q_points,
+                             ExcDimensionMismatch(
+                               fe_data.enrichment[base_no][m].values.size(),
+                               n_q_points));
               for (unsigned int q = 0; q < n_q_points; q++)
                 fe_data.enrichment[base_no][m].values[q] =
                   enrichments[base_no - 1][m](cell)->value(
@@ -887,7 +896,7 @@ FE_Enriched<dim, spacedim>::get_face_interpolation_matrix(
     }
   else
     {
-      AssertThrow(
+      DEAL_II_AssertThrow(
         false,
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
@@ -911,7 +920,7 @@ FE_Enriched<dim, spacedim>::get_subface_interpolation_matrix(
     }
   else
     {
-      AssertThrow(
+      DEAL_II_AssertThrow(
         false,
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
@@ -931,7 +940,7 @@ FE_Enriched<dim, spacedim>::hp_vertex_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -949,7 +958,7 @@ FE_Enriched<dim, spacedim>::hp_line_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -967,7 +976,7 @@ FE_Enriched<dim, spacedim>::hp_quad_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -996,7 +1005,7 @@ FE_Enriched<dim, spacedim>::compare_for_face_domination(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return FiniteElementDomination::neither_element_dominates;
     }
 }
@@ -1201,9 +1210,9 @@ namespace ColorEnriched
                     std::pair<unsigned int, unsigned int>(predicate_colors[i],
                                                           i));
 
-                  AssertThrow(ret.second == 1,
-                              ExcMessage(
-                                "Only one enrichment function per color"));
+                  DEAL_II_AssertThrow(
+                    ret.second == 1,
+                    ExcMessage("Only one enrichment function per color"));
 
                   color_list.insert(predicate_colors[i]);
                 }
@@ -1398,8 +1407,8 @@ namespace ColorEnriched
         dummy_function =
           [=](const typename Triangulation<dim, spacedim>::cell_iterator &)
         -> const Function<spacedim> * {
-        AssertThrow(false,
-                    ExcMessage("Called enrichment function for FE_Nothing"));
+        DEAL_II_AssertThrow(
+          false, ExcMessage("Called enrichment function for FE_Nothing"));
         return nullptr;
       };
 
@@ -1423,9 +1432,9 @@ namespace ColorEnriched
               // indexed from zero and colors are indexed from 1.
               const unsigned int ind = it - 1;
 
-              AssertIndexRange(ind, vec_fe_enriched.size());
-              AssertIndexRange(ind, functions.size());
-              AssertIndexRange(ind, color_enrichments.size());
+              DEAL_II_AssertIndexRange(ind, vec_fe_enriched.size());
+              DEAL_II_AssertIndexRange(ind, functions.size());
+              DEAL_II_AssertIndexRange(ind, color_enrichments.size());
 
               // Assume an active predicate colors {1,2} for a cell.
               // We then need to create a vector of FE enriched elements
@@ -1438,7 +1447,7 @@ namespace ColorEnriched
               functions[ind][0] = color_enrichments[ind];
             }
 
-          AssertDimension(vec_fe_enriched.size(), functions.size());
+          DEAL_II_AssertDimension(vec_fe_enriched.size(), functions.size());
 
           FE_Enriched<dim, spacedim> fe_component(&fe_base,
                                                   vec_fe_enriched,
@@ -1463,10 +1472,10 @@ namespace ColorEnriched
     , enrichments(enrichments)
     , n_colors(numbers::invalid_unsigned_int)
   {
-    AssertDimension(predicates.size(), enrichments.size());
-    AssertDimension(fe_base.n_components(), fe_enriched.n_components());
-    AssertThrow(predicates.size() > 0,
-                ExcMessage("Number of predicates should be positive"));
+    DEAL_II_AssertDimension(predicates.size(), enrichments.size());
+    DEAL_II_AssertDimension(fe_base.n_components(), fe_enriched.n_components());
+    DEAL_II_AssertThrow(predicates.size() > 0,
+                        ExcMessage("Number of predicates should be positive"));
   }
 
 

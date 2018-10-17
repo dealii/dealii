@@ -138,7 +138,8 @@ assemble_on_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
             fe_eval.begin_dof_values()[j][v];
     }
   data.test_matrix.add(-1., data.cell_matrix);
-  AssertThrow(data.test_matrix.frobenius_norm() < 1e-10, ExcInternalError());
+  DEAL_II_AssertThrow(data.test_matrix.frobenius_norm() < 1e-10,
+                      ExcInternalError());
 }
 
 

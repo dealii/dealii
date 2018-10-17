@@ -53,7 +53,7 @@ FE_Bernstein<dim, spacedim>::get_interpolation_matrix(
   FullMatrix<double> &) const
 {
   // no interpolation possible. throw exception, as documentation says
-  AssertThrow(
+  DEAL_II_AssertThrow(
     false,
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
 }
@@ -66,8 +66,8 @@ FE_Bernstein<dim, spacedim>::get_restriction_matrix(
   const unsigned int,
   const RefinementCase<dim> &) const
 {
-  AssertThrow(false,
-              (typename FiniteElement<dim, spacedim>::ExcProjectionVoid()));
+  DEAL_II_AssertThrow(
+    false, (typename FiniteElement<dim, spacedim>::ExcProjectionVoid()));
   // return dummy, nothing will happen because the base class FE_Q_Base
   // implements lazy evaluation of those matrices
   return this->restriction[0][0];
@@ -81,8 +81,8 @@ FE_Bernstein<dim, spacedim>::get_prolongation_matrix(
   const unsigned int,
   const RefinementCase<dim> &) const
 {
-  AssertThrow(false,
-              (typename FiniteElement<dim, spacedim>::ExcEmbeddingVoid()));
+  DEAL_II_AssertThrow(
+    false, (typename FiniteElement<dim, spacedim>::ExcEmbeddingVoid()));
   // return dummy, nothing will happen because the base class FE_Q_Base
   // implements lazy evaluation of those matrices
   return this->prolongation[0][0];
@@ -96,7 +96,7 @@ FE_Bernstein<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
   FullMatrix<double> &                interpolation_matrix) const
 {
-  Assert(dim > 1, ExcImpossibleInDim(1));
+  DEAL_II_Assert(dim > 1, ExcImpossibleInDim(1));
   get_subface_interpolation_matrix(source_fe,
                                    numbers::invalid_unsigned_int,
                                    interpolation_matrix);
@@ -110,9 +110,9 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
   const unsigned int                  subface,
   FullMatrix<double> &                interpolation_matrix) const
 {
-  Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_face));
+  DEAL_II_Assert(interpolation_matrix.m() == x_source_fe.dofs_per_face,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      x_source_fe.dofs_per_face));
 
   // see if source is a Bernstein element
   if (const FE_Bernstein<dim, spacedim> *source_fe =
@@ -120,16 +120,16 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
     {
       // have this test in here since a table of size 2x0 reports its size as
       // 0x0
-      Assert(interpolation_matrix.n() == this->dofs_per_face,
-             ExcDimensionMismatch(interpolation_matrix.n(),
-                                  this->dofs_per_face));
+      DEAL_II_Assert(interpolation_matrix.n() == this->dofs_per_face,
+                     ExcDimensionMismatch(interpolation_matrix.n(),
+                                          this->dofs_per_face));
 
       // Make sure that the element for which the DoFs should be constrained
       // is the one with the higher polynomial degree.  Actually the procedure
       // will work also if this assertion is not satisfied. But the matrices
       // produced in that case might lead to problems in the hp procedures,
       // which use this method.
-      Assert(
+      DEAL_II_Assert(
         this->dofs_per_face <= source_fe->dofs_per_face,
         (typename FiniteElement<dim,
                                 spacedim>::ExcInterpolationNotImplemented()));
@@ -183,7 +183,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
           for (unsigned int i = 0; i < this->dofs_per_face; ++i)
             sum += interpolation_matrix(j, i);
 
-          Assert(std::fabs(sum - 1) < eps, ExcInternalError());
+          DEAL_II_Assert(std::fabs(sum - 1) < eps, ExcInternalError());
         }
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe) != nullptr)
@@ -191,7 +191,7 @@ FE_Bernstein<dim, spacedim>::get_subface_interpolation_matrix(
       // nothing to do here, the FE_Nothing has no degrees of freedom anyway
     }
   else
-    AssertThrow(
+    DEAL_II_AssertThrow(
       false,
       (typename FiniteElement<dim,
                               spacedim>::ExcInterpolationNotImplemented()));
@@ -240,7 +240,7 @@ FE_Bernstein<dim, spacedim>::hp_vertex_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -307,7 +307,7 @@ FE_Bernstein<dim, spacedim>::compare_for_face_domination(
         }
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -341,7 +341,8 @@ template <int dim, int spacedim>
 std::vector<unsigned int>
 FE_Bernstein<dim, spacedim>::get_dpo_vector(const unsigned int deg)
 {
-  AssertThrow(deg > 0, ExcMessage("FE_Bernstein needs to be of degree > 0."));
+  DEAL_II_AssertThrow(deg > 0,
+                      ExcMessage("FE_Bernstein needs to be of degree > 0."));
   std::vector<unsigned int> dpo(dim + 1, 1U);
   for (unsigned int i = 1; i < dpo.size(); ++i)
     dpo[i] = dpo[i - 1] * (deg - 1);

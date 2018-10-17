@@ -27,14 +27,14 @@
 #include "../tests.h"
 #include "create_matrix.h"
 
-DeclException5(ExcEl,
-               int,
-               int,
-               double,
-               double,
-               double,
-               << "Error in element (" << arg1 << "," << arg2 << "): " << arg3
-               << " != " << arg4 << " delta=" << arg5);
+DEAL_II_DeclException5(ExcEl,
+                       int,
+                       int,
+                       double,
+                       double,
+                       double,
+                       << "Error in element (" << arg1 << "," << arg2
+                       << "): " << arg3 << " != " << arg4 << " delta=" << arg5);
 
 template <typename NumberType>
 void
@@ -64,16 +64,18 @@ test(const unsigned int m,
 
   for (unsigned int i = 0; i < m; ++i)
     for (unsigned int j = 0; j < n; ++j)
-      AssertThrow(std::abs(C(i, j) - CL(i, j)) < eps * std::abs(CL(i, j)),
-                  ExcEl(i, j, C(i, j), CL(i, j), C(i, j) - CL(i, j)));
+      DEAL_II_AssertThrow(std::abs(C(i, j) - CL(i, j)) <
+                            eps * std::abs(CL(i, j)),
+                          ExcEl(i, j, C(i, j), CL(i, j), C(i, j) - CL(i, j)));
 
   deallog << "OK non-symmetric" << std::endl;
 
   AL.Tmmult(CL, BL, DL, true);
   for (unsigned int i = 0; i < m; ++i)
     for (unsigned int j = 0; j < n; ++j)
-      AssertThrow(std::abs(2. * C(i, j) - CL(i, j)) < eps * std::abs(CL(i, j)),
-                  ExcEl(i, j, 2. * C(i, j), CL(i, j), 2. * C(i, j) - CL(i, j)));
+      DEAL_II_AssertThrow(
+        std::abs(2. * C(i, j) - CL(i, j)) < eps * std::abs(CL(i, j)),
+        ExcEl(i, j, 2. * C(i, j), CL(i, j), 2. * C(i, j) - CL(i, j)));
 
 
   deallog << "OK non-symmetric adding" << std::endl;
@@ -88,8 +90,9 @@ test(const unsigned int m,
 
       for (unsigned int i = 0; i < m; ++i)
         for (unsigned int j = 0; j < n; ++j)
-          AssertThrow(std::abs(C(i, j) - CL(i, j)) < eps * std::abs(CL(i, j)),
-                      ExcEl(i, j, C(i, j), CL(i, j), C(i, j) - CL(i, j)));
+          DEAL_II_AssertThrow(
+            std::abs(C(i, j) - CL(i, j)) < eps * std::abs(CL(i, j)),
+            ExcEl(i, j, C(i, j), CL(i, j), C(i, j) - CL(i, j)));
 
       deallog << "OK symmetric" << std::endl;
 
@@ -97,7 +100,7 @@ test(const unsigned int m,
 
       for (unsigned int i = 0; i < m; ++i)
         for (unsigned int j = 0; j < n; ++j)
-          AssertThrow(
+          DEAL_II_AssertThrow(
             std::abs(2. * C(i, j) - CL(i, j)) < eps * std::abs(CL(i, j)),
             ExcEl(i, j, 2. * C(i, j), CL(i, j), 2. * C(i, j) - CL(i, j)));
 

@@ -93,7 +93,7 @@ test()
       {
         deallog << pair.first << ": " << non_artificial_vertices_old[pair.first]
                 << " vs. " << pair.second << std::endl;
-        AssertThrow(
+        DEAL_II_AssertThrow(
           false,
           ExcMessage(
             "Some of the vertices on ghost cell were not moved correctly!"));

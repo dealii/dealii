@@ -108,9 +108,9 @@ do_check(const FiniteElement<dim> &coarse_fe, const FiniteElement<dim> &fine_fe)
         for (unsigned int i = 0; i < fine_fe.dofs_per_cell; ++i)
           for (unsigned int j = 0; j < coarse_fe.dofs_per_cell; ++j)
             injection_2(i, j) -= injection_1(i, j);
-        AssertThrow(injection_2.frobenius_norm() <=
-                      1e-12 * injection_1.frobenius_norm(),
-                    ExcInternalError());
+        DEAL_II_AssertThrow(injection_2.frobenius_norm() <=
+                              1e-12 * injection_1.frobenius_norm(),
+                            ExcInternalError());
       }
 }
 

@@ -60,17 +60,17 @@ test()
   x.compress(VectorOperation::insert);
   v = x;
 
-  Assert(v(myid * 2) == myid * 2.0, ExcInternalError());
-  Assert(v(myid * 2 + 1) == myid * 2.0 + 1.0, ExcInternalError());
-  Assert(v(ghostel) == ghostel, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2) == myid * 2.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2 + 1) == myid * 2.0 + 1.0, ExcInternalError());
+  DEAL_II_Assert(v(ghostel) == ghostel, ExcInternalError());
 
   // change x, transfer, and check again
   x *= 2.0;
   v = x;
 
-  Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
-  Assert(v(ghostel) == 2.0 * ghostel, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(v(ghostel) == 2.0 * ghostel, ExcInternalError());
 
   if (myid == 0)
     {

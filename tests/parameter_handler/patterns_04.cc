@@ -36,14 +36,14 @@ test(const Patterns::PatternBase &p)
   auto p3 = Patterns::pattern_factory(desc);
   deallog << p3->description() << std::endl;
 
-  AssertThrow(desc == p2->description(),
-              ExcInternalError("Cloned pattern does not have the same "
-                               "description as the original pattern!"));
+  DEAL_II_AssertThrow(desc == p2->description(),
+                      ExcInternalError("Cloned pattern does not have the same "
+                                       "description as the original pattern!"));
 
-  AssertThrow(desc == p3->description(),
-              ExcInternalError("Pattern created using factory "
-                               "does not have the same "
-                               "description as the original pattern!"));
+  DEAL_II_AssertThrow(desc == p3->description(),
+                      ExcInternalError("Pattern created using factory "
+                                       "does not have the same "
+                                       "description as the original pattern!"));
 }
 
 

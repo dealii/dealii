@@ -79,10 +79,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
           for (unsigned int d = 0; d < dim; ++d)
             {
               deallog << selected_vector_values[q][d] << std::endl;
-              Assert(std::fabs(selected_vector_values[q][d] -
-                               vector_values[q](c + d)) <=
-                       1e-12 * selected_vector_values[q].norm(),
-                     ExcInternalError());
+              DEAL_II_Assert(std::fabs(selected_vector_values[q][d] -
+                                       vector_values[q](c + d)) <=
+                               1e-12 * selected_vector_values[q].norm(),
+                             ExcInternalError());
             }
       }
 }

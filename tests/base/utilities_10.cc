@@ -46,9 +46,10 @@ test()
     deallog << Utilities::split_string_list("   ", ' ').size() << std::endl;
   }
 
-  Assert(Utilities::split_string_list(" ; ", ';').size() == 1,
-         ExcInternalError());
-  Assert(Utilities::split_string_list(" ; ", ';')[0] == "", ExcInternalError());
+  DEAL_II_Assert(Utilities::split_string_list(" ; ", ';').size() == 1,
+                 ExcInternalError());
+  DEAL_II_Assert(Utilities::split_string_list(" ; ", ';')[0] == "",
+                 ExcInternalError());
 }
 
 

@@ -264,7 +264,7 @@ KDTree<dim>::size() const
 template <int dim>
 inline const Point<dim> &KDTree<dim>::operator[](const unsigned int i) const
 {
-  AssertIndexRange(i, size());
+  DEAL_II_AssertIndexRange(i, size());
   return adaptor->points[i];
 }
 
@@ -291,7 +291,7 @@ template <int dim>
 inline double
 KDTree<dim>::PointCloudAdaptor::kdtree_get_pt(const size_t idx, int d) const
 {
-  AssertIndexRange(d, dim);
+  DEAL_II_AssertIndexRange(d, dim);
   return points[idx][d];
 }
 
@@ -313,7 +313,7 @@ KDTree<dim>::PointCloudAdaptor::kdtree_distance(const double *p1,
                                                 const size_t  idx_p2,
                                                 const size_t  size) const
 {
-  AssertDimension(size, dim);
+  DEAL_II_AssertDimension(size, dim);
   double res = 0.0;
   for (size_t d = 0; d < size; ++d)
     res += (p1[d] - points[idx_p2][d]) * (p1[d] - points[idx_p2][d]);

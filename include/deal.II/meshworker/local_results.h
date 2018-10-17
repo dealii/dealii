@@ -558,7 +558,7 @@ namespace MeshWorker
   inline number &
   LocalResults<number>::value(unsigned int i)
   {
-    AssertIndexRange(i, J.size());
+    DEAL_II_AssertIndexRange(i, J.size());
     return J[i];
   }
 
@@ -567,7 +567,7 @@ namespace MeshWorker
   inline BlockVector<number> &
   LocalResults<number>::vector(unsigned int i)
   {
-    AssertIndexRange(i, R.size());
+    DEAL_II_AssertIndexRange(i, R.size());
     return R[i];
   }
 
@@ -578,10 +578,10 @@ namespace MeshWorker
   {
     if (external)
       {
-        AssertIndexRange(i, M2.size());
+        DEAL_II_AssertIndexRange(i, M2.size());
         return M2[i];
       }
-    AssertIndexRange(i, M1.size());
+    DEAL_II_AssertIndexRange(i, M1.size());
     return M1[i];
   }
 
@@ -606,7 +606,7 @@ namespace MeshWorker
   inline number
   LocalResults<number>::value(unsigned int i) const
   {
-    AssertIndexRange(i, J.size());
+    DEAL_II_AssertIndexRange(i, J.size());
     return J[i];
   }
 
@@ -615,7 +615,7 @@ namespace MeshWorker
   inline const BlockVector<number> &
   LocalResults<number>::vector(unsigned int i) const
   {
-    AssertIndexRange(i, R.size());
+    DEAL_II_AssertIndexRange(i, R.size());
     return R[i];
   }
 
@@ -626,10 +626,10 @@ namespace MeshWorker
   {
     if (external)
       {
-        AssertIndexRange(i, M2.size());
+        DEAL_II_AssertIndexRange(i, M2.size());
         return M2[i];
       }
-    AssertIndexRange(i, M1.size());
+    DEAL_II_AssertIndexRange(i, M1.size());
     return M1[i];
   }
 

@@ -37,7 +37,7 @@ namespace parallel
       : dof_handler(&dof_handler, typeid(*this).name())
       , handle(numbers::invalid_unsigned_int)
     {
-      Assert(
+      DEAL_II_Assert(
         (dynamic_cast<
            const parallel::distributed::Triangulation<dim, spacedim> *>(
            &(this->dof_handler)->get_triangulation()) != nullptr),
@@ -55,7 +55,7 @@ namespace parallel
         (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
           const_cast<dealii::Triangulation<dim, spacedim> *>(
             &dof_handler->get_triangulation())));
-      Assert(tria != nullptr, ExcInternalError());
+      DEAL_II_Assert(tria != nullptr, ExcInternalError());
 
       handle = tria->register_data_attach(
         std::bind(&ActiveFEIndicesTransfer<dim, spacedim>::pack_callback,
@@ -76,7 +76,7 @@ namespace parallel
         (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
           const_cast<dealii::Triangulation<dim, spacedim> *>(
             &dof_handler->get_triangulation())));
-      Assert(tria != nullptr, ExcInternalError());
+      DEAL_II_Assert(tria != nullptr, ExcInternalError());
 
       tria->notify_ready_to_unpack(
         handle,
@@ -142,16 +142,17 @@ namespace parallel
                            .find_least_face_dominating_fe_in_collection(
                              fe_indices_children);
 
-              Assert(fe_index != numbers::invalid_unsigned_int,
-                     ExcMessage(
-                       "No FiniteElement has been found in your FECollection "
-                       "that dominates all children of a cell you are trying "
-                       "to coarsen!"));
+              DEAL_II_Assert(
+                fe_index != numbers::invalid_unsigned_int,
+                ExcMessage(
+                  "No FiniteElement has been found in your FECollection "
+                  "that dominates all children of a cell you are trying "
+                  "to coarsen!"));
             }
             break;
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
             break;
         }
 
@@ -176,7 +177,8 @@ namespace parallel
                                         data_range.end(),
                                         /*allow_compression=*/false);
 
-      Assert(fe_index <= dof_handler->get_fe().size(), ExcInternalError());
+      DEAL_II_Assert(fe_index <= dof_handler->get_fe().size(),
+                     ExcInternalError());
 
       switch (status)
         {
@@ -198,7 +200,7 @@ namespace parallel
             break;
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
             break;
         }
     }

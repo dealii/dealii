@@ -32,7 +32,7 @@ test(TrilinosWrappers::MPI::Vector &v)
 {
   v.reinit(complete_index_set(13), MPI_COMM_WORLD);
 
-  AssertThrow(v.size() == 13, ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

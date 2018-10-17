@@ -74,9 +74,12 @@ test_dim_2(const double e1,
   v1 /= v1.norm();
   const Tensor<1, dim> v2 = cross_product_2d(v1);
 
-  Assert(is_unit_vector(v1), ExcMessage("Vector is not of unit length."));
-  Assert(is_unit_vector(v2), ExcMessage("Vector is not of unit length."));
-  Assert(e1 >= e2, ExcMessage("Input eigenvalue ordering is not correct."));
+  DEAL_II_Assert(is_unit_vector(v1),
+                 ExcMessage("Vector is not of unit length."));
+  DEAL_II_Assert(is_unit_vector(v2),
+                 ExcMessage("Vector is not of unit length."));
+  DEAL_II_Assert(e1 >= e2,
+                 ExcMessage("Input eigenvalue ordering is not correct."));
 
   const SymmetricTensor<2, dim> T = e1 * symmetrize(outer_product(v1, v1)) +
                                     e2 * symmetrize(outer_product(v2, v2));
@@ -106,13 +109,18 @@ test_dim_3(const double e1,
   v1 = cross_product_3d(v2, v3);
   v3 = cross_product_3d(v1, v2); // Ensure that system is right-handed
 
-  Assert(is_unit_vector(v1), ExcMessage("Vector is not of unit length."));
-  Assert(is_unit_vector(v2), ExcMessage("Vector is not of unit length."));
-  Assert(is_unit_vector(v3), ExcMessage("Vector is not of unit length."));
-  Assert(check_orientation(v2, cross_product_3d(v3, v1)),
-         ExcMessage("Vectors are not orthogonal."));
-  Assert(e1 >= e2, ExcMessage("Input eigenvalue ordering is not correct."));
-  Assert(e2 >= e3, ExcMessage("Input eigenvalue ordering is not correct."));
+  DEAL_II_Assert(is_unit_vector(v1),
+                 ExcMessage("Vector is not of unit length."));
+  DEAL_II_Assert(is_unit_vector(v2),
+                 ExcMessage("Vector is not of unit length."));
+  DEAL_II_Assert(is_unit_vector(v3),
+                 ExcMessage("Vector is not of unit length."));
+  DEAL_II_Assert(check_orientation(v2, cross_product_3d(v3, v1)),
+                 ExcMessage("Vectors are not orthogonal."));
+  DEAL_II_Assert(e1 >= e2,
+                 ExcMessage("Input eigenvalue ordering is not correct."));
+  DEAL_II_Assert(e2 >= e3,
+                 ExcMessage("Input eigenvalue ordering is not correct."));
 
 
   const SymmetricTensor<2, dim> T = e1 * symmetrize(outer_product(v1, v1)) +

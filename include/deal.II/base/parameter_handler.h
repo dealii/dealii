@@ -310,7 +310,7 @@ class MultipleParameterLoop;
  * if you correctly specified the regular expression for this entry; you
  * should not try to get out an integer or a double from an entry for which no
  * according regular expression was set. The internal error is raised through
- * the Assert() macro family which only works in debug mode.
+ * the DEAL_II_Assert() macro family which only works in debug mode.
  *
  * If you want to print out all user selectable features, use the
  * print_parameters() function. It is generally a good idea to print all
@@ -1192,7 +1192,7 @@ public:
   /**
    * Return value of entry @p entry_string.  If the entry was changed,
    * then the changed value is returned, otherwise the default value. If the
-   * value of an undeclared entry is required, an @p Assert will fail.
+   * value of an undeclared entry is required, an @p DEAL_II_Assert will fail.
    */
   std::string
   get(const std::string &entry_string) const;
@@ -1200,7 +1200,7 @@ public:
   /**
    * Return value of entry @p entry_string.  If the entry was changed,
    * then the changed value is returned, otherwise the default value. If the
-   * value of an undeclared entry is required, an @p Assert will fail.
+   * value of an undeclared entry is required, an @p DEAL_II_Assert will fail.
    * If @p entry_subsection_path is non-empty, the value will be gotten
    * from the subsection represented by that path instead of the current
    * subsection. The first string in @p entry_subsection_path must be the name
@@ -1477,31 +1477,33 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcEntryAlreadyExists,
-                 std::string,
-                 << "The following entry already exists: " << arg1 << ".");
+  DEAL_II_DeclException1(ExcEntryAlreadyExists,
+                         std::string,
+                         << "The following entry already exists: " << arg1
+                         << ".");
   /**
    * Exception
    */
-  DeclException2(ExcValueDoesNotMatchPattern,
-                 std::string,
-                 std::string,
-                 << "The string <" << arg1
-                 << "> does not match the given pattern <" << arg2 << ">.");
+  DEAL_II_DeclException2(ExcValueDoesNotMatchPattern,
+                         std::string,
+                         std::string,
+                         << "The string <" << arg1
+                         << "> does not match the given pattern <" << arg2
+                         << ">.");
   /**
    * Exception
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcAlreadyAtTopLevel,
     "You can't leave a subsection if you are already at the top level "
     "of the subsection hierarchy.");
   /**
    * Exception
    */
-  DeclException1(ExcEntryUndeclared,
-                 std::string,
-                 << "You can't ask for entry <" << arg1
-                 << "> you have not yet declared.");
+  DEAL_II_DeclException1(ExcEntryUndeclared,
+                         std::string,
+                         << "You can't ask for entry <" << arg1
+                         << "> you have not yet declared.");
 
   /**
    * Exception for when there are an unequal number of 'subsection' and 'end'
@@ -1509,81 +1511,83 @@ public:
    * argument is a formatted list of the subsection path before and after
    * entering the parser.
    */
-  DeclException2(ExcUnbalancedSubsections,
-                 std::string,
-                 std::string,
-                 << "There are unequal numbers of 'subsection' and 'end' "
-                    "statements in the parameter file <"
-                 << arg1 << ">." << (arg2.size() > 0 ? "\n" + arg2 : ""));
+  DEAL_II_DeclException2(
+    ExcUnbalancedSubsections,
+    std::string,
+    std::string,
+    << "There are unequal numbers of 'subsection' and 'end' "
+       "statements in the parameter file <"
+    << arg1 << ">." << (arg2.size() > 0 ? "\n" + arg2 : ""));
 
   /**
    * Exception for when, during parsing of a parameter file, the parser
    * encounters a subsection in the file that was not previously declared.
    */
-  DeclException3(ExcNoSubsection,
-                 int,
-                 std::string,
-                 std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2
-                 << ": There is "
-                    "no such subsection to be entered: "
-                 << arg3);
+  DEAL_II_DeclException3(ExcNoSubsection,
+                         int,
+                         std::string,
+                         std::string,
+                         << "Line <" << arg1 << "> of file <" << arg2
+                         << ": There is "
+                            "no such subsection to be entered: "
+                         << arg3);
 
   /**
    * General exception for a line that could not be parsed, taking, as
    * arguments, the line number, file name, and a brief description of why the
    * line cannot be parsed.
    */
-  DeclException3(ExcCannotParseLine,
-                 int,
-                 std::string,
-                 std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2 << ">: " << arg3);
+  DEAL_II_DeclException3(ExcCannotParseLine,
+                         int,
+                         std::string,
+                         std::string,
+                         << "Line <" << arg1 << "> of file <" << arg2
+                         << ">: " << arg3);
 
   /**
    * Exception for an entry in a parameter file that does not match the
    * provided pattern. The arguments are, in order, the line number, file
    * name, entry value, entry name, and a description of the pattern.
    */
-  DeclException5(ExcInvalidEntryForPattern,
-                 int,
-                 std::string,
-                 std::string,
-                 std::string,
-                 std::string,
-                 << "Line <" << arg1 << "> of file <" << arg2
-                 << ">:\n"
-                    "    The entry value \n"
-                 << "        " << arg3 << '\n'
-                 << "    for the entry named\n"
-                 << "        " << arg4 << '\n'
-                 << "    does not match the given pattern:\n"
-                 << "        " << arg5);
+  DEAL_II_DeclException5(ExcInvalidEntryForPattern,
+                         int,
+                         std::string,
+                         std::string,
+                         std::string,
+                         std::string,
+                         << "Line <" << arg1 << "> of file <" << arg2
+                         << ">:\n"
+                            "    The entry value \n"
+                         << "        " << arg3 << '\n'
+                         << "    for the entry named\n"
+                         << "        " << arg4 << '\n'
+                         << "    does not match the given pattern:\n"
+                         << "        " << arg5);
 
   /**
    * Exception for when an XML file cannot be read at all. This happens when
    * there is no top-level XML element called "ParameterHandler" or when there
    * are multiple top level elements.
    */
-  DeclExceptionMsg(ExcInvalidXMLParameterFile,
-                   "The provided file could not be parsed as a "
-                   "ParameterHandler description.");
+  DEAL_II_DeclExceptionMsg(ExcInvalidXMLParameterFile,
+                           "The provided file could not be parsed as a "
+                           "ParameterHandler description.");
 
   /**
    * Exception for when an entry in an XML parameter file does not match the
    * provided pattern. The arguments are, in order, the entry value, entry
    * name, and a description of the pattern.
    */
-  DeclException3(ExcInvalidEntryForPatternXML,
-                 std::string,
-                 std::string,
-                 std::string,
-                 << "    The entry value \n"
-                 << "        " << arg1 << '\n'
-                 << "    for the entry named\n"
-                 << "        " << arg2 << '\n'
-                 << "    does not match the given pattern:\n"
-                 << "        " << arg3);
+  DEAL_II_DeclException3(ExcInvalidEntryForPatternXML,
+                         std::string,
+                         std::string,
+                         std::string,
+                         << "    The entry value \n"
+                         << "        " << arg1 << '\n'
+                         << "    for the entry named\n"
+                         << "        " << arg2 << '\n'
+                         << "    does not match the given pattern:\n"
+                         << "        " << arg3);
 
   /**
    * Exception for when the file given in an include statement cannot be
@@ -1591,7 +1595,7 @@ public:
    * statement, current parameter file name, and the name of the file intended
    * for inclusion.
    */
-  DeclException3(
+  DEAL_II_DeclException3(
     ExcCannotOpenIncludeStatementFile,
     int,
     std::string,

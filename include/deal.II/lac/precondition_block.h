@@ -319,16 +319,17 @@ public:
    * For non-overlapping block preconditioners, the block size must divide the
    * matrix size. If not, this exception gets thrown.
    */
-  DeclException2(ExcWrongBlockSize,
-                 int,
-                 int,
-                 << "The blocksize " << arg1 << " and the size of the matrix "
-                 << arg2 << " do not match.");
+  DEAL_II_DeclException2(ExcWrongBlockSize,
+                         int,
+                         int,
+                         << "The blocksize " << arg1
+                         << " and the size of the matrix " << arg2
+                         << " do not match.");
 
   /**
    * Exception
    */
-  DeclException0(ExcInverseMatricesAlreadyExist);
+  DEAL_II_DeclException0(ExcInverseMatricesAlreadyExist);
 
   //@}
 
@@ -957,7 +958,8 @@ inline PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
   b_iterator = matrix->inverse(a_block).begin(r);
   b_end      = matrix->inverse(a_block).end();
 
-  Assert(a_block < matrix->size(), ExcIndexRange(a_block, 0, matrix->size()));
+  DEAL_II_Assert(a_block < matrix->size(),
+                 ExcIndexRange(a_block, 0, matrix->size()));
 }
 
 
@@ -966,7 +968,7 @@ inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::size_type
 PreconditionBlockJacobi<MatrixType,
                         inverse_type>::const_iterator::Accessor::row() const
 {
-  Assert(a_block < matrix->size(), ExcIteratorPastEnd());
+  DEAL_II_Assert(a_block < matrix->size(), ExcIteratorPastEnd());
 
   return bs * a_block + b_iterator->row();
 }
@@ -977,7 +979,7 @@ inline typename PreconditionBlockJacobi<MatrixType, inverse_type>::size_type
 PreconditionBlockJacobi<MatrixType,
                         inverse_type>::const_iterator::Accessor::column() const
 {
-  Assert(a_block < matrix->size(), ExcIteratorPastEnd());
+  DEAL_II_Assert(a_block < matrix->size(), ExcIteratorPastEnd());
 
   return bs * a_block + b_iterator->column();
 }
@@ -988,7 +990,7 @@ inline inverse_type
 PreconditionBlockJacobi<MatrixType,
                         inverse_type>::const_iterator::Accessor::value() const
 {
-  Assert(a_block < matrix->size(), ExcIteratorPastEnd());
+  DEAL_II_Assert(a_block < matrix->size(), ExcIteratorPastEnd());
 
   return b_iterator->value();
 }
@@ -1009,7 +1011,7 @@ inline
   PreconditionBlockJacobi<MatrixType, inverse_type>::const_iterator::
   operator++()
 {
-  Assert(*this != accessor.matrix->end(), ExcIteratorPastEnd());
+  DEAL_II_Assert(*this != accessor.matrix->end(), ExcIteratorPastEnd());
 
   ++accessor.b_iterator;
   if (accessor.b_iterator == accessor.b_end)
@@ -1108,7 +1110,7 @@ inline
   PreconditionBlockJacobi<MatrixType, inverse_type>::begin(
     const size_type r) const
 {
-  Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
+  DEAL_II_Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r);
 }
 
@@ -1120,7 +1122,7 @@ inline
   PreconditionBlockJacobi<MatrixType, inverse_type>::end(
     const size_type r) const
 {
-  Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
+  DEAL_II_Assert(r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r + 1);
 }
 

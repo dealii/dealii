@@ -127,7 +127,8 @@ test()
   A.add(-1., B);
   deallog << "|A|=" << A.frobenius_norm() << std::endl;
   deallog << "|B|=" << B.frobenius_norm() << std::endl;
-  Assert(A.frobenius_norm() < 1e-12 * B.frobenius_norm(), ExcInternalError());
+  DEAL_II_Assert(A.frobenius_norm() < 1e-12 * B.frobenius_norm(),
+                 ExcInternalError());
 }
 
 

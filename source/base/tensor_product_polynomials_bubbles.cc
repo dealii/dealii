@@ -33,7 +33,7 @@ TensorProductPolynomialsBubbles<dim>::compute_value(const unsigned int i,
   const unsigned int max_q_indices = this->n_tensor_pols;
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
   (void)n_bubbles;
-  Assert(i < max_q_indices + n_bubbles, ExcInternalError());
+  DEAL_II_Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_q_indices)
@@ -58,7 +58,7 @@ double
 TensorProductPolynomialsBubbles<0>::compute_value(const unsigned int,
                                                   const Point<0> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0.;
 }
 
@@ -72,7 +72,7 @@ TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
   const unsigned int max_q_indices = this->n_tensor_pols;
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
   (void)n_bubbles;
-  Assert(i < max_q_indices + n_bubbles, ExcInternalError());
+  DEAL_II_Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_q_indices)
@@ -120,7 +120,7 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
   const unsigned int max_q_indices = this->n_tensor_pols;
   const unsigned int n_bubbles     = ((q_degree <= 1) ? 1 : dim);
   (void)n_bubbles;
-  Assert(i < max_q_indices + n_bubbles, ExcInternalError());
+  DEAL_II_Assert(i < max_q_indices + n_bubbles, ExcInternalError());
 
   // treat the regular basis functions
   if (i < max_q_indices)
@@ -227,23 +227,26 @@ TensorProductPolynomialsBubbles<dim>::compute(
   const unsigned int max_q_indices = this->n_tensor_pols;
   (void)max_q_indices;
   const unsigned int n_bubbles = ((q_degree <= 1) ? 1 : dim);
-  Assert(values.size() == max_q_indices + n_bubbles || values.size() == 0,
-         ExcDimensionMismatch2(values.size(), max_q_indices + n_bubbles, 0));
-  Assert(grads.size() == max_q_indices + n_bubbles || grads.size() == 0,
-         ExcDimensionMismatch2(grads.size(), max_q_indices + n_bubbles, 0));
-  Assert(
+  DEAL_II_Assert(
+    values.size() == max_q_indices + n_bubbles || values.size() == 0,
+    ExcDimensionMismatch2(values.size(), max_q_indices + n_bubbles, 0));
+  DEAL_II_Assert(grads.size() == max_q_indices + n_bubbles || grads.size() == 0,
+                 ExcDimensionMismatch2(grads.size(),
+                                       max_q_indices + n_bubbles,
+                                       0));
+  DEAL_II_Assert(
     grad_grads.size() == max_q_indices + n_bubbles || grad_grads.size() == 0,
     ExcDimensionMismatch2(grad_grads.size(), max_q_indices + n_bubbles, 0));
-  Assert(third_derivatives.size() == max_q_indices + n_bubbles ||
-           third_derivatives.size() == 0,
-         ExcDimensionMismatch2(third_derivatives.size(),
-                               max_q_indices + n_bubbles,
-                               0));
-  Assert(fourth_derivatives.size() == max_q_indices + n_bubbles ||
-           fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(fourth_derivatives.size(),
-                               max_q_indices + n_bubbles,
-                               0));
+  DEAL_II_Assert(third_derivatives.size() == max_q_indices + n_bubbles ||
+                   third_derivatives.size() == 0,
+                 ExcDimensionMismatch2(third_derivatives.size(),
+                                       max_q_indices + n_bubbles,
+                                       0));
+  DEAL_II_Assert(fourth_derivatives.size() == max_q_indices + n_bubbles ||
+                   fourth_derivatives.size() == 0,
+                 ExcDimensionMismatch2(fourth_derivatives.size(),
+                                       max_q_indices + n_bubbles,
+                                       0));
 
   bool do_values = false, do_grads = false, do_grad_grads = false;
   bool do_3rd_derivatives = false, do_4th_derivatives = false;

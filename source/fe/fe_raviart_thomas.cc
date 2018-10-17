@@ -57,7 +57,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
                                    deg),
                                  std::vector<bool>(dim, true)))
 {
-  Assert(dim >= 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
 
   this->mapping_type = mapping_raviart_thomas;
@@ -173,7 +173,7 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
 
       boundary_weights.reinit(n_face_points, legendre.n());
 
-      //       Assert (face_points.size() == this->dofs_per_face,
+      //       DEAL_II_Assert (face_points.size() == this->dofs_per_face,
       //            ExcInternalError());
 
       for (unsigned int k = 0; k < n_face_points; ++k)
@@ -232,8 +232,8 @@ FE_RaviartThomas<dim>::initialize_support_points(const unsigned int deg)
             polynomials[d]->compute_value(i, cell_quadrature.point(k));
     }
 
-  Assert(current == this->generalized_support_points.size(),
-         ExcInternalError());
+  DEAL_II_Assert(current == this->generalized_support_points.size(),
+                 ExcInternalError());
 }
 
 
@@ -442,10 +442,12 @@ bool
 FE_RaviartThomas<dim>::has_support_on_face(const unsigned int shape_index,
                                            const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  DEAL_II_Assert(shape_index < this->dofs_per_cell,
+                 ExcIndexRange(shape_index, 0, this->dofs_per_cell));
+  DEAL_II_Assert(face_index < GeometryInfo<dim>::faces_per_cell,
+                 ExcIndexRange(face_index,
+                               0,
+                               GeometryInfo<dim>::faces_per_cell));
 
   // Return computed values if we
   // know them easily. Otherwise, it
@@ -487,14 +489,16 @@ FE_RaviartThomas<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->generalized_support_points.size()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
-  Assert(support_point_values[0].size() == this->n_components(),
-         ExcDimensionMismatch(support_point_values[0].size(),
-                              this->n_components()));
+  DEAL_II_Assert(support_point_values.size() ==
+                   this->generalized_support_points.size(),
+                 ExcDimensionMismatch(support_point_values.size(),
+                                      this->generalized_support_points.size()));
+  DEAL_II_Assert(nodal_values.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(nodal_values.size(),
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(support_point_values[0].size() == this->n_components(),
+                 ExcDimensionMismatch(support_point_values[0].size(),
+                                      this->n_components()));
 
   std::fill(nodal_values.begin(), nodal_values.end(), 0.);
 
@@ -528,7 +532,7 @@ template <int dim>
 std::size_t
 FE_RaviartThomas<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 

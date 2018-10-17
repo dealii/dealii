@@ -50,7 +50,7 @@ void check(Triangulation<3> &tria)
     GeometryInfo<3>::project_to_unit_cell(
       StaticMappingQ1<3>::mapping.transform_real_to_unit_cell(cell, p)));
 
-  AssertThrow(p.distance(pp) < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(p.distance(pp) < 1e-15, ExcInternalError());
 }
 
 

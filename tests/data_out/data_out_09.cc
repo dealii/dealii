@@ -15,7 +15,7 @@
 
 
 // check that add_data_vector and type_automatic work correctly and confirm
-// that the Assert is triggered that checks, when we have dof_data and
+// that the DEAL_II_Assert is triggered that checks, when we have dof_data and
 // cell_data with the same length.
 
 

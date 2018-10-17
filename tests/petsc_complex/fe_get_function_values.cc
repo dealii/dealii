@@ -157,10 +157,10 @@ test()
 
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
-              AssertThrow(PetscRealPart(values[q]) == values_Re[q],
-                          ExcInternalError());
-              AssertThrow(PetscImaginaryPart(values[q]) == values_Im[q],
-                          ExcInternalError());
+              DEAL_II_AssertThrow(PetscRealPart(values[q]) == values_Re[q],
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(PetscImaginaryPart(values[q]) == values_Im[q],
+                                  ExcInternalError());
             }
         }
   }

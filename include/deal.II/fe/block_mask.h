@@ -263,8 +263,8 @@ inline bool BlockMask::operator[](const unsigned int block_index) const
     {
       // otherwise check the validity of the index and
       // return whatever is appropriate
-      Assert(block_index < block_mask.size(),
-             ExcIndexRange(block_index, 0, block_mask.size()));
+      DEAL_II_Assert(block_index < block_mask.size(),
+                     ExcIndexRange(block_index, 0, block_mask.size()));
       return block_mask[block_index];
     }
 }
@@ -281,14 +281,14 @@ inline unsigned int
 BlockMask::n_selected_blocks(const unsigned int n) const
 {
   if ((n != numbers::invalid_unsigned_int) && (size() > 0))
-    AssertDimension(n, size());
+    DEAL_II_AssertDimension(n, size());
 
   const unsigned int real_n = (n != numbers::invalid_unsigned_int ? n : size());
   if (block_mask.size() == 0)
     return real_n;
   else
     {
-      AssertDimension(real_n, block_mask.size());
+      DEAL_II_AssertDimension(real_n, block_mask.size());
       unsigned int c = 0;
       for (unsigned int i = 0; i < block_mask.size(); ++i)
         if (block_mask[i] == true)
@@ -302,7 +302,7 @@ inline unsigned int
 BlockMask::first_selected_block(const unsigned int n) const
 {
   if ((n != numbers::invalid_unsigned_int) && (size() > 0))
-    AssertDimension(n, size());
+    DEAL_II_AssertDimension(n, size());
 
   if (block_mask.size() == 0)
     return 0;
@@ -312,7 +312,7 @@ BlockMask::first_selected_block(const unsigned int n) const
         if (block_mask[c] == true)
           return c;
 
-      Assert(false, ExcMessage("No block is selected at all!"));
+      DEAL_II_Assert(false, ExcMessage("No block is selected at all!"));
       return numbers::invalid_unsigned_int;
     }
 }
@@ -340,7 +340,7 @@ BlockMask::operator|(const BlockMask &mask) const
     {
       // if both masks have individual entries set, form
       // the combination of the two
-      AssertDimension(block_mask.size(), mask.block_mask.size());
+      DEAL_II_AssertDimension(block_mask.size(), mask.block_mask.size());
       std::vector<bool> new_mask(block_mask.size());
       for (unsigned int i = 0; i < block_mask.size(); ++i)
         new_mask[i] = (block_mask[i] || mask.block_mask[i]);
@@ -362,7 +362,7 @@ inline BlockMask BlockMask::operator&(const BlockMask &mask) const
     {
       // if both masks have individual entries set, form
       // the combination of the two
-      AssertDimension(block_mask.size(), mask.block_mask.size());
+      DEAL_II_AssertDimension(block_mask.size(), mask.block_mask.size());
       std::vector<bool> new_mask(block_mask.size());
       for (unsigned int i = 0; i < block_mask.size(); ++i)
         new_mask[i] = (block_mask[i] && mask.block_mask[i]);

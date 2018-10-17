@@ -106,7 +106,8 @@ test(bool transpose = false)
               << std::endl;
       deallog << "absolute norms = " << x.l2_norm() << ' ' << solution.l2_norm()
               << std::endl;
-      Assert(x.l2_norm() / solution.l2_norm() < 1e-8, ExcInternalError());
+      DEAL_II_Assert(x.l2_norm() / solution.l2_norm() < 1e-8,
+                     ExcInternalError());
     }
 }
 

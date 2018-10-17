@@ -47,11 +47,11 @@ main(int argc, char **argv)
       {
         if ((i == 2) && (j == 1))
           {
-            AssertThrow(B.exists(i, j) == true, ExcInternalError());
+            DEAL_II_AssertThrow(B.exists(i, j) == true, ExcInternalError());
           }
         else
           {
-            AssertThrow(B.exists(i, j) == false, ExcInternalError());
+            DEAL_II_AssertThrow(B.exists(i, j) == false, ExcInternalError());
           }
       }
 
@@ -64,11 +64,11 @@ main(int argc, char **argv)
       {
         if ((i == 1) && (j == 2))
           {
-            AssertThrow(A.exists(i, j) == true, ExcInternalError());
+            DEAL_II_AssertThrow(A.exists(i, j) == true, ExcInternalError());
           }
         else
           {
-            AssertThrow(A.exists(i, j) == false, ExcInternalError());
+            DEAL_II_AssertThrow(A.exists(i, j) == false, ExcInternalError());
           }
       }
 

@@ -108,7 +108,7 @@ make_mesh(Triangulation<dim, spacedim> &tria)
       for (unsigned int d = 0; d < dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1 << d);
-      AssertThrow(subdomain < (1 << dim), ExcInternalError());
+      DEAL_II_AssertThrow(subdomain < (1 << dim), ExcInternalError());
 
       cell->set_subdomain_id(subdomain);
     }
@@ -186,7 +186,8 @@ check()
         {
           deallog << i << ' ' << this_error(i) << std::endl;
 
-          Assert((this_error(i) == 0) || (error2(i) == 0), ExcInternalError());
+          DEAL_II_Assert((this_error(i) == 0) || (error2(i) == 0),
+                         ExcInternalError());
           if (this_error(i) != 0)
             error2(i) = this_error(i);
         }
@@ -194,7 +195,7 @@ check()
 
   //                                   now compare the results of the two
   //                                   computations
-  AssertThrow(error1 == error2, ExcInternalError());
+  DEAL_II_AssertThrow(error1 == error2, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

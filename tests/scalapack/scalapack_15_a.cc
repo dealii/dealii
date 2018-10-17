@@ -167,11 +167,12 @@ test(const unsigned int size,
                                                        false);
   scalapack_syevr.copy_to(p_eigenvectors);
   for (unsigned int i = 0; i < max_n_eigenvalues; ++i)
-    AssertThrow(std::abs(eigenvalues_psyer[n_eigenvalues - i - 1] -
-                         eigenvalues_Lapack[n_eigenvalues - i - 1]) /
-                    std::abs(eigenvalues_Lapack[n_eigenvalues - i - 1]) <
-                  tol,
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::abs(eigenvalues_psyer[n_eigenvalues - i - 1] -
+                                 eigenvalues_Lapack[n_eigenvalues - i - 1]) /
+                            std::abs(
+                              eigenvalues_Lapack[n_eigenvalues - i - 1]) <
+                          tol,
+                        ExcInternalError());
 
   pcout << "   with respect to the given tolerance the eigenvalues coincide"
         << std::endl;

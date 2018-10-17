@@ -85,12 +85,12 @@ namespace MatrixTools
     Vector<number> &                                 right_hand_side,
     const bool                                       eliminate_columns)
   {
-    Assert(matrix.n() == right_hand_side.size(),
-           ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
-           ExcDimensionMismatch(matrix.n(), solution.size()));
-    Assert(matrix.n() == matrix.m(),
-           ExcDimensionMismatch(matrix.n(), matrix.m()));
+    DEAL_II_Assert(matrix.n() == right_hand_side.size(),
+                   ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+    DEAL_II_Assert(matrix.n() == solution.size(),
+                   ExcDimensionMismatch(matrix.n(), solution.size()));
+    DEAL_II_Assert(matrix.n() == matrix.m(),
+                   ExcDimensionMismatch(matrix.n(), matrix.m()));
 
     // if no boundary values are to be applied
     // simply return
@@ -120,7 +120,7 @@ namespace MatrixTools
       endd = boundary_values.end();
     for (; dof != endd; ++dof)
       {
-        Assert(dof->first < n_dofs, ExcInternalError());
+        DEAL_II_Assert(dof->first < n_dofs, ExcInternalError());
 
         const types::global_dof_index dof_number = dof->first;
         // for each boundary dof:
@@ -213,13 +213,14 @@ namespace MatrixTools
                 // we have assumed that the sparsity pattern is
                 // symmetric and we only walk over those rows for
                 // which the current row has a column entry
-                Assert((p != matrix.end(row)) && (p->column() == dof_number),
-                       ExcMessage(
-                         "This function is trying to access an element of the "
-                         "matrix that doesn't seem to exist. Are you using a "
-                         "nonsymmetric sparsity pattern? If so, you are not "
-                         "allowed to set the eliminate_column argument of this "
-                         "function, see the documentation."));
+                DEAL_II_Assert(
+                  (p != matrix.end(row)) && (p->column() == dof_number),
+                  ExcMessage(
+                    "This function is trying to access an element of the "
+                    "matrix that doesn't seem to exist. Are you using a "
+                    "nonsymmetric sparsity pattern? If so, you are not "
+                    "allowed to set the eliminate_column argument of this "
+                    "function, see the documentation."));
 
                 // correct right hand side
                 right_hand_side(row) -=
@@ -248,20 +249,21 @@ namespace MatrixTools
   {
     const unsigned int blocks = matrix.n_block_rows();
 
-    Assert(matrix.n() == right_hand_side.size(),
-           ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-    Assert(matrix.n() == solution.size(),
-           ExcDimensionMismatch(matrix.n(), solution.size()));
-    Assert(matrix.n_block_rows() == matrix.n_block_cols(), ExcNotQuadratic());
-    Assert(matrix.get_sparsity_pattern().get_row_indices() ==
-             matrix.get_sparsity_pattern().get_column_indices(),
-           ExcNotQuadratic());
-    Assert(matrix.get_sparsity_pattern().get_column_indices() ==
-             solution.get_block_indices(),
-           ExcBlocksDontMatch());
-    Assert(matrix.get_sparsity_pattern().get_row_indices() ==
-             right_hand_side.get_block_indices(),
-           ExcBlocksDontMatch());
+    DEAL_II_Assert(matrix.n() == right_hand_side.size(),
+                   ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+    DEAL_II_Assert(matrix.n() == solution.size(),
+                   ExcDimensionMismatch(matrix.n(), solution.size()));
+    DEAL_II_Assert(matrix.n_block_rows() == matrix.n_block_cols(),
+                   ExcNotQuadratic());
+    DEAL_II_Assert(matrix.get_sparsity_pattern().get_row_indices() ==
+                     matrix.get_sparsity_pattern().get_column_indices(),
+                   ExcNotQuadratic());
+    DEAL_II_Assert(matrix.get_sparsity_pattern().get_column_indices() ==
+                     solution.get_block_indices(),
+                   ExcBlocksDontMatch());
+    DEAL_II_Assert(matrix.get_sparsity_pattern().get_row_indices() ==
+                     right_hand_side.get_block_indices(),
+                   ExcBlocksDontMatch());
 
     // if no boundary values are to be applied
     // simply return
@@ -316,7 +318,7 @@ namespace MatrixTools
     // now loop over all boundary dofs
     for (; dof != endd; ++dof)
       {
-        Assert(dof->first < n_dofs, ExcInternalError());
+        DEAL_II_Assert(dof->first < n_dofs, ExcInternalError());
         (void)n_dofs;
 
         // get global index and index
@@ -479,9 +481,9 @@ namespace MatrixTools
                     // we have assumed that the sparsity pattern is
                     // symmetric and we only walk over those rows for
                     // which the current row has a column entry
-                    Assert((p->column() == block_index.second) &&
-                             (p != this_matrix.end(row)),
-                           ExcInternalError());
+                    DEAL_II_Assert((p->column() == block_index.second) &&
+                                     (p != this_matrix.end(row)),
+                                   ExcInternalError());
 
                     // correct right hand side
                     right_hand_side.block(block_row)(row) -=
@@ -509,12 +511,15 @@ namespace MatrixTools
     Vector<number> &                                 local_rhs,
     const bool                                       eliminate_columns)
   {
-    Assert(local_dof_indices.size() == local_matrix.m(),
-           ExcDimensionMismatch(local_dof_indices.size(), local_matrix.m()));
-    Assert(local_dof_indices.size() == local_matrix.n(),
-           ExcDimensionMismatch(local_dof_indices.size(), local_matrix.n()));
-    Assert(local_dof_indices.size() == local_rhs.size(),
-           ExcDimensionMismatch(local_dof_indices.size(), local_rhs.size()));
+    DEAL_II_Assert(local_dof_indices.size() == local_matrix.m(),
+                   ExcDimensionMismatch(local_dof_indices.size(),
+                                        local_matrix.m()));
+    DEAL_II_Assert(local_dof_indices.size() == local_matrix.n(),
+                   ExcDimensionMismatch(local_dof_indices.size(),
+                                        local_matrix.n()));
+    DEAL_II_Assert(local_dof_indices.size() == local_rhs.size(),
+                   ExcDimensionMismatch(local_dof_indices.size(),
+                                        local_rhs.size()));
 
     // if there is nothing to do, then exit
     // right away

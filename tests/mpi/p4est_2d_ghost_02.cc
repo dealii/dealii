@@ -73,8 +73,8 @@ test()
             {
               if (cell->subdomain_id() != (unsigned int)myid)
                 {
-                  AssertThrow(cell->is_ghost() || cell->is_artificial(),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(cell->is_ghost() || cell->is_artificial(),
+                                      ExcInternalError());
                   continue;
                 }
 
@@ -83,14 +83,16 @@ test()
                 {
                   if (cell->at_boundary(n))
                     continue;
-                  AssertThrow(cell->neighbor(n).state() == IteratorState::valid,
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(cell->neighbor(n).state() ==
+                                        IteratorState::valid,
+                                      ExcInternalError());
 
-                  AssertThrow(cell->neighbor(n)->level() == cell->level(),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(cell->neighbor(n)->level() ==
+                                        cell->level(),
+                                      ExcInternalError());
 
-                  AssertThrow(!cell->neighbor(n)->has_children(),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(!cell->neighbor(n)->has_children(),
+                                      ExcInternalError());
                 }
             }
 
@@ -98,7 +100,7 @@ test()
           if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
             deallog << "Checksum: " << checksum << std::endl;
 
-          AssertThrow(
+          DEAL_II_AssertThrow(
             tr.n_global_active_cells() ==
               static_cast<unsigned int>(
                 std::pow(1. * GeometryInfo<dim>::max_children_per_cell, i + 1)),

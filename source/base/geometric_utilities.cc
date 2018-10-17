@@ -25,17 +25,20 @@ namespace GeometricUtilities
 {
   namespace Coordinates
   {
-    DeclException1(NegativeRadius,
-                   double,
-                   << "The radius <" << arg1 << "> can not be negative.");
+    DEAL_II_DeclException1(NegativeRadius,
+                           double,
+                           << "The radius <" << arg1
+                           << "> can not be negative.");
 
-    DeclException1(SphericalAzimuth,
-                   double,
-                   << "The azimuth angle <" << arg1 << "> is not in [0,2Pi).");
+    DEAL_II_DeclException1(SphericalAzimuth,
+                           double,
+                           << "The azimuth angle <" << arg1
+                           << "> is not in [0,2Pi).");
 
-    DeclException1(SphericalPolar,
-                   double,
-                   << "The polar angle <" << arg1 << "> is not in [0,Pi].");
+    DEAL_II_DeclException1(SphericalPolar,
+                           double,
+                           << "The polar angle <" << arg1
+                           << "> is not in [0,Pi].");
 
 
     template <int dim>
@@ -70,10 +73,10 @@ namespace GeometricUtilities
     {
       Point<dim> ccoord;
 
-      Assert(scoord[0] >= 0., NegativeRadius(scoord[0]));
+      DEAL_II_Assert(scoord[0] >= 0., NegativeRadius(scoord[0]));
 
-      Assert(scoord[1] >= 0. && scoord[1] < 2. * numbers::PI,
-             SphericalAzimuth(scoord[1]));
+      DEAL_II_Assert(scoord[1] >= 0. && scoord[1] < 2. * numbers::PI,
+                     SphericalAzimuth(scoord[1]));
 
       switch (dim)
         {
@@ -85,8 +88,8 @@ namespace GeometricUtilities
             }
           case 3:
             {
-              Assert(scoord[2] >= 0. && scoord[2] <= numbers::PI,
-                     SphericalPolar(scoord[2]));
+              DEAL_II_Assert(scoord[2] >= 0. && scoord[2] <= numbers::PI,
+                             SphericalPolar(scoord[2]));
 
               ccoord[0] = scoord[0] * std::sin(scoord[2]) * std::cos(scoord[1]);
               ccoord[1] = scoord[0] * std::sin(scoord[2]) * std::sin(scoord[1]);
@@ -94,7 +97,7 @@ namespace GeometricUtilities
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             break;
         }
 

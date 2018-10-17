@@ -191,8 +191,8 @@ MGLevelObject<Object>::MGLevelObject(const unsigned int min,
 template <class Object>
 Object &MGLevelObject<Object>::operator[](const unsigned int i)
 {
-  Assert((i >= minlevel) && (i < minlevel + objects.size()),
-         ExcIndexRange(i, minlevel, minlevel + objects.size()));
+  DEAL_II_Assert((i >= minlevel) && (i < minlevel + objects.size()),
+                 ExcIndexRange(i, minlevel, minlevel + objects.size()));
   return *objects[i - minlevel];
 }
 
@@ -200,8 +200,8 @@ Object &MGLevelObject<Object>::operator[](const unsigned int i)
 template <class Object>
 const Object &MGLevelObject<Object>::operator[](const unsigned int i) const
 {
-  Assert((i >= minlevel) && (i < minlevel + objects.size()),
-         ExcIndexRange(i, minlevel, minlevel + objects.size()));
+  DEAL_II_Assert((i >= minlevel) && (i < minlevel + objects.size()),
+                 ExcIndexRange(i, minlevel, minlevel + objects.size()));
   return *objects[i - minlevel];
 }
 
@@ -211,7 +211,7 @@ void
 MGLevelObject<Object>::resize(const unsigned int new_minlevel,
                               const unsigned int new_maxlevel)
 {
-  Assert(new_minlevel <= new_maxlevel, ExcInternalError());
+  DEAL_II_Assert(new_minlevel <= new_maxlevel, ExcInternalError());
   // note that on clear(), the
   // shared_ptr class takes care of
   // deleting the object it points to

@@ -47,7 +47,7 @@ test_tensor(const Tensor<2, dim> &F)
 
     const Tensor<1, dim> T_trans =
       Physics::Transformations::Contravariant::push_forward(T, F);
-    Assert(
+    DEAL_II_Assert(
       (T_calc - T_trans).norm() < 1e-9,
       ExcMessage(
         "Rank 1 tensor: Contraction using push_forward() function is incorrect."));
@@ -77,7 +77,7 @@ test_tensor(const Tensor<2, dim> &F)
 
     const Tensor<2, dim> T_trans =
       Physics::Transformations::Contravariant::push_forward(T, F);
-    Assert(
+    DEAL_II_Assert(
       (T_calc - T_trans).norm() < 1e-9,
       ExcMessage(
         "Rank 2 tensor: Contraction using push_forward() function is incorrect."));
@@ -131,7 +131,7 @@ test_tensor(const Tensor<2, dim> &F)
 
     const Tensor<4, dim> T_trans =
       Physics::Transformations::Contravariant::push_forward(T, F);
-    Assert(
+    DEAL_II_Assert(
       (T_calc - T_trans).norm() < 1e-9,
       ExcMessage(
         "Rank 4 tensor: Contraction using push_forward() function is incorrect."));
@@ -170,7 +170,7 @@ test_symmetric_tensor(const Tensor<2, dim> &F)
 
     const Tensor<2, dim> T_trans =
       Physics::Transformations::Contravariant::push_forward(T, F);
-    Assert(
+    DEAL_II_Assert(
       (T_calc - T_trans).norm() < 1e-9,
       ExcMessage(
         "Rank 2 symmetric tensor: Contraction using push_forward() function is incorrect."));
@@ -232,7 +232,7 @@ test_symmetric_tensor(const Tensor<2, dim> &F)
     std::cout << "T_calc: " << T_calc << std::endl;
     std::cout << "T_trans: " << T_trans << std::endl;
 
-    Assert(
+    DEAL_II_Assert(
       (T_calc - T_trans).norm() < 1e-9,
       ExcMessage(
         "Rank 4 symmetric tensor: Contraction using push_forward() function is incorrect."));

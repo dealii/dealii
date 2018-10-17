@@ -58,13 +58,13 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   deallog << modify_name<dim>(fe1.get_name());
   std::unique_ptr<FiniteElement<dim>> p1 =
     FETools::get_fe_by_name<dim, dim>(modify_name<dim>(fe1.get_name()));
-  AssertThrow(fe1.get_name() == p1->get_name(), ExcInternalError());
+  DEAL_II_AssertThrow(fe1.get_name() == p1->get_name(), ExcInternalError());
   deallog << " ok" << std::endl;
 
   // same for fe2
   deallog << modify_name<dim>(fe2.get_name());
   std::unique_ptr<FiniteElement<dim>> p2 =
     FETools::get_fe_by_name<dim, dim>(modify_name<dim>(fe2.get_name()));
-  AssertThrow(fe2.get_name() == p2->get_name(), ExcInternalError());
+  DEAL_II_AssertThrow(fe2.get_name() == p2->get_name(), ExcInternalError());
   deallog << " ok" << std::endl;
 }

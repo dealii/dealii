@@ -90,7 +90,7 @@ test()
             if (cell->refine_flag_set())
               ++n_flagged_cells;
 
-        Assert(n_flagged_cells == x_flagged_cells, ExcInternalError());
+        DEAL_II_Assert(n_flagged_cells == x_flagged_cells, ExcInternalError());
 
         unsigned int global_f_c = 0;
         MPI_Allreduce(&n_flagged_cells,

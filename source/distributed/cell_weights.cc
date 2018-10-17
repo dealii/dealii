@@ -46,7 +46,7 @@ namespace parallel
                     std::placeholders::_2));
       }
     else
-      Assert(
+      DEAL_II_Assert(
         triangulation != nullptr,
         ExcMessage(
           "parallel::CellWeights requires a parallel::Triangulation object."));
@@ -120,9 +120,9 @@ namespace parallel
   {
     // Check if we are still working with the correct combination of
     // Triangulation and DoFHandler.
-    Assert(&(*triangulation) == &(dof_handler->get_triangulation()),
-           ExcMessage(
-             "Triangulation associated with the DoFHandler has changed!"));
+    DEAL_II_Assert(
+      &(*triangulation) == &(dof_handler->get_triangulation()),
+      ExcMessage("Triangulation associated with the DoFHandler has changed!"));
 
     // Convert cell type from Triangulation to DoFHandler to be able
     // to access the information about the degrees of freedom.
@@ -153,16 +153,16 @@ namespace parallel
               dof_handler->get_fe().find_least_face_dominating_fe_in_collection(
                 fe_indices_children);
 
-            Assert(fe_index != numbers::invalid_unsigned_int,
-                   ExcMessage(
-                     "No FiniteElement has been found in your FECollection "
-                     "that dominates all children of a cell you are trying "
-                     "to coarsen!"));
+            DEAL_II_Assert(
+              fe_index != numbers::invalid_unsigned_int,
+              ExcMessage("No FiniteElement has been found in your FECollection "
+                         "that dominates all children of a cell you are trying "
+                         "to coarsen!"));
           }
           break;
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
           break;
       }
 

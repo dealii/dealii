@@ -43,9 +43,9 @@ test()
     {
       deallog << index_set.nth_index_in_set(i) << std::endl;
 
-      AssertThrow(index_set.index_within_set(index_set.nth_index_in_set(i) ==
-                                             i),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(index_set.index_within_set(
+                            index_set.nth_index_in_set(i) == i),
+                          ExcInternalError());
     }
   deallog << "OK" << std::endl;
 
@@ -53,7 +53,8 @@ test()
     {
       const IndexSet::size_type i_out  = index_set.index_within_set(i);
       const bool                within = (i_out != numbers::invalid_dof_index);
-      AssertThrow(within == index_set.is_element(i), ExcInternalError());
+      DEAL_II_AssertThrow(within == index_set.is_element(i),
+                          ExcInternalError());
 
       if (within)
         deallog << i << ' ' << i_out << std::endl;

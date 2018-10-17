@@ -102,10 +102,10 @@ BlockMatrixArray<number, BlockVectorType>::vmult_add(
   const BlockVectorType &src) const
 {
   GrowingVectorMemory<typename BlockVectorType::BlockType> mem;
-  Assert(dst.n_blocks() == block_rows,
-         ExcDimensionMismatch(dst.n_blocks(), block_rows));
-  Assert(src.n_blocks() == block_cols,
-         ExcDimensionMismatch(src.n_blocks(), block_cols));
+  DEAL_II_Assert(dst.n_blocks() == block_rows,
+                 ExcDimensionMismatch(dst.n_blocks(), block_rows));
+  DEAL_II_Assert(src.n_blocks() == block_cols,
+                 ExcDimensionMismatch(src.n_blocks(), block_cols));
 
   typename VectorMemory<typename BlockVectorType::BlockType>::Pointer p_aux(
     mem);
@@ -146,10 +146,10 @@ BlockMatrixArray<number, BlockVectorType>::Tvmult_add(
   const BlockVectorType &src) const
 {
   GrowingVectorMemory<typename BlockVectorType::BlockType> mem;
-  Assert(dst.n_blocks() == block_cols,
-         ExcDimensionMismatch(dst.n_blocks(), block_cols));
-  Assert(src.n_blocks() == block_rows,
-         ExcDimensionMismatch(src.n_blocks(), block_rows));
+  DEAL_II_Assert(dst.n_blocks() == block_cols,
+                 ExcDimensionMismatch(dst.n_blocks(), block_cols));
+  DEAL_II_Assert(src.n_blocks() == block_rows,
+                 ExcDimensionMismatch(src.n_blocks(), block_rows));
 
   typename std::vector<Entry>::const_iterator m   = entries.begin();
   typename std::vector<Entry>::const_iterator end = entries.end();
@@ -190,10 +190,10 @@ BlockMatrixArray<number, BlockVectorType>::matrix_scalar_product(
   const BlockVectorType &v) const
 {
   GrowingVectorMemory<typename BlockVectorType::BlockType> mem;
-  Assert(u.n_blocks() == block_rows,
-         ExcDimensionMismatch(u.n_blocks(), block_rows));
-  Assert(v.n_blocks() == block_cols,
-         ExcDimensionMismatch(v.n_blocks(), block_cols));
+  DEAL_II_Assert(u.n_blocks() == block_rows,
+                 ExcDimensionMismatch(u.n_blocks(), block_rows));
+  DEAL_II_Assert(v.n_blocks() == block_cols,
+                 ExcDimensionMismatch(v.n_blocks(), block_cols));
 
   typename VectorMemory<typename BlockVectorType::BlockType>::Pointer p_aux(
     mem);
@@ -328,7 +328,7 @@ BlockTrianglePrecondition<number, BlockVectorType>::do_row(
           dst.block(i).add(-1.0 * m->prefix, aux);
         }
     }
-  Assert(diagonals.size() != 0, ExcNoDiagonal(row_num));
+  DEAL_II_Assert(diagonals.size() != 0, ExcNoDiagonal(row_num));
 
   // Inverting the diagonal block is
   // simple, if there is only one
@@ -369,10 +369,10 @@ BlockTrianglePrecondition<number, BlockVectorType>::vmult_add(
   BlockVectorType &      dst,
   const BlockVectorType &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+  DEAL_II_Assert(dst.n_blocks() == n_block_rows(),
+                 ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+  DEAL_II_Assert(src.n_blocks() == n_block_cols(),
+                 ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   BlockVectorType aux;
   aux.reinit(dst);
@@ -388,10 +388,10 @@ BlockTrianglePrecondition<number, BlockVectorType>::vmult(
   BlockVectorType &      dst,
   const BlockVectorType &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
+  DEAL_II_Assert(dst.n_blocks() == n_block_rows(),
+                 ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
+  DEAL_II_Assert(src.n_blocks() == n_block_cols(),
+                 ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   dst.equ(1., src);
 
@@ -413,7 +413,7 @@ BlockTrianglePrecondition<number, BlockVectorType>::Tvmult(
   BlockVectorType &,
   const BlockVectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -423,7 +423,7 @@ BlockTrianglePrecondition<number, BlockVectorType>::Tvmult_add(
   BlockVectorType &,
   const BlockVectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 template class BlockMatrixArray<float>;

@@ -209,30 +209,30 @@ check()
             mapping_1, dof_handler, v, p[i], gradient);
           deallog << -gradient[0] << std::endl;
 
-          Assert(std::abs(
-                   (gradient[0] - function.gradient(p[i])).norm_square()) <
-                   1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(
+            std::abs((gradient[0] - function.gradient(p[i])).norm_square()) <
+              1e-4,
+            ExcInternalError());
           VectorTools::point_gradient(
             mapping_2, dof_handler, v, p[i], gradient);
           deallog << -gradient[0] << std::endl;
 
-          Assert(std::abs(
-                   (gradient[0] - function.gradient(p[i])).norm_square()) <
-                   1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(
+            std::abs((gradient[0] - function.gradient(p[i])).norm_square()) <
+              1e-4,
+            ExcInternalError());
 
           const Tensor<1, dim> scalar_gradient_1 =
             VectorTools::point_gradient(mapping_1, dof_handler, v, p[i]);
-          Assert(std::abs((gradient[0] - scalar_gradient_1).norm_square()) <
-                   1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(
+            std::abs((gradient[0] - scalar_gradient_1).norm_square()) < 1e-4,
+            ExcInternalError());
 
           const Tensor<1, dim> scalar_gradient_2 =
             VectorTools::point_gradient(mapping_2, dof_handler, v, p[i]);
-          Assert(std::abs((gradient[0] - scalar_gradient_2).norm_square()) <
-                   1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(
+            std::abs((gradient[0] - scalar_gradient_2).norm_square()) < 1e-4,
+            ExcInternalError());
         }
     }
 

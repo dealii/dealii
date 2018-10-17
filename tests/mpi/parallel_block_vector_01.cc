@@ -64,8 +64,9 @@ test()
   v *= 2.0;
   if (myid < 8)
     {
-      AssertThrow(v(myid * 2) == myid * 4.0, ExcInternalError());
-      AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+      DEAL_II_AssertThrow(v(myid * 2) == myid * 4.0, ExcInternalError());
+      DEAL_II_AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 2.0,
+                          ExcInternalError());
     }
 
   LinearAlgebra::distributed::BlockVector<double> w(3);
@@ -78,8 +79,9 @@ test()
     const double l2_norm = w.l2_norm();
     if (myid == 0)
       deallog << "l2 norm: " << l2_norm << std::endl;
-    AssertThrow(std::abs(v.l2_norm() * std::sqrt(3.) - w.l2_norm()) < 1e-13,
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::abs(v.l2_norm() * std::sqrt(3.) - w.l2_norm()) <
+                          1e-13,
+                        ExcInternalError());
   }
 
   // check l1 norm
@@ -87,8 +89,8 @@ test()
     const double l1_norm = w.l1_norm();
     if (myid == 0)
       deallog << "l1 norm: " << l1_norm << std::endl;
-    AssertThrow(std::abs(v.l1_norm() * 3. - w.l1_norm()) < 1e-14,
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::abs(v.l1_norm() * 3. - w.l1_norm()) < 1e-14,
+                        ExcInternalError());
   }
 
   // check linfty norm
@@ -96,7 +98,7 @@ test()
     const double linfty_norm = w.linfty_norm();
     if (myid == 0)
       deallog << "linfty norm: " << linfty_norm << std::endl;
-    AssertThrow(v.linfty_norm() == w.linfty_norm(), ExcInternalError());
+    DEAL_II_AssertThrow(v.linfty_norm() == w.linfty_norm(), ExcInternalError());
   }
 
   // check lp norm
@@ -105,8 +107,8 @@ test()
     if (myid == 0)
       deallog << "l2.2 norm: " << lp_norm << std::endl;
 
-    AssertThrow(std::fabs(w.l2_norm() - w.lp_norm(2.0)) < 1e-14,
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(w.l2_norm() - w.lp_norm(2.0)) < 1e-14,
+                        ExcInternalError());
   }
 
   // check mean value (should be equal to l1
@@ -117,16 +119,18 @@ test()
     if (myid == 0)
       deallog << "Mean value: " << mean << std::endl;
 
-    AssertThrow(std::fabs(mean * w.size() - w.l1_norm()) < 1e-15,
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(mean * w.size() - w.l1_norm()) < 1e-15,
+                        ExcInternalError());
   }
   // check inner product
   {
     const double norm_sqr = w.l2_norm() * w.l2_norm();
-    AssertThrow(std::fabs(w * w - norm_sqr) < 1e-12, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(w * w - norm_sqr) < 1e-12,
+                        ExcInternalError());
     LinearAlgebra::distributed::BlockVector<double> w2;
     w2 = w;
-    AssertThrow(std::fabs(w2 * w - norm_sqr) < 1e-12, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(w2 * w - norm_sqr) < 1e-12,
+                        ExcInternalError());
 
     if (myid < 8)
       w2.block(0).local_element(0) = -1;

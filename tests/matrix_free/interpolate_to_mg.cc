@@ -242,13 +242,13 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
                               << "val(q)=" << q_values[q] << std::endl;
                     std::cout << "MGTransfer indices:" << std::endl;
                     mg_transfer.print_indices(std::cout);
-                    AssertThrow(false,
-                                ExcMessage("Level " + std::to_string(level) +
-                                           " Diff " + std::to_string(diff) +
-                                           " center_x " +
-                                           std::to_string(cell->center()[0]) +
-                                           " center_y " +
-                                           std::to_string(cell->center()[1])));
+                    DEAL_II_AssertThrow(
+                      false,
+                      ExcMessage("Level " + std::to_string(level) + " Diff " +
+                                 std::to_string(diff) + " center_x " +
+                                 std::to_string(cell->center()[0]) +
+                                 " center_y " +
+                                 std::to_string(cell->center()[1])));
                   }
               }
           }

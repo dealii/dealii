@@ -334,7 +334,7 @@ namespace Particles
                               PARTICLE_INDEX_MPI_TYPE,
                               MPI_SUM,
                               triangulation->get_communicator());
-    AssertThrowMPI(ierr);
+    DEAL_II_AssertThrowMPI(ierr);
     local_start_index -= particles_to_add_locally;
 #  endif
 
@@ -422,7 +422,7 @@ namespace Particles
     else if (cell->is_ghost())
       return ghost_particles.count(found_cell);
     else if (cell->is_artificial())
-      AssertThrow(false, ExcInternalError());
+      DEAL_II_AssertThrow(false, ExcInternalError());
 
     return 0;
   }
@@ -809,21 +809,23 @@ namespace Particles
     const unsigned int                     n_neighbors = neighbors.size();
 
     if (send_cells.size() != 0)
-      Assert(particles_to_send.size() == send_cells.size(), ExcInternalError());
+      DEAL_II_Assert(particles_to_send.size() == send_cells.size(),
+                     ExcInternalError());
 
     // If we do not know the subdomain this particle needs to be send to, throw
     // an error
-    Assert(particles_to_send.find(numbers::artificial_subdomain_id) ==
-             particles_to_send.end(),
-           ExcInternalError());
+    DEAL_II_Assert(particles_to_send.find(numbers::artificial_subdomain_id) ==
+                     particles_to_send.end(),
+                   ExcInternalError());
 
     // TODO: Implement the shipping of particles to processes that are not ghost
     // owners of the local domain
     for (auto send_particles = particles_to_send.begin();
          send_particles != particles_to_send.end();
          ++send_particles)
-      Assert(ghost_owners.find(send_particles->first) != ghost_owners.end(),
-             ExcNotImplemented());
+      DEAL_II_Assert(ghost_owners.find(send_particles->first) !=
+                       ghost_owners.end(),
+                     ExcNotImplemented());
 
     unsigned int n_send_particles = 0;
     for (auto send_particles = particles_to_send.begin();
@@ -903,7 +905,7 @@ namespace Particles
                                      0,
                                      triangulation->get_communicator(),
                                      &(n_requests[2 * i]));
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
       for (unsigned int i = 0; i < n_neighbors; ++i)
         {
@@ -914,11 +916,11 @@ namespace Particles
                                      0,
                                      triangulation->get_communicator(),
                                      &(n_requests[2 * i + 1]));
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
       const int ierr =
         MPI_Waitall(2 * n_neighbors, &n_requests[0], MPI_STATUSES_IGNORE);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
     }
 
     // Determine how many particles and data we will receive
@@ -948,7 +950,7 @@ namespace Particles
                                        1,
                                        triangulation->get_communicator(),
                                        &(requests[send_ops]));
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
             send_ops++;
           }
 
@@ -962,12 +964,12 @@ namespace Particles
                                        1,
                                        triangulation->get_communicator(),
                                        &(requests[send_ops + recv_ops]));
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
             recv_ops++;
           }
       const int ierr =
         MPI_Waitall(send_ops + recv_ops, &requests[0], MPI_STATUSES_IGNORE);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
     }
 
     // Put the received particles into the domain if they are in the
@@ -998,10 +1000,10 @@ namespace Particles
                           recv_data_it);
       }
 
-    AssertThrow(recv_data_it == recv_data.data() + recv_data.size(),
-                ExcMessage(
-                  "The amount of data that was read into new particles "
-                  "does not match the amount of data sent around."));
+    DEAL_II_AssertThrow(recv_data_it == recv_data.data() + recv_data.size(),
+                        ExcMessage(
+                          "The amount of data that was read into new particles "
+                          "does not match the amount of data sent around."));
   }
 #  endif
 
@@ -1147,7 +1149,8 @@ namespace Particles
                 stored_particles_on_cell.push_back(particle.second);
               });
 
-            AssertDimension(n_particles, stored_particles_on_cell.size());
+            DEAL_II_AssertDimension(n_particles,
+                                    stored_particles_on_cell.size());
           }
           break;
 
@@ -1191,12 +1194,13 @@ namespace Particles
                   });
               }
 
-            AssertDimension(n_particles, stored_particles_on_cell.size());
+            DEAL_II_AssertDimension(n_particles,
+                                    stored_particles_on_cell.size());
           }
           break;
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
           break;
       }
 
@@ -1355,7 +1359,7 @@ namespace Particles
           break;
 
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
           break;
       }
   }

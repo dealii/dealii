@@ -71,8 +71,9 @@ Lh(const Point<dim> &x_q, const TableIndices<dim> &indices)
   for (unsigned int d = 0; d < dim; d++)
     {
       const double x = 2.0 * (x_q[d] - 0.5);
-      Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.),
-             ExcMessage("x_q is not in [0,1]" + Utilities::to_string(x_q[d])));
+      DEAL_II_Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.),
+                     ExcMessage("x_q is not in [0,1]" +
+                                Utilities::to_string(x_q[d])));
       const int ind = indices[d];
       res *= sqrt(2.0) * gsl_sf_legendre_Pl(ind, x);
     }

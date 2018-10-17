@@ -87,7 +87,7 @@ check()
 
       FullMatrix<double> x(fe.constraints().m(), fe.constraints().n());
 
-      Assert(q <= Matrices::n_constraint_matrices, ExcInternalError());
+      DEAL_II_Assert(q <= Matrices::n_constraint_matrices, ExcInternalError());
       x.fill(Matrices::constraint_matrices[q - 1]);
 
       for (unsigned int i = 0; i < x.m(); ++i)
@@ -95,8 +95,8 @@ check()
           {
             deallog << i << ' ' << j << ' ' << x(i, j) << ' '
                     << fe.constraints()(i, j) << std::endl;
-            Assert(std::fabs(x(i, j) - fe.constraints()(i, j)) < 1e-14,
-                   ExcInternalError());
+            DEAL_II_Assert(std::fabs(x(i, j) - fe.constraints()(i, j)) < 1e-14,
+                           ExcInternalError());
           }
     }
   deallog << "OK" << std::endl;

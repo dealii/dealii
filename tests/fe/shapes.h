@@ -92,22 +92,24 @@ plot_shape_functions(Mapping<dim> &      mapping,
                     {
                       if (fe.get_fe().system_to_component_index(i).first == c)
                         {
-                          AssertThrow((fe.shape_value(i, k) ==
-                                         fe.shape_value_component(i, k, c) &&
-                                       fe.shape_grad(i, k) ==
-                                         fe.shape_grad_component(i, k, c) &&
-                                       fe.shape_hessian(i, k) ==
-                                         fe.shape_hessian_component(i, k, c)),
-                                      ExcInternalError());
+                          DEAL_II_AssertThrow(
+                            (fe.shape_value(i, k) ==
+                               fe.shape_value_component(i, k, c) &&
+                             fe.shape_grad(i, k) ==
+                               fe.shape_grad_component(i, k, c) &&
+                             fe.shape_hessian(i, k) ==
+                               fe.shape_hessian_component(i, k, c)),
+                            ExcInternalError());
                         }
                       else
                         {
-                          AssertThrow((fe.shape_value_component(i, k, c) == 0 &&
-                                       fe.shape_grad_component(i, k, c) ==
-                                         Tensor<1, dim>() &&
-                                       fe.shape_hessian_component(i, k, c) ==
-                                         Tensor<2, dim>()),
-                                      ExcInternalError());
+                          DEAL_II_AssertThrow(
+                            (fe.shape_value_component(i, k, c) == 0 &&
+                             fe.shape_grad_component(i, k, c) ==
+                               Tensor<1, dim>() &&
+                             fe.shape_hessian_component(i, k, c) ==
+                               Tensor<2, dim>()),
+                            ExcInternalError());
                         }
                     };
                 }
@@ -187,20 +189,22 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                               c)
                             {
                               if (uflags & update_values)
-                                AssertThrow((fe.shape_value(i, k) ==
-                                             fe.shape_value_component(i, k, c)),
-                                            ExcInternalError());
+                                DEAL_II_AssertThrow(
+                                  (fe.shape_value(i, k) ==
+                                   fe.shape_value_component(i, k, c)),
+                                  ExcInternalError());
                               if (uflags & update_gradients)
-                                AssertThrow((fe.shape_grad(i, k) ==
-                                             fe.shape_grad_component(i, k, c)),
-                                            ExcInternalError());
+                                DEAL_II_AssertThrow(
+                                  (fe.shape_grad(i, k) ==
+                                   fe.shape_grad_component(i, k, c)),
+                                  ExcInternalError());
                               if (uflags & update_hessians)
-                                AssertThrow(
+                                DEAL_II_AssertThrow(
                                   (fe.shape_hessian(i, k) ==
                                    fe.shape_hessian_component(i, k, c)),
                                   ExcInternalError());
                               if (uflags & update_3rd_derivatives)
-                                AssertThrow(
+                                DEAL_II_AssertThrow(
                                   (fe.shape_3rd_derivative(i, k) ==
                                    fe.shape_3rd_derivative_component(i, k, c)),
                                   ExcInternalError());
@@ -208,21 +212,24 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                           else
                             {
                               if (uflags & update_values)
-                                AssertThrow(
+                                DEAL_II_AssertThrow(
                                   (fe.shape_value_component(i, k, c) == 0),
                                   ExcInternalError());
                               if (uflags & update_gradients)
-                                AssertThrow((fe.shape_grad_component(i, k, c) ==
-                                             Tensor<1, dim>()),
-                                            ExcInternalError());
+                                DEAL_II_AssertThrow(
+                                  (fe.shape_grad_component(i, k, c) ==
+                                   Tensor<1, dim>()),
+                                  ExcInternalError());
                               if (uflags & update_hessians)
-                                AssertThrow((fe.shape_hessian_component(
-                                               i, k, c) == Tensor<2, dim>()),
-                                            ExcInternalError());
+                                DEAL_II_AssertThrow(
+                                  (fe.shape_hessian_component(i, k, c) ==
+                                   Tensor<2, dim>()),
+                                  ExcInternalError());
                               if (uflags & update_3rd_derivatives)
-                                AssertThrow((fe.shape_3rd_derivative_component(
-                                               i, k, c) == Tensor<3, dim>()),
-                                            ExcInternalError());
+                                DEAL_II_AssertThrow(
+                                  (fe.shape_3rd_derivative_component(i, k, c) ==
+                                   Tensor<3, dim>()),
+                                  ExcInternalError());
                             }
                         }
                     }
@@ -268,14 +275,16 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                                                    v2 =
                                                      sub.shape_value_component(
                                                        i, k, c);
-                                      Assert(v1 == v2, ExcInternalError());
+                                      DEAL_II_Assert(v1 == v2,
+                                                     ExcInternalError());
                                     }
                                   if (uflags & update_gradients)
                                     {
                                       const Tensor<1, dim>
                                         g1 = sub.shape_grad(i, k),
                                         g2 = sub.shape_grad_component(i, k, c);
-                                      Assert(g1 == g2, ExcInternalError());
+                                      DEAL_II_Assert(g1 == g2,
+                                                     ExcInternalError());
                                     }
                                   if (uflags & update_hessians)
                                     {
@@ -283,7 +292,8 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                                         s1 = sub.shape_hessian(i, k),
                                         s2 =
                                           sub.shape_hessian_component(i, k, c);
-                                      Assert(s1 == s2, ExcInternalError());
+                                      DEAL_II_Assert(s1 == s2,
+                                                     ExcInternalError());
                                     }
                                   if (uflags & update_3rd_derivatives)
                                     {
@@ -293,27 +303,31 @@ plot_face_shape_functions(Mapping<dim> &      mapping,
                                           sub.shape_3rd_derivative_component(i,
                                                                              k,
                                                                              c);
-                                      Assert(t1 == t2, ExcInternalError());
+                                      DEAL_II_Assert(t1 == t2,
+                                                     ExcInternalError());
                                     }
                                 }
                               else
                                 {
                                   if (uflags & update_values)
-                                    Assert(
+                                    DEAL_II_Assert(
                                       (sub.shape_value_component(i, k, c) == 0),
                                       ExcInternalError());
                                   if (uflags & update_gradients)
-                                    Assert((sub.shape_grad_component(i, k, c) ==
-                                            Tensor<1, dim>()),
-                                           ExcInternalError());
+                                    DEAL_II_Assert(
+                                      (sub.shape_grad_component(i, k, c) ==
+                                       Tensor<1, dim>()),
+                                      ExcInternalError());
                                   if (uflags & update_hessians)
-                                    Assert((sub.shape_hessian_component(
-                                              i, k, c) == Tensor<2, dim>()),
-                                           ExcInternalError());
+                                    DEAL_II_Assert(
+                                      (sub.shape_hessian_component(i, k, c) ==
+                                       Tensor<2, dim>()),
+                                      ExcInternalError());
                                   if (uflags & update_3rd_derivatives)
-                                    Assert((sub.shape_3rd_derivative_component(
-                                              i, k, c) == Tensor<3, dim>()),
-                                           ExcInternalError());
+                                    DEAL_II_Assert(
+                                      (sub.shape_3rd_derivative_component(
+                                         i, k, c) == Tensor<3, dim>()),
+                                      ExcInternalError());
                                 }
                             };
                         }
@@ -370,12 +384,12 @@ check_values_and_derivatives(const FiniteElement<dim> &fe,
         // non-primitive elements
         if (fe.is_primitive(i))
           for (unsigned int c = 0; c < fe.n_components(); ++c)
-            Assert(((c == fe.system_to_component_index(i).first) &&
-                    (fe_values.shape_value(i, x) ==
-                     fe_values.shape_value_component(i, x, c))) ||
-                     ((c != fe.system_to_component_index(i).first) &&
-                      (fe_values.shape_value_component(i, x, c) == 0)),
-                   ExcInternalError());
+            DEAL_II_Assert(((c == fe.system_to_component_index(i).first) &&
+                            (fe_values.shape_value(i, x) ==
+                             fe_values.shape_value_component(i, x, c))) ||
+                             ((c != fe.system_to_component_index(i).first) &&
+                              (fe_values.shape_value_component(i, x, c) == 0)),
+                           ExcInternalError());
       };
 
   // check gradients
@@ -386,18 +400,18 @@ check_values_and_derivatives(const FiniteElement<dim> &fe,
           {
             Tensor<1, dim> tmp = fe_values.shape_grad_component(i, x, c);
             tmp -= fe.shape_grad_component(i, q.point(x), c);
-            Assert(std::sqrt(tmp * tmp) < 1e-14, ExcInternalError());
+            DEAL_II_Assert(std::sqrt(tmp * tmp) < 1e-14, ExcInternalError());
           };
 
         if (fe.is_primitive(i))
           for (unsigned int c = 0; c < fe.n_components(); ++c)
-            Assert(((c == fe.system_to_component_index(i).first) &&
-                    (fe_values.shape_grad(i, x) ==
-                     fe_values.shape_grad_component(i, x, c))) ||
-                     ((c != fe.system_to_component_index(i).first) &&
-                      (fe_values.shape_grad_component(i, x, c) ==
-                       Tensor<1, dim>())),
-                   ExcInternalError());
+            DEAL_II_Assert(((c == fe.system_to_component_index(i).first) &&
+                            (fe_values.shape_grad(i, x) ==
+                             fe_values.shape_grad_component(i, x, c))) ||
+                             ((c != fe.system_to_component_index(i).first) &&
+                              (fe_values.shape_grad_component(i, x, c) ==
+                               Tensor<1, dim>())),
+                           ExcInternalError());
       }
 
   // check second derivatives
@@ -424,13 +438,13 @@ check_values_and_derivatives(const FiniteElement<dim> &fe,
 
         if (fe.is_primitive(i))
           for (unsigned int c = 0; c < fe.n_components(); ++c)
-            Assert(((c == fe.system_to_component_index(i).first) &&
-                    (fe_values.shape_hessian(i, x) ==
-                     fe_values.shape_hessian_component(i, x, c))) ||
-                     ((c != fe.system_to_component_index(i).first) &&
-                      (fe_values.shape_hessian_component(i, x, c) ==
-                       Tensor<2, dim>())),
-                   ExcInternalError());
+            DEAL_II_Assert(((c == fe.system_to_component_index(i).first) &&
+                            (fe_values.shape_hessian(i, x) ==
+                             fe_values.shape_hessian_component(i, x, c))) ||
+                             ((c != fe.system_to_component_index(i).first) &&
+                              (fe_values.shape_hessian_component(i, x, c) ==
+                               Tensor<2, dim>())),
+                           ExcInternalError());
       }
 }
 

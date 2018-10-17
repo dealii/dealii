@@ -86,11 +86,12 @@ test(std::string filename)
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
           for (unsigned int i = 0; i < fe.dofs_per_vertex; ++i)
             {
-              Assert(bv.find(cell->face(f)->vertex_dof_index(v, i)) != bv.end(),
-                     ExcInternalError());
-              Assert(bv[cell->face(f)->vertex_dof_index(v, i)] ==
-                       X<spacedim>().value(cell->face(f)->vertex(v), i),
-                     ExcInternalError());
+              DEAL_II_Assert(bv.find(cell->face(f)->vertex_dof_index(v, i)) !=
+                               bv.end(),
+                             ExcInternalError());
+              DEAL_II_Assert(bv[cell->face(f)->vertex_dof_index(v, i)] ==
+                               X<spacedim>().value(cell->face(f)->vertex(v), i),
+                             ExcInternalError());
             }
 }
 

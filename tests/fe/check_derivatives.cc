@@ -62,7 +62,8 @@ test(const FiniteElement<dim> &fe, const Quadrature<dim> &quadrature)
                            delta_x;
             }
 
-          AssertThrow((gradient - fd_grad).norm() <= 2e-5, ExcInternalError());
+          DEAL_II_AssertThrow((gradient - fd_grad).norm() <= 2e-5,
+                              ExcInternalError());
         }
   deallog << "OK" << std::endl;
 }

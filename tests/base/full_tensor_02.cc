@@ -37,17 +37,17 @@ main()
   t[1][2] = 6;
   t[2][1] = 6;
 
-  AssertThrow(t[0][1] == t[1][0], ExcInternalError());
+  DEAL_II_AssertThrow(t[0][1] == t[1][0], ExcInternalError());
 
   // make sure transposition doesn't change
   // anything
-  AssertThrow(t == transpose(t), ExcInternalError());
+  DEAL_II_AssertThrow(t == transpose(t), ExcInternalError());
 
   // check norm of tensor
-  AssertThrow(std::fabs(t.norm() -
-                        std::sqrt(1. * 1 + 2 * 2 + 3 * 3 + 2 * 4 * 4 +
-                                  2 * 5 * 5 + 2 * 6 * 6)) < 1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(t.norm() -
+                                std::sqrt(1. * 1 + 2 * 2 + 3 * 3 + 2 * 4 * 4 +
+                                          2 * 5 * 5 + 2 * 6 * 6)) < 1e-14,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

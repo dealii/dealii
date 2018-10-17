@@ -61,8 +61,9 @@ test()
                                             reps,
                                             Point<dim>(),
                                             top_right);
-  Assert(triangulation.n_global_active_cells() == 4, ExcInternalError());
-  Assert(triangulation.n_active_cells() == 4, ExcInternalError());
+  DEAL_II_Assert(triangulation.n_global_active_cells() == 4,
+                 ExcInternalError());
+  DEAL_II_Assert(triangulation.n_active_cells() == 4, ExcInternalError());
 
   hp::FECollection<dim> fe;
   fe.push_back(FE_Q<dim>(4));

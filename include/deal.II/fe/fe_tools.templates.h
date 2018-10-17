@@ -81,7 +81,7 @@ namespace FETools
       const std::vector<unsigned int> &                        multiplicities,
       const bool do_tensor_product)
     {
-      AssertDimension(fes.size(), multiplicities.size());
+      DEAL_II_AssertDimension(fes.size(), multiplicities.size());
 
       unsigned int multiplied_dofs_per_vertex = 0;
       unsigned int multiplied_dofs_per_line   = 0;
@@ -115,9 +115,10 @@ namespace FETools
             multiplied_n_components +=
               fes[i]->n_components() * multiplicities[i];
 
-            Assert(do_tensor_product ||
-                     (n_components == fes[i]->n_components()),
-                   ExcDimensionMismatch(n_components, fes[i]->n_components()));
+            DEAL_II_Assert(do_tensor_product ||
+                             (n_components == fes[i]->n_components()),
+                           ExcDimensionMismatch(n_components,
+                                                fes[i]->n_components()));
 
             degree = std::max(degree, fes[i]->tensor_degree());
           }
@@ -204,7 +205,7 @@ namespace FETools
       const std::vector<const FiniteElement<dim, spacedim> *> &fes,
       const std::vector<unsigned int> &                        multiplicities)
     {
-      AssertDimension(fes.size(), multiplicities.size());
+      DEAL_II_AssertDimension(fes.size(), multiplicities.size());
 
       // first count the number of dofs and components that will emerge from the
       // given FEs
@@ -238,8 +239,8 @@ namespace FETools
                   const unsigned int index_in_base =
                     (fes[base]->dofs_per_vertex * vertex_number + local_index);
 
-                  Assert(index_in_base < fes[base]->dofs_per_cell,
-                         ExcInternalError());
+                  DEAL_II_Assert(index_in_base < fes[base]->dofs_per_cell,
+                                 ExcInternalError());
                   retval[total_index] =
                     fes[base]->restriction_is_additive(index_in_base);
                 }
@@ -261,8 +262,8 @@ namespace FETools
                       (fes[base]->dofs_per_line * line_number + local_index +
                        fes[base]->first_line_index);
 
-                    Assert(index_in_base < fes[base]->dofs_per_cell,
-                           ExcInternalError());
+                    DEAL_II_Assert(index_in_base < fes[base]->dofs_per_cell,
+                                   ExcInternalError());
                     retval[total_index] =
                       fes[base]->restriction_is_additive(index_in_base);
                   }
@@ -284,8 +285,8 @@ namespace FETools
                       (fes[base]->dofs_per_quad * quad_number + local_index +
                        fes[base]->first_quad_index);
 
-                    Assert(index_in_base < fes[base]->dofs_per_cell,
-                           ExcInternalError());
+                    DEAL_II_Assert(index_in_base < fes[base]->dofs_per_cell,
+                                   ExcInternalError());
                     retval[total_index] =
                       fes[base]->restriction_is_additive(index_in_base);
                   }
@@ -307,14 +308,14 @@ namespace FETools
                       (fes[base]->dofs_per_hex * hex_number + local_index +
                        fes[base]->first_hex_index);
 
-                    Assert(index_in_base < fes[base]->dofs_per_cell,
-                           ExcInternalError());
+                    DEAL_II_Assert(index_in_base < fes[base]->dofs_per_cell,
+                                   ExcInternalError());
                     retval[total_index] =
                       fes[base]->restriction_is_additive(index_in_base);
                   }
           }
 
-      Assert(total_index == n_shape_functions, ExcInternalError());
+      DEAL_II_Assert(total_index == n_shape_functions, ExcInternalError());
 
       return retval;
     }
@@ -370,7 +371,7 @@ namespace FETools
       const std::vector<unsigned int> &                        multiplicities,
       const bool do_tensor_product)
     {
-      AssertDimension(fes.size(), multiplicities.size());
+      DEAL_II_AssertDimension(fes.size(), multiplicities.size());
 
       // first count the number of dofs and components that will emerge from the
       // given FEs
@@ -397,9 +398,9 @@ namespace FETools
           // Now check that all FEs have the same number of components:
           for (unsigned int i = 0; i < fes.size(); ++i)
             if (multiplicities[i] > 0) // needed because fe might be NULL
-              Assert(n_components == fes[i]->n_components(),
-                     ExcDimensionMismatch(n_components,
-                                          fes[i]->n_components()));
+              DEAL_II_Assert(n_components == fes[i]->n_components(),
+                             ExcDimensionMismatch(n_components,
+                                                  fes[i]->n_components()));
         }
 
       // generate the array that will hold the output
@@ -434,15 +435,16 @@ namespace FETools
                   const unsigned int index_in_base =
                     (fes[base]->dofs_per_vertex * vertex_number + local_index);
 
-                  Assert(comp_start + fes[base]->n_components() <=
-                           retval[total_index].size(),
-                         ExcInternalError());
+                  DEAL_II_Assert(comp_start + fes[base]->n_components() <=
+                                   retval[total_index].size(),
+                                 ExcInternalError());
                   for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
                     {
-                      Assert(c < fes[base]
-                                   ->get_nonzero_components(index_in_base)
-                                   .size(),
-                             ExcInternalError());
+                      DEAL_II_Assert(c <
+                                       fes[base]
+                                         ->get_nonzero_components(index_in_base)
+                                         .size(),
+                                     ExcInternalError());
                       retval[total_index][comp_start + c] =
                         fes[base]->get_nonzero_components(index_in_base)[c];
                     }
@@ -469,15 +471,16 @@ namespace FETools
                       (fes[base]->dofs_per_line * line_number + local_index +
                        fes[base]->first_line_index);
 
-                    Assert(comp_start + fes[base]->n_components() <=
-                             retval[total_index].size(),
-                           ExcInternalError());
+                    DEAL_II_Assert(comp_start + fes[base]->n_components() <=
+                                     retval[total_index].size(),
+                                   ExcInternalError());
                     for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
                       {
-                        Assert(c < fes[base]
-                                     ->get_nonzero_components(index_in_base)
-                                     .size(),
-                               ExcInternalError());
+                        DEAL_II_Assert(c < fes[base]
+                                             ->get_nonzero_components(
+                                               index_in_base)
+                                             .size(),
+                                       ExcInternalError());
                         retval[total_index][comp_start + c] =
                           fes[base]->get_nonzero_components(index_in_base)[c];
                       }
@@ -504,15 +507,16 @@ namespace FETools
                       (fes[base]->dofs_per_quad * quad_number + local_index +
                        fes[base]->first_quad_index);
 
-                    Assert(comp_start + fes[base]->n_components() <=
-                             retval[total_index].size(),
-                           ExcInternalError());
+                    DEAL_II_Assert(comp_start + fes[base]->n_components() <=
+                                     retval[total_index].size(),
+                                   ExcInternalError());
                     for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
                       {
-                        Assert(c < fes[base]
-                                     ->get_nonzero_components(index_in_base)
-                                     .size(),
-                               ExcInternalError());
+                        DEAL_II_Assert(c < fes[base]
+                                             ->get_nonzero_components(
+                                               index_in_base)
+                                             .size(),
+                                       ExcInternalError());
                         retval[total_index][comp_start + c] =
                           fes[base]->get_nonzero_components(index_in_base)[c];
                       }
@@ -539,22 +543,23 @@ namespace FETools
                       (fes[base]->dofs_per_hex * hex_number + local_index +
                        fes[base]->first_hex_index);
 
-                    Assert(comp_start + fes[base]->n_components() <=
-                             retval[total_index].size(),
-                           ExcInternalError());
+                    DEAL_II_Assert(comp_start + fes[base]->n_components() <=
+                                     retval[total_index].size(),
+                                   ExcInternalError());
                     for (unsigned int c = 0; c < fes[base]->n_components(); ++c)
                       {
-                        Assert(c < fes[base]
-                                     ->get_nonzero_components(index_in_base)
-                                     .size(),
-                               ExcInternalError());
+                        DEAL_II_Assert(c < fes[base]
+                                             ->get_nonzero_components(
+                                               index_in_base)
+                                             .size(),
+                                       ExcInternalError());
                         retval[total_index][comp_start + c] =
                           fes[base]->get_nonzero_components(index_in_base)[c];
                       }
                   }
           }
 
-      Assert(total_index == n_shape_functions, ExcInternalError());
+      DEAL_II_Assert(total_index == n_shape_functions, ExcInternalError());
 
       // now copy the vector<vector<bool> > into a vector<ComponentMask>.
       // this appears complicated but we do it this way since it's just
@@ -635,8 +640,8 @@ namespace FETools
                   component_to_base_table[total_index++] =
                     std::make_pair(std::make_pair(base, k), m);
               }
-          Assert(total_index == component_to_base_table.size(),
-                 ExcInternalError());
+          DEAL_II_Assert(total_index == component_to_base_table.size(),
+                         ExcInternalError());
         }
       else
         {
@@ -1011,11 +1016,11 @@ namespace FETools
                         non_primitive_index;
                   }
           }
-      Assert(total_index == fe.dofs_per_face, ExcInternalError());
-      Assert(total_index == face_system_to_component_table.size(),
-             ExcInternalError());
-      Assert(total_index == face_system_to_base_table.size(),
-             ExcInternalError());
+      DEAL_II_Assert(total_index == fe.dofs_per_face, ExcInternalError());
+      DEAL_II_Assert(total_index == face_system_to_component_table.size(),
+                     ExcInternalError());
+      DEAL_II_Assert(total_index == face_system_to_base_table.size(),
+                     ExcInternalError());
     }
   } // namespace Compositing
 
@@ -1026,7 +1031,7 @@ namespace FETools
   std::unique_ptr<FiniteElement<FE::dimension, FE::space_dimension>>
   FEFactory<FE>::get(const Quadrature<1> &) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return nullptr;
   }
 
@@ -1368,7 +1373,7 @@ namespace FETools
             (name[position + 3] == 'm') && (name[position + 4] == '>'))
           return 5;
 
-        Assert(dim < 10, ExcNotImplemented());
+        DEAL_II_Assert(dim < 10, ExcNotImplemented());
         const char dim_char = '0' + dim;
 
         if ((position + 3 < name.size()) && (name[position] == '<') &&
@@ -1390,8 +1395,9 @@ namespace FETools
                          std::vector<unsigned int> &             renumbering,
                          std::vector<std::vector<unsigned int>> &comp_start)
   {
-    Assert(renumbering.size() == element.dofs_per_cell,
-           ExcDimensionMismatch(renumbering.size(), element.dofs_per_cell));
+    DEAL_II_Assert(renumbering.size() == element.dofs_per_cell,
+                   ExcDimensionMismatch(renumbering.size(),
+                                        element.dofs_per_cell));
 
     comp_start.resize(element.n_base_elements());
 
@@ -1431,10 +1437,11 @@ namespace FETools
                             std::vector<types::global_dof_index> &block_data,
                             bool return_start_indices)
   {
-    Assert(renumbering.size() == element.dofs_per_cell,
-           ExcDimensionMismatch(renumbering.size(), element.dofs_per_cell));
-    Assert(block_data.size() == element.n_blocks(),
-           ExcDimensionMismatch(block_data.size(), element.n_blocks()));
+    DEAL_II_Assert(renumbering.size() == element.dofs_per_cell,
+                   ExcDimensionMismatch(renumbering.size(),
+                                        element.dofs_per_cell));
+    DEAL_II_Assert(block_data.size() == element.n_blocks(),
+                   ExcDimensionMismatch(block_data.size(), element.n_blocks()));
 
     types::global_dof_index k     = 0;
     unsigned int            count = 0;
@@ -1446,7 +1453,7 @@ namespace FETools
                                   (element.base_element(b).n_dofs_per_cell());
           k += element.base_element(b).n_dofs_per_cell();
         }
-    Assert(count == element.n_blocks(), ExcInternalError());
+    DEAL_II_Assert(count == element.n_blocks(), ExcInternalError());
 
     std::vector<types::global_dof_index> start_indices(block_data.size());
     k = 0;
@@ -1475,14 +1482,15 @@ namespace FETools
                            const FiniteElement<dim, spacedim> &fe2,
                            FullMatrix<number> &interpolation_matrix)
   {
-    Assert(fe1.n_components() == fe2.n_components(),
-           ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-    Assert(interpolation_matrix.m() == fe2.dofs_per_cell &&
-             interpolation_matrix.n() == fe1.dofs_per_cell,
-           ExcMatrixDimensionMismatch(interpolation_matrix.m(),
-                                      interpolation_matrix.n(),
-                                      fe2.dofs_per_cell,
-                                      fe1.dofs_per_cell));
+    DEAL_II_Assert(fe1.n_components() == fe2.n_components(),
+                   ExcDimensionMismatch(fe1.n_components(),
+                                        fe2.n_components()));
+    DEAL_II_Assert(interpolation_matrix.m() == fe2.dofs_per_cell &&
+                     interpolation_matrix.n() == fe1.dofs_per_cell,
+                   ExcMatrixDimensionMismatch(interpolation_matrix.m(),
+                                              interpolation_matrix.n(),
+                                              fe2.dofs_per_cell,
+                                              fe1.dofs_per_cell));
 
     // first try the easy way: maybe
     // the FE wants to implement things
@@ -1507,8 +1515,8 @@ namespace FETools
     // way. note that this will only
     // work if the element is
     // primitive, so check this first
-    Assert(fe1.is_primitive() == true, ExcFENotPrimitive());
-    Assert(fe2.is_primitive() == true, ExcFENotPrimitive());
+    DEAL_II_Assert(fe1.is_primitive() == true, ExcFENotPrimitive());
+    DEAL_II_Assert(fe2.is_primitive() == true, ExcFENotPrimitive());
 
     // Initialize FEValues for fe1 at
     // the unit support points of the
@@ -1516,8 +1524,9 @@ namespace FETools
     const std::vector<Point<dim>> &fe2_support_points =
       fe2.get_unit_support_points();
 
-    Assert(fe2_support_points.size() == fe2.dofs_per_cell,
-           (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
+    DEAL_II_Assert(
+      fe2_support_points.size() == fe2.dofs_per_cell,
+      (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
 
     for (unsigned int i = 0; i < fe2.dofs_per_cell; ++i)
       {
@@ -1542,14 +1551,15 @@ namespace FETools
                                 const FiniteElement<dim, spacedim> &fe2,
                                 FullMatrix<number> &interpolation_matrix)
   {
-    Assert(fe1.n_components() == fe2.n_components(),
-           ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-    Assert(interpolation_matrix.m() == fe1.dofs_per_cell &&
-             interpolation_matrix.n() == fe1.dofs_per_cell,
-           ExcMatrixDimensionMismatch(interpolation_matrix.m(),
-                                      interpolation_matrix.n(),
-                                      fe1.dofs_per_cell,
-                                      fe1.dofs_per_cell));
+    DEAL_II_Assert(fe1.n_components() == fe2.n_components(),
+                   ExcDimensionMismatch(fe1.n_components(),
+                                        fe2.n_components()));
+    DEAL_II_Assert(interpolation_matrix.m() == fe1.dofs_per_cell &&
+                     interpolation_matrix.n() == fe1.dofs_per_cell,
+                   ExcMatrixDimensionMismatch(interpolation_matrix.m(),
+                                              interpolation_matrix.n(),
+                                              fe1.dofs_per_cell,
+                                              fe1.dofs_per_cell));
 
     FullMatrix<number> first_matrix(fe2.dofs_per_cell, fe1.dofs_per_cell);
     FullMatrix<number> second_matrix(fe1.dofs_per_cell, fe2.dofs_per_cell);
@@ -1569,14 +1579,15 @@ namespace FETools
                                       const FiniteElement<dim, spacedim> &fe2,
                                       FullMatrix<number> &difference_matrix)
   {
-    Assert(fe1.n_components() == fe2.n_components(),
-           ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-    Assert(difference_matrix.m() == fe1.dofs_per_cell &&
-             difference_matrix.n() == fe1.dofs_per_cell,
-           ExcMatrixDimensionMismatch(difference_matrix.m(),
-                                      difference_matrix.n(),
-                                      fe1.dofs_per_cell,
-                                      fe1.dofs_per_cell));
+    DEAL_II_Assert(fe1.n_components() == fe2.n_components(),
+                   ExcDimensionMismatch(fe1.n_components(),
+                                        fe2.n_components()));
+    DEAL_II_Assert(difference_matrix.m() == fe1.dofs_per_cell &&
+                     difference_matrix.n() == fe1.dofs_per_cell,
+                   ExcMatrixDimensionMismatch(difference_matrix.m(),
+                                              difference_matrix.n(),
+                                              fe1.dofs_per_cell,
+                                              fe1.dofs_per_cell));
 
     FullMatrix<number> interpolation_matrix(fe1.dofs_per_cell);
     get_back_interpolation_matrix(fe1, fe2, interpolation_matrix);
@@ -1594,12 +1605,16 @@ namespace FETools
                         const FiniteElement<dim, spacedim> &fe2,
                         FullMatrix<number> &                matrix)
   {
-    Assert(fe1.n_components() == 1, ExcNotImplemented());
-    Assert(fe1.n_components() == fe2.n_components(),
-           ExcDimensionMismatch(fe1.n_components(), fe2.n_components()));
-    Assert(matrix.m() == fe2.dofs_per_cell && matrix.n() == fe1.dofs_per_cell,
-           ExcMatrixDimensionMismatch(
-             matrix.m(), matrix.n(), fe2.dofs_per_cell, fe1.dofs_per_cell));
+    DEAL_II_Assert(fe1.n_components() == 1, ExcNotImplemented());
+    DEAL_II_Assert(fe1.n_components() == fe2.n_components(),
+                   ExcDimensionMismatch(fe1.n_components(),
+                                        fe2.n_components()));
+    DEAL_II_Assert(matrix.m() == fe2.dofs_per_cell &&
+                     matrix.n() == fe1.dofs_per_cell,
+                   ExcMatrixDimensionMismatch(matrix.m(),
+                                              matrix.n(),
+                                              fe2.dofs_per_cell,
+                                              fe1.dofs_per_cell));
     matrix = 0;
 
     const unsigned int n1 = fe1.dofs_per_cell;
@@ -1612,7 +1627,8 @@ namespace FETools
     // Choose a Gauss quadrature rule that is exact up to degree 2n-1
     const unsigned int degree =
       std::max(fe1.tensor_degree(), fe2.tensor_degree());
-    Assert(degree != numbers::invalid_unsigned_int, ExcNotImplemented());
+    DEAL_II_Assert(degree != numbers::invalid_unsigned_int,
+                   ExcNotImplemented());
     const QGauss<dim> quadrature(degree + 1);
 
     // Set up FEValues.
@@ -1675,8 +1691,8 @@ namespace FETools
 
     FullMatrix<double> N(n_dofs, n_dofs);
 
-    Assert(fe.has_generalized_support_points(), ExcNotInitialized());
-    Assert(fe.n_components() == dim, ExcNotImplemented());
+    DEAL_II_Assert(fe.has_generalized_support_points(), ExcNotInitialized());
+    DEAL_II_Assert(fe.n_components() == dim, ExcNotImplemented());
 
     const std::vector<Point<dim>> &points = fe.get_generalized_support_points();
 
@@ -1703,8 +1719,8 @@ namespace FETools
             {
               support_point_values[k][d] =
                 fe.shape_value_component(i, points[k], d);
-              Assert(numbers::is_finite(support_point_values[k][d]),
-                     ExcInternalError());
+              DEAL_II_Assert(numbers::is_finite(support_point_values[k][d]),
+                             ExcInternalError());
             }
 
         fe.convert_generalized_support_point_values_to_dof_values(
@@ -1714,7 +1730,8 @@ namespace FETools
         for (unsigned int j = 0; j < n_dofs; ++j)
           {
             N(j, i) = nodal_values[j];
-            Assert(numbers::is_finite(nodal_values[j]), ExcInternalError());
+            DEAL_II_Assert(numbers::is_finite(nodal_values[j]),
+                           ExcInternalError());
           }
       }
 
@@ -1767,7 +1784,8 @@ namespace FETools
         // solve the least squares
         // problem.
         const double result = H.least_squares(v_fine, v_coarse);
-        Assert(result <= threshold, FETools::ExcLeastSquaresError(result));
+        DEAL_II_Assert(result <= threshold,
+                       FETools::ExcLeastSquaresError(result));
         // Avoid warnings in release mode
         (void)result;
         (void)threshold;
@@ -1797,10 +1815,10 @@ namespace FETools
           GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
         for (unsigned int i = 0; i < nc; ++i)
           {
-            Assert(matrices[i].n() == n,
-                   ExcDimensionMismatch(matrices[i].n(), n));
-            Assert(matrices[i].m() == n,
-                   ExcDimensionMismatch(matrices[i].m(), n));
+            DEAL_II_Assert(matrices[i].n() == n,
+                           ExcDimensionMismatch(matrices[i].n(), n));
+            DEAL_II_Assert(matrices[i].m() == n,
+                           ExcDimensionMismatch(matrices[i].m(), n));
           }
 
         // Set up meshes, one with a single
@@ -1913,9 +1931,9 @@ namespace FETools
                   this_matrix(i, j) = 0.;
           }
 
-        Assert(cell_number ==
-                 GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)),
-               ExcInternalError());
+        DEAL_II_Assert(cell_number == GeometryInfo<dim>::n_children(
+                                        RefinementCase<dim>(ref_case)),
+                       ExcInternalError());
       }
     } // namespace FEToolsComputeEmbeddingMatricesHelper
   }   // namespace internal
@@ -1960,8 +1978,8 @@ namespace FETools
     const unsigned int face_fine,
     const double       threshold)
   {
-    Assert(face_coarse == 0, ExcNotImplemented());
-    Assert(face_fine == 0, ExcNotImplemented());
+    DEAL_II_Assert(face_coarse == 0, ExcNotImplemented());
+    DEAL_II_Assert(face_fine == 0, ExcNotImplemented());
 
     const unsigned int nc     = GeometryInfo<dim>::max_children_per_face;
     const unsigned int n      = fe.dofs_per_face;
@@ -1973,8 +1991,10 @@ namespace FETools
 
     for (unsigned int i = 0; i < nc; ++i)
       {
-        Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n(), n));
-        Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(), n));
+        DEAL_II_Assert(matrices[i].n() == n,
+                       ExcDimensionMismatch(matrices[i].n(), n));
+        DEAL_II_Assert(matrices[i].m() == n,
+                       ExcDimensionMismatch(matrices[i].m(), n));
       }
 
     // In order to make the loops below
@@ -2031,7 +2051,7 @@ namespace FETools
               ++face_dof;
             }
         }
-      Assert(face_dof == fe.dofs_per_face, ExcInternalError());
+      DEAL_II_Assert(face_dof == fe.dofs_per_face, ExcInternalError());
     }
 
     // Set up meshes, one with a single
@@ -2142,7 +2162,8 @@ namespace FETools
             // solve the least squares
             // problem.
             const double result = H.least_squares(v_fine, v_coarse);
-            Assert(result <= threshold, FETools::ExcLeastSquaresError(result));
+            DEAL_II_Assert(result <= threshold,
+                           FETools::ExcLeastSquaresError(result));
             // Avoid compiler warnings in Release mode
             (void)result;
             (void)threshold;
@@ -2240,28 +2261,28 @@ namespace FETools
 
         for (unsigned int i = 0; i < nc; ++i)
           {
-            Assert(matrices[i].
+            DEAL_II_Assert(matrices[i].
 
-                     n()
+                             n()
 
-                     == n,
-                   ExcDimensionMismatch(matrices[i].
+                             == n,
+                           ExcDimensionMismatch(matrices[i].
 
-                                        n(),
-                                        n
+                                                n(),
+                                                n
 
-                                        ));
-            Assert(matrices[i].
+                                                ));
+            DEAL_II_Assert(matrices[i].
 
-                     m()
+                             m()
 
-                     == n,
-                   ExcDimensionMismatch(matrices[i].
+                             == n,
+                           ExcDimensionMismatch(matrices[i].
 
-                                        m(),
-                                        n
+                                                m(),
+                                                n
 
-                                        ));
+                                                ));
           }
 
         // create a respective refinement on the triangulation
@@ -2412,7 +2433,7 @@ namespace FETools
     std::lock_guard<std::mutex> lock(
       internal::FEToolsAddFENameHelper::fe_name_map_lock);
 
-    Assert(
+    DEAL_II_Assert(
       internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim].find(name) ==
         internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim].end(),
       ExcMessage("Cannot change existing element in finite element name list"));
@@ -2530,9 +2551,9 @@ namespace FETools
               throw(std::string("Invalid first character in ") + name);
             name.erase(0, 1);
             // just one more sanity check
-            Assert((base_fes.size() == base_multiplicities.size()) &&
-                     (base_fes.size() > 0),
-                   ExcInternalError());
+            DEAL_II_Assert((base_fes.size() == base_multiplicities.size()) &&
+                             (base_fes.size() > 0),
+                           ExcInternalError());
 
             // this is a workaround since the constructor for FESystem
             // only accepts raw pointers.
@@ -2568,8 +2589,9 @@ namespace FETools
             // is just adding an element
             std::lock_guard<std::mutex> lock(
               internal::FEToolsAddFENameHelper::fe_name_map_lock);
-            AssertThrow(fe_name_map.find(name_part) != fe_name_map.end(),
-                        FETools::ExcInvalidFEName(name));
+            DEAL_II_AssertThrow(fe_name_map.find(name_part) !=
+                                  fe_name_map.end(),
+                                FETools::ExcInvalidFEName(name));
 
             // Now, just the (degree)
             // or (Quadrature<1>(degree+1))
@@ -2625,10 +2647,10 @@ namespace FETools
                     // find sub-quadrature
                     position = name.find('(');
                     const std::string subquadrature_name(name, 0, position);
-                    AssertThrow(subquadrature_name.compare("QTrapez") == 0,
-                                ExcNotImplemented(
-                                  "Could not detect quadrature of name " +
-                                  subquadrature_name));
+                    DEAL_II_AssertThrow(
+                      subquadrature_name.compare("QTrapez") == 0,
+                      ExcNotImplemented("Could not detect quadrature of name " +
+                                        subquadrature_name));
                     // delete "QTrapez(),"
                     name.erase(0, position + 3);
                     const std::pair<int, unsigned int> tmp =
@@ -2644,7 +2666,7 @@ namespace FETools
                   }
                 else
                   {
-                    AssertThrow(false, ExcNotImplemented());
+                    DEAL_II_AssertThrow(false, ExcNotImplemented());
                   }
               }
           }
@@ -2654,7 +2676,7 @@ namespace FETools
         // didn't know what to do with the
         // string we got. so do as the docs
         // say: raise an exception
-        AssertThrow(false, FETools::ExcInvalidFEName(name));
+        DEAL_II_AssertThrow(false, FETools::ExcInvalidFEName(name));
 
         // make some compilers happy that
         // do not realize that we can't get
@@ -2723,11 +2745,11 @@ namespace FETools
             const char dimchar = '0' + dim;
             (void)dimchar;
             if (name.at(pos1 + 1) != 'd')
-              Assert(name.at(pos1 + 1) == dimchar,
-                     ExcInvalidFEDimension(name.at(pos1 + 1), dim));
+              DEAL_II_Assert(name.at(pos1 + 1) == dimchar,
+                             ExcInvalidFEDimension(name.at(pos1 + 1), dim));
           }
         else
-          Assert(pos2 - pos1 == 4, ExcInvalidFEName(name));
+          DEAL_II_Assert(pos2 - pos1 == 4, ExcInvalidFEName(name));
 
         // If pos1==pos2, then we are
         // probably at the end of the
@@ -2755,17 +2777,18 @@ namespace FETools
 
         // Make sure the auxiliary function
         // ate up all characters of the name.
-        AssertThrow(name.size() == 0,
-                    ExcInvalidFEName(parameter_name +
-                                     std::string(" extra characters after "
-                                                 "end of name")));
+        DEAL_II_AssertThrow(name.size() == 0,
+                            ExcInvalidFEName(
+                              parameter_name +
+                              std::string(" extra characters after "
+                                          "end of name")));
         return fe;
       }
     catch (const std::string &errline)
       {
-        AssertThrow(false,
-                    ExcInvalidFEName(parameter_name + std::string(" at ") +
-                                     errline));
+        DEAL_II_AssertThrow(false,
+                            ExcInvalidFEName(parameter_name +
+                                             std::string(" at ") + errline));
         return nullptr;
       }
   }
@@ -2780,7 +2803,7 @@ namespace FETools
     const Quadrature<dim> &             rhs_quadrature,
     FullMatrix<double> &                X)
   {
-    Assert(fe.n_components() == 1, ExcNotImplemented());
+    DEAL_II_Assert(fe.n_components() == 1, ExcNotImplemented());
 
     // first build the matrices M and Q
     // described in the documentation
@@ -2807,8 +2830,8 @@ namespace FETools
     X.reinit(fe.dofs_per_cell, rhs_quadrature.size());
     M_inverse.mmult(X, Q);
 
-    Assert(X.m() == fe.dofs_per_cell, ExcInternalError());
-    Assert(X.n() == rhs_quadrature.size(), ExcInternalError());
+    DEAL_II_Assert(X.m() == fe.dofs_per_cell, ExcInternalError());
+    DEAL_II_Assert(X.n() == rhs_quadrature.size(), ExcInternalError());
   }
 
 
@@ -2820,9 +2843,11 @@ namespace FETools
     const Quadrature<dim> &             quadrature,
     FullMatrix<double> &                I_q)
   {
-    Assert(fe.n_components() == 1, ExcNotImplemented());
-    Assert(I_q.m() == quadrature.size(), ExcMessage("Wrong matrix size"));
-    Assert(I_q.n() == fe.dofs_per_cell, ExcMessage("Wrong matrix size"));
+    DEAL_II_Assert(fe.n_components() == 1, ExcNotImplemented());
+    DEAL_II_Assert(I_q.m() == quadrature.size(),
+                   ExcMessage("Wrong matrix size"));
+    DEAL_II_Assert(I_q.n() == fe.dofs_per_cell,
+                   ExcMessage("Wrong matrix size"));
 
     for (unsigned int q = 0; q < quadrature.size(); ++q)
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
@@ -2840,15 +2865,16 @@ namespace FETools
   {
     // check that the number columns of the projection_matrix
     // matches the size of the vector_of_tensors_at_qp
-    Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
-           ExcDimensionMismatch(projection_matrix.n_cols(),
-                                vector_of_tensors_at_qp.size()));
+    DEAL_II_Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
+                   ExcDimensionMismatch(projection_matrix.n_cols(),
+                                        vector_of_tensors_at_qp.size()));
 
     // check that the number rows of the projection_matrix
     // matches the size of the vector_of_tensors_at_nodes
-    Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
-           ExcDimensionMismatch(projection_matrix.n_rows(),
-                                vector_of_tensors_at_nodes.size()));
+    DEAL_II_Assert(projection_matrix.n_rows() ==
+                     vector_of_tensors_at_nodes.size(),
+                   ExcDimensionMismatch(projection_matrix.n_rows(),
+                                        vector_of_tensors_at_nodes.size()));
 
     // number of support points (nodes) to project to
     const unsigned int n_support_points = projection_matrix.n_rows();
@@ -2899,15 +2925,16 @@ namespace FETools
   {
     // check that the number columns of the projection_matrix
     // matches the size of the vector_of_tensors_at_qp
-    Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
-           ExcDimensionMismatch(projection_matrix.n_cols(),
-                                vector_of_tensors_at_qp.size()));
+    DEAL_II_Assert(projection_matrix.n_cols() == vector_of_tensors_at_qp.size(),
+                   ExcDimensionMismatch(projection_matrix.n_cols(),
+                                        vector_of_tensors_at_qp.size()));
 
     // check that the number rows of the projection_matrix
     // matches the size of the vector_of_tensors_at_nodes
-    Assert(projection_matrix.n_rows() == vector_of_tensors_at_nodes.size(),
-           ExcDimensionMismatch(projection_matrix.n_rows(),
-                                vector_of_tensors_at_nodes.size()));
+    DEAL_II_Assert(projection_matrix.n_rows() ==
+                     vector_of_tensors_at_nodes.size(),
+                   ExcDimensionMismatch(projection_matrix.n_rows(),
+                                        vector_of_tensors_at_nodes.size()));
 
     // number of support points (nodes)
     const unsigned int n_support_points = projection_matrix.n_rows();
@@ -2971,9 +2998,9 @@ namespace FETools
     const unsigned int                                              face,
     FullMatrix<double> &                                            X)
   {
-    Assert(fe.n_components() == 1, ExcNotImplemented());
-    Assert(lhs_quadrature.size() > fe.degree,
-           ExcNotGreaterThan(lhs_quadrature.size(), fe.degree));
+    DEAL_II_Assert(fe.n_components() == 1, ExcNotImplemented());
+    DEAL_II_Assert(lhs_quadrature.size() > fe.degree,
+                   ExcNotGreaterThan(lhs_quadrature.size(), fe.degree));
 
 
 
@@ -3017,8 +3044,8 @@ namespace FETools
     X.reinit(fe.dofs_per_cell, rhs_quadrature.size());
     M_inverse.mmult(X, Q);
 
-    Assert(X.m() == fe.dofs_per_cell, ExcInternalError());
-    Assert(X.n() == rhs_quadrature.size(), ExcInternalError());
+    DEAL_II_Assert(X.m() == fe.dofs_per_cell, ExcInternalError());
+    DEAL_II_Assert(X.n() == rhs_quadrature.size(), ExcInternalError());
   }
 
 
@@ -3142,9 +3169,10 @@ namespace FETools
     const std::vector<Vector<number>> & support_point_values,
     std::vector<number> &               dof_values)
   {
-    AssertDimension(support_point_values.size(),
-                    finite_element.get_generalized_support_points().size());
-    AssertDimension(dof_values.size(), finite_element.dofs_per_cell);
+    DEAL_II_AssertDimension(
+      support_point_values.size(),
+      finite_element.get_generalized_support_points().size());
+    DEAL_II_AssertDimension(dof_values.size(), finite_element.dofs_per_cell);
 
     internal::FEToolsConvertHelper::convert_helper<dim, spacedim>(
       finite_element, support_point_values, dof_values);
@@ -3162,8 +3190,8 @@ namespace FETools
 
     const unsigned int dofs_per_cell = Utilities::fixed_power<dim>(n);
 
-    // Assert size maches degree
-    AssertDimension(h2l.size(), dofs_per_cell);
+    // DEAL_II_Assert size maches degree
+    DEAL_II_AssertDimension(h2l.size(), dofs_per_cell);
 
     // polynomial degree
     const unsigned int dofs_per_line = degree - 1;
@@ -3216,7 +3244,7 @@ namespace FETools
               for (unsigned int j = 0; j < dofs_per_line; ++j)
                 h2l[next_index++] = n * (i + 1) + j + 1;
 
-            Assert(next_index == dofs_per_cell, ExcInternalError());
+            DEAL_II_Assert(next_index == dofs_per_cell, ExcInternalError());
 
             break;
           }
@@ -3306,13 +3334,13 @@ namespace FETools
                 for (unsigned int k = 0; k < dofs_per_line; ++k)
                   h2l[next_index++] = n * n * (i + 1) + n * (j + 1) + k + 1;
 
-            Assert(next_index == dofs_per_cell, ExcInternalError());
+            DEAL_II_Assert(next_index == dofs_per_cell, ExcInternalError());
 
             break;
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 
@@ -3323,8 +3351,8 @@ namespace FETools
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe,
                                         std::vector<unsigned int> &   h2l)
   {
-    Assert(h2l.size() == fe.dofs_per_cell,
-           ExcDimensionMismatch(h2l.size(), fe.dofs_per_cell));
+    DEAL_II_Assert(h2l.size() == fe.dofs_per_cell,
+                   ExcDimensionMismatch(h2l.size(), fe.dofs_per_cell));
     hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1, h2l);
   }
 
@@ -3334,7 +3362,7 @@ namespace FETools
   std::vector<unsigned int>
   hierarchic_to_lexicographic_numbering(const FiniteElementData<dim> &fe)
   {
-    Assert(fe.n_components() == 1, ExcInvalidFE());
+    DEAL_II_Assert(fe.n_components() == 1, ExcInvalidFE());
     std::vector<unsigned int> h2l(fe.dofs_per_cell);
     hierarchic_to_lexicographic_numbering<dim>(fe.dofs_per_line + 1, h2l);
     return h2l;

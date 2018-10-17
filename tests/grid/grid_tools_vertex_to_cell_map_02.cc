@@ -43,8 +43,8 @@ test()
   std::vector<std::set<Triangulation<3>::active_cell_iterator>> vertex_to_cell =
     GridTools::vertex_to_cell_map(tria);
 
-  AssertThrow(tria.n_vertices() == vertex_to_cell.size(),
-              ExcMessage("Wrong number of vertices"));
+  DEAL_II_AssertThrow(tria.n_vertices() == vertex_to_cell.size(),
+                      ExcMessage("Wrong number of vertices"));
 
   std::vector<unsigned int> n_cells;
   for (unsigned int i = 0; i < vertex_to_cell.size(); ++i)
@@ -54,15 +54,16 @@ test()
   for (unsigned int i = 0; i < n_cells.size(); ++i)
     histogram[n_cells[i]] += 1;
 
-  AssertThrow(histogram[0] == 0, ExcMessage("Wrong cell distribution"));
-  AssertThrow(histogram[1] == 8, ExcMessage("Wrong cell distribution"));
-  AssertThrow(histogram[2] == 13, ExcMessage("Wrong cell distribution"));
-  AssertThrow(histogram[3] == 6, ExcMessage("Wrong cell distribution"));
-  AssertThrow(histogram[4] == 6, ExcMessage("Wrong cell distribution"));
-  AssertThrow(histogram[5] == 3, ExcMessage("Wrong cell distribution"));
-  AssertThrow(histogram[6] == 0, ExcMessage("Wrong cell distribution"));
-  AssertThrow(histogram[7] == 0, ExcMessage("Wrong cell distribution"));
-  AssertThrow(histogram[8] == 1, ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[0] == 0, ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[1] == 8, ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[2] == 13,
+                      ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[3] == 6, ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[4] == 6, ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[5] == 3, ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[6] == 0, ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[7] == 0, ExcMessage("Wrong cell distribution"));
+  DEAL_II_AssertThrow(histogram[8] == 1, ExcMessage("Wrong cell distribution"));
 }
 
 int

@@ -58,10 +58,10 @@ test()
   std::vector<types::global_dof_index> dofs_per_component(fe.n_components());
   DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
 
-  AssertThrow(std::accumulate(dofs_per_component.begin(),
-                              dofs_per_component.end(),
-                              0U) == dof_handler.n_dofs(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::accumulate(dofs_per_component.begin(),
+                                      dofs_per_component.end(),
+                                      0U) == dof_handler.n_dofs(),
+                      ExcInternalError());
 
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   if (myid == 0)

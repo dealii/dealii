@@ -42,9 +42,9 @@ test()
     // where the diagonal elements are the
     // traces of t
     SymmetricTensor<2, dim> x = T * t;
-    AssertThrow((x - trace(t) * unit_symmetric_tensor<dim>()).norm() <
-                  1e-15 * t.norm(),
-                ExcInternalError());
+    DEAL_II_AssertThrow((x - trace(t) * unit_symmetric_tensor<dim>()).norm() <
+                          1e-15 * t.norm(),
+                        ExcInternalError());
 
     deallog << "x=" << std::endl;
     for (unsigned int i = 0; i < dim; ++i)
@@ -59,8 +59,8 @@ test()
 
     // T*t should yield norm(t)^2*t
     SymmetricTensor<2, dim> x = T * t;
-    AssertThrow((x - (t * t) * t).norm() < 1e-15 * t.norm(),
-                ExcInternalError());
+    DEAL_II_AssertThrow((x - (t * t) * t).norm() < 1e-15 * t.norm(),
+                        ExcInternalError());
 
     deallog << "x=" << std::endl;
     for (unsigned int i = 0; i < dim; ++i)

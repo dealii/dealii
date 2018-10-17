@@ -54,7 +54,7 @@ plot_faces(Mapping<dim> &                           mapping,
   // create a QGauss<0>(4), which should
   // still only have 1 quadrature point
   QGauss<dim - 1> q(4);
-  Assert(q.size() == 1, ExcInternalError());
+  DEAL_II_Assert(q.size() == 1, ExcInternalError());
 
   FEFaceValues<dim> fe_values(mapping,
                               fe,
@@ -99,7 +99,7 @@ plot_subfaces(Mapping<dim> &                           mapping,
   // create a QGauss<0>(4), which should
   // still only have 1 quadrature point
   QGauss<dim - 1> q(4);
-  Assert(q.size() == 1, ExcInternalError());
+  DEAL_II_Assert(q.size() == 1, ExcInternalError());
 
   FESubfaceValues<dim> fe_values(
     mapping,

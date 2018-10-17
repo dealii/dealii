@@ -44,8 +44,8 @@ namespace
   translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3>> &face,
                        const unsigned int                         subface_no)
   {
-    Assert(face->has_children(), ExcInternalError());
-    Assert(subface_no < face->n_children(), ExcInternalError());
+    DEAL_II_Assert(face->has_children(), ExcInternalError());
+    DEAL_II_Assert(subface_no < face->n_children(), ExcInternalError());
 
     if (face->child(subface_no)->has_children())
       // although the subface is refine, it
@@ -87,16 +87,17 @@ namespace
                        const unsigned int                         subface_no,
                        const unsigned int                         subsubface_no)
   {
-    Assert(face->has_children(), ExcInternalError());
+    DEAL_II_Assert(face->has_children(), ExcInternalError());
     // the subface must be refined, otherwise
     // we would have ended up in the second
     // function of this name...
-    Assert(face->child(subface_no)->has_children(), ExcInternalError());
-    Assert(subsubface_no < face->child(subface_no)->n_children(),
-           ExcInternalError());
+    DEAL_II_Assert(face->child(subface_no)->has_children(), ExcInternalError());
+    DEAL_II_Assert(subsubface_no < face->child(subface_no)->n_children(),
+                   ExcInternalError());
     // This can only be an anisotropic refinement case
-    Assert(face->refinement_case() < RefinementCase<2>::isotropic_refinement,
-           ExcInternalError());
+    DEAL_II_Assert(face->refinement_case() <
+                     RefinementCase<2>::isotropic_refinement,
+                   ExcInternalError());
 
     const bool first_child_has_children = face->child(0)->has_children();
 
@@ -118,9 +119,9 @@ namespace
        {2, 3}}}; // second subface, second subsubface,
                  // first_child_has_children==no and yes
 
-    Assert(translated_subface_no[subface_no][subsubface_no]
-                                [first_child_has_children] != e,
-           ExcInternalError());
+    DEAL_II_Assert(translated_subface_no[subface_no][subsubface_no]
+                                        [first_child_has_children] != e,
+                   ExcInternalError());
 
     return translated_subface_no[subface_no][subsubface_no]
                                 [first_child_has_children];
@@ -1244,7 +1245,7 @@ namespace
   {
     // this function catches all the cases not
     // explicitly handled above
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return Point<spacedim>();
   }
 
@@ -1348,7 +1349,7 @@ namespace
     if (std::abs((v03 * normal) * (v03 * normal) /
                  ((v03 * v03) * (v01 * v01) * (v02 * v02))) >= 1e-24)
       {
-        Assert(
+        DEAL_II_Assert(
           false,
           ExcMessage(
             "Computing the measure of a nonplanar face is not implemented!"));
@@ -1370,7 +1371,7 @@ namespace
   {
     // catch-all for all cases not explicitly
     // listed above
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return std::numeric_limits<double>::quiet_NaN();
   }
 
@@ -1499,7 +1500,7 @@ double
 TriaAccessor<structdim, dim, spacedim>::extent_in_direction(
   const unsigned int /*axis*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return std::numeric_limits<double>::signaling_NaN();
 }
 
@@ -1510,7 +1511,7 @@ double
 TriaAccessor<1, 1, 1>::extent_in_direction(const unsigned int axis) const
 {
   (void)axis;
-  Assert(axis == 0, ExcIndexRange(axis, 0, 1));
+  DEAL_II_Assert(axis == 0, ExcIndexRange(axis, 0, 1));
 
   return this->diameter();
 }
@@ -1521,7 +1522,7 @@ double
 TriaAccessor<1, 1, 2>::extent_in_direction(const unsigned int axis) const
 {
   (void)axis;
-  Assert(axis == 0, ExcIndexRange(axis, 0, 1));
+  DEAL_II_Assert(axis == 0, ExcIndexRange(axis, 0, 1));
 
   return this->diameter();
 }
@@ -1535,7 +1536,7 @@ TriaAccessor<2, 2, 2>::extent_in_direction(const unsigned int axis) const
     {2, 3},  /// Lines along x-axis, see GeometryInfo
     {0, 1}}; /// Lines along y-axis
 
-  Assert(axis < 2, ExcIndexRange(axis, 0, 2));
+  DEAL_II_Assert(axis < 2, ExcIndexRange(axis, 0, 2));
 
   return std::max(this->line(lines[axis][0])->diameter(),
                   this->line(lines[axis][1])->diameter());
@@ -1549,7 +1550,7 @@ TriaAccessor<2, 2, 3>::extent_in_direction(const unsigned int axis) const
     {2, 3},  /// Lines along x-axis, see GeometryInfo
     {0, 1}}; /// Lines along y-axis
 
-  Assert(axis < 2, ExcIndexRange(axis, 0, 2));
+  DEAL_II_Assert(axis < 2, ExcIndexRange(axis, 0, 2));
 
   return std::max(this->line(lines[axis][0])->diameter(),
                   this->line(lines[axis][1])->diameter());
@@ -1565,7 +1566,7 @@ TriaAccessor<3, 3, 3>::extent_in_direction(const unsigned int axis) const
     {0, 1, 4, 5},    /// Lines along y-axis
     {8, 9, 10, 11}}; /// Lines along z-axis
 
-  Assert(axis < 3, ExcIndexRange(axis, 0, 3));
+  DEAL_II_Assert(axis < 3, ExcIndexRange(axis, 0, 3));
 
   double lengths[4] = {this->line(lines[axis][0])->diameter(),
                        this->line(lines[axis][1])->diameter(),
@@ -1756,7 +1757,7 @@ TriaAccessor<structdim, dim, spacedim>::center(
 {
   if (respect_manifold == false)
     {
-      Assert(use_interpolation == false, ExcNotImplemented());
+      DEAL_II_Assert(use_interpolation == false, ExcNotImplemented());
       Point<spacedim> p;
       for (unsigned int v = 0; v < GeometryInfo<structdim>::vertices_per_cell;
            ++v)
@@ -1960,7 +1961,7 @@ CellAccessor<dim, spacedim>::at_boundary() const
         return (at_boundary(0) || at_boundary(1) || at_boundary(2) ||
                 at_boundary(3) || at_boundary(4) || at_boundary(5));
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return false;
     }
 }
@@ -1971,7 +1972,7 @@ template <int dim, int spacedim>
 types::material_id
 CellAccessor<dim, spacedim>::material_id() const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->tria->levels[this->present_level]
     ->cells.boundary_or_material_id[this->present_index]
     .material_id;
@@ -1984,9 +1985,9 @@ void
 CellAccessor<dim, spacedim>::set_material_id(
   const types::material_id mat_id) const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(mat_id < numbers::invalid_material_id,
-         ExcIndexRange(mat_id, 0, numbers::invalid_material_id));
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(mat_id < numbers::invalid_material_id,
+                 ExcIndexRange(mat_id, 0, numbers::invalid_material_id));
   this->tria->levels[this->present_level]
     ->cells.boundary_or_material_id[this->present_index]
     .material_id = mat_id;
@@ -2013,9 +2014,10 @@ void
 CellAccessor<dim, spacedim>::set_subdomain_id(
   const types::subdomain_id new_subdomain_id) const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->active(),
-         ExcMessage("set_subdomain_id() can only be called on active cells!"));
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(this->active(),
+                 ExcMessage(
+                   "set_subdomain_id() can only be called on active cells!"));
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index] =
     new_subdomain_id;
 }
@@ -2025,7 +2027,7 @@ template <int dim, int spacedim>
 types::subdomain_id
 CellAccessor<dim, spacedim>::level_subdomain_id() const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->tria->levels[this->present_level]
     ->level_subdomain_ids[this->present_index];
 }
@@ -2037,7 +2039,7 @@ void
 CellAccessor<dim, spacedim>::set_level_subdomain_id(
   const types::subdomain_id new_level_subdomain_id) const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->tria->levels[this->present_level]
     ->level_subdomain_ids[this->present_index] = new_level_subdomain_id;
 }
@@ -2047,7 +2049,7 @@ template <int dim, int spacedim>
 bool
 CellAccessor<dim, spacedim>::direction_flag() const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   if (dim == spacedim)
     return true;
   else
@@ -2062,14 +2064,15 @@ void
 CellAccessor<dim, spacedim>::set_direction_flag(
   const bool new_direction_flag) const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   if (dim < spacedim)
     this->tria->levels[this->present_level]
       ->direction_flags[this->present_index] = new_direction_flag;
   else
-    Assert(new_direction_flag == true,
-           ExcMessage("If dim==spacedim, direction flags are always true and "
-                      "can not be set to anything else."));
+    DEAL_II_Assert(new_direction_flag == true,
+                   ExcMessage(
+                     "If dim==spacedim, direction flags are always true and "
+                     "can not be set to anything else."));
 }
 
 
@@ -2091,8 +2094,9 @@ template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::set_parent(const unsigned int parent_index)
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(this->present_level > 0,
+                 TriaAccessorExceptions::ExcCellHasNoParent());
   this->tria->levels[this->present_level]->parents[this->present_index / 2] =
     parent_index;
 }
@@ -2103,7 +2107,8 @@ template <int dim, int spacedim>
 int
 CellAccessor<dim, spacedim>::parent_index() const
 {
-  Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
+  DEAL_II_Assert(this->present_level > 0,
+                 TriaAccessorExceptions::ExcCellHasNoParent());
 
   // the parent of two consecutive cells
   // is stored only once, since it is
@@ -2118,8 +2123,8 @@ template <int dim, int spacedim>
 unsigned int
 CellAccessor<dim, spacedim>::active_cell_index() const
 {
-  Assert(this->has_children() == false,
-         TriaAccessorExceptions::ExcCellNotActive());
+  DEAL_II_Assert(this->has_children() == false,
+                 TriaAccessorExceptions::ExcCellNotActive());
   return this->tria->levels[this->present_level]
     ->active_cell_indices[this->present_index];
 }
@@ -2130,8 +2135,9 @@ template <int dim, int spacedim>
 TriaIterator<CellAccessor<dim, spacedim>>
 CellAccessor<dim, spacedim>::parent() const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(this->present_level > 0,
+                 TriaAccessorExceptions::ExcCellHasNoParent());
   TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
                                               this->present_level - 1,
                                               parent_index());
@@ -2160,7 +2166,7 @@ CellAccessor<dim, spacedim>::set_neighbor(
   const unsigned int                               i,
   const TriaIterator<CellAccessor<dim, spacedim>> &pointer) const
 {
-  AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(i, GeometryInfo<dim>::faces_per_cell);
 
   if (pointer.state() == IteratorState::valid)
     {
@@ -2209,13 +2215,13 @@ CellAccessor<dim, spacedim>::id() const
             }
         }
 
-      Assert(v != static_cast<unsigned char>(-1), ExcInternalError());
+      DEAL_II_Assert(v != static_cast<unsigned char>(-1), ExcInternalError());
       id[ptr.level() - 1] = v;
 
       ptr.copy_from(*parent);
     }
 
-  Assert(ptr.level() == 0, ExcInternalError());
+  DEAL_II_Assert(ptr.level() == 0, ExcInternalError());
   const unsigned int coarse_index = ptr.index();
 
   return CellId(coarse_index, n_child_indices, &(id[0]));
@@ -2228,7 +2234,7 @@ unsigned int
 CellAccessor<dim, spacedim>::neighbor_of_neighbor_internal(
   const unsigned int neighbor) const
 {
-  AssertIndexRange(neighbor, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(neighbor, GeometryInfo<dim>::faces_per_cell);
 
   // if we have a 1d mesh in 1d, we
   // can assume that the left
@@ -2296,8 +2302,8 @@ CellAccessor<dim, spacedim>::neighbor_of_neighbor(
   const unsigned int neighbor) const
 {
   const unsigned int n2 = neighbor_of_neighbor_internal(neighbor);
-  Assert(n2 != numbers::invalid_unsigned_int,
-         TriaAccessorExceptions::ExcNeighborIsCoarser());
+  DEAL_II_Assert(n2 != numbers::invalid_unsigned_int,
+                 TriaAccessorExceptions::ExcNeighborIsCoarser());
 
   return n2;
 }
@@ -2320,11 +2326,11 @@ std::pair<unsigned int, unsigned int>
 CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
   const unsigned int neighbor) const
 {
-  AssertIndexRange(neighbor, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(neighbor, GeometryInfo<dim>::faces_per_cell);
   // make sure that the neighbor is
   // on a coarser level
-  Assert(neighbor_is_coarser(neighbor),
-         TriaAccessorExceptions::ExcNeighborIsNotCoarser());
+  DEAL_II_Assert(neighbor_is_coarser(neighbor),
+                 TriaAccessorExceptions::ExcNeighborIsNotCoarser());
 
   switch (dim)
     {
@@ -2384,7 +2390,7 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
           // we should never get here,
           // since then we did not find
           // our way back...
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
           return std::make_pair(numbers::invalid_unsigned_int,
                                 numbers::invalid_unsigned_int);
         }
@@ -2479,14 +2485,14 @@ CellAccessor<dim, spacedim>::neighbor_of_coarser_neighbor(
 
           // we should never get here, since then we did not find our way
           // back...
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
           return std::make_pair(numbers::invalid_unsigned_int,
                                 numbers::invalid_unsigned_int);
         }
 
       default:
         {
-          Assert(false, ExcImpossibleInDim(1));
+          DEAL_II_Assert(false, ExcImpossibleInDim(1));
           return std::make_pair(numbers::invalid_unsigned_int,
                                 numbers::invalid_unsigned_int);
         }
@@ -2522,7 +2528,7 @@ CellAccessor<dim, spacedim>::has_periodic_neighbor(
    *
    * We decided to use the 2nd option.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   // my_it : is the iterator to the current cell.
   cell_iterator my_it(*this);
@@ -2547,7 +2553,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor(const unsigned int i_face) const
    * my_face_pair : the pair reported by periodic_face_map as its first pair
    * being the current cell_face.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
 
@@ -2556,9 +2562,10 @@ CellAccessor<dim, spacedim>::periodic_neighbor(const unsigned int i_face) const
                                     std::bitset<3>>>::const_iterator
     my_face_pair = this->tria->periodic_face_map.find(
       std::pair<cell_iterator, unsigned int>(my_it, i_face));
-  // Assertion is required to check that we are actually on a periodic boundary.
-  Assert(my_face_pair != this->tria->periodic_face_map.end(),
-         TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+  // DEAL_II_Assertion is required to check that we are actually on a periodic
+  // boundary.
+  DEAL_II_Assert(my_face_pair != this->tria->periodic_face_map.end(),
+                 TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   return my_face_pair->second.first.first;
 }
 
@@ -2574,7 +2581,7 @@ CellAccessor<dim, spacedim>::neighbor_or_periodic_neighbor(
   else if (this->has_periodic_neighbor(i_face))
     return this->periodic_neighbor(i_face);
   else
-    AssertThrow(false, TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+    DEAL_II_AssertThrow(false, TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   // we can't come here
   return this->neighbor(i_face);
 }
@@ -2599,7 +2606,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_child_on_subface(
    * nb_parent_face_it: the iterator to the parent face of the periodically
    *                    neighboring face.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2611,8 +2618,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_child_on_subface(
    * There should be an assertion, which tells the user that this function
    * should not be used for a cell which is not located at a periodic boundary.
    */
-  Assert(my_face_pair != this->tria->periodic_face_map.end(),
-         TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+  DEAL_II_Assert(my_face_pair != this->tria->periodic_face_map.end(),
+                 TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   cell_iterator parent_nb_it = my_face_pair->second.first.first;
   unsigned int  nb_face_num  = my_face_pair->second.first.second;
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> nb_parent_face_it =
@@ -2621,7 +2628,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_child_on_subface(
    * We should check if the parent face of the neighbor has at least the same
    * number of children as i_subface.
    */
-  AssertIndexRange(i_subface, nb_parent_face_it->n_children());
+  DEAL_II_AssertIndexRange(i_subface, nb_parent_face_it->n_children());
   unsigned int sub_neighbor_num =
     GeometryInfo<dim>::child_cell_on_face(parent_nb_it->refinement_case(),
                                           nb_face_num,
@@ -2652,7 +2659,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
    * iterator of the periodic neighbor of the periodic neighbor of the current
    * cell.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
   using cell_iterator         = TriaIterator<CellAccessor<dim, spacedim>>;
   const int     my_face_index = this->face_index(i_face);
   cell_iterator my_it(*this);
@@ -2665,8 +2672,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
    * There should be an assertion, which tells the user that this function
    * should not be used for a cell which is not located at a periodic boundary.
    */
-  Assert(my_face_pair != this->tria->periodic_face_map.end(),
-         TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+  DEAL_II_Assert(my_face_pair != this->tria->periodic_face_map.end(),
+                 TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   cell_iterator nb_it          = my_face_pair->second.first.first;
   unsigned int  face_num_of_nb = my_face_pair->second.first.second;
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2679,8 +2686,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
    * artificial or inactive) the nb_face_pair should also be mapped to some
    * cell_face pair. We assert this here.
    */
-  Assert(nb_face_pair != this->tria->periodic_face_map.end(),
-         TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+  DEAL_II_Assert(nb_face_pair != this->tria->periodic_face_map.end(),
+                 TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   cell_iterator p_nb_of_p_nb = nb_face_pair->second.first.first;
   TriaIterator<TriaAccessor<dim - 1, dim, spacedim>> parent_face_it =
     p_nb_of_p_nb->face(nb_face_pair->second.first.second);
@@ -2693,7 +2700,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_of_coarser_periodic_neighbor(
    * should have been false. The most important one is, the user has called this
    * function on a face which does not have a coarser periodic neighbor.
    */
-  Assert(false, TriaAccessorExceptions::ExcNeighborIsNotCoarser());
+  DEAL_II_Assert(false, TriaAccessorExceptions::ExcNeighborIsNotCoarser());
   return std::pair<unsigned int, unsigned int>(numbers::invalid_unsigned_int,
                                                numbers::invalid_unsigned_int);
 }
@@ -2743,7 +2750,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_face_no(
    * my_face_pair : the pair reported by periodic_face_map as its first pair
    * being the current cell_face.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2756,8 +2763,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_face_no(
    * should not be called for a cell which is not located at a periodic boundary
    * !
    */
-  Assert(my_face_pair != this->tria->periodic_face_map.end(),
-         TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+  DEAL_II_Assert(my_face_pair != this->tria->periodic_face_map.end(),
+                 TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   return my_face_pair->second.first.second;
 }
 
@@ -2785,7 +2792,7 @@ CellAccessor<dim, spacedim>::periodic_neighbor_is_coarser(
    * neighbor. nb_face_pair : the pair reported by periodic_face_map as its
    * first pair being the periodic neighbor cell_face.
    */
-  AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertIndexRange(i_face, GeometryInfo<dim>::faces_per_cell);
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
   cell_iterator my_it(*this);
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2797,8 +2804,8 @@ CellAccessor<dim, spacedim>::periodic_neighbor_is_coarser(
    * There should be an assertion, which tells the user that this function
    * should not be used for a cell which is not located at a periodic boundary.
    */
-  Assert(my_face_pair != this->tria->periodic_face_map.end(),
-         TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+  DEAL_II_Assert(my_face_pair != this->tria->periodic_face_map.end(),
+                 TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   cell_iterator nb_it          = my_face_pair->second.first.first;
   unsigned int  face_num_of_nb = my_face_pair->second.first.second;
   const typename std::map<std::pair<cell_iterator, unsigned int>,
@@ -2811,11 +2818,11 @@ CellAccessor<dim, spacedim>::periodic_neighbor_is_coarser(
    * artificial or inactive) the nb_face_pair should also be mapped to some
    * cell_face pair. We assert this here.
    */
-  Assert(nb_face_pair != this->tria->periodic_face_map.end(),
-         TriaAccessorExceptions::ExcNoPeriodicNeighbor());
+  DEAL_II_Assert(nb_face_pair != this->tria->periodic_face_map.end(),
+                 TriaAccessorExceptions::ExcNoPeriodicNeighbor());
   const unsigned int my_level       = this->level();
   const unsigned int neighbor_level = nb_face_pair->second.first.first->level();
-  Assert(my_level >= neighbor_level, ExcInternalError());
+  DEAL_II_Assert(my_level >= neighbor_level, ExcInternalError());
   return my_level > neighbor_level;
 }
 
@@ -2825,9 +2832,9 @@ template <int dim, int spacedim>
 bool
 CellAccessor<dim, spacedim>::at_boundary(const unsigned int i) const
 {
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(i < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(i, 0, GeometryInfo<dim>::faces_per_cell));
+  DEAL_II_Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  DEAL_II_Assert(i < GeometryInfo<dim>::faces_per_cell,
+                 ExcIndexRange(i, 0, GeometryInfo<dim>::faces_per_cell));
 
   return (neighbor_index(i) == -1);
 }
@@ -2858,12 +2865,12 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
   const unsigned int face,
   const unsigned int subface) const
 {
-  Assert(!this->has_children(),
-         ExcMessage("The present cell must not have children!"));
-  Assert(!this->at_boundary(face),
-         ExcMessage("The present cell must have a valid neighbor!"));
-  Assert(this->neighbor(face)->has_children() == true,
-         ExcMessage("The neighbor must have children!"));
+  DEAL_II_Assert(!this->has_children(),
+                 ExcMessage("The present cell must not have children!"));
+  DEAL_II_Assert(!this->at_boundary(face),
+                 ExcMessage("The present cell must have a valid neighbor!"));
+  DEAL_II_Assert(this->neighbor(face)->has_children() == true,
+                 ExcMessage("The neighbor must have children!"));
 
   switch (dim)
     {
@@ -2886,10 +2893,11 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
           // child's child, search for the right one.
           while (sub_neighbor->has_children())
             {
-              Assert((GeometryInfo<dim>::face_refinement_case(
-                        sub_neighbor->refinement_case(), neighbor_neighbor) ==
-                      RefinementCase<dim>::no_refinement),
-                     ExcInternalError());
+              DEAL_II_Assert((GeometryInfo<dim>::face_refinement_case(
+                                sub_neighbor->refinement_case(),
+                                neighbor_neighbor) ==
+                              RefinementCase<dim>::no_refinement),
+                             ExcInternalError());
               sub_neighbor =
                 sub_neighbor->child(GeometryInfo<dim>::child_cell_on_face(
                   sub_neighbor->refinement_case(), neighbor_neighbor, 0));
@@ -2958,10 +2966,11 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
           const typename Triangulation<dim, spacedim>::face_iterator
                              mother_face    = this->face(face);
           const unsigned int total_children = mother_face->number_of_children();
-          Assert(subface < total_children,
-                 ExcIndexRange(subface, 0, total_children));
-          Assert(total_children <= GeometryInfo<3>::max_children_per_face,
-                 ExcInternalError());
+          DEAL_II_Assert(subface < total_children,
+                         ExcIndexRange(subface, 0, total_children));
+          DEAL_II_Assert(total_children <=
+                           GeometryInfo<3>::max_children_per_face,
+                         ExcInternalError());
 
           unsigned int                                    neighbor_neighbor;
           TriaIterator<CellAccessor<dim, spacedim>>       neighbor_child;
@@ -2996,9 +3005,9 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
               // make sure that the neighbor child cell we
               // have found shares the desired subface.
-              Assert((this->face(face)->child(subface) ==
-                      neighbor_child->face(neighbor_neighbor)),
-                     ExcInternalError());
+              DEAL_II_Assert((this->face(face)->child(subface) ==
+                              neighbor_child->face(neighbor_neighbor)),
+                             ExcInternalError());
             }
           else //-> the face is refined anisotropically
             {
@@ -3073,7 +3082,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                     iso_subface = 2 * first_child_to_find + indices.second;
                   else
                     {
-                      Assert(
+                      DEAL_II_Assert(
                         neighbor->face(neighbor_neighbor)->refinement_case() ==
                           RefinementCase<2>::cut_y,
                         ExcInternalError());
@@ -3136,8 +3145,8 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                     }
                   else
                     {
-                      Assert(mother_face->child(1)->has_children(),
-                             ExcInternalError());
+                      DEAL_II_Assert(mother_face->child(1)->has_children(),
+                                     ExcInternalError());
                       if (subface > 0)
                         neighbor_child = neighbor_child->child(
                           GeometryInfo<dim>::child_cell_on_face(
@@ -3201,7 +3210,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                       requested = mother_face->child(1);
                       break;
                     default:
-                      Assert(false, ExcInternalError());
+                      DEAL_II_Assert(false, ExcInternalError());
                   }
                 break;
               case internal::SubfaceCase<3>::case_x2y:
@@ -3216,15 +3225,15 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
                       requested = mother_face->child(1)->child(subface - 1);
                       break;
                     default:
-                      Assert(false, ExcInternalError());
+                      DEAL_II_Assert(false, ExcInternalError());
                   }
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
                 break;
             }
-          Assert(requested == neighbor_child->face(neighbor_neighbor),
-                 ExcInternalError());
+          DEAL_II_Assert(requested == neighbor_child->face(neighbor_neighbor),
+                         ExcInternalError());
 #endif
 
           return neighbor_child;
@@ -3232,7 +3241,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
 
       default:
         // 1d or more than 3d
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return TriaIterator<CellAccessor<dim, spacedim>>();
     }
 }

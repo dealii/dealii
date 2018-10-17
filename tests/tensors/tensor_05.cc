@@ -39,7 +39,7 @@ main()
   t = 0;
   deallog << linfty_norm(t) << std::endl;
 
-  Assert(t.norm() == 0, ExcInternalError());
+  DEAL_II_Assert(t.norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

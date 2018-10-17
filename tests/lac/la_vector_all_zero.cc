@@ -26,10 +26,10 @@ check_all_zero()
 {
   LinearAlgebra::Vector<Number> v(10);
 
-  AssertThrow(v.all_zero() == true, ExcInternalError());
+  DEAL_II_AssertThrow(v.all_zero() == true, ExcInternalError());
 
   v[0] = 1.;
-  AssertThrow(v.all_zero() == false, ExcInternalError());
+  DEAL_II_AssertThrow(v.all_zero() == false, ExcInternalError());
 }
 
 int

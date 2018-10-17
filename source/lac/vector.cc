@@ -80,7 +80,7 @@ template <>
 Vector<int>::real_type
 Vector<int>::lp_norm(const real_type) const
 {
-  Assert(false, ExcMessage("No lp norm for integer vectors"));
+  DEAL_II_Assert(false, ExcMessage("No lp norm for integer vectors"));
   return -1;
 }
 

@@ -125,7 +125,7 @@ test()
                        size_shape_values,
                        0,
                        cudaMemcpyHostToDevice);
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
 
   cuda_error =
     cudaMemcpyToSymbol(CUDAWrappers::internal::global_shape_gradients,
@@ -133,7 +133,7 @@ test()
                        size_shape_values,
                        0,
                        cudaMemcpyHostToDevice);
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
 
   // Launch the kernel
   dim3 block_dim(M, N);

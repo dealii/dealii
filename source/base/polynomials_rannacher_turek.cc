@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 PolynomialsRannacherTurek<dim>::PolynomialsRannacherTurek()
 {
-  Assert(dim == 2, ExcNotImplemented());
+  DEAL_II_Assert(dim == 2, ExcNotImplemented());
 }
 
 
@@ -33,7 +33,7 @@ double
 PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
                                               const Point<dim> & p) const
 {
-  Assert(dim == 2, ExcNotImplemented());
+  DEAL_II_Assert(dim == 2, ExcNotImplemented());
   if (i == 0)
     {
       return (0.75 - 2.5 * p(0) + 1.5 * p(1) +
@@ -55,7 +55,7 @@ PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
               1.5 * (p(0) * p(0) - p(1) * p(1)));
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -66,7 +66,7 @@ Tensor<1, dim>
 PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i,
                                              const Point<dim> & p) const
 {
-  Assert(dim == 2, ExcNotImplemented());
+  DEAL_II_Assert(dim == 2, ExcNotImplemented());
   Tensor<1, dim> grad;
   if (i == 0)
     {
@@ -90,7 +90,7 @@ PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i,
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   return grad;
@@ -104,7 +104,7 @@ PolynomialsRannacherTurek<dim>::compute_grad_grad(
   const unsigned int i,
   const Point<dim> & /*p*/) const
 {
-  Assert(dim == 2, ExcNotImplemented());
+  DEAL_II_Assert(dim == 2, ExcNotImplemented());
   Tensor<2, dim> grad_grad;
   if (i == 0)
     {
@@ -150,16 +150,18 @@ PolynomialsRannacherTurek<dim>::compute(
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
   const unsigned int n_pols = dealii::GeometryInfo<dim>::faces_per_cell;
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  DEAL_II_Assert(values.size() == n_pols || values.size() == 0,
+                 ExcDimensionMismatch(values.size(), n_pols));
+  DEAL_II_Assert(grads.size() == n_pols || grads.size() == 0,
+                 ExcDimensionMismatch(grads.size(), n_pols));
+  DEAL_II_Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
+                 ExcDimensionMismatch(grad_grads.size(), n_pols));
+  DEAL_II_Assert(third_derivatives.size() == n_pols ||
+                   third_derivatives.size() == 0,
+                 ExcDimensionMismatch(third_derivatives.size(), n_pols));
+  DEAL_II_Assert(fourth_derivatives.size() == n_pols ||
+                   fourth_derivatives.size() == 0,
+                 ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
   for (unsigned int i = 0; i < n_pols; ++i)
     {

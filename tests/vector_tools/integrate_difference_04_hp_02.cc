@@ -133,7 +133,8 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
   const double difference = std::abs(error - value);
   deallog << "computed: " << error << " expected: " << value
           << " difference: " << difference << std::endl;
-  Assert(difference < 2e-3, ExcMessage("Error in integrate_difference"));
+  DEAL_II_Assert(difference < 2e-3,
+                 ExcMessage("Error in integrate_difference"));
 }
 
 template <int dim>

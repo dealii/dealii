@@ -29,7 +29,7 @@ test(Vector<double> &v)
 {
   v.reinit(13, true);
 
-  AssertThrow(v.size() == 13, ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

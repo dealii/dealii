@@ -175,7 +175,7 @@ namespace internal
       std::vector<types::manifold_id> manifold_id;
 
       /**
-       * Assert that enough space is allocated to accommodate
+       * DEAL_II_Assert that enough space is allocated to accommodate
        * <code>new_objs_in_pairs</code> new objects, stored in pairs, plus
        * <code>new_obj_single</code> stored individually. This function does
        * not only call <code>vector::reserve()</code>, but does really append
@@ -321,11 +321,11 @@ namespace internal
        * Exception
        * @ingroup Exceptions
        */
-      DeclException2(ExcMemoryInexact,
-                     int,
-                     int,
-                     << "The containers have sizes " << arg1 << " and " << arg2
-                     << ", which is not as expected.");
+      DEAL_II_DeclException2(ExcMemoryInexact,
+                             int,
+                             int,
+                             << "The containers have sizes " << arg1 << " and "
+                             << arg2 << ", which is not as expected.");
 
       /**
        * dealii::Triangulation objects can either access a user pointer or a
@@ -334,7 +334,7 @@ namespace internal
        *
        * @ingroup Exceptions
        */
-      DeclException0(ExcPointerIndexClash);
+      DEAL_II_DeclException0(ExcPointerIndexClash);
 
     protected:
       /**
@@ -467,7 +467,7 @@ namespace internal
       std::vector<bool> face_rotations;
 
       /**
-       * Assert that enough space is allocated to accommodate
+       * DEAL_II_Assert that enough space is allocated to accommodate
        * <code>new_objs</code> new objects. This function does not only call
        * <code>vector::reserve()</code>, but does really append the needed
        * elements.
@@ -533,7 +533,7 @@ namespace internal
       std::vector<bool> line_orientations;
 
       /**
-       * Assert that enough space is allocated to accommodate
+       * DEAL_II_Assert that enough space is allocated to accommodate
        * <code>new_quads_in_pairs</code> new quads, stored in pairs, plus
        * <code>new_quads_single</code> stored individually. This function does
        * not only call <code>vector::reserve()</code>, but does really append
@@ -628,11 +628,13 @@ namespace internal
     inline void *&
     TriaObjects<G>::user_pointer(const unsigned int i)
     {
-      Assert(user_data_type == data_unknown || user_data_type == data_pointer,
-             ExcPointerIndexClash());
+      DEAL_II_Assert(user_data_type == data_unknown ||
+                       user_data_type == data_pointer,
+                     ExcPointerIndexClash());
       user_data_type = data_pointer;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      DEAL_II_Assert(i < user_data.size(),
+                     ExcIndexRange(i, 0, user_data.size()));
       return user_data[i].p;
     }
 
@@ -641,11 +643,13 @@ namespace internal
     inline const void *
     TriaObjects<G>::user_pointer(const unsigned int i) const
     {
-      Assert(user_data_type == data_unknown || user_data_type == data_pointer,
-             ExcPointerIndexClash());
+      DEAL_II_Assert(user_data_type == data_unknown ||
+                       user_data_type == data_pointer,
+                     ExcPointerIndexClash());
       user_data_type = data_pointer;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      DEAL_II_Assert(i < user_data.size(),
+                     ExcIndexRange(i, 0, user_data.size()));
       return user_data[i].p;
     }
 
@@ -654,11 +658,13 @@ namespace internal
     inline unsigned int &
     TriaObjects<G>::user_index(const unsigned int i)
     {
-      Assert(user_data_type == data_unknown || user_data_type == data_index,
-             ExcPointerIndexClash());
+      DEAL_II_Assert(user_data_type == data_unknown ||
+                       user_data_type == data_index,
+                     ExcPointerIndexClash());
       user_data_type = data_index;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      DEAL_II_Assert(i < user_data.size(),
+                     ExcIndexRange(i, 0, user_data.size()));
       return user_data[i].i;
     }
 
@@ -667,7 +673,8 @@ namespace internal
     inline void
     TriaObjects<G>::clear_user_data(const unsigned int i)
     {
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      DEAL_II_Assert(i < user_data.size(),
+                     ExcIndexRange(i, 0, user_data.size()));
       user_data[i].i = 0;
     }
 
@@ -685,11 +692,13 @@ namespace internal
     inline unsigned int
     TriaObjects<G>::user_index(const unsigned int i) const
     {
-      Assert(user_data_type == data_unknown || user_data_type == data_index,
-             ExcPointerIndexClash());
+      DEAL_II_Assert(user_data_type == data_unknown ||
+                       user_data_type == data_index,
+                     ExcPointerIndexClash());
       user_data_type = data_index;
 
-      Assert(i < user_data.size(), ExcIndexRange(i, 0, user_data.size()));
+      DEAL_II_Assert(i < user_data.size(),
+                     ExcIndexRange(i, 0, user_data.size()));
       return user_data[i].i;
     }
 
@@ -765,13 +774,14 @@ namespace internal
     TriaObjectsHex::face_orientation(const unsigned int cell,
                                      const unsigned int face) const
     {
-      Assert(cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
-             ExcIndexRange(0,
-                           cell,
-                           face_orientations.size() /
-                             GeometryInfo<3>::faces_per_cell));
-      Assert(face < GeometryInfo<3>::faces_per_cell,
-             ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
+      DEAL_II_Assert(cell < face_orientations.size() /
+                              GeometryInfo<3>::faces_per_cell,
+                     ExcIndexRange(0,
+                                   cell,
+                                   face_orientations.size() /
+                                     GeometryInfo<3>::faces_per_cell));
+      DEAL_II_Assert(face < GeometryInfo<3>::faces_per_cell,
+                     ExcIndexRange(0, face, GeometryInfo<3>::faces_per_cell));
 
       return face_orientations[cell * GeometryInfo<3>::faces_per_cell + face];
     }

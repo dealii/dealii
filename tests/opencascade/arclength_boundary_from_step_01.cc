@@ -44,7 +44,7 @@ main()
   std::vector<TopoDS_Vertex> vertices;
 
   extract_geometrical_shapes(new_edge, faces, edges, vertices);
-  AssertDimension(edges.size(), 1);
+  DEAL_II_AssertDimension(edges.size(), 1);
 
   ArclengthProjectionLineManifold<1, 3> manifold(edges[0]);
 

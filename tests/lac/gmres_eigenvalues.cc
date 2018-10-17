@@ -67,9 +67,9 @@ test(unsigned int variant)
         matrix(n - 1, i) = -2.;
       }
   else
-    Assert(false, ExcMessage("Invalid variant"));
+    DEAL_II_Assert(false, ExcMessage("Invalid variant"));
   if (std::is_same<number, float>::value == true)
-    Assert(variant < 4, ExcMessage("Invalid_variant"));
+    DEAL_II_Assert(variant < 4, ExcMessage("Invalid_variant"));
 
   deallog.push(Utilities::int_to_string(variant, 1));
 

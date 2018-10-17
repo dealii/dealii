@@ -92,7 +92,7 @@ check(const Triangulation<dim> &tria)
             }
     }
 
-  Assert(std::fabs(v1 - v2) < 1e-12, ExcInternalError());
+  DEAL_II_Assert(std::fabs(v1 - v2) < 1e-12, ExcInternalError());
   deallog << " face integration: " << v1 / dim << std::endl;
   deallog << " subface integration: " << v2 / dim << std::endl;
 }

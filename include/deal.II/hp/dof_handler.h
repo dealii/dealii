@@ -899,59 +899,61 @@ namespace hp
     /**
      * Exception
      */
-    DeclException0(ExcNoFESelected);
+    DEAL_II_DeclException0(ExcNoFESelected);
     /**
      * Exception
      */
-    DeclException0(ExcGridsDoNotMatch);
+    DEAL_II_DeclException0(ExcGridsDoNotMatch);
     /**
      * Exception
      */
-    DeclException0(ExcInvalidBoundaryIndicator);
+    DEAL_II_DeclException0(ExcInvalidBoundaryIndicator);
     /**
      * Exception
      */
-    DeclException1(ExcMatrixHasWrongSize,
-                   int,
-                   << "The matrix has the wrong dimension " << arg1);
+    DEAL_II_DeclException1(ExcMatrixHasWrongSize,
+                           int,
+                           << "The matrix has the wrong dimension " << arg1);
     /**
      * Exception
      */
-    DeclException0(ExcFunctionNotUseful);
+    DEAL_II_DeclException0(ExcFunctionNotUseful);
     /**
      * Exception
      */
-    DeclException1(ExcNewNumbersNotConsecutive,
-                   types::global_dof_index,
-                   << "The given list of new dof indices is not consecutive: "
-                   << "the index " << arg1 << " does not exist.");
+    DEAL_II_DeclException1(
+      ExcNewNumbersNotConsecutive,
+      types::global_dof_index,
+      << "The given list of new dof indices is not consecutive: "
+      << "the index " << arg1 << " does not exist.");
     /**
      * Exception
      */
-    DeclException2(ExcInvalidFEIndex,
-                   int,
-                   int,
-                   << "The mesh contains a cell with an active_fe_index of "
-                   << arg1 << ", but the finite element collection only has "
-                   << arg2 << " elements");
+    DEAL_II_DeclException2(
+      ExcInvalidFEIndex,
+      int,
+      int,
+      << "The mesh contains a cell with an active_fe_index of " << arg1
+      << ", but the finite element collection only has " << arg2
+      << " elements");
     /**
      * Exception
      */
-    DeclException1(ExcInvalidLevel,
-                   int,
-                   << "The given level " << arg1
-                   << " is not in the valid range!");
+    DEAL_II_DeclException1(ExcInvalidLevel,
+                           int,
+                           << "The given level " << arg1
+                           << " is not in the valid range!");
     /**
      * Exception
      */
-    DeclException0(ExcFacesHaveNoLevel);
+    DEAL_II_DeclException0(ExcFacesHaveNoLevel);
     /**
      * The triangulation level you accessed is empty.
      */
-    DeclException1(ExcEmptyLevel,
-                   int,
-                   << "You tried to do something on level " << arg1
-                   << ", but this level is empty.");
+    DEAL_II_DeclException1(ExcEmptyLevel,
+                           int,
+                           << "You tried to do something on level " << arg1
+                           << ", but this level is empty.");
 
   private:
     /**
@@ -1273,18 +1275,18 @@ namespace hp
 
     ar &n_cells &policy_name;
 
-    AssertThrow(
+    DEAL_II_AssertThrow(
       n_cells == tria->n_cells(),
       ExcMessage(
         "The object being loaded into does not match the triangulation "
         "that has been stored previously."));
-    AssertThrow(policy_name == dealii::internal::policy_to_string(*policy),
-                ExcMessage(
-                  "The policy currently associated with this DoFHandler (" +
-                  dealii::internal::policy_to_string(*policy) +
-                  ") does not match the one that was associated with the "
-                  "DoFHandler previously stored (" +
-                  policy_name + ")."));
+    DEAL_II_AssertThrow(
+      policy_name == dealii::internal::policy_to_string(*policy),
+      ExcMessage("The policy currently associated with this DoFHandler (" +
+                 dealii::internal::policy_to_string(*policy) +
+                 ") does not match the one that was associated with the "
+                 "DoFHandler previously stored (" +
+                 policy_name + ")."));
   }
 
   template <int dim, int spacedim>
@@ -1300,7 +1302,7 @@ namespace hp
   inline types::global_dof_index
   DoFHandler<dim, spacedim>::n_dofs(const unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return numbers::invalid_dof_index;
   }
 
@@ -1347,10 +1349,10 @@ namespace hp
   DoFHandler<dim, spacedim>::locally_owned_mg_dofs(
     const unsigned int level) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     (void)level;
-    Assert(level < this->get_triangulation().n_global_levels(),
-           ExcMessage("invalid level in locally_owned_mg_dofs"));
+    DEAL_II_Assert(level < this->get_triangulation().n_global_levels(),
+                   ExcMessage("invalid level in locally_owned_mg_dofs"));
     return mg_number_cache[0].locally_owned_dofs;
   }
 
@@ -1360,10 +1362,11 @@ namespace hp
   DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor(
     const unsigned int level) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     (void)level;
-    Assert(level < this->get_triangulation().n_global_levels(),
-           ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
+    DEAL_II_Assert(level < this->get_triangulation().n_global_levels(),
+                   ExcMessage(
+                     "invalid level in locally_owned_mg_dofs_per_processor"));
     return mg_number_cache[0].locally_owned_dofs_per_processor;
   }
 
@@ -1373,9 +1376,9 @@ namespace hp
   inline const hp::FECollection<dim, spacedim> &
   DoFHandler<dim, spacedim>::get_fe() const
   {
-    Assert(fe_collection.size() > 0,
-           ExcMessage("No finite element collection is associated with "
-                      "this DoFHandler"));
+    DEAL_II_Assert(fe_collection.size() > 0,
+                   ExcMessage("No finite element collection is associated with "
+                              "this DoFHandler"));
     return fe_collection;
   }
 
@@ -1385,9 +1388,9 @@ namespace hp
   inline const FiniteElement<dim, spacedim> &
   DoFHandler<dim, spacedim>::get_fe(const unsigned int number) const
   {
-    Assert(fe_collection.size() > 0,
-           ExcMessage("No finite element collection is associated with "
-                      "this DoFHandler"));
+    DEAL_II_Assert(fe_collection.size() > 0,
+                   ExcMessage("No finite element collection is associated with "
+                              "this DoFHandler"));
     return fe_collection[number];
   }
 
@@ -1397,9 +1400,9 @@ namespace hp
   inline const hp::FECollection<dim, spacedim> &
   DoFHandler<dim, spacedim>::get_fe_collection() const
   {
-    Assert(fe_collection.size() > 0,
-           ExcMessage("No finite element collection is associated with "
-                      "this DoFHandler"));
+    DEAL_II_Assert(fe_collection.size() > 0,
+                   ExcMessage("No finite element collection is associated with "
+                              "this DoFHandler"));
     return fe_collection;
   }
 
@@ -1409,9 +1412,9 @@ namespace hp
   inline const Triangulation<dim, spacedim> &
   DoFHandler<dim, spacedim>::get_triangulation() const
   {
-    Assert(tria != nullptr,
-           ExcMessage("This DoFHandler object has not been associated "
-                      "with a triangulation."));
+    DEAL_II_Assert(tria != nullptr,
+                   ExcMessage("This DoFHandler object has not been associated "
+                              "with a triangulation."));
     return *tria;
   }
 

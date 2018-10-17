@@ -64,8 +64,8 @@ test()
       comp[2] = 6.;
       comp[3] = 7.;
       for (unsigned int i = 0; i < 4; ++i)
-        AssertThrow(readwrite.local_element(i) == comp[i],
-                    ExcMessage("Element not copied correctly"));
+        DEAL_II_AssertThrow(readwrite.local_element(i) == comp[i],
+                            ExcMessage("Element not copied correctly"));
     }
   MPI_Barrier(MPI_COMM_WORLD);
   if (rank == 1)
@@ -76,8 +76,8 @@ test()
       comp[2] = 4.;
       comp[3] = 5.;
       for (unsigned int i = 0; i < 4; ++i)
-        AssertThrow(readwrite.local_element(i) == comp[i],
-                    ExcMessage("Element not copied correctly"));
+        DEAL_II_AssertThrow(readwrite.local_element(i) == comp[i],
+                            ExcMessage("Element not copied correctly"));
     }
 
   readwrite.import(tril_vector, VectorOperation::add);
@@ -90,8 +90,8 @@ test()
       comp[2] = 12.;
       comp[3] = 14.;
       for (unsigned int i = 0; i < 4; ++i)
-        AssertThrow(readwrite.local_element(i) == comp[i],
-                    ExcMessage("Element not copied correctly"));
+        DEAL_II_AssertThrow(readwrite.local_element(i) == comp[i],
+                            ExcMessage("Element not copied correctly"));
     }
   MPI_Barrier(MPI_COMM_WORLD);
   if (rank == 1)
@@ -102,8 +102,8 @@ test()
       comp[2] = 8.;
       comp[3] = 10.;
       for (unsigned int i = 0; i < 4; ++i)
-        AssertThrow(readwrite.local_element(i) == comp[i],
-                    ExcMessage("Element not copied correctly"));
+        DEAL_II_AssertThrow(readwrite.local_element(i) == comp[i],
+                            ExcMessage("Element not copied correctly"));
     }
 
   deallog << "OK" << std::endl;

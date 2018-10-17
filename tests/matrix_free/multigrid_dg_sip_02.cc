@@ -160,8 +160,8 @@ public:
   number
   el(const unsigned int row, const unsigned int col) const
   {
-    AssertThrow(false,
-                ExcMessage("Matrix-free does not allow for entry access"));
+    DEAL_II_AssertThrow(
+      false, ExcMessage("Matrix-free does not allow for entry access"));
     return number();
   }
 

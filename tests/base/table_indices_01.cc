@@ -33,16 +33,16 @@ main()
   t2[0] = 84;
   t2[1] = 42;
 
-  AssertThrow(t1 == t2, ExcInternalError());
-  AssertThrow(t1[0] == t2[0], ExcInternalError());
-  AssertThrow(t1[1] == t2[1], ExcInternalError());
+  DEAL_II_AssertThrow(t1 == t2, ExcInternalError());
+  DEAL_II_AssertThrow(t1[0] == t2[0], ExcInternalError());
+  DEAL_II_AssertThrow(t1[1] == t2[1], ExcInternalError());
 
-  AssertThrow(!(t1 != t2), ExcInternalError());
+  DEAL_II_AssertThrow(!(t1 != t2), ExcInternalError());
 
   t2.sort();
-  AssertThrow(t1 != t2, ExcInternalError());
-  AssertThrow(t1[0] == t2[1], ExcInternalError());
-  AssertThrow(t1[1] == t2[0], ExcInternalError());
+  DEAL_II_AssertThrow(t1 != t2, ExcInternalError());
+  DEAL_II_AssertThrow(t1[0] == t2[1], ExcInternalError());
+  DEAL_II_AssertThrow(t1[1] == t2[0], ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

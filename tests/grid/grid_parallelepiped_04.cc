@@ -73,7 +73,7 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
         break;
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
   Triangulation<dim> triangulation;

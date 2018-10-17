@@ -31,7 +31,7 @@ test(Vector<std::complex<double>> &v)
 
   v.compress();
 
-  Assert(v.size() == 100, ExcInternalError());
+  DEAL_II_Assert(v.size() == 100, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -137,14 +137,14 @@ FE_DGQ<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  AssertDimension(support_point_values.size(),
-                  this->get_unit_support_points().size());
-  AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  DEAL_II_AssertDimension(support_point_values.size(),
+                          this->get_unit_support_points().size());
+  DEAL_II_AssertDimension(support_point_values.size(), nodal_values.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell, nodal_values.size());
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      AssertDimension(support_point_values[i].size(), 1);
+      DEAL_II_AssertDimension(support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
     }
@@ -226,7 +226,7 @@ FE_DGQ<dim, spacedim>::rotate_indices(std::vector<unsigned int> &numbers,
           // Rotate yz-plane
           // counter-clockwise
           case 'x':
-            Assert(dim > 2, ExcDimensionMismatch(dim, 3));
+            DEAL_II_Assert(dim > 2, ExcDimensionMismatch(dim, 3));
             for (unsigned int iz = 0; iz < n; ++iz)
               for (unsigned int iy = 0; iy < n; ++iy)
                 for (unsigned int ix = 0; ix < n; ++ix)
@@ -238,7 +238,7 @@ FE_DGQ<dim, spacedim>::rotate_indices(std::vector<unsigned int> &numbers,
           // Rotate yz-plane
           // clockwise
           case 'X':
-            Assert(dim > 2, ExcDimensionMismatch(dim, 3));
+            DEAL_II_Assert(dim > 2, ExcDimensionMismatch(dim, 3));
             for (unsigned int iz = 0; iz < n; ++iz)
               for (unsigned int iy = 0; iy < n; ++iy)
                 for (unsigned int ix = 0; ix < n; ++ix)
@@ -248,7 +248,7 @@ FE_DGQ<dim, spacedim>::rotate_indices(std::vector<unsigned int> &numbers,
                   }
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -265,20 +265,21 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
   // source FE is also a
   // DGQ element
   using FE = FiniteElement<dim, spacedim>;
-  AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) !=
-               nullptr),
-              typename FE::ExcInterpolationNotImplemented());
+  DEAL_II_AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
+                         &x_source_fe) != nullptr),
+                      typename FE::ExcInterpolationNotImplemented());
 
   // ok, source is a Q element, so
   // we will be able to do the work
   const FE_DGQ<dim, spacedim> &source_fe =
     dynamic_cast<const FE_DGQ<dim, spacedim> &>(x_source_fe);
 
-  Assert(interpolation_matrix.m() == this->dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(interpolation_matrix.n() == source_fe.dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.n(),
-                              source_fe.dofs_per_cell));
+  DEAL_II_Assert(interpolation_matrix.m() == this->dofs_per_cell,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(interpolation_matrix.n() == source_fe.dofs_per_cell,
+                 ExcDimensionMismatch(interpolation_matrix.n(),
+                                      source_fe.dofs_per_cell));
 
 
   // compute the interpolation
@@ -327,8 +328,9 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
       for (unsigned int j = 0; j < source_fe.dofs_per_cell; ++j)
         sum += interpolation_matrix(i, j);
 
-      Assert(std::fabs(sum - 1) < 5e-14 * std::max(this->degree, 1U) * dim,
-             ExcInternalError());
+      DEAL_II_Assert(std::fabs(sum - 1) <
+                       5e-14 * std::max(this->degree, 1U) * dim,
+                     ExcInternalError());
     }
 }
 
@@ -348,14 +350,14 @@ FE_DGQ<dim, spacedim>::get_face_interpolation_matrix(
   // much we need to do here.
   (void)interpolation_matrix;
   using FE = FiniteElement<dim, spacedim>;
-  AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) !=
-               nullptr),
-              typename FE::ExcInterpolationNotImplemented());
+  DEAL_II_AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
+                         &x_source_fe) != nullptr),
+                      typename FE::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
 }
 
 
@@ -375,14 +377,14 @@ FE_DGQ<dim, spacedim>::get_subface_interpolation_matrix(
   // much we need to do here.
   (void)interpolation_matrix;
   using FE = FiniteElement<dim, spacedim>;
-  AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) !=
-               nullptr),
-              typename FE::ExcInterpolationNotImplemented());
+  DEAL_II_AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
+                         &x_source_fe) != nullptr),
+                      typename FE::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
 }
 
 
@@ -393,17 +395,18 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(refinement_case != RefinementCase<dim>::no_refinement,
-         ExcMessage(
-           "Prolongation matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  DEAL_II_Assert(refinement_case <
+                   RefinementCase<dim>::isotropic_refinement + 1,
+                 ExcIndexRange(refinement_case,
+                               0,
+                               RefinementCase<dim>::isotropic_refinement + 1));
+  DEAL_II_Assert(
+    refinement_case != RefinementCase<dim>::no_refinement,
+    ExcMessage("Prolongation matrices are only available for refined cells!"));
+  DEAL_II_Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+                 ExcIndexRange(child,
+                               0,
+                               GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -473,17 +476,18 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(refinement_case != RefinementCase<dim>::no_refinement,
-         ExcMessage(
-           "Restriction matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  DEAL_II_Assert(refinement_case <
+                   RefinementCase<dim>::isotropic_refinement + 1,
+                 ExcIndexRange(refinement_case,
+                               0,
+                               RefinementCase<dim>::isotropic_refinement + 1));
+  DEAL_II_Assert(
+    refinement_case != RefinementCase<dim>::no_refinement,
+    ExcMessage("Restriction matrices are only available for refined cells!"));
+  DEAL_II_Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+                 ExcIndexRange(child,
+                               0,
+                               GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -616,10 +620,12 @@ bool
 FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
                                            const unsigned int face_index) const
 {
-  Assert(shape_index < this->dofs_per_cell,
-         ExcIndexRange(shape_index, 0, this->dofs_per_cell));
-  Assert(face_index < GeometryInfo<dim>::faces_per_cell,
-         ExcIndexRange(face_index, 0, GeometryInfo<dim>::faces_per_cell));
+  DEAL_II_Assert(shape_index < this->dofs_per_cell,
+                 ExcIndexRange(shape_index, 0, this->dofs_per_cell));
+  DEAL_II_Assert(face_index < GeometryInfo<dim>::faces_per_cell,
+                 ExcIndexRange(face_index,
+                               0,
+                               GeometryInfo<dim>::faces_per_cell));
 
   unsigned int n = this->degree + 1;
 
@@ -697,7 +703,7 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
         };
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return true;
 }
@@ -720,7 +726,7 @@ template <int dim, int spacedim>
 std::size_t
 FE_DGQ<dim, spacedim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -734,8 +740,9 @@ FE_DGQArbitraryNodes<dim, spacedim>::FE_DGQArbitraryNodes(
   : FE_DGQ<dim, spacedim>(
       Polynomials::generate_complete_Lagrange_basis(points.get_points()))
 {
-  Assert(points.size() > 0,
-         (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
+  DEAL_II_Assert(
+    points.size() > 0,
+    (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
   this->unit_support_points = Quadrature<dim>(points).get_points();
 }
 
@@ -844,14 +851,14 @@ FE_DGQArbitraryNodes<dim, spacedim>::
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const
 {
-  AssertDimension(support_point_values.size(),
-                  this->get_unit_support_points().size());
-  AssertDimension(support_point_values.size(), nodal_values.size());
-  AssertDimension(this->dofs_per_cell, nodal_values.size());
+  DEAL_II_AssertDimension(support_point_values.size(),
+                          this->get_unit_support_points().size());
+  DEAL_II_AssertDimension(support_point_values.size(), nodal_values.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell, nodal_values.size());
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
     {
-      AssertDimension(support_point_values[i].size(), 1);
+      DEAL_II_AssertDimension(support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
     }

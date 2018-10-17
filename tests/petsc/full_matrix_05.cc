@@ -44,7 +44,7 @@ test(PETScWrappers::FullMatrix &m)
   // check n_nonzero_elements then
   // output a dummy number.
   deallog << counter << std::endl;
-  Assert(m.m() * m.m(), ExcInternalError());
+  DEAL_II_Assert(m.m() * m.m(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

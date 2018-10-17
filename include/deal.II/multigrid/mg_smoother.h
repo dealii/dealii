@@ -846,8 +846,10 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
 
-  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
-  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+  DEAL_II_Assert(data.min_level() == min,
+                 ExcDimensionMismatch(data.min_level(), min));
+  DEAL_II_Assert(data.max_level() == max,
+                 ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -901,8 +903,10 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
 
-  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
-  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+  DEAL_II_Assert(data.min_level() == min,
+                 ExcDimensionMismatch(data.min_level(), min));
+  DEAL_II_Assert(data.max_level() == max,
+                 ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -1061,8 +1065,10 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
 
-  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
-  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+  DEAL_II_Assert(data.min_level() == min,
+                 ExcDimensionMismatch(data.min_level(), min));
+  DEAL_II_Assert(data.max_level() == max,
+                 ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -1116,8 +1122,10 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
 
-  Assert(data.min_level() == min, ExcDimensionMismatch(data.min_level(), min));
-  Assert(data.max_level() == max, ExcDimensionMismatch(data.max_level(), max));
+  DEAL_II_Assert(data.min_level() == min,
+                 ExcDimensionMismatch(data.min_level(), min));
+  DEAL_II_Assert(data.max_level() == max,
+                 ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);

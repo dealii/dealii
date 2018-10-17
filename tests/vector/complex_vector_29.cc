@@ -29,7 +29,7 @@ test(Vector<std::complex<double>> &v)
 {
   v.reinit(13, true);
 
-  Assert(v.size() == 13, ExcInternalError());
+  DEAL_II_Assert(v.size() == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

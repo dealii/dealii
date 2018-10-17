@@ -500,40 +500,39 @@ public:
   /**
    * Exception for TriaObjects with level, i.e. cells.
    */
-  DeclException1(ExcDereferenceInvalidCell,
-                 Accessor,
-                 << "You tried to dereference a cell iterator for which this "
-                 << "is not possible. More information on this iterator: "
-                 << "level=" << arg1.level() << ", index=" << arg1.index()
-                 << ", state="
-                 << (arg1.state() == IteratorState::valid ?
-                       "valid" :
-                       (arg1.state() == IteratorState::past_the_end ?
-                          "past_the_end" :
-                          "invalid")));
+  DEAL_II_DeclException1(
+    ExcDereferenceInvalidCell,
+    Accessor,
+    << "You tried to dereference a cell iterator for which this "
+    << "is not possible. More information on this iterator: "
+    << "level=" << arg1.level() << ", index=" << arg1.index() << ", state="
+    << (arg1.state() == IteratorState::valid ?
+          "valid" :
+          (arg1.state() == IteratorState::past_the_end ? "past_the_end" :
+                                                         "invalid")));
 
   /**
    * Exception.
    */
-  DeclException1(ExcDereferenceInvalidObject,
-                 Accessor,
-                 << "You tried to dereference an iterator for which this "
-                 << "is not possible. More information on this iterator: "
-                 << "index=" << arg1.index() << ", state="
-                 << (arg1.state() == IteratorState::valid ?
-                       "valid" :
-                       (arg1.state() == IteratorState::past_the_end ?
-                          "past_the_end" :
-                          "invalid")));
+  DEAL_II_DeclException1(
+    ExcDereferenceInvalidObject,
+    Accessor,
+    << "You tried to dereference an iterator for which this "
+    << "is not possible. More information on this iterator: "
+    << "index=" << arg1.index() << ", state="
+    << (arg1.state() == IteratorState::valid ?
+          "valid" :
+          (arg1.state() == IteratorState::past_the_end ? "past_the_end" :
+                                                         "invalid")));
 
   /**
    * Exception
    */
-  DeclException0(ExcAdvanceInvalidObject);
+  DEAL_II_DeclException0(ExcAdvanceInvalidObject);
   /**
    * Exception
    */
-  DeclException0(ExcInvalidComparison);
+  DEAL_II_DeclException0(ExcInvalidComparison);
 
   /*@}*/
 protected:
@@ -730,7 +729,7 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcAssignmentOfUnusedObject);
+  DEAL_II_DeclException0(ExcAssignmentOfUnusedObject);
 };
 
 
@@ -918,7 +917,7 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcAssignmentOfInactiveObject);
+  DEAL_II_DeclException0(ExcAssignmentOfInactiveObject);
 };
 
 
@@ -970,12 +969,12 @@ inline TriaRawIterator<Accessor>::TriaRawIterator(
 template <typename Accessor>
 inline const Accessor &TriaRawIterator<Accessor>::operator*() const
 {
-  Assert(Accessor::structure_dimension != Accessor::dimension ||
-           state() == IteratorState::valid,
-         ExcDereferenceInvalidCell(accessor));
-  Assert(Accessor::structure_dimension == Accessor::dimension ||
-           state() == IteratorState::valid,
-         ExcDereferenceInvalidObject(accessor));
+  DEAL_II_Assert(Accessor::structure_dimension != Accessor::dimension ||
+                   state() == IteratorState::valid,
+                 ExcDereferenceInvalidCell(accessor));
+  DEAL_II_Assert(Accessor::structure_dimension == Accessor::dimension ||
+                   state() == IteratorState::valid,
+                 ExcDereferenceInvalidObject(accessor));
 
   return accessor;
 }
@@ -985,12 +984,12 @@ inline const Accessor &TriaRawIterator<Accessor>::operator*() const
 template <typename Accessor>
 inline Accessor &TriaRawIterator<Accessor>::operator*()
 {
-  Assert(Accessor::structure_dimension != Accessor::dimension ||
-           state() == IteratorState::valid,
-         ExcDereferenceInvalidCell(accessor));
-  Assert(Accessor::structure_dimension == Accessor::dimension ||
-           state() == IteratorState::valid,
-         ExcDereferenceInvalidObject(accessor));
+  DEAL_II_Assert(Accessor::structure_dimension != Accessor::dimension ||
+                   state() == IteratorState::valid,
+                 ExcDereferenceInvalidCell(accessor));
+  DEAL_II_Assert(Accessor::structure_dimension == Accessor::dimension ||
+                   state() == IteratorState::valid,
+                 ExcDereferenceInvalidObject(accessor));
 
   return accessor;
 }
@@ -1036,13 +1035,14 @@ inline bool
 TriaRawIterator<Accessor>::
 operator<(const TriaRawIterator<Accessor> &other) const
 {
-  Assert(state() != IteratorState::invalid,
-         ExcDereferenceInvalidObject(accessor));
-  Assert(other.state() != IteratorState::invalid,
-         ExcDereferenceInvalidObject(other.accessor));
+  DEAL_II_Assert(state() != IteratorState::invalid,
+                 ExcDereferenceInvalidObject(accessor));
+  DEAL_II_Assert(other.state() != IteratorState::invalid,
+                 ExcDereferenceInvalidObject(other.accessor));
 
-  Assert(&accessor.get_triangulation() == &other.accessor.get_triangulation(),
-         ExcInvalidComparison());
+  DEAL_II_Assert(&accessor.get_triangulation() ==
+                   &other.accessor.get_triangulation(),
+                 ExcInvalidComparison());
 
   // Deal with iterators past end
   if (state() == IteratorState::past_the_end)
@@ -1069,7 +1069,7 @@ template <typename Accessor>
 inline TriaRawIterator<Accessor> &
 TriaRawIterator<Accessor>::operator++()
 {
-  Assert(state() == IteratorState::valid, ExcAdvanceInvalidObject());
+  DEAL_II_Assert(state() == IteratorState::valid, ExcAdvanceInvalidObject());
 
   ++accessor;
   return *this;
@@ -1081,7 +1081,7 @@ template <typename Accessor>
 inline TriaRawIterator<Accessor> &
 TriaRawIterator<Accessor>::operator--()
 {
-  Assert(state() == IteratorState::valid, ExcAdvanceInvalidObject());
+  DEAL_II_Assert(state() == IteratorState::valid, ExcAdvanceInvalidObject());
 
   --accessor;
   return *this;
@@ -1138,12 +1138,12 @@ inline TriaIterator<Accessor>::TriaIterator(
 #  ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || used)"
+  // "DEAL_II_Assert (IteratorState::past_the_end || used)"
   // used() is called anyway, even if
   // state==IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    DEAL_II_Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
 #  endif
 }
 
@@ -1155,12 +1155,12 @@ TriaIterator<Accessor>::TriaIterator(const OtherAccessor &a)
 #  ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || used)"
+  // "DEAL_II_Assert (IteratorState::past_the_end || used)"
   // used() is called anyway, even if
   // state==IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
+    DEAL_II_Assert(this->accessor.used(), ExcAssignmentOfUnusedObject());
 #  endif
 }
 
@@ -1182,13 +1182,13 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
 #  ifdef DEBUG
   // do this like this, because:
   // if we write
-  // "Assert (IteratorState::past_the_end || !has_children())"
+  // "DEAL_II_Assert (IteratorState::past_the_end || !has_children())"
   // has_children() is called anyway, even if
   // state==IteratorState::past_the_end, and will then
   // throw the exception!
   if (this->state() != IteratorState::past_the_end)
-    Assert(this->accessor.has_children() == false,
-           ExcAssignmentOfInactiveObject());
+    DEAL_II_Assert(this->accessor.has_children() == false,
+                   ExcAssignmentOfInactiveObject());
 #  endif
 }
 

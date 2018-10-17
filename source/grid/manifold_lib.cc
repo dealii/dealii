@@ -83,8 +83,8 @@ namespace internal
   Point<3>
   compute_normal(const Tensor<1, 3> &vector, bool normalize = false)
   {
-    Assert(vector.norm_square() != 0.,
-           ExcMessage("The direction parameter must not be zero!"));
+    DEAL_II_Assert(vector.norm_square() != 0.,
+                   ExcMessage("The direction parameter must not be zero!"));
     Point<3> normal;
     if (std::abs(vector[0]) >= std::abs(vector[1]) &&
         std::abs(vector[0]) >= std::abs(vector[2]))
@@ -158,8 +158,8 @@ Point<spacedim>
 PolarManifold<dim, spacedim>::push_forward(
   const Point<spacedim> &spherical_point) const
 {
-  Assert(spherical_point[0] >= 0.0,
-         ExcMessage("Negative radius for given point."));
+  DEAL_II_Assert(spherical_point[0] >= 0.0,
+                 ExcMessage("Negative radius for given point."));
   const double rho   = spherical_point[0];
   const double theta = spherical_point[1];
 
@@ -180,7 +180,7 @@ PolarManifold<dim, spacedim>::push_forward(
             break;
           }
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   return p + center;
 }
@@ -219,7 +219,7 @@ PolarManifold<dim, spacedim>::pull_back(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return p;
 }
@@ -231,8 +231,8 @@ DerivativeForm<1, spacedim, spacedim>
 PolarManifold<dim, spacedim>::push_forward_gradient(
   const Point<spacedim> &spherical_point) const
 {
-  Assert(spherical_point[0] >= 0.0,
-         ExcMessage("Negative radius for given point."));
+  DEAL_II_Assert(spherical_point[0] >= 0.0,
+                 ExcMessage("Negative radius for given point."));
   const double rho   = spherical_point[0];
   const double theta = spherical_point[1];
 
@@ -267,7 +267,7 @@ PolarManifold<dim, spacedim>::push_forward_gradient(
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   return DX;
 }
@@ -320,8 +320,8 @@ SphericalManifold<dim, spacedim>::get_intermediate_point(
   const double              r1 = v1.norm();
   const double              r2 = v2.norm();
 
-  Assert(r1 > tol && r2 > tol,
-         ExcMessage("p1 and p2 cannot coincide with the center."));
+  DEAL_II_Assert(r1 > tol && r2 > tol,
+                 ExcMessage("p1 and p2 cannot coincide with the center."));
 
   const Tensor<1, spacedim> e1 = v1 / r1;
   const Tensor<1, spacedim> e2 = v2 / r2;
@@ -346,9 +346,9 @@ SphericalManifold<dim, spacedim>::get_intermediate_point(
   // Since p1 and p2 do not coincide n is not zero and well defined.
   Tensor<1, spacedim> n      = v2 - (v2 * e1) * e1;
   const double        n_norm = n.norm();
-  Assert(n_norm > 0,
-         ExcInternalError("n should be different from the null vector. "
-                          "Probably, this means v1==v2 or v2==0."));
+  DEAL_II_Assert(n_norm > 0,
+                 ExcInternalError("n should be different from the null vector. "
+                                  "Probably, this means v1==v2 or v2==0."));
 
   n /= n_norm;
 
@@ -371,16 +371,16 @@ SphericalManifold<dim, spacedim>::get_tangent_vector(
   const double tol = 1e-10;
   (void)tol;
 
-  Assert(p1 != p2, ExcMessage("p1 and p2 should not concide."));
+  DEAL_II_Assert(p1 != p2, ExcMessage("p1 and p2 should not concide."));
 
   const Tensor<1, spacedim> v1 = p1 - center;
   const Tensor<1, spacedim> v2 = p2 - center;
   const double              r1 = v1.norm();
   const double              r2 = v2.norm();
 
-  Assert(r1 > tol, ExcMessage("p1 cannot coincide with the center."));
+  DEAL_II_Assert(r1 > tol, ExcMessage("p1 cannot coincide with the center."));
 
-  Assert(r2 > tol, ExcMessage("p2 cannot coincide with the center."));
+  DEAL_II_Assert(r2 > tol, ExcMessage("p2 cannot coincide with the center."));
 
   const Tensor<1, spacedim> e1 = v1 / r1;
   const Tensor<1, spacedim> e2 = v2 / r2;
@@ -388,9 +388,10 @@ SphericalManifold<dim, spacedim>::get_tangent_vector(
   // Find the cosine of the angle gamma described by v1 and v2.
   const double cosgamma = e1 * e2;
 
-  Assert(cosgamma > -1 + 8. * std::numeric_limits<double>::epsilon(),
-         ExcMessage("p1 and p2 cannot lie on the same diameter and be opposite "
-                    "respect to the center."));
+  DEAL_II_Assert(cosgamma > -1 + 8. * std::numeric_limits<double>::epsilon(),
+                 ExcMessage(
+                   "p1 and p2 cannot lie on the same diameter and be opposite "
+                   "respect to the center."));
 
   if (cosgamma > 1 - 8. * std::numeric_limits<double>::epsilon())
     return v2 - v1;
@@ -399,9 +400,9 @@ SphericalManifold<dim, spacedim>::get_tangent_vector(
   // Since p1 and p2 do not coincide n is not zero and well defined.
   Tensor<1, spacedim> n      = v2 - (v2 * e1) * e1;
   const double        n_norm = n.norm();
-  Assert(n_norm > 0,
-         ExcInternalError("n should be different from the null vector. "
-                          "Probably, this means v1==v2 or v2==0."));
+  DEAL_II_Assert(n_norm > 0,
+                 ExcInternalError("n should be different from the null vector. "
+                                  "Probably, this means v1==v2 or v2==0."));
 
   n /= n_norm;
 
@@ -458,7 +459,7 @@ SphericalManifold<1, 1>::get_normals_at_vertices(
   const Triangulation<1>::face_iterator &,
   Manifold<1, 1>::FaceVertexNormals &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
 }
 
 
@@ -469,7 +470,7 @@ SphericalManifold<1, 2>::get_normals_at_vertices(
   const Triangulation<1, 2>::face_iterator &,
   Manifold<1, 2>::FaceVertexNormals &) const
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
 }
 
 
@@ -520,8 +521,8 @@ SphericalManifold<dim, spacedim>::get_new_points(
   const Table<2, double> &                weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
-  AssertDimension(new_points.size(), weights.size(0));
-  AssertDimension(surrounding_points.size(), weights.size(1));
+  DEAL_II_AssertDimension(new_points.size(), weights.size(0));
+  DEAL_II_AssertDimension(surrounding_points.size(), weights.size(1));
 
   get_new_points(surrounding_points, make_array_view(weights), new_points);
 
@@ -555,8 +556,8 @@ SphericalManifold<dim, spacedim>::get_new_points(
   const ArrayView<const double> &         weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
-  AssertDimension(weights.size(),
-                  new_points.size() * surrounding_points.size());
+  DEAL_II_AssertDimension(weights.size(),
+                          new_points.size() * surrounding_points.size());
   const unsigned int weight_rows    = new_points.size();
   const unsigned int weight_columns = surrounding_points.size();
 
@@ -585,9 +586,10 @@ SphericalManifold<dim, spacedim>::get_new_points(
       if (distances[i] != 0.)
         directions[i] /= distances[i];
       else
-        Assert(false,
-               ExcMessage("One of the vertices coincides with the center. "
-                          "This is not allowed!"));
+        DEAL_II_Assert(false,
+                       ExcMessage(
+                         "One of the vertices coincides with the center. "
+                         "This is not allowed!"));
 
       // Check if an estimate is good enough,
       // this is often the case for sufficiently refined meshes.
@@ -801,7 +803,7 @@ namespace
                    const ArrayView<const double> & /*weights*/,
                    const Point<spacedim> & /*candidate_point*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return Point<spacedim>();
   }
 
@@ -814,8 +816,8 @@ namespace
   {
     (void)distances;
 
-    AssertDimension(directions.size(), distances.size());
-    AssertDimension(directions.size(), weights.size());
+    DEAL_II_AssertDimension(directions.size(), distances.size());
+    DEAL_II_AssertDimension(directions.size(), weights.size());
 
     Point<3>           candidate       = candidate_point;
     const unsigned int n_merged_points = directions.size();
@@ -838,8 +840,8 @@ namespace
       if (n_merged_points == 2)
         {
           SphericalManifold<3, 3> unit_manifold;
-          Assert(std::abs(weights[0] + weights[1] - 1.0) < 1e-13,
-                 ExcMessage("Weights do not sum up to 1"));
+          DEAL_II_Assert(std::abs(weights[0] + weights[1] - 1.0) < 1e-13,
+                         ExcMessage("Weights do not sum up to 1"));
           Point<3> intermediate =
             unit_manifold.get_intermediate_point(Point<3>(directions[0]),
                                                  Point<3>(directions[1]),
@@ -904,7 +906,7 @@ namespace
                   }
               }
 
-          Assert(determinant(Hessian) > tolerance, ExcInternalError());
+          DEAL_II_Assert(determinant(Hessian) > tolerance, ExcInternalError());
 
           const Tensor<2, 2> inverse_Hessian = invert(Hessian);
 
@@ -936,7 +938,7 @@ SphericalManifold<dim, spacedim>::get_new_point(
   const ArrayView<const double> &,
   const Point<spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return Point<spacedim>();
 }
 
@@ -993,8 +995,9 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
 {
   // do not use static_assert to make dimension-independent programming
   // easier.
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  DEAL_II_Assert(spacedim == 3,
+                 ExcMessage(
+                   "CylindricalManifold can only be used for spacedim==3!"));
 }
 
 
@@ -1012,8 +1015,9 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(
 {
   // do not use static_assert to make dimension-independent programming
   // easier.
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  DEAL_II_Assert(spacedim == 3,
+                 ExcMessage(
+                   "CylindricalManifold can only be used for spacedim==3!"));
 }
 
 
@@ -1034,8 +1038,9 @@ CylindricalManifold<dim, spacedim>::get_new_point(
   const ArrayView<const Point<spacedim>> &surrounding_points,
   const ArrayView<const double> &         weights) const
 {
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  DEAL_II_Assert(spacedim == 3,
+                 ExcMessage(
+                   "CylindricalManifold can only be used for spacedim==3!"));
 
   // First check if the average in space lies on the axis.
   Point<spacedim> middle;
@@ -1062,8 +1067,9 @@ Point<3>
 CylindricalManifold<dim, spacedim>::pull_back(
   const Point<spacedim> &space_point) const
 {
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  DEAL_II_Assert(spacedim == 3,
+                 ExcMessage(
+                   "CylindricalManifold can only be used for spacedim==3!"));
 
   // First find the projection of the given point to the axis.
   const Tensor<1, spacedim> normalized_point = space_point - point_on_axis;
@@ -1088,8 +1094,9 @@ Point<spacedim>
 CylindricalManifold<dim, spacedim>::push_forward(
   const Point<3> &chart_point) const
 {
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  DEAL_II_Assert(spacedim == 3,
+                 ExcMessage(
+                   "CylindricalManifold can only be used for spacedim==3!"));
 
   // Rotate the orthogonal direction by the given angle.
   // Formula from Section 5.2 in
@@ -1113,8 +1120,9 @@ DerivativeForm<1, 3, spacedim>
 CylindricalManifold<dim, spacedim>::push_forward_gradient(
   const Point<3> &chart_point) const
 {
-  Assert(spacedim == 3,
-         ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  DEAL_II_Assert(spacedim == 3,
+                 ExcMessage(
+                   "CylindricalManifold can only be used for spacedim==3!"));
 
   Tensor<2, 3> derivatives;
 
@@ -1165,8 +1173,8 @@ FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   , owns_pointers(false)
   , finite_difference_step(0)
 {
-  AssertDimension(push_forward_function.n_components, spacedim);
-  AssertDimension(pull_back_function.n_components, chartdim);
+  DEAL_II_AssertDimension(push_forward_function.n_components, spacedim);
+  DEAL_II_AssertDimension(pull_back_function.n_components, chartdim);
 }
 
 
@@ -1269,7 +1277,7 @@ FunctionManifold<dim, spacedim, chartdim>::push_forward(
   Vector<double> pb(chartdim);
   pull_back_function->vector_value(result, pb);
   for (unsigned int i = 0; i < chartdim; ++i)
-    Assert(
+    DEAL_II_Assert(
       (chart_point.norm() > tolerance &&
        (std::abs(pb[i] - chart_point[i]) < tolerance * chart_point.norm())) ||
         (std::abs(pb[i] - chart_point[i]) < tolerance),
@@ -1355,10 +1363,10 @@ TorusManifold<dim>::TorusManifold(const double R, const double r)
   , r(r)
   , R(R)
 {
-  Assert(R > r,
-         ExcMessage("Outer radius R must be greater than the inner "
-                    "radius r."));
-  Assert(r > 0.0, ExcMessage("inner radius must be positive."));
+  DEAL_II_Assert(R > r,
+                 ExcMessage("Outer radius R must be greater than the inner "
+                            "radius r."));
+  DEAL_II_Assert(r > 0.0, ExcMessage("inner radius must be positive."));
 }
 
 
@@ -1408,7 +1416,7 @@ TransfiniteInterpolationManifold<dim,
   : triangulation(nullptr)
   , level_coarse(-1)
 {
-  AssertThrow(dim > 1, ExcNotImplemented());
+  DEAL_II_AssertThrow(dim > 1, ExcNotImplemented());
 }
 
 
@@ -1463,8 +1471,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::initialize(
           if (cell->quad(q)->manifold_id() != cell->manifold_id() &&
               cell->quad(q)->manifold_id() != numbers::flat_manifold_id)
             cell_is_flat = false;
-      AssertIndexRange(static_cast<unsigned int>(cell->index()),
-                       coarse_cell_is_flat.size());
+      DEAL_II_AssertIndexRange(static_cast<unsigned int>(cell->index()),
+                               coarse_cell_is_flat.size());
       coarse_cell_is_flat[cell->index()] = cell_is_flat;
     }
 }
@@ -1792,13 +1800,13 @@ TransfiniteInterpolationManifold<dim, spacedim>::push_forward(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim> &                                          chart_point) const
 {
-  AssertDimension(cell->level(), level_coarse);
+  DEAL_II_AssertDimension(cell->level(), level_coarse);
 
   // check that the point is in the unit cell which is the current chart
   // Tolerance 1e-6 chosen that the method also works with
   // SphericalManifold
-  Assert(GeometryInfo<dim>::is_inside_unit_cell(chart_point, 1e-6),
-         ExcMessage("chart_point is not in unit interval"));
+  DEAL_II_Assert(GeometryInfo<dim>::is_inside_unit_cell(chart_point, 1e-6),
+                 ExcMessage("chart_point is not in unit interval"));
 
   return compute_transfinite_interpolation(*cell,
                                            chart_point,
@@ -1977,12 +1985,13 @@ TransfiniteInterpolationManifold<dim, spacedim>::
   // The methods to identify cells around points in GridTools are all written
   // for the active cells, but we are here looking at some cells at the coarse
   // level.
-  Assert(triangulation != nullptr, ExcNotInitialized());
-  Assert(triangulation->begin_active()->level() >= level_coarse,
-         ExcMessage("The manifold was initialized with level " +
-                    Utilities::to_string(level_coarse) + " but there are now" +
-                    "active cells on a lower level. Coarsening the mesh is " +
-                    "currently not supported"));
+  DEAL_II_Assert(triangulation != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(triangulation->begin_active()->level() >= level_coarse,
+                 ExcMessage(
+                   "The manifold was initialized with level " +
+                   Utilities::to_string(level_coarse) + " but there are now" +
+                   "active cells on a lower level. Coarsening the mesh is " +
+                   "currently not supported"));
 
   // This computes the distance of the surrounding points transformed to the
   // unit cell from the unit cell.
@@ -2041,8 +2050,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::
       distances_and_cells.emplace_back(current_distance, cell->index());
     }
   // no coarse cell could be found -> transformation failed
-  AssertThrow(distances_and_cells.size() > 0,
-              (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
+  DEAL_II_AssertThrow(
+    distances_and_cells.size() > 0,
+    (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
   std::sort(distances_and_cells.begin(), distances_and_cells.end());
   std::array<unsigned int, 20> cells;
   cells.fill(numbers::invalid_unsigned_int);
@@ -2061,9 +2071,10 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   const ArrayView<const Point<spacedim>> &surrounding_points,
   ArrayView<Point<dim>>                   chart_points) const
 {
-  Assert(surrounding_points.size() == chart_points.size(),
-         ExcMessage("The chart points array view must be as large as the "
-                    "surrounding points array view."));
+  DEAL_II_Assert(surrounding_points.size() == chart_points.size(),
+                 ExcMessage(
+                   "The chart points array view must be as large as the "
+                   "surrounding points array view."));
 
   std::array<unsigned int, 20> nearby_cells =
     get_possible_cells_around_points(surrounding_points);
@@ -2091,17 +2102,18 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   // This function assumes that the first three chart points have been
   // computed since there is no effective way to guess them.
   auto guess_chart_point_structdim_2 = [&](const unsigned int i) -> Point<dim> {
-    Assert(surrounding_points.size() == 8 && 2 < i && i < 8,
-           ExcMessage("This function assumes that there are eight surrounding "
-                      "points around a two-dimensional object. It also assumes "
-                      "that the first three chart points have already been "
-                      "computed."));
+    DEAL_II_Assert(surrounding_points.size() == 8 && 2 < i && i < 8,
+                   ExcMessage(
+                     "This function assumes that there are eight surrounding "
+                     "points around a two-dimensional object. It also assumes "
+                     "that the first three chart points have already been "
+                     "computed."));
     switch (i)
       {
         case 0:
         case 1:
         case 2:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
           break;
         case 3:
           return chart_points[1] + (chart_points[2] - chart_points[0]);
@@ -2114,7 +2126,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
         case 7:
           return 0.5 * (chart_points[2] + chart_points[3]);
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
       }
 
     return Point<dim>();
@@ -2142,11 +2154,12 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
   // This function assumes that the first five chart points have been computed
   // since there is no effective way to guess them.
   auto guess_chart_point_structdim_3 = [&](const unsigned int i) -> Point<dim> {
-    Assert(surrounding_points.size() == 8 && 4 < i && i < 8,
-           ExcMessage("This function assumes that there are eight surrounding "
-                      "points around a three-dimensional object. It also "
-                      "assumes that the first five chart points have already "
-                      "been computed."));
+    DEAL_II_Assert(surrounding_points.size() == 8 && 4 < i && i < 8,
+                   ExcMessage(
+                     "This function assumes that there are eight surrounding "
+                     "points around a three-dimensional object. It also "
+                     "assumes that the first five chart points have already "
+                     "been computed."));
     return chart_points[i - 4] + (chart_points[4] - chart_points[0]);
   };
 
@@ -2177,9 +2190,9 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
         use_structdim_3_guesses = true;
     }
   // we should enable at most one of the optimizations
-  Assert((!use_structdim_2_guesses && !use_structdim_3_guesses) ||
-           (use_structdim_2_guesses ^ use_structdim_3_guesses),
-         ExcInternalError());
+  DEAL_II_Assert((!use_structdim_2_guesses && !use_structdim_3_guesses) ||
+                   (use_structdim_2_guesses ^ use_structdim_3_guesses),
+                 ExcInternalError());
 
   // check whether all points are inside the unit cell of the current chart
   for (unsigned int c = 0; c < nearby_cells.size(); ++c)
@@ -2267,16 +2280,17 @@ TransfiniteInterpolationManifold<dim, spacedim>::compute_chart_points(
                 }
             }
 
-          AssertThrow(false,
-                      (typename Mapping<dim, spacedim>::ExcTransformationFailed(
-                        message.str())));
+          DEAL_II_AssertThrow(
+            false,
+            (typename Mapping<dim, spacedim>::ExcTransformationFailed(
+              message.str())));
         }
     }
 
   // a valid inversion should have returned a point above. an invalid
   // inversion should have triggered the assertion, so we should never end up
   // here
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
   return typename Triangulation<dim, spacedim>::cell_iterator();
 }
 
@@ -2309,8 +2323,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::get_new_points(
   const Table<2, double> &                weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
-  Assert(weights.size(0) > 0, ExcEmptyObject());
-  AssertDimension(surrounding_points.size(), weights.size(1));
+  DEAL_II_Assert(weights.size(0) > 0, ExcEmptyObject());
+  DEAL_II_AssertDimension(surrounding_points.size(), weights.size(1));
 
   boost::container::small_vector<Point<dim>, 100> chart_points(
     surrounding_points.size());

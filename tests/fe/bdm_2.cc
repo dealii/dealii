@@ -88,7 +88,7 @@ void transform_grid(Triangulation<2> &tria, const unsigned int transform)
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     };
 }
 

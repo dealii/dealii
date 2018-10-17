@@ -76,7 +76,7 @@ namespace
       std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
                 unsigned int>>> &       edge_to_cell)
   {
-    Assert(triangulation.n_levels() == 1, ExcInternalError());
+    DEAL_II_Assert(triangulation.n_levels() == 1, ExcInternalError());
 
     edge_touch_count.resize(triangulation.n_active_lines());
     edge_to_cell.resize(triangulation.n_active_lines());
@@ -117,13 +117,13 @@ namespace
     // but make sure
     //
     // note that p4est stores coordinates as a triplet of values even in 2d
-    Assert(triangulation.get_used_vertices().size() ==
-             triangulation.get_vertices().size(),
-           ExcInternalError());
-    Assert(std::find(triangulation.get_used_vertices().begin(),
-                     triangulation.get_used_vertices().end(),
-                     false) == triangulation.get_used_vertices().end(),
-           ExcInternalError());
+    DEAL_II_Assert(triangulation.get_used_vertices().size() ==
+                     triangulation.get_vertices().size(),
+                   ExcInternalError());
+    DEAL_II_Assert(std::find(triangulation.get_used_vertices().begin(),
+                             triangulation.get_used_vertices().end(),
+                             false) == triangulation.get_used_vertices().end(),
+                   ExcInternalError());
     if (set_vertex_info == true)
       for (unsigned int v = 0; v < triangulation.n_vertices(); ++v)
         {
@@ -254,7 +254,7 @@ namespace
                     }
 
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_Assert(false, ExcNotImplemented());
                 }
             }
           else
@@ -271,13 +271,14 @@ namespace
     const typename internal::p4est::types<dim>::locidx num_vtt =
       std::accumulate(vertex_touch_count.begin(), vertex_touch_count.end(), 0u);
     (void)num_vtt;
-    Assert(connectivity->ctt_offset[triangulation.n_vertices()] == num_vtt,
-           ExcInternalError());
+    DEAL_II_Assert(connectivity->ctt_offset[triangulation.n_vertices()] ==
+                     num_vtt,
+                   ExcInternalError());
 
     for (unsigned int v = 0; v < triangulation.n_vertices(); ++v)
       {
-        Assert(vertex_to_cell[v].size() == vertex_touch_count[v],
-               ExcInternalError());
+        DEAL_II_Assert(vertex_to_cell[v].size() == vertex_touch_count[v],
+                       ExcInternalError());
 
         typename std::list<
           std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
@@ -301,8 +302,8 @@ namespace
     const typename internal::p4est::types<dim>::forest *parallel_forest,
     const typename internal::p4est::types<dim>::topidx  coarse_grid_cell)
   {
-    Assert(coarse_grid_cell < parallel_forest->connectivity->num_trees,
-           ExcInternalError());
+    DEAL_II_Assert(coarse_grid_cell < parallel_forest->connectivity->num_trees,
+                   ExcInternalError());
     return ((coarse_grid_cell >= parallel_forest->first_local_tree) &&
             (coarse_grid_cell <= parallel_forest->last_local_tree));
   }
@@ -407,8 +408,8 @@ namespace
           {
             int owner = internal::p4est::functions<dim>::comm_find_owner(
               &forest, tree_index, &p4est_cell, my_subdomain);
-            Assert((owner != -2) && (owner != -1),
-                   ExcMessage("p4est should know the owner."));
+            DEAL_II_Assert((owner != -2) && (owner != -1),
+                           ExcMessage("p4est should know the owner."));
             dealii_cell->set_level_subdomain_id(owner);
           }
       }
@@ -428,7 +429,7 @@ namespace
                 P8EST_QUADRANT_INIT(&p4est_child[c]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
 
 
@@ -496,7 +497,7 @@ namespace
                     P8EST_QUADRANT_INIT(&p4est_child[c]);
                     break;
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_Assert(false, ExcNotImplemented());
                 }
 
 
@@ -697,16 +698,18 @@ namespace
       }
 
 
-    Assert(refine_list.size() == n_refine_flags, ExcInternalError());
-    Assert(coarsen_list.size() == n_coarsen_flags, ExcInternalError());
+    DEAL_II_Assert(refine_list.size() == n_refine_flags, ExcInternalError());
+    DEAL_II_Assert(coarsen_list.size() == n_coarsen_flags, ExcInternalError());
 
     // make sure that our ordering in fact worked
     for (unsigned int i = 1; i < refine_list.size(); ++i)
-      Assert(refine_list[i].p.which_tree >= refine_list[i - 1].p.which_tree,
-             ExcInternalError());
+      DEAL_II_Assert(refine_list[i].p.which_tree >=
+                       refine_list[i - 1].p.which_tree,
+                     ExcInternalError());
     for (unsigned int i = 1; i < coarsen_list.size(); ++i)
-      Assert(coarsen_list[i].p.which_tree >= coarsen_list[i - 1].p.which_tree,
-             ExcInternalError());
+      DEAL_II_Assert(coarsen_list[i].p.which_tree >=
+                       coarsen_list[i - 1].p.which_tree,
+                     ExcInternalError());
 
     current_refine_pointer  = refine_list.begin();
     current_coarsen_pointer = coarsen_list.begin();
@@ -746,7 +749,7 @@ namespace
                 P8EST_QUADRANT_INIT(&p4est_child[c]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
                                                             p4est_child);
@@ -776,9 +779,9 @@ namespace
     if (this_object->current_refine_pointer == this_object->refine_list.end())
       return false;
 
-    Assert(coarse_cell_index <=
-             this_object->current_refine_pointer->p.which_tree,
-           ExcInternalError());
+    DEAL_II_Assert(coarse_cell_index <=
+                     this_object->current_refine_pointer->p.which_tree,
+                   ExcInternalError());
 
     // if p4est hasn't yet reached the tree of the next flagged cell the
     // current cell can't be flagged for refinement
@@ -786,15 +789,15 @@ namespace
       return false;
 
     // now we're in the right tree in the forest
-    Assert(coarse_cell_index <=
-             this_object->current_refine_pointer->p.which_tree,
-           ExcInternalError());
+    DEAL_II_Assert(coarse_cell_index <=
+                     this_object->current_refine_pointer->p.which_tree,
+                   ExcInternalError());
 
     // make sure that the p4est loop over cells hasn't gotten ahead of our own
     // pointer
-    Assert(internal::p4est::functions<dim>::quadrant_compare(
-             quadrant, &*this_object->current_refine_pointer) <= 0,
-           ExcInternalError());
+    DEAL_II_Assert(internal::p4est::functions<dim>::quadrant_compare(
+                     quadrant, &*this_object->current_refine_pointer) <= 0,
+                   ExcInternalError());
 
     // now, if the p4est cell is one in the list, it is supposed to be refined
     if (internal::p4est::functions<dim>::quadrant_is_equal(
@@ -826,9 +829,9 @@ namespace
     if (this_object->current_coarsen_pointer == this_object->coarsen_list.end())
       return false;
 
-    Assert(coarse_cell_index <=
-             this_object->current_coarsen_pointer->p.which_tree,
-           ExcInternalError());
+    DEAL_II_Assert(coarse_cell_index <=
+                     this_object->current_coarsen_pointer->p.which_tree,
+                   ExcInternalError());
 
     // if p4est hasn't yet reached the tree of the next flagged cell the
     // current cell can't be flagged for coarsening
@@ -836,15 +839,15 @@ namespace
       return false;
 
     // now we're in the right tree in the forest
-    Assert(coarse_cell_index <=
-             this_object->current_coarsen_pointer->p.which_tree,
-           ExcInternalError());
+    DEAL_II_Assert(coarse_cell_index <=
+                     this_object->current_coarsen_pointer->p.which_tree,
+                   ExcInternalError());
 
     // make sure that the p4est loop over cells hasn't gotten ahead of our own
     // pointer
-    Assert(internal::p4est::functions<dim>::quadrant_compare(
-             children[0], &*this_object->current_coarsen_pointer) <= 0,
-           ExcInternalError());
+    DEAL_II_Assert(internal::p4est::functions<dim>::quadrant_compare(
+                     children[0], &*this_object->current_coarsen_pointer) <= 0,
+                   ExcInternalError());
 
     // now, if the p4est cell is one in the list, it is supposed to be
     // coarsened
@@ -859,9 +862,10 @@ namespace
         for (unsigned int c = 1; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
           {
-            Assert(internal::p4est::functions<dim>::quadrant_is_equal(
-                     children[c], &*this_object->current_coarsen_pointer),
-                   ExcInternalError());
+            DEAL_II_Assert(internal::p4est::functions<dim>::quadrant_is_equal(
+                             children[c],
+                             &*this_object->current_coarsen_pointer),
+                           ExcInternalError());
             ++this_object->current_coarsen_pointer;
           }
 
@@ -934,11 +938,12 @@ namespace
     PartitionWeights<dim, spacedim> *this_object =
       reinterpret_cast<PartitionWeights<dim, spacedim> *>(forest->user_pointer);
 
-    Assert(this_object->current_pointer >=
-             this_object->cell_weights_list.begin(),
-           ExcInternalError());
-    Assert(this_object->current_pointer < this_object->cell_weights_list.end(),
-           ExcInternalError());
+    DEAL_II_Assert(this_object->current_pointer >=
+                     this_object->cell_weights_list.begin(),
+                   ExcInternalError());
+    DEAL_II_Assert(this_object->current_pointer <
+                     this_object->cell_weights_list.end(),
+                   ExcInternalError());
 
     // get the weight, increment the pointer, and return the weight
     return *this_object->current_pointer++;
@@ -979,7 +984,8 @@ namespace
         sc_array_index(const_cast<sc_array_t *>(&tree.quadrants), idx));
 
     // check if we will be writing into valid memory
-    Assert(local_quadrant_index < quad_cell_rel.size(), ExcInternalError());
+    DEAL_II_Assert(local_quadrant_index < quad_cell_rel.size(),
+                   ExcInternalError());
 
     // store relation
     quad_cell_rel[local_quadrant_index] =
@@ -1037,7 +1043,7 @@ namespace
                 P8EST_QUADRANT_INIT(&p4est_child[c]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
 
         dealii::internal::p4est::functions<dim>::quadrant_childrenv(
@@ -1082,7 +1088,7 @@ namespace
                 P8EST_QUADRANT_INIT(&p4est_child[c]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
 
         dealii::internal::p4est::functions<dim>::quadrant_childrenv(
@@ -1150,9 +1156,10 @@ namespace parallel
       const std::vector<typename CellAttachedData::pack_callback_t>
         &pack_callbacks_variable)
     {
-      Assert(src_data_fixed.size() == 0,
-             ExcMessage("Previously packed data has not been released yet!"));
-      Assert(src_sizes_variable.size() == 0, ExcInternalError());
+      DEAL_II_Assert(src_data_fixed.size() == 0,
+                     ExcMessage(
+                       "Previously packed data has not been released yet!"));
+      DEAL_II_Assert(src_sizes_variable.size() == 0, ExcInternalError());
 
       const unsigned int n_callbacks_fixed    = pack_callbacks_fixed.size();
       const unsigned int n_callbacks_variable = pack_callbacks_variable.size();
@@ -1200,7 +1207,7 @@ namespace parallel
             const auto &cell_status = std::get<1>(*quad_cell_rel_it);
             const auto &dealii_cell = std::get<2>(*quad_cell_rel_it);
 
-            // Assertions about the tree structure.
+            // DEAL_II_Assertions about the tree structure.
             switch (cell_status)
               {
                 case parallel::distributed::Triangulation<dim, spacedim>::
@@ -1209,7 +1216,7 @@ namespace parallel
                   CELL_REFINE:
                   // double check the condition that we will only ever attach
                   // data to active cells when we get here
-                  Assert(dealii_cell->active(), ExcInternalError());
+                  DEAL_II_Assert(dealii_cell->active(), ExcInternalError());
                   break;
 
                 case parallel::distributed::Triangulation<dim, spacedim>::
@@ -1218,11 +1225,13 @@ namespace parallel
                   // data to cells with children when we get here. however, we
                   // can only tolerate one level of coarsening at a time, so
                   // check that the children are all active
-                  Assert(dealii_cell->active() == false, ExcInternalError());
+                  DEAL_II_Assert(dealii_cell->active() == false,
+                                 ExcInternalError());
                   for (unsigned int c = 0;
                        c < GeometryInfo<dim>::max_children_per_cell;
                        ++c)
-                    Assert(dealii_cell->child(c)->active(), ExcInternalError());
+                    DEAL_II_Assert(dealii_cell->child(c)->active(),
+                                   ExcInternalError());
                   break;
 
                 case parallel::distributed::Triangulation<dim, spacedim>::
@@ -1231,7 +1240,7 @@ namespace parallel
                   break;
 
                 default:
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
                   break;
               }
 
@@ -1328,8 +1337,8 @@ namespace parallel
 
                 // Double check that we packed everything we wanted
                 // in the fixed size buffers.
-                Assert(data_fixed_it == data_cell_fixed_it->end(),
-                       ExcInternalError());
+                DEAL_II_Assert(data_fixed_it == data_cell_fixed_it->end(),
+                               ExcInternalError());
               }
 
             // Increment the variable size data iterator
@@ -1378,9 +1387,10 @@ namespace parallel
            data_cell_fixed_it != packed_fixed_size_data.cend();
            ++data_cell_fixed_it)
         {
-          Assert((data_cell_fixed_it->size() == 1) ||
-                   (data_cell_fixed_it->size() == local_sizes_fixed.size()),
-                 ExcInternalError());
+          DEAL_II_Assert((data_cell_fixed_it->size() == 1) ||
+                           (data_cell_fixed_it->size() ==
+                            local_sizes_fixed.size()),
+                         ExcInternalError());
         }
 
       // Share information about the packed data sizes
@@ -1481,9 +1491,10 @@ namespace parallel
         }
 
       // Double check that we packed everything correctly.
-      Assert(src_data_fixed.size() == expected_size_fixed, ExcInternalError());
-      Assert(src_data_variable.size() == expected_size_variable,
-             ExcInternalError());
+      DEAL_II_Assert(src_data_fixed.size() == expected_size_fixed,
+                     ExcInternalError());
+      DEAL_II_Assert(src_data_variable.size() == expected_size_variable,
+                     ExcInternalError());
     }
 
 
@@ -1496,8 +1507,8 @@ namespace parallel
       const typename dealii::internal::p4est::types<dim>::gloidx
         *previous_global_first_quadrant)
     {
-      Assert(sizes_fixed_cumulative.size() > 0,
-             ExcMessage("No data has been packed!"));
+      DEAL_II_Assert(sizes_fixed_cumulative.size() > 0,
+                     ExcMessage("No data has been packed!"));
 
       // Resize memory according to the data that we will receive.
       dest_data_fixed.resize(parallel_forest->local_num_quadrants *
@@ -1586,12 +1597,12 @@ namespace parallel
     Triangulation<dim, spacedim>::DataTransfer::unpack_cell_status(
       std::vector<quadrant_cell_relation_t> &quad_cell_relations) const
     {
-      Assert(sizes_fixed_cumulative.size() > 0,
-             ExcMessage("No data has been packed!"));
+      DEAL_II_Assert(sizes_fixed_cumulative.size() > 0,
+                     ExcMessage("No data has been packed!"));
       if (quad_cell_relations.size() > 0)
         {
-          Assert(dest_data_fixed.size() > 0,
-                 ExcMessage("No data has been received!"));
+          DEAL_II_Assert(dest_data_fixed.size() > 0,
+                         ExcMessage("No data has been received!"));
         }
 
       // Size of CellStatus object that will be unpacked on each cell.
@@ -1635,16 +1646,16 @@ namespace parallel
       const bool         callback_variable_transfer = (handle % 2 == 0);
       const unsigned int callback_index             = handle / 2;
 
-      Assert(sizes_fixed_cumulative.size() > 0,
-             ExcMessage("No data has been packed!"));
+      DEAL_II_Assert(sizes_fixed_cumulative.size() > 0,
+                     ExcMessage("No data has been packed!"));
       if (quad_cell_relations.size() > 0)
         {
-          Assert(dest_data_fixed.size() > 0,
-                 ExcMessage("No data has been received!"));
+          DEAL_II_Assert(dest_data_fixed.size() > 0,
+                         ExcMessage("No data has been received!"));
 
           if (callback_variable_transfer)
-            Assert(dest_data_variable.size() > 0,
-                   ExcMessage("No data has been received!"));
+            DEAL_II_Assert(dest_data_variable.size() > 0,
+                           ExcMessage("No data has been received!"));
         }
 
       std::vector<char>::const_iterator dest_data_it;
@@ -1776,7 +1787,7 @@ namespace parallel
                 break;
 
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
                 break;
             }
         }
@@ -1795,8 +1806,8 @@ namespace parallel
       // DataOutInterface::write_vtu_in_parallel.
       // TODO: Write general MPIIO interface.
 
-      Assert(sizes_fixed_cumulative.size() > 0,
-             ExcMessage("No data has been packed!"));
+      DEAL_II_Assert(sizes_fixed_cumulative.size() > 0,
+                     ExcMessage("No data has been packed!"));
 
       const int myrank = Utilities::MPI::this_mpi_process(mpi_communicator);
 
@@ -1808,7 +1819,7 @@ namespace parallel
 
         MPI_Info info;
         int      ierr = MPI_Info_create(&info);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         MPI_File fh;
         ierr = MPI_File_open(mpi_communicator,
@@ -1816,20 +1827,20 @@ namespace parallel
                              MPI_MODE_CREATE | MPI_MODE_WRONLY,
                              info,
                              &fh);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         ierr = MPI_File_set_size(fh, 0); // delete the file contents
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
         // this barrier is necessary, because otherwise others might already
         // write while one core is still setting the size to zero.
         ierr = MPI_Barrier(mpi_communicator);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
         ierr = MPI_Info_free(&info);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
         // ------------------
 
         // Check if number of processors is lined up with p4est partitioning.
-        Assert(myrank < parallel_forest->mpisize, ExcInternalError());
+        DEAL_II_Assert(myrank < parallel_forest->mpisize, ExcInternalError());
 
         // Write cumulative sizes to file.
         // Since each processor owns the same information about the data sizes,
@@ -1844,7 +1855,7 @@ namespace parallel
                                      sizes_fixed_cumulative.size(),
                                      MPI_UNSIGNED,
                                      MPI_STATUS_IGNORE);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
           }
 
         // Write packed data to file simultaneously.
@@ -1862,10 +1873,10 @@ namespace parallel
           src_data_fixed.size(), // local buffer
           MPI_CHAR,
           MPI_STATUS_IGNORE);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
 
       //
@@ -1880,7 +1891,7 @@ namespace parallel
 
           MPI_Info info;
           int      ierr = MPI_Info_create(&info);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           MPI_File fh;
           ierr = MPI_File_open(mpi_communicator,
@@ -1888,16 +1899,16 @@ namespace parallel
                                MPI_MODE_CREATE | MPI_MODE_WRONLY,
                                info,
                                &fh);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           ierr = MPI_File_set_size(fh, 0); // delete the file contents
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           // this barrier is necessary, because otherwise others might already
           // write while one core is still setting the size to zero.
           ierr = MPI_Barrier(mpi_communicator);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           ierr = MPI_Info_free(&info);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           // Write sizes of each cell into file simultaneously.
           {
@@ -1910,7 +1921,7 @@ namespace parallel
                                 src_sizes_variable.size(), // local buffer
                                 MPI_INT,
                                 MPI_STATUS_IGNORE);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
           }
 
 
@@ -1929,7 +1940,7 @@ namespace parallel
                                1,
                                MPI_UNSIGNED,
                                mpi_communicator);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           // Generate accumulated sum to get an offset for writing variable
           // size data.
@@ -1950,10 +1961,10 @@ namespace parallel
             src_data_variable.size(), // local buffer
             MPI_CHAR,
             MPI_STATUS_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           ierr = MPI_File_close(&fh);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
     }
 
@@ -1972,8 +1983,9 @@ namespace parallel
       // DataOutInterface::write_vtu_in_parallel.
       // TODO: Write general MPIIO interface.
 
-      Assert(dest_data_fixed.size() == 0,
-             ExcMessage("Previously loaded data has not been released yet!"));
+      DEAL_II_Assert(dest_data_fixed.size() == 0,
+                     ExcMessage(
+                       "Previously loaded data has not been released yet!"));
 
       variable_size_data_stored = (n_attached_deserialize_variable > 0);
 
@@ -1987,7 +1999,7 @@ namespace parallel
 
         MPI_Info info;
         int      ierr = MPI_Info_create(&info);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         MPI_File fh;
         ierr = MPI_File_open(mpi_communicator,
@@ -1995,13 +2007,13 @@ namespace parallel
                              MPI_MODE_RDONLY,
                              info,
                              &fh);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         ierr = MPI_Info_free(&info);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         // Check if number of processors is lined up with p4est partitioning.
-        Assert(myrank < parallel_forest->mpisize, ExcInternalError());
+        DEAL_II_Assert(myrank < parallel_forest->mpisize, ExcInternalError());
 
         // Read cumulative sizes from file.
         // Since all processors need the same information about the data sizes,
@@ -2015,7 +2027,7 @@ namespace parallel
                                 sizes_fixed_cumulative.size(),
                                 MPI_UNSIGNED,
                                 MPI_STATUS_IGNORE);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         // Allocate sufficient memory.
         dest_data_fixed.resize(parallel_forest->local_num_quadrants *
@@ -2033,10 +2045,10 @@ namespace parallel
           dest_data_fixed.size(), // local buffer
           MPI_CHAR,
           MPI_STATUS_IGNORE);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         ierr = MPI_File_close(&fh);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
 
       //
@@ -2051,7 +2063,7 @@ namespace parallel
 
           MPI_Info info;
           int      ierr = MPI_Info_create(&info);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           MPI_File fh;
           ierr = MPI_File_open(mpi_communicator,
@@ -2059,10 +2071,10 @@ namespace parallel
                                MPI_MODE_RDONLY,
                                info,
                                &fh);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           ierr = MPI_Info_free(&info);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           // Read sizes of all locally owned cells.
           dest_sizes_variable.resize(parallel_forest->local_num_quadrants);
@@ -2074,7 +2086,7 @@ namespace parallel
                              dest_sizes_variable.size(),
                              MPI_INT,
                              MPI_STATUS_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           const unsigned int offset =
             parallel_forest->global_num_quadrants * sizeof(int);
@@ -2093,7 +2105,7 @@ namespace parallel
                                1,
                                MPI_UNSIGNED,
                                mpi_communicator);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           // generate accumulated sum
           std::partial_sum(sizes_on_all_procs.begin(),
@@ -2109,10 +2121,10 @@ namespace parallel
                                   dest_data_variable.size(),
                                   MPI_CHAR,
                                   MPI_STATUS_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           ierr = MPI_File_close(&fh);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
     }
 
@@ -2197,9 +2209,10 @@ namespace parallel
       catch (...)
         {}
 
-      AssertNothrow(triangulation_has_content == false, ExcInternalError());
-      AssertNothrow(connectivity == nullptr, ExcInternalError());
-      AssertNothrow(parallel_forest == nullptr, ExcInternalError());
+      DEAL_II_AssertNothrow(triangulation_has_content == false,
+                            ExcInternalError());
+      DEAL_II_AssertNothrow(connectivity == nullptr, ExcInternalError());
+      DEAL_II_AssertNothrow(parallel_forest == nullptr, ExcInternalError());
     }
 
 
@@ -2222,7 +2235,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       // note that now we have some content in the p4est objects and call the
@@ -2242,7 +2255,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       this->update_number_cache();
@@ -2329,7 +2342,8 @@ namespace parallel
                         vertices.size() * sizeof(dealii::Point<spacedim>));
             ptr += vertices.size() * sizeof(dealii::Point<spacedim>);
 
-            Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+            DEAL_II_Assert(ptr == buffer.data() + buffer.size(),
+                           ExcInternalError());
           }
 
           void
@@ -2395,7 +2409,8 @@ namespace parallel
             for (unsigned int c = 0; c < cells; ++c)
               first_vertices[c] = &vertices[first_indices[c]];
 
-            Assert(ptr == buffer.data() + buffer.size(), ExcInternalError());
+            DEAL_II_Assert(ptr == buffer.data() + buffer.size(),
+                           ExcInternalError());
           }
         };
 
@@ -2475,8 +2490,9 @@ namespace parallel
                   if (neighbor_subdomains_of_vertex !=
                       vertices_with_ghost_neighbors.end())
                     {
-                      Assert(neighbor_subdomains_of_vertex->second.size() != 0,
-                             ExcInternalError());
+                      DEAL_II_Assert(
+                        neighbor_subdomains_of_vertex->second.size() != 0,
+                        ExcInternalError());
                       send_to.insert(
                         neighbor_subdomains_of_vertex->second.begin(),
                         neighbor_subdomains_of_vertex->second.end());
@@ -2560,9 +2576,10 @@ namespace parallel
           if (dealii::internal::p4est::quadrant_is_equal<dim>(p4est_cell,
                                                               quadrant))
             {
-              Assert(!dealii_cell->is_artificial(), ExcInternalError());
-              Assert(!dealii_cell->has_children(), ExcInternalError());
-              Assert(!dealii_cell->is_locally_owned(), ExcInternalError());
+              DEAL_II_Assert(!dealii_cell->is_artificial(), ExcInternalError());
+              DEAL_II_Assert(!dealii_cell->has_children(), ExcInternalError());
+              DEAL_II_Assert(!dealii_cell->is_locally_owned(),
+                             ExcInternalError());
 
               const unsigned int n_vertices = vertex_indices[0];
 
@@ -2691,8 +2708,9 @@ namespace parallel
     Triangulation<dim, spacedim>::write_mesh_vtk(
       const char *file_basename) const
     {
-      Assert(parallel_forest != nullptr,
-             ExcMessage("Can't produce output when no forest is created yet."));
+      DEAL_II_Assert(parallel_forest != nullptr,
+                     ExcMessage(
+                       "Can't produce output when no forest is created yet."));
       dealii::internal::p4est::functions<dim>::vtk_write_file(parallel_forest,
                                                               nullptr,
                                                               file_basename);
@@ -2704,12 +2722,12 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::save(const char *filename) const
     {
-      Assert(
+      DEAL_II_Assert(
         cell_attached_data.n_attached_deserialize == 0,
         ExcMessage(
           "not all SolutionTransfer's got deserialized after the last load()"));
-      Assert(this->n_cells() > 0,
-             ExcMessage("Can not save() an empty Triangulation."));
+      DEAL_II_Assert(this->n_cells() > 0,
+                     ExcMessage("Can not save() an empty Triangulation."));
 
       // signal that serialization is going to happen
       this->signals.pre_distributed_save();
@@ -2731,7 +2749,7 @@ namespace parallel
       for (const auto &quad_cell_rel : local_quadrant_cell_relations)
         {
           (void)quad_cell_rel;
-          Assert(
+          DEAL_II_Assert(
             (std::get<1>(quad_cell_rel) == // cell_status
              parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST),
             ExcInternalError());
@@ -2781,11 +2799,11 @@ namespace parallel
     Triangulation<dim, spacedim>::load(const char *filename,
                                        const bool  autopartition)
     {
-      Assert(
+      DEAL_II_Assert(
         this->n_cells() > 0,
         ExcMessage(
           "load() only works if the Triangulation already contains a coarse mesh!"));
-      Assert(
+      DEAL_II_Assert(
         this->n_levels() == 1,
         ExcMessage(
           "Triangulation may only contain coarse cells when calling load()."));
@@ -2808,17 +2826,17 @@ namespace parallel
       {
         std::string   fname = std::string(filename) + ".info";
         std::ifstream f(fname.c_str());
-        AssertThrow(f, ExcIO());
+        DEAL_II_AssertThrow(f, ExcIO());
         std::string firstline;
         getline(f, firstline); // skip first line
         f >> version >> numcpus >> attached_count_fixed >>
           attached_count_variable >> n_coarse_cells;
       }
 
-      AssertThrow(version == 4,
-                  ExcMessage("Incompatible version found in .info file."));
-      Assert(this->n_cells(0) == n_coarse_cells,
-             ExcMessage("Number of coarse cells differ!"));
+      DEAL_II_AssertThrow(
+        version == 4, ExcMessage("Incompatible version found in .info file."));
+      DEAL_II_Assert(this->n_cells(0) == n_coarse_cells,
+                     ExcMessage("Number of coarse cells differ!"));
 
       // clear all of the callback data, as explained in the documentation of
       // register_data_attach()
@@ -2854,7 +2872,7 @@ namespace parallel
           // triangulation should not
           // be checking for
           // distorted cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       // load saved data, if any was stored
@@ -2871,7 +2889,7 @@ namespace parallel
           for (const auto &quad_cell_rel : local_quadrant_cell_relations)
             {
               (void)quad_cell_rel;
-              Assert(
+              DEAL_II_Assert(
                 (std::get<1>(quad_cell_rel) == // cell_status
                  parallel::distributed::Triangulation<dim,
                                                       spacedim>::CELL_PERSIST),
@@ -2893,9 +2911,9 @@ namespace parallel
     unsigned int
     Triangulation<dim, spacedim>::get_checksum() const
     {
-      Assert(parallel_forest != nullptr,
-             ExcMessage(
-               "Can't produce a check sum when no forest is created yet."));
+      DEAL_II_Assert(
+        parallel_forest != nullptr,
+        ExcMessage("Can't produce a check sum when no forest is created yet."));
       return dealii::internal::p4est::functions<dim>::checksum(parallel_forest);
     }
 
@@ -2935,8 +2953,8 @@ namespace parallel
       std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2, spacedim = 2;
-      Assert(this->n_cells(0) > 0, ExcInternalError());
-      Assert(this->n_levels() == 1, ExcInternalError());
+      DEAL_II_Assert(this->n_cells(0) > 0, ExcInternalError());
+      DEAL_II_Assert(this->n_levels() == 1, ExcInternalError());
 
       // data structures that counts how many cells touch each vertex
       // (vertex_touch_count), and which cells touch a given vertex (together
@@ -2977,8 +2995,8 @@ namespace parallel
                                set_vertex_info,
                                connectivity);
 
-      Assert(p4est_connectivity_is_valid(connectivity) == 1,
-             ExcInternalError());
+      DEAL_II_Assert(p4est_connectivity_is_valid(connectivity) == 1,
+                     ExcInternalError());
 
       // now create a forest out of the connectivity data structure
       parallel_forest = dealii::internal::p4est::functions<2>::new_forest(
@@ -3002,8 +3020,8 @@ namespace parallel
       std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2, spacedim = 3;
-      Assert(this->n_cells(0) > 0, ExcInternalError());
-      Assert(this->n_levels() == 1, ExcInternalError());
+      DEAL_II_Assert(this->n_cells(0) > 0, ExcInternalError());
+      DEAL_II_Assert(this->n_levels() == 1, ExcInternalError());
 
       // data structures that counts how many cells touch each vertex
       // (vertex_touch_count), and which cells touch a given vertex (together
@@ -3044,8 +3062,8 @@ namespace parallel
                                set_vertex_info,
                                connectivity);
 
-      Assert(p4est_connectivity_is_valid(connectivity) == 1,
-             ExcInternalError());
+      DEAL_II_Assert(p4est_connectivity_is_valid(connectivity) == 1,
+                     ExcInternalError());
 
       // now create a forest out of the connectivity data structure
       parallel_forest = dealii::internal::p4est::functions<2>::new_forest(
@@ -3067,8 +3085,8 @@ namespace parallel
       std::integral_constant<int, 3>)
     {
       const int dim = 3, spacedim = 3;
-      Assert(this->n_cells(0) > 0, ExcInternalError());
-      Assert(this->n_levels() == 1, ExcInternalError());
+      DEAL_II_Assert(this->n_cells(0) > 0, ExcInternalError());
+      DEAL_II_Assert(this->n_levels() == 1, ExcInternalError());
 
       // data structures that counts how many cells touch each vertex
       // (vertex_touch_count), and which cells touch a given vertex (together
@@ -3164,13 +3182,14 @@ namespace parallel
                        edge_touch_count.end(),
                        &connectivity->ett_offset[1]);
 
-      Assert(connectivity->ett_offset[this->n_active_lines()] == num_ett,
-             ExcInternalError());
+      DEAL_II_Assert(connectivity->ett_offset[this->n_active_lines()] ==
+                       num_ett,
+                     ExcInternalError());
 
       for (unsigned int v = 0; v < this->n_active_lines(); ++v)
         {
-          Assert(edge_to_cell[v].size() == edge_touch_count[v],
-                 ExcInternalError());
+          DEAL_II_Assert(edge_to_cell[v].size() == edge_touch_count[v],
+                         ExcInternalError());
 
           std::list<
             std::pair<Triangulation<dim, spacedim>::active_cell_iterator,
@@ -3185,8 +3204,8 @@ namespace parallel
             }
         }
 
-      Assert(p8est_connectivity_is_valid(connectivity) == 1,
-             ExcInternalError());
+      DEAL_II_Assert(p8est_connectivity_is_valid(connectivity) == 1,
+                     ExcInternalError());
 
       // now create a forest out of the connectivity data structure
       parallel_forest = dealii::internal::p4est::functions<3>::new_forest(
@@ -3287,7 +3306,8 @@ namespace parallel
           {
             const unsigned int j = topological_vertex_numbering[i];
             if (j != i)
-              Assert(topological_vertex_numbering[j] == j, ExcInternalError());
+              DEAL_II_Assert(topological_vertex_numbering[j] == j,
+                             ExcInternalError());
           }
 
 
@@ -3331,7 +3351,8 @@ namespace parallel
                     // again) and so we may make an error here. we try
                     // to correct this by iterating over the entire
                     // process until we are converged
-                    Assert(cell->coarsen_flag_set(), ExcInternalError());
+                    DEAL_II_Assert(cell->coarsen_flag_set(),
+                                   ExcInternalError());
                     for (unsigned int vertex = 0;
                          vertex < GeometryInfo<dim>::vertices_per_cell;
                          ++vertex)
@@ -3517,7 +3538,7 @@ namespace parallel
               {
                 // the underlying triangulation should not be checking for
                 // distorted cells
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
               }
           }
 
@@ -3536,7 +3557,7 @@ namespace parallel
                     typename dealii::internal::p4est::types<dim>::balance_type(
                       P8EST_CONNECT_CORNER)));
 
-      Assert(parallel_ghost, ExcInternalError());
+      DEAL_II_Assert(parallel_ghost, ExcInternalError());
 
 
       // set all cells to artificial. we will later set it to the correct
@@ -3647,7 +3668,7 @@ namespace parallel
             {
               // the underlying triangulation should not be checking for
               // distorted cells
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
             }
         }
       while (mesh_changed);
@@ -3666,8 +3687,8 @@ namespace parallel
             ++num_ghosts;
         }
 
-      Assert(num_ghosts == parallel_ghost->ghosts.elem_count,
-             ExcInternalError());
+      DEAL_II_Assert(num_ghosts == parallel_ghost->ghosts.elem_count,
+                     ExcInternalError());
 #  endif
 
 
@@ -3757,9 +3778,10 @@ namespace parallel
                             // make sure we set the level subdomain id
                             const types::subdomain_id mark =
                               cell->child(0)->level_subdomain_id();
-                            Assert(mark != numbers::artificial_subdomain_id,
-                                   ExcInternalError()); // we should know the
-                                                        // child(0)
+                            DEAL_II_Assert(
+                              mark != numbers::artificial_subdomain_id,
+                              ExcInternalError()); // we should know the
+                                                   // child(0)
                             cell->set_level_subdomain_id(mark);
                             break;
                           }
@@ -3781,15 +3803,17 @@ namespace parallel
 
         if (Utilities::MPI::n_mpi_processes(this->mpi_communicator) == 1)
           {
-            Assert(static_cast<unsigned int>(
-                     parallel_forest->local_num_quadrants) == total_local_cells,
-                   ExcInternalError());
+            DEAL_II_Assert(static_cast<unsigned int>(
+                             parallel_forest->local_num_quadrants) ==
+                             total_local_cells,
+                           ExcInternalError());
           }
         else
           {
-            Assert(static_cast<unsigned int>(
-                     parallel_forest->local_num_quadrants) <= total_local_cells,
-                   ExcInternalError());
+            DEAL_II_Assert(static_cast<unsigned int>(
+                             parallel_forest->local_num_quadrants) <=
+                             total_local_cells,
+                           ExcInternalError());
           }
 
         // count the number of owned, active cells and compare with p4est.
@@ -3803,9 +3827,9 @@ namespace parallel
               ++n_owned;
           }
 
-        Assert(static_cast<unsigned int>(
-                 parallel_forest->local_num_quadrants) == n_owned,
-               ExcInternalError());
+        DEAL_II_Assert(static_cast<unsigned int>(
+                         parallel_forest->local_num_quadrants) == n_owned,
+                       ExcInternalError());
       }
 
       this->smooth_grid = save_smooth;
@@ -3830,10 +3854,10 @@ namespace parallel
            cell != this->end();
            ++cell)
         if (cell->is_locally_owned() && cell->refine_flag_set())
-          Assert(cell->refine_flag_set() ==
-                   RefinementPossibilities<dim>::isotropic_refinement,
-                 ExcMessage(
-                   "This class does not support anisotropic refinement"));
+          DEAL_II_Assert(
+            cell->refine_flag_set() ==
+              RefinementPossibilities<dim>::isotropic_refinement,
+            ExcMessage("This class does not support anisotropic refinement"));
 #  endif
 
 
@@ -3849,7 +3873,7 @@ namespace parallel
                          1);
                ++cell)
             {
-              AssertThrow(
+              DEAL_II_AssertThrow(
                 !(cell->refine_flag_set()),
                 ExcMessage(
                   "Fatal Error: maximum refinement level of p4est reached."));
@@ -3884,7 +3908,7 @@ namespace parallel
       // and coarsening. this uses the refine_and_coarsen_list just built,
       // which is communicated to the callback functions through
       // p4est's user_pointer object
-      Assert(parallel_forest->user_pointer == this, ExcInternalError());
+      DEAL_II_Assert(parallel_forest->user_pointer == this, ExcInternalError());
       parallel_forest->user_pointer = &refine_and_coarsen_list;
 
       if (parallel_ghost != nullptr)
@@ -3905,7 +3929,8 @@ namespace parallel
         /*init_callback=*/nullptr);
 
       // make sure all cells in the lists have been consumed
-      Assert(refine_and_coarsen_list.pointers_are_at_end(), ExcInternalError());
+      DEAL_II_Assert(refine_and_coarsen_list.pointers_are_at_end(),
+                     ExcInternalError());
 
       // reset the pointer
       parallel_forest->user_pointer = this;
@@ -3965,7 +3990,8 @@ namespace parallel
 
               // attach (temporarily) a pointer to the cell weights through
               // p4est's user_pointer object
-              Assert(parallel_forest->user_pointer == this, ExcInternalError());
+              DEAL_II_Assert(parallel_forest->user_pointer == this,
+                             ExcInternalError());
               parallel_forest->user_pointer = &partition_weights;
 
               dealii::internal::p4est::functions<dim>::partition(
@@ -4002,7 +4028,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       // transfer data
@@ -4061,7 +4087,7 @@ namespace parallel
                           break;
                         }
 
-                    Assert(
+                    DEAL_II_Assert(
                       !need_to_know || !is_level_artificial,
                       ExcMessage(
                         "Internal error: the owner of cell" +
@@ -4094,7 +4120,7 @@ namespace parallel
            cell != this->end();
            ++cell)
         if (cell->is_locally_owned())
-          Assert(
+          DEAL_II_Assert(
             !cell->refine_flag_set() && !cell->coarsen_flag_set(),
             ExcMessage(
               "Error: There shouldn't be any cells flagged for coarsening/refinement when calling repartition()."));
@@ -4140,7 +4166,8 @@ namespace parallel
 
           // attach (temporarily) a pointer to the cell weights through p4est's
           // user_pointer object
-          Assert(parallel_forest->user_pointer == this, ExcInternalError());
+          DEAL_II_Assert(parallel_forest->user_pointer == this,
+                         ExcInternalError());
           parallel_forest->user_pointer = &partition_weights;
 
           dealii::internal::p4est::functions<dim>::partition(
@@ -4161,7 +4188,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       // transfer data
@@ -4185,18 +4212,19 @@ namespace parallel
     Triangulation<dim, spacedim>::communicate_locally_moved_vertices(
       const std::vector<bool> &vertex_locally_moved)
     {
-      Assert(vertex_locally_moved.size() == this->n_vertices(),
-             ExcDimensionMismatch(vertex_locally_moved.size(),
-                                  this->n_vertices()));
+      DEAL_II_Assert(vertex_locally_moved.size() == this->n_vertices(),
+                     ExcDimensionMismatch(vertex_locally_moved.size(),
+                                          this->n_vertices()));
 #  ifdef DEBUG
       {
         const std::vector<bool> locally_owned_vertices =
           dealii::GridTools::get_locally_owned_vertices(*this);
         for (unsigned int i = 0; i < locally_owned_vertices.size(); ++i)
-          Assert((vertex_locally_moved[i] == false) ||
-                   (locally_owned_vertices[i] == true),
-                 ExcMessage("The vertex_locally_moved argument must not "
-                            "contain vertices that are not locally owned"));
+          DEAL_II_Assert((vertex_locally_moved[i] == false) ||
+                           (locally_owned_vertices[i] == true),
+                         ExcMessage(
+                           "The vertex_locally_moved argument must not "
+                           "contain vertices that are not locally owned"));
       }
 #  endif
 
@@ -4252,8 +4280,9 @@ namespace parallel
           (void)num_cells;
           destinations.push_back(it->first);
 
-          Assert(num_cells == it->second.quadrants.size(), ExcInternalError());
-          Assert(num_cells > 0, ExcInternalError());
+          DEAL_II_Assert(num_cells == it->second.quadrants.size(),
+                         ExcInternalError());
+          DEAL_II_Assert(num_cells > 0, ExcInternalError());
 
           // pack all the data into
           // the buffer for this
@@ -4270,11 +4299,11 @@ namespace parallel
                                      123,
                                      this->get_communicator(),
                                      &requests[idx]);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
 
-      Assert(destinations.size() == needs_to_get_cells.size(),
-             ExcInternalError());
+      DEAL_II_Assert(destinations.size() == needs_to_get_cells.size(),
+                     ExcInternalError());
 
       // collect the neighbors
       // that are going to send stuff to us
@@ -4291,9 +4320,9 @@ namespace parallel
           int        len;
           int        ierr =
             MPI_Probe(MPI_ANY_SOURCE, 123, this->get_communicator(), &status);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           receive.resize(len);
 
           char *ptr = receive.data();
@@ -4304,7 +4333,7 @@ namespace parallel
                           status.MPI_TAG,
                           this->get_communicator(),
                           &status);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           cellinfo.unpack_data(receive);
           const unsigned int cells = cellinfo.tree_index.size();
@@ -4339,14 +4368,14 @@ namespace parallel
         {
           const int ierr =
             MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
         }
 
       // check all msgs got sent and received
-      Assert(Utilities::MPI::sum(needs_to_get_cells.size(),
-                                 this->get_communicator()) ==
-               Utilities::MPI::sum(n_senders, this->get_communicator()),
-             ExcInternalError());
+      DEAL_II_Assert(Utilities::MPI::sum(needs_to_get_cells.size(),
+                                         this->get_communicator()) ==
+                       Utilities::MPI::sum(n_senders, this->get_communicator()),
+                     ExcInternalError());
     }
 
 
@@ -4391,15 +4420,17 @@ namespace parallel
              const boost::iterator_range<std::vector<char>::const_iterator> &)>
         &unpack_callback)
     {
-      Assert(cell_attached_data.n_attached_data_sets > 0,
-             ExcMessage("The notify_ready_to_unpack() has already been called "
-                        "once for each registered callback."));
+      DEAL_II_Assert(cell_attached_data.n_attached_data_sets > 0,
+                     ExcMessage(
+                       "The notify_ready_to_unpack() has already been called "
+                       "once for each registered callback."));
 
       // check if local_quadrant_cell_relations have been previously gathered
       // correctly
-      Assert(local_quadrant_cell_relations.size() ==
-               static_cast<unsigned int>(parallel_forest->local_num_quadrants),
-             ExcInternalError());
+      DEAL_II_Assert(local_quadrant_cell_relations.size() ==
+                       static_cast<unsigned int>(
+                         parallel_forest->local_num_quadrants),
+                     ExcInternalError());
 
 #  ifdef DEBUG
       // check validity of handle and deregister pack_callback function.
@@ -4408,24 +4439,25 @@ namespace parallel
       const unsigned int callback_index = handle / 2;
       if (handle % 2 == 0)
         {
-          Assert(callback_index <
-                   cell_attached_data.pack_callbacks_variable.size(),
-                 ExcMessage("Invalid handle."));
+          DEAL_II_Assert(callback_index <
+                           cell_attached_data.pack_callbacks_variable.size(),
+                         ExcMessage("Invalid handle."));
 
-          Assert(cell_attached_data.pack_callbacks_variable[callback_index] !=
-                   nullptr,
-                 ExcInternalError());
+          DEAL_II_Assert(
+            cell_attached_data.pack_callbacks_variable[callback_index] !=
+              nullptr,
+            ExcInternalError());
           cell_attached_data.pack_callbacks_variable[callback_index] = nullptr;
         }
       else
         {
-          Assert(callback_index <
-                   cell_attached_data.pack_callbacks_fixed.size(),
-                 ExcMessage("Invalid handle."));
+          DEAL_II_Assert(callback_index <
+                           cell_attached_data.pack_callbacks_fixed.size(),
+                         ExcMessage("Invalid handle."));
 
-          Assert(cell_attached_data.pack_callbacks_fixed[callback_index] !=
-                   nullptr,
-                 ExcInternalError());
+          DEAL_II_Assert(
+            cell_attached_data.pack_callbacks_fixed[callback_index] != nullptr,
+            ExcInternalError());
           cell_attached_data.pack_callbacks_fixed[callback_index] = nullptr;
         }
 #  endif
@@ -4487,7 +4519,7 @@ namespace parallel
     std::map<unsigned int, std::set<dealii::types::subdomain_id>>
     Triangulation<dim, spacedim>::compute_vertices_with_ghost_neighbors() const
     {
-      Assert(dim > 1, ExcNotImplemented());
+      DEAL_II_Assert(dim > 1, ExcNotImplemented());
 
       return dealii::internal::p4est::compute_vertices_with_ghost_neighbors<
         dim,
@@ -4501,7 +4533,7 @@ namespace parallel
     Triangulation<dim, spacedim>::mark_locally_active_vertices_on_level(
       const int level) const
     {
-      Assert(dim > 1, ExcNotImplemented());
+      DEAL_II_Assert(dim > 1, ExcNotImplemented());
 
       std::vector<bool> marked_vertices(this->n_vertices(), false);
       cell_iterator     cell = this->begin(level), endc = this->end(level);
@@ -4578,10 +4610,10 @@ namespace parallel
       const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
         &periodicity_vector)
     {
-      Assert(triangulation_has_content == true,
-             ExcMessage("The triangulation is empty!"));
-      Assert(this->n_levels() == 1,
-             ExcMessage("The triangulation is refined!"));
+      DEAL_II_Assert(triangulation_has_content == true,
+                     ExcMessage("The triangulation is empty!"));
+      DEAL_II_Assert(this->n_levels() == 1,
+                     ExcMessage("The triangulation is refined!"));
 
       using FaceVector =
         std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>;
@@ -4654,8 +4686,9 @@ namespace parallel
                       break;
                     }
                 }
-              Assert(first_dealii_idx_on_face != numbers::invalid_unsigned_int,
-                     ExcInternalError());
+              DEAL_II_Assert(first_dealii_idx_on_face !=
+                               numbers::invalid_unsigned_int,
+                             ExcInternalError());
               // Now map dealii_idx_on_face according to the orientation
               const unsigned int left_to_right[8][4] = {{0, 2, 1, 3},
                                                         {0, 1, 2, 3},
@@ -4704,9 +4737,10 @@ namespace parallel
         }
 
 
-      Assert(dealii::internal::p4est::functions<dim>::connectivity_is_valid(
-               connectivity) == 1,
-             ExcInternalError());
+      DEAL_II_Assert(
+        dealii::internal::p4est::functions<dim>::connectivity_is_valid(
+          connectivity) == 1,
+        ExcInternalError());
 
       // now create a forest out of the connectivity data structure
       dealii::internal::p4est::functions<dim>::destroy(parallel_forest);
@@ -4729,7 +4763,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       // finally call the base class for storing the periodicity information
@@ -4797,7 +4831,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       // note that now we have some content in the p4est objects and call the
@@ -4805,10 +4839,10 @@ namespace parallel
       // separate)
       triangulation_has_content = true;
 
-      Assert(other_tria.n_levels() == 1,
-             ExcMessage(
-               "Parallel distributed triangulations can only be copied, "
-               "if they are not refined!"));
+      DEAL_II_Assert(
+        other_tria.n_levels() == 1,
+        ExcMessage("Parallel distributed triangulations can only be copied, "
+                   "if they are not refined!"));
 
       if (const dealii::parallel::distributed::Triangulation<dim, spacedim>
             *other_tria_x =
@@ -4839,7 +4873,7 @@ namespace parallel
         {
           // the underlying triangulation should not be checking for distorted
           // cells
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
         }
 
       this->update_number_cache();
@@ -4891,9 +4925,10 @@ namespace parallel
     {
       // check if local_quadrant_cell_relations have been previously gathered
       // correctly
-      Assert(local_quadrant_cell_relations.size() ==
-               static_cast<unsigned int>(parallel_forest->local_num_quadrants),
-             ExcInternalError());
+      DEAL_II_Assert(local_quadrant_cell_relations.size() ==
+                       static_cast<unsigned int>(
+                         parallel_forest->local_num_quadrants),
+                     ExcInternalError());
 
       // Allocate the space for the weights. In fact we do not know yet, how
       // many cells we own after the refinement (only p4est knows that
@@ -4952,7 +4987,7 @@ namespace parallel
                 break;
 
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
                 break;
             }
         }
@@ -4972,14 +5007,14 @@ namespace parallel
                                                      smooth_grid,
                                                      false)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
     template <int spacedim>
     Triangulation<1, spacedim>::~Triangulation()
     {
-      AssertNothrow(false, ExcNotImplemented());
+      DEAL_II_AssertNothrow(false, ExcNotImplemented());
     }
 
 
@@ -4989,7 +5024,7 @@ namespace parallel
     Triangulation<1, spacedim>::communicate_locally_moved_vertices(
       const std::vector<bool> & /*vertex_locally_moved*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -5003,7 +5038,7 @@ namespace parallel
         & /*pack_callback*/,
       const bool /*returns_variable_size_data*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return 0;
     }
 
@@ -5019,7 +5054,7 @@ namespace parallel
              const boost::iterator_range<std::vector<char>::const_iterator> &)>
         & /*unpack_callback*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -5039,7 +5074,7 @@ namespace parallel
     std::map<unsigned int, std::set<dealii::types::subdomain_id>>
     Triangulation<1, spacedim>::compute_vertices_with_ghost_neighbors() const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::map<unsigned int, std::set<dealii::types::subdomain_id>>();
     }
 
@@ -5050,7 +5085,7 @@ namespace parallel
     Triangulation<1, spacedim>::compute_level_vertices_with_ghost_neighbors(
       const unsigned int /*level*/) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
 
       return std::map<unsigned int, std::set<dealii::types::subdomain_id>>();
     }
@@ -5062,7 +5097,7 @@ namespace parallel
     Triangulation<1, spacedim>::mark_locally_active_vertices_on_level(
       const unsigned int) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<bool>();
     }
 
@@ -5072,7 +5107,7 @@ namespace parallel
     void
     Triangulation<1, spacedim>::load(const char *, const bool)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -5081,7 +5116,7 @@ namespace parallel
     void
     Triangulation<1, spacedim>::save(const char *) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   } // namespace distributed

@@ -443,7 +443,7 @@ operator()(const unsigned int /* level */,
            VectorType &      dst,
            const VectorType &src) const
 {
-  Assert(solver != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(solver != nullptr, ExcNotInitialized());
   solver->solve(matrix, dst, src, precondition);
 }
 
@@ -547,9 +547,9 @@ operator()(const unsigned int /*level*/,
            VectorType &      dst,
            const VectorType &src) const
 {
-  Assert(solver != nullptr, ExcNotInitialized());
-  Assert(matrix != nullptr, ExcNotInitialized());
-  Assert(preconditioner != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(solver != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(matrix != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(preconditioner != nullptr, ExcNotInitialized());
   solver->solve(*matrix, dst, src, *preconditioner);
 }
 

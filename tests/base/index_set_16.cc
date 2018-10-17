@@ -44,13 +44,13 @@ test()
 
   for (unsigned int i = 0; i < is3.size(); ++i)
     {
-      AssertThrow((is1.is_element(i) && !is2.is_element(i)) ==
-                    is3.is_element(i),
-                  ExcInternalError());
+      DEAL_II_AssertThrow((is1.is_element(i) && !is2.is_element(i)) ==
+                            is3.is_element(i),
+                          ExcInternalError());
     }
 
   deallog << is3.index_within_set(51) << std::endl;
-  AssertThrow(is3.index_within_set(51) == 1, ExcInternalError());
+  DEAL_II_AssertThrow(is3.index_within_set(51) == 1, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

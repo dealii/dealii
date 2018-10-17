@@ -46,15 +46,16 @@ test(Vector<std::complex<double>> &v, Vector<std::complex<double>> &w)
     {
       if (i % 3 == 0)
         {
-          AssertThrow(w(i) == std::complex<double>(i + 1., i + 2.),
-                      ExcInternalError());
-          AssertThrow(v(i) == std::complex<double>(i + 1., i + 2.) + 1. * i,
-                      ExcInternalError());
+          DEAL_II_AssertThrow(w(i) == std::complex<double>(i + 1., i + 2.),
+                              ExcInternalError());
+          DEAL_II_AssertThrow(v(i) ==
+                                std::complex<double>(i + 1., i + 2.) + 1. * i,
+                              ExcInternalError());
         }
       else
         {
-          AssertThrow(w(i) == 0., ExcInternalError());
-          AssertThrow(v(i) == 1. * i, ExcInternalError());
+          DEAL_II_AssertThrow(w(i) == 0., ExcInternalError());
+          DEAL_II_AssertThrow(v(i) == 1. * i, ExcInternalError());
         }
     }
 

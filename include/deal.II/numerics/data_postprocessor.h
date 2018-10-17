@@ -643,7 +643,7 @@ private:
  *     // ensure that there really are as many output slots
  *     // as there are points at which DataOut provides the
  *     // gradients:
- *     AssertDimension (input_data.solution_gradients.size(),
+ *     DEAL_II_AssertDimension (input_data.solution_gradients.size(),
  *                      computed_quantities.size());
  *
  *     // then loop over all of these inputs:
@@ -654,7 +654,7 @@ private:
  *         // want to create vector-valued outputs), and copy the
  *         // gradients of the solution at the evaluation points
  *         // into the output slots:
- *         AssertDimension (computed_quantities[p].size(), dim);
+ *         DEAL_II_AssertDimension (computed_quantities[p].size(), dim);
  *         for (unsigned int d=0; d<dim; ++d)
  *           computed_quantities[p][d]
  *             = input_data.solution_gradients[p][d];
@@ -726,12 +726,12 @@ private:
  *     const DataPostprocessorInputs::Scalar<dim> &input_data,
  *     std::vector<Vector<double> >               &computed_quantities) const
  *   {
- *     AssertDimension (input_data.solution_gradients.size(),
+ *     DEAL_II_AssertDimension (input_data.solution_gradients.size(),
  *                      computed_quantities.size());
  *
  *     for (unsigned int p=0; p<input_data.solution_gradients.size(); ++p)
  *       {
- *         AssertDimension (computed_quantities[p].size(), dim);
+ *         DEAL_II_AssertDimension (computed_quantities[p].size(), dim);
  *         for (unsigned int d=0; d<dim; ++d)
  *           // like above, but also multiply the gradients with
  *           // the coefficient evaluated at the current point:
@@ -901,7 +901,7 @@ private:
  *       // ensure that there really are as many output slots
  *       // as there are points at which DataOut provides the
  *       // gradients:
- *       AssertDimension (input_data.solution_gradients.size(),
+ *       DEAL_II_AssertDimension (input_data.solution_gradients.size(),
  *                        computed_quantities.size());
  *
  *       for (unsigned int p=0; p<input_data.solution_gradients.size(); ++p)
@@ -911,7 +911,7 @@ private:
  *           // want to create tensor-valued outputs), and copy the
  *           // gradients of the solution at the evaluation points
  *           // into the output slots:
- *           AssertDimension (computed_quantities[p].size(),
+ *           DEAL_II_AssertDimension (computed_quantities[p].size(),
  *                            (Tensor<2,dim>::n_independent_components));
  *           for (unsigned int d=0; d<dim; ++d)
  *             for (unsigned int e=0; e<dim; ++e)
@@ -988,12 +988,12 @@ private:
  *       const DataPostprocessorInputs::Vector<dim> &input_data,
  *       std::vector<Vector<double> >               &computed_quantities) const
  *     {
- *       AssertDimension (input_data.solution_gradients.size(),
+ *       DEAL_II_AssertDimension (input_data.solution_gradients.size(),
  *                        computed_quantities.size());
  *
  *       for (unsigned int p=0; p<input_data.solution_gradients.size(); ++p)
  *         {
- *           AssertDimension (computed_quantities[p].size(),
+ *           DEAL_II_AssertDimension (computed_quantities[p].size(),
  *                            (Tensor<2,dim>::n_independent_components));
  *           for (unsigned int d=0; d<dim; ++d)
  *             for (unsigned int e=0; e<dim; ++e)
@@ -1104,22 +1104,22 @@ namespace DataPostprocessorInputs
   typename DoFHandlerType::cell_iterator
   CommonInputs<spacedim>::get_cell() const
   {
-    Assert(cell.empty() == false,
-           ExcMessage(
-             "You are trying to access the cell associated with a "
-             "DataPostprocessorInputs::Scalar object for which no cell has "
-             "been set."));
-    Assert(boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) !=
-             nullptr,
-           ExcMessage(
-             "You are trying to access the cell associated with a "
-             "DataPostprocessorInputs::Scalar with a DoFHandler type that "
-             "is different from the type with which it has been set. For "
-             "example, if the cell for which output is currently being "
-             "generated belongs to a hp::DoFHandler<2,3> object, then you can "
-             "only call the current function with a template argument "
-             "equal to hp::DoFHandler<2,3>, but not with any other class "
-             "type or dimension template argument."));
+    DEAL_II_Assert(
+      cell.empty() == false,
+      ExcMessage("You are trying to access the cell associated with a "
+                 "DataPostprocessorInputs::Scalar object for which no cell has "
+                 "been set."));
+    DEAL_II_Assert(
+      boost::any_cast<typename DoFHandlerType::cell_iterator>(&cell) != nullptr,
+      ExcMessage(
+        "You are trying to access the cell associated with a "
+        "DataPostprocessorInputs::Scalar with a DoFHandler type that "
+        "is different from the type with which it has been set. For "
+        "example, if the cell for which output is currently being "
+        "generated belongs to a hp::DoFHandler<2,3> object, then you can "
+        "only call the current function with a template argument "
+        "equal to hp::DoFHandler<2,3>, but not with any other class "
+        "type or dimension template argument."));
     return boost::any_cast<typename DoFHandlerType::cell_iterator>(cell);
   }
 } // namespace DataPostprocessorInputs

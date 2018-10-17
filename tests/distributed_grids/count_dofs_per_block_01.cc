@@ -73,7 +73,8 @@ test()
            ++cell, ++index)
         if (flags[index])
           cell->set_refine_flag();
-      AssertThrow(index == triangulation.n_active_cells(), ExcInternalError());
+      DEAL_II_AssertThrow(index == triangulation.n_active_cells(),
+                          ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
@@ -93,10 +94,10 @@ test()
       std::vector<types::global_dof_index> dofs_per_block(fe.n_components());
       DoFTools::count_dofs_per_block(dof_handler, dofs_per_block);
 
-      AssertThrow(std::accumulate(dofs_per_block.begin(),
-                                  dofs_per_block.end(),
-                                  0U) == dof_handler.n_dofs(),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::accumulate(dofs_per_block.begin(),
+                                          dofs_per_block.end(),
+                                          0U) == dof_handler.n_dofs(),
+                          ExcInternalError());
 
       unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
       if (myid == 0)

@@ -92,9 +92,10 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup Exceptions
  */
-DeclExceptionMsg(ExcADOLCAdvancedBranching,
-                 "This function has not yet been implemented for taped ADOL-C "
-                 "numbers when the advanced branching feature is activated.");
+DEAL_II_DeclExceptionMsg(
+  ExcADOLCAdvancedBranching,
+  "This function has not yet been implemented for taped ADOL-C "
+  "numbers when the advanced branching feature is activated.");
 
 
 /* ----------- inline and template functions and specializations ----------- */
@@ -209,11 +210,11 @@ namespace Differentiation
           // Violating this condition when will result in an ADOL-C internal
           // error. We could rather always throw here in order to provide a
           // less cryptic message.
-          AssertThrow(index < adtl::getNumDir(),
-                      ExcMessage(
-                        "The index number of the independent variable being "
-                        "marked is greater than the number of independent "
-                        "variables that have been declared."));
+          DEAL_II_AssertThrow(
+            index < adtl::getNumDir(),
+            ExcMessage("The index number of the independent variable being "
+                       "marked is greater than the number of independent "
+                       "variables that have been declared."));
           out.setADValue(index, 1 /*seed value for first derivative*/);
         }
 
@@ -272,10 +273,10 @@ namespace Differentiation
         static double
         directional_derivative(const adouble &, const unsigned int)
         {
-          AssertThrow(false,
-                      ExcMessage(
-                        "The derivative values for taped ADOL-C numbers must be"
-                        "computed through the ::gradient function."));
+          DEAL_II_AssertThrow(
+            false,
+            ExcMessage("The derivative values for taped ADOL-C numbers must be"
+                       "computed through the ::gradient function."));
           return 0.0;
         }
       };
@@ -318,7 +319,7 @@ namespace Differentiation
         directional_derivative(const adtl::adouble &x,
                                const unsigned int   direction)
         {
-          Assert(
+          DEAL_II_Assert(
             direction < n_directional_derivatives(x),
             ExcMessage(
               "Requested directional derivative is greater than the number "

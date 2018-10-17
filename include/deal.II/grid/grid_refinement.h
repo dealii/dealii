@@ -354,13 +354,13 @@ namespace GridRefinement
    * An exception thrown if the vector with cell criteria contains negative
    * values
    */
-  DeclException0(ExcNegativeCriteria);
+  DEAL_II_DeclException0(ExcNegativeCriteria);
 
   /**
    * One of the threshold parameters causes trouble. Or the refinement and
    * coarsening thresholds overlap.
    */
-  DeclException0(ExcInvalidParameterValue);
+  DEAL_II_DeclException0(ExcInvalidParameterValue);
 } // namespace GridRefinement
 
 

@@ -105,7 +105,7 @@ check()
                                     conflicts_j.end(),
                                     intersection.begin());
             // verify that there is no intersection
-            AssertThrow(p == intersection.begin(), ExcInternalError());
+            DEAL_II_AssertThrow(p == intersection.begin(), ExcInternalError());
           }
       }
 

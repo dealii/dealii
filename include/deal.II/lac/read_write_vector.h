@@ -895,7 +895,7 @@ namespace LinearAlgebra
   inline Number
   ReadWriteVector<Number>::local_element(const size_type local_index) const
   {
-    AssertIndexRange(local_index, this->n_elements());
+    DEAL_II_AssertIndexRange(local_index, this->n_elements());
 
     return values[local_index];
   }
@@ -906,7 +906,7 @@ namespace LinearAlgebra
   inline Number &
   ReadWriteVector<Number>::local_element(const size_type local_index)
   {
-    AssertIndexRange(local_index, this->n_elements());
+    DEAL_II_AssertIndexRange(local_index, this->n_elements());
 
     return values[local_index];
   }
@@ -919,7 +919,7 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::add(const std::vector<size_type> &indices,
                                const std::vector<Number2> &  values)
   {
-    AssertDimension(indices.size(), values.size());
+    DEAL_II_AssertDimension(indices.size(), values.size());
     add(indices.size(), indices.data(), values.data());
   }
 
@@ -934,7 +934,7 @@ namespace LinearAlgebra
     const size_type size = indices.size();
     for (size_type i = 0; i < size; ++i)
       {
-        Assert(
+        DEAL_II_Assert(
           numbers::is_finite(values[i]),
           ExcMessage(
             "The given value is not finite but either infinite or Not A Number (NaN)"));
@@ -953,7 +953,7 @@ namespace LinearAlgebra
   {
     for (size_type i = 0; i < n_indices; ++i)
       {
-        Assert(
+        DEAL_II_Assert(
           numbers::is_finite(values[i]),
           ExcMessage(
             "The given value is not finite but either infinite or Not A Number (NaN)"));

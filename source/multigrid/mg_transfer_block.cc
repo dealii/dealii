@@ -104,8 +104,8 @@ namespace
     std::vector<std::vector<types::global_dof_index>> &ndofs)
   {
     const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
-    Assert(selected_block < n_blocks,
-           ExcIndexRange(selected_block, 0, n_blocks));
+    DEAL_II_Assert(selected_block < n_blocks,
+                   ExcIndexRange(selected_block, 0, n_blocks));
 
     std::vector<bool> selected(n_blocks, false);
     selected[selected_block] = true;
@@ -213,8 +213,8 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
   const unsigned int        dofs_per_cell = fe.dofs_per_cell;
   const unsigned int        n_levels = mg_dof.get_triangulation().n_levels();
 
-  Assert(selected.size() == n_blocks,
-         ExcDimensionMismatch(selected.size(), n_blocks));
+  DEAL_II_Assert(selected.size() == n_blocks,
+                 ExcDimensionMismatch(selected.size(), n_blocks));
 
   // Compute the mapping between real
   // blocks and blocks used for
@@ -336,9 +336,9 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
-            Assert(cell->n_children() ==
-                     GeometryInfo<dim>::max_children_per_cell,
-                   ExcNotImplemented());
+            DEAL_II_Assert(cell->n_children() ==
+                             GeometryInfo<dim>::max_children_per_cell,
+                           ExcNotImplemented());
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
                 // set an alias to the
@@ -379,9 +379,9 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
           {
             cell->get_mg_dof_indices(dof_indices_parent);
 
-            Assert(cell->n_children() ==
-                     GeometryInfo<dim>::max_children_per_cell,
-                   ExcNotImplemented());
+            DEAL_II_Assert(cell->n_children() ==
+                             GeometryInfo<dim>::max_children_per_cell,
+                           ExcNotImplemented());
             for (unsigned int child = 0; child < cell->n_children(); ++child)
               {
                 // set an alias to the
@@ -554,7 +554,7 @@ MGTransferBlockSelect<number>::build_matrices(
           copy_indices[selected_block][level][counter++] =
             std::pair<types::global_dof_index, unsigned int>(
               temp_copy_indices[i], i);
-      Assert(counter == n_active_dofs, ExcInternalError());
+      DEAL_II_Assert(counter == n_active_dofs, ExcInternalError());
     }
 }
 
@@ -572,8 +572,8 @@ MGTransferBlock<number>::build_matrices(const DoFHandler<dim, spacedim> &dof,
 
   if (sel.size() != 0)
     {
-      Assert(sel.size() == n_blocks,
-             ExcDimensionMismatch(sel.size(), n_blocks));
+      DEAL_II_Assert(sel.size() == n_blocks,
+                     ExcDimensionMismatch(sel.size(), n_blocks));
       selected = sel;
     }
   if (selected.size() == 0)
@@ -638,7 +638,7 @@ MGTransferBlock<number>::build_matrices(const DoFHandler<dim, spacedim> &dof,
                 copy_indices[block][level][counter++] =
                   std::pair<types::global_dof_index, unsigned int>(
                     temp_copy_indices[block][i], i);
-            Assert(counter == n_active_dofs, ExcInternalError());
+            DEAL_II_Assert(counter == n_active_dofs, ExcInternalError());
           }
     }
 }

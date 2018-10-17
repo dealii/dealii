@@ -61,7 +61,7 @@ template <int dim>
 inline double
 gradient_power(const Tensor<1, dim> &v, const unsigned int n)
 {
-  Assert((n / 2) * 2 == n, ExcMessage("Value of 'n' must be even"));
+  DEAL_II_Assert((n / 2) * 2 == n, ExcMessage("Value of 'n' must be even"));
   double p = 1;
   for (unsigned int k = 0; k < n; k += 2)
     p *= (v * v);
@@ -448,8 +448,8 @@ MinimizationProblem<1>::refine_grid()
       const double x_right =
         fe_values.get_present_fe_values().quadrature_point(1)[0];
 
-      Assert(x_left == cell->vertex(0)[0], ExcInternalError());
-      Assert(x_right == cell->vertex(1)[0], ExcInternalError());
+      DEAL_II_Assert(x_left == cell->vertex(0)[0], ExcInternalError());
+      DEAL_II_Assert(x_right == cell->vertex(1)[0], ExcInternalError());
 
       const double u_left  = local_values[0];
       const double u_right = local_values[1];

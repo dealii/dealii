@@ -52,17 +52,17 @@ test()
   deallog << it->row() << ' ' << it->column() << ' ' << it->block_row() << ' '
           << it->block_column() << std::endl;
 
-  Assert(it->row() == 0, ExcInternalError());
-  Assert(it->column() == 2, ExcInternalError());
-  Assert(it->block_row() == 0, ExcInternalError());
-  Assert(it->block_column() == 1, ExcInternalError());
+  DEAL_II_Assert(it->row() == 0, ExcInternalError());
+  DEAL_II_Assert(it->column() == 2, ExcInternalError());
+  DEAL_II_Assert(it->block_row() == 0, ExcInternalError());
+  DEAL_II_Assert(it->block_column() == 1, ExcInternalError());
 
   // now advance by two (the only two
   // elements of the matrix) and make sure
   // that we equal the end iterator
   ++it;
   ++it;
-  Assert(it == m.end(), ExcInternalError());
+  DEAL_II_Assert(it == m.end(), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

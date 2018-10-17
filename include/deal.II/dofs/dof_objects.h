@@ -124,8 +124,8 @@ namespace internal
         const types::global_dof_index               index) const;
 
       /**
-       * Similar to the function above. Assert that the given index is zero,
-       * and then return true.
+       * Similar to the function above. DEAL_II_Assert that the given index is
+       * zero, and then return true.
        */
       template <int dh_dim, int spacedim>
       bool
@@ -183,9 +183,9 @@ namespace internal
       const unsigned int fe_index) const
     {
       (void)fe_index;
-      Assert(fe_index == 0,
-             ExcMessage("Only zero fe_index values are allowed for "
-                        "non-hp DoFHandlers."));
+      DEAL_II_Assert(fe_index == 0,
+                     ExcMessage("Only zero fe_index values are allowed for "
+                                "non-hp DoFHandlers."));
       return true;
     }
 
@@ -201,20 +201,20 @@ namespace internal
       const unsigned int                          local_index) const
     {
       (void)fe_index;
-      Assert(
+      DEAL_II_Assert(
         (fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
         ExcMessage(
           "Only the default FE index is allowed for non-hp DoFHandler objects"));
-      Assert(
+      DEAL_II_Assert(
         local_index < dof_handler.get_fe().template n_dofs_per_object<dim>(),
         ExcIndexRange(local_index,
                       0,
                       dof_handler.get_fe().template n_dofs_per_object<dim>()));
-      Assert(obj_index *
-                   dof_handler.get_fe().template n_dofs_per_object<dim>() +
-                 local_index <
-               dofs.size(),
-             ExcInternalError());
+      DEAL_II_Assert(
+        obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>() +
+            local_index <
+          dofs.size(),
+        ExcInternalError());
 
       return dofs[obj_index *
                     dof_handler.get_fe().template n_dofs_per_object<dim>() +

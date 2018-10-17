@@ -1781,7 +1781,7 @@ inline void
 MatrixFree<dim, Number>::initialize_dof_vector(VectorType &       vec,
                                                const unsigned int comp) const
 {
-  AssertIndexRange(comp, n_components());
+  DEAL_II_AssertIndexRange(comp, n_components());
   vec.reinit(dof_info[comp].vector_partitioner->size());
 }
 
@@ -1794,7 +1794,7 @@ MatrixFree<dim, Number>::initialize_dof_vector(
   LinearAlgebra::distributed::Vector<Number2> &vec,
   const unsigned int                           comp) const
 {
-  AssertIndexRange(comp, n_components());
+  DEAL_II_AssertIndexRange(comp, n_components());
   vec.reinit(dof_info[comp].vector_partitioner);
 }
 
@@ -1804,7 +1804,7 @@ template <int dim, typename Number>
 inline const std::shared_ptr<const Utilities::MPI::Partitioner> &
 MatrixFree<dim, Number>::get_vector_partitioner(const unsigned int comp) const
 {
-  AssertIndexRange(comp, n_components());
+  DEAL_II_AssertIndexRange(comp, n_components());
   return dof_info[comp].vector_partitioner;
 }
 
@@ -1814,7 +1814,7 @@ template <int dim, typename Number>
 inline const std::vector<unsigned int> &
 MatrixFree<dim, Number>::get_constrained_dofs(const unsigned int comp) const
 {
-  AssertIndexRange(comp, n_components());
+  DEAL_II_AssertIndexRange(comp, n_components());
   return dof_info[comp].constrained_dofs;
 }
 
@@ -1824,7 +1824,7 @@ template <int dim, typename Number>
 inline unsigned int
 MatrixFree<dim, Number>::n_components() const
 {
-  AssertDimension(dof_handlers.n_dof_handlers, dof_info.size());
+  DEAL_II_AssertDimension(dof_handlers.n_dof_handlers, dof_info.size());
   return dof_handlers.n_dof_handlers;
 }
 
@@ -1834,8 +1834,8 @@ template <int dim, typename Number>
 inline unsigned int
 MatrixFree<dim, Number>::n_base_elements(const unsigned int dof_no) const
 {
-  AssertDimension(dof_handlers.n_dof_handlers, dof_info.size());
-  AssertIndexRange(dof_no, dof_handlers.n_dof_handlers);
+  DEAL_II_AssertDimension(dof_handlers.n_dof_handlers, dof_info.size());
+  DEAL_II_AssertIndexRange(dof_no, dof_handlers.n_dof_handlers);
   return dof_handlers.dof_handler[dof_no]->get_fe().n_base_elements();
 }
 
@@ -1934,11 +1934,11 @@ template <int dim, typename Number>
 inline types::boundary_id
 MatrixFree<dim, Number>::get_boundary_id(const unsigned int macro_face) const
 {
-  Assert(macro_face >= task_info.boundary_partition_data[0] &&
-           macro_face < task_info.boundary_partition_data.back(),
-         ExcIndexRange(macro_face,
-                       task_info.boundary_partition_data[0],
-                       task_info.boundary_partition_data.back()));
+  DEAL_II_Assert(macro_face >= task_info.boundary_partition_data[0] &&
+                   macro_face < task_info.boundary_partition_data.back(),
+                 ExcIndexRange(macro_face,
+                               task_info.boundary_partition_data[0],
+                               task_info.boundary_partition_data.back()));
   return types::boundary_id(face_info.faces[macro_face].exterior_face_no);
 }
 
@@ -1950,10 +1950,10 @@ MatrixFree<dim, Number>::get_faces_by_cells_boundary_id(
   const unsigned int macro_cell,
   const unsigned int face_number) const
 {
-  AssertIndexRange(macro_cell, n_macro_cells());
-  AssertIndexRange(face_number, GeometryInfo<dim>::faces_per_cell);
-  Assert(face_info.cell_and_face_boundary_id.size(0) >= n_macro_cells(),
-         ExcNotInitialized());
+  DEAL_II_AssertIndexRange(macro_cell, n_macro_cells());
+  DEAL_II_AssertIndexRange(face_number, GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_Assert(face_info.cell_and_face_boundary_id.size(0) >= n_macro_cells(),
+                 ExcNotInitialized());
   std::array<types::boundary_id, VectorizedArray<Number>::n_array_elements>
     result;
   result.fill(numbers::invalid_boundary_id);
@@ -1977,7 +1977,7 @@ template <int dim, typename Number>
 inline const internal::MatrixFreeFunctions::DoFInfo &
 MatrixFree<dim, Number>::get_dof_info(const unsigned int dof_index) const
 {
-  AssertIndexRange(dof_index, n_components());
+  DEAL_II_AssertIndexRange(dof_index, n_components());
   return dof_info[dof_index];
 }
 
@@ -1996,7 +1996,7 @@ template <int dim, typename Number>
 inline const Number *
 MatrixFree<dim, Number>::constraint_pool_begin(const unsigned int row) const
 {
-  AssertIndexRange(row, constraint_pool_row_index.size() - 1);
+  DEAL_II_AssertIndexRange(row, constraint_pool_row_index.size() - 1);
   return constraint_pool_data.empty() ?
            nullptr :
            constraint_pool_data.data() + constraint_pool_row_index[row];
@@ -2008,7 +2008,7 @@ template <int dim, typename Number>
 inline const Number *
 MatrixFree<dim, Number>::constraint_pool_end(const unsigned int row) const
 {
-  AssertIndexRange(row, constraint_pool_row_index.size() - 1);
+  DEAL_II_AssertIndexRange(row, constraint_pool_row_index.size() - 1);
   return constraint_pool_data.empty() ?
            nullptr :
            constraint_pool_data.data() + constraint_pool_row_index[row + 1];
@@ -2025,9 +2025,9 @@ MatrixFree<dim, Number>::create_cell_subrange_hp(
 {
   if (dof_info[dof_handler_component].cell_active_fe_index.empty())
     {
-      AssertDimension(
+      DEAL_II_AssertDimension(
         dof_info[dof_handler_component].fe_index_conversion.size(), 1);
-      AssertDimension(
+      DEAL_II_AssertDimension(
         dof_info[dof_handler_component].fe_index_conversion[0].size(), 1);
       if (dof_info[dof_handler_component].fe_index_conversion[0][0] == degree)
         return range;
@@ -2052,7 +2052,7 @@ template <int dim, typename Number>
 inline bool
 MatrixFree<dim, Number>::at_irregular_cell(const unsigned int macro_cell) const
 {
-  AssertIndexRange(macro_cell, task_info.cell_partition_data.back());
+  DEAL_II_AssertIndexRange(macro_cell, task_info.cell_partition_data.back());
   return VectorizedArray<Number>::n_array_elements > 1 &&
          cell_level_index[(macro_cell + 1) *
                             VectorizedArray<Number>::n_array_elements -
@@ -2079,7 +2079,8 @@ inline unsigned int
 MatrixFree<dim, Number>::n_active_entries_per_cell_batch(
   const unsigned int cell_batch_number) const
 {
-  AssertIndexRange(cell_batch_number, task_info.cell_partition_data.back());
+  DEAL_II_AssertIndexRange(cell_batch_number,
+                           task_info.cell_partition_data.back());
   unsigned int n_components = VectorizedArray<Number>::n_array_elements;
   while (n_components > 1 &&
          cell_level_index[cell_batch_number *
@@ -2089,7 +2090,8 @@ MatrixFree<dim, Number>::n_active_entries_per_cell_batch(
                               VectorizedArray<Number>::n_array_elements +
                             n_components - 2])
     --n_components;
-  AssertIndexRange(n_components - 1, VectorizedArray<Number>::n_array_elements);
+  DEAL_II_AssertIndexRange(n_components - 1,
+                           VectorizedArray<Number>::n_array_elements);
   return n_components;
 }
 
@@ -2100,13 +2102,14 @@ inline unsigned int
 MatrixFree<dim, Number>::n_active_entries_per_face_batch(
   const unsigned int face_batch_number) const
 {
-  AssertIndexRange(face_batch_number, face_info.faces.size());
+  DEAL_II_AssertIndexRange(face_batch_number, face_info.faces.size());
   unsigned int n_components = VectorizedArray<Number>::n_array_elements;
   while (n_components > 1 &&
          face_info.faces[face_batch_number].cells_interior[n_components - 1] ==
            numbers::invalid_unsigned_int)
     --n_components;
-  AssertIndexRange(n_components - 1, VectorizedArray<Number>::n_array_elements);
+  DEAL_II_AssertIndexRange(n_components - 1,
+                           VectorizedArray<Number>::n_array_elements);
   return n_components;
 }
 
@@ -2129,7 +2132,7 @@ MatrixFree<dim, Number>::get_n_q_points(
   const unsigned int quad_index,
   const unsigned int active_fe_index) const
 {
-  AssertIndexRange(quad_index, mapping_info.cell_data.size());
+  DEAL_II_AssertIndexRange(quad_index, mapping_info.cell_data.size());
   return mapping_info.cell_data[quad_index]
     .descriptor[active_fe_index]
     .n_q_points;
@@ -2154,7 +2157,7 @@ MatrixFree<dim, Number>::get_n_q_points_face(
   const unsigned int quad_index,
   const unsigned int active_fe_index) const
 {
-  AssertIndexRange(quad_index, mapping_info.face_data.size());
+  DEAL_II_AssertIndexRange(quad_index, mapping_info.face_data.size());
   return mapping_info.face_data[quad_index]
     .descriptor[active_fe_index]
     .n_q_points;
@@ -2191,13 +2194,13 @@ MatrixFree<dim, Number>::get_shape_info(
   const unsigned int active_fe_index,
   const unsigned int active_quad_index) const
 {
-  AssertIndexRange(dof_handler_index, dof_info.size());
+  DEAL_II_AssertIndexRange(dof_handler_index, dof_info.size());
   const unsigned int ind =
     dof_info[dof_handler_index].global_base_element_offset + index_fe;
-  AssertIndexRange(ind, shape_info.size(0));
-  AssertIndexRange(index_quad, shape_info.size(1));
-  AssertIndexRange(active_fe_index, shape_info.size(2));
-  AssertIndexRange(active_quad_index, shape_info.size(3));
+  DEAL_II_AssertIndexRange(ind, shape_info.size(0));
+  DEAL_II_AssertIndexRange(index_quad, shape_info.size(1));
+  DEAL_II_AssertIndexRange(active_fe_index, shape_info.size(2));
+  DEAL_II_AssertIndexRange(active_quad_index, shape_info.size(3));
   return shape_info(ind, index_quad, active_fe_index, active_quad_index);
 }
 
@@ -2208,7 +2211,7 @@ inline const internal::MatrixFreeFunctions::FaceToCellTopology<
   VectorizedArray<Number>::n_array_elements> &
 MatrixFree<dim, Number>::get_face_info(const unsigned int macro_face) const
 {
-  AssertIndexRange(macro_face, face_info.faces.size());
+  DEAL_II_AssertIndexRange(macro_face, face_info.faces.size());
   return face_info.faces[macro_face];
 }
 
@@ -2220,7 +2223,7 @@ MatrixFree<dim, Number>::get_quadrature(
   const unsigned int quad_index,
   const unsigned int active_fe_index) const
 {
-  AssertIndexRange(quad_index, mapping_info.cell_data.size());
+  DEAL_II_AssertIndexRange(quad_index, mapping_info.cell_data.size());
   return mapping_info.cell_data[quad_index]
     .descriptor[active_fe_index]
     .quadrature;
@@ -2234,7 +2237,7 @@ MatrixFree<dim, Number>::get_face_quadrature(
   const unsigned int quad_index,
   const unsigned int active_fe_index) const
 {
-  AssertIndexRange(quad_index, mapping_info.face_data.size());
+  DEAL_II_AssertIndexRange(quad_index, mapping_info.face_data.size());
   return mapping_info.face_data[quad_index]
     .descriptor[active_fe_index]
     .quadrature;
@@ -2246,8 +2249,8 @@ template <int dim, typename Number>
 inline unsigned int
 MatrixFree<dim, Number>::get_cell_category(const unsigned int macro_cell) const
 {
-  AssertIndexRange(0, dof_info.size());
-  AssertIndexRange(macro_cell, dof_info[0].cell_active_fe_index.size());
+  DEAL_II_AssertIndexRange(0, dof_info.size());
+  DEAL_II_AssertIndexRange(macro_cell, dof_info[0].cell_active_fe_index.size());
   if (dof_info[0].cell_active_fe_index.empty())
     return 0;
   else
@@ -2260,7 +2263,7 @@ template <int dim, typename Number>
 inline std::pair<unsigned int, unsigned int>
 MatrixFree<dim, Number>::get_face_category(const unsigned int macro_face) const
 {
-  AssertIndexRange(macro_face, face_info.faces.size());
+  DEAL_II_AssertIndexRange(macro_face, face_info.faces.size());
   if (dof_info[0].cell_active_fe_index.empty())
     return std::make_pair(0U, 0U);
 
@@ -2339,11 +2342,12 @@ MatrixFree<dim, Number>::release_scratch_data(
   for (typename list_type::iterator it = data.begin(); it != data.end(); ++it)
     if (&it->second == scratch)
       {
-        Assert(it->first == true, ExcInternalError());
+        DEAL_II_Assert(it->first == true, ExcInternalError());
         it->first = false;
         return;
       }
-  AssertThrow(false, ExcMessage("Tried to release invalid scratch pad"));
+  DEAL_II_AssertThrow(false,
+                      ExcMessage("Tried to release invalid scratch pad"));
 }
 
 
@@ -2379,11 +2383,12 @@ MatrixFree<dim, Number>::release_scratch_data_non_threadsafe(
        ++it)
     if (&it->second == scratch)
       {
-        Assert(it->first == true, ExcInternalError());
+        DEAL_II_Assert(it->first == true, ExcInternalError());
         it->first = false;
         return;
       }
-  AssertThrow(false, ExcMessage("Tried to release invalid scratch pad"));
+  DEAL_II_AssertThrow(false,
+                      ExcMessage("Tried to release invalid scratch pad"));
 }
 
 
@@ -2406,7 +2411,7 @@ namespace internal
         if (level == numbers::invalid_unsigned_int)
           locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
         else
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       return locally_owned_set;
     }
 
@@ -2662,7 +2667,7 @@ namespace internal
       if (this->vector_face_access !=
           dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified)
         for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
-          AssertDimension(
+          DEAL_II_AssertDimension(
             matrix_free.get_dof_info(c).vector_partitioner_face_variants.size(),
             3);
     }
@@ -2701,9 +2706,9 @@ namespace internal
     const Utilities::MPI::Partitioner &
     get_partitioner(const unsigned int mf_component) const
     {
-      AssertDimension(matrix_free.get_dof_info(mf_component)
-                        .vector_partitioner_face_variants.size(),
-                      3);
+      DEAL_II_AssertDimension(matrix_free.get_dof_info(mf_component)
+                                .vector_partitioner_face_variants.size(),
+                              3);
       if (vector_face_access ==
           dealii::MatrixFree<dim, Number>::DataAccessOnFaces::none)
         return *matrix_free.get_dof_info(mf_component)
@@ -2752,7 +2757,7 @@ namespace internal
             matrix_free.acquire_scratch_data_non_threadsafe();
           tmp_data[component_in_block_vector]->resize_fast(
             part.n_import_indices());
-          AssertDimension(requests.size(), tmp_data.size());
+          DEAL_II_AssertDimension(requests.size(), tmp_data.size());
 
           part.export_to_ghosted_array_start(
             component_in_block_vector + channel_shift,
@@ -2781,8 +2786,8 @@ namespace internal
         {
 #  ifdef DEAL_II_WITH_MPI
 
-          AssertIndexRange(component_in_block_vector, tmp_data.size());
-          AssertDimension(requests.size(), tmp_data.size());
+          DEAL_II_AssertIndexRange(component_in_block_vector, tmp_data.size());
+          DEAL_II_AssertDimension(requests.size(), tmp_data.size());
 
           const unsigned int mf_component = find_vector_in_mf(vec);
           const Utilities::MPI::Partitioner &part =
@@ -2815,7 +2820,7 @@ namespace internal
                    LinearAlgebra::distributed::Vector<Number> &vec)
     {
       (void)component_in_block_vector;
-      Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
+      DEAL_II_Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
       if (vector_face_access ==
             dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
           vec.size() == 0)
@@ -2841,7 +2846,7 @@ namespace internal
             matrix_free.acquire_scratch_data_non_threadsafe();
           tmp_data[component_in_block_vector]->resize_fast(
             part.n_import_indices());
-          AssertDimension(requests.size(), tmp_data.size());
+          DEAL_II_AssertDimension(requests.size(), tmp_data.size());
 
           part.import_from_ghosted_array_start(
             dealii::VectorOperation::add,
@@ -2867,8 +2872,8 @@ namespace internal
       else
         {
 #  ifdef DEAL_II_WITH_MPI
-          AssertIndexRange(component_in_block_vector, tmp_data.size());
-          AssertDimension(requests.size(), tmp_data.size());
+          DEAL_II_AssertIndexRange(component_in_block_vector, tmp_data.size());
+          DEAL_II_AssertDimension(requests.size(), tmp_data.size());
 
           const unsigned int mf_component = find_vector_in_mf(vec);
 
@@ -2915,7 +2920,7 @@ namespace internal
       else
         {
 #  ifdef DEAL_II_WITH_MPI
-          AssertDimension(requests.size(), tmp_data.size());
+          DEAL_II_AssertDimension(requests.size(), tmp_data.size());
 
           const unsigned int mf_component = find_vector_in_mf(vec);
           const Utilities::MPI::Partitioner &part =
@@ -2954,13 +2959,14 @@ namespace internal
           const unsigned int mf_component = find_vector_in_mf(vec, false);
           const internal::MatrixFreeFunctions::DoFInfo &dof_info =
             matrix_free.get_dof_info(mf_component);
-          Assert(dof_info.vector_zero_range_list_index.empty() == false,
-                 ExcNotInitialized());
+          DEAL_II_Assert(dof_info.vector_zero_range_list_index.empty() == false,
+                         ExcNotInitialized());
 
-          Assert(vec.partitioners_are_compatible(*dof_info.vector_partitioner),
-                 ExcInternalError());
-          AssertIndexRange(range_index,
-                           dof_info.vector_zero_range_list_index.size() - 1);
+          DEAL_II_Assert(vec.partitioners_are_compatible(
+                           *dof_info.vector_partitioner),
+                         ExcInternalError());
+          DEAL_II_AssertIndexRange(
+            range_index, dof_info.vector_zero_range_list_index.size() - 1);
           for (unsigned int id =
                  dof_info.vector_zero_range_list_index[range_index];
                id != dof_info.vector_zero_range_list_index[range_index + 1];

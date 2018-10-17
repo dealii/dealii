@@ -86,8 +86,8 @@ namespace internal
                 if (nn < GeometryInfo<dim>::faces_per_cell / 2)
                   for (unsigned int j = 0; j < dofs_per_face; ++j)
                     {
-                      Assert(f * dofs_per_face + j < face_sign.size(),
-                             ExcInternalError());
+                      DEAL_II_Assert(f * dofs_per_face + j < face_sign.size(),
+                                     ExcInternalError());
 
                       // TODO: This is probably only going to work for those
                       // elements for which all dofs are face dofs
@@ -185,7 +185,8 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_value(
   const Point<dim> &) const
 
 {
-  Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
+  DEAL_II_Assert(false,
+                 (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
   return 0.;
 }
 
@@ -198,8 +199,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_value_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < dim, ExcIndexRange(component, 0, dim));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(component < dim, ExcIndexRange(component, 0, dim));
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 
@@ -231,7 +233,8 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad(
   const unsigned int,
   const Point<dim> &) const
 {
-  Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
+  DEAL_II_Assert(false,
+                 (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
   return Tensor<1, dim>();
 }
 
@@ -244,8 +247,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < dim, ExcIndexRange(component, 0, dim));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(component < dim, ExcIndexRange(component, 0, dim));
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 
@@ -278,7 +282,8 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_grad(
   const unsigned int,
   const Point<dim> &) const
 {
-  Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
+  DEAL_II_Assert(false,
+                 (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
   return Tensor<2, dim>();
 }
 
@@ -291,8 +296,9 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::shape_grad_grad_component(
   const Point<dim> & p,
   const unsigned int component) const
 {
-  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
-  Assert(component < dim, ExcIndexRange(component, 0, dim));
+  DEAL_II_Assert(i < this->dofs_per_cell,
+                 ExcIndexRange(i, 0, this->dofs_per_cell));
+  DEAL_II_Assert(component < dim, ExcIndexRange(component, 0, dim));
 
   std::lock_guard<std::mutex> lock(cache_mutex);
 
@@ -342,19 +348,20 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(fe_data.update_each & update_values) ||
-           fe_data.shape_values.size()[0] == this->dofs_per_cell,
-         ExcDimensionMismatch(fe_data.shape_values.size()[0],
-                              this->dofs_per_cell));
-  Assert(!(fe_data.update_each & update_values) ||
-           fe_data.shape_values.size()[1] == n_q_points,
-         ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
+  DEAL_II_Assert(!(fe_data.update_each & update_values) ||
+                   fe_data.shape_values.size()[0] == this->dofs_per_cell,
+                 ExcDimensionMismatch(fe_data.shape_values.size()[0],
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(!(fe_data.update_each & update_values) ||
+                   fe_data.shape_values.size()[1] == n_q_points,
+                 ExcDimensionMismatch(fe_data.shape_values.size()[1],
+                                      n_q_points));
 
   // Create table with sign changes, due to the special structure of the RT
   // elements.
@@ -455,7 +462,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
@@ -600,7 +607,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
@@ -876,7 +883,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
@@ -887,7 +894,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
             (mapping_type == mapping_raviart_thomas) ||
             (mapping_type == mapping_nedelec))))
         {
-          Assert(false, ExcNotImplemented())
+          DEAL_II_Assert(false, ExcNotImplemented())
         }
     }
 }
@@ -914,8 +921,8 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_face_values(
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   const unsigned int n_q_points = quadrature.size();
@@ -1039,7 +1046,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_face_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
@@ -1203,7 +1210,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_face_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
@@ -1503,14 +1510,14 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_face_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
       // third derivatives are not implemented
       if (fe_data.update_each & update_3rd_derivatives)
         {
-          Assert(false, ExcNotImplemented())
+          DEAL_II_Assert(false, ExcNotImplemented())
         }
     }
 }
@@ -1538,8 +1545,8 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   const unsigned int n_q_points = quadrature.size();
@@ -1556,7 +1563,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
                                                 n_q_points,
                                                 cell->subface_case(face_no));
 
-  //   Assert(mapping_type == independent
+  //   DEAL_II_Assert(mapping_type == independent
   //       || ( mapping_type == independent_on_cartesian
   //            && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
   //       ExcNotImplemented());
@@ -1670,7 +1677,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
@@ -1820,7 +1827,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
@@ -2119,14 +2126,14 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_subface_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 
       // third derivatives are not implemented
       if (fe_data.update_each & update_3rd_derivatives)
         {
-          Assert(false, ExcNotImplemented())
+          DEAL_II_Assert(false, ExcNotImplemented())
         }
     }
 }
@@ -2221,7 +2228,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::requires_update_flags(
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 

@@ -582,8 +582,8 @@ inline FilteredMatrix<VectorType>::Accessor::Accessor(
   : matrix(matrix)
   , index(index)
 {
-  Assert(index <= matrix->constraints.size(),
-         ExcIndexRange(index, 0, matrix->constraints.size()));
+  DEAL_II_Assert(index <= matrix->constraints.size(),
+                 ExcIndexRange(index, 0, matrix->constraints.size()));
 }
 
 
@@ -619,7 +619,7 @@ template <typename VectorType>
 inline void
 FilteredMatrix<VectorType>::Accessor::advance()
 {
-  Assert(index < matrix->constraints.size(), ExcIteratorPastEnd());
+  DEAL_II_Assert(index < matrix->constraints.size(), ExcIteratorPastEnd());
   ++index;
 }
 
@@ -834,7 +834,7 @@ FilteredMatrix<VectorType>::apply_constraints(VectorType &v) const
   const const_index_value_iterator e = constraints.end();
   for (; i != e; ++i)
     {
-      AssertIsFinite(i->second);
+      DEAL_II_AssertIsFinite(i->second);
       (*tmp_vector)(i->first) = -i->second;
     }
 
@@ -846,7 +846,7 @@ FilteredMatrix<VectorType>::apply_constraints(VectorType &v) const
   // entries themselves
   for (i = constraints.begin(); i != e; ++i)
     {
-      AssertIsFinite(i->second);
+      DEAL_II_AssertIsFinite(i->second);
       v(i->first) = i->second;
     }
 }
@@ -877,7 +877,7 @@ FilteredMatrix<VectorType>::post_filter(const VectorType &in,
   const const_index_value_iterator e = constraints.end();
   for (; i != e; ++i)
     {
-      AssertIsFinite(in(i->first));
+      DEAL_II_AssertIsFinite(in(i->first));
       out(i->first) = in(i->first);
     }
 }

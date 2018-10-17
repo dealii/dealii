@@ -48,15 +48,16 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::SolutionTransfer(
   , n_dofs_old(0)
   , prepared_for(none)
 {
-  Assert((dynamic_cast<const parallel::distributed::Triangulation<
-            DoFHandlerType::dimension,
-            DoFHandlerType::space_dimension> *>(
-            &dof_handler->get_triangulation()) == nullptr),
-         ExcMessage("You are calling the dealii::SolutionTransfer class "
-                    "with a DoF handler that is built on a "
-                    "parallel::distributed::Triangulation. This will not "
-                    "work for parallel computations. You probably want to "
-                    "use the parallel::distributed::SolutionTransfer class."));
+  DEAL_II_Assert((dynamic_cast<const parallel::distributed::Triangulation<
+                    DoFHandlerType::dimension,
+                    DoFHandlerType::space_dimension> *>(
+                    &dof_handler->get_triangulation()) == nullptr),
+                 ExcMessage(
+                   "You are calling the dealii::SolutionTransfer class "
+                   "with a DoF handler that is built on a "
+                   "parallel::distributed::Triangulation. This will not "
+                   "work for parallel computations. You probably want to "
+                   "use the parallel::distributed::SolutionTransfer class."));
 }
 
 
@@ -86,9 +87,9 @@ template <int dim, typename VectorType, typename DoFHandlerType>
 void
 SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
 {
-  Assert(prepared_for != pure_refinement, ExcAlreadyPrepForRef());
-  Assert(prepared_for != coarsening_and_refinement,
-         ExcAlreadyPrepForCoarseAndRef());
+  DEAL_II_Assert(prepared_for != pure_refinement, ExcAlreadyPrepForRef());
+  DEAL_II_Assert(prepared_for != coarsening_and_refinement,
+                 ExcAlreadyPrepForCoarseAndRef());
 
   clear();
 
@@ -128,13 +129,14 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
   const VectorType &in,
   VectorType &      out) const
 {
-  Assert(prepared_for == pure_refinement, ExcNotPrepared());
-  Assert(in.size() == n_dofs_old, ExcDimensionMismatch(in.size(), n_dofs_old));
-  Assert(out.size() == dof_handler->n_dofs(),
-         ExcDimensionMismatch(out.size(), dof_handler->n_dofs()));
-  Assert(&in != &out,
-         ExcMessage("Vectors cannot be used as input and output"
-                    " at the same time!"));
+  DEAL_II_Assert(prepared_for == pure_refinement, ExcNotPrepared());
+  DEAL_II_Assert(in.size() == n_dofs_old,
+                 ExcDimensionMismatch(in.size(), n_dofs_old));
+  DEAL_II_Assert(out.size() == dof_handler->n_dofs(),
+                 ExcDimensionMismatch(out.size(), dof_handler->n_dofs()));
+  DEAL_II_Assert(&in != &out,
+                 ExcMessage("Vectors cannot be used as input and output"
+                            " at the same time!"));
 
   Vector<typename VectorType::value_type> local_values(0);
 
@@ -167,8 +169,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate(
           // make sure that the size of the stored indices is the same as
           // dofs_per_cell. since we store the desired fe_index, we know
           // what this size should be
-          Assert(dofs_per_cell == (*pointerstruct->second.indices_ptr).size(),
-                 ExcInternalError());
+          DEAL_II_Assert(dofs_per_cell ==
+                           (*pointerstruct->second.indices_ptr).size(),
+                         ExcInternalError());
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             local_values(i) = internal::ElementAccess<VectorType>::get(
               in, (*pointerstruct->second.indices_ptr)[i]);
@@ -264,14 +267,14 @@ void
 SolutionTransfer<dim, VectorType, DoFHandlerType>::
   prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 {
-  Assert(prepared_for != pure_refinement, ExcAlreadyPrepForRef());
-  Assert(prepared_for != coarsening_and_refinement,
-         ExcAlreadyPrepForCoarseAndRef());
+  DEAL_II_Assert(prepared_for != pure_refinement, ExcAlreadyPrepForRef());
+  DEAL_II_Assert(prepared_for != coarsening_and_refinement,
+                 ExcAlreadyPrepForCoarseAndRef());
 
   const unsigned int in_size = all_in.size();
-  Assert(in_size != 0,
-         ExcMessage("The array of input vectors you pass to this "
-                    "function has no elements. This is not useful."));
+  DEAL_II_Assert(in_size != 0,
+                 ExcMessage("The array of input vectors you pass to this "
+                            "function has no elements. This is not useful."));
 
   clear();
 
@@ -282,8 +285,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
 
   for (unsigned int i = 0; i < in_size; ++i)
     {
-      Assert(all_in[i].size() == n_dofs_old,
-             ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
+      DEAL_II_Assert(all_in[i].size() == n_dofs_old,
+                     ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
     }
 
   // first count the number
@@ -301,8 +304,9 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
       else
         ++n_cells_to_stay_or_refine;
     }
-  Assert((n_cells_to_coarsen + n_cells_to_stay_or_refine) == n_active_cells,
-         ExcInternalError());
+  DEAL_II_Assert((n_cells_to_coarsen + n_cells_to_stay_or_refine) ==
+                   n_active_cells,
+                 ExcInternalError());
 
   unsigned int n_coarsen_fathers = 0;
   for (typename DoFHandlerType::cell_iterator cell = dof_handler->begin();
@@ -310,7 +314,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
        ++cell)
     if (!cell->active() && cell->child(0)->coarsen_flag_set())
       ++n_coarsen_fathers;
-  Assert(n_cells_to_coarsen >= 2 * n_coarsen_fathers, ExcInternalError());
+  DEAL_II_Assert(n_cells_to_coarsen >= 2 * n_coarsen_fathers,
+                 ExcInternalError());
 
   // allocate the needed memory. initialize
   // the following arrays in an efficient
@@ -361,11 +366,12 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
           // have if Tria::prepare_* has
           // worked correctly
           for (unsigned int i = 1; i < cell->n_children(); ++i)
-            Assert(cell->child(i)->coarsen_flag_set(),
-                   ExcMessage(
-                     "It looks like you didn't call "
-                     "Triangulation::prepare_coarsening_and_refinement before "
-                     "calling the current function. This can't work."));
+            DEAL_II_Assert(
+              cell->child(i)->coarsen_flag_set(),
+              ExcMessage(
+                "It looks like you didn't call "
+                "Triangulation::prepare_coarsening_and_refinement before "
+                "calling the current function. This can't work."));
 
           // we will need to interpolate from the children of this cell
           // to the current one. in the hp context, this also means
@@ -414,8 +420,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
           ++n_cf;
         }
     }
-  Assert(n_sr == n_cells_to_stay_or_refine, ExcInternalError());
-  Assert(n_cf == n_coarsen_fathers, ExcInternalError());
+  DEAL_II_Assert(n_sr == n_cells_to_stay_or_refine, ExcInternalError());
+  DEAL_II_Assert(n_cf == n_coarsen_fathers, ExcInternalError());
 
   prepared_for = coarsening_and_refinement;
 }
@@ -439,20 +445,22 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
   const std::vector<VectorType> &all_in,
   std::vector<VectorType> &      all_out) const
 {
-  Assert(prepared_for == coarsening_and_refinement, ExcNotPrepared());
+  DEAL_II_Assert(prepared_for == coarsening_and_refinement, ExcNotPrepared());
   const unsigned int size = all_in.size();
-  Assert(all_out.size() == size, ExcDimensionMismatch(all_out.size(), size));
+  DEAL_II_Assert(all_out.size() == size,
+                 ExcDimensionMismatch(all_out.size(), size));
   for (unsigned int i = 0; i < size; ++i)
-    Assert(all_in[i].size() == n_dofs_old,
-           ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
+    DEAL_II_Assert(all_in[i].size() == n_dofs_old,
+                   ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
   for (unsigned int i = 0; i < all_out.size(); ++i)
-    Assert(all_out[i].size() == dof_handler->n_dofs(),
-           ExcDimensionMismatch(all_out[i].size(), dof_handler->n_dofs()));
+    DEAL_II_Assert(all_out[i].size() == dof_handler->n_dofs(),
+                   ExcDimensionMismatch(all_out[i].size(),
+                                        dof_handler->n_dofs()));
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = 0; j < size; ++j)
-      Assert(&all_in[i] != &all_out[j],
-             ExcMessage("Vectors cannot be used as input and output"
-                        " at the same time!"));
+      DEAL_II_Assert(&all_in[i] != &all_out[j],
+                     ExcMessage("Vectors cannot be used as input and output"
+                                " at the same time!"));
 
   Vector<typename VectorType::value_type> local_values;
   std::vector<types::global_dof_index>    dofs;
@@ -483,7 +491,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
           // cell stayed as it was or was refined
           if (indexptr)
             {
-              Assert(valuesptr == nullptr, ExcInternalError());
+              DEAL_II_Assert(valuesptr == nullptr, ExcInternalError());
 
               const unsigned int old_fe_index =
                 pointerstruct->second.active_fe_index;
@@ -511,8 +519,8 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
             // the children of this cell were
             // deleted
             {
-              Assert(!cell->has_children(), ExcInternalError());
-              Assert(indexptr == nullptr, ExcInternalError());
+              DEAL_II_Assert(!cell->has_children(), ExcInternalError());
+              DEAL_II_Assert(indexptr == nullptr, ExcInternalError());
 
               const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
               dofs.resize(dofs_per_cell);
@@ -542,10 +550,10 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
                       const unsigned int old_index =
                         pointerstruct->second.active_fe_index;
                       tmp.reinit(dofs_per_cell, true);
-                      AssertDimension(
+                      DEAL_II_AssertDimension(
                         (*valuesptr)[j].size(),
                         interpolation_hp(active_fe_index, old_index).n());
-                      AssertDimension(
+                      DEAL_II_AssertDimension(
                         tmp.size(),
                         interpolation_hp(active_fe_index, old_index).m());
                       interpolation_hp(active_fe_index, old_index)
@@ -564,7 +572,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
             }
           // undefined status
           else
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
         }
     }
 }
@@ -577,9 +585,10 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate(
   const VectorType &in,
   VectorType &      out) const
 {
-  Assert(in.size() == n_dofs_old, ExcDimensionMismatch(in.size(), n_dofs_old));
-  Assert(out.size() == dof_handler->n_dofs(),
-         ExcDimensionMismatch(out.size(), dof_handler->n_dofs()));
+  DEAL_II_Assert(in.size() == n_dofs_old,
+                 ExcDimensionMismatch(in.size(), n_dofs_old));
+  DEAL_II_Assert(out.size() == dof_handler->n_dofs(),
+                 ExcDimensionMismatch(out.size(), dof_handler->n_dofs()));
 
   std::vector<VectorType> all_in(1);
   all_in[0] = in;

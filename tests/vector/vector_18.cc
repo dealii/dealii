@@ -37,9 +37,9 @@ test(Vector<double> &v)
   v.compress();
 
   // then check the norm
-  AssertThrow(std::fabs((v.l2_norm() - std::sqrt(norm)) / std::sqrt(norm)) <
-                1e-14,
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs((v.l2_norm() - std::sqrt(norm)) /
+                                std::sqrt(norm)) < 1e-14,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

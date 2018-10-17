@@ -64,7 +64,7 @@ test()
   ghost_set.add_index(1);
   LinearAlgebra::ReadWriteVector<double> ghost_vector(ghost_set);
   ghost_vector.import(v, VectorOperation::insert);
-  AssertThrow(ghost_vector(1) == 1., ExcInternalError());
+  DEAL_II_AssertThrow(ghost_vector(1) == 1., ExcInternalError());
 
   // copy vector
   w = v;
@@ -73,9 +73,9 @@ test()
   v.update_ghost_values();
   w.update_ghost_values();
   ghost_vector.import(v, VectorOperation::insert);
-  AssertThrow(ghost_vector(1) == 2., ExcInternalError());
+  DEAL_II_AssertThrow(ghost_vector(1) == 2., ExcInternalError());
   ghost_vector.import(w, VectorOperation::insert);
-  AssertThrow(ghost_vector(1) == 1., ExcInternalError());
+  DEAL_II_AssertThrow(ghost_vector(1) == 1., ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -99,10 +99,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   if (myid == 0)
     {

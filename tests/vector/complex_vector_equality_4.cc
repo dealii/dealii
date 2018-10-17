@@ -39,7 +39,7 @@ test(Vector<std::complex<double>> &v, Vector<std::complex<double>> &w)
   // but then copy elements and make sure the
   // vectors are actually equal
   v = w;
-  AssertThrow(!(v.operator!=(w)), ExcInternalError());
+  DEAL_II_AssertThrow(!(v.operator!=(w)), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

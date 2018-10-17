@@ -187,16 +187,16 @@ derivatives()
       double normthird = DerivativeApproximation::derivative_norm(third);
 
       // symmetry of second derivative
-      Assert(second == transpose(second),
-             ExcMessage("Second derivative is not symmetric"));
+      DEAL_II_Assert(second == transpose(second),
+                     ExcMessage("Second derivative is not symmetric"));
 
       // symmetry of third derivative note,
       // that this is only part of the truth,
       // we would have to test more here to be
       // really sure, but this should be enough
       for (unsigned int i = 0; i < dim; ++i)
-        Assert(third[i] == transpose(third[i]),
-               ExcMessage("Third derivative is not symmetric"));
+        DEAL_II_Assert(third[i] == transpose(third[i]),
+                       ExcMessage("Third derivative is not symmetric"));
 
       // get exact derivatives
       fe_values.reinit(cell);

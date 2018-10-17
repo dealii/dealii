@@ -320,13 +320,14 @@ namespace internal
       {
         // double check that the element does not already exists in the
         // global map
-        Assert(face_integrals.find(p->first) == face_integrals.end(),
-               ExcInternalError());
+        DEAL_II_Assert(face_integrals.find(p->first) == face_integrals.end(),
+                       ExcInternalError());
 
         for (unsigned int i = 0; i < p->second.size(); ++i)
           {
-            Assert(numbers::is_finite(p->second[i]), ExcInternalError());
-            Assert(p->second[i] >= 0, ExcInternalError());
+            DEAL_II_Assert(numbers::is_finite(p->second[i]),
+                           ExcInternalError());
+            DEAL_II_Assert(p->second[i] >= 0, ExcInternalError());
           }
 
         face_integrals[p->first] = p->second;
@@ -426,9 +427,9 @@ namespace internal
       {
         const types::boundary_id boundary_id = face->boundary_id();
 
-        Assert(parallel_data.neumann_bc->find(boundary_id) !=
-                 parallel_data.neumann_bc->end(),
-               ExcInternalError());
+        DEAL_II_Assert(parallel_data.neumann_bc->find(boundary_id) !=
+                         parallel_data.neumann_bc->end(),
+                       ExcInternalError());
         // get the values of the boundary function at the quadrature points
         if (n_components == 1)
           {
@@ -525,7 +526,7 @@ namespace internal
           }
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             return -std::numeric_limits<double>::max();
           }
       }
@@ -580,7 +581,7 @@ namespace internal
           }
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             return -std::numeric_limits<double>::max();
           }
       }
@@ -636,7 +637,7 @@ namespace internal
           }
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             return -std::numeric_limits<double>::max();
           }
       }
@@ -677,7 +678,7 @@ namespace internal
           }
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             return -std::numeric_limits<double>::max();
           }
       }
@@ -733,8 +734,8 @@ namespace internal
     if (face->at_boundary() == false)
       // internal face; integrate jump of gradient across this face
       {
-        Assert(cell->neighbor(face_no).state() == IteratorState::valid,
-               ExcInternalError());
+        DEAL_II_Assert(cell->neighbor(face_no).state() == IteratorState::valid,
+                       ExcInternalError());
 
         const typename DoFHandlerType::active_cell_iterator neighbor =
           cell->neighbor(face_no);
@@ -743,8 +744,8 @@ namespace internal
         // neighboring cell
         const unsigned int neighbor_neighbor =
           cell->neighbor_of_neighbor(face_no);
-        Assert(neighbor_neighbor < GeometryInfo<dim>::faces_per_cell,
-               ExcInternalError());
+        DEAL_II_Assert(neighbor_neighbor < GeometryInfo<dim>::faces_per_cell,
+                       ExcInternalError());
 
         // get restriction of finite element function of @p{neighbor} to the
         // common face. in the hp case, use the quadrature formula that
@@ -822,8 +823,9 @@ namespace internal
     const unsigned int n_solution_vectors             = solutions.size();
     const typename DoFHandlerType::face_iterator face = cell->face(face_no);
 
-    Assert(neighbor.state() == IteratorState::valid, ExcInternalError());
-    Assert(face->has_children(), ExcInternalError());
+    DEAL_II_Assert(neighbor.state() == IteratorState::valid,
+                   ExcInternalError());
+    DEAL_II_Assert(face->has_children(), ExcInternalError());
 
     // set up a vector of the gradients of the finite element function on
     // this cell at the quadrature points
@@ -835,8 +837,8 @@ namespace internal
     // store which number @p{cell} has in the list of neighbors of
     // @p{neighbor}
     const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor(face_no);
-    Assert(neighbor_neighbor < GeometryInfo<dim>::faces_per_cell,
-           ExcInternalError());
+    DEAL_II_Assert(neighbor_neighbor < GeometryInfo<dim>::faces_per_cell,
+                   ExcInternalError());
 
     // loop over all subfaces
     for (unsigned int subface_no = 0; subface_no < face->n_children();
@@ -845,7 +847,7 @@ namespace internal
         // get an iterator pointing to the cell behind the present subface
         const typename DoFHandlerType::active_cell_iterator neighbor_child =
           cell->neighbor_child_on_subface(face_no, subface_no);
-        Assert(!neighbor_child->has_children(), ExcInternalError());
+        DEAL_II_Assert(!neighbor_child->has_children(), ExcInternalError());
 
         // restrict the finite element on the present cell to the subface
         fe_subface_values.reinit(cell,
@@ -898,11 +900,11 @@ namespace internal
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
       {
-        Assert(local_face_integrals.find(face->child(subface_no)) !=
-                 local_face_integrals.end(),
-               ExcInternalError());
-        Assert(local_face_integrals[face->child(subface_no)][0] >= 0,
-               ExcInternalError());
+        DEAL_II_Assert(local_face_integrals.find(face->child(subface_no)) !=
+                         local_face_integrals.end(),
+                       ExcInternalError());
+        DEAL_II_Assert(local_face_integrals[face->child(subface_no)][0] >= 0,
+                       ExcInternalError());
 
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           sum[n] += local_face_integrals[face->child(subface_no)][n];
@@ -1223,16 +1225,15 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
         &dof_handler.get_triangulation()) != nullptr)
-    Assert((subdomain_id_ == numbers::invalid_subdomain_id) ||
-             (subdomain_id_ ==
-              dynamic_cast<
-                const parallel::distributed::Triangulation<dim, spacedim> &>(
-                dof_handler.get_triangulation())
-                .locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel distributed triangulations, the only "
-             "valid subdomain_id that can be passed here is the "
-             "one that corresponds to the locally owned subdomain id."));
+    DEAL_II_Assert(
+      (subdomain_id_ == numbers::invalid_subdomain_id) ||
+        (subdomain_id_ ==
+         dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                        &>(dof_handler.get_triangulation())
+           .locally_owned_subdomain()),
+      ExcMessage("For parallel distributed triangulations, the only "
+                 "valid subdomain_id that can be passed here is the "
+                 "one that corresponds to the locally owned subdomain id."));
 
   const types::subdomain_id subdomain_id =
     ((dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
@@ -1249,32 +1250,35 @@ KellyErrorEstimator<dim, spacedim>::estimate(
   (void)n_components;
 
   // sanity checks
-  Assert(solutions.size() > 0, ExcNoSolutions());
-  Assert(solutions.size() == errors.size(),
-         ExcIncompatibleNumberOfElements(solutions.size(), errors.size()));
+  DEAL_II_Assert(solutions.size() > 0, ExcNoSolutions());
+  DEAL_II_Assert(solutions.size() == errors.size(),
+                 ExcIncompatibleNumberOfElements(solutions.size(),
+                                                 errors.size()));
 
   for (const auto &boundary_function : neumann_bc)
     {
       (void)boundary_function;
-      Assert(boundary_function.second->n_components == n_components,
-             ExcInvalidBoundaryFunction(boundary_function.first,
-                                        boundary_function.second->n_components,
-                                        n_components));
+      DEAL_II_Assert(
+        boundary_function.second->n_components == n_components,
+        ExcInvalidBoundaryFunction(boundary_function.first,
+                                   boundary_function.second->n_components,
+                                   n_components));
     }
 
-  Assert(component_mask.represents_n_components(n_components),
-         ExcInvalidComponentMask());
-  Assert(component_mask.n_selected_components(n_components) > 0,
-         ExcInvalidComponentMask());
+  DEAL_II_Assert(component_mask.represents_n_components(n_components),
+                 ExcInvalidComponentMask());
+  DEAL_II_Assert(component_mask.n_selected_components(n_components) > 0,
+                 ExcInvalidComponentMask());
 
-  Assert((coefficients == nullptr) ||
-           (coefficients->n_components == n_components) ||
-           (coefficients->n_components == 1),
-         ExcInvalidCoefficient());
+  DEAL_II_Assert((coefficients == nullptr) ||
+                   (coefficients->n_components == n_components) ||
+                   (coefficients->n_components == 1),
+                 ExcInvalidCoefficient());
 
   for (unsigned int n = 0; n < solutions.size(); ++n)
-    Assert(solutions[n]->size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(solutions[n]->size(), dof_handler.n_dofs()));
+    DEAL_II_Assert(solutions[n]->size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(solutions[n]->size(),
+                                        dof_handler.n_dofs()));
 
   const unsigned int n_solution_vectors = solutions.size();
 
@@ -1348,9 +1352,9 @@ KellyErrorEstimator<dim, spacedim>::estimate(
              face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           {
-            Assert(face_integrals.find(cell->face(face_no)) !=
-                     face_integrals.end(),
-                   ExcInternalError());
+            DEAL_II_Assert(face_integrals.find(cell->face(face_no)) !=
+                             face_integrals.end(),
+                           ExcInternalError());
             const double factor = internal::cell_factor<DoFHandlerType>(
               cell, face_no, dof_handler, strategy);
 
@@ -1358,8 +1362,8 @@ KellyErrorEstimator<dim, spacedim>::estimate(
               {
                 // make sure that we have written a meaningful value into this
                 // slot
-                Assert(face_integrals[cell->face(face_no)][n] >= 0,
-                       ExcInternalError());
+                DEAL_II_Assert(face_integrals[cell->face(face_no)][n] >= 0,
+                               ExcInternalError());
 
                 (*errors[n])(present_cell) +=
                   (face_integrals[cell->face(face_no)][n] * factor);

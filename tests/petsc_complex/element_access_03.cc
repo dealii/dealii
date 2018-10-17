@@ -47,9 +47,10 @@ test_matrix(PETScWrappers::SparseMatrix &m)
   // Check elements have the correct value
   for (unsigned int k = 0; k < m.m(); ++k)
     for (unsigned int l = 0; l < m.n(); ++l)
-      AssertThrow((m(k, l).real() == (k + l) * dealii::numbers::PI) &&
-                    (m(k, l).imag() == -1. * (k + l) * dealii::numbers::PI),
-                  ExcInternalError());
+      DEAL_II_AssertThrow((m(k, l).real() == (k + l) * dealii::numbers::PI) &&
+                            (m(k, l).imag() ==
+                             -1. * (k + l) * dealii::numbers::PI),
+                          ExcInternalError());
 
   // Use the conjugate to check elements have equal (and opposite)
   // values.
@@ -58,8 +59,8 @@ test_matrix(PETScWrappers::SparseMatrix &m)
       {
         PetscScalar m_conjugate = PetscConj(m(k, l));
 
-        AssertThrow(m_conjugate.real() == m_conjugate.imag(),
-                    ExcInternalError());
+        DEAL_II_AssertThrow(m_conjugate.real() == m_conjugate.imag(),
+                            ExcInternalError());
       }
 
   deallog << "OK" << std::endl;

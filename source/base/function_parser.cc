@@ -110,16 +110,17 @@ FunctionParser<dim>::initialize(const std::string &             variables,
   this->constants   = constants;
   this->var_names   = Utilities::split_string_list(variables, ',');
   this->expressions = expressions;
-  AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
-              ExcMessage("Wrong number of variables"));
+  DEAL_II_AssertThrow(((time_dependent) ? dim + 1 : dim) == var_names.size(),
+                      ExcMessage("Wrong number of variables"));
 
   // We check that the number of
   // components of this function
   // matches the number of components
   // passed in as a vector of
   // strings.
-  AssertThrow(this->n_components == expressions.size(),
-              ExcInvalidExpressionSize(this->n_components, expressions.size()));
+  DEAL_II_AssertThrow(this->n_components == expressions.size(),
+                      ExcInvalidExpressionSize(this->n_components,
+                                               expressions.size()));
 
   // Now we define how many variables
   // we expect to read in.  We
@@ -281,7 +282,7 @@ FunctionParser<dim>::init_muparser() const
   // check that we have not already initialized the parser on the
   // current thread, i.e., that the current function is only called
   // once per thread
-  Assert(fp.get().size() == 0, ExcInternalError());
+  DEAL_II_Assert(fp.get().size() == 0, ExcInternalError());
 
   // initialize the objects for the current thread (fp.get() and
   // vars.get())
@@ -411,7 +412,8 @@ FunctionParser<dim>::init_muparser() const
           std::cerr << "Token:    <" << e.GetToken() << ">\n";
           std::cerr << "Position: <" << e.GetPos() << ">\n";
           std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
-          AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
+          DEAL_II_AssertThrow(false,
+                              ExcParseError(e.GetCode(), e.GetMsg().c_str()));
         }
     }
 }
@@ -438,9 +440,9 @@ double
 FunctionParser<dim>::value(const Point<dim> & p,
                            const unsigned int component) const
 {
-  Assert(initialized == true, ExcNotInitialized());
-  Assert(component < this->n_components,
-         ExcIndexRange(component, 0, this->n_components));
+  DEAL_II_Assert(initialized == true, ExcNotInitialized());
+  DEAL_II_Assert(component < this->n_components,
+                 ExcIndexRange(component, 0, this->n_components));
 
   // initialize the parser if that hasn't happened yet on the current thread
   if (fp.get().size() == 0)
@@ -462,7 +464,8 @@ FunctionParser<dim>::value(const Point<dim> & p,
       std::cerr << "Token:    <" << e.GetToken() << ">\n";
       std::cerr << "Position: <" << e.GetPos() << ">\n";
       std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
-      AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
+      DEAL_II_AssertThrow(false,
+                          ExcParseError(e.GetCode(), e.GetMsg().c_str()));
       return 0.0;
     }
 }
@@ -474,9 +477,9 @@ void
 FunctionParser<dim>::vector_value(const Point<dim> &p,
                                   Vector<double> &  values) const
 {
-  Assert(initialized == true, ExcNotInitialized());
-  Assert(values.size() == this->n_components,
-         ExcDimensionMismatch(values.size(), this->n_components));
+  DEAL_II_Assert(initialized == true, ExcNotInitialized());
+  DEAL_II_Assert(values.size() == this->n_components,
+                 ExcDimensionMismatch(values.size(), this->n_components));
 
 
   // initialize the parser if that hasn't happened yet on the current thread
@@ -502,7 +505,7 @@ FunctionParser<dim>::initialize(const std::string &,
                                 const std::map<std::string, double> &,
                                 const bool)
 {
-  Assert(false, ExcNeedsFunctionparser());
+  DEAL_II_Assert(false, ExcNeedsFunctionparser());
 }
 
 template <int dim>
@@ -512,7 +515,7 @@ FunctionParser<dim>::initialize(const std::string &,
                                 const std::map<std::string, double> &,
                                 const bool)
 {
-  Assert(false, ExcNeedsFunctionparser());
+  DEAL_II_Assert(false, ExcNeedsFunctionparser());
 }
 
 
@@ -521,7 +524,7 @@ template <int dim>
 double
 FunctionParser<dim>::value(const Point<dim> &, unsigned int) const
 {
-  Assert(false, ExcNeedsFunctionparser());
+  DEAL_II_Assert(false, ExcNeedsFunctionparser());
   return 0.;
 }
 
@@ -530,7 +533,7 @@ template <int dim>
 void
 FunctionParser<dim>::vector_value(const Point<dim> &, Vector<double> &) const
 {
-  Assert(false, ExcNeedsFunctionparser());
+  DEAL_II_Assert(false, ExcNeedsFunctionparser());
 }
 
 

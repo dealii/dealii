@@ -141,7 +141,7 @@ namespace MeshWorker
      *
      * @ingroup Exceptions
      */
-    DeclException0(ExcPureFunction);
+    DEAL_II_DeclException0(ExcPureFunction);
   };
 } // namespace MeshWorker
 

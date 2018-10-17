@@ -74,7 +74,7 @@ test()
     DoFRenumbering::component_wise(dofh);
     // check if n_dofs() is still
     // correct. This was a bug at some point.
-    Assert(n_dofs == dofh.n_dofs(), ExcInternalError());
+    DEAL_II_Assert(n_dofs == dofh.n_dofs(), ExcInternalError());
     {
       IndexSet dof_set;
       DoFTools::extract_locally_active_dofs(dofh, dof_set);

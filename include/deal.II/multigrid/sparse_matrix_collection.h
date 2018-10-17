@@ -88,8 +88,8 @@ namespace mg
   void
   SparseMatrixCollection<number>::reinit(const DoFHandlerType &dof_handler)
   {
-    AssertIndexRange(sparsity.max_level(),
-                     dof_handler.get_triangulation().n_levels());
+    DEAL_II_AssertIndexRange(sparsity.max_level(),
+                             dof_handler.get_triangulation().n_levels());
 
     for (unsigned int level = sparsity.min_level();
          level <= sparsity.max_level();

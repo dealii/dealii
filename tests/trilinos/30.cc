@@ -39,8 +39,8 @@ test(TrilinosWrappers::MPI::Vector &v)
   // then resize with setting to zero
   v.reinit(complete_index_set(13), MPI_COMM_WORLD);
 
-  AssertThrow(v.size() == 13, ExcInternalError());
-  AssertThrow(v.l2_norm() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == 13, ExcInternalError());
+  DEAL_II_AssertThrow(v.l2_norm() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

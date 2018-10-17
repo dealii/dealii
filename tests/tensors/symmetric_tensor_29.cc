@@ -38,7 +38,7 @@ test()
 
   deallog << s * t << std::endl << t * s << std::endl;
 
-  Assert(s * t == t * s, ExcInternalError());
+  DEAL_II_Assert(s * t == t * s, ExcInternalError());
 }
 
 

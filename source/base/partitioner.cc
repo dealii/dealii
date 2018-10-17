@@ -121,9 +121,10 @@ namespace Utilities
         }
 
       // set the local range
-      Assert(locally_owned_indices.is_contiguous() == true,
-             ExcMessage("The index set specified in locally_owned_indices "
-                        "is not contiguous."));
+      DEAL_II_Assert(locally_owned_indices.is_contiguous() == true,
+                     ExcMessage(
+                       "The index set specified in locally_owned_indices "
+                       "is not contiguous."));
       locally_owned_indices.compress();
       if (locally_owned_indices.n_elements() > 0)
         local_range_data =
@@ -131,7 +132,7 @@ namespace Utilities
             locally_owned_indices.nth_index_in_set(0),
             locally_owned_indices.nth_index_in_set(0) +
               locally_owned_indices.n_elements());
-      AssertThrow(
+      DEAL_II_AssertThrow(
         local_range_data.second - local_range_data.first <
           static_cast<types::global_dof_index>(
             std::numeric_limits<unsigned int>::max()),
@@ -154,17 +155,18 @@ namespace Utilities
       // Set ghost indices from input. To be sure that no entries from the
       // locally owned range are present, subtract the locally owned indices
       // in any case.
-      Assert(ghost_indices_in.n_elements() == 0 ||
-               ghost_indices_in.size() == locally_owned_range_data.size(),
-             ExcDimensionMismatch(ghost_indices_in.size(),
-                                  locally_owned_range_data.size()));
+      DEAL_II_Assert(ghost_indices_in.n_elements() == 0 ||
+                       ghost_indices_in.size() ==
+                         locally_owned_range_data.size(),
+                     ExcDimensionMismatch(ghost_indices_in.size(),
+                                          locally_owned_range_data.size()));
 
       ghost_indices_data = ghost_indices_in;
       if (ghost_indices_data.size() != locally_owned_range_data.size())
         ghost_indices_data.set_size(locally_owned_range_data.size());
       ghost_indices_data.subtract_set(locally_owned_range_data);
       ghost_indices_data.compress();
-      AssertThrow(
+      DEAL_II_AssertThrow(
         ghost_indices_data.n_elements() <
           static_cast<types::global_dof_index>(
             std::numeric_limits<unsigned int>::max()),
@@ -186,9 +188,10 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       if (n_procs < 2)
         {
-          Assert(ghost_indices_data.n_elements() == 0, ExcInternalError());
-          Assert(n_import_indices_data == 0, ExcInternalError());
-          Assert(n_ghost_indices_data == 0, ExcInternalError());
+          DEAL_II_Assert(ghost_indices_data.n_elements() == 0,
+                         ExcInternalError());
+          DEAL_II_Assert(n_import_indices_data == 0, ExcInternalError());
+          DEAL_II_Assert(n_ghost_indices_data == 0, ExcInternalError());
           return;
         }
 
@@ -198,7 +201,7 @@ namespace Utilities
       first_index[0] = local_range_data.first;
       int ierr       = MPI_Bcast(
         first_index.data(), 1, DEAL_II_DOF_INDEX_MPI_TYPE, 0, communicator);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // Get the end-of-local_range for all processors
       ierr = MPI_Allgather(&local_range_data.second,
@@ -208,7 +211,7 @@ namespace Utilities
                            1,
                            DEAL_II_DOF_INDEX_MPI_TYPE,
                            communicator);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
       first_index[n_procs] = global_size;
 
       // fix case when there are some processors without any locally owned
@@ -226,8 +229,8 @@ namespace Utilities
           // correct if our processor has a wrong local range
           if (first_index[my_pid] != local_range_data.first)
             {
-              Assert(local_range_data.first == local_range_data.second,
-                     ExcInternalError());
+              DEAL_II_Assert(local_range_data.first == local_range_data.second,
+                             ExcInternalError());
               local_range_data.first = local_range_data.second =
                 first_index[my_pid];
             }
@@ -249,7 +252,7 @@ namespace Utilities
           types::global_dof_index current_index = expanded_ghost_indices[0];
           while (current_index >= first_index[current_proc + 1])
             current_proc++;
-          AssertIndexRange(current_proc, n_procs);
+          DEAL_II_AssertIndexRange(current_proc, n_procs);
 
           // since DoFs are contiguous, populate a vector which stores
           // a process rank and the number of ghosts
@@ -264,7 +267,7 @@ namespace Utilities
               current_index = expanded_ghost_indices[iterator];
               while (current_index >= first_index[current_proc + 1])
                 current_proc++;
-              AssertIndexRange(current_proc, n_procs);
+              DEAL_II_AssertIndexRange(current_proc, n_procs);
               // if we found a new target (i.e. higher rank) then adjust the
               // pair.second in the last element so that it stores the total
               // number of ghosts owned by pair.first
@@ -298,7 +301,7 @@ namespace Utilities
                                       1,
                                       MPI_INT,
                                       communicator);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
 
         // allocate memory for import data
         std::vector<std::pair<unsigned int, unsigned int>> import_targets_temp;
@@ -331,10 +334,10 @@ namespace Utilities
                         import_targets_data[i].first,
                         communicator,
                         &import_requests[i]);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
             current_index_start += import_targets_data[i].second;
           }
-        AssertDimension(current_index_start, n_import_indices_data);
+        DEAL_II_AssertDimension(current_index_start, n_import_indices_data);
 
         // use blocking send for ghost indices stored in expanded_ghost_indices
         current_index_start = 0;
@@ -347,10 +350,10 @@ namespace Utilities
                        ghost_targets_data[i].first,
                        my_pid,
                        communicator);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
             current_index_start += ghost_targets_data[i].second;
           }
-        AssertDimension(current_index_start, n_ghost_indices_data);
+        DEAL_II_AssertDimension(current_index_start, n_ghost_indices_data);
 
         // wait for all import from other processes to be done
         if (import_requests.size() > 0)
@@ -358,7 +361,7 @@ namespace Utilities
             const int ierr = MPI_Waitall(import_requests.size(),
                                          import_requests.data(),
                                          MPI_STATUSES_IGNORE);
-            AssertThrowMPI(ierr);
+            DEAL_II_AssertThrowMPI(ierr);
           }
 
         // transform import indices to local index space and compress
@@ -380,17 +383,19 @@ namespace Utilities
                 {
                   // index in expanded_import_indices for a pair (p,ii):
                   const unsigned int i = shift + ii;
-                  Assert(expanded_import_indices[i] >= local_range_data.first &&
-                           expanded_import_indices[i] < local_range_data.second,
-                         ExcIndexRange(expanded_import_indices[i],
-                                       local_range_data.first,
-                                       local_range_data.second));
+                  DEAL_II_Assert(expanded_import_indices[i] >=
+                                     local_range_data.first &&
+                                   expanded_import_indices[i] <
+                                     local_range_data.second,
+                                 ExcIndexRange(expanded_import_indices[i],
+                                               local_range_data.first,
+                                               local_range_data.second));
                   // local index starting from the beginning of locally owned
                   // DoFs:
                   types::global_dof_index new_index =
                     (expanded_import_indices[i] - local_range_data.first);
-                  Assert(new_index < numbers::invalid_unsigned_int,
-                         ExcNotImplemented());
+                  DEAL_II_Assert(new_index < numbers::invalid_unsigned_int,
+                                 ExcNotImplemented());
                   if (new_index == last_index + 1)
                     // if contiguous, increment the end of last range:
                     compressed_import_indices.back().second++;
@@ -412,8 +417,10 @@ namespace Utilities
             local_range_data.second - local_range_data.first;
           for (unsigned int i = 0; i < import_indices_data.size(); ++i)
             {
-              AssertIndexRange(import_indices_data[i].first, n_local_dofs);
-              AssertIndexRange(import_indices_data[i].second - 1, n_local_dofs);
+              DEAL_II_AssertIndexRange(import_indices_data[i].first,
+                                       n_local_dofs);
+              DEAL_II_AssertIndexRange(import_indices_data[i].second - 1,
+                                       n_local_dofs);
             }
 #  endif
         }
@@ -430,16 +437,17 @@ namespace Utilities
         }
       else
         {
-          AssertDimension(larger_ghost_index_set.size(),
-                          ghost_indices_data.size());
-          Assert(
+          DEAL_II_AssertDimension(larger_ghost_index_set.size(),
+                                  ghost_indices_data.size());
+          DEAL_II_Assert(
             (larger_ghost_index_set & locally_owned_range_data).n_elements() ==
               0,
             ExcMessage("Ghost index set should not overlap with owned set."));
-          Assert((larger_ghost_index_set & ghost_indices_data) ==
-                   ghost_indices_data,
-                 ExcMessage("Larger ghost index set must contain the tight "
-                            "ghost index set."));
+          DEAL_II_Assert((larger_ghost_index_set & ghost_indices_data) ==
+                           ghost_indices_data,
+                         ExcMessage(
+                           "Larger ghost index set must contain the tight "
+                           "ghost index set."));
 
           n_ghost_indices_in_larger_set = larger_ghost_index_set.n_elements();
 
@@ -450,10 +458,11 @@ namespace Utilities
                it != ghost_indices_data.end();
                ++it)
             {
-              Assert(larger_ghost_index_set.is_element(*it),
-                     ExcMessage("The given larger ghost index set must contain"
-                                "all indices in the actual index set."));
-              Assert(
+              DEAL_II_Assert(larger_ghost_index_set.is_element(*it),
+                             ExcMessage(
+                               "The given larger ghost index set must contain"
+                               "all indices in the actual index set."));
+              DEAL_II_Assert(
                 larger_ghost_index_set.index_within_set(*it) <
                   static_cast<types::global_dof_index>(
                     std::numeric_limits<unsigned int>::max()),
@@ -511,7 +520,7 @@ namespace Utilities
           const int ierr               = MPI_Comm_compare(part.communicator,
                                             communicator,
                                             &communicators_same);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
           if (!(communicators_same == MPI_IDENT ||
                 communicators_same == MPI_CONGRUENT))
             return false;

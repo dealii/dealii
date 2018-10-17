@@ -55,7 +55,7 @@ transform(const Point<dim> p)
                           p(1) * (1 + p(0)) * (1 + p(2)),
                           p(2) * (1 + p(0)) * (1 + p(1)));
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return Point<dim>();
     };
 }
@@ -93,7 +93,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
         // some of them
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          AssertThrow(cell->child(c)->active(), ExcInternalError());
+          DEAL_II_AssertThrow(cell->child(c)->active(), ExcInternalError());
 
         // then restrict and prolongate
         cell->get_interpolated_dof_values(tmp, v);
@@ -126,7 +126,8 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   // TODO:[WB] Why this exception with a value different from above. Output of
   // the error should be sufficient!
-  //  Assert (relative_residual < threshold*x.l2_norm(), ExcInternalError());
+  //  DEAL_II_Assert (relative_residual < threshold*x.l2_norm(),
+  //  ExcInternalError());
 }
 
 

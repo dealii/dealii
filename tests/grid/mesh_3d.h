@@ -71,7 +71,7 @@ void create_two_cubes(Triangulation<3> &coarse_grid)
 void create_two_cubes_rotation(Triangulation<3> & coarse_grid,
                                const unsigned int n_rotations)
 {
-  Assert(n_rotations < 4, ExcNotImplemented());
+  DEAL_II_Assert(n_rotations < 4, ExcNotImplemented());
 
   const Point<3>        points[6] = {Point<3>(0, 0, 0),
                               Point<3>(1, 0, 0),
@@ -138,7 +138,8 @@ void create_L_shape(Triangulation<3> &coarse_grid)
     vertices.push_back(outer_points[i] + Point<3>(0, 0, -1));
 
   const unsigned int n_vertices_per_surface = 8;
-  Assert(vertices.size() == n_vertices_per_surface * 2, ExcInternalError());
+  DEAL_II_Assert(vertices.size() == n_vertices_per_surface * 2,
+                 ExcInternalError());
 
   const unsigned int connectivity[3][4] = {{1, 2, 3, 0},
                                            {3, 4, 5, 0},

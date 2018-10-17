@@ -66,8 +66,9 @@ test()
   v *= 2.0;
 
   rw_vector.import(v, VectorOperation::insert);
-  AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
-  AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_AssertThrow(rw_vector(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_AssertThrow(rw_vector(myid * 2 + 1) == myid * 4.0 + 2.0,
+                      ExcInternalError());
 
   // set ghost dof on remote process, no compress called. Since we don't want to
   // call compress we cannot use import
@@ -83,34 +84,35 @@ test()
   std::vector<double> v_host(allocated_size);
   Utilities::CUDA::copy_to_host(v.get_values(), v_host);
 
-  AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == myid * 4.0,
-              ExcInternalError());
-  AssertThrow(v_host[partitioner->global_to_local(myid * 2 + 1)] ==
-                myid * 4.0 + 2.0,
-              ExcInternalError());
+  DEAL_II_AssertThrow(v_host[partitioner->global_to_local(myid * 2)] ==
+                        myid * 4.0,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(v_host[partitioner->global_to_local(myid * 2 + 1)] ==
+                        myid * 4.0 + 2.0,
+                      ExcInternalError());
 
   if (myid > 0)
-    AssertThrow(v_host[partitioner->global_to_local(1)] == 7.0,
-                ExcInternalError());
+    DEAL_II_AssertThrow(v_host[partitioner->global_to_local(1)] == 7.0,
+                        ExcInternalError());
 
   // reset to zero
   v = 0;
 
   Utilities::CUDA::copy_to_host(v.get_values(), v_host);
-  AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == 0.,
-              ExcInternalError());
-  AssertThrow(v_host[partitioner->global_to_local(myid * 2 + 1)] == 0.,
-              ExcInternalError());
+  DEAL_II_AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == 0.,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(v_host[partitioner->global_to_local(myid * 2 + 1)] == 0.,
+                      ExcInternalError());
 
   // check that everything remains zero also
   // after compress
   v.compress(VectorOperation::add);
 
   Utilities::CUDA::copy_to_host(v.get_values(), v_host);
-  AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == 0.,
-              ExcInternalError());
-  AssertThrow(v_host[partitioner->global_to_local(myid * 2 + 1)] == 0.,
-              ExcInternalError());
+  DEAL_II_AssertThrow(v_host[partitioner->global_to_local(myid * 2)] == 0.,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(v_host[partitioner->global_to_local(myid * 2 + 1)] == 0.,
+                      ExcInternalError());
 
   // set element 1 on owning process to
   // something nonzero
@@ -123,8 +125,8 @@ test()
   if (myid > 0)
     {
       Utilities::CUDA::copy_to_host(v.get_values(), v_host);
-      AssertThrow(v_host[partitioner->global_to_local(1)] == 0.,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(v_host[partitioner->global_to_local(1)] == 0.,
+                          ExcInternalError());
     }
 
   // check that all processors get the correct
@@ -133,13 +135,13 @@ test()
   v.update_ghost_values();
 
   Utilities::CUDA::copy_to_host(v.get_values(), v_host);
-  AssertThrow(v_host[partitioner->global_to_local(1)] == 2.,
-              ExcInternalError());
+  DEAL_II_AssertThrow(v_host[partitioner->global_to_local(1)] == 2.,
+                      ExcInternalError());
 
   v = 0;
   Utilities::CUDA::copy_to_host(v.get_values(), v_host);
-  AssertThrow(v_host[partitioner->global_to_local(1)] == 0.,
-              ExcInternalError());
+  DEAL_II_AssertThrow(v_host[partitioner->global_to_local(1)] == 0.,
+                      ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -163,10 +165,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
 
   if (myid == 0)

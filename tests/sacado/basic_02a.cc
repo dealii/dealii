@@ -115,13 +115,15 @@ main()
   const double d2f_dy_dy_ad = y_ad.adj().dx(1);   // d^2f/dy^2
 
   const double tol = 1.0e-14;
-  Assert(std::fabs(f - f_ad) < tol, ExcMessage("Computation incorrect: Value"));
-  Assert(std::fabs(df_dx - df_dx_ad) < tol && std::fabs(df_dy - df_dy_ad) < tol,
-         ExcMessage("Computation incorrect: First derivative"));
-  Assert(std::fabs(d2f_dx_dx - d2f_dx_dx_ad) < tol &&
-           std::fabs(d2f_dy_dy - d2f_dy_dy_ad) < tol &&
-           std::fabs(d2f_dy_dx - d2f_dy_dx_ad) < tol,
-         ExcMessage("Computation incorrect: Second derivative"));
+  DEAL_II_Assert(std::fabs(f - f_ad) < tol,
+                 ExcMessage("Computation incorrect: Value"));
+  DEAL_II_Assert(std::fabs(df_dx - df_dx_ad) < tol &&
+                   std::fabs(df_dy - df_dy_ad) < tol,
+                 ExcMessage("Computation incorrect: First derivative"));
+  DEAL_II_Assert(std::fabs(d2f_dx_dx - d2f_dx_dx_ad) < tol &&
+                   std::fabs(d2f_dy_dy - d2f_dy_dy_ad) < tol &&
+                   std::fabs(d2f_dy_dx - d2f_dy_dx_ad) < tol,
+                 ExcMessage("Computation incorrect: Second derivative"));
 
   deallog << "OK" << std::endl;
 }

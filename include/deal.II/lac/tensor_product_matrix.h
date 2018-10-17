@@ -413,7 +413,7 @@ namespace internal
                       Number *           eigenvalues,
                       Number *           eigenvectors)
     {
-      Assert(n_rows == n_cols, ExcNotImplemented());
+      DEAL_II_Assert(n_rows == n_cols, ExcNotImplemented());
 
       auto &&transpose_fill_nm = [](Number *           out,
                                     const Number *     in,
@@ -433,7 +433,7 @@ namespace internal
 
       deriv_copy.compute_generalized_eigenvalues_symmetric(mass_copy,
                                                            eigenvecs);
-      AssertDimension(eigenvecs.size(), n_rows);
+      DEAL_II_AssertDimension(eigenvecs.size(), n_rows);
       for (unsigned int i = 0; i < n_rows; ++i)
         for (unsigned int j = 0; j < n_cols; ++j, ++eigenvectors)
           *eigenvectors = eigenvecs[j][i];
@@ -475,8 +475,8 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::vmult(
   const ArrayView<Number> &      dst_view,
   const ArrayView<const Number> &src_view) const
 {
-  AssertDimension(dst_view.size(), this->m());
-  AssertDimension(src_view.size(), this->n());
+  DEAL_II_AssertDimension(dst_view.size(), this->m());
+  DEAL_II_AssertDimension(src_view.size(), this->n());
   std::lock_guard<std::mutex> lock(this->mutex);
   const unsigned int          n =
     Utilities::fixed_power<dim>(size > 0 ? size : eigenvalues[0].size());
@@ -532,7 +532,7 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::vmult(
     }
 
   else
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 
@@ -543,8 +543,8 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::apply_inverse(
   const ArrayView<Number> &      dst_view,
   const ArrayView<const Number> &src_view) const
 {
-  AssertDimension(dst_view.size(), this->n());
-  AssertDimension(src_view.size(), this->m());
+  DEAL_II_AssertDimension(dst_view.size(), this->n());
+  DEAL_II_AssertDimension(src_view.size(), this->m());
   std::lock_guard<std::mutex> lock(this->mutex);
   const unsigned int          n = size > 0 ? size : eigenvalues[0].size();
   tmp_array.resize_fast(Utilities::fixed_power<dim>(n));
@@ -609,7 +609,7 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::apply_inverse(
     }
 
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -661,14 +661,16 @@ TensorProductMatrixSymmetricSum<dim, Number, size>::reinit_impl(
 
   for (int dir = 0; dir < dim; ++dir)
     {
-      Assert(size == -1 || (size > 0 && static_cast<unsigned int>(size) ==
-                                          mass_matrices[dir].n_rows()),
-             ExcDimensionMismatch(size, mass_matrices[dir].n_rows()));
-      AssertDimension(mass_matrices[dir].n_rows(), mass_matrices[dir].n_cols());
-      AssertDimension(mass_matrices[dir].n_rows(),
-                      derivative_matrices[dir].n_rows());
-      AssertDimension(mass_matrices[dir].n_rows(),
-                      derivative_matrices[dir].n_cols());
+      DEAL_II_Assert(size == -1 ||
+                       (size > 0 && static_cast<unsigned int>(size) ==
+                                      mass_matrices[dir].n_rows()),
+                     ExcDimensionMismatch(size, mass_matrices[dir].n_rows()));
+      DEAL_II_AssertDimension(mass_matrices[dir].n_rows(),
+                              mass_matrices[dir].n_cols());
+      DEAL_II_AssertDimension(mass_matrices[dir].n_rows(),
+                              derivative_matrices[dir].n_rows());
+      DEAL_II_AssertDimension(mass_matrices[dir].n_rows(),
+                              derivative_matrices[dir].n_cols());
 
       this->eigenvectors[dir].reinit(mass_matrices[dir].n_cols(),
                                      mass_matrices[dir].n_rows());
@@ -797,14 +799,16 @@ TensorProductMatrixSymmetricSum<dim, VectorizedArray<Number>, size>::
   std::array<unsigned int, macro_size> offsets_n;
   for (int dir = 0; dir < dim; ++dir)
     {
-      Assert(size == -1 || (size > 0 && static_cast<unsigned int>(size) ==
-                                          mass_matrix[dir].n_rows()),
-             ExcDimensionMismatch(size, mass_matrix[dir].n_rows()));
-      AssertDimension(mass_matrix[dir].n_rows(), mass_matrix[dir].n_cols());
-      AssertDimension(mass_matrix[dir].n_rows(),
-                      derivative_matrix[dir].n_rows());
-      AssertDimension(mass_matrix[dir].n_rows(),
-                      derivative_matrix[dir].n_cols());
+      DEAL_II_Assert(size == -1 ||
+                       (size > 0 && static_cast<unsigned int>(size) ==
+                                      mass_matrix[dir].n_rows()),
+                     ExcDimensionMismatch(size, mass_matrix[dir].n_rows()));
+      DEAL_II_AssertDimension(mass_matrix[dir].n_rows(),
+                              mass_matrix[dir].n_cols());
+      DEAL_II_AssertDimension(mass_matrix[dir].n_rows(),
+                              derivative_matrix[dir].n_rows());
+      DEAL_II_AssertDimension(mass_matrix[dir].n_rows(),
+                              derivative_matrix[dir].n_cols());
 
       const unsigned int n_rows = mass_matrix[dir].n_rows();
       const unsigned int n_cols = mass_matrix[dir].n_cols();

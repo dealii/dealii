@@ -32,10 +32,10 @@ test()
 {
   unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  Assert(numproc > 2, ExcNotImplemented());
+  DEAL_II_Assert(numproc > 2, ExcNotImplemented());
 
   const unsigned int set = 200;
-  AssertIndexRange(numproc, set - 2);
+  DEAL_II_AssertIndexRange(numproc, set - 2);
   const unsigned int      local_size  = set - myid;
   types::global_dof_index global_size = 0;
   types::global_dof_index my_start    = 0;

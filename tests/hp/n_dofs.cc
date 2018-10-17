@@ -63,7 +63,8 @@ test(const FiniteElement<dim> &fe)
   deallog << fe.get_name() << ' ' << dof_handler.n_dofs() << ' '
           << hp_dof_handler.n_dofs() << std::endl;
 
-  Assert(dof_handler.n_dofs() == hp_dof_handler.n_dofs(), ExcInternalError());
+  DEAL_II_Assert(dof_handler.n_dofs() == hp_dof_handler.n_dofs(),
+                 ExcInternalError());
 }
 
 

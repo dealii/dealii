@@ -47,7 +47,7 @@ test()
   // correct
   for (unsigned int i = 0; i < X.m(); ++i)
     for (unsigned int j = 0; j < X.n(); ++j)
-      AssertThrow(X(i, j) == 2 * i + 2 * j, ExcInternalError());
+      DEAL_II_AssertThrow(X(i, j) == 2 * i + 2 * j, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

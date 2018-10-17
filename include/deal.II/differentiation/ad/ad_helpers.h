@@ -1088,9 +1088,10 @@ namespace Differentiation
      *         // Calculate the deformation gradient at this quadrature point
      *         const Tensor<2, dim, ADNumberType> F =
      *           unit_symmetric_tensor<dim>() + Grad_u[q_point];
-     *         Assert(numbers::value_is_greater_than(determinant(F), 0.0),
-     *                ExcMessage("Negative determinant of the deformation "
-     *                           "gradient detected!"));
+     *         DEAL_II_Assert(numbers::value_is_greater_than(determinant(F),
+     *                                                       0.0),
+     *                        ExcMessage("Negative determinant of the "
+     *                                   "deformatrion gradient detected!"));
      *
      *         // Add contribution of the internal energy:
      *         // Integrate the stored energy density function with the current
@@ -1606,14 +1607,15 @@ namespace Differentiation
       // in the sense that we simply populate our array of independent values
       // with a meaningful number. However, in this case we need to double check
       // that we're not registering these variables twice
-      Assert(
+      DEAL_II_Assert(
         local_dof_indices.size() == this->n_independent_variables(),
         ExcMessage(
           "Degree of freedom index vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         {
-          Assert(this->registered_independent_variable_values[i] == false,
-                 ExcMessage("Independent variables already registered."));
+          DEAL_II_Assert(
+            this->registered_independent_variable_values[i] == false,
+            ExcMessage("Independent variables already registered."));
         }
       set_dof_values(values, local_dof_indices);
     }
@@ -1627,9 +1629,10 @@ namespace Differentiation
       const VectorType &                                  values,
       const std::vector<dealii::types::global_dof_index> &local_dof_indices)
     {
-      Assert(local_dof_indices.size() == this->n_independent_variables(),
-             ExcMessage(
-               "Vector size does not match number of independent variables"));
+      DEAL_II_Assert(
+        local_dof_indices.size() == this->n_independent_variables(),
+        ExcMessage(
+          "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
           i, values[local_dof_indices[i]]);

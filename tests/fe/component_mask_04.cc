@@ -29,8 +29,9 @@
 void
 test()
 {
-  AssertThrow(ComponentMask(12, false).size() == 12, ExcInternalError());
-  AssertThrow(ComponentMask().size() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(ComponentMask(12, false).size() == 12,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(ComponentMask().size() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

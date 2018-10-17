@@ -45,7 +45,7 @@ template <int dim>
 void
 test()
 {
-  Assert(dim > 1, ExcNotImplemented());
+  DEAL_II_Assert(dim > 1, ExcNotImplemented());
 
   const Point<dim> origin;
 

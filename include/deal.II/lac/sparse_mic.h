@@ -136,22 +136,22 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcStrengthenDiagonalTooSmall);
+  DEAL_II_DeclException0(ExcStrengthenDiagonalTooSmall);
   /**
    * Exception
    */
-  DeclException1(ExcInvalidStrengthening,
-                 double,
-                 << "The strengthening parameter " << arg1
-                 << " is not greater or equal than zero!");
+  DEAL_II_DeclException1(ExcInvalidStrengthening,
+                         double,
+                         << "The strengthening parameter " << arg1
+                         << " is not greater or equal than zero!");
   /**
    * Exception
    */
-  DeclException2(ExcDecompositionNotStable,
-                 int,
-                 double,
-                 << "The diagonal element (" << arg1 << "," << arg1 << ") is "
-                 << arg2 << ", but must be positive");
+  DEAL_II_DeclException2(ExcDecompositionNotStable,
+                         int,
+                         double,
+                         << "The diagonal element (" << arg1 << "," << arg1
+                         << ") is " << arg2 << ", but must be positive");
 
   //@}
 private:

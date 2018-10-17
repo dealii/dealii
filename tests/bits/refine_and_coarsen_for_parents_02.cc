@@ -94,7 +94,8 @@ check()
        cell != dof_handler.end();
        ++cell)
     for (unsigned int child = 0; child < cell->n_children(); ++child)
-      AssertThrow(cell->child(child)->parent() == cell, ExcInternalError());
+      DEAL_II_AssertThrow(cell->child(child)->parent() == cell,
+                          ExcInternalError());
 
   // coarsen the mesh globally and
   // verify that the parent relation
@@ -111,7 +112,8 @@ check()
        cell != dof_handler.end();
        ++cell)
     for (unsigned int child = 0; child < cell->n_children(); ++child)
-      AssertThrow(cell->child(child)->parent() == cell, ExcInternalError());
+      DEAL_II_AssertThrow(cell->child(child)->parent() == cell,
+                          ExcInternalError());
 
   deallog << "OK for " << dim << "d" << std::endl;
 }

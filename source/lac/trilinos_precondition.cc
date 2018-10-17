@@ -77,8 +77,8 @@ namespace TrilinosWrappers
   Epetra_Operator &
   PreconditionBase::trilinos_operator() const
   {
-    AssertThrow(preconditioner,
-                ExcMessage("Trying to dereference a null pointer."));
+    DEAL_II_AssertThrow(preconditioner,
+                        ExcMessage("Trying to dereference a null pointer."));
     return (*preconditioner);
   }
 
@@ -122,9 +122,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -137,13 +137,13 @@ namespace TrilinosWrappers
                        additional_data.min_diagonal);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -174,9 +174,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -190,13 +190,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -227,9 +227,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -243,13 +243,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -289,9 +289,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -310,13 +310,13 @@ namespace TrilinosWrappers
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -357,9 +357,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -379,13 +379,13 @@ namespace TrilinosWrappers
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -426,9 +426,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -448,13 +448,13 @@ namespace TrilinosWrappers
     parameter_list.set("partitioner: local parts", n_local_parts);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -485,9 +485,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -498,13 +498,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -535,9 +535,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -549,13 +549,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -588,9 +588,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -602,13 +602,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -634,9 +634,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -644,13 +644,13 @@ namespace TrilinosWrappers
     parameter_list.set("schwarz: combine mode", "Add");
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -684,9 +684,9 @@ namespace TrilinosWrappers
 
     Ifpack_Chebyshev *ifpack =
       static_cast<Ifpack_Chebyshev *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -704,13 +704,13 @@ namespace TrilinosWrappers
                        !additional_data.nonzero_starting);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -739,9 +739,9 @@ namespace TrilinosWrappers
 
     Ifpack_Preconditioner *ifpack =
       static_cast<Ifpack_Preconditioner *>(preconditioner.get());
-    Assert(ifpack != nullptr,
-           ExcMessage("Trilinos could not create this "
-                      "preconditioner"));
+    DEAL_II_Assert(ifpack != nullptr,
+                   ExcMessage("Trilinos could not create this "
+                              "preconditioner"));
 
     int ierr;
 
@@ -752,13 +752,13 @@ namespace TrilinosWrappers
     parameter_list.set("relaxation: min diagonal value", 0.0);
 
     ierr = ifpack->SetParameters(parameter_list);
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Initialize();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     ierr = ifpack->Compute();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
   void

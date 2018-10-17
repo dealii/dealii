@@ -51,8 +51,9 @@ main()
   Tensor<2, dim, std::complex<double>> t(a);
   Tensor<2, dim, std::complex<double>> tt;
   Tensor<2, dim, std::complex<double>> result(b);
-  AssertThrow(transpose(transpose(t)) == t, ExcInternalError());
-  AssertThrow(transpose(transpose(result)) == result, ExcInternalError());
+  DEAL_II_AssertThrow(transpose(transpose(t)) == t, ExcInternalError());
+  DEAL_II_AssertThrow(transpose(transpose(result)) == result,
+                      ExcInternalError());
 
   Vector<std::complex<double>> unrolled(9);
 

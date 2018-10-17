@@ -29,21 +29,21 @@ check_q_assign_move(Args &&... args)
   const std::vector<Point<dim>> points1  = quad1.get_points();
 
   Quadrature<dim> quad2;
-  AssertThrow(quad2.size() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(quad2.size() == 0, ExcInternalError());
 
   quad2 = std::move(quad1);
 
-  AssertThrow(quad1.size() == 0, ExcInternalError());
-  AssertThrow(quad2.size() == size1, ExcInternalError());
+  DEAL_II_AssertThrow(quad1.size() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(quad2.size() == size1, ExcInternalError());
 
   const std::vector<double>     weights2 = quad2.get_weights();
   const std::vector<Point<dim>> points2  = quad2.get_points();
   for (unsigned int i = 0; i < size1; ++i)
     {
-      AssertThrow(std::abs(weights1[i] - weights2[i]) < 1.e-16,
-                  ExcInternalError());
-      AssertThrow((points1[i] - points2[i]).norm() < 1.e-16,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(weights1[i] - weights2[i]) < 1.e-16,
+                          ExcInternalError());
+      DEAL_II_AssertThrow((points1[i] - points2[i]).norm() < 1.e-16,
+                          ExcInternalError());
     }
 
   return "OK";

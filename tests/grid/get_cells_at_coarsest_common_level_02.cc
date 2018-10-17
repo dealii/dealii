@@ -59,7 +59,8 @@ test()
       // in uniform refinemenet(without any hanging nodes), we expect the size
       // of vector of patch_cells for each cell be equal to the vector of
       // coarse_cells around that cell
-      Assert(patch_cells.size() == coarse_cells.size(), ExcInternalError());
+      DEAL_II_Assert(patch_cells.size() == coarse_cells.size(),
+                     ExcInternalError());
 
       // we sort both vectors to ensure that we are comparing the correct cells
       // to each other
@@ -67,7 +68,7 @@ test()
       std::sort(coarse_cells.begin(), coarse_cells.end());
 
       for (unsigned int i = 0; i < patch_cells.size(); ++i)
-        Assert(patch_cells[i] == coarse_cells[i], ExcInternalError());
+        DEAL_II_Assert(patch_cells[i] == coarse_cells[i], ExcInternalError());
 
       deallog << "coarse_ cells " << cell << ": ";
       for (unsigned int i = 0; i < coarse_cells.size(); ++i)

@@ -169,12 +169,13 @@ check()
           VectorTools::point_value(dof_handler, v, p[i], value);
           deallog << -value(0) << std::endl;
 
-          Assert(std::abs(value(0) - function.value(p[i])) < 1e-4,
-                 ExcInternalError());
+          DEAL_II_Assert(std::abs(value(0) - function.value(p[i])) < 1e-4,
+                         ExcInternalError());
 
           const double scalar_value =
             VectorTools::point_value(dof_handler, v, p[i]);
-          Assert(std::abs(value(0) - scalar_value) < 1e-4, ExcInternalError());
+          DEAL_II_Assert(std::abs(value(0) - scalar_value) < 1e-4,
+                         ExcInternalError());
         }
     }
 

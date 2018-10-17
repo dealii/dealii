@@ -52,7 +52,7 @@ test()
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
         s += GeometryInfo<dim>::d_linear_shape_function_gradient(
           GeometryInfo<dim>::unit_cell_vertex(v), i);
-      AssertThrow(s.norm() == 0, ExcInternalError());
+      DEAL_II_AssertThrow(s.norm() == 0, ExcInternalError());
 
       deallog << "Sum of shape functions: " << s << std::endl;
     }
@@ -64,7 +64,7 @@ test()
     Tensor<1, dim> s;
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
       s += GeometryInfo<dim>::d_linear_shape_function_gradient(center, i);
-    AssertThrow(s.norm() == 0, ExcInternalError());
+    DEAL_II_AssertThrow(s.norm() == 0, ExcInternalError());
 
     deallog << "Sum of shape functions: " << s << std::endl;
   }

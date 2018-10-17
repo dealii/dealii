@@ -68,7 +68,7 @@ test()
   a.resize(100000, 1);
   deallog << "Check large initialization: ";
   for (unsigned int i = 0; i < 100000; ++i)
-    AssertDimension(a[i], 1);
+    DEAL_II_AssertDimension(a[i], 1);
   deallog << "OK" << std::endl;
 
   // check resize for large vectors
@@ -76,11 +76,11 @@ test()
   a.resize(200000, 2);
   a.resize(400000);
   for (unsigned int i = 0; i < 100000; ++i)
-    AssertDimension(a[i], 1);
+    DEAL_II_AssertDimension(a[i], 1);
   for (unsigned int i = 100000; i < 200000; ++i)
-    AssertDimension(a[i], 2);
+    DEAL_II_AssertDimension(a[i], 2);
   for (unsigned int i = 200000; i < 400000; ++i)
-    AssertDimension(a[i], 0);
+    DEAL_II_AssertDimension(a[i], 0);
   deallog << "OK" << std::endl;
 }
 

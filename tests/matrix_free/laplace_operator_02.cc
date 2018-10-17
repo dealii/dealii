@@ -56,7 +56,8 @@ public:
   virtual double
   value(const Point<dim> &p, const unsigned int component = 0) const
   {
-    Assert((component == 0) && (this->n_components == 1), ExcInternalError());
+    DEAL_II_Assert((component == 0) && (this->n_components == 1),
+                   ExcInternalError());
     double val = 0;
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int i = 0; i <= q; ++i)

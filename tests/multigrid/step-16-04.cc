@@ -139,10 +139,10 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 {
   const unsigned int n_points = points.size();
 
-  Assert(values.size() == n_points,
-         ExcDimensionMismatch(values.size(), n_points));
+  DEAL_II_Assert(values.size() == n_points,
+                 ExcDimensionMismatch(values.size(), n_points));
 
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
   for (unsigned int i = 0; i < n_points; ++i)
     values[i] = Coefficient<dim>::value(points[i]);
@@ -415,9 +415,9 @@ LaplaceProblem<dim>::solve()
     mg_smoother,
     min_level,
     triangulation.n_global_levels() - 1);
-  Assert(min_level == mg.get_minlevel(), ExcInternalError());
-  Assert(triangulation.n_global_levels() - 1 == mg.get_maxlevel(),
-         ExcInternalError());
+  DEAL_II_Assert(min_level == mg.get_minlevel(), ExcInternalError());
+  DEAL_II_Assert(triangulation.n_global_levels() - 1 == mg.get_maxlevel(),
+                 ExcInternalError());
   mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
   PreconditionMG<dim,

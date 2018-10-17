@@ -31,7 +31,7 @@ FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int degree)
       std::vector<ComponentMask>(compute_num_dofs(degree),
                                  std::vector<bool>(dim, true)))
 {
-  Assert(dim >= 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(dim >= 2, ExcImpossibleInDim(dim));
 
   this->mapping_type = mapping_nedelec;
   // Set up the table converting components to base components. Since we have
@@ -53,7 +53,7 @@ FE_NedelecSZ<dim, spacedim>::shape_value(const unsigned int /*i*/,
                                          const Point<dim> & /*p*/) const
 {
   using FEE = FiniteElement<dim, dim>;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  DEAL_II_Assert(false, typename FEE::ExcFENotPrimitive());
   return 0.;
 }
 
@@ -67,7 +67,7 @@ FE_NedelecSZ<dim, spacedim>::shape_value_component(
   const unsigned int /*component*/) const
 {
   // Not implemented yet:
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0.;
 }
 
@@ -79,7 +79,7 @@ FE_NedelecSZ<dim, spacedim>::shape_grad(const unsigned int /*i*/,
                                         const Point<dim> & /*p*/) const
 {
   using FEE = FiniteElement<dim, dim>;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  DEAL_II_Assert(false, typename FEE::ExcFENotPrimitive());
   return Tensor<1, dim>();
 }
 
@@ -92,7 +92,7 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_component(
   const Point<dim> & /*p*/,
   const unsigned int /*component*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return Tensor<1, dim>();
 }
 
@@ -104,7 +104,7 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_grad(const unsigned int /*i*/,
                                              const Point<dim> & /*p*/) const
 {
   using FEE = FiniteElement<dim, dim>;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  DEAL_II_Assert(false, typename FEE::ExcFENotPrimitive());
   return Tensor<2, dim>();
 }
 
@@ -117,7 +117,7 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_grad_component(
   const Point<dim> & /*p*/,
   const unsigned int /*component*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return Tensor<2, dim>();
 }
 
@@ -174,7 +174,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
   // Not implementing second derivatives yet:
   if (flags & update_hessians)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   std::vector<Point<dim>> p_list(n_q_points);
@@ -1091,7 +1091,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
   return std::move(data);
@@ -1120,13 +1120,14 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(flags & update_values) ||
-           fe_data.shape_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(fe_data.shape_values.size(),
-                              this->dofs_per_cell));
-  Assert(!(flags & update_values) ||
-           fe_data.shape_values[0].size() == n_q_points,
-         ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
+  DEAL_II_Assert(!(flags & update_values) ||
+                   fe_data.shape_values.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(fe_data.shape_values.size(),
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(!(flags & update_values) ||
+                   fe_data.shape_values[0].size() == n_q_points,
+                 ExcDimensionMismatch(fe_data.shape_values[0].size(),
+                                      n_q_points));
 
   // Useful constants:
   const unsigned int degree(
@@ -1517,7 +1518,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -1533,7 +1534,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
   // shape functions.
   //
   // Note that it should only be called in 3D.
-  Assert(dim == 3, ExcDimensionMismatch(dim, 3));
+  DEAL_II_Assert(dim == 3, ExcDimensionMismatch(dim, 3));
   //
   // It will fill in the missing parts of fe_data which were not possible to
   // fill in the get_data routine, with respect to face-based shape functions.
@@ -1555,14 +1556,14 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
         {
           const unsigned int n_q_points = quadrature.size();
 
-          Assert(!(flags & update_values) ||
-                   fe_data.shape_values.size() == this->dofs_per_cell,
-                 ExcDimensionMismatch(fe_data.shape_values.size(),
-                                      this->dofs_per_cell));
-          Assert(!(flags & update_values) ||
-                   fe_data.shape_values[0].size() == n_q_points,
-                 ExcDimensionMismatch(fe_data.shape_values[0].size(),
-                                      n_q_points));
+          DEAL_II_Assert(!(flags & update_values) ||
+                           fe_data.shape_values.size() == this->dofs_per_cell,
+                         ExcDimensionMismatch(fe_data.shape_values.size(),
+                                              this->dofs_per_cell));
+          DEAL_II_Assert(!(flags & update_values) ||
+                           fe_data.shape_values[0].size() == n_q_points,
+                         ExcDimensionMismatch(fe_data.shape_values[0].size(),
+                                              n_q_points));
 
           // Useful geometry info:
           const unsigned int vertices_per_face(
@@ -1891,7 +1892,7 @@ FE_NedelecSZ<dim, spacedim>::fill_face_values(
         }
       if (flags & update_hessians)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -1911,8 +1912,8 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
     &data) const
 {
   // Convert to the correct internal data class for this FE class.
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != 0,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != 0,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   // Now update the edge-based DoFs, which depend on the cell.
@@ -1927,13 +1928,14 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   const UpdateFlags  flags(fe_data.update_each);
   const unsigned int n_q_points = quadrature.size();
 
-  Assert(!(flags & update_values) ||
-           fe_data.shape_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(fe_data.shape_values.size(),
-                              this->dofs_per_cell));
-  Assert(!(flags & update_values) ||
-           fe_data.shape_values[0].size() == n_q_points,
-         ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
+  DEAL_II_Assert(!(flags & update_values) ||
+                   fe_data.shape_values.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(fe_data.shape_values.size(),
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(!(flags & update_values) ||
+                   fe_data.shape_values[0].size() == n_q_points,
+                 ExcDimensionMismatch(fe_data.shape_values[0].size(),
+                                      n_q_points));
 
   if (flags & update_values)
     {
@@ -2035,8 +2037,8 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != 0,
-         ExcInternalError());
+  DEAL_II_Assert(dynamic_cast<const InternalData *>(&fe_internal) != 0,
+                 ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
   // Now update the edge-based DoFs, which depend on the cell.
@@ -2149,7 +2151,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_subface_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
     & /*data*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 template <int dim, int spacedim>
@@ -2188,7 +2190,7 @@ FE_NedelecSZ<dim, spacedim>::update_each(const UpdateFlags flags) const
            update_covariant_transformation;
 
   if (flags & update_hessians)
-    //     Assert (false, ExcNotImplemented());
+    //     DEAL_II_Assert (false, ExcNotImplemented());
     out |= update_hessians | update_values | update_gradients |
            update_jacobian_pushed_forward_grads |
            update_jacobian_pushed_forward_2nd_derivatives |
@@ -2258,7 +2260,7 @@ FE_NedelecSZ<dim, spacedim>::compute_num_dofs(const unsigned int degree) const
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return 0;
         }
     }

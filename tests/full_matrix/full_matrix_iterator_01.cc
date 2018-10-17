@@ -31,28 +31,28 @@ test()
   // test prefix operator
   const IteratorType k = A.begin(), j = ++A.begin();
 
-  AssertThrow(k < j, ExcInternalError());
-  AssertThrow(j > k, ExcInternalError());
+  DEAL_II_AssertThrow(k < j, ExcInternalError());
+  DEAL_II_AssertThrow(j > k, ExcInternalError());
 
-  AssertThrow(k <= j, ExcInternalError());
-  AssertThrow(j >= k, ExcInternalError());
+  DEAL_II_AssertThrow(k <= j, ExcInternalError());
+  DEAL_II_AssertThrow(j >= k, ExcInternalError());
 
-  AssertThrow(!(j < k), ExcInternalError());
-  AssertThrow(!(k > j), ExcInternalError());
+  DEAL_II_AssertThrow(!(j < k), ExcInternalError());
+  DEAL_II_AssertThrow(!(k > j), ExcInternalError());
 
-  AssertThrow(k != j, ExcInternalError());
-  AssertThrow(!(k == j), ExcInternalError());
+  DEAL_II_AssertThrow(k != j, ExcInternalError());
+  DEAL_II_AssertThrow(!(k == j), ExcInternalError());
 
-  AssertThrow(k == k, ExcInternalError());
-  AssertThrow(!(k != k), ExcInternalError());
+  DEAL_II_AssertThrow(k == k, ExcInternalError());
+  DEAL_II_AssertThrow(!(k != k), ExcInternalError());
 
   // test postfix operator
   IteratorType l = A.begin();
   IteratorType m = l++;
 
-  AssertThrow(m == k, ExcInternalError());
-  AssertThrow(l > m, ExcInternalError());
-  AssertThrow(l->column() == k->column() + 1, ExcInternalError());
+  DEAL_II_AssertThrow(m == k, ExcInternalError());
+  DEAL_II_AssertThrow(l > m, ExcInternalError());
+  DEAL_II_AssertThrow(l->column() == k->column() + 1, ExcInternalError());
 }
 
 

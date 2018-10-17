@@ -71,8 +71,8 @@ namespace Polynomials
                                  const unsigned int           center)
     : in_lagrange_product_form(true)
   {
-    Assert(supp.size() > 0, ExcEmptyObject());
-    AssertIndexRange(center, supp.size());
+    DEAL_II_Assert(supp.size() > 0, ExcEmptyObject());
+    DEAL_II_AssertIndexRange(center, supp.size());
 
     lagrange_support_points.reserve(supp.size() - 1);
     number tmp_lagrange_weight = 1.;
@@ -84,10 +84,12 @@ namespace Polynomials
         }
 
     // check for underflow and overflow
-    Assert(std::fabs(tmp_lagrange_weight) > std::numeric_limits<number>::min(),
-           ExcMessage("Underflow in computation of Lagrange denominator."));
-    Assert(std::fabs(tmp_lagrange_weight) < std::numeric_limits<number>::max(),
-           ExcMessage("Overflow in computation of Lagrange denominator."));
+    DEAL_II_Assert(
+      std::fabs(tmp_lagrange_weight) > std::numeric_limits<number>::min(),
+      ExcMessage("Underflow in computation of Lagrange denominator."));
+    DEAL_II_Assert(
+      std::fabs(tmp_lagrange_weight) < std::numeric_limits<number>::max(),
+      ExcMessage("Overflow in computation of Lagrange denominator."));
 
     lagrange_weight = static_cast<number>(1.) / tmp_lagrange_weight;
   }
@@ -98,7 +100,7 @@ namespace Polynomials
   void
   Polynomial<number>::value(const number x, std::vector<number> &values) const
   {
-    Assert(values.size() > 0, ExcZero());
+    DEAL_II_Assert(values.size() > 0, ExcZero());
 
     value(x, values.size() - 1, values.data());
   }
@@ -201,7 +203,7 @@ namespace Polynomials
         return;
       }
 
-    Assert(coefficients.size() > 0, ExcEmptyObject());
+    DEAL_II_Assert(coefficients.size() > 0, ExcEmptyObject());
 
     // if we only need the value, then call the other function since that is
     // significantly faster (there is no need to allocate and free memory,
@@ -243,8 +245,8 @@ namespace Polynomials
   Polynomial<number>::transform_into_standard_form()
   {
     // should only be called when the product form is active
-    Assert(in_lagrange_product_form == true, ExcInternalError());
-    Assert(coefficients.size() == 0, ExcInternalError());
+    DEAL_II_Assert(in_lagrange_product_form == true, ExcInternalError());
+    DEAL_II_Assert(coefficients.size() == 0, ExcInternalError());
 
     // compute coefficients by expanding the product (x-x_i) term by term
     coefficients.resize(lagrange_support_points.size() + 1);
@@ -511,7 +513,7 @@ namespace Polynomials
   {
     // too many coefficients cause overflow in
     // the binomial coefficient used below
-    Assert(coefficients.size() < 31, ExcNotImplemented());
+    DEAL_II_Assert(coefficients.size() < 31, ExcNotImplemented());
 
     // Copy coefficients to a vector of
     // accuracy given by the argument
@@ -556,7 +558,7 @@ namespace Polynomials
         // should have gone through a
         // whole row of Pascal's
         // triangle.
-        Assert(binomial_coefficient == 1, ExcInternalError());
+        DEAL_II_Assert(binomial_coefficient == 1, ExcInternalError());
       }
 
     // copy new elements to old vector
@@ -720,7 +722,7 @@ namespace Polynomials
                            generate_equidistant_unit_points(n),
                          support_point)
   {
-    Assert(coefficients.size() == 0, ExcInternalError());
+    DEAL_II_Assert(coefficients.size() == 0, ExcInternalError());
 
     // For polynomial order up to 3, we have precomputed weights. Use these
     // weights instead of the product form
@@ -742,11 +744,12 @@ namespace Polynomials
                                             const unsigned int   support_point,
                                             std::vector<double> &a)
   {
-    Assert(support_point < n + 1, ExcIndexRange(support_point, 0, n + 1));
+    DEAL_II_Assert(support_point < n + 1,
+                   ExcIndexRange(support_point, 0, n + 1));
 
     unsigned int n_functions = n + 1;
-    Assert(support_point < n_functions,
-           ExcIndexRange(support_point, 0, n_functions));
+    DEAL_II_Assert(support_point < n_functions,
+                   ExcIndexRange(support_point, 0, n_functions));
     double const *x = nullptr;
 
     switch (n)
@@ -786,10 +789,10 @@ namespace Polynomials
             break;
           }
         default:
-          Assert(false, ExcInternalError())
+          DEAL_II_Assert(false, ExcInternalError())
       }
 
-    Assert(x != nullptr, ExcInternalError());
+    DEAL_II_Assert(x != nullptr, ExcInternalError());
     for (unsigned int i = 0; i < n_functions; ++i)
       a[i] = x[support_point * n_functions + i];
   }
@@ -1229,9 +1232,9 @@ namespace Polynomials
   std::vector<Polynomial<double>>
   HermiteInterpolation::generate_complete_basis(const unsigned int n)
   {
-    Assert(n >= 3,
-           ExcNotImplemented("Hermite interpolation makes no sense for "
-                             "degrees less than three"));
+    DEAL_II_Assert(n >= 3,
+                   ExcNotImplemented("Hermite interpolation makes no sense for "
+                                     "degrees less than three"));
     std::vector<Polynomial<double>> basis(n + 1);
 
     for (unsigned int i = 0; i <= n; ++i)
@@ -1297,7 +1300,7 @@ namespace Polynomials
                                                      const unsigned int index)
     : Polynomial<double>(0)
   {
-    AssertIndexRange(index, degree + 1);
+    DEAL_II_AssertIndexRange(index, degree + 1);
 
     this->coefficients.clear();
     this->in_lagrange_product_form = true;
@@ -1405,7 +1408,7 @@ namespace Polynomials
 
         std::vector<double> jacobi_roots =
           jacobi_polynomial_roots<double>(degree - 3, 2, 2);
-        AssertDimension(jacobi_roots.size(), degree - 3);
+        DEAL_II_AssertDimension(jacobi_roots.size(), degree - 3);
 
         // iteration from variable support point N with secant method
         // initial values
@@ -1451,8 +1454,9 @@ namespace Polynomials
             Polynomial<double>  helper(points, 0);
             std::vector<double> value_and_grad(2);
             helper.value(0., value_and_grad);
-            Assert(std::abs(value_and_grad[0]) > 1e-10,
-                   ExcInternalError("There should not be a zero at x=0."));
+            DEAL_II_Assert(std::abs(value_and_grad[0]) > 1e-10,
+                           ExcInternalError(
+                             "There should not be a zero at x=0."));
 
             const double auxiliary_zero =
               find_support_point_x_star(jacobi_roots);
@@ -1493,8 +1497,9 @@ namespace Polynomials
             Polynomial<double>  helper(points, degree - 1);
             std::vector<double> value_and_grad(2);
             helper.value(1., value_and_grad);
-            Assert(std::abs(value_and_grad[0]) > 1e-10,
-                   ExcInternalError("There should not be a zero at x=1."));
+            DEAL_II_Assert(std::abs(value_and_grad[0]) > 1e-10,
+                           ExcInternalError(
+                             "There should not be a zero at x=1."));
 
             const double auxiliary_zero =
               find_support_point_x_star(jacobi_roots);

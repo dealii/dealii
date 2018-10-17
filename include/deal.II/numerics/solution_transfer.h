@@ -442,17 +442,18 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcNotPrepared,
-                   "You are attempting an operation for which this object is "
-                   "not prepared. This may be because you either did not call "
-                   "one of the prepare_*() functions at all, or because you "
-                   "called the wrong one for the operation you are currently "
-                   "attempting.");
+  DEAL_II_DeclExceptionMsg(
+    ExcNotPrepared,
+    "You are attempting an operation for which this object is "
+    "not prepared. This may be because you either did not call "
+    "one of the prepare_*() functions at all, or because you "
+    "called the wrong one for the operation you are currently "
+    "attempting.");
 
   /**
    * Exception
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcAlreadyPrepForRef,
     "You are attempting to call one of the prepare_*() functions "
     "of this object to prepare it for an operation for which it "
@@ -462,7 +463,7 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcAlreadyPrepForCoarseAndRef,
     "You are attempting to call one of the prepare_*() functions "
     "of this object to prepare it for an operation for which it "

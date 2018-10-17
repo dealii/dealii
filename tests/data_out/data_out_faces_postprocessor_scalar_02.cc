@@ -59,15 +59,15 @@ public:
   {
     for (unsigned int q = 0; q < input_data.solution_values.size(); ++q)
       {
-        Assert(computed_quantities[q].size() == 1, ExcInternalError());
+        DEAL_II_Assert(computed_quantities[q].size() == 1, ExcInternalError());
 
         // get the cell this all belongs to
         typename DoFHandler<dim>::cell_iterator cell =
           input_data.template get_cell<DoFHandler<dim>>();
 
-        Assert(input_data.solution_values[q] ==
-                 double(cell->active_cell_index()),
-               ExcInternalError());
+        DEAL_II_Assert(input_data.solution_values[q] ==
+                         double(cell->active_cell_index()),
+                       ExcInternalError());
 
         computed_quantities[q][0] = input_data.solution_values[q];
       }

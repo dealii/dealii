@@ -66,7 +66,7 @@ private:
               const LinearAlgebra::distributed::BlockVector<Number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    AssertDimension(src.n_blocks(), dst.n_blocks());
+    DEAL_II_AssertDimension(src.n_blocks(), dst.n_blocks());
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> phi(data);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
@@ -161,7 +161,7 @@ test()
   // make sure that the value we set here at least includes some case where we
   // need to go to the alternative case of calling the full
   // update_ghost_values()
-  Assert(
+  DEAL_II_Assert(
     LinearAlgebra::distributed::BlockVector<number>::communication_block_size <
       80,
     ExcInternalError());
@@ -176,7 +176,7 @@ test()
 
       // after initialization via MatrixFree we are in the write state for
       // ghosts
-      AssertThrow(in.has_ghost_elements() == false, ExcInternalError());
+      DEAL_II_AssertThrow(in.has_ghost_elements() == false, ExcInternalError());
 
       // fill each block with random numbers and do the block-wise
       // matrix-vector product for reference
@@ -194,7 +194,7 @@ test()
 
       // explicitly update ghosts so that we can read them:
       in.update_ghost_values();
-      AssertThrow(in.has_ghost_elements(), ExcInternalError());
+      DEAL_II_AssertThrow(in.has_ghost_elements(), ExcInternalError());
 
       deallog << "Norm of difference with " << n_blocks << " blocks:";
 
@@ -205,7 +205,7 @@ test()
           mf.vmult(out, in);
 
           // since we made "in" ghosted, make sure it is still ghosted
-          AssertThrow(in.has_ghost_elements(), ExcInternalError());
+          DEAL_II_AssertThrow(in.has_ghost_elements(), ExcInternalError());
 
           out -= ref;
           const double diff_norm = out.linfty_norm();

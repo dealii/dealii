@@ -167,14 +167,15 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcInvalidKey,
-                 cell_iterator,
-                 << "The iterator " << arg1 << " is not valid as key for "
-                 << "this map.");
+  DEAL_II_DeclException1(ExcInvalidKey,
+                         cell_iterator,
+                         << "The iterator " << arg1
+                         << " is not valid as key for "
+                         << "this map.");
   /**
    * Exception
    */
-  DeclException0(ExcIncompatibleGrids);
+  DEAL_II_DeclException0(ExcIncompatibleGrids);
 
 private:
   /**

@@ -58,7 +58,7 @@ eigenvalues(const SymmetricTensor<2, 2, Number> &T)
       const Number tr_T    = trace(T);
       const Number det_T   = determinant(T);
       const Number descrim = tr_T * tr_T - 4.0 * det_T;
-      Assert(
+      DEAL_II_Assert(
         descrim > internal::NumberType<Number>::value(0.0),
         ExcMessage(
           "The roots of the characteristic polynomial are complex valued."));
@@ -67,8 +67,8 @@ eigenvalues(const SymmetricTensor<2, 2, Number> &T)
       const std::array<Number, 2> eig_vals = {
         {internal::NumberType<Number>::value(0.5 * (tr_T + sqrt_desc)),
          internal::NumberType<Number>::value(0.5 * (tr_T - sqrt_desc))}};
-      Assert(eig_vals[0] >= eig_vals[1],
-             ExcMessage("The eigenvalue ordering is incorrect."));
+      DEAL_II_Assert(eig_vals[0] >= eig_vals[1],
+                     ExcMessage("The eigenvalue ordering is incorrect."));
       return eig_vals;
     }
 }
@@ -286,7 +286,7 @@ namespace internal
               // stipulated number of iterations
               if (it == max_n_it)
                 {
-                  AssertThrow(
+                  DEAL_II_AssertThrow(
                     false,
                     ExcMessage(
                       "No convergence in iterative QL eigenvector algorithm.")) return std::
@@ -363,7 +363,8 @@ namespace internal
             }
 
           // Normalize
-          Assert(eig_vals_vecs[e].second.norm() != 0.0, ExcDivideByZero());
+          DEAL_II_Assert(eig_vals_vecs[e].second.norm() != 0.0,
+                         ExcDivideByZero());
           eig_vals_vecs[e].second /= eig_vals_vecs[e].second.norm();
         }
       return eig_vals_vecs;
@@ -419,7 +420,7 @@ namespace internal
           // stipulated number of iterations
           if (it == max_n_it)
             {
-              AssertThrow(
+              DEAL_II_AssertThrow(
                 false,
                 ExcMessage(
                   "No convergence in iterative Jacobi eigenvector algorithm.")) return std::
@@ -527,7 +528,8 @@ namespace internal
             }
 
           // Normalize
-          Assert(eig_vals_vecs[e].second.norm() != 0.0, ExcDivideByZero());
+          DEAL_II_Assert(eig_vals_vecs[e].second.norm() != 0.0,
+                         ExcDivideByZero());
           eig_vals_vecs[e].second /= eig_vals_vecs[e].second.norm();
         }
       return eig_vals_vecs;
@@ -712,7 +714,8 @@ namespace internal
             }
 
           // Normalize
-          Assert(eig_vals_vecs[e].second.norm() != 0.0, ExcDivideByZero());
+          DEAL_II_Assert(eig_vals_vecs[e].second.norm() != 0.0,
+                         ExcDivideByZero());
           eig_vals_vecs[e].second /= eig_vals_vecs[e].second.norm();
         }
       return eig_vals_vecs;
@@ -725,7 +728,7 @@ namespace internal
                          const double /*rotation_angle*/,
                          const unsigned int /*axis*/ = 0)
     {
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
       return Tensor<2, 1, Number>({{T[0][0]}});
     }
 
@@ -749,7 +752,7 @@ namespace internal
                          const double       rotation_angle,
                          const unsigned int axis = 0)
     {
-      Assert(axis < 3, ExcIndexRange(axis, 0, 3));
+      DEAL_II_Assert(axis < 3, ExcIndexRange(axis, 0, 3));
 
       Tensor<2, 3> R;
       switch (axis)
@@ -767,7 +770,7 @@ namespace internal
               {0, 0, 1}, rotation_angle);
             break;
           default:
-            AssertThrow(false, ExcNotImplemented());
+            DEAL_II_AssertThrow(false, ExcNotImplemented());
             break;
         }
       return R * T;
@@ -806,7 +809,7 @@ namespace internal
             break;
         }
 
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
       return std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>();
     }
 
@@ -854,7 +857,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
           perform_eigenvector_decomposition(T, method);
       else
         {
-          Assert(
+          DEAL_II_Assert(
             method != SymmetricTensorEigenvectorMethod::hybrid,
             ExcMessage(
               "The hybrid method cannot be used with auto-differentiable numbers "
@@ -886,7 +889,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               else if (method == SymmetricTensorEigenvectorMethod::jacobi)
                 sf = (dim == 2 ? 1e6 : 1e9);
               else
-                AssertThrow(false, ExcNotImplemented());
+                DEAL_II_AssertThrow(false, ExcNotImplemented());
             }
           else if (Differentiation::AD::is_sacado_rad_number<Number>::value)
             {
@@ -897,14 +900,15 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               else if (method == SymmetricTensorEigenvectorMethod::jacobi)
                 sf = (dim == 2 ? 1e8 : 1e9);
               else
-                AssertThrow(false, ExcNotImplemented());
+                DEAL_II_AssertThrow(false, ExcNotImplemented());
             }
           else
             {
               // Everything else
-              Assert(Differentiation::AD::is_tapeless_ad_number<Number>::value,
-                     ExcInternalError());
-              Assert(
+              DEAL_II_Assert(
+                Differentiation::AD::is_tapeless_ad_number<Number>::value,
+                ExcInternalError());
+              DEAL_II_Assert(
                 Differentiation::AD::is_sacado_dfad_number<Number>::value ||
                   Differentiation::AD::is_adolc_tapeless_number<Number>::value,
                 ExcInternalError());
@@ -915,7 +919,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
               else if (method == SymmetricTensorEigenvectorMethod::jacobi)
                 sf = (dim == 2 ? 1e2 : 1e7);
               else
-                AssertThrow(false, ExcNotImplemented());
+                DEAL_II_AssertThrow(false, ExcNotImplemented());
             }
 
           using scalar_type =
@@ -949,7 +953,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
             }
           else
             {
-              Assert(dim == 3, ExcDimensionMismatch(dim, 3));
+              DEAL_II_Assert(dim == 3, ExcDimensionMismatch(dim, 3));
 
               SymmetricTensor<2, dim, Number> T_prime;
               Tensor<2, dim, Number>          T_prime_ns;
@@ -1024,7 +1028,7 @@ namespace internal
       static dealii::SymmetricTensor<4, 3, adouble>
       value(const dealii::SymmetricTensor<4, 3, adouble> & /*t*/)
       {
-        AssertThrow(false, ExcADOLCAdvancedBranching());
+        DEAL_II_AssertThrow(false, ExcADOLCAdvancedBranching());
         return dealii::SymmetricTensor<4, 3, adouble>();
       }
     };
@@ -1035,7 +1039,7 @@ template <>
 std::array<adouble, 1>
 eigenvalues(const SymmetricTensor<2, 1, adouble> & /*T*/)
 {
-  AssertThrow(false, ExcADOLCAdvancedBranching());
+  DEAL_II_AssertThrow(false, ExcADOLCAdvancedBranching());
   return std::array<adouble, 1>();
 }
 
@@ -1045,7 +1049,7 @@ template <>
 std::array<adouble, 2>
 eigenvalues(const SymmetricTensor<2, 2, adouble> & /*T*/)
 {
-  AssertThrow(false, ExcADOLCAdvancedBranching());
+  DEAL_II_AssertThrow(false, ExcADOLCAdvancedBranching());
   return std::array<adouble, 2>();
 }
 
@@ -1055,7 +1059,7 @@ template <>
 std::array<adouble, 3>
 eigenvalues(const SymmetricTensor<2, 3, adouble> & /*T*/)
 {
-  AssertThrow(false, ExcADOLCAdvancedBranching());
+  DEAL_II_AssertThrow(false, ExcADOLCAdvancedBranching());
   return std::array<adouble, 3>();
 }
 
@@ -1067,7 +1071,7 @@ std::array<std::pair<adouble, Tensor<1, dim, adouble>>,
 eigenvectors(const SymmetricTensor<2, dim, adouble> & /*T*/,
              const SymmetricTensorEigenvectorMethod /*method*/)
 {
-  AssertThrow(false, ExcADOLCAdvancedBranching());
+  DEAL_II_AssertThrow(false, ExcADOLCAdvancedBranching());
   return std::array<std::pair<adouble, Tensor<1, dim, adouble>>,
                     std::integral_constant<int, dim>::value>();
 }

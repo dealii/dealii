@@ -630,7 +630,7 @@ namespace MeshWorker
             ps->get_quadrature(),
             ps->get_update_flags());
         else
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
       }
   }
 
@@ -669,7 +669,7 @@ namespace MeshWorker
   inline const FiniteElement<dim, spacedim> &
   IntegrationInfo<dim, spacedim>::finite_element() const
   {
-    Assert(fe_pointer != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(fe_pointer != nullptr, ExcNotInitialized());
     return *fe_pointer;
   }
 
@@ -677,7 +677,7 @@ namespace MeshWorker
   inline const FEValuesBase<dim, spacedim> &
   IntegrationInfo<dim, spacedim>::fe_values() const
   {
-    AssertDimension(fevalv.size(), 1);
+    DEAL_II_AssertDimension(fevalv.size(), 1);
     return *fevalv[0];
   }
 
@@ -686,7 +686,7 @@ namespace MeshWorker
   inline const FEValuesBase<dim, spacedim> &
   IntegrationInfo<dim, spacedim>::fe_values(unsigned int i) const
   {
-    Assert(i < fevalv.size(), ExcIndexRange(i, 0, fevalv.size()));
+    DEAL_II_Assert(i < fevalv.size(), ExcIndexRange(i, 0, fevalv.size()));
     return *fevalv[i];
   }
 

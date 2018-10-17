@@ -57,7 +57,7 @@ test(std::ostream & /*out*/)
     //    write_vtk(tr, "2");
     deallog << "cells test2: " << tr.n_active_cells() << std::endl;
 
-    Assert(tr.n_active_cells() == 88, ExcInternalError());
+    DEAL_II_Assert(tr.n_active_cells() == 88, ExcInternalError());
   }
 }
 

@@ -78,7 +78,8 @@ main(int argc, char **argv)
   const BlockVectorLocal local_vector_2 = parallel_vector;
   local_vector_2.print(deallog.get_file_stream());
 
-  Assert(local_vector_1 == local_vector_2, ExcMessage("Vectors don't match"));
+  DEAL_II_Assert(local_vector_1 == local_vector_2,
+                 ExcMessage("Vectors don't match"));
 
   deallog << "OK" << std::endl;
 }

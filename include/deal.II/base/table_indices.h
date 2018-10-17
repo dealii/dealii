@@ -279,36 +279,36 @@ TableIndices<N>::TableIndices(const std::size_t index0,
   switch (N)
     {
       case 1:
-        Assert(index1 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
+        DEAL_II_Assert(index1 == numbers::invalid_unsigned_int,
+                       ExcMessage("more than N index values provided"));
         DEAL_II_FALLTHROUGH;
       case 2:
-        Assert(index2 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
+        DEAL_II_Assert(index2 == numbers::invalid_unsigned_int,
+                       ExcMessage("more than N index values provided"));
         DEAL_II_FALLTHROUGH;
       case 3:
-        Assert(index3 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
+        DEAL_II_Assert(index3 == numbers::invalid_unsigned_int,
+                       ExcMessage("more than N index values provided"));
         DEAL_II_FALLTHROUGH;
       case 4:
-        Assert(index4 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
+        DEAL_II_Assert(index4 == numbers::invalid_unsigned_int,
+                       ExcMessage("more than N index values provided"));
         DEAL_II_FALLTHROUGH;
       case 5:
-        Assert(index5 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
+        DEAL_II_Assert(index5 == numbers::invalid_unsigned_int,
+                       ExcMessage("more than N index values provided"));
         DEAL_II_FALLTHROUGH;
       case 6:
-        Assert(index6 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
+        DEAL_II_Assert(index6 == numbers::invalid_unsigned_int,
+                       ExcMessage("more than N index values provided"));
         DEAL_II_FALLTHROUGH;
       case 7:
-        Assert(index7 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
+        DEAL_II_Assert(index7 == numbers::invalid_unsigned_int,
+                       ExcMessage("more than N index values provided"));
         DEAL_II_FALLTHROUGH;
       case 8:
-        Assert(index8 == numbers::invalid_unsigned_int,
-               ExcMessage("more than N index values provided"));
+        DEAL_II_Assert(index8 == numbers::invalid_unsigned_int,
+                       ExcMessage("more than N index values provided"));
         break;
       default:;
     }
@@ -356,7 +356,7 @@ TableIndices<N>::TableIndices(const std::size_t index0,
 template <int N>
 inline std::size_t TableIndices<N>::operator[](const unsigned int i) const
 {
-  AssertIndexRange(i, N);
+  DEAL_II_AssertIndexRange(i, N);
   return indices[i];
 }
 
@@ -364,7 +364,7 @@ inline std::size_t TableIndices<N>::operator[](const unsigned int i) const
 template <int N>
 inline std::size_t &TableIndices<N>::operator[](const unsigned int i)
 {
-  AssertIndexRange(i, N);
+  DEAL_II_AssertIndexRange(i, N);
   return indices[i];
 }
 

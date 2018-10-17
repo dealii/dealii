@@ -88,7 +88,8 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     {
       deallog << "  curls[q]= " << curls[q] << std::endl
               << "  grads[q]= " << grads[q] << std::endl;
-      Assert((curl(grads[q]) - curls[q]).norm() <= 1e-10, ExcInternalError());
+      DEAL_II_Assert((curl(grads[q]) - curls[q]).norm() <= 1e-10,
+                     ExcInternalError());
     }
 }
 

@@ -63,7 +63,7 @@ public:
 double
 TestFunction::value(const Point<2> &p, const unsigned int component) const
 {
-  Assert(component == 0, ExcInternalError());
+  DEAL_II_Assert(component == 0, ExcInternalError());
   return std::sin(pi * p(0)) * std::cos(pi * p(1));
 }
 
@@ -151,7 +151,7 @@ test(const Triangulation<dim> &tria,
                                           function1_back);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   DataOut<dim> data_out;
@@ -183,7 +183,7 @@ test(const Triangulation<dim> &tria,
         file2_name += fe_string2 + "_interpolation_diff.gnuplot";
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   deallog << file2_name << std::endl;
 

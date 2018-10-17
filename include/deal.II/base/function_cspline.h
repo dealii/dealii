@@ -29,29 +29,30 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
 {
-  DeclException1(ExcCSplineEmpty,
-                 int,
-                 << "Interpolation points vector size can not be <" << arg1
-                 << ">.");
+  DEAL_II_DeclException1(ExcCSplineEmpty,
+                         int,
+                         << "Interpolation points vector size can not be <"
+                         << arg1 << ">.");
 
-  DeclException2(ExcCSplineSizeMismatch,
-                 int,
-                 int,
-                 << "The size of interpolation points <" << arg1
-                 << "> is different from the size of interpolation values <"
-                 << arg2 << ">.");
+  DEAL_II_DeclException2(
+    ExcCSplineSizeMismatch,
+    int,
+    int,
+    << "The size of interpolation points <" << arg1
+    << "> is different from the size of interpolation values <" << arg2
+    << ">.");
 
 
-  DeclException3(ExcCSplineOrder,
-                 int,
-                 double,
-                 double,
-                 << "The input interpolation points are not strictly ordered : "
-                 << std::endl
-                 << "x[" << arg1 << "] = " << arg2 << " >= x[" << (arg1 + 1)
-                 << "] = " << arg3 << ".");
+  DEAL_II_DeclException3(
+    ExcCSplineOrder,
+    int,
+    double,
+    double,
+    << "The input interpolation points are not strictly ordered : " << std::endl
+    << "x[" << arg1 << "] = " << arg2 << " >= x[" << (arg1 + 1)
+    << "] = " << arg3 << ".");
 
-  DeclException3(
+  DEAL_II_DeclException3(
     ExcCSplineRange,
     double,
     double,

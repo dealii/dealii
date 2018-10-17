@@ -64,7 +64,7 @@ test()
   std::stringstream merged;
   GridOut().write_gnuplot(merged_triangulation, merged);
   deallog << merged.str() << std::endl;
-  AssertThrow(separate.str() == merged.str(), ExcInternalError());
+  DEAL_II_AssertThrow(separate.str() == merged.str(), ExcInternalError());
 }
 
 

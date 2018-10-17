@@ -109,8 +109,8 @@ namespace
         u.push_back(s[i]);
       else
         {
-          Assert(i + 2 < s.size(),
-                 ExcMessage("Trying to demangle an invalid string."));
+          DEAL_II_Assert(i + 2 < s.size(),
+                         ExcMessage("Trying to demangle an invalid string."));
 
           unsigned char c = 0;
           switch (s[i + 1])
@@ -164,7 +164,7 @@ namespace
                 c = 15 * 16;
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             }
           switch (s[i + 2])
             {
@@ -217,7 +217,7 @@ namespace
                 c += 15;
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             }
 
           u.push_back(static_cast<char>(c));
@@ -319,7 +319,7 @@ ParameterHandler::parse_input(std::istream &     input,
                               const std::string &last_line,
                               const bool         skip_undefined)
 {
-  AssertThrow(input, ExcIO());
+  DEAL_II_AssertThrow(input, ExcIO());
 
   // store subsections we are currently in
   const std::vector<std::string> saved_path = subsection_path;
@@ -439,8 +439,9 @@ ParameterHandler::parse_input(std::istream &     input,
         }
       // restore subsection we started with before throwing the exception:
       subsection_path = saved_path;
-      AssertThrow(false,
-                  ExcUnbalancedSubsections(filename, paths_message.str()));
+      DEAL_II_AssertThrow(false,
+                          ExcUnbalancedSubsections(filename,
+                                                   paths_message.str()));
     }
 }
 
@@ -500,22 +501,23 @@ namespace
                                     current_path + path_separator + p->first);
 
             const std::string new_value = p->second.get<std::string>("value");
-            AssertThrow(destination.get_optional<std::string>(full_path) &&
-                          destination.get_optional<std::string>(
-                            full_path + path_separator + "value"),
-                        ParameterHandler::ExcEntryUndeclared(p->first));
+            DEAL_II_AssertThrow(destination.get_optional<std::string>(
+                                  full_path) &&
+                                  destination.get_optional<std::string>(
+                                    full_path + path_separator + "value"),
+                                ParameterHandler::ExcEntryUndeclared(p->first));
 
             // first make sure that the new entry actually satisfies its
             // constraints
             const unsigned int pattern_index = destination.get<unsigned int>(
               full_path + path_separator + "pattern");
-            AssertThrow(patterns[pattern_index]->match(new_value),
-                        ParameterHandler::ExcInvalidEntryForPatternXML
-                        // XML entries sometimes have extra surrounding
-                        // newlines
-                        (Utilities::trim(new_value),
-                         p->first,
-                         patterns[pattern_index]->description()));
+            DEAL_II_AssertThrow(patterns[pattern_index]->match(new_value),
+                                ParameterHandler::ExcInvalidEntryForPatternXML
+                                // XML entries sometimes have extra surrounding
+                                // newlines
+                                (Utilities::trim(new_value),
+                                 p->first,
+                                 patterns[pattern_index]->description()));
 
             // set the found parameter in the destination argument
             destination.put(full_path + path_separator + "value", new_value);
@@ -551,7 +553,7 @@ namespace
 void
 ParameterHandler::parse_input_from_xml(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
   // read the XML tree assuming that (as we
   // do in print_parameters(XML) it has only
   // a single top-level node called
@@ -563,9 +565,10 @@ ParameterHandler::parse_input_from_xml(std::istream &in)
 
   // make sure there is a single top-level element
   // called "ParameterHandler"
-  AssertThrow(single_node_tree.get_optional<std::string>("ParameterHandler"),
-              ExcInvalidXMLParameterFile("There is no top-level XML element "
-                                         "called \"ParameterHandler\"."));
+  DEAL_II_AssertThrow(
+    single_node_tree.get_optional<std::string>("ParameterHandler"),
+    ExcInvalidXMLParameterFile("There is no top-level XML element "
+                               "called \"ParameterHandler\"."));
 
   const std::size_t n_top_level_elements =
     std::distance(single_node_tree.begin(), single_node_tree.end());
@@ -590,8 +593,8 @@ ParameterHandler::parse_input_from_xml(std::istream &in)
         }
 
       // repeat assertion condition to make the printed version easier to read
-      AssertThrow(n_top_level_elements == 1,
-                  ExcInvalidXMLParameterFile(top_level_message.str()));
+      DEAL_II_AssertThrow(n_top_level_elements == 1,
+                          ExcInvalidXMLParameterFile(top_level_message.str()));
     }
 
   // read the child elements recursively
@@ -605,7 +608,7 @@ ParameterHandler::parse_input_from_xml(std::istream &in)
 void
 ParameterHandler::parse_input_from_json(std::istream &in)
 {
-  AssertThrow(in, ExcIO());
+  DEAL_II_AssertThrow(in, ExcIO());
 
   boost::property_tree::ptree node_tree;
   // This boost function will raise an exception if this is not a valid JSON
@@ -658,9 +661,9 @@ ParameterHandler::declare_entry(const std::string &          entry,
                patterns.back()->description());
 
   // as documented, do the default value checking at the very end
-  AssertThrow(pattern.match(default_value),
-              ExcValueDoesNotMatchPattern(default_value,
-                                          pattern.description()));
+  DEAL_II_AssertThrow(pattern.match(default_value),
+                      ExcValueDoesNotMatchPattern(default_value,
+                                                  pattern.description()));
 }
 
 
@@ -707,20 +710,21 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
                                 const bool         alias_is_deprecated)
 {
   // see if there is anything to refer to already
-  Assert(entries->get_optional<std::string>(
-           get_current_full_path(existing_entry_name)),
-         ExcMessage("You are trying to declare an alias entry <" + alias_name +
-                    "> that references an entry <" + existing_entry_name +
-                    ">, but the latter does not exist."));
+  DEAL_II_Assert(entries->get_optional<std::string>(
+                   get_current_full_path(existing_entry_name)),
+                 ExcMessage("You are trying to declare an alias entry <" +
+                            alias_name + "> that references an entry <" +
+                            existing_entry_name +
+                            ">, but the latter does not exist."));
   // then also make sure that what is being referred to is in
   // fact a parameter (not an alias or subsection)
-  Assert(entries->get_optional<std::string>(
-           get_current_full_path(existing_entry_name) + path_separator +
-           "value"),
-         ExcMessage("You are trying to declare an alias entry <" + alias_name +
-                    "> that references an entry <" + existing_entry_name +
-                    ">, but the latter does not seem to be a "
-                    "parameter declaration."));
+  DEAL_II_Assert(
+    entries->get_optional<std::string>(
+      get_current_full_path(existing_entry_name) + path_separator + "value"),
+    ExcMessage("You are trying to declare an alias entry <" + alias_name +
+               "> that references an entry <" + existing_entry_name +
+               ">, but the latter does not seem to be a "
+               "parameter declaration."));
 
 
   // now also make sure that if the alias has already been
@@ -728,29 +732,29 @@ ParameterHandler::declare_alias(const std::string &existing_entry_name,
   // entry
   if (entries->get_optional<std::string>(get_current_full_path(alias_name)))
     {
-      Assert(entries->get_optional<std::string>(
-               get_current_full_path(alias_name) + path_separator + "alias"),
-             ExcMessage("You are trying to declare an alias entry <" +
-                        alias_name +
-                        "> but a non-alias entry already exists in this "
-                        "subsection (i.e., there is either a preexisting "
-                        "further subsection, or a parameter entry, with "
-                        "the same name as the alias)."));
-      Assert(entries->get<std::string>(get_current_full_path(alias_name) +
-                                       path_separator + "alias") ==
-               existing_entry_name,
-             ExcMessage(
-               "You are trying to declare an alias entry <" + alias_name +
-               "> but an alias entry already exists in this "
-               "subsection and this existing alias references a "
-               "different parameter entry. Specifically, "
-               "you are trying to reference the entry <" +
-               existing_entry_name +
-               "> whereas the existing alias references "
-               "the entry <" +
-               entries->get<std::string>(get_current_full_path(alias_name) +
-                                         path_separator + "alias") +
-               ">."));
+      DEAL_II_Assert(
+        entries->get_optional<std::string>(get_current_full_path(alias_name) +
+                                           path_separator + "alias"),
+        ExcMessage("You are trying to declare an alias entry <" + alias_name +
+                   "> but a non-alias entry already exists in this "
+                   "subsection (i.e., there is either a preexisting "
+                   "further subsection, or a parameter entry, with "
+                   "the same name as the alias)."));
+      DEAL_II_Assert(
+        entries->get<std::string>(get_current_full_path(alias_name) +
+                                  path_separator + "alias") ==
+          existing_entry_name,
+        ExcMessage("You are trying to declare an alias entry <" + alias_name +
+                   "> but an alias entry already exists in this "
+                   "subsection and this existing alias references a "
+                   "different parameter entry. Specifically, "
+                   "you are trying to reference the entry <" +
+                   existing_entry_name +
+                   "> whereas the existing alias references "
+                   "the entry <" +
+                   entries->get<std::string>(get_current_full_path(alias_name) +
+                                             path_separator + "alias") +
+                   ">."));
     }
 
   entries->put(get_current_full_path(alias_name) + path_separator + "alias",
@@ -781,7 +785,7 @@ ParameterHandler::leave_subsection()
 {
   // assert there is a subsection that
   // we may leave
-  Assert(subsection_path.size() != 0, ExcAlreadyAtTopLevel());
+  DEAL_II_Assert(subsection_path.size() != 0, ExcAlreadyAtTopLevel());
 
   if (subsection_path.size() > 0)
     subsection_path.pop_back();
@@ -799,7 +803,7 @@ ParameterHandler::get(const std::string &entry_string) const
     return value.get();
   else
     {
-      Assert(false, ExcEntryUndeclared(entry_string));
+      DEAL_II_Assert(false, ExcEntryUndeclared(entry_string));
       return "";
     }
 }
@@ -818,9 +822,9 @@ ParameterHandler::get(const std::vector<std::string> &entry_subsection_path,
     return value.get();
   else
     {
-      Assert(false,
-             ExcEntryUndeclared(demangle(
-               get_current_full_path(entry_subsection_path, entry_string))));
+      DEAL_II_Assert(false,
+                     ExcEntryUndeclared(demangle(get_current_full_path(
+                       entry_subsection_path, entry_string))));
       return "";
     }
 }
@@ -836,10 +840,10 @@ ParameterHandler::get_integer(const std::string &entry_string) const
     }
   catch (...)
     {
-      AssertThrow(false,
-                  ExcMessage("Can't convert the parameter value <" +
-                             get(entry_string) + "> for entry <" +
-                             entry_string + "> to an integer."));
+      DEAL_II_AssertThrow(false,
+                          ExcMessage("Can't convert the parameter value <" +
+                                     get(entry_string) + "> for entry <" +
+                                     entry_string + "> to an integer."));
       return 0;
     }
 }
@@ -857,13 +861,13 @@ ParameterHandler::get_integer(
     }
   catch (...)
     {
-      AssertThrow(false,
-                  ExcMessage(
-                    "Can't convert the parameter value <" +
-                    get(entry_subsection_path, entry_string) + "> for entry <" +
-                    demangle(get_current_full_path(entry_subsection_path,
-                                                   entry_string)) +
-                    "> to an integer."));
+      DEAL_II_AssertThrow(
+        false,
+        ExcMessage(
+          "Can't convert the parameter value <" +
+          get(entry_subsection_path, entry_string) + "> for entry <" +
+          demangle(get_current_full_path(entry_subsection_path, entry_string)) +
+          "> to an integer."));
       return 0;
     }
 }
@@ -879,11 +883,11 @@ ParameterHandler::get_double(const std::string &entry_string) const
     }
   catch (...)
     {
-      AssertThrow(false,
-                  ExcMessage("Can't convert the parameter value <" +
-                             get(entry_string) + "> for entry <" +
-                             entry_string +
-                             "> to a double precision variable."));
+      DEAL_II_AssertThrow(false,
+                          ExcMessage("Can't convert the parameter value <" +
+                                     get(entry_string) + "> for entry <" +
+                                     entry_string +
+                                     "> to a double precision variable."));
       return 0;
     }
 }
@@ -902,13 +906,13 @@ ParameterHandler::get_double(
     }
   catch (...)
     {
-      AssertThrow(false,
-                  ExcMessage(
-                    "Can't convert the parameter value <" +
-                    get(entry_subsection_path, entry_string) + "> for entry <" +
-                    demangle(get_current_full_path(entry_subsection_path,
-                                                   entry_string)) +
-                    "> to a double precision variable."));
+      DEAL_II_AssertThrow(
+        false,
+        ExcMessage(
+          "Can't convert the parameter value <" +
+          get(entry_subsection_path, entry_string) + "> for entry <" +
+          demangle(get_current_full_path(entry_subsection_path, entry_string)) +
+          "> to a double precision variable."));
       return 0;
     }
 }
@@ -920,10 +924,11 @@ ParameterHandler::get_bool(const std::string &entry_string) const
 {
   const std::string s = get(entry_string);
 
-  AssertThrow((s == "true") || (s == "false") || (s == "yes") || (s == "no"),
-              ExcMessage("Can't convert the parameter value <" +
-                         get(entry_string) + "> for entry <" + entry_string +
-                         "> to a boolean."));
+  DEAL_II_AssertThrow((s == "true") || (s == "false") || (s == "yes") ||
+                        (s == "no"),
+                      ExcMessage("Can't convert the parameter value <" +
+                                 get(entry_string) + "> for entry <" +
+                                 entry_string + "> to a boolean."));
   if (s == "true" || s == "yes")
     return true;
   else
@@ -939,13 +944,13 @@ ParameterHandler::get_bool(
 {
   const std::string s = get(entry_subsection_path, entry_string);
 
-  AssertThrow((s == "true") || (s == "false") || (s == "yes") || (s == "no"),
-              ExcMessage("Can't convert the parameter value <" +
-                         get(entry_subsection_path, entry_string) +
-                         "> for entry <" +
-                         demangle(get_current_full_path(entry_subsection_path,
-                                                        entry_string)) +
-                         "> to a boolean."));
+  DEAL_II_AssertThrow(
+    (s == "true") || (s == "false") || (s == "yes") || (s == "no"),
+    ExcMessage(
+      "Can't convert the parameter value <" +
+      get(entry_subsection_path, entry_string) + "> for entry <" +
+      demangle(get_current_full_path(entry_subsection_path, entry_string)) +
+      "> to a boolean."));
   if (s == "true" || s == "yes")
     return true;
   else
@@ -972,11 +977,11 @@ ParameterHandler::set(const std::string &entry_string,
       // verify that the new value satisfies the provided pattern
       const unsigned int pattern_index =
         entries->get<unsigned int>(path + path_separator + "pattern");
-      AssertThrow(patterns[pattern_index]->match(new_value),
-                  ExcValueDoesNotMatchPattern(new_value,
-                                              entries->get<std::string>(
-                                                path + path_separator +
-                                                "pattern_description")));
+      DEAL_II_AssertThrow(patterns[pattern_index]->match(new_value),
+                          ExcValueDoesNotMatchPattern(
+                            new_value,
+                            entries->get<std::string>(path + path_separator +
+                                                      "pattern_description")));
 
       // then also execute the actions associated with this
       // parameter (if any have been provided)
@@ -995,7 +1000,7 @@ ParameterHandler::set(const std::string &entry_string,
       entries->put(path + path_separator + "value", new_value);
     }
   else
-    AssertThrow(false, ExcEntryUndeclared(entry_string));
+    DEAL_II_AssertThrow(false, ExcEntryUndeclared(entry_string));
 }
 
 
@@ -1048,7 +1053,7 @@ std::ostream &
 ParameterHandler::print_parameters(std::ostream &    out,
                                    const OutputStyle style) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // we'll have to print some text that is padded with spaces;
   // set the appropriate fill character, but also make sure that
@@ -1107,7 +1112,7 @@ ParameterHandler::print_parameters(std::ostream &    out,
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   // dive recursively into the subsections
@@ -1129,10 +1134,10 @@ ParameterHandler::recursively_print_parameters(
   const unsigned int              indent_level,
   std::ostream &                  out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // this function should not be necessary for XML or JSON output...
-  Assert((style != XML) && (style != JSON), ExcInternalError());
+  DEAL_II_Assert((style != XML) && (style != JSON), ExcInternalError());
 
   const boost::property_tree::ptree &current_section =
     entries->get_child(collate_path_string(target_subsection_path));
@@ -1436,7 +1441,7 @@ ParameterHandler::recursively_print_parameters(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -1504,7 +1509,7 @@ ParameterHandler::recursively_print_parameters(
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
 
         // then the contents of the subsection
@@ -1546,7 +1551,7 @@ ParameterHandler::recursively_print_parameters(
               break;
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
 }
@@ -1565,7 +1570,7 @@ ParameterHandler::print_parameters_section(
   const unsigned int indent_level,
   const bool         include_top_level_elements)
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   const boost::property_tree::ptree &current_section =
     entries->get_child(get_current_path());
@@ -1610,7 +1615,7 @@ ParameterHandler::print_parameters_section(
               write_xml(out, single_node_tree);
             }
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
 
           break;
         }
@@ -1897,7 +1902,7 @@ ParameterHandler::print_parameters_section(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -1965,7 +1970,7 @@ ParameterHandler::print_parameters_section(
                   }
 
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               };
 
             // then the contents of the subsection
@@ -1997,7 +2002,7 @@ ParameterHandler::print_parameters_section(
                 case LaTeX:
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
           }
     }
@@ -2024,7 +2029,7 @@ ParameterHandler::print_parameters_section(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -2114,11 +2119,12 @@ ParameterHandler::scan_line(std::string        line,
       const std::string subsection = Utilities::trim(line);
 
       // check whether subsection exists
-      AssertThrow(skip_undefined || entries->get_child_optional(
-                                      get_current_full_path(subsection)),
-                  ExcNoSubsection(current_line_n,
-                                  input_filename,
-                                  demangle(get_current_full_path(subsection))));
+      DEAL_II_AssertThrow(
+        skip_undefined ||
+          entries->get_child_optional(get_current_full_path(subsection)),
+        ExcNoSubsection(current_line_n,
+                        input_filename,
+                        demangle(get_current_full_path(subsection))));
 
       // subsection exists
       subsection_path.push_back(subsection);
@@ -2131,15 +2137,16 @@ ParameterHandler::scan_line(std::string        line,
       while ((line.size() > 0) && (std::isspace(line[0])))
         line.erase(0, 1);
 
-      AssertThrow(
+      DEAL_II_AssertThrow(
         line.size() == 0,
         ExcCannotParseLine(current_line_n,
                            input_filename,
                            "Invalid content after 'end' or 'END' statement."));
-      AssertThrow(subsection_path.size() != 0,
-                  ExcCannotParseLine(current_line_n,
-                                     input_filename,
-                                     "There is no subsection to leave here."));
+      DEAL_II_AssertThrow(
+        subsection_path.size() != 0,
+        ExcCannotParseLine(current_line_n,
+                           input_filename,
+                           "There is no subsection to leave here."));
       leave_subsection();
     }
   // regular entry
@@ -2150,7 +2157,7 @@ ParameterHandler::scan_line(std::string        line,
       line.erase(0, 4);
 
       std::string::size_type pos = line.find('=');
-      AssertThrow(
+      DEAL_II_AssertThrow(
         pos != std::string::npos,
         ExcCannotParseLine(current_line_n,
                            input_filename,
@@ -2194,13 +2201,13 @@ ParameterHandler::scan_line(std::string        line,
               // verify that the new value satisfies the provided pattern
               const unsigned int pattern_index =
                 entries->get<unsigned int>(path + path_separator + "pattern");
-              AssertThrow(patterns[pattern_index]->match(entry_value),
-                          ExcInvalidEntryForPattern(
-                            current_line_n,
-                            input_filename,
-                            entry_value,
-                            entry_name,
-                            patterns[pattern_index]->description()));
+              DEAL_II_AssertThrow(patterns[pattern_index]->match(entry_value),
+                                  ExcInvalidEntryForPattern(
+                                    current_line_n,
+                                    input_filename,
+                                    entry_value,
+                                    entry_name,
+                                    patterns[pattern_index]->description()));
 
               // then also execute the actions associated with this
               // parameter (if any have been provided)
@@ -2223,7 +2230,7 @@ ParameterHandler::scan_line(std::string        line,
         }
       else
         {
-          AssertThrow(
+          DEAL_II_AssertThrow(
             skip_undefined,
             ExcCannotParseLine(current_line_n,
                                input_filename,
@@ -2241,23 +2248,24 @@ ParameterHandler::scan_line(std::string        line,
         line.erase(0, 1);
 
       // the remainder must then be a filename
-      AssertThrow(line.size() != 0,
-                  ExcCannotParseLine(current_line_n,
-                                     input_filename,
-                                     "The current line is an 'include' or "
-                                     "'INCLUDE' statement, but it does not "
-                                     "name a file for inclusion."));
+      DEAL_II_AssertThrow(
+        line.size() != 0,
+        ExcCannotParseLine(current_line_n,
+                           input_filename,
+                           "The current line is an 'include' or "
+                           "'INCLUDE' statement, but it does not "
+                           "name a file for inclusion."));
 
       std::ifstream input(line.c_str());
-      AssertThrow(input,
-                  ExcCannotOpenIncludeStatementFile(current_line_n,
-                                                    input_filename,
-                                                    line));
+      DEAL_II_AssertThrow(input,
+                          ExcCannotOpenIncludeStatementFile(current_line_n,
+                                                            input_filename,
+                                                            line));
       parse_input(input, line, "", skip_undefined);
     }
   else
     {
-      AssertThrow(
+      DEAL_II_AssertThrow(
         false,
         ExcCannotParseLine(current_line_n,
                            input_filename,
@@ -2320,7 +2328,7 @@ MultipleParameterLoop::parse_input(std::istream &     input,
                                    const std::string &last_line,
                                    const bool         skip_undefined)
 {
-  AssertThrow(input, ExcIO());
+  DEAL_II_AssertThrow(input, ExcIO());
 
   // Note that (to avoid infinite recursion) we have to explicitly call the
   // base class version of parse_input and *not* a wrapper (which may be

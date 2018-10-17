@@ -338,24 +338,24 @@ namespace LinearAlgebra
        * The vectors have different partitioning, i.e. they have use different
        * IndexSet.
        */
-      DeclException0(ExcDifferentParallelPartitioning);
+      DEAL_II_DeclException0(ExcDifferentParallelPartitioning);
 
       /**
        * Attempt to perform an operation between two incompatible vector types.
        *
        * @ingroup Exceptions
        */
-      DeclException0(ExcVectorTypeNotCompatible);
+      DEAL_II_DeclException0(ExcVectorTypeNotCompatible);
 
       /**
        * Exception thrown by an error in Trilinos.
        *
        * @ingroup Exceptions
        */
-      DeclException1(ExcTrilinosError,
-                     int,
-                     << "An error with error number " << arg1
-                     << " occurred while calling a Trilinos function");
+      DEAL_II_DeclException1(ExcTrilinosError,
+                             int,
+                             << "An error with error number " << arg1
+                             << " occurred while calling a Trilinos function");
 
     private:
       /**

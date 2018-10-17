@@ -39,7 +39,7 @@ namespace internal
                          const unsigned int,
                          unsigned int (&)[dim])
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
     inline void
@@ -82,8 +82,8 @@ TensorProductPolynomials<dim, PolynomialType>::compute_index(
   const unsigned int i,
   unsigned int (&indices)[(dim > 0 ? dim : 1)]) const
 {
-  Assert(i < Utilities::fixed_power<dim>(polynomials.size()),
-         ExcInternalError());
+  DEAL_II_Assert(i < Utilities::fixed_power<dim>(polynomials.size()),
+                 ExcInternalError());
   internal::compute_tensor_index(index_map[i],
                                  polynomials.size(),
                                  polynomials.size(),
@@ -115,8 +115,8 @@ void
 TensorProductPolynomials<dim, PolynomialType>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
-  Assert(renumber.size() == index_map.size(),
-         ExcDimensionMismatch(renumber.size(), index_map.size()));
+  DEAL_II_Assert(renumber.size() == index_map.size(),
+                 ExcDimensionMismatch(renumber.size(), index_map.size()));
 
   index_map = renumber;
   for (unsigned int i = 0; i < index_map.size(); ++i)
@@ -131,7 +131,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_value(
   const unsigned int,
   const Point<0> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -143,7 +143,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_value(
   const unsigned int i,
   const Point<dim> & p) const
 {
-  Assert(dim > 0, ExcNotImplemented());
+  DEAL_II_Assert(dim > 0, ExcNotImplemented());
 
   unsigned int indices[dim];
   compute_index(i, indices);
@@ -249,19 +249,21 @@ TensorProductPolynomials<dim, PolynomialType>::compute(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  Assert(dim <= 3, ExcNotImplemented());
-  Assert(values.size() == n_tensor_pols || values.size() == 0,
-         ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
-  Assert(grads.size() == n_tensor_pols || grads.size() == 0,
-         ExcDimensionMismatch2(grads.size(), n_tensor_pols, 0));
-  Assert(grad_grads.size() == n_tensor_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch2(grad_grads.size(), n_tensor_pols, 0));
-  Assert(third_derivatives.size() == n_tensor_pols ||
-           third_derivatives.size() == 0,
-         ExcDimensionMismatch2(third_derivatives.size(), n_tensor_pols, 0));
-  Assert(fourth_derivatives.size() == n_tensor_pols ||
-           fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(fourth_derivatives.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(dim <= 3, ExcNotImplemented());
+  DEAL_II_Assert(values.size() == n_tensor_pols || values.size() == 0,
+                 ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(grads.size() == n_tensor_pols || grads.size() == 0,
+                 ExcDimensionMismatch2(grads.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(grad_grads.size() == n_tensor_pols || grad_grads.size() == 0,
+                 ExcDimensionMismatch2(grad_grads.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(
+    third_derivatives.size() == n_tensor_pols || third_derivatives.size() == 0,
+    ExcDimensionMismatch2(third_derivatives.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(fourth_derivatives.size() == n_tensor_pols ||
+                   fourth_derivatives.size() == 0,
+                 ExcDimensionMismatch2(fourth_derivatives.size(),
+                                       n_tensor_pols,
+                                       0));
 
   const bool update_values     = (values.size() == n_tensor_pols),
              update_grads      = (grads.size() == n_tensor_pols),
@@ -414,11 +416,12 @@ AnisotropicPolynomials<dim>::AnisotropicPolynomials(
   : polynomials(pols)
   , n_tensor_pols(get_n_tensor_pols(pols))
 {
-  Assert(pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
+  DEAL_II_Assert(pols.size() == dim, ExcDimensionMismatch(pols.size(), dim));
   for (unsigned int d = 0; d < dim; ++d)
-    Assert(pols[d].size() > 0,
-           ExcMessage("The number of polynomials must be larger than zero "
-                      "for all coordinate directions."));
+    DEAL_II_Assert(pols[d].size() > 0,
+                   ExcMessage(
+                     "The number of polynomials must be larger than zero "
+                     "for all coordinate directions."));
 }
 
 
@@ -432,7 +435,7 @@ AnisotropicPolynomials<dim>::compute_index(const unsigned int i,
   unsigned int n_poly = 1;
   for (unsigned int d = 0; d < dim; ++d)
     n_poly *= polynomials[d].size();
-  Assert(i < n_poly, ExcInternalError());
+  DEAL_II_Assert(i < n_poly, ExcInternalError());
 #endif
 
   if (dim == 1)
@@ -539,18 +542,20 @@ AnisotropicPolynomials<dim>::compute(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_tensor_pols || values.size() == 0,
-         ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
-  Assert(grads.size() == n_tensor_pols || grads.size() == 0,
-         ExcDimensionMismatch2(grads.size(), n_tensor_pols, 0));
-  Assert(grad_grads.size() == n_tensor_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch2(grad_grads.size(), n_tensor_pols, 0));
-  Assert(third_derivatives.size() == n_tensor_pols ||
-           third_derivatives.size() == 0,
-         ExcDimensionMismatch2(third_derivatives.size(), n_tensor_pols, 0));
-  Assert(fourth_derivatives.size() == n_tensor_pols ||
-           fourth_derivatives.size() == 0,
-         ExcDimensionMismatch2(fourth_derivatives.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(values.size() == n_tensor_pols || values.size() == 0,
+                 ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(grads.size() == n_tensor_pols || grads.size() == 0,
+                 ExcDimensionMismatch2(grads.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(grad_grads.size() == n_tensor_pols || grad_grads.size() == 0,
+                 ExcDimensionMismatch2(grad_grads.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(
+    third_derivatives.size() == n_tensor_pols || third_derivatives.size() == 0,
+    ExcDimensionMismatch2(third_derivatives.size(), n_tensor_pols, 0));
+  DEAL_II_Assert(fourth_derivatives.size() == n_tensor_pols ||
+                   fourth_derivatives.size() == 0,
+                 ExcDimensionMismatch2(fourth_derivatives.size(),
+                                       n_tensor_pols,
+                                       0));
 
   const bool update_values     = (values.size() == n_tensor_pols),
              update_grads      = (grads.size() == n_tensor_pols),

@@ -87,14 +87,14 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(1. + read_write_1[i] == read_write_3[i],
-                    ExcMessage("Problem in add(scalar)."));
+        DEAL_II_AssertThrow(1. + read_write_1[i] == read_write_3[i],
+                            ExcMessage("Problem in add(scalar)."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(1. + read_write_1[i] == read_write_3[i],
-                    ExcMessage("Problem in add(scalar)."));
+        DEAL_II_AssertThrow(1. + read_write_1[i] == read_write_3[i],
+                            ExcMessage("Problem in add(scalar)."));
     }
 
   a.add(2., b);
@@ -102,16 +102,16 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(1. + read_write_1[i] + 2. * read_write_2[i] ==
-                      read_write_3[i],
-                    ExcMessage("Problem in add(scalar,Vector)."));
+        DEAL_II_AssertThrow(1. + read_write_1[i] + 2. * read_write_2[i] ==
+                              read_write_3[i],
+                            ExcMessage("Problem in add(scalar,Vector)."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(1. + read_write_1[i] + 2. * read_write_2[i] ==
-                      read_write_3[i],
-                    ExcMessage("Problem in add(scalar,Vector)."));
+        DEAL_II_AssertThrow(1. + read_write_1[i] + 2. * read_write_2[i] ==
+                              read_write_3[i],
+                            ExcMessage("Problem in add(scalar,Vector)."));
     }
 
 
@@ -121,16 +121,16 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(4. + 4. * read_write_1[i] + 10. * read_write_2[i] ==
-                      read_write_3[i],
-                    ExcMessage("Problem in add(scalar,Vector,scalar,Vector)."));
+        DEAL_II_AssertThrow(
+          4. + 4. * read_write_1[i] + 10. * read_write_2[i] == read_write_3[i],
+          ExcMessage("Problem in add(scalar,Vector,scalar,Vector)."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(4. + 4. * read_write_1[i] + 10. * read_write_2[i] ==
-                      read_write_3[i],
-                    ExcMessage("Problem in add(scalar,Vector,scalar,Vector)."));
+        DEAL_II_AssertThrow(
+          4. + 4. * read_write_1[i] + 10. * read_write_2[i] == read_write_3[i],
+          ExcMessage("Problem in add(scalar,Vector,scalar,Vector)."));
     }
 
 
@@ -140,16 +140,16 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(3. * read_write_1[i] + 2. * read_write_2[i] ==
-                      read_write_3[i],
-                    ExcMessage("Problem in sadd(scalar,scalar,Vector)."));
+        DEAL_II_AssertThrow(
+          3. * read_write_1[i] + 2. * read_write_2[i] == read_write_3[i],
+          ExcMessage("Problem in sadd(scalar,scalar,Vector)."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(3. * read_write_1[i] + 2. * read_write_2[i] ==
-                      read_write_3[i],
-                    ExcMessage("Problem in sadd(scalar,scalar,Vector)."));
+        DEAL_II_AssertThrow(
+          3. * read_write_1[i] + 2. * read_write_2[i] == read_write_3[i],
+          ExcMessage("Problem in sadd(scalar,scalar,Vector)."));
     }
 
 
@@ -159,14 +159,16 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(read_write_1[i] * read_write_2[i] == read_write_3[i],
-                    ExcMessage("Problem in scale."));
+        DEAL_II_AssertThrow(read_write_1[i] * read_write_2[i] ==
+                              read_write_3[i],
+                            ExcMessage("Problem in scale."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(read_write_1[i] * read_write_2[i] == read_write_3[i],
-                    ExcMessage("Problem in scale."));
+        DEAL_II_AssertThrow(read_write_1[i] * read_write_2[i] ==
+                              read_write_3[i],
+                            ExcMessage("Problem in scale."));
     }
 
 
@@ -175,28 +177,29 @@ test()
   if (rank == 0)
     {
       for (unsigned int i = 0; i < 5; ++i)
-        AssertThrow(2. * read_write_2[i] == read_write_3[i],
-                    ExcMessage("Problem in scale."));
+        DEAL_II_AssertThrow(2. * read_write_2[i] == read_write_3[i],
+                            ExcMessage("Problem in scale."));
     }
   else
     {
       for (unsigned int i = 5; i < 10; ++i)
-        AssertThrow(2. * read_write_2[i] == read_write_3[i],
-                    ExcMessage("Problem in equ."));
+        DEAL_II_AssertThrow(2. * read_write_2[i] == read_write_3[i],
+                            ExcMessage("Problem in equ."));
     }
 
 
-  AssertThrow(b.l1_norm() == 95., ExcMessage("Problem in l1_norm."));
+  DEAL_II_AssertThrow(b.l1_norm() == 95., ExcMessage("Problem in l1_norm."));
 
   const double eps = 1e-6;
-  AssertThrow(std::fabs(b.l2_norm() - 31.3847096) < eps,
-              ExcMessage("Problem in l2_norm"));
+  DEAL_II_AssertThrow(std::fabs(b.l2_norm() - 31.3847096) < eps,
+                      ExcMessage("Problem in l2_norm"));
 
-  AssertThrow(b.linfty_norm() == 14., ExcMessage("Problem in linfty_norm."));
+  DEAL_II_AssertThrow(b.linfty_norm() == 14.,
+                      ExcMessage("Problem in linfty_norm."));
 
   a.import(read_write_1, VectorOperation::insert);
   const double val = a.add_and_dot(2., a, b);
-  AssertThrow(val == 1530., ExcMessage("Problem in add_and_dot"));
+  DEAL_II_AssertThrow(val == 1530., ExcMessage("Problem in add_and_dot"));
 }
 
 

@@ -111,7 +111,7 @@ test(const unsigned int size,
          &*work.begin(),
          &lwork,
          &info);
-    AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("syev", info));
+    DEAL_II_AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("syev", info));
   }
 
   // the actual test:
@@ -137,7 +137,7 @@ test(const unsigned int size,
                     << std::endl;
         }
 
-      AssertThrow(
+      DEAL_II_AssertThrow(
         std::abs(eigenvalues_psyevx[i] -
                  eigenvalues_Lapack[size - eigenvalues_psyevx.size() + i]) /
             std::abs(eigenvalues_Lapack[size - eigenvalues_psyevx.size() + i]) <

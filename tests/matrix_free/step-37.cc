@@ -109,9 +109,9 @@ namespace Step37
                                std::vector<double> &          values,
                                const unsigned int             component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const unsigned int n_points = points.size();
     for (unsigned int i = 0; i < n_points; ++i)
@@ -258,7 +258,8 @@ namespace Step37
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
-    AssertDimension(coefficient.size(), data.n_macro_cells() * phi.n_q_points);
+    DEAL_II_AssertDimension(coefficient.size(),
+                            data.n_macro_cells() * phi.n_q_points);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {
@@ -332,8 +333,8 @@ namespace Step37
   LaplaceOperator<dim, fe_degree, number>::el(const unsigned int row,
                                               const unsigned int col) const
   {
-    Assert(row == col, ExcNotImplemented());
-    Assert(diagonal_is_available == true, ExcNotInitialized());
+    DEAL_II_Assert(row == col, ExcNotImplemented());
+    DEAL_II_Assert(diagonal_is_available == true, ExcNotInitialized());
     return diagonal_values(row);
   }
 
@@ -344,7 +345,7 @@ namespace Step37
   LaplaceOperator<dim, fe_degree, number>::set_diagonal(
     const Vector<number> &diagonal)
   {
-    AssertDimension(m(), diagonal.size());
+    DEAL_II_AssertDimension(m(), diagonal.size());
 
     diagonal_values = diagonal;
 

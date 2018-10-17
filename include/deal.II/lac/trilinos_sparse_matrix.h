@@ -81,19 +81,19 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException0(ExcBeyondEndOfMatrix);
+    DEAL_II_DeclException0(ExcBeyondEndOfMatrix);
 
     /**
      * Exception
      */
-    DeclException3(ExcAccessToNonlocalRow,
-                   std::size_t,
-                   std::size_t,
-                   std::size_t,
-                   << "You tried to access row " << arg1
-                   << " of a distributed sparsity pattern, "
-                   << " but only rows " << arg2 << " through " << arg3
-                   << " are stored locally and can be accessed.");
+    DEAL_II_DeclException3(ExcAccessToNonlocalRow,
+                           std::size_t,
+                           std::size_t,
+                           std::size_t,
+                           << "You tried to access row " << arg1
+                           << " of a distributed sparsity pattern, "
+                           << " but only rows " << arg2 << " through " << arg3
+                           << " are stored locally and can be accessed.");
 
     /**
      * Handling of indices for both constant and non constant Accessor objects
@@ -431,11 +431,12 @@ namespace TrilinosWrappers
       /**
        * Exception
        */
-      DeclException2(ExcInvalidIndexWithinRow,
-                     size_type,
-                     size_type,
-                     << "Attempt to access element " << arg2 << " of row "
-                     << arg1 << " which doesn't have that many elements.");
+      DEAL_II_DeclException2(ExcInvalidIndexWithinRow,
+                             size_type,
+                             size_type,
+                             << "Attempt to access element " << arg2
+                             << " of row " << arg1
+                             << " which doesn't have that many elements.");
 
     private:
       /**
@@ -522,12 +523,12 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException1(ExcAccessToNonlocalRow,
-                   std::size_t,
-                   << "You tried to access row " << arg1
-                   << " of a non-contiguous locally owned row set."
-                   << " The row " << arg1
-                   << " is not stored locally and can't be accessed.");
+    DEAL_II_DeclException1(ExcAccessToNonlocalRow,
+                           std::size_t,
+                           << "You tried to access row " << arg1
+                           << " of a non-contiguous locally owned row set."
+                           << " The row " << arg1
+                           << " is not stored locally and can't be accessed.");
 
     /**
      * A structure that describes some of the traits of this class in terms of
@@ -1989,57 +1990,58 @@ namespace TrilinosWrappers
     /**
      * Exception
      */
-    DeclException1(ExcTrilinosError,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while calling a Trilinos function");
+    DEAL_II_DeclException1(ExcTrilinosError,
+                           int,
+                           << "An error with error number " << arg1
+                           << " occurred while calling a Trilinos function");
 
     /**
      * Exception
      */
-    DeclException2(ExcInvalidIndex,
-                   size_type,
-                   size_type,
-                   << "The entry with index <" << arg1 << ',' << arg2
-                   << "> does not exist.");
+    DEAL_II_DeclException2(ExcInvalidIndex,
+                           size_type,
+                           size_type,
+                           << "The entry with index <" << arg1 << ',' << arg2
+                           << "> does not exist.");
 
     /**
      * Exception
      */
-    DeclExceptionMsg(ExcSourceEqualsDestination,
-                     "You are attempting an operation on two matrices that "
-                     "are the same object, but the operation requires that the "
-                     "two objects are in fact different.");
+    DEAL_II_DeclExceptionMsg(
+      ExcSourceEqualsDestination,
+      "You are attempting an operation on two matrices that "
+      "are the same object, but the operation requires that the "
+      "two objects are in fact different.");
 
     /**
      * Exception
      */
-    DeclException0(ExcMatrixNotCompressed);
+    DEAL_II_DeclException0(ExcMatrixNotCompressed);
 
     /**
      * Exception
      */
-    DeclException4(ExcAccessToNonLocalElement,
-                   size_type,
-                   size_type,
-                   size_type,
-                   size_type,
-                   << "You tried to access element (" << arg1 << "/" << arg2
-                   << ")"
-                   << " of a distributed matrix, but only rows " << arg3
-                   << " through " << arg4
-                   << " are stored locally and can be accessed.");
+    DEAL_II_DeclException4(ExcAccessToNonLocalElement,
+                           size_type,
+                           size_type,
+                           size_type,
+                           size_type,
+                           << "You tried to access element (" << arg1 << "/"
+                           << arg2 << ")"
+                           << " of a distributed matrix, but only rows " << arg3
+                           << " through " << arg4
+                           << " are stored locally and can be accessed.");
 
     /**
      * Exception
      */
-    DeclException2(ExcAccessToNonPresentElement,
-                   size_type,
-                   size_type,
-                   << "You tried to access element (" << arg1 << "/" << arg2
-                   << ")"
-                   << " of a sparse matrix, but it appears to not"
-                   << " exist in the Trilinos sparsity pattern.");
+    DEAL_II_DeclException2(ExcAccessToNonPresentElement,
+                           size_type,
+                           size_type,
+                           << "You tried to access element (" << arg1 << "/"
+                           << arg2 << ")"
+                           << " of a sparse matrix, but it appears to not"
+                           << " exist in the Trilinos sparsity pattern.");
     //@}
 
 
@@ -2135,19 +2137,21 @@ namespace TrilinosWrappers
     {
       if (transpose == false)
         {
-          Assert(src.Map().SameAs(mtrx.DomainMap()) == true,
-                 ExcMessage(
-                   "Column map of matrix does not fit with vector map!"));
-          Assert(dst.Map().SameAs(mtrx.RangeMap()) == true,
-                 ExcMessage("Row map of matrix does not fit with vector map!"));
+          DEAL_II_Assert(
+            src.Map().SameAs(mtrx.DomainMap()) == true,
+            ExcMessage("Column map of matrix does not fit with vector map!"));
+          DEAL_II_Assert(dst.Map().SameAs(mtrx.RangeMap()) == true,
+                         ExcMessage(
+                           "Row map of matrix does not fit with vector map!"));
         }
       else
         {
-          Assert(src.Map().SameAs(mtrx.RangeMap()) == true,
-                 ExcMessage(
-                   "Column map of matrix does not fit with vector map!"));
-          Assert(dst.Map().SameAs(mtrx.DomainMap()) == true,
-                 ExcMessage("Row map of matrix does not fit with vector map!"));
+          DEAL_II_Assert(
+            src.Map().SameAs(mtrx.RangeMap()) == true,
+            ExcMessage("Column map of matrix does not fit with vector map!"));
+          DEAL_II_Assert(dst.Map().SameAs(mtrx.DomainMap()) == true,
+                         ExcMessage(
+                           "Row map of matrix does not fit with vector map!"));
         }
       (void)mtrx; // removes -Wunused-variable in optimized mode
       (void)src;
@@ -2162,21 +2166,21 @@ namespace TrilinosWrappers
     {
       if (transpose == false)
         {
-          Assert(src.Map().SameAs(op.OperatorDomainMap()) == true,
-                 ExcMessage(
-                   "Column map of operator does not fit with vector map!"));
-          Assert(dst.Map().SameAs(op.OperatorRangeMap()) == true,
-                 ExcMessage(
-                   "Row map of operator does not fit with vector map!"));
+          DEAL_II_Assert(
+            src.Map().SameAs(op.OperatorDomainMap()) == true,
+            ExcMessage("Column map of operator does not fit with vector map!"));
+          DEAL_II_Assert(
+            dst.Map().SameAs(op.OperatorRangeMap()) == true,
+            ExcMessage("Row map of operator does not fit with vector map!"));
         }
       else
         {
-          Assert(src.Map().SameAs(op.OperatorRangeMap()) == true,
-                 ExcMessage(
-                   "Column map of operator does not fit with vector map!"));
-          Assert(dst.Map().SameAs(op.OperatorDomainMap()) == true,
-                 ExcMessage(
-                   "Row map of operator does not fit with vector map!"));
+          DEAL_II_Assert(
+            src.Map().SameAs(op.OperatorRangeMap()) == true,
+            ExcMessage("Column map of operator does not fit with vector map!"));
+          DEAL_II_Assert(
+            dst.Map().SameAs(op.OperatorDomainMap()) == true,
+            ExcMessage("Row map of operator does not fit with vector map!"));
         }
       (void)op; // removes -Wunused-variable in optimized mode
       (void)src;
@@ -2627,7 +2631,7 @@ namespace TrilinosWrappers
     inline AccessorBase::size_type
     AccessorBase::row() const
     {
-      Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      DEAL_II_Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return a_row;
     }
 
@@ -2635,7 +2639,7 @@ namespace TrilinosWrappers
     inline AccessorBase::size_type
     AccessorBase::column() const
     {
-      Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      DEAL_II_Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return (*colnum_cache)[a_index];
     }
 
@@ -2643,7 +2647,7 @@ namespace TrilinosWrappers
     inline AccessorBase::size_type
     AccessorBase::index() const
     {
-      Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      DEAL_II_Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return a_index;
     }
 
@@ -2664,7 +2668,7 @@ namespace TrilinosWrappers
     inline TrilinosScalar
     Accessor<true>::value() const
     {
-      Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      DEAL_II_Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return (*value_cache)[a_index];
     }
 
@@ -2744,7 +2748,7 @@ namespace TrilinosWrappers
     inline Accessor<false>::Reference
     Accessor<false>::value() const
     {
-      Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      DEAL_II_Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return Reference(*this);
     }
 
@@ -2769,7 +2773,8 @@ namespace TrilinosWrappers
     inline Iterator<Constness> &
     Iterator<Constness>::operator++()
     {
-      Assert(accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
+      DEAL_II_Assert(accessor.a_row < accessor.matrix->m(),
+                     ExcIteratorPastEnd());
 
       ++accessor.a_index;
 
@@ -2879,7 +2884,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::const_iterator
   SparseMatrix::begin(const size_type r) const
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
     if (in_local_range(r) && (row_length(r) > 0))
       return const_iterator(this, r, 0);
     else
@@ -2891,7 +2896,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::const_iterator
   SparseMatrix::end(const size_type r) const
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
 
     // place the iterator on the first entry
     // past this line, or at the end of the
@@ -2926,7 +2931,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::iterator
   SparseMatrix::begin(const size_type r)
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
     if (in_local_range(r) && (row_length(r) > 0))
       return iterator(this, r, 0);
     else
@@ -2938,7 +2943,7 @@ namespace TrilinosWrappers
   inline SparseMatrix::iterator
   SparseMatrix::end(const size_type r)
   {
-    Assert(r < m(), ExcIndexRange(r, 0, m()));
+    DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
 
     // place the iterator on the first entry
     // past this line, or at the end of the
@@ -2988,7 +2993,7 @@ namespace TrilinosWrappers
                     const size_type      j,
                     const TrilinosScalar value)
   {
-    AssertIsFinite(value);
+    DEAL_II_AssertIsFinite(value);
 
     set(i, 1, &j, &value, false);
   }
@@ -3000,9 +3005,9 @@ namespace TrilinosWrappers
                     const FullMatrix<TrilinosScalar> &values,
                     const bool                        elide_zero_values)
   {
-    Assert(indices.size() == values.m(),
-           ExcDimensionMismatch(indices.size(), values.m()));
-    Assert(values.m() == values.n(), ExcNotQuadratic());
+    DEAL_II_Assert(indices.size() == values.m(),
+                   ExcDimensionMismatch(indices.size(), values.m()));
+    DEAL_II_Assert(values.m() == values.n(), ExcNotQuadratic());
 
     for (size_type i = 0; i < indices.size(); ++i)
       set(indices[i],
@@ -3019,7 +3024,7 @@ namespace TrilinosWrappers
                     const size_type      j,
                     const TrilinosScalar value)
   {
-    AssertIsFinite(value);
+    DEAL_II_AssertIsFinite(value);
 
     if (value == 0)
       {
@@ -3036,7 +3041,7 @@ namespace TrilinosWrappers
                                           matrix->RowMap(),
                                           false);
 
-            Assert(ierr == 0, ExcTrilinosError(ierr));
+            DEAL_II_Assert(ierr == 0, ExcTrilinosError(ierr));
             (void)ierr; // removes -Wunused-but-set-variable in optimized mode
           }
 
@@ -3070,7 +3075,7 @@ namespace TrilinosWrappers
     // If the matrix structure has not been fixed (i.e., we did not have a
     // sparsity pattern), it does not know about the number of columns so we
     // must always take this from the additional column space map
-    Assert(column_space_map.get() != nullptr, ExcInternalError());
+    DEAL_II_Assert(column_space_map.get() != nullptr, ExcInternalError());
 #      ifndef DEAL_II_WITH_64BIT_INDICES
     return column_space_map->NumGlobalElements();
 #      else
@@ -3226,8 +3231,9 @@ namespace TrilinosWrappers
                                 const TrilinosPayload::Range &tril_src) {
           // Duplicated from TrilinosWrappers::PreconditionBase::vmult
           // as well as from TrilinosWrappers::SparseMatrix::Tvmult
-          Assert(&tril_src != &tril_dst,
-                 TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+          DEAL_II_Assert(
+            &tril_src != &tril_dst,
+            TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
           internal::check_vector_map_equality(payload,
                                               tril_src,
                                               tril_dst,
@@ -3240,8 +3246,9 @@ namespace TrilinosWrappers
                                  const TrilinosPayload::Domain &tril_src) {
           // Duplicated from TrilinosWrappers::PreconditionBase::vmult
           // as well as from TrilinosWrappers::SparseMatrix::Tvmult
-          Assert(&tril_src != &tril_dst,
-                 TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
+          DEAL_II_Assert(
+            &tril_src != &tril_dst,
+            TrilinosWrappers::SparseMatrix::ExcSourceEqualsDestination());
           internal::check_vector_map_equality(payload,
                                               tril_src,
                                               tril_dst,
@@ -3272,16 +3279,18 @@ namespace TrilinosWrappers
 
         return_op.inv_vmult = [](TrilinosPayload::Domain &,
                                  const TrilinosPayload::Range &) {
-          AssertThrow(false,
-                      ExcMessage("Payload inv_vmult disabled because of "
-                                 "incompatible solver/preconditioner choice."));
+          DEAL_II_AssertThrow(false,
+                              ExcMessage(
+                                "Payload inv_vmult disabled because of "
+                                "incompatible solver/preconditioner choice."));
         };
 
         return_op.inv_Tvmult = [](TrilinosPayload::Range &,
                                   const TrilinosPayload::Domain &) {
-          AssertThrow(false,
-                      ExcMessage("Payload inv_vmult disabled because of "
-                                 "incompatible solver/preconditioner choice."));
+          DEAL_II_AssertThrow(false,
+                              ExcMessage(
+                                "Payload inv_vmult disabled because of "
+                                "incompatible solver/preconditioner choice."));
         };
 
         return return_op;

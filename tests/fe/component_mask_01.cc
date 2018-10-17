@@ -30,9 +30,9 @@ void
 test()
 {
   ComponentMask m;
-  AssertThrow(m[0] == true, ExcInternalError());
-  AssertThrow(m[42] == true, ExcInternalError());
-  AssertThrow(m[1000000000] == true, ExcInternalError());
+  DEAL_II_AssertThrow(m[0] == true, ExcInternalError());
+  DEAL_II_AssertThrow(m[42] == true, ExcInternalError());
+  DEAL_II_AssertThrow(m[1000000000] == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

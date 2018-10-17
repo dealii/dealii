@@ -397,7 +397,7 @@ namespace Utilities
         "ExcMessage(\"The exponent must not be negative!\")",
         ExcMessage("The exponent must not be negative!"));
 #    else
-    Assert(iexp >= 0, ExcMessage("The exponent must not be negative!"));
+    DEAL_II_Assert(iexp >= 0, ExcMessage("The exponent must not be negative!"));
 #    endif
 #  endif
 #endif
@@ -979,7 +979,7 @@ namespace Utilities
   inline T
   fixed_power(const T n)
   {
-    Assert(N >= 0, ExcNotImplemented());
+    DEAL_II_Assert(N >= 0, ExcNotImplemented());
     switch (N)
       {
         case 0:
@@ -1018,9 +1018,9 @@ namespace Utilities
     // verify that the two iterators are properly ordered. since
     // we need operator- for the iterator type anyway, do the
     // test as follows, rather than via 'last >= first'
-    Assert(last - first >= 0,
-           ExcMessage(
-             "The given iterators do not satisfy the proper ordering."));
+    DEAL_II_Assert(
+      last - first >= 0,
+      ExcMessage("The given iterators do not satisfy the proper ordering."));
 
     unsigned int len = static_cast<unsigned int>(last - first);
 
@@ -1082,7 +1082,7 @@ namespace Utilities
                   // somehow? that
                   // shouldn't have
                   // happened
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
               }
           }
 
@@ -1213,7 +1213,8 @@ namespace Utilities
 #  endif
 #endif
       {
-        Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
+        DEAL_II_Assert(std::distance(cbegin, cend) == sizeof(T),
+                       ExcInternalError());
         T object;
         std::memcpy(&object, &*cbegin, sizeof(T));
         return object;
@@ -1279,8 +1280,8 @@ namespace Utilities
 #endif
       && sizeof(T) * N < 256)
       {
-        Assert(std::distance(cbegin, cend) == sizeof(T) * N,
-               ExcInternalError());
+        DEAL_II_Assert(std::distance(cbegin, cend) == sizeof(T) * N,
+                       ExcInternalError());
         std::memcpy(unpacked_object, &*cbegin, sizeof(T) * N);
       }
     else

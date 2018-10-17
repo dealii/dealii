@@ -144,8 +144,8 @@ public:
   void
   vector_value(const Point<dim> &p, Vector<double> &values) const
   {
-    Assert(values.size() == totalDOF,
-           ExcDimensionMismatch(values.size(), totalDOF));
+    DEAL_II_Assert(values.size() == totalDOF,
+                   ExcDimensionMismatch(values.size(), totalDOF));
     values(totalDOF - 4) = 0; // u=0
     values(totalDOF - 3) = 0;
     values(totalDOF - 2) = 0;
@@ -183,7 +183,7 @@ diffusionMechanics<dim>::set_active_fe_indices()
       else if (cell_is_in_omega2_domain(cell))
         cell->set_active_fe_index(1);
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 

@@ -619,12 +619,12 @@ namespace PETScWrappers
       /**
        * Exception
        */
-      DeclException2(ExcLocalRowsTooLarge,
-                     int,
-                     int,
-                     << "The number of local rows " << arg1
-                     << " must be larger than the total number of rows "
-                     << arg2);
+      DEAL_II_DeclException2(ExcLocalRowsTooLarge,
+                             int,
+                             int,
+                             << "The number of local rows " << arg1
+                             << " must be larger than the total number of rows "
+                             << arg2);
       //@}
 
       /**

@@ -88,8 +88,8 @@ test(bool transpose = false)
   // check that we've done it right
   for (SparseMatrix<double>::iterator p = B.begin(); p != B.end(); ++p)
     if (p->column() != p->row())
-      AssertThrow(B(p->row(), p->column()) != B(p->column(), p->row()),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(B(p->row(), p->column()) != B(p->column(), p->row()),
+                          ExcInternalError());
 
   // for a number of different solution
   // vectors, make up a matching rhs vector
@@ -116,7 +116,8 @@ test(bool transpose = false)
               << std::endl;
       deallog << "absolute norms = " << x.l2_norm() << ' ' << solution.l2_norm()
               << std::endl;
-      Assert(x.l2_norm() / solution.l2_norm() < 1e-8, ExcInternalError());
+      DEAL_II_Assert(x.l2_norm() / solution.l2_norm() < 1e-8,
+                     ExcInternalError());
     }
 }
 

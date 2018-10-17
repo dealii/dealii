@@ -235,7 +235,7 @@ BlockInfo::local() const
 inline const BlockIndices &
 BlockInfo::level(const unsigned int l) const
 {
-  AssertIndexRange(l, levels.size());
+  DEAL_II_AssertIndexRange(l, levels.size());
   return levels[l];
 }
 
@@ -243,7 +243,8 @@ BlockInfo::level(const unsigned int l) const
 inline types::global_dof_index
 BlockInfo::renumber(const unsigned int i) const
 {
-  AssertIndexRange(i, static_cast<unsigned int>(local_renumbering.size()));
+  DEAL_II_AssertIndexRange(i,
+                           static_cast<unsigned int>(local_renumbering.size()));
   return local_renumbering[i];
 }
 
@@ -251,7 +252,7 @@ BlockInfo::renumber(const unsigned int i) const
 inline unsigned int
 BlockInfo::base_element(const unsigned int i) const
 {
-  AssertIndexRange(i, base_elements.size());
+  DEAL_II_AssertIndexRange(i, base_elements.size());
 
   return base_elements[i];
 }

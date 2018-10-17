@@ -66,8 +66,8 @@ test()
         dofs_per_block, dh.n_dofs());
 
     if (locally_owned_dofs_per_block[0] != locally_owned_dofs_per_block[1])
-      AssertThrow(false,
-                  ExcMessage("Locally owned dofs differ across blocks."));
+      DEAL_II_AssertThrow(
+        false, ExcMessage("Locally owned dofs differ across blocks."));
   }
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

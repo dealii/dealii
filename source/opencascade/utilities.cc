@@ -171,7 +171,7 @@ namespace OpenCASCADE
         case 3:
           return gp_Pnt(p[0], p[1], p[2]);
       }
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return {};
   }
 
@@ -183,22 +183,25 @@ namespace OpenCASCADE
     switch (spacedim)
       {
         case 1:
-          Assert(std::abs(p.Y()) <= tolerance,
-                 ExcMessage(
-                   "Cannot convert OpenCASCADE point to 1d if p.Y() != 0."));
-          Assert(std::abs(p.Z()) <= tolerance,
-                 ExcMessage(
-                   "Cannot convert OpenCASCADE point to 1d if p.Z() != 0."));
+          DEAL_II_Assert(
+            std::abs(p.Y()) <= tolerance,
+            ExcMessage(
+              "Cannot convert OpenCASCADE point to 1d if p.Y() != 0."));
+          DEAL_II_Assert(
+            std::abs(p.Z()) <= tolerance,
+            ExcMessage(
+              "Cannot convert OpenCASCADE point to 1d if p.Z() != 0."));
           return Point<spacedim>(p.X());
         case 2:
-          Assert(std::abs(p.Z()) <= tolerance,
-                 ExcMessage(
-                   "Cannot convert OpenCASCADE point to 2d if p.Z() != 0."));
+          DEAL_II_Assert(
+            std::abs(p.Z()) <= tolerance,
+            ExcMessage(
+              "Cannot convert OpenCASCADE point to 2d if p.Z() != 0."));
           return Point<spacedim>(p.X(), p.Y());
         case 3:
           return Point<spacedim>(p.X(), p.Y(), p.Z());
       }
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
     return {};
   }
 
@@ -232,7 +235,8 @@ namespace OpenCASCADE
     IGESControl_Reader    reader;
     IFSelect_ReturnStatus stat;
     stat = reader.ReadFile(filename.c_str());
-    AssertThrow(stat == IFSelect_RetDone, ExcMessage("Error in reading file!"));
+    DEAL_II_AssertThrow(stat == IFSelect_RetDone,
+                        ExcMessage("Error in reading file!"));
 
     Standard_Boolean    failsonly = Standard_False;
     IFSelect_PrintCount mode      = IFSelect_ItemsByEntity;
@@ -242,7 +246,7 @@ namespace OpenCASCADE
     // selects all IGES entities (including non visible ones) in the
     // file and puts them into a list called MyList,
 
-    AssertThrow(nRoots > 0, ExcMessage("Read nothing from file."));
+    DEAL_II_AssertThrow(nRoots > 0, ExcMessage("Read nothing from file."));
 
     // Handle IGES Scale here.
     gp_Pnt  Origin;
@@ -261,10 +265,11 @@ namespace OpenCASCADE
     IGESControl_Controller::Init();
     IGESControl_Writer ICW("MM", 0);
     Standard_Boolean   ok = ICW.AddShape(shape);
-    AssertThrow(ok, ExcMessage("Failed to add shape to IGES controller."));
+    DEAL_II_AssertThrow(ok,
+                        ExcMessage("Failed to add shape to IGES controller."));
     ICW.ComputeModel();
     Standard_Boolean OK = ICW.Write(filename.c_str());
-    AssertThrow(OK, ExcMessage("Failed to write IGES file."));
+    DEAL_II_AssertThrow(OK, ExcMessage("Failed to write IGES file."));
   }
 
   TopoDS_Shape
@@ -273,7 +278,8 @@ namespace OpenCASCADE
     STEPControl_Reader    reader;
     IFSelect_ReturnStatus stat;
     stat = reader.ReadFile(filename.c_str());
-    AssertThrow(stat == IFSelect_RetDone, ExcMessage("Error in reading file!"));
+    DEAL_II_AssertThrow(stat == IFSelect_RetDone,
+                        ExcMessage("Error in reading file!"));
 
     Standard_Boolean    failsonly = Standard_False;
     IFSelect_PrintCount mode      = IFSelect_ItemsByEntity;
@@ -283,7 +289,7 @@ namespace OpenCASCADE
     // selects all IGES entities (including non visible ones) in the
     // file and puts them into a list called MyList,
 
-    AssertThrow(nRoots > 0, ExcMessage("Read nothing from file."));
+    DEAL_II_AssertThrow(nRoots > 0, ExcMessage("Read nothing from file."));
 
     // Handle STEP Scale here.
     gp_Pnt  Origin;
@@ -303,13 +309,14 @@ namespace OpenCASCADE
     STEPControl_Writer    SCW;
     IFSelect_ReturnStatus status;
     status = SCW.Transfer(shape, STEPControl_AsIs);
-    AssertThrow(status == IFSelect_RetDone,
-                ExcMessage("Failed to add shape to STEP controller."));
+    DEAL_II_AssertThrow(status == IFSelect_RetDone,
+                        ExcMessage("Failed to add shape to STEP controller."));
 
     status = SCW.Write(filename.c_str());
 
-    AssertThrow(status == IFSelect_RetDone,
-                ExcMessage("Failed to write translated shape to STEP file."));
+    DEAL_II_AssertThrow(status == IFSelect_RetDone,
+                        ExcMessage(
+                          "Failed to write translated shape to STEP file."));
   }
 
   double
@@ -375,7 +382,7 @@ namespace OpenCASCADE
     // Now we build a single bspline out of all the geometrical
     // curves, in Lexycographical order
     unsigned int numIntersEdges = intersections.size();
-    Assert(numIntersEdges > 0, ExcMessage("No curves to process!"));
+    DEAL_II_Assert(numIntersEdges > 0, ExcMessage("No curves to process!"));
 
     GeomConvert_CompCurveToBSplineCurve convert_bspline(intersections[0]);
 
@@ -408,8 +415,8 @@ namespace OpenCASCADE
             }
       }
 
-    Assert(one_failed == false,
-           ExcMessage("Joining some of the Edges failed."));
+    DEAL_II_Assert(one_failed == false,
+                   ExcMessage("Joining some of the Edges failed."));
 
     Handle(Geom_Curve) bspline = convert_bspline.BSplineCurve();
 
@@ -444,7 +451,7 @@ namespace OpenCASCADE
     // Keep in mind: PerformNearest sounds pretty but DOESN'T WORK!!!
     // The closest point must be found by hand
     Inters.Perform(line, -RealLast(), +RealLast());
-    Assert(Inters.IsDone(), ExcMessage("Could not project point."));
+    DEAL_II_Assert(Inters.IsDone(), ExcMessage("Could not project point."));
 
     double     minDistance = 1e7;
     Point<dim> result;
@@ -495,8 +502,8 @@ namespace OpenCASCADE
 
     GeomAPI_Interpolate bspline_generator(vertices, closed, tolerance);
     bspline_generator.Perform();
-    Assert((bspline_generator.IsDone()),
-           ExcMessage("Interpolated bspline generation failed"));
+    DEAL_II_Assert((bspline_generator.IsDone()),
+                   ExcMessage("Interpolated bspline generation failed"));
 
     Handle(Geom_BSplineCurve) bspline = bspline_generator.Curve();
     TopoDS_Edge out_shape             = BRepBuilderAPI_MakeEdge(bspline);
@@ -686,7 +693,8 @@ namespace OpenCASCADE
             }
         }
 
-    Assert(counter > 0, ExcMessage("Could not find projection points."));
+    DEAL_II_Assert(counter > 0,
+                   ExcMessage("Could not find projection points."));
     return std::tuple<Point<dim>, TopoDS_Shape, double, double>(
       point<dim>(Pproj), out_shape, u, v);
   }
@@ -722,11 +730,11 @@ namespace OpenCASCADE
       count_elements(out_shape);
     (void)numbers;
 
-    Assert(
+    DEAL_II_Assert(
       std::get<0>(numbers) > 0,
       ExcMessage(
         "Could not find normal: the shape containing the closest point has 0 faces."));
-    Assert(
+    DEAL_II_Assert(
       std::get<0>(numbers) < 2,
       ExcMessage(
         "Could not find normal: the shape containing the closest point has more than 1 face."));
@@ -755,7 +763,7 @@ namespace OpenCASCADE
             return point<dim>(curve.Value(u));
           }
         default:
-          Assert(false, ExcUnsupportedShape());
+          DEAL_II_Assert(false, ExcUnsupportedShape());
       }
     return Point<dim>();
   }
@@ -769,10 +777,11 @@ namespace OpenCASCADE
     Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
     GeomLProp_SLProps props(SurfToProj, u, v, 1, 1e-7);
     gp_Pnt            Value = props.Value();
-    Assert(props.IsNormalDefined(), ExcMessage("Normal is not well defined!"));
+    DEAL_II_Assert(props.IsNormalDefined(),
+                   ExcMessage("Normal is not well defined!"));
     gp_Dir Normal = props.Normal();
-    Assert(props.IsCurvatureDefined(),
-           ExcMessage("Curvature is not well defined!"));
+    DEAL_II_Assert(props.IsCurvatureDefined(),
+                   ExcMessage("Curvature is not well defined!"));
     Standard_Real Min_Curvature = props.MinCurvature();
     Standard_Real Max_Curvature = props.MaxCurvature();
     Tensor<1, 3>  normal        = Point<3>(Normal.X(), Normal.Y(), Normal.Z());

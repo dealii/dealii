@@ -158,7 +158,7 @@ namespace CUDAWrappers
                              &mapped_matrix[0][0],
                              sizeof(double) * fe_q.dofs_per_face *
                                fe_q.dofs_per_face);
-        AssertCuda(error_code);
+        DEAL_II_AssertCuda(error_code);
       }
     } // namespace internal
 
@@ -175,7 +175,7 @@ namespace CUDAWrappers
       , fe_degree(fe_degree)
       , dof_handler(dof_handler)
     {
-      AssertThrow(
+      DEAL_II_AssertThrow(
         (dim == 3) || ((fe_degree % 2) == 1),
         ExcMessage(
           "This function is not implemented when dim = 2 and fe_degree is even."));

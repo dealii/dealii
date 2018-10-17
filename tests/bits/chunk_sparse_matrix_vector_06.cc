@@ -52,14 +52,14 @@ test(const unsigned int chunk_size, Vector<double> &v)
 
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
-    AssertThrow(v(i) == i, ExcInternalError());
+    DEAL_II_AssertThrow(v(i) == i, ExcInternalError());
 
   double result = 0;
   for (unsigned int i = 0; i < m.m(); ++i)
     for (unsigned int j = 0; j < m.n(); ++j)
       result += (i + 2 * j) * j * i;
 
-  AssertThrow(s == result, ExcInternalError());
+  DEAL_II_AssertThrow(s == result, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -95,15 +95,15 @@ test()
       cell->get_interpolated_dof_values(solution, local3, 0);
 
       // now verify correctness
-      AssertThrow(local1 == local2, ExcInternalError());
+      DEAL_II_AssertThrow(local1 == local2, ExcInternalError());
 
       // also for the second test. note that vertex dofs always come first in
       // local1, so we can easily compare
       for (unsigned int i = 0; i < fe[0].dofs_per_cell; ++i)
-        AssertThrow(std::abs(local1[i] - local3[i]) <
-                      1e-15 * dof_handler.n_dofs(),
-                    ExcInternalError("Got difference " +
-                                     std::to_string(local1[i] - local3[i])));
+        DEAL_II_AssertThrow(
+          std::abs(local1[i] - local3[i]) < 1e-15 * dof_handler.n_dofs(),
+          ExcInternalError("Got difference " +
+                           std::to_string(local1[i] - local3[i])));
     }
   deallog << "OK" << std::endl;
 }

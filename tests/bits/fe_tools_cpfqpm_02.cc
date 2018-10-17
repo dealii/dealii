@@ -90,5 +90,5 @@ check_this(const FiniteElement<dim> &fe, const FiniteElement<dim> & /*fe2*/)
     product(i, i) -= 1;
 
   output_matrix(product);
-  AssertThrow(product.frobenius_norm() < 1e-10, ExcInternalError());
+  DEAL_II_AssertThrow(product.frobenius_norm() < 1e-10, ExcInternalError());
 }

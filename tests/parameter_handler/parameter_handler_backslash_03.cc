@@ -47,7 +47,7 @@ main()
 
       // We need a local path for the file to get consistent output messages.
       const int chdir_return_code = chdir(SOURCE_DIR);
-      AssertThrow(chdir_return_code == 0, ExcInternalError());
+      DEAL_II_AssertThrow(chdir_return_code == 0, ExcInternalError());
       // test both relevant parse_input functions. They should fail with a
       // specific exception.
       try

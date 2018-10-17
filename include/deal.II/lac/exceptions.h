@@ -30,18 +30,18 @@ namespace LACExceptions
   /**
    * This function only works for quadratic matrices.
    */
-  DeclExceptionMsg(ExcNotQuadratic,
-                   "This function only works for quadratic objects!");
+  DEAL_II_DeclExceptionMsg(ExcNotQuadratic,
+                           "This function only works for quadratic objects!");
 
   /**
    * The operation cannot be finished since the matrix is singular.
    */
-  DeclException0(ExcSingular);
+  DEAL_II_DeclException0(ExcSingular);
 
   /**
    * Block indices of two block objects are different.
    */
-  DeclException0(ExcDifferentBlockIndices);
+  DEAL_II_DeclException0(ExcDifferentBlockIndices);
 
   /**
    * Exception thrown when a PETSc function reports an error. If possible,
@@ -66,10 +66,10 @@ namespace LACExceptions
    * An error of a Trilinos function was encountered. Check the Trilinos
    * documentation for details.
    */
-  DeclException1(ExcTrilinosError,
-                 int,
-                 << "An error with error number " << arg1
-                 << " occurred while calling a Trilinos function");
+  DEAL_II_DeclException1(ExcTrilinosError,
+                         int,
+                         << "An error with error number " << arg1
+                         << " occurred while calling a Trilinos function");
 
   //@}
 } // namespace LACExceptions

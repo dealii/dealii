@@ -99,7 +99,7 @@ namespace Algorithms
   void
   Newton<VectorType>::operator()(AnyData &out, const AnyData &in)
   {
-    Assert(out.size() == 1, ExcNotImplemented());
+    DEAL_II_Assert(out.size() == 1, ExcNotImplemented());
     LogStream::Prefix prefix("Newton");
 
     VectorType &u = *out.entry<VectorType *>(0);
@@ -199,9 +199,9 @@ namespace Algorithms
 
     // in case of failure: throw exception
     if (control.last_check() != SolverControl::success)
-      AssertThrow(false,
-                  SolverControl::NoConvergence(control.last_step(),
-                                               control.last_value()));
+      DEAL_II_AssertThrow(false,
+                          SolverControl::NoConvergence(control.last_step(),
+                                                       control.last_value()));
     // otherwise exit as normal
   }
 } // namespace Algorithms

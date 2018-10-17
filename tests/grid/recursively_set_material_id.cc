@@ -82,12 +82,12 @@ test()
 
       if (t == 0)
         {
-          AssertThrow(n == GeometryInfo<dim>::max_children_per_cell,
-                      ExcInternalError());
+          DEAL_II_AssertThrow(n == GeometryInfo<dim>::max_children_per_cell,
+                              ExcInternalError());
         }
       else
         {
-          AssertThrow(n == 2, ExcInternalError());
+          DEAL_II_AssertThrow(n == 2, ExcInternalError());
         }
     }
 }

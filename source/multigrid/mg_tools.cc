@@ -57,7 +57,7 @@ namespace MGTools
                             std::vector<unsigned int> &,
                             const DoFTools::Coupling)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -70,7 +70,7 @@ namespace MGTools
                             const Table<2, DoFTools::Coupling> &,
                             const Table<2, DoFTools::Coupling> &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -82,7 +82,7 @@ namespace MGTools
                             std::vector<unsigned int> &,
                             const DoFTools::Coupling)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -94,7 +94,7 @@ namespace MGTools
                             const Table<2, DoFTools::Coupling> &,
                             const Table<2, DoFTools::Coupling> &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -107,8 +107,8 @@ namespace MGTools
                             std::vector<unsigned int> &      row_lengths,
                             const DoFTools::Coupling         flux_coupling)
   {
-    Assert(row_lengths.size() == dofs.n_dofs(),
-           ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+    DEAL_II_Assert(row_lengths.size() == dofs.n_dofs(),
+                   ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
 
     // Function starts here by
     // resetting the counters.
@@ -292,8 +292,8 @@ namespace MGTools
                             const Table<2, DoFTools::Coupling> &couplings,
                             const Table<2, DoFTools::Coupling> &flux_couplings)
   {
-    Assert(row_lengths.size() == dofs.n_dofs(),
-           ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+    DEAL_II_Assert(row_lengths.size() == dofs.n_dofs(),
+                   ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
 
     // Function starts here by
     // resetting the counters.
@@ -337,16 +337,18 @@ namespace MGTools
         const FiniteElement<dim> &fe       = cell->get_fe();
         const unsigned int        fe_index = cell->active_fe_index();
 
-        Assert(couplings.n_rows() == fe.n_components(),
-               ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
-        Assert(couplings.n_cols() == fe.n_components(),
-               ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
-        Assert(flux_couplings.n_rows() == fe.n_components(),
-               ExcDimensionMismatch(flux_couplings.n_rows(),
-                                    fe.n_components()));
-        Assert(flux_couplings.n_cols() == fe.n_components(),
-               ExcDimensionMismatch(flux_couplings.n_cols(),
-                                    fe.n_components()));
+        DEAL_II_Assert(couplings.n_rows() == fe.n_components(),
+                       ExcDimensionMismatch(couplings.n_rows(),
+                                            fe.n_components()));
+        DEAL_II_Assert(couplings.n_cols() == fe.n_components(),
+                       ExcDimensionMismatch(couplings.n_cols(),
+                                            fe.n_components()));
+        DEAL_II_Assert(flux_couplings.n_rows() == fe.n_components(),
+                       ExcDimensionMismatch(flux_couplings.n_rows(),
+                                            fe.n_components()));
+        DEAL_II_Assert(flux_couplings.n_cols() == fe.n_components(),
+                       ExcDimensionMismatch(flux_couplings.n_cols(),
+                                            fe.n_components()));
 
         cell_indices.resize(fe.dofs_per_cell);
         cell->get_mg_dof_indices(cell_indices);
@@ -577,10 +579,10 @@ namespace MGTools
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
+    DEAL_II_Assert(sparsity.n_rows() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index>   dofs_on_this_cell(dofs_per_cell);
@@ -611,10 +613,10 @@ namespace MGTools
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
+    DEAL_II_Assert(sparsity.n_rows() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
@@ -684,8 +686,9 @@ namespace MGTools
                                   SparsityPatternType &            sparsity,
                                   const unsigned int               level)
   {
-    Assert((level >= 1) && (level < dof.get_triangulation().n_global_levels()),
-           ExcIndexRange(level, 1, dof.get_triangulation().n_global_levels()));
+    DEAL_II_Assert(
+      (level >= 1) && (level < dof.get_triangulation().n_global_levels()),
+      ExcIndexRange(level, 1, dof.get_triangulation().n_global_levels()));
 
     const types::global_dof_index fine_dofs   = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level - 1);
@@ -694,10 +697,10 @@ namespace MGTools
 
     // Matrix maps from fine level to coarse level
 
-    Assert(sparsity.n_rows() == coarse_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
-    Assert(sparsity.n_cols() == fine_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), fine_dofs));
+    DEAL_II_Assert(sparsity.n_rows() == coarse_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == fine_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), fine_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
@@ -762,18 +765,18 @@ namespace MGTools
     (void)n_dofs;
     (void)n_comp;
 
-    Assert(sparsity.n_rows() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
-    Assert(int_mask.n_rows() == n_comp,
-           ExcDimensionMismatch(int_mask.n_rows(), n_comp));
-    Assert(int_mask.n_cols() == n_comp,
-           ExcDimensionMismatch(int_mask.n_cols(), n_comp));
-    Assert(flux_mask.n_rows() == n_comp,
-           ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
-    Assert(flux_mask.n_cols() == n_comp,
-           ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
+    DEAL_II_Assert(sparsity.n_rows() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
+    DEAL_II_Assert(int_mask.n_rows() == n_comp,
+                   ExcDimensionMismatch(int_mask.n_rows(), n_comp));
+    DEAL_II_Assert(int_mask.n_cols() == n_comp,
+                   ExcDimensionMismatch(int_mask.n_cols(), n_comp));
+    DEAL_II_Assert(flux_mask.n_rows() == n_comp,
+                   ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
+    DEAL_II_Assert(flux_mask.n_cols() == n_comp,
+                   ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
     const unsigned int                   total_dofs = fe.dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(total_dofs);
@@ -948,8 +951,9 @@ namespace MGTools
     const unsigned int        n_comp = fe.n_components();
     (void)n_comp;
 
-    Assert((level >= 1) && (level < dof.get_triangulation().n_global_levels()),
-           ExcIndexRange(level, 1, dof.get_triangulation().n_global_levels()));
+    DEAL_II_Assert(
+      (level >= 1) && (level < dof.get_triangulation().n_global_levels()),
+      ExcIndexRange(level, 1, dof.get_triangulation().n_global_levels()));
 
     const types::global_dof_index fine_dofs   = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level - 1);
@@ -958,14 +962,14 @@ namespace MGTools
 
     // Matrix maps from fine level to coarse level
 
-    Assert(sparsity.n_rows() == coarse_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
-    Assert(sparsity.n_cols() == fine_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), fine_dofs));
-    Assert(flux_mask.n_rows() == n_comp,
-           ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
-    Assert(flux_mask.n_cols() == n_comp,
-           ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
+    DEAL_II_Assert(sparsity.n_rows() == coarse_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), coarse_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == fine_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), fine_dofs));
+    DEAL_II_Assert(flux_mask.n_rows() == n_comp,
+                   ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
+    DEAL_II_Assert(flux_mask.n_cols() == n_comp,
+                   ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
@@ -1040,10 +1044,10 @@ namespace MGTools
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
+    DEAL_II_Assert(sparsity.n_rows() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index>   dofs_on_this_cell(dofs_per_cell);
@@ -1076,8 +1080,8 @@ namespace MGTools
     const unsigned int        nlevels =
       dof_handler.get_triangulation().n_global_levels();
 
-    Assert(result.size() == nlevels,
-           ExcDimensionMismatch(result.size(), nlevels));
+    DEAL_II_Assert(result.size() == nlevels,
+                   ExcDimensionMismatch(result.size(), nlevels));
 
     if (target_component.size() == 0)
       {
@@ -1086,8 +1090,8 @@ namespace MGTools
           target_component[i] = i;
       }
 
-    Assert(target_component.size() == n_components,
-           ExcDimensionMismatch(target_component.size(), n_components));
+    DEAL_II_Assert(target_component.size() == n_components,
+                   ExcDimensionMismatch(target_component.size(), n_components));
 
     for (unsigned int l = 0; l < nlevels; ++l)
       {
@@ -1153,12 +1157,12 @@ namespace MGTools
                   }
               }
             // finally sanity check
-            Assert(!dof_handler.get_fe().is_primitive() ||
-                     std::accumulate(result[l].begin(),
-                                     result[l].end(),
-                                     types::global_dof_index(0)) ==
-                       dof_handler.n_dofs(l),
-                   ExcInternalError());
+            DEAL_II_Assert(!dof_handler.get_fe().is_primitive() ||
+                             std::accumulate(result[l].begin(),
+                                             result[l].end(),
+                                             types::global_dof_index(0)) ==
+                               dof_handler.n_dofs(l),
+                           ExcInternalError());
           }
       }
   }
@@ -1179,7 +1183,7 @@ namespace MGTools
     const unsigned int n_levels =
       dof_handler.get_triangulation().n_global_levels();
 
-    AssertDimension(dofs_per_block.size(), n_levels);
+    DEAL_II_AssertDimension(dofs_per_block.size(), n_levels);
 
     for (unsigned int l = 0; l < n_levels; ++l)
       std::fill(dofs_per_block[l].begin(), dofs_per_block[l].end(), 0U);
@@ -1192,8 +1196,8 @@ namespace MGTools
         for (unsigned int i = 0; i < n_blocks; ++i)
           target_block[i] = i;
       }
-    Assert(target_block.size() == n_blocks,
-           ExcDimensionMismatch(target_block.size(), n_blocks));
+    DEAL_II_Assert(target_block.size() == n_blocks,
+                   ExcDimensionMismatch(target_block.size(), n_blocks));
 
     const unsigned int max_block =
       *std::max_element(target_block.begin(), target_block.end());
@@ -1201,7 +1205,7 @@ namespace MGTools
     (void)n_target_blocks;
 
     for (unsigned int l = 0; l < n_levels; ++l)
-      AssertDimension(dofs_per_block[l].size(), n_target_blocks);
+      DEAL_II_AssertDimension(dofs_per_block[l].size(), n_target_blocks);
 
     // special case for only one
     // block. treat this first
@@ -1259,9 +1263,10 @@ namespace MGTools
     std::vector<std::set<types::global_dof_index>> &boundary_indices,
     const ComponentMask &                           component_mask)
   {
-    Assert(boundary_indices.size() == dof.get_triangulation().n_global_levels(),
-           ExcDimensionMismatch(boundary_indices.size(),
-                                dof.get_triangulation().n_global_levels()));
+    DEAL_II_Assert(
+      boundary_indices.size() == dof.get_triangulation().n_global_levels(),
+      ExcDimensionMismatch(boundary_indices.size(),
+                           dof.get_triangulation().n_global_levels()));
 
     std::set<types::boundary_id> boundary_ids;
     for (const auto &boundary_function : function_map)
@@ -1283,9 +1288,10 @@ namespace MGTools
                      std::vector<IndexSet> &boundary_indices,
                      const ComponentMask &  component_mask)
   {
-    Assert(boundary_indices.size() == dof.get_triangulation().n_global_levels(),
-           ExcDimensionMismatch(boundary_indices.size(),
-                                dof.get_triangulation().n_global_levels()));
+    DEAL_II_Assert(
+      boundary_indices.size() == dof.get_triangulation().n_global_levels(),
+      ExcDimensionMismatch(boundary_indices.size(),
+                           dof.get_triangulation().n_global_levels()));
 
     std::set<types::boundary_id> boundary_ids;
     for (const auto &boundary_function : function_map)
@@ -1356,9 +1362,10 @@ namespace MGTools
       }
     else
       {
-        Assert(component_mask.n_selected_components(n_components) > 0,
-               ExcMessage(
-                 "It's probably worthwhile to select at least one component."));
+        DEAL_II_Assert(
+          component_mask.n_selected_components(n_components) > 0,
+          ExcMessage(
+            "It's probably worthwhile to select at least one component."));
 
         typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(),
                                                           endc = dof.end();
@@ -1401,7 +1408,7 @@ namespace MGTools
                             }
                         if (selected)
                           for (unsigned int c = 0; c < n_components; ++c)
-                            Assert(
+                            DEAL_II_Assert(
                               nonzero_component_array[c] == false ||
                                 component_mask[c] == true,
                               ExcMessage(
@@ -1436,8 +1443,9 @@ namespace MGTools
                                       break;
                                     }
                               }
-                            Assert(component != numbers::invalid_unsigned_int,
-                                   ExcInternalError());
+                            DEAL_II_Assert(component !=
+                                             numbers::invalid_unsigned_int,
+                                           ExcInternalError());
                             if (component_mask[component] == true)
                               boundary_indices[level].add_index(local_dofs[i]);
                           }
@@ -1457,11 +1465,11 @@ namespace MGTools
     const DoFHandler<dim, spacedim> &               mg_dof_handler,
     std::vector<std::set<types::global_dof_index>> &non_interface_dofs)
   {
-    Assert(non_interface_dofs.size() ==
-             mg_dof_handler.get_triangulation().n_global_levels(),
-           ExcDimensionMismatch(
-             non_interface_dofs.size(),
-             mg_dof_handler.get_triangulation().n_global_levels()));
+    DEAL_II_Assert(non_interface_dofs.size() ==
+                     mg_dof_handler.get_triangulation().n_global_levels(),
+                   ExcDimensionMismatch(
+                     non_interface_dofs.size(),
+                     mg_dof_handler.get_triangulation().n_global_levels()));
 
     const FiniteElement<dim, spacedim> &fe = mg_dof_handler.get_fe();
 
@@ -1536,11 +1544,11 @@ namespace MGTools
   extract_inner_interface_dofs(const DoFHandler<dim, spacedim> &mg_dof_handler,
                                std::vector<IndexSet> &          interface_dofs)
   {
-    Assert(interface_dofs.size() ==
-             mg_dof_handler.get_triangulation().n_global_levels(),
-           ExcDimensionMismatch(
-             interface_dofs.size(),
-             mg_dof_handler.get_triangulation().n_global_levels()));
+    DEAL_II_Assert(interface_dofs.size() ==
+                     mg_dof_handler.get_triangulation().n_global_levels(),
+                   ExcDimensionMismatch(
+                     interface_dofs.size(),
+                     mg_dof_handler.get_triangulation().n_global_levels()));
 
     std::vector<std::vector<types::global_dof_index>> tmp_interface_dofs(
       interface_dofs.size());
@@ -1657,7 +1665,7 @@ namespace MGTools
           dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(&tria))
       global_min = Utilities::MPI::min(min_level, tr->get_communicator());
 
-    AssertIndexRange(global_min, tria.n_global_levels());
+    DEAL_II_AssertIndexRange(global_min, tria.n_global_levels());
 
     return global_min;
   }

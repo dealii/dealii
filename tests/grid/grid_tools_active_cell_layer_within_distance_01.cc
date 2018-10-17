@@ -97,7 +97,8 @@ test()
     GridTools::compute_active_cell_layer_within_distance(
       tria, predicate, 0.); // General predicate
 
-  AssertThrow(active_halo_layer.size() > 0, ExcMessage("No halo layer found."));
+  DEAL_II_AssertThrow(active_halo_layer.size() > 0,
+                      ExcMessage("No halo layer found."));
   for (typename std::vector<cell_iterator>::const_iterator it =
          active_halo_layer.begin();
        it != active_halo_layer.end();

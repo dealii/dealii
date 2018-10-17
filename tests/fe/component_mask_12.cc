@@ -50,9 +50,10 @@ test()
         component_mask[c] = (int_mask & (1 << c));
 
       // make sure that the round-trip works
-      Assert(ComponentMask(component_mask) ==
-               fe.component_mask(fe.block_mask(ComponentMask(component_mask))),
-             ExcInternalError());
+      DEAL_II_Assert(ComponentMask(component_mask) ==
+                       fe.component_mask(
+                         fe.block_mask(ComponentMask(component_mask))),
+                     ExcInternalError());
 
       // then compare elementwise with
       // the block mask (where there is
@@ -62,8 +63,9 @@ test()
       // element corresponds to a
       // block)
       for (unsigned int c = 0; c < fe.n_components(); ++c)
-        AssertThrow(component_mask[c] == fe.block_mask(component_mask)[c],
-                    ExcInternalError());
+        DEAL_II_AssertThrow(component_mask[c] ==
+                              fe.block_mask(component_mask)[c],
+                            ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

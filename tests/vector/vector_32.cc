@@ -37,9 +37,9 @@ test(Vector<double> &v)
   v.compress();
 
   // then check the norm
-  AssertThrow(std::fabs(v.mean_value() - sum / v.size()) <
-                1e-14 * sum / v.size(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(v.mean_value() - sum / v.size()) <
+                        1e-14 * sum / v.size(),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

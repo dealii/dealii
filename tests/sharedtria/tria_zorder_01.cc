@@ -35,9 +35,9 @@ void
 compare_meshes(parallel::shared::Triangulation<dim> &     shared_tria,
                parallel::distributed::Triangulation<dim> &p4est_tria)
 {
-  AssertThrow(shared_tria.n_locally_owned_active_cells() ==
-                p4est_tria.n_locally_owned_active_cells(),
-              ExcMessage("Subdomains are of different sizes."))
+  DEAL_II_AssertThrow(shared_tria.n_locally_owned_active_cells() ==
+                        p4est_tria.n_locally_owned_active_cells(),
+                      ExcMessage("Subdomains are of different sizes."))
 
     std::map<CellId, unsigned int>
                                  shared_map;
@@ -65,8 +65,9 @@ compare_meshes(parallel::shared::Triangulation<dim> &     shared_tria,
        it != p4est_map.end();
        ++it)
     {
-      AssertThrow(shared_map[it->first] == it->second,
-                  ExcMessage("Not all CellIds map to correct subdomain_ids."))
+      DEAL_II_AssertThrow(shared_map[it->first] == it->second,
+                          ExcMessage(
+                            "Not all CellIds map to correct subdomain_ids."))
     }
 }
 

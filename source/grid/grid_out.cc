@@ -598,7 +598,7 @@ GridOut::default_suffix(const OutputFormat output_format)
       case vtu:
         return ".vtu";
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return "";
     }
 }
@@ -649,7 +649,7 @@ GridOut::parse_output_format(const std::string &format_name)
   if (format_name == "vtu")
     return vtu;
 
-  AssertThrow(false, ExcInvalidState());
+  DEAL_II_AssertThrow(false, ExcInvalidState());
   // return something weird
   return OutputFormat(-1);
 }
@@ -773,21 +773,21 @@ template <>
 void
 GridOut::write_dx(const Triangulation<1> &, std::ostream &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 template <>
 void
 GridOut::write_dx(const Triangulation<1, 2> &, std::ostream &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 template <>
 void
 GridOut::write_dx(const Triangulation<1, 3> &, std::ostream &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -798,8 +798,8 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
                   std::ostream &                      out) const
 {
   // TODO:[GK] allow for boundary faces only
-  Assert(dx_flags.write_all_faces, ExcNotImplemented());
-  AssertThrow(out, ExcIO());
+  DEAL_II_Assert(dx_flags.write_all_faces, ExcNotImplemented());
+  DEAL_II_AssertThrow(out, ExcIO());
   // Copied and adapted from write_ucd
   const std::vector<Point<spacedim>> &vertices    = tria.get_vertices();
   const std::vector<bool> &           vertex_used = tria.get_used_vertices();
@@ -818,7 +818,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
   for (unsigned int i = 0; i < vertices.size(); ++i)
     if (vertex_used[i])
       renumber[i] = new_number++;
-  Assert(new_number == n_vertices, ExcInternalError());
+  DEAL_II_Assert(new_number == n_vertices, ExcInternalError());
 
   typename Triangulation<dim, spacedim>::active_cell_iterator       cell;
   const typename Triangulation<dim, spacedim>::active_cell_iterator endc =
@@ -1031,7 +1031,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
   // disk
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -1041,7 +1041,7 @@ void
 GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
                    std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // get the positions of the
   // vertices and whether they are
@@ -1140,7 +1140,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
         elm_type = 5;
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   // write cells. Enumerate cells
@@ -1179,7 +1179,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
   // disk
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -1188,7 +1188,7 @@ void
 GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
                    std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // get the positions of the
   // vertices and whether they are
@@ -1262,7 +1262,7 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
             out << "hex     ";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
       // it follows a list of the
@@ -1303,7 +1303,7 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
   // disk
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -1314,7 +1314,7 @@ GridOut::write_xfig(const Triangulation<dim, spacedim> &,
                     std::ostream &,
                     const Mapping<dim, spacedim> *) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1427,7 +1427,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
             out << cell->level_subdomain_id() + 32;
             break;
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
         }
 
       // Depth, unused, fill
@@ -1510,7 +1510,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
   // disk
   out.flush();
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -1520,7 +1520,7 @@ void
 GridOut::write_svg(const Triangulation<dim, spacedim> &,
                    std::ostream & /*out*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1542,8 +1542,9 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   // both of them zero does not produce reasonable output.
   unsigned int height = svg_flags.height;
   unsigned int width  = svg_flags.width;
-  Assert(height != 0 || width != 0,
-         ExcMessage("You have to set at least one of width and height"));
+  DEAL_II_Assert(height != 0 || width != 0,
+                 ExcMessage(
+                   "You have to set at least one of width and height"));
 
   unsigned int margin_in_percent = 0;
   if (svg_flags.margin || svg_flags.background == GridOutFlags::Svg::dealii)
@@ -2735,7 +2736,7 @@ void
 GridOut::write_mathgl(const Triangulation<1> &, std::ostream &) const
 {
   // 1d specialization not done yet
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -2744,7 +2745,7 @@ void
 GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
                       std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // (i) write header
   {
@@ -2795,7 +2796,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
         out << "\nrotate 60 40";
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   out << "\n";
 
@@ -2821,7 +2822,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
           << "\n";
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   // (iv) write a list of vertices of cells
@@ -2878,7 +2879,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
 
   // make sure everything now gets to the output stream
   out.flush();
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -2941,7 +2942,7 @@ void
 GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
                    std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // convert the cells of the triangulation into a set of patches
   // and then have them output. since there is no data attached to
@@ -2961,7 +2962,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     vtk_flags,
     out);
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -2971,7 +2972,7 @@ void
 GridOut::write_vtu(const Triangulation<dim, spacedim> &tria,
                    std::ostream &                      out) const
 {
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 
   // convert the cells of the triangulation into a set of patches
   // and then have them output. since there is no data attached to
@@ -2991,7 +2992,7 @@ GridOut::write_vtu(const Triangulation<dim, spacedim> &tria,
     vtu_flags,
     out);
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -3322,7 +3323,7 @@ GridOut::write_msh_faces(const Triangulation<dim, spacedim> &tria,
               out << 3 << ' ';
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
         out << static_cast<unsigned int>(face->boundary_id()) << ' '
             << static_cast<unsigned int>(face->boundary_id()) << ' '
@@ -3488,7 +3489,7 @@ GridOut::write_ucd_faces(const Triangulation<dim, spacedim> &tria,
               out << "quad    ";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
         // note: vertex numbers are 1-base
         for (unsigned int vertex = 0;
@@ -3648,7 +3649,7 @@ namespace internal
                   const Mapping<1, spacedim> *,
                   const GridOutFlags::Gnuplot &gnuplot_flags)
     {
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
 
       const int dim = 1;
 
@@ -3672,7 +3673,7 @@ namespace internal
       // disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
     }
 
 
@@ -3684,7 +3685,7 @@ namespace internal
                   const Mapping<2, spacedim> *              mapping,
                   const GridOutFlags::Gnuplot &             gnuplot_flags)
     {
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
 
       const int dim = 2;
 
@@ -3798,7 +3799,7 @@ namespace internal
       // make sure everything now gets to disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
     }
 
 
@@ -3810,7 +3811,7 @@ namespace internal
                   const Mapping<3, spacedim> *              mapping,
                   const GridOutFlags::Gnuplot &             gnuplot_flags)
     {
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
 
       const int dim = 3;
 
@@ -4021,7 +4022,7 @@ namespace internal
       // make sure everything now gets to disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
     }
   } // namespace
 } // namespace internal
@@ -4068,7 +4069,7 @@ namespace internal
               const GridOutFlags::Eps<2> &,
               const GridOutFlags::Eps<3> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
     void
@@ -4078,7 +4079,7 @@ namespace internal
               const GridOutFlags::Eps<2> &,
               const GridOutFlags::Eps<3> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
     void
@@ -4088,7 +4089,7 @@ namespace internal
               const GridOutFlags::Eps<2> &,
               const GridOutFlags::Eps<3> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
     void
@@ -4098,7 +4099,7 @@ namespace internal
               const GridOutFlags::Eps<2> &,
               const GridOutFlags::Eps<3> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
 
@@ -4115,7 +4116,7 @@ namespace internal
 
       // We should never get here in 1D since this function is overloaded for
       // all dim == 1 cases.
-      Assert(dim == 2 || dim == 3, ExcInternalError());
+      DEAL_II_Assert(dim == 2 || dim == 3, ExcInternalError());
 
       // Copy, with an object slice, something containing the flags common to
       // all dimensions in order to avoid the recurring distinctions between
@@ -4125,7 +4126,7 @@ namespace internal
           static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_2) :
           static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_3);
 
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
       const unsigned int n_points = eps_flags_base.n_boundary_face_points;
 
       // make up a list of lines by which
@@ -4145,7 +4146,7 @@ namespace internal
         {
           case 1:
             {
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
               break;
             }
 
@@ -4280,7 +4281,7 @@ namespace internal
             {
               // curved boundary output
               // presently not supported
-              Assert(mapping == nullptr, ExcNotImplemented());
+              DEAL_II_Assert(mapping == nullptr, ExcNotImplemented());
 
               typename dealii::Triangulation<dim,
                                              spacedim>::active_cell_iterator
@@ -4355,7 +4356,7 @@ namespace internal
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
 
@@ -4556,7 +4557,7 @@ namespace internal
       // disk
       out.flush();
 
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
     }
   } // namespace
 } // namespace internal
@@ -4625,7 +4626,7 @@ GridOut::write(const Triangulation<dim, spacedim> &tria,
         return;
     }
 
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
 }
 
 

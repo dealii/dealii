@@ -52,10 +52,11 @@ test()
   v2 = vb;
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << get_real_assert_zero_imag(v2(1)) << std::endl;
-  Assert(get_real_assert_zero_imag(v2(1)) == 1.5, ExcInternalError());
-  Assert(get_real_assert_zero_imag(v2(myid * 2)) == 1.5, ExcInternalError());
-  Assert(get_real_assert_zero_imag(v2(myid * 2 + 1)) == 1.5,
-         ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v2(1)) == 1.5, ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v2(myid * 2)) == 1.5,
+                 ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v2(myid * 2 + 1)) == 1.5,
+                 ExcInternalError());
 
   // set local values
   vb(myid * 2)     = myid * 2.0;
@@ -75,24 +76,25 @@ test()
               << get_real_assert_zero_imag(v(myid * 2 + 1)) << std::endl;
     }
 
-  Assert(get_real_assert_zero_imag(v(myid * 2)) == myid * 4.0,
-         ExcInternalError());
-  Assert(get_real_assert_zero_imag(v(myid * 2 + 1)) == myid * 4.0 + 2.0,
-         ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v(myid * 2)) == myid * 4.0,
+                 ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v(myid * 2 + 1)) == myid * 4.0 + 2.0,
+                 ExcInternalError());
 
 
   // check ghost values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << get_real_assert_zero_imag(v(1)) << std::endl;
-  Assert(get_real_assert_zero_imag(v(1)) == 2.0, ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v(1)) == 2.0, ExcInternalError());
 
   // assignment from ghosted to ghosted
   v2 = v;
-  Assert(get_real_assert_zero_imag(v2(1)) == 2.0, ExcInternalError());
-  Assert(get_real_assert_zero_imag(v2(myid * 2)) == myid * 4.0,
-         ExcInternalError());
-  Assert(get_real_assert_zero_imag(v2(myid * 2 + 1)) == myid * 4.0 + 2.0,
-         ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v2(1)) == 2.0, ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v2(myid * 2)) == myid * 4.0,
+                 ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v2(myid * 2 + 1)) ==
+                   myid * 4.0 + 2.0,
+                 ExcInternalError());
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << get_real_assert_zero_imag(v2(1)) << std::endl;
 

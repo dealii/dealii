@@ -97,7 +97,7 @@ void
 LaplaceMatrix<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
                          MeshWorker::IntegrationInfo<dim> &info) const
 {
-  AssertDimension(dinfo.n_matrices(), 1);
+  DEAL_II_AssertDimension(dinfo.n_matrices(), 1);
   Laplace::cell_matrix(dinfo.matrix(0, false).matrix, info.fe_values(0));
 }
 
@@ -213,10 +213,10 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 {
   const unsigned int n_points = points.size();
 
-  Assert(values.size() == n_points,
-         ExcDimensionMismatch(values.size(), n_points));
+  DEAL_II_Assert(values.size() == n_points,
+                 ExcDimensionMismatch(values.size(), n_points));
 
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
   for (unsigned int i = 0; i < n_points; ++i)
     values[i] = Coefficient<dim>::value(points[i]);

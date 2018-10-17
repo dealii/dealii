@@ -66,9 +66,10 @@ FunctionDerivative<dim>::set_formula(
       case AutoDerivativeFunction<dim>::FourthOrder:
         break;
       default:
-        Assert(false,
-               ExcMessage("The argument passed to this function does not "
-                          "match any known difference formula."));
+        DEAL_II_Assert(false,
+                       ExcMessage(
+                         "The argument passed to this function does not "
+                         "match any known difference formula."));
     }
 
   formula = form;
@@ -92,9 +93,10 @@ double
 FunctionDerivative<dim>::value(const Point<dim> & p,
                                const unsigned int component) const
 {
-  Assert(incr.size() == 1,
-         ExcMessage(
-           "FunctionDerivative was not initialized for constant direction"));
+  DEAL_II_Assert(
+    incr.size() == 1,
+    ExcMessage(
+      "FunctionDerivative was not initialized for constant direction"));
 
   switch (formula)
     {
@@ -111,7 +113,7 @@ FunctionDerivative<dim>::value(const Point<dim> & p,
                 f.value(p - 2 * incr[0], component)) /
                (12 * h);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return 0.;
 }
@@ -123,9 +125,10 @@ void
 FunctionDerivative<dim>::vector_value(const Point<dim> &p,
                                       Vector<double> &  result) const
 {
-  Assert(incr.size() == 1,
-         ExcMessage(
-           "FunctionDerivative was not initialized for constant direction"));
+  DEAL_II_Assert(
+    incr.size() == 1,
+    ExcMessage(
+      "FunctionDerivative was not initialized for constant direction"));
   Vector<double> aux(result.size());
 
   // Formulas are the same as in
@@ -154,7 +157,7 @@ FunctionDerivative<dim>::vector_value(const Point<dim> &p,
         result /= (12. * h);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -169,8 +172,8 @@ FunctionDerivative<dim>::value_list(const std::vector<Point<dim>> &points,
   const unsigned int n                  = points.size();
   const bool         variable_direction = (incr.size() == 1) ? false : true;
   if (variable_direction)
-    Assert(incr.size() == points.size(),
-           ExcDimensionMismatch(incr.size(), points.size()));
+    DEAL_II_Assert(incr.size() == points.size(),
+                   ExcDimensionMismatch(incr.size(), points.size()));
 
   // Vector of auxiliary values
   std::vector<double> aux(n);
@@ -220,7 +223,7 @@ FunctionDerivative<dim>::value_list(const std::vector<Point<dim>> &points,
           values[i] = (values[i] - 8. * aux[i]) / (12 * h);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 

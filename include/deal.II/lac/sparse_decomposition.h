@@ -275,10 +275,10 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcInvalidStrengthening,
-                 double,
-                 << "The strengthening parameter " << arg1
-                 << " is not greater or equal than zero!");
+  DEAL_II_DeclException1(ExcInvalidStrengthening,
+                         double,
+                         << "The strengthening parameter " << arg1
+                         << " is not greater or equal than zero!");
   //@}
 protected:
   /**

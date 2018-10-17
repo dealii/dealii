@@ -37,9 +37,9 @@ test(Vector<std::complex<double>> &v)
   v.compress();
 
   // then check the norm
-  AssertThrow(std::abs(v.lp_norm(3) - std::pow(sum, 1. / 3.)) <
-                1e-14 * std::abs(std::pow(sum, 1. / 3.)),
-              ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(v.lp_norm(3) - std::pow(sum, 1. / 3.)) <
+                        1e-14 * std::abs(std::pow(sum, 1. / 3.)),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

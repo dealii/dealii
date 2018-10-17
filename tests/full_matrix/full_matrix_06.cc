@@ -50,11 +50,11 @@ test()
       {
         if ((i % 2 == 0) && (j % 2 == 0))
           {
-            AssertThrow(X(i, j) == i / 2 + j / 2, ExcInternalError());
+            DEAL_II_AssertThrow(X(i, j) == i / 2 + j / 2, ExcInternalError());
           }
         else
           {
-            AssertThrow(X(i, j) == 0, ExcInternalError());
+            DEAL_II_AssertThrow(X(i, j) == 0, ExcInternalError());
           }
       }
 

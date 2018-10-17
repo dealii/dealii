@@ -131,7 +131,7 @@ namespace hp
     /**
      * Exception
      */
-    DeclException0(ExcNoQuadrature);
+    DEAL_II_DeclException0(ExcNoQuadrature);
 
   private:
     /**
@@ -176,8 +176,9 @@ namespace hp
   inline unsigned int
   QCollection<dim>::max_n_quadrature_points() const
   {
-    Assert(quadratures.size() > 0,
-           ExcMessage("You can't call this function for an empty collection"));
+    DEAL_II_Assert(quadratures.size() > 0,
+                   ExcMessage(
+                     "You can't call this function for an empty collection"));
 
     unsigned int m = 0;
     for (unsigned int i = 0; i < quadratures.size(); ++i)
@@ -193,8 +194,8 @@ namespace hp
   inline const Quadrature<dim> &QCollection<dim>::
                                 operator[](const unsigned int index) const
   {
-    Assert(index < quadratures.size(),
-           ExcIndexRange(index, 0, quadratures.size()));
+    DEAL_II_Assert(index < quadratures.size(),
+                   ExcIndexRange(index, 0, quadratures.size()));
     return *quadratures[index];
   }
 

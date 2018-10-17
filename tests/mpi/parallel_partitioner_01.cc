@@ -37,7 +37,7 @@ test()
     deallog << "numproc=" << numproc << std::endl;
 
   const unsigned int set = 200;
-  AssertIndexRange(numproc, set - 2);
+  DEAL_II_AssertIndexRange(numproc, set - 2);
   const unsigned int local_size  = set - myid;
   unsigned int       global_size = 0;
   unsigned int       my_start    = 0;
@@ -74,51 +74,51 @@ test()
   // the above)
   if (myid == 0)
     {
-      AssertDimension(v.n_ghost_indices(), 5);
+      DEAL_II_AssertDimension(v.n_ghost_indices(), 5);
     }
   else if (myid == 1)
     {
-      AssertDimension(v.n_ghost_indices(), 8);
+      DEAL_II_AssertDimension(v.n_ghost_indices(), 8);
     }
   else if (myid == 2)
     {
-      AssertDimension(v.n_ghost_indices(), 7);
+      DEAL_II_AssertDimension(v.n_ghost_indices(), 7);
     }
   else
     {
-      AssertDimension(v.n_ghost_indices(), 10);
+      DEAL_II_AssertDimension(v.n_ghost_indices(), 10);
     }
 
   // count that 13 is ghost only on non-owning
   // processors
   if (myid == 0)
     {
-      AssertThrow(v.is_ghost_entry(13) == false, ExcInternalError());
+      DEAL_II_AssertThrow(v.is_ghost_entry(13) == false, ExcInternalError());
     }
   else
     {
-      AssertThrow(v.is_ghost_entry(13) == true, ExcInternalError());
+      DEAL_II_AssertThrow(v.is_ghost_entry(13) == true, ExcInternalError());
     }
 
   // count that 27 is ghost nowhere
-  AssertThrow(v.is_ghost_entry(27) == false, ExcInternalError());
+  DEAL_II_AssertThrow(v.is_ghost_entry(27) == false, ExcInternalError());
   if (myid == 0)
     {
-      AssertThrow(v.in_local_range(27) == true, ExcInternalError());
+      DEAL_II_AssertThrow(v.in_local_range(27) == true, ExcInternalError());
     }
   else
     {
-      AssertThrow(v.in_local_range(27) == false, ExcInternalError());
+      DEAL_II_AssertThrow(v.in_local_range(27) == false, ExcInternalError());
     }
 
   // element with number set is ghost
   if (myid == 1)
     {
-      AssertThrow(v.is_ghost_entry(set) == false, ExcInternalError());
+      DEAL_II_AssertThrow(v.is_ghost_entry(set) == false, ExcInternalError());
     }
   else
     {
-      AssertThrow(v.is_ghost_entry(set) == true, ExcInternalError());
+      DEAL_II_AssertThrow(v.is_ghost_entry(set) == true, ExcInternalError());
     }
 
   if (myid == 0)

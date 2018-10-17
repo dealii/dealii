@@ -368,33 +368,33 @@ namespace internal
       const unsigned int                           local_index,
       const unsigned int /*obj_level*/) const
     {
-      Assert((fe_index !=
-              dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
-             ExcMessage("You need to specify a FE index when working "
-                        "with hp DoFHandlers"));
-      Assert(fe_index < dof_handler.get_fe_collection().size(),
-             ExcIndexRange(fe_index,
-                           0,
-                           dof_handler.get_fe_collection().size()));
-      Assert(local_index < dof_handler.get_fe(fe_index)
-                             .template n_dofs_per_object<structdim>(),
-             ExcIndexRange(local_index,
-                           0,
-                           dof_handler.get_fe(fe_index)
-                             .template n_dofs_per_object<structdim>()));
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      DEAL_II_Assert((fe_index !=
+                      dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
+                     ExcMessage("You need to specify a FE index when working "
+                                "with hp DoFHandlers"));
+      DEAL_II_Assert(fe_index < dof_handler.get_fe_collection().size(),
+                     ExcIndexRange(fe_index,
+                                   0,
+                                   dof_handler.get_fe_collection().size()));
+      DEAL_II_Assert(local_index < dof_handler.get_fe(fe_index)
+                                     .template n_dofs_per_object<structdim>(),
+                     ExcIndexRange(local_index,
+                                   0,
+                                   dof_handler.get_fe(fe_index)
+                                     .template n_dofs_per_object<structdim>()));
+      DEAL_II_Assert(obj_index < dof_offsets.size(),
+                     ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert(dof_offsets[obj_index] != numbers::invalid_unsigned_int,
-             ExcMessage("You are trying to access degree of freedom "
-                        "information for an object on which no such "
-                        "information is available"));
+      DEAL_II_Assert(dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+                     ExcMessage("You are trying to access degree of freedom "
+                                "information for an object on which no such "
+                                "information is available"));
 
-      Assert(structdim < dim,
-             ExcMessage("This object can not be used for cells."));
+      DEAL_II_Assert(structdim < dim,
+                     ExcMessage("This object can not be used for cells."));
 
       // there may be multiple finite elements associated with
       // this object. hop along the list of index sets until we
@@ -405,7 +405,8 @@ namespace internal
       const types::global_dof_index *pointer         = &dofs[starting_offset];
       while (true)
         {
-          Assert(*pointer != numbers::invalid_dof_index, ExcInternalError());
+          DEAL_II_Assert(*pointer != numbers::invalid_dof_index,
+                         ExcInternalError());
           if (*pointer == fe_index)
             return *(pointer + 1 + local_index);
           else
@@ -429,33 +430,33 @@ namespace internal
       const types::global_dof_index                global_index,
       const unsigned int /*obj_level*/)
     {
-      Assert((fe_index !=
-              dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
-             ExcMessage("You need to specify a FE index when working "
-                        "with hp DoFHandlers"));
-      Assert(fe_index < dof_handler.get_fe_collection().size(),
-             ExcIndexRange(fe_index,
-                           0,
-                           dof_handler.get_fe_collection().size()));
-      Assert(local_index < dof_handler.get_fe(fe_index)
-                             .template n_dofs_per_object<structdim>(),
-             ExcIndexRange(local_index,
-                           0,
-                           dof_handler.get_fe(fe_index)
-                             .template n_dofs_per_object<structdim>()));
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      DEAL_II_Assert((fe_index !=
+                      dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
+                     ExcMessage("You need to specify a FE index when working "
+                                "with hp DoFHandlers"));
+      DEAL_II_Assert(fe_index < dof_handler.get_fe_collection().size(),
+                     ExcIndexRange(fe_index,
+                                   0,
+                                   dof_handler.get_fe_collection().size()));
+      DEAL_II_Assert(local_index < dof_handler.get_fe(fe_index)
+                                     .template n_dofs_per_object<structdim>(),
+                     ExcIndexRange(local_index,
+                                   0,
+                                   dof_handler.get_fe(fe_index)
+                                     .template n_dofs_per_object<structdim>()));
+      DEAL_II_Assert(obj_index < dof_offsets.size(),
+                     ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert(dof_offsets[obj_index] != numbers::invalid_unsigned_int,
-             ExcMessage("You are trying to access degree of freedom "
-                        "information for an object on which no such "
-                        "information is available"));
+      DEAL_II_Assert(dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+                     ExcMessage("You are trying to access degree of freedom "
+                                "information for an object on which no such "
+                                "information is available"));
 
-      Assert(structdim < dim,
-             ExcMessage("This object can not be used for cells."));
+      DEAL_II_Assert(structdim < dim,
+                     ExcMessage("This object can not be used for cells."));
 
       // there may be multiple finite elements associated with
       // this object.  hop along the list of index sets until we
@@ -466,7 +467,8 @@ namespace internal
       types::global_dof_index *     pointer         = &dofs[starting_offset];
       while (true)
         {
-          Assert(*pointer != numbers::invalid_dof_index, ExcInternalError());
+          DEAL_II_Assert(*pointer != numbers::invalid_dof_index,
+                         ExcInternalError());
           if (*pointer == fe_index)
             {
               *(pointer + 1 + local_index) = global_index;
@@ -488,8 +490,8 @@ namespace internal
       const dealii::hp::DoFHandler<dim, spacedim> &dof_handler,
       const unsigned int                           obj_index) const
     {
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      DEAL_II_Assert(obj_index < dof_offsets.size(),
+                     ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
       // make sure we are on an
       // object for which DoFs have
@@ -497,8 +499,8 @@ namespace internal
       if (dof_offsets[obj_index] == numbers::invalid_unsigned_int)
         return 0;
 
-      Assert(structdim < dim,
-             ExcMessage("This object can not be used for cells."));
+      DEAL_II_Assert(structdim < dim,
+                     ExcMessage("This object can not be used for cells."));
 
       // there may be multiple finite elements associated with this
       // object. hop along the list of index sets until we find the
@@ -534,22 +536,23 @@ namespace internal
       const unsigned int obj_index,
       const unsigned int n) const
     {
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index, 0, dof_offsets.size()));
+      DEAL_II_Assert(obj_index < dof_offsets.size(),
+                     ExcIndexRange(obj_index, 0, dof_offsets.size()));
 
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert(dof_offsets[obj_index] != numbers::invalid_unsigned_int,
-             ExcMessage("You are trying to access degree of freedom "
-                        "information for an object on which no such "
-                        "information is available"));
+      DEAL_II_Assert(dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+                     ExcMessage("You are trying to access degree of freedom "
+                                "information for an object on which no such "
+                                "information is available"));
 
-      Assert(structdim < dim,
-             ExcMessage("This object can not be used for cells."));
+      DEAL_II_Assert(structdim < dim,
+                     ExcMessage("This object can not be used for cells."));
 
-      Assert(n < n_active_fe_indices(dof_handler, obj_index),
-             ExcIndexRange(n, 0, n_active_fe_indices(dof_handler, obj_index)));
+      DEAL_II_Assert(
+        n < n_active_fe_indices(dof_handler, obj_index),
+        ExcIndexRange(n, 0, n_active_fe_indices(dof_handler, obj_index)));
 
       // there may be multiple finite elements associated with
       // this object. hop along the list of index sets until we
@@ -561,12 +564,13 @@ namespace internal
       unsigned int                   counter         = 0;
       while (true)
         {
-          Assert(*pointer != numbers::invalid_dof_index, ExcInternalError());
+          DEAL_II_Assert(*pointer != numbers::invalid_dof_index,
+                         ExcInternalError());
 
           const unsigned int fe_index = *pointer;
 
-          Assert(fe_index < dof_handler.get_fe_collection().size(),
-                 ExcInternalError());
+          DEAL_II_Assert(fe_index < dof_handler.get_fe_collection().size(),
+                         ExcInternalError());
 
           if (counter == n)
             return fe_index;
@@ -589,29 +593,30 @@ namespace internal
       const unsigned int                           fe_index,
       const unsigned int /*obj_level*/) const
     {
-      Assert(obj_index < dof_offsets.size(),
-             ExcIndexRange(obj_index,
-                           0,
-                           static_cast<unsigned int>(dof_offsets.size())));
-      Assert((fe_index !=
-              dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
-             ExcMessage("You need to specify a FE index when working "
-                        "with hp DoFHandlers"));
-      Assert(fe_index < dof_handler.get_fe_collection().size(),
-             ExcIndexRange(fe_index,
-                           0,
-                           dof_handler.get_fe_collection().size()));
+      DEAL_II_Assert(obj_index < dof_offsets.size(),
+                     ExcIndexRange(obj_index,
+                                   0,
+                                   static_cast<unsigned int>(
+                                     dof_offsets.size())));
+      DEAL_II_Assert((fe_index !=
+                      dealii::hp::DoFHandler<dim, spacedim>::default_fe_index),
+                     ExcMessage("You need to specify a FE index when working "
+                                "with hp DoFHandlers"));
+      DEAL_II_Assert(fe_index < dof_handler.get_fe_collection().size(),
+                     ExcIndexRange(fe_index,
+                                   0,
+                                   dof_handler.get_fe_collection().size()));
 
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert(dof_offsets[obj_index] != numbers::invalid_unsigned_int,
-             ExcMessage("You are trying to access degree of freedom "
-                        "information for an object on which no such "
-                        "information is available"));
+      DEAL_II_Assert(dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+                     ExcMessage("You are trying to access degree of freedom "
+                                "information for an object on which no such "
+                                "information is available"));
 
-      Assert(structdim < dim,
-             ExcMessage("This object can not be used for cells."));
+      DEAL_II_Assert(structdim < dim,
+                     ExcMessage("This object can not be used for cells."));
 
       // there may be multiple finite elements associated with
       // this object. hop along the list of index sets until we

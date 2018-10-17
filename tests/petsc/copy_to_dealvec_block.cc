@@ -90,9 +90,10 @@ test()
 
   for (unsigned int bl = 0; bl < 2; ++bl)
     {
-      Assert(copied.block(bl)(myid * 2) == myid * 4.0, ExcInternalError());
-      Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0,
-             ExcInternalError());
+      DEAL_II_Assert(copied.block(bl)(myid * 2) == myid * 4.0,
+                     ExcInternalError());
+      DEAL_II_Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0,
+                     ExcInternalError());
     }
 
   copied = v;
@@ -100,8 +101,8 @@ test()
   // check ghost values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << copied(1) << std::endl;
-  Assert(copied(1) == 2.0, ExcInternalError());
-  Assert(copied.block(1)(1) == 2.0, ExcInternalError());
+  DEAL_II_Assert(copied(1) == 2.0, ExcInternalError());
+  DEAL_II_Assert(copied.block(1)(1) == 2.0, ExcInternalError());
 
   // check local values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -112,9 +113,10 @@ test()
 
   for (unsigned int bl = 0; bl < 2; ++bl)
     {
-      Assert(copied.block(bl)(myid * 2) == myid * 4.0, ExcInternalError());
-      Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0,
-             ExcInternalError());
+      DEAL_II_Assert(copied.block(bl)(myid * 2) == myid * 4.0,
+                     ExcInternalError());
+      DEAL_II_Assert(copied.block(bl)(myid * 2 + 1) == myid * 4.0 + 2.0,
+                     ExcInternalError());
     }
 
   // done

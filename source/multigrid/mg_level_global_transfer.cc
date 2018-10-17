@@ -67,8 +67,8 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices(
        .n_elements());
   if (my_perform_plain_copy)
     {
-      AssertDimension(copy_indices_global_mine.back().size(), 0);
-      AssertDimension(copy_indices_level_mine.back().size(), 0);
+      DEAL_II_AssertDimension(copy_indices_global_mine.back().size(), 0);
+      DEAL_II_AssertDimension(copy_indices_level_mine.back().size(), 0);
 
       // check whether there is a renumbering of degrees of freedom on
       // either the finest level or the global dofs, which means that we
@@ -329,8 +329,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
   if (my_perform_renumbered_plain_copy)
     {
       my_perform_plain_copy = true;
-      AssertDimension(this->copy_indices_global_mine.back().size(), 0);
-      AssertDimension(this->copy_indices_level_mine.back().size(), 0);
+      DEAL_II_AssertDimension(this->copy_indices_global_mine.back().size(), 0);
+      DEAL_II_AssertDimension(this->copy_indices_level_mine.back().size(), 0);
 
       // check whether there is a renumbering of degrees of freedom on
       // either the finest level or the global dofs, which means that we

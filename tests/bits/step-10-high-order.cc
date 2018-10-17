@@ -102,8 +102,8 @@ compute_pi_by_area()
           deallog << "Evaluation of pi on " << triangulation.n_active_cells()
                   << " cells: " << area << std::endl;
           // assert accuracy because numdiff might cut off digits from output
-          Assert(std::abs(area - pi) < 1e-14,
-                 ExcMessage("Calculation not accurate"));
+          DEAL_II_Assert(std::abs(area - pi) < 1e-14,
+                         ExcMessage("Calculation not accurate"));
         }
       else
         {
@@ -111,7 +111,7 @@ compute_pi_by_area()
           deallog << "Evaluation of pi on in 3D "
                   << triangulation.n_active_cells() << " cells: " << area
                   << std::endl;
-          // Assert(std::abs(area - pi) < 1e-12,
+          // DEAL_II_Assert(std::abs(area - pi) < 1e-12,
           //       ExcMessage("Calculation not accurate"));
         }
     };
@@ -171,8 +171,8 @@ compute_pi_by_perimeter()
             };
       deallog << "Evaluation of pi on " << triangulation.n_active_cells()
               << " cells: " << perimeter / 2. << std::endl;
-      Assert(std::abs(perimeter / 2. - pi) < 1e-14,
-             ExcMessage("Calculation not accurate"));
+      DEAL_II_Assert(std::abs(perimeter / 2. - pi) < 1e-14,
+                     ExcMessage("Calculation not accurate"));
     };
 
   deallog << std::endl;

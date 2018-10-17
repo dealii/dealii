@@ -36,13 +36,17 @@ test()
   LinearAlgebra::CUDAWrappers::Vector<double> d;
   d.reinit(c);
 
-  AssertThrow(a.size() == 0, ExcMessage("Vector has the wrong size."));
-  AssertThrow(b.size() == size, ExcMessage("Vector has the wrong size."));
-  AssertThrow(c.size() == size, ExcMessage("Vector has the wrong size."));
-  AssertThrow(d.size() == size, ExcMessage("Vector has the wrong size."));
+  DEAL_II_AssertThrow(a.size() == 0, ExcMessage("Vector has the wrong size."));
+  DEAL_II_AssertThrow(b.size() == size,
+                      ExcMessage("Vector has the wrong size."));
+  DEAL_II_AssertThrow(c.size() == size,
+                      ExcMessage("Vector has the wrong size."));
+  DEAL_II_AssertThrow(d.size() == size,
+                      ExcMessage("Vector has the wrong size."));
 
   a.reinit(size);
-  AssertThrow(a.size() == size, ExcMessage("Vector has the wrong size."));
+  DEAL_II_AssertThrow(a.size() == size,
+                      ExcMessage("Vector has the wrong size."));
 
 
   LinearAlgebra::ReadWriteVector<double> read_write_1(size);
@@ -61,52 +65,55 @@ test()
 
   read_write_3.import(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(read_write_2[i] == read_write_3[i],
-                ExcMessage("Vector a has been modified."));
+    DEAL_II_AssertThrow(read_write_2[i] == read_write_3[i],
+                        ExcMessage("Vector a has been modified."));
 
   read_write_3.import(b, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(read_write_1[i] == read_write_3[i],
-                ExcMessage("Vector b has been modified."));
+    DEAL_II_AssertThrow(read_write_1[i] == read_write_3[i],
+                        ExcMessage("Vector b has been modified."));
 
   read_write_3.import(c, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(read_write_2[i] == read_write_3[i],
-                ExcMessage("Vector c has been modified."));
+    DEAL_II_AssertThrow(read_write_2[i] == read_write_3[i],
+                        ExcMessage("Vector c has been modified."));
 
   a *= 2.;
   read_write_3.import(a, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(2. * read_write_2[i] == read_write_3[i],
-                ExcMessage("Problem in operator *=."));
+    DEAL_II_AssertThrow(2. * read_write_2[i] == read_write_3[i],
+                        ExcMessage("Problem in operator *=."));
 
   c /= 2.;
   read_write_3.import(c, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(0.5 * read_write_2[i] == read_write_3[i],
-                ExcMessage("Problem in operator /=."));
+    DEAL_II_AssertThrow(0.5 * read_write_2[i] == read_write_3[i],
+                        ExcMessage("Problem in operator /=."));
 
   b += a;
   read_write_3.import(b, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(2. * read_write_2[i] + read_write_1[i] == read_write_3[i],
-                ExcMessage("Problem in operator +=."));
+    DEAL_II_AssertThrow(2. * read_write_2[i] + read_write_1[i] ==
+                          read_write_3[i],
+                        ExcMessage("Problem in operator +=."));
 
   b -= c;
   read_write_3.import(b, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(1.5 * read_write_2[i] + read_write_1[i] == read_write_3[i],
-                ExcMessage("Problem in operator -=."));
+    DEAL_II_AssertThrow(1.5 * read_write_2[i] + read_write_1[i] ==
+                          read_write_3[i],
+                        ExcMessage("Problem in operator -=."));
 
   b.import(read_write_1, VectorOperation::insert);
   c.import(read_write_1, VectorOperation::insert);
   const double val = b * c;
-  AssertThrow(val == 328350., ExcMessage("Problem in operator *."));
+  DEAL_II_AssertThrow(val == 328350., ExcMessage("Problem in operator *."));
 
   b = 0.;
   read_write_3.import(b, VectorOperation::insert);
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(read_write_3[i] == 0., ExcMessage("Problem in operator =."));
+    DEAL_II_AssertThrow(read_write_3[i] == 0.,
+                        ExcMessage("Problem in operator =."));
 }
 
 int

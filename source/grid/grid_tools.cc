@@ -84,8 +84,8 @@ namespace GridTools
     if (const parallel::distributed::Triangulation<dim, spacedim> *p_tria =
           dynamic_cast<
             const parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
-      Assert(p_tria->n_global_active_cells() == tria.n_cells(0),
-             ExcNotImplemented());
+      DEAL_II_Assert(p_tria->n_global_active_cells() == tria.n_cells(0),
+                     ExcNotImplemented());
 #endif
 
     // the algorithm used simply traverses all cells and picks out the
@@ -435,7 +435,7 @@ namespace GridTools
                          std::vector<CellData<dim>> &  cells,
                          SubCellData &                 subcelldata)
   {
-    Assert(
+    DEAL_II_Assert(
       subcelldata.check_consistency(dim),
       ExcMessage(
         "Invalid SubCellData supplied according to ::check_consistency(). "
@@ -446,14 +446,15 @@ namespace GridTools
     for (unsigned int c = 0; c < cells.size(); ++c)
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         {
-          Assert(cells[c].vertices[v] < vertices.size(),
-                 ExcMessage("Invalid vertex index encountered! cells[" +
-                            Utilities::int_to_string(c) + "].vertices[" +
-                            Utilities::int_to_string(v) + "]=" +
-                            Utilities::int_to_string(cells[c].vertices[v]) +
-                            " is invalid, because only " +
-                            Utilities::int_to_string(vertices.size()) +
-                            " vertices were supplied."));
+          DEAL_II_Assert(cells[c].vertices[v] < vertices.size(),
+                         ExcMessage(
+                           "Invalid vertex index encountered! cells[" +
+                           Utilities::int_to_string(c) + "].vertices[" +
+                           Utilities::int_to_string(v) + "]=" +
+                           Utilities::int_to_string(cells[c].vertices[v]) +
+                           " is invalid, because only " +
+                           Utilities::int_to_string(vertices.size()) +
+                           " vertices were supplied."));
           vertex_used[cells[c].vertices[v]] = true;
         }
 
@@ -480,18 +481,18 @@ namespace GridTools
     for (unsigned int c = 0; c < subcelldata.boundary_lines.size(); ++c)
       for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell; ++v)
         {
-          Assert(subcelldata.boundary_lines[c].vertices[v] <
-                   new_vertex_numbers.size(),
-                 ExcMessage(
-                   "Invalid vertex index in subcelldata.boundary_lines. "
-                   "subcelldata.boundary_lines[" +
-                   Utilities::int_to_string(c) + "].vertices[" +
-                   Utilities::int_to_string(v) + "]=" +
-                   Utilities::int_to_string(
-                     subcelldata.boundary_lines[c].vertices[v]) +
-                   " is invalid, because only " +
-                   Utilities::int_to_string(vertices.size()) +
-                   " vertices were supplied."));
+          DEAL_II_Assert(
+            subcelldata.boundary_lines[c].vertices[v] <
+              new_vertex_numbers.size(),
+            ExcMessage("Invalid vertex index in subcelldata.boundary_lines. "
+                       "subcelldata.boundary_lines[" +
+                       Utilities::int_to_string(c) + "].vertices[" +
+                       Utilities::int_to_string(v) + "]=" +
+                       Utilities::int_to_string(
+                         subcelldata.boundary_lines[c].vertices[v]) +
+                       " is invalid, because only " +
+                       Utilities::int_to_string(vertices.size()) +
+                       " vertices were supplied."));
           subcelldata.boundary_lines[c].vertices[v] =
             new_vertex_numbers[subcelldata.boundary_lines[c].vertices[v]];
         }
@@ -499,18 +500,18 @@ namespace GridTools
     for (unsigned int c = 0; c < subcelldata.boundary_quads.size(); ++c)
       for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
         {
-          Assert(subcelldata.boundary_quads[c].vertices[v] <
-                   new_vertex_numbers.size(),
-                 ExcMessage(
-                   "Invalid vertex index in subcelldata.boundary_quads. "
-                   "subcelldata.boundary_quads[" +
-                   Utilities::int_to_string(c) + "].vertices[" +
-                   Utilities::int_to_string(v) + "]=" +
-                   Utilities::int_to_string(
-                     subcelldata.boundary_quads[c].vertices[v]) +
-                   " is invalid, because only " +
-                   Utilities::int_to_string(vertices.size()) +
-                   " vertices were supplied."));
+          DEAL_II_Assert(
+            subcelldata.boundary_quads[c].vertices[v] <
+              new_vertex_numbers.size(),
+            ExcMessage("Invalid vertex index in subcelldata.boundary_quads. "
+                       "subcelldata.boundary_quads[" +
+                       Utilities::int_to_string(c) + "].vertices[" +
+                       Utilities::int_to_string(v) + "]=" +
+                       Utilities::int_to_string(
+                         subcelldata.boundary_quads[c].vertices[v]) +
+                       " is invalid, because only " +
+                       Utilities::int_to_string(vertices.size()) +
+                       " vertices were supplied."));
 
           subcelldata.boundary_quads[c].vertices[v] =
             new_vertex_numbers[subcelldata.boundary_quads[c].vertices[v]];
@@ -548,7 +549,8 @@ namespace GridTools
     if (considered_vertices.size() == 0)
       considered_vertices = new_vertex_numbers;
 
-    Assert(considered_vertices.size() <= vertices.size(), ExcInternalError());
+    DEAL_II_Assert(considered_vertices.size() <= vertices.size(),
+                   ExcInternalError());
 
 
     // now loop over all vertices to be
@@ -556,7 +558,8 @@ namespace GridTools
     // one
     for (unsigned int i = 0; i < considered_vertices.size(); ++i)
       {
-        Assert(considered_vertices[i] < vertices.size(), ExcInternalError());
+        DEAL_II_Assert(considered_vertices[i] < vertices.size(),
+                       ExcInternalError());
         if (new_vertex_numbers[considered_vertices[i]] !=
             considered_vertices[i])
           // this vertex has been identified with
@@ -715,7 +718,7 @@ namespace GridTools
          const unsigned int     axis,
          Triangulation<dim, 3> &triangulation)
   {
-    Assert(axis < 3, ExcMessage("Invalid axis given!"));
+    DEAL_II_Assert(axis < 3, ExcMessage("Invalid axis given!"));
 
     transform(Rotate3d(angle, axis), triangulation);
   }
@@ -725,7 +728,8 @@ namespace GridTools
   scale(const double                  scaling_factor,
         Triangulation<dim, spacedim> &triangulation)
   {
-    Assert(scaling_factor > 0, ExcScalingFactorNotPositive(scaling_factor));
+    DEAL_II_Assert(scaling_factor > 0,
+                   ExcScalingFactorNotPositive(scaling_factor));
     transform(Scale<spacedim>(scaling_factor), triangulation);
   }
 
@@ -770,7 +774,7 @@ namespace GridTools
                     const Function<1> *,
                     const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
   }
 
 
@@ -912,7 +916,7 @@ namespace GridTools
     // if spacedim>dim we need to make sure that we perturb
     // points but keep them on
     // the manifold. however, this isn't implemented right now
-    Assert(spacedim == dim, ExcNotImplemented());
+    DEAL_II_Assert(spacedim == dim, ExcNotImplemented());
 
 
     // find the smallest length of the
@@ -1047,7 +1051,7 @@ namespace GridTools
           locally_owned_vertices);
 #else
         (void)distributed_triangulation;
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
 #endif
       }
     else
@@ -1165,10 +1169,10 @@ namespace GridTools
 
     const std::vector<Point<spacedim>> &vertices = tria.get_vertices();
 
-    Assert(tria.get_vertices().size() == marked_vertices.size() ||
-             marked_vertices.size() == 0,
-           ExcDimensionMismatch(tria.get_vertices().size(),
-                                marked_vertices.size()));
+    DEAL_II_Assert(tria.get_vertices().size() == marked_vertices.size() ||
+                     marked_vertices.size() == 0,
+                   ExcDimensionMismatch(tria.get_vertices().size(),
+                                        marked_vertices.size()));
 
     // If p is an element of marked_vertices,
     // and q is that of used_Vertices,
@@ -1177,7 +1181,7 @@ namespace GridTools
     // I.e., if p is true q must be true
     // (if p is false, q could be false or true).
     // p implies q logic is encapsulated in ~p|q.
-    Assert(
+    DEAL_II_Assert(
       marked_vertices.size() == 0 ||
         std::equal(marked_vertices.begin(),
                    marked_vertices.end(),
@@ -1202,9 +1206,9 @@ namespace GridTools
     std::vector<bool>::const_iterator first =
       std::find(used.begin(), used.end(), true);
 
-    // Assert that at least one vertex
+    // DEAL_II_Assert that at least one vertex
     // is actually used
-    Assert(first != used.end(), ExcInternalError());
+    DEAL_II_Assert(first != used.end(), ExcInternalError());
 
     unsigned int best_vertex = std::distance(used.begin(), first);
     double       best_dist   = (p - vertices[best_vertex]).norm_square();
@@ -1246,10 +1250,10 @@ namespace GridTools
 
     auto vertices = extract_used_vertices(tria, mapping);
 
-    Assert(tria.get_vertices().size() == marked_vertices.size() ||
-             marked_vertices.size() == 0,
-           ExcDimensionMismatch(tria.get_vertices().size(),
-                                marked_vertices.size()));
+    DEAL_II_Assert(tria.get_vertices().size() == marked_vertices.size() ||
+                     marked_vertices.size() == 0,
+                   ExcDimensionMismatch(tria.get_vertices().size(),
+                                        marked_vertices.size()));
 
     // If p is an element of marked_vertices,
     // and q is that of used_Vertices,
@@ -1258,7 +1262,7 @@ namespace GridTools
     // I.e., if p is true q must be true
     // (if p is false, q could be false or true).
     // p implies q logic is encapsulated in ~p|q.
-    Assert(
+    DEAL_II_Assert(
       marked_vertices.size() == 0 ||
         std::equal(marked_vertices.begin(),
                    marked_vertices.end(),
@@ -1301,10 +1305,12 @@ namespace GridTools
     // make sure that the given vertex is
     // an active vertex of the underlying
     // triangulation
-    Assert(vertex < mesh.get_triangulation().n_vertices(),
-           ExcIndexRange(0, mesh.get_triangulation().n_vertices(), vertex));
-    Assert(mesh.get_triangulation().get_used_vertices()[vertex],
-           ExcVertexNotUsed(vertex));
+    DEAL_II_Assert(vertex < mesh.get_triangulation().n_vertices(),
+                   ExcIndexRange(0,
+                                 mesh.get_triangulation().n_vertices(),
+                                 vertex));
+    DEAL_II_Assert(mesh.get_triangulation().get_used_vertices()[vertex],
+                   ExcVertexNotUsed(vertex));
 
     // use a set instead of a vector
     // to ensure that cells are inserted only
@@ -1411,7 +1417,7 @@ namespace GridTools
 
         // in more than 3d we would probably have to do the same as
         // above also for even lower-dimensional objects
-        Assert(dim <= 3, ExcNotImplemented());
+        DEAL_II_Assert(dim <= 3, ExcNotImplemented());
 
         // move on to the next cell if we have found the
         // vertex on the current one
@@ -1420,7 +1426,7 @@ namespace GridTools
 
     // if this was an active vertex then there needs to have been
     // at least one cell to which it is adjacent!
-    Assert(adjacent_cells.size() > 0, ExcInternalError());
+    DEAL_II_Assert(adjacent_cells.size() > 0, ExcInternalError());
 
     // return the result as a vector, rather than the set we built above
     return std::vector<
@@ -1442,7 +1448,7 @@ namespace GridTools
     const std::vector<Point<spacedim>> &vertices   = mesh.get_vertices();
     const unsigned int                  n_vertices = vertex_to_cells.size();
 
-    AssertDimension(vertices.size(), n_vertices);
+    DEAL_II_AssertDimension(vertices.size(), n_vertices);
 
 
     std::vector<std::vector<Tensor<1, spacedim>>> vertex_to_cell_centers(
@@ -1622,8 +1628,8 @@ namespace GridTools
         // while loop we performed an actual global search on the mesh
         // vertices. Not finding the point then means the point is outside the
         // domain.
-        AssertThrow(current_cell.state() == IteratorState::valid,
-                    ExcPointNotFound<spacedim>(p));
+        DEAL_II_AssertThrow(current_cell.state() == IteratorState::valid,
+                            ExcPointNotFound<spacedim>(p));
 
         current_cell = typename MeshType<dim, spacedim>::active_cell_iterator();
       }
@@ -1729,7 +1735,7 @@ namespace GridTools
     // cells at refinement_level (and coarser levels if there are active cells)
     // which have the predicate property. These are then merged
 
-    Assert(
+    DEAL_II_Assert(
       refinement_level <= mesh.n_levels(),
       ExcMessage(
         "Error: refinement level is higher then total levels in the triangulation!"));
@@ -1843,13 +1849,14 @@ namespace GridTools
                       merged_b_boxes.erase(merged_b_boxes.begin() + min_idx);
                       not_removed = false;
                     }
-                Assert(!not_removed,
-                       ExcMessage("Error: couldn't merge bounding boxes!"));
+                DEAL_II_Assert(!not_removed,
+                               ExcMessage(
+                                 "Error: couldn't merge bounding boxes!"));
               }
           }
-        Assert(merged_b_boxes.size() <= max_boxes,
-               ExcMessage(
-                 "Error: couldn't reach target number of bounding boxes!"));
+        DEAL_II_Assert(
+          merged_b_boxes.size() <= max_boxes,
+          ExcMessage("Error: couldn't reach target number of bounding boxes!"));
         return merged_b_boxes;
       }
   }
@@ -1889,9 +1896,9 @@ namespace GridTools
                   break; // We can check now the next process
                 }
           }
-        Assert(owners_found.size() > 0,
-               ExcMessage("No owners found for the point " +
-                          std::to_string(pt)));
+        DEAL_II_Assert(owners_found.size() > 0,
+                       ExcMessage("No owners found for the point " +
+                                  std::to_string(pt)));
         if (owners_found.size() == 1)
           map_owners_found[pt] = owners_found[0];
         else
@@ -1979,10 +1986,10 @@ namespace GridTools
     // use parallel::distributed::Triangulation in any meaningful
     // way
     (void)triangulation;
-    Assert(false,
-           ExcMessage("This function does not make any sense "
-                      "for parallel::distributed::Triangulation "
-                      "objects if you do not have MPI enabled."));
+    DEAL_II_Assert(false,
+                   ExcMessage("This function does not make any sense "
+                              "for parallel::distributed::Triangulation "
+                              "objects if you do not have MPI enabled."));
 
 #else
 
@@ -2124,10 +2131,10 @@ namespace GridTools
                              1,
                              DEAL_II_VERTEX_INDEX_MPI_TYPE,
                              triangulation.get_communicator());
-    AssertThrowMPI(ierr);
-    Assert(indices.begin() + triangulation.locally_owned_subdomain() <
-             indices.end(),
-           ExcInternalError());
+    DEAL_II_AssertThrowMPI(ierr);
+    DEAL_II_Assert(indices.begin() + triangulation.locally_owned_subdomain() <
+                     indices.end(),
+                   ExcInternalError());
     const types::global_vertex_index shift =
       std::accumulate(indices.begin(),
                       indices.begin() + triangulation.locally_owned_subdomain(),
@@ -2179,7 +2186,7 @@ namespace GridTools
                          0,
                          triangulation.get_communicator(),
                          &first_requests[i]);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
 
     // Receive the first message
@@ -2204,7 +2211,7 @@ namespace GridTools
                         0,
                         triangulation.get_communicator(),
                         MPI_STATUS_IGNORE);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
 
 
@@ -2245,7 +2252,7 @@ namespace GridTools
                          0,
                          triangulation.get_communicator(),
                          &second_requests[i]);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
 
     // Receive the second message
@@ -2268,7 +2275,7 @@ namespace GridTools
                         0,
                         triangulation.get_communicator(),
                         MPI_STATUS_IGNORE);
-        AssertThrowMPI(ierr);
+        DEAL_II_AssertThrowMPI(ierr);
       }
 
 
@@ -2488,12 +2495,14 @@ namespace GridTools
                           Triangulation<dim, spacedim> &   triangulation,
                           const SparsityTools::Partitioner partitioner)
   {
-    Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-              &triangulation) == nullptr),
-           ExcMessage("Objects of type parallel::distributed::Triangulation "
-                      "are already partitioned implicitly and can not be "
-                      "partitioned again explicitly."));
-    Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+    DEAL_II_Assert(
+      (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
+         &triangulation) == nullptr),
+      ExcMessage("Objects of type parallel::distributed::Triangulation "
+                 "are already partitioned implicitly and can not be "
+                 "partitioned again explicitly."));
+    DEAL_II_Assert(n_partitions > 0,
+                   ExcInvalidNumberOfPartitions(n_partitions));
 
     // check for an easy return
     if (n_partitions == 1)
@@ -2571,16 +2580,20 @@ namespace GridTools
                           Triangulation<dim, spacedim> &triangulation,
                           const SparsityTools::Partitioner partitioner)
   {
-    Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-              &triangulation) == nullptr),
-           ExcMessage("Objects of type parallel::distributed::Triangulation "
-                      "are already partitioned implicitly and can not be "
-                      "partitioned again explicitly."));
-    Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
-    Assert(cell_connection_graph.n_rows() == triangulation.n_active_cells(),
-           ExcMessage("Connectivity graph has wrong size"));
-    Assert(cell_connection_graph.n_cols() == triangulation.n_active_cells(),
-           ExcMessage("Connectivity graph has wrong size"));
+    DEAL_II_Assert(
+      (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
+         &triangulation) == nullptr),
+      ExcMessage("Objects of type parallel::distributed::Triangulation "
+                 "are already partitioned implicitly and can not be "
+                 "partitioned again explicitly."));
+    DEAL_II_Assert(n_partitions > 0,
+                   ExcInvalidNumberOfPartitions(n_partitions));
+    DEAL_II_Assert(cell_connection_graph.n_rows() ==
+                     triangulation.n_active_cells(),
+                   ExcMessage("Connectivity graph has wrong size"));
+    DEAL_II_Assert(cell_connection_graph.n_cols() ==
+                     triangulation.n_active_cells(),
+                   ExcMessage("Connectivity graph has wrong size"));
 
     // check for an easy return
     if (n_partitions == 1)
@@ -2657,12 +2670,14 @@ namespace GridTools
   partition_triangulation_zorder(const unsigned int            n_partitions,
                                  Triangulation<dim, spacedim> &triangulation)
   {
-    Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-              &triangulation) == nullptr),
-           ExcMessage("Objects of type parallel::distributed::Triangulation "
-                      "are already partitioned implicitly and can not be "
-                      "partitioned again explicitly."));
-    Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+    DEAL_II_Assert(
+      (dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
+         &triangulation) == nullptr),
+      ExcMessage("Objects of type parallel::distributed::Triangulation "
+                 "are already partitioned implicitly and can not be "
+                 "partitioned again explicitly."));
+    DEAL_II_Assert(n_partitions > 0,
+                   ExcInvalidNumberOfPartitions(n_partitions));
 
     // check for an easy return
     if (n_partitions == 1)
@@ -2774,9 +2789,9 @@ namespace GridTools
               cell->set_level_subdomain_id(cell->subdomain_id());
             else
               {
-                Assert(cell->child(0)->level_subdomain_id() !=
-                         numbers::artificial_subdomain_id,
-                       ExcInternalError());
+                DEAL_II_Assert(cell->child(0)->level_subdomain_id() !=
+                                 numbers::artificial_subdomain_id,
+                               ExcInternalError());
                 cell->set_level_subdomain_id(
                   cell->child(0)->level_subdomain_id());
               }
@@ -2790,9 +2805,9 @@ namespace GridTools
   get_subdomain_association(const Triangulation<dim, spacedim> &triangulation,
                             std::vector<types::subdomain_id> &  subdomain)
   {
-    Assert(subdomain.size() == triangulation.n_active_cells(),
-           ExcDimensionMismatch(subdomain.size(),
-                                triangulation.n_active_cells()));
+    DEAL_II_Assert(subdomain.size() == triangulation.n_active_cells(),
+                   ExcDimensionMismatch(subdomain.size(),
+                                        triangulation.n_active_cells()));
     for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
            triangulation.begin_active();
          cell != triangulation.end();
@@ -2876,7 +2891,7 @@ namespace GridTools
                             std::max((vertices[2] - vertices[5]).norm(),
                                      (vertices[3] - vertices[4]).norm()));
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             return -1e10;
         }
     }
@@ -2970,15 +2985,15 @@ namespace GridTools
       {
         const unsigned int structdim =
           Iterator::AccessorType::structure_dimension;
-        Assert(spacedim == Iterator::AccessorType::dimension,
-               ExcInternalError());
+        DEAL_II_Assert(spacedim == Iterator::AccessorType::dimension,
+                       ExcInternalError());
 
         // everything below is wrong
         // if not for the following
         // condition
-        Assert(object->refinement_case() ==
-                 RefinementCase<structdim>::isotropic_refinement,
-               ExcNotImplemented());
+        DEAL_II_Assert(object->refinement_case() ==
+                         RefinementCase<structdim>::isotropic_refinement,
+                       ExcNotImplemented());
         // first calculate the
         // average alternating form
         // for the parent cell/face
@@ -3171,10 +3186,10 @@ namespace GridTools
         // isotropically because that is the only case where we have a cell
         // mid-point that can be moved around without having to consider
         // boundary information
-        Assert(object->has_children(), ExcInternalError());
-        Assert(object->refinement_case() ==
-                 RefinementCase<structdim>::isotropic_refinement,
-               ExcNotImplemented());
+        DEAL_II_Assert(object->has_children(), ExcInternalError());
+        DEAL_II_Assert(object->refinement_case() ==
+                         RefinementCase<structdim>::isotropic_refinement,
+                       ExcNotImplemented());
 
         // get the current location of the object mid-vertex:
         Point<spacedim> object_mid_point = object->child(0)->vertex(
@@ -3380,10 +3395,10 @@ namespace GridTools
         // should then also be able to ignore it this time as well
         for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           {
-            Assert(cell->face(f)->has_children(), ExcInternalError());
-            Assert(cell->face(f)->refinement_case() ==
-                     RefinementCase<dim - 1>::isotropic_refinement,
-                   ExcInternalError());
+            DEAL_II_Assert(cell->face(f)->has_children(), ExcInternalError());
+            DEAL_II_Assert(cell->face(f)->refinement_case() ==
+                             RefinementCase<dim - 1>::isotropic_refinement,
+                           ExcInternalError());
 
             bool subface_is_more_refined = false;
             for (unsigned int g = 0;
@@ -3425,10 +3440,11 @@ namespace GridTools
         const typename Triangulation<dim, spacedim>::cell_iterator cell =
           *cell_ptr;
 
-        Assert(!cell->active(),
-               ExcMessage(
-                 "This function is only valid for a list of cells that "
-                 "have children (i.e., no cell in the list may be active)."));
+        DEAL_II_Assert(
+          !cell->active(),
+          ExcMessage(
+            "This function is only valid for a list of cells that "
+            "have children (i.e., no cell in the list may be active)."));
 
         internal::FixUpDistortedChildCells ::fix_up_faces(
           cell,
@@ -3478,10 +3494,10 @@ namespace GridTools
     Triangulation<dim, spacedim> &         tria,
     const std::vector<types::boundary_id> &reset_boundary_ids_)
   {
-    AssertDimension(src_boundary_ids.size(), dst_manifold_ids.size());
+    DEAL_II_AssertDimension(src_boundary_ids.size(), dst_manifold_ids.size());
     const auto reset_boundary_ids =
       reset_boundary_ids_.size() ? reset_boundary_ids_ : src_boundary_ids;
-    AssertDimension(reset_boundary_ids.size(), src_boundary_ids.size());
+    DEAL_II_AssertDimension(reset_boundary_ids.size(), src_boundary_ids.size());
 
     // in 3d, we not only have to copy boundary ids of faces, but also of edges
     // because we see them twice (once from each adjacent boundary face),
@@ -3682,9 +3698,9 @@ namespace GridTools
       return; // Nothing to do
 
     // Check that we don't have hanging nodes
-    AssertThrow(!tria.has_hanging_nodes(),
-                ExcMessage("The input Triangulation cannot "
-                           "have hanging nodes."));
+    DEAL_II_AssertThrow(!tria.has_hanging_nodes(),
+                        ExcMessage("The input Triangulation cannot "
+                                   "have hanging nodes."));
 
 
     bool has_cells_with_more_than_dim_faces_on_boundary = true;
@@ -3791,7 +3807,7 @@ namespace GridTools
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
           }
 
         if (angle_fraction > limit_angle_fraction)
@@ -3884,7 +3900,7 @@ namespace GridTools
               }
             else
               {
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
               }
           }
       }
@@ -4090,15 +4106,15 @@ namespace GridTools
       }
 
     // Debug Checking
-    Assert(std::get<0>(cell_qpoint_map).size() ==
-             std::get<2>(cell_qpoint_map).size(),
-           ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(),
-                                std::get<2>(cell_qpoint_map).size()));
+    DEAL_II_Assert(std::get<0>(cell_qpoint_map).size() ==
+                     std::get<2>(cell_qpoint_map).size(),
+                   ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(),
+                                        std::get<2>(cell_qpoint_map).size()));
 
-    Assert(std::get<0>(cell_qpoint_map).size() ==
-             std::get<1>(cell_qpoint_map).size(),
-           ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(),
-                                std::get<1>(cell_qpoint_map).size()));
+    DEAL_II_Assert(std::get<0>(cell_qpoint_map).size() ==
+                     std::get<1>(cell_qpoint_map).size(),
+                   ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(),
+                                        std::get<1>(cell_qpoint_map).size()));
 
 #ifdef DEBUG
     unsigned int c   = std::get<0>(cell_qpoint_map).size();
@@ -4109,13 +4125,14 @@ namespace GridTools
     // started off from.
     for (unsigned int n = 0; n < c; ++n)
       {
-        Assert(std::get<1>(cell_qpoint_map)[n].size() ==
-                 std::get<2>(cell_qpoint_map)[n].size(),
-               ExcDimensionMismatch(std::get<1>(cell_qpoint_map)[n].size(),
-                                    std::get<2>(cell_qpoint_map)[n].size()));
+        DEAL_II_Assert(
+          std::get<1>(cell_qpoint_map)[n].size() ==
+            std::get<2>(cell_qpoint_map)[n].size(),
+          ExcDimensionMismatch(std::get<1>(cell_qpoint_map)[n].size(),
+                               std::get<2>(cell_qpoint_map)[n].size()));
         qps += std::get<1>(cell_qpoint_map)[n].size();
       }
-    Assert(qps == np, ExcDimensionMismatch(qps, np));
+    DEAL_II_Assert(qps == np, ExcDimensionMismatch(qps, np));
 #endif
 
     return cell_qpoint_map;
@@ -4233,12 +4250,12 @@ namespace GridTools
         // started off from.
         for (const auto &m : cell_qpoint_map)
           {
-            Assert(m.second.second.size() == m.second.first.size(),
-                   ExcDimensionMismatch(m.second.second.size(),
-                                        m.second.first.size()));
+            DEAL_II_Assert(m.second.second.size() == m.second.first.size(),
+                           ExcDimensionMismatch(m.second.second.size(),
+                                                m.second.first.size()));
             qps += m.second.second.size();
           }
-        Assert(qps == np, ExcDimensionMismatch(qps, np));
+        DEAL_II_Assert(qps == np, ExcDimensionMismatch(qps, np));
 #endif
         return cell_qpoint_map;
       }
@@ -4512,9 +4529,10 @@ namespace GridTools
     (void)cache;
     (void)local_points;
     (void)global_bboxes;
-    Assert(false,
-           ExcMessage(
-             "GridTools::distributed_compute_point_locations() requires MPI."));
+    DEAL_II_Assert(
+      false,
+      ExcMessage(
+        "GridTools::distributed_compute_point_locations() requires MPI."));
     std::tuple<
       std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>,
       std::vector<std::vector<Point<dim>>>,
@@ -4530,7 +4548,7 @@ namespace GridTools
         &cache.get_triangulation());
     // If the dynamic cast failed we can't recover the mpi communicator:
     // throwing an assertion error
-    Assert(
+    DEAL_II_Assert(
       tria_mpi,
       ExcMessage(
         "GridTools::distributed_compute_point_locations() requires a parallel triangulation."));
@@ -4804,9 +4822,9 @@ namespace GridTools
 #ifndef DEAL_II_WITH_MPI
     (void)local_bboxes;
     (void)mpi_communicator;
-    Assert(false,
-           ExcMessage(
-             "GridTools::exchange_local_bounding_boxes() requires MPI."));
+    DEAL_II_Assert(
+      false,
+      ExcMessage("GridTools::exchange_local_bounding_boxes() requires MPI."));
     return {};
 #else
     // Step 1: preparing data to be sent
@@ -4839,7 +4857,7 @@ namespace GridTools
                              1,
                              MPI_INT,
                              mpi_communicator);
-    AssertThrowMPI(ierr);
+    DEAL_II_AssertThrowMPI(ierr);
 
     // Now computing the the displacement, relative to recvbuf,
     // at which to store the incoming data
@@ -4860,7 +4878,7 @@ namespace GridTools
                           &(rdispls[0]),
                           MPI_DOUBLE,
                           mpi_communicator);
-    AssertThrowMPI(ierr);
+    DEAL_II_AssertThrowMPI(ierr);
 
     // Step 4: create the array of bboxes for output
     std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes(n_procs);

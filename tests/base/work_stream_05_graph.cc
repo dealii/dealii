@@ -98,7 +98,7 @@ test()
 
   // and compare
   for (unsigned int i = 0; i < result.size(); ++i)
-    AssertThrow(result(i) == comp(i), ExcInternalError());
+    DEAL_II_AssertThrow(result(i) == comp(i), ExcInternalError());
 
   for (unsigned int i = 0; i < result.size(); ++i)
     deallog << result(i) << std::endl;

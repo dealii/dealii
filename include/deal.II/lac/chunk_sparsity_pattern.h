@@ -753,32 +753,32 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcInvalidNumber,
-                 int,
-                 << "The provided number is invalid here: " << arg1);
+  DEAL_II_DeclException1(ExcInvalidNumber,
+                         int,
+                         << "The provided number is invalid here: " << arg1);
   /**
    * Exception
    */
-  DeclException2(ExcInvalidIndex,
-                 int,
-                 int,
-                 << "The given index " << arg1 << " should be less than "
-                 << arg2 << ".");
+  DEAL_II_DeclException2(ExcInvalidIndex,
+                         int,
+                         int,
+                         << "The given index " << arg1
+                         << " should be less than " << arg2 << ".");
   /**
    * Exception
    */
-  DeclException2(ExcNotEnoughSpace,
-                 int,
-                 int,
-                 << "Upon entering a new entry to row " << arg1
-                 << ": there was no free entry any more. " << std::endl
-                 << "(Maximum number of entries for this row: " << arg2
-                 << "; maybe the matrix is already compressed?)");
+  DEAL_II_DeclException2(ExcNotEnoughSpace,
+                         int,
+                         int,
+                         << "Upon entering a new entry to row " << arg1
+                         << ": there was no free entry any more. " << std::endl
+                         << "(Maximum number of entries for this row: " << arg2
+                         << "; maybe the matrix is already compressed?)");
   /**
    * The operation is only allowed after the SparsityPattern has been set up
    * and compress() was called.
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcNotCompressed,
     "The operation you attempted is only allowed after the SparsityPattern "
     "has been set up and compress() was called.");
@@ -786,41 +786,42 @@ public:
    * This operation changes the structure of the SparsityPattern and is not
    * possible after compress() has been called.
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcMatrixIsCompressed,
     "The operation you attempted changes the structure of the SparsityPattern "
     "and is not possible after compress() has been called.");
   /**
    * Exception
    */
-  DeclException0(ExcEmptyObject);
+  DEAL_II_DeclException0(ExcEmptyObject);
   /**
    * Exception
    */
-  DeclException2(ExcIteratorRange,
-                 int,
-                 int,
-                 << "The iterators denote a range of " << arg1
-                 << " elements, but the given number of rows was " << arg2);
+  DEAL_II_DeclException2(ExcIteratorRange,
+                         int,
+                         int,
+                         << "The iterators denote a range of " << arg1
+                         << " elements, but the given number of rows was "
+                         << arg2);
   /**
    * Exception
    */
-  DeclException0(ExcMETISNotInstalled);
+  DEAL_II_DeclException0(ExcMETISNotInstalled);
   /**
    * Exception
    */
-  DeclException1(ExcInvalidNumberOfPartitions,
-                 int,
-                 << "The number of partitions you gave is " << arg1
-                 << ", but must be greater than zero.");
+  DEAL_II_DeclException1(ExcInvalidNumberOfPartitions,
+                         int,
+                         << "The number of partitions you gave is " << arg1
+                         << ", but must be greater than zero.");
   /**
    * Exception
    */
-  DeclException2(ExcInvalidArraySize,
-                 int,
-                 int,
-                 << "The array has size " << arg1 << " but should have size "
-                 << arg2);
+  DEAL_II_DeclException2(ExcInvalidArraySize,
+                         int,
+                         int,
+                         << "The array has size " << arg1
+                         << " but should have size " << arg2);
   //@}
 private:
   /**
@@ -905,7 +906,7 @@ namespace ChunkSparsityPatternIterators
   inline unsigned int
   Accessor::row() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    DEAL_II_Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     return sparsity_pattern->get_chunk_size() * reduced_accessor.row() +
            chunk_row;
@@ -916,7 +917,7 @@ namespace ChunkSparsityPatternIterators
   inline unsigned int
   Accessor::column() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    DEAL_II_Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     return sparsity_pattern->get_chunk_size() * reduced_accessor.column() +
            chunk_col;
@@ -927,7 +928,7 @@ namespace ChunkSparsityPatternIterators
   inline std::size_t
   Accessor::reduced_index() const
   {
-    Assert(is_valid_entry() == true, ExcInvalidIterator());
+    DEAL_II_Assert(is_valid_entry() == true, ExcInvalidIterator());
 
     return reduced_accessor.linear_index;
   }
@@ -949,7 +950,8 @@ namespace ChunkSparsityPatternIterators
   inline bool
   Accessor::operator<(const Accessor &other) const
   {
-    Assert(sparsity_pattern == other.sparsity_pattern, ExcInternalError());
+    DEAL_II_Assert(sparsity_pattern == other.sparsity_pattern,
+                   ExcInternalError());
 
     if (chunk_row != other.chunk_row)
       {
@@ -984,13 +986,13 @@ namespace ChunkSparsityPatternIterators
   Accessor::advance()
   {
     const unsigned int chunk_size = sparsity_pattern->get_chunk_size();
-    Assert(chunk_row < chunk_size && chunk_col < chunk_size,
-           ExcIteratorPastEnd());
-    Assert(reduced_accessor.row() * chunk_size + chunk_row <
-               sparsity_pattern->n_rows() &&
-             reduced_accessor.column() * chunk_size + chunk_col <
-               sparsity_pattern->n_cols(),
-           ExcIteratorPastEnd());
+    DEAL_II_Assert(chunk_row < chunk_size && chunk_col < chunk_size,
+                   ExcIteratorPastEnd());
+    DEAL_II_Assert(reduced_accessor.row() * chunk_size + chunk_row <
+                       sparsity_pattern->n_rows() &&
+                     reduced_accessor.column() * chunk_size + chunk_col <
+                       sparsity_pattern->n_cols(),
+                   ExcIteratorPastEnd());
     if (chunk_size == 1)
       {
         reduced_accessor.advance();
@@ -1120,7 +1122,7 @@ ChunkSparsityPattern::end() const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::begin(const unsigned int r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+  DEAL_II_Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
   return iterator(this, r);
 }
 
@@ -1129,8 +1131,8 @@ ChunkSparsityPattern::begin(const unsigned int r) const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::end(const unsigned int r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows())) return iterator(this,
-                                                                      r + 1);
+  DEAL_II_Assert(r < n_rows(),
+                 ExcIndexRange(r, 0, n_rows())) return iterator(this, r + 1);
 }
 
 
@@ -1174,8 +1176,8 @@ ChunkSparsityPattern::copy_from(const size_type       n_rows,
                                 const ForwardIterator end,
                                 const size_type       chunk_size)
 {
-  Assert(static_cast<size_type>(std::distance(begin, end)) == n_rows,
-         ExcIteratorRange(std::distance(begin, end), n_rows));
+  DEAL_II_Assert(static_cast<size_type>(std::distance(begin, end)) == n_rows,
+                 ExcIteratorRange(std::distance(begin, end), n_rows));
 
   // first determine row lengths for each row. if the matrix is quadratic,
   // then we might have to add an additional entry for the diagonal, if that
@@ -1200,7 +1202,7 @@ ChunkSparsityPattern::copy_from(const size_type       n_rows,
         {
           const size_type col =
             internal::SparsityPatternTools::get_column_index_from_iterator(*j);
-          Assert(col < n_cols, ExcInvalidIndex(col, n_cols));
+          DEAL_II_Assert(col < n_cols, ExcInvalidIndex(col, n_cols));
 
           add(row, col);
         }

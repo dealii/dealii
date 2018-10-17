@@ -32,11 +32,13 @@ test()
   deal_II_exceptions::disable_abort_on_exception();
 
   // test for an initialized mask
-  Assert(BlockMask(12, true).n_selected_blocks() == 12, ExcInternalError());
-  Assert(BlockMask(12, true).n_selected_blocks(12) == 12, ExcInternalError());
+  DEAL_II_Assert(BlockMask(12, true).n_selected_blocks() == 12,
+                 ExcInternalError());
+  DEAL_II_Assert(BlockMask(12, true).n_selected_blocks(12) == 12,
+                 ExcInternalError());
   // test for an empty mask
-  Assert(BlockMask().n_selected_blocks(12) == 12, ExcInternalError());
-  Assert(BlockMask().n_selected_blocks(13) == 13, ExcInternalError());
+  DEAL_II_Assert(BlockMask().n_selected_blocks(12) == 12, ExcInternalError());
+  DEAL_II_Assert(BlockMask().n_selected_blocks(13) == 13, ExcInternalError());
 
 
   deallog << "OK" << std::endl;
@@ -45,8 +47,8 @@ test()
   // though:
   try
     {
-      Assert(BlockMask(12, true).n_selected_blocks(13) == 12,
-             ExcInternalError());
+      DEAL_II_Assert(BlockMask(12, true).n_selected_blocks(13) == 12,
+                     ExcInternalError());
     }
   catch (ExceptionBase &e)
     {

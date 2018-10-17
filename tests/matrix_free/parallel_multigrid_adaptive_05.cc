@@ -150,12 +150,12 @@ public:
   vmult_add(LinearAlgebra::distributed::Vector<number> &      dst,
             const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
+    DEAL_II_Assert(src.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
+    DEAL_II_Assert(dst.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
 
     // set zero Dirichlet values on the input vector (and remember the src and
     // dst values because we need to reset them at the end)
@@ -193,12 +193,12 @@ public:
     LinearAlgebra::distributed::Vector<number> &      dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
+    DEAL_II_Assert(src.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
+    DEAL_II_Assert(dst.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
 
     dst = 0;
 
@@ -239,12 +239,12 @@ public:
     LinearAlgebra::distributed::Vector<number> &      dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
-    Assert(src.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
-    Assert(dst.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
+    DEAL_II_Assert(src.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
+    DEAL_II_Assert(dst.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
 
     dst = 0;
 
@@ -284,8 +284,8 @@ public:
   number
   el(const unsigned int row, const unsigned int col) const
   {
-    AssertThrow(false,
-                ExcMessage("Matrix-free does not allow for entry access"));
+    DEAL_II_AssertThrow(
+      false, ExcMessage("Matrix-free does not allow for entry access"));
     return number();
   }
 
@@ -296,15 +296,15 @@ public:
     if (!vector.partitioners_are_compatible(
           *data.get_dof_info(0).vector_partitioner))
       data.initialize_dof_vector(vector);
-    Assert(vector.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
+    DEAL_II_Assert(vector.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
   }
 
   const LinearAlgebra::distributed::Vector<number> &
   get_matrix_diagonal_inverse() const
   {
-    Assert(inverse_diagonal_entries.size() > 0, ExcNotInitialized());
+    DEAL_II_Assert(inverse_diagonal_entries.size() > 0, ExcNotInitialized());
     return inverse_diagonal_entries;
   }
 

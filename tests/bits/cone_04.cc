@@ -56,12 +56,12 @@ check()
               const Tensor<1, 3> normal_vector =
                 boundary.normal_vector(face, vertex);
 
-              Assert(std::fabs(normal_vector.norm() - 1) < 1e-12,
-                     ExcInternalError());
-              Assert(std::fabs(normal_vector * tangent_1) < 1e-12,
-                     ExcInternalError());
-              Assert(std::fabs(normal_vector * tangent_2) < 1e-12,
-                     ExcInternalError());
+              DEAL_II_Assert(std::fabs(normal_vector.norm() - 1) < 1e-12,
+                             ExcInternalError());
+              DEAL_II_Assert(std::fabs(normal_vector * tangent_1) < 1e-12,
+                             ExcInternalError());
+              DEAL_II_Assert(std::fabs(normal_vector * tangent_2) < 1e-12,
+                             ExcInternalError());
             }
       }
   deallog << "OK" << std::endl;

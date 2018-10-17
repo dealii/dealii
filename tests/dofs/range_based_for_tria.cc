@@ -44,8 +44,8 @@ check()
 
     // now verify that it is really only the active cells
     for (auto cell : tr.cell_iterators())
-      AssertThrow(cell->user_flag_set() == !cell->has_children(),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(cell->user_flag_set() == !cell->has_children(),
+                          ExcInternalError());
   }
 
   // now do the same again for all levels of the triangulation
@@ -56,13 +56,13 @@ check()
         cell->set_user_flag();
 
       for (auto cell : tr.cell_iterators_on_level(l))
-        AssertThrow(cell->user_flag_set() == !cell->has_children(),
-                    ExcInternalError());
+        DEAL_II_AssertThrow(cell->user_flag_set() == !cell->has_children(),
+                            ExcInternalError());
 
       for (auto cell : tr.cell_iterators())
-        AssertThrow((cell->user_flag_set() == !cell->has_children()) ||
-                      (l != (unsigned int)cell->level()),
-                    ExcInternalError());
+        DEAL_II_AssertThrow((cell->user_flag_set() == !cell->has_children()) ||
+                              (l != (unsigned int)cell->level()),
+                            ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

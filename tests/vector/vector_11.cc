@@ -31,7 +31,7 @@ test(Vector<double> &v)
 
   v.compress();
 
-  AssertThrow(v.size() == 100, ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == 100, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

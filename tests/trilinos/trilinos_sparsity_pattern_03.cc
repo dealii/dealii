@@ -59,16 +59,16 @@ test()
   deallog << "Checks: ";
   IndexSet stored_rows = sp.locally_owned_range_indices();
   IndexSet stored_cols = sp.locally_owned_domain_indices();
-  AssertThrow(stored_rows == rows, ExcInternalError());
-  AssertThrow(stored_cols == columns, ExcInternalError());
+  DEAL_II_AssertThrow(stored_rows == rows, ExcInternalError());
+  DEAL_II_AssertThrow(stored_cols == columns, ExcInternalError());
 
   const unsigned int stored_n_procs =
     Utilities::MPI::n_mpi_processes(sp.get_mpi_communicator());
   const unsigned int stored_myid =
     Utilities::MPI::this_mpi_process(sp.get_mpi_communicator());
 
-  AssertThrow(stored_n_procs == n_procs, ExcInternalError());
-  AssertThrow(stored_myid == myid, ExcInternalError());
+  DEAL_II_AssertThrow(stored_n_procs == n_procs, ExcInternalError());
+  DEAL_II_AssertThrow(stored_myid == myid, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

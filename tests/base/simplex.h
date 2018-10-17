@@ -64,9 +64,9 @@ exact_integral_one_over_r(const unsigned int vertex_index,
                           const unsigned int i,
                           const unsigned int j)
 {
-  Assert(vertex_index < 4, ExcInternalError());
-  Assert(i < 6, ExcNotImplemented());
-  Assert(j < 6, ExcNotImplemented());
+  DEAL_II_Assert(vertex_index < 4, ExcInternalError());
+  DEAL_II_Assert(i < 6, ExcNotImplemented());
+  DEAL_II_Assert(j < 6, ExcNotImplemented());
 
   // The integrals are computed using the following maple snippet of
   // code:
@@ -248,8 +248,8 @@ exact_integral_one_over_r(const unsigned int vertex_index,
 double
 exact_integral_one_over_r_middle(const unsigned int i, const unsigned int j)
 {
-  Assert(i < 6, ExcNotImplemented());
-  Assert(j < 6, ExcNotImplemented());
+  DEAL_II_Assert(i < 6, ExcNotImplemented());
+  DEAL_II_Assert(j < 6, ExcNotImplemented());
 
   // The integrals are computed using the following Mathematica snippet of
   // code:

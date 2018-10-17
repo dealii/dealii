@@ -41,36 +41,36 @@ main()
   double *    device_x;
   double *    device_y;
   cudaError_t cuda_error = cudaMalloc(&device_x, n * sizeof(double));
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
   cuda_error = cudaMalloc(&device_y, n * sizeof(double));
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
   cuda_error = cudaMemcpy(device_x,
                           host_x.data(),
                           n * sizeof(double),
                           cudaMemcpyHostToDevice);
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
 
   // Launch the kernel.
   double_value<<<1, n>>>(device_x, device_y);
 
   // Copy output data to host.
   cuda_error = cudaDeviceSynchronize();
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
   cuda_error = cudaMemcpy(host_y.data(),
                           device_y,
                           n * sizeof(double),
                           cudaMemcpyDeviceToHost);
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
 
   // Print the results and test
   for (int i = 0; i < n; ++i)
     {
       std::cout << "y[" << i << "] = " << host_y[i] << "\n";
-      AssertThrow(std::abs(host_y[i] - 2 * host_x[i]) < 1.e-10,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(host_y[i] - 2 * host_x[i]) < 1.e-10,
+                          ExcInternalError());
     }
 
   cuda_error = cudaDeviceReset();
-  AssertCuda(cuda_error);
+  DEAL_II_AssertCuda(cuda_error);
   return 0;
 }

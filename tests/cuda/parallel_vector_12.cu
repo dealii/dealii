@@ -28,10 +28,11 @@
 
 #include "../tests.h"
 
-DeclException2(ExcNonEqual,
-               double,
-               double,
-               << "Left compare: " << arg1 << ", right compare: " << arg2);
+DEAL_II_DeclException2(ExcNonEqual,
+                       double,
+                       double,
+                       << "Left compare: " << arg1
+                       << ", right compare: " << arg2);
 
 void
 test()
@@ -94,11 +95,11 @@ test()
   LinearAlgebra::ReadWriteVector<double> v1_rw(local_owned1);
   v1_rw.import(v1, VectorOperation::insert);
   for (unsigned int i = 0; i < v0.local_size(); ++i)
-    AssertThrow(v0_rw.local_element(i) == 1.,
-                ExcNonEqual(v0_rw.local_element(i), 1.));
+    DEAL_II_AssertThrow(v0_rw.local_element(i) == 1.,
+                        ExcNonEqual(v0_rw.local_element(i), 1.));
   for (unsigned int i = 0; i < v1.local_size(); ++i)
-    AssertThrow(v1_rw.local_element(i) == 2.,
-                ExcNonEqual(v1_rw.local_element(i), 2.));
+    DEAL_II_AssertThrow(v1_rw.local_element(i) == 2.,
+                        ExcNonEqual(v1_rw.local_element(i), 2.));
 
   // check ghost elements in initial state
   v0.update_ghost_values();
@@ -107,15 +108,17 @@ test()
   v0_ghost_rw.import(v0, VectorOperation::insert);
   LinearAlgebra::ReadWriteVector<double> v1_ghost_rw(local_relevant1);
   v1_ghost_rw.import(v1, VectorOperation::insert);
-  AssertThrow(v0_ghost_rw(2) == 1., ExcNonEqual(v0_ghost_rw(2), 1.));
+  DEAL_II_AssertThrow(v0_ghost_rw(2) == 1., ExcNonEqual(v0_ghost_rw(2), 1.));
   if (numproc > 2)
-    AssertThrow(v0_ghost_rw(8) == 1., ExcNonEqual(v0_ghost_rw(8), 2.));
-  AssertThrow(v1_ghost_rw(0) == 2., ExcNonEqual(v1_ghost_rw(0), 2.));
-  AssertThrow(v1_ghost_rw(2) == 2., ExcNonEqual(v1_ghost_rw(2), 2.));
+    DEAL_II_AssertThrow(v0_ghost_rw(8) == 1., ExcNonEqual(v0_ghost_rw(8), 2.));
+  DEAL_II_AssertThrow(v1_ghost_rw(0) == 2., ExcNonEqual(v1_ghost_rw(0), 2.));
+  DEAL_II_AssertThrow(v1_ghost_rw(2) == 2., ExcNonEqual(v1_ghost_rw(2), 2.));
   if (numproc > 2)
     {
-      AssertThrow(v1_ghost_rw(8) == 2., ExcNonEqual(v1_ghost_rw(8), 2.));
-      AssertThrow(v1_ghost_rw(10) == 2., ExcNonEqual(v1_ghost_rw(10), 2.));
+      DEAL_II_AssertThrow(v1_ghost_rw(8) == 2.,
+                          ExcNonEqual(v1_ghost_rw(8), 2.));
+      DEAL_II_AssertThrow(v1_ghost_rw(10) == 2.,
+                          ExcNonEqual(v1_ghost_rw(10), 2.));
     }
   MPI_Barrier(MPI_COMM_WORLD);
   if (myid == 0)
@@ -123,34 +126,36 @@ test()
 
   // now swap v1 and v0
   v0.swap(v1);
-  AssertDimension(v0.local_size(), local_size1);
-  AssertDimension(v1.local_size(), actual_local_size0);
-  AssertDimension(v0.size(), global_size1);
-  AssertDimension(v1.size(), global_size0);
+  DEAL_II_AssertDimension(v0.local_size(), local_size1);
+  DEAL_II_AssertDimension(v1.local_size(), actual_local_size0);
+  DEAL_II_AssertDimension(v0.size(), global_size1);
+  DEAL_II_AssertDimension(v1.size(), global_size0);
   v1_rw.import(v0, VectorOperation::insert);
   for (unsigned int i = 0; i < local_size1; ++i)
-    AssertThrow(v1_rw.local_element(i) == 2.,
-                ExcNonEqual(v1_rw.local_element(i), 2.));
+    DEAL_II_AssertThrow(v1_rw.local_element(i) == 2.,
+                        ExcNonEqual(v1_rw.local_element(i), 2.));
   v0_rw.import(v1, VectorOperation::insert);
   for (unsigned int i = 0; i < actual_local_size0; ++i)
-    AssertThrow(v0_rw.local_element(i) == 1.,
-                ExcNonEqual(v0_rw.local_element(i), 1.));
+    DEAL_II_AssertThrow(v0_rw.local_element(i) == 1.,
+                        ExcNonEqual(v0_rw.local_element(i), 1.));
   MPI_Barrier(MPI_COMM_WORLD);
   if (myid == 0)
     deallog << "First swap OK" << std::endl;
   v0.update_ghost_values();
   v1.update_ghost_values();
   v0_ghost_rw.import(v1, VectorOperation::insert);
-  AssertThrow(v0_ghost_rw(2) == 1., ExcNonEqual(v0_ghost_rw(2), 1.));
+  DEAL_II_AssertThrow(v0_ghost_rw(2) == 1., ExcNonEqual(v0_ghost_rw(2), 1.));
   if (numproc > 2)
-    AssertThrow(v0_ghost_rw(8) == 1., ExcNonEqual(v0_ghost_rw(8), 1.));
+    DEAL_II_AssertThrow(v0_ghost_rw(8) == 1., ExcNonEqual(v0_ghost_rw(8), 1.));
   v1_ghost_rw.import(v0, VectorOperation::insert);
-  AssertThrow(v1_ghost_rw(0) == 2., ExcNonEqual(v1_ghost_rw(0), 2.));
-  AssertThrow(v1_ghost_rw(2) == 2., ExcNonEqual(v1_ghost_rw(2), 2.));
+  DEAL_II_AssertThrow(v1_ghost_rw(0) == 2., ExcNonEqual(v1_ghost_rw(0), 2.));
+  DEAL_II_AssertThrow(v1_ghost_rw(2) == 2., ExcNonEqual(v1_ghost_rw(2), 2.));
   if (numproc > 2)
     {
-      AssertThrow(v1_ghost_rw(8) == 2., ExcNonEqual(v1_ghost_rw(8), 2.));
-      AssertThrow(v1_ghost_rw(10) == 2., ExcNonEqual(v1_ghost_rw(10), 2.));
+      DEAL_II_AssertThrow(v1_ghost_rw(8) == 2.,
+                          ExcNonEqual(v1_ghost_rw(8), 2.));
+      DEAL_II_AssertThrow(v1_ghost_rw(10) == 2.,
+                          ExcNonEqual(v1_ghost_rw(10), 2.));
     }
   MPI_Barrier(MPI_COMM_WORLD);
   if (myid == 0)
@@ -163,16 +168,19 @@ test()
   v0.update_ghost_values();
   v1.update_ghost_values();
   v0_ghost_rw.import(v1, VectorOperation::insert);
-  AssertThrow(v0_ghost_rw(2) == 42., ExcNonEqual(v0_ghost_rw(2), 42.));
+  DEAL_II_AssertThrow(v0_ghost_rw(2) == 42., ExcNonEqual(v0_ghost_rw(2), 42.));
   if (numproc > 2)
-    AssertThrow(v0_ghost_rw(8) == 42., ExcNonEqual(v0_ghost_rw(8), 42.));
+    DEAL_II_AssertThrow(v0_ghost_rw(8) == 42.,
+                        ExcNonEqual(v0_ghost_rw(8), 42.));
   v1_ghost_rw.import(v0, VectorOperation::insert);
-  AssertThrow(v1_ghost_rw(0) == 7., ExcNonEqual(v1_ghost_rw(0), 7.));
-  AssertThrow(v1_ghost_rw(2) == 7., ExcNonEqual(v1_ghost_rw(2), 7.));
+  DEAL_II_AssertThrow(v1_ghost_rw(0) == 7., ExcNonEqual(v1_ghost_rw(0), 7.));
+  DEAL_II_AssertThrow(v1_ghost_rw(2) == 7., ExcNonEqual(v1_ghost_rw(2), 7.));
   if (numproc > 2)
     {
-      AssertThrow(v1_ghost_rw(8) == 7., ExcNonEqual(v1_ghost_rw(8), 7.));
-      AssertThrow(v1_ghost_rw(10) == 7., ExcNonEqual(v1_ghost_rw(10), 7.));
+      DEAL_II_AssertThrow(v1_ghost_rw(8) == 7.,
+                          ExcNonEqual(v1_ghost_rw(8), 7.));
+      DEAL_II_AssertThrow(v1_ghost_rw(10) == 7.,
+                          ExcNonEqual(v1_ghost_rw(10), 7.));
     }
   MPI_Barrier(MPI_COMM_WORLD);
   if (myid == 0)
@@ -181,24 +189,26 @@ test()
   // swap with an empty vector
   LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v2;
   v2.swap(v0);
-  AssertDimension(v0.size(), 0);
-  AssertDimension(v2.size(), global_size1);
-  AssertDimension(v2.local_size(), local_size1);
+  DEAL_II_AssertDimension(v0.size(), 0);
+  DEAL_II_AssertDimension(v2.size(), global_size1);
+  DEAL_II_AssertDimension(v2.local_size(), local_size1);
   v1_rw.import(v2, VectorOperation::insert);
   for (int i = my_start1; i < my_end1; ++i)
-    AssertThrow(v1_rw(i) == 7., ExcNonEqual(v1_rw(i), 7.));
+    DEAL_II_AssertThrow(v1_rw(i) == 7., ExcNonEqual(v1_rw(i), 7.));
   MPI_Barrier(MPI_COMM_WORLD);
   if (myid == 0)
     deallog << "Second swap OK" << std::endl;
   v2 = -1.;
   v2.update_ghost_values();
   v1_ghost_rw.import(v2, VectorOperation::insert);
-  AssertThrow(v1_ghost_rw(0) == -1., ExcNonEqual(v1_ghost_rw(0), -1.));
-  AssertThrow(v1_ghost_rw(2) == -1., ExcNonEqual(v1_ghost_rw(2), -1.));
+  DEAL_II_AssertThrow(v1_ghost_rw(0) == -1., ExcNonEqual(v1_ghost_rw(0), -1.));
+  DEAL_II_AssertThrow(v1_ghost_rw(2) == -1., ExcNonEqual(v1_ghost_rw(2), -1.));
   if (numproc > 2)
     {
-      AssertThrow(v1_ghost_rw(8) == -1., ExcNonEqual(v1_ghost_rw(8), -1.));
-      AssertThrow(v1_ghost_rw(10) == -1., ExcNonEqual(v1_ghost_rw(10), -1.));
+      DEAL_II_AssertThrow(v1_ghost_rw(8) == -1.,
+                          ExcNonEqual(v1_ghost_rw(8), -1.));
+      DEAL_II_AssertThrow(v1_ghost_rw(10) == -1.,
+                          ExcNonEqual(v1_ghost_rw(10), -1.));
     }
   MPI_Barrier(MPI_COMM_WORLD);
   if (myid == 0)
@@ -223,10 +233,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
 
   if (myid == 0)

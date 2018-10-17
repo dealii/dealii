@@ -46,9 +46,11 @@ namespace LocalIntegrators
       const VectorSlice<const std::vector<std::vector<double>>> &input)
     {
       const unsigned int n_comp = fe.get_fe().n_components();
-      AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-      AssertDimension(result.n_rows(), fe.n_quadrature_points);
-      AssertDimension(result.n_cols(), n_comp + dim);
+      DEAL_II_AssertVectorVectorDimension(input,
+                                          n_comp,
+                                          fe.n_quadrature_points);
+      DEAL_II_AssertDimension(result.n_rows(), fe.n_quadrature_points);
+      DEAL_II_AssertDimension(result.n_cols(), n_comp + dim);
 
       for (unsigned int k = 0; k < fe.n_quadrature_points; ++k)
         {

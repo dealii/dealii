@@ -1386,7 +1386,7 @@ public:
   /**
    * Exception
    */
-  DeclException0(ExcInvalidState);
+  DEAL_II_DeclException0(ExcInvalidState);
 
 private:
   /**

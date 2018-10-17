@@ -62,6 +62,6 @@ main()
       fe_values.reinit(cell);
       deallog << cell << ' ' << fe_values.JxW(0) << std::endl;
 
-      Assert(fe_values.JxW(0) > 0, ExcInternalError());
+      DEAL_II_Assert(fe_values.JxW(0) > 0, ExcInternalError());
     }
 }

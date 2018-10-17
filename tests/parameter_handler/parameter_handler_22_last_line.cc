@@ -45,7 +45,7 @@ main()
   // go into the source dir to read files there. this
   // is necessary so that we can include files there
   const int chdir_return_code = chdir(SOURCE_DIR);
-  AssertThrow(chdir_return_code == 0, ExcInternalError());
+  DEAL_II_AssertThrow(chdir_return_code == 0, ExcInternalError());
   check("parameter_handler_22_last_line.prm", "");
   check("parameter_handler_22_last_line.prm", "# end-of-parameter-section");
 

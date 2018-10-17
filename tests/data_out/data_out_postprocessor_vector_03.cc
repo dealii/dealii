@@ -268,12 +268,12 @@ public:
   evaluate_scalar_field(const DataPostprocessorInputs::Scalar<dim> &input_data,
                         std::vector<Vector<double>> &computed_quantities) const
   {
-    AssertDimension(input_data.solution_gradients.size(),
-                    computed_quantities.size());
+    DEAL_II_AssertDimension(input_data.solution_gradients.size(),
+                            computed_quantities.size());
 
     for (unsigned int p = 0; p < input_data.solution_gradients.size(); ++p)
       {
-        AssertDimension(computed_quantities[p].size(), dim);
+        DEAL_II_AssertDimension(computed_quantities[p].size(), dim);
         for (unsigned int d = 0; d < dim; ++d)
           // like above, but also multiply the gradients with
           // the coefficient evaluated at the current point:

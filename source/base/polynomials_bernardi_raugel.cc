@@ -75,16 +75,18 @@ PolynomialsBernardiRaugel<dim>::compute(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == n_pols || values.size() == 0,
-         ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
-         ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
-         ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
-         ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
-         ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
+  DEAL_II_Assert(values.size() == n_pols || values.size() == 0,
+                 ExcDimensionMismatch(values.size(), n_pols));
+  DEAL_II_Assert(grads.size() == n_pols || grads.size() == 0,
+                 ExcDimensionMismatch(grads.size(), n_pols));
+  DEAL_II_Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
+                 ExcDimensionMismatch(grad_grads.size(), n_pols));
+  DEAL_II_Assert(third_derivatives.size() == n_pols ||
+                   third_derivatives.size() == 0,
+                 ExcDimensionMismatch(third_derivatives.size(), n_pols));
+  DEAL_II_Assert(fourth_derivatives.size() == n_pols ||
+                   fourth_derivatives.size() == 0,
+                 ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
   std::vector<double>         Q_values;
   std::vector<Tensor<1, dim>> Q_grads;
@@ -237,13 +239,13 @@ unsigned int
 PolynomialsBernardiRaugel<dim>::compute_n_pols(const unsigned int k)
 {
   (void)k;
-  Assert(k == 1, ExcNotImplemented());
+  DEAL_II_Assert(k == 1, ExcNotImplemented());
   if (dim == 2 || dim == 3)
     return dim * GeometryInfo<dim>::vertices_per_cell +
            GeometryInfo<dim>::faces_per_cell;
   // 2*4+4=12 polynomials in 2D and 3*8+6=30 polynomials in 3D
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 

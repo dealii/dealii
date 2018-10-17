@@ -197,19 +197,20 @@ test()
           for (unsigned int j = 0; j < eigenfunctions.size(); j++)
             {
               const double err = std::abs(eigenfunctions[j] * Bx - (i == j));
-              Assert(err < precision,
-                     ExcMessage(
-                       "Eigenvectors " + Utilities::int_to_string(i) + " and " +
-                       Utilities::int_to_string(j) +
-                       " are not orthonormal: " + std::to_string(err)));
+              DEAL_II_Assert(err < precision,
+                             ExcMessage(
+                               "Eigenvectors " + Utilities::int_to_string(i) +
+                               " and " + Utilities::int_to_string(j) +
+                               " are not orthonormal: " + std::to_string(err)));
             }
 
           laplace.vmult(Ax, eigenfunctions[i]);
           Ax.add(-1.0 * eigenvalues[i], Bx);
           const double err = Ax.l2_norm();
-          Assert(err < precision,
-                 ExcMessage("Returned vector " + Utilities::int_to_string(i) +
-                            " is not an eigenvector: " + std::to_string(err)));
+          DEAL_II_Assert(err < precision,
+                         ExcMessage(
+                           "Returned vector " + Utilities::int_to_string(i) +
+                           " is not an eigenvector: " + std::to_string(err)));
         }
     }
   }

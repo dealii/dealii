@@ -82,10 +82,10 @@ namespace internal
               q_fine = std_cxx14::make_unique<QGauss<dim>>(degree + 1);
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
           }
 
-        Assert(q_fine.get() != nullptr, ExcInternalError());
+        DEAL_II_Assert(q_fine.get() != nullptr, ExcInternalError());
         const unsigned int nq = q_fine->size();
 
         // loop over all possible refinement cases
@@ -100,12 +100,12 @@ namespace internal
 
             for (unsigned int i = 0; i < nc; ++i)
               {
-                Assert(matrices[ref_case - 1][i].n() == dpc,
-                       ExcDimensionMismatch(matrices[ref_case - 1][i].n(),
-                                            dpc));
-                Assert(matrices[ref_case - 1][i].m() == dpc,
-                       ExcDimensionMismatch(matrices[ref_case - 1][i].m(),
-                                            dpc));
+                DEAL_II_Assert(
+                  matrices[ref_case - 1][i].n() == dpc,
+                  ExcDimensionMismatch(matrices[ref_case - 1][i].n(), dpc));
+                DEAL_II_Assert(
+                  matrices[ref_case - 1][i].m() == dpc,
+                  ExcDimensionMismatch(matrices[ref_case - 1][i].m(), dpc));
               }
 
             // create a respective refinement on the triangulation
@@ -193,9 +193,10 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree)
       get_riaf_vector(q_degree))
   , n_bubbles((q_degree <= 1) ? 1 : dim)
 {
-  Assert(q_degree > 0,
-         ExcMessage("This element can only be used for polynomial degrees "
-                    "greater than zero"));
+  DEAL_II_Assert(q_degree > 0,
+                 ExcMessage(
+                   "This element can only be used for polynomial degrees "
+                   "greater than zero"));
 
   this->initialize(QGaussLobatto<1>(q_degree + 1).get_points());
 
@@ -205,7 +206,8 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const unsigned int q_degree)
     point[d] = 0.5;
   for (unsigned int i = 0; i < n_bubbles; ++i)
     this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell,
+                          this->unit_support_points.size());
 
   this->reinit_restriction_and_prolongation_matrices();
   if (dim == spacedim)
@@ -232,9 +234,10 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const Quadrature<1> &points)
       get_riaf_vector(points.size() - 1))
   , n_bubbles((points.size() - 1 <= 1) ? 1 : dim)
 {
-  Assert(points.size() > 1,
-         ExcMessage("This element can only be used for polynomial degrees "
-                    "at least one"));
+  DEAL_II_Assert(points.size() > 1,
+                 ExcMessage(
+                   "This element can only be used for polynomial degrees "
+                   "at least one"));
 
   this->initialize(points.get_points());
 
@@ -244,7 +247,8 @@ FE_Q_Bubbles<dim, spacedim>::FE_Q_Bubbles(const Quadrature<1> &points)
     point[d] = 0.5;
   for (unsigned int i = 0; i < n_bubbles; ++i)
     this->unit_support_points.push_back(point);
-  AssertDimension(this->dofs_per_cell, this->unit_support_points.size());
+  DEAL_II_AssertDimension(this->dofs_per_cell,
+                          this->unit_support_points.size());
 
   this->reinit_restriction_and_prolongation_matrices();
   if (dim == spacedim)
@@ -294,9 +298,9 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
         }
     }
   // Do not consider the discontinuous node for dimension 1
-  Assert(index == n_points || (dim == 1 && index == n_points + n_bubbles),
-         ExcMessage(
-           "Could not decode support points in one coordinate direction."));
+  DEAL_II_Assert(
+    index == n_points || (dim == 1 && index == n_points + n_bubbles),
+    ExcMessage("Could not decode support points in one coordinate direction."));
 
   // Check whether the support points are equidistant.
   for (unsigned int j = 0; j < n_points; j++)
@@ -353,14 +357,16 @@ FE_Q_Bubbles<dim, spacedim>::
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->unit_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->unit_support_points.size()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
-  Assert(support_point_values[0].size() == this->n_components(),
-         ExcDimensionMismatch(support_point_values[0].size(),
-                              this->n_components()));
+  DEAL_II_Assert(support_point_values.size() ==
+                   this->unit_support_points.size(),
+                 ExcDimensionMismatch(support_point_values.size(),
+                                      this->unit_support_points.size()));
+  DEAL_II_Assert(nodal_values.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(nodal_values.size(),
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(support_point_values[0].size() == this->n_components(),
+                 ExcDimensionMismatch(support_point_values[0].size(),
+                                      this->n_components()));
 
   for (unsigned int i = 0; i < this->dofs_per_cell - 1; ++i)
     {
@@ -387,15 +393,16 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
   // for the case that the x_source_fe is identical to this FE
   using FEQBUBBLES = FE_Q_Bubbles<dim, spacedim>;
 
-  AssertThrow(
+  DEAL_II_AssertThrow(
     (x_source_fe.get_name().find("FE_Q_Bubbles<") == 0) ||
       (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr),
     (typename FiniteElement<dim, spacedim>::ExcInterpolationNotImplemented()));
-  Assert(interpolation_matrix.m() == this->dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.m(), this->dofs_per_cell));
-  Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              x_source_fe.dofs_per_cell));
+  DEAL_II_Assert(interpolation_matrix.m() == this->dofs_per_cell,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+                 ExcDimensionMismatch(interpolation_matrix.m(),
+                                      x_source_fe.dofs_per_cell));
 
   // Provide a short cut in case we are just inquiring the identity
   auto casted_fe = dynamic_cast<const FEQBUBBLES *>(&x_source_fe);
@@ -404,7 +411,7 @@ FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
       interpolation_matrix.set(i, i, 1.);
   // else we need to do more...
   else
-    Assert(
+    DEAL_II_Assert(
       false,
       (typename FiniteElement<dim,
                               spacedim>::ExcInterpolationNotImplemented()));
@@ -460,20 +467,22 @@ FE_Q_Bubbles<dim, spacedim>::get_prolongation_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(refinement_case != RefinementCase<dim>::no_refinement,
-         ExcMessage(
-           "Prolongation matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  DEAL_II_Assert(refinement_case <
+                   RefinementCase<dim>::isotropic_refinement + 1,
+                 ExcIndexRange(refinement_case,
+                               0,
+                               RefinementCase<dim>::isotropic_refinement + 1));
+  DEAL_II_Assert(
+    refinement_case != RefinementCase<dim>::no_refinement,
+    ExcMessage("Prolongation matrices are only available for refined cells!"));
+  DEAL_II_Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+                 ExcIndexRange(child,
+                               0,
+                               GeometryInfo<dim>::n_children(refinement_case)));
 
-  Assert(this->prolongation[refinement_case - 1][child].n() != 0,
-         ExcMessage("This prolongation matrix has not been computed yet!"));
+  DEAL_II_Assert(this->prolongation[refinement_case - 1][child].n() != 0,
+                 ExcMessage(
+                   "This prolongation matrix has not been computed yet!"));
   // finally return the matrix
   return this->prolongation[refinement_case - 1][child];
 }
@@ -486,20 +495,22 @@ FE_Q_Bubbles<dim, spacedim>::get_restriction_matrix(
   const unsigned int         child,
   const RefinementCase<dim> &refinement_case) const
 {
-  Assert(refinement_case < RefinementCase<dim>::isotropic_refinement + 1,
-         ExcIndexRange(refinement_case,
-                       0,
-                       RefinementCase<dim>::isotropic_refinement + 1));
-  Assert(refinement_case != RefinementCase<dim>::no_refinement,
-         ExcMessage(
-           "Restriction matrices are only available for refined cells!"));
-  Assert(child < GeometryInfo<dim>::n_children(refinement_case),
-         ExcIndexRange(child,
-                       0,
-                       GeometryInfo<dim>::n_children(refinement_case)));
+  DEAL_II_Assert(refinement_case <
+                   RefinementCase<dim>::isotropic_refinement + 1,
+                 ExcIndexRange(refinement_case,
+                               0,
+                               RefinementCase<dim>::isotropic_refinement + 1));
+  DEAL_II_Assert(
+    refinement_case != RefinementCase<dim>::no_refinement,
+    ExcMessage("Restriction matrices are only available for refined cells!"));
+  DEAL_II_Assert(child < GeometryInfo<dim>::n_children(refinement_case),
+                 ExcIndexRange(child,
+                               0,
+                               GeometryInfo<dim>::n_children(refinement_case)));
 
-  Assert(this->restriction[refinement_case - 1][child].n() != 0,
-         ExcMessage("This restriction matrix has not been computed yet!"));
+  DEAL_II_Assert(this->restriction[refinement_case - 1][child].n() != 0,
+                 ExcMessage(
+                   "This restriction matrix has not been computed yet!"));
 
   // finally return the matrix
   return this->restriction[refinement_case - 1][child];

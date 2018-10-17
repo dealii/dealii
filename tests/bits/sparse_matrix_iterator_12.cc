@@ -39,17 +39,17 @@ test()
 
   SparseMatrix<double>::const_iterator k = A.begin(), j = ++A.begin();
 
-  AssertThrow(k < j, ExcInternalError());
-  AssertThrow(j > k, ExcInternalError());
+  DEAL_II_AssertThrow(k < j, ExcInternalError());
+  DEAL_II_AssertThrow(j > k, ExcInternalError());
 
-  AssertThrow(!(j < k), ExcInternalError());
-  AssertThrow(!(k > j), ExcInternalError());
+  DEAL_II_AssertThrow(!(j < k), ExcInternalError());
+  DEAL_II_AssertThrow(!(k > j), ExcInternalError());
 
-  AssertThrow(k != j, ExcInternalError());
-  AssertThrow(!(k == j), ExcInternalError());
+  DEAL_II_AssertThrow(k != j, ExcInternalError());
+  DEAL_II_AssertThrow(!(k == j), ExcInternalError());
 
-  AssertThrow(k == k, ExcInternalError());
-  AssertThrow(!(k != k), ExcInternalError());
+  DEAL_II_AssertThrow(k == k, ExcInternalError());
+  DEAL_II_AssertThrow(!(k != k), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -96,8 +96,8 @@ test()
                                             QGauss<dim>(q + 2),
                                             VectorTools::L2_norm);
           if (q <= p)
-            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
-                   ExcInternalError());
+            DEAL_II_Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
+                           ExcInternalError());
 
           deallog << fe.get_name() << ", P_" << q
                   << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()

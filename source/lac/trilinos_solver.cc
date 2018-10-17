@@ -178,12 +178,14 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    Assert(x.size() == A.n(), ExcDimensionMismatch(x.size(), A.n()));
-    Assert(b.size() == A.m(), ExcDimensionMismatch(b.size(), A.m()));
-    Assert(A.local_range().second == A.m(),
-           ExcMessage("Can only work in serial when using deal.II vectors."));
-    Assert(A.trilinos_matrix().Filled(),
-           ExcMessage("Matrix is not compressed. Call compress() method."));
+    DEAL_II_Assert(x.size() == A.n(), ExcDimensionMismatch(x.size(), A.n()));
+    DEAL_II_Assert(b.size() == A.m(), ExcDimensionMismatch(b.size(), A.m()));
+    DEAL_II_Assert(A.local_range().second == A.m(),
+                   ExcMessage(
+                     "Can only work in serial when using deal.II vectors."));
+    DEAL_II_Assert(A.trilinos_matrix().Filled(),
+                   ExcMessage(
+                     "Matrix is not compressed. Call compress() method."));
 
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
     Epetra_Vector ep_b(View,
@@ -229,12 +231,12 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      x.local_size()),
-                    A.domain_partitioner().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      b.local_size()),
-                    A.range_partitioner().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              x.local_size()),
+                            A.domain_partitioner().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              b.local_size()),
+                            A.range_partitioner().NumMyElements());
 
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
     Epetra_Vector ep_b(View,
@@ -257,12 +259,12 @@ namespace TrilinosWrappers
                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
                     const PreconditionBase &preconditioner)
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      x.local_size()),
-                    A.OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      b.local_size()),
-                    A.OperatorRangeMap().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              x.local_size()),
+                            A.OperatorDomainMap().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              b.local_size()),
+                            A.OperatorRangeMap().NumMyElements());
 
     Epetra_Vector ep_x(View, A.OperatorDomainMap(), x.begin());
     Epetra_Vector ep_b(View,
@@ -285,11 +287,12 @@ namespace TrilinosWrappers
       double
       compute_residual(const Epetra_MultiVector *const residual_vector)
       {
-        Assert(residual_vector->NumVectors() == 1,
-               ExcMessage("Residual multivector holds more than one vector"));
+        DEAL_II_Assert(residual_vector->NumVectors() == 1,
+                       ExcMessage(
+                         "Residual multivector holds more than one vector"));
         TrilinosScalar res_l2_norm = 0.0;
         const int      ierr        = residual_vector->Norm2(&res_l2_norm);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
         return res_l2_norm;
       }
 
@@ -378,13 +381,14 @@ namespace TrilinosWrappers
             AztecOO_StatusTestCombo::OR);
 
         // Maximum number of iterations
-        Assert(max_steps >= 0, ExcInternalError());
+        DEAL_II_Assert(max_steps >= 0, ExcInternalError());
         status_test_max_steps =
           std_cxx14::make_unique<AztecOO_StatusTestMaxIters>(max_steps);
         status_test_collection->AddStatusTest(*status_test_max_steps);
 
-        Assert(linear_problem.GetRHS()->NumVectors() == 1,
-               ExcMessage("RHS multivector holds more than one vector"));
+        DEAL_II_Assert(linear_problem.GetRHS()->NumVectors() == 1,
+                       ExcMessage(
+                         "RHS multivector holds more than one vector"));
 
         // Residual norm is below some absolute value
         status_test_abs_tol = std_cxx14::make_unique<AztecOO_StatusTestResNorm>(
@@ -446,7 +450,7 @@ namespace TrilinosWrappers
           solver.SetAztecOption(AZ_solver, AZ_tfqmr);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // Set the preconditioner
@@ -496,27 +500,27 @@ namespace TrilinosWrappers
     switch (ierr)
       {
         case -1:
-          AssertThrow(false,
-                      ExcMessage("AztecOO::Iterate error code -1: "
-                                 "option not implemented"));
+          DEAL_II_AssertThrow(false,
+                              ExcMessage("AztecOO::Iterate error code -1: "
+                                         "option not implemented"));
           break;
         case -2:
-          AssertThrow(false,
-                      ExcMessage("AztecOO::Iterate error code -2: "
-                                 "numerical breakdown"));
+          DEAL_II_AssertThrow(false,
+                              ExcMessage("AztecOO::Iterate error code -2: "
+                                         "numerical breakdown"));
           break;
         case -3:
-          AssertThrow(false,
-                      ExcMessage("AztecOO::Iterate error code -3: "
-                                 "loss of precision"));
+          DEAL_II_AssertThrow(false,
+                              ExcMessage("AztecOO::Iterate error code -3: "
+                                         "loss of precision"));
           break;
         case -4:
-          AssertThrow(false,
-                      ExcMessage("AztecOO::Iterate error code -4: "
-                                 "GMRES Hessenberg ill-conditioned"));
+          DEAL_II_AssertThrow(false,
+                              ExcMessage("AztecOO::Iterate error code -4: "
+                                         "GMRES Hessenberg ill-conditioned"));
           break;
         default:
-          AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
+          DEAL_II_AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
       }
 
     // Finally, let the deal.II SolverControl object know what has
@@ -531,8 +535,9 @@ namespace TrilinosWrappers
             dynamic_cast<const internal::TrilinosReductionControl *const>(
               status_test.get()))
       {
-        Assert(dynamic_cast<const ReductionControl *const>(&solver_control),
-               ExcInternalError());
+        DEAL_II_Assert(dynamic_cast<const ReductionControl *const>(
+                         &solver_control),
+                       ExcInternalError());
 
         // Check to see if solver converged in one step
         // This can happen if the matrix is diagonal and a non-trivial
@@ -555,14 +560,15 @@ namespace TrilinosWrappers
       }
     else
       {
-        Assert(solver.TrueResidual() >= 0.0, ExcInternalError());
+        DEAL_II_Assert(solver.TrueResidual() >= 0.0, ExcInternalError());
         solver_control.check(solver.NumIters(), solver.TrueResidual());
       }
 
     if (solver_control.last_check() != SolverControl::success)
-      AssertThrow(false,
-                  SolverControl::NoConvergence(solver_control.last_step(),
-                                               solver_control.last_value()));
+      DEAL_II_AssertThrow(
+        false,
+        SolverControl::NoConvergence(solver_control.last_step(),
+                                     solver_control.last_value()));
   }
 
 
@@ -578,7 +584,7 @@ namespace TrilinosWrappers
       {
         const int ierr = solver.SetPrecOperator(
           const_cast<Epetra_Operator *>(preconditioner.preconditioner.get()));
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
     else
       solver.SetAztecOption(AZ_precond, AZ_none);
@@ -592,7 +598,7 @@ namespace TrilinosWrappers
   {
     const int ierr =
       solver.SetPrecOperator(const_cast<Epetra_Operator *>(&preconditioner));
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -729,24 +735,24 @@ namespace TrilinosWrappers
     // solver, if possible.
     Amesos Factory;
 
-    AssertThrow(Factory.Query(additional_data.solver_type.c_str()),
-                ExcMessage(
-                  std::string("You tried to select the solver type <") +
-                  additional_data.solver_type +
-                  "> but this solver is not supported by Trilinos either "
-                  "because it does not exist, or because Trilinos was not "
-                  "configured for its use."));
+    DEAL_II_AssertThrow(
+      Factory.Query(additional_data.solver_type.c_str()),
+      ExcMessage(std::string("You tried to select the solver type <") +
+                 additional_data.solver_type +
+                 "> but this solver is not supported by Trilinos either "
+                 "because it does not exist, or because Trilinos was not "
+                 "configured for its use."));
 
     solver.reset(
       Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     ierr = solver->SymbolicFactorization();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     verbose_cout << "Starting numeric factorization" << std::endl;
     ierr = solver->NumericFactorization();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
   }
 
 
@@ -770,7 +776,7 @@ namespace TrilinosWrappers
 
     // Fetch return value of Amesos Solver functions
     int ierr = solver->Solve();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     // Finally, force the SolverControl object to report convergence
     solver_control.check(0, 0);
@@ -805,7 +811,7 @@ namespace TrilinosWrappers
 
     // Fetch return value of Amesos Solver functions
     int ierr = solver->Solve();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     // Finally, force the SolverControl object to report convergence
     solver_control.check(0, 0);
@@ -829,28 +835,28 @@ namespace TrilinosWrappers
     // solver, if possible.
     Amesos Factory;
 
-    AssertThrow(Factory.Query(additional_data.solver_type.c_str()),
-                ExcMessage(
-                  std::string("You tried to select the solver type <") +
-                  additional_data.solver_type +
-                  "> but this solver is not supported by Trilinos either "
-                  "because it does not exist, or because Trilinos was not "
-                  "configured for its use."));
+    DEAL_II_AssertThrow(
+      Factory.Query(additional_data.solver_type.c_str()),
+      ExcMessage(std::string("You tried to select the solver type <") +
+                 additional_data.solver_type +
+                 "> but this solver is not supported by Trilinos either "
+                 "because it does not exist, or because Trilinos was not "
+                 "configured for its use."));
 
     solver.reset(
       Factory.Create(additional_data.solver_type.c_str(), *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
     ierr = solver->SymbolicFactorization();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     verbose_cout << "Starting numeric factorization" << std::endl;
     ierr = solver->NumericFactorization();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     verbose_cout << "Starting solve" << std::endl;
     ierr = solver->Solve();
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
     // Finally, let the deal.II SolverControl object know what has
     // happened. If the solve succeeded, the status of the solver control will
@@ -858,9 +864,10 @@ namespace TrilinosWrappers
     solver_control.check(0, 0);
 
     if (solver_control.last_check() != SolverControl::success)
-      AssertThrow(false,
-                  SolverControl::NoConvergence(solver_control.last_step(),
-                                               solver_control.last_value()));
+      DEAL_II_AssertThrow(
+        false,
+        SolverControl::NoConvergence(solver_control.last_step(),
+                                     solver_control.last_value()));
   }
 
 
@@ -888,10 +895,11 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    Assert(x.size() == A.n(), ExcDimensionMismatch(x.size(), A.n()));
-    Assert(b.size() == A.m(), ExcDimensionMismatch(b.size(), A.m()));
-    Assert(A.local_range().second == A.m(),
-           ExcMessage("Can only work in serial when using deal.II vectors."));
+    DEAL_II_Assert(x.size() == A.n(), ExcDimensionMismatch(x.size(), A.n()));
+    DEAL_II_Assert(b.size() == A.m(), ExcDimensionMismatch(b.size(), A.m()));
+    DEAL_II_Assert(A.local_range().second == A.m(),
+                   ExcMessage(
+                     "Can only work in serial when using deal.II vectors."));
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
     Epetra_Vector ep_b(View,
                        A.range_partitioner(),
@@ -913,12 +921,12 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &      x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      x.local_size()),
-                    A.domain_partitioner().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      b.local_size()),
-                    A.range_partitioner().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              x.local_size()),
+                            A.domain_partitioner().NumMyElements());
+    DEAL_II_AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
+                              b.local_size()),
+                            A.range_partitioner().NumMyElements());
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
     Epetra_Vector ep_b(View,
                        A.range_partitioner(),

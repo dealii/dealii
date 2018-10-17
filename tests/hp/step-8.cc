@@ -118,8 +118,9 @@ inline void
 RightHandSide<dim>::vector_value(const Point<dim> &p,
                                  Vector<double> &  values) const
 {
-  Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
-  Assert(dim >= 2, ExcNotImplemented());
+  DEAL_II_Assert(values.size() == dim,
+                 ExcDimensionMismatch(values.size(), dim));
+  DEAL_II_Assert(dim >= 2, ExcNotImplemented());
 
   Point<dim> point_1, point_2;
   point_1(0) = 0.5;
@@ -145,8 +146,8 @@ RightHandSide<dim>::vector_value_list(
   const std::vector<Point<dim>> &points,
   std::vector<Vector<double>> &  value_list) const
 {
-  Assert(value_list.size() == points.size(),
-         ExcDimensionMismatch(value_list.size(), points.size()));
+  DEAL_II_Assert(value_list.size() == points.size(),
+                 ExcDimensionMismatch(value_list.size(), points.size()));
 
   const unsigned int n_points = points.size();
 
@@ -357,7 +358,7 @@ ElasticProblem<dim>::output_results(const unsigned int cycle) const
 {
   std::string filename = "solution-";
   filename += ('0' + cycle);
-  Assert(cycle < 10, ExcInternalError());
+  DEAL_II_Assert(cycle < 10, ExcInternalError());
 
   filename += ".gmv";
 
@@ -382,7 +383,7 @@ ElasticProblem<dim>::output_results(const unsigned int cycle) const
         solution_names.push_back("z_displacement");
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   data_out.add_data_vector(solution, solution_names);

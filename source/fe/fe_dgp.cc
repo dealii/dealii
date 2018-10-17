@@ -113,14 +113,14 @@ FE_DGP<dim, spacedim>::get_face_interpolation_matrix(
   (void)interpolation_matrix;
   using FE    = FiniteElement<dim, spacedim>;
   using FEDGP = FE_DGP<dim, spacedim>;
-  AssertThrow((x_source_fe.get_name().find("FE_DGP<") == 0) ||
-                (dynamic_cast<const FEDGP *>(&x_source_fe) != nullptr),
-              typename FE::ExcInterpolationNotImplemented());
+  DEAL_II_AssertThrow((x_source_fe.get_name().find("FE_DGP<") == 0) ||
+                        (dynamic_cast<const FEDGP *>(&x_source_fe) != nullptr),
+                      typename FE::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -139,14 +139,14 @@ FE_DGP<dim, spacedim>::get_subface_interpolation_matrix(
   (void)interpolation_matrix;
   using FE    = FiniteElement<dim, spacedim>;
   using FEDGP = FE_DGP<dim, spacedim>;
-  AssertThrow((x_source_fe.get_name().find("FE_DGP<") == 0) ||
-                (dynamic_cast<const FEDGP *>(&x_source_fe) != nullptr),
-              typename FE::ExcInterpolationNotImplemented());
+  DEAL_II_AssertThrow((x_source_fe.get_name().find("FE_DGP<") == 0) ||
+                        (dynamic_cast<const FEDGP *>(&x_source_fe) != nullptr),
+                      typename FE::ExcInterpolationNotImplemented());
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -170,7 +170,7 @@ FE_DGP<dim, spacedim>::hp_vertex_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -187,7 +187,7 @@ FE_DGP<dim, spacedim>::hp_line_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -204,7 +204,7 @@ FE_DGP<dim, spacedim>::hp_quad_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -221,7 +221,7 @@ FE_DGP<dim, spacedim>::compare_for_face_domination(
   if (dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe_other) != nullptr)
     return FiniteElementDomination::no_requirements;
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -254,7 +254,7 @@ template <int dim, int spacedim>
 std::size_t
 FE_DGP<dim, spacedim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
   return 0;
 }
 

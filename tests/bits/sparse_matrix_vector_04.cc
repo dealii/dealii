@@ -57,12 +57,12 @@ test(Vector<double> &v, Vector<double> &w)
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(v(i) == i, ExcInternalError());
+      DEAL_II_AssertThrow(v(i) == i, ExcInternalError());
 
       double result = 0;
       for (unsigned int j = 0; j < m.n(); ++j)
         result += (j + 2 * i) * j;
-      AssertThrow(w(i) == i + result, ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == i + result, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

@@ -152,8 +152,8 @@ SolverControl::enable_history_data()
 const std::vector<double> &
 SolverControl::get_history_data() const
 {
-  Assert(history_data_enabled, ExcHistoryDataRequired());
-  Assert(
+  DEAL_II_Assert(history_data_enabled, ExcHistoryDataRequired());
+  DEAL_II_Assert(
     history_data.size() > 0,
     ExcMessage(
       "The SolverControl object was asked for the solver history "
@@ -171,10 +171,10 @@ SolverControl::average_reduction() const
   if (lstep == 0)
     return 0.;
 
-  Assert(history_data_enabled, ExcHistoryDataRequired());
-  Assert(history_data.size() > lstep, ExcInternalError());
-  Assert(history_data[0] > 0., ExcInternalError());
-  Assert(history_data[lstep] > 0., ExcInternalError());
+  DEAL_II_Assert(history_data_enabled, ExcHistoryDataRequired());
+  DEAL_II_Assert(history_data.size() > lstep, ExcInternalError());
+  DEAL_II_Assert(history_data[0] > 0., ExcInternalError());
+  DEAL_II_Assert(history_data[lstep] > 0., ExcInternalError());
 
   return std::pow(history_data[lstep] / history_data[0], 1. / lstep);
 }
@@ -184,10 +184,10 @@ SolverControl::average_reduction() const
 double
 SolverControl::step_reduction(unsigned int step) const
 {
-  Assert(history_data_enabled, ExcHistoryDataRequired());
-  Assert(history_data.size() > lstep, ExcInternalError());
-  Assert(step <= lstep, ExcIndexRange(step, 1, lstep + 1));
-  Assert(step > 0, ExcIndexRange(step, 1, lstep + 1));
+  DEAL_II_Assert(history_data_enabled, ExcHistoryDataRequired());
+  DEAL_II_Assert(history_data.size() > lstep, ExcInternalError());
+  DEAL_II_Assert(step <= lstep, ExcIndexRange(step, 1, lstep + 1));
+  DEAL_II_Assert(step > 0, ExcIndexRange(step, 1, lstep + 1));
 
   return history_data[step] / history_data[step - 1];
 }
@@ -351,8 +351,9 @@ ConsecutiveControl::ConsecutiveControl(
   , n_consecutive_iterations(n_consecutive_iterations)
   , n_converged_iterations(0)
 {
-  AssertThrow(n_consecutive_iterations > 0,
-              ExcMessage("n_consecutive_iterations should be positive"));
+  DEAL_II_AssertThrow(n_consecutive_iterations > 0,
+                      ExcMessage(
+                        "n_consecutive_iterations should be positive"));
 }
 
 
@@ -387,8 +388,8 @@ ConsecutiveControl::check(const unsigned int step, const double check_value)
       // check two things:
       // (i)  steps are ascending without repetitions
       // (ii) user started from zero even when solver is being reused.
-      Assert(step - 1 == lstep,
-             ExcMessage("steps should be ascending integers."));
+      DEAL_II_Assert(step - 1 == lstep,
+                     ExcMessage("steps should be ascending integers."));
     }
 
   SolverControl::State state = SolverControl::check(step, check_value);

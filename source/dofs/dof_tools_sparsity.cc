@@ -67,23 +67,23 @@ namespace DoFTools
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
+    DEAL_II_Assert(sparsity.n_rows() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel::distributed::Triangulation objects and "
-             "associated DoF handler objects, asking for any subdomain other "
-             "than the locally owned one does not make sense."));
+    DEAL_II_Assert(
+      (dof.get_triangulation().locally_owned_subdomain() ==
+       numbers::invalid_subdomain_id) ||
+        (subdomain_id == numbers::invalid_subdomain_id) ||
+        (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
+      ExcMessage(
+        "For parallel::distributed::Triangulation objects and "
+        "associated DoF handler objects, asking for any subdomain other "
+        "than the locally owned one does not make sense."));
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
     dofs_on_this_cell.reserve(max_dofs_per_cell(dof));
@@ -127,29 +127,29 @@ namespace DoFTools
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
 
-    Assert(sparsity.n_rows() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
-    Assert(couplings.n_rows() == dof.get_fe(0).n_components(),
-           ExcDimensionMismatch(couplings.n_rows(),
-                                dof.get_fe(0).n_components()));
-    Assert(couplings.n_cols() == dof.get_fe(0).n_components(),
-           ExcDimensionMismatch(couplings.n_cols(),
-                                dof.get_fe(0).n_components()));
+    DEAL_II_Assert(sparsity.n_rows() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
+    DEAL_II_Assert(couplings.n_rows() == dof.get_fe(0).n_components(),
+                   ExcDimensionMismatch(couplings.n_rows(),
+                                        dof.get_fe(0).n_components()));
+    DEAL_II_Assert(couplings.n_cols() == dof.get_fe(0).n_components(),
+                   ExcDimensionMismatch(couplings.n_cols(),
+                                        dof.get_fe(0).n_components()));
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel::distributed::Triangulation objects and "
-             "associated DoF handler objects, asking for any subdomain other "
-             "than the locally owned one does not make sense."));
+    DEAL_II_Assert(
+      (dof.get_triangulation().locally_owned_subdomain() ==
+       numbers::invalid_subdomain_id) ||
+        (subdomain_id == numbers::invalid_subdomain_id) ||
+        (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
+      ExcMessage(
+        "For parallel::distributed::Triangulation objects and "
+        "associated DoF handler objects, asking for any subdomain other "
+        "than the locally owned one does not make sense."));
 
     const hp::FECollection<DoFHandlerType::dimension,
                            DoFHandlerType::space_dimension> &fe_collection =
@@ -217,10 +217,10 @@ namespace DoFTools
     (void)n_dofs_row;
     (void)n_dofs_col;
 
-    Assert(sparsity.n_rows() == n_dofs_row,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs_row));
-    Assert(sparsity.n_cols() == n_dofs_col,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs_col));
+    DEAL_II_Assert(sparsity.n_rows() == n_dofs_row,
+                   ExcDimensionMismatch(sparsity.n_rows(), n_dofs_row));
+    DEAL_II_Assert(sparsity.n_cols() == n_dofs_col,
+                   ExcDimensionMismatch(sparsity.n_cols(), n_dofs_col));
 
     // TODO: Looks like wasteful memory management here
 
@@ -336,9 +336,9 @@ namespace DoFTools
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
 
-    AssertDimension(dof_to_boundary_mapping.size(), n_dofs);
-    AssertDimension(sparsity.n_rows(), dof.n_boundary_dofs());
-    AssertDimension(sparsity.n_cols(), dof.n_boundary_dofs());
+    DEAL_II_AssertDimension(dof_to_boundary_mapping.size(), n_dofs);
+    DEAL_II_AssertDimension(sparsity.n_rows(), dof.n_boundary_dofs());
+    DEAL_II_AssertDimension(sparsity.n_cols(), dof.n_boundary_dofs());
 #ifdef DEBUG
     if (sparsity.n_rows() != 0)
       {
@@ -349,7 +349,7 @@ namespace DoFTools
              ++i)
           if ((*i != numbers::invalid_dof_index) && (*i > max_element))
             max_element = *i;
-        AssertDimension(max_element, sparsity.n_rows() - 1);
+        DEAL_II_AssertDimension(max_element, sparsity.n_rows() - 1);
       };
 #endif
 
@@ -433,16 +433,16 @@ namespace DoFTools
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
 
-    AssertDimension(dof_to_boundary_mapping.size(), n_dofs);
-    Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
-             boundary_ids.end(),
-           typename DoFHandlerType::ExcInvalidBoundaryIndicator());
-    Assert(sparsity.n_rows() == dof.n_boundary_dofs(boundary_ids),
-           ExcDimensionMismatch(sparsity.n_rows(),
-                                dof.n_boundary_dofs(boundary_ids)));
-    Assert(sparsity.n_cols() == dof.n_boundary_dofs(boundary_ids),
-           ExcDimensionMismatch(sparsity.n_cols(),
-                                dof.n_boundary_dofs(boundary_ids)));
+    DEAL_II_AssertDimension(dof_to_boundary_mapping.size(), n_dofs);
+    DEAL_II_Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
+                     boundary_ids.end(),
+                   typename DoFHandlerType::ExcInvalidBoundaryIndicator());
+    DEAL_II_Assert(sparsity.n_rows() == dof.n_boundary_dofs(boundary_ids),
+                   ExcDimensionMismatch(sparsity.n_rows(),
+                                        dof.n_boundary_dofs(boundary_ids)));
+    DEAL_II_Assert(sparsity.n_cols() == dof.n_boundary_dofs(boundary_ids),
+                   ExcDimensionMismatch(sparsity.n_cols(),
+                                        dof.n_boundary_dofs(boundary_ids)));
 #ifdef DEBUG
     if (sparsity.n_rows() != 0)
       {
@@ -453,7 +453,7 @@ namespace DoFTools
              ++i)
           if ((*i != numbers::invalid_dof_index) && (*i > max_element))
             max_element = *i;
-        AssertDimension(max_element, sparsity.n_rows() - 1);
+        DEAL_II_AssertDimension(max_element, sparsity.n_rows() - 1);
       };
 #endif
 
@@ -499,21 +499,21 @@ namespace DoFTools
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
 
-    AssertDimension(sparsity.n_rows(), n_dofs);
-    AssertDimension(sparsity.n_cols(), n_dofs);
+    DEAL_II_AssertDimension(sparsity.n_rows(), n_dofs);
+    DEAL_II_AssertDimension(sparsity.n_cols(), n_dofs);
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel::distributed::Triangulation objects and "
-             "associated DoF handler objects, asking for any subdomain other "
-             "than the locally owned one does not make sense."));
+    DEAL_II_Assert(
+      (dof.get_triangulation().locally_owned_subdomain() ==
+       numbers::invalid_subdomain_id) ||
+        (subdomain_id == numbers::invalid_subdomain_id) ||
+        (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
+      ExcMessage(
+        "For parallel::distributed::Triangulation objects and "
+        "associated DoF handler objects, asking for any subdomain other "
+        "than the locally owned one does not make sense."));
 
     std::vector<types::global_dof_index> dofs_on_this_cell;
     std::vector<types::global_dof_index> dofs_on_other_cell;
@@ -670,12 +670,12 @@ namespace DoFTools
     const FiniteElement<dim, spacedim> &fe,
     const Table<2, Coupling> &          component_couplings)
   {
-    Assert(component_couplings.n_rows() == fe.n_components(),
-           ExcDimensionMismatch(component_couplings.n_rows(),
-                                fe.n_components()));
-    Assert(component_couplings.n_cols() == fe.n_components(),
-           ExcDimensionMismatch(component_couplings.n_cols(),
-                                fe.n_components()));
+    DEAL_II_Assert(component_couplings.n_rows() == fe.n_components(),
+                   ExcDimensionMismatch(component_couplings.n_rows(),
+                                        fe.n_components()));
+    DEAL_II_Assert(component_couplings.n_cols() == fe.n_components(),
+                   ExcDimensionMismatch(component_couplings.n_cols(),
+                                        fe.n_components()));
 
     const unsigned int n_dofs = fe.dofs_per_cell;
 
@@ -687,7 +687,7 @@ namespace DoFTools
           (fe.is_primitive(i) ?
              fe.system_to_component_index(i).first :
              fe.get_nonzero_components(i).first_selected_component());
-        Assert(ii < fe.n_components(), ExcInternalError());
+        DEAL_II_Assert(ii < fe.n_components(), ExcInternalError());
 
         for (unsigned int j = 0; j < n_dofs; ++j)
           {
@@ -695,7 +695,7 @@ namespace DoFTools
               (fe.is_primitive(j) ?
                  fe.system_to_component_index(j).first :
                  fe.get_nonzero_components(j).first_selected_component());
-            Assert(jj < fe.n_components(), ExcInternalError());
+            DEAL_II_Assert(jj < fe.n_components(), ExcInternalError());
 
             dof_couplings(i, j) = component_couplings(ii, jj);
           }
@@ -1045,10 +1045,10 @@ namespace DoFTools
           DoFTools::max_dofs_per_cell(dof));
 
         const unsigned int n_components = fe.n_components();
-        AssertDimension(int_mask.size(0), n_components);
-        AssertDimension(int_mask.size(1), n_components);
-        AssertDimension(flux_mask.size(0), n_components);
-        AssertDimension(flux_mask.size(1), n_components);
+        DEAL_II_AssertDimension(int_mask.size(0), n_components);
+        DEAL_II_AssertDimension(int_mask.size(1), n_components);
+        DEAL_II_AssertDimension(flux_mask.size(0), n_components);
+        DEAL_II_AssertDimension(flux_mask.size(1), n_components);
 
         // note that we also need to set the respective entries if flux_mask
         // says so. this is necessary since we need to consider all degrees of
@@ -1172,8 +1172,9 @@ namespace DoFTools
                                          .get_nonzero_components(i)
                                          .first_selected_component());
 
-                                  Assert(ii < cell->get_fe().n_components(),
-                                         ExcInternalError());
+                                  DEAL_II_Assert(
+                                    ii < cell->get_fe().n_components(),
+                                    ExcInternalError());
 
                                   for (unsigned int j = 0;
                                        j < sub_neighbor->get_fe().dofs_per_cell;
@@ -1189,9 +1190,9 @@ namespace DoFTools
                                              .get_nonzero_components(j)
                                              .first_selected_component());
 
-                                      Assert(jj < sub_neighbor->get_fe()
-                                                    .n_components(),
-                                             ExcInternalError());
+                                      DEAL_II_Assert(jj < sub_neighbor->get_fe()
+                                                            .n_components(),
+                                                     ExcInternalError());
 
                                       if ((flux_mask(ii, jj) == always) ||
                                           (flux_mask(ii, jj) == nonzero))
@@ -1228,8 +1229,8 @@ namespace DoFTools
                                      .get_nonzero_components(i)
                                      .first_selected_component());
 
-                              Assert(ii < cell->get_fe().n_components(),
-                                     ExcInternalError());
+                              DEAL_II_Assert(ii < cell->get_fe().n_components(),
+                                             ExcInternalError());
 
                               for (unsigned int j = 0;
                                    j < neighbor->get_fe().dofs_per_cell;
@@ -1244,8 +1245,9 @@ namespace DoFTools
                                          .get_nonzero_components(j)
                                          .first_selected_component());
 
-                                  Assert(jj < neighbor->get_fe().n_components(),
-                                         ExcInternalError());
+                                  DEAL_II_Assert(
+                                    jj < neighbor->get_fe().n_components(),
+                                    ExcInternalError());
 
                                   if ((flux_mask(ii, jj) == always) ||
                                       (flux_mask(ii, jj) == nonzero))
@@ -1313,31 +1315,31 @@ namespace DoFTools
     const unsigned int n_comp = dof.get_fe(0).n_components();
     (void)n_comp;
 
-    Assert(sparsity.n_rows() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
-    Assert(int_mask.n_rows() == n_comp,
-           ExcDimensionMismatch(int_mask.n_rows(), n_comp));
-    Assert(int_mask.n_cols() == n_comp,
-           ExcDimensionMismatch(int_mask.n_cols(), n_comp));
-    Assert(flux_mask.n_rows() == n_comp,
-           ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
-    Assert(flux_mask.n_cols() == n_comp,
-           ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
+    DEAL_II_Assert(sparsity.n_rows() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
+    DEAL_II_Assert(sparsity.n_cols() == n_dofs,
+                   ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
+    DEAL_II_Assert(int_mask.n_rows() == n_comp,
+                   ExcDimensionMismatch(int_mask.n_rows(), n_comp));
+    DEAL_II_Assert(int_mask.n_cols() == n_comp,
+                   ExcDimensionMismatch(int_mask.n_cols(), n_comp));
+    DEAL_II_Assert(flux_mask.n_rows() == n_comp,
+                   ExcDimensionMismatch(flux_mask.n_rows(), n_comp));
+    DEAL_II_Assert(flux_mask.n_cols() == n_comp,
+                   ExcDimensionMismatch(flux_mask.n_cols(), n_comp));
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
-    Assert((dof.get_triangulation().locally_owned_subdomain() ==
-            numbers::invalid_subdomain_id) ||
-             (subdomain_id == numbers::invalid_subdomain_id) ||
-             (subdomain_id ==
-              dof.get_triangulation().locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel::distributed::Triangulation objects and "
-             "associated DoF handler objects, asking for any subdomain other "
-             "than the locally owned one does not make sense."));
+    DEAL_II_Assert(
+      (dof.get_triangulation().locally_owned_subdomain() ==
+       numbers::invalid_subdomain_id) ||
+        (subdomain_id == numbers::invalid_subdomain_id) ||
+        (subdomain_id == dof.get_triangulation().locally_owned_subdomain()),
+      ExcMessage(
+        "For parallel::distributed::Triangulation objects and "
+        "associated DoF handler objects, asking for any subdomain other "
+        "than the locally owned one does not make sense."));
 
     internal::make_flux_sparsity_pattern(dof,
                                          sparsity,

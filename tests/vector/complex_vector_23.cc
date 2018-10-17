@@ -50,10 +50,10 @@ test(Vector<std::complex<double>> &v, Vector<std::complex<double>> &w)
   deallog << v * w << ' ' << w * v << ' ' << product << ' '
           << std::conj(product) << std::endl;
 
-  AssertThrow(v * w == product, ExcInternalError());
+  DEAL_II_AssertThrow(v * w == product, ExcInternalError());
 
   // also make sure that v*w=conj(w*v)
-  AssertThrow(w * v == std::conj(product), ExcInternalError());
+  DEAL_II_AssertThrow(w * v == std::conj(product), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

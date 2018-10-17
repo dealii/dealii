@@ -124,7 +124,7 @@ LaplaceKernelIntegration<2>::compute_SD_integral_on_cell(
   DoFHandler<2, 3>::active_cell_iterator &cell,
   const Point<3> &                        point)
 {
-  Assert(dst.size() == 2, ExcDimensionMismatch(dst.size(), 2));
+  DEAL_II_Assert(dst.size() == 2, ExcDimensionMismatch(dst.size(), 2));
   fe_values->reinit(cell);
   vector<DerivativeForm<1, 2, 3>> jacobians = fe_values->get_jacobians();
   vector<Tensor<1, 3>>            normals = fe_values->get_all_normal_vectors();

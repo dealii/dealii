@@ -58,7 +58,8 @@ check()
             << "</tr>\n";
 
     // we should be able to use ComponentMask or indices:
-    Assert(fe.get_sub_fe(mask) == fe.get_sub_fe(first, n), ExcInternalError());
+    DEAL_II_Assert(fe.get_sub_fe(mask) == fe.get_sub_fe(first, n),
+                   ExcInternalError());
   };
 
   deallog

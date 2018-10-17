@@ -3282,7 +3282,7 @@ test()
 
     // we should be at least under the given
     // residual limit
-    Assert(tmp.l2_norm() < tolerance, ExcInternalError());
+    DEAL_II_Assert(tmp.l2_norm() < tolerance, ExcInternalError());
   }
 }
 

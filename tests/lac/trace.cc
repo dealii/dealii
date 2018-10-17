@@ -44,5 +44,5 @@ main()
       }
 
   deallog << "Trace=" << m.trace() << std::endl;
-  Assert(m.trace() == tr, ExcInternalError());
+  DEAL_II_Assert(m.trace() == tr, ExcInternalError());
 }

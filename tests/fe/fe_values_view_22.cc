@@ -223,12 +223,13 @@ MixedElastoPlasticity<dim>::assemble_system()
         for (unsigned int m = 0; m < dim; m++)
           {
             for (unsigned int n = 0; n < dim; n++)
-              AssertThrow((local_values[q])[m][n] == stress_value,
-                          ExcInternalError());
+              DEAL_II_AssertThrow((local_values[q])[m][n] == stress_value,
+                                  ExcInternalError());
 
-            AssertThrow((local_divergences[q])[m] == 0.0, ExcInternalError());
-            AssertThrow(local_scalar_values[q] == gamma_value,
-                        ExcInternalError());
+            DEAL_II_AssertThrow((local_divergences[q])[m] == 0.0,
+                                ExcInternalError());
+            DEAL_II_AssertThrow(local_scalar_values[q] == gamma_value,
+                                ExcInternalError());
           }
       }
   }

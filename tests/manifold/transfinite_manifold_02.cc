@@ -74,7 +74,7 @@ do_test(const Triangulation<dim, spacedim> &tria)
                 make_array_view(points), make_array_view(weights));
             deallog << "Distance between cell manifold and face manifold: "
                     << (pref - p) << std::endl;
-            Assert((pref - p).norm() < 1e-6, ExcInternalError());
+            DEAL_II_Assert((pref - p).norm() < 1e-6, ExcInternalError());
             weights[0] = 0.55;
             weights[1] = 0.45;
             p    = cell->get_manifold().get_new_point(make_array_view(points),
@@ -83,7 +83,7 @@ do_test(const Triangulation<dim, spacedim> &tria)
               make_array_view(points), make_array_view(weights));
             deallog << "Distance between cell manifold and face manifold: "
                     << (pref - p) << std::endl;
-            Assert((pref - p).norm() < 1e-6, ExcInternalError());
+            DEAL_II_Assert((pref - p).norm() < 1e-6, ExcInternalError());
           }
     }
   deallog << std::endl;

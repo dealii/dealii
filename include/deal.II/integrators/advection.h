@@ -88,7 +88,7 @@ namespace LocalIntegrators
       const unsigned int t_dofs       = fetest.dofs_per_cell;
       const unsigned int n_components = fe.get_fe().n_components();
 
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       // If the size of the
       // velocity vectors is one,
       // then do not increment
@@ -97,11 +97,13 @@ namespace LocalIntegrators
 
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe.n_quadrature_points);
         }
 
-      AssertDimension(M.n(), n_dofs);
-      AssertDimension(M.m(), t_dofs);
+      DEAL_II_AssertDimension(M.n(), n_dofs);
+      DEAL_II_AssertDimension(M.m(), t_dofs);
 
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
         {
@@ -143,15 +145,18 @@ namespace LocalIntegrators
     {
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
-      Assert(input.size() == nq, ExcDimensionMismatch(input.size(), nq));
-      Assert(result.size() == n_dofs,
-             ExcDimensionMismatch(result.size(), n_dofs));
+      DEAL_II_Assert(input.size() == nq,
+                     ExcDimensionMismatch(input.size(), nq));
+      DEAL_II_Assert(result.size() == n_dofs,
+                     ExcDimensionMismatch(result.size(), n_dofs));
 
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe.n_quadrature_points);
         }
 
       for (unsigned k = 0; k < nq; ++k)
@@ -189,15 +194,19 @@ namespace LocalIntegrators
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_comp = fe.get_fe().n_components();
 
-      AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-      Assert(result.size() == n_dofs,
-             ExcDimensionMismatch(result.size(), n_dofs));
+      DEAL_II_AssertVectorVectorDimension(input,
+                                          n_comp,
+                                          fe.n_quadrature_points);
+      DEAL_II_Assert(result.size() == n_dofs,
+                     ExcDimensionMismatch(result.size(), n_dofs));
 
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe.n_quadrature_points);
         }
 
       for (unsigned k = 0; k < nq; ++k)
@@ -230,15 +239,18 @@ namespace LocalIntegrators
     {
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
-      Assert(input.size() == nq, ExcDimensionMismatch(input.size(), nq));
-      Assert(result.size() == n_dofs,
-             ExcDimensionMismatch(result.size(), n_dofs));
+      DEAL_II_Assert(input.size() == nq,
+                     ExcDimensionMismatch(input.size(), nq));
+      DEAL_II_Assert(result.size() == n_dofs,
+                     ExcDimensionMismatch(result.size(), n_dofs));
 
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe.n_quadrature_points);
         }
 
       for (unsigned k = 0; k < nq; ++k)
@@ -273,15 +285,19 @@ namespace LocalIntegrators
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_comp = fe.get_fe().n_components();
 
-      AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-      Assert(result.size() == n_dofs,
-             ExcDimensionMismatch(result.size(), n_dofs));
+      DEAL_II_AssertVectorVectorDimension(input,
+                                          n_comp,
+                                          fe.n_quadrature_points);
+      DEAL_II_Assert(result.size() == n_dofs,
+                     ExcDimensionMismatch(result.size(), n_dofs));
 
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe.n_quadrature_points);
         }
 
       for (unsigned k = 0; k < nq; ++k)
@@ -327,14 +343,16 @@ namespace LocalIntegrators
       const unsigned int n_dofs       = fe.dofs_per_cell;
       const unsigned int t_dofs       = fetest.dofs_per_cell;
       unsigned int       n_components = fe.get_fe().n_components();
-      AssertDimension(M.m(), n_dofs);
-      AssertDimension(M.n(), n_dofs);
+      DEAL_II_AssertDimension(M.m(), n_dofs);
+      DEAL_II_AssertDimension(M.n(), n_dofs);
 
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe.n_quadrature_points);
         }
 
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
@@ -401,14 +419,16 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(input.size(), fe.n_quadrature_points);
-      AssertDimension(data.size(), fe.n_quadrature_points);
+      DEAL_II_AssertDimension(input.size(), fe.n_quadrature_points);
+      DEAL_II_AssertDimension(data.size(), fe.n_quadrature_points);
 
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe.n_quadrature_points);
         }
 
 
@@ -470,14 +490,18 @@ namespace LocalIntegrators
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_comp = fe.get_fe().n_components();
 
-      AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
-      AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
+      DEAL_II_AssertVectorVectorDimension(input,
+                                          n_comp,
+                                          fe.n_quadrature_points);
+      DEAL_II_AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
 
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe.n_quadrature_points);
         }
 
 
@@ -544,11 +568,13 @@ namespace LocalIntegrators
       // index below with this factor to
       // have simpler data for constant
       // velocities.
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe1.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe1.n_quadrature_points);
         }
 
       for (unsigned k = 0; k < fe1.n_quadrature_points; ++k)
@@ -623,21 +649,23 @@ namespace LocalIntegrators
       const VectorSlice<const std::vector<std::vector<double>>> &velocity,
       const double                                               factor = 1.)
     {
-      Assert(fe1.get_fe().n_components() == 1,
-             ExcDimensionMismatch(fe1.get_fe().n_components(), 1));
-      Assert(fe2.get_fe().n_components() == 1,
-             ExcDimensionMismatch(fe2.get_fe().n_components(), 1));
+      DEAL_II_Assert(fe1.get_fe().n_components() == 1,
+                     ExcDimensionMismatch(fe1.get_fe().n_components(), 1));
+      DEAL_II_Assert(fe2.get_fe().n_components() == 1,
+                     ExcDimensionMismatch(fe2.get_fe().n_components(), 1));
 
       const unsigned int n1 = fe1.dofs_per_cell;
       // Multiply the quadrature point
       // index below with this factor to
       // have simpler data for constant
       // velocities.
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe1.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe1.n_quadrature_points);
         }
 
       for (unsigned k = 0; k < fe1.n_quadrature_points; ++k)
@@ -703,18 +731,24 @@ namespace LocalIntegrators
     {
       const unsigned int n_comp = fe1.get_fe().n_components();
       const unsigned int n1     = fe1.dofs_per_cell;
-      AssertVectorVectorDimension(input1, n_comp, fe1.n_quadrature_points);
-      AssertVectorVectorDimension(input2, n_comp, fe2.n_quadrature_points);
+      DEAL_II_AssertVectorVectorDimension(input1,
+                                          n_comp,
+                                          fe1.n_quadrature_points);
+      DEAL_II_AssertVectorVectorDimension(input2,
+                                          n_comp,
+                                          fe2.n_quadrature_points);
 
       // Multiply the quadrature point
       // index below with this factor to
       // have simpler data for constant
       // velocities.
-      AssertDimension(velocity.size(), dim);
+      DEAL_II_AssertDimension(velocity.size(), dim);
       const unsigned int v_increment = (velocity[0].size() == 1) ? 0 : 1;
       if (v_increment == 1)
         {
-          AssertVectorVectorDimension(velocity, dim, fe1.n_quadrature_points);
+          DEAL_II_AssertVectorVectorDimension(velocity,
+                                              dim,
+                                              fe1.n_quadrature_points);
         }
 
       for (unsigned k = 0; k < fe1.n_quadrature_points; ++k)

@@ -43,7 +43,7 @@ namespace Particles
   void
   ParticleAccessor<dim, spacedim>::write_data(void *&data) const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     particle->second.write_data(data);
   }
@@ -54,7 +54,7 @@ namespace Particles
   void
   ParticleAccessor<dim, spacedim>::set_location(const Point<spacedim> &new_loc)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     particle->second.set_location(new_loc);
   }
@@ -65,7 +65,7 @@ namespace Particles
   const Point<spacedim> &
   ParticleAccessor<dim, spacedim>::get_location() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     return particle->second.get_location();
   }
@@ -77,7 +77,7 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::set_reference_location(
     const Point<dim> &new_loc)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     particle->second.set_reference_location(new_loc);
   }
@@ -88,7 +88,7 @@ namespace Particles
   const Point<dim> &
   ParticleAccessor<dim, spacedim>::get_reference_location() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     return particle->second.get_reference_location();
   }
@@ -99,7 +99,7 @@ namespace Particles
   types::particle_index
   ParticleAccessor<dim, spacedim>::get_id() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     return particle->second.get_id();
   }
@@ -111,7 +111,7 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::set_property_pool(
     PropertyPool &new_property_pool)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     particle->second.set_property_pool(new_property_pool);
   }
@@ -122,7 +122,7 @@ namespace Particles
   bool
   ParticleAccessor<dim, spacedim>::has_properties() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     return particle->second.has_properties();
   }
@@ -134,7 +134,7 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::set_properties(
     const std::vector<double> &new_properties)
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     particle->second.set_properties(new_properties);
     return;
@@ -146,7 +146,7 @@ namespace Particles
   const ArrayView<const double>
   ParticleAccessor<dim, spacedim>::get_properties() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     return particle->second.get_properties();
   }
@@ -158,7 +158,7 @@ namespace Particles
   ParticleAccessor<dim, spacedim>::get_surrounding_cell(
     const Triangulation<dim, spacedim> &triangulation) const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     const typename Triangulation<dim, spacedim>::cell_iterator cell(
       &triangulation, particle->first.first, particle->first.second);
@@ -171,7 +171,7 @@ namespace Particles
   const ArrayView<double>
   ParticleAccessor<dim, spacedim>::get_properties()
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     return particle->second.get_properties();
   }
@@ -182,7 +182,7 @@ namespace Particles
   std::size_t
   ParticleAccessor<dim, spacedim>::serialized_size_in_bytes() const
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
 
     return particle->second.serialized_size_in_bytes();
   }
@@ -193,7 +193,7 @@ namespace Particles
   void
   ParticleAccessor<dim, spacedim>::next()
   {
-    Assert(particle != map->end(), ExcInternalError());
+    DEAL_II_Assert(particle != map->end(), ExcInternalError());
     ++particle;
   }
 
@@ -203,7 +203,7 @@ namespace Particles
   void
   ParticleAccessor<dim, spacedim>::prev()
   {
-    Assert(particle != map->begin(), ExcInternalError());
+    DEAL_II_Assert(particle != map->begin(), ExcInternalError());
     --particle;
   }
 

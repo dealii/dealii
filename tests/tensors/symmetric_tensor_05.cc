@@ -53,7 +53,7 @@ test()
         b[i][j] = tmp_ij;
       }
 
-  AssertThrow(a == b / 2, ExcInternalError());
+  DEAL_II_AssertThrow(a == b / 2, ExcInternalError());
 
   // try the same thing with scaled
   // tensors etc
@@ -69,7 +69,7 @@ test()
         b[i][j] = tmp_ij;
       }
 
-  AssertThrow(a == b / 4, ExcInternalError());
+  DEAL_II_AssertThrow(a == b / 4, ExcInternalError());
 }
 
 

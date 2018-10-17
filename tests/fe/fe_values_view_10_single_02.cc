@@ -83,9 +83,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                       << (d < dim - 1 || e < dim - 1 ? " " : "");
           deallog << std::endl;
 
-          Assert((scalar_values[q] - vector_values[q][c]).norm() <=
-                   1e-12 * scalar_values[q].norm(),
-                 ExcInternalError());
+          DEAL_II_Assert((scalar_values[q] - vector_values[q][c]).norm() <=
+                           1e-12 * scalar_values[q].norm(),
+                         ExcInternalError());
         }
     }
 }

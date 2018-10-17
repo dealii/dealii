@@ -220,7 +220,7 @@ namespace Utilities
     hyperbolic_rotation(const std::complex<NumberType> & /*f*/,
                         const std::complex<NumberType> & /*g*/)
     {
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
       std::array<NumberType, 3> res;
       return res;
     }
@@ -231,12 +231,12 @@ namespace Utilities
     std::array<NumberType, 3>
     hyperbolic_rotation(const NumberType &f, const NumberType &g)
     {
-      Assert(f != 0, ExcDivideByZero());
+      DEAL_II_Assert(f != 0, ExcDivideByZero());
       const NumberType tau = g / f;
-      AssertThrow(std::abs(tau) < 1.,
-                  ExcMessage(
-                    "real-valued Hyperbolic rotation does not exist for (" +
-                    std::to_string(f) + "," + std::to_string(g) + ")"));
+      DEAL_II_AssertThrow(
+        std::abs(tau) < 1.,
+        ExcMessage("real-valued Hyperbolic rotation does not exist for (" +
+                   std::to_string(f) + "," + std::to_string(g) + ")"));
       const NumberType u =
         std::copysign(std::sqrt((1. - tau) * (1. + tau)),
                       f); // <-- more stable than std::sqrt(1.-tau*tau)
@@ -254,7 +254,7 @@ namespace Utilities
     givens_rotation(const std::complex<NumberType> & /*f*/,
                     const std::complex<NumberType> & /*g*/)
     {
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
       std::array<NumberType, 3> res;
       return res;
     }
@@ -339,7 +339,7 @@ namespace Utilities
       // 1. Normalize input vector
       (*v)     = v0_;
       double a = v->l2_norm();
-      Assert(a != 0, ExcDivideByZero());
+      DEAL_II_Assert(a != 0, ExcDivideByZero());
       (*v) *= 1. / a;
 
       // 2. Compute f = Hv; a = f*v; f <- f - av; T(0,0)=a;
@@ -353,7 +353,7 @@ namespace Utilities
         {
           // 4. L2 norm of f
           const double b = f->l2_norm();
-          Assert(b != 0, ExcDivideByZero());
+          DEAL_II_Assert(b != 0, ExcDivideByZero());
           // 5. v0 <- v; v <- f/b
           *v0 = *v;
           *v  = *f;
@@ -369,8 +369,8 @@ namespace Utilities
           subdiagonal.push_back(b);
         }
 
-      Assert(diagonal.size() == k, ExcInternalError());
-      Assert(subdiagonal.size() == k - 1, ExcInternalError());
+      DEAL_II_Assert(diagonal.size() == k, ExcInternalError());
+      DEAL_II_Assert(subdiagonal.size() == k - 1, ExcInternalError());
 
       // Use Lapack dstev to get ||T||_2 norm, i.e. the largest eigenvalue
       // of T
@@ -389,7 +389,7 @@ namespace Utilities
            work.data(),
            &info);
 
-      Assert(info == 0, LAPACKSupport::ExcErrorCode("dstev", info));
+      DEAL_II_Assert(info == 0, LAPACKSupport::ExcErrorCode("dstev", info));
 
       if (eigenvalues != nullptr)
         {
@@ -416,17 +416,19 @@ namespace Utilities
     {
       const double a = unwanted_spectrum.first;
       const double b = unwanted_spectrum.second;
-      Assert(degree > 0, ExcMessage("Only positive degrees make sense."));
+      DEAL_II_Assert(degree > 0,
+                     ExcMessage("Only positive degrees make sense."));
 
       const bool scale = (a_L < std::numeric_limits<double>::infinity());
-      Assert(
+      DEAL_II_Assert(
         a < b,
         ExcMessage(
           "Lower bound of the unwanted spectrum should be smaller than the upper bound."));
 
-      Assert(a_L <= a || a_L >= b || !scale,
-             ExcMessage(
-               "Scaling point should be outside of the unwanted spectrum."));
+      DEAL_II_Assert(
+        a_L <= a || a_L >= b || !scale,
+        ExcMessage(
+          "Scaling point should be outside of the unwanted spectrum."));
 
       // Setup auxiliary vectors:
       typename VectorMemory<VectorType>::Pointer p_y(vector_memory);

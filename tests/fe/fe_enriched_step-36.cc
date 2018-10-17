@@ -77,7 +77,7 @@ template <int dim>
 double
 PotentialFunction<dim>::value(const Point<dim> &p, const unsigned int) const
 {
-  Assert(p.square() > 0., ExcDivideByZero());
+  DEAL_II_Assert(p.square() > 0., ExcDivideByZero());
   return -1.0 / std::sqrt(p.square());
 }
 
@@ -116,7 +116,7 @@ public:
   {
     Tensor<1, dim> dist = p - origin;
     const double   r    = dist.norm();
-    Assert(r > 0., ExcDivideByZero());
+    DEAL_II_Assert(r > 0., ExcDivideByZero());
     dist /= r;
     return -Z * std::exp(-Z * r) * dist;
   }
@@ -279,7 +279,7 @@ namespace Step36
         else if (cell->material_id() == pou_material_id)
           cell->set_active_fe_index(pou_fe_index);
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     GridTools::partition_triangulation(n_mpi_processes, triangulation);
@@ -547,7 +547,7 @@ namespace Step36
         fe_index(index) = cell->active_fe_index();
     }
 
-    Assert(cycle < 10, ExcNotImplemented());
+    DEAL_II_Assert(cycle < 10, ExcNotImplemented());
     if (this_mpi_process == 0)
       {
         std::string filename = "solution-";
@@ -624,7 +624,7 @@ namespace Step36
         assemble_system();
 
         const std::pair<unsigned int, double> res = solve();
-        AssertThrow(res.second < 5e-8, ExcInternalError());
+        DEAL_II_AssertThrow(res.second < 5e-8, ExcInternalError());
 
         estimate_error();
         // output_results(cycle);

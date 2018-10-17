@@ -88,7 +88,7 @@ test(const unsigned int block_size_i, const unsigned int block_size_j)
     for (unsigned int j = 0; j < sub_size; ++j)
       dest(i + offset_B.first, j + offset_B.second) -=
         full(offset_A.first + i, offset_A.second + j);
-  AssertThrow(dest.frobenius_norm() < 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(dest.frobenius_norm() < 1e-12, ExcInternalError());
 }
 
 

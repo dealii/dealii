@@ -209,9 +209,9 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcRateColumnAlreadyExists,
-                 std::string,
-                 << "Rate column <" << arg1 << "> does already exist.");
+  DEAL_II_DeclException1(ExcRateColumnAlreadyExists,
+                         std::string,
+                         << "Rate column <" << arg1 << "> does already exist.");
   //@}
 };
 

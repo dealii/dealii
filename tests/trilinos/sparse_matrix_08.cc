@@ -54,11 +54,11 @@ main(int argc, char **argv)
       {
         if ((i == 2) && (j == 1))
           {
-            AssertThrow(B.el(i, j) == 2, ExcInternalError());
+            DEAL_II_AssertThrow(B.el(i, j) == 2, ExcInternalError());
           }
         else
           {
-            AssertThrow(B.el(i, j) == 0, ExcInternalError());
+            DEAL_II_AssertThrow(B.el(i, j) == 0, ExcInternalError());
           }
       }
 
@@ -74,11 +74,11 @@ main(int argc, char **argv)
       {
         if ((i == 1) && (j == 2))
           {
-            AssertThrow(A.el(i, j) == 2, ExcInternalError());
+            DEAL_II_AssertThrow(A.el(i, j) == 2, ExcInternalError());
           }
         else
           {
-            AssertThrow(A.el(i, j) == 0, ExcInternalError());
+            DEAL_II_AssertThrow(A.el(i, j) == 0, ExcInternalError());
           }
       }
 

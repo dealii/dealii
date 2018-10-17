@@ -33,45 +33,46 @@ test()
   v.push_back("1");
   v.push_back(" -12");
   v.push_back("+125 ");
-  AssertThrow(Utilities::string_to_int(v).size() == 3, ExcInternalError());
+  DEAL_II_AssertThrow(Utilities::string_to_int(v).size() == 3,
+                      ExcInternalError());
   deallog << Utilities::string_to_int(v)[0] << std::endl;
   deallog << Utilities::string_to_int(v)[1] << std::endl;
   deallog << Utilities::string_to_int(v)[2] << std::endl;
 
   {
     const char *p = "alpha, beta, gamma ";
-    AssertThrow(Utilities::split_string_list(p).size() == 3,
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p)[0] == "alpha",
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p)[1] == "beta",
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p)[2] == "gamma",
-                ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p).size() == 3,
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p)[0] == "alpha",
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p)[1] == "beta",
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p)[2] == "gamma",
+                        ExcInternalError());
   }
 
   {
     const char *p = "alpha; beta; gamma ";
-    AssertThrow(Utilities::split_string_list(p, ';').size() == 3,
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p, ';')[0] == "alpha",
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p, ';')[1] == "beta",
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p, ';')[2] == "gamma",
-                ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p, ';').size() == 3,
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p, ';')[0] == "alpha",
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p, ';')[1] == "beta",
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p, ';')[2] == "gamma",
+                        ExcInternalError());
   }
 
   {
     const char *p = "alpha;; beta;; gamma ";
-    AssertThrow(Utilities::split_string_list(p, ";;").size() == 3,
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p, ";;")[0] == "alpha",
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p, ";;")[1] == "beta",
-                ExcInternalError());
-    AssertThrow(Utilities::split_string_list(p, ";;")[2] == "gamma",
-                ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p, ";;").size() == 3,
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p, ";;")[0] == "alpha",
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p, ";;")[1] == "beta",
+                        ExcInternalError());
+    DEAL_II_AssertThrow(Utilities::split_string_list(p, ";;")[2] == "gamma",
+                        ExcInternalError());
   }
 
   deallog << Utilities::generate_normal_random_number(13, 44) << ' ';

@@ -82,7 +82,7 @@ namespace MeshWorker
     DoFInfo<dim, spacedim, number> &,
     IntegrationInfo<dim, spacedim> &) const
   {
-    Assert(false, ExcPureFunction());
+    DEAL_II_Assert(false, ExcPureFunction());
   }
 
 
@@ -92,7 +92,7 @@ namespace MeshWorker
     DoFInfo<dim, spacedim, number> &,
     IntegrationInfo<dim, spacedim> &) const
   {
-    Assert(false, ExcPureFunction());
+    DEAL_II_Assert(false, ExcPureFunction());
   }
 
 
@@ -104,7 +104,7 @@ namespace MeshWorker
     IntegrationInfo<dim, spacedim> &,
     IntegrationInfo<dim, spacedim> &) const
   {
-    Assert(false, ExcPureFunction());
+    DEAL_II_Assert(false, ExcPureFunction());
   }
 
 

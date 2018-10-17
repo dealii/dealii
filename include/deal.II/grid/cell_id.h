@@ -239,10 +239,10 @@ operator>>(std::istream &is, CellId &cid)
   cid.coarse_cell_id = cellid;
   char dummy;
   is >> dummy;
-  Assert(dummy == '_', ExcMessage("invalid CellId"));
+  DEAL_II_Assert(dummy == '_', ExcMessage("invalid CellId"));
   is >> cid.n_child_indices;
   is >> dummy;
-  Assert(dummy == ':', ExcMessage("invalid CellId"));
+  DEAL_II_Assert(dummy == ':', ExcMessage("invalid CellId"));
 
   unsigned char value;
   for (unsigned int i = 0; i < cid.n_child_indices; ++i)

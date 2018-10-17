@@ -537,7 +537,7 @@ namespace Step22
   void
   StokesProblem<dim>::check_periodicity() const
   {
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
   }
 
   template <>
@@ -692,7 +692,7 @@ namespace Step22
                     pcout << vel_value_1(c) << "\t" << expected_vel(c) << "\t"
                           << vel_value_2(c) << std::endl;
                   pcout << std::endl;
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
                 }
             }
         }
@@ -746,7 +746,7 @@ namespace Step22
                     pcout << vel_value_1(c) << "\t" << expected_vel(c) << "\t"
                           << vel_value_2(c) << std::endl;
                   pcout << std::endl;
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
                 }
             }
         }

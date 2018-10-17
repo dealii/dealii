@@ -38,12 +38,13 @@ SparseILU<number>::initialize(const SparseMatrix<somenumber> &matrix,
 {
   SparseLUDecomposition<number>::initialize(matrix, data);
 
-  Assert(matrix.m() == matrix.n(), ExcNotQuadratic());
-  Assert(this->m() == this->n(), ExcNotQuadratic());
-  Assert(matrix.m() == this->m(), ExcDimensionMismatch(matrix.m(), this->m()));
+  DEAL_II_Assert(matrix.m() == matrix.n(), ExcNotQuadratic());
+  DEAL_II_Assert(this->m() == this->n(), ExcNotQuadratic());
+  DEAL_II_Assert(matrix.m() == this->m(),
+                 ExcDimensionMismatch(matrix.m(), this->m()));
 
-  Assert(data.strengthen_diagonal >= 0,
-         ExcInvalidStrengthening(data.strengthen_diagonal));
+  DEAL_II_Assert(data.strengthen_diagonal >= 0,
+                 ExcInvalidStrengthening(data.strengthen_diagonal));
 
   this->strengthen_diagonal = data.strengthen_diagonal;
   this->prebuild_lower_bound();
@@ -117,12 +118,12 @@ SparseILU<number>::initialize(const SparseMatrix<somenumber> &matrix,
       // element, i.e. that jrow==k. however, we store the diagonal element at
       // the front, so jrow must actually be larger than k or j is already in
       // the next row
-      Assert((jrow > k) || (j == ia[k + 1]), ExcInternalError());
+      DEAL_II_Assert((jrow > k) || (j == ia[k + 1]), ExcInternalError());
 
       // now we have to deal with the diagonal element. in the book it is
       // located at position 'j', but here we use the convention of storing
       // the diagonal element first, so instead of j we use uptr[k]=ia[k]
-      Assert(luval[ia[k]] != 0, ExcZeroPivot(k));
+      DEAL_II_Assert(luval[ia[k]] != 0, ExcZeroPivot(k));
 
       luval[ia[k]] = 1. / luval[ia[k]];
 
@@ -139,9 +140,10 @@ void
 SparseILU<number>::vmult(Vector<somenumber> &      dst,
                          const Vector<somenumber> &src) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
-  Assert(dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
+  DEAL_II_Assert(dst.size() == src.size(),
+                 ExcDimensionMismatch(dst.size(), src.size()));
+  DEAL_II_Assert(dst.size() == this->m(),
+                 ExcDimensionMismatch(dst.size(), this->m()));
 
   const size_type          N = dst.size();
   const std::size_t *const rowstart_indices =
@@ -221,9 +223,10 @@ void
 SparseILU<number>::Tvmult(Vector<somenumber> &      dst,
                           const Vector<somenumber> &src) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
-  Assert(dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
+  DEAL_II_Assert(dst.size() == src.size(),
+                 ExcDimensionMismatch(dst.size(), src.size()));
+  DEAL_II_Assert(dst.size() == this->m(),
+                 ExcDimensionMismatch(dst.size(), this->m()));
 
   const size_type          N = dst.size();
   const std::size_t *const rowstart_indices =

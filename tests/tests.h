@@ -119,7 +119,7 @@ filter_out_xml_key(std::istream &in, const std::string &key, std::ostream &out)
 PetscReal
 get_real_assert_zero_imag(const PETScWrappers::internal::VectorReference &a)
 {
-  Assert(a.imag() == 0.0, ExcInternalError());
+  DEAL_II_Assert(a.imag() == 0.0, ExcInternalError());
   return a.real();
 }
 #endif
@@ -128,7 +128,7 @@ template <typename number>
 number
 get_real_assert_zero_imag(const std::complex<number> &a)
 {
-  Assert(a.imag() == 0.0, ExcInternalError());
+  DEAL_II_Assert(a.imag() == 0.0, ExcInternalError());
   return a.real();
 }
 
@@ -251,7 +251,7 @@ template <int dim>
 inline Point<dim>
 random_point(const double &min = 0.0, const double &max = 1.0)
 {
-  Assert(max >= min, ExcMessage("Make sure max>=min"));
+  DEAL_II_Assert(max >= min, ExcMessage("Make sure max>=min"));
   Point<dim> p;
   for (unsigned int i = 0; i < dim; ++i)
     p[i] = random_value(min, max);
@@ -266,7 +266,7 @@ void
 cat_file(const char *filename)
 {
   std::ifstream in(filename);
-  Assert(in, dealii::ExcIO());
+  DEAL_II_Assert(in, dealii::ExcIO());
 
   while (in)
     {
@@ -293,7 +293,7 @@ sort_file_contents(const std::string &filename)
 {
   int error = std::system(
     (std::string("LC_ALL=C sort ") + filename + " -o " + filename).c_str());
-  AssertThrow(error == 0, ExcInternalError());
+  DEAL_II_AssertThrow(error == 0, ExcInternalError());
 }
 
 
@@ -304,8 +304,8 @@ template <class IT>
 unsigned int
 checksum(const IT &begin, const IT &end)
 {
-  AssertThrow(sizeof(unsigned int) == 4, ExcInternalError());
-  AssertThrow(sizeof(*begin) == 1, ExcInternalError());
+  DEAL_II_AssertThrow(sizeof(unsigned int) == 4, ExcInternalError());
+  DEAL_II_AssertThrow(sizeof(*begin) == 1, ExcInternalError());
 
   unsigned int a = 1;
   unsigned int b = 0;
@@ -435,9 +435,9 @@ namespace
     // I don't quite understand petsc and it looks like
     // stageLog->stageInfo->classLog->classInfo[i].id is always -1, so we look
     // it up in stageLog->classLog, make sure it has the same number of entries:
-    Assert(stageLog->stageInfo->classLog->numClasses ==
-             stageLog->classLog->numClasses,
-           dealii::ExcInternalError());
+    DEAL_II_Assert(stageLog->stageInfo->classLog->numClasses ==
+                     stageLog->classLog->numClasses,
+                   dealii::ExcInternalError());
 
     bool errors = false;
     for (int i = 0; i < stageLog->stageInfo->classLog->numClasses; ++i)
@@ -506,7 +506,7 @@ mpi_initlog(const bool                    console = false,
   (void)console;
   (void)flags;
   // can't use this function if not using MPI
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
 #endif
 }
 
@@ -547,7 +547,7 @@ struct MPILogInitAll
 #else
     (void)console;
     // can't use this function if not using MPI
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
 #endif
   }
 
@@ -585,7 +585,7 @@ struct MPILogInitAll
 
 #else
     // can't use this function if not using MPI
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
 #endif
   }
 };
@@ -617,8 +617,8 @@ new_tbb_assertion_handler(const char *file,
 {
   // Print out the original assertion message
   std::cerr << "TBB assertion:" << std::endl;
-  std::cerr << "Assertion " << expr << " failed on line " << line << " of file "
-            << file << std::endl;
+  std::cerr << "DEAL_II_Assertion " << expr << " failed on line " << line
+            << " of file " << file << std::endl;
   std::cerr << "Detailed description: " << comment << std::endl;
 
   // Reenable abort and stacktraces:
@@ -626,12 +626,12 @@ new_tbb_assertion_handler(const char *file,
   deal_II_exceptions::internals::show_stacktrace          = true;
 
   // And abort with a deal.II exception:
-  Assert(false, ExcMessage("TBB Exception, see above"));
+  DEAL_II_Assert(false, ExcMessage("TBB Exception, see above"));
 }
 
-struct SetTBBAssertionHandler
+struct SetTBBDEAL_II_AssertionHandler
 {
-  SetTBBAssertionHandler()
+  SetTBBDEAL_II_AssertionHandler()
   {
     ::tbb::set_assertion_handler(new_tbb_assertion_handler);
   }

@@ -147,8 +147,8 @@ namespace Step22
   ExactSolution<dim>::value(const Point<dim> & p,
                             const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
 
     double x = p[0];
     double y = p[1];
@@ -181,8 +181,8 @@ namespace Step22
   ExactSolution<dim>::gradient(const Point<dim> & p,
                                const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
 
     double x = p[0];
     double y = p[1];
@@ -231,8 +231,8 @@ namespace Step22
   ExactSolution<dim>::laplacian(const Point<dim> & p,
                                 const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
 
     double x = p[0];
     double y = p[1];
@@ -304,8 +304,8 @@ namespace Step22
   RightHandSide<dim>::value(const Point<dim> & p,
                             const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
     if (component == dim)
       return 0;
     // grad p -laplace u
@@ -829,7 +829,7 @@ namespace Step22
   void
   StokesProblem<dim>::run()
   {
-    Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
     GridGenerator::hyper_cube(triangulation);
     triangulation.refine_global(1);
 

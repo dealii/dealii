@@ -172,39 +172,39 @@ public:
     , is_null_operator(false)
   {
     vmult = [](Range &, const Domain &) {
-      Assert(false,
-             ExcMessage("Uninitialized LinearOperator<Range, "
-                        "Domain>::vmult called"));
+      DEAL_II_Assert(false,
+                     ExcMessage("Uninitialized LinearOperator<Range, "
+                                "Domain>::vmult called"));
     };
 
     vmult_add = [](Range &, const Domain &) {
-      Assert(false,
-             ExcMessage("Uninitialized LinearOperator<Range, "
-                        "Domain>::vmult_add called"));
+      DEAL_II_Assert(false,
+                     ExcMessage("Uninitialized LinearOperator<Range, "
+                                "Domain>::vmult_add called"));
     };
 
     Tvmult = [](Domain &, const Range &) {
-      Assert(false,
-             ExcMessage("Uninitialized LinearOperator<Range, "
-                        "Domain>::Tvmult called"));
+      DEAL_II_Assert(false,
+                     ExcMessage("Uninitialized LinearOperator<Range, "
+                                "Domain>::Tvmult called"));
     };
 
     Tvmult_add = [](Domain &, const Range &) {
-      Assert(false,
-             ExcMessage("Uninitialized LinearOperator<Range, "
-                        "Domain>::Tvmult_add called"));
+      DEAL_II_Assert(false,
+                     ExcMessage("Uninitialized LinearOperator<Range, "
+                                "Domain>::Tvmult_add called"));
     };
 
     reinit_range_vector = [](Range &, bool) {
-      Assert(false,
-             ExcMessage("Uninitialized LinearOperator<Range, "
-                        "Domain>::reinit_range_vector method called"));
+      DEAL_II_Assert(false,
+                     ExcMessage("Uninitialized LinearOperator<Range, "
+                                "Domain>::reinit_range_vector method called"));
     };
 
     reinit_domain_vector = [](Domain &, bool) {
-      Assert(false,
-             ExcMessage("Uninitialized LinearOperator<Range, "
-                        "Domain>::reinit_domain_vector method called"));
+      DEAL_II_Assert(false,
+                     ExcMessage("Uninitialized LinearOperator<Range, "
+                                "Domain>::reinit_domain_vector method called"));
     };
   }
 

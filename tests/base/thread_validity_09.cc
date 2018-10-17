@@ -71,7 +71,7 @@ main()
     ;
 
   for (unsigned int i = 0; i < sz; ++i)
-    AssertThrow(p[i] == 0, ExcInternalError());
+    DEAL_II_AssertThrow(p[i] == 0, ExcInternalError());
 
   delete[] p;
 }

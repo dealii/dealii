@@ -302,11 +302,11 @@ public:
   connect_re_orthogonalization_slot(const std::function<void(int)> &slot);
 
 
-  DeclException1(ExcTooFewTmpVectors,
-                 int,
-                 << "The number of temporary vectors you gave (" << arg1
-                 << ") is too small. It should be at least 10 for "
-                 << "any results, and much more for reasonable ones.");
+  DEAL_II_DeclException1(ExcTooFewTmpVectors,
+                         int,
+                         << "The number of temporary vectors you gave (" << arg1
+                         << ") is too small. It should be at least 10 for "
+                         << "any results, and much more for reasonable ones.");
 
 protected:
   /**
@@ -547,9 +547,9 @@ namespace internal
     inline VectorType &TmpVectors<VectorType>::
                        operator[](const unsigned int i) const
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      DEAL_II_Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
 
-      Assert(data[i] != nullptr, ExcNotInitialized());
+      DEAL_II_Assert(data[i] != nullptr, ExcNotInitialized());
       return *data[i];
     }
 
@@ -560,7 +560,7 @@ namespace internal
     TmpVectors<VectorType>::operator()(const unsigned int i,
                                        const VectorType & temp)
     {
-      Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
+      DEAL_II_Assert(i < data.size(), ExcIndexRange(i, 0, data.size()));
       if (data[i] == nullptr)
         {
           data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
@@ -604,9 +604,9 @@ inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
   , use_default_residual(use_default_residual)
   , force_re_orthogonalization(force_re_orthogonalization)
 {
-  Assert(3 <= max_n_tmp_vectors,
-         ExcMessage("SolverGMRES needs at least three "
-                    "temporary vectors."));
+  DEAL_II_Assert(3 <= max_n_tmp_vectors,
+                 ExcMessage("SolverGMRES needs at least three "
+                            "temporary vectors."));
 }
 
 
@@ -669,7 +669,7 @@ SolverGMRES<VectorType>::modified_gram_schmidt(
   bool &                                    reorthogonalize,
   const boost::signals2::signal<void(int)> &reorthogonalize_signal)
 {
-  Assert(dim > 0, ExcInternalError());
+  DEAL_II_Assert(dim > 0, ExcInternalError());
   const unsigned int inner_iteration = dim - 1;
 
   // need initial norm for detection of re-orthogonalization, see below
@@ -1078,8 +1078,9 @@ SolverGMRES<VectorType>::solve(const MatrixType &        A,
     krylov_space_signal(tmp_vectors);
 
   // in case of failure: throw exception
-  AssertThrow(iteration_state == SolverControl::success,
-              SolverControl::NoConvergence(accumulated_iterations, last_res));
+  DEAL_II_AssertThrow(iteration_state == SolverControl::success,
+                      SolverControl::NoConvergence(accumulated_iterations,
+                                                   last_res));
 }
 
 
@@ -1165,7 +1166,7 @@ SolverGMRES<VectorType>::criterion()
 {
   // dummy implementation. this function is not needed for the present
   // implementation of gmres
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
   return 0;
 }
 
@@ -1289,8 +1290,9 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
 
   // in case of failure: throw exception
   if (iteration_state != SolverControl::success)
-    AssertThrow(false,
-                SolverControl::NoConvergence(accumulated_iterations, res));
+    DEAL_II_AssertThrow(false,
+                        SolverControl::NoConvergence(accumulated_iterations,
+                                                     res));
 }
 
 #endif // DOXYGEN

@@ -85,7 +85,8 @@ test()
   // Trilinos produces a 0 instead of a 7 here. Why?
   if (myid == 0)
     {
-      Assert(test(locally_owned.nth_index_in_set(5)) == 7, ExcInternalError());
+      DEAL_II_Assert(test(locally_owned.nth_index_in_set(5)) == 7,
+                     ExcInternalError());
     }
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

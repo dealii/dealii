@@ -83,7 +83,7 @@ test()
 
   // we should now have only 1s in the new_solution vector
   for (unsigned int i = 0; i < new_solution.size(); ++i)
-    AssertThrow(new_solution[i] == 1, ExcInternalError());
+    DEAL_II_AssertThrow(new_solution[i] == 1, ExcInternalError());
 
   // we are good if we made it to here
   deallog << "OK" << std::endl;

@@ -825,10 +825,10 @@ Tensor<0, dim, Number>::end_raw() const
 template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::operator Number &()
 {
-  // We cannot use Assert inside a CUDA kernel
+  // We cannot use DEAL_II_Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+  DEAL_II_Assert(
+    dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
 #endif
   return value;
 }
@@ -838,10 +838,10 @@ template <int dim, typename Number>
 inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number>::
                              operator const Number &() const
 {
-  // We cannot use Assert inside a CUDA kernel
+  // We cannot use DEAL_II_Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+  DEAL_II_Assert(
+    dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
 #endif
   return value;
 }
@@ -884,11 +884,12 @@ inline bool
 Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
 {
 #ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
-  Assert(!(std::is_same<Number, adouble>::value ||
-           std::is_same<OtherNumber, adouble>::value),
-         ExcMessage(
-           "The Tensor equality operator for ADOL-C taped numbers has not yet "
-           "been extended to support advanced branching."));
+  DEAL_II_Assert(
+    !(std::is_same<Number, adouble>::value ||
+      std::is_same<OtherNumber, adouble>::value),
+    ExcMessage(
+      "The Tensor equality operator for ADOL-C taped numbers has not yet "
+      "been extended to support advanced branching."));
 #endif
 
   return numbers::values_are_equal(value, p.value);
@@ -956,8 +957,8 @@ template <int dim, typename Number>
 inline typename Tensor<0, dim, Number>::real_type
 Tensor<0, dim, Number>::norm() const
 {
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+  DEAL_II_Assert(
+    dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
   return numbers::NumberTraits<Number>::abs(value);
 }
 
@@ -966,10 +967,10 @@ template <int dim, typename Number>
 inline typename Tensor<0, dim, Number>::real_type DEAL_II_CUDA_HOST_DEV
                                                   Tensor<0, dim, Number>::norm_square() const
 {
-  // We cannot use Assert inside a CUDA kernel
+  // We cannot use DEAL_II_Assert inside a CUDA kernel
 #ifndef __CUDA_ARCH__
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+  DEAL_II_Assert(
+    dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
 #endif
   return numbers::NumberTraits<Number>::abs_square(value);
 }
@@ -981,8 +982,8 @@ inline void
 Tensor<0, dim, Number>::unroll_recursion(Vector<OtherNumber> &result,
                                          unsigned int &       index) const
 {
-  Assert(dim != 0,
-         ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
+  DEAL_II_Assert(
+    dim != 0, ExcMessage("Cannot unroll an object of type Tensor<0,0,Number>"));
   result[index] = value;
   ++index;
 }
@@ -1070,9 +1071,9 @@ namespace internal
                                                                  const unsigned int i,
                                                                  std::integral_constant<int, dim>)
     {
-      // We cannot use Assert in a CUDA kernel
+      // We cannot use DEAL_II_Assert in a CUDA kernel
 #ifndef __CUDA_ARCH__
-      Assert(i < dim, ExcIndexRange(i, 0, dim));
+      DEAL_II_Assert(i < dim, ExcIndexRange(i, 0, dim));
 #endif
       return values[i];
     }
@@ -1084,7 +1085,7 @@ namespace internal
               const unsigned int,
               std::integral_constant<int, 0>)
     {
-      Assert(
+      DEAL_II_Assert(
         false,
         ExcMessage(
           "Cannot access elements of an object of type Tensor<rank,0,Number>."));
@@ -1119,8 +1120,9 @@ template <int rank_, int dim, typename Number>
 inline const Number &Tensor<rank_, dim, Number>::
                      operator[](const TableIndices<rank_> &indices) const
 {
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+  DEAL_II_Assert(dim != 0,
+                 ExcMessage(
+                   "Cannot access an object of type Tensor<rank_,0,Number>"));
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1131,8 +1133,9 @@ template <int rank_, int dim, typename Number>
 inline Number &Tensor<rank_, dim, Number>::
                operator[](const TableIndices<rank_> &indices)
 {
-  Assert(dim != 0,
-         ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+  DEAL_II_Assert(dim != 0,
+                 ExcMessage(
+                   "Cannot access an object of type Tensor<rank_,0,Number>"));
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1192,8 +1195,8 @@ template <int rank_, int dim, typename Number>
 inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator=(const Number &d)
 {
-  Assert(numbers::value_is_zero(d),
-         ExcMessage("Only assignment with zero is allowed"));
+  DEAL_II_Assert(numbers::value_is_zero(d),
+                 ExcMessage("Only assignment with zero is allowed"));
   (void)d;
 
   for (unsigned int i = 0; i < dim; ++i)
@@ -1322,8 +1325,8 @@ template <typename OtherNumber>
 inline void
 Tensor<rank_, dim, Number>::unroll(Vector<OtherNumber> &result) const
 {
-  AssertDimension(result.size(),
-                  (Utilities::fixed_power<rank_, unsigned int>(dim)));
+  DEAL_II_AssertDimension(result.size(),
+                          (Utilities::fixed_power<rank_, unsigned int>(dim)));
 
   unsigned int index = 0;
   unroll_recursion(result, index);
@@ -1371,7 +1374,7 @@ namespace internal
   inline unsigned int
   mod<0>(const unsigned int x)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
     return x;
   }
 
@@ -1386,7 +1389,7 @@ namespace internal
   inline unsigned int
   div<0>(const unsigned int x)
   {
-    Assert(false, ExcInternalError());
+    DEAL_II_Assert(false, ExcInternalError());
     return x;
   }
 
@@ -1398,8 +1401,8 @@ template <int rank_, int dim, typename Number>
 inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
 {
-  Assert(i < n_independent_components,
-         ExcIndexRange(i, 0, n_independent_components));
+  DEAL_II_Assert(i < n_independent_components,
+                 ExcIndexRange(i, 0, n_independent_components));
 
   TableIndices<rank_> indices;
 
@@ -1409,7 +1412,7 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
       indices[r] = internal::mod<dim>(remainder);
       remainder  = internal::div<dim>(remainder);
     }
-  Assert(remainder == 0, ExcInternalError());
+  DEAL_II_Assert(remainder == 0, ExcInternalError());
 
   return indices;
 }
@@ -1806,12 +1809,12 @@ inline DEAL_II_ALWAYS_INLINE
   contract(const Tensor<rank_1, dim, Number> &     src1,
            const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  Assert(0 <= index_1 && index_1 < rank_1,
-         ExcMessage(
-           "The specified index_1 must lie within the range [0,rank_1)"));
-  Assert(0 <= index_2 && index_2 < rank_2,
-         ExcMessage(
-           "The specified index_2 must lie within the range [0,rank_2)"));
+  DEAL_II_Assert(
+    0 <= index_1 && index_1 < rank_1,
+    ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
+  DEAL_II_Assert(
+    0 <= index_2 && index_2 < rank_2,
+    ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
 
   using namespace TensorAccessors;
   using namespace TensorAccessors::internal;
@@ -1880,22 +1883,22 @@ inline
   double_contract(const Tensor<rank_1, dim, Number> &     src1,
                   const Tensor<rank_2, dim, OtherNumber> &src2)
 {
-  Assert(0 <= index_1 && index_1 < rank_1,
-         ExcMessage(
-           "The specified index_1 must lie within the range [0,rank_1)"));
-  Assert(0 <= index_3 && index_3 < rank_1,
-         ExcMessage(
-           "The specified index_3 must lie within the range [0,rank_1)"));
-  Assert(index_1 != index_3,
-         ExcMessage("index_1 and index_3 must not be the same"));
-  Assert(0 <= index_2 && index_2 < rank_2,
-         ExcMessage(
-           "The specified index_2 must lie within the range [0,rank_2)"));
-  Assert(0 <= index_4 && index_4 < rank_2,
-         ExcMessage(
-           "The specified index_4 must lie within the range [0,rank_2)"));
-  Assert(index_2 != index_4,
-         ExcMessage("index_2 and index_4 must not be the same"));
+  DEAL_II_Assert(
+    0 <= index_1 && index_1 < rank_1,
+    ExcMessage("The specified index_1 must lie within the range [0,rank_1)"));
+  DEAL_II_Assert(
+    0 <= index_3 && index_3 < rank_1,
+    ExcMessage("The specified index_3 must lie within the range [0,rank_1)"));
+  DEAL_II_Assert(index_1 != index_3,
+                 ExcMessage("index_1 and index_3 must not be the same"));
+  DEAL_II_Assert(
+    0 <= index_2 && index_2 < rank_2,
+    ExcMessage("The specified index_2 must lie within the range [0,rank_2)"));
+  DEAL_II_Assert(
+    0 <= index_4 && index_4 < rank_2,
+    ExcMessage("The specified index_4 must lie within the range [0,rank_2)"));
+  DEAL_II_Assert(index_2 != index_4,
+                 ExcMessage("index_2 and index_4 must not be the same"));
 
   using namespace TensorAccessors;
   using namespace TensorAccessors::internal;
@@ -2057,7 +2060,7 @@ template <int dim, typename Number>
 inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
                              cross_product_2d(const Tensor<1, dim, Number> &src)
 {
-  Assert(dim == 2, ExcInternalError());
+  DEAL_II_Assert(dim == 2, ExcInternalError());
 
   Tensor<1, dim, Number> result;
 
@@ -2083,7 +2086,7 @@ inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
                              cross_product_3d(const Tensor<1, dim, Number> &src1,
                                               const Tensor<1, dim, Number> &src2)
 {
-  Assert(dim == 3, ExcInternalError());
+  DEAL_II_Assert(dim == 3, ExcInternalError());
 
   Tensor<1, dim, Number> result;
 
@@ -2180,7 +2183,7 @@ invert(const Tensor<2, dim, Number> &)
   // if desired, take over the
   // inversion of a 4x4 tensor
   // from the FullMatrix
-  AssertThrow(false, ExcNotImplemented());
+  DEAL_II_AssertThrow(false, ExcNotImplemented());
 
   return Tensor<2, dim, Number>(return_tensor);
 }

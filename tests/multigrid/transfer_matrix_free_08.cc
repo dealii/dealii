@@ -75,7 +75,8 @@ check(const FiniteElement<dim> &fe)
 
   LinearAlgebra::distributed::Vector<double> vrefdouble;
   LinearAlgebra::distributed::Vector<Number> vref;
-  AssertDimension(mgdof.n_dofs(tr.n_global_levels() - 1), mgdof.n_dofs());
+  DEAL_II_AssertDimension(mgdof.n_dofs(tr.n_global_levels() - 1),
+                          mgdof.n_dofs());
   vrefdouble.reinit(mgdof.n_dofs());
   VectorTools::interpolate(mgdof,
                            Functions::Monomial<dim>(exponents_monomial),

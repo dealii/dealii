@@ -67,16 +67,18 @@ main()
     }
   hp_dof_handler.distribute_dofs(fe_collection);
 
-  Assert(DoFTools::locally_owned_dofs_per_subdomain(hp_dof_handler).size() ==
-           n_subdomains,
-         ExcDimensionMismatch(
-           DoFTools::locally_owned_dofs_per_subdomain(hp_dof_handler).size(),
-           n_subdomains));
-  Assert(DoFTools::locally_relevant_dofs_per_subdomain(hp_dof_handler).size() ==
-           n_subdomains,
-         ExcDimensionMismatch(
-           DoFTools::locally_relevant_dofs_per_subdomain(hp_dof_handler).size(),
-           n_subdomains));
+  DEAL_II_Assert(
+    DoFTools::locally_owned_dofs_per_subdomain(hp_dof_handler).size() ==
+      n_subdomains,
+    ExcDimensionMismatch(
+      DoFTools::locally_owned_dofs_per_subdomain(hp_dof_handler).size(),
+      n_subdomains));
+  DEAL_II_Assert(
+    DoFTools::locally_relevant_dofs_per_subdomain(hp_dof_handler).size() ==
+      n_subdomains,
+    ExcDimensionMismatch(
+      DoFTools::locally_relevant_dofs_per_subdomain(hp_dof_handler).size(),
+      n_subdomains));
 
   deallog << "OK" << std::endl;
 }

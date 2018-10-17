@@ -122,7 +122,8 @@ test_real_to_unit_cell()
             map.transform_unit_to_real_cell(cell, unit_points[i]);
           const Point<dim> p_unit = map.transform_real_to_unit_cell(cell, p);
 
-          Assert(unit_points[i].distance(p_unit) < 1e-10, ExcInternalError());
+          DEAL_II_Assert(unit_points[i].distance(p_unit) < 1e-10,
+                         ExcInternalError());
         }
     }
 

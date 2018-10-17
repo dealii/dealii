@@ -40,7 +40,7 @@ checkTvmult_add(FullMatrix<number> &A,
   P.Tvmult_add(O, V);
 
   // Check the dimensions of the result matrix
-  Assert(A.m() == O.size(), ExcInternalError());
+  DEAL_II_Assert(A.m() == O.size(), ExcInternalError());
   deallog << "Dimensions of result vector verified" << std::endl;
 
   // Verifying results with Method 2: O=O+A Transpose*V
@@ -50,7 +50,7 @@ checkTvmult_add(FullMatrix<number> &A,
 
   A.Tvmult_add(O_, V);
 
-  Assert(O == O_, ExcInternalError());
+  DEAL_II_Assert(O == O_, ExcInternalError());
   deallog << "Result vector data verified" << std::endl;
 
   for (unsigned int i = 0; i < O.size(); ++i)

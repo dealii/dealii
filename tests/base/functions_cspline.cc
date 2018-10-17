@@ -64,7 +64,7 @@ check()
       }
   }
 
-  AssertThrow(
+  DEAL_II_AssertThrow(
     std::equal(y_native.begin(), y_native.end(), y_dealii.begin()),
     ExcMessage("deal.II implementation of CSpline does not match native GSL."));
 

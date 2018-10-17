@@ -157,7 +157,7 @@ check()
     {
       cat_file((output_basename + ".xdmf").c_str());
       std::ifstream f((output_basename + ".h5").c_str());
-      AssertThrow(f.good(), ExcIO());
+      DEAL_II_AssertThrow(f.good(), ExcIO());
     }
 
   deallog << std::flush;

@@ -20,7 +20,7 @@
 #17 0x00007fffebfde43b in sc_abort_verbose (
     filename=0x7fffec2ef7c8
 "/scratch/p4estbuild/p4est-0.3.1.55-67fe1/src/p4est_bits.c", lineno=756,
-msg=0x7fffec2efc07 "Assertion 'q->level > 0'") at
+msg=0x7fffec2efc07 "DEAL_II_Assertion 'q->level > 0'") at
 /scratch/p4estbuild/p4est-0.3.1.55-67fe1/sc/src/sc.c:603 #18 0x00007fffec2a2d4b
 in p8est_quadrant_parent (q=0x834670, r=0x833a50) at
 /scratch/p4estbuild/p4est-0.3.1.55-67fe1/src/p4est_bits.c:756 #19

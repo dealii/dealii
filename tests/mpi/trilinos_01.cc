@@ -74,7 +74,7 @@ test()
           std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
-      Assert(flag != 0, ExcMessage("hang in has_ghost_elements()"));
+      DEAL_II_Assert(flag != 0, ExcMessage("hang in has_ghost_elements()"));
     }
 
 

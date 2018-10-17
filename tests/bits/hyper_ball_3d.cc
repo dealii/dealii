@@ -68,7 +68,7 @@ main()
 
   deallog << "External faces: " << external_faces << std::endl;
 
-  Assert(external_faces == 6, ExcInternalError());
+  DEAL_II_Assert(external_faces == 6, ExcInternalError());
 
   return 0;
 }

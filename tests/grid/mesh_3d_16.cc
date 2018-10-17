@@ -68,7 +68,7 @@ void check(Triangulation<3> &tria)
           for (unsigned int q = 0; q < q_face.size(); ++q)
             n1 += fe_face_values.normal_vector(q) * fe_face_values.JxW(q);
         }
-      Assert(n1 * n1 < 1e-24, ExcInternalError());
+      DEAL_II_Assert(n1 * n1 < 1e-24, ExcInternalError());
       deallog << cell << " face integration is ok: " << std::sqrt(n1 * n1)
               << std::endl;
 
@@ -83,7 +83,7 @@ void check(Triangulation<3> &tria)
               n2 +=
                 fe_subface_values.normal_vector(q) * fe_subface_values.JxW(q);
           }
-      Assert(n2 * n2 < 1e-24, ExcInternalError());
+      DEAL_II_Assert(n2 * n2 < 1e-24, ExcInternalError());
       deallog << cell << " subface integration is ok: " << std::sqrt(n2 * n2)
               << std::endl;
     }

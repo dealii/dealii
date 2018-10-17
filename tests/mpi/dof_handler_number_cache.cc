@@ -80,7 +80,8 @@ test()
             ++index;
           }
 
-      Assert(index <= triangulation.n_active_cells(), ExcInternalError());
+      DEAL_II_Assert(index <= triangulation.n_active_cells(),
+                     ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
@@ -105,17 +106,20 @@ test()
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         deallog << N << std::endl;
 
-      Assert(dof_handler.n_locally_owned_dofs() <= N, ExcInternalError());
+      DEAL_II_Assert(dof_handler.n_locally_owned_dofs() <= N,
+                     ExcInternalError());
       for (unsigned int i = 0;
            i < dof_handler.n_locally_owned_dofs_per_processor().size();
            ++i)
-        AssertThrow(dof_handler.n_locally_owned_dofs_per_processor()[i] <= N,
-                    ExcInternalError());
-      AssertThrow(std::accumulate(
-                    dof_handler.n_locally_owned_dofs_per_processor().begin(),
-                    dof_handler.n_locally_owned_dofs_per_processor().end(),
-                    0U) == N,
-                  ExcInternalError());
+        DEAL_II_AssertThrow(
+          dof_handler.n_locally_owned_dofs_per_processor()[i] <= N,
+          ExcInternalError());
+      DEAL_II_AssertThrow(
+        std::accumulate(
+          dof_handler.n_locally_owned_dofs_per_processor().begin(),
+          dof_handler.n_locally_owned_dofs_per_processor().end(),
+          0U) == N,
+        ExcInternalError());
 
       IndexSet all(N), really_all(N);
       // poor man's union operation
@@ -125,11 +129,12 @@ test()
         for (unsigned int j = 0; j < N; ++j)
           if (dof_handler.locally_owned_dofs_per_processor()[i].is_element(j))
             {
-              AssertThrow(all.is_element(j) == false, ExcInternalError());
+              DEAL_II_AssertThrow(all.is_element(j) == false,
+                                  ExcInternalError());
               all.add_index(j);
             }
       really_all.add_range(0, N);
-      AssertThrow(all == really_all, ExcInternalError());
+      DEAL_II_AssertThrow(all == really_all, ExcInternalError());
     }
 }
 

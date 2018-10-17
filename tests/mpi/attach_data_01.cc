@@ -55,11 +55,11 @@ pack_function(
 
   if (status == parallel::distributed::Triangulation<dim, dim>::CELL_COARSEN)
     {
-      Assert(cell->has_children(), ExcInternalError());
+      DEAL_II_Assert(cell->has_children(), ExcInternalError());
     }
   else
     {
-      Assert(!cell->has_children(), ExcInternalError());
+      DEAL_II_Assert(!cell->has_children(), ExcInternalError());
     }
 
   return Utilities::pack(some_number++, /*allow_compression=*/false);
@@ -92,11 +92,11 @@ unpack_function(
 
   if (status == parallel::distributed::Triangulation<dim, dim>::CELL_REFINE)
     {
-      Assert(cell->has_children(), ExcInternalError());
+      DEAL_II_Assert(cell->has_children(), ExcInternalError());
     }
   else
     {
-      Assert(!cell->has_children(), ExcInternalError());
+      DEAL_II_Assert(!cell->has_children(), ExcInternalError());
     }
 }
 

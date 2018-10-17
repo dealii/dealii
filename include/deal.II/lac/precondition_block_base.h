@@ -227,14 +227,14 @@ public:
    * You are trying to access a diagonal block (not its inverse), but you
    * decided not to store the diagonal blocks.
    */
-  DeclException0(ExcDiagonalsNotStored);
+  DEAL_II_DeclException0(ExcDiagonalsNotStored);
 
   /**
    * You are accessing a diagonal block, assuming that it has a certain type.
    * But, the method used for inverting the diagonal blocks does not use this
    * type
    */
-  DeclException0(ExcInverseNotAvailable);
+  DEAL_II_DeclException0(ExcInverseNotAvailable);
 
 protected:
   /**
@@ -356,7 +356,7 @@ PreconditionBlockBase<number>::reinit(unsigned int n,
             var_inverse_svd[0].reinit(b, b);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
       if (store_diagonals())
@@ -400,7 +400,7 @@ PreconditionBlockBase<number>::reinit(unsigned int n,
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -425,19 +425,19 @@ PreconditionBlockBase<number>::inverse_vmult(size_type              i,
   switch (inversion)
     {
       case gauss_jordan:
-        AssertIndexRange(ii, var_inverse_full.size());
+        DEAL_II_AssertIndexRange(ii, var_inverse_full.size());
         var_inverse_full[ii].vmult(dst, src);
         break;
       case householder:
-        AssertIndexRange(ii, var_inverse_householder.size());
+        DEAL_II_AssertIndexRange(ii, var_inverse_householder.size());
         var_inverse_householder[ii].vmult(dst, src);
         break;
       case svd:
-        AssertIndexRange(ii, var_inverse_svd.size());
+        DEAL_II_AssertIndexRange(ii, var_inverse_svd.size());
         var_inverse_svd[ii].vmult(dst, src);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -454,19 +454,19 @@ PreconditionBlockBase<number>::inverse_Tvmult(size_type              i,
   switch (inversion)
     {
       case gauss_jordan:
-        AssertIndexRange(ii, var_inverse_full.size());
+        DEAL_II_AssertIndexRange(ii, var_inverse_full.size());
         var_inverse_full[ii].Tvmult(dst, src);
         break;
       case householder:
-        AssertIndexRange(ii, var_inverse_householder.size());
+        DEAL_II_AssertIndexRange(ii, var_inverse_householder.size());
         var_inverse_householder[ii].Tvmult(dst, src);
         break;
       case svd:
-        AssertIndexRange(ii, var_inverse_svd.size());
+        DEAL_II_AssertIndexRange(ii, var_inverse_svd.size());
         var_inverse_svd[ii].Tvmult(dst, src);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -478,8 +478,8 @@ PreconditionBlockBase<number>::inverse(size_type i) const
   if (same_diagonal())
     return var_inverse_full[0];
 
-  Assert(i < var_inverse_full.size(),
-         ExcIndexRange(i, 0, var_inverse_full.size()));
+  DEAL_II_Assert(i < var_inverse_full.size(),
+                 ExcIndexRange(i, 0, var_inverse_full.size()));
   return var_inverse_full[i];
 }
 
@@ -491,7 +491,7 @@ PreconditionBlockBase<number>::inverse_householder(size_type i) const
   if (same_diagonal())
     return var_inverse_householder[0];
 
-  AssertIndexRange(i, var_inverse_householder.size());
+  DEAL_II_AssertIndexRange(i, var_inverse_householder.size());
   return var_inverse_householder[i];
 }
 
@@ -503,7 +503,7 @@ PreconditionBlockBase<number>::inverse_svd(size_type i) const
   if (same_diagonal())
     return var_inverse_svd[0];
 
-  AssertIndexRange(i, var_inverse_svd.size());
+  DEAL_II_AssertIndexRange(i, var_inverse_svd.size());
   return var_inverse_svd[i];
 }
 
@@ -512,12 +512,13 @@ template <typename number>
 inline const FullMatrix<number> &
 PreconditionBlockBase<number>::diagonal(size_type i) const
 {
-  Assert(store_diagonals(), ExcDiagonalsNotStored());
+  DEAL_II_Assert(store_diagonals(), ExcDiagonalsNotStored());
 
   if (same_diagonal())
     return var_diagonal[0];
 
-  Assert(i < var_diagonal.size(), ExcIndexRange(i, 0, var_diagonal.size()));
+  DEAL_II_Assert(i < var_diagonal.size(),
+                 ExcIndexRange(i, 0, var_diagonal.size()));
   return var_diagonal[i];
 }
 
@@ -526,13 +527,13 @@ template <typename number>
 inline FullMatrix<number> &
 PreconditionBlockBase<number>::inverse(size_type i)
 {
-  Assert(var_inverse_full.size() != 0, ExcInverseNotAvailable());
+  DEAL_II_Assert(var_inverse_full.size() != 0, ExcInverseNotAvailable());
 
   if (same_diagonal())
     return var_inverse_full[0];
 
-  Assert(i < var_inverse_full.size(),
-         ExcIndexRange(i, 0, var_inverse_full.size()));
+  DEAL_II_Assert(i < var_inverse_full.size(),
+                 ExcIndexRange(i, 0, var_inverse_full.size()));
   return var_inverse_full[i];
 }
 
@@ -541,12 +542,12 @@ template <typename number>
 inline Householder<number> &
 PreconditionBlockBase<number>::inverse_householder(size_type i)
 {
-  Assert(var_inverse_householder.size() != 0, ExcInverseNotAvailable());
+  DEAL_II_Assert(var_inverse_householder.size() != 0, ExcInverseNotAvailable());
 
   if (same_diagonal())
     return var_inverse_householder[0];
 
-  AssertIndexRange(i, var_inverse_householder.size());
+  DEAL_II_AssertIndexRange(i, var_inverse_householder.size());
   return var_inverse_householder[i];
 }
 
@@ -555,12 +556,12 @@ template <typename number>
 inline LAPACKFullMatrix<number> &
 PreconditionBlockBase<number>::inverse_svd(size_type i)
 {
-  Assert(var_inverse_svd.size() != 0, ExcInverseNotAvailable());
+  DEAL_II_Assert(var_inverse_svd.size() != 0, ExcInverseNotAvailable());
 
   if (same_diagonal())
     return var_inverse_svd[0];
 
-  AssertIndexRange(i, var_inverse_svd.size());
+  DEAL_II_AssertIndexRange(i, var_inverse_svd.size());
   return var_inverse_svd[i];
 }
 
@@ -569,12 +570,13 @@ template <typename number>
 inline FullMatrix<number> &
 PreconditionBlockBase<number>::diagonal(size_type i)
 {
-  Assert(store_diagonals(), ExcDiagonalsNotStored());
+  DEAL_II_Assert(store_diagonals(), ExcDiagonalsNotStored());
 
   if (same_diagonal())
     return var_diagonal[0];
 
-  Assert(i < var_diagonal.size(), ExcIndexRange(i, 0, var_diagonal.size()));
+  DEAL_II_Assert(i < var_diagonal.size(),
+                 ExcIndexRange(i, 0, var_diagonal.size()));
   return var_diagonal[i];
 }
 
@@ -657,7 +659,7 @@ PreconditionBlockBase<number>::log_statistics() const
     {}
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 

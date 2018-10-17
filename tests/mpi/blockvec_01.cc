@@ -56,7 +56,7 @@ test()
 
   v.compress(VectorOperation::insert);
 
-  // Assert(!v.has_ghost_elements(), ExcInternalError());
+  // DEAL_II_Assert(!v.has_ghost_elements(), ExcInternalError());
 
   deallog << "size: " << v.size() << std::endl;
   deallog << "size[0]: " << v.block(0).size() << std::endl;

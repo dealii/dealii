@@ -174,7 +174,7 @@ namespace internal
       const dealii::parallel::Triangulation<dim, spacedim> *tria =
         (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
           &mg_dof.get_triangulation()));
-      AssertThrow(
+      DEAL_II_AssertThrow(
         send_data_temp.size() == 0 || tria != nullptr,
         ExcMessage(
           "We should only be sending information with a parallel Triangulation!"));
@@ -212,8 +212,8 @@ namespace internal
                 }
               // Is this level dof not owned by any of our neighbors? That would
               // certainly be a bug!
-              Assert(it != neighbors.end(),
-                     ExcMessage("could not find DoF owner."));
+              DEAL_II_Assert(it != neighbors.end(),
+                             ExcMessage("could not find DoF owner."));
             }
 
           // * send
@@ -238,7 +238,7 @@ namespace internal
                                                71,
                                                tria->get_communicator(),
                                                &*requests.rbegin());
-                    AssertThrowMPI(ierr);
+                    DEAL_II_AssertThrowMPI(ierr);
                   }
                 else
                   {
@@ -249,7 +249,7 @@ namespace internal
                                                71,
                                                tria->get_communicator(),
                                                &*requests.rbegin());
-                    AssertThrowMPI(ierr);
+                    DEAL_II_AssertThrowMPI(ierr);
                   }
               }
           }
@@ -267,9 +267,9 @@ namespace internal
                                      71,
                                      tria->get_communicator(),
                                      &status);
-                AssertThrowMPI(ierr);
+                DEAL_II_AssertThrowMPI(ierr);
                 ierr = MPI_Get_count(&status, MPI_BYTE, &len);
-                AssertThrowMPI(ierr);
+                DEAL_II_AssertThrowMPI(ierr);
 
                 if (len == 0)
                   {
@@ -280,13 +280,13 @@ namespace internal
                                     status.MPI_TAG,
                                     tria->get_communicator(),
                                     &status);
-                    AssertThrowMPI(ierr);
+                    DEAL_II_AssertThrowMPI(ierr);
                     continue;
                   }
 
                 int count = len / sizeof(DoFPair);
-                Assert(static_cast<int>(count * sizeof(DoFPair)) == len,
-                       ExcInternalError());
+                DEAL_II_Assert(static_cast<int>(count * sizeof(DoFPair)) == len,
+                               ExcInternalError());
                 receive_buffer.resize(count);
 
                 void *ptr = receive_buffer.data();
@@ -297,7 +297,7 @@ namespace internal
                                 status.MPI_TAG,
                                 tria->get_communicator(),
                                 &status);
-                AssertThrowMPI(ierr);
+                DEAL_II_AssertThrowMPI(ierr);
 
                 for (unsigned int i = 0; i < receive_buffer.size(); ++i)
                   {
@@ -314,7 +314,7 @@ namespace internal
               const int ierr = MPI_Waitall(requests.size(),
                                            requests.data(),
                                            MPI_STATUSES_IGNORE);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
               requests.clear();
             }
 #  ifdef DEBUG
@@ -322,7 +322,7 @@ namespace internal
           // on this level. If a deadlock occurs here, the list of expected
           // senders is not computed correctly.
           const int ierr = MPI_Barrier(tria->get_communicator());
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 #  endif
         }
 #endif
@@ -461,10 +461,11 @@ namespace internal
                   c * n_scalar_cell_dofs +
                   k * n_child_dofs_1d * n_child_dofs_1d + j * n_child_dofs_1d +
                   i;
-                Assert(indices[index] == numbers::invalid_dof_index ||
-                         indices[index] ==
-                           local_dof_indices[lexicographic_numbering[m]],
-                       ExcInternalError());
+                DEAL_II_Assert(
+                  indices[index] == numbers::invalid_dof_index ||
+                    indices[index] ==
+                      local_dof_indices[lexicographic_numbering[m]],
+                  ExcInternalError());
                 indices[index] = local_dof_indices[lexicographic_numbering[m]];
               }
     }
@@ -477,20 +478,20 @@ namespace internal
     {
       // currently, we have only FE_Q and FE_DGQ type elements implemented
       elem_info.n_components = mg_dof.get_fe().element_multiplicity(0);
-      AssertDimension(Utilities::fixed_power<dim>(fe.dofs_per_cell) *
-                        elem_info.n_components,
-                      mg_dof.get_fe().dofs_per_cell);
-      AssertDimension(fe.degree, mg_dof.get_fe().degree);
+      DEAL_II_AssertDimension(Utilities::fixed_power<dim>(fe.dofs_per_cell) *
+                                elem_info.n_components,
+                              mg_dof.get_fe().dofs_per_cell);
+      DEAL_II_AssertDimension(fe.degree, mg_dof.get_fe().degree);
       elem_info.fe_degree             = fe.degree;
       elem_info.element_is_continuous = fe.dofs_per_vertex > 0;
-      Assert(fe.dofs_per_vertex < 2, ExcNotImplemented());
+      DEAL_II_Assert(fe.dofs_per_vertex < 2, ExcNotImplemented());
 
       // step 1.2: get renumbering of 1D basis functions to lexicographic
       // numbers. The distinction according to fe.dofs_per_vertex is to support
       // both continuous and discontinuous bases.
       std::vector<unsigned int> renumbering(fe.dofs_per_cell);
       {
-        AssertIndexRange(fe.dofs_per_vertex, 2);
+        DEAL_II_AssertIndexRange(fe.dofs_per_vertex, 2);
         renumbering[0] = 0;
         for (unsigned int i = 0; i < fe.dofs_per_line; ++i)
           renumbering[i + fe.dofs_per_vertex] =
@@ -503,8 +504,8 @@ namespace internal
       // step 1.3: create a dummy 1D quadrature formula to extract the
       // lexicographic numbering for the elements
       std::vector<Point<1>> basic_support_points = fe.get_unit_support_points();
-      Assert(fe.dofs_per_vertex == 0 || fe.dofs_per_vertex == 1,
-             ExcNotImplemented());
+      DEAL_II_Assert(fe.dofs_per_vertex == 0 || fe.dofs_per_vertex == 1,
+                     ExcNotImplemented());
       const unsigned int shift = fe.dofs_per_cell - fe.dofs_per_vertex;
       const unsigned int n_child_dofs_1d =
         (fe.dofs_per_vertex > 0 ? (2 * fe.dofs_per_cell - 1) :
@@ -549,10 +550,10 @@ namespace internal
             if (mg_constrained_dofs->get_level_constraints(level)
                   .is_identity_constrained(ind))
               {
-                Assert(mg_constrained_dofs->get_level_constraints(level)
-                           .get_constraint_entries(ind)
-                           ->size() == 1,
-                       ExcInternalError());
+                DEAL_II_Assert(mg_constrained_dofs->get_level_constraints(level)
+                                   .get_constraint_entries(ind)
+                                   ->size() == 1,
+                               ExcInternalError());
                 ind = mg_constrained_dofs->get_level_constraints(level)
                         .get_constraint_entries(ind)
                         ->front()
@@ -595,13 +596,13 @@ namespace internal
       // ---------------------------- 1. Extract 1D info about the finite
       // element step 1.1: create a 1D copy of the finite element from FETools
       // where we substitute the template argument
-      AssertDimension(mg_dof.get_fe().n_base_elements(), 1);
+      DEAL_II_AssertDimension(mg_dof.get_fe().n_base_elements(), 1);
       std::string fe_name = mg_dof.get_fe().base_element(0).get_name();
       {
         const std::size_t template_starts = fe_name.find_first_of('<');
-        Assert(fe_name[template_starts + 1] ==
-                 (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
-               ExcInternalError());
+        DEAL_II_Assert(fe_name[template_starts + 1] ==
+                         (dim == 1 ? '1' : (dim == 2 ? '2' : '3')),
+                       ExcInternalError());
         fe_name[template_starts + 1] = '1';
       }
       const std::unique_ptr<FiniteElement<1>> fe(
@@ -680,8 +681,8 @@ namespace internal
               // restriction/prolongation between level-1 and level) and the
               // remote case (which needs to store DoF indices for the
               // operations between level and level+1).
-              AssertDimension(cell->n_children(),
-                              GeometryInfo<dim>::max_children_per_cell);
+              DEAL_II_AssertDimension(cell->n_children(),
+                                      GeometryInfo<dim>::max_children_per_cell);
               std::vector<types::global_dof_index> &next_indices =
                 cell_is_remote ? global_level_dof_indices_remote :
                                  global_level_dof_indices;
@@ -722,8 +723,8 @@ namespace internal
                     {
                       const unsigned int child_index =
                         coarse_level_indices[level][cell->child(c)->index()];
-                      AssertIndexRange(child_index,
-                                       parent_child_connect[level].size());
+                      DEAL_II_AssertIndexRange(
+                        child_index, parent_child_connect[level].size());
                       unsigned int parent_index = counter;
                       // remote cells, i.e., cells where we work on a further
                       // level but are not treated on the current level, need to
@@ -737,8 +738,8 @@ namespace internal
                           tria.n_cells(level);
                       parent_child_connect[level][child_index] =
                         std::make_pair(parent_index, c);
-                      AssertIndexRange(mg_dof.get_fe().dofs_per_cell,
-                                       static_cast<unsigned short>(-1));
+                      DEAL_II_AssertIndexRange(mg_dof.get_fe().dofs_per_cell,
+                                               static_cast<unsigned short>(-1));
 
                       // set Dirichlet boundary conditions (as a list of
                       // constrained DoFs) for the child
@@ -755,8 +756,9 @@ namespace internal
                 }
               if (!cell_is_remote)
                 {
-                  AssertIndexRange(static_cast<unsigned int>(cell->index()),
-                                   coarse_level_indices[level - 1].size());
+                  DEAL_II_AssertIndexRange(
+                    static_cast<unsigned int>(cell->index()),
+                    coarse_level_indices[level - 1].size());
                   coarse_level_indices[level - 1][cell->index()] = counter++;
                 }
 
@@ -804,8 +806,8 @@ namespace internal
           // step 2.5: store information about the current level and prepare the
           // Dirichlet indices and parent-child relationship for the next
           // coarser level
-          AssertDimension(counter * elem_info.n_child_cell_dofs,
-                          global_level_dof_indices.size());
+          DEAL_II_AssertDimension(counter * elem_info.n_child_cell_dofs,
+                                  global_level_dof_indices.size());
           n_owned_level_cells[level - 1] = counter;
           dirichlet_indices[level - 1].resize(counter);
           parent_child_connect[level - 1].resize(

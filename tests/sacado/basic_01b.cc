@@ -171,18 +171,21 @@ main()
   std::cout << "dh_dy: " << dh_dy << "  dh_dy_ad: " << dh_dy_ad << std::endl;
 
   const double tol = 1.0e-14;
-  Assert(std::fabs(f - f_ad) < tol,
-         ExcMessage("Computation incorrect: Value of f"));
-  Assert(std::fabs(df_dx - df_dx_ad) < tol && std::fabs(df_dy - df_dy_ad) < tol,
-         ExcMessage("Computation incorrect: First derivative of f"));
-  Assert(std::fabs(g - g_ad) < tol,
-         ExcMessage("Computation incorrect: Value of g"));
-  Assert(std::fabs(dg_dx - dg_dx_ad) < tol && std::fabs(dg_dy - dg_dy_ad) < tol,
-         ExcMessage("Computation incorrect: First derivative of g"));
-  Assert(std::fabs(h - h_ad) < tol,
-         ExcMessage("Computation incorrect: Value of h"));
-  Assert(std::fabs(dh_dx - dh_dx_ad) < tol && std::fabs(dh_dy - dh_dy_ad) < tol,
-         ExcMessage("Computation incorrect: First derivative of h"));
+  DEAL_II_Assert(std::fabs(f - f_ad) < tol,
+                 ExcMessage("Computation incorrect: Value of f"));
+  DEAL_II_Assert(std::fabs(df_dx - df_dx_ad) < tol &&
+                   std::fabs(df_dy - df_dy_ad) < tol,
+                 ExcMessage("Computation incorrect: First derivative of f"));
+  DEAL_II_Assert(std::fabs(g - g_ad) < tol,
+                 ExcMessage("Computation incorrect: Value of g"));
+  DEAL_II_Assert(std::fabs(dg_dx - dg_dx_ad) < tol &&
+                   std::fabs(dg_dy - dg_dy_ad) < tol,
+                 ExcMessage("Computation incorrect: First derivative of g"));
+  DEAL_II_Assert(std::fabs(h - h_ad) < tol,
+                 ExcMessage("Computation incorrect: Value of h"));
+  DEAL_II_Assert(std::fabs(dh_dx - dh_dx_ad) < tol &&
+                   std::fabs(dh_dy - dh_dy_ad) < tol,
+                 ExcMessage("Computation incorrect: First derivative of h"));
 
   deallog << "OK" << std::endl;
 }

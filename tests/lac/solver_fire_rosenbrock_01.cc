@@ -50,7 +50,7 @@ using vector_t = typename dealii::Vector<double>;
 double
 compute(vector_t &G, const vector_t &X)
 {
-  AssertThrow(X.size() % 2 == 0, ExcInternalError());
+  DEAL_II_AssertThrow(X.size() % 2 == 0, ExcInternalError());
 
   double value = 0.;
 
@@ -77,7 +77,7 @@ compute(vector_t &G, const vector_t &X)
 void
 check_value(const unsigned int N, const double tol)
 {
-  AssertThrow(N % 2 == 0, ExcInternalError());
+  DEAL_II_AssertThrow(N % 2 == 0, ExcInternalError());
 
   vector_t X(N);
 

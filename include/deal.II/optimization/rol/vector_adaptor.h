@@ -302,8 +302,9 @@ namespace Rol
   void
   VectorAdaptor<VectorType>::plus(const ROL::Vector<value_type> &rol_vector)
   {
-    Assert(this->dimension() == rol_vector.dimension(),
-           ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
+    DEAL_II_Assert(this->dimension() == rol_vector.dimension(),
+                   ExcDimensionMismatch(this->dimension(),
+                                        rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
       Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
@@ -318,8 +319,9 @@ namespace Rol
   VectorAdaptor<VectorType>::axpy(const value_type               alpha,
                                   const ROL::Vector<value_type> &rol_vector)
   {
-    Assert(this->dimension() == rol_vector.dimension(),
-           ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
+    DEAL_II_Assert(this->dimension() == rol_vector.dimension(),
+                   ExcDimensionMismatch(this->dimension(),
+                                        rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
       Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
@@ -333,9 +335,10 @@ namespace Rol
   int
   VectorAdaptor<VectorType>::dimension() const
   {
-    Assert(vector_ptr->size() < std::numeric_limits<int>::max(),
-           ExcMessage("The size of the vector being used is greater than "
-                      "largest value of type int."));
+    DEAL_II_Assert(vector_ptr->size() < std::numeric_limits<int>::max(),
+                   ExcMessage(
+                     "The size of the vector being used is greater than "
+                     "largest value of type int."));
     return static_cast<int>(vector_ptr->size());
   }
 
@@ -355,8 +358,9 @@ namespace Rol
   VectorAdaptor<VectorType>::dot(
     const ROL::Vector<value_type> &rol_vector) const
   {
-    Assert(this->dimension() == rol_vector.dimension(),
-           ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
+    DEAL_II_Assert(this->dimension() == rol_vector.dimension(),
+                   ExcDimensionMismatch(this->dimension(),
+                                        rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
       Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);
@@ -431,8 +435,9 @@ namespace Rol
     const ROL::Elementwise::BinaryFunction<value_type> &f,
     const ROL::Vector<value_type> &                     rol_vector)
   {
-    Assert(this->dimension() == rol_vector.dimension(),
-           ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
+    DEAL_II_Assert(this->dimension() == rol_vector.dimension(),
+                   ExcDimensionMismatch(this->dimension(),
+                                        rol_vector.dimension()));
 
     const VectorAdaptor &vector_adaptor =
       Teuchos::dyn_cast<const VectorAdaptor>(rol_vector);

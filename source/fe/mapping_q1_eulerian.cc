@@ -60,11 +60,13 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
   // object is constructed, which is not necessarily what we want.
 
   // TODO: Only one of these two assertions should be relevant
-  AssertDimension(spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
-  AssertDimension(shiftmap_dof_handler->get_fe(0).n_components(), spacedim);
+  DEAL_II_AssertDimension(spacedim,
+                          shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
+  DEAL_II_AssertDimension(shiftmap_dof_handler->get_fe(0).n_components(),
+                          spacedim);
 
-  AssertDimension(shiftmap_dof_handler->n_dofs(),
-                  euler_transform_vectors->size());
+  DEAL_II_AssertDimension(shiftmap_dof_handler->n_dofs(),
+                          euler_transform_vectors->size());
 
   // cast the Triangulation<dim>::cell_iterator into a
   // DoFHandler<dim>::cell_iterator which is necessary for access to
@@ -74,7 +76,7 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
 
   // We require the cell to be active since we can only then get nodal
   // values for the shifts
-  Assert(dof_cell->active() == true, ExcInactiveCell());
+  DEAL_II_Assert(dof_cell->active() == true, ExcInactiveCell());
 
   // now get the values of the shift vectors at the vertices
   Vector<double> mapping_values(shiftmap_dof_handler->get_fe().dofs_per_cell);

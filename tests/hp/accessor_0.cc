@@ -111,10 +111,11 @@ main()
                face_n < GeometryInfo<1>::faces_per_cell;
                ++face_n)
             {
-              AssertThrow(&cell->face(face_n)->get_fe(fe_index) ==
-                            &fe_collection[fe_index],
-                          ExcMessage("The result of get_fe should always return"
-                                     " a known finite element."));
+              DEAL_II_AssertThrow(&cell->face(face_n)->get_fe(fe_index) ==
+                                    &fe_collection[fe_index],
+                                  ExcMessage(
+                                    "The result of get_fe should always return"
+                                    " a known finite element."));
 
               if (index_is_active)
                 {

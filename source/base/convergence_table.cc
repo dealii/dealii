@@ -26,9 +26,10 @@ ConvergenceTable::evaluate_convergence_rates(
   const RateMode     rate_mode,
   const unsigned int dim)
 {
-  Assert(columns.count(data_column_key), ExcColumnNotExistent(data_column_key));
-  Assert(columns.count(reference_column_key),
-         ExcColumnNotExistent(reference_column_key));
+  DEAL_II_Assert(columns.count(data_column_key),
+                 ExcColumnNotExistent(data_column_key));
+  DEAL_II_Assert(columns.count(reference_column_key),
+                 ExcColumnNotExistent(reference_column_key));
 
   if (rate_mode == none)
     return;
@@ -44,7 +45,7 @@ ConvergenceTable::evaluate_convergence_rates(
 
   const unsigned int n     = entries.size();
   const unsigned int n_ref = ref_entries.size();
-  Assert(n == n_ref, ExcDimensionMismatch(n, n_ref));
+  DEAL_II_Assert(n == n_ref, ExcDimensionMismatch(n, n_ref));
 
   std::vector<double> values(n);
   std::vector<double> ref_values(n_ref);
@@ -100,10 +101,10 @@ ConvergenceTable::evaluate_convergence_rates(
           }
         break;
       default:
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
     }
 
-  Assert(columns.count(rate_key), ExcInternalError());
+  DEAL_II_Assert(columns.count(rate_key), ExcInternalError());
   columns[rate_key].flag = 1;
   set_precision(rate_key, 2);
 
@@ -127,7 +128,8 @@ void
 ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
                                              const RateMode     rate_mode)
 {
-  Assert(columns.count(data_column_key), ExcColumnNotExistent(data_column_key));
+  DEAL_II_Assert(columns.count(data_column_key),
+                 ExcColumnNotExistent(data_column_key));
 
   // reset the auto fill mode flag since we are going to fill columns from
   // the top that don't yet exist
@@ -188,10 +190,10 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
         break;
 
       default:
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
     }
 
-  Assert(columns.count(rate_key), ExcInternalError());
+  DEAL_II_Assert(columns.count(rate_key), ExcInternalError());
   columns[rate_key].flag = 1;
   set_precision(rate_key, 2);
 
@@ -218,7 +220,7 @@ void
 ConvergenceTable::omit_column_from_convergence_rate_evaluation(
   const std::string &key)
 {
-  Assert(columns.count(key), ExcColumnNotExistent(key));
+  DEAL_II_Assert(columns.count(key), ExcColumnNotExistent(key));
 
   const std::map<std::string, Column>::iterator col_iter = columns.find(key);
   col_iter->second.flag                                  = 1;

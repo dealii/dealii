@@ -47,8 +47,8 @@ main()
   Tensor<2, 1> t1;
   t1[0][0] = 2.0;
   deallog << invert(t1) << std::endl;
-  Assert((invert(t1) * t1 - unit_symmetric_tensor<1>()).norm() < 1e-12,
-         ExcMessage("Dim 1 inverse tensor definition is incorrect"));
+  DEAL_II_Assert((invert(t1) * t1 - unit_symmetric_tensor<1>()).norm() < 1e-12,
+                 ExcMessage("Dim 1 inverse tensor definition is incorrect"));
 
   deallog << "Tensor dim 2" << std::endl;
   Tensor<2, 2> t2;
@@ -57,8 +57,8 @@ main()
   t2[1][0] = -1.0;
   t2[1][1] = 1.5;
   deallog << invert(t2) << std::endl;
-  Assert((invert(t2) * t2 - unit_symmetric_tensor<2>()).norm() < 1e-12,
-         ExcMessage("Dim 2 inverse tensor definition is incorrect"));
+  DEAL_II_Assert((invert(t2) * t2 - unit_symmetric_tensor<2>()).norm() < 1e-12,
+                 ExcMessage("Dim 2 inverse tensor definition is incorrect"));
 
   deallog << "Tensor dim 3" << std::endl;
   Tensor<2, 3> t3;
@@ -72,8 +72,8 @@ main()
   t3[2][1] = -0.75;
   t3[2][2] = 1.25;
   deallog << invert(t3) << std::endl;
-  Assert((invert(t3) * t3 - unit_symmetric_tensor<3>()).norm() < 1e-12,
-         ExcMessage("Dim 3 inverse tensor definition is incorrect"));
+  DEAL_II_Assert((invert(t3) * t3 - unit_symmetric_tensor<3>()).norm() < 1e-12,
+                 ExcMessage("Dim 3 inverse tensor definition is incorrect"));
 
   deallog << "OK" << std::endl;
 }

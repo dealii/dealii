@@ -104,8 +104,10 @@ template <typename number2>
 FullMatrix<number> &
 FullMatrix<number>::operator=(const LAPACKFullMatrix<number2> &M)
 {
-  Assert(this->m() == M.n_rows(), ExcDimensionMismatch(this->m(), M.n_rows()));
-  Assert(this->n() == M.n_cols(), ExcDimensionMismatch(this->n(), M.n_cols()));
+  DEAL_II_Assert(this->m() == M.n_rows(),
+                 ExcDimensionMismatch(this->m(), M.n_rows()));
+  DEAL_II_Assert(this->n() == M.n_cols(),
+                 ExcDimensionMismatch(this->n(), M.n_cols()));
   for (size_type i = 0; i < this->m(); ++i)
     for (size_type j = 0; j < this->n(); ++j)
       (*this)(i, j) = M(i, j);
@@ -119,7 +121,7 @@ template <typename number>
 bool
 FullMatrix<number>::all_zero() const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   const number *      p = &this->values[0];
   const number *const e = &this->values[0] + this->n_elements();
@@ -136,7 +138,7 @@ template <typename number>
 FullMatrix<number> &
 FullMatrix<number>::operator*=(const number factor)
 {
-  AssertIsFinite(factor);
+  DEAL_II_AssertIsFinite(factor);
 
   number *      p = &(*this)(0, 0);
   const number *e = &(*this)(0, 0) + n() * m();
@@ -152,14 +154,14 @@ template <typename number>
 FullMatrix<number> &
 FullMatrix<number>::operator/=(const number factor)
 {
-  AssertIsFinite(factor);
+  DEAL_II_AssertIsFinite(factor);
 
   number *      p = &(*this)(0, 0);
   const number *e = &(*this)(0, 0) + n() * m();
 
   const number factor_inv = number(1.) / factor;
 
-  AssertIsFinite(factor_inv);
+  DEAL_II_AssertIsFinite(factor_inv);
 
   while (p != e)
     *p++ *= factor_inv;
@@ -176,12 +178,12 @@ FullMatrix<number>::vmult(Vector<number2> &      dst,
                           const Vector<number2> &src,
                           const bool             adding) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  DEAL_II_Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
+  DEAL_II_Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
-  Assert(&src != &dst, ExcSourceEqualsDestination());
+  DEAL_II_Assert(&src != &dst, ExcSourceEqualsDestination());
 
   const number *e = &this->values[0];
   // get access to the data in order to
@@ -207,12 +209,12 @@ FullMatrix<number>::Tvmult(Vector<number2> &      dst,
                            const Vector<number2> &src,
                            const bool             adding) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
+  DEAL_II_Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  DEAL_II_Assert(src.size() == m(), ExcDimensionMismatch(src.size(), m()));
 
-  Assert(&src != &dst, ExcSourceEqualsDestination());
+  DEAL_II_Assert(&src != &dst, ExcSourceEqualsDestination());
 
   const number *  e       = &this->values[0];
   number2 *       dst_ptr = &dst(0);
@@ -241,13 +243,13 @@ FullMatrix<number>::residual(Vector<number2> &      dst,
                              const Vector<number2> &src,
                              const Vector<number3> &right) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
-  Assert(right.size() == m(), ExcDimensionMismatch(right.size(), m()));
+  DEAL_II_Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
+  DEAL_II_Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  DEAL_II_Assert(right.size() == m(), ExcDimensionMismatch(right.size(), m()));
 
-  Assert(&src != &dst, ExcSourceEqualsDestination());
+  DEAL_II_Assert(&src != &dst, ExcSourceEqualsDestination());
 
   number          res    = 0.;
   const size_type size_m = m(), size_n = n();
@@ -270,10 +272,10 @@ void
 FullMatrix<number>::forward(Vector<number2> &      dst,
                             const Vector<number2> &src) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  DEAL_II_Assert(dst.size() == m(), ExcDimensionMismatch(dst.size(), m()));
+  DEAL_II_Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   size_type i, j;
   size_type nu = ((m() < n()) ? m() : n());
@@ -284,7 +286,7 @@ FullMatrix<number>::forward(Vector<number2> &      dst,
         s -=
           typename ProductType<number, number2>::type(dst(j)) * (*this)(i, j);
       dst(i) = number2(s) / number2((*this)(i, i));
-      AssertIsFinite(dst(i));
+      DEAL_II_AssertIsFinite(dst(i));
     }
 }
 
@@ -296,7 +298,7 @@ void
 FullMatrix<number>::backward(Vector<number2> &      dst,
                              const Vector<number2> &src) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   size_type j;
   size_type nu = (m() < n() ? m() : n());
@@ -307,7 +309,7 @@ FullMatrix<number>::backward(Vector<number2> &      dst,
         s -=
           typename ProductType<number, number2>::type(dst(j)) * (*this)(i, j);
       dst(i) = number2(s) / number2((*this)(i, i));
-      AssertIsFinite(dst(i));
+      DEAL_II_AssertIsFinite(dst(i));
     }
 }
 
@@ -322,10 +324,10 @@ FullMatrix<number>::fill(const FullMatrix<number2> &src,
                          const size_type            src_offset_i,
                          const size_type            src_offset_j)
 {
-  AssertIndexRange(dst_offset_i, m());
-  AssertIndexRange(dst_offset_j, n());
-  AssertIndexRange(src_offset_i, src.m());
-  AssertIndexRange(src_offset_j, src.n());
+  DEAL_II_AssertIndexRange(dst_offset_i, m());
+  DEAL_II_AssertIndexRange(dst_offset_j, n());
+  DEAL_II_AssertIndexRange(src_offset_i, src.m());
+  DEAL_II_AssertIndexRange(src_offset_j, src.n());
 
   // Compute maximal size of copied block
   const size_type rows = std::min(m() - dst_offset_i, src.m() - src_offset_i);
@@ -345,10 +347,10 @@ FullMatrix<number>::fill_permutation(const FullMatrix<number2> &   src,
                                      const std::vector<size_type> &p_rows,
                                      const std::vector<size_type> &p_cols)
 {
-  Assert(p_rows.size() == this->n_rows(),
-         ExcDimensionMismatch(p_rows.size(), this->n_rows()));
-  Assert(p_cols.size() == this->n_cols(),
-         ExcDimensionMismatch(p_cols.size(), this->n_cols()));
+  DEAL_II_Assert(p_rows.size() == this->n_rows(),
+                 ExcDimensionMismatch(p_rows.size(), this->n_rows()));
+  DEAL_II_Assert(p_cols.size() == this->n_cols(),
+                 ExcDimensionMismatch(p_cols.size(), this->n_cols()));
 
   for (size_type i = 0; i < this->n_rows(); ++i)
     for (size_type j = 0; j < this->n_cols(); ++j)
@@ -363,7 +365,7 @@ FullMatrix<number>::add_row(const size_type i,
                             const number    s,
                             const size_type j)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   for (size_type k = 0; k < n(); ++k)
     (*this)(i, k) += s * (*this)(j, k);
@@ -378,7 +380,7 @@ FullMatrix<number>::add_row(const size_type i,
                             const number    t,
                             const size_type k)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   const size_type size_m = n();
   for (size_type l = 0; l < size_m; ++l)
@@ -392,7 +394,7 @@ FullMatrix<number>::add_col(const size_type i,
                             const number    s,
                             const size_type j)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   for (size_type k = 0; k < m(); ++k)
     (*this)(k, i) += s * (*this)(k, j);
@@ -407,7 +409,7 @@ FullMatrix<number>::add_col(const size_type i,
                             const number    t,
                             const size_type k)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   for (size_t l = 0; l < m(); ++l)
     (*this)(l, i) += s * (*this)(l, j) + t * (*this)(l, k);
@@ -419,7 +421,7 @@ template <typename number>
 void
 FullMatrix<number>::swap_row(const size_type i, const size_type j)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   for (size_type k = 0; k < n(); ++k)
     std::swap((*this)(i, k), (*this)(j, k));
@@ -430,7 +432,7 @@ template <typename number>
 void
 FullMatrix<number>::swap_col(const size_type i, const size_type j)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   for (size_type k = 0; k < m(); ++k)
     std::swap((*this)(k, i), (*this)(k, j));
@@ -441,8 +443,8 @@ template <typename number>
 void
 FullMatrix<number>::diagadd(const number src)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
-  Assert(m() == n(), ExcDimensionMismatch(m(), n()));
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(m() == n(), ExcDimensionMismatch(m(), n()));
 
   for (size_type i = 0; i < n(); ++i)
     (*this)(i, i) += src;
@@ -454,10 +456,10 @@ template <typename number2>
 void
 FullMatrix<number>::equ(const number a, const FullMatrix<number2> &A)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
-  Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  DEAL_II_Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  DEAL_II_Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
   for (size_type i = 0; i < m(); ++i)
     for (size_type j = 0; j < n(); ++j)
@@ -473,12 +475,12 @@ FullMatrix<number>::equ(const number               a,
                         const number               b,
                         const FullMatrix<number2> &B)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
-  Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
-  Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-  Assert(n() == B.n(), ExcDimensionMismatch(n(), B.n()));
+  DEAL_II_Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  DEAL_II_Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  DEAL_II_Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  DEAL_II_Assert(n() == B.n(), ExcDimensionMismatch(n(), B.n()));
 
   for (size_type i = 0; i < m(); ++i)
     for (size_type j = 0; j < n(); ++j)
@@ -496,14 +498,14 @@ FullMatrix<number>::equ(const number               a,
                         const number               c,
                         const FullMatrix<number2> &C)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
-  Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
-  Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-  Assert(n() == B.n(), ExcDimensionMismatch(n(), B.n()));
-  Assert(m() == C.m(), ExcDimensionMismatch(m(), C.m()));
-  Assert(n() == C.n(), ExcDimensionMismatch(n(), C.n()));
+  DEAL_II_Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  DEAL_II_Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  DEAL_II_Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  DEAL_II_Assert(n() == B.n(), ExcDimensionMismatch(n(), B.n()));
+  DEAL_II_Assert(m() == C.m(), ExcDimensionMismatch(m(), C.m()));
+  DEAL_II_Assert(n() == C.n(), ExcDimensionMismatch(n(), C.n()));
 
   for (size_type i = 0; i < m(); ++i)
     for (size_type j = 0; j < n(); ++j)
@@ -520,10 +522,10 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
                           const FullMatrix<number2> &src,
                           const bool                 adding) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
-  Assert(n() == src.m(), ExcDimensionMismatch(n(), src.m()));
-  Assert(dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
-  Assert(dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(n() == src.m(), ExcDimensionMismatch(n(), src.m()));
+  DEAL_II_Assert(dst.n() == src.n(), ExcDimensionMismatch(dst.n(), src.n()));
+  DEAL_II_Assert(dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
 
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
@@ -602,10 +604,10 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
                            const FullMatrix<number2> &src,
                            const bool                 adding) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
-  Assert(m() == src.m(), ExcDimensionMismatch(m(), src.m()));
-  Assert(n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
-  Assert(src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(m() == src.m(), ExcDimensionMismatch(m(), src.m()));
+  DEAL_II_Assert(n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
+  DEAL_II_Assert(src.n() == dst.n(), ExcDimensionMismatch(src.n(), dst.n()));
 
 
   // see if we can use BLAS algorithms for this and if the type for 'number'
@@ -706,10 +708,10 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
                            const FullMatrix<number2> &src,
                            const bool                 adding) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
-  Assert(n() == src.n(), ExcDimensionMismatch(n(), src.n()));
-  Assert(dst.n() == src.m(), ExcDimensionMismatch(dst.n(), src.m()));
-  Assert(dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(n() == src.n(), ExcDimensionMismatch(n(), src.n()));
+  DEAL_II_Assert(dst.n() == src.m(), ExcDimensionMismatch(dst.n(), src.m()));
+  DEAL_II_Assert(dst.m() == m(), ExcDimensionMismatch(m(), dst.m()));
 
   // see if we can use BLAS algorithms for this and if the type for 'number'
   // works for us (it is usually not efficient to use BLAS for very small
@@ -806,10 +808,10 @@ FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
                             const FullMatrix<number2> &src,
                             const bool                 adding) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
-  Assert(m() == src.n(), ExcDimensionMismatch(m(), src.n()));
-  Assert(n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
-  Assert(src.m() == dst.n(), ExcDimensionMismatch(src.m(), dst.n()));
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(m() == src.n(), ExcDimensionMismatch(m(), src.n()));
+  DEAL_II_Assert(n() == dst.m(), ExcDimensionMismatch(n(), dst.m()));
+  DEAL_II_Assert(src.m() == dst.n(), ExcDimensionMismatch(src.m(), dst.n()));
 
 
   // see if we can use BLAS algorithms for this and if the type for 'number'
@@ -894,23 +896,23 @@ FullMatrix<number>::triple_product(const FullMatrix<number> &A,
 {
   if (transpose_B)
     {
-      AssertDimension(B.m(), A.m());
-      AssertDimension(B.n(), m());
+      DEAL_II_AssertDimension(B.m(), A.m());
+      DEAL_II_AssertDimension(B.n(), m());
     }
   else
     {
-      AssertDimension(B.n(), A.m());
-      AssertDimension(B.m(), m());
+      DEAL_II_AssertDimension(B.n(), A.m());
+      DEAL_II_AssertDimension(B.m(), m());
     }
   if (transpose_D)
     {
-      AssertDimension(D.n(), A.n());
-      AssertDimension(D.m(), n());
+      DEAL_II_AssertDimension(D.n(), A.n());
+      DEAL_II_AssertDimension(D.m(), n());
     }
   else
     {
-      AssertDimension(D.m(), A.n());
-      AssertDimension(D.n(), n());
+      DEAL_II_AssertDimension(D.m(), A.n());
+      DEAL_II_AssertDimension(D.n(), n());
     }
 
   // For all entries of the product
@@ -944,10 +946,10 @@ template <typename number2>
 number2
 FullMatrix<number>::matrix_norm_square(const Vector<number2> &v) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
-  Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
+  DEAL_II_Assert(m() == v.size(), ExcDimensionMismatch(m(), v.size()));
+  DEAL_II_Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
 
   number2         sum     = 0.;
   const size_type n_rows  = m();
@@ -974,10 +976,10 @@ number2
 FullMatrix<number>::matrix_scalar_product(const Vector<number2> &u,
                                           const Vector<number2> &v) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == u.size(), ExcDimensionMismatch(m(), u.size()));
-  Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
+  DEAL_II_Assert(m() == u.size(), ExcDimensionMismatch(m(), u.size()));
+  DEAL_II_Assert(n() == v.size(), ExcDimensionMismatch(n(), v.size()));
 
   number2         sum     = 0.;
   const size_type n_rows  = m();
@@ -1004,7 +1006,7 @@ template <typename number>
 void
 FullMatrix<number>::symmetrize()
 {
-  Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
 
   const size_type N = m();
   for (size_type i = 0; i < N; ++i)
@@ -1020,7 +1022,7 @@ template <typename number>
 typename FullMatrix<number>::real_type
 FullMatrix<number>::l1_norm() const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   real_type       sum = 0, max = 0;
   const size_type n_rows = m(), n_cols = n();
@@ -1042,7 +1044,7 @@ template <typename number>
 typename FullMatrix<number>::real_type
 FullMatrix<number>::linfty_norm() const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   real_type       sum = 0, max = 0;
   const size_type n_rows = m(), n_cols = n();
@@ -1065,10 +1067,10 @@ template <typename number2>
 void
 FullMatrix<number>::add(const number a, const FullMatrix<number2> &A)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
-  Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  DEAL_II_Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  DEAL_II_Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
   for (size_type i = 0; i < m(); ++i)
     for (size_type j = 0; j < n(); ++j)
@@ -1084,12 +1086,12 @@ FullMatrix<number>::add(const number               a,
                         const number               b,
                         const FullMatrix<number2> &B)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
-  Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
-  Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-  Assert(n() == B.n(), ExcDimensionMismatch(n(), B.n()));
+  DEAL_II_Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  DEAL_II_Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  DEAL_II_Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  DEAL_II_Assert(n() == B.n(), ExcDimensionMismatch(n(), B.n()));
 
   for (size_type i = 0; i < m(); ++i)
     for (size_type j = 0; j < n(); ++j)
@@ -1108,14 +1110,14 @@ FullMatrix<number>::add(const number               a,
                         const number               c,
                         const FullMatrix<number2> &C)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
-  Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
-  Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
-  Assert(n() == B.n(), ExcDimensionMismatch(n(), B.n()));
-  Assert(m() == C.m(), ExcDimensionMismatch(m(), C.m()));
-  Assert(n() == C.n(), ExcDimensionMismatch(n(), C.n()));
+  DEAL_II_Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  DEAL_II_Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  DEAL_II_Assert(m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  DEAL_II_Assert(n() == B.n(), ExcDimensionMismatch(n(), B.n()));
+  DEAL_II_Assert(m() == C.m(), ExcDimensionMismatch(m(), C.m()));
+  DEAL_II_Assert(n() == C.n(), ExcDimensionMismatch(n(), C.n()));
 
 
   for (size_type i = 0; i < m(); ++i)
@@ -1136,10 +1138,10 @@ FullMatrix<number>::add(const FullMatrix<number2> &src,
                         const size_type            src_offset_i,
                         const size_type            src_offset_j)
 {
-  AssertIndexRange(dst_offset_i, m());
-  AssertIndexRange(dst_offset_j, n());
-  AssertIndexRange(src_offset_i, src.m());
-  AssertIndexRange(src_offset_j, src.n());
+  DEAL_II_AssertIndexRange(dst_offset_i, m());
+  DEAL_II_AssertIndexRange(dst_offset_j, n());
+  DEAL_II_AssertIndexRange(src_offset_i, src.m());
+  DEAL_II_AssertIndexRange(src_offset_j, src.n());
 
   // Compute maximal size of copied block
   const size_type rows = std::min(m() - dst_offset_i, src.m() - src_offset_i);
@@ -1163,10 +1165,10 @@ FullMatrix<number>::Tadd(const FullMatrix<number2> &src,
                          const size_type            src_offset_i,
                          const size_type            src_offset_j)
 {
-  AssertIndexRange(dst_offset_i, m());
-  AssertIndexRange(dst_offset_j, n());
-  AssertIndexRange(src_offset_i, src.n());
-  AssertIndexRange(src_offset_j, src.m());
+  DEAL_II_AssertIndexRange(dst_offset_i, m());
+  DEAL_II_AssertIndexRange(dst_offset_j, n());
+  DEAL_II_AssertIndexRange(src_offset_i, src.n());
+  DEAL_II_AssertIndexRange(src_offset_j, src.m());
 
   // Compute maximal size of copied block
   const size_type rows = std::min(m() - dst_offset_i, src.n() - src_offset_j);
@@ -1186,11 +1188,11 @@ template <typename number2>
 void
 FullMatrix<number>::Tadd(const number a, const FullMatrix<number2> &A)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(m() == n(), ExcNotQuadratic());
-  Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
-  Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_Assert(m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  DEAL_II_Assert(n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
   for (size_type i = 0; i < n(); ++i)
     for (size_type j = 0; j < m(); ++j)
@@ -1217,7 +1219,7 @@ namespace internal
     static number
     value(const FullMatrix<number> &)
     {
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
       return 0.0;
     }
   };
@@ -1236,8 +1238,8 @@ namespace internal
     value(const FullMatrix<number> &A)
     {
       using s_type = typename LAPACKFullMatrix<number>::size_type;
-      AssertIndexRange(A.m() - 1, std::numeric_limits<s_type>::max());
-      AssertIndexRange(A.n() - 1, std::numeric_limits<s_type>::max());
+      DEAL_II_AssertIndexRange(A.m() - 1, std::numeric_limits<s_type>::max());
+      DEAL_II_AssertIndexRange(A.n() - 1, std::numeric_limits<s_type>::max());
       LAPACKFullMatrix<number> lp_A(static_cast<s_type>(A.m()),
                                     static_cast<s_type>(A.n()));
       lp_A = A;
@@ -1248,7 +1250,7 @@ namespace internal
     static number
     value(const FullMatrix<number> &)
     {
-      AssertThrow(false, ExcNeedsLAPACK());
+      DEAL_II_AssertThrow(false, ExcNeedsLAPACK());
       return 0.0;
     }
 #endif
@@ -1261,10 +1263,10 @@ template <typename number>
 number
 FullMatrix<number>::determinant() const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(this->n_cols() == this->n_rows(),
-         ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+  DEAL_II_Assert(this->n_cols() == this->n_rows(),
+                 ExcDimensionMismatch(this->n_cols(), this->n_rows()));
 
   switch (this->n_cols())
     {
@@ -1290,10 +1292,10 @@ template <typename number>
 number
 FullMatrix<number>::trace() const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(this->n_cols() == this->n_rows(),
-         ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+  DEAL_II_Assert(this->n_cols() == this->n_rows(),
+                 ExcDimensionMismatch(this->n_cols(), this->n_rows()));
 
   number tr = 0;
   for (size_type i = 0; i < this->n_rows(); ++i)
@@ -1308,7 +1310,7 @@ template <typename number>
 typename FullMatrix<number>::real_type
 FullMatrix<number>::frobenius_norm() const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   real_type s = 0.;
   for (size_type i = 0; i < this->n_rows() * this->n_cols(); ++i)
@@ -1322,7 +1324,7 @@ template <typename number>
 typename FullMatrix<number>::real_type
 FullMatrix<number>::relative_symmetry_norm2() const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
   real_type s = 0.;
   real_type a = 0.;
@@ -1348,13 +1350,13 @@ template <typename number2>
 void
 FullMatrix<number>::invert(const FullMatrix<number2> &M)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
 
-  Assert(this->n_cols() == this->n_rows(), ExcNotQuadratic());
-  Assert(this->n_cols() == M.n_cols(),
-         ExcDimensionMismatch(this->n_cols(), M.n_cols()));
-  Assert(this->n_rows() == M.n_rows(),
-         ExcDimensionMismatch(this->n_rows(), M.n_rows()));
+  DEAL_II_Assert(this->n_cols() == this->n_rows(), ExcNotQuadratic());
+  DEAL_II_Assert(this->n_cols() == M.n_cols(),
+                 ExcDimensionMismatch(this->n_cols(), M.n_cols()));
+  DEAL_II_Assert(this->n_rows() == M.n_rows(),
+                 ExcDimensionMismatch(this->n_rows(), M.n_rows()));
 
   if (PointerComparison::equal(&M, this))
     {
@@ -1540,11 +1542,11 @@ template <typename number2>
 void
 FullMatrix<number>::cholesky(const FullMatrix<number2> &A)
 {
-  Assert(!A.empty(), ExcEmptyMatrix());
-  Assert(A.n() == A.m(), ExcNotQuadratic());
+  DEAL_II_Assert(!A.empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(A.n() == A.m(), ExcNotQuadratic());
   // Matrix must be symmetric.
-  Assert(A.relative_symmetry_norm2() < 1.0e-10,
-         ExcMessage("A must be symmetric."));
+  DEAL_II_Assert(A.relative_symmetry_norm2() < 1.0e-10,
+                 ExcMessage("A must be symmetric."));
 
   if (PointerComparison::equal(&A, this))
     {
@@ -1571,7 +1573,8 @@ FullMatrix<number>::cholesky(const FullMatrix<number2> &A)
               (*this)(i, j) = (1. / (*this)(j, j)) * (A(i, j) - SLikLjk);
               SLik2 += (*this)(i, j) * (*this)(i, j);
             }
-          AssertThrow(A(i, i) - SLik2 >= 0, ExcMatrixNotPositiveDefinite());
+          DEAL_II_AssertThrow(A(i, i) - SLik2 >= 0,
+                              ExcMatrixNotPositiveDefinite());
 
           (*this)(i, i) = std::sqrt(A(i, i) - SLik2);
         }
@@ -1585,8 +1588,8 @@ void
 FullMatrix<number>::outer_product(const Vector<number2> &V,
                                   const Vector<number2> &W)
 {
-  Assert(V.size() == W.size(),
-         ExcMessage("Vectors V, W must be the same size."));
+  DEAL_II_Assert(V.size() == W.size(),
+                 ExcMessage("Vectors V, W must be the same size."));
   this->reinit(V.size(), V.size());
 
   for (size_type i = 0; i < this->n(); i++)
@@ -1604,7 +1607,7 @@ template <typename number2>
 void
 FullMatrix<number>::left_invert(const FullMatrix<number2> &A)
 {
-  Assert(!A.empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!A.empty(), ExcEmptyMatrix());
 
   // If the matrix is square, simply do a
   // standard inversion
@@ -1616,9 +1619,9 @@ FullMatrix<number>::left_invert(const FullMatrix<number2> &A)
       return;
     }
 
-  Assert(A.m() > A.n(), ExcDimensionMismatch(A.m(), A.n()));
-  Assert(this->m() == A.n(), ExcDimensionMismatch(this->m(), A.n()));
-  Assert(this->n() == A.m(), ExcDimensionMismatch(this->n(), A.m()));
+  DEAL_II_Assert(A.m() > A.n(), ExcDimensionMismatch(A.m(), A.n()));
+  DEAL_II_Assert(this->m() == A.n(), ExcDimensionMismatch(this->m(), A.n()));
+  DEAL_II_Assert(this->n() == A.m(), ExcDimensionMismatch(this->n(), A.m()));
 
   FullMatrix<number2> A_t(A.n(), A.m());
   FullMatrix<number2> A_t_times_A(A.n(), A.n());
@@ -1628,7 +1631,7 @@ FullMatrix<number>::left_invert(const FullMatrix<number2> &A)
   A_t.Tadd(A, 1);
   A_t.mmult(A_t_times_A, A);
   if (number(A_t_times_A.determinant()) == number(0))
-    Assert(false, ExcSingular()) else
+    DEAL_II_Assert(false, ExcSingular()) else
     {
       A_t_times_A_inv.invert(A_t_times_A);
       A_t_times_A_inv.mmult(left_inv, A_t);
@@ -1642,7 +1645,7 @@ template <typename number2>
 void
 FullMatrix<number>::right_invert(const FullMatrix<number2> &A)
 {
-  Assert(!A.empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(!A.empty(), ExcEmptyMatrix());
 
   // If the matrix is square, simply do a
   // standard inversion
@@ -1654,9 +1657,9 @@ FullMatrix<number>::right_invert(const FullMatrix<number2> &A)
       return;
     }
 
-  Assert(A.n() > A.m(), ExcDimensionMismatch(A.n(), A.m()));
-  Assert(this->m() == A.n(), ExcDimensionMismatch(this->m(), A.n()));
-  Assert(this->n() == A.m(), ExcDimensionMismatch(this->n(), A.m()));
+  DEAL_II_Assert(A.n() > A.m(), ExcDimensionMismatch(A.n(), A.m()));
+  DEAL_II_Assert(this->m() == A.n(), ExcDimensionMismatch(this->m(), A.n()));
+  DEAL_II_Assert(this->n() == A.m(), ExcDimensionMismatch(this->n(), A.m()));
 
   FullMatrix<number> A_t(A.n(), A.m());
   FullMatrix<number> A_times_A_t(A.m(), A.m());
@@ -1666,7 +1669,7 @@ FullMatrix<number>::right_invert(const FullMatrix<number2> &A)
   A_t.Tadd(A, 1);
   A.mmult(A_times_A_t, A_t);
   if (number(A_times_A_t.determinant()) == number(0))
-    Assert(false, ExcSingular()) else
+    DEAL_II_Assert(false, ExcSingular()) else
     {
       A_times_A_t_inv.invert(A_times_A_t);
       A_t.mmult(right_inv, A_times_A_t_inv);
@@ -1687,13 +1690,13 @@ FullMatrix<number>::copy_from(const Tensor<2, dim> &T,
                               const size_type       dst_r,
                               const size_type       dst_c)
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
-  AssertIndexRange(src_r_j - src_r_i, this->m() - dst_r);
-  AssertIndexRange(src_c_j - src_c_i, this->n() - dst_c);
-  AssertIndexRange(src_r_j, dim);
-  AssertIndexRange(src_c_j, dim);
-  AssertIndexRange(src_r_i, src_r_j + 1);
-  AssertIndexRange(src_c_i, src_c_j + 1);
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_AssertIndexRange(src_r_j - src_r_i, this->m() - dst_r);
+  DEAL_II_AssertIndexRange(src_c_j - src_c_i, this->n() - dst_c);
+  DEAL_II_AssertIndexRange(src_r_j, dim);
+  DEAL_II_AssertIndexRange(src_c_j, dim);
+  DEAL_II_AssertIndexRange(src_r_i, src_r_j + 1);
+  DEAL_II_AssertIndexRange(src_c_i, src_c_j + 1);
 
   for (size_type i = 0; i < src_r_j - src_r_i + 1; i++)
     for (size_type j = 0; j < src_c_j - src_c_i + 1; j++)
@@ -1715,13 +1718,13 @@ void FullMatrix<number>::copy_to(Tensor<2, dim> &   T,
                                  const unsigned int dst_r,
                                  const unsigned int dst_c) const
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
-  AssertIndexRange(src_r_j - src_r_i, dim - dst_r);
-  AssertIndexRange(src_c_j - src_c_i, dim - dst_c);
-  AssertIndexRange(src_r_j, this->m());
-  AssertIndexRange(src_r_j, this->n());
-  AssertIndexRange(src_r_i, src_r_j + 1);
-  AssertIndexRange(src_c_j, src_c_j + 1);
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_AssertIndexRange(src_r_j - src_r_i, dim - dst_r);
+  DEAL_II_AssertIndexRange(src_c_j - src_c_i, dim - dst_c);
+  DEAL_II_AssertIndexRange(src_r_j, this->m());
+  DEAL_II_AssertIndexRange(src_r_j, this->n());
+  DEAL_II_AssertIndexRange(src_r_i, src_r_j + 1);
+  DEAL_II_AssertIndexRange(src_c_j, src_c_j + 1);
 
   for (size_type i = 0; i < src_r_j - src_r_i + 1; i++)
     for (size_type j = 0; j < src_c_j - src_c_i + 1; j++)
@@ -1741,9 +1744,9 @@ FullMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
                                         const Vector<somenumber> &src,
                                         const number              om) const
 {
-  Assert(m() == n(), ExcNotQuadratic());
-  Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
-  Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
+  DEAL_II_Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   const size_t      n       = src.size();
   somenumber *      dst_ptr = dst.begin();
@@ -1767,8 +1770,8 @@ FullMatrix<number>::print_formatted(std::ostream &     out,
 {
   unsigned int width = width_;
 
-  Assert((!this->empty()) || (this->n_cols() + this->n_rows() == 0),
-         ExcInternalError());
+  DEAL_II_Assert((!this->empty()) || (this->n_cols() + this->n_rows() == 0),
+                 ExcInternalError());
 
   // set output format, but store old
   // state
@@ -1802,7 +1805,7 @@ FullMatrix<number>::print_formatted(std::ostream &     out,
       out << std::endl;
     };
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
   // reset output format
   out.flags(old_flags);
   out.precision(old_precision);
@@ -1813,8 +1816,8 @@ template <typename number>
 void
 FullMatrix<number>::gauss_jordan()
 {
-  Assert(!this->empty(), ExcEmptyMatrix());
-  Assert(this->n_cols() == this->n_rows(), ExcNotQuadratic());
+  DEAL_II_Assert(!this->empty(), ExcEmptyMatrix());
+  DEAL_II_Assert(this->n_cols() == this->n_rows(), ExcNotQuadratic());
 
   // see if we can use Lapack algorithms
   // for this and if the type for 'number'
@@ -1855,8 +1858,8 @@ FullMatrix<number>::gauss_jordan()
         // calculating the LU factorization.
         getrf(&nn, &nn, &this->values[0], &nn, ipiv.data(), &info);
 
-        Assert(info >= 0, ExcInternalError());
-        Assert(info == 0, LACExceptions::ExcSingular());
+        DEAL_II_Assert(info >= 0, ExcInternalError());
+        DEAL_II_Assert(info == 0, LACExceptions::ExcSingular());
 
         // scratch array
         std::vector<number> inv_work(nn);
@@ -1867,8 +1870,8 @@ FullMatrix<number>::gauss_jordan()
         getri(
           &nn, &this->values[0], &nn, ipiv.data(), inv_work.data(), &nn, &info);
 
-        Assert(info >= 0, ExcInternalError());
-        Assert(info == 0, LACExceptions::ExcSingular());
+        DEAL_II_Assert(info >= 0, ExcInternalError());
+        DEAL_II_Assert(info == 0, LACExceptions::ExcSingular());
 
         return;
       }
@@ -1919,7 +1922,8 @@ FullMatrix<number>::gauss_jordan()
         }
       // check whether the pivot is
       // too small
-      Assert(max > 1.e-16 * typical_diagonal_element, ExcNotRegular(max));
+      DEAL_II_Assert(max > 1.e-16 * typical_diagonal_element,
+                     ExcNotRegular(max));
 
       // row interchange
       if (r > j)

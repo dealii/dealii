@@ -41,7 +41,7 @@ test(MatrixType &m)
   m = 0;
   m.compress(VectorOperation::insert);
 
-  Assert(fabs(m.frobenius_norm()) < 1e-15, ExcInternalError());
+  DEAL_II_Assert(fabs(m.frobenius_norm()) < 1e-15, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
@@ -70,7 +70,7 @@ main(int argc, char **argv)
         // TrilinosWrappers::SparseMatrix
         const unsigned int n_jobs = Utilities::Trilinos::get_n_mpi_processes(
           Utilities::Trilinos::comm_world());
-        Assert(n_dofs % n_jobs == 0, ExcInternalError());
+        DEAL_II_Assert(n_dofs % n_jobs == 0, ExcInternalError());
         const unsigned int n_local_dofs = n_dofs / n_jobs;
         Epetra_Map map(static_cast<TrilinosWrappers::types::int_type>(n_dofs),
                        static_cast<TrilinosWrappers::types::int_type>(

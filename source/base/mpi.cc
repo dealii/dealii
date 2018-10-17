@@ -71,7 +71,7 @@ namespace Utilities
     {
       int       n_jobs = 1;
       const int ierr   = MPI_Comm_size(mpi_communicator, &n_jobs);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       return n_jobs;
     }
@@ -82,7 +82,7 @@ namespace Utilities
     {
       int       rank = 0;
       const int ierr = MPI_Comm_rank(mpi_communicator, &rank);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       return rank;
     }
@@ -93,7 +93,7 @@ namespace Utilities
     {
       MPI_Comm  new_communicator;
       const int ierr = MPI_Comm_dup(mpi_communicator, &new_communicator);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
       return new_communicator;
     }
 
@@ -110,11 +110,11 @@ namespace Utilities
 #  else
       int rank;
       int ierr = MPI_Comm_rank(comm, &rank);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       int grp_rank;
       ierr = MPI_Group_rank(group, &grp_rank);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
       if (grp_rank == MPI_UNDEFINED)
         {
           *new_comm = MPI_COMM_NULL;
@@ -123,23 +123,23 @@ namespace Utilities
 
       int grp_size;
       ierr = MPI_Group_size(group, &grp_size);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       ierr = MPI_Comm_dup(MPI_COMM_SELF, new_comm);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       MPI_Group parent_grp;
       ierr = MPI_Comm_group(comm, &parent_grp);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       std::vector<int> pids(grp_size);
       std::vector<int> grp_pids(grp_size);
       std::iota(grp_pids.begin(), grp_pids.end(), 0);
       ierr = MPI_Group_translate_ranks(
         group, grp_size, grp_pids.data(), parent_grp, pids.data());
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
       ierr = MPI_Group_free(&parent_grp);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       MPI_Comm comm_old = *new_comm;
       MPI_Comm ic;
@@ -153,25 +153,25 @@ namespace Utilities
                 {
                   ierr = (MPI_Intercomm_create(
                     *new_comm, 0, comm, pids[(gid + 1) * merge_sz], tag, &ic));
-                  AssertThrowMPI(ierr);
+                  DEAL_II_AssertThrowMPI(ierr);
                   ierr = MPI_Intercomm_merge(ic, 0 /* LOW */, new_comm);
-                  AssertThrowMPI(ierr);
+                  DEAL_II_AssertThrowMPI(ierr);
                 }
             }
           else
             {
               ierr = MPI_Intercomm_create(
                 *new_comm, 0, comm, pids[(gid - 1) * merge_sz], tag, &ic);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
               ierr = MPI_Intercomm_merge(ic, 1 /* HIGH */, new_comm);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
           if (*new_comm != comm_old)
             {
               ierr = MPI_Comm_free(&ic);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
               ierr = MPI_Comm_free(&comm_old);
-              AssertThrowMPI(ierr);
+              DEAL_II_AssertThrowMPI(ierr);
             }
         }
 
@@ -191,11 +191,11 @@ namespace Utilities
 
       for (unsigned int i = 0; i < destinations.size(); ++i)
         {
-          Assert(destinations[i] < n_procs,
-                 ExcIndexRange(destinations[i], 0, n_procs));
-          Assert(destinations[i] != myid,
-                 ExcMessage(
-                   "There is no point in communicating with ourselves."));
+          DEAL_II_Assert(destinations[i] < n_procs,
+                         ExcIndexRange(destinations[i], 0, n_procs));
+          DEAL_II_Assert(
+            destinations[i] != myid,
+            ExcMessage("There is no point in communicating with ourselves."));
         }
 
 #  if DEAL_II_MPI_VERSION_GTE(2, 2)
@@ -211,7 +211,7 @@ namespace Utilities
       const int    ierr = MPI_Reduce_scatter_block(
         &dest_vector[0], &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
 
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // Send myid to every process in `destinations` vector...
       std::vector<MPI_Request> send_requests(destinations.size());
@@ -276,7 +276,7 @@ namespace Utilities
                                      max_n_destinations,
                                      MPI_UNSIGNED,
                                      mpi_comm);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // now we know who is going to communicate with whom. collect who is
       // going to communicate with us!
@@ -304,11 +304,11 @@ namespace Utilities
 
       for (unsigned int i = 0; i < destinations.size(); ++i)
         {
-          Assert(destinations[i] < n_procs,
-                 ExcIndexRange(destinations[i], 0, n_procs));
-          Assert(destinations[i] != Utilities::MPI::this_mpi_process(mpi_comm),
-                 ExcMessage(
-                   "There is no point in communicating with ourselves."));
+          DEAL_II_Assert(destinations[i] < n_procs,
+                         ExcIndexRange(destinations[i], 0, n_procs));
+          DEAL_II_Assert(
+            destinations[i] != Utilities::MPI::this_mpi_process(mpi_comm),
+            ExcMessage("There is no point in communicating with ourselves."));
         }
 
       // Calculate the number of messages to send to each process
@@ -324,7 +324,7 @@ namespace Utilities
       const int ierr = MPI_Reduce_scatter_block(
         &dest_vector[0], &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
 
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       return n_recv_from;
 #  else
@@ -369,7 +369,7 @@ namespace Utilities
         const MinMaxAvg *in_lhs    = static_cast<const MinMaxAvg *>(in_lhs_);
         MinMaxAvg *      inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
 
-        Assert(*len == 1, ExcInternalError());
+        DEAL_II_Assert(*len == 1, ExcInternalError());
 
         inout_rhs->sum += in_lhs->sum;
         if (inout_rhs->min > in_lhs->min)
@@ -434,7 +434,7 @@ namespace Utilities
 
       MPI_Op op;
       int    ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       MinMaxAvg in;
       in.sum = in.min = in.max = my_value;
@@ -446,18 +446,18 @@ namespace Utilities
       MPI_Datatype types[]         = {MPI_DOUBLE, MPI_INT};
 
       ierr = MPI_Type_struct(2, lengths, displacements, types, &type);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       ierr = MPI_Type_commit(&type);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
       ierr = MPI_Allreduce(&in, &result, 1, type, op, mpi_communicator);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       ierr = MPI_Type_free(&type);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       ierr = MPI_Op_free(&op);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       result.avg = result.sum / numproc;
 
@@ -514,9 +514,10 @@ namespace Utilities
     {
       static bool constructor_has_already_run = false;
       (void)constructor_has_already_run;
-      Assert(constructor_has_already_run == false,
-             ExcMessage("You can only create a single object of this class "
-                        "in a program since it initializes the MPI system."));
+      DEAL_II_Assert(constructor_has_already_run == false,
+                     ExcMessage(
+                       "You can only create a single object of this class "
+                       "in a program since it initializes the MPI system."));
 
 
       int ierr = 0;
@@ -525,9 +526,10 @@ namespace Utilities
       // Otherwise, we will do it.
       int MPI_has_been_started = 0;
       ierr                     = MPI_Initialized(&MPI_has_been_started);
-      AssertThrowMPI(ierr);
-      AssertThrow(MPI_has_been_started == 0,
-                  ExcMessage("MPI error. You can only start MPI once!"));
+      DEAL_II_AssertThrowMPI(ierr);
+      DEAL_II_AssertThrow(MPI_has_been_started == 0,
+                          ExcMessage(
+                            "MPI error. You can only start MPI once!"));
 
       int provided;
       // this works like ierr = MPI_Init (&argc, &argv); but tells MPI that
@@ -536,11 +538,11 @@ namespace Utilities
       // http://www.open-mpi.org/community/lists/users/2010/03/12244.php
       int wanted = MPI_THREAD_SERIALIZED;
       ierr       = MPI_Init_thread(&argc, &argv, wanted, &provided);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       // disable for now because at least some implementations always return
       // MPI_THREAD_SINGLE.
-      // Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
+      // DEAL_II_Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
       //    ExcMessage("MPI reports that we are not allowed to use multiple
       //    threads."));
 #else
@@ -556,11 +558,12 @@ namespace Utilities
 #  ifdef DEAL_II_WITH_SLEPC
       // Initialize SLEPc (with PETSc):
       ierr = SlepcInitialize(&argc, &argv, nullptr, nullptr);
-      AssertThrow(ierr == 0, SLEPcWrappers::SolverBase::ExcSLEPcError(ierr));
+      DEAL_II_AssertThrow(ierr == 0,
+                          SLEPcWrappers::SolverBase::ExcSLEPcError(ierr));
 #  else
       // or just initialize PETSc alone:
       ierr = PetscInitialize(&argc, &argv, nullptr, nullptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
 #  endif
 
       // Disable PETSc exception handling. This just prints a large wall
@@ -625,7 +628,7 @@ namespace Utilities
                                          max_hostname_size,
                                          MPI_CHAR,
                                          MPI_COMM_WORLD);
-          AssertThrowMPI(ierr);
+          DEAL_II_AssertThrowMPI(ierr);
 
           // search how often our own hostname appears and the how-manyth
           // instance the current process represents
@@ -640,7 +643,7 @@ namespace Utilities
                 if (i <= MPI::this_mpi_process(MPI_COMM_WORLD))
                   ++nth_process_on_host;
               }
-          Assert(nth_process_on_host > 0, ExcInternalError());
+          DEAL_II_Assert(nth_process_on_host > 0, ExcInternalError());
 
 
           // compute how many cores each process gets. if the number does not
@@ -741,7 +744,7 @@ namespace Utilities
             {
               const int ierr = MPI_Finalize();
               (void)ierr;
-              AssertNothrow(ierr == MPI_SUCCESS, dealii::ExcMPI(ierr));
+              DEAL_II_AssertNothrow(ierr == MPI_SUCCESS, dealii::ExcMPI(ierr));
             }
         }
 #endif
@@ -755,7 +758,7 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       int       MPI_has_been_started = 0;
       const int ierr                 = MPI_Initialized(&MPI_has_been_started);
-      AssertThrowMPI(ierr);
+      DEAL_II_AssertThrowMPI(ierr);
 
       return (MPI_has_been_started > 0);
 #else

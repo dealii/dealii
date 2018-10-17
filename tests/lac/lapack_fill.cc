@@ -41,8 +41,8 @@ main()
   // insert C into A's middle:
   A.fill(C, 3, 3, 0, 0);
   // check some values
-  Assert(A(3, 3) == 1, ExcInternalError());
-  Assert(A(5, 5) == 1, ExcInternalError());
+  DEAL_II_Assert(A(3, 3) == 1, ExcInternalError());
+  DEAL_II_Assert(A(5, 5) == 1, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

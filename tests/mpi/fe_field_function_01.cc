@@ -99,9 +99,9 @@ test()
           value       = field_function.value(p);
           point_found = true;
 
-          Assert(std::fabs(value - (p[0] + 2)) <
-                   1e-8 * std::fabs(value + (p[0] + 2)),
-                 ExcInternalError());
+          DEAL_II_Assert(std::fabs(value - (p[0] + 2)) <
+                           1e-8 * std::fabs(value + (p[0] + 2)),
+                         ExcInternalError());
         }
       catch (typename VectorTools::ExcPointNotAvailableHere &)
         {
@@ -110,8 +110,9 @@ test()
 
       // the point should be found at least once (it  might also be found
       // in the ghost layer)
-      Assert(Utilities::MPI::sum(point_found ? 1 : 0, MPI_COMM_WORLD) >= 1,
-             ExcInternalError());
+      DEAL_II_Assert(Utilities::MPI::sum(point_found ? 1 : 0, MPI_COMM_WORLD) >=
+                       1,
+                     ExcInternalError());
     }
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

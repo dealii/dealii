@@ -81,7 +81,8 @@ public:
   gradient(const Point<dim> &point, const unsigned int component = 0) const
   {
     Tensor<1, dim> d = point - origin;
-    Assert(d.norm() > 0, dealii::ExcMessage("gradient is not defined at zero"));
+    DEAL_II_Assert(d.norm() > 0,
+                   dealii::ExcMessage("gradient is not defined at zero"));
     d *= -std::exp(-d.norm()) / d.norm();
     return d;
   }
@@ -91,7 +92,7 @@ public:
   {
     Tensor<1, dim> dir = p - origin;
     const double   r   = dir.norm();
-    Assert(r > 0.0, ExcMessage("r is not positive"));
+    DEAL_II_Assert(r > 0.0, ExcMessage("r is not positive"));
     dir /= r;
     SymmetricTensor<2, dim> dir_x_dir;
     for (unsigned int i = 0; i < dim; i++)
@@ -179,13 +180,13 @@ check_consistency(const Point<dim> &    p,
                              sp3 + v_s3 * h_f3;
 
   const double v_d = v_s - v_e;
-  AssertThrow(std::abs(v_d) < eps, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(v_d) < eps, ExcInternalError());
   const Tensor<1, dim> g_d = g_s - g_e;
-  AssertThrow(g_d.norm() < eps, ExcInternalError());
+  DEAL_II_AssertThrow(g_d.norm() < eps, ExcInternalError());
 
   // see note above.
   const Tensor<2, dim> h_d = h_s - h_e;
-  AssertThrow(h_d.norm() < eps, ExcInternalError());
+  DEAL_II_AssertThrow(h_d.norm() < eps, ExcInternalError());
 }
 
 /**
@@ -237,11 +238,12 @@ test(const FiniteElement<dim> & fe_base,
       return &fun3;
     };
   functions[2].resize(1);
-  functions[2][0] = [&](
-                      const typename Triangulation<dim, dim>::cell_iterator &) {
-    AssertThrow(false, ExcMessage("Called enrichment function for FE_Nothing"));
-    return nullptr;
-  };
+  functions[2][0] =
+    [&](const typename Triangulation<dim, dim>::cell_iterator &) {
+      DEAL_II_AssertThrow(
+        false, ExcMessage("Called enrichment function for FE_Nothing"));
+      return nullptr;
+    };
 
   FE_Enriched<dim> fe_enriched(&fe_base, fe_enrichements, functions);
   FESystem<dim>    fe_system(fe_base, 1, fe_en1, 1, fe_en2, 2);
@@ -286,13 +288,14 @@ test(const FiniteElement<dim> & fe_base,
                                             update_hessians |
                                             update_quadrature_points);
 
-  AssertThrow(dof_handler_enriched.n_dofs() == dof_handler_system.n_dofs(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(dof_handler_enriched.n_dofs() ==
+                        dof_handler_system.n_dofs(),
+                      ExcInternalError());
   Vector<double> solution(dof_handler_enriched.n_dofs());
 
   const unsigned int dofs_per_cell = fe_enriched.dofs_per_cell;
-  Assert(fe_enriched.dofs_per_cell == fe_system.dofs_per_cell,
-         ExcInternalError());
+  DEAL_II_Assert(fe_enriched.dofs_per_cell == fe_system.dofs_per_cell,
+                 ExcInternalError());
 
   typename DoFHandler<dim>::active_cell_iterator
     cell_enriched = dof_handler_enriched.begin_active(),

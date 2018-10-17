@@ -198,11 +198,11 @@ namespace internal
       /**
        * Exception
        */
-      DeclException2(ExcMemoryInexact,
-                     int,
-                     int,
-                     << "The containers have sizes " << arg1 << " and " << arg2
-                     << ", which is not as expected.");
+      DEAL_II_DeclException2(ExcMemoryInexact,
+                             int,
+                             int,
+                             << "The containers have sizes " << arg1 << " and "
+                             << arg2 << ", which is not as expected.");
     };
 
     // TODO: Replace TriaObjectsHex to avoid this specialization
@@ -255,11 +255,11 @@ namespace internal
       /**
        * Exception
        */
-      DeclException2(ExcMemoryInexact,
-                     int,
-                     int,
-                     << "The containers have sizes " << arg1 << " and " << arg2
-                     << ", which is not as expected.");
+      DEAL_II_DeclException2(ExcMemoryInexact,
+                             int,
+                             int,
+                             << "The containers have sizes " << arg1 << " and "
+                             << arg2 << ", which is not as expected.");
     };
 
 

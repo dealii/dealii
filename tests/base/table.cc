@@ -46,16 +46,21 @@ main()
       for (unsigned int i = 0; i < 3; ++i)
         for (unsigned int j = 0; j < 3; ++j)
           {
-            AssertThrow(Td[i][j] == Td(i, j), ExcInternalError());
-            AssertThrow(Ti[i][j] == Ti(i, j), ExcInternalError());
-            AssertThrow(Ti[i][j] == Td(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(Td[i][j] == Td(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(Ti[i][j] == Ti(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(Ti[i][j] == Td(i, j), ExcInternalError());
 
-            AssertThrow(*(Td[i].begin() + j) == Td(i, j), ExcInternalError());
-            AssertThrow(*(Ti[i].begin() + j) == Ti(i, j), ExcInternalError());
-            AssertThrow(*(Ti[i].begin() + j) == Td(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(*(Td[i].begin() + j) == Td(i, j),
+                                ExcInternalError());
+            DEAL_II_AssertThrow(*(Ti[i].begin() + j) == Ti(i, j),
+                                ExcInternalError());
+            DEAL_II_AssertThrow(*(Ti[i].begin() + j) == Td(i, j),
+                                ExcInternalError());
 
-            AssertThrow(&*(Td[i].begin() + j) == &Td(i, j), ExcInternalError());
-            AssertThrow(&*(Ti[i].begin() + j) == &Ti(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(&*(Td[i].begin() + j) == &Td(i, j),
+                                ExcInternalError());
+            DEAL_II_AssertThrow(&*(Ti[i].begin() + j) == &Ti(i, j),
+                                ExcInternalError());
 
             deallog << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
           };
@@ -76,22 +81,28 @@ main()
       for (unsigned int i = 0; i < 4; ++i)
         for (unsigned int j = 0; j < 3; ++j)
           {
-            AssertThrow(Td[i][j] == Td(i, j), ExcInternalError());
-            AssertThrow(Ti[i][j] == Ti(i, j), ExcInternalError());
-            AssertThrow(Ti[i][j] == Td(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(Td[i][j] == Td(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(Ti[i][j] == Ti(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(Ti[i][j] == Td(i, j), ExcInternalError());
 
-            AssertThrow(*(Td[i].begin() + j) == Td(i, j), ExcInternalError());
-            AssertThrow(*(Ti[i].begin() + j) == Ti(i, j), ExcInternalError());
-            AssertThrow(*(Ti[i].begin() + j) == Td(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(*(Td[i].begin() + j) == Td(i, j),
+                                ExcInternalError());
+            DEAL_II_AssertThrow(*(Ti[i].begin() + j) == Ti(i, j),
+                                ExcInternalError());
+            DEAL_II_AssertThrow(*(Ti[i].begin() + j) == Td(i, j),
+                                ExcInternalError());
 
-            AssertThrow(&*(Td[i].begin() + j) == &Td(i, j), ExcInternalError());
-            AssertThrow(&*(Ti[i].begin() + j) == &Ti(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(&*(Td[i].begin() + j) == &Td(i, j),
+                                ExcInternalError());
+            DEAL_II_AssertThrow(&*(Ti[i].begin() + j) == &Ti(i, j),
+                                ExcInternalError());
 
             deallog << i << " " << j << " " << Td[i][j] << " ok" << std::endl;
           };
 
       for (unsigned int i = 0; i < 4; ++i)
-        AssertThrow(Td[i].end() - Td[i].begin() == 3, ExcInternalError());
+        DEAL_II_AssertThrow(Td[i].end() - Td[i].begin() == 3,
+                            ExcInternalError());
     };
 
 
@@ -140,9 +151,9 @@ main()
 
       for (unsigned int i = 0; i < N; ++i)
         {
-          AssertThrow(Td[i] == Td(i), ExcInternalError());
-          AssertThrow(Ti[i] == Ti(i), ExcInternalError());
-          AssertThrow(Ti[i] == Td(i), ExcInternalError());
+          DEAL_II_AssertThrow(Td[i] == Td(i), ExcInternalError());
+          DEAL_II_AssertThrow(Ti[i] == Ti(i), ExcInternalError());
+          DEAL_II_AssertThrow(Ti[i] == Td(i), ExcInternalError());
 
           deallog << i << " " << Td[i] << " ok" << std::endl;
         };
@@ -168,21 +179,24 @@ main()
         for (unsigned int j = 0; j < J; ++j)
           for (unsigned int k = 0; k < K; ++k)
             {
-              AssertThrow(Td[i][j][k] == Td(i, j, k), ExcInternalError());
-              AssertThrow(Ti[i][j][k] == Ti(i, j, k), ExcInternalError());
-              AssertThrow(Ti[i][j][k] == Td(i, j, k), ExcInternalError());
+              DEAL_II_AssertThrow(Td[i][j][k] == Td(i, j, k),
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(Ti[i][j][k] == Ti(i, j, k),
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(Ti[i][j][k] == Td(i, j, k),
+                                  ExcInternalError());
 
-              AssertThrow(*(Td[i][j].begin() + k) == Td(i, j, k),
-                          ExcInternalError());
-              AssertThrow(*(Ti[i][j].begin() + k) == Ti(i, j, k),
-                          ExcInternalError());
-              AssertThrow(*(Ti[i][j].begin() + k) == Td(i, j, k),
-                          ExcInternalError());
+              DEAL_II_AssertThrow(*(Td[i][j].begin() + k) == Td(i, j, k),
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(*(Ti[i][j].begin() + k) == Ti(i, j, k),
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(*(Ti[i][j].begin() + k) == Td(i, j, k),
+                                  ExcInternalError());
 
-              AssertThrow(&*(Td[i][j].begin() + k) == &Td(i, j, k),
-                          ExcInternalError());
-              AssertThrow(&*(Ti[i][j].begin() + k) == &Ti(i, j, k),
-                          ExcInternalError());
+              DEAL_II_AssertThrow(&*(Td[i][j].begin() + k) == &Td(i, j, k),
+                                  ExcInternalError());
+              DEAL_II_AssertThrow(&*(Ti[i][j].begin() + k) == &Ti(i, j, k),
+                                  ExcInternalError());
 
               deallog << i << " " << j << " " << k << " " << Td[i][j][k]
                       << " ok" << std::endl;
@@ -190,9 +204,9 @@ main()
 
       for (unsigned int i = 0; i < I; ++i)
         for (unsigned int j = 0; j < J; ++j)
-          AssertThrow(Td[i][j].end() - Td[i][j].begin() ==
-                        static_cast<signed int>(K),
-                      ExcInternalError());
+          DEAL_II_AssertThrow(Td[i][j].end() - Td[i][j].begin() ==
+                                static_cast<signed int>(K),
+                              ExcInternalError());
     };
 
   // a 4d-table
@@ -224,24 +238,29 @@ main()
           for (unsigned int k = 0; k < K; ++k)
             for (unsigned int l = 0; l < L; ++l)
               {
-                AssertThrow(Td[i][j][k][l] == Td(i, j, k, l),
-                            ExcInternalError());
-                AssertThrow(Ti[i][j][k][l] == Ti(i, j, k, l),
-                            ExcInternalError());
-                AssertThrow(Ti[i][j][k][l] == Td(i, j, k, l),
-                            ExcInternalError());
+                DEAL_II_AssertThrow(Td[i][j][k][l] == Td(i, j, k, l),
+                                    ExcInternalError());
+                DEAL_II_AssertThrow(Ti[i][j][k][l] == Ti(i, j, k, l),
+                                    ExcInternalError());
+                DEAL_II_AssertThrow(Ti[i][j][k][l] == Td(i, j, k, l),
+                                    ExcInternalError());
 
-                AssertThrow(*(Td[i][j][k].begin() + l) == Td(i, j, k, l),
-                            ExcInternalError());
-                AssertThrow(*(Ti[i][j][k].begin() + l) == Ti(i, j, k, l),
-                            ExcInternalError());
-                AssertThrow(*(Ti[i][j][k].begin() + l) == Td(i, j, k, l),
-                            ExcInternalError());
+                DEAL_II_AssertThrow(*(Td[i][j][k].begin() + l) ==
+                                      Td(i, j, k, l),
+                                    ExcInternalError());
+                DEAL_II_AssertThrow(*(Ti[i][j][k].begin() + l) ==
+                                      Ti(i, j, k, l),
+                                    ExcInternalError());
+                DEAL_II_AssertThrow(*(Ti[i][j][k].begin() + l) ==
+                                      Td(i, j, k, l),
+                                    ExcInternalError());
 
-                AssertThrow(&*(Td[i][j][k].begin() + l) == &Td(i, j, k, l),
-                            ExcInternalError());
-                AssertThrow(&*(Ti[i][j][k].begin() + l) == &Ti(i, j, k, l),
-                            ExcInternalError());
+                DEAL_II_AssertThrow(&*(Td[i][j][k].begin() + l) ==
+                                      &Td(i, j, k, l),
+                                    ExcInternalError());
+                DEAL_II_AssertThrow(&*(Ti[i][j][k].begin() + l) ==
+                                      &Ti(i, j, k, l),
+                                    ExcInternalError());
 
                 deallog << i << " " << j << " " << k << " " << l << " "
                         << Td[i][j][k][l] << " ok" << std::endl;
@@ -250,11 +269,11 @@ main()
       for (unsigned int i = 0; i < I; ++i)
         for (unsigned int j = 0; j < J; ++j)
           for (unsigned int k = 0; k < K; ++k)
-            AssertThrow(Td[i][j][k].end() - Td[i][j][k].begin() ==
-                          static_cast<signed int>(L),
-                        ExcDimensionMismatch(Td[i][j][k].end() -
-                                               Td[i][j][k].begin(),
-                                             static_cast<signed int>(L)));
+            DEAL_II_AssertThrow(
+              Td[i][j][k].end() - Td[i][j][k].begin() ==
+                static_cast<signed int>(L),
+              ExcDimensionMismatch(Td[i][j][k].end() - Td[i][j][k].begin(),
+                                   static_cast<signed int>(L)));
     };
 
   // 5d-table
@@ -281,29 +300,29 @@ main()
             for (unsigned int l = 0; l < L; ++l)
               for (unsigned int m = 0; m < M; ++m)
                 {
-                  AssertThrow(Td[i][j][k][l][m] == Td(i, j, k, l, m),
-                              ExcInternalError());
-                  AssertThrow(Ti[i][j][k][l][m] == Ti(i, j, k, l, m),
-                              ExcInternalError());
-                  AssertThrow(Ti[i][j][k][l][m] == Td(i, j, k, l, m),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(Td[i][j][k][l][m] == Td(i, j, k, l, m),
+                                      ExcInternalError());
+                  DEAL_II_AssertThrow(Ti[i][j][k][l][m] == Ti(i, j, k, l, m),
+                                      ExcInternalError());
+                  DEAL_II_AssertThrow(Ti[i][j][k][l][m] == Td(i, j, k, l, m),
+                                      ExcInternalError());
 
-                  AssertThrow(*(Td[i][j][k][l].begin() + m) ==
-                                Td(i, j, k, l, m),
-                              ExcInternalError());
-                  AssertThrow(*(Ti[i][j][k][l].begin() + m) ==
-                                Ti(i, j, k, l, m),
-                              ExcInternalError());
-                  AssertThrow(*(Ti[i][j][k][l].begin() + m) ==
-                                Td(i, j, k, l, m),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(*(Td[i][j][k][l].begin() + m) ==
+                                        Td(i, j, k, l, m),
+                                      ExcInternalError());
+                  DEAL_II_AssertThrow(*(Ti[i][j][k][l].begin() + m) ==
+                                        Ti(i, j, k, l, m),
+                                      ExcInternalError());
+                  DEAL_II_AssertThrow(*(Ti[i][j][k][l].begin() + m) ==
+                                        Td(i, j, k, l, m),
+                                      ExcInternalError());
 
-                  AssertThrow(&*(Td[i][j][k][l].begin() + m) ==
-                                &Td(i, j, k, l, m),
-                              ExcInternalError());
-                  AssertThrow(&*(Ti[i][j][k][l].begin() + m) ==
-                                &Ti(i, j, k, l, m),
-                              ExcInternalError());
+                  DEAL_II_AssertThrow(&*(Td[i][j][k][l].begin() + m) ==
+                                        &Td(i, j, k, l, m),
+                                      ExcInternalError());
+                  DEAL_II_AssertThrow(&*(Ti[i][j][k][l].begin() + m) ==
+                                        &Ti(i, j, k, l, m),
+                                      ExcInternalError());
 
                   deallog << i << " " << j << " " << k << " " << l << " " << m
                           << " " << Td[i][j][k][l][m] << " ok" << std::endl;
@@ -313,11 +332,12 @@ main()
         for (unsigned int j = 0; j < J; ++j)
           for (unsigned int k = 0; k < K; ++k)
             for (unsigned int l = 0; l < L; ++l)
-              AssertThrow(Td[i][j][k][l].end() - Td[i][j][k][l].begin() ==
-                            static_cast<signed int>(M),
-                          ExcDimensionMismatch(Td[i][j][k][l].end() -
-                                                 Td[i][j][k][l].begin(),
-                                               static_cast<signed int>(M)));
+              DEAL_II_AssertThrow(
+                Td[i][j][k][l].end() - Td[i][j][k][l].begin() ==
+                  static_cast<signed int>(M),
+                ExcDimensionMismatch(Td[i][j][k][l].end() -
+                                       Td[i][j][k][l].begin(),
+                                     static_cast<signed int>(M)));
     };
 
   // a 6d-table
@@ -346,29 +366,32 @@ main()
               for (unsigned int m = 0; m < M; ++m)
                 for (unsigned int n = 0; n < N; ++n)
                   {
-                    AssertThrow(Td[i][j][k][l][m][n] == Td(i, j, k, l, m, n),
-                                ExcInternalError());
-                    AssertThrow(Ti[i][j][k][l][m][n] == Ti(i, j, k, l, m, n),
-                                ExcInternalError());
-                    AssertThrow(Ti[i][j][k][l][m][n] == Td(i, j, k, l, m, n),
-                                ExcInternalError());
+                    DEAL_II_AssertThrow(Td[i][j][k][l][m][n] ==
+                                          Td(i, j, k, l, m, n),
+                                        ExcInternalError());
+                    DEAL_II_AssertThrow(Ti[i][j][k][l][m][n] ==
+                                          Ti(i, j, k, l, m, n),
+                                        ExcInternalError());
+                    DEAL_II_AssertThrow(Ti[i][j][k][l][m][n] ==
+                                          Td(i, j, k, l, m, n),
+                                        ExcInternalError());
 
-                    AssertThrow(*(Td[i][j][k][l][m].begin() + n) ==
-                                  Td(i, j, k, l, m, n),
-                                ExcInternalError());
-                    AssertThrow(*(Ti[i][j][k][l][m].begin() + n) ==
-                                  Ti(i, j, k, l, m, n),
-                                ExcInternalError());
-                    AssertThrow(*(Ti[i][j][k][l][m].begin() + n) ==
-                                  Td(i, j, k, l, m, n),
-                                ExcInternalError());
+                    DEAL_II_AssertThrow(*(Td[i][j][k][l][m].begin() + n) ==
+                                          Td(i, j, k, l, m, n),
+                                        ExcInternalError());
+                    DEAL_II_AssertThrow(*(Ti[i][j][k][l][m].begin() + n) ==
+                                          Ti(i, j, k, l, m, n),
+                                        ExcInternalError());
+                    DEAL_II_AssertThrow(*(Ti[i][j][k][l][m].begin() + n) ==
+                                          Td(i, j, k, l, m, n),
+                                        ExcInternalError());
 
-                    AssertThrow(&*(Td[i][j][k][l][m].begin() + n) ==
-                                  &Td(i, j, k, l, m, n),
-                                ExcInternalError());
-                    AssertThrow(&*(Ti[i][j][k][l][m].begin() + n) ==
-                                  &Ti(i, j, k, l, m, n),
-                                ExcInternalError());
+                    DEAL_II_AssertThrow(&*(Td[i][j][k][l][m].begin() + n) ==
+                                          &Td(i, j, k, l, m, n),
+                                        ExcInternalError());
+                    DEAL_II_AssertThrow(&*(Ti[i][j][k][l][m].begin() + n) ==
+                                          &Ti(i, j, k, l, m, n),
+                                        ExcInternalError());
 
                     deallog << i << " " << j << " " << k << " " << l << " " << m
                             << " " << n << " " << Td[i][j][k][l][m][n] << " ok"
@@ -380,11 +403,11 @@ main()
           for (unsigned int k = 0; k < K; ++k)
             for (unsigned int l = 0; l < L; ++l)
               for (unsigned int m = 0; m < M; ++m)
-                AssertThrow(Td[i][j][k][l][m].end() -
-                                Td[i][j][k][l][m].begin() ==
-                              static_cast<signed int>(N),
-                            ExcDimensionMismatch(Td[i][j][k][l][m].end() -
-                                                   Td[i][j][k][l][m].begin(),
-                                                 static_cast<signed int>(N)));
+                DEAL_II_AssertThrow(
+                  Td[i][j][k][l][m].end() - Td[i][j][k][l][m].begin() ==
+                    static_cast<signed int>(N),
+                  ExcDimensionMismatch(Td[i][j][k][l][m].end() -
+                                         Td[i][j][k][l][m].begin(),
+                                       static_cast<signed int>(N)));
     };
 }

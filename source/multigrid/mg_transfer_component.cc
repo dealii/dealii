@@ -117,8 +117,9 @@ namespace
           selected[target_component[i]] = true;
       }
 
-    Assert(selected.size() == target_component.size(),
-           ExcDimensionMismatch(selected.size(), target_component.size()));
+    DEAL_II_Assert(selected.size() == target_component.size(),
+                   ExcDimensionMismatch(selected.size(),
+                                        target_component.size()));
 
     // Compute the number of blocks needed
     const unsigned int n_selected =
@@ -186,8 +187,9 @@ namespace
     const std::vector<unsigned int> &                  target_component,
     std::vector<std::vector<types::global_dof_index>> &ndofs)
   {
-    Assert(component_mask.represents_n_components(target_component.size()),
-           ExcMessage("The component mask does not have the correct size."));
+    DEAL_II_Assert(
+      component_mask.represents_n_components(target_component.size()),
+      ExcMessage("The component mask does not have the correct size."));
 
     unsigned int selected_block = 0;
     for (unsigned int i = 0; i < target_component.size(); ++i)
@@ -221,8 +223,8 @@ MGTransferSelect<number>::do_copy_to_mg(
 {
   dst = 0;
 
-  Assert(sizes.size() == mg_dof_handler.get_triangulation().n_levels(),
-         ExcMatricesNotBuilt());
+  DEAL_II_Assert(sizes.size() == mg_dof_handler.get_triangulation().n_levels(),
+                 ExcMatricesNotBuilt());
 
   reinit_vector_by_components(
     mg_dof_handler, dst, mg_component_mask, mg_target_component, sizes);
@@ -270,14 +272,14 @@ MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
   else
     {
       // otherwise, check it for consistency
-      Assert(target_component.size() == mg_dof.get_fe(0).n_components(),
-             ExcDimensionMismatch(target_component.size(),
-                                  mg_dof.get_fe(0).n_components()));
+      DEAL_II_Assert(target_component.size() == mg_dof.get_fe(0).n_components(),
+                     ExcDimensionMismatch(target_component.size(),
+                                          mg_dof.get_fe(0).n_components()));
 
       for (unsigned int i = 0; i < target_component.size(); ++i)
         {
-          Assert(i < target_component.size(),
-                 ExcIndexRange(i, 0, target_component.size()));
+          DEAL_II_Assert(i < target_component.size(),
+                         ExcIndexRange(i, 0, target_component.size()));
         }
     }
   // Do the same for the multilevel
@@ -291,14 +293,15 @@ MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
     }
   else
     {
-      Assert(mg_target_component.size() == mg_dof.get_fe(0).n_components(),
-             ExcDimensionMismatch(mg_target_component.size(),
-                                  mg_dof.get_fe(0).n_components()));
+      DEAL_II_Assert(mg_target_component.size() ==
+                       mg_dof.get_fe(0).n_components(),
+                     ExcDimensionMismatch(mg_target_component.size(),
+                                          mg_dof.get_fe(0).n_components()));
 
       for (unsigned int i = 0; i < mg_target_component.size(); ++i)
         {
-          Assert(i < mg_target_component.size(),
-                 ExcIndexRange(i, 0, mg_target_component.size()));
+          DEAL_II_Assert(i < mg_target_component.size(),
+                         ExcIndexRange(i, 0, mg_target_component.size()));
         }
     }
 
@@ -315,8 +318,8 @@ MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_levels      = mg_dof.get_triangulation().n_levels();
 
-  Assert(mg_component_mask.represents_n_components(fe.n_components()),
-         ExcMessage("Component mask has wrong size."));
+  DEAL_II_Assert(mg_component_mask.represents_n_components(fe.n_components()),
+                 ExcMessage("Component mask has wrong size."));
 
   // Compute the lengths of all blocks
   sizes.resize(n_levels);
@@ -693,7 +696,7 @@ MGTransferSelect<number>::build_matrices(
           copy_to_and_from_indices[level][counter++] =
             std::pair<types::global_dof_index, unsigned int>(
               temp_copy_indices[i], i);
-      Assert(counter == n_active_dofs, ExcInternalError());
+      DEAL_II_Assert(counter == n_active_dofs, ExcInternalError());
     }
 }
 

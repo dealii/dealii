@@ -66,11 +66,11 @@ public:
   double value;
 };
 
-DeclException3(ExcWrongValue,
-               double,
-               double,
-               double,
-               << arg1 << " != " << arg2 << " with delta = " << arg3);
+DEAL_II_DeclException3(ExcWrongValue,
+                       double,
+                       double,
+                       double,
+                       << arg1 << " != " << arg2 << " with delta = " << arg3);
 
 
 template <int dim>
@@ -112,7 +112,7 @@ test()
 
           // do erase
           const bool erased = data_storage.erase(cell);
-          Assert(erased, ExcInternalError());
+          DEAL_II_Assert(erased, ExcInternalError());
           // initialize with default constructor
           data_storage.initialize(cell, rhs.size());
           // check that values are now zero (see default constructor)
@@ -120,10 +120,11 @@ test()
             std::vector<std::shared_ptr<MyQData>> qpd =
               data_storage.get_data(cell);
             for (unsigned int q = 0; q < rhs.size(); q++)
-              AssertThrow(qpd[q]->value == default_value,
-                          ExcWrongValue(qpd[q]->value,
-                                        default_value,
-                                        (qpd[q]->value - default_value)));
+              DEAL_II_AssertThrow(qpd[q]->value == default_value,
+                                  ExcWrongValue(qpd[q]->value,
+                                                default_value,
+                                                (qpd[q]->value -
+                                                 default_value)));
           }
         }
     dof_handler.clear();

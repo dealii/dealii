@@ -83,9 +83,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
             for (unsigned int d = 0; d < dim; ++d)
               grad[d] = vector_values[q][c + d];
 
-            AssertThrow(std::fabs(selected_vector_values[q] - trace(grad)) <=
-                          1e-12 * std::fabs(selected_vector_values[q]),
-                        ExcInternalError());
+            DEAL_II_AssertThrow(std::fabs(selected_vector_values[q] -
+                                          trace(grad)) <=
+                                  1e-12 * std::fabs(selected_vector_values[q]),
+                                ExcInternalError());
           }
       }
 }

@@ -287,11 +287,13 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   if (fe2.degree == fe1.degree)
     {
       out_distributed -= in_distributed;
-      AssertThrow(out_distributed.l2_norm() < 1.e-8, ExcInternalError());
+      DEAL_II_AssertThrow(out_distributed.l2_norm() < 1.e-8,
+                          ExcInternalError());
     }
   if (fe2.degree > fe1.degree)
     {
-      AssertThrow(global_error_after < global_error_before, ExcInternalError());
+      DEAL_II_AssertThrow(global_error_after < global_error_before,
+                          ExcInternalError());
     }
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
@@ -416,11 +418,12 @@ check_this_dealii(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   if (fe2.degree == fe1.degree)
     {
       out_ghosted -= in_ghosted;
-      AssertThrow(out_ghosted.l2_norm() < 1.e-8, ExcInternalError());
+      DEAL_II_AssertThrow(out_ghosted.l2_norm() < 1.e-8, ExcInternalError());
     }
   if (fe2.degree > fe1.degree)
     {
-      AssertThrow(global_error_after < global_error_before, ExcInternalError());
+      DEAL_II_AssertThrow(global_error_after < global_error_before,
+                          ExcInternalError());
     }
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;

@@ -141,7 +141,7 @@ template <>
 QGaussLobatto<1>::QGaussLobatto(const unsigned int n)
   : Quadrature<1>(n)
 {
-  Assert(n >= 2, ExcNotImplemented());
+  DEAL_II_Assert(n >= 2, ExcNotImplemented());
 
   std::vector<long double> points =
     Polynomials::jacobi_polynomial_roots<long double>(n - 2, 1, 1);
@@ -384,7 +384,7 @@ QGaussLog<1>::get_quadrature_points(const unsigned int n)
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         break;
     }
 
@@ -516,7 +516,7 @@ QGaussLog<1>::get_quadrature_weights(const unsigned int n)
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         break;
     }
 
@@ -551,8 +551,8 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
   QGauss<1>    quad(n);
 
   // Check that the origin is inside 0,1
-  Assert((fraction >= 0) && (fraction <= 1),
-         ExcMessage("Origin is outside [0,1]."));
+  DEAL_II_Assert((fraction >= 0) && (fraction <= 1),
+                 ExcMessage("Origin is outside [0,1]."));
 
   // Non singular offset. This is the start of non singular quad
   // points.
@@ -589,16 +589,17 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
   if (factor_out_singularity == true)
     for (unsigned int i = 0; i < size(); ++i)
       {
-        Assert(
+        DEAL_II_Assert(
           this->quadrature_points[i] != origin,
           ExcMessage(
             "The singularity cannot be on a Gauss point of the same order!"));
         double denominator =
           std::log(std::abs((this->quadrature_points[i] - origin)[0]) / alpha);
-        Assert(denominator != 0.0,
-               ExcMessage(
-                 "The quadrature formula you are using does not allow to "
-                 "factor out the singularity, which is zero at one point."));
+        DEAL_II_Assert(
+          denominator != 0.0,
+          ExcMessage(
+            "The quadrature formula you are using does not allow to "
+            "factor out the singularity, which is zero at one point."));
         this->weights[i] /= denominator;
       }
 }
@@ -686,19 +687,19 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   // general one, you should use the
   // one with the Point<2> in the
   // constructor.
-  Assert(vertex_index < 4, ExcIndexRange(vertex_index, 0, 4));
+  DEAL_II_Assert(vertex_index < 4, ExcIndexRange(vertex_index, 0, 4));
 
   // Start with the gauss quadrature formula on the (u,v) reference
   // element.
   QGauss<2> gauss(n);
 
-  Assert(gauss.size() == n * n, ExcInternalError());
+  DEAL_II_Assert(gauss.size() == n * n, ExcInternalError());
 
   // For the moment we only implemented this for the vertices of a
   // quadrilateral. We are planning to do this also for the support
   // points of arbitrary FE_Q elements, to allow the use of this
   // class in boundary element programs with higher order mappings.
-  Assert(vertex_index < 4, ExcIndexRange(vertex_index, 0, 4));
+  DEAL_II_Assert(vertex_index < 4, ExcIndexRange(vertex_index, 0, 4));
 
   // We create only the first one. All other pieces are rotation of
   // this one.
@@ -1003,7 +1004,8 @@ template <>
 QGaussChebyshev<1>::QGaussChebyshev(const unsigned int n)
   : Quadrature<1>(n)
 {
-  Assert(n > 0, ExcMessage("Need at least one point for the quadrature rule"));
+  DEAL_II_Assert(n > 0,
+                 ExcMessage("Need at least one point for the quadrature rule"));
   std::vector<double> p = internal::QGaussChebyshev::get_quadrature_points(n);
   std::vector<double> w = internal::QGaussChebyshev::get_quadrature_weights(n);
 
@@ -1058,7 +1060,7 @@ namespace internal
               }
 
             default:
-              Assert(
+              DEAL_II_Assert(
                 false,
                 ExcMessage(
                   "This constructor can only be called with either "
@@ -1100,7 +1102,8 @@ QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n, EndPoint ep)
   : Quadrature<1>(n)
   , ep(ep)
 {
-  Assert(n > 0, ExcMessage("Need at least one point for quadrature rules"));
+  DEAL_II_Assert(n > 0,
+                 ExcMessage("Need at least one point for quadrature rules"));
   std::vector<double> p =
     internal::QGaussRadauChebyshev::get_quadrature_points(n, ep);
   std::vector<double> w =
@@ -1171,9 +1174,9 @@ template <>
 QGaussLobattoChebyshev<1>::QGaussLobattoChebyshev(const unsigned int n)
   : Quadrature<1>(n)
 {
-  Assert(n > 1,
-         ExcMessage(
-           "Need at least two points for Gauss-Lobatto quadrature rule"));
+  DEAL_II_Assert(
+    n > 1,
+    ExcMessage("Need at least two points for Gauss-Lobatto quadrature rule"));
   std::vector<double> p =
     internal::QGaussLobattoChebyshev::get_quadrature_points(n);
   std::vector<double> w =
@@ -1318,9 +1321,9 @@ QDuffy::QDuffy(const unsigned int n, const double beta)
 template <int dim>
 QSplit<dim>::QSplit(const QSimplex<dim> &base, const Point<dim> &split_point)
 {
-  AssertThrow(GeometryInfo<dim>::is_inside_unit_cell(split_point, 1e-12),
-              ExcMessage(
-                "The split point should be inside the unit reference cell."));
+  DEAL_II_AssertThrow(
+    GeometryInfo<dim>::is_inside_unit_cell(split_point, 1e-12),
+    ExcMessage("The split point should be inside the unit reference cell."));
 
   std::array<Point<dim>, dim + 1> vertices;
   vertices[0] = split_point;

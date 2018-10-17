@@ -68,7 +68,7 @@ public:
   {
     Tensor<1, dim> dist = p - origin;
     const double   r    = dist.norm();
-    Assert(r > 0.0, ExcMessage("r is not positive"));
+    DEAL_II_Assert(r > 0.0, ExcMessage("r is not positive"));
     Tensor<1, dim> res;
     const double   x  = dist[0];
     const double   y  = dist[1];
@@ -89,7 +89,7 @@ public:
   {
     const Tensor<1, dim> dist = p - origin;
     const double         r    = dist.norm();
-    Assert(r > 0.0, ExcMessage("r is not positive"));
+    DEAL_II_Assert(r > 0.0, ExcMessage("r is not positive"));
     const double x  = dist[0];
     const double y  = dist[1];
     const double z  = dist[2];
@@ -192,21 +192,23 @@ check()
           // check values:
           const double v1 = func.value(p);
           const double v2 = func2.value(p);
-          AssertThrow(std::fabs(v1 - v2) <= std::abs(v1) * 1e-10,
-                      ExcInternalError());
+          DEAL_II_AssertThrow(std::fabs(v1 - v2) <= std::abs(v1) * 1e-10,
+                              ExcInternalError());
 
           // check gradients:
           const Tensor<1, dim> g1 = func.gradient(p);
           const Tensor<1, dim> g2 = func2.gradient(p);
           const Tensor<1, dim> gd = g1 - g2;
-          AssertThrow(gd.norm() <= g1.norm() * 1e-10, ExcInternalError());
+          DEAL_II_AssertThrow(gd.norm() <= g1.norm() * 1e-10,
+                              ExcInternalError());
 
 
           // check hessian:
           const SymmetricTensor<2, dim> h1 = func.hessian(p);
           const SymmetricTensor<2, dim> h2 = func2.hessian(p);
           const SymmetricTensor<2, dim> dh = h1 - h2;
-          AssertThrow(dh.norm() <= h1.norm() * 1e-10, ExcInternalError());
+          DEAL_II_AssertThrow(dh.norm() <= h1.norm() * 1e-10,
+                              ExcInternalError());
         }
   deallog << "OK" << std::endl;
 }

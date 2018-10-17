@@ -40,7 +40,7 @@ test(PETScWrappers::SparseMatrix &m)
   m.compress(VectorOperation::insert);
 
   deallog << m.n_nonzero_elements() << std::endl;
-  AssertThrow(m.n_nonzero_elements() == counter, ExcInternalError());
+  DEAL_II_AssertThrow(m.n_nonzero_elements() == counter, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

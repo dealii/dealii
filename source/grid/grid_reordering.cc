@@ -226,8 +226,9 @@ namespace
         adjacent_cells[0] = adjacent_cell;
       else
         {
-          Assert(adjacent_cells[1].cell_index == numbers::invalid_unsigned_int,
-                 ExcInternalError());
+          DEAL_II_Assert(adjacent_cells[1].cell_index ==
+                           numbers::invalid_unsigned_int,
+                         ExcInternalError());
           adjacent_cells[1] = adjacent_cell;
         }
     }
@@ -308,8 +309,8 @@ namespace
     Edge(const CellData<dim> &cell, const unsigned int edge_number)
       : orientation_status(not_oriented)
     {
-      Assert(edge_number < GeometryInfo<dim>::lines_per_cell,
-             ExcInternalError());
+      DEAL_II_Assert(edge_number < GeometryInfo<dim>::lines_per_cell,
+                     ExcInternalError());
 
       // copy vertices for this particular line
       vertex_indices[0] =
@@ -397,8 +398,9 @@ namespace
           edge_indices[l] =
             (std::lower_bound(edge_list.begin(), edge_list.end(), e) -
              edge_list.begin());
-          Assert(edge_indices[l] < edge_list.size(), ExcInternalError());
-          Assert(edge_list[edge_indices[l]] == e, ExcInternalError())
+          DEAL_II_Assert(edge_indices[l] < edge_list.size(),
+                         ExcInternalError());
+          DEAL_II_Assert(edge_list[edge_indices[l]] == e, ExcInternalError())
         }
     }
 
@@ -467,8 +469,8 @@ namespace
         edge_indices[0] = edge_index;
       else
         {
-          Assert(edge_indices[1] == numbers::invalid_unsigned_int,
-                 ExcInternalError());
+          DEAL_II_Assert(edge_indices[1] == numbers::invalid_unsigned_int,
+                         ExcInternalError());
           edge_indices[1] = edge_index;
         }
     }
@@ -578,7 +580,7 @@ namespace
           edges[cell_list.back().edge_indices[l]].adjacent_cells.push_back(
             AdjacentCell(i, l));
       }
-    Assert(cell_list.size() == cells.size(), ExcInternalError());
+    DEAL_II_Assert(cell_list.size() == cells.size(), ExcInternalError());
 
     return cell_list;
   }
@@ -647,12 +649,12 @@ namespace
         (dim == 2 ? Edge<dim>::backward : Edge<dim>::forward);
     else
       {
-        Assert(
+        DEAL_II_Assert(
           edges[cells[cell].edge_indices[local_edge]].vertex_indices[0] ==
             cells[cell].vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
               local_edge, 1)],
           ExcInternalError());
-        Assert(
+        DEAL_II_Assert(
           edges[cells[cell].edge_indices[local_edge]].vertex_indices[1] ==
             cells[cell].vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
               local_edge, 0)],
@@ -684,8 +686,9 @@ namespace
              delta != Delta_k_minus_1.end();
              ++delta)
           {
-            Assert(edges[*delta].orientation_status != Edge<dim>::not_oriented,
-                   ExcInternalError());
+            DEAL_II_Assert(edges[*delta].orientation_status !=
+                             Edge<dim>::not_oriented,
+                           ExcInternalError());
 
             // now go through the cells adjacent to this edge
             for (typename AdjacentCells<dim>::const_iterator adjacent_cell =
@@ -707,7 +710,7 @@ namespace
                   cells[K]
                     .vertex_indices[GeometryInfo<dim>::line_to_cell_vertices(
                       delta_is_edge_in_K, 0)];
-                Assert(
+                DEAL_II_Assert(
                   first_edge_vertex == first_edge_vertex_in_K ||
                     first_edge_vertex ==
                       cells[K].vertex_indices[GeometryInfo<
@@ -769,9 +772,10 @@ namespace
                         // 'cells' array that the user gave us
                         if (dim == 2)
                           {
-                            Assert(edges[opposite_edge].orientation_status ==
-                                     opposite_edge_orientation,
-                                   ExcMeshNotOrientable());
+                            DEAL_II_Assert(
+                              edges[opposite_edge].orientation_status ==
+                                opposite_edge_orientation,
+                              ExcMeshNotOrientable());
                           }
                         else if (dim == 3)
                           {
@@ -780,7 +784,7 @@ namespace
                               throw ExcMeshNotOrientable();
                           }
                         else
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_Assert(false, ExcNotImplemented());
                       }
                   }
               }
@@ -813,9 +817,9 @@ namespace
     unsigned int starting_vertex_of_edge[GeometryInfo<dim>::lines_per_cell];
     for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
       {
-        Assert(edge_list[cell_list[cell_index].edge_indices[e]]
-                   .orientation_status != Edge<dim>::not_oriented,
-               ExcInternalError());
+        DEAL_II_Assert(edge_list[cell_list[cell_index].edge_indices[e]]
+                           .orientation_status != Edge<dim>::not_oriented,
+                       ExcInternalError());
         if (edge_list[cell_list[cell_index].edge_indices[e]]
               .orientation_status == Edge<dim>::forward)
           starting_vertex_of_edge[e] =
@@ -844,7 +848,7 @@ namespace
                      (starting_vertex_of_edge[1] == starting_vertex_of_edge[3]))
               origin_vertex_of_cell = starting_vertex_of_edge[1];
             else
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
 
             break;
           }
@@ -863,14 +867,15 @@ namespace
                              cell_list[cell_index]
                                .vertex_indices[origin_vertex_of_cell]) == dim)
                 break;
-            Assert(origin_vertex_of_cell < GeometryInfo<dim>::vertices_per_cell,
-                   ExcInternalError());
+            DEAL_II_Assert(origin_vertex_of_cell <
+                             GeometryInfo<dim>::vertices_per_cell,
+                           ExcInternalError());
 
             break;
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // now rotate raw_cells[cell_index] in such a way that its orientation
@@ -936,7 +941,7 @@ namespace
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -988,7 +993,7 @@ namespace
         // ensure that we have really oriented all edges now, not just
         // the starter edges
         for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-          Assert(
+          DEAL_II_Assert(
             edge_list[cell_list[next_cell_with_unoriented_edge].edge_indices[l]]
                 .orientation_status != Edge<dim>::not_oriented,
             ExcInternalError());
@@ -1080,8 +1085,9 @@ void
 GridReordering<dim, spacedim>::reorder_cells(std::vector<CellData<dim>> &cells,
                                              const bool use_new_style_ordering)
 {
-  Assert(cells.size() != 0,
-         ExcMessage("List of elements to orient must have at least one cell"));
+  DEAL_II_Assert(cells.size() != 0,
+                 ExcMessage(
+                   "List of elements to orient must have at least one cell"));
 
   // there is nothing for us to do in 1d
   if (dim == 1)
@@ -1176,9 +1182,9 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
           for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
             vertices_lex[GeometryInfo<2>::ucd_to_deal[i]] =
               cells[cell_no].vertices[i];
-          AssertThrow(GridTools::cell_measure<2>(all_vertices, vertices_lex) >
-                        0,
-                      ExcInternalError());
+          DEAL_II_AssertThrow(GridTools::cell_measure<2>(all_vertices,
+                                                         vertices_lex) > 0,
+                              ExcInternalError());
         }
     }
 
@@ -1188,10 +1194,10 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
   // might work also on single cells, grids
   // with both kind of cells are very likely to
   // be broken. Check for this here.
-  AssertThrow(n_negative_cells == 0 || n_negative_cells == cells.size(),
-              ExcMessage(
-                std::string(
-                  "This class assumes that either all cells have positive "
+  DEAL_II_AssertThrow(
+    n_negative_cells == 0 || n_negative_cells == cells.size(),
+    ExcMessage(
+      std::string("This class assumes that either all cells have positive "
                   "volume, or that all cells have been specified in an "
                   "inverted vertex order so that their volume is negative. "
                   "(In the latter case, this class automatically inverts "
@@ -1200,9 +1206,9 @@ GridReordering<2>::invert_all_cells_of_negative_grid(
                   "negative volume. You need to check your mesh which "
                   "cells these are and how they got there.\n"
                   "As a hint, of the total ") +
-                Utilities::to_string(cells.size()) + " cells in the mesh, " +
-                Utilities::to_string(n_negative_cells) +
-                " appear to have a negative volume."));
+      Utilities::to_string(cells.size()) + " cells in the mesh, " +
+      Utilities::to_string(n_negative_cells) +
+      " appear to have a negative volume."));
 }
 
 
@@ -1213,7 +1219,7 @@ GridReordering<2, 3>::invert_all_cells_of_negative_grid(
   const std::vector<Point<3>> &,
   std::vector<CellData<2>> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_Assert(false, ExcNotImplemented());
 }
 
 
@@ -1251,9 +1257,9 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
           for (unsigned int i = 0; i < GeometryInfo<3>::vertices_per_cell; ++i)
             vertices_lex[GeometryInfo<3>::ucd_to_deal[i]] =
               cells[cell_no].vertices[i];
-          AssertThrow(GridTools::cell_measure<3>(all_vertices, vertices_lex) >
-                        0,
-                      ExcInternalError());
+          DEAL_II_AssertThrow(GridTools::cell_measure<3>(all_vertices,
+                                                         vertices_lex) > 0,
+                              ExcInternalError());
         }
     }
 
@@ -1265,25 +1271,26 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
   // grids with both kind of cells
   // are very likely to be
   // broken. Check for this here.
-  AssertThrow(n_negative_cells == 0 || n_negative_cells == cells.size(),
-              ExcMessage("While sorting the cells that will be passed for "
-                         "creating a Triangulation object, deal.II found that "
-                         "some but not all cells have a negative volume. (If "
-                         "all cells had a negative volume, they would simply "
-                         "all have been inverted.) This usually happens in "
-                         "hand-generated meshes if one accidentally uses an "
-                         "incorrect convention for ordering the vertices in "
-                         "one or more cells; in that case, you may want to "
-                         "double check that you specified the vertex indices "
-                         "in their correct order. If you are reading a mesh "
-                         "that was created by a mesh generator, then this "
-                         "exception indicates that some of the cells created "
-                         "are so badly distorted that their volume becomes "
-                         "negative; this commonly occurs at complex geometric "
-                         "features, and you may see if the problem can be "
-                         "fixed by playing with the parameters that control "
-                         "mesh properties in your mesh generator, such as "
-                         "the number of cells, the mesh density, etc."));
+  DEAL_II_AssertThrow(n_negative_cells == 0 || n_negative_cells == cells.size(),
+                      ExcMessage(
+                        "While sorting the cells that will be passed for "
+                        "creating a Triangulation object, deal.II found that "
+                        "some but not all cells have a negative volume. (If "
+                        "all cells had a negative volume, they would simply "
+                        "all have been inverted.) This usually happens in "
+                        "hand-generated meshes if one accidentally uses an "
+                        "incorrect convention for ordering the vertices in "
+                        "one or more cells; in that case, you may want to "
+                        "double check that you specified the vertex indices "
+                        "in their correct order. If you are reading a mesh "
+                        "that was created by a mesh generator, then this "
+                        "exception indicates that some of the cells created "
+                        "are so badly distorted that their volume becomes "
+                        "negative; this commonly occurs at complex geometric "
+                        "features, and you may see if the problem can be "
+                        "fixed by playing with the parameters that control "
+                        "mesh properties in your mesh generator, such as "
+                        "the number of cells, the mesh density, etc."));
 }
 
 

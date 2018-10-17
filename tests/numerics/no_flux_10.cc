@@ -56,7 +56,7 @@ void colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                                     const double      outer_radius)
 {
   //    if (tria.n_cells() != 4)
-  //      AssertThrow (false, ExcNotImplemented());
+  //      DEAL_II_AssertThrow (false, ExcNotImplemented());
 
   double middle = (outer_radius - inner_radius) / 2e0 + inner_radius;
   double eps    = 1e-3 * middle;
@@ -132,7 +132,7 @@ void colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                   cell->face(f)->line(j)->set_boundary_id(1);
           }
         else
-          AssertThrow(false, ExcInternalError());
+          DEAL_II_AssertThrow(false, ExcInternalError());
       }
 }
 

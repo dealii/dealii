@@ -51,16 +51,16 @@ execute(Threads::Mutex &m)
   // check correct default initialization
   bool exists;
   int  i = tls_data.get(exists).i;
-  AssertThrow(i == 42, ExcInternalError());
-  AssertThrow(exists == false, ExcInternalError());
+  DEAL_II_AssertThrow(i == 42, ExcInternalError());
+  DEAL_II_AssertThrow(exists == false, ExcInternalError());
 
   // set value
   tls_data.get(exists).i = 2;
 
   // try again. should have existed this time around
   i = tls_data.get(exists).i;
-  AssertThrow(i == 2, ExcInternalError());
-  AssertThrow(exists == true, ExcInternalError());
+  DEAL_II_AssertThrow(i == 2, ExcInternalError());
+  DEAL_II_AssertThrow(exists == true, ExcInternalError());
 
   // wait for the barrier to clear
   m.acquire();
@@ -69,8 +69,8 @@ execute(Threads::Mutex &m)
   // at this point, the tls object should have been cleared and should
   // be back at its original value
   i = tls_data.get(exists).i;
-  AssertThrow(i == 42, ExcInternalError());
-  AssertThrow(exists == false, ExcInternalError());
+  DEAL_II_AssertThrow(i == 42, ExcInternalError());
+  DEAL_II_AssertThrow(exists == false, ExcInternalError());
 }
 
 

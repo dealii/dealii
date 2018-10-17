@@ -106,8 +106,8 @@ namespace Maxwell
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  value_list) const
   {
-    Assert(value_list.size() == points.size(),
-           ExcDimensionMismatch(value_list.size(), points.size()));
+    DEAL_II_Assert(value_list.size() == points.size(),
+                   ExcDimensionMismatch(value_list.size(), points.size()));
     const unsigned int n_points = points.size();
 
     for (unsigned int i = 0; i < n_points; ++i)
@@ -126,8 +126,8 @@ namespace Maxwell
   ExactSolution<dim>::curl_value_list(const std::vector<Point<dim>> &points,
                                       std::vector<Vector<double>> &  value_list)
   {
-    Assert(value_list.size() == points.size(),
-           ExcDimensionMismatch(value_list.size(), points.size()));
+    DEAL_II_Assert(value_list.size() == points.size(),
+                   ExcDimensionMismatch(value_list.size(), points.size()));
     const unsigned int n_points = points.size();
 
 

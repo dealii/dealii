@@ -273,7 +273,7 @@ public:
    * the output and can be looked up in the UMFPack user manual. The name of
    * the routine is included for reference.
    */
-  DeclException2(
+  DEAL_II_DeclException2(
     ExcUMFPACKError,
     std::string,
     int,

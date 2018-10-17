@@ -72,14 +72,14 @@ ParameterAcceptor::initialize(
           catch (const dealii::PathSearch::ExcFileNotFound &)
             {
               std::ofstream out(filename);
-              Assert(out, ExcIO());
+              DEAL_II_Assert(out, ExcIO());
               prm.print_parameters(out, ParameterHandler::Text);
               out.close();
-              AssertThrow(false,
-                          ExcMessage("You specified <" + filename +
-                                     "> as input " +
-                                     "parameter file, but it does not exist. " +
-                                     "We created it for you."));
+              DEAL_II_AssertThrow(
+                false,
+                ExcMessage("You specified <" + filename + "> as input " +
+                           "parameter file, but it does not exist. " +
+                           "We created it for you."));
             }
         }
       else if (filename.substr(filename.find_last_of('.') + 1) == "xml")
@@ -88,19 +88,19 @@ ParameterAcceptor::initialize(
           if (!is)
             {
               std::ofstream out(filename);
-              Assert(out, ExcIO());
+              DEAL_II_Assert(out, ExcIO());
               prm.print_parameters(out, ParameterHandler::XML);
               out.close();
-              AssertThrow(false,
-                          ExcMessage("You specified <" + filename +
-                                     "> as input " +
-                                     "parameter file, but it does not exist. " +
-                                     "We created it for you."));
+              DEAL_II_AssertThrow(
+                false,
+                ExcMessage("You specified <" + filename + "> as input " +
+                           "parameter file, but it does not exist. " +
+                           "We created it for you."));
             }
           prm.parse_input_from_xml(is);
         }
       else
-        AssertThrow(
+        DEAL_II_AssertThrow(
           false,
           ExcMessage(
             "Invalid extension of parameter file. Please use .prm or .xml"));
@@ -109,7 +109,7 @@ ParameterAcceptor::initialize(
   if (output_filename != "")
     {
       std::ofstream outfile(output_filename.c_str());
-      Assert(outfile, ExcIO());
+      DEAL_II_Assert(outfile, ExcIO());
       std::string extension =
         output_filename.substr(output_filename.find_last_of('.') + 1);
 
@@ -118,7 +118,7 @@ ParameterAcceptor::initialize(
           outfile << "# Parameter file generated with " << std::endl
                   << "# DEAL_II_PACKAGE_VERSION = " << DEAL_II_PACKAGE_VERSION
                   << std::endl;
-          Assert(
+          DEAL_II_Assert(
             output_style_for_prm_format == ParameterHandler::Text ||
               output_style_for_prm_format == ParameterHandler::ShortText,
             ExcMessage(
@@ -130,7 +130,7 @@ ParameterAcceptor::initialize(
       else if (extension == "latex" || extension == "tex")
         prm.print_parameters(outfile, ParameterHandler::LaTeX);
       else
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
     }
 
   // Finally do the parsing.
@@ -143,7 +143,7 @@ void
 ParameterAcceptor::initialize(std::istream &input_stream, ParameterHandler &prm)
 
 {
-  AssertThrow(input_stream, ExcIO());
+  DEAL_II_AssertThrow(input_stream, ExcIO());
   declare_all_parameters(prm);
   prm.parse_input(input_stream);
   parse_all_parameters(prm);
@@ -200,7 +200,7 @@ ParameterAcceptor::declare_all_parameters(ParameterHandler &prm)
 std::vector<std::string>
 ParameterAcceptor::get_section_path() const
 {
-  Assert(acceptor_id < class_list.size(), ExcInternalError());
+  DEAL_II_Assert(acceptor_id < class_list.size(), ExcInternalError());
   const auto my_section_name = get_section_name();
   const bool is_absolute     = (my_section_name.front() == sep);
 

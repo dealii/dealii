@@ -381,9 +381,9 @@ namespace internal
       : source_(source_begin)
       , destination_(destination)
     {
-      Assert(source_end >= source_begin, ExcInternalError());
-      Assert(source_end == source_begin || destination != nullptr,
-             ExcInternalError());
+      DEAL_II_Assert(source_end >= source_begin, ExcInternalError());
+      DEAL_II_Assert(source_end == source_begin || destination != nullptr,
+                     ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
         apply_to_subrange(0, size);
@@ -448,9 +448,9 @@ namespace internal
       : source_(source_begin)
       , destination_(destination)
     {
-      Assert(source_end >= source_begin, ExcInternalError());
-      Assert(source_end == source_begin || destination != nullptr,
-             ExcInternalError());
+      DEAL_II_Assert(source_end >= source_begin, ExcInternalError());
+      DEAL_II_Assert(source_end == source_begin || destination != nullptr,
+                     ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
         apply_to_subrange(0, size);
@@ -524,7 +524,7 @@ namespace internal
     {
       if (size == 0)
         return;
-      Assert(destination != nullptr, ExcInternalError());
+      DEAL_II_Assert(destination != nullptr, ExcInternalError());
 
       // do not use memcmp for long double because on some systems it does not
       // completely fill its memory and may lead to false positives in
@@ -620,7 +620,7 @@ namespace internal
     {
       if (size == 0)
         return;
-      Assert(destination != nullptr, ExcInternalError());
+      DEAL_II_Assert(destination != nullptr, ExcInternalError());
 
       if (size < minimum_parallel_grain_size)
         apply_to_subrange(0, size);
@@ -878,7 +878,7 @@ AlignedVector<T>::reserve(const size_type size_alloc)
           free(new_data);
         }
       else
-        Assert(new_data == nullptr, ExcInternalError());
+        DEAL_II_Assert(new_data == nullptr, ExcInternalError());
     }
   else if (size_alloc == 0)
     clear();
@@ -909,7 +909,7 @@ template <class T>
 inline void
 AlignedVector<T>::push_back(const T in_data)
 {
-  Assert(_end_data <= _end_allocated, ExcInternalError());
+  DEAL_II_Assert(_end_data <= _end_allocated, ExcInternalError());
   if (_end_data == _end_allocated)
     reserve(std::max(2 * capacity(), static_cast<size_type>(16)));
   if (std::is_trivial<T>::value == false)
@@ -924,7 +924,7 @@ template <class T>
 inline typename AlignedVector<T>::reference
 AlignedVector<T>::back()
 {
-  AssertIndexRange(0, size());
+  DEAL_II_AssertIndexRange(0, size());
   T *field = _end_data - 1;
   return *field;
 }
@@ -935,7 +935,7 @@ template <class T>
 inline typename AlignedVector<T>::const_reference
 AlignedVector<T>::back() const
 {
-  AssertIndexRange(0, size());
+  DEAL_II_AssertIndexRange(0, size());
   const T *field = _end_data - 1;
   return *field;
 }
@@ -1019,7 +1019,7 @@ template <class T>
 inline typename AlignedVector<T>::reference AlignedVector<T>::
                                             operator[](const size_type index)
 {
-  AssertIndexRange(index, size());
+  DEAL_II_AssertIndexRange(index, size());
   return _data[index];
 }
 
@@ -1029,7 +1029,7 @@ template <class T>
 inline typename AlignedVector<T>::const_reference AlignedVector<T>::
                                                   operator[](const size_type index) const
 {
-  AssertIndexRange(index, size());
+  DEAL_II_AssertIndexRange(index, size());
   return _data[index];
 }
 

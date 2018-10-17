@@ -33,8 +33,8 @@ namespace Polynomials
     , interval(interval)
     , spans_two_intervals(spans_next_interval)
   {
-    Assert(n_intervals > 0, ExcMessage("No intervals given"));
-    AssertIndexRange(interval, n_intervals);
+    DEAL_II_Assert(n_intervals > 0, ExcMessage("No intervals given"));
+    DEAL_II_AssertIndexRange(interval, n_intervals);
   }
 
 
@@ -44,7 +44,7 @@ namespace Polynomials
   PiecewisePolynomial<number>::value(const number         x,
                                      std::vector<number> &values) const
   {
-    Assert(values.size() > 0, ExcZero());
+    DEAL_II_Assert(values.size() > 0, ExcZero());
 
     value(x, values.size() - 1, values.data());
   }

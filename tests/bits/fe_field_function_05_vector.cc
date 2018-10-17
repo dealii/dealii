@@ -105,11 +105,11 @@ test()
 
   for (unsigned int i = 0; i < m.size(); ++i)
     {
-      Assert(std::fabs(m[i](0) - points[i].square()) <
-               1e-10 * std::fabs(m[i](0) + points[i].square()),
-             ExcInternalError());
+      DEAL_II_Assert(std::fabs(m[i](0) - points[i].square()) <
+                       1e-10 * std::fabs(m[i](0) + points[i].square()),
+                     ExcInternalError());
 
-      Assert(std::fabs(m[i](1)) < 1e-10, ExcInternalError());
+      DEAL_II_Assert(std::fabs(m[i](1)) < 1e-10, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

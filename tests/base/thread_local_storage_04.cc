@@ -52,15 +52,15 @@ test()
   {
     Threads::Thread<int> t;
     t = Threads::new_thread(&X::f, x);
-    AssertThrow(t.return_value() == 10, ExcInternalError());
+    DEAL_II_AssertThrow(t.return_value() == 10, ExcInternalError());
   }
   {
     Threads::Thread<int> t;
     t = Threads::new_thread(&X::f, x);
-    AssertThrow(t.return_value() == 11, ExcInternalError());
+    DEAL_II_AssertThrow(t.return_value() == 11, ExcInternalError());
   }
 
-  AssertThrow(counter == 12, ExcInternalError());
+  DEAL_II_AssertThrow(counter == 12, ExcInternalError());
 }
 
 

@@ -38,12 +38,12 @@ main()
       double p = 0;
       for (unsigned int i = 0; i < q.size(); ++i)
         p += (q.point(i)[0] - 0.5);
-      AssertThrow(std::fabs(p) < 1e-12, ExcInternalError());
+      DEAL_II_AssertThrow(std::fabs(p) < 1e-12, ExcInternalError());
 
       // the sum of weights must be one
       double w = 0;
       for (unsigned int i = 0; i < q.size(); ++i)
         w += q.weight(i);
-      AssertThrow(std::fabs(w - 1) < 1e-12, ExcInternalError());
+      DEAL_II_AssertThrow(std::fabs(w - 1) < 1e-12, ExcInternalError());
     }
 }

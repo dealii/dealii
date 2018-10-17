@@ -52,8 +52,12 @@ main()
 
   // make sure by hand that certain
   // vertices match up
-  AssertThrow(cells[0]->vertex(1) == cells[1]->vertex(4), ExcInternalError());
-  AssertThrow(cells[0]->vertex(3) == cells[1]->vertex(6), ExcInternalError());
-  AssertThrow(cells[0]->vertex(5) == cells[1]->vertex(5), ExcInternalError());
-  AssertThrow(cells[0]->vertex(7) == cells[1]->vertex(7), ExcInternalError());
+  DEAL_II_AssertThrow(cells[0]->vertex(1) == cells[1]->vertex(4),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(cells[0]->vertex(3) == cells[1]->vertex(6),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(cells[0]->vertex(5) == cells[1]->vertex(5),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(cells[0]->vertex(7) == cells[1]->vertex(7),
+                      ExcInternalError());
 }

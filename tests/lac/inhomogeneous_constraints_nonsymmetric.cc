@@ -203,7 +203,7 @@ AdvectionProblem<dim>::test_equality()
 
   deallog << "  Matrix difference norm: " << test_matrix.frobenius_norm()
           << std::endl;
-  Assert(test_matrix.frobenius_norm() < 1e-13, ExcInternalError());
+  DEAL_II_Assert(test_matrix.frobenius_norm() < 1e-13, ExcInternalError());
 
   // same here -- Dirichlet lines will have
   // nonzero rhs, whereas we will have zero
@@ -217,7 +217,7 @@ AdvectionProblem<dim>::test_equality()
 
   deallog << "  RHS difference norm: " << test_rhs.l2_norm() << std::endl;
 
-  Assert(test_rhs.l2_norm() < 1e-14, ExcInternalError());
+  DEAL_II_Assert(test_rhs.l2_norm() < 1e-14, ExcInternalError());
 }
 
 

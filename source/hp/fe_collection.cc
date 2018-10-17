@@ -28,7 +28,7 @@ namespace hp
     const std::set<unsigned int> &fes) const
   {
     for (auto it = fes.cbegin(); it != fes.cend(); ++it)
-      AssertIndexRange(*it, finite_elements.size());
+      DEAL_II_AssertIndexRange(*it, finite_elements.size());
 
     // If the set of elements to be dominated contains only a single element X,
     // then by definition the dominating set contains this single element X
@@ -110,7 +110,7 @@ namespace hp
     const std::set<unsigned int> &fes) const
   {
     for (auto it = fes.cbegin(); it != fes.cend(); ++it)
-      AssertIndexRange(*it, finite_elements.size());
+      DEAL_II_AssertIndexRange(*it, finite_elements.size());
 
     // If the set of elements to be dominated contains only a single element X,
     // then by definition the dominating set contains this single element
@@ -163,8 +163,8 @@ namespace hp
   FECollection<dim, spacedim>::FECollection(
     const std::vector<const FiniteElement<dim, spacedim> *> &fes)
   {
-    Assert(fes.size() > 0,
-           ExcMessage("Need to pass at least one finite element."));
+    DEAL_II_Assert(fes.size() > 0,
+                   ExcMessage("Need to pass at least one finite element."));
 
     for (unsigned int i = 0; i < fes.size(); ++i)
       push_back(*fes[i]);
@@ -183,9 +183,11 @@ namespace hp
     // elements have already passed the test
     // against the first element
     if (finite_elements.size() != 0)
-      Assert(new_fe.n_components() == finite_elements[0]->n_components(),
-             ExcMessage("All elements inside a collection need to have the "
-                        "same number of vector components!"));
+      DEAL_II_Assert(new_fe.n_components() ==
+                       finite_elements[0]->n_components(),
+                     ExcMessage(
+                       "All elements inside a collection need to have the "
+                       "same number of vector components!"));
 
     finite_elements.push_back(new_fe.clone());
   }
@@ -197,8 +199,8 @@ namespace hp
   FECollection<dim, spacedim>::component_mask(
     const FEValuesExtractors::Scalar &scalar) const
   {
-    Assert(size() > 0,
-           ExcMessage("This collection contains no finite element."));
+    DEAL_II_Assert(size() > 0,
+                   ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
     const ComponentMask mask = (*this)[0].component_mask(scalar);
@@ -206,7 +208,8 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].component_mask(scalar), ExcInternalError());
+      DEAL_II_Assert(mask == (*this)[c].component_mask(scalar),
+                     ExcInternalError());
 
     return mask;
   }
@@ -217,8 +220,8 @@ namespace hp
   FECollection<dim, spacedim>::component_mask(
     const FEValuesExtractors::Vector &vector) const
   {
-    Assert(size() > 0,
-           ExcMessage("This collection contains no finite element."));
+    DEAL_II_Assert(size() > 0,
+                   ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
     const ComponentMask mask = (*this)[0].component_mask(vector);
@@ -226,7 +229,8 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].component_mask(vector), ExcInternalError());
+      DEAL_II_Assert(mask == (*this)[c].component_mask(vector),
+                     ExcInternalError());
 
     return mask;
   }
@@ -237,8 +241,8 @@ namespace hp
   FECollection<dim, spacedim>::component_mask(
     const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
   {
-    Assert(size() > 0,
-           ExcMessage("This collection contains no finite element."));
+    DEAL_II_Assert(size() > 0,
+                   ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
     const ComponentMask mask = (*this)[0].component_mask(sym_tensor);
@@ -246,7 +250,8 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].component_mask(sym_tensor), ExcInternalError());
+      DEAL_II_Assert(mask == (*this)[c].component_mask(sym_tensor),
+                     ExcInternalError());
 
     return mask;
   }
@@ -256,8 +261,8 @@ namespace hp
   ComponentMask
   FECollection<dim, spacedim>::component_mask(const BlockMask &block_mask) const
   {
-    Assert(size() > 0,
-           ExcMessage("This collection contains no finite element."));
+    DEAL_II_Assert(size() > 0,
+                   ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
     const ComponentMask mask = (*this)[0].component_mask(block_mask);
@@ -265,9 +270,10 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].component_mask(block_mask),
-             ExcMessage("Not all elements of this collection agree on what "
-                        "the appropriate mask should be."));
+      DEAL_II_Assert(mask == (*this)[c].component_mask(block_mask),
+                     ExcMessage(
+                       "Not all elements of this collection agree on what "
+                       "the appropriate mask should be."));
 
     return mask;
   }
@@ -278,8 +284,8 @@ namespace hp
   FECollection<dim, spacedim>::block_mask(
     const FEValuesExtractors::Scalar &scalar) const
   {
-    Assert(size() > 0,
-           ExcMessage("This collection contains no finite element."));
+    DEAL_II_Assert(size() > 0,
+                   ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
     const BlockMask mask = (*this)[0].block_mask(scalar);
@@ -287,9 +293,10 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].block_mask(scalar),
-             ExcMessage("Not all elements of this collection agree on what "
-                        "the appropriate mask should be."));
+      DEAL_II_Assert(mask == (*this)[c].block_mask(scalar),
+                     ExcMessage(
+                       "Not all elements of this collection agree on what "
+                       "the appropriate mask should be."));
 
     return mask;
   }
@@ -300,8 +307,8 @@ namespace hp
   FECollection<dim, spacedim>::block_mask(
     const FEValuesExtractors::Vector &vector) const
   {
-    Assert(size() > 0,
-           ExcMessage("This collection contains no finite element."));
+    DEAL_II_Assert(size() > 0,
+                   ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
     const BlockMask mask = (*this)[0].block_mask(vector);
@@ -309,9 +316,10 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].block_mask(vector),
-             ExcMessage("Not all elements of this collection agree on what "
-                        "the appropriate mask should be."));
+      DEAL_II_Assert(mask == (*this)[c].block_mask(vector),
+                     ExcMessage(
+                       "Not all elements of this collection agree on what "
+                       "the appropriate mask should be."));
 
     return mask;
   }
@@ -322,8 +330,8 @@ namespace hp
   FECollection<dim, spacedim>::block_mask(
     const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const
   {
-    Assert(size() > 0,
-           ExcMessage("This collection contains no finite element."));
+    DEAL_II_Assert(size() > 0,
+                   ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
     const BlockMask mask = (*this)[0].block_mask(sym_tensor);
@@ -331,9 +339,10 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].block_mask(sym_tensor),
-             ExcMessage("Not all elements of this collection agree on what "
-                        "the appropriate mask should be."));
+      DEAL_II_Assert(mask == (*this)[c].block_mask(sym_tensor),
+                     ExcMessage(
+                       "Not all elements of this collection agree on what "
+                       "the appropriate mask should be."));
 
     return mask;
   }
@@ -345,8 +354,8 @@ namespace hp
   FECollection<dim, spacedim>::block_mask(
     const ComponentMask &component_mask) const
   {
-    Assert(size() > 0,
-           ExcMessage("This collection contains no finite element."));
+    DEAL_II_Assert(size() > 0,
+                   ExcMessage("This collection contains no finite element."));
 
     // get the mask from the first element of the collection
     const BlockMask mask = (*this)[0].block_mask(component_mask);
@@ -354,9 +363,10 @@ namespace hp
     // but then also verify that the other elements of the collection
     // would return the same mask
     for (unsigned int c = 1; c < size(); ++c)
-      Assert(mask == (*this)[c].block_mask(component_mask),
-             ExcMessage("Not all elements of this collection agree on what "
-                        "the appropriate mask should be."));
+      DEAL_II_Assert(mask == (*this)[c].block_mask(component_mask),
+                     ExcMessage(
+                       "Not all elements of this collection agree on what "
+                       "the appropriate mask should be."));
 
     return mask;
   }
@@ -367,13 +377,14 @@ namespace hp
   unsigned int
   FECollection<dim, spacedim>::n_blocks() const
   {
-    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+    DEAL_II_Assert(finite_elements.size() > 0, ExcNoFiniteElements());
 
     const unsigned int nb = finite_elements[0]->n_blocks();
     for (unsigned int i = 1; i < finite_elements.size(); ++i)
-      Assert(finite_elements[i]->n_blocks() == nb,
-             ExcMessage("Not all finite elements in this collection have "
-                        "the same number of components."));
+      DEAL_II_Assert(finite_elements[i]->n_blocks() == nb,
+                     ExcMessage(
+                       "Not all finite elements in this collection have "
+                       "the same number of components."));
 
     return nb;
   }

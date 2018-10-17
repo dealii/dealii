@@ -40,7 +40,7 @@ test()
     deallog << "numproc=" << numproc << std::endl;
 
   const unsigned int set = 200;
-  AssertIndexRange(numproc, set - 2);
+  DEAL_II_AssertIndexRange(numproc, set - 2);
   const unsigned int local_size  = set - myid;
   unsigned int       global_size = 0;
   unsigned int       my_start    = 0;
@@ -83,15 +83,15 @@ test()
   // check local values for correctness
   rw_vector.import(v, VectorOperation::insert);
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(rw_vector.local_element(i) == 2.0 * (i + my_start),
-                ExcInternalError());
+    DEAL_II_AssertThrow(rw_vector.local_element(i) == 2.0 * (i + my_start),
+                        ExcInternalError());
 
   // check non-local entries on all processors
   LinearAlgebra::ReadWriteVector<double> ghost_vector(local_relevant);
   ghost_vector.import(v, VectorOperation::insert);
   for (unsigned int i = 0; i < 10; ++i)
-    AssertThrow(ghost_vector(ghost_indices[i]) == 2. * ghost_indices[i],
-                ExcInternalError());
+    DEAL_II_AssertThrow(ghost_vector(ghost_indices[i]) == 2. * ghost_indices[i],
+                        ExcInternalError());
 
   // now the same again, but import ghosts automatically because v had ghosts
   // set before calling operator =
@@ -102,14 +102,14 @@ test()
   // check local values for correctness
   rw_vector.import(v, VectorOperation::insert);
   for (unsigned int i = 0; i < local_size; ++i)
-    AssertThrow(rw_vector.local_element(i) == 2.0 * (i + my_start),
-                ExcInternalError());
+    DEAL_II_AssertThrow(rw_vector.local_element(i) == 2.0 * (i + my_start),
+                        ExcInternalError());
 
   // check non-local entries on all processors
   ghost_vector.import(v, VectorOperation::insert);
   for (unsigned int i = 0; i < 10; ++i)
-    AssertThrow(ghost_vector(ghost_indices[i]) == 2. * ghost_indices[i],
-                ExcInternalError());
+    DEAL_II_AssertThrow(ghost_vector(ghost_indices[i]) == 2. * ghost_indices[i],
+                        ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -133,10 +133,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   if (myid == 0)
     {

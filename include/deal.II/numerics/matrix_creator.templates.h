@@ -178,7 +178,7 @@ namespace MatrixCreator
         Scratch &
         operator=(const Scratch &)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           return *this;
         }
 
@@ -230,14 +230,14 @@ namespace MatrixCreator
       const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
       const unsigned int                  n_components = fe.n_components();
 
-      Assert(data.rhs_function == nullptr ||
-               data.rhs_function->n_components == 1 ||
-               data.rhs_function->n_components == n_components,
-             ::dealii::MatrixCreator::ExcComponentMismatch());
-      Assert(data.coefficient == nullptr ||
-               data.coefficient->n_components == 1 ||
-               data.coefficient->n_components == n_components,
-             ::dealii::MatrixCreator::ExcComponentMismatch());
+      DEAL_II_Assert(data.rhs_function == nullptr ||
+                       data.rhs_function->n_components == 1 ||
+                       data.rhs_function->n_components == n_components,
+                     ::dealii::MatrixCreator::ExcComponentMismatch());
+      DEAL_II_Assert(data.coefficient == nullptr ||
+                       data.coefficient->n_components == 1 ||
+                       data.coefficient->n_components == n_components,
+                     ::dealii::MatrixCreator::ExcComponentMismatch());
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
       copy_data.cell_rhs.reinit(dofs_per_cell);
@@ -437,14 +437,14 @@ namespace MatrixCreator
       const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
       const unsigned int                  n_components = fe.n_components();
 
-      Assert(data.rhs_function == nullptr ||
-               data.rhs_function->n_components == 1 ||
-               data.rhs_function->n_components == n_components,
-             ::dealii::MatrixCreator::ExcComponentMismatch());
-      Assert(data.coefficient == nullptr ||
-               data.coefficient->n_components == 1 ||
-               data.coefficient->n_components == n_components,
-             ::dealii::MatrixCreator::ExcComponentMismatch());
+      DEAL_II_Assert(data.rhs_function == nullptr ||
+                       data.rhs_function->n_components == 1 ||
+                       data.rhs_function->n_components == n_components,
+                     ::dealii::MatrixCreator::ExcComponentMismatch());
+      DEAL_II_Assert(data.coefficient == nullptr ||
+                       data.coefficient->n_components == 1 ||
+                       data.coefficient->n_components == n_components,
+                     ::dealii::MatrixCreator::ExcComponentMismatch());
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
       copy_data.cell_rhs.reinit(dofs_per_cell);
@@ -631,11 +631,11 @@ namespace MatrixCreator
       const unsigned int dofs_per_cell = data.dof_indices.size();
       (void)dofs_per_cell;
 
-      Assert(data.cell_matrix.m() == dofs_per_cell, ExcInternalError());
-      Assert(data.cell_matrix.n() == dofs_per_cell, ExcInternalError());
-      Assert((right_hand_side == nullptr) ||
-               (data.cell_rhs.size() == dofs_per_cell),
-             ExcInternalError());
+      DEAL_II_Assert(data.cell_matrix.m() == dofs_per_cell, ExcInternalError());
+      DEAL_II_Assert(data.cell_matrix.n() == dofs_per_cell, ExcInternalError());
+      DEAL_II_Assert((right_hand_side == nullptr) ||
+                       (data.cell_rhs.size() == dofs_per_cell),
+                     ExcInternalError());
 
       if (right_hand_side != nullptr)
         data.constraints->distribute_local_to_global(data.cell_matrix,
@@ -705,10 +705,10 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const coefficient,
                      const AffineConstraints<number> &       constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.m() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.n() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
     hp::QCollection<dim>                 q_collection(q);
@@ -782,10 +782,10 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const coefficient,
                      const AffineConstraints<number> &       constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.m() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.n() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
     hp::QCollection<dim>                 q_collection(q);
@@ -859,10 +859,10 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const     coefficient,
                      const AffineConstraints<number> &           constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.m() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.n() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
                                                              assembler_data(dof.get_fe_collection(),
@@ -932,10 +932,10 @@ namespace MatrixCreator
                      const Function<spacedim, number> *const     coefficient,
                      const AffineConstraints<number> &           constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.m() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.n() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
                                                              assembler_data(dof.get_fe_collection(),
@@ -1119,11 +1119,11 @@ namespace MatrixCreator
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv) &&
                         fe_is_primitive)
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_Assert(false, ExcNotImplemented());
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hcurl))
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_Assert(false, ExcNotImplemented());
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
@@ -1294,13 +1294,14 @@ namespace MatrixCreator
                             dof_to_boundary_mapping[copy_data.dofs[j]] !=
                               numbers::invalid_dof_index)
                           {
-                            AssertIsFinite(copy_data.cell_matrix[pos](i, j));
+                            DEAL_II_AssertIsFinite(
+                              copy_data.cell_matrix[pos](i, j));
                             matrix.add(
                               dof_to_boundary_mapping[copy_data.dofs[i]],
                               dof_to_boundary_mapping[copy_data.dofs[j]],
                               copy_data.cell_matrix[pos](i, j));
                           }
-                      AssertIsFinite(copy_data.cell_vector[pos](i));
+                      DEAL_II_AssertIsFinite(copy_data.cell_vector[pos](i));
                       rhs_vector(dof_to_boundary_mapping[copy_data.dofs[i]]) +=
                         copy_data.cell_vector[pos](i);
                     }
@@ -1326,7 +1327,7 @@ namespace MatrixCreator
       Function<3, float> const *const /*coefficient*/,
       std::vector<unsigned int> const & /*component_mapping*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
     template <>
@@ -1344,7 +1345,7 @@ namespace MatrixCreator
       Function<3, double> const *const /*coefficient*/,
       std::vector<unsigned int> const & /*component_mapping*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   } // namespace internal
@@ -1370,32 +1371,33 @@ namespace MatrixCreator
     // dofs?
     if (dim == 1)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return;
       }
 
     const FiniteElement<dim, spacedim> &fe           = dof.get_fe();
     const unsigned int                  n_components = fe.n_components();
 
-    Assert(matrix.n() == dof.n_boundary_dofs(boundary_functions),
-           ExcInternalError());
-    Assert(matrix.n() == matrix.m(), ExcInternalError());
-    Assert(matrix.n() == rhs_vector.size(), ExcInternalError());
-    Assert(boundary_functions.size() != 0, ExcInternalError());
-    Assert(dof_to_boundary_mapping.size() == dof.n_dofs(), ExcInternalError());
-    Assert(coefficient == nullptr || coefficient->n_components == 1 ||
-             coefficient->n_components == n_components,
-           ExcComponentMismatch());
+    DEAL_II_Assert(matrix.n() == dof.n_boundary_dofs(boundary_functions),
+                   ExcInternalError());
+    DEAL_II_Assert(matrix.n() == matrix.m(), ExcInternalError());
+    DEAL_II_Assert(matrix.n() == rhs_vector.size(), ExcInternalError());
+    DEAL_II_Assert(boundary_functions.size() != 0, ExcInternalError());
+    DEAL_II_Assert(dof_to_boundary_mapping.size() == dof.n_dofs(),
+                   ExcInternalError());
+    DEAL_II_Assert(coefficient == nullptr || coefficient->n_components == 1 ||
+                     coefficient->n_components == n_components,
+                   ExcComponentMismatch());
 
     if (component_mapping.size() == 0)
       {
-        AssertDimension(n_components,
-                        boundary_functions.begin()->second->n_components);
+        DEAL_II_AssertDimension(
+          n_components, boundary_functions.begin()->second->n_components);
         for (unsigned int i = 0; i < n_components; ++i)
           component_mapping.push_back(i);
       }
     else
-      AssertDimension(n_components, component_mapping.size());
+      DEAL_II_AssertDimension(n_components, component_mapping.size());
 
     MatrixCreator::internal::AssemblerBoundary::Scratch scratch;
     MatrixCreator::internal::AssemblerBoundary::
@@ -1571,11 +1573,11 @@ namespace MatrixCreator
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv) &&
                         fe_is_primitive)
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_Assert(false, ExcNotImplemented());
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hcurl))
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_Assert(false, ExcNotImplemented());
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
@@ -1764,7 +1766,7 @@ namespace MatrixCreator
                    ++i)
                 if ((*i != numbers::invalid_dof_index) && (*i > max_element))
                   max_element = *i;
-              Assert(max_element == matrix.n() - 1, ExcInternalError());
+              DEAL_II_Assert(max_element == matrix.n() - 1, ExcInternalError());
 
               double max_diag_entry = 0;
               for (unsigned int i = 0; i < copy_data.dofs_per_cell; ++i)
@@ -1783,13 +1785,14 @@ namespace MatrixCreator
                             dof_to_boundary_mapping[copy_data.dofs[j]] !=
                               numbers::invalid_dof_index)
                           {
-                            AssertIsFinite(copy_data.cell_matrix[pos](i, j));
+                            DEAL_II_AssertIsFinite(
+                              copy_data.cell_matrix[pos](i, j));
                             matrix.add(
                               dof_to_boundary_mapping[copy_data.dofs[i]],
                               dof_to_boundary_mapping[copy_data.dofs[j]],
                               copy_data.cell_matrix[pos](i, j));
                           }
-                      AssertIsFinite(copy_data.cell_vector[pos](i));
+                      DEAL_II_AssertIsFinite(copy_data.cell_vector[pos](i));
                       rhs_vector(dof_to_boundary_mapping[copy_data.dofs[i]]) +=
                         copy_data.cell_vector[pos](i);
                     }
@@ -1846,7 +1849,7 @@ namespace MatrixCreator
     // dofs?
     if (dim == 1)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return;
       }
 
@@ -1854,25 +1857,26 @@ namespace MatrixCreator
       dof.get_fe_collection();
     const unsigned int n_components = fe_collection.n_components();
 
-    Assert(matrix.n() == dof.n_boundary_dofs(boundary_functions),
-           ExcInternalError());
-    Assert(matrix.n() == matrix.m(), ExcInternalError());
-    Assert(matrix.n() == rhs_vector.size(), ExcInternalError());
-    Assert(boundary_functions.size() != 0, ExcInternalError());
-    Assert(dof_to_boundary_mapping.size() == dof.n_dofs(), ExcInternalError());
-    Assert(coefficient == nullptr || coefficient->n_components == 1 ||
-             coefficient->n_components == n_components,
-           ExcComponentMismatch());
+    DEAL_II_Assert(matrix.n() == dof.n_boundary_dofs(boundary_functions),
+                   ExcInternalError());
+    DEAL_II_Assert(matrix.n() == matrix.m(), ExcInternalError());
+    DEAL_II_Assert(matrix.n() == rhs_vector.size(), ExcInternalError());
+    DEAL_II_Assert(boundary_functions.size() != 0, ExcInternalError());
+    DEAL_II_Assert(dof_to_boundary_mapping.size() == dof.n_dofs(),
+                   ExcInternalError());
+    DEAL_II_Assert(coefficient == nullptr || coefficient->n_components == 1 ||
+                     coefficient->n_components == n_components,
+                   ExcComponentMismatch());
 
     if (component_mapping.size() == 0)
       {
-        AssertDimension(n_components,
-                        boundary_functions.begin()->second->n_components);
+        DEAL_II_AssertDimension(
+          n_components, boundary_functions.begin()->second->n_components);
         for (unsigned int i = 0; i < n_components; ++i)
           component_mapping.push_back(i);
       }
     else
-      AssertDimension(n_components, component_mapping.size());
+      DEAL_II_AssertDimension(n_components, component_mapping.size());
 
     MatrixCreator::internal::AssemblerBoundary::Scratch scratch;
     MatrixCreator::internal::AssemblerBoundary::
@@ -1949,10 +1953,10 @@ namespace MatrixCreator
                         const Function<spacedim> *const  coefficient,
                         const AffineConstraints<double> &constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.m() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.n() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
     hp::QCollection<dim>                 q_collection(q);
@@ -2024,10 +2028,10 @@ namespace MatrixCreator
                         const Function<spacedim> *const  coefficient,
                         const AffineConstraints<double> &constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.m() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.n() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     hp::FECollection<dim, spacedim>      fe_collection(dof.get_fe());
     hp::QCollection<dim>                 q_collection(q);
@@ -2100,10 +2104,10 @@ namespace MatrixCreator
                         const Function<spacedim> *const             coefficient,
                         const AffineConstraints<double> &           constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.m() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.n() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
                                                              assembler_data(dof.get_fe_collection(),
@@ -2173,10 +2177,10 @@ namespace MatrixCreator
                         const Function<spacedim> *const             coefficient,
                         const AffineConstraints<double> &           constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.m() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
+    DEAL_II_Assert(matrix.n() == dof.n_dofs(),
+                   ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, double>
                                                              assembler_data(dof.get_fe_collection(),

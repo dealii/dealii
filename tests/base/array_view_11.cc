@@ -32,7 +32,7 @@ test()
 
     int i = 0;
     for (auto &&it = arr.cbegin(); it != arr.cend(); ++it, ++i)
-      AssertThrow(*it == i + 1, ExcInternalError());
+      DEAL_II_AssertThrow(*it == i + 1, ExcInternalError());
   }
 
   {
@@ -43,7 +43,7 @@ test()
 
     int i = 0;
     for (auto &&it = arr.cbegin(); it != arr.cend(); ++it, ++i)
-      AssertThrow(*it == i + 1, ExcInternalError());
+      DEAL_II_AssertThrow(*it == i + 1, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

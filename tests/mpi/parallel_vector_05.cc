@@ -56,8 +56,8 @@ test()
   v.compress(VectorOperation::insert);
   v *= 2.0;
 
-  Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   // set ghost dof to zero on remote processors,
   // compress
@@ -67,8 +67,8 @@ test()
   v.compress(VectorOperation::add);
 
   // check that nothing has changed
-  Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
-  Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   if (myid == 0)
     deallog << "OK" << std::endl;

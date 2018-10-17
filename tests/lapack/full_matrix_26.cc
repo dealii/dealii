@@ -26,7 +26,7 @@
 void
 test(const unsigned int size)
 {
-  AssertThrow(size > 2, ExcInternalError());
+  DEAL_II_AssertThrow(size > 2, ExcInternalError());
   const unsigned int smaller = size - 2;
   const unsigned int larger  = size + 3;
 
@@ -43,7 +43,7 @@ test(const unsigned int size)
   M1.grow_or_shrink(smaller);
   for (unsigned int i = 0; i < smaller; ++i)
     for (unsigned int j = 0; j < smaller; ++j)
-      AssertThrow(M1(i, j) == M(i, j), ExcInternalError());
+      DEAL_II_AssertThrow(M1(i, j) == M(i, j), ExcInternalError());
 
   M2.grow_or_shrink(larger);
   for (unsigned int i = 0; i < larger; ++i)
@@ -51,11 +51,11 @@ test(const unsigned int size)
       {
         if (i < size && j < size)
           {
-            AssertThrow(M2(i, j) == M(i, j), ExcInternalError());
+            DEAL_II_AssertThrow(M2(i, j) == M(i, j), ExcInternalError());
           }
         else
           {
-            AssertThrow(M2(i, j) == 0., ExcInternalError());
+            DEAL_II_AssertThrow(M2(i, j) == 0., ExcInternalError());
           }
       }
 

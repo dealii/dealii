@@ -30,7 +30,8 @@ test()
   v.push_back("1.5");
   v.push_back(" -12.5");
   v.push_back("+125.5 ");
-  AssertThrow(Utilities::string_to_double(v).size() == 3, ExcInternalError());
+  DEAL_II_AssertThrow(Utilities::string_to_double(v).size() == 3,
+                      ExcInternalError());
   deallog << Utilities::string_to_double(v)[0] << std::endl;
   deallog << Utilities::string_to_double(v)[1] << std::endl;
   deallog << Utilities::string_to_double(v)[2] << std::endl;

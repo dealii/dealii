@@ -125,7 +125,7 @@ test()
     // also ensure that we indeed get the
     // same value on every cell
     diff.add(-1);
-    AssertThrow(diff.l2_norm() == 0, ExcInternalError());
+    DEAL_II_AssertThrow(diff.l2_norm() == 0, ExcInternalError());
   }
 
   // W1infty norm. the Linfty norm is one, so
@@ -140,7 +140,7 @@ test()
                                       VectorTools::W1infty_norm);
     deallog << "W1infty, diff=" << diff.linfty_norm() << std::endl;
     diff.add(-2);
-    AssertThrow(diff.l1_norm() > 0.5, ExcInternalError());
+    DEAL_II_AssertThrow(diff.l1_norm() > 0.5, ExcInternalError());
   }
 }
 

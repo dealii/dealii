@@ -696,7 +696,7 @@ public:
   /**
    * Exception.
    */
-  DeclException1(
+  DEAL_II_DeclException1(
     ExcInvalidElement,
     BaseIterator,
     << "The element " << arg1
@@ -993,8 +993,8 @@ template <typename BaseIterator>
 inline FilteredIterator<BaseIterator> &
 FilteredIterator<BaseIterator>::operator=(const BaseIterator &bi)
 {
-  Assert((bi.state() != IteratorState::valid) || (*predicate)(bi),
-         ExcInvalidElement(bi));
+  DEAL_II_Assert((bi.state() != IteratorState::valid) || (*predicate)(bi),
+                 ExcInvalidElement(bi));
   BaseIterator::operator=(bi);
   return *this;
 }

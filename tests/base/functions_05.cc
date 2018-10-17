@@ -33,7 +33,7 @@ check1()
       for (unsigned int d = 0; d < dim; ++d)
         p[d] = i + d;
 
-      AssertThrow(object.value(p) == p.norm(), ExcInternalError());
+      DEAL_II_AssertThrow(object.value(p) == p.norm(), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -57,7 +57,7 @@ check2()
       for (unsigned int d = 0; d < dim; ++d)
         p[d] = i + d;
 
-      AssertThrow(object.value(p) == q.distance(p), ExcInternalError());
+      DEAL_II_AssertThrow(object.value(p) == q.distance(p), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

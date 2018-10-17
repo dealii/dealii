@@ -210,7 +210,7 @@ check()
               mapping, dof, quadrature, matrix, &coefficient);
             break;
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
         };
 
       // since we only generate

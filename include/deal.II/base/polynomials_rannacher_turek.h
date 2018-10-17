@@ -102,7 +102,7 @@ namespace internal
     inline Tensor<order, dim>
     compute_derivative(const unsigned int, const Point<dim> &)
     {
-      Assert(dim == 2, ExcNotImplemented());
+      DEAL_II_Assert(dim == 2, ExcNotImplemented());
       return Tensor<order, dim>();
     }
 
@@ -142,7 +142,7 @@ namespace internal
                 }
               else
                 {
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
                 }
               return derivative;
             }

@@ -27,10 +27,10 @@ test()
 {
   const unsigned int     N = 1000;
   DynamicSparsityPattern csp;
-  AssertThrow(csp.empty() == true, ExcInternalError());
+  DEAL_II_AssertThrow(csp.empty() == true, ExcInternalError());
 
   csp.reinit(N, N);
-  AssertThrow(csp.empty() == false, ExcInternalError());
+  DEAL_II_AssertThrow(csp.empty() == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

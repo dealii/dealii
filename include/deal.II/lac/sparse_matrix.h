@@ -1617,48 +1617,51 @@ public:
   /**
    * Exception
    */
-  DeclException2(ExcInvalidIndex,
-                 int,
-                 int,
-                 << "You are trying to access the matrix entry with index <"
-                 << arg1 << ',' << arg2
-                 << ">, but this entry does not exist in the sparsity pattern "
-                    "of this matrix."
-                    "\n\n"
-                    "The most common cause for this problem is that you used "
-                    "a method to build the sparsity pattern that did not "
-                    "(completely) take into account all of the entries you "
-                    "will later try to write into. An example would be "
-                    "building a sparsity pattern that does not include "
-                    "the entries you will write into due to constraints "
-                    "on degrees of freedom such as hanging nodes or periodic "
-                    "boundary conditions. In such cases, building the "
-                    "sparsity pattern will succeed, but you will get errors "
-                    "such as the current one at one point or other when "
-                    "trying to write into the entries of the matrix.");
+  DEAL_II_DeclException2(
+    ExcInvalidIndex,
+    int,
+    int,
+    << "You are trying to access the matrix entry with index <" << arg1 << ','
+    << arg2
+    << ">, but this entry does not exist in the sparsity pattern "
+       "of this matrix."
+       "\n\n"
+       "The most common cause for this problem is that you used "
+       "a method to build the sparsity pattern that did not "
+       "(completely) take into account all of the entries you "
+       "will later try to write into. An example would be "
+       "building a sparsity pattern that does not include "
+       "the entries you will write into due to constraints "
+       "on degrees of freedom such as hanging nodes or periodic "
+       "boundary conditions. In such cases, building the "
+       "sparsity pattern will succeed, but you will get errors "
+       "such as the current one at one point or other when "
+       "trying to write into the entries of the matrix.");
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcDifferentSparsityPatterns,
-                   "When copying one sparse matrix into another, "
-                   "or when adding one sparse matrix to another, "
-                   "both matrices need to refer to the same "
-                   "sparsity pattern.");
+  DEAL_II_DeclExceptionMsg(ExcDifferentSparsityPatterns,
+                           "When copying one sparse matrix into another, "
+                           "or when adding one sparse matrix to another, "
+                           "both matrices need to refer to the same "
+                           "sparsity pattern.");
   /**
    * Exception
    */
-  DeclException2(ExcIteratorRange,
-                 int,
-                 int,
-                 << "The iterators denote a range of " << arg1
-                 << " elements, but the given number of rows was " << arg2);
+  DEAL_II_DeclException2(ExcIteratorRange,
+                         int,
+                         int,
+                         << "The iterators denote a range of " << arg1
+                         << " elements, but the given number of rows was "
+                         << arg2);
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcSourceEqualsDestination,
-                   "You are attempting an operation on two matrices that "
-                   "are the same object, but the operation requires that the "
-                   "two objects are in fact different.");
+  DEAL_II_DeclExceptionMsg(
+    ExcSourceEqualsDestination,
+    "You are attempting an operation on two matrices that "
+    "are the same object, but the operation requires that the "
+    "two objects are in fact different.");
   //@}
 
 protected:
@@ -1750,7 +1753,7 @@ template <typename number>
 inline typename SparseMatrix<number>::size_type
 SparseMatrix<number>::m() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
   return cols->rows;
 }
 
@@ -1759,7 +1762,7 @@ template <typename number>
 inline typename SparseMatrix<number>::size_type
 SparseMatrix<number>::n() const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
   return cols->cols;
 }
 
@@ -1771,7 +1774,7 @@ SparseMatrix<number>::set(const size_type i,
                           const size_type j,
                           const number    value)
 {
-  AssertIsFinite(value);
+  DEAL_II_AssertIsFinite(value);
 
   const size_type index = cols->operator()(i, j);
 
@@ -1779,8 +1782,9 @@ SparseMatrix<number>::set(const size_type i,
   // sparsity pattern, if the value to which we set it is zero
   if (index == SparsityPattern::invalid_entry)
     {
-      Assert((index != SparsityPattern::invalid_entry) || (value == number()),
-             ExcInvalidIndex(i, j));
+      DEAL_II_Assert((index != SparsityPattern::invalid_entry) ||
+                       (value == number()),
+                     ExcInvalidIndex(i, j));
       return;
     }
 
@@ -1796,9 +1800,9 @@ SparseMatrix<number>::set(const std::vector<size_type> &indices,
                           const FullMatrix<number2> &   values,
                           const bool                    elide_zero_values)
 {
-  Assert(indices.size() == values.m(),
-         ExcDimensionMismatch(indices.size(), values.m()));
-  Assert(values.m() == values.n(), ExcNotQuadratic());
+  DEAL_II_Assert(indices.size() == values.m(),
+                 ExcDimensionMismatch(indices.size(), values.m()));
+  DEAL_II_Assert(values.m() == values.n(), ExcNotQuadratic());
 
   for (size_type i = 0; i < indices.size(); ++i)
     set(indices[i],
@@ -1818,10 +1822,10 @@ SparseMatrix<number>::set(const std::vector<size_type> &row_indices,
                           const FullMatrix<number2> &   values,
                           const bool                    elide_zero_values)
 {
-  Assert(row_indices.size() == values.m(),
-         ExcDimensionMismatch(row_indices.size(), values.m()));
-  Assert(col_indices.size() == values.n(),
-         ExcDimensionMismatch(col_indices.size(), values.n()));
+  DEAL_II_Assert(row_indices.size() == values.m(),
+                 ExcDimensionMismatch(row_indices.size(), values.m()));
+  DEAL_II_Assert(col_indices.size() == values.n(),
+                 ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i = 0; i < row_indices.size(); ++i)
     set(row_indices[i],
@@ -1841,8 +1845,8 @@ SparseMatrix<number>::set(const size_type               row,
                           const std::vector<number2> &  values,
                           const bool                    elide_zero_values)
 {
-  Assert(col_indices.size() == values.size(),
-         ExcDimensionMismatch(col_indices.size(), values.size()));
+  DEAL_II_Assert(col_indices.size() == values.size(),
+                 ExcDimensionMismatch(col_indices.size(), values.size()));
 
   set(row,
       col_indices.size(),
@@ -1859,7 +1863,7 @@ SparseMatrix<number>::add(const size_type i,
                           const size_type j,
                           const number    value)
 {
-  AssertIsFinite(value);
+  DEAL_II_AssertIsFinite(value);
 
   if (value == number())
     return;
@@ -1870,8 +1874,9 @@ SparseMatrix<number>::add(const size_type i,
   // sparsity pattern, if the value to which we set it is zero
   if (index == SparsityPattern::invalid_entry)
     {
-      Assert((index != SparsityPattern::invalid_entry) || (value == number()),
-             ExcInvalidIndex(i, j));
+      DEAL_II_Assert((index != SparsityPattern::invalid_entry) ||
+                       (value == number()),
+                     ExcInvalidIndex(i, j));
       return;
     }
 
@@ -1887,9 +1892,9 @@ SparseMatrix<number>::add(const std::vector<size_type> &indices,
                           const FullMatrix<number2> &   values,
                           const bool                    elide_zero_values)
 {
-  Assert(indices.size() == values.m(),
-         ExcDimensionMismatch(indices.size(), values.m()));
-  Assert(values.m() == values.n(), ExcNotQuadratic());
+  DEAL_II_Assert(indices.size() == values.m(),
+                 ExcDimensionMismatch(indices.size(), values.m()));
+  DEAL_II_Assert(values.m() == values.n(), ExcNotQuadratic());
 
   for (size_type i = 0; i < indices.size(); ++i)
     add(indices[i],
@@ -1909,10 +1914,10 @@ SparseMatrix<number>::add(const std::vector<size_type> &row_indices,
                           const FullMatrix<number2> &   values,
                           const bool                    elide_zero_values)
 {
-  Assert(row_indices.size() == values.m(),
-         ExcDimensionMismatch(row_indices.size(), values.m()));
-  Assert(col_indices.size() == values.n(),
-         ExcDimensionMismatch(col_indices.size(), values.n()));
+  DEAL_II_Assert(row_indices.size() == values.m(),
+                 ExcDimensionMismatch(row_indices.size(), values.m()));
+  DEAL_II_Assert(col_indices.size() == values.n(),
+                 ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i = 0; i < row_indices.size(); ++i)
     add(row_indices[i],
@@ -1932,8 +1937,8 @@ SparseMatrix<number>::add(const size_type               row,
                           const std::vector<number2> &  values,
                           const bool                    elide_zero_values)
 {
-  Assert(col_indices.size() == values.size(),
-         ExcDimensionMismatch(col_indices.size(), values.size()));
+  DEAL_II_Assert(col_indices.size() == values.size(),
+                 ExcDimensionMismatch(col_indices.size(), values.size()));
 
   add(row,
       col_indices.size(),
@@ -1948,8 +1953,8 @@ template <typename number>
 inline SparseMatrix<number> &
 SparseMatrix<number>::operator*=(const number factor)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(val != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(val != nullptr, ExcNotInitialized());
 
   number *            val_ptr = val.get();
   const number *const end_ptr = val.get() + cols->n_nonzero_elements();
@@ -1966,9 +1971,9 @@ template <typename number>
 inline SparseMatrix<number> &
 SparseMatrix<number>::operator/=(const number factor)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(val != nullptr, ExcNotInitialized());
-  Assert(factor != number(), ExcDivideByZero());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(val != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(factor != number(), ExcDivideByZero());
 
   const number factor_inv = number(1.) / factor;
 
@@ -1987,9 +1992,9 @@ template <typename number>
 inline const number &
 SparseMatrix<number>::operator()(const size_type i, const size_type j) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(cols->operator()(i, j) != SparsityPattern::invalid_entry,
-         ExcInvalidIndex(i, j));
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols->operator()(i, j) != SparsityPattern::invalid_entry,
+                 ExcInvalidIndex(i, j));
   return val[cols->operator()(i, j)];
 }
 
@@ -1999,9 +2004,9 @@ template <typename number>
 inline number &
 SparseMatrix<number>::operator()(const size_type i, const size_type j)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(cols->operator()(i, j) != SparsityPattern::invalid_entry,
-         ExcInvalidIndex(i, j));
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols->operator()(i, j) != SparsityPattern::invalid_entry,
+                 ExcInvalidIndex(i, j));
   return val[cols->operator()(i, j)];
 }
 
@@ -2011,7 +2016,7 @@ template <typename number>
 inline number
 SparseMatrix<number>::el(const size_type i, const size_type j) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
   const size_type index = cols->operator()(i, j);
 
   if (index != SparsityPattern::invalid_entry)
@@ -2026,9 +2031,9 @@ template <typename number>
 inline number
 SparseMatrix<number>::diag_element(const size_type i) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(m() == n(), ExcNotQuadratic());
-  AssertIndexRange(i, m());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal
@@ -2041,9 +2046,9 @@ template <typename number>
 inline number &
 SparseMatrix<number>::diag_element(const size_type i)
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(m() == n(), ExcNotQuadratic());
-  AssertIndexRange(i, m());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m() == n(), ExcNotQuadratic());
+  DEAL_II_AssertIndexRange(i, m());
 
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal
@@ -2058,8 +2063,8 @@ void
 SparseMatrix<number>::copy_from(const ForwardIterator begin,
                                 const ForwardIterator end)
 {
-  Assert(static_cast<size_type>(std::distance(begin, end)) == m(),
-         ExcIteratorRange(std::distance(begin, end), m()));
+  DEAL_II_Assert(static_cast<size_type>(std::distance(begin, end)) == m(),
+                 ExcIteratorRange(std::distance(begin, end), m()));
 
   // for use in the inner loop, we define an alias to the type of the inner
   // iterators
@@ -2112,7 +2117,7 @@ namespace SparseMatrixIterators
   inline number
   Accessor<number, true>::value() const
   {
-    AssertIndexRange(linear_index, matrix->n_nonzero_elements());
+    DEAL_II_AssertIndexRange(linear_index, matrix->n_nonzero_elements());
     return matrix->val[linear_index];
   }
 
@@ -2137,8 +2142,8 @@ namespace SparseMatrixIterators
   template <typename number>
   inline Accessor<number, false>::Reference::operator number() const
   {
-    AssertIndexRange(accessor->linear_index,
-                     accessor->matrix->n_nonzero_elements());
+    DEAL_II_AssertIndexRange(accessor->linear_index,
+                             accessor->matrix->n_nonzero_elements());
     return accessor->matrix->val[accessor->linear_index];
   }
 
@@ -2148,8 +2153,8 @@ namespace SparseMatrixIterators
   inline const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator=(const number n) const
   {
-    AssertIndexRange(accessor->linear_index,
-                     accessor->matrix->n_nonzero_elements());
+    DEAL_II_AssertIndexRange(accessor->linear_index,
+                             accessor->matrix->n_nonzero_elements());
     accessor->matrix->val[accessor->linear_index] = n;
     return *this;
   }
@@ -2160,8 +2165,8 @@ namespace SparseMatrixIterators
   inline const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator+=(const number n) const
   {
-    AssertIndexRange(accessor->linear_index,
-                     accessor->matrix->n_nonzero_elements());
+    DEAL_II_AssertIndexRange(accessor->linear_index,
+                             accessor->matrix->n_nonzero_elements());
     accessor->matrix->val[accessor->linear_index] += n;
     return *this;
   }
@@ -2172,8 +2177,8 @@ namespace SparseMatrixIterators
   inline const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator-=(const number n) const
   {
-    AssertIndexRange(accessor->linear_index,
-                     accessor->matrix->n_nonzero_elements());
+    DEAL_II_AssertIndexRange(accessor->linear_index,
+                             accessor->matrix->n_nonzero_elements());
     accessor->matrix->val[accessor->linear_index] -= n;
     return *this;
   }
@@ -2184,8 +2189,8 @@ namespace SparseMatrixIterators
   inline const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator*=(const number n) const
   {
-    AssertIndexRange(accessor->linear_index,
-                     accessor->matrix->n_nonzero_elements());
+    DEAL_II_AssertIndexRange(accessor->linear_index,
+                             accessor->matrix->n_nonzero_elements());
     accessor->matrix->val[accessor->linear_index] *= n;
     return *this;
   }
@@ -2196,8 +2201,8 @@ namespace SparseMatrixIterators
   inline const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator/=(const number n) const
   {
-    AssertIndexRange(accessor->linear_index,
-                     accessor->matrix->n_nonzero_elements());
+    DEAL_II_AssertIndexRange(accessor->linear_index,
+                             accessor->matrix->n_nonzero_elements());
     accessor->matrix->val[accessor->linear_index] /= n;
     return *this;
   }
@@ -2317,8 +2322,8 @@ namespace SparseMatrixIterators
   inline bool
   Iterator<number, Constness>::operator<(const Iterator &other) const
   {
-    Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
-           ExcInternalError());
+    DEAL_II_Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+                   ExcInternalError());
 
     return (accessor < other.accessor);
   }
@@ -2336,8 +2341,8 @@ namespace SparseMatrixIterators
   inline int
   Iterator<number, Constness>::operator-(const Iterator &other) const
   {
-    Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
-           ExcInternalError());
+    DEAL_II_Assert(&accessor.get_matrix() == &other.accessor.get_matrix(),
+                   ExcInternalError());
 
     return (*this)->linear_index - other->linear_index;
   }
@@ -2395,7 +2400,7 @@ template <typename number>
 inline typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::begin(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
 
   return const_iterator(this, cols->rowstart[r]);
 }
@@ -2406,7 +2411,7 @@ template <typename number>
 inline typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::end(const size_type r) const
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
 
   return const_iterator(this, cols->rowstart[r + 1]);
 }
@@ -2417,7 +2422,7 @@ template <typename number>
 inline typename SparseMatrix<number>::iterator
 SparseMatrix<number>::begin(const size_type r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
 
   return iterator(this, cols->rowstart[r]);
 }
@@ -2428,7 +2433,7 @@ template <typename number>
 inline typename SparseMatrix<number>::iterator
 SparseMatrix<number>::end(const size_type r)
 {
-  Assert(r < m(), ExcIndexRange(r, 0, m()));
+  DEAL_II_Assert(r < m(), ExcIndexRange(r, 0, m()));
 
   return iterator(this, cols->rowstart[r + 1]);
 }
@@ -2442,8 +2447,8 @@ SparseMatrix<number>::print(StreamType &out,
                             const bool  across,
                             const bool  diagonal_first) const
 {
-  Assert(cols != nullptr, ExcNotInitialized());
-  Assert(val != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(cols != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(val != nullptr, ExcNotInitialized());
 
   bool   hanging_diagonal = false;
   number diagonal         = number();

@@ -82,7 +82,7 @@ test()
   v2.add(-1, v1);
 
   deallog << "Projection error: " << abs_zero(v2.l2_norm()) << std::endl;
-  Assert(v2.l2_norm() < 1e-10, ExcInternalError());
+  DEAL_II_Assert(v2.l2_norm() < 1e-10, ExcInternalError());
 }
 
 int

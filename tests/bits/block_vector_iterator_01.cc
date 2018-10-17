@@ -33,9 +33,9 @@ test()
   // iterator
   {
     BlockVector<double>::const_iterator i = v.begin();
-    AssertThrow(*i == 1, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 1, ExcInternalError());
     ++i;
-    AssertThrow(*i == 2, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 2, ExcInternalError());
   }
 
   // same, but create iterator in a different
@@ -43,17 +43,17 @@ test()
   {
     BlockVector<double>::const_iterator i =
       const_cast<const BlockVector<double> &>(v).begin();
-    AssertThrow(*i == 1, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 1, ExcInternalError());
     ++i;
-    AssertThrow(*i == 2, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 2, ExcInternalError());
   }
 
   // read through a read-write iterator
   {
     BlockVector<double>::iterator i = v.begin();
-    AssertThrow(*i == 1, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 1, ExcInternalError());
     ++i;
-    AssertThrow(*i == 2, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 2, ExcInternalError());
   }
 
   // write through a read-write iterator
@@ -68,9 +68,9 @@ test()
   // and read again
   {
     BlockVector<double>::iterator i = v.begin();
-    AssertThrow(*i == 2, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 2, ExcInternalError());
     ++i;
-    AssertThrow(*i == 3, ExcInternalError());
+    DEAL_II_AssertThrow(*i == 3, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

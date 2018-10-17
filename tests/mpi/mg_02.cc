@@ -78,18 +78,18 @@ test()
   }
 
   static const FE_DGP<dim> fe(0);
-  Assert(dofh.has_active_dofs() == false, ExcInternalError());
-  Assert(dofh.has_level_dofs() == false, ExcInternalError());
+  DEAL_II_Assert(dofh.has_active_dofs() == false, ExcInternalError());
+  DEAL_II_Assert(dofh.has_level_dofs() == false, ExcInternalError());
 
   dofh.distribute_dofs(fe);
 
-  Assert(dofh.has_active_dofs() == true, ExcInternalError());
-  Assert(dofh.has_level_dofs() == false, ExcInternalError());
+  DEAL_II_Assert(dofh.has_active_dofs() == true, ExcInternalError());
+  DEAL_II_Assert(dofh.has_level_dofs() == false, ExcInternalError());
 
   dofh.distribute_mg_dofs(fe);
 
-  Assert(dofh.has_active_dofs() == true, ExcInternalError());
-  Assert(dofh.has_level_dofs() == true, ExcInternalError());
+  DEAL_II_Assert(dofh.has_active_dofs() == true, ExcInternalError());
+  DEAL_II_Assert(dofh.has_level_dofs() == true, ExcInternalError());
   {
     deallog << "Levels: " << tr.n_global_levels() << std::endl;
     std::cout << "Levels: " << tr.n_global_levels() << std::endl;

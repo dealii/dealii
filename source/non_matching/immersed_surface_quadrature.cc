@@ -26,13 +26,13 @@ namespace NonMatching
     : Quadrature<dim>(points, weights)
     , normals(normals)
   {
-    AssertDimension(weights.size(), points.size());
-    AssertDimension(normals.size(), points.size());
+    DEAL_II_AssertDimension(weights.size(), points.size());
+    DEAL_II_AssertDimension(normals.size(), points.size());
     for (auto normal : normals)
       {
         (void)normal;
-        Assert(std::abs(normal.norm() - 1.0) < 1e-9,
-               ExcMessage("Normal is not normalized."));
+        DEAL_II_Assert(std::abs(normal.norm() - 1.0) < 1e-9,
+                       ExcMessage("Normal is not normalized."));
       }
   }
 
@@ -47,8 +47,8 @@ namespace NonMatching
     this->quadrature_points.push_back(point);
     this->weights.push_back(weight);
     this->normals.push_back(normal);
-    Assert(std::abs(normal.norm() - 1.0) < 1e-9,
-           ExcMessage("Normal is not normalized."));
+    DEAL_II_Assert(std::abs(normal.norm() - 1.0) < 1e-9,
+                   ExcMessage("Normal is not normalized."));
   }
 
 
@@ -57,7 +57,7 @@ namespace NonMatching
   const Tensor<1, dim> &
   ImmersedSurfaceQuadrature<dim>::normal_vector(const unsigned int i) const
   {
-    AssertIndexRange(i, this->size());
+    DEAL_II_AssertIndexRange(i, this->size());
     return normals[i];
   }
 

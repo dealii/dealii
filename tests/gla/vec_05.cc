@@ -62,28 +62,28 @@ test()
   typename LA::MPI::Vector big(local_active_big, MPI_COMM_WORLD);
 
   typename LA::MPI::Vector x;
-  Assert(!x.has_ghost_elements(), ExcInternalError());
-  Assert(x.size() == 0, ExcInternalError());
+  DEAL_II_Assert(!x.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(x.size() == 0, ExcInternalError());
   x.reinit(v);
-  Assert(!x.has_ghost_elements(), ExcInternalError());
-  Assert(x.size() == v.size(), ExcInternalError());
+  DEAL_II_Assert(!x.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(x.size() == v.size(), ExcInternalError());
 
   x.reinit(big);
-  Assert(!x.has_ghost_elements(), ExcInternalError());
-  Assert(x.size() == big.size(), ExcInternalError());
+  DEAL_II_Assert(!x.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(x.size() == big.size(), ExcInternalError());
 
   x.reinit(v);
-  Assert(!x.has_ghost_elements(), ExcInternalError());
-  Assert(x.size() == v.size(), ExcInternalError());
+  DEAL_II_Assert(!x.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(x.size() == v.size(), ExcInternalError());
 
   x.reinit(g);
-  Assert(x.has_ghost_elements(), ExcInternalError());
-  Assert(x.size() == g.size(), ExcInternalError());
+  DEAL_II_Assert(x.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(x.size() == g.size(), ExcInternalError());
   deallog << get_real_assert_zero_imag(x(1)) << std::endl;
 
   x.reinit(v);
-  Assert(!x.has_ghost_elements(), ExcInternalError());
-  Assert(x.size() == v.size(), ExcInternalError());
+  DEAL_II_Assert(!x.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(x.size() == v.size(), ExcInternalError());
 
   // done
   if (myid == 0)

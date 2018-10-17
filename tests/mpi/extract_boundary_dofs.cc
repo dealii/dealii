@@ -54,7 +54,7 @@ test()
   // locally relevant dofs, so test this
   DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
   boundary_dofs.subtract_set(relevant_set);
-  AssertThrow(boundary_dofs.n_elements() == 0, ExcInternalError());
+  DEAL_II_AssertThrow(boundary_dofs.n_elements() == 0, ExcInternalError());
 }
 
 

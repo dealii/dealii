@@ -213,7 +213,7 @@ namespace MeshWorker
     inline number
     Functional<number>::operator()(const unsigned int i) const
     {
-      AssertIndexRange(i, results.size());
+      DEAL_II_AssertIndexRange(i, results.size());
       return results[i];
     }
 
@@ -230,12 +230,15 @@ namespace MeshWorker
     inline void
     CellsAndFaces<number>::initialize(AnyData &r, bool sep)
     {
-      Assert(r.name(0) == "cells", AnyData::ExcNameMismatch(0, "cells"));
+      DEAL_II_Assert(r.name(0) == "cells",
+                     AnyData::ExcNameMismatch(0, "cells"));
       if (sep)
         {
-          Assert(r.name(1) == "faces", AnyData::ExcNameMismatch(1, "faces"));
-          AssertDimension(r.entry<BlockVector<double> *>(0)->n_blocks(),
-                          r.entry<BlockVector<double> *>(1)->n_blocks());
+          DEAL_II_Assert(r.name(1) == "faces",
+                         AnyData::ExcNameMismatch(1, "faces"));
+          DEAL_II_AssertDimension(
+            r.entry<BlockVector<double> *>(0)->n_blocks(),
+            r.entry<BlockVector<double> *>(1)->n_blocks());
         }
 
       results        = r;

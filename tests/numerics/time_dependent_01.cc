@@ -69,8 +69,8 @@ test()
 
   // make sure we have called TimeStep::end_sweep once for every time step
   // object
-  AssertThrow(end_sweep_flags == std::vector<bool>(n_time_steps, true),
-              ExcInternalError());
+  DEAL_II_AssertThrow(end_sweep_flags == std::vector<bool>(n_time_steps, true),
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

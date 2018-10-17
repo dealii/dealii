@@ -41,18 +41,18 @@ check_2()
           // check assignment
           change_with_brackets[indices]    = entry;
           change_with_parentheses(indices) = entry;
-          AssertThrow(change_with_brackets[k][l] == entry,
-                      ExcMessage("Entries should match"));
-          AssertThrow(change_with_parentheses[k][l] == entry,
-                      ExcMessage("Entries should match"));
+          DEAL_II_AssertThrow(change_with_brackets[k][l] == entry,
+                              ExcMessage("Entries should match"));
+          DEAL_II_AssertThrow(change_with_parentheses[k][l] == entry,
+                              ExcMessage("Entries should match"));
 
           // and access
           const double brackets_entry    = change_with_brackets[indices];
           const double parentheses_entry = change_with_parentheses(indices);
-          AssertThrow(brackets_entry == entry,
-                      ExcMessage("Entries should match"));
-          AssertThrow(parentheses_entry == entry,
-                      ExcMessage("Entries should match"));
+          DEAL_II_AssertThrow(brackets_entry == entry,
+                              ExcMessage("Entries should match"));
+          DEAL_II_AssertThrow(parentheses_entry == entry,
+                              ExcMessage("Entries should match"));
         }
     }
 }
@@ -80,19 +80,20 @@ check_4()
                   // check assignment
                   change_with_brackets[indices]    = entry;
                   change_with_parentheses(indices) = entry;
-                  AssertThrow(change_with_brackets[i][j][k][l] == entry,
-                              ExcMessage("Entries should match"));
-                  AssertThrow(change_with_parentheses[i][j][k][l] == entry,
-                              ExcMessage("Entries should match"));
+                  DEAL_II_AssertThrow(change_with_brackets[i][j][k][l] == entry,
+                                      ExcMessage("Entries should match"));
+                  DEAL_II_AssertThrow(change_with_parentheses[i][j][k][l] ==
+                                        entry,
+                                      ExcMessage("Entries should match"));
 
                   // and access
                   const double brackets_entry = change_with_brackets[indices];
                   const double parentheses_entry =
                     change_with_parentheses(indices);
-                  AssertThrow(brackets_entry == entry,
-                              ExcMessage("Entries should match"));
-                  AssertThrow(parentheses_entry == entry,
-                              ExcMessage("Entries should match"));
+                  DEAL_II_AssertThrow(brackets_entry == entry,
+                                      ExcMessage("Entries should match"));
+                  DEAL_II_AssertThrow(parentheses_entry == entry,
+                                      ExcMessage("Entries should match"));
                 }
             }
         }

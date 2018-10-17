@@ -88,10 +88,11 @@ test()
     n_cell_types[mf.get_mapping_info().get_cell_type(i)]++;
 
   // should do at least some compression
-  Assert(n_cell_types[0] + n_cell_types[1] > 0, ExcInternalError());
-  Assert(mf.get_mapping_info().cell_data[0].jacobians[0].size() <
-           (n_cell_types[3] * quad.size() + n_macro_cells - n_cell_types[3]),
-         ExcInternalError());
+  DEAL_II_Assert(n_cell_types[0] + n_cell_types[1] > 0, ExcInternalError());
+  DEAL_II_Assert(mf.get_mapping_info().cell_data[0].jacobians[0].size() <
+                   (n_cell_types[3] * quad.size() + n_macro_cells -
+                    n_cell_types[3]),
+                 ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
@@ -126,9 +127,10 @@ test_cube()
 
   // should have one Cartesian cell and no other
   // cell type
-  AssertDimension(n_cell_types[0], n_macro_cells);
-  AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 1);
-  Assert(n_macro_cells > 1, ExcInternalError());
+  DEAL_II_AssertDimension(n_cell_types[0], n_macro_cells);
+  DEAL_II_AssertDimension(
+    mf.get_mapping_info().cell_data[0].jacobians[0].size(), 1);
+  DEAL_II_Assert(n_macro_cells > 1, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 
@@ -170,9 +172,10 @@ test_parallelogram()
 
   // should have one affine cell and no other
   // cell type
-  AssertDimension(n_cell_types[1], n_macro_cells);
-  AssertDimension(mf.get_mapping_info().cell_data[0].jacobians[0].size(), 1);
-  Assert(n_macro_cells > 1, ExcInternalError());
+  DEAL_II_AssertDimension(n_cell_types[1], n_macro_cells);
+  DEAL_II_AssertDimension(
+    mf.get_mapping_info().cell_data[0].jacobians[0].size(), 1);
+  DEAL_II_Assert(n_macro_cells > 1, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

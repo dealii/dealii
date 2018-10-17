@@ -190,15 +190,16 @@ public:
   /**
    * Exception
    */
-  DeclException1(ExcRadialVariableHasNegativeValues,
-                 double,
-                 << "You are attempting to use this class on a triangulation "
-                    "in which some vertices have a negative radial coordinate "
-                    "value of "
-                 << arg1
-                 << ". If you rotate such a triangulation around an "
-                    "axis, you will get (dim+1)-dimensional meshes "
-                    "that are not likely what you hoped to see.");
+  DEAL_II_DeclException1(
+    ExcRadialVariableHasNegativeValues,
+    double,
+    << "You are attempting to use this class on a triangulation "
+       "in which some vertices have a negative radial coordinate "
+       "value of "
+    << arg1
+    << ". If you rotate such a triangulation around an "
+       "axis, you will get (dim+1)-dimensional meshes "
+       "that are not likely what you hoped to see.");
 
 private:
   /**

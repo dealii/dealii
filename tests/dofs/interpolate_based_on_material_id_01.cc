@@ -104,7 +104,8 @@ test()
           Vector<double> values(fe.dofs_per_cell);
           cell->get_dof_values(interpolant, values);
           for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-            AssertThrow(values[i] == cell->index() % 128, ExcInternalError());
+            DEAL_II_AssertThrow(values[i] == cell->index() % 128,
+                                ExcInternalError());
         }
     }
 

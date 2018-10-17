@@ -39,7 +39,7 @@ CellId::CellId(const unsigned int               coarse_cell_id,
   : coarse_cell_id(coarse_cell_id)
   , n_child_indices(id.size())
 {
-  Assert(n_child_indices < child_indices.size(), ExcInternalError());
+  DEAL_II_Assert(n_child_indices < child_indices.size(), ExcInternalError());
   std::copy(id.begin(), id.end(), child_indices.begin());
 }
 
@@ -51,7 +51,7 @@ CellId::CellId(const unsigned int  coarse_cell_id,
   : coarse_cell_id(coarse_cell_id)
   , n_child_indices(n_child_indices)
 {
-  Assert(n_child_indices < child_indices.size(), ExcInternalError());
+  DEAL_II_Assert(n_child_indices < child_indices.size(), ExcInternalError());
   memcpy(&(child_indices[0]), id, n_child_indices);
 }
 
@@ -68,7 +68,7 @@ CellId::CellId(const CellId::binary_type &binary_representation)
   const unsigned int dim          = binary_representation[1] & two_bit_mask;
   n_child_indices                 = (binary_representation[1] >> 2);
 
-  Assert(n_child_indices < child_indices.size(), ExcInternalError());
+  DEAL_II_Assert(n_child_indices < child_indices.size(), ExcInternalError());
 
   // Each child requires 'dim' bits to store its index
   const unsigned int children_per_value =
@@ -103,7 +103,7 @@ CellId::to_binary() const
   CellId::binary_type binary_representation;
   binary_representation.fill(0);
 
-  Assert(n_child_indices < child_indices.size(), ExcInternalError());
+  DEAL_II_Assert(n_child_indices < child_indices.size(), ExcInternalError());
 
   // The first entry stores the coarse cell id
   binary_representation[0] = coarse_cell_id;
@@ -122,7 +122,8 @@ CellId::to_binary() const
   // Loop until all child indices have been written
   while (child_level < n_child_indices)
     {
-      Assert(binary_entry < binary_representation.size(), ExcInternalError());
+      DEAL_II_Assert(binary_entry < binary_representation.size(),
+                     ExcInternalError());
 
       for (unsigned int j = 0; j < children_per_value; ++j)
         {

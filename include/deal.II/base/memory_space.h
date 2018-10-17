@@ -165,7 +165,7 @@ namespace MemorySpace
                    values_dev.get(),
                    n_elements * sizeof(Number),
                    cudaMemcpyDeviceToHost);
-      AssertCuda(cuda_error_code);
+      DEAL_II_AssertCuda(cuda_error_code);
     }
 
     void
@@ -176,7 +176,7 @@ namespace MemorySpace
                    begin,
                    n_elements * sizeof(Number),
                    cudaMemcpyHostToDevice);
-      AssertCuda(cuda_error_code);
+      DEAL_II_AssertCuda(cuda_error_code);
     }
 
     std::unique_ptr<Number[], decltype(&free)>    values;

@@ -52,7 +52,7 @@ namespace PETScWrappers
     const PetscErrorCode ierr =
       PetscOptionsSetValue(nullptr, name.c_str(), value.c_str());
 #  endif
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -108,7 +108,7 @@ namespace PETScWrappers
                     const PetscBool option_value = PETSC_FALSE)
   {
     const PetscErrorCode ierr = MatSetOption(matrix, option_name, option_value);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    DEAL_II_AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 

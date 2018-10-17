@@ -60,7 +60,7 @@ test(const unsigned int max_particles,
   auto all_n_local_particles =
     Utilities::MPI::all_gather(MPI_COMM_WORLD, n_local_particles);
 
-  AssertDimension(all_n_local_particles.size(), n_procs);
+  DEAL_II_AssertDimension(all_n_local_particles.size(), n_procs);
 
   // Compute the start of my global indices
   unsigned int my_global_start = 0;

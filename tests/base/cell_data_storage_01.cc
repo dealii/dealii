@@ -67,11 +67,11 @@ public:
 };
 
 const double eps = 1e-10;
-DeclException3(ExcWrongValue,
-               double,
-               double,
-               double,
-               << arg1 << " != " << arg2 << " with delta = " << arg3);
+DEAL_II_DeclException3(ExcWrongValue,
+                       double,
+                       double,
+                       double,
+                       << arg1 << " != " << arg2 << " with delta = " << arg3);
 
 
 /**
@@ -105,8 +105,8 @@ check_qph(Triangulation<dim> &         tr,
           {
             const double value  = func.value(q_points[q]);
             const double value2 = qpd[q]->value;
-            AssertThrow(std::fabs(value - value2) < eps,
-                        ExcWrongValue(value, value2, value - value2));
+            DEAL_II_AssertThrow(std::fabs(value - value2) < eps,
+                                ExcWrongValue(value, value2, value - value2));
           }
       }
   dof_handler.clear();

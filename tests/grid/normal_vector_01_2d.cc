@@ -50,7 +50,7 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     };
 }
 
@@ -78,10 +78,10 @@ main()
           face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
           for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_face; ++v)
-            AssertThrow((boundary.normal_vector(face, face->vertex(v)) -
-                         normals[v] / normals[v].norm())
-                            .norm() < 1e-12,
-                        ExcInternalError());
+            DEAL_II_AssertThrow((boundary.normal_vector(face, face->vertex(v)) -
+                                 normals[v] / normals[v].norm())
+                                    .norm() < 1e-12,
+                                ExcInternalError());
         }
       tria.clear();
     }

@@ -53,7 +53,7 @@ operator==(const BlockSparsityPattern &sp1, const BlockSparsityPattern &sp2)
     for (unsigned int j = 0; j < sp1.n_block_cols(); ++j)
       if (!(sp1.block(i, j) == sp2.block(i, j)))
         {
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
           return false;
         }
 

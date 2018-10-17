@@ -146,8 +146,8 @@ transfer(std::ostream &out)
 
         cell->get_dof_indices(local_dof_indices);
 
-        Assert(local_dof_indices.size() >= fe_val.n_quadrature_points,
-               ExcInternalError());
+        DEAL_II_Assert(local_dof_indices.size() >= fe_val.n_quadrature_points,
+                       ExcInternalError());
 
         for (unsigned int q = 0; q < fe_val.n_quadrature_points; ++q)
           {

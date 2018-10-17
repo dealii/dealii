@@ -100,7 +100,7 @@ namespace internal
                &policy))
       policy_name = "Policy::ParallelShared<";
     else
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
     policy_name += Utilities::int_to_string(dim) + "," +
                    Utilities::int_to_string(spacedim) + ">";
     return policy_name;
@@ -237,7 +237,7 @@ namespace internal
               break;
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
               max_couplings = 0;
           }
         return std::min(max_couplings, dof_handler.n_dofs());
@@ -273,7 +273,7 @@ namespace internal
                           27 * dof_handler.get_fe().dofs_per_hex;
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
             max_couplings = 0;
           }
 
@@ -393,8 +393,8 @@ namespace internal
       template <int spacedim>
       static void reserve_space_mg(DoFHandler<1, spacedim> &dof_handler)
       {
-        Assert(dof_handler.get_triangulation().n_levels() > 0,
-               ExcMessage("Invalid triangulation"));
+        DEAL_II_Assert(dof_handler.get_triangulation().n_levels() > 0,
+                       ExcMessage("Invalid triangulation"));
         dof_handler.clear_mg_space();
 
         const dealii::Triangulation<1, spacedim> &tria =
@@ -443,9 +443,9 @@ namespace internal
         for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
           if (tria.vertex_used(vertex))
             {
-              Assert(min_level[vertex] < n_levels, ExcInternalError());
-              Assert(max_level[vertex] >= min_level[vertex],
-                     ExcInternalError());
+              DEAL_II_Assert(min_level[vertex] < n_levels, ExcInternalError());
+              DEAL_II_Assert(max_level[vertex] >= min_level[vertex],
+                             ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(
                 min_level[vertex],
                 max_level[vertex],
@@ -454,8 +454,8 @@ namespace internal
 
           else
             {
-              Assert(min_level[vertex] == n_levels, ExcInternalError());
-              Assert(max_level[vertex] == 0, ExcInternalError());
+              DEAL_II_Assert(min_level[vertex] == n_levels, ExcInternalError());
+              DEAL_II_Assert(max_level[vertex] == 0, ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(1, 0, 0);
             }
       }
@@ -463,8 +463,8 @@ namespace internal
       template <int spacedim>
       static void reserve_space_mg(DoFHandler<2, spacedim> &dof_handler)
       {
-        Assert(dof_handler.get_triangulation().n_levels() > 0,
-               ExcMessage("Invalid triangulation"));
+        DEAL_II_Assert(dof_handler.get_triangulation().n_levels() > 0,
+                       ExcMessage("Invalid triangulation"));
         dof_handler.clear_mg_space();
 
         const dealii::FiniteElement<2, spacedim> &fe = dof_handler.get_fe();
@@ -519,9 +519,9 @@ namespace internal
         for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
           if (tria.vertex_used(vertex))
             {
-              Assert(min_level[vertex] < n_levels, ExcInternalError());
-              Assert(max_level[vertex] >= min_level[vertex],
-                     ExcInternalError());
+              DEAL_II_Assert(min_level[vertex] < n_levels, ExcInternalError());
+              DEAL_II_Assert(max_level[vertex] >= min_level[vertex],
+                             ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(min_level[vertex],
                                                       max_level[vertex],
                                                       fe.dofs_per_vertex);
@@ -529,8 +529,8 @@ namespace internal
 
           else
             {
-              Assert(min_level[vertex] == n_levels, ExcInternalError());
-              Assert(max_level[vertex] == 0, ExcInternalError());
+              DEAL_II_Assert(min_level[vertex] == n_levels, ExcInternalError());
+              DEAL_II_Assert(max_level[vertex] == 0, ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(1, 0, 0);
             }
       }
@@ -538,8 +538,8 @@ namespace internal
       template <int spacedim>
       static void reserve_space_mg(DoFHandler<3, spacedim> &dof_handler)
       {
-        Assert(dof_handler.get_triangulation().n_levels() > 0,
-               ExcMessage("Invalid triangulation"));
+        DEAL_II_Assert(dof_handler.get_triangulation().n_levels() > 0,
+                       ExcMessage("Invalid triangulation"));
         dof_handler.clear_mg_space();
 
         const dealii::FiniteElement<3, spacedim> &fe = dof_handler.get_fe();
@@ -596,9 +596,9 @@ namespace internal
         for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
           if (tria.vertex_used(vertex))
             {
-              Assert(min_level[vertex] < n_levels, ExcInternalError());
-              Assert(max_level[vertex] >= min_level[vertex],
-                     ExcInternalError());
+              DEAL_II_Assert(min_level[vertex] < n_levels, ExcInternalError());
+              DEAL_II_Assert(max_level[vertex] >= min_level[vertex],
+                             ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(min_level[vertex],
                                                       max_level[vertex],
                                                       fe.dofs_per_vertex);
@@ -606,8 +606,8 @@ namespace internal
 
           else
             {
-              Assert(min_level[vertex] == n_levels, ExcInternalError());
-              Assert(max_level[vertex] == 0, ExcInternalError());
+              DEAL_II_Assert(min_level[vertex] == n_levels, ExcInternalError());
+              DEAL_II_Assert(max_level[vertex] == 0, ExcInternalError());
               dof_handler.mg_vertex_dofs[vertex].init(1, 0, 0);
             }
       }
@@ -991,7 +991,8 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::level_cell_iterator
 DoFHandler<dim, spacedim>::begin_mg(const unsigned int level) const
 {
-  // Assert(this->has_level_dofs(), ExcMessage("You can only iterate over mg "
+  // DEAL_II_Assert(this->has_level_dofs(), ExcMessage("You can only iterate
+  // over mg "
   //     "levels if mg dofs got distributed."));
   typename Triangulation<dim, spacedim>::cell_iterator cell =
     this->get_triangulation().begin(level);
@@ -1005,7 +1006,8 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::level_cell_iterator
 DoFHandler<dim, spacedim>::end_mg(const unsigned int level) const
 {
-  // Assert(this->has_level_dofs(), ExcMessage("You can only iterate over mg "
+  // DEAL_II_Assert(this->has_level_dofs(), ExcMessage("You can only iterate
+  // over mg "
   //     "levels if mg dofs got distributed."));
   typename Triangulation<dim, spacedim>::cell_iterator cell =
     this->get_triangulation().end(level);
@@ -1135,9 +1137,9 @@ types::global_dof_index
 DoFHandler<dim, spacedim>::n_boundary_dofs(
   const std::set<types::boundary_id> &boundary_ids) const
 {
-  Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
-           boundary_ids.end(),
-         ExcInvalidBoundaryIndicator());
+  DEAL_II_Assert(boundary_ids.find(numbers::internal_face_boundary_id) ==
+                   boundary_ids.end(),
+                 ExcInvalidBoundaryIndicator());
 
   std::set<types::global_dof_index> boundary_dofs;
 
@@ -1202,13 +1204,13 @@ void
 DoFHandler<dim, spacedim>::distribute_dofs(
   const FiniteElement<dim, spacedim> &ff)
 {
-  Assert(
+  DEAL_II_Assert(
     tria != nullptr,
     ExcMessage(
       "You need to set the Triangulation in the DoFHandler using initialize() or "
       "in the constructor before you can distribute DoFs."));
-  Assert(tria->n_levels() > 0,
-         ExcMessage("The Triangulation you are using is empty!"));
+  DEAL_II_Assert(tria->n_levels() > 0,
+                 ExcMessage("The Triangulation you are using is empty!"));
 
   // Only recreate the FECollection if we don't already store
   // the exact same FiniteElement object.
@@ -1262,12 +1264,12 @@ template <int dim, int spacedim>
 void
 DoFHandler<dim, spacedim>::distribute_mg_dofs()
 {
-  Assert(
+  DEAL_II_Assert(
     levels.size() > 0,
     ExcMessage(
       "Distribute active DoFs using distribute_dofs() before calling distribute_mg_dofs()."));
 
-  Assert(
+  DEAL_II_Assert(
     ((tria->get_mesh_smoothing() &
       Triangulation<dim, spacedim>::limit_level_difference_at_vertices) !=
      Triangulation<dim, spacedim>::none),
@@ -1330,27 +1332,27 @@ void
 DoFHandler<dim, spacedim>::renumber_dofs(
   const std::vector<types::global_dof_index> &new_numbers)
 {
-  Assert(levels.size() > 0,
-         ExcMessage(
-           "You need to distribute DoFs before you can renumber them."));
+  DEAL_II_Assert(
+    levels.size() > 0,
+    ExcMessage("You need to distribute DoFs before you can renumber them."));
 
 #ifdef DEBUG
   if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
         &*tria) != nullptr)
     {
-      Assert(new_numbers.size() == n_dofs() ||
-               new_numbers.size() == n_locally_owned_dofs(),
-             ExcMessage("Incorrect size of the input array."));
+      DEAL_II_Assert(new_numbers.size() == n_dofs() ||
+                       new_numbers.size() == n_locally_owned_dofs(),
+                     ExcMessage("Incorrect size of the input array."));
     }
   else if (dynamic_cast<
              const parallel::distributed::Triangulation<dim, spacedim> *>(
              &*tria) != nullptr)
     {
-      AssertDimension(new_numbers.size(), n_locally_owned_dofs());
+      DEAL_II_AssertDimension(new_numbers.size(), n_locally_owned_dofs());
     }
   else
     {
-      AssertDimension(new_numbers.size(), n_dofs());
+      DEAL_II_AssertDimension(new_numbers.size(), n_dofs());
     }
 
   // assert that the new indices are
@@ -1369,13 +1371,13 @@ DoFHandler<dim, spacedim>::renumber_dofs(
       std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
       types::global_dof_index                              i = 0;
       for (; p != tmp.end(); ++p, ++i)
-        Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+        DEAL_II_Assert(*p == i, ExcNewNumbersNotConsecutive(i));
     }
   else
     for (types::global_dof_index i = 0; i < new_numbers.size(); ++i)
-      Assert(new_numbers[i] < n_dofs(),
-             ExcMessage(
-               "New DoF index is not less than the total number of dofs."));
+      DEAL_II_Assert(
+        new_numbers[i] < n_dofs(),
+        ExcMessage("New DoF index is not less than the total number of dofs."));
 #endif
 
   number_cache = policy->renumber_dofs(new_numbers);
@@ -1388,13 +1390,13 @@ DoFHandler<dim, spacedim>::renumber_dofs(
   const unsigned int                          level,
   const std::vector<types::global_dof_index> &new_numbers)
 {
-  Assert(
+  DEAL_II_Assert(
     mg_levels.size() > 0 && levels.size() > 0,
     ExcMessage(
       "You need to distribute active and level DoFs before you can renumber level DoFs."));
-  AssertIndexRange(level, get_triangulation().n_global_levels());
-  AssertDimension(new_numbers.size(),
-                  locally_owned_mg_dofs(level).n_elements());
+  DEAL_II_AssertIndexRange(level, get_triangulation().n_global_levels());
+  DEAL_II_AssertDimension(new_numbers.size(),
+                          locally_owned_mg_dofs(level).n_elements());
 
 #ifdef DEBUG
   // assert that the new indices are consecutively numbered if we are working
@@ -1408,13 +1410,13 @@ DoFHandler<dim, spacedim>::renumber_dofs(
       std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
       types::global_dof_index                              i = 0;
       for (; p != tmp.end(); ++p, ++i)
-        Assert(*p == i, ExcNewNumbersNotConsecutive(i));
+        DEAL_II_Assert(*p == i, ExcNewNumbersNotConsecutive(i));
     }
   else
     for (types::global_dof_index i = 0; i < new_numbers.size(); ++i)
-      Assert(new_numbers[i] < n_dofs(level),
-             ExcMessage(
-               "New DoF index is not less than the total number of dofs."));
+      DEAL_II_Assert(
+        new_numbers[i] < n_dofs(level),
+        ExcMessage("New DoF index is not less than the total number of dofs."));
 #endif
 
   mg_number_cache[level] = policy->renumber_mg_dofs(level, new_numbers);
@@ -1462,7 +1464,7 @@ DoFHandler<dim, spacedim>::max_couplings_between_boundary_dofs() const
         return (19 * get_fe().dofs_per_vertex + 28 * get_fe().dofs_per_line +
                 8 * get_fe().dofs_per_quad);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
         return numbers::invalid_unsigned_int;
     }
 }

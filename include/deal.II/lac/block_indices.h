@@ -323,15 +323,16 @@ BlockIndices::push_back(const size_type sz)
 {
   start_indices.push_back(start_indices[n_blocks] + sz);
   ++n_blocks;
-  AssertDimension(start_indices.size(), n_blocks + 1);
+  DEAL_II_AssertDimension(start_indices.size(), n_blocks + 1);
 }
 
 
 inline std::pair<unsigned int, BlockIndices::size_type>
 BlockIndices::global_to_local(const size_type i) const
 {
-  Assert(i < total_size(), ExcIndexRangeType<size_type>(i, 0, total_size()));
-  Assert(n_blocks > 0, ExcLowerRangeType<size_type>(i, size_type(1)));
+  DEAL_II_Assert(i < total_size(),
+                 ExcIndexRangeType<size_type>(i, 0, total_size()));
+  DEAL_II_Assert(n_blocks > 0, ExcLowerRangeType<size_type>(i, size_type(1)));
 
   unsigned int block = n_blocks - 1;
   while (i < start_indices[block])
@@ -345,10 +346,10 @@ inline BlockIndices::size_type
 BlockIndices::local_to_global(const unsigned int block,
                               const size_type    index) const
 {
-  Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
-  Assert(index < start_indices[block + 1] - start_indices[block],
-         ExcIndexRangeType<size_type>(
-           index, 0, start_indices[block + 1] - start_indices[block]));
+  DEAL_II_Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
+  DEAL_II_Assert(index < start_indices[block + 1] - start_indices[block],
+                 ExcIndexRangeType<size_type>(
+                   index, 0, start_indices[block + 1] - start_indices[block]));
 
   return start_indices[block] + index;
 }
@@ -375,7 +376,7 @@ BlockIndices::total_size() const
 inline BlockIndices::size_type
 BlockIndices::block_size(const unsigned int block) const
 {
-  Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
+  DEAL_II_Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   return start_indices[block + 1] - start_indices[block];
 }
 
@@ -400,7 +401,7 @@ BlockIndices::to_string() const
 inline BlockIndices::size_type
 BlockIndices::block_start(const unsigned int block) const
 {
-  Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
+  DEAL_II_Assert(block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   return start_indices[block];
 }
 

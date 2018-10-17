@@ -56,11 +56,11 @@ test()
   vb *= 2.0;
   v = vb;
 
-  Assert(vb.size() == numproc * 2, ExcInternalError());
-  Assert(v.size() == numproc * 2, ExcInternalError());
+  DEAL_II_Assert(vb.size() == numproc * 2, ExcInternalError());
+  DEAL_II_Assert(v.size() == numproc * 2, ExcInternalError());
 
-  Assert(!vb.has_ghost_elements(), ExcInternalError());
-  Assert(v.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(!vb.has_ghost_elements(), ExcInternalError());
+  DEAL_II_Assert(v.has_ghost_elements(), ExcInternalError());
 
   // check local values
   if (myid == 0)
@@ -71,16 +71,16 @@ test()
               << get_real_assert_zero_imag(v(myid * 2 + 1)) << std::endl;
     }
 
-  Assert(get_real_assert_zero_imag(v(myid * 2)) == myid * 4.0,
-         ExcInternalError());
-  Assert(get_real_assert_zero_imag(v(myid * 2 + 1)) == myid * 4.0 + 2.0,
-         ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v(myid * 2)) == myid * 4.0,
+                 ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v(myid * 2 + 1)) == myid * 4.0 + 2.0,
+                 ExcInternalError());
 
 
   // check ghost values
   if (myid == 0)
     deallog << "ghost: " << get_real_assert_zero_imag(v(1)) << std::endl;
-  Assert(get_real_assert_zero_imag(v(1)) == 2.0, ExcInternalError());
+  DEAL_II_Assert(get_real_assert_zero_imag(v(1)) == 2.0, ExcInternalError());
 
   // done
   if (myid == 0)

@@ -63,7 +63,7 @@ test()
   deallog << "w: ";
   print(w);
 
-  Assert(v.size() == 9, ExcInternalError());
+  DEAL_II_Assert(v.size() == 9, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

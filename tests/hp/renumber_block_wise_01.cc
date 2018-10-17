@@ -79,7 +79,7 @@ check_renumbering(hp::DoFHandler<dim> &dof)
   DoFRenumbering::block_wise(dof);
   const std::vector<types::global_dof_index> vb = get_dofs(dof);
 
-  AssertThrow(vc == vb, ExcInternalError());
+  DEAL_II_AssertThrow(vc == vb, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

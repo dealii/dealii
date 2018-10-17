@@ -39,7 +39,7 @@ test(Vector<double> &v, Vector<double> &w)
   // but then copy elements and make sure the
   // vectors are actually equal
   v = w;
-  AssertThrow(v == w, ExcInternalError());
+  DEAL_II_AssertThrow(v == w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -58,8 +58,8 @@ test()
   typename LA::MPI::SparseMatrix mat;
   mat.reinit(local_active, local_active, csp, MPI_COMM_WORLD);
 
-  Assert(mat.n() == 10, ExcInternalError());
-  Assert(mat.m() == 10, ExcInternalError());
+  DEAL_II_Assert(mat.n() == 10, ExcInternalError());
+  DEAL_II_Assert(mat.m() == 10, ExcInternalError());
 
   mat.set(0, 0, 0.1);
   mat.set(1, 1, 0.1);

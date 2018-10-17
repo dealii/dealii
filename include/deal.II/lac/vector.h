@@ -1144,7 +1144,7 @@ template <typename Number>
 inline Number
 Vector<Number>::operator()(const size_type i) const
 {
-  Assert(i < vec_size, ExcIndexRange(i, 0, vec_size));
+  DEAL_II_Assert(i < vec_size, ExcIndexRange(i, 0, vec_size));
   return values[i];
 }
 
@@ -1154,7 +1154,7 @@ template <typename Number>
 inline Number &
 Vector<Number>::operator()(const size_type i)
 {
-  Assert(i < vec_size, ExcIndexRangeType<size_type>(i, 0, vec_size));
+  DEAL_II_Assert(i < vec_size, ExcIndexRangeType<size_type>(i, 0, vec_size));
   return values[i];
 }
 
@@ -1209,8 +1209,8 @@ template <typename Number>
 inline Vector<Number> &
 Vector<Number>::operator/=(const Number factor)
 {
-  AssertIsFinite(factor);
-  Assert(factor != Number(0.), ExcZero());
+  DEAL_II_AssertIsFinite(factor);
+  DEAL_II_Assert(factor != Number(0.), ExcZero());
 
   this->operator*=(Number(1.) / factor);
   return *this;
@@ -1224,8 +1224,8 @@ inline void
 Vector<Number>::add(const std::vector<size_type> &  indices,
                     const std::vector<OtherNumber> &values)
 {
-  Assert(indices.size() == values.size(),
-         ExcDimensionMismatch(indices.size(), values.size()));
+  DEAL_II_Assert(indices.size() == values.size(),
+                 ExcDimensionMismatch(indices.size(), values.size()));
   add(indices.size(), indices.data(), values.data());
 }
 
@@ -1237,8 +1237,8 @@ inline void
 Vector<Number>::add(const std::vector<size_type> &indices,
                     const Vector<OtherNumber> &   values)
 {
-  Assert(indices.size() == values.size(),
-         ExcDimensionMismatch(indices.size(), values.size()));
+  DEAL_II_Assert(indices.size() == values.size(),
+                 ExcDimensionMismatch(indices.size(), values.size()));
   add(indices.size(), indices.data(), values.values.get());
 }
 
@@ -1253,8 +1253,9 @@ Vector<Number>::add(const size_type    n_indices,
 {
   for (size_type i = 0; i < n_indices; ++i)
     {
-      Assert(indices[i] < vec_size, ExcIndexRange(indices[i], 0, vec_size));
-      Assert(
+      DEAL_II_Assert(indices[i] < vec_size,
+                     ExcIndexRange(indices[i], 0, vec_size));
+      DEAL_II_Assert(
         numbers::is_finite(values[i]),
         ExcMessage(
           "The given value is not finite but either infinite or Not A Number (NaN)"));

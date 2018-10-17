@@ -46,11 +46,12 @@ test(PETScWrappers::MPI::Vector &v)
   for (unsigned int k = 0; k < v.size(); ++k)
     {
       const PetscScalar el = v(k);
-      AssertThrow(((pattern[k] == true) && (PetscRealPart(el) == 0.) &&
-                   (PetscImaginaryPart(el) == k)) ||
-                    ((pattern[k] == false) && (PetscRealPart(el) == 0.) &&
-                     (PetscImaginaryPart(el) == 0.)),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(((pattern[k] == true) && (PetscRealPart(el) == 0.) &&
+                           (PetscImaginaryPart(el) == k)) ||
+                            ((pattern[k] == false) &&
+                             (PetscRealPart(el) == 0.) &&
+                             (PetscImaginaryPart(el) == 0.)),
+                          ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

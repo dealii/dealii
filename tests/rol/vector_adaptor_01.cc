@@ -31,8 +31,8 @@ test(const VectorType &given_vector)
 
   // --- Testing the constructor
   Rol::VectorAdaptor<VectorType> given_vector_rol(given_vector_rcp);
-  AssertThrow(given_vector == *given_vector_rol.getVector(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(given_vector == *given_vector_rol.getVector(),
+                      ExcInternalError());
 
 
   Teuchos::RCP<VectorType>       w_rcp = Teuchos::rcp(new VectorType);
@@ -41,7 +41,7 @@ test(const VectorType &given_vector)
   // --- Testing VectorAdaptor::set()
   {
     w_rol.set(given_vector_rol);
-    AssertThrow(given_vector == *w_rol.getVector(), ExcInternalError());
+    DEAL_II_AssertThrow(given_vector == *w_rol.getVector(), ExcInternalError());
   }
 
   // --- Testing VectorAdaptor::plus()
@@ -50,7 +50,7 @@ test(const VectorType &given_vector)
     u = given_vector;
     u *= 2.;
     w_rol.plus(given_vector_rol);
-    AssertThrow(u == *w_rol.getVector(), ExcInternalError());
+    DEAL_II_AssertThrow(u == *w_rol.getVector(), ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

@@ -37,11 +37,11 @@ check_norms()
       const typename LinearAlgebra::ReadWriteVector<number>::real_type norm =
         vec.l2_norm();
       for (unsigned int i = 0; i < 30; ++i)
-        AssertThrow(vec.l2_norm() == norm, ExcInternalError());
+        DEAL_II_AssertThrow(vec.l2_norm() == norm, ExcInternalError());
 
       LinearAlgebra::Vector<number> vec2(vec);
       for (unsigned int i = 0; i < 10; ++i)
-        AssertThrow(vec2.l2_norm() == norm, ExcInternalError());
+        DEAL_II_AssertThrow(vec2.l2_norm() == norm, ExcInternalError());
     }
 }
 

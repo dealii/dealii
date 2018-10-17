@@ -142,19 +142,19 @@ test_scalars()
   std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
   std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-  Assert(std::abs(A_conv - A) < 1e-12,
-         ExcMessage("Different result for input A"));
-  Assert(std::abs(C_conv - C) < 1e-12,
-         ExcMessage("Different result for input C"));
-  Assert(std::abs(B_conv - B) < 1e-12,
-         ExcMessage("Different result for output B"));
+  DEAL_II_Assert(std::abs(A_conv - A) < 1e-12,
+                 ExcMessage("Different result for input A"));
+  DEAL_II_Assert(std::abs(C_conv - C) < 1e-12,
+                 ExcMessage("Different result for input C"));
+  DEAL_II_Assert(std::abs(B_conv - B) < 1e-12,
+                 ExcMessage("Different result for output B"));
 
-  Assert(std::abs(vA.l2_norm() - std::abs(A)) < 1e-12,
-         ExcMessage("Different norm for input A"));
-  Assert(std::abs(mC.frobenius_norm() - std::abs(C)) < 1e-12,
-         ExcMessage("Different norm for input C"));
-  Assert(std::abs(vB.l2_norm() - std::abs(B)) < 1e-12,
-         ExcMessage("Different norm for output B"));
+  DEAL_II_Assert(std::abs(vA.l2_norm() - std::abs(A)) < 1e-12,
+                 ExcMessage("Different norm for input A"));
+  DEAL_II_Assert(std::abs(mC.frobenius_norm() - std::abs(C)) < 1e-12,
+                 ExcMessage("Different norm for input C"));
+  DEAL_II_Assert(std::abs(vB.l2_norm() - std::abs(B)) < 1e-12,
+                 ExcMessage("Different norm for output B"));
 }
 
 template <int dim>
@@ -182,19 +182,19 @@ test_rank_0_tensors()
   std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
   std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-  Assert((A_conv - A).norm() < 1e-12,
-         ExcMessage("Different result for input A"));
-  Assert((C_conv - C).norm() < 1e-12,
-         ExcMessage("Different result for input C"));
-  Assert((B_conv - B).norm() < 1e-12,
-         ExcMessage("Different result for output B"));
+  DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                 ExcMessage("Different result for input A"));
+  DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                 ExcMessage("Different result for input C"));
+  DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                 ExcMessage("Different result for output B"));
 
-  Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-         ExcMessage("Different norm for input A"));
-  Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-         ExcMessage("Different norm for input C"));
-  Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-         ExcMessage("Different norm for output B"));
+  DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                 ExcMessage("Different norm for input A"));
+  DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                 ExcMessage("Different norm for input C"));
+  DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                 ExcMessage("Different norm for output B"));
 }
 
 template <int dim>
@@ -226,19 +226,19 @@ test_rank_1_2_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 
   // Symmetric tensor
@@ -266,19 +266,19 @@ test_rank_1_2_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 }
 
@@ -311,19 +311,19 @@ test_rank_2_4_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 
   // Symmetric tensor
@@ -351,19 +351,19 @@ test_rank_2_4_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 
   // Non-symmetric tensor from symmetric tensor
@@ -394,19 +394,19 @@ test_rank_2_4_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 }
 
@@ -441,19 +441,19 @@ test_rank_3_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 
   // Non-symmetric tensor: Version 2
@@ -485,19 +485,19 @@ test_rank_3_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 
   // Symmetric tensor: Version 1
@@ -530,19 +530,19 @@ test_rank_3_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 
   // Symmetric tensor: Version 2
@@ -575,19 +575,19 @@ test_rank_3_tensors()
     std::cout << "B: " << B << "  B_conv: " << B_conv << std::endl;
     std::cout << "C: " << C << "  C_conv: " << C_conv << std::endl;
 
-    Assert((A_conv - A).norm() < 1e-12,
-           ExcMessage("Different result for input A"));
-    Assert((C_conv - C).norm() < 1e-12,
-           ExcMessage("Different result for input C"));
-    Assert((B_conv - B).norm() < 1e-12,
-           ExcMessage("Different result for output B"));
+    DEAL_II_Assert((A_conv - A).norm() < 1e-12,
+                   ExcMessage("Different result for input A"));
+    DEAL_II_Assert((C_conv - C).norm() < 1e-12,
+                   ExcMessage("Different result for input C"));
+    DEAL_II_Assert((B_conv - B).norm() < 1e-12,
+                   ExcMessage("Different result for output B"));
 
-    Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
-           ExcMessage("Different norm for input A"));
-    Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
-           ExcMessage("Different norm for input C"));
-    Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
-           ExcMessage("Different norm for output B"));
+    DEAL_II_Assert(std::abs(vA.l2_norm() - A.norm()) < 1e-12,
+                   ExcMessage("Different norm for input A"));
+    DEAL_II_Assert(std::abs(mC.frobenius_norm() - C.norm()) < 1e-12,
+                   ExcMessage("Different norm for input C"));
+    DEAL_II_Assert(std::abs(vB.l2_norm() - B.norm()) < 1e-12,
+                   ExcMessage("Different norm for output B"));
   }
 }
 

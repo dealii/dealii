@@ -43,8 +43,8 @@ FE_RannacherTurek<dim>::FE_RannacherTurek(
   , order(order)
   , n_face_support_points(n_face_support_points)
 {
-  Assert(dim == 2, ExcNotImplemented());
-  Assert(order == 0, ExcNotImplemented());
+  DEAL_II_Assert(dim == 2, ExcNotImplemented());
+  DEAL_II_Assert(order == 0, ExcNotImplemented());
   this->initialize_support_points();
 }
 
@@ -89,7 +89,7 @@ template <int dim>
 void
 FE_RannacherTurek<dim>::initialize_support_points()
 {
-  Assert(dim == 2, ExcNotImplemented());
+  DEAL_II_Assert(dim == 2, ExcNotImplemented());
   dealii::QGauss<dim - 1> face_quadrature(this->n_face_support_points);
   this->weights = face_quadrature.get_weights();
   this->generalized_support_points.resize(4 * face_quadrature.size());
@@ -114,9 +114,9 @@ FE_RannacherTurek<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  AssertDimension(support_point_values.size(),
-                  this->generalized_support_points.size());
-  AssertDimension(nodal_values.size(), this->dofs_per_cell);
+  DEAL_II_AssertDimension(support_point_values.size(),
+                          this->generalized_support_points.size());
+  DEAL_II_AssertDimension(nodal_values.size(), this->dofs_per_cell);
 
   const unsigned int q_points_per_face = this->weights.size();
   std::fill(nodal_values.begin(), nodal_values.end(), 0.0);

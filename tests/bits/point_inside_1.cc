@@ -65,7 +65,7 @@ check()
 
       bool res = cell->point_inside(testpoint);
       deallog << testpoint << " inside " << res << std::endl;
-      AssertThrow(res == expected[i], ExcInternalError());
+      DEAL_II_AssertThrow(res == expected[i], ExcInternalError());
     }
 }
 

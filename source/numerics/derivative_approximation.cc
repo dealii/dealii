@@ -461,7 +461,7 @@ namespace DerivativeApproximation
           const double XX = 4. * J3 / R3;
           const double YY = 1. - std::fabs(XX);
 
-          Assert(YY > -1e-14, ExcInternalError());
+          DEAL_II_Assert(YY > -1e-14, ExcInternalError());
 
           if (YY < 0)
             {
@@ -502,7 +502,7 @@ namespace DerivativeApproximation
       // needs to be employed. maybe some
       // steps of the power method would
       // suffice?
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return 0;
     }
 
@@ -895,7 +895,7 @@ namespace DerivativeApproximation
       // otherwise we would not have
       // all components of the
       // gradient
-      AssertThrow(determinant(Y) != 0, ExcInsufficientDirections());
+      DEAL_II_AssertThrow(determinant(Y) != 0, ExcInsufficientDirections());
 
       // compute Y^-1 g
       const Tensor<2, dim> Y_inverse = invert(Y);
@@ -978,13 +978,15 @@ namespace DerivativeApproximation
                            const unsigned int                   component,
                            Vector<float> &                      derivative_norm)
     {
-      Assert(derivative_norm.size() ==
-               dof_handler.get_triangulation().n_active_cells(),
-             ExcVectorLengthVsNActiveCells(
-               derivative_norm.size(),
-               dof_handler.get_triangulation().n_active_cells()));
-      Assert(component < dof_handler.get_fe(0).n_components(),
-             ExcIndexRange(component, 0, dof_handler.get_fe(0).n_components()));
+      DEAL_II_Assert(derivative_norm.size() ==
+                       dof_handler.get_triangulation().n_active_cells(),
+                     ExcVectorLengthVsNActiveCells(
+                       derivative_norm.size(),
+                       dof_handler.get_triangulation().n_active_cells()));
+      DEAL_II_Assert(component < dof_handler.get_fe(0).n_components(),
+                     ExcIndexRange(component,
+                                   0,
+                                   dof_handler.get_fe(0).n_components()));
 
       using Iterators = std::tuple<
         TriaActiveIterator<

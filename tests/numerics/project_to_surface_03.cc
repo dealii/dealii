@@ -112,9 +112,9 @@ test()
           // trial_point than any of
           // the vertices of the quad
           for (unsigned int v = 0; v < 4; ++v)
-            AssertThrow(p.distance(trial_point) <=
-                          quad->vertex(v).distance(trial_point),
-                        ExcInternalError());
+            DEAL_II_AssertThrow(p.distance(trial_point) <=
+                                  quad->vertex(v).distance(trial_point),
+                                ExcInternalError());
         }
       deallog << std::endl;
     }

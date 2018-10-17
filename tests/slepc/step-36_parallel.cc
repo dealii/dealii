@@ -240,7 +240,7 @@ test(std::string solver_name, std::string preconditioner_name)
       }
     else
       {
-        AssertThrow(false, ExcMessage("not supported preconditioner"));
+        DEAL_II_AssertThrow(false, ExcMessage("not supported preconditioner"));
 
         // make compiler happy
         preconditioner =
@@ -290,7 +290,7 @@ test(std::string solver_name, std::string preconditioner_name)
       }
     else
       {
-        AssertThrow(false, ExcMessage("not supported eigensolver"));
+        DEAL_II_AssertThrow(false, ExcMessage("not supported eigensolver"));
 
         // Make compiler happy and not complaining about non
         // uninitialized variables
@@ -340,15 +340,17 @@ test(std::string solver_name, std::string preconditioner_name)
           mass_matrix.vmult(Bx, eigenfunctions[i]);
 
           for (unsigned int j = 0; j < eigenfunctions.size(); j++)
-            Assert(std::abs(eigenfunctions[j] * Bx - (i == j)) < precision,
-                   ExcMessage("Eigenvectors " + Utilities::int_to_string(i) +
-                              " and " + Utilities::int_to_string(j) +
-                              " are not orthonormal!"));
+            DEAL_II_Assert(std::abs(eigenfunctions[j] * Bx - (i == j)) <
+                             precision,
+                           ExcMessage("Eigenvectors " +
+                                      Utilities::int_to_string(i) + " and " +
+                                      Utilities::int_to_string(j) +
+                                      " are not orthonormal!"));
 
           stiffness_matrix.vmult(Ax, eigenfunctions[i]);
           Ax.add(-1.0 * eigenvalues[i], Bx);
-          Assert(Ax.l2_norm() < precision,
-                 ExcMessage(Utilities::to_string(Ax.l2_norm())));
+          DEAL_II_Assert(Ax.l2_norm() < precision,
+                         ExcMessage(Utilities::to_string(Ax.l2_norm())));
         }
     }
   }

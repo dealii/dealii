@@ -77,7 +77,7 @@ namespace CUDAWrappers
                                                    x,
                                                    &beta,
                                                    y);
-      AssertCusparse(error_code);
+      DEAL_II_AssertCusparse(error_code);
     }
 
 
@@ -116,7 +116,7 @@ namespace CUDAWrappers
                                                    x,
                                                    &beta,
                                                    y);
-      AssertCusparse(error_code);
+      DEAL_II_AssertCusparse(error_code);
     }
 
 
@@ -216,7 +216,7 @@ namespace CUDAWrappers
       {
         const cusparseStatus_t cusparse_error_code =
           cusparseDestroyMatDescr(descr);
-        AssertNothrowCusparse(cusparse_error_code);
+        DEAL_II_AssertNothrowCusparse(cusparse_error_code);
         descr = nullptr;
       }
 
@@ -301,35 +301,35 @@ namespace CUDAWrappers
                                         &val[0],
                                         nnz * sizeof(Number),
                                         cudaMemcpyHostToDevice);
-    AssertCuda(error_code);
+    DEAL_II_AssertCuda(error_code);
 
     // Copy the column indices to the gpu
     column_index_dev.reset(Utilities::CUDA::allocate_device_data<int>(nnz));
-    AssertCuda(error_code);
+    DEAL_II_AssertCuda(error_code);
     error_code = cudaMemcpy(column_index_dev.get(),
                             &column_index[0],
                             nnz * sizeof(int),
                             cudaMemcpyHostToDevice);
-    AssertCuda(error_code);
+    DEAL_II_AssertCuda(error_code);
 
     // Copy the row pointer to the gpu
     row_ptr_dev.reset(Utilities::CUDA::allocate_device_data<int>(row_ptr_size));
-    AssertCuda(error_code);
+    DEAL_II_AssertCuda(error_code);
     error_code = cudaMemcpy(row_ptr_dev.get(),
                             &row_ptr[0],
                             row_ptr_size * sizeof(int),
                             cudaMemcpyHostToDevice);
-    AssertCuda(error_code);
+    DEAL_II_AssertCuda(error_code);
 
     // Create the matrix descriptor
     cusparseStatus_t cusparse_error_code = cusparseCreateMatDescr(&descr);
-    AssertCusparse(cusparse_error_code);
+    DEAL_II_AssertCusparse(cusparse_error_code);
     cusparse_error_code =
       cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL);
-    AssertCusparse(cusparse_error_code);
+    DEAL_II_AssertCusparse(cusparse_error_code);
     cusparse_error_code =
       cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO);
-    AssertCusparse(cusparse_error_code);
+    DEAL_II_AssertCusparse(cusparse_error_code);
   }
 
 
@@ -338,15 +338,15 @@ namespace CUDAWrappers
   SparseMatrix<Number> &
   SparseMatrix<Number>::operator*=(const Number factor)
   {
-    AssertIsFinite(factor);
+    DEAL_II_AssertIsFinite(factor);
     const int n_blocks = 1 + (nnz - 1) / block_size;
     internal::scale<Number>
       <<<n_blocks, block_size>>>(val_dev.get(), factor, nnz);
 
     // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
+    DEAL_II_AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
+    DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
     return *this;
   }
@@ -357,16 +357,16 @@ namespace CUDAWrappers
   SparseMatrix<Number> &
   SparseMatrix<Number>::operator/=(const Number factor)
   {
-    AssertIsFinite(factor);
-    Assert(factor != Number(0.), ExcZero());
+    DEAL_II_AssertIsFinite(factor);
+    DEAL_II_Assert(factor != Number(0.), ExcZero());
     const int n_blocks = 1 + (nnz - 1) / block_size;
     internal::scale<Number>
       <<<n_blocks, block_size>>>(val_dev.get(), 1. / factor, nnz);
 
     // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
+    DEAL_II_AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
+    DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
     return *this;
   }
@@ -516,9 +516,9 @@ namespace CUDAWrappers
                                  row_ptr_dev.get(),
                                  column_sums.get_values());
     // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
+    DEAL_II_AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
+    DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
     return column_sums.linfty_norm();
   }
@@ -538,9 +538,9 @@ namespace CUDAWrappers
                                  row_ptr_dev.get(),
                                  row_sums.get_values());
     // Check that the kernel was launched correctly
-    AssertCuda(cudaGetLastError());
+    DEAL_II_AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel
-    AssertCuda(cudaDeviceSynchronize());
+    DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
     return row_sums.linfty_norm();
   }

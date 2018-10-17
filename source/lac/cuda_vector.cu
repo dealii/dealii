@@ -56,7 +56,7 @@ namespace LinearAlgebra
                                                 V.val.get(),
                                                 n_elements * sizeof(Number),
                                                 cudaMemcpyDeviceToDevice);
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
     }
 
 
@@ -75,7 +75,7 @@ namespace LinearAlgebra
                                                 V.val.get(),
                                                 n_elements * sizeof(Number),
                                                 cudaMemcpyDeviceToDevice);
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
 
       return *this;
     }
@@ -107,7 +107,7 @@ namespace LinearAlgebra
         {
           const cudaError_t error_code =
             cudaMemset(val.get(), 0, n * sizeof(Number));
-          AssertCuda(error_code);
+          DEAL_II_AssertCuda(error_code);
         }
       n_elements = n;
     }
@@ -136,7 +136,7 @@ namespace LinearAlgebra
                                                     V.begin(),
                                                     n_elements * sizeof(Number),
                                                     cudaMemcpyHostToDevice);
-          AssertCuda(error_code);
+          DEAL_II_AssertCuda(error_code);
         }
       else if (operation == VectorOperation::add)
         {
@@ -144,14 +144,14 @@ namespace LinearAlgebra
           Number *    tmp;
           cudaError_t error_code =
             cudaMalloc(&tmp, n_elements * sizeof(Number));
-          AssertCuda(error_code);
+          DEAL_II_AssertCuda(error_code);
 
           // Copy the vector from the host to the temporary vector on the device
           error_code = cudaMemcpy(tmp,
                                   V.begin(),
                                   n_elements * sizeof(Number),
                                   cudaMemcpyHostToDevice);
-          AssertCuda(error_code);
+          DEAL_II_AssertCuda(error_code);
 
           // Add the two vectors
           const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
@@ -159,15 +159,15 @@ namespace LinearAlgebra
           kernel::vector_bin_op<Number, kernel::Binop_Addition>
             <<<n_blocks, block_size>>>(val.get(), tmp, n_elements);
           // Check that the kernel was launched correctly
-          AssertCuda(cudaGetLastError());
+          DEAL_II_AssertCuda(cudaGetLastError());
           // Check that there was no problem during the execution of the kernel
-          AssertCuda(cudaDeviceSynchronize());
+          DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
           // Delete the temporary vector
           Utilities::CUDA::free(tmp);
         }
       else
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
     }
 
 
@@ -176,12 +176,13 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator=(const Number s)
     {
-      Assert(s == Number(), ExcMessage("Only 0 can be assigned to a vector."));
+      DEAL_II_Assert(s == Number(),
+                     ExcMessage("Only 0 can be assigned to a vector."));
       (void)s;
 
       const cudaError_t error_code =
         cudaMemset(val.get(), 0, n_elements * sizeof(Number));
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
 
       return *this;
     }
@@ -192,15 +193,15 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator*=(const Number factor)
     {
-      AssertIsFinite(factor);
+      DEAL_II_AssertIsFinite(factor);
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::vec_scale<Number>
         <<<n_blocks, block_size>>>(val.get(), factor, n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
       return *this;
     }
@@ -211,16 +212,16 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator/=(const Number factor)
     {
-      AssertIsFinite(factor);
-      Assert(factor != Number(0.), ExcZero());
+      DEAL_II_AssertIsFinite(factor);
+      DEAL_II_Assert(factor != Number(0.), ExcZero());
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::vec_scale<Number>
         <<<n_blocks, block_size>>>(val.get(), 1. / factor, n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
       return *this;
     }
@@ -232,14 +233,15 @@ namespace LinearAlgebra
     Vector<Number>::operator+=(const VectorSpaceVector<Number> &V)
     {
       // Check that casting will work
-      Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If it fails, it throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
-             ExcMessage(
-               "Cannot add two vectors with different numbers of elements"));
+      DEAL_II_Assert(
+        down_V.size() == this->size(),
+        ExcMessage(
+          "Cannot add two vectors with different numbers of elements"));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
 
@@ -247,9 +249,9 @@ namespace LinearAlgebra
         <<<n_blocks, block_size>>>(val.get(), down_V.val.get(), n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
       return *this;
     }
@@ -261,14 +263,15 @@ namespace LinearAlgebra
     Vector<Number>::operator-=(const VectorSpaceVector<Number> &V)
     {
       // Check that casting will work
-      Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
-             ExcMessage(
-               "Cannot add two vectors with different numbers of elements."));
+      DEAL_II_Assert(
+        down_V.size() == this->size(),
+        ExcMessage(
+          "Cannot add two vectors with different numbers of elements."));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
 
@@ -276,9 +279,9 @@ namespace LinearAlgebra
         <<<n_blocks, block_size>>>(val.get(), down_V.val.get(), n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
 
       return *this;
     }
@@ -289,19 +292,20 @@ namespace LinearAlgebra
     Number Vector<Number>::operator*(const VectorSpaceVector<Number> &V) const
     {
       // Check that casting will work
-      Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
-             ExcMessage(
-               "Cannot add two vectors with different numbers of elements"));
+      DEAL_II_Assert(
+        down_V.size() == this->size(),
+        ExcMessage(
+          "Cannot add two vectors with different numbers of elements"));
 
       Number *    result_device;
       cudaError_t error_code =
         cudaMalloc(&result_device, n_elements * sizeof(Number));
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
@@ -318,7 +322,7 @@ namespace LinearAlgebra
                               result_device,
                               sizeof(Number),
                               cudaMemcpyDeviceToHost);
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       // Free the memory on the device
       Utilities::CUDA::free(result_device);
 
@@ -331,15 +335,15 @@ namespace LinearAlgebra
     void
     Vector<Number>::add(const Number a)
     {
-      AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(a);
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::vec_add<Number>
         <<<n_blocks, block_size>>>(val.get(), a, n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -348,26 +352,27 @@ namespace LinearAlgebra
     void
     Vector<Number>::add(const Number a, const VectorSpaceVector<Number> &V)
     {
-      AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(a);
 
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
-             ExcMessage(
-               "Cannot add two vectors with different numbers of elements."));
+      DEAL_II_Assert(
+        down_V.size() == this->size(),
+        ExcMessage(
+          "Cannot add two vectors with different numbers of elements."));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::add_aV<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         val.get(), a, down_V.val.get(), n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -379,37 +384,39 @@ namespace LinearAlgebra
                         const Number                     b,
                         const VectorSpaceVector<Number> &W)
     {
-      AssertIsFinite(a);
-      AssertIsFinite(b);
+      DEAL_II_AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(b);
 
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
-             ExcMessage(
-               "Cannot add two vectors with different numbers of elements."));
+      DEAL_II_Assert(
+        down_V.size() == this->size(),
+        ExcMessage(
+          "Cannot add two vectors with different numbers of elements."));
 
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector<Number> *>(&W) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&W) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_W = dynamic_cast<const Vector<Number> &>(W);
-      Assert(down_W.size() == this->size(),
-             ExcMessage(
-               "Cannot add two vectors with different numbers of elements."));
+      DEAL_II_Assert(
+        down_W.size() == this->size(),
+        ExcMessage(
+          "Cannot add two vectors with different numbers of elements."));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::add_aVbW<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         val.get(), a, down_V.val.get(), b, down_W.val.get(), n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -420,27 +427,28 @@ namespace LinearAlgebra
                          const Number                     a,
                          const VectorSpaceVector<Number> &V)
     {
-      AssertIsFinite(s);
-      AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(s);
+      DEAL_II_AssertIsFinite(a);
 
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
-             ExcMessage(
-               "Cannot add two vectors with different numbers of elements."));
+      DEAL_II_Assert(
+        down_V.size() == this->size(),
+        ExcMessage(
+          "Cannot add two vectors with different numbers of elements."));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::sadd<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         s, val.get(), a, down_V.val.get(), n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -450,24 +458,26 @@ namespace LinearAlgebra
     Vector<Number>::scale(const VectorSpaceVector<Number> &scaling_factors)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector<Number> *>(&scaling_factors) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&scaling_factors) !=
+                       nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_scaling_factors =
         dynamic_cast<const Vector<Number> &>(scaling_factors);
-      Assert(down_scaling_factors.size() == this->size(),
-             ExcMessage(
-               "Cannot scale two vectors with different numbers of elements."));
+      DEAL_II_Assert(
+        down_scaling_factors.size() == this->size(),
+        ExcMessage(
+          "Cannot scale two vectors with different numbers of elements."));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::scale<Number><<<dim3(n_blocks, 1), dim3(block_size)>>>(
         val.get(), down_scaling_factors.val.get(), n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -476,15 +486,15 @@ namespace LinearAlgebra
     void
     Vector<Number>::equ(const Number a, const VectorSpaceVector<Number> &V)
     {
-      AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(a);
 
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throw an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(
+      DEAL_II_Assert(
         down_V.size() == this->size(),
         ExcMessage(
           "Cannot assign two vectors with different numbers of elements."));
@@ -494,9 +504,9 @@ namespace LinearAlgebra
         val.get(), a, down_V.val.get(), n_elements);
 
       // Check that the kernel was launched correctly
-      AssertCuda(cudaGetLastError());
+      DEAL_II_AssertCuda(cudaGetLastError());
       // Check that there was no problem during the execution of the kernel
-      AssertCuda(cudaDeviceSynchronize());
+      DEAL_II_AssertCuda(cudaDeviceSynchronize());
     }
 
 
@@ -516,7 +526,7 @@ namespace LinearAlgebra
     {
       Number *    result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
@@ -531,7 +541,7 @@ namespace LinearAlgebra
                               result_device,
                               sizeof(Number),
                               cudaMemcpyDeviceToHost);
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       // Free the memory on the device
       Utilities::CUDA::free(result_device);
 
@@ -547,7 +557,7 @@ namespace LinearAlgebra
     {
       Number *    result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
@@ -562,7 +572,7 @@ namespace LinearAlgebra
                               result_device,
                               sizeof(Number),
                               cudaMemcpyDeviceToHost);
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       // Free the memory on the device
       Utilities::CUDA::free(result_device);
 
@@ -595,7 +605,7 @@ namespace LinearAlgebra
     {
       Number *    result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       error_code = cudaMemset(result_device, Number(), sizeof(Number));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
@@ -610,7 +620,7 @@ namespace LinearAlgebra
                               result_device,
                               sizeof(Number),
                               cudaMemcpyDeviceToHost);
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       // Free the memory on the device
       Utilities::CUDA::free(result_device);
 
@@ -625,27 +635,27 @@ namespace LinearAlgebra
                                 const VectorSpaceVector<Number> &V,
                                 const VectorSpaceVector<Number> &W)
     {
-      AssertIsFinite(a);
+      DEAL_II_AssertIsFinite(a);
 
       // Check that casting will work
-      Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-      Assert(dynamic_cast<const Vector<Number> *>(&W) != nullptr,
-             ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&V) != nullptr,
+                     ExcVectorTypeNotCompatible());
+      DEAL_II_Assert(dynamic_cast<const Vector<Number> *>(&W) != nullptr,
+                     ExcVectorTypeNotCompatible());
 
       // Downcast V and W. If it fails, throw an exceptiion.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      Assert(down_V.size() == this->size(),
-             ExcMessage("Vector V has the wrong size."));
+      DEAL_II_Assert(down_V.size() == this->size(),
+                     ExcMessage("Vector V has the wrong size."));
       const Vector<Number> &down_W = dynamic_cast<const Vector<Number> &>(W);
-      Assert(down_W.size() == this->size(),
-             ExcMessage("Vector W has the wrong size."));
+      DEAL_II_Assert(down_W.size() == this->size(),
+                     ExcMessage("Vector W has the wrong size."));
 
       Number *    result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
       error_code = cudaMemset(result_device, 0., sizeof(Number));
-      AssertCuda(error_code);
+      DEAL_II_AssertCuda(error_code);
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::add_and_dot<Number>
@@ -675,7 +685,7 @@ namespace LinearAlgebra
                           const bool         scientific,
                           const bool) const
     {
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
       std::ios::fmtflags old_flags     = out.flags();
       unsigned int       old_precision = out.precision(precision);
 
@@ -696,7 +706,7 @@ namespace LinearAlgebra
         out << cpu_val[i] << std::endl;
       out << std::flush;
 
-      AssertThrow(out, ExcIO());
+      DEAL_II_AssertThrow(out, ExcIO());
       // reset output format
       out.flags(old_flags);
       out.precision(old_precision);

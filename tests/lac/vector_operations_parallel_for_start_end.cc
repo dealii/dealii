@@ -60,7 +60,7 @@ check()
 
       // check values:
       for (unsigned int i = 0; i < size; ++i)
-        AssertThrow(val[i] == s, ExcInternalError());
+        DEAL_II_AssertThrow(val[i] == s, ExcInternalError());
 
       free(val);
     }

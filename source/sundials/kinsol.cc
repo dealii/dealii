@@ -77,7 +77,7 @@ namespace SUNDIALS
       else if (solver.iteration_function)
         err = solver.iteration_function(*src_yy, *dst_FF);
       else
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
 
       copy(FF, *dst_FF);
 
@@ -177,7 +177,7 @@ namespace SUNDIALS
       {
         const int ierr = MPI_Comm_free(&communicator);
         (void)ierr;
-        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
+        DEAL_II_AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
       }
 #  endif
   }
@@ -211,9 +211,10 @@ namespace SUNDIALS
     else
 #  endif
       {
-        Assert(is_serial_vector<VectorType>::value,
-               ExcInternalError(
-                 "Trying to use a serial code with a parallel vector."));
+        DEAL_II_Assert(
+          is_serial_vector<VectorType>::value,
+          ExcInternalError(
+            "Trying to use a serial code with a parallel vector."));
         solution = N_VNew_Serial(system_size);
         u_scale  = N_VNew_Serial(system_size);
         N_VConst_Serial(1.e0, u_scale);
@@ -236,37 +237,37 @@ namespace SUNDIALS
 
     int status = KINInit(kinsol_mem, t_kinsol_function<VectorType>, solution);
     (void)status;
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetUserData(kinsol_mem, (void *)this);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetNumMaxIters(kinsol_mem, data.maximum_non_linear_iterations);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetFuncNormTol(kinsol_mem, data.function_tolerance);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetScaledStepTol(kinsol_mem, data.step_tolerance);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetMaxSetupCalls(kinsol_mem, data.maximum_setup_calls);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetNoInitSetup(kinsol_mem, (int)data.no_init_setup);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetMaxNewtonStep(kinsol_mem, data.maximum_newton_step);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetMaxBetaFails(kinsol_mem, data.maximum_beta_failures);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetMAA(kinsol_mem, data.anderson_subspace_size);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     status = KINSetRelErrFunc(kinsol_mem, data.dq_relative_error);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
     SUNMatrix       J  = nullptr;
@@ -294,20 +295,21 @@ namespace SUNDIALS
 #  else
         status = KINDense(kinsol_mem, system_size);
 #  endif
-        AssertKINSOL(status);
+        DEAL_II_AssertKINSOL(status);
       }
 
     if (data.strategy == AdditionalData::newton ||
         data.strategy == AdditionalData::linesearch)
-      Assert(residual, ExcFunctionNotProvided("residual"));
+      DEAL_II_Assert(residual, ExcFunctionNotProvided("residual"));
 
     if (data.strategy == AdditionalData::fixed_point ||
         data.strategy == AdditionalData::picard)
-      Assert(iteration_function, ExcFunctionNotProvided("iteration_function"));
+      DEAL_II_Assert(iteration_function,
+                     ExcFunctionNotProvided("iteration_function"));
 
     // call to KINSol
     status = KINSol(kinsol_mem, solution, (int)data.strategy, u_scale, f_scale);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
     copy(initial_guess_and_solution, solution);
 
@@ -329,7 +331,7 @@ namespace SUNDIALS
 
     long nniters;
     status = KINGetNumNonlinSolvIters(kinsol_mem, &nniters);
-    AssertKINSOL(status);
+    DEAL_II_AssertKINSOL(status);
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
     SUNMatDestroy(J);
@@ -345,7 +347,7 @@ namespace SUNDIALS
   KINSOL<VectorType>::set_functions_to_trigger_an_assert()
   {
     reinit_vector = [](VectorType &) {
-      AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
+      DEAL_II_AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
   }
 

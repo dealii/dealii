@@ -43,14 +43,14 @@ check_matrix(SparseMatrix<double> const &        A,
                                val_dev,
                                nnz * sizeof(double),
                                cudaMemcpyDeviceToHost);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   std::vector<int> column_index_host(nnz);
   cuda_error_code = cudaMemcpy(&column_index_host[0],
                                column_index_dev,
                                nnz * sizeof(int),
                                cudaMemcpyDeviceToHost);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   int const        n_rows = A_dev.m() + 1;
   std::vector<int> row_ptr_host(n_rows + 1);
@@ -58,12 +58,13 @@ check_matrix(SparseMatrix<double> const &        A,
                                row_ptr_dev,
                                (A_dev.m() + 1) * sizeof(int),
                                cudaMemcpyDeviceToHost);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
   for (int i = 0; i < n_rows; ++i)
     for (int j = row_ptr_host[i]; j < row_ptr_host[i + 1]; ++j)
-      AssertThrow(std::abs(val_host[j] - A(i, column_index_host[j])) < 1e-15,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(val_host[j] - A(i, column_index_host[j])) <
+                            1e-15,
+                          ExcInternalError());
 }
 
 void
@@ -72,7 +73,7 @@ check_vector(Vector<double> const &                        a,
 {
   unsigned int size = a.size();
   for (unsigned int i = 0; i < size; ++i)
-    AssertThrow(std::abs(a[i] - b[i]) < 1e-15, ExcInternalError());
+    DEAL_II_AssertThrow(std::abs(a[i] - b[i]) < 1e-15, ExcInternalError());
 }
 
 void
@@ -93,8 +94,8 @@ test(Utilities::CUDA::Handle &cuda_handle)
   CUDAWrappers::SparseMatrix<double> A_dev(cuda_handle, A);
   check_matrix(A, A_dev);
 
-  AssertThrow(A.m() == A_dev.m(), ExcInternalError());
-  AssertThrow(A.n() == A_dev.n(), ExcInternalError());
+  DEAL_II_AssertThrow(A.m() == A_dev.m(), ExcInternalError());
+  DEAL_II_AssertThrow(A.n() == A_dev.n(), ExcInternalError());
 
   // Multiply by a constant
   A *= 2.;
@@ -144,12 +145,12 @@ test(Utilities::CUDA::Handle &cuda_handle)
   // Matrix norm square
   double value      = A.matrix_norm_square(src);
   double value_host = A_dev.matrix_norm_square(src_dev);
-  AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
 
   // Matrix scalar product (reuse dst and src but they are both input)
   value      = A.matrix_scalar_product(dst, src);
   value_host = A_dev.matrix_scalar_product(dst_dev, src_dev);
-  AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
 
   // Compute the residual
   Vector<double> b(src);
@@ -164,24 +165,24 @@ test(Utilities::CUDA::Handle &cuda_handle)
   src_dev.import(read_write, VectorOperation::insert);
   value      = A.residual(dst, src, b);
   value_host = A_dev.residual(dst_dev, src_dev, b_dev);
-  AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
   read_write.import(dst_dev, VectorOperation::insert);
   check_vector(dst, read_write);
 
   // Compute L1 norm
   value      = A.l1_norm();
   value_host = A_dev.l1_norm();
-  AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
 
   // Compute Linfty norm
   value      = A.linfty_norm();
   value_host = A_dev.linfty_norm();
-  AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
 
   // Compute Frobenius norm
   value      = A.frobenius_norm();
   value_host = A_dev.frobenius_norm();
-  AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
 
   // Compute L1 norm second test
   SparsityPattern sparsity_pattern(vector_size, vector_size, 3);
@@ -204,7 +205,7 @@ test(Utilities::CUDA::Handle &cuda_handle)
   CUDAWrappers::SparseMatrix<double> B_dev(cuda_handle, B);
   value      = B.l1_norm();
   value_host = B_dev.l1_norm();
-  AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
+  DEAL_II_AssertThrow(std::abs(value - value_host) < 1e-15, ExcInternalError());
 }
 
 int

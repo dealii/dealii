@@ -29,11 +29,11 @@
 #include "../tests.h"
 
 
-DeclException2(ExcNumberMismatch,
-               int,
-               int,
-               << "The numbers " << arg1 << " and " << arg2
-               << " should be equation, but are not.");
+DEAL_II_DeclException2(ExcNumberMismatch,
+                       int,
+                       int,
+                       << "The numbers " << arg1 << " and " << arg2
+                       << " should be equation, but are not.");
 
 
 
@@ -78,7 +78,7 @@ test()
       for (unsigned int d = 0; d < 2; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1 << d);
-      AssertThrow(subdomain < (1 << 2), ExcInternalError());
+      DEAL_II_AssertThrow(subdomain < (1 << 2), ExcInternalError());
 
       cell->set_subdomain_id(subdomain);
     };
@@ -94,9 +94,9 @@ test()
         end(predicate, tria.end());
       begin.set_to_next_positive(tria.begin_active());
 
-      Assert(std::distance(begin, end) ==
-               static_cast<signed int>(tria.n_active_cells(3)),
-             ExcInternalError());
+      DEAL_II_Assert(std::distance(begin, end) ==
+                       static_cast<signed int>(tria.n_active_cells(3)),
+                     ExcInternalError());
       logfile << "Check 1: "
               << (std::distance(begin, end) ==
                       static_cast<signed int>(tria.n_active_cells(3)) ?
@@ -116,9 +116,9 @@ test()
                                                    tria.begin_active(3)),
         end(predicate, tria.end());
 
-      Assert(std::distance(begin, end) ==
-               static_cast<signed int>(tria.n_active_cells(3)),
-             ExcInternalError());
+      DEAL_II_Assert(std::distance(begin, end) ==
+                       static_cast<signed int>(tria.n_active_cells(3)),
+                     ExcInternalError());
       logfile << "Check 2: "
               << (std::distance(begin, end) ==
                       static_cast<signed int>(tria.n_active_cells(3)) ?
@@ -139,9 +139,9 @@ test()
         std::bind(predicate, std::placeholders::_1, 3), tria.begin_active(3)),
         end(std::bind(predicate, std::placeholders::_1, 3), tria.end());
 
-      Assert(std::distance(begin, end) ==
-               static_cast<signed int>(tria.n_active_cells(3)),
-             ExcInternalError());
+      DEAL_II_Assert(std::distance(begin, end) ==
+                       static_cast<signed int>(tria.n_active_cells(3)),
+                     ExcInternalError());
       logfile << "Check 3: "
               << (std::distance(begin, end) ==
                       static_cast<signed int>(tria.n_active_cells(3)) ?
@@ -158,12 +158,13 @@ test()
 
       bool (*predicate)(const active_cell_iterator, const unsigned int) =
         &level_equal_to<active_cell_iterator>;
-      Assert(std::distance(FI(std::bind(predicate, std::placeholders::_1, 3))
-                             .set_to_next_positive(tria.begin_active()),
-                           FI(std::bind(predicate, std::placeholders::_1, 3),
-                              tria.end())) ==
-               static_cast<signed int>(tria.n_active_cells(3)),
-             ExcInternalError());
+      DEAL_II_Assert(
+        std::distance(FI(std::bind(predicate, std::placeholders::_1, 3))
+                        .set_to_next_positive(tria.begin_active()),
+                      FI(std::bind(predicate, std::placeholders::_1, 3),
+                         tria.end())) ==
+          static_cast<signed int>(tria.n_active_cells(3)),
+        ExcInternalError());
       logfile
         << "Check 4: "
         << (std::distance(FI(std::bind(predicate, std::placeholders::_1, 3))
@@ -202,14 +203,14 @@ test()
           while ((cell1 != endc) && (cell1->subdomain_id() != 1))
             ++cell1;
 
-          AssertThrow(cell == cell1, ExcInternalError());
-          AssertThrow(cell1 == cell, ExcInternalError());
+          DEAL_II_AssertThrow(cell == cell1, ExcInternalError());
+          DEAL_II_AssertThrow(cell1 == cell, ExcInternalError());
 
           if (cell.state() != IteratorState::valid)
             break;
         };
-      AssertThrow(cell == endc, ExcInternalError());
-      AssertThrow(cell1 == endc, ExcInternalError());
+      DEAL_II_AssertThrow(cell == endc, ExcInternalError());
+      DEAL_II_AssertThrow(cell1 == endc, ExcInternalError());
 
       logfile << "Check 5: OK" << std::endl;
     };

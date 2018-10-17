@@ -68,8 +68,8 @@ check()
         }
 
       // check values:
-      AssertThrow(std::fabs(sum - sum_direct) < 1e-6 * sum_direct,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::fabs(sum - sum_direct) < 1e-6 * sum_direct,
+                          ExcInternalError());
 
       free(val);
     }

@@ -128,7 +128,8 @@ test()
   // This test should fail if skin_thickness is 1./3. (which will accumulate an
   // extra layer of cells)
 
-  AssertThrow(cells_within_skin.size() > 0, ExcMessage("No skin cells found."));
+  DEAL_II_AssertThrow(cells_within_skin.size() > 0,
+                      ExcMessage("No skin cells found."));
   for (typename std::vector<cell_iterator>::const_iterator it =
          cells_within_skin.begin();
        it != cells_within_skin.end();

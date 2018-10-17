@@ -106,7 +106,8 @@ test()
   for (const auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
       {
-        AssertIndexRange(cell->active_cell_index(), tria.n_active_cells());
+        DEAL_II_AssertIndexRange(cell->active_cell_index(),
+                                 tria.n_active_cells());
         data.cell_vectorization_category[cell->active_cell_index()] =
           cell->material_id();
       }
@@ -130,7 +131,7 @@ test()
       for (const auto &cell : tria.cell_iterators_on_level(level))
         if (cell->is_locally_owned_on_level())
           {
-            AssertIndexRange(cell->index(), tria.n_cells(level));
+            DEAL_II_AssertIndexRange(cell->index(), tria.n_cells(level));
             mg_additional_data[level]
               .cell_vectorization_category[cell->index()] = cell->material_id();
           }
@@ -166,7 +167,7 @@ test()
         {
           const unsigned int c_id =
             mf_data.get_cell_iterator(i, c)->material_id();
-          AssertThrow(c_id == m_id, ExcInternalError());
+          DEAL_II_AssertThrow(c_id == m_id, ExcInternalError());
         }
     }
 
@@ -181,7 +182,7 @@ test()
             {
               const unsigned int c_id =
                 level_data->get_cell_iterator(i, c)->material_id();
-              AssertThrow(m_id == c_id, ExcInternalError());
+              DEAL_II_AssertThrow(m_id == c_id, ExcInternalError());
             }
         }
     }

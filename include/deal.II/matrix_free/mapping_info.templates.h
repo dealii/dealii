@@ -51,9 +51,9 @@ namespace internal
       initialize(const Quadrature<1> &quadrature_1d,
                  const UpdateFlags    update_flags_inner_faces)
     {
-      Assert(structdim + 1 <= spacedim ||
-               update_flags_inner_faces == update_default,
-             ExcMessage("Volume cells do not allow for setting inner faces"));
+      DEAL_II_Assert(
+        structdim + 1 <= spacedim || update_flags_inner_faces == update_default,
+        ExcMessage("Volume cells do not allow for setting inner faces"));
       quadrature = Quadrature<structdim>(quadrature_1d);
       n_q_points = quadrature.size();
       quadrature_weights.resize(n_q_points);
@@ -700,11 +700,11 @@ namespace internal
                        ++j)
                     if (cell_t[j] > most_general_type)
                       most_general_type = cell_t[j];
-                  AssertIndexRange((unsigned int)most_general_type, 4U);
+                  DEAL_II_AssertIndexRange((unsigned int)most_general_type, 4U);
                   mapping_info.cell_type[cell] = most_general_type;
                 }
 
-              AssertThrow(
+              DEAL_II_AssertThrow(
                 data.first[my_q].JxW_values.size() <
                   static_cast<std::size_t>(
                     std::numeric_limits<unsigned int>::max()),
@@ -913,7 +913,7 @@ namespace internal
             typename CONTAINER::value_type entry = *it;
             entry.second                         = destination.size();
             lookup = destination.insert(lookup, entry);
-            AssertIndexRange(it->second, indices.size());
+            DEAL_II_AssertIndexRange(it->second, indices.size());
             indices[it->second] = lookup->second;
             // best guess for insert position of next item
             ++lookup;
@@ -1009,7 +1009,7 @@ namespace internal
       const unsigned int n_cells = cells.size();
       const unsigned int vectorization_width =
         VectorizedArray<Number>::n_array_elements;
-      Assert(n_cells % vectorization_width == 0, ExcInternalError());
+      DEAL_II_Assert(n_cells % vectorization_width == 0, ExcInternalError());
       const unsigned int n_macro_cells = n_cells / vectorization_width;
       cell_data.resize(n_quads);
       cell_type.resize(n_macro_cells);
@@ -1022,7 +1022,7 @@ namespace internal
       for (unsigned int my_q = 0; my_q < n_quads; ++my_q)
         {
           const unsigned int n_hp_quads = quad[my_q].size();
-          AssertIndexRange(0, n_hp_quads);
+          DEAL_II_AssertIndexRange(0, n_hp_quads);
           cell_data[my_q].descriptor.resize(n_hp_quads);
           for (unsigned int q = 0; q < n_hp_quads; ++q)
             cell_data[my_q].descriptor[q].initialize(quad[my_q][q],
@@ -1142,7 +1142,7 @@ namespace internal
                            v < VectorizedArray<Number>::n_array_elements;
                            ++v)
                         jac[d][e][v] = it.first[d][e][v];
-                  AssertIndexRange(it.second, n_constant_jacobians);
+                  DEAL_II_AssertIndexRange(it.second, n_constant_jacobians);
                   const std::size_t index           = it.second;
                   cell_data[my_q].JxW_values[index] = determinant(jac);
                   // invert and transpose jac
@@ -1213,7 +1213,7 @@ namespace internal
       reorder_face_derivative_indices(const unsigned int face_no,
                                       const unsigned int index)
       {
-        Assert(index < dim, ExcInternalError());
+        DEAL_II_Assert(index < dim, ExcInternalError());
         if (dim == 3)
           {
             unsigned int table[3][3] = {{1, 2, 0}, {2, 0, 1}, {0, 1, 2}};
@@ -1227,9 +1227,9 @@ namespace internal
         else if (dim == 1)
           return 0;
         else
-          Assert(false,
-                 ExcNotImplemented("Not possible in dim=" +
-                                   std::to_string(dim)));
+          DEAL_II_Assert(false,
+                         ExcNotImplemented("Not possible in dim=" +
+                                           std::to_string(dim)));
 
         return numbers::invalid_unsigned_int;
       }
@@ -1284,8 +1284,9 @@ namespace internal
                ++my_q)
             {
               // currently only non-hp case...
-              Assert(mapping_info.face_data[my_q].descriptor.size() == 1,
-                     ExcNotImplemented());
+              DEAL_II_Assert(mapping_info.face_data[my_q].descriptor.size() ==
+                               1,
+                             ExcNotImplemented());
               const Quadrature<dim - 1> &quadrature =
                 mapping_info.face_data[my_q].descriptor[0].quadrature;
 
@@ -1489,9 +1490,9 @@ namespace internal
                   // Fill up with 'known' values
                   else if (is_boundary_face == false)
                     {
-                      Assert(faces[face].cells_exterior[0] !=
-                               numbers::invalid_unsigned_int,
-                             ExcInternalError());
+                      DEAL_II_Assert(faces[face].cells_exterior[0] !=
+                                       numbers::invalid_unsigned_int,
+                                     ExcInternalError());
                       for (unsigned int q = 0; q < n_q_points; ++q)
                         for (unsigned int d = 0; d < dim; ++d)
                           for (unsigned int e = 0; e < dim; ++e)
@@ -1894,7 +1895,7 @@ namespace internal
       for (unsigned int my_q = 0; my_q < n_quads; ++my_q)
         {
           const unsigned int n_hp_quads = quad[my_q].size();
-          AssertIndexRange(0, n_hp_quads);
+          DEAL_II_AssertIndexRange(0, n_hp_quads);
           face_data_by_cells[my_q].descriptor.resize(n_hp_quads);
           for (unsigned int q = 0; q < n_hp_quads; ++q)
             face_data_by_cells[my_q].descriptor[q].initialize(quad[my_q][q],
@@ -1903,7 +1904,8 @@ namespace internal
           // since we already know the cell type, we can pre-allocate the right
           // amount of data straight away and we just need to do some basic
           // counting
-          AssertDimension(cell_type.size(), cells.size() / vectorization_width);
+          DEAL_II_AssertDimension(cell_type.size(),
+                                  cells.size() / vectorization_width);
           face_data_by_cells[my_q].data_index_offsets.resize(
             cell_type.size() * GeometryInfo<dim>::faces_per_cell);
           if (update_flags & update_quadrature_points)
@@ -2015,7 +2017,7 @@ namespace internal
                         }
                       if (update_flags & update_jacobian_grads)
                         {
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_Assert(false, ExcNotImplemented());
                         }
                       if (update_flags & update_normal_vectors)
                         for (unsigned int d = 0; d < dim; ++d)
@@ -2050,7 +2052,7 @@ namespace internal
                           }
                       if (update_flags & update_jacobian_grads)
                         {
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_Assert(false, ExcNotImplemented());
                         }
                       if (update_flags & update_normal_vectors)
                         for (unsigned int q = 0; q < fe_val.n_quadrature_points;

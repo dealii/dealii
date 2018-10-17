@@ -87,12 +87,12 @@ MGTransferBlock<number>::prolongate(const unsigned int         to_level,
                                     BlockVector<number> &      dst,
                                     const BlockVector<number> &src) const
 {
-  Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
-         ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
-  Assert(src.n_blocks() == this->n_mg_blocks,
-         ExcDimensionMismatch(src.n_blocks(), this->n_mg_blocks));
-  Assert(dst.n_blocks() == this->n_mg_blocks,
-         ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
+  DEAL_II_Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
+                 ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
+  DEAL_II_Assert(src.n_blocks() == this->n_mg_blocks,
+                 ExcDimensionMismatch(src.n_blocks(), this->n_mg_blocks));
+  DEAL_II_Assert(dst.n_blocks() == this->n_mg_blocks,
+                 ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
 
   // Multiplicate with prolongation
   // matrix, but only those blocks
@@ -112,12 +112,13 @@ MGTransferBlock<number>::restrict_and_add(const unsigned int         from_level,
                                           BlockVector<number> &      dst,
                                           const BlockVector<number> &src) const
 {
-  Assert((from_level >= 1) && (from_level <= prolongation_matrices.size()),
-         ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
-  Assert(src.n_blocks() == this->n_mg_blocks,
-         ExcDimensionMismatch(src.n_blocks(), this->n_mg_blocks));
-  Assert(dst.n_blocks() == this->n_mg_blocks,
-         ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
+  DEAL_II_Assert(
+    (from_level >= 1) && (from_level <= prolongation_matrices.size()),
+    ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
+  DEAL_II_Assert(src.n_blocks() == this->n_mg_blocks,
+                 ExcDimensionMismatch(src.n_blocks(), this->n_mg_blocks));
+  DEAL_II_Assert(dst.n_blocks() == this->n_mg_blocks,
+                 ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
 
   for (unsigned int b = 0; b < this->mg_block.size(); ++b)
     {
@@ -125,7 +126,7 @@ MGTransferBlock<number>::restrict_and_add(const unsigned int         from_level,
         {
           if (factors.size() != 0)
             {
-              Assert(memory != nullptr, ExcNotInitialized());
+              DEAL_II_Assert(memory != nullptr, ExcNotInitialized());
               Vector<number> *aux = memory->alloc();
               aux->reinit(dst.block(this->mg_block[b]));
               prolongation_matrices[from_level - 1]->block(b, b).Tvmult(
@@ -216,8 +217,8 @@ MGTransferSelect<number>::prolongate(const unsigned int    to_level,
                                      Vector<number> &      dst,
                                      const Vector<number> &src) const
 {
-  Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
-         ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
+  DEAL_II_Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
+                 ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
   prolongation_matrices[to_level - 1]
     ->block(mg_target_component[mg_selected_component],
@@ -233,8 +234,9 @@ MGTransferSelect<number>::restrict_and_add(const unsigned int    from_level,
                                            Vector<number> &      dst,
                                            const Vector<number> &src) const
 {
-  Assert((from_level >= 1) && (from_level <= prolongation_matrices.size()),
-         ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
+  DEAL_II_Assert(
+    (from_level >= 1) && (from_level <= prolongation_matrices.size()),
+    ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
 
   prolongation_matrices[from_level - 1]
     ->block(mg_target_component[mg_selected_component],
@@ -277,8 +279,8 @@ MGTransferBlockSelect<number>::prolongate(const unsigned int    to_level,
                                           Vector<number> &      dst,
                                           const Vector<number> &src) const
 {
-  Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
-         ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
+  DEAL_II_Assert((to_level >= 1) && (to_level <= prolongation_matrices.size()),
+                 ExcIndexRange(to_level, 1, prolongation_matrices.size() + 1));
 
   prolongation_matrices[to_level - 1]
     ->block(selected_block, selected_block)
@@ -292,8 +294,9 @@ MGTransferBlockSelect<number>::restrict_and_add(const unsigned int from_level,
                                                 Vector<number> &   dst,
                                                 const Vector<number> &src) const
 {
-  Assert((from_level >= 1) && (from_level <= prolongation_matrices.size()),
-         ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
+  DEAL_II_Assert(
+    (from_level >= 1) && (from_level <= prolongation_matrices.size()),
+    ExcIndexRange(from_level, 1, prolongation_matrices.size() + 1));
 
   prolongation_matrices[from_level - 1]
     ->block(selected_block, selected_block)

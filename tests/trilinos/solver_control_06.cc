@@ -520,7 +520,7 @@ main(int argc, char *argv[])
   // write parts of it to the logstream
   std::ifstream inputfile;
   inputfile.open("stdout");
-  Assert(inputfile.good() && inputfile.is_open(), ExcIO());
+  DEAL_II_Assert(inputfile.good() && inputfile.is_open(), ExcIO());
   std::string       line;
   const std::string key = "*****";
   while (std::getline(inputfile, line))

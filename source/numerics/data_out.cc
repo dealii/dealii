@@ -115,8 +115,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
        (cell_and_index->first->at_boundary() ||
         (DoFHandlerType::dimension != DoFHandlerType::space_dimension))))
     {
-      Assert(patch.space_dim == DoFHandlerType::space_dimension,
-             ExcInternalError());
+      DEAL_II_Assert(patch.space_dim == DoFHandlerType::space_dimension,
+                     ExcInternalError());
 
       // set the flag indicating that for this cell the points are
       // explicitly given
@@ -326,7 +326,8 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
       // first_cell/next_cell functions only return active cells
       if (this->cell_data.size() != 0)
         {
-          Assert(!cell_and_index->first->has_children(), ExcNotImplemented());
+          DEAL_II_Assert(!cell_and_index->first->has_children(),
+                         ExcNotImplemented());
 
           for (unsigned int dataset = 0; dataset < this->cell_data.size();
                ++dataset)
@@ -383,9 +384,9 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
         }
 
       const cell_iterator neighbor = cell_and_index->first->neighbor(f);
-      Assert(static_cast<unsigned int>(neighbor->level()) <
-               scratch_data.cell_to_patch_index_map->size(),
-             ExcInternalError());
+      DEAL_II_Assert(static_cast<unsigned int>(neighbor->level()) <
+                       scratch_data.cell_to_patch_index_map->size(),
+                     ExcInternalError());
       if ((static_cast<unsigned int>(neighbor->index()) >=
            (*scratch_data.cell_to_patch_index_map)[neighbor->level()].size()) ||
           ((*scratch_data.cell_to_patch_index_map)[neighbor->level()]
@@ -407,7 +408,7 @@ DataOut<dim, DoFHandlerType>::build_one_patch(
     (*scratch_data.cell_to_patch_index_map)[cell_and_index->first->level()]
                                            [cell_and_index->first->index()];
   // did we mess up the indices?
-  Assert(patch_idx < this->patches.size(), ExcInternalError());
+  DEAL_II_Assert(patch_idx < this->patches.size(), ExcInternalError());
   patch.patch_index = patch_idx;
 
   // Put the patch into the patches vector. instead of copying the data,
@@ -439,17 +440,19 @@ DataOut<dim, DoFHandlerType>::build_patches(
   const CurvedCellRegion curved_region)
 {
   // Check consistency of redundant template parameter
-  Assert(dim == DoFHandlerType::dimension,
-         ExcDimensionMismatch(dim, DoFHandlerType::dimension));
+  DEAL_II_Assert(dim == DoFHandlerType::dimension,
+                 ExcDimensionMismatch(dim, DoFHandlerType::dimension));
 
-  Assert(this->triangulation != nullptr,
-         Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
+  DEAL_II_Assert(
+    this->triangulation != nullptr,
+    Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions =
     (n_subdivisions_ != 0) ? n_subdivisions_ : this->default_subdivisions;
-  Assert(n_subdivisions >= 1,
-         Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(
-           n_subdivisions));
+  DEAL_II_Assert(
+    n_subdivisions >= 1,
+    Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(
+      n_subdivisions));
 
   this->validate_dataset_names();
 
@@ -511,14 +514,14 @@ DataOut<dim, DoFHandlerType>::build_patches(
             ++active_index;
           }
 
-        Assert(static_cast<unsigned int>(cell->level()) <
-                 cell_to_patch_index_map.size(),
-               ExcInternalError());
-        Assert(static_cast<unsigned int>(cell->index()) <
-                 cell_to_patch_index_map[cell->level()].size(),
-               ExcInternalError());
-        Assert(active_index < this->triangulation->n_active_cells(),
-               ExcInternalError());
+        DEAL_II_Assert(static_cast<unsigned int>(cell->level()) <
+                         cell_to_patch_index_map.size(),
+                       ExcInternalError());
+        DEAL_II_Assert(static_cast<unsigned int>(cell->index()) <
+                         cell_to_patch_index_map[cell->level()].size(),
+                       ExcInternalError());
+        DEAL_II_Assert(active_index < this->triangulation->n_active_cells(),
+                       ExcInternalError());
         cell_to_patch_index_map[cell->level()][cell->index()] =
           all_cells.size();
 
@@ -558,7 +561,7 @@ DataOut<dim, DoFHandlerType>::build_patches(
         this->dof_data[i]->postprocessor->get_needed_update_flags();
   // perhaps update_normal_vectors is present, which would only be useful on
   // faces, but we may not use it here.
-  Assert(
+  DEAL_II_Assert(
     !(update_flags & update_normal_vectors),
     ExcMessage(
       "The update of normal vectors may not be requested for evaluation of "

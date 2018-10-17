@@ -290,7 +290,7 @@ namespace Particles
     const ArrayView<double> old_properties =
       property_pool->get_properties(properties);
 
-    Assert(
+    DEAL_II_Assert(
       new_properties.size() == old_properties.size(),
       ExcMessage(
         std::string(
@@ -313,7 +313,7 @@ namespace Particles
   const ArrayView<const double>
   Particle<dim, spacedim>::get_properties() const
   {
-    Assert(property_pool != nullptr, ExcInternalError());
+    DEAL_II_Assert(property_pool != nullptr, ExcInternalError());
 
     return property_pool->get_properties(properties);
   }
@@ -324,7 +324,7 @@ namespace Particles
   const ArrayView<double>
   Particle<dim, spacedim>::get_properties()
   {
-    Assert(property_pool != nullptr, ExcInternalError());
+    DEAL_II_Assert(property_pool != nullptr, ExcInternalError());
 
     return property_pool->get_properties(properties);
   }

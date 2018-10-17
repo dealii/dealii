@@ -34,7 +34,7 @@ template <int dim>
 void
 test()
 {
-  Assert(dim == 2, ExcNotImplemented());
+  DEAL_II_Assert(dim == 2, ExcNotImplemented());
   parallel::distributed::Triangulation<dim> tria(
     MPI_COMM_WORLD,
     Triangulation<dim>::limit_level_difference_at_vertices,

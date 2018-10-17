@@ -62,7 +62,7 @@ test()
   // check ghost values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << v_tmp(1) << std::endl;
-  Assert(v_tmp(1) == 1.0, ExcInternalError());
+  DEAL_II_Assert(v_tmp(1) == 1.0, ExcInternalError());
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;

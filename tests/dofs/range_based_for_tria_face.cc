@@ -41,7 +41,8 @@ check()
   for (const auto &cell : tr.active_cell_iterators())
     for (unsigned int face_n = 0; face_n < GeometryInfo<dim>::faces_per_cell;
          ++face_n)
-      Assert(cell->face(face_n)->manifold_id() == 42, ExcInternalError());
+      DEAL_II_Assert(cell->face(face_n)->manifold_id() == 42,
+                     ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -61,7 +61,7 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
       IndexSet shared_dofs = shared_dof_handler.locally_owned_mg_dofs(lvl);
       IndexSet distributed_dofs =
         distributed_dof_handler.locally_owned_mg_dofs(lvl);
-      Assert(shared_dofs == distributed_dofs, ExcInternalError());
+      DEAL_II_Assert(shared_dofs == distributed_dofs, ExcInternalError());
 
       typename DoFHandler<dim>::cell_iterator cell =
                                                 distributed_dof_handler.begin(
@@ -89,8 +89,8 @@ compare_meshes(DoFHandler<dim> &shared_dof_handler,
           cell->get_mg_dof_indices(distributed_cell_dofs);
           dof_shared_cell->get_mg_dof_indices(shared_cell_dofs);
           for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-            Assert(distributed_cell_dofs[i] == shared_cell_dofs[i],
-                   ExcInternalError());
+            DEAL_II_Assert(distributed_cell_dofs[i] == shared_cell_dofs[i],
+                           ExcInternalError());
         }
     }
 }

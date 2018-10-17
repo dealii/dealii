@@ -69,7 +69,7 @@ test()
   // and make sure that the h5 file is created:
   cat_file("out.xdmf");
   std::ifstream f("out.h5");
-  AssertThrow(f.good(), ExcIO());
+  DEAL_II_AssertThrow(f.good(), ExcIO());
 }
 
 

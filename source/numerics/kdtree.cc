@@ -39,10 +39,10 @@ KDTree<dim>::get_points_within_ball(const Point<dim> &center,
                                     const double      radius,
                                     bool              sorted) const
 {
-  Assert(adaptor, ExcNotInitialized());
-  Assert(kdtree, ExcInternalError());
+  DEAL_II_Assert(adaptor, ExcNotInitialized());
+  DEAL_II_Assert(kdtree, ExcInternalError());
 
-  Assert(radius > 0, ExcMessage("Radius is expected to be positive."));
+  DEAL_II_Assert(radius > 0, ExcMessage("Radius is expected to be positive."));
 
   nanoflann::SearchParams params;
   params.sorted = sorted;
@@ -60,8 +60,8 @@ std::vector<std::pair<unsigned int, double>>
 KDTree<dim>::get_closest_points(const Point<dim> & target,
                                 const unsigned int n_points) const
 {
-  Assert(adaptor, ExcNotInitialized());
-  Assert(kdtree, ExcInternalError());
+  DEAL_II_Assert(adaptor, ExcNotInitialized());
+  DEAL_II_Assert(kdtree, ExcInternalError());
 
   // get the information out of nanoflann
   std::vector<unsigned int> indices(n_points);
@@ -83,7 +83,8 @@ template <int dim>
 void
 KDTree<dim>::set_points(const std::vector<Point<dim>> &pts)
 {
-  Assert(pts.size() > 0, ExcMessage("Expecting a non zero set of points."));
+  DEAL_II_Assert(pts.size() > 0,
+                 ExcMessage("Expecting a non zero set of points."));
   adaptor = std_cxx14::make_unique<PointCloudAdaptor>(pts);
   kdtree  = std_cxx14::make_unique<NanoFlannKDTree>(
     dim, *adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));

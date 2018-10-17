@@ -48,8 +48,8 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
       std::vector<ComponentMask>(PolynomialsBDM<dim>::compute_n_pols(deg),
                                  std::vector<bool>(dim, true)))
 {
-  Assert(dim >= 2, ExcImpossibleInDim(dim));
-  Assert(
+  DEAL_II_Assert(dim >= 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(
     deg > 0,
     ExcMessage(
       "Lowest order BDM element are degree 1, but you asked for degree 0"));
@@ -135,12 +135,14 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->generalized_support_points.size()));
-  AssertDimension(support_point_values[0].size(), dim);
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
+  DEAL_II_Assert(support_point_values.size() ==
+                   this->generalized_support_points.size(),
+                 ExcDimensionMismatch(support_point_values.size(),
+                                      this->generalized_support_points.size()));
+  DEAL_II_AssertDimension(support_point_values[0].size(), dim);
+  DEAL_II_Assert(nodal_values.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(nodal_values.size(),
+                                      this->dofs_per_cell));
 
   // First do interpolation on faces. There, the component evaluated
   // depends on the face direction and orientation.
@@ -178,11 +180,12 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
       dbase += this->dofs_per_face;
     }
 
-  AssertDimension(dbase,
-                  this->dofs_per_face * GeometryInfo<dim>::faces_per_cell);
-  AssertDimension(pbase,
-                  this->generalized_support_points.size() -
-                    test_values_cell.size());
+  DEAL_II_AssertDimension(dbase,
+                          this->dofs_per_face *
+                            GeometryInfo<dim>::faces_per_cell);
+  DEAL_II_AssertDimension(pbase,
+                          this->generalized_support_points.size() -
+                            test_values_cell.size());
 
   // Done for BDM1
   if (dbase == this->dofs_per_cell)
@@ -192,7 +195,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
   // degrees of freedom. In each
   // point, we take all components of
   // the solution.
-  Assert((this->dofs_per_cell - dbase) % dim == 0, ExcInternalError());
+  DEAL_II_Assert((this->dofs_per_cell - dbase) % dim == 0, ExcInternalError());
 
   for (unsigned int d = 0; d < dim; ++d, dbase += test_values_cell[0].size())
     {
@@ -205,7 +208,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
         }
     }
 
-  Assert(dbase == this->dofs_per_cell, ExcInternalError());
+  DEAL_II_Assert(dbase == this->dofs_per_cell, ExcInternalError());
 }
 
 
@@ -240,7 +243,7 @@ FE_BDM<dim>::get_ria_vector(const unsigned int deg)
 {
   if (dim == 1)
     {
-      Assert(false, ExcImpossibleInDim(1));
+      DEAL_II_Assert(false, ExcImpossibleInDim(1));
       return std::vector<bool>();
     }
 
@@ -248,8 +251,9 @@ FE_BDM<dim>::get_ria_vector(const unsigned int deg)
   const unsigned int dofs_per_face =
     PolynomialSpace<dim - 1>::compute_n_pols(deg + 1);
 
-  Assert(GeometryInfo<dim>::faces_per_cell * dofs_per_face <= dofs_per_cell,
-         ExcInternalError());
+  DEAL_II_Assert(GeometryInfo<dim>::faces_per_cell * dofs_per_face <=
+                   dofs_per_cell,
+                 ExcInternalError());
 
   // all dofs need to be
   // non-additive, since they have

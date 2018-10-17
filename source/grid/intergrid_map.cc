@@ -92,7 +92,7 @@ InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
 
   // little assertion that the two grids
   // are indeed related:
-  Assert(dst_cell == destination_grid.end(0), ExcIncompatibleGrids());
+  DEAL_II_Assert(dst_cell == destination_grid.end(0), ExcIncompatibleGrids());
 }
 
 
@@ -109,14 +109,14 @@ InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
   // recurse further into the hierarchy
   if (src_cell->has_children() && dst_cell->has_children())
     {
-      Assert(src_cell->n_children() ==
-               GeometryInfo<MeshType::dimension>::max_children_per_cell,
-             ExcNotImplemented());
-      Assert(dst_cell->n_children() ==
-               GeometryInfo<MeshType::dimension>::max_children_per_cell,
-             ExcNotImplemented());
-      Assert(src_cell->refinement_case() == dst_cell->refinement_case(),
-             ExcNotImplemented());
+      DEAL_II_Assert(src_cell->n_children() ==
+                       GeometryInfo<MeshType::dimension>::max_children_per_cell,
+                     ExcNotImplemented());
+      DEAL_II_Assert(dst_cell->n_children() ==
+                       GeometryInfo<MeshType::dimension>::max_children_per_cell,
+                     ExcNotImplemented());
+      DEAL_II_Assert(src_cell->refinement_case() == dst_cell->refinement_case(),
+                     ExcNotImplemented());
       for (unsigned int c = 0;
            c < GeometryInfo<MeshType::dimension>::max_children_per_cell;
            ++c)
@@ -156,13 +156,13 @@ template <class MeshType>
 typename InterGridMap<MeshType>::cell_iterator InterGridMap<MeshType>::
                                                operator[](const cell_iterator &source_cell) const
 {
-  Assert(source_cell.state() == IteratorState::valid,
-         ExcInvalidKey(source_cell));
-  Assert(source_cell->level() <= static_cast<int>(mapping.size()),
-         ExcInvalidKey(source_cell));
-  Assert(source_cell->index() <=
-           static_cast<int>(mapping[source_cell->level()].size()),
-         ExcInvalidKey(source_cell));
+  DEAL_II_Assert(source_cell.state() == IteratorState::valid,
+                 ExcInvalidKey(source_cell));
+  DEAL_II_Assert(source_cell->level() <= static_cast<int>(mapping.size()),
+                 ExcInvalidKey(source_cell));
+  DEAL_II_Assert(source_cell->index() <=
+                   static_cast<int>(mapping[source_cell->level()].size()),
+                 ExcInvalidKey(source_cell));
 
   return mapping[source_cell->level()][source_cell->index()];
 }

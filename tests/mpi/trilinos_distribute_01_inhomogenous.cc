@@ -42,9 +42,11 @@ test()
     is.add_range(100 * myid, 100 * myid + 100);
     vec.reinit(is, MPI_COMM_WORLD);
   }
-  AssertThrow(vec.local_size() == 100, ExcInternalError());
-  AssertThrow(vec.local_range().first == 100 * myid, ExcInternalError());
-  AssertThrow(vec.local_range().second == 100 * myid + 100, ExcInternalError());
+  DEAL_II_AssertThrow(vec.local_size() == 100, ExcInternalError());
+  DEAL_II_AssertThrow(vec.local_range().first == 100 * myid,
+                      ExcInternalError());
+  DEAL_II_AssertThrow(vec.local_range().second == 100 * myid + 100,
+                      ExcInternalError());
   for (unsigned int i = vec.local_range().first; i < vec.local_range().second;
        ++i)
     vec(i) = i;
@@ -55,7 +57,7 @@ test()
     double exact_l1 = 0;
     for (unsigned int i = 0; i < vec.size(); ++i)
       exact_l1 += i;
-    AssertThrow(vec.l1_norm() == exact_l1, ExcInternalError());
+    DEAL_II_AssertThrow(vec.l1_norm() == exact_l1, ExcInternalError());
   }
 
 
@@ -99,14 +101,14 @@ test()
 
   // verify correctness
   if (myid != 0)
-    AssertThrow(vec(vec.local_range().first + 10) ==
-                  vec.local_range().first - 25 + 1,
-                ExcInternalError());
+    DEAL_II_AssertThrow(vec(vec.local_range().first + 10) ==
+                          vec.local_range().first - 25 + 1,
+                        ExcInternalError());
 
   if (myid != n_processes - 1)
-    AssertThrow(vec(vec.local_range().first + 90) ==
-                  vec.local_range().first + 105 - 1,
-                ExcInternalError());
+    DEAL_II_AssertThrow(vec(vec.local_range().first + 90) ==
+                          vec.local_range().first + 105 - 1,
+                        ExcInternalError());
 
   for (unsigned int i = vec.local_range().first; i < vec.local_range().second;
        ++i)
@@ -115,7 +117,7 @@ test()
           (i != vec.local_range().first + 90))
         {
           double val = vec(i);
-          AssertThrow(std::fabs(val - i) <= 1e-6, ExcInternalError());
+          DEAL_II_AssertThrow(std::fabs(val - i) <= 1e-6, ExcInternalError());
         }
     }
 
@@ -136,7 +138,7 @@ test()
       }
 
     const double l1_norm = vec.l1_norm();
-    Assert(l1_norm == exact_l1, ExcInternalError());
+    DEAL_II_Assert(l1_norm == exact_l1, ExcInternalError());
 
     if (myid == 0)
       deallog << "Norm = " << l1_norm << std::endl;

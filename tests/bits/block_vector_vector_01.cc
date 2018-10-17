@@ -33,7 +33,7 @@ test(BlockVector<double> &v)
     v(i) = i + 1.;
   BlockVector<float> w(v);
 
-  AssertThrow(w == v, ExcInternalError());
+  DEAL_II_AssertThrow(w == v, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

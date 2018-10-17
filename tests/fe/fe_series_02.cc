@@ -71,7 +71,7 @@ double
 LegendreFunction<dim>::value(const dealii::Point<dim> &point,
                              const unsigned int) const
 {
-  Assert(dim == 1, dealii::ExcNotImplemented());
+  DEAL_II_Assert(dim == 1, dealii::ExcNotImplemented());
 
   double f = 0.0;
 

@@ -66,7 +66,7 @@ check()
         p2[1] = p2[2] = 1.0;
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 
   GridGenerator::subdivided_hyper_rectangle(triangulation,

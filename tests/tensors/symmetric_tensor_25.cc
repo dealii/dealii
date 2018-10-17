@@ -57,7 +57,7 @@ check()
                          third_invariant(S) * unit_symmetric_tensor<dim>();
       deallog << R << std::endl;
 
-      AssertThrow(R.norm() < 1e-10, ExcInternalError());
+      DEAL_II_AssertThrow(R.norm() < 1e-10, ExcInternalError());
     }
 }
 

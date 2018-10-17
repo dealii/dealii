@@ -76,8 +76,8 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
               << "   method 1: " << divergences[q] << std::endl
               << "   method 2: " << div_alt << std::endl
               << std::endl;
-      Assert((divergences[q] - div_alt).norm() <= divergences[q].norm(),
-             ExcInternalError());
+      DEAL_II_Assert((divergences[q] - div_alt).norm() <= divergences[q].norm(),
+                     ExcInternalError());
     }
 }
 

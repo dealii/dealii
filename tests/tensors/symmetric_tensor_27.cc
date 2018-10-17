@@ -40,15 +40,19 @@ test()
       t[i][j] = (1. + (i + 1) * (j * 2));
 
   deallog << scalar_product(s, s) << std::endl;
-  AssertThrow(scalar_product(s, s) == s * s, ExcInternalError());
+  DEAL_II_AssertThrow(scalar_product(s, s) == s * s, ExcInternalError());
 
   deallog << scalar_product(s, t) << std::endl;
-  AssertThrow(scalar_product(s, t) == s * symmetrize(t), ExcInternalError());
-  AssertThrow(scalar_product(s, t) == symmetrize(t) * s, ExcInternalError());
+  DEAL_II_AssertThrow(scalar_product(s, t) == s * symmetrize(t),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(scalar_product(s, t) == symmetrize(t) * s,
+                      ExcInternalError());
 
   deallog << scalar_product(t, s) << std::endl;
-  AssertThrow(scalar_product(t, s) == s * symmetrize(t), ExcInternalError());
-  AssertThrow(scalar_product(t, s) == symmetrize(t) * s, ExcInternalError());
+  DEAL_II_AssertThrow(scalar_product(t, s) == s * symmetrize(t),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(scalar_product(t, s) == symmetrize(t) * s,
+                      ExcInternalError());
 }
 
 

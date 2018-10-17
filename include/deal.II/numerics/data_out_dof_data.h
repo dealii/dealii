@@ -52,46 +52,50 @@ namespace Exceptions
     /**
      * Exception
      */
-    DeclException1(ExcInvalidNumberOfSubdivisions,
-                   int,
-                   << "The number of subdivisions per patch, " << arg1
-                   << ", is not valid. It needs to be greater or equal to "
-                      "one, or zero if you want it to be determined "
-                      "automatically.");
+    DEAL_II_DeclException1(
+      ExcInvalidNumberOfSubdivisions,
+      int,
+      << "The number of subdivisions per patch, " << arg1
+      << ", is not valid. It needs to be greater or equal to "
+         "one, or zero if you want it to be determined "
+         "automatically.");
 
     /**
      * Exception
      */
-    DeclExceptionMsg(ExcNoTriangulationSelected,
-                     "For the operation you are attempting, you first need to "
-                     "tell the DataOut or related object which DoFHandler or "
-                     "triangulation you would like to work on.");
+    DEAL_II_DeclExceptionMsg(
+      ExcNoTriangulationSelected,
+      "For the operation you are attempting, you first need to "
+      "tell the DataOut or related object which DoFHandler or "
+      "triangulation you would like to work on.");
 
     /**
      * Exception
      */
-    DeclExceptionMsg(ExcNoDoFHandlerSelected,
-                     "For the operation you are attempting, you first need to "
-                     "tell the DataOut or related object which DoFHandler "
-                     "you would like to work on.");
+    DEAL_II_DeclExceptionMsg(
+      ExcNoDoFHandlerSelected,
+      "For the operation you are attempting, you first need to "
+      "tell the DataOut or related object which DoFHandler "
+      "you would like to work on.");
 
     /**
      * Exception
      */
-    DeclException3(ExcInvalidVectorSize,
-                   int,
-                   int,
-                   int,
-                   << "The vector has size " << arg1
-                   << " but the DoFHandler object says that there are " << arg2
-                   << " degrees of freedom and there are " << arg3
-                   << " active cells. The size of your vector needs to be"
-                   << " either equal to the number of degrees of freedom, or"
-                   << " equal to the number of active cells.");
+    DEAL_II_DeclException3(
+      ExcInvalidVectorSize,
+      int,
+      int,
+      int,
+      << "The vector has size " << arg1
+      << " but the DoFHandler object says that there are " << arg2
+      << " degrees of freedom and there are " << arg3
+      << " active cells. The size of your vector needs to be"
+      << " either equal to the number of degrees of freedom, or"
+      << " equal to the number of active cells.");
     /**
      * Exception
      */
-    DeclException2(
+    DEAL_II_DeclException2(
       ExcInvalidCharacter,
       std::string,
       size_t,
@@ -104,7 +108,7 @@ namespace Exceptions
     /**
      * Exception
      */
-    DeclExceptionMsg(
+    DEAL_II_DeclExceptionMsg(
       ExcOldDataStillPresent,
       "When attaching a triangulation or DoFHandler object, it is "
       "not allowed if old data vectors are still referenced. If "
@@ -113,54 +117,59 @@ namespace Exceptions
     /**
      * Exception
      */
-    DeclException2(ExcInvalidNumberOfNames,
-                   int,
-                   int,
-                   << "You have to give one name per component in your "
-                   << "data vector. The number you gave was " << arg1
-                   << ", but the number of components is " << arg2 << ".");
+    DEAL_II_DeclException2(ExcInvalidNumberOfNames,
+                           int,
+                           int,
+                           << "You have to give one name per component in your "
+                           << "data vector. The number you gave was " << arg1
+                           << ", but the number of components is " << arg2
+                           << ".");
     /**
      * Exception
      */
-    DeclExceptionMsg(ExcIncompatibleDatasetNames,
-                     "While merging sets of patches, the two sets to be merged "
-                     "need to refer to data that agrees on the names of the "
-                     "various variables represented. In other words, you "
-                     "cannot merge sets of patches that originate from "
-                     "entirely unrelated simulations.");
+    DEAL_II_DeclExceptionMsg(
+      ExcIncompatibleDatasetNames,
+      "While merging sets of patches, the two sets to be merged "
+      "need to refer to data that agrees on the names of the "
+      "various variables represented. In other words, you "
+      "cannot merge sets of patches that originate from "
+      "entirely unrelated simulations.");
     /**
      * Exception
      */
-    DeclExceptionMsg(ExcIncompatiblePatchLists,
-                     "While merging sets of patches, the two sets to be merged "
-                     "need to refer to data that agrees on the number of "
-                     "subdivisions and other properties. In other words, you "
-                     "cannot merge sets of patches that originate from "
-                     "entirely unrelated simulations.");
+    DEAL_II_DeclExceptionMsg(
+      ExcIncompatiblePatchLists,
+      "While merging sets of patches, the two sets to be merged "
+      "need to refer to data that agrees on the number of "
+      "subdivisions and other properties. In other words, you "
+      "cannot merge sets of patches that originate from "
+      "entirely unrelated simulations.");
 
-    DeclException2(ExcInvalidVectorDeclaration,
-                   int,
-                   std::string,
-                   << "When declaring that a number of components in a data "
-                   << "set to be output logically form a vector instead of "
-                   << "simply a set of scalar fields, you need to specify "
-                   << "this for all relevant components. Furthermore, "
-                   << "vectors must always consist of exactly <dim> "
-                   << "components. However, the vector component at "
-                   << "position " << arg1 << " with name <" << arg2
-                   << "> does not satisfy these conditions.");
+    DEAL_II_DeclException2(
+      ExcInvalidVectorDeclaration,
+      int,
+      std::string,
+      << "When declaring that a number of components in a data "
+      << "set to be output logically form a vector instead of "
+      << "simply a set of scalar fields, you need to specify "
+      << "this for all relevant components. Furthermore, "
+      << "vectors must always consist of exactly <dim> "
+      << "components. However, the vector component at "
+      << "position " << arg1 << " with name <" << arg2
+      << "> does not satisfy these conditions.");
 
-    DeclException2(ExcInvalidTensorDeclaration,
-                   int,
-                   std::string,
-                   << "When declaring that a number of components in a data "
-                   << "set to be output logically form a tensor instead of "
-                   << "simply a set of scalar fields, you need to specify "
-                   << "this for all relevant components. Furthermore, "
-                   << "tensors must always consist of exactly <dim*dim> "
-                   << "components. However, the tensor component at "
-                   << "position " << arg1 << " with name <" << arg2
-                   << "> does not satisfy these conditions.");
+    DEAL_II_DeclException2(
+      ExcInvalidTensorDeclaration,
+      int,
+      std::string,
+      << "When declaring that a number of components in a data "
+      << "set to be output logically form a tensor instead of "
+      << "simply a set of scalar fields, you need to specify "
+      << "this for all relevant components. Furthermore, "
+      << "tensors must always consist of exactly <dim*dim> "
+      << "components. However, the tensor component at "
+      << "position " << arg1 << " with name <" << arg2
+      << "> does not satisfy these conditions.");
 
   } // namespace DataOutImplementation
 } // namespace Exceptions
@@ -1032,8 +1041,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     &data_component_interpretation)
 {
-  Assert(triangulation != nullptr,
-         Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
+  DEAL_II_Assert(
+    triangulation != nullptr,
+    Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
   std::vector<std::string> names(1, name);
   add_data_vector_internal(
     dofs, vec, names, type, data_component_interpretation, true);
@@ -1051,8 +1061,9 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     &data_component_interpretation)
 {
-  Assert(triangulation != nullptr,
-         Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
+  DEAL_II_Assert(
+    triangulation != nullptr,
+    Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
   add_data_vector_internal(
     dofs, vec, names, type, data_component_interpretation, false);
 }
@@ -1107,8 +1118,8 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::add_data_vector(
   const VectorType &                                        vec,
   const DataPostprocessor<DoFHandlerType::space_dimension> &data_postprocessor)
 {
-  Assert(dofs != nullptr,
-         Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
+  DEAL_II_Assert(dofs != nullptr,
+                 Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
   add_data_vector(*dofs, vec, data_postprocessor);
 }
 
@@ -1122,48 +1133,55 @@ DataOut_DoFData<DoFHandlerType, patch_dim, patch_space_dim>::merge_patches(
   const Point<patch_space_dim> &                                      shift)
 {
   const std::vector<Patch> &source_patches = source.get_patches();
-  Assert((patches.size() != 0) && (source_patches.size() != 0),
-         ExcMessage("When calling this function, both the current "
-                    "object and the one being merged need to have a "
-                    "nonzero number of patches associated with it. "
-                    "Either you called this function on objects that "
-                    "are empty, or you may have forgotten to call "
-                    "the 'build_patches()' function."));
+  DEAL_II_Assert((patches.size() != 0) && (source_patches.size() != 0),
+                 ExcMessage("When calling this function, both the current "
+                            "object and the one being merged need to have a "
+                            "nonzero number of patches associated with it. "
+                            "Either you called this function on objects that "
+                            "are empty, or you may have forgotten to call "
+                            "the 'build_patches()' function."));
   // check equality of component
   // names
-  Assert(get_dataset_names() == source.get_dataset_names(),
-         Exceptions::DataOutImplementation::ExcIncompatibleDatasetNames());
+  DEAL_II_Assert(
+    get_dataset_names() == source.get_dataset_names(),
+    Exceptions::DataOutImplementation::ExcIncompatibleDatasetNames());
   // make sure patches are compatible. we'll
   // assume that if the first respective
   // patches are ok that all the other ones
   // are ok as well
-  Assert(patches[0].n_subdivisions == source_patches[0].n_subdivisions,
-         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
-  Assert(patches[0].data.n_rows() == source_patches[0].data.n_rows(),
-         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
-  Assert(patches[0].data.n_cols() == source_patches[0].data.n_cols(),
-         Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
+  DEAL_II_Assert(
+    patches[0].n_subdivisions == source_patches[0].n_subdivisions,
+    Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
+  DEAL_II_Assert(
+    patches[0].data.n_rows() == source_patches[0].data.n_rows(),
+    Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
+  DEAL_II_Assert(
+    patches[0].data.n_cols() == source_patches[0].data.n_cols(),
+    Exceptions::DataOutImplementation::ExcIncompatiblePatchLists());
 
   // check equality of the vector data
   // specifications
-  Assert(get_nonscalar_data_ranges().size() ==
-           source.get_nonscalar_data_ranges().size(),
-         ExcMessage("Both sources need to declare the same components "
-                    "as vectors."));
+  DEAL_II_Assert(get_nonscalar_data_ranges().size() ==
+                   source.get_nonscalar_data_ranges().size(),
+                 ExcMessage("Both sources need to declare the same components "
+                            "as vectors."));
   for (unsigned int i = 0; i < get_nonscalar_data_ranges().size(); ++i)
     {
-      Assert(std::get<0>(get_nonscalar_data_ranges()[i]) ==
-               std::get<0>(source.get_nonscalar_data_ranges()[i]),
-             ExcMessage("Both sources need to declare the same components "
-                        "as vectors."));
-      Assert(std::get<1>(get_nonscalar_data_ranges()[i]) ==
-               std::get<1>(source.get_nonscalar_data_ranges()[i]),
-             ExcMessage("Both sources need to declare the same components "
-                        "as vectors."));
-      Assert(std::get<2>(get_nonscalar_data_ranges()[i]) ==
-               std::get<2>(source.get_nonscalar_data_ranges()[i]),
-             ExcMessage("Both sources need to declare the same components "
-                        "as vectors."));
+      DEAL_II_Assert(std::get<0>(get_nonscalar_data_ranges()[i]) ==
+                       std::get<0>(source.get_nonscalar_data_ranges()[i]),
+                     ExcMessage(
+                       "Both sources need to declare the same components "
+                       "as vectors."));
+      DEAL_II_Assert(std::get<1>(get_nonscalar_data_ranges()[i]) ==
+                       std::get<1>(source.get_nonscalar_data_ranges()[i]),
+                     ExcMessage(
+                       "Both sources need to declare the same components "
+                       "as vectors."));
+      DEAL_II_Assert(std::get<2>(get_nonscalar_data_ranges()[i]) ==
+                       std::get<2>(source.get_nonscalar_data_ranges()[i]),
+                     ExcMessage(
+                       "Both sources need to declare the same components "
+                       "as vectors."));
     }
 
   // merge patches. store old number

@@ -46,8 +46,8 @@ plot_diff(const Vector<double> &v1,
           const Vector<double> &v2,
           const Tensor<1, 2> &  n)
 {
-  AssertDimension(v1.size(), 2);
-  AssertDimension(v2.size(), 2);
+  DEAL_II_AssertDimension(v1.size(), 2);
+  DEAL_II_AssertDimension(v2.size(), 2);
 
   double p1 = v1(0) * n[1] - v1(1) * n[0];
   double p2 = v2(0) * n[1] - v2(1) * n[0];
@@ -62,8 +62,8 @@ plot_diff(const Vector<double> &v1,
           const Vector<double> &v2,
           const Tensor<1, 3> &  n)
 {
-  AssertDimension(v1.size(), 3);
-  AssertDimension(v2.size(), 3);
+  DEAL_II_AssertDimension(v1.size(), 3);
+  DEAL_II_AssertDimension(v2.size(), 3);
 
   Tensor<1, 3> p1, p2;
   for (unsigned int d = 0; d < 3; ++d)

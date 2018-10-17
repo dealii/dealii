@@ -94,7 +94,7 @@ test()
   {
     VectorTools::project(dh, cm, QGauss<dim>(3), F<dim>(), v);
     deallog << v.l2_norm() << std::endl;
-    Assert(v.l2_norm() == 0, ExcInternalError());
+    DEAL_II_Assert(v.l2_norm() == 0, ExcInternalError());
   }
 
   // use an explicit Q1 mapping. this will yield a zero solution
@@ -102,7 +102,7 @@ test()
     VectorTools::project(
       MappingQGeneric<dim>(1), dh, cm, QGauss<dim>(3), F<dim>(), v);
     deallog << v.l2_norm() << std::endl;
-    Assert(v.l2_norm() == 0, ExcInternalError());
+    DEAL_II_Assert(v.l2_norm() == 0, ExcInternalError());
   }
 
   // use an explicit Q2 mapping. this will yield a nonzero solution if it's a
@@ -111,7 +111,7 @@ test()
   {
     VectorTools::project(MappingQ<dim>(2), dh, cm, QGauss<dim>(3), F<dim>(), v);
     deallog << v.l2_norm() << std::endl;
-    Assert(v.l2_norm() != 0, ExcInternalError());
+    DEAL_II_Assert(v.l2_norm() != 0, ExcInternalError());
   }
 
   // use an explicit Q2 mapping but enforce zero boundary values. this will
@@ -123,7 +123,7 @@ test()
     VectorTools::project(
       MappingQ<dim>(2), dh, cm, QGauss<dim>(3), F<dim>(), v, true);
     deallog << v.l2_norm() << std::endl;
-    Assert(v.l2_norm() != 0, ExcInternalError());
+    DEAL_II_Assert(v.l2_norm() != 0, ExcInternalError());
   }
 
   // use an explicit Q2 mapping and project to the boundary first. this will
@@ -142,7 +142,7 @@ test()
                          QGauss<dim - 1>(2),
                          true);
     deallog << v.l2_norm() << std::endl;
-    Assert(v.l2_norm() != 0, ExcInternalError());
+    DEAL_II_Assert(v.l2_norm() != 0, ExcInternalError());
     for (typename DoFHandler<dim>::active_cell_iterator cell =
            dh.begin_active();
          cell != dh.end();
@@ -167,7 +167,7 @@ test()
                          QTrapez<dim - 1>(),
                          true);
     deallog << v.l2_norm() << std::endl;
-    Assert(v.l2_norm() != 0, ExcInternalError());
+    DEAL_II_Assert(v.l2_norm() != 0, ExcInternalError());
     for (typename DoFHandler<dim>::active_cell_iterator cell =
            dh.begin_active();
          cell != dh.end();

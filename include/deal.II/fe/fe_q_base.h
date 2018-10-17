@@ -282,11 +282,12 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcFEQCannotHaveDegree0,
-                   "FE_Q can only be used for polynomial degrees "
-                   "greater than zero. If you want an element of polynomial "
-                   "degree zero, then it cannot be continuous and you "
-                   "will want to use FE_DGQ<dim>(0).");
+  DEAL_II_DeclExceptionMsg(
+    ExcFEQCannotHaveDegree0,
+    "FE_Q can only be used for polynomial degrees "
+    "greater than zero. If you want an element of polynomial "
+    "degree zero, then it cannot be continuous and you "
+    "will want to use FE_DGQ<dim>(0).");
 
 protected:
   /**

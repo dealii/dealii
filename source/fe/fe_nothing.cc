@@ -84,7 +84,7 @@ double
 FE_Nothing<dim, spacedim>::shape_value(const unsigned int /*i*/,
                                        const Point<dim> & /*p*/) const
 {
-  Assert(false, ExcMessage("This element has no shape functions."));
+  DEAL_II_Assert(false, ExcMessage("This element has no shape functions."));
   return 0;
 }
 
@@ -285,10 +285,10 @@ FE_Nothing<dim, spacedim>::get_interpolation_matrix(
   // the interpolation matrix is necessarily empty.
   (void)interpolation_matrix;
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.n(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.n(), 0));
 }
 
 
@@ -303,10 +303,10 @@ FE_Nothing<dim, spacedim>::get_face_interpolation_matrix(
   // interpolation matrix is necessarily empty
   (void)interpolation_matrix;
 
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
 }
 
 
@@ -321,10 +321,10 @@ FE_Nothing<dim, spacedim>::get_subface_interpolation_matrix(
   // interpolation matrix is necessarily empty
 
   (void)interpolation_matrix;
-  Assert(interpolation_matrix.m() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
-  Assert(interpolation_matrix.n() == 0,
-         ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.m() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
+  DEAL_II_Assert(interpolation_matrix.n() == 0,
+                 ExcDimensionMismatch(interpolation_matrix.m(), 0));
 }
 
 

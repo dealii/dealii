@@ -49,7 +49,7 @@ main(int argc, char **argv)
   IndexSet local_dofs(n_global_dofs);
   local_dofs.add_range(begin_dof, end_dof);
   local_dofs.compress();
-  AssertDimension(local_dofs.n_elements(), n_local_dofs);
+  DEAL_II_AssertDimension(local_dofs.n_elements(), n_local_dofs);
 
 
   PETScWrappers::MPI::Vector vec(local_dofs, MPI_COMM_WORLD);
@@ -67,10 +67,10 @@ main(int argc, char **argv)
   PETScWrappers::MPI::Vector vec2(local_dofs, MPI_COMM_WORLD);
   SUNDIALS::internal::copy(vec2, sundials_vector);
 
-  AssertThrow(vec2 == vec,
-              ExcMessage(
-                "The two PETSc vectors should be equal since they are "
-                "copies (by means of an intermediate SUNDIALs vector)"));
+  DEAL_II_AssertThrow(
+    vec2 == vec,
+    ExcMessage("The two PETSc vectors should be equal since they are "
+               "copies (by means of an intermediate SUNDIALs vector)"));
 
   deallog << "n_local_dofs: " << n_local_dofs << std::endl;
   deallog << "OK" << std::endl;

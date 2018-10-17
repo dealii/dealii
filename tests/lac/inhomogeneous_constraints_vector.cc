@@ -121,9 +121,9 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
                              std::vector<double> &          values,
                              const unsigned int             component) const
 {
-  Assert(values.size() == points.size(),
-         ExcDimensionMismatch(values.size(), points.size()));
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_Assert(values.size() == points.size(),
+                 ExcDimensionMismatch(values.size(), points.size()));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
   const unsigned int n_points = points.size();
 
@@ -248,7 +248,7 @@ LaplaceProblem<dim>::assemble_system()
   // and compare whether we really got the
   // same right hand side vector
   test -= system_rhs;
-  AssertThrow(test.l2_norm() <= 1e-12, ExcInternalError());
+  DEAL_II_AssertThrow(test.l2_norm() <= 1e-12, ExcInternalError());
 }
 
 template <int dim>

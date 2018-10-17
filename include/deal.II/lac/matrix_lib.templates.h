@@ -38,8 +38,8 @@ template <typename number>
 void
 MeanValueFilter::vmult(Vector<number> &dst, const Vector<number> &src) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
+  DEAL_II_Assert(dst.size() == src.size(),
+                 ExcDimensionMismatch(dst.size(), src.size()));
 
   number mean = src.mean_value();
 
@@ -53,8 +53,8 @@ template <typename number>
 void
 MeanValueFilter::vmult_add(Vector<number> &dst, const Vector<number> &src) const
 {
-  Assert(dst.size() == src.size(),
-         ExcDimensionMismatch(dst.size(), src.size()));
+  DEAL_II_Assert(dst.size() == src.size(),
+                 ExcDimensionMismatch(dst.size(), src.size()));
 
   number mean = src.mean_value();
 
@@ -68,7 +68,8 @@ template <typename number>
 void
 MeanValueFilter::filter(BlockVector<number> &v) const
 {
-  Assert(component != numbers::invalid_unsigned_int, ExcNotInitialized());
+  DEAL_II_Assert(component != numbers::invalid_unsigned_int,
+                 ExcNotInitialized());
 
   for (unsigned int i = 0; i < v.n_blocks(); ++i)
     if (i == component)
@@ -82,10 +83,11 @@ void
 MeanValueFilter::vmult(BlockVector<number> &      dst,
                        const BlockVector<number> &src) const
 {
-  Assert(component != numbers::invalid_unsigned_int, ExcNotInitialized());
+  DEAL_II_Assert(component != numbers::invalid_unsigned_int,
+                 ExcNotInitialized());
 
-  Assert(dst.n_blocks() == src.n_blocks(),
-         ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
+  DEAL_II_Assert(dst.n_blocks() == src.n_blocks(),
+                 ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
 
   for (unsigned int i = 0; i < dst.n_blocks(); ++i)
     if (i == component)
@@ -101,10 +103,11 @@ void
 MeanValueFilter::vmult_add(BlockVector<number> &      dst,
                            const BlockVector<number> &src) const
 {
-  Assert(component != numbers::invalid_unsigned_int, ExcNotInitialized());
+  DEAL_II_Assert(component != numbers::invalid_unsigned_int,
+                 ExcNotInitialized());
 
-  Assert(dst.n_blocks() == src.n_blocks(),
-         ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
+  DEAL_II_Assert(dst.n_blocks() == src.n_blocks(),
+                 ExcDimensionMismatch(dst.n_blocks(), src.n_blocks()));
 
   for (unsigned int i = 0; i < dst.n_blocks(); ++i)
     if (i == component)

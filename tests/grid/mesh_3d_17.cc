@@ -85,7 +85,8 @@ void check(Triangulation<3> &tria)
 
             // check that
             // neighbor_of_neighbor works:
-            Assert(neighbor->neighbor(nb_of_nb) == cell, ExcInternalError());
+            DEAL_II_Assert(neighbor->neighbor(nb_of_nb) == cell,
+                           ExcInternalError());
 
             const Triangulation<dim>::face_iterator neighbor_face =
               neighbor->face(nb_of_nb);
@@ -111,7 +112,7 @@ void check(Triangulation<3> &tria)
 
                 // we used to abort in the
                 // following call, due to a
-                // wrong Assert condition:
+                // wrong DEAL_II_Assert condition:
                 cell->neighbor_child_on_subface(face_no, subface_no);
               }
           }

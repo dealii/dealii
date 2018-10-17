@@ -401,7 +401,7 @@ test()
   deallog << sol1.l2_norm() << ' ' << sol2.l2_norm() << std::endl;
 
   sol1 -= sol2;
-  Assert(sol1.l2_norm() <= 1e-8 * sol2.l2_norm(), ExcInternalError());
+  DEAL_II_Assert(sol1.l2_norm() <= 1e-8 * sol2.l2_norm(), ExcInternalError());
 }
 
 

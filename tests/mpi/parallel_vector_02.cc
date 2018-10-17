@@ -56,8 +56,8 @@ test()
   v.compress(VectorOperation::add);
   v *= 2.0;
 
-  AssertThrow(v(myid * 2) == myid * 4.0, ExcInternalError());
-  AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
+  DEAL_II_AssertThrow(v(myid * 2) == myid * 4.0, ExcInternalError());
+  DEAL_II_AssertThrow(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
   // set ghost dof, compress
   v(1) = 7;
@@ -71,7 +71,7 @@ test()
 
   // import ghosts onto all procs
   v.update_ghost_values();
-  AssertThrow(v(1) == 7. * numproc, ExcInternalError());
+  DEAL_II_AssertThrow(v(1) == 7. * numproc, ExcInternalError());
 
   // check l2 norm
   const double l2_norm = v.l2_norm();

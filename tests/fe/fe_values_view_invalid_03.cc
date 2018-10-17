@@ -54,7 +54,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
       goto ok;
     }
 
-  Assert(false, ExcMessage("No exception!?"));
+  DEAL_II_Assert(false, ExcMessage("No exception!?"));
 
 ok:;
 }

@@ -38,7 +38,7 @@ public:
     : Function<dim>()
     , distance_source(distance_source)
   {
-    Assert(distance_source.size() > 0, ExcNotImplemented());
+    DEAL_II_Assert(distance_source.size() > 0, ExcNotImplemented());
   }
 
   virtual double

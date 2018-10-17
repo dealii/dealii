@@ -85,8 +85,8 @@ main(int argc, char *argv[])
   for (; cell_world != endc_world && cell_self != endc_self;
        ++cell_world, ++cell_self)
     if (cell_world->is_locally_owned())
-      Assert(cell_world->dof_index(0) == cell_self->dof_index(0),
-             ExcInternalError());
+      DEAL_II_Assert(cell_world->dof_index(0) == cell_self->dof_index(0),
+                     ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -49,12 +49,13 @@ DoFInvalidAccessor<structdim, dim, spacedim>::DoFInvalidAccessor(
   const int,
   const AccessorData *)
 {
-  Assert(false,
-         ExcMessage("You are attempting an illegal conversion between "
-                    "iterator/accessor types. The constructor you call "
-                    "only exists to make certain template constructs "
-                    "easier to write as dimension independent code but "
-                    "the conversion is not valid in the current context."));
+  DEAL_II_Assert(false,
+                 ExcMessage(
+                   "You are attempting an illegal conversion between "
+                   "iterator/accessor types. The constructor you call "
+                   "only exists to make certain template constructs "
+                   "easier to write as dimension independent code but "
+                   "the conversion is not valid in the current context."));
 }
 
 
@@ -65,12 +66,13 @@ DoFInvalidAccessor<structdim, dim, spacedim>::DoFInvalidAccessor(
   : InvalidAccessor<structdim, dim, spacedim>(
       static_cast<const InvalidAccessor<structdim, dim, spacedim> &>(i))
 {
-  Assert(false,
-         ExcMessage("You are attempting an illegal conversion between "
-                    "iterator/accessor types. The constructor you call "
-                    "only exists to make certain template constructs "
-                    "easier to write as dimension independent code but "
-                    "the conversion is not valid in the current context."));
+  DEAL_II_Assert(false,
+                 ExcMessage(
+                   "You are attempting an illegal conversion between "
+                   "iterator/accessor types. The constructor you call "
+                   "only exists to make certain template constructs "
+                   "easier to write as dimension independent code but "
+                   "the conversion is not valid in the current context."));
 }
 
 
@@ -82,7 +84,7 @@ DoFInvalidAccessor<structdim, dim, spacedim>::set_dof_index(
   const types::global_dof_index,
   const unsigned int) const
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
 }
 
 
@@ -95,11 +97,12 @@ template <typename DoFHandlerType, bool lda>
 void
 DoFCellAccessor<DoFHandlerType, lda>::update_cell_dof_indices_cache() const
 {
-  Assert(static_cast<unsigned int>(this->present_level) <
-           this->dof_handler->levels.size(),
-         ExcMessage("DoFHandler not initialized"));
+  DEAL_II_Assert(static_cast<unsigned int>(this->present_level) <
+                   this->dof_handler->levels.size(),
+                 ExcMessage("DoFHandler not initialized"));
 
-  Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
+  DEAL_II_Assert(this->dof_handler != nullptr,
+                 typename BaseClass::ExcInvalidObject());
 
   internal::DoFCellAccessorImplementation::Implementation::
     update_cell_dof_indices_cache(*this);
@@ -112,11 +115,12 @@ void
 DoFCellAccessor<DoFHandlerType, lda>::set_dof_indices(
   const std::vector<types::global_dof_index> &local_dof_indices)
 {
-  Assert(static_cast<unsigned int>(this->present_level) <
-           this->dof_handler->levels.size(),
-         ExcMessage("DoFHandler not initialized"));
+  DEAL_II_Assert(static_cast<unsigned int>(this->present_level) <
+                   this->dof_handler->levels.size(),
+                 ExcMessage("DoFHandler not initialized"));
 
-  Assert(this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
+  DEAL_II_Assert(this->dof_handler != nullptr,
+                 typename BaseClass::ExcInvalidObject());
 
   internal::DoFCellAccessorImplementation::Implementation::set_dof_indices(
     *this, local_dof_indices);

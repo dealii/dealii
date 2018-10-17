@@ -83,10 +83,10 @@ namespace Functions
                                         std::vector<double> &          values,
                                         const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
 
 
     if (this->selected == CutOffFunctionBase<dim>::no_component ||
@@ -104,8 +104,8 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int k = 0; k < values.size(); ++k)
       {
@@ -152,8 +152,8 @@ namespace Functions
                                     std::vector<double> &          values,
                                     const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     if (this->selected == CutOffFunctionBase<dim>::no_component ||
         component == this->selected)
@@ -174,8 +174,8 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int k = 0; k < values.size(); ++k)
       {
@@ -227,8 +227,8 @@ namespace Functions
                                         std::vector<double> &          values,
                                         const unsigned int component) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     const double r = this->radius;
 
@@ -258,8 +258,8 @@ namespace Functions
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int k = 0; k < values.size(); ++k)
       {

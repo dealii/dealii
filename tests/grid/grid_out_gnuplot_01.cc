@@ -87,9 +87,9 @@ main()
     GridOutFlags::Gnuplot flags;
     // check that this really is a reference for the real name
     flags.n_boundary_face_points = 42;
-    Assert(flags.n_extra_curved_line_points == 42, ExcInternalError());
+    DEAL_II_Assert(flags.n_extra_curved_line_points == 42, ExcInternalError());
     flags.n_extra_curved_line_points = 0;
-    Assert(flags.n_boundary_face_points == 0, ExcInternalError());
+    DEAL_II_Assert(flags.n_boundary_face_points == 0, ExcInternalError());
 
     flags.curved_inner_cells              = false;
     flags.write_additional_boundary_lines = false;

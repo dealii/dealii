@@ -83,7 +83,7 @@ test(TrilinosWrappers::SparseMatrix &m)
   // matrix in order to check whether all
   // elements really are zero
   double norm = m2.frobenius_norm();
-  AssertThrow(norm == 0, ExcInternalError());
+  DEAL_II_AssertThrow(norm == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

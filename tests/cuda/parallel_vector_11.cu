@@ -57,7 +57,8 @@ test()
 
   LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> v(
     local_owned, local_relevant, MPI_COMM_WORLD);
-  AssertDimension(static_cast<unsigned int>(actual_local_size), v.local_size());
+  DEAL_II_AssertDimension(static_cast<unsigned int>(actual_local_size),
+                          v.local_size());
   LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> w(v), x(v),
     y(v);
 
@@ -79,14 +80,16 @@ test()
   LinearAlgebra::ReadWriteVector<double> y_rw(local_owned);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == i + my_start, ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == i + my_start,
+                        ExcInternalError());
 
   if (myid == 0)
     deallog << "Check add (scalar): ";
   y.add(42);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == i + my_start + 42, ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == i + my_start + 42,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -95,8 +98,8 @@ test()
   y.add(1., w);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == 3 * (i + my_start) + 1042,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == 3 * (i + my_start) + 1042,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -105,7 +108,8 @@ test()
   y.add(-1., w);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == i + my_start + 42, ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == i + my_start + 42,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -114,8 +118,9 @@ test()
   y.add(2., w, -0.5, x);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == 5 * (i + my_start) + 2042 - 5000,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) ==
+                          5 * (i + my_start) + 2042 - 5000,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -125,7 +130,8 @@ test()
   y.sadd(-3., 2., v);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == (-i - my_start), ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == (-i - my_start),
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -135,8 +141,8 @@ test()
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
     {
-      AssertThrow(y_rw.local_element(i) == 5 * (i + my_start) + 2000,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(y_rw.local_element(i) == 5 * (i + my_start) + 2000,
+                          ExcInternalError());
     }
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -148,7 +154,7 @@ test()
   y.add(2., x);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == 20000, ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == 20000, ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -158,8 +164,8 @@ test()
   y.add(1., v, 3., v);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == 4 * (i + my_start),
-                ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == 4 * (i + my_start),
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -168,7 +174,7 @@ test()
   x *= 2.;
   x_rw.import(x, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(x_rw.local_element(i) == 20000., ExcInternalError());
+    DEAL_II_AssertThrow(x_rw.local_element(i) == 20000., ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -177,7 +183,7 @@ test()
   x /= 2.;
   x_rw.import(x, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(x_rw.local_element(i) == 10000., ExcInternalError());
+    DEAL_II_AssertThrow(x_rw.local_element(i) == 10000., ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -186,8 +192,8 @@ test()
   y.scale(x);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == 40000. * (i + my_start),
-                ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == 40000. * (i + my_start),
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -196,7 +202,7 @@ test()
   y.equ(10., x);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == 100000., ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == 100000., ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -205,8 +211,8 @@ test()
   y.equ(10., v, -2., w);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == 6. * (i + my_start) - 2000,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == 6. * (i + my_start) - 2000,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 
@@ -216,8 +222,8 @@ test()
   y.add(3., x);
   y_rw.import(y, VectorOperation::insert);
   for (int i = 0; i < actual_local_size; ++i)
-    AssertThrow(y_rw.local_element(i) == 6. * (i + my_start) + 28000,
-                ExcInternalError());
+    DEAL_II_AssertThrow(y_rw.local_element(i) == 6. * (i + my_start) + 28000,
+                        ExcInternalError());
   if (myid == 0)
     deallog << "OK" << std::endl;
 }
@@ -240,10 +246,10 @@ main(int argc, char **argv)
   // each node has the same number of GPUs.
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
   int device_id   = myid % n_devices;
   cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  DEAL_II_AssertCuda(cuda_error_code);
 
 
   if (myid == 0)

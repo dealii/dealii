@@ -78,7 +78,7 @@ main()
                 break;
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_Assert(false, ExcNotImplemented());
             };
           ilu_pattern.compress();
 

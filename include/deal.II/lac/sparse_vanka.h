@@ -599,7 +599,7 @@ template <typename number>
 inline typename SparseVanka<number>::size_type
 SparseVanka<number>::m() const
 {
-  Assert(_m != 0, ExcNotInitialized());
+  DEAL_II_Assert(_m != 0, ExcNotInitialized());
   return _m;
 }
 
@@ -607,7 +607,7 @@ template <typename number>
 inline typename SparseVanka<number>::size_type
 SparseVanka<number>::n() const
 {
-  Assert(_n != 0, ExcNotInitialized());
+  DEAL_II_Assert(_n != 0, ExcNotInitialized());
   return _n;
 }
 
@@ -617,7 +617,7 @@ inline void
 SparseVanka<number>::Tvmult(Vector<number2> & /*dst*/,
                             const Vector<number2> & /*src*/) const
 {
-  AssertThrow(false, ExcNotImplemented());
+  DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 #endif // DOXYGEN

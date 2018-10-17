@@ -35,27 +35,27 @@ check_vmult()
     u(i) = i + 1;
 
   M.vmult(v, u);
-  Assert(v == u, ExcInternalError());
+  DEAL_II_Assert(v == u, ExcInternalError());
   for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
 
   M.vmult_add(v, u);
   v /= 2;
-  Assert(v == u, ExcInternalError());
+  DEAL_II_Assert(v == u, ExcInternalError());
   for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
 
   M.Tvmult(v, u);
-  Assert(v == u, ExcInternalError());
+  DEAL_II_Assert(v == u, ExcInternalError());
   for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;
 
   M.Tvmult_add(v, u);
   v /= 2;
-  Assert(v == u, ExcInternalError());
+  DEAL_II_Assert(v == u, ExcInternalError());
   for (unsigned int i = 0; i < v.size(); ++i)
     deallog << ' ' << v(i);
   deallog << std::endl;

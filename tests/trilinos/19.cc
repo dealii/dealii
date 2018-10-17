@@ -40,7 +40,7 @@ test(TrilinosWrappers::MPI::Vector &v)
   v.compress(VectorOperation::insert);
 
   // then check the norm
-  AssertThrow(v.linfty_norm() == norm, ExcInternalError());
+  DEAL_II_AssertThrow(v.linfty_norm() == norm, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -838,13 +838,14 @@ private:
    */
   const Tensor<1, spacedim> periodicity;
 
-  DeclException3(ExcPeriodicBox,
-                 int,
-                 Point<spacedim>,
-                 double,
-                 << "The component number " << arg1 << " of the point [ "
-                 << arg2 << " ] is not in the interval [ 0, " << arg3
-                 << "), bailing out.");
+  DEAL_II_DeclException3(ExcPeriodicBox,
+                         int,
+                         Point<spacedim>,
+                         double,
+                         << "The component number " << arg1
+                         << " of the point [ " << arg2
+                         << " ] is not in the interval [ 0, " << arg3
+                         << "), bailing out.");
 
   /**
    * Relative tolerance. This tolerance is used to compute distances in double
@@ -1221,16 +1222,16 @@ namespace Manifolds
     switch (dim)
       {
         case 1:
-          Assert(points_weights.first.size() == 2, ExcInternalError());
-          Assert(points_weights.second.size() == 2, ExcInternalError());
+          DEAL_II_Assert(points_weights.first.size() == 2, ExcInternalError());
+          DEAL_II_Assert(points_weights.second.size() == 2, ExcInternalError());
           points_weights.first[0]  = iterator->vertex(0);
           points_weights.second[0] = .5;
           points_weights.first[1]  = iterator->vertex(1);
           points_weights.second[1] = .5;
           break;
         case 2:
-          Assert(points_weights.first.size() == 8, ExcInternalError());
-          Assert(points_weights.second.size() == 8, ExcInternalError());
+          DEAL_II_Assert(points_weights.first.size() == 8, ExcInternalError());
+          DEAL_II_Assert(points_weights.second.size() == 8, ExcInternalError());
 
           for (unsigned int i = 0; i < 4; ++i)
             {
@@ -1263,8 +1264,10 @@ namespace Manifolds
             const unsigned int np = GeometryInfo<dim>::vertices_per_cell +
                                     GeometryInfo<dim>::lines_per_cell +
                                     GeometryInfo<dim>::faces_per_cell;
-            Assert(points_weights.first.size() == np, ExcInternalError());
-            Assert(points_weights.second.size() == np, ExcInternalError());
+            DEAL_II_Assert(points_weights.first.size() == np,
+                           ExcInternalError());
+            DEAL_II_Assert(points_weights.second.size() == np,
+                           ExcInternalError());
             auto *sp3 = reinterpret_cast<
               std::array<Point<3>, n_default_points_per_cell<decltype(hex)>()>
                 *>(&points_weights.first);
@@ -1315,7 +1318,7 @@ namespace Manifolds
           }
           break;
         default:
-          Assert(false, ExcInternalError());
+          DEAL_II_Assert(false, ExcInternalError());
           break;
       }
     return points_weights;

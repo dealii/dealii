@@ -30,7 +30,7 @@ test(PETScWrappers::MPI::Vector &v)
 {
   v.reinit(MPI_COMM_WORLD, 13, 13, true);
 
-  AssertThrow(v.size() == 13, ExcInternalError());
+  DEAL_II_AssertThrow(v.size() == 13, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -40,22 +40,23 @@ check_norms()
         vec(i) = i + 1;
 
       const number l1_norm = vec.l1_norm();
-      AssertThrow(std::abs(l1_norm - 0.5 * size * (size + 1)) <
-                    acc * 0.5 * size * (size + 1),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(l1_norm - 0.5 * size * (size + 1)) <
+                            acc * 0.5 * size * (size + 1),
+                          ExcInternalError());
 
       // test accuracy of summation
       const long double value = 3.14159265358979323846;
       vec                     = (number)value;
       const number l1_norma   = vec.l1_norm();
-      AssertThrow(std::abs(l1_norma - value * size) < acc * size * value,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(l1_norma - value * size) <
+                            acc * size * value,
+                          ExcInternalError());
       const number l2_norma = vec.l2_norm();
-      AssertThrow(std::abs(l2_norma - value * std::sqrt((number)size)) <
-                    acc * std::sqrt(size) * value,
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(l2_norma - value * std::sqrt((number)size)) <
+                            acc * std::sqrt(size) * value,
+                          ExcInternalError());
       const number lp_norma = vec.lp_norm(3.);
-      AssertThrow(
+      DEAL_II_AssertThrow(
         std::abs(lp_norma - value * std::pow(static_cast<number>(size),
                                              static_cast<number>(1. / 3.))) <
           std::max(acc, number(1e-15)) *
@@ -87,22 +88,23 @@ check_complex_norms()
         }
 
       const number l1_norm = vec.l1_norm();
-      AssertThrow(std::abs(l1_norm - sum) < acc * sum, ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(l1_norm - sum) < acc * sum,
+                          ExcInternalError());
 
       // test accuracy of summation
       const std::complex<long double> value(3.14159265358979323846, 0.1);
       vec                   = std::complex<number>(value);
       const number l1_norma = vec.l1_norm();
-      AssertThrow(std::abs(l1_norma - std::abs(value) * size) <
-                    acc * size * std::abs(value),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(l1_norma - std::abs(value) * size) <
+                            acc * size * std::abs(value),
+                          ExcInternalError());
       const number l2_norma = vec.l2_norm();
-      AssertThrow(std::abs(l2_norma -
-                           std::abs(value) * std::sqrt((number)size)) <
-                    acc * std::sqrt((number)size) * std::abs(value),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(std::abs(l2_norma -
+                                   std::abs(value) * std::sqrt((number)size)) <
+                            acc * std::sqrt((number)size) * std::abs(value),
+                          ExcInternalError());
       const number lp_norma = vec.lp_norm(3.);
-      AssertThrow(
+      DEAL_II_AssertThrow(
         std::abs(lp_norma -
                  std::abs(value) * std::pow(static_cast<number>(size),
                                             static_cast<number>(1. / 3.))) <

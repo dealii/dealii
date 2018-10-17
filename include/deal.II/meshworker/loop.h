@@ -304,8 +304,8 @@ namespace MeshWorker
                   (periodic_neighbor &&
                    cell->periodic_neighbor_is_coarser(face_no)))
                 {
-                  Assert(!cell->has_children(), ExcInternalError());
-                  Assert(!neighbor->has_children(), ExcInternalError());
+                  DEAL_II_Assert(!cell->has_children(), ExcInternalError());
+                  DEAL_II_Assert(!neighbor->has_children(), ExcInternalError());
 
                   // skip if only one processor needs to assemble the face
                   // to a ghost cell and the fine cell is not ours.
@@ -344,7 +344,7 @@ namespace MeshWorker
                   if (internal::is_active_iterator(cell) &&
                       neighbor->has_children())
                     {
-                      Assert(
+                      DEAL_II_Assert(
                         loop_control.own_faces != LoopControl::both,
                         ExcMessage(
                           "Assembling from both sides for own_faces is not "
@@ -353,8 +353,8 @@ namespace MeshWorker
                     }
 
                   // Now neighbor is on same level, double-check this:
-                  Assert(cell->level() == neighbor->level(),
-                         ExcInternalError());
+                  DEAL_II_Assert(cell->level() == neighbor->level(),
+                                 ExcInternalError());
 
                   // If we own both cells only do faces from one side (unless
                   // LoopControl says otherwise). Here, we rely on cell
@@ -382,9 +382,9 @@ namespace MeshWorker
                     periodic_neighbor ?
                       cell->periodic_neighbor_face_no(face_no) :
                       cell->neighbor_face_no(face_no);
-                  Assert(periodic_neighbor ||
-                           neighbor->face(neighbor_face_no) == face,
-                         ExcInternalError());
+                  DEAL_II_Assert(periodic_neighbor ||
+                                   neighbor->face(neighbor_face_no) == face,
+                                 ExcInternalError());
                   // Regular interior face
                   dof_info.interior_face_available[face_no] = true;
                   dof_info.exterior_face_available[face_no] = true;

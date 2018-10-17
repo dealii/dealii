@@ -517,7 +517,7 @@ namespace Step27
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     const unsigned      n_fourier_modes = k_vectors.size();
@@ -624,7 +624,8 @@ namespace Step27
                                               predicate_ind<dim>,
                                               VectorTools::Linfty_norm);
 
-        Assert(res.first.size() == res.second.size(), ExcInternalError());
+        DEAL_II_Assert(res.first.size() == res.second.size(),
+                       ExcInternalError());
 
         if (ln_k.size() == 0)
           {

@@ -45,8 +45,8 @@ test()
     {
       deallog << i->row() << ' ' << i->column() << ' ' << i->value()
               << std::endl;
-      Assert(std::fabs(i->value() - i->row() * i->column()) < 1e-14,
-             ExcInternalError());
+      DEAL_II_Assert(std::fabs(i->value() - i->row() * i->column()) < 1e-14,
+                     ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

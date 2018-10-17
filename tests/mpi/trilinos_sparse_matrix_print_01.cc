@@ -63,7 +63,7 @@ test()
         }
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
 
   TrilinosWrappers::SparsityPattern sp(row_partitioning,
                                        col_partitioning,

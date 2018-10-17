@@ -75,7 +75,7 @@ template <int dim>
 void
 test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
 {
-  Assert(dim > 1, ExcInternalError());
+  DEAL_II_Assert(dim > 1, ExcInternalError());
   Triangulation<dim> triangulation;
   {
     Point<dim> p1, p2;

@@ -103,11 +103,11 @@ test()
   fe_function.vector_value(point, m);
 
   {
-    AssertThrow(std::fabs(m(0) - point.square()) <
-                  1e-10 * std::fabs(m(0) + point.square()),
-                ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(m(0) - point.square()) <
+                          1e-10 * std::fabs(m(0) + point.square()),
+                        ExcInternalError());
 
-    AssertThrow(std::fabs(m(1)) < 1e-10, ExcInternalError());
+    DEAL_II_AssertThrow(std::fabs(m(1)) < 1e-10, ExcInternalError());
   }
 
   deallog << "OK" << std::endl;

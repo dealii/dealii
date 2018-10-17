@@ -37,8 +37,8 @@ test()
   {
     std::vector<int> v(10);
     ArrayView<int>   a(&v[4], 3);
-    AssertThrow(a.begin() == &v[4], ExcInternalError());
-    AssertThrow(a.end() == &v[7], ExcInternalError());
+    DEAL_II_AssertThrow(a.begin() == &v[4], ExcInternalError());
+    DEAL_II_AssertThrow(a.end() == &v[7], ExcInternalError());
 
     static_assert(std::is_reference<decltype(*a.begin())>::value,
                   "type should be a reference");
@@ -54,8 +54,8 @@ test()
   {
     std::vector<int>           v(10);
     const ArrayView<const int> a(&v[4], 3);
-    AssertThrow(a.begin() == &v[4], ExcInternalError());
-    AssertThrow(a.end() == &v[7], ExcInternalError());
+    DEAL_II_AssertThrow(a.begin() == &v[4], ExcInternalError());
+    DEAL_II_AssertThrow(a.end() == &v[7], ExcInternalError());
 
     static_assert(is_const_reference<decltype(*a.begin())>(),
                   "type should be const reference");
@@ -67,8 +67,8 @@ test()
   {
     const std::vector<int>     v(10, 42);
     const ArrayView<const int> a(&v[4], 3);
-    AssertThrow(a.begin() == &v[4], ExcInternalError());
-    AssertThrow(a.end() == &v[7], ExcInternalError());
+    DEAL_II_AssertThrow(a.begin() == &v[4], ExcInternalError());
+    DEAL_II_AssertThrow(a.end() == &v[7], ExcInternalError());
 
     static_assert(is_const_reference<decltype(*a.begin())>(),
                   "type should be const reference");

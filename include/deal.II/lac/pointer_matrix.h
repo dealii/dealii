@@ -679,7 +679,7 @@ inline void
 PointerMatrix<MatrixType, VectorType>::vmult(VectorType &      dst,
                                              const VectorType &src) const
 {
-  Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
   m->vmult(dst, src);
 }
 
@@ -689,7 +689,7 @@ inline void
 PointerMatrix<MatrixType, VectorType>::Tvmult(VectorType &      dst,
                                               const VectorType &src) const
 {
-  Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
   m->Tvmult(dst, src);
 }
 
@@ -699,7 +699,7 @@ inline void
 PointerMatrix<MatrixType, VectorType>::vmult_add(VectorType &      dst,
                                                  const VectorType &src) const
 {
-  Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
   m->vmult_add(dst, src);
 }
 
@@ -709,7 +709,7 @@ inline void
 PointerMatrix<MatrixType, VectorType>::Tvmult_add(VectorType &      dst,
                                                   const VectorType &src) const
 {
-  Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
   m->Tvmult_add(dst, src);
 }
 
@@ -799,8 +799,8 @@ PointerMatrixAux<MatrixType, VectorType>::vmult(VectorType &      dst,
 {
   if (mem == nullptr)
     mem = &my_memory;
-  Assert(mem != nullptr, ExcNotInitialized());
-  Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(mem != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
   m->vmult(dst, src);
 }
 
@@ -812,8 +812,8 @@ PointerMatrixAux<MatrixType, VectorType>::Tvmult(VectorType &      dst,
 {
   if (mem == nullptr)
     mem = &my_memory;
-  Assert(mem != nullptr, ExcNotInitialized());
-  Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(mem != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
   m->Tvmult(dst, src);
 }
 
@@ -825,8 +825,8 @@ PointerMatrixAux<MatrixType, VectorType>::vmult_add(VectorType &      dst,
 {
   if (mem == nullptr)
     mem = &my_memory;
-  Assert(mem != nullptr, ExcNotInitialized());
-  Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(mem != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
   VectorType *v = mem->alloc();
   v->reinit(dst);
   m->vmult(*v, src);
@@ -843,8 +843,8 @@ PointerMatrixAux<MatrixType, VectorType>::Tvmult_add(
 {
   if (mem == nullptr)
     mem = &my_memory;
-  Assert(mem != nullptr, ExcNotInitialized());
-  Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(mem != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
   VectorType *v = mem->alloc();
   v->reinit(dst);
   m->Tvmult(*v, src);
@@ -906,8 +906,8 @@ inline void
 PointerMatrixVector<number>::vmult(Vector<number> &      dst,
                                    const Vector<number> &src) const
 {
-  Assert(m != nullptr, ExcNotInitialized());
-  Assert(dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
 
   dst(0) = *m * src;
 }
@@ -918,8 +918,8 @@ inline void
 PointerMatrixVector<number>::Tvmult(Vector<number> &      dst,
                                     const Vector<number> &src) const
 {
-  Assert(m != nullptr, ExcNotInitialized());
-  Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
 
   dst.equ(src(0), *m);
 }
@@ -930,8 +930,8 @@ inline void
 PointerMatrixVector<number>::vmult_add(Vector<number> &      dst,
                                        const Vector<number> &src) const
 {
-  Assert(m != nullptr, ExcNotInitialized());
-  Assert(dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
 
   dst(0) += *m * src;
 }
@@ -942,8 +942,8 @@ inline void
 PointerMatrixVector<number>::Tvmult_add(Vector<number> &      dst,
                                         const Vector<number> &src) const
 {
-  Assert(m != nullptr, ExcNotInitialized());
-  Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
+  DEAL_II_Assert(m != nullptr, ExcNotInitialized());
+  DEAL_II_Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
 
   dst.add(src(0), *m);
 }

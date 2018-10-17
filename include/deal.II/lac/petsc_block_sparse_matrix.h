@@ -274,7 +274,7 @@ namespace PETScWrappers
     inline BlockSparseMatrix &
     BlockSparseMatrix::operator=(const double d)
     {
-      Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+      DEAL_II_Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
       for (size_type r = 0; r < this->n_block_rows(); ++r)
         for (size_type c = 0; c < this->n_block_cols(); ++c)

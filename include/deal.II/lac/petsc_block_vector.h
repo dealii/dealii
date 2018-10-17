@@ -279,11 +279,11 @@ namespace PETScWrappers
       /**
        * Exception
        */
-      DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
+      DEAL_II_DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
       /**
        * Exception
        */
-      DeclException0(ExcNonMatchingBlockVectors);
+      DEAL_II_DeclException0(ExcNonMatchingBlockVectors);
     };
 
     /*@}*/
@@ -346,8 +346,8 @@ namespace PETScWrappers
     {
       // we only allow assignment to vectors with the same number of blocks
       // or to an empty BlockVector
-      Assert(n_blocks() == 0 || n_blocks() == v.n_blocks(),
-             ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+      DEAL_II_Assert(n_blocks() == 0 || n_blocks() == v.n_blocks(),
+                     ExcDimensionMismatch(n_blocks(), v.n_blocks()));
 
       if (this->n_blocks() != v.n_blocks())
         reinit(v.n_blocks());
@@ -455,7 +455,8 @@ namespace PETScWrappers
       bool ghosted = block(0).has_ghost_elements();
 #  ifdef DEBUG
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
-        Assert(block(i).has_ghost_elements() == ghosted, ExcInternalError());
+        DEAL_II_Assert(block(i).has_ghost_elements() == ghosted,
+                       ExcInternalError());
 #  endif
       return ghosted;
     }

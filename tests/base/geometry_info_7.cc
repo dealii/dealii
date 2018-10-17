@@ -52,7 +52,8 @@ test()
           {
             deallog << "Reference cell: face " << f << ": "
                     << alternating_forms[v] << std::endl;
-            AssertThrow(alternating_forms[v].norm() == 1, ExcInternalError());
+            DEAL_II_AssertThrow(alternating_forms[v].norm() == 1,
+                                ExcInternalError());
           }
       }
   }
@@ -86,13 +87,13 @@ test()
             // squashed
             if (f < 2)
               {
-                AssertThrow(alternating_forms[v].norm() == 1,
-                            ExcInternalError());
+                DEAL_II_AssertThrow(alternating_forms[v].norm() == 1,
+                                    ExcInternalError());
               }
             else
               {
-                AssertThrow(alternating_forms[v].norm() == 0.1,
-                            ExcInternalError());
+                DEAL_II_AssertThrow(alternating_forms[v].norm() == 0.1,
+                                    ExcInternalError());
               }
           }
       }
@@ -137,13 +138,13 @@ test()
             // rotated along)
             if (f < 2)
               {
-                AssertThrow(alternating_forms[v].norm() == 1,
-                            ExcInternalError());
+                DEAL_II_AssertThrow(alternating_forms[v].norm() == 1,
+                                    ExcInternalError());
               }
             else
               {
-                AssertThrow(alternating_forms[v].norm() == 0.1,
-                            ExcInternalError());
+                DEAL_II_AssertThrow(alternating_forms[v].norm() == 0.1,
+                                    ExcInternalError());
               }
           }
       }

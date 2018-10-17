@@ -199,7 +199,7 @@ public:
   Number &operator[](const unsigned int comp)
   {
     (void)comp;
-    AssertIndexRange(comp, 1);
+    DEAL_II_AssertIndexRange(comp, 1);
     return data;
   }
 
@@ -210,7 +210,7 @@ public:
   const Number &operator[](const unsigned int comp) const
   {
     (void)comp;
-    AssertIndexRange(comp, 1);
+    DEAL_II_AssertIndexRange(comp, 1);
     return data;
   }
 
@@ -601,7 +601,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   double &operator[](const unsigned int comp)
   {
-    AssertIndexRange(comp, 8);
+    DEAL_II_AssertIndexRange(comp, 8);
     return *(reinterpret_cast<double *>(&data) + comp);
   }
 
@@ -611,7 +611,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   const double &operator[](const unsigned int comp) const
   {
-    AssertIndexRange(comp, 8);
+    DEAL_II_AssertIndexRange(comp, 8);
     return *(reinterpret_cast<const double *>(&data) + comp);
   }
 
@@ -711,8 +711,8 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
-           ExcMessage("Memory not aligned"));
+    DEAL_II_Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
+                   ExcMessage("Memory not aligned"));
     _mm512_stream_pd(ptr, data);
   }
 
@@ -758,9 +758,10 @@ public:
   {
     for (unsigned int i = 0; i < 8; ++i)
       for (unsigned int j = i + 1; j < 8; ++j)
-        Assert(offsets[i] != offsets[j],
-               ExcMessage("Result of scatter undefined if two offset elements"
-                          " point to the same position"));
+        DEAL_II_Assert(offsets[i] != offsets[j],
+                       ExcMessage(
+                         "Result of scatter undefined if two offset elements"
+                         " point to the same position"));
 
     // unfortunately, there does not appear to be a 256 bit integer load, so
     // do it by some reinterpret casts here. this is allowed because the Intel
@@ -1003,7 +1004,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   float &operator[](const unsigned int comp)
   {
-    AssertIndexRange(comp, 16);
+    DEAL_II_AssertIndexRange(comp, 16);
     return *(reinterpret_cast<float *>(&data) + comp);
   }
 
@@ -1013,7 +1014,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   const float &operator[](const unsigned int comp) const
   {
-    AssertIndexRange(comp, 16);
+    DEAL_II_AssertIndexRange(comp, 16);
     return *(reinterpret_cast<const float *>(&data) + comp);
   }
 
@@ -1113,8 +1114,8 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
-           ExcMessage("Memory not aligned"));
+    DEAL_II_Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
+                   ExcMessage("Memory not aligned"));
     _mm512_stream_ps(ptr, data);
   }
 
@@ -1160,9 +1161,10 @@ public:
   {
     for (unsigned int i = 0; i < 16; ++i)
       for (unsigned int j = i + 1; j < 16; ++j)
-        Assert(offsets[i] != offsets[j],
-               ExcMessage("Result of scatter undefined if two offset elements"
-                          " point to the same position"));
+        DEAL_II_Assert(offsets[i] != offsets[j],
+                       ExcMessage(
+                         "Result of scatter undefined if two offset elements"
+                         " point to the same position"));
 
     // unfortunately, there does not appear to be a 512 bit integer load, so
     // do it by some reinterpret casts here. this is allowed because the Intel
@@ -1438,7 +1440,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   double &operator[](const unsigned int comp)
   {
-    AssertIndexRange(comp, 4);
+    DEAL_II_AssertIndexRange(comp, 4);
     return *(reinterpret_cast<double *>(&data) + comp);
   }
 
@@ -1448,7 +1450,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   const double &operator[](const unsigned int comp) const
   {
-    AssertIndexRange(comp, 4);
+    DEAL_II_AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const double *>(&data) + comp);
   }
 
@@ -1548,8 +1550,8 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
-           ExcMessage("Memory not aligned"));
+    DEAL_II_Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
+                   ExcMessage("Memory not aligned"));
     _mm256_stream_pd(ptr, data);
   }
 
@@ -1817,7 +1819,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   float &operator[](const unsigned int comp)
   {
-    AssertIndexRange(comp, 8);
+    DEAL_II_AssertIndexRange(comp, 8);
     return *(reinterpret_cast<float *>(&data) + comp);
   }
 
@@ -1827,7 +1829,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   const float &operator[](const unsigned int comp) const
   {
-    AssertIndexRange(comp, 8);
+    DEAL_II_AssertIndexRange(comp, 8);
     return *(reinterpret_cast<const float *>(&data) + comp);
   }
 
@@ -1927,8 +1929,8 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
-           ExcMessage("Memory not aligned"));
+    DEAL_II_Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
+                   ExcMessage("Memory not aligned"));
     _mm256_stream_ps(ptr, data);
   }
 
@@ -2224,7 +2226,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   double &operator[](const unsigned int comp)
   {
-    AssertIndexRange(comp, 2);
+    DEAL_II_AssertIndexRange(comp, 2);
     return *(reinterpret_cast<double *>(&data) + comp);
   }
 
@@ -2234,7 +2236,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   const double &operator[](const unsigned int comp) const
   {
-    AssertIndexRange(comp, 2);
+    DEAL_II_AssertIndexRange(comp, 2);
     return *(reinterpret_cast<const double *>(&data) + comp);
   }
 
@@ -2330,8 +2332,8 @@ public:
   void
   streaming_store(double *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
-           ExcMessage("Memory not aligned"));
+    DEAL_II_Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
+                   ExcMessage("Memory not aligned"));
     _mm_stream_pd(ptr, data);
   }
 
@@ -2563,7 +2565,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   float &operator[](const unsigned int comp)
   {
-    AssertIndexRange(comp, 4);
+    DEAL_II_AssertIndexRange(comp, 4);
     return *(reinterpret_cast<float *>(&data) + comp);
   }
 
@@ -2573,7 +2575,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   const float &operator[](const unsigned int comp) const
   {
-    AssertIndexRange(comp, 4);
+    DEAL_II_AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const float *>(&data) + comp);
   }
 
@@ -2669,8 +2671,8 @@ public:
   void
   streaming_store(float *ptr) const
   {
-    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
-           ExcMessage("Memory not aligned"));
+    DEAL_II_Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
+                   ExcMessage("Memory not aligned"));
     _mm_stream_ps(ptr, data);
   }
 
@@ -2922,7 +2924,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   double &operator[](const unsigned int comp)
   {
-    AssertIndexRange(comp, 2);
+    DEAL_II_AssertIndexRange(comp, 2);
     return *(reinterpret_cast<double *>(&data) + comp);
   }
 
@@ -2932,7 +2934,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   const double &operator[](const unsigned int comp) const
   {
-    AssertIndexRange(comp, 2);
+    DEAL_II_AssertIndexRange(comp, 2);
     return *(reinterpret_cast<const double *>(&data) + comp);
   }
 
@@ -3135,7 +3137,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   float &operator[](const unsigned int comp)
   {
-    AssertIndexRange(comp, 4);
+    DEAL_II_AssertIndexRange(comp, 4);
     return *(reinterpret_cast<float *>(&data) + comp);
   }
 
@@ -3145,7 +3147,7 @@ public:
   DEAL_II_ALWAYS_INLINE
   const float &operator[](const unsigned int comp) const
   {
-    AssertIndexRange(comp, 4);
+    DEAL_II_AssertIndexRange(comp, 4);
     return *(reinterpret_cast<const float *>(&data) + comp);
   }
 

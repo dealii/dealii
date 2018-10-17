@@ -287,7 +287,7 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const types::material_id /*material_id*/,
   const Strategy /*strategy*/)
 {
-  Assert(false, ExcInternalError());
+  DEAL_II_Assert(false, ExcInternalError());
 }
 
 
@@ -311,21 +311,20 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const types::material_id  material_id,
   const Strategy            strategy)
 {
-  AssertThrow(strategy == cell_diameter_over_24, ExcNotImplemented());
+  DEAL_II_AssertThrow(strategy == cell_diameter_over_24, ExcNotImplemented());
   using number = typename InputVector::value_type;
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1, spacedim> *>(
         &dof_handler.get_triangulation()) != nullptr)
-    Assert((subdomain_id_ == numbers::invalid_subdomain_id) ||
-             (subdomain_id_ ==
-              dynamic_cast<
-                const parallel::distributed::Triangulation<1, spacedim> &>(
-                dof_handler.get_triangulation())
-                .locally_owned_subdomain()),
-           ExcMessage(
-             "For parallel distributed triangulations, the only "
-             "valid subdomain_id that can be passed here is the "
-             "one that corresponds to the locally owned subdomain id."));
+    DEAL_II_Assert(
+      (subdomain_id_ == numbers::invalid_subdomain_id) ||
+        (subdomain_id_ ==
+         dynamic_cast<const parallel::distributed::Triangulation<1, spacedim>
+                        &>(dof_handler.get_triangulation())
+           .locally_owned_subdomain()),
+      ExcMessage("For parallel distributed triangulations, the only "
+                 "valid subdomain_id that can be passed here is the "
+                 "one that corresponds to the locally owned subdomain id."));
 
   const types::subdomain_id subdomain_id =
     ((dynamic_cast<const parallel::distributed::Triangulation<1, spacedim> *>(
@@ -342,50 +341,55 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const unsigned int n_solution_vectors = solutions.size();
 
   // sanity checks
-  Assert(neumann_bc.find(numbers::internal_face_boundary_id) ==
-           neumann_bc.end(),
-         ExcMessage("You are not allowed to list the special boundary "
-                    "indicator for internal boundaries in your boundary "
-                    "value map."));
+  DEAL_II_Assert(neumann_bc.find(numbers::internal_face_boundary_id) ==
+                   neumann_bc.end(),
+                 ExcMessage(
+                   "You are not allowed to list the special boundary "
+                   "indicator for internal boundaries in your boundary "
+                   "value map."));
 
   for (const auto &boundary_function : neumann_bc)
     {
       (void)boundary_function;
-      Assert(boundary_function.second->n_components == n_components,
-             ExcInvalidBoundaryFunction(boundary_function.first,
-                                        boundary_function.second->n_components,
-                                        n_components));
+      DEAL_II_Assert(
+        boundary_function.second->n_components == n_components,
+        ExcInvalidBoundaryFunction(boundary_function.first,
+                                   boundary_function.second->n_components,
+                                   n_components));
     }
 
-  Assert(component_mask.represents_n_components(n_components),
-         ExcInvalidComponentMask());
-  Assert(component_mask.n_selected_components(n_components) > 0,
-         ExcInvalidComponentMask());
+  DEAL_II_Assert(component_mask.represents_n_components(n_components),
+                 ExcInvalidComponentMask());
+  DEAL_II_Assert(component_mask.n_selected_components(n_components) > 0,
+                 ExcInvalidComponentMask());
 
-  Assert((coefficient == nullptr) ||
-           (coefficient->n_components == n_components) ||
-           (coefficient->n_components == 1),
-         ExcInvalidCoefficient());
+  DEAL_II_Assert((coefficient == nullptr) ||
+                   (coefficient->n_components == n_components) ||
+                   (coefficient->n_components == 1),
+                 ExcInvalidCoefficient());
 
-  Assert(solutions.size() > 0, ExcNoSolutions());
-  Assert(solutions.size() == errors.size(),
-         ExcIncompatibleNumberOfElements(solutions.size(), errors.size()));
+  DEAL_II_Assert(solutions.size() > 0, ExcNoSolutions());
+  DEAL_II_Assert(solutions.size() == errors.size(),
+                 ExcIncompatibleNumberOfElements(solutions.size(),
+                                                 errors.size()));
   for (unsigned int n = 0; n < solutions.size(); ++n)
-    Assert(solutions[n]->size() == dof_handler.n_dofs(),
-           ExcDimensionMismatch(solutions[n]->size(), dof_handler.n_dofs()));
+    DEAL_II_Assert(solutions[n]->size() == dof_handler.n_dofs(),
+                   ExcDimensionMismatch(solutions[n]->size(),
+                                        dof_handler.n_dofs()));
 
-  Assert((coefficient == nullptr) ||
-           (coefficient->n_components == n_components) ||
-           (coefficient->n_components == 1),
-         ExcInvalidCoefficient());
+  DEAL_II_Assert((coefficient == nullptr) ||
+                   (coefficient->n_components == n_components) ||
+                   (coefficient->n_components == 1),
+                 ExcInvalidCoefficient());
 
   for (const auto &boundary_function : neumann_bc)
     {
       (void)boundary_function;
-      Assert(boundary_function.second->n_components == n_components,
-             ExcInvalidBoundaryFunction(boundary_function.first,
-                                        boundary_function.second->n_components,
-                                        n_components));
+      DEAL_II_Assert(
+        boundary_function.second->n_components == n_components,
+        ExcInvalidBoundaryFunction(boundary_function.first,
+                                   boundary_function.second->n_components,
+                                   n_components));
     }
 
   // reserve one slot for each cell and set it to zero

@@ -29,7 +29,7 @@ test()
   index_set.add_index(3);
   index_set.add_index(4);
   deallog << (index_set.is_contiguous() ? "true" : "false") << std::endl;
-  AssertThrow(index_set.is_contiguous() == true, ExcInternalError());
+  DEAL_II_AssertThrow(index_set.is_contiguous() == true, ExcInternalError());
 
   for (unsigned int i = 0; i < index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
@@ -37,7 +37,7 @@ test()
 
   index_set.add_index(6);
   deallog << (index_set.is_contiguous() ? "true" : "false") << std::endl;
-  AssertThrow(index_set.is_contiguous() == false, ExcInternalError());
+  DEAL_II_AssertThrow(index_set.is_contiguous() == false, ExcInternalError());
 
   for (unsigned int i = 0; i < index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")

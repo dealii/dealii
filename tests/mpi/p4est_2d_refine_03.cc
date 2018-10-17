@@ -75,7 +75,7 @@ test()
                 cell->set_refine_flag();
               }
 
-          Assert(index == tr.n_active_cells(), ExcInternalError());
+          DEAL_II_Assert(index == tr.n_active_cells(), ExcInternalError());
           tr.execute_coarsening_and_refinement();
 
           if (myid == 0)

@@ -65,7 +65,7 @@ test()
           ++my_cell_index;
           indicators(cell_index) = my_cell_index;
         }
-    AssertThrow(my_cell_index == 20, ExcInternalError());
+    DEAL_II_AssertThrow(my_cell_index == 20, ExcInternalError());
   }
 
 
@@ -113,10 +113,10 @@ test()
       // this is what we should expect. do not actually run the assertions
       // since that would make 'make' delete the output file without us
       // ever seeing what we want to see if things go wrong
-      //       Assert (n_refined ==
+      //       DEAL_II_Assert (n_refined ==
       //        4*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD),
       //        ExcInternalError());
-      //       Assert (n_coarsened ==
+      //       DEAL_II_Assert (n_coarsened ==
       //        4*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD),
       //        ExcInternalError());
     }

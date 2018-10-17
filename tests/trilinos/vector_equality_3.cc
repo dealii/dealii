@@ -41,7 +41,7 @@ test(TrilinosWrappers::MPI::Vector &v, TrilinosWrappers::MPI::Vector &w)
         w(i) = i + 1.;
     }
 
-  AssertThrow(v != w, ExcInternalError());
+  DEAL_II_AssertThrow(v != w, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

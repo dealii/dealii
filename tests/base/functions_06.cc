@@ -29,7 +29,7 @@ check1()
 {
   VectorFunctionFromScalarFunctionObject<dim> object(&Point<dim>::norm, 1, 3);
 
-  Assert(object.n_components == 3, ExcInternalError());
+  DEAL_II_Assert(object.n_components == 3, ExcInternalError());
 
   for (unsigned int i = 0; i < 10; ++i)
     {
@@ -38,13 +38,14 @@ check1()
         p[d] = i + d;
 
       for (unsigned int c = 0; c < 3; ++c)
-        AssertThrow(object.value(p, c) == (c == 1 ? p.norm() : 0),
-                    ExcInternalError());
+        DEAL_II_AssertThrow(object.value(p, c) == (c == 1 ? p.norm() : 0),
+                            ExcInternalError());
 
       Vector<double> v(3);
       object.vector_value(p, v);
       for (unsigned int c = 0; c < 3; ++c)
-        AssertThrow(v(c) == (c == 1 ? p.norm() : 0), ExcInternalError());
+        DEAL_II_AssertThrow(v(c) == (c == 1 ? p.norm() : 0),
+                            ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -68,7 +69,7 @@ check2()
       for (unsigned int d = 0; d < dim; ++d)
         p[d] = i + d;
 
-      AssertThrow(object.value(p) == q.distance(p), ExcInternalError());
+      DEAL_II_AssertThrow(object.value(p) == q.distance(p), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

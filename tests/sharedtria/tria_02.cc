@@ -68,13 +68,13 @@ test()
     /*artificial*/ true,
     parallel::shared::Triangulation<dim>::partition_metis);
 
-  AssertThrow(tr.with_artificial_cells() == true, ExcInternalError());
+  DEAL_II_AssertThrow(tr.with_artificial_cells() == true, ExcInternalError());
 
   const std::vector<unsigned int> &true_subdomain_ids_of_cells =
     tr.get_true_subdomain_ids_of_cells();
 
-  AssertThrow(true_subdomain_ids_of_cells.size() == tr.n_active_cells(),
-              ExcInternalError());
+  DEAL_II_AssertThrow(true_subdomain_ids_of_cells.size() == tr.n_active_cells(),
+                      ExcInternalError());
 
   GridGenerator::hyper_cube(tr);
   tr.refine_global();
@@ -108,9 +108,10 @@ test()
     {
       // check that true subdomain_ids are the same as those, stored in
       // cell->subdomain_id()
-      AssertThrow((it->is_artificial() == true) ||
-                    (true_subdomain_ids_of_cells[index] == it->subdomain_id()),
-                  ExcInternalError());
+      DEAL_II_AssertThrow((it->is_artificial() == true) ||
+                            (true_subdomain_ids_of_cells[index] ==
+                             it->subdomain_id()),
+                          ExcInternalError());
       // deallog << (int) it->subdomain_id() << " ";
     }
   deallog << std::endl;

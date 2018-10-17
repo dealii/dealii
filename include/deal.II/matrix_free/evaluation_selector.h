@@ -414,9 +414,9 @@ namespace internal
       const bool evaluate_gradients,
       const bool evaluate_hessians)
     {
-      Assert(shape_info.element_type <=
-               internal::MatrixFreeFunctions::tensor_symmetric,
-             ExcInternalError());
+      DEAL_II_Assert(shape_info.element_type <=
+                       internal::MatrixFreeFunctions::tensor_symmetric,
+                     ExcInternalError());
       Factory<dim, n_components, Number>::evaluate(shape_info,
                                                    values_dofs_actual,
                                                    values_quad,
@@ -446,9 +446,9 @@ namespace internal
       const bool integrate_gradients,
       const bool sum_into_values_array = false)
     {
-      Assert(shape_info.element_type <=
-               internal::MatrixFreeFunctions::tensor_symmetric,
-             ExcInternalError());
+      DEAL_II_Assert(shape_info.element_type <=
+                       internal::MatrixFreeFunctions::tensor_symmetric,
+                     ExcInternalError());
       Factory<dim, n_components, Number>::integrate(shape_info,
                                                     values_dofs_actual,
                                                     values_quad,
@@ -588,7 +588,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
   const bool                                              evaluate_gradients,
   const bool                                              evaluate_hessians)
 {
-  Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
+  DEAL_II_Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
   if (fe_degree + 1 == n_q_points_1d &&
       shape_info.element_type ==
@@ -701,7 +701,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
                                                    evaluate_hessians);
     }
   else
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 
@@ -722,7 +722,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
   const bool                                              integrate_gradients,
   const bool                                              sum_into_values_array)
 {
-  Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
+  DEAL_II_Assert(fe_degree >= 0 && n_q_points_1d > 0, ExcInternalError());
 
   if (fe_degree + 1 == n_q_points_1d &&
       shape_info.element_type ==
@@ -829,7 +829,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                                                     sum_into_values_array);
     }
   else
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
 }
 
 

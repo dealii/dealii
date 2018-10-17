@@ -133,8 +133,8 @@ test()
                                             VectorTools::L2_norm,
                                             &select_mask1);
           if (q <= p)
-            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
-                   ExcInternalError());
+            DEAL_II_Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
+                           ExcInternalError());
 
           deallog << fe.get_name() << ", Mask 1, P_" << q
                   << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
@@ -149,8 +149,8 @@ test()
                                             VectorTools::L2_norm,
                                             &select_mask2);
           if (q <= p)
-            Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
-                   ExcInternalError());
+            DEAL_II_Assert(error.l2_norm() < 1e-12 * interpolant.l2_norm(),
+                           ExcInternalError());
 
           deallog << fe.get_name() << ", Mask 2, P_" << q
                   << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()

@@ -63,10 +63,10 @@ namespace parallel
 
     TBBPartitioner::~TBBPartitioner()
     {
-      AssertNothrow(in_use == false,
-                    ExcInternalError(
-                      "A vector partitioner goes out of scope, but "
-                      "it appears to be still in use."));
+      DEAL_II_AssertNothrow(in_use == false,
+                            ExcInternalError(
+                              "A vector partitioner goes out of scope, but "
+                              "it appears to be still in use."));
     }
 
 

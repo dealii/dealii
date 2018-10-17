@@ -106,8 +106,8 @@ namespace Step22
   BoundaryValues<dim>::value(const Point<dim> & p,
                              const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
     if (component == 0)
       return (p[0] < 0 ? -1 : (p[0] > 0 ? 1 : 0));
     return 0;

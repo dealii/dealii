@@ -51,9 +51,10 @@ AutoDerivativeFunction<dim>::set_formula(const DifferenceFormula form)
       case FourthOrder:
         break;
       default:
-        Assert(false,
-               ExcMessage("The argument passed to this function does not "
-                          "match any known difference formula."));
+        DEAL_II_Assert(false,
+                       ExcMessage(
+                         "The argument passed to this function does not "
+                         "match any known difference formula."));
     }
 
   formula = form;
@@ -116,7 +117,7 @@ AutoDerivativeFunction<dim>::gradient(const Point<dim> & p,
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return grad;
 }
@@ -128,8 +129,8 @@ AutoDerivativeFunction<dim>::vector_gradient(
   const Point<dim> &           p,
   std::vector<Tensor<1, dim>> &gradients) const
 {
-  Assert(gradients.size() == this->n_components,
-         ExcDimensionMismatch(gradients.size(), this->n_components));
+  DEAL_II_Assert(gradients.size() == this->n_components,
+                 ExcDimensionMismatch(gradients.size(), this->n_components));
 
   switch (formula)
     {
@@ -194,7 +195,7 @@ AutoDerivativeFunction<dim>::vector_gradient(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -206,8 +207,8 @@ AutoDerivativeFunction<dim>::gradient_list(
   std::vector<Tensor<1, dim>> &  gradients,
   const unsigned int             comp) const
 {
-  Assert(gradients.size() == points.size(),
-         ExcDimensionMismatch(gradients.size(), points.size()));
+  DEAL_II_Assert(gradients.size() == points.size(),
+                 ExcDimensionMismatch(gradients.size(), points.size()));
 
   switch (formula)
     {
@@ -257,7 +258,7 @@ AutoDerivativeFunction<dim>::gradient_list(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -269,11 +270,11 @@ AutoDerivativeFunction<dim>::vector_gradient_list(
   const std::vector<Point<dim>> &           points,
   std::vector<std::vector<Tensor<1, dim>>> &gradients) const
 {
-  Assert(gradients.size() == points.size(),
-         ExcDimensionMismatch(gradients.size(), points.size()));
+  DEAL_II_Assert(gradients.size() == points.size(),
+                 ExcDimensionMismatch(gradients.size(), points.size()));
   for (unsigned int p = 0; p < points.size(); ++p)
-    Assert(gradients[p].size() == this->n_components,
-           ExcDimensionMismatch(gradients.size(), this->n_components));
+    DEAL_II_Assert(gradients[p].size() == this->n_components,
+                   ExcDimensionMismatch(gradients.size(), this->n_components));
 
   switch (formula)
     {
@@ -326,7 +327,7 @@ AutoDerivativeFunction<dim>::vector_gradient_list(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
 }
 
@@ -346,7 +347,7 @@ AutoDerivativeFunction<dim>::get_formula_of_order(const unsigned int ord)
       case 4:
         return FourthOrder;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_Assert(false, ExcNotImplemented());
     }
   return Euler;
 }

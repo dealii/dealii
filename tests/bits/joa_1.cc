@@ -214,10 +214,10 @@ Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
 {
   const unsigned int n_points = points.size();
 
-  Assert(values.size() == n_points,
-         ExcDimensionMismatch(values.size(), n_points));
+  DEAL_II_Assert(values.size() == n_points,
+                 ExcDimensionMismatch(values.size(), n_points));
 
-  Assert(component == 0, ExcIndexRange(component, 0, 1));
+  DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
   for (unsigned int i = 0; i < n_points; ++i)
     {
@@ -982,7 +982,7 @@ template <int dim>
 void
 LaplaceProblem<dim>::output_results(const unsigned int cycle) const
 {
-  Assert(cycle < 10, ExcNotImplemented());
+  DEAL_II_Assert(cycle < 10, ExcNotImplemented());
 
   std::string filename = "grid-";
   filename += ('0' + cycle);
@@ -1116,7 +1116,7 @@ LaplaceProblem<dim>::run()
 // for all, this kind of exceptions
 // is not switched off in optimized
 // mode, in contrast to the
-// <code>Assert</code> macro which we have
+// <code>DEAL_II_Assert</code> macro which we have
 // used to test against programming
 // errors. If uncaught, these
 // exceptions propagate the call tree
@@ -1174,7 +1174,7 @@ main()
   // approximately the same string as
   // would be generated if the
   // exception was thrown using the
-  // <code>Assert</code> macro. You have seen
+  // <code>DEAL_II_Assert</code> macro. You have seen
   // the output of such an exception
   // in the previous example, and you
   // then know that it contains the

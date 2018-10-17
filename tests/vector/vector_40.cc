@@ -43,9 +43,10 @@ test(Vector<double> &v, Vector<double> &w, Vector<double> &x)
   // make sure we get the expected result
   for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow(w(i) == i + 1., ExcInternalError());
-      AssertThrow(x(i) == i + 2., ExcInternalError());
-      AssertThrow(v(i) == i + 2 * (i + 1.) + 3 * (i + 2.), ExcInternalError());
+      DEAL_II_AssertThrow(w(i) == i + 1., ExcInternalError());
+      DEAL_II_AssertThrow(x(i) == i + 2., ExcInternalError());
+      DEAL_II_AssertThrow(v(i) == i + 2 * (i + 1.) + 3 * (i + 2.),
+                          ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

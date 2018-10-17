@@ -31,8 +31,8 @@ test()
   std::vector<unsigned int> values(&values_[0], &values_[2]);
   std::vector<unsigned int> output(2);
   Utilities::MPI::min(values, MPI_COMM_WORLD, output);
-  Assert(output[0] == 1, ExcInternalError());
-  Assert(output[1] == numprocs, ExcInternalError());
+  DEAL_II_Assert(output[0] == 1, ExcInternalError());
+  DEAL_II_Assert(output[1] == numprocs, ExcInternalError());
 
   if (myid == 0)
     deallog << output[0] << ' ' << output[1] << std::endl;

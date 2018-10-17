@@ -86,7 +86,7 @@ test()
   // constrained rows are zero
   for (unsigned int i = 0; i < b.size(); ++i)
     if (constraints.is_constrained(i))
-      AssertThrow(b(i) == 0, ExcInternalError());
+      DEAL_II_AssertThrow(b(i) == 0, ExcInternalError());
 }
 
 

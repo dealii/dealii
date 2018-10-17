@@ -1201,17 +1201,18 @@ namespace DoFRenumbering
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg(ExcDoFHandlerNotInitialized,
-                   "The DoFHandler on which this function should work has not "
-                   "been initialized, i.e., it doesn't appear that DoF indices "
-                   "have been distributed on it.");
+  DEAL_II_DeclExceptionMsg(
+    ExcDoFHandlerNotInitialized,
+    "The DoFHandler on which this function should work has not "
+    "been initialized, i.e., it doesn't appear that DoF indices "
+    "have been distributed on it.");
 
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcInvalidComponentOrder);
+  DEAL_II_DeclException0(ExcInvalidComponentOrder);
 
   /**
    * The function is only implemented for Discontinuous Galerkin Finite
@@ -1219,7 +1220,7 @@ namespace DoFRenumbering
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcNotDGFEM);
+  DEAL_II_DeclException0(ExcNotDGFEM);
 } // namespace DoFRenumbering
 
 

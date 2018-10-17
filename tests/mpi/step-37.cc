@@ -302,7 +302,7 @@ namespace Step37
     value(const Point<dim> &p, const unsigned int) const
     {
       const double r = p.distance(x0);
-      Assert(r > 0, ExcDivideByZero());
+      DEAL_II_Assert(r > 0, ExcDivideByZero());
       return charge / r;
     }
 

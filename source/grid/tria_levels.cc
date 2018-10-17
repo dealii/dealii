@@ -91,10 +91,12 @@ namespace internal
     TriaLevel<dim>::monitor_memory(const unsigned int true_dimension) const
     {
       (void)true_dimension;
-      Assert(2 * true_dimension * refine_flags.size() == neighbors.size(),
-             ExcMemoryInexact(refine_flags.size(), neighbors.size()));
-      Assert(2 * true_dimension * coarsen_flags.size() == neighbors.size(),
-             ExcMemoryInexact(coarsen_flags.size(), neighbors.size()));
+      DEAL_II_Assert(2 * true_dimension * refine_flags.size() ==
+                       neighbors.size(),
+                     ExcMemoryInexact(refine_flags.size(), neighbors.size()));
+      DEAL_II_Assert(2 * true_dimension * coarsen_flags.size() ==
+                       neighbors.size(),
+                     ExcMemoryInexact(coarsen_flags.size(), neighbors.size()));
     }
 
 
@@ -182,10 +184,12 @@ namespace internal
     TriaLevel<3>::monitor_memory(const unsigned int true_dimension) const
     {
       (void)true_dimension;
-      Assert(2 * true_dimension * refine_flags.size() == neighbors.size(),
-             ExcMemoryInexact(refine_flags.size(), neighbors.size()));
-      Assert(2 * true_dimension * coarsen_flags.size() == neighbors.size(),
-             ExcMemoryInexact(coarsen_flags.size(), neighbors.size()));
+      DEAL_II_Assert(2 * true_dimension * refine_flags.size() ==
+                       neighbors.size(),
+                     ExcMemoryInexact(refine_flags.size(), neighbors.size()));
+      DEAL_II_Assert(2 * true_dimension * coarsen_flags.size() ==
+                       neighbors.size(),
+                     ExcMemoryInexact(coarsen_flags.size(), neighbors.size()));
     }
 
 

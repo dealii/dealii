@@ -48,8 +48,8 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
                                    deg),
                                  std::vector<bool>(dim, true)))
 {
-  Assert(dim >= 2, ExcImpossibleInDim(dim));
-  Assert(
+  DEAL_II_Assert(dim >= 2, ExcImpossibleInDim(dim));
+  DEAL_II_Assert(
     deg >= 1,
     ExcMessage(
       "Lowest order RT_Bubbles element is degree 1, but you requested for degree 0"));
@@ -144,7 +144,8 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
   if (dim > 1)
     {
       QGaussLobatto<dim - 1> face_points(deg + 1);
-      Assert(face_points.size() == this->dofs_per_face, ExcInternalError());
+      DEAL_II_Assert(face_points.size() == this->dofs_per_face,
+                     ExcInternalError());
       for (unsigned int k = 0; k < this->dofs_per_face; ++k)
         this->generalized_face_support_points[k] = face_points.point(k);
       Quadrature<dim> faces =
@@ -192,13 +193,13 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
                                                                     high));
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
       for (unsigned int k = 0; k < quadrature->size(); ++k)
         this->generalized_support_points[current++] = quadrature->point(k);
     }
-  Assert(current == this->dofs_per_cell, ExcInternalError());
+  DEAL_II_Assert(current == this->dofs_per_cell, ExcInternalError());
 }
 
 
@@ -229,7 +230,7 @@ template <>
 std::vector<bool>
 FE_RT_Bubbles<1>::get_ria_vector(const unsigned int)
 {
-  Assert(false, ExcImpossibleInDim(1));
+  DEAL_II_Assert(false, ExcImpossibleInDim(1));
   return std::vector<bool>();
 }
 
@@ -264,14 +265,16 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
   std::vector<double> &              nodal_values) const
 {
-  Assert(support_point_values.size() == this->generalized_support_points.size(),
-         ExcDimensionMismatch(support_point_values.size(),
-                              this->generalized_support_points.size()));
-  Assert(nodal_values.size() == this->dofs_per_cell,
-         ExcDimensionMismatch(nodal_values.size(), this->dofs_per_cell));
-  Assert(support_point_values[0].size() == this->n_components(),
-         ExcDimensionMismatch(support_point_values[0].size(),
-                              this->n_components()));
+  DEAL_II_Assert(support_point_values.size() ==
+                   this->generalized_support_points.size(),
+                 ExcDimensionMismatch(support_point_values.size(),
+                                      this->generalized_support_points.size()));
+  DEAL_II_Assert(nodal_values.size() == this->dofs_per_cell,
+                 ExcDimensionMismatch(nodal_values.size(),
+                                      this->dofs_per_cell));
+  DEAL_II_Assert(support_point_values[0].size() == this->n_components(),
+                 ExcDimensionMismatch(support_point_values[0].size(),
+                                      this->n_components()));
 
   // First do interpolation on faces. There, the component
   // evaluated depends on the face direction and orientation.
@@ -289,7 +292,7 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
 
   // The remaining points form dim chunks, one for each component.
   const unsigned int istep = (this->dofs_per_cell - fbase) / dim;
-  Assert((this->dofs_per_cell - fbase) % dim == 0, ExcInternalError());
+  DEAL_II_Assert((this->dofs_per_cell - fbase) % dim == 0, ExcInternalError());
 
   f = 0;
   while (fbase < this->dofs_per_cell)
@@ -301,7 +304,7 @@ FE_RT_Bubbles<dim>::convert_generalized_support_point_values_to_dof_values(
       fbase += istep;
       ++f;
     }
-  Assert(fbase == this->dofs_per_cell, ExcInternalError());
+  DEAL_II_Assert(fbase == this->dofs_per_cell, ExcInternalError());
 }
 
 

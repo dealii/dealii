@@ -484,8 +484,9 @@ inline SolverControl::State
 Solver<VectorType>::StateCombiner::operator()(const Iterator begin,
                                               const Iterator end) const
 {
-  Assert(begin != end,
-         ExcMessage("You can't combine iterator states if no state is given."));
+  DEAL_II_Assert(begin != end,
+                 ExcMessage(
+                   "You can't combine iterator states if no state is given."));
 
   // combine the first with all of the following states
   SolverControl::State state = *begin;

@@ -60,7 +60,7 @@ test()
       for (unsigned int d = 0; d < dim; ++d)
         if (cell->center()(d) > 0)
           subdomain |= (1 << d);
-      AssertThrow(subdomain < (1 << dim), ExcInternalError());
+      DEAL_II_AssertThrow(subdomain < (1 << dim), ExcInternalError());
 
       cell->set_subdomain_id(subdomain);
     }
@@ -72,7 +72,7 @@ test()
       // check that the number of cells
       // associated is also what the respective
       // function returns
-      AssertThrow(
+      DEAL_II_AssertThrow(
         static_cast<unsigned int>(std::count(subdomain_association.begin(),
                                              subdomain_association.end(),
                                              subdomain)) ==
@@ -81,9 +81,10 @@ test()
 
       // ...and that this is also the correct
       // number
-      AssertThrow(GridTools::count_cells_with_subdomain_association(
-                    tria, subdomain) == (tria.n_active_cells() / (1 << dim)),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(
+        GridTools::count_cells_with_subdomain_association(tria, subdomain) ==
+          (tria.n_active_cells() / (1 << dim)),
+        ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

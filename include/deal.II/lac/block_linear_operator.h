@@ -218,7 +218,7 @@ public:
         typename BlockPayload::BlockType(payload, payload))
   {
     n_block_rows = []() -> unsigned int {
-      Assert(
+      DEAL_II_Assert(
         false,
         ExcMessage(
           "Uninitialized BlockLinearOperator<Range, Domain>::n_block_rows called"));
@@ -226,7 +226,7 @@ public:
     };
 
     n_block_cols = []() -> unsigned int {
-      Assert(
+      DEAL_II_Assert(
         false,
         ExcMessage(
           "Uninitialized BlockLinearOperator<Range, Domain>::n_block_cols called"));
@@ -234,7 +234,7 @@ public:
     };
 
     block = [](unsigned int, unsigned int) -> BlockType {
-      Assert(
+      DEAL_II_Assert(
         false,
         ExcMessage(
           "Uninitialized BlockLinearOperator<Range, Domain>::block called"));
@@ -423,8 +423,10 @@ namespace internal
       op.vmult = [&op](Range &v, const Domain &u) {
         const unsigned int m = op.n_block_rows();
         const unsigned int n = op.n_block_cols();
-        Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-        Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
+        DEAL_II_Assert(v.n_blocks() == m,
+                       ExcDimensionMismatch(v.n_blocks(), m));
+        DEAL_II_Assert(u.n_blocks() == n,
+                       ExcDimensionMismatch(u.n_blocks(), n));
 
         if (PointerComparison::equal(&v, &u))
           {
@@ -458,8 +460,10 @@ namespace internal
       op.vmult_add = [&op](Range &v, const Domain &u) {
         const unsigned int m = op.n_block_rows();
         const unsigned int n = op.n_block_cols();
-        Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-        Assert(u.n_blocks() == n, ExcDimensionMismatch(u.n_blocks(), n));
+        DEAL_II_Assert(v.n_blocks() == m,
+                       ExcDimensionMismatch(v.n_blocks(), m));
+        DEAL_II_Assert(u.n_blocks() == n,
+                       ExcDimensionMismatch(u.n_blocks(), n));
 
         if (PointerComparison::equal(&v, &u))
           {
@@ -490,8 +494,10 @@ namespace internal
       op.Tvmult = [&op](Domain &v, const Range &u) {
         const unsigned int n = op.n_block_cols();
         const unsigned int m = op.n_block_rows();
-        Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
-        Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+        DEAL_II_Assert(v.n_blocks() == n,
+                       ExcDimensionMismatch(v.n_blocks(), n));
+        DEAL_II_Assert(u.n_blocks() == m,
+                       ExcDimensionMismatch(u.n_blocks(), m));
 
         if (PointerComparison::equal(&v, &u))
           {
@@ -525,8 +531,10 @@ namespace internal
       op.Tvmult_add = [&op](Domain &v, const Range &u) {
         const unsigned int n = op.n_block_cols();
         const unsigned int m = op.n_block_rows();
-        Assert(v.n_blocks() == n, ExcDimensionMismatch(v.n_blocks(), n));
-        Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+        DEAL_II_Assert(v.n_blocks() == n,
+                       ExcDimensionMismatch(v.n_blocks(), n));
+        DEAL_II_Assert(u.n_blocks() == m,
+                       ExcDimensionMismatch(u.n_blocks(), m));
 
         if (PointerComparison::equal(&v, &u))
           {
@@ -639,8 +647,8 @@ block_operator(const BlockMatrixType &block_matrix)
 #ifdef DEBUG
     const unsigned int m = block_matrix.n_block_rows();
     const unsigned int n = block_matrix.n_block_cols();
-    Assert(i < m, ExcIndexRange(i, 0, m));
-    Assert(j < n, ExcIndexRange(j, 0, n));
+    DEAL_II_Assert(i < m, ExcIndexRange(i, 0, m));
+    DEAL_II_Assert(j < n, ExcIndexRange(j, 0, n));
 #endif
 
     return BlockType(block_matrix.block(i, j));
@@ -707,8 +715,8 @@ block_operator(
   return_op.n_block_cols = []() -> unsigned int { return n; };
 
   return_op.block = [ops](unsigned int i, unsigned int j) -> BlockType {
-    Assert(i < m, ExcIndexRange(i, 0, m));
-    Assert(j < n, ExcIndexRange(j, 0, n));
+    DEAL_II_Assert(i < m, ExcIndexRange(i, 0, m));
+    DEAL_II_Assert(j < n, ExcIndexRange(j, 0, n));
 
     return ops[i][j];
   };
@@ -760,9 +768,9 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
 #ifdef DEBUG
     const unsigned int m = block_matrix.n_block_rows();
     const unsigned int n = block_matrix.n_block_cols();
-    Assert(m == n, ExcDimensionMismatch(m, n));
-    Assert(i < m, ExcIndexRange(i, 0, m));
-    Assert(j < n, ExcIndexRange(j, 0, n));
+    DEAL_II_Assert(m == n, ExcDimensionMismatch(m, n));
+    DEAL_II_Assert(i < m, ExcIndexRange(i, 0, m));
+    DEAL_II_Assert(j < n, ExcIndexRange(j, 0, n));
 #endif
     if (i == j)
       return BlockType(block_matrix.block(i, j));
@@ -919,14 +927,14 @@ block_forward_substitution(
   return_op.vmult = [block_operator, diagonal_inverse](Range &      v,
                                                        const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
-    Assert(block_operator.n_block_cols() == m,
-           ExcDimensionMismatch(block_operator.n_block_cols(), m));
-    Assert(diagonal_inverse.n_block_rows() == m,
-           ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
-    Assert(diagonal_inverse.n_block_cols() == m,
-           ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
-    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+    DEAL_II_Assert(block_operator.n_block_cols() == m,
+                   ExcDimensionMismatch(block_operator.n_block_cols(), m));
+    DEAL_II_Assert(diagonal_inverse.n_block_rows() == m,
+                   ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
+    DEAL_II_Assert(diagonal_inverse.n_block_cols() == m,
+                   ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
+    DEAL_II_Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    DEAL_II_Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
 
     if (m == 0)
       return;
@@ -948,14 +956,14 @@ block_forward_substitution(
   return_op.vmult_add = [block_operator, diagonal_inverse](Range &      v,
                                                            const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
-    Assert(block_operator.n_block_cols() == m,
-           ExcDimensionMismatch(block_operator.n_block_cols(), m));
-    Assert(diagonal_inverse.n_block_rows() == m,
-           ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
-    Assert(diagonal_inverse.n_block_cols() == m,
-           ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
-    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+    DEAL_II_Assert(block_operator.n_block_cols() == m,
+                   ExcDimensionMismatch(block_operator.n_block_cols(), m));
+    DEAL_II_Assert(diagonal_inverse.n_block_rows() == m,
+                   ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
+    DEAL_II_Assert(diagonal_inverse.n_block_cols() == m,
+                   ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
+    DEAL_II_Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    DEAL_II_Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
 
     if (m == 0)
       return;
@@ -1034,14 +1042,14 @@ block_back_substitution(
   return_op.vmult = [block_operator, diagonal_inverse](Range &      v,
                                                        const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
-    Assert(block_operator.n_block_cols() == m,
-           ExcDimensionMismatch(block_operator.n_block_cols(), m));
-    Assert(diagonal_inverse.n_block_rows() == m,
-           ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
-    Assert(diagonal_inverse.n_block_cols() == m,
-           ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
-    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+    DEAL_II_Assert(block_operator.n_block_cols() == m,
+                   ExcDimensionMismatch(block_operator.n_block_cols(), m));
+    DEAL_II_Assert(diagonal_inverse.n_block_rows() == m,
+                   ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
+    DEAL_II_Assert(diagonal_inverse.n_block_cols() == m,
+                   ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
+    DEAL_II_Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    DEAL_II_Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
 
     if (m == 0)
       return;
@@ -1064,14 +1072,14 @@ block_back_substitution(
   return_op.vmult_add = [block_operator, diagonal_inverse](Range &      v,
                                                            const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
-    Assert(block_operator.n_block_cols() == m,
-           ExcDimensionMismatch(block_operator.n_block_cols(), m));
-    Assert(diagonal_inverse.n_block_rows() == m,
-           ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
-    Assert(diagonal_inverse.n_block_cols() == m,
-           ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
-    Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
-    Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
+    DEAL_II_Assert(block_operator.n_block_cols() == m,
+                   ExcDimensionMismatch(block_operator.n_block_cols(), m));
+    DEAL_II_Assert(diagonal_inverse.n_block_rows() == m,
+                   ExcDimensionMismatch(diagonal_inverse.n_block_rows(), m));
+    DEAL_II_Assert(diagonal_inverse.n_block_cols() == m,
+                   ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
+    DEAL_II_Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
+    DEAL_II_Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
     GrowingVectorMemory<typename Range::BlockType>            vector_memory;
     typename VectorMemory<typename Range::BlockType>::Pointer tmp(
       vector_memory);

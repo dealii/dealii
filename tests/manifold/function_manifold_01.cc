@@ -48,7 +48,7 @@ test(unsigned int ref = 1)
         pull_back_expression    = "x; y; z";
         break;
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
   FunctionManifold<dim, spacedim, spacedim> manifold(push_forward_expression,

@@ -36,8 +36,8 @@ test()
     for (unsigned int j = 0; j < 40; ++j)
       csp.add(i, (i + (i + 1) * (j * j + i)) % N);
 
-  Assert(csp.n_rows() == N, ExcInternalError());
-  Assert(csp.n_cols() == N, ExcInternalError());
+  DEAL_II_Assert(csp.n_rows() == N, ExcInternalError());
+  DEAL_II_Assert(csp.n_cols() == N, ExcInternalError());
   deallog << csp.n_nonzero_elements() << std::endl;
 }
 

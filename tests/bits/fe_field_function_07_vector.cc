@@ -111,10 +111,10 @@ test()
   std::vector<Tensor<1, dim>> m(2);
   fe_function.vector_gradient(point, m);
 
-  AssertThrow(std::fabs(m[0][0] - 1) < 1e-10 * std::fabs(m[0][0] + 1),
-              ExcInternalError());
-  AssertThrow(std::fabs(m[0][1]) < 1e-10, ExcInternalError());
-  AssertThrow(m[1].norm() < 1e-10, ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(m[0][0] - 1) < 1e-10 * std::fabs(m[0][0] + 1),
+                      ExcInternalError());
+  DEAL_II_AssertThrow(std::fabs(m[0][1]) < 1e-10, ExcInternalError());
+  DEAL_II_AssertThrow(m[1].norm() < 1e-10, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

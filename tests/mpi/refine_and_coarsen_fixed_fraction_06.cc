@@ -59,14 +59,14 @@ test()
 
   tr.refine_global(initial_refinement);
 
-  Assert(tr.n_active_cells() == 768, ExcInternalError());
+  DEAL_II_Assert(tr.n_active_cells() == 768, ExcInternalError());
 
   // now read indicators
   Vector<float> indicators(tr.n_active_cells());
   {
     std::ifstream in(SOURCE_DIR
                      "/refine_and_coarsen_fixed_fraction_06/indicators");
-    Assert(in, ExcMessage("File missing"));
+    DEAL_II_Assert(in, ExcMessage("File missing"));
     for (unsigned int i = 0; i < indicators.size(); ++i)
       in >> indicators(i);
   }

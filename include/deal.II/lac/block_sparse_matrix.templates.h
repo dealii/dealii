@@ -57,10 +57,10 @@ template <typename number>
 BlockSparseMatrix<number> &
 BlockSparseMatrix<number>::operator=(const BlockSparseMatrix<number> &m)
 {
-  Assert(this->row_block_indices == m.row_block_indices,
-         ExcBlockDimensionMismatch());
-  Assert(this->column_block_indices == m.column_block_indices,
-         ExcBlockDimensionMismatch());
+  DEAL_II_Assert(this->row_block_indices == m.row_block_indices,
+                 ExcBlockDimensionMismatch());
+  DEAL_II_Assert(this->column_block_indices == m.column_block_indices,
+                 ExcBlockDimensionMismatch());
 
   // this operator does not do
   // anything except than checking

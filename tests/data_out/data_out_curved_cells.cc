@@ -190,7 +190,7 @@ curved_grid(std::ofstream &out)
                   for (unsigned int i = 0; i < 2; ++i)
                     m[i][face->dof_index(0)] = 0.;
                 else
-                  Assert(false, ExcInternalError());
+                  DEAL_II_Assert(false, ExcInternalError());
               }
           }
     }

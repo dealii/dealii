@@ -43,9 +43,9 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   const Point<spacedim> &                                     p) const
 {
   // The function doesn't make physical sense for dim=1
-  Assert(dim > 1, ExcNotImplemented());
+  DEAL_II_Assert(dim > 1, ExcNotImplemented());
   // Not implemented for higher dimensions
-  Assert(dim <= 3, ExcNotImplemented());
+  DEAL_II_Assert(dim <= 3, ExcNotImplemented());
 
   Point<dim> unit_cell_pt = transform_real_to_unit_cell(cell, p);
 

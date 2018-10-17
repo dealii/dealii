@@ -26,10 +26,11 @@
 
 #include "../tests.h"
 
-DeclException2(ExcNonEqual,
-               double,
-               double,
-               << "Left compare: " << arg1 << ", right compare: " << arg2);
+DEAL_II_DeclException2(ExcNonEqual,
+                       double,
+                       double,
+                       << "Left compare: " << arg1
+                       << ", right compare: " << arg2);
 
 void
 test()
@@ -90,24 +91,24 @@ test()
   v1 = 2;
   // check assignment in initial state
   for (unsigned int i = 0; i < v0.local_size(); ++i)
-    AssertThrow(v0.local_element(i) == 1.,
-                ExcNonEqual(v0.local_element(i), 1.));
+    DEAL_II_AssertThrow(v0.local_element(i) == 1.,
+                        ExcNonEqual(v0.local_element(i), 1.));
   for (unsigned int i = 0; i < v1.local_size(); ++i)
-    AssertThrow(v1.local_element(i) == 2.,
-                ExcNonEqual(v1.local_element(i), 2.));
+    DEAL_II_AssertThrow(v1.local_element(i) == 2.,
+                        ExcNonEqual(v1.local_element(i), 2.));
 
   // check ghost elements in initial state
   v0.update_ghost_values();
   v1.update_ghost_values();
-  AssertThrow(v0(2) == 1., ExcNonEqual(v0(2), 1.));
+  DEAL_II_AssertThrow(v0(2) == 1., ExcNonEqual(v0(2), 1.));
   if (numproc > 2)
-    AssertThrow(v0(8) == 1., ExcNonEqual(v0(8), 2.));
-  AssertThrow(v1(0) == 2., ExcNonEqual(v1(0), 2.));
-  AssertThrow(v1(2) == 2., ExcNonEqual(v1(2), 2.));
+    DEAL_II_AssertThrow(v0(8) == 1., ExcNonEqual(v0(8), 2.));
+  DEAL_II_AssertThrow(v1(0) == 2., ExcNonEqual(v1(0), 2.));
+  DEAL_II_AssertThrow(v1(2) == 2., ExcNonEqual(v1(2), 2.));
   if (numproc > 2)
     {
-      AssertThrow(v1(8) == 2., ExcNonEqual(v1(8), 2.));
-      AssertThrow(v1(10) == 2., ExcNonEqual(v1(10), 2.));
+      DEAL_II_AssertThrow(v1(8) == 2., ExcNonEqual(v1(8), 2.));
+      DEAL_II_AssertThrow(v1(10) == 2., ExcNonEqual(v1(10), 2.));
     }
   if (myid == 0)
     deallog << "Initial set and ghost update OK" << std::endl;
@@ -115,29 +116,29 @@ test()
 
   // now swap v1 and v0
   v0.swap(v1);
-  AssertDimension(v0.local_size(), local_size1);
-  AssertDimension(v1.local_size(), actual_local_size0);
-  AssertDimension(v0.size(), global_size1);
-  AssertDimension(v1.size(), global_size0);
+  DEAL_II_AssertDimension(v0.local_size(), local_size1);
+  DEAL_II_AssertDimension(v1.local_size(), actual_local_size0);
+  DEAL_II_AssertDimension(v0.size(), global_size1);
+  DEAL_II_AssertDimension(v1.size(), global_size0);
   for (unsigned int i = 0; i < local_size1; ++i)
-    AssertThrow(v0.local_element(i) == 2.,
-                ExcNonEqual(v0.local_element(i), 2.));
+    DEAL_II_AssertThrow(v0.local_element(i) == 2.,
+                        ExcNonEqual(v0.local_element(i), 2.));
   for (unsigned int i = 0; i < actual_local_size0; ++i)
-    AssertThrow(v1.local_element(i) == 1.,
-                ExcNonEqual(v1.local_element(i), 1.));
+    DEAL_II_AssertThrow(v1.local_element(i) == 1.,
+                        ExcNonEqual(v1.local_element(i), 1.));
   if (myid == 0)
     deallog << "First swap OK" << std::endl;
   v0.update_ghost_values();
   v1.update_ghost_values();
-  AssertThrow(v1(2) == 1., ExcNonEqual(v1(2), 1.));
+  DEAL_II_AssertThrow(v1(2) == 1., ExcNonEqual(v1(2), 1.));
   if (numproc > 2)
-    AssertThrow(v1(8) == 1., ExcNonEqual(v1(8), 1.));
-  AssertThrow(v0(0) == 2., ExcNonEqual(v0(0), 2.));
-  AssertThrow(v0(2) == 2., ExcNonEqual(v0(2), 2.));
+    DEAL_II_AssertThrow(v1(8) == 1., ExcNonEqual(v1(8), 1.));
+  DEAL_II_AssertThrow(v0(0) == 2., ExcNonEqual(v0(0), 2.));
+  DEAL_II_AssertThrow(v0(2) == 2., ExcNonEqual(v0(2), 2.));
   if (numproc > 2)
     {
-      AssertThrow(v0(8) == 2., ExcNonEqual(v0(8), 2.));
-      AssertThrow(v0(10) == 2., ExcNonEqual(v0(10), 2.));
+      DEAL_II_AssertThrow(v0(8) == 2., ExcNonEqual(v0(8), 2.));
+      DEAL_II_AssertThrow(v0(10) == 2., ExcNonEqual(v0(10), 2.));
     }
   if (myid == 0)
     deallog << "Ghost values after first swap OK" << std::endl;
@@ -148,15 +149,15 @@ test()
   v1 = 42.;
   v0.update_ghost_values();
   v1.update_ghost_values();
-  AssertThrow(v1(2) == 42., ExcNonEqual(v1(2), 42.));
+  DEAL_II_AssertThrow(v1(2) == 42., ExcNonEqual(v1(2), 42.));
   if (numproc > 2)
-    AssertThrow(v1(8) == 42., ExcNonEqual(v1(8), 42.));
-  AssertThrow(v0(0) == 7., ExcNonEqual(v0(0), 7.));
-  AssertThrow(v0(2) == 7., ExcNonEqual(v0(2), 7.));
+    DEAL_II_AssertThrow(v1(8) == 42., ExcNonEqual(v1(8), 42.));
+  DEAL_II_AssertThrow(v0(0) == 7., ExcNonEqual(v0(0), 7.));
+  DEAL_II_AssertThrow(v0(2) == 7., ExcNonEqual(v0(2), 7.));
   if (numproc > 2)
     {
-      AssertThrow(v0(8) == 7., ExcNonEqual(v0(8), 7.));
-      AssertThrow(v0(10) == 7., ExcNonEqual(v0(10), 7.));
+      DEAL_II_AssertThrow(v0(8) == 7., ExcNonEqual(v0(8), 7.));
+      DEAL_II_AssertThrow(v0(10) == 7., ExcNonEqual(v0(10), 7.));
     }
   if (myid == 0)
     deallog << "Ghost values after re-set OK" << std::endl;
@@ -164,21 +165,21 @@ test()
   // swap with an empty vector
   LinearAlgebra::distributed::Vector<double> v2;
   v2.swap(v0);
-  AssertDimension(v0.size(), 0);
-  AssertDimension(v2.size(), global_size1);
-  AssertDimension(v2.local_size(), local_size1);
+  DEAL_II_AssertDimension(v0.size(), 0);
+  DEAL_II_AssertDimension(v2.size(), global_size1);
+  DEAL_II_AssertDimension(v2.local_size(), local_size1);
   for (int i = my_start1; i < my_end1; ++i)
-    AssertThrow(v2(i) == 7., ExcNonEqual(v2(i), 7.));
+    DEAL_II_AssertThrow(v2(i) == 7., ExcNonEqual(v2(i), 7.));
   if (myid == 0)
     deallog << "Second swap OK" << std::endl;
   v2 = -1.;
   v2.update_ghost_values();
-  AssertThrow(v2(0) == -1., ExcNonEqual(v2(0), -1.));
-  AssertThrow(v2(2) == -1., ExcNonEqual(v2(2), -1.));
+  DEAL_II_AssertThrow(v2(0) == -1., ExcNonEqual(v2(0), -1.));
+  DEAL_II_AssertThrow(v2(2) == -1., ExcNonEqual(v2(2), -1.));
   if (numproc > 2)
     {
-      AssertThrow(v2(8) == -1., ExcNonEqual(v2(8), -1.));
-      AssertThrow(v2(10) == -1., ExcNonEqual(v2(10), -1.));
+      DEAL_II_AssertThrow(v2(8) == -1., ExcNonEqual(v2(8), -1.));
+      DEAL_II_AssertThrow(v2(10) == -1., ExcNonEqual(v2(10), -1.));
     }
   if (myid == 0)
     deallog << "Ghost values after second swap OK" << std::endl;

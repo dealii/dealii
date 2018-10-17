@@ -72,8 +72,8 @@ test()
         {
           deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
 
-          Assert(tr.n_global_active_cells() == tr.n_active_cells(),
-                 ExcInternalError());
+          DEAL_II_Assert(tr.n_global_active_cells() == tr.n_active_cells(),
+                         ExcInternalError());
         }
 
       const unsigned int checksum = tr.get_checksum();

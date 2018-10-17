@@ -77,10 +77,10 @@ test()
 
   // verify correct value
   for (int i = begin_index; i < end_index; ++i)
-    Assert(distributed(i) == 3, ExcInternalError());
+    DEAL_II_Assert(distributed(i) == 3, ExcInternalError());
 
   for (int i = local_begin; i < local_end; ++i)
-    Assert(ghosted(i) == 3, ExcInternalError());
+    DEAL_II_Assert(ghosted(i) == 3, ExcInternalError());
 }
 
 

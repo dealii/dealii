@@ -50,11 +50,12 @@ BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase(
   , columns(0)
 {
   (void)s;
-  Assert(s.rows == 0 && s.columns == 0,
-         ExcMessage(
-           "This constructor can only be called if the provided argument "
-           "is the sparsity pattern for an empty matrix. This constructor can "
-           "not be used to copy-construct a non-empty sparsity pattern."));
+  DEAL_II_Assert(
+    s.rows == 0 && s.columns == 0,
+    ExcMessage(
+      "This constructor can only be called if the provided argument "
+      "is the sparsity pattern for an empty matrix. This constructor can "
+      "not be used to copy-construct a non-empty sparsity pattern."));
 }
 
 
@@ -111,8 +112,9 @@ BlockSparsityPatternBase<SparsityPatternBase> &
 BlockSparsityPatternBase<SparsityPatternBase>::
 operator=(const BlockSparsityPatternBase<SparsityPatternBase> &bsp)
 {
-  Assert(rows == bsp.rows, ExcDimensionMismatch(rows, bsp.rows));
-  Assert(columns == bsp.columns, ExcDimensionMismatch(columns, bsp.columns));
+  DEAL_II_Assert(rows == bsp.rows, ExcDimensionMismatch(rows, bsp.rows));
+  DEAL_II_Assert(columns == bsp.columns,
+                 ExcDimensionMismatch(columns, bsp.columns));
   // copy objects
   for (size_type i = 0; i < rows; ++i)
     for (size_type j = 0; j < columns; ++j)
@@ -141,8 +143,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::collect_sizes()
   // sizes
   for (size_type c = 1; c < columns; ++c)
     for (size_type r = 0; r < rows; ++r)
-      Assert(row_sizes[r] == sub_objects[r][c]->n_rows(),
-             ExcIncompatibleRowNumbers(r, 0, r, c));
+      DEAL_II_Assert(row_sizes[r] == sub_objects[r][c]->n_rows(),
+                     ExcIncompatibleRowNumbers(r, 0, r, c));
 
   // finally initialize the row
   // indices with this array
@@ -154,8 +156,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::collect_sizes()
     col_sizes[c] = sub_objects[0][c]->n_cols();
   for (size_type r = 1; r < rows; ++r)
     for (size_type c = 0; c < columns; ++c)
-      Assert(col_sizes[c] == sub_objects[r][c]->n_cols(),
-             ExcIncompatibleRowNumbers(0, c, r, c));
+      DEAL_II_Assert(col_sizes[c] == sub_objects[r][c]->n_cols(),
+                     ExcIncompatibleRowNumbers(0, c, r, c));
 
   // finally initialize the row
   // indices with this array
@@ -341,7 +343,7 @@ BlockSparsityPattern::reinit(
   const BlockIndices &                          cols,
   const std::vector<std::vector<unsigned int>> &row_lengths)
 {
-  AssertDimension(row_lengths.size(), cols.size());
+  DEAL_II_AssertDimension(row_lengths.size(), cols.size());
 
   this->reinit(rows.size(), cols.size());
   for (size_type j = 0; j < cols.size(); ++j)
@@ -364,8 +366,8 @@ BlockSparsityPattern::reinit(
           }
       }
   this->collect_sizes();
-  Assert(this->row_indices == rows, ExcInternalError());
-  Assert(this->column_indices == cols, ExcInternalError());
+  DEAL_II_Assert(this->row_indices == rows, ExcInternalError());
+  DEAL_II_Assert(this->column_indices == cols, ExcInternalError());
 }
 
 
@@ -645,7 +647,8 @@ namespace TrilinosWrappers
     const std::vector<IndexSet> &writable_rows,
     const MPI_Comm &             communicator)
   {
-    AssertDimension(writable_rows.size(), row_parallel_partitioning.size());
+    DEAL_II_AssertDimension(writable_rows.size(),
+                            row_parallel_partitioning.size());
     dealii::BlockSparsityPatternBase<SparsityPattern>::reinit(
       row_parallel_partitioning.size(), col_parallel_partitioning.size());
     for (size_type i = 0; i < row_parallel_partitioning.size(); ++i)

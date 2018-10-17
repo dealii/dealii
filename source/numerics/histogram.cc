@@ -58,15 +58,16 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
                     const unsigned int                 n_intervals,
                     const IntervalSpacing              interval_spacing)
 {
-  Assert(values.size() > 0,
-         ExcMessage(
-           "Your input data needs to contain at least one input vector."));
-  Assert(n_intervals > 0,
-         ExcMessage("The number of intervals needs to be at least one."));
+  DEAL_II_Assert(
+    values.size() > 0,
+    ExcMessage("Your input data needs to contain at least one input vector."));
+  DEAL_II_Assert(n_intervals > 0,
+                 ExcMessage(
+                   "The number of intervals needs to be at least one."));
   for (unsigned int i = 0; i < values.size(); ++i)
-    Assert(values[i].size() > 0, ExcEmptyData());
-  Assert(values.size() == y_values_.size(),
-         ExcIncompatibleArraySize(values.size(), y_values_.size()));
+    DEAL_II_Assert(values[i].size() > 0, ExcEmptyData());
+  DEAL_II_Assert(values.size() == y_values_.size(),
+                 ExcIncompatibleArraySize(values.size(), y_values_.size()));
 
   // store y_values
   y_values = y_values_;
@@ -126,7 +127,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
         }
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     }
 
   // move right bound arbitrarily if
@@ -175,7 +176,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
         };
 
       default:
-        Assert(false, ExcInternalError());
+        DEAL_II_Assert(false, ExcInternalError());
     };
 
   // fill the other lists of intervals
@@ -224,10 +225,10 @@ Histogram::evaluate(const Vector<number> &values,
 void
 Histogram::write_gnuplot(std::ostream &out) const
 {
-  AssertThrow(out, ExcIO());
-  Assert(!intervals.empty(),
-         ExcMessage("There is nothing to write into the output file. "
-                    "Did you forget to call the evaluate() function?"));
+  DEAL_II_AssertThrow(out, ExcIO());
+  DEAL_II_Assert(!intervals.empty(),
+                 ExcMessage("There is nothing to write into the output file. "
+                            "Did you forget to call the evaluate() function?"));
 
   // do a simple 2d plot, if only
   // one data set is available
@@ -272,7 +273,7 @@ Histogram::write_gnuplot(std::ostream &out) const
         out << std::endl;
       };
 
-  AssertThrow(out, ExcIO());
+  DEAL_II_AssertThrow(out, ExcIO());
 }
 
 
@@ -294,7 +295,7 @@ Histogram::parse_interval_spacing(const std::string &name)
     return logarithmic;
   else
     {
-      AssertThrow(false, ExcInvalidName(name));
+      DEAL_II_AssertThrow(false, ExcInvalidName(name));
 
       return linear;
     };

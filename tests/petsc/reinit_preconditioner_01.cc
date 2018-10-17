@@ -56,8 +56,8 @@ test()
   PETScWrappers::MPI::SparseMatrix mat;
   mat.reinit(local_active, local_active, csp, MPI_COMM_WORLD);
 
-  Assert(mat.n() == numproc * 2, ExcInternalError());
-  Assert(mat.m() == numproc * 2, ExcInternalError());
+  DEAL_II_Assert(mat.n() == numproc * 2, ExcInternalError());
+  DEAL_II_Assert(mat.m() == numproc * 2, ExcInternalError());
 
   // set local values
   mat.set(myid * 2, myid * 2, 1.0 + myid * 2.0);

@@ -232,7 +232,7 @@ LaplaceProblem<BlockVector<double>,
         };
 
       default:
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
     };
 }
 
@@ -275,7 +275,7 @@ LaplaceProblem<BlockVector<double>,
         };
 
       default:
-        AssertThrow(false, ExcNotImplemented());
+        DEAL_II_AssertThrow(false, ExcNotImplemented());
     };
 }
 
@@ -449,7 +449,8 @@ main()
   deallog << "Checking " << n_datasets << " data sets." << std::endl;
 
   for (unsigned int i = 1; i < n_datasets; ++i)
-    Assert(solutions[i].size() == solutions[i].size(), ExcInternalError());
+    DEAL_II_Assert(solutions[i].size() == solutions[i].size(),
+                   ExcInternalError());
 
   deallog << std::setprecision(16);
   for (unsigned int i = 1; i < n_datasets; ++i)
@@ -468,7 +469,7 @@ main()
                     << ", sol[i][j]=" << solutions[i][j]
                     << ", sol[0][j]=" << solutions[0][j] << std::endl;
             deallog << std::flush;
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
           };
     };
 

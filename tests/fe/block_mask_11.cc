@@ -45,10 +45,10 @@ test()
   BlockMask m = m1 | m2;
 
   // verify equality
-  AssertThrow(m == BlockMask(v), ExcInternalError());
-  AssertThrow(!(m == m1), ExcInternalError());
-  AssertThrow(!(m == BlockMask(v1)), ExcInternalError());
-  AssertThrow(!(m == BlockMask(v2)), ExcInternalError());
+  DEAL_II_AssertThrow(m == BlockMask(v), ExcInternalError());
+  DEAL_II_AssertThrow(!(m == m1), ExcInternalError());
+  DEAL_II_AssertThrow(!(m == BlockMask(v1)), ExcInternalError());
+  DEAL_II_AssertThrow(!(m == BlockMask(v2)), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -103,7 +103,7 @@ test()
           {
             deallog << "expected value: " << F<dim>().value(cell->vertex(i))
                     << std::endl;
-            AssertThrow(false, ExcInternalError());
+            DEAL_II_AssertThrow(false, ExcInternalError());
           }
       }
 }

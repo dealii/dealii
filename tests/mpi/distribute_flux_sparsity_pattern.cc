@@ -279,9 +279,10 @@ namespace LinearAdvectionTest
                           }
                         else
                           {
-                            Assert(neighbor_cell->is_ghost(),
-                                   ExcMessage("All neighbors should be locally "
-                                              "owned or ghost cells."));
+                            DEAL_II_Assert(neighbor_cell->is_ghost(),
+                                           ExcMessage(
+                                             "All neighbors should be locally "
+                                             "owned or ghost cells."));
                             if (current_cell->level() ==
                                   neighbor_cell->level() &&
                                 current_cell->subdomain_id() <
@@ -296,8 +297,8 @@ namespace LinearAdvectionTest
                       {
                         const unsigned int neighbor_face_n =
                           current_cell->neighbor_face_no(face_n);
-                        AssertThrow(!neighbor_is_level_lower,
-                                    ExcInternalError());
+                        DEAL_II_AssertThrow(!neighbor_is_level_lower,
+                                            ExcInternalError());
                         neighbor_face_values.reinit(neighbor_cell,
                                                     neighbor_face_n);
 

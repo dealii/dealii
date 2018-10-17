@@ -38,14 +38,14 @@ test()
   parallel_partitioner.compress();
   LinearAlgebra::EpetraWrappers::Vector a(parallel_partitioner, MPI_COMM_WORLD);
 
-  AssertThrow(a.all_zero() == true, ExcInternalError());
+  DEAL_II_AssertThrow(a.all_zero() == true, ExcInternalError());
 
   IndexSet                               read_write_index_set(10);
   LinearAlgebra::ReadWriteVector<double> read_write(parallel_partitioner);
   if (rank == 0)
     read_write[0] = 1.;
   a.import(read_write, VectorOperation::insert);
-  AssertThrow(a.all_zero() == false, ExcInternalError());
+  DEAL_II_AssertThrow(a.all_zero() == false, ExcInternalError());
 }
 
 

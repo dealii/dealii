@@ -31,7 +31,7 @@
 void create_star_structured_cylinder(Triangulation<3> & coarse_grid,
                                      const unsigned int n_cells)
 {
-  Assert(n_cells > 1, ExcNotImplemented());
+  DEAL_II_Assert(n_cells > 1, ExcNotImplemented());
 
   std::vector<Point<3>> points(2 * (1 + 2 * n_cells));
   points[0] = Point<3>();

@@ -60,9 +60,10 @@ test()
   for (unsigned int i = 0; i < 3; ++i)
     for (unsigned int j = 0; j < 3; ++j)
       {
-        Assert(GridTools::have_same_coarse_mesh(*dof_handler[i],
-                                                *dof_handler[j]) == (i == j),
-               ExcInternalError());
+        DEAL_II_Assert(GridTools::have_same_coarse_mesh(*dof_handler[i],
+                                                        *dof_handler[j]) ==
+                         (i == j),
+                       ExcInternalError());
 
         deallog << "meshes " << i << " and " << j << ": "
                 << (GridTools::have_same_coarse_mesh(*dof_handler[i],

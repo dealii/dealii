@@ -289,7 +289,7 @@ namespace Step36
         else if (cell->material_id() == pou_material_id)
           cell->set_active_fe_index(pou_fe_index);
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     GridTools::partition_triangulation(n_mpi_processes, triangulation);
@@ -501,7 +501,7 @@ namespace Step36
             }
           else // POUFEM
             {
-              Assert(cell->active_fe_index() == 1, ExcInternalError());
+              DEAL_II_Assert(cell->active_fe_index() == 1, ExcInternalError());
 
               enrichment.value_list(fe_values.get_quadrature_points(),
                                     enrichment_values);
@@ -595,8 +595,9 @@ namespace Step36
                         }
                       else // pou - pou
                         {
-                          Assert(i_group == pou_group && j_group == pou_group,
-                                 ExcInternalError());
+                          DEAL_II_Assert(i_group == pou_group &&
+                                           j_group == pou_group,
+                                         ExcInternalError());
 
                           for (unsigned int q_point = 0; q_point < n_q_points;
                                ++q_point)
@@ -777,13 +778,13 @@ namespace Step36
     std::vector<Vector<double>> &  computed_quantities) const
   {
     const unsigned int n_quadrature_points = solution_values.size();
-    Assert(computed_quantities.size() == n_quadrature_points,
-           ExcInternalError());
+    DEAL_II_Assert(computed_quantities.size() == n_quadrature_points,
+                   ExcInternalError());
     for (unsigned int q = 0; q < n_quadrature_points; ++q)
       {
-        Assert(solution_values[q].size() == 2,
-               ExcDimensionMismatch(solution_values[q].size(),
-                                    2)); // FESystem with 2 components
+        DEAL_II_Assert(solution_values[q].size() == 2,
+                       ExcDimensionMismatch(solution_values[q].size(),
+                                            2)); // FESystem with 2 components
 
         computed_quantities[q](0) =
           (solution_values[q](0) +
@@ -807,7 +808,7 @@ namespace Step36
         fe_index(index) = cell->active_fe_index();
     }
 
-    Assert(cycle < 10, ExcNotImplemented());
+    DEAL_II_Assert(cycle < 10, ExcNotImplemented());
     if (this_mpi_process == 0)
       {
         std::string filename = "solution-";
@@ -889,7 +890,7 @@ namespace Step36
         assemble_system();
 
         const std::pair<unsigned int, double> res = solve();
-        AssertThrow(res.second < 5e-8, ExcInternalError());
+        DEAL_II_AssertThrow(res.second < 5e-8, ExcInternalError());
 
         estimate_error();
         // output_results(cycle);

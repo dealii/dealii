@@ -699,12 +699,12 @@ namespace LinearAlgebra
        *
        * @ingroup Exceptions
        */
-      DeclException0(ExcVectorTypeNotCompatible);
+      DEAL_II_DeclException0(ExcVectorTypeNotCompatible);
 
       /**
        * Exception
        */
-      DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
+      DEAL_II_DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
       //@}
     };
 

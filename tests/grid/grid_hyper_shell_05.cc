@@ -52,8 +52,8 @@ check(const unsigned int n)
        cell != tria.end();
        ++cell)
     for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-      AssertThrow(cell->face(f)->at_boundary() == cell->at_boundary(f),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(cell->face(f)->at_boundary() == cell->at_boundary(f),
+                          ExcInternalError());
 
   // also output something slightly
   // more useful

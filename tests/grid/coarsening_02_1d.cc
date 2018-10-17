@@ -96,7 +96,8 @@ test()
            ++cell, ++index)
         if (flags[index])
           cell->set_refine_flag();
-      Assert(index == triangulation.n_active_cells(), ExcInternalError());
+      DEAL_II_Assert(index == triangulation.n_active_cells(),
+                     ExcInternalError());
 
       // flag all other cells for coarsening
       // (this should ensure that at least
@@ -130,8 +131,8 @@ test()
 
       // verify that none of the cells
       // violates the level-1-at-vertex rule
-      AssertThrow(satisfies_level1_at_vertex_rule(triangulation),
-                  ExcInternalError());
+      DEAL_II_AssertThrow(satisfies_level1_at_vertex_rule(triangulation),
+                          ExcInternalError());
 
 
       deallog << "Iteration " << i

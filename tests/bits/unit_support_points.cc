@@ -35,8 +35,9 @@ void
 check_cell1(const FiniteElement<dim> &fe)
 {
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-    AssertThrow(fe.get_unit_support_points()[i] == fe.unit_support_point(i),
-                ExcInternalError());
+    DEAL_II_AssertThrow(fe.get_unit_support_points()[i] ==
+                          fe.unit_support_point(i),
+                        ExcInternalError());
   deallog << "dim=" << dim << ", cell=ok" << std::endl;
 }
 
@@ -46,9 +47,9 @@ void
 check_face1(const FiniteElement<dim> &fe)
 {
   for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
-    AssertThrow(fe.get_unit_face_support_points()[i] ==
-                  fe.unit_face_support_point(i),
-                ExcInternalError());
+    DEAL_II_AssertThrow(fe.get_unit_face_support_points()[i] ==
+                          fe.unit_face_support_point(i),
+                        ExcInternalError());
   deallog << "dim=" << dim << ", face=ok" << std::endl;
 }
 

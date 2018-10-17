@@ -41,7 +41,8 @@ test(TrilinosWrappers::MPI::Vector &v)
 
   // then check the norm
   const double eps = typeid(TrilinosScalar) == typeid(double) ? 1e-14 : 1e-5;
-  AssertThrow(fabs(v.l2_norm() - std::sqrt(norm)) < eps, ExcInternalError());
+  DEAL_II_AssertThrow(fabs(v.l2_norm() - std::sqrt(norm)) < eps,
+                      ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

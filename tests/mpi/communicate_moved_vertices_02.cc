@@ -67,9 +67,9 @@ test()
         const_cast<Point<dim> &>(tr.get_vertices()[v]) += shift;
         ++n_vertices_moved;
       }
-  AssertThrow(Utilities::MPI::sum(n_vertices_moved, MPI_COMM_WORLD) ==
-                (dim == 2 ? 15 : 75),
-              ExcInternalError());
+  DEAL_II_AssertThrow(Utilities::MPI::sum(n_vertices_moved, MPI_COMM_WORLD) ==
+                        (dim == 2 ? 15 : 75),
+                      ExcInternalError());
 
   tr.communicate_locally_moved_vertices(moved_locally_owned_vertices);
 

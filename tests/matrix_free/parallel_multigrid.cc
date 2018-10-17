@@ -175,8 +175,8 @@ public:
   number
   el(const unsigned int row, const unsigned int col) const
   {
-    AssertThrow(false,
-                ExcMessage("Matrix-free does not allow for entry access"));
+    DEAL_II_AssertThrow(
+      false, ExcMessage("Matrix-free does not allow for entry access"));
     return number();
   }
 
@@ -187,15 +187,15 @@ public:
     if (!vector.partitioners_are_compatible(
           *data.get_dof_info(0).vector_partitioner))
       data.initialize_dof_vector(vector);
-    Assert(vector.partitioners_are_globally_compatible(
-             *data.get_dof_info(0).vector_partitioner),
-           ExcInternalError());
+    DEAL_II_Assert(vector.partitioners_are_globally_compatible(
+                     *data.get_dof_info(0).vector_partitioner),
+                   ExcInternalError());
   }
 
   const LinearAlgebra::distributed::Vector<number> &
   get_matrix_diagonal_inverse() const
   {
-    Assert(inverse_diagonal_entries.size() > 0, ExcNotInitialized());
+    DEAL_II_Assert(inverse_diagonal_entries.size() > 0, ExcNotInitialized());
     return inverse_diagonal_entries;
   }
 

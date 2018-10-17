@@ -30,8 +30,8 @@ test()
   unsigned int values[2] = {1 + myid, numprocs + myid};
   unsigned int maxima[2];
   Utilities::MPI::max(values, MPI_COMM_WORLD, maxima);
-  Assert(maxima[0] == numprocs, ExcInternalError());
-  Assert(maxima[1] == 2 * numprocs - 1, ExcInternalError());
+  DEAL_II_Assert(maxima[0] == numprocs, ExcInternalError());
+  DEAL_II_Assert(maxima[1] == 2 * numprocs - 1, ExcInternalError());
 
   if (myid == 0)
     deallog << maxima[0] << ' ' << maxima[1] << std::endl;

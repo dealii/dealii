@@ -31,7 +31,8 @@ test()
   a.import(read_write, VectorOperation::insert);
 
   a.reinit(size / 2);
-  AssertThrow(a.l1_norm() == 0., ExcMessage("reinit did not zero the entry"));
+  DEAL_II_AssertThrow(a.l1_norm() == 0.,
+                      ExcMessage("reinit did not zero the entry"));
 }
 
 

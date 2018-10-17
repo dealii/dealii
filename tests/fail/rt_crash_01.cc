@@ -73,7 +73,7 @@ check_this(const DoFHandler<dim> &dof_handler)
   // should be close around 1 (the value of
   // the original function)
   for (unsigned int i = 0; i < solution.size(); ++i)
-    Assert(std::fabs(solution(i) - 1) < 1e-6, ExcInternalError());
+    DEAL_II_Assert(std::fabs(solution(i) - 1) < 1e-6, ExcInternalError());
 
   // Evaluate error
   Vector<double> cellwise_errors(
@@ -96,5 +96,5 @@ check_this(const DoFHandler<dim> &dof_handler)
     data_out.write_gnuplot(deallog.get_file_stream());
   }
 
-  Assert(p_l2_error < 1e-12, ExcInternalError());
+  DEAL_II_Assert(p_l2_error < 1e-12, ExcInternalError());
 }

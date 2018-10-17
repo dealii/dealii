@@ -201,11 +201,12 @@ SolverFIRE<VectorType>::AdditionalData::AdditionalData(
   , maximum_timestep(maximum_timestep)
   , maximum_linfty_norm(maximum_linfty_norm)
 {
-  AssertThrow(initial_timestep > 0. && maximum_timestep > 0. &&
-                maximum_linfty_norm > 0.,
-              ExcMessage("Expected positive values for initial_timestep, "
-                         "maximum_timestep and maximum_linfty_norm but one "
-                         "or more of the these values are not positive."));
+  DEAL_II_AssertThrow(initial_timestep > 0. && maximum_timestep > 0. &&
+                        maximum_linfty_norm > 0.,
+                      ExcMessage(
+                        "Expected positive values for initial_timestep, "
+                        "maximum_timestep and maximum_linfty_norm but one "
+                        "or more of the these values are not positive."));
 }
 
 
@@ -309,7 +310,7 @@ SolverFIRE<VectorType>::solve(
           const real_type velocities_norm_squared = velocities * velocities;
 
           // Check if we divide by zero in DEBUG mode.
-          Assert(gradient_norm_squared > 0., ExcInternalError());
+          DEAL_II_Assert(gradient_norm_squared > 0., ExcInternalError());
 
           // beta = - alpha |V|/|G|
           const real_type beta =
@@ -351,8 +352,9 @@ SolverFIRE<VectorType>::solve(
 
   // In the case of failure: throw exception.
   if (conv != SolverControl::success)
-    AssertThrow(false,
-                SolverControl::NoConvergence(iter, gradients * gradients));
+    DEAL_II_AssertThrow(false,
+                        SolverControl::NoConvergence(iter,
+                                                     gradients * gradients));
 }
 
 

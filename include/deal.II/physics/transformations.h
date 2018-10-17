@@ -961,8 +961,8 @@ Physics::Transformations::Rotations::rotation_matrix_3d(
   const Point<3, Number> &axis,
   const Number &          angle)
 {
-  Assert(std::abs(axis.norm() - 1.0) < 1e-9,
-         ExcMessage("The supplied axial vector is not a unit vector."));
+  DEAL_II_Assert(std::abs(axis.norm() - 1.0) < 1e-9,
+                 ExcMessage("The supplied axial vector is not a unit vector."));
   const Number c              = std::cos(angle);
   const Number s              = std::sin(angle);
   const Number t              = 1. - c;

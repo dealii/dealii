@@ -46,8 +46,9 @@ namespace internal
             const int child_id =
               dealii::internal::p4est::functions<dim>::quadrant_ancestor_id(
                 &quad, i + 1);
-            Assert(cell->has_children(),
-                   ExcMessage("p4est quadrant does not correspond to a cell!"));
+            DEAL_II_Assert(cell->has_children(),
+                           ExcMessage(
+                             "p4est quadrant does not correspond to a cell!"));
             dealii_index = cell->child_index(child_id);
           }
 
@@ -109,8 +110,9 @@ namespace internal
                     cell_from_quad(triangulation,
                                    sides[i].treeid,
                                    *(sides[i].quad));
-                Assert(cell->is_ghost(),
-                       ExcMessage("ghost quad did not find ghost cell"));
+                DEAL_II_Assert(cell->is_ghost(),
+                               ExcMessage(
+                                 "ghost quad did not find ghost cell"));
                 dealii::types::subdomain_id *subid =
                   static_cast<dealii::types::subdomain_id *>(
                     sc_array_push(subids));
@@ -136,8 +138,8 @@ namespace internal
                                    sides[i].treeid,
                                    *(sides[i].quad));
 
-                Assert(!cell->is_ghost(),
-                       ExcMessage("local quad found ghost cell"));
+                DEAL_II_Assert(!cell->is_ghost(),
+                               ExcMessage("local quad found ghost cell"));
 
                 for (j = 0; j < nsubs; j++)
                   {
@@ -515,7 +517,7 @@ namespace internal
             break;
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
       sc_array_destroy(fg.subids);
@@ -777,7 +779,7 @@ namespace internal
               P8EST_QUADRANT_INIT(&p4est_children[c]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
 
 
@@ -797,7 +799,7 @@ namespace internal
             P8EST_QUADRANT_INIT(&quad);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
       functions<dim>::quadrant_set_morton(&quad,
                                           /*level=*/0,
@@ -827,8 +829,9 @@ namespace internal
     tree_exists_locally(const typename types<dim>::forest *parallel_forest,
                         const typename types<dim>::topidx  coarse_grid_cell)
     {
-      Assert(coarse_grid_cell < parallel_forest->connectivity->num_trees,
-             ExcInternalError());
+      DEAL_II_Assert(coarse_grid_cell <
+                       parallel_forest->connectivity->num_trees,
+                     ExcInternalError());
       return ((coarse_grid_cell >= parallel_forest->first_local_tree) &&
               (coarse_grid_cell <= parallel_forest->last_local_tree));
     }

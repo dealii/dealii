@@ -291,7 +291,7 @@ Step4<2>::check_periodicity(const unsigned int cycle) const
           all_passed = false;
         }
     }
-  AssertThrow(all_passed, ExcInternalError());
+  DEAL_II_AssertThrow(all_passed, ExcInternalError());
 }
 
 

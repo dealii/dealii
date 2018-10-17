@@ -90,13 +90,13 @@ test()
     {
       if (constraints.is_constrained(i))
         {
-          AssertThrow(b(i) == 0, ExcInternalError());
+          DEAL_II_AssertThrow(b(i) == 0, ExcInternalError());
         }
       else
         {
-          AssertThrow(std::fabs(b(i) - (1. + 1. * i * i) / 3) <
-                        1e-14 * std::fabs(b(i)),
-                      ExcInternalError());
+          DEAL_II_AssertThrow(std::fabs(b(i) - (1. + 1. * i * i) / 3) <
+                                1e-14 * std::fabs(b(i)),
+                              ExcInternalError());
         }
     }
 }

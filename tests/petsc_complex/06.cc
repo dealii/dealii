@@ -36,7 +36,7 @@ test(PETScWrappers::SparseMatrix &m)
 
   // compare against the exact value of the l1-norm (max col-sum)
   deallog << m.l1_norm() << std::endl;
-  AssertThrow(m.l1_norm() == 7, ExcInternalError());
+  DEAL_II_AssertThrow(m.l1_norm() == 7, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

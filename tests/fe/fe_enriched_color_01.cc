@@ -71,7 +71,7 @@ test()
   triangulation.refine_global(4);
 
   // Construct vector of predicates for 2 and 3 dimensions
-  Assert(dim == 2 || dim == 3, ExcDimensionMismatch2(dim, 2, 3));
+  DEAL_II_Assert(dim == 2 || dim == 3, ExcDimensionMismatch2(dim, 2, 3));
   typedef std::function<bool(
     const typename Triangulation<dim>::active_cell_iterator &)>
                                   predicate_function;

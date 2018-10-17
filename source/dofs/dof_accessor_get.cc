@@ -88,28 +88,28 @@ DoFCellAccessor<DoFHandlerType, lda>::get_interpolated_dof_values(
       // mesh). consequently, we cannot interpolate from children's FE
       // space to this cell's (unknown) FE space unless an explicit
       // fe_index is given
-      Assert((dynamic_cast<DoFHandler<DoFHandlerType::dimension,
-                                      DoFHandlerType::space_dimension> *>(
-                this->dof_handler) != nullptr) ||
-               (fe_index != DoFHandlerType::default_fe_index),
-             ExcMessage(
-               "You cannot call this function on non-active cells "
-               "of hp::DoFHandler objects unless you provide an explicit "
-               "finite element index because they do not have naturally "
-               "associated finite element spaces associated: degrees "
-               "of freedom are only distributed on active cells for which "
-               "the active_fe_index has been set."));
+      DEAL_II_Assert(
+        (dynamic_cast<DoFHandler<DoFHandlerType::dimension,
+                                 DoFHandlerType::space_dimension> *>(
+           this->dof_handler) != nullptr) ||
+          (fe_index != DoFHandlerType::default_fe_index),
+        ExcMessage("You cannot call this function on non-active cells "
+                   "of hp::DoFHandler objects unless you provide an explicit "
+                   "finite element index because they do not have naturally "
+                   "associated finite element spaces associated: degrees "
+                   "of freedom are only distributed on active cells for which "
+                   "the active_fe_index has been set."));
 
       const FiniteElement<dim, spacedim> &fe =
         this->get_dof_handler().get_fe(fe_index);
       const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-      Assert(this->dof_handler != nullptr,
-             typename BaseClass::ExcInvalidObject());
-      Assert(interpolated_values.size() == dofs_per_cell,
-             typename BaseClass::ExcVectorDoesNotMatch());
-      Assert(values.size() == this->dof_handler->n_dofs(),
-             typename BaseClass::ExcVectorDoesNotMatch());
+      DEAL_II_Assert(this->dof_handler != nullptr,
+                     typename BaseClass::ExcInvalidObject());
+      DEAL_II_Assert(interpolated_values.size() == dofs_per_cell,
+                     typename BaseClass::ExcVectorDoesNotMatch());
+      DEAL_II_Assert(values.size() == this->dof_handler->n_dofs(),
+                     typename BaseClass::ExcVectorDoesNotMatch());
 
 
       // see if the finite element we have on the current cell has any

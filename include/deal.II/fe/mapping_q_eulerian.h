@@ -145,7 +145,7 @@ public:
    * Exception which is thrown when the mapping is being evaluated at
    * non-active cell.
    */
-  DeclException0(ExcInactiveCell);
+  DEAL_II_DeclException0(ExcInactiveCell);
 
 protected:
   /**

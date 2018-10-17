@@ -109,21 +109,22 @@ public:
   PackagedOperation()
   {
     apply = [](Range &) {
-      Assert(false,
-             ExcMessage(
-               "Uninitialized PackagedOperation<Range>::apply called"));
+      DEAL_II_Assert(false,
+                     ExcMessage(
+                       "Uninitialized PackagedOperation<Range>::apply called"));
     };
 
     apply_add = [](Range &) {
-      Assert(false,
-             ExcMessage(
-               "Uninitialized PackagedOperation<Range>::apply_add called"));
+      DEAL_II_Assert(
+        false,
+        ExcMessage("Uninitialized PackagedOperation<Range>::apply_add called"));
     };
 
     reinit_vector = [](Range &, bool) {
-      Assert(false,
-             ExcMessage("Uninitialized PackagedOperation<Range>::reinit_vector "
-                        "method called"));
+      DEAL_II_Assert(false,
+                     ExcMessage(
+                       "Uninitialized PackagedOperation<Range>::reinit_vector "
+                       "method called"));
     };
   }
 

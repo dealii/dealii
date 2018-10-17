@@ -126,7 +126,7 @@ main()
       GridGenerator::extract_boundary_mesh(volume_mesh, boundary_mesh);
 
     if (!test_vertices_orientation(boundary_mesh, surface_to_volume_mapping, 2))
-      Assert(false, ExcInternalError());
+      DEAL_II_Assert(false, ExcInternalError());
     save_mesh(boundary_mesh);
   }
 

@@ -42,7 +42,7 @@ private:
 void
 execute(const X &x)
 {
-  AssertThrow(x.i == 42, ExcInternalError());
+  DEAL_II_AssertThrow(x.i == 42, ExcInternalError());
   deallog << "OK" << std::endl;
 }
 

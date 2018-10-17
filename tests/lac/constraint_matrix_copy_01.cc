@@ -48,7 +48,7 @@ test()
   constraints_2.print(s2);
 
   // make sure they're the same
-  Assert(s1.str() == s2.str(), ExcInternalError());
+  DEAL_II_Assert(s1.str() == s2.str(), ExcInternalError());
 }
 
 int

@@ -38,7 +38,7 @@ namespace CUDAWrappers
                            std::get<1>(cusparse_matrix),
                            dense_matrix_dev,
                            matrix.m());
-      AssertCusparse(cusparse_error_code);
+      DEAL_II_AssertCusparse(cusparse_error_code);
     }
 
 
@@ -60,7 +60,7 @@ namespace CUDAWrappers
                            std::get<1>(cusparse_matrix),
                            dense_matrix_dev,
                            matrix.m());
-      AssertCusparse(cusparse_error_code);
+      DEAL_II_AssertCusparse(cusparse_error_code);
     }
 
 
@@ -74,7 +74,7 @@ namespace CUDAWrappers
     {
       const cusolverStatus_t cusolver_error_code = cusolverDnSgetrf_bufferSize(
         cusolver_dn_handle, m, n, dense_matrix_dev, m, &workspace_size);
-      AssertCusolver(cusolver_error_code);
+      DEAL_II_AssertCusolver(cusolver_error_code);
     }
 
 
@@ -88,7 +88,7 @@ namespace CUDAWrappers
     {
       const cusolverStatus_t cusolver_error_code = cusolverDnDgetrf_bufferSize(
         cusolver_dn_handle, m, n, dense_matrix_dev, m, &workspace_size);
-      AssertCusolver(cusolver_error_code);
+      DEAL_II_AssertCusolver(cusolver_error_code);
     }
 
 
@@ -111,7 +111,7 @@ namespace CUDAWrappers
                          workspace_dev,
                          pivot_dev,
                          info_dev);
-      AssertCusolver(cusolver_error_code);
+      DEAL_II_AssertCusolver(cusolver_error_code);
     }
 
 
@@ -134,7 +134,7 @@ namespace CUDAWrappers
                          workspace_dev,
                          pivot_dev,
                          info_dev);
-      AssertCusolver(cusolver_error_code);
+      DEAL_II_AssertCusolver(cusolver_error_code);
     }
 
 
@@ -159,7 +159,7 @@ namespace CUDAWrappers
                          b,
                          m,
                          info_dev);
-      AssertCusolver(cusolver_error_code);
+      DEAL_II_AssertCusolver(cusolver_error_code);
     }
 
 
@@ -184,7 +184,7 @@ namespace CUDAWrappers
                          b,
                          m,
                          info_dev);
-      AssertCusolver(cusolver_error_code);
+      DEAL_II_AssertCusolver(cusolver_error_code);
     }
 
 
@@ -214,8 +214,9 @@ namespace CUDAWrappers
                                 1,
                                 x_host,
                                 &singularity);
-      AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is singular"));
+      DEAL_II_AssertCusolver(cusolver_error_code);
+      DEAL_II_Assert(singularity == -1,
+                     ExcMessage("Coarse matrix is singular"));
     }
 
 
@@ -245,8 +246,9 @@ namespace CUDAWrappers
                                 1,
                                 x_host,
                                 &singularity);
-      AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is singular"));
+      DEAL_II_AssertCusolver(cusolver_error_code);
+      DEAL_II_Assert(singularity == -1,
+                     ExcMessage("Coarse matrix is singular"));
     }
 
 
@@ -273,8 +275,8 @@ namespace CUDAWrappers
                               0,
                               x,
                               &singularity);
-      AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is not SPD"));
+      DEAL_II_AssertCusolver(cusolver_error_code);
+      DEAL_II_Assert(singularity == -1, ExcMessage("Coarse matrix is not SPD"));
     }
 
 
@@ -301,8 +303,8 @@ namespace CUDAWrappers
                               0,
                               x,
                               &singularity);
-      AssertCusolver(cusolver_error_code);
-      Assert(singularity == -1, ExcMessage("Coarse matrix is not SPD"));
+      DEAL_II_AssertCusolver(cusolver_error_code);
+      DEAL_II_Assert(singularity == -1, ExcMessage("Coarse matrix is not SPD"));
     }
 
 
@@ -318,7 +320,7 @@ namespace CUDAWrappers
       // Change the format of the matrix from sparse to dense
       unsigned int const m = matrix.m();
       unsigned int const n = matrix.n();
-      Assert(m == n, ExcMessage("The matrix is not square"));
+      DEAL_II_Assert(m == n, ExcMessage("The matrix is not square"));
       Number *dense_matrix_dev;
       Utilities::CUDA::malloc(dense_matrix_dev, m * n);
 
@@ -329,7 +331,8 @@ namespace CUDAWrappers
       int workspace_size = 0;
       cusolverDngetrf_buffer_size(
         cusolver_dn_handle, m, n, dense_matrix_dev, workspace_size);
-      Assert(workspace_size > 0, ExcMessage("No workspace was allocated"));
+      DEAL_II_Assert(workspace_size > 0,
+                     ExcMessage("No workspace was allocated"));
       Number *workspace_dev;
       Utilities::CUDA::malloc(workspace_dev, workspace_size);
 
@@ -351,22 +354,24 @@ namespace CUDAWrappers
       int         info = 0;
       cudaError_t cuda_error_code_debug =
         cudaMemcpy(&info, info_dev, sizeof(int), cudaMemcpyDeviceToHost);
-      AssertCuda(cuda_error_code_debug);
-      Assert(info == 0,
-             ExcMessage("There was a problem during the LU factorization"));
+      DEAL_II_AssertCuda(cuda_error_code_debug);
+      DEAL_II_Assert(info == 0,
+                     ExcMessage(
+                       "There was a problem during the LU factorization"));
 #endif
 
       // Solve Ax = b
       cudaError_t cuda_error_code =
         cudaMemcpy(x_dev, b_dev, m * sizeof(Number), cudaMemcpyDeviceToDevice);
-      AssertCuda(cuda_error_code);
+      DEAL_II_AssertCuda(cuda_error_code);
       cusolverDngetrs(
         cusolver_dn_handle, m, dense_matrix_dev, pivot_dev, x_dev, info_dev);
 #ifdef DEBUG
       cuda_error_code =
         cudaMemcpy(&info, info_dev, sizeof(int), cudaMemcpyDeviceToHost);
-      AssertCuda(cuda_error_code);
-      Assert(info == 0, ExcMessage("There was a problem during the LU solve"));
+      DEAL_II_AssertCuda(cuda_error_code);
+      DEAL_II_Assert(info == 0,
+                     ExcMessage("There was a problem during the LU solve"));
 #endif
 
       // Free the memory allocated
@@ -472,9 +477,10 @@ namespace CUDAWrappers
                        b.get_values(),
                        x.get_values());
     else
-      AssertThrow(false,
-                  ExcMessage("The provided solver name " +
-                             additional_data.solver_type + " is invalid."));
+      DEAL_II_AssertThrow(false,
+                          ExcMessage("The provided solver name " +
+                                     additional_data.solver_type +
+                                     " is invalid."));
 
     // Force the SolverControl object to report convergence
     solver_control.check(0, 0);

@@ -298,38 +298,39 @@ namespace SparsityTools
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcMETISNotInstalled,
-                   "The function you called requires METIS, but you did not "
-                   "configure deal.II with METIS.");
+  DEAL_II_DeclExceptionMsg(
+    ExcMETISNotInstalled,
+    "The function you called requires METIS, but you did not "
+    "configure deal.II with METIS.");
 
   /**
    * Exception
    */
-  DeclException1(ExcInvalidNumberOfPartitions,
-                 int,
-                 << "The number of partitions you gave is " << arg1
-                 << ", but must be greater than zero.");
+  DEAL_II_DeclException1(ExcInvalidNumberOfPartitions,
+                         int,
+                         << "The number of partitions you gave is " << arg1
+                         << ", but must be greater than zero.");
 
   /**
    * Exception
    */
-  DeclException1(ExcMETISError,
-                 int,
-                 << "    An error with error number " << arg1
-                 << " occurred while calling a METIS function");
+  DEAL_II_DeclException1(ExcMETISError,
+                         int,
+                         << "    An error with error number " << arg1
+                         << " occurred while calling a METIS function");
 
   /**
    * Exception
    */
-  DeclException2(ExcInvalidArraySize,
-                 int,
-                 int,
-                 << "The array has size " << arg1 << " but should have size "
-                 << arg2);
+  DEAL_II_DeclException2(ExcInvalidArraySize,
+                         int,
+                         int,
+                         << "The array has size " << arg1
+                         << " but should have size " << arg2);
   /**
    * Exception
    */
-  DeclExceptionMsg(
+  DEAL_II_DeclExceptionMsg(
     ExcZOLTANNotInstalled,
     "The function you called requires ZOLTAN, but you did not "
     "configure deal.II with ZOLTAN or zoltan_cpp.h is not available.");
