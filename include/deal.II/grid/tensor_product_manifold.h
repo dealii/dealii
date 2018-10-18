@@ -119,24 +119,10 @@ public:
   push_forward_gradient(const Point<chartdim> &chart_point) const override;
 
 private:
-  SmartPointer<const ChartManifold<dim_A, spacedim_A, chartdim_A>,
-               TensorProductManifold<dim,
-                                     dim_A,
-                                     spacedim_A,
-                                     chartdim_A,
-                                     dim_B,
-                                     spacedim_B,
-                                     chartdim_B>>
+  std::shared_ptr<const ChartManifold<dim_A, spacedim_A, chartdim_A>>
     manifold_A;
 
-  SmartPointer<const ChartManifold<dim_B, spacedim_B, chartdim_B>,
-               TensorProductManifold<dim,
-                                     dim_A,
-                                     spacedim_A,
-                                     chartdim_A,
-                                     dim_B,
-                                     spacedim_B,
-                                     chartdim_B>>
+  std::shared_ptr<const ChartManifold<dim_B, spacedim_B, chartdim_B>>
     manifold_B;
 };
 
@@ -210,9 +196,18 @@ TensorProductManifold<dim,
       internal::TensorProductManifoldImplementation::concat(
         manifold_A.get_periodicity(),
         manifold_B.get_periodicity()))
-  , manifold_A(&manifold_A)
-  , manifold_B(&manifold_B)
-{}
+{
+  std::shared_ptr<Manifold<dim_A, spacedim_A>> tmpA(
+    std::move(manifold_A.clone()));
+  std::shared_ptr<Manifold<dim_B, spacedim_B>> tmpB(
+    std::move(manifold_B.clone()));
+  this->manifold_A =
+    std::static_pointer_cast<ChartManifold<dim_A, spacedim_A, chartdim_A>>(
+      tmpA);
+  this->manifold_B =
+    std::static_pointer_cast<ChartManifold<dim_B, spacedim_B, chartdim_B>>(
+      tmpB);
+}
 
 template <int dim,
           int dim_A,
