@@ -74,6 +74,11 @@ public:
   PolarManifold(const Point<spacedim> center = Point<spacedim>());
 
   /**
+   * Virtual destructor
+   */
+  virtual ~PolarManifold() = default;
+
+  /**
    * Make a clone of this Manifold object.
    */
   virtual std::unique_ptr<Manifold<dim, spacedim>>
@@ -400,6 +405,10 @@ public:
                       const double               tolerance = 1e-10);
 
   /**
+   * Virtual destructor.
+   */
+  virtual ~CylindricalManifold() = default;
+  /**
    * Make a clone of this Manifold object.
    */
   virtual std::unique_ptr<Manifold<dim, spacedim>>
@@ -497,6 +506,7 @@ public:
     const Function<spacedim> & pull_back_function,
     const Tensor<1, chartdim> &periodicity = Tensor<1, chartdim>(),
     const double               tolerance   = 1e-10);
+
 
   /**
    * Expressions constructor. Takes the expressions of the push_forward
@@ -666,6 +676,11 @@ public:
    * the parameters in GridGenerator::torus().
    */
   TorusManifold(const double R, const double r);
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~TorusManifold() = default;
 
   /**
    * Make a clone of this Manifold object.

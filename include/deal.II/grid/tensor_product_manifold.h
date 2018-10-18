@@ -90,6 +90,11 @@ public:
     const ChartManifold<dim_B, spacedim_B, chartdim_B> &manifold_B);
 
   /**
+   * Virtual destructor
+   */
+  virtual ~TensorProductManifold() = default;
+
+  /**
    * Clone this manifold.
    */
   virtual std::unique_ptr<Manifold<dim, spacedim_A + spacedim_B>>
