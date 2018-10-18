@@ -421,7 +421,8 @@ namespace LinearAlgebra
       resize_val(size);
 
       // delete previous content in import data
-      import_data.reset();
+      import_data.values.reset();
+      import_data.values_dev.reset();
 
       // set partitioner to serial version
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(size);
@@ -465,7 +466,8 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-      import_data.reset();
+      import_data.values.reset();
+      import_data.values_dev.reset();
 
       thread_loop_partitioner = v.thread_loop_partitioner;
     }
@@ -522,7 +524,8 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-      import_data.reset();
+      import_data.values.reset();
+      import_data.values_dev.reset();
 
       vector_is_ghosted = false;
     }
@@ -880,9 +883,15 @@ namespace LinearAlgebra
       std::lock_guard<std::mutex> lock(mutex);
 
       // allocate import_data in case it is not set up yet
-      if (import_data == nullptr && partitioner->n_import_indices() > 0)
-        import_data =
-          std_cxx14::make_unique<Number[]>(partitioner->n_import_indices());
+      if (import_data.values == nullptr && partitioner->n_import_indices() > 0)
+        {
+          Number *new_val;
+          Utilities::System::posix_memalign((void **)&new_val,
+                                            64,
+                                            sizeof(Number) *
+                                              partitioner->n_import_indices());
+          import_data.values.reset(new_val);
+        }
 
 #  ifdef DEAL_II_COMPILER_CUDA_AWARE
       // TODO: for now move the data to the host and then move it back to the
@@ -910,7 +919,8 @@ namespace LinearAlgebra
         counter,
         ArrayView<Number>(data.values.get() + partitioner->local_size(),
                           partitioner->n_ghost_indices()),
-        ArrayView<Number>(import_data.get(), partitioner->n_import_indices()),
+        ArrayView<Number>(import_data.values.get(),
+                          partitioner->n_import_indices()),
         compress_requests);
 #endif
     }
@@ -932,11 +942,12 @@ namespace LinearAlgebra
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
 
-      Assert(partitioner->n_import_indices() == 0 || import_data != nullptr,
+      Assert(partitioner->n_import_indices() == 0 ||
+               import_data.values != nullptr,
              ExcNotInitialized());
       partitioner->import_from_ghosted_array_finish(
         operation,
-        ArrayView<const Number>(import_data.get(),
+        ArrayView<const Number>(import_data.values.get(),
                                 partitioner->n_import_indices()),
         ArrayView<Number>(data.values.get(), partitioner->local_size()),
         ArrayView<Number>(data.values.get() + partitioner->local_size(),
