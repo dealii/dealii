@@ -365,6 +365,13 @@ UNSET(ENV{NVCCFLAGS})
 #                                                                      #
 ########################################################################
 
+ OPTION(DEAL_II_WITH_CUDA_AWARE_MPI
+   "If set to ON, then we assume that the MPI implementation used is CUDA-aware."
+   OFF
+   )
+ LIST(APPEND DEAL_II_FEATURES CUDA_AWARE_MPI)
+
+
 OPTION(DEAL_II_WITH_64BIT_INDICES
   "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
   OFF
