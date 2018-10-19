@@ -2253,7 +2253,7 @@ ParameterHandler::scan_line(std::string        line,
                   ExcCannotOpenIncludeStatementFile(current_line_n,
                                                     input_filename,
                                                     line));
-      parse_input(input);
+      parse_input(input, line, "", skip_undefined);
     }
   else
     {
