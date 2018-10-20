@@ -164,13 +164,7 @@ namespace Utilities
 #  endif
             const int ierr =
               MPI_Allreduce(values != output ?
-                              // TODO This const_cast is only needed for older
-                              // (e.g., openMPI 1.6, released in 2012)
-                              // implementations of MPI-2. It is not needed as
-                              // of MPI-3 and we should remove it at some
-                              // point in the future.
-                              const_cast<void *>(
-                                static_cast<const void *>(values.data())) :
+                              DEAL_II_MPI_CONST_CAST(values.data()) :
                               MPI_IN_PLACE,
                             static_cast<void *>(output.data()),
                             static_cast<int>(values.size()),
