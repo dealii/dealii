@@ -328,8 +328,27 @@ namespace HDF5
       Container>::type
     initialize_container(std::vector<hsize_t> dimensions)
     {
-      AssertDimension(dimensions.size(), 2);
-      return Container(dimensions[0], dimensions[1]);
+      // If the rank is higher than 2, then remove single-dimensional entries
+      // from the shape defined by dimensions. This is equivalent to the squeeze
+      // function of python/numpy. For example the following code would convert
+      // the vector {1,3,1,2} to {3,2}
+      std::vector<hsize_t> squeezed_dimensions;
+
+      if (dimensions.size() > 2)
+        {
+          for (auto &&dimension : dimensions)
+            {
+              if (dimension > 1)
+                squeezed_dimensions.push_back(dimension);
+            }
+        }
+      else
+        {
+          squeezed_dimensions = dimensions;
+        }
+
+      AssertDimension(squeezed_dimensions.size(), 2);
+      return Container(squeezed_dimensions[0], squeezed_dimensions[1]);
     }
 
 
