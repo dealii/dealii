@@ -18,7 +18,7 @@ that even for the generally well-behaved class of elliptic problems, higher
 degrees of regularity can not be guaranteed in the vicinity of boundaries,
 corners, or where coefficients are discontinuous; consequently, the
 approximation can not be improved in these areas by increasing the polynomial
-degree $p$ but only by refining the mesh, i.e. by reducing the mesh size
+degree $p$ but only by refining the mesh, i.e., by reducing the mesh size
 $h$. These differing means to reduce the
 error have led to the notion of $hp$ finite elements, where the approximating
 finite element spaces are adapted to have a high polynomial degree $p$
@@ -36,35 +36,34 @@ we will have to discuss the following aspects:
 <ul>
   <li>Instead of using the same finite element on all cells, we now will want
   a collection of finite element objects, and associate each cell with one
-  of these objects in this collection.
+  of these objects in this collection.</li>
 
   <li>Degrees of freedom will then have to be allocated on each cell depending
   on what finite element is associated with this particular cell. Constraints
   will have to generated in the same way as for hanging nodes, but now also
-  including the case where two neighboring cells.
+  including the case where two neighboring cells.</li>
 
   <li>We will need to be able to assemble cell and face contributions
-  to global matrices and right hand side vectors.
+  to global matrices and right hand side vectors.</li>
 
   <li>After solving the resulting linear system, we will want to
   analyze the solution. In particular, we will want to compute error
   indicators that tell us whether a given cell should be refined
   and/or whether the polynomial degree of the shape functions used on
-  it should be increased.
+  it should be increased.</li>
 </ul>
 
 We will discuss all these aspects in the following subsections of this
 introduction. It will not come as a big surprise that most of these
 tasks are already well supported by functionality provided by the
-deal.II libraries, and that we will only have to provide the logic of
-what the program should do, not exactly how all this is going to
-happen.
+deal.II, and that we will only have to provide the logic of what the
+program should do, not exactly how all this is going to happen.
 
 In deal.II, the $hp$ functionality is largely packaged into
 the hp namespace. This namespace provides classes that handle
 $hp$ discretizations, assembling matrices and vectors, and other
 tasks. We will get to know many of them further down below. In
-addition, many of the functions in the DoFTools, and VectorTools
+addition, most of the functions in the DoFTools, and VectorTools
 namespaces accept $hp$ objects in addition to the non-$hp$ ones. Much of
 the $hp$ implementation is also discussed in the @ref hp documentation
 module and the links found there.
@@ -113,8 +112,8 @@ orders 2 through 7 (in 2d) or 2 through 5 (in 3d). The collection of
 used elements can then be created as follows:
 @code
   hp::FECollection<dim> fe_collection;
-  for (unsigned int degree=2; degree<=max_degree; ++degree)
-    fe_collection.push_back (FE_Q<dim>(degree));
+  for (unsigned int degree = 2; degree <= max_degree; ++degree)
+    fe_collection.push_back(FE_Q<dim>(degree));
 @endcode
 
 
@@ -148,10 +147,10 @@ on this cell, whereas all the other elements of the collection are
 inactive on it. The general outline of this reads like this:
 
 @code
-  hp::DoFHandler<dim> dof_handler (triangulation);
+  hp::DoFHandler<dim> dof_handler(triangulation);
   for (auto &cell: dof_handler.active_cell_iterators())
-    cell->set_active_fe_index (...);
-  dof_handler.distribute_dofs (fe_collection);
+    cell->set_active_fe_index(...);
+  dof_handler.distribute_dofs(fe_collection);
 @endcode
 
 Dots in the call to <code>set_active_fe_index()</code> indicate that
@@ -170,7 +169,7 @@ conceptually very similar to how we compute hanging node constraints,
 and in fact the code looks exactly the same:
 @code
   AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 @endcode
 In other words, the DoFTools::make_hanging_node_constraints deals not
 only with hanging node constraints, but also with $hp$ constraints at
@@ -186,8 +185,8 @@ same way as for the non-$hp$ case. Assembling requires a bit more thought.
 
 The main idea is of course unchanged: we have to loop over all cells, assemble
 local contributions, and then copy them into the global objects. As discussed
-in some detail first in step-3, deal.II has the FEValues class
-that pulls finite element description, mapping, and quadrature formula
+in some detail first in step-3, deal.II has the FEValues class that pulls
+the finite element description, mapping, and quadrature formula
 together and aids in evaluating values and gradients of shape functions as
 well as other information on each of the quadrature points mapped to the real
 location of a cell. Every time we move on to a new cell we re-initialize this
@@ -209,20 +208,17 @@ of these objects. It's use is very much like the regular FEValues class,
 i.e. the interesting part of the loop over all cells would look like this:
 
 @code
-  hp::FEValues<dim> hp_fe_values (mapping_collection,
-                                  fe_collection,
-				  quadrature_collection,
-				  update_values    |  update_gradients |
-				  update_q_points  |  update_JxW_values);
+  hp::FEValues<dim> hp_fe_values(mapping_collection,
+                                 fe_collection,
+                                 quadrature_collection,
+                                 update_values   | update_gradients |
+                                 update_q_points | update_JxW_values);
 
-  for (const auto &cell: dof_handler.active_cell_iterators())
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      hp_fe_values.reinit (cell,
-                           cell->active_fe_index(),
-                           cell->active_fe_index(),
-                           cell->active_fe_index());
+      hp_fe_values.reinit(cell);
 
-      const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
+      const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
 
       ...  // assemble local contributions and copy them into global object
     }
@@ -300,20 +296,20 @@ able to drive the simple calculations this tutorial program will perform.
 Our approach here is simple: for a function $u({\bf x})$ to be in the
 Sobolev space $H^s(K)$ on a cell $K$, it has to satisfy the condition
 @f[
-	\int_K |\nabla^s u({\bf x})|^2 \; d{\bf x} < \infty.
+   \int_K |\nabla^s u({\bf x})|^2 \; d{\bf x} < \infty.
 @f]
 Assuming that the cell $K$ is not degenerate, i.e. that the mapping from the
 unit cell to cell $K$ is sufficiently regular, above condition is of course
 equivalent to
 @f[
-	\int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x} < \infty\,,
+   \int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x} < \infty\,,
 @f]
 where $\hat u(\hat{\bf x})$ is the function $u({\bf x})$ mapped back onto the unit cell
 $\hat K$. From here, we can do the following: first, let us define the
 Fourier series of $\hat u$ as
 @f[
-	\hat u(\hat{\bf x})
-	= \sum_{\bf k} \hat U_{\bf k}\,e^{-i {\bf k}\cdot \hat{\bf x}},
+   \hat u(\hat{\bf x})
+   = \sum_{\bf k} \hat U_{\bf k}\,e^{-i {\bf k}\cdot \hat{\bf x}},
 @f]
 with Fourier vectors ${\bf k}=(k_x,k_y)$ in 2d, ${\bf k}=(k_x,k_y,k_z)$
 in 3d, etc, and $k_x,k_y,k_z=0,2\pi,4\pi,\ldots$. The coefficients of expansion
@@ -323,25 +319,25 @@ $\hat U_{\bf k}$ can be obtained using $L^2$-orthogonality of the exponential ba
 @f]
 that leads to the following expression
 @f[
-	\hat U_{\bf k}
-	= \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x} \,.
+   \hat U_{\bf k}
+   = \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x} \,.
 @f]
 It becomes clear that we can then write the $H^s$ norm of $\hat u$ as
 @f[
-	\int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x}
-	=
-	\int_{\hat K}
-	\left|
-	  \sum_{\bf k} |{\bf k}|^s e^{-i{\bf k}\cdot \hat{\bf x}} \hat U_{\bf k}
-        \right|^2 \; d\hat{\bf x}
-	=
-	\sum_{\bf k}
-	  |{\bf k}|^{2s}
-	  |\hat U_{\bf k}|^2.
+  \int_{\hat K} |\nabla^s \hat u(\hat{\bf x})|^2 \; d\hat{\bf x}
+  =
+  \int_{\hat K}
+  \left|
+    \sum_{\bf k} |{\bf k}|^s e^{-i{\bf k}\cdot \hat{\bf x}} \hat U_{\bf k}
+  \right|^2 \; d\hat{\bf x}
+  =
+  \sum_{\bf k}
+    |{\bf k}|^{2s}
+    |\hat U_{\bf k}|^2.
 @f]
 In other words, if this norm is to be finite (i.e. for $\hat u(\hat{\bf x})$ to be in $H^s(\hat K)$), we need that
 @f[
-	|\hat U_{\bf k}| = {\cal O}\left(|{\bf k}|^{-\left(s+1/2+\frac{d-1}{2}+\epsilon\right)}\right).
+   |\hat U_{\bf k}| = {\cal O}\left(|{\bf k}|^{-\left(s+1/2+\frac{d-1}{2}+\epsilon\right)}\right).
 @f]
 Put differently: the higher regularity $s$ we want, the faster the
 Fourier coefficients have to go to zero. If you wonder where the
@@ -366,7 +362,7 @@ We can turn this around: Assume we are given a function $\hat u$ of unknown
 smoothness. Let us compute its Fourier coefficients $\hat U_{\bf k}$
 and see how fast they decay. If they decay as
 @f[
-	|\hat U_{\bf k}| = {\cal O}(|{\bf k}|^{-\mu-\epsilon}),
+   |\hat U_{\bf k}| = {\cal O}(|{\bf k}|^{-\mu-\epsilon}),
 @f]
 then consequently the function we had here was in $H^{\mu-d/2}$.
 
@@ -388,28 +384,28 @@ polynomial approximates, not of the polynomial itself, we need to
 choose a reasonable cutoff for $N$. Either way, computing this series
 is not particularly hard: from the definition
 @f[
-	\hat U_{\bf k}
-	= \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x}
+   \hat U_{\bf k}
+   = \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat u(\hat{\bf x}) d\hat{\bf x}
 @f]
 we see that we can compute the coefficient $\hat U_{\bf k}$ as
 @f[
-	\hat U_{\bf k}
-	= 
-          \sum_{i=0}^{\textrm{\tiny dofs per cell}}
-          \left[\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_i(\hat{\bf x})
-	  d\hat{\bf x} \right] u_i,
+   \hat U_{\bf k}
+   =
+   \sum_{i=0}^{\textrm{dofs per cell}}
+   \left[\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_i(\hat{\bf x})
+   d\hat{\bf x} \right] u_i,
 @f]
 where $u_i$ is the value of the $i$th degree of freedom on this
 cell. In other words, we can write it as a matrix-vector product
 @f[
-	\hat U_{\bf k}
-	= {\cal F}_{{\bf k},j} u_j,
+   \hat U_{\bf k}
+   = {\cal F}_{{\bf k},j} u_j,
 @f]
 with the matrix
 @f[
-	{\cal F}_{{\bf k},j}
-	= 
-	\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
+        {\cal F}_{{\bf k},j}
+        =
+        \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
 @f]
 This matrix is easily computed for a given number of shape functions
 $\varphi_j$ and Fourier modes $N$. Consequently, finding the
@@ -424,9 +420,9 @@ words, the best we can do is to fit a function $\alpha |{\bf k}|^{-\mu}$
 to our data points $\hat U_{\bf k}$, for example by
 determining $\alpha,\mu$ via a least-squares procedure:
 @f[
-	\min_{\alpha,\mu}
-	\frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
-	\left( |\hat U_{\bf k}| - \alpha |{\bf k}|^{-\mu}\right)^2
+   \min_{\alpha,\mu}
+   \frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
+   \left( |\hat U_{\bf k}| - \alpha |{\bf k}|^{-\mu}\right)^2
 @f]
 However, the problem with this is that it leads to a nonlinear
 problem, a fact that we would like to avoid. On the other hand, we can
@@ -434,68 +430,76 @@ transform the problem into a simpler one if we try to fit the
 logarithm of our coefficients to the logarithm of $\alpha |{\bf k}|^{-\mu}$,
 like this:
 @f[
-	\min_{\alpha,\mu}
-	Q(\alpha,\mu) =
-	\frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
-	\left( \ln |\hat U_{\bf k}| - \ln (\alpha |{\bf k}|^{-\mu})\right)^2.
+   \min_{\alpha,\mu}
+   Q(\alpha,\mu) =
+   \frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
+   \left( \ln |\hat U_{\bf k}| - \ln (\alpha |{\bf k}|^{-\mu})\right)^2.
 @f]
 Using the usual facts about logarithms, we see that this yields the
 problem
 @f[
-	\min_{\beta,\mu}
-	Q(\beta,\mu) =
-	\frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
-	\left( \ln |\hat U_{\bf k}| - \beta + \mu \ln |{\bf k}|\right)^2,
+   \min_{\beta,\mu}
+   Q(\beta,\mu) =
+   \frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
+   \left( \ln |\hat U_{\bf k}| - \beta + \mu \ln |{\bf k}|\right)^2,
 @f]
 where $\beta=\ln \alpha$. This is now a problem for which the
 optimality conditions $\frac{\partial Q}{\partial\beta}=0,
 \frac{\partial Q}{\partial\mu}=0$, are linear in $\beta,\mu$. We can
 write these conditions as follows:
 @f[
-	\left(\begin{array}{cc}
-	\sum_{{\bf k}, |{\bf k}|\le N} 1 &
-	\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|
-	\\
-	\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}| &
-	\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2
-	\end{array}\right)
-	\left(\begin{array}{c}
-	\beta \\ -\mu
-	\end{array}\right)
-	=
-	\left(\begin{array}{c}
-	\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|
-	\\
-	\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}|
-	\end{array}\right)
+   \left(\begin{array}{cc}
+   \sum_{{\bf k}, |{\bf k}|\le N} 1 &
+   \sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|
+   \\
+   \sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}| &
+   \sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2
+   \end{array}\right)
+   \left(\begin{array}{c}
+   \beta \\ -\mu
+   \end{array}\right)
+   =
+   \left(\begin{array}{c}
+   \sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|
+   \\
+   \sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}|
+   \end{array}\right)
 @f]
 This linear system is readily inverted to yield
 @f[
-	\beta =
-	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
-                \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
-		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
-	\left[
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
-	  -
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
-	\right]
+   \beta =
+   \frac
+   {
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
+   -
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
+   }
+   {
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
+   -
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2
+   }
 @f]
 and
 @f[
-	\mu =
-	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
-                \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
-		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
-	\left[
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
-	  -
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
-	\right].
+   \mu =
+   \frac
+   {
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
+   -
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
+   }
+   {
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
+   -
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2
+   }.
 @f]
 
 This is nothing else but linear regression fit and to do that we will use
@@ -508,7 +512,7 @@ $\hat u(\hat{\bf x})$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
 
 <h4>Compensating for anisotropy</h4>
 
-In the formulas above, we have derived the Fourier coefficients $\hat U_{\vec
+In the formulas above, we have derived the Fourier coefficients $\hat U_{\bf
 k}$. Because ${\bf k}$ is a vector, we will get a number of Fourier
 coefficients $\hat U_{{\bf k}}$ for the same absolute value $|{\bf k}|$,
 corresponding to the Fourier transform in different directions. If we now
@@ -534,19 +538,23 @@ viewpoint that we should tailor the polynomial degree to the lowest amount of
 regularity, in order to keep numerical efforts low. Consequently, instead of
 using the formula
 @f[
-	\mu =
-	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
-                \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
-		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
-	\left[
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
-	  -
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
-	  \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
-	\right].
+   \mu =
+   \frac
+   {
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|\right)
+   -
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| \right)
+   }
+   {
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
+   -
+   \left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2
+   }.
 @f]
-to calculate $\mu$ as shown above, we have to slightly modify all sums:
+To calculate $\mu$ as shown above, we have to slightly modify all sums:
 instead of summing over all Fourier modes, we only sum over those for which
 the Fourier coefficient is the largest one among all $\hat U_{{\bf k}}$ with
 the same magnitude $|{\bf k}|$, i.e. all sums above have to replaced by the
@@ -555,7 +563,7 @@ following sums:
   \sum_{{\bf k}, |{\bf k}|\le N}
   \longrightarrow
   \sum_{\begin{matrix}{{\bf k}, |{\bf k}|\le N} \\ {|\hat U_{{\bf k}}| \ge |\hat U_{{\bf k}'}|
-  \ \textrm{for all}\ {\bf k}'\ \textrm{with}\ |{\bf k}'|=|{\bf k}|}\end{matrix}}
+  \ \textrm{for all}\ {\bf k}'\ \textrm{with}\ |{\bf k}'|=|{\bf k}|}\end{matrix}}.
 @f]
 This is the form we will implement in the program.
 
@@ -577,22 +585,22 @@ compensate for the transformation.
 The short answer is "no". In the process outlined above, we attempt to find
 coefficients $\beta,\mu$ that minimize the sum of squares of the terms
 @f[
-	\ln |\hat U_{{\bf k}}| - \beta + \mu \ln |{\bf k}|.
+   \ln |\hat U_{{\bf k}}| - \beta + \mu \ln |{\bf k}|.
 @f]
 To compensate for the transformation means not attempting to fit a decay
 $|{\bf k}|^\mu$ with respect to the Fourier frequencies ${\bf k}$ <i>on the unit
 cell</i>, but to fit the coefficients $\hat U_{{\bf k}}$ computed on the
-reference cell <i>to the Fourier frequencies on the real cell $|\vec
+reference cell <i>to the Fourier frequencies on the real cell $|\bf
 k|h$</i>, where $h$ is the norm of the transformation operator (i.e. something
 like the diameter of the cell). In other words, we would have to minimize the
 sum of squares of the terms
 @f[
-	\ln |\hat U_{{\bf k}}| - \beta + \mu \ln (|{\bf k}|h).
+   \ln |\hat U_{{\bf k}}| - \beta + \mu \ln (|{\bf k}|h).
 @f]
 instead. However, using fundamental properties of the logarithm, this is
 simply equivalent to minimizing
 @f[
-	\ln |\hat U_{{\bf k}}| - (\beta - \mu \ln h) + \mu \ln (|{\bf k}|).
+   \ln |\hat U_{{\bf k}}| - (\beta - \mu \ln h) + \mu \ln (|{\bf k}|).
 @f]
 In other words, this and the original least squares problem will produce the
 same best-fit exponent $\mu$, though the offset will in one case be $\beta$
@@ -689,14 +697,14 @@ is exactly what we've shown in step-6.
 The test case we will solve with this program is a re-take of the one we
 already look at in step-14: we solve the Laplace equation
 @f[
-	-\Delta u = f
+   -\Delta u = f
 @f]
 in 2d, with $f=(x+1)(y+1)$, and with zero Dirichlet boundary values for
 $u$. We do so on the domain $[-1,1]^2\backslash[-\frac 12,\frac 12]^2$, i.e. a
 square with a square hole in the middle.
 
 The difference to step-14 is of course that we use $hp$ finite
-elements for the solution. The testcase is of interest because it has
+elements for the solution. The test case is of interest because it has
 re-entrant corners in the corners of the hole, at which the solution has
 singularities. We therefore expect that the solution will be smooth in the
 interior of the domain, and rough in the vicinity of the singularities. The

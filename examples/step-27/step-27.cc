@@ -605,7 +605,7 @@ namespace Step27
 
         setup_system();
 
-        std::cout << "   Number of active cells:       "
+        std::cout << "   Number of active cells      : "
                   << triangulation.n_active_cells() << std::endl
                   << "   Number of degrees of freedom: " << dof_handler.n_dofs()
                   << std::endl
