@@ -21,6 +21,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/manifold.h>
 
@@ -90,11 +91,6 @@ public:
     const ChartManifold<dim_B, spacedim_B, chartdim_B> &manifold_B);
 
   /**
-   * Virtual destructor
-   */
-  virtual ~TensorProductManifold() = default;
-
-  /**
    * Clone this manifold.
    */
   virtual std::unique_ptr<Manifold<dim, spacedim_A + spacedim_B>>
@@ -119,10 +115,10 @@ public:
   push_forward_gradient(const Point<chartdim> &chart_point) const override;
 
 private:
-  std::shared_ptr<const ChartManifold<dim_A, spacedim_A, chartdim_A>>
+  std::unique_ptr<const ChartManifold<dim_A, spacedim_A, chartdim_A>>
     manifold_A;
 
-  std::shared_ptr<const ChartManifold<dim_B, spacedim_B, chartdim_B>>
+  std::unique_ptr<const ChartManifold<dim_B, spacedim_B, chartdim_B>>
     manifold_B;
 };
 
@@ -196,18 +192,13 @@ TensorProductManifold<dim,
       internal::TensorProductManifoldImplementation::concat(
         manifold_A.get_periodicity(),
         manifold_B.get_periodicity()))
-{
-  std::shared_ptr<Manifold<dim_A, spacedim_A>> tmpA(
-    std::move(manifold_A.clone()));
-  std::shared_ptr<Manifold<dim_B, spacedim_B>> tmpB(
-    std::move(manifold_B.clone()));
-  this->manifold_A =
-    std::static_pointer_cast<ChartManifold<dim_A, spacedim_A, chartdim_A>>(
-      tmpA);
-  this->manifold_B =
-    std::static_pointer_cast<ChartManifold<dim_B, spacedim_B, chartdim_B>>(
-      tmpB);
-}
+  , manifold_A(Utilities::dynamic_unique_cast<
+               ChartManifold<dim_A, spacedim_A, chartdim_A>,
+               Manifold<dim_A, spacedim_A>>(manifold_A.clone()))
+  , manifold_B(Utilities::dynamic_unique_cast<
+               ChartManifold<dim_B, spacedim_B, chartdim_B>,
+               Manifold<dim_B, spacedim_B>>(manifold_B.clone()))
+{}
 
 template <int dim,
           int dim_A,

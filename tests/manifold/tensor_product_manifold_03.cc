@@ -26,19 +26,28 @@
 #include "../tests.h"
 
 
-void
+bool
 test()
 {
   Triangulation<3, 3> tria;
   GridGenerator::hyper_cube(tria);
   {
-    FunctionManifold<1, 1>                     F("x", "x");
-    PolarManifold<2, 2>                        G(Point<2>(0.5, 0.5));
-    TensorProductManifold<3, 2, 2, 2, 1, 1, 1> manifold(G, F);
-    tria.set_all_manifold_ids(0);
-    tria.set_manifold(0, manifold);
+    FunctionManifold<1, 1> F("x", "x");
+    PolarManifold<2, 2>    G(Point<2>(0.5, 0.5));
+    try
+      {
+        TensorProductManifold<3, 2, 2, 2, 1, 1, 1> manifold(G, F);
+        tria.set_all_manifold_ids(0);
+        tria.set_manifold(0, manifold);
+      }
+    catch (std::bad_cast &e)
+      {
+        (void)e;
+        return false;
+      }
   }
   tria.refine_global(1);
+  return true;
 }
 
 
@@ -46,7 +55,16 @@ test()
 int
 main()
 {
-  test();
+  initlog();
+
+  if (test())
+    {
+      deallog << "OK" << std::endl;
+    }
+  else
+    {
+      deallog << "FAILED" << std::endl;
+    }
 
   return 0;
 }
