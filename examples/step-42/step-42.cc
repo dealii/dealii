@@ -197,7 +197,7 @@ namespace Step42
     const SymmetricTensor<2, dim> &strain_tensor,
     SymmetricTensor<4, dim> &      stress_strain_tensor) const
   {
-    Assert(dim == 3, ExcNotImplemented());
+    DEAL_II_Assert(dim == 3, ExcNotImplemented());
 
     SymmetricTensor<2, dim> stress_tensor;
     stress_tensor =
@@ -237,7 +237,7 @@ namespace Step42
     SymmetricTensor<4, dim> &      stress_strain_tensor_linearized,
     SymmetricTensor<4, dim> &      stress_strain_tensor) const
   {
-    Assert(dim == 3, ExcNotImplemented());
+    DEAL_II_Assert(dim == 3, ExcNotImplemented());
 
     SymmetricTensor<2, dim> stress_tensor;
     stress_tensor =
@@ -397,9 +397,9 @@ namespace Step42
             return 1000;
         }
 
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return 1e9; // an unreasonable value; ignored in debug mode because of the
-                  // preceding Assert
+                  // preceding DEAL_II_Assert
     }
 
 
@@ -462,14 +462,14 @@ namespace Step42
       , ny(0)
     {
       std::ifstream f(name);
-      AssertThrow(f,
-                  ExcMessage(std::string("Can't read from file <") + name +
-                             ">!"));
+      DEAL_II_AssertThrow(f,
+                          ExcMessage(std::string("Can't read from file <") +
+                                     name + ">!"));
 
       std::string temp;
       f >> temp >> nx >> ny;
 
-      AssertThrow(nx > 0 && ny > 0, ExcMessage("Invalid file format."));
+      DEAL_II_AssertThrow(nx > 0 && ny > 0, ExcMessage("Invalid file format."));
 
       for (int k = 0; k < nx * ny; k++)
         {
@@ -572,9 +572,9 @@ namespace Step42
             return z_surface + 0.999 - input_obstacle.get_value(p(0), p(1));
         }
 
-      Assert(false, ExcNotImplemented());
+      DEAL_II_Assert(false, ExcNotImplemented());
       return 1e9; // an unreasonable value; ignored in debug mode because of the
-                  // preceding Assert
+                  // preceding DEAL_II_Assert
     }
 
     template <int dim>
@@ -866,7 +866,7 @@ namespace Step42
     else if (strat == "percentage")
       refinement_strategy = RefinementStrategy::refine_percentage;
     else
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
 
     output_dir = prm.get("output directory");
     if (output_dir != "" && *(output_dir.rbegin()) != '/')
@@ -876,7 +876,7 @@ namespace Step42
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
         const int ierr = mkdir(output_dir.c_str(), 0777);
-        AssertThrow(ierr == 0 || errno == EEXIST, ExcIO());
+        DEAL_II_AssertThrow(ierr == 0 || errno == EEXIST, ExcIO());
       }
 
     pcout << "    Using output directory '" << output_dir << "'" << std::endl;

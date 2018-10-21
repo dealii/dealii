@@ -138,9 +138,9 @@ namespace Step8
   void right_hand_side(const std::vector<Point<dim>> &points,
                        std::vector<Tensor<1, dim>> &  values)
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-    Assert(dim >= 2, ExcNotImplemented());
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(dim >= 2, ExcNotImplemented());
 
     // The rest of the function implements computing force values. We will use
     // a constant (unit) force in x-direction located in two little circles
@@ -553,7 +553,7 @@ namespace Step8
           solution_names.emplace_back("z_displacement");
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // After setting up the names for the different components of the

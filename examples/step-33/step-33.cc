@@ -421,7 +421,7 @@ namespace Step33
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
     }
 
@@ -574,22 +574,24 @@ namespace Step33
     const unsigned int n_quadrature_points = inputs.solution_values.size();
 
     if (do_schlieren_plot == true)
-      Assert(inputs.solution_gradients.size() == n_quadrature_points,
-             ExcInternalError());
+      DEAL_II_Assert(inputs.solution_gradients.size() == n_quadrature_points,
+                     ExcInternalError());
 
-    Assert(computed_quantities.size() == n_quadrature_points,
-           ExcInternalError());
+    DEAL_II_Assert(computed_quantities.size() == n_quadrature_points,
+                   ExcInternalError());
 
-    Assert(inputs.solution_values[0].size() == n_components,
-           ExcInternalError());
+    DEAL_II_Assert(inputs.solution_values[0].size() == n_components,
+                   ExcInternalError());
 
     if (do_schlieren_plot == true)
       {
-        Assert(computed_quantities[0].size() == dim + 2, ExcInternalError());
+        DEAL_II_Assert(computed_quantities[0].size() == dim + 2,
+                       ExcInternalError());
       }
     else
       {
-        Assert(computed_quantities[0].size() == dim + 1, ExcInternalError());
+        DEAL_II_Assert(computed_quantities[0].size() == dim + 1,
+                       ExcInternalError());
       }
 
     // Then loop over all quadrature points and do our work there. The code
@@ -949,7 +951,7 @@ namespace Step33
         else if (stab == "mesh")
           stabilization_kind = mesh_dependent;
         else
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
 
         stabilization_value = prm.get_double("stab value");
       }
@@ -1241,7 +1243,7 @@ namespace Step33
                   boundary_conditions[boundary_id].kind[di] =
                     EulerEquations<dim>::outflow_boundary;
                 else
-                  AssertThrow(false, ExcNotImplemented());
+                  DEAL_II_AssertThrow(false, ExcNotImplemented());
 
                 expressions[di] =
                   prm.get("w_" + Utilities::int_to_string(di) + " value");
@@ -1554,11 +1556,11 @@ namespace Step33
                         neighbor_child =
                           cell->neighbor_child_on_subface(face_no, subface_no);
 
-                      Assert(neighbor_child->face(neighbor2) ==
-                               cell->face(face_no)->child(subface_no),
-                             ExcInternalError());
-                      Assert(neighbor_child->has_children() == false,
-                             ExcInternalError());
+                      DEAL_II_Assert(neighbor_child->face(neighbor2) ==
+                                       cell->face(face_no)->child(subface_no),
+                                     ExcInternalError());
+                      DEAL_II_Assert(neighbor_child->has_children() == false,
+                                     ExcInternalError());
 
                       fe_v_subface.reinit(cell, face_no, subface_no);
                       fe_v_face_neighbor.reinit(neighbor_child, neighbor2);
@@ -1587,8 +1589,8 @@ namespace Step33
                 {
                   const typename DoFHandler<dim>::cell_iterator neighbor =
                     cell->neighbor(face_no);
-                  Assert(neighbor->level() == cell->level() - 1,
-                         ExcInternalError());
+                  DEAL_II_Assert(neighbor->level() == cell->level() - 1,
+                                 ExcInternalError());
 
                   neighbor->get_dof_indices(dof_indices_neighbor);
 
@@ -1598,9 +1600,10 @@ namespace Step33
                                      neighbor_subface_no =
                                        faceno_subfaceno.second;
 
-                  Assert(neighbor->neighbor_child_on_subface(
-                           neighbor_face_no, neighbor_subface_no) == cell,
-                         ExcInternalError());
+                  DEAL_II_Assert(neighbor->neighbor_child_on_subface(
+                                   neighbor_face_no, neighbor_subface_no) ==
+                                   cell,
+                                 ExcInternalError());
 
                   fe_v_face.reinit(cell, face_no);
                   fe_v_subface_neighbor.reinit(neighbor,
@@ -2009,10 +2012,11 @@ namespace Step33
     // that would otherwise be tremendously complicated.
     else
       {
-        Assert(boundary_id < Parameters::AllParameters<dim>::max_n_boundaries,
-               ExcIndexRange(boundary_id,
-                             0,
-                             Parameters::AllParameters<dim>::max_n_boundaries));
+        DEAL_II_Assert(
+          boundary_id < Parameters::AllParameters<dim>::max_n_boundaries,
+          ExcIndexRange(boundary_id,
+                        0,
+                        Parameters::AllParameters<dim>::max_n_boundaries));
 
         std::vector<Vector<double>> boundary_values(
           n_q_points, Vector<double>(EulerEquations<dim>::n_components));
@@ -2062,7 +2066,7 @@ namespace Step33
           alpha = face_diameter / (2.0 * parameters.time_step);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
           alpha = 1;
       }
 
@@ -2220,7 +2224,7 @@ namespace Step33
           }
       }
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_Assert(false, ExcNotImplemented());
     return std::pair<unsigned int, double>(0, 0);
   }
 
@@ -2375,7 +2379,8 @@ namespace Step33
       grid_in.attach_triangulation(triangulation);
 
       std::ifstream input_file(parameters.mesh_filename);
-      Assert(input_file, ExcFileNotOpen(parameters.mesh_filename.c_str()));
+      DEAL_II_Assert(input_file,
+                     ExcFileNotOpen(parameters.mesh_filename.c_str()));
 
       grid_in.read_ucd(input_file);
     }
@@ -2451,14 +2456,15 @@ namespace Step33
         // that will be caught in <code>main()</code> with status information
         // being displayed before the program aborts.
         //
-        // Note that the way we write the AssertThrow macro below is by and
-        // large equivalent to writing something like <code>if (!(nonlin_iter
+        // Note that the way we write the DEAL_II_AssertThrow macro below is by
+        // and large equivalent to writing something like <code>if
+        // (!(nonlin_iter
         // @<= 10)) throw ExcMessage ("No convergence in nonlinear
         // solver");</code>. The only significant difference is that
-        // AssertThrow also makes sure that the exception being thrown carries
-        // with it information about the location (file name and line number)
-        // where it was generated. This is not overly critical here, because
-        // there is only a single place where this sort of exception can
+        // DEAL_II_AssertThrow also makes sure that the exception being thrown
+        // carries with it information about the location (file name and line
+        // number) where it was generated. This is not overly critical here,
+        // because there is only a single place where this sort of exception can
         // happen; however, it is generally a very useful tool when one wants
         // to find out where an error occurred.
         unsigned int nonlin_iter = 0;
@@ -2492,8 +2498,9 @@ namespace Step33
               }
 
             ++nonlin_iter;
-            AssertThrow(nonlin_iter <= 10,
-                        ExcMessage("No convergence in nonlinear solver"));
+            DEAL_II_AssertThrow(nonlin_iter <= 10,
+                                ExcMessage(
+                                  "No convergence in nonlinear solver"));
           }
 
         // We only get to this point if the Newton iteration has converged, so

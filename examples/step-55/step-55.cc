@@ -140,7 +140,7 @@ namespace Step55
         }
       catch (std::exception &e)
         {
-          Assert(false, ExcMessage(e.what()));
+          DEAL_II_Assert(false, ExcMessage(e.what()));
         }
     }
 

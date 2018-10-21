@@ -240,7 +240,7 @@ namespace Step18
   inline SymmetricTensor<2, dim>
   get_strain(const std::vector<Tensor<1, dim>> &grad)
   {
-    Assert(grad.size() == dim, ExcInternalError());
+    DEAL_II_Assert(grad.size() == dim, ExcInternalError());
 
     SymmetricTensor<2, dim> strain;
     for (unsigned int i = 0; i < dim; ++i)
@@ -577,7 +577,8 @@ namespace Step18
   inline void BodyForce<dim>::vector_value(const Point<dim> & /*p*/,
                                            Vector<double> &values) const
   {
-    Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
+    DEAL_II_Assert(values.size() == dim,
+                   ExcDimensionMismatch(values.size(), dim));
 
     const double g   = 9.81;
     const double rho = 7700;
@@ -595,8 +596,8 @@ namespace Step18
   {
     const unsigned int n_points = points.size();
 
-    Assert(value_list.size() == n_points,
-           ExcDimensionMismatch(value_list.size(), n_points));
+    DEAL_II_Assert(value_list.size() == n_points,
+                   ExcDimensionMismatch(value_list.size(), n_points));
 
     for (unsigned int p = 0; p < n_points; ++p)
       BodyForce<dim>::vector_value(points[p], value_list[p]);
@@ -668,7 +669,8 @@ namespace Step18
   IncrementalBoundaryValues<dim>::vector_value(const Point<dim> & /*p*/,
                                                Vector<double> &values) const
   {
-    Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
+    DEAL_II_Assert(values.size() == dim,
+                   ExcDimensionMismatch(values.size(), dim));
 
     values    = 0;
     values(2) = -present_timestep * velocity;
@@ -683,8 +685,8 @@ namespace Step18
   {
     const unsigned int n_points = points.size();
 
-    Assert(value_list.size() == n_points,
-           ExcDimensionMismatch(value_list.size(), n_points));
+    DEAL_II_Assert(value_list.size() == n_points,
+                   ExcDimensionMismatch(value_list.size(), n_points));
 
     for (unsigned int p = 0; p < n_points; ++p)
       IncrementalBoundaryValues<dim>::vector_value(points[p], value_list[p]);
@@ -1206,7 +1208,7 @@ namespace Step18
           solution_names.emplace_back("delta_z");
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     data_out.add_data_vector(incremental_displacement, solution_names);
@@ -1291,7 +1293,7 @@ namespace Step18
     // the largest computations with the most processors in optimized mode,
     // and we should check our assumptions in this particular case, and not
     // only when running in debug mode:
-    AssertThrow(n_mpi_processes < 1000, ExcNotImplemented());
+    DEAL_II_AssertThrow(n_mpi_processes < 1000, ExcNotImplemented());
 
     // With the so-completed filename, let us open a file and write the data
     // we have generated into it:
@@ -1664,8 +1666,8 @@ namespace Step18
     // time. Recall that constructs using the <code>Assert</code> macro are
     // optimized away in optimized mode, so do not affect the run time of
     // optimized runs:
-    Assert(history_index == quadrature_point_history.size(),
-           ExcInternalError());
+    DEAL_II_Assert(history_index == quadrature_point_history.size(),
+                   ExcInternalError());
   }
 
 
@@ -1739,12 +1741,12 @@ namespace Step18
           // this pointer is within the bounds of the global array:
           PointHistory<dim> *local_quadrature_points_history =
             reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
-          Assert(local_quadrature_points_history >=
-                   &quadrature_point_history.front(),
-                 ExcInternalError());
-          Assert(local_quadrature_points_history <
-                   &quadrature_point_history.back(),
-                 ExcInternalError());
+          DEAL_II_Assert(local_quadrature_points_history >=
+                           &quadrature_point_history.front(),
+                         ExcInternalError());
+          DEAL_II_Assert(local_quadrature_points_history <
+                           &quadrature_point_history.back(),
+                         ExcInternalError());
 
           // Then initialize the <code>FEValues</code> object on the present
           // cell, and extract the gradients of the displacement at the

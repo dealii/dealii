@@ -93,11 +93,11 @@ namespace Step9
     // In previous examples, we have used assertions that throw exceptions in
     // several places. However, we have never seen how such exceptions are
     // declared. This can be done as follows:
-    DeclException2(ExcDimensionMismatch,
-                   unsigned int,
-                   unsigned int,
-                   << "The vector has size " << arg1 << " but should have "
-                   << arg2 << " elements.");
+    DEAL_II_DeclException2(ExcDimensionMismatch,
+                           unsigned int,
+                           unsigned int,
+                           << "The vector has size " << arg1
+                           << " but should have " << arg2 << " elements.");
     // The syntax may look a little strange, but is reasonable. The format is
     // basically as follows: use the name of one of the macros
     // <code>DeclExceptionN</code>, where <code>N</code> denotes the number of
@@ -187,7 +187,7 @@ namespace Step9
                                    const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     const double diameter = 0.1;
     return ((p - center_point).norm_square() < diameter * diameter ?
               0.1 / std::pow(diameter, dim) :
@@ -213,7 +213,7 @@ namespace Step9
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     const double sine_term = std::sin(16. * numbers::PI * p.norm_square());
     const double weight    = std::exp(5. * (1. - p.norm_square()));
@@ -414,12 +414,12 @@ namespace Step9
                          const Vector<double> & solution,
                          Vector<float> &        error_per_cell);
 
-    DeclException2(ExcInvalidVectorLength,
-                   int,
-                   int,
-                   << "Vector has length " << arg1 << ", but should have "
-                   << arg2);
-    DeclException0(ExcInsufficientDirections);
+    DEAL_II_DeclException2(ExcInvalidVectorLength,
+                           int,
+                           int,
+                           << "Vector has length " << arg1
+                           << ", but should have " << arg2);
+    DEAL_II_DeclException0(ExcInsufficientDirections);
 
   private:
     template <int dim>
@@ -947,7 +947,7 @@ namespace Step9
                                     const Vector<double> & solution,
                                     Vector<float> &        error_per_cell)
   {
-    Assert(
+    DEAL_II_Assert(
       error_per_cell.size() == dof_handler.get_triangulation().n_active_cells(),
       ExcInvalidVectorLength(error_per_cell.size(),
                              dof_handler.get_triangulation().n_active_cells()));
@@ -1092,8 +1092,9 @@ namespace Step9
                   // an error that is irrecoverable and probably qualifies
                   // as an internal error. We therefore use a predefined
                   // exception class to throw here.
-                  Assert(neighbor_child->neighbor(face_n == 0 ? 1 : 0) == cell,
-                         ExcInternalError());
+                  DEAL_II_Assert(neighbor_child->neighbor(
+                                   face_n == 0 ? 1 : 0) == cell,
+                                 ExcInternalError());
 
                   // If the check succeeded, we push the active neighbor
                   // we just found to the stack we keep:
@@ -1179,7 +1180,7 @@ namespace Step9
     // refine the grid globally, as the case of insufficient directions
     // can not occur if every cell of the initial grid has been refined at
     // least once.
-    AssertThrow(determinant(Y) != 0, ExcInsufficientDirections());
+    DEAL_II_AssertThrow(determinant(Y) != 0, ExcInsufficientDirections());
 
     // If, on the other hand, the matrix is invertible, then invert it,
     // multiply the other quantity with it, and compute the estimated error

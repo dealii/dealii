@@ -386,7 +386,7 @@ void Step5<dim>::run()
   // the condition which is given as first argument is valid, and if not
   // throws an exception (its second argument) which will usually terminate
   // the program giving information where the error occurred and what the
-  // reason was. (A longer discussion of what exactly the @p Assert macro
+  // reason was. (A longer discussion of what exactly the @p DEAL_II_Assert macro
   // does can be found in the @ref Exceptions "exception documentation module".)
   // This generally reduces the time to find programming errors
   // dramatically and we have found assertions an invaluable means to program
@@ -413,7 +413,7 @@ void Step5<dim>::run()
   // it will later also be linked to libraries that have been compiled for
   // optimized mode. In order to switch back to debug mode, simply recompile
   // with the command <code>make debug</code>.
-  Assert(dim == 2, ExcInternalError());
+  DEAL_II_Assert(dim == 2, ExcInternalError());
   // ExcInternalError is a globally defined exception, which may be thrown
   // whenever something is terribly wrong. Usually, one would like to use more
   // specific exceptions, and particular in this case one would of course try
@@ -422,8 +422,8 @@ void Step5<dim>::run()
   // idea and assertions should really only be used for exceptional cases
   // which should not occur, but might due to stupidity of the programmer,
   // user, or someone else. The situation above is not a very clever use of
-  // Assert, but again: this is a tutorial and it might be worth to show what
-  // not to do, after all.
+  // DEAL_II_Assert, but again: this is a tutorial and it might be worth to show
+  // what not to do, after all.
 
   // So if we got past the assertion, we know that dim==2, and we can now
   // actually read the grid. It is in UCD (unstructured cell data) format

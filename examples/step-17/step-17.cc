@@ -207,8 +207,9 @@ namespace Step17
   inline void RightHandSide<dim>::vector_value(const Point<dim> &p,
                                                Vector<double> &  values) const
   {
-    Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
-    Assert(dim >= 2, ExcInternalError());
+    DEAL_II_Assert(values.size() == dim,
+                   ExcDimensionMismatch(values.size(), dim));
+    DEAL_II_Assert(dim >= 2, ExcInternalError());
 
     Point<dim> point_1, point_2;
     point_1(0) = 0.5;
@@ -235,8 +236,8 @@ namespace Step17
   {
     const unsigned int n_points = points.size();
 
-    Assert(value_list.size() == n_points,
-           ExcDimensionMismatch(value_list.size(), n_points));
+    DEAL_II_Assert(value_list.size() == n_points,
+                   ExcDimensionMismatch(value_list.size(), n_points));
 
     for (unsigned int p = 0; p < n_points; ++p)
       RightHandSide<dim>::vector_value(points[p], value_list[p]);
@@ -952,7 +953,7 @@ namespace Step17
               solution_names.emplace_back("z_displacement");
               break;
             default:
-              Assert(false, ExcInternalError());
+              DEAL_II_Assert(false, ExcInternalError());
           }
 
         data_out.add_data_vector(localized_solution, solution_names);

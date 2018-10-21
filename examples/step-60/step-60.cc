@@ -846,13 +846,12 @@ namespace Step60
                  embedding_space_minimal_diameter
             << std::endl;
 
-    AssertThrow(embedded_space_maximal_diameter <
-                  embedding_space_minimal_diameter,
-                ExcMessage(
-                  "The embedding grid is too refined (or the embedded grid "
-                  "is too coarse). Adjust the parameters so that the minimal "
-                  "grid size of the embedding grid is larger "
-                  "than the maximal grid size of the embedded grid."));
+    DEAL_II_AssertThrow(
+      embedded_space_maximal_diameter < embedding_space_minimal_diameter,
+      ExcMessage("The embedding grid is too refined (or the embedded grid "
+                 "is too coarse). Adjust the parameters so that the minimal "
+                 "grid size of the embedding grid is larger "
+                 "than the maximal grid size of the embedded grid."));
 
     // $\Omega$ has been refined and we can now set up its DoFs
     setup_embedding_dofs();
@@ -1060,7 +1059,7 @@ namespace Step60
   template <int dim, int spacedim>
   void DistributedLagrangeProblem<dim, spacedim>::run()
   {
-    AssertThrow(parameters.initialized, ExcNotInitialized());
+    DEAL_II_AssertThrow(parameters.initialized, ExcNotInitialized());
     deallog.depth_console(parameters.verbosity_level);
 
     setup_grids_and_dofs();

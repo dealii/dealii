@@ -105,9 +105,9 @@ namespace Step12
                                        const unsigned int component) const
   {
     (void)component;
-    AssertIndexRange(component, 1);
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_AssertIndexRange(component, 1);
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
@@ -127,7 +127,7 @@ namespace Step12
   template <int dim>
   Tensor<1, dim> beta(const Point<dim> &p)
   {
-    Assert(dim >= 2, ExcNotImplemented());
+    DEAL_II_Assert(dim >= 2, ExcNotImplemented());
 
     Point<dim> wind_field;
     wind_field(0) = -p(1);

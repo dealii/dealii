@@ -700,7 +700,8 @@ namespace Step27
                       std::placeholders::_1),
             VectorTools::Linfty_norm);
 
-        Assert(res.first.size() == res.second.size(), ExcInternalError());
+        DEAL_II_Assert(res.first.size() == res.second.size(),
+                       ExcInternalError());
 
         // The first vector in the <code>std::pair</code> will store values of
         // the predicate, that is $i*i+j*j= const$ or $i*i+j*j+k*k = const$ in

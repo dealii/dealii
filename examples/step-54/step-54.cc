@@ -256,7 +256,7 @@ namespace Step54
     //
     // Once the projector is created, we then assign it to all the parts of
     // the triangulation with manifold_id = 2:
-    Assert(
+    DEAL_II_Assert(
       wires.size() > 0,
       ExcMessage(
         "I could not find any wire in the CAD file you gave me. Bailing out."));
@@ -326,7 +326,7 @@ namespace Step54
         // really covers all possible options of the @p case statement. If we
         // get any other value, we simply abort the program:
         default:
-          AssertThrow(false, ExcInternalError());
+          DEAL_II_AssertThrow(false, ExcInternalError());
       }
   }
 

@@ -175,7 +175,7 @@ namespace Step13
       virtual void operator()(const DoFHandler<dim> &dof_handler,
                               const Vector<double> & solution) const override;
 
-      DeclException1(
+      DEAL_II_DeclException1(
         ExcEvaluationPointNotFound,
         Point<dim>,
         << "The evaluation point " << arg1
@@ -280,8 +280,8 @@ namespace Step13
       // has), you will catch all exceptions that are not caught somewhere in
       // between and thus already handled, and this additional information
       // will help you find out what happened and where it went wrong.
-      AssertThrow(evaluation_point_found,
-                  ExcEvaluationPointNotFound(evaluation_point));
+      DEAL_II_AssertThrow(evaluation_point_found,
+                          ExcEvaluationPointNotFound(evaluation_point));
       // Note that we have used the <code>Assert</code> macro in other example
       // programs as well. It differed from the <code>AssertThrow</code> macro
       // used here in that it simply aborts the program, rather than throwing
@@ -1277,7 +1277,7 @@ namespace Step13
                               const unsigned int component) const
   {
     (void)component;
-    AssertIndexRange(component, 1);
+    DEAL_II_AssertIndexRange(component, 1);
     double q = p(0);
     for (unsigned int i = 1; i < dim; ++i)
       q += std::sin(10 * p(i) + 5 * p(0) * p(0));
@@ -1305,7 +1305,7 @@ namespace Step13
                                    const unsigned int component) const
   {
     (void)component;
-    AssertIndexRange(component, 1);
+    DEAL_II_AssertIndexRange(component, 1);
     double q = p(0);
     for (unsigned int i = 1; i < dim; ++i)
       q += std::sin(10 * p(i) + 5 * p(0) * p(0));
@@ -1430,7 +1430,7 @@ namespace Step13
       solver = std_cxx14::make_unique<LaplaceSolver::RefinementKelly<dim>>(
         triangulation, fe, quadrature, rhs_function, boundary_values);
     else
-      AssertThrow(false, ExcNotImplemented());
+      DEAL_II_AssertThrow(false, ExcNotImplemented());
 
     // Next create a table object in which the values of the numerical
     // solution at the point (0.5,0.5) will be stored, and create a respective

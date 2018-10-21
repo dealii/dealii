@@ -182,10 +182,10 @@ namespace Step31
                                          const unsigned int component) const
     {
       (void)component;
-      Assert(component == 0,
-             ExcMessage("Invalid operation for a scalar function."));
+      DEAL_II_Assert(component == 0,
+                     ExcMessage("Invalid operation for a scalar function."));
 
-      Assert((dim == 2) || (dim == 3), ExcNotImplemented());
+      DEAL_II_Assert((dim == 2) || (dim == 3), ExcNotImplemented());
 
       static const Point<dim> source_centers[3] = {
         (dim == 2 ? Point<dim>(.3, .1) : Point<dim>(.3, .5, .1)),
@@ -307,7 +307,7 @@ namespace Step31
         }
       catch (std::exception &e)
         {
-          Assert(false, ExcMessage(e.what()));
+          DEAL_II_Assert(false, ExcMessage(e.what()));
         }
     }
 
@@ -2185,9 +2185,9 @@ int main(int argc, char *argv[])
         argc, argv, numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
-                  ExcMessage(
-                    "This program can only be run in serial, use ./step-31"));
+      DEAL_II_AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage("This program can only be run in serial, use ./step-31"));
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run();

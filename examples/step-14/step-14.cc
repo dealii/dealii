@@ -106,7 +106,7 @@ namespace Step14
       virtual void operator()(const DoFHandler<dim> &dof_handler,
                               const Vector<double> & solution) const override;
 
-      DeclException1(
+      DEAL_II_DeclException1(
         ExcEvaluationPointNotFound,
         Point<dim>,
         << "The evaluation point " << arg1
@@ -147,8 +147,8 @@ namespace Step14
                 break;
               }
 
-      AssertThrow(evaluation_point_found,
-                  ExcEvaluationPointNotFound(evaluation_point));
+      DEAL_II_AssertThrow(evaluation_point_found,
+                          ExcEvaluationPointNotFound(evaluation_point));
 
       std::cout << "   Point value=" << point_value << std::endl;
     }
@@ -176,7 +176,7 @@ namespace Step14
       virtual void operator()(const DoFHandler<dim> &dof_handler,
                               const Vector<double> & solution) const;
 
-      DeclException1(
+      DEAL_II_DeclException1(
         ExcEvaluationPointNotFound,
         Point<dim>,
         << "The evaluation point " << arg1
@@ -259,7 +259,8 @@ namespace Step14
                   break;
 
               // Check that the evaluation point was indeed found,
-              Assert(q_point < solution_gradients.size(), ExcInternalError());
+              DEAL_II_Assert(q_point < solution_gradients.size(),
+                             ExcInternalError());
               // and if so take the x-derivative of the gradient there as the
               // value which we are interested in, and increase the counter
               // indicating how often we have added to that variable:
@@ -275,8 +276,8 @@ namespace Step14
 
       // Now we have looped over all cells and vertices, so check whether the
       // point was found:
-      AssertThrow(evaluation_point_hits > 0,
-                  ExcEvaluationPointNotFound(evaluation_point));
+      DEAL_II_AssertThrow(evaluation_point_hits > 0,
+                          ExcEvaluationPointNotFound(evaluation_point));
 
       // We have simply summed up the contributions of all adjacent cells, so
       // we still have to compute the mean value. Once this is done, report
@@ -1408,7 +1409,7 @@ namespace Step14
       virtual void assemble_rhs(const DoFHandler<dim> &dof_handler,
                                 Vector<double> &       rhs) const override;
 
-      DeclException1(
+      DEAL_II_DeclException1(
         ExcEvaluationPointNotFound,
         Point<dim>,
         << "The evaluation point " << arg1
@@ -1465,7 +1466,7 @@ namespace Step14
 
       // Finally, a sanity check: if we somehow got here, then we must have
       // missed the evaluation point, so raise an exception unconditionally:
-      AssertThrow(false, ExcEvaluationPointNotFound(evaluation_point));
+      DEAL_II_AssertThrow(false, ExcEvaluationPointNotFound(evaluation_point));
     }
 
 
@@ -1484,7 +1485,7 @@ namespace Step14
       virtual void assemble_rhs(const DoFHandler<dim> &dof_handler,
                                 Vector<double> &       rhs) const;
 
-      DeclException1(
+      DEAL_II_DeclException1(
         ExcEvaluationPointNotFound,
         Point<dim>,
         << "The evaluation point " << arg1
@@ -1581,8 +1582,8 @@ namespace Step14
       // at all, by making sure that their volume is non-zero. If not, then
       // the results will be botched, as the right hand side should then still
       // be zero, so throw an exception:
-      AssertThrow(total_volume > 0,
-                  ExcEvaluationPointNotFound(evaluation_point));
+      DEAL_II_AssertThrow(total_volume > 0,
+                          ExcEvaluationPointNotFound(evaluation_point));
 
       // Finally, we have by now only integrated the gradients of the shape
       // functions, not taking their mean value. We fix this by dividing by
@@ -2231,9 +2232,9 @@ namespace Step14
                face_no < GeometryInfo<dim>::faces_per_cell;
                ++face_no)
             {
-              Assert(face_integrals.find(cell->face(face_no)) !=
-                       face_integrals.end(),
-                     ExcInternalError());
+              DEAL_II_Assert(face_integrals.find(cell->face(face_no)) !=
+                               face_integrals.end(),
+                             ExcInternalError());
               error_indicators(present_cell) -=
                 0.5 * face_integrals[cell->face(face_no)];
             }
@@ -2414,8 +2415,8 @@ namespace Step14
       // actually exists (yes, we should not have come here if the neighbor
       // did not exist, but in complicated software there are bugs, so better
       // check this), and if this is not the case throw an error.
-      Assert(cell->neighbor(face_no).state() == IteratorState::valid,
-             ExcInternalError());
+      DEAL_II_Assert(cell->neighbor(face_no).state() == IteratorState::valid,
+                     ExcInternalError());
       // If we have that, then we need to find out with which face of the
       // neighboring cell we have to work, i.e. the <code>how-many'th</code> the
       // neighbor the present cell is of the cell behind the present face. For
@@ -2453,9 +2454,11 @@ namespace Step14
 
       // Double check that the element already exists and that it was not
       // already written to...
-      Assert(face_integrals.find(cell->face(face_no)) != face_integrals.end(),
-             ExcInternalError());
-      Assert(face_integrals[cell->face(face_no)] == -1e20, ExcInternalError());
+      DEAL_II_Assert(face_integrals.find(cell->face(face_no)) !=
+                       face_integrals.end(),
+                     ExcInternalError());
+      DEAL_II_Assert(face_integrals[cell->face(face_no)] == -1e20,
+                     ExcInternalError());
 
       // ...then store computed value at assigned location. Note that the
       // stored value does not contain the factor 1/2 that appears in the
@@ -2491,8 +2494,9 @@ namespace Step14
       const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
       const typename DoFHandler<dim>::cell_iterator neighbor =
         cell->neighbor(face_no);
-      Assert(neighbor.state() == IteratorState::valid, ExcInternalError());
-      Assert(neighbor->has_children(), ExcInternalError());
+      DEAL_II_Assert(neighbor.state() == IteratorState::valid,
+                     ExcInternalError());
+      DEAL_II_Assert(neighbor->has_children(), ExcInternalError());
       (void)neighbor;
 
       // Then find out which neighbor the present cell is of the adjacent
@@ -2519,9 +2523,9 @@ namespace Step14
           // assertion will be removed anyway.
           const active_cell_iterator neighbor_child =
             cell->neighbor_child_on_subface(face_no, subface_no);
-          Assert(neighbor_child->face(neighbor_neighbor) ==
-                   cell->face(face_no)->child(subface_no),
-                 ExcInternalError());
+          DEAL_II_Assert(neighbor_child->face(neighbor_neighbor) ==
+                           cell->face(face_no)->child(subface_no),
+                         ExcInternalError());
 
           // Now start the work by again getting the gradient of the solution
           // first at this side of the interface,
@@ -2566,11 +2570,11 @@ namespace Step14
       for (unsigned int subface_no = 0; subface_no < face->n_children();
            ++subface_no)
         {
-          Assert(face_integrals.find(face->child(subface_no)) !=
-                   face_integrals.end(),
-                 ExcInternalError());
-          Assert(face_integrals[face->child(subface_no)] != -1e20,
-                 ExcInternalError());
+          DEAL_II_Assert(face_integrals.find(face->child(subface_no)) !=
+                           face_integrals.end(),
+                         ExcInternalError());
+          DEAL_II_Assert(face_integrals[face->child(subface_no)] != -1e20,
+                         ExcInternalError());
 
           sum += face_integrals[face->child(subface_no)];
         }
@@ -2766,7 +2770,7 @@ namespace Step14
           }
 
         default:
-          AssertThrow(false, ExcInternalError());
+          DEAL_II_AssertThrow(false, ExcInternalError());
       }
 
     // Now that all objects are in place, run the main loop. The stopping

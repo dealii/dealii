@@ -90,7 +90,7 @@ namespace Step34
             return (1. / (R.norm() * 4 * numbers::PI));
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
             return 0.;
         }
     }
@@ -108,7 +108,7 @@ namespace Step34
             return R / (-4 * numbers::PI * R.norm_square() * R.norm());
 
           default:
-            Assert(false, ExcInternalError());
+            DEAL_II_Assert(false, ExcInternalError());
             return Tensor<1, dim>();
         }
     }
@@ -512,7 +512,7 @@ namespace Step34
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     GridIn<dim - 1, dim> gi;
@@ -670,8 +670,8 @@ namespace Step34
                 // The correct quadrature formula is selected by the
                 // get_singular_quadrature function, which is explained in
                 // detail below.
-                Assert(singular_index != numbers::invalid_unsigned_int,
-                       ExcInternalError());
+                DEAL_II_Assert(singular_index != numbers::invalid_unsigned_int,
+                               ExcInternalError());
 
                 const Quadrature<dim - 1> &singular_quadrature =
                   get_singular_quadrature(cell, singular_index);
@@ -871,7 +871,8 @@ namespace Step34
     const DoFHandler<2, 3>::active_cell_iterator &,
     const unsigned int index) const
   {
-    Assert(index < fe.dofs_per_cell, ExcIndexRange(0, fe.dofs_per_cell, index));
+    DEAL_II_Assert(index < fe.dofs_per_cell,
+                   ExcIndexRange(0, fe.dofs_per_cell, index));
 
     static std::vector<QGaussOneOverR<2>> quadratures;
     if (quadratures.size() == 0)
@@ -888,7 +889,8 @@ namespace Step34
     const DoFHandler<1, 2>::active_cell_iterator &cell,
     const unsigned int                            index) const
   {
-    Assert(index < fe.dofs_per_cell, ExcIndexRange(0, fe.dofs_per_cell, index));
+    DEAL_II_Assert(index < fe.dofs_per_cell,
+                   ExcIndexRange(0, fe.dofs_per_cell, index));
 
     static Quadrature<1> *q_pointer = nullptr;
     if (q_pointer)

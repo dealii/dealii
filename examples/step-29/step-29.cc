@@ -116,7 +116,7 @@ namespace Step29
   DirichletBoundaryValues<dim>::vector_value(const Point<dim> & /*p*/,
                                              Vector<double> &values) const
   {
-    Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
+    DEAL_II_Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
 
     values(0) = 1;
     values(1) = 0;
@@ -128,8 +128,8 @@ namespace Step29
     const std::vector<Point<dim>> &points,
     std::vector<Vector<double>> &  value_list) const
   {
-    Assert(value_list.size() == points.size(),
-           ExcDimensionMismatch(value_list.size(), points.size()));
+    DEAL_II_Assert(value_list.size() == points.size(),
+                   ExcDimensionMismatch(value_list.size(), points.size()));
 
     for (unsigned int p = 0; p < points.size(); ++p)
       DirichletBoundaryValues<dim>::vector_value(points[p], value_list[p]);
@@ -341,19 +341,20 @@ namespace Step29
     const DataPostprocessorInputs::Vector<dim> &inputs,
     std::vector<Vector<double>> &               computed_quantities) const
   {
-    Assert(computed_quantities.size() == inputs.solution_values.size(),
-           ExcDimensionMismatch(computed_quantities.size(),
-                                inputs.solution_values.size()));
+    DEAL_II_Assert(computed_quantities.size() == inputs.solution_values.size(),
+                   ExcDimensionMismatch(computed_quantities.size(),
+                                        inputs.solution_values.size()));
 
     // The computation itself is straightforward: We iterate over each entry
     // in the output vector and compute $|u|$ from the corresponding values of
     // $v$ and $w$:
     for (unsigned int i = 0; i < computed_quantities.size(); i++)
       {
-        Assert(computed_quantities[i].size() == 1,
-               ExcDimensionMismatch(computed_quantities[i].size(), 1));
-        Assert(inputs.solution_values[i].size() == 2,
-               ExcDimensionMismatch(inputs.solution_values[i].size(), 2));
+        DEAL_II_Assert(computed_quantities[i].size() == 1,
+                       ExcDimensionMismatch(computed_quantities[i].size(), 1));
+        DEAL_II_Assert(inputs.solution_values[i].size() == 2,
+                       ExcDimensionMismatch(inputs.solution_values[i].size(),
+                                            2));
 
         computed_quantities[i](0) = std::sqrt(
           inputs.solution_values[i](0) * inputs.solution_values[i](0) +

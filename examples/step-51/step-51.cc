@@ -203,7 +203,7 @@ namespace Step51
   void SolutionAndGradient<dim>::vector_value(const Point<dim> &p,
                                               Vector<double> &  v) const
   {
-    AssertDimension(v.size(), dim + 1);
+    DEAL_II_AssertDimension(v.size(), dim + 1);
     Solution<dim>  solution;
     Tensor<1, dim> grad = solution.gradient(p);
     for (unsigned int d = 0; d < dim; ++d)
@@ -248,7 +248,7 @@ namespace Step51
           convection[2] = 1;
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
     return convection;
   }
@@ -1226,7 +1226,7 @@ namespace Step51
           filename = "solution-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     std::string face_out(filename);
@@ -1350,7 +1350,7 @@ namespace Step51
 
           default:
             {
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
             }
         }
 

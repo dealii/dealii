@@ -298,8 +298,8 @@ namespace Step21
     void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
                                    std::vector<Tensor<2, dim>> &  values) const
     {
-      Assert(points.size() == values.size(),
-             ExcDimensionMismatch(points.size(), values.size()));
+      DEAL_II_Assert(points.size() == values.size(),
+                     ExcDimensionMismatch(points.size(), values.size()));
 
       for (unsigned int p = 0; p < points.size(); ++p)
         {
@@ -399,8 +399,8 @@ namespace Step21
     void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
                                    std::vector<Tensor<2, dim>> &  values) const
     {
-      Assert(points.size() == values.size(),
-             ExcDimensionMismatch(points.size(), values.size()));
+      DEAL_II_Assert(points.size() == values.size(),
+                     ExcDimensionMismatch(points.size(), values.size()));
 
       for (unsigned int p = 0; p < points.size(); ++p)
         {
@@ -1108,7 +1108,7 @@ namespace Step21
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     DataOut<dim> data_out;

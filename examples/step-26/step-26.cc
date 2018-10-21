@@ -145,8 +145,8 @@ namespace Step26
                                    const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-    Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
 
     const double time = this->get_time();
     const double point_within_period =
@@ -187,7 +187,7 @@ namespace Step26
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
 

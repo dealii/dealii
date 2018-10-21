@@ -240,9 +240,9 @@ namespace Step28
 
 
         default:
-          Assert(false,
-                 ExcMessage(
-                   "Presently, only data for 2 groups is implemented"));
+          DEAL_II_Assert(false,
+                         ExcMessage(
+                           "Presently, only data for 2 groups is implemented"));
       }
   }
 
@@ -255,9 +255,9 @@ namespace Step28
   MaterialData::get_diffusion_coefficient(const unsigned int group,
                                           const unsigned int material_id) const
   {
-    Assert(group < n_groups, ExcIndexRange(group, 0, n_groups));
-    Assert(material_id < n_materials,
-           ExcIndexRange(material_id, 0, n_materials));
+    DEAL_II_Assert(group < n_groups, ExcIndexRange(group, 0, n_groups));
+    DEAL_II_Assert(material_id < n_materials,
+                   ExcIndexRange(material_id, 0, n_materials));
 
     return diffusion[material_id][group];
   }
@@ -267,9 +267,9 @@ namespace Step28
   double MaterialData::get_removal_XS(const unsigned int group,
                                       const unsigned int material_id) const
   {
-    Assert(group < n_groups, ExcIndexRange(group, 0, n_groups));
-    Assert(material_id < n_materials,
-           ExcIndexRange(material_id, 0, n_materials));
+    DEAL_II_Assert(group < n_groups, ExcIndexRange(group, 0, n_groups));
+    DEAL_II_Assert(material_id < n_materials,
+                   ExcIndexRange(material_id, 0, n_materials));
 
     return sigma_r[material_id][group];
   }
@@ -278,9 +278,9 @@ namespace Step28
   double MaterialData::get_fission_XS(const unsigned int group,
                                       const unsigned int material_id) const
   {
-    Assert(group < n_groups, ExcIndexRange(group, 0, n_groups));
-    Assert(material_id < n_materials,
-           ExcIndexRange(material_id, 0, n_materials));
+    DEAL_II_Assert(group < n_groups, ExcIndexRange(group, 0, n_groups));
+    DEAL_II_Assert(material_id < n_materials,
+                   ExcIndexRange(material_id, 0, n_materials));
 
     return nu_sigma_f[material_id][group];
   }
@@ -291,10 +291,10 @@ namespace Step28
                                          const unsigned int group_2,
                                          const unsigned int material_id) const
   {
-    Assert(group_1 < n_groups, ExcIndexRange(group_1, 0, n_groups));
-    Assert(group_2 < n_groups, ExcIndexRange(group_2, 0, n_groups));
-    Assert(material_id < n_materials,
-           ExcIndexRange(material_id, 0, n_materials));
+    DEAL_II_Assert(group_1 < n_groups, ExcIndexRange(group_1, 0, n_groups));
+    DEAL_II_Assert(group_2 < n_groups, ExcIndexRange(group_2, 0, n_groups));
+    DEAL_II_Assert(material_id < n_materials,
+                   ExcIndexRange(material_id, 0, n_materials));
 
     return sigma_s[material_id][group_1][group_2];
   }
@@ -305,9 +305,9 @@ namespace Step28
   MaterialData::get_fission_spectrum(const unsigned int group,
                                      const unsigned int material_id) const
   {
-    Assert(group < n_groups, ExcIndexRange(group, 0, n_groups));
-    Assert(material_id < n_materials,
-           ExcIndexRange(material_id, 0, n_materials));
+    DEAL_II_Assert(group < n_groups, ExcIndexRange(group, 0, n_groups));
+    DEAL_II_Assert(material_id < n_materials,
+                   ExcIndexRange(material_id, 0, n_materials));
 
     return chi[material_id][group];
   }
@@ -1475,14 +1475,14 @@ namespace Step28
         const unsigned int az =
           (dim == 2 ? 0 : int(cell_center[dim - 1] / assembly_height));
 
-        Assert(ax < assemblies_x, ExcInternalError());
-        Assert(ay < assemblies_y, ExcInternalError());
-        Assert(az < assemblies_z, ExcInternalError());
+        DEAL_II_Assert(ax < assemblies_x, ExcInternalError());
+        DEAL_II_Assert(ay < assemblies_y, ExcInternalError());
+        DEAL_II_Assert(az < assemblies_z, ExcInternalError());
 
-        Assert(core[ax][ay][az] < n_assemblies, ExcInternalError());
+        DEAL_II_Assert(core[ax][ay][az] < n_assemblies, ExcInternalError());
 
-        Assert(cx < rods_per_assembly_x, ExcInternalError());
-        Assert(cy < rods_per_assembly_y, ExcInternalError());
+        DEAL_II_Assert(cx < rods_per_assembly_x, ExcInternalError());
+        DEAL_II_Assert(cy < rods_per_assembly_y, ExcInternalError());
 
         cell->set_material_id(assembly_materials[core[ax][ay][az]][cx][cy] - 1);
       }

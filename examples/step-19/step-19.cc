@@ -370,7 +370,7 @@ namespace Step19
 
     {
       std::ifstream input(input_file_names[0]);
-      AssertThrow(input, ExcIO());
+      DEAL_II_AssertThrow(input, ExcIO());
 
       merged_data.read(input);
     }
@@ -380,7 +380,7 @@ namespace Step19
     for (unsigned int i = 1; i < input_file_names.size(); ++i)
       {
         std::ifstream input(input_file_names[i]);
-        AssertThrow(input, ExcIO());
+        DEAL_II_AssertThrow(input, ExcIO());
 
         DataOutReader<dim, spacedim> additional_data;
         additional_data.read(input);
@@ -396,7 +396,7 @@ namespace Step19
     // the ability to output in other output formats, this program will be
     // able to make use of this ability without having to be changed!
     std::ofstream output_stream(output_file);
-    AssertThrow(output_stream, ExcIO());
+    DEAL_II_AssertThrow(output_stream, ExcIO());
 
     const DataOutBase::OutputFormat format =
       DataOutBase::parse_output_format(output_format);
@@ -430,11 +430,11 @@ namespace Step19
   // code that shouldn't be reached:
   void convert()
   {
-    AssertThrow(input_file_names.size() > 0,
-                ExcMessage("No input files specified."));
+    DEAL_II_AssertThrow(input_file_names.size() > 0,
+                        ExcMessage("No input files specified."));
 
     std::ifstream input(input_file_names[0]);
-    AssertThrow(input, ExcIO());
+    DEAL_II_AssertThrow(input, ExcIO());
 
     const std::pair<unsigned int, unsigned int> dimensions =
       DataOutBase::determine_intermediate_format_dimensions(input);
@@ -452,7 +452,7 @@ namespace Step19
                 do_convert<1, 2>();
                 return;
             }
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
           break;
 
         case 2:
@@ -466,7 +466,7 @@ namespace Step19
                 do_convert<2, 3>();
                 return;
             }
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
           break;
 
         case 3:
@@ -476,10 +476,10 @@ namespace Step19
                 do_convert<3, 3>();
                 return;
             }
-          AssertThrow(false, ExcNotImplemented());
+          DEAL_II_AssertThrow(false, ExcNotImplemented());
       }
 
-    AssertThrow(false, ExcNotImplemented());
+    DEAL_II_AssertThrow(false, ExcNotImplemented());
   }
 } // namespace Step19
 

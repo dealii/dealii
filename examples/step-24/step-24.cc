@@ -212,7 +212,7 @@ namespace Step24
     // to run the same program in 3d, we would have to add code here for the
     // initialization of detector locations in 3d. Due to the assertion, there
     // is no way we can forget to do this.
-    Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
 
     const double detector_step_angle = 2.25;
     const double detector_radius     = 0.5;

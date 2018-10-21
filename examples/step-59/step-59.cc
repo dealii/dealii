@@ -343,7 +343,7 @@ namespace Step59
   template <int dim, int fe_degree, typename number>
   types::global_dof_index LaplaceOperator<dim, fe_degree, number>::m() const
   {
-    Assert(data.get() != nullptr, ExcNotInitialized());
+    DEAL_II_Assert(data.get() != nullptr, ExcNotInitialized());
     return data->get_dof_handler().n_dofs();
   }
 
@@ -829,8 +829,8 @@ namespace Step59
               for (unsigned int v = 0;
                    v < VectorizedArray<number>::n_array_elements;
                    ++v)
-                AssertThrow(inverse_jacobian[d][e][v] == 0.,
-                            ExcNotImplemented());
+                DEAL_II_AssertThrow(inverse_jacobian[d][e][v] == 0.,
+                                    ExcNotImplemented());
 
         VectorizedArray<number> jacobian_determinant = inverse_jacobian[0][0];
         for (unsigned int e = 1; e < dim; ++e)

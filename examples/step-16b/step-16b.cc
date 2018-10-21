@@ -147,7 +147,7 @@ namespace Step16
   LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
                                MeshWorker::IntegrationInfo<dim> &info) const
   {
-    AssertDimension(dinfo.n_matrices(), 1);
+    DEAL_II_AssertDimension(dinfo.n_matrices(), 1);
     const double coefficient = (dinfo.cell->center()(0) > 0.) ? .1 : 1.;
 
     LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,

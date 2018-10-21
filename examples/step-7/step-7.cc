@@ -832,7 +832,7 @@ namespace Step7
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
           }
       }
   }
@@ -1049,7 +1049,7 @@ namespace Step7
           vtk_filename = "solution-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // We augment the filename by a postfix denoting the finite element which
@@ -1073,7 +1073,7 @@ namespace Step7
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     // Once we have the base name for the output file, we add an extension
@@ -1181,7 +1181,7 @@ namespace Step7
           error_filename += "-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     switch (fe->degree)
@@ -1193,7 +1193,7 @@ namespace Step7
           error_filename += "-q2";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
 
     error_filename += ".tex";
@@ -1267,7 +1267,7 @@ namespace Step7
               conv_filename += "-adaptive";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
         switch (fe->degree)
           {
@@ -1278,7 +1278,7 @@ namespace Step7
               conv_filename += "-q2";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_Assert(false, ExcNotImplemented());
           }
         conv_filename += ".tex";
 

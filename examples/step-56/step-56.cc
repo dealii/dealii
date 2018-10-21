@@ -119,7 +119,7 @@ namespace Step56
   double Solution<2>::value(const Point<2> &   p,
                             const unsigned int component) const
   {
-    Assert(component <= 2 + 1, ExcIndexRange(component, 0, 2 + 1));
+    DEAL_II_Assert(component <= 2 + 1, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
     const double x = p(0);
@@ -139,7 +139,7 @@ namespace Step56
   double Solution<3>::value(const Point<3> &   p,
                             const unsigned int component) const
   {
-    Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
+    DEAL_II_Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
     const double x = p(0);
@@ -163,7 +163,7 @@ namespace Step56
   Tensor<1, 2> Solution<2>::gradient(const Point<2> &   p,
                                      const unsigned int component) const
   {
-    Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
+    DEAL_II_Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
     const double x = p(0);
@@ -193,7 +193,7 @@ namespace Step56
   Tensor<1, 3> Solution<3>::gradient(const Point<3> &   p,
                                      const unsigned int component) const
   {
-    Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
+    DEAL_II_Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
     const double x = p(0);
@@ -246,7 +246,7 @@ namespace Step56
   double RightHandSide<2>::value(const Point<2> &   p,
                                  const unsigned int component) const
   {
-    Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
+    DEAL_II_Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
     double x = p(0);
@@ -265,7 +265,7 @@ namespace Step56
   double RightHandSide<3>::value(const Point<3> &   p,
                                  const unsigned int component) const
   {
-    Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
+    DEAL_II_Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
     double x = p(0);

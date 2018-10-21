@@ -131,8 +131,8 @@ namespace Step45
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
 
     return 0;
   }

@@ -211,8 +211,8 @@ namespace Step43
     void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
                                    std::vector<Tensor<2, dim>> &  values) const
     {
-      Assert(points.size() == values.size(),
-             ExcDimensionMismatch(points.size(), values.size()));
+      DEAL_II_Assert(points.size() == values.size(),
+                     ExcDimensionMismatch(points.size(), values.size()));
 
       for (unsigned int p = 0; p < points.size(); ++p)
         {
@@ -280,8 +280,8 @@ namespace Step43
     void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
                                    std::vector<Tensor<2, dim>> &  values) const
     {
-      Assert(points.size() == values.size(),
-             ExcDimensionMismatch(points.size(), values.size()));
+      DEAL_II_Assert(points.size() == values.size(),
+                     ExcDimensionMismatch(points.size(), values.size()));
 
       for (unsigned int p = 0; p < points.size(); ++p)
         {
@@ -321,8 +321,9 @@ namespace Step43
 
   double fractional_flow(const double S, const double viscosity)
   {
-    Assert((S >= 0) && (S <= 1),
-           ExcMessage("Saturation is outside its physically valid range."));
+    DEAL_II_Assert((S >= 0) && (S <= 1),
+                   ExcMessage(
+                     "Saturation is outside its physically valid range."));
 
     return S * S / (S * S + viscosity * (1 - S) * (1 - S));
   }
@@ -330,8 +331,9 @@ namespace Step43
 
   double fractional_flow_derivative(const double S, const double viscosity)
   {
-    Assert((S >= 0) && (S <= 1),
-           ExcMessage("Saturation is outside its physically valid range."));
+    DEAL_II_Assert((S >= 0) && (S <= 1),
+                   ExcMessage(
+                     "Saturation is outside its physically valid range."));
 
     const double temp = (S * S + viscosity * (1 - S) * (1 - S));
 
@@ -341,7 +343,7 @@ namespace Step43
 
     const double F_prime = numerator / denominator;
 
-    Assert(F_prime >= 0, ExcInternalError());
+    DEAL_II_Assert(F_prime >= 0, ExcInternalError());
 
     return F_prime;
   }
@@ -400,7 +402,7 @@ namespace Step43
         }
       catch (std::exception &e)
         {
-          Assert(false, ExcMessage(e.what()));
+          DEAL_II_Assert(false, ExcMessage(e.what()));
         }
     }
 
@@ -1798,9 +1800,10 @@ namespace Step43
     const FESystem<dim> joint_fe(darcy_fe, 1, saturation_fe, 1);
     DoFHandler<dim>     joint_dof_handler(triangulation);
     joint_dof_handler.distribute_dofs(joint_fe);
-    Assert(joint_dof_handler.n_dofs() ==
-             darcy_dof_handler.n_dofs() + saturation_dof_handler.n_dofs(),
-           ExcInternalError());
+    DEAL_II_Assert(joint_dof_handler.n_dofs() ==
+                     darcy_dof_handler.n_dofs() +
+                       saturation_dof_handler.n_dofs(),
+                   ExcInternalError());
 
     Vector<double> joint_solution(joint_dof_handler.n_dofs());
 
@@ -1828,20 +1831,21 @@ namespace Step43
           for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
             if (joint_fe.system_to_base_index(i).first.first == 0)
               {
-                Assert(joint_fe.system_to_base_index(i).second <
-                         local_darcy_dof_indices.size(),
-                       ExcInternalError());
+                DEAL_II_Assert(joint_fe.system_to_base_index(i).second <
+                                 local_darcy_dof_indices.size(),
+                               ExcInternalError());
                 joint_solution(local_joint_dof_indices[i]) = darcy_solution(
                   local_darcy_dof_indices[joint_fe.system_to_base_index(i)
                                             .second]);
               }
             else
               {
-                Assert(joint_fe.system_to_base_index(i).first.first == 1,
-                       ExcInternalError());
-                Assert(joint_fe.system_to_base_index(i).second <
-                         local_darcy_dof_indices.size(),
-                       ExcInternalError());
+                DEAL_II_Assert(joint_fe.system_to_base_index(i).first.first ==
+                                 1,
+                               ExcInternalError());
+                DEAL_II_Assert(joint_fe.system_to_base_index(i).second <
+                                 local_darcy_dof_indices.size(),
+                               ExcInternalError());
                 joint_solution(local_joint_dof_indices[i]) =
                   saturation_solution(
                     local_saturation_dof_indices
@@ -2286,9 +2290,9 @@ int main(int argc, char *argv[])
         argc, argv, numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
-                  ExcMessage(
-                    "This program can only be run in serial, use ./step-43"));
+      DEAL_II_AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage("This program can only be run in serial, use ./step-43"));
 
       TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run();

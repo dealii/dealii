@@ -191,7 +191,7 @@ namespace Step23
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
 
@@ -202,7 +202,7 @@ namespace Step23
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
 
@@ -229,7 +229,7 @@ namespace Step23
                                    const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
     return 0;
   }
 
@@ -270,7 +270,7 @@ namespace Step23
                                      const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     if ((this->get_time() <= 0.5) && (p[0] < 0) && (p[1] < 1. / 3) &&
         (p[1] > -1. / 3))
@@ -286,7 +286,7 @@ namespace Step23
                                      const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     if ((this->get_time() <= 0.5) && (p[0] < 0) && (p[1] < 1. / 3) &&
         (p[1] > -1. / 3))

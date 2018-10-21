@@ -157,7 +157,7 @@ victim: The one object that still uses the SparsityPattern is the
 SparseMatrix.
 
 The stacktrace gives an indication of where the problem happened. We
-see that the AssertNothrow macro was triggered in the
+see that the DEAL_II_AssertNothrow macro was triggered in the
 destructor of the SparseMatrix class (which inherits from Subscriptor) that was called
 through a few more functions from the destructor of the
 <code>Step6</code> class, exactly where we have commented out
@@ -578,7 +578,7 @@ double coefficient (const Point<dim> &p)
     return 1000;
   else
     {
-      Assert (false, ExcInternalError());
+      DEAL_II_Assert (false, ExcInternalError());
       return 0;
     }
 }

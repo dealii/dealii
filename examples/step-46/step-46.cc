@@ -176,8 +176,8 @@ namespace Step46
   double StokesBoundaryValues<dim>::value(const Point<dim> & p,
                                           const unsigned int component) const
   {
-    Assert(component < this->n_components,
-           ExcIndexRange(component, 0, this->n_components));
+    DEAL_II_Assert(component < this->n_components,
+                   ExcIndexRange(component, 0, this->n_components));
 
     if (component == dim - 1)
       switch (dim)
@@ -187,7 +187,7 @@ namespace Step46
           case 3:
             return std::sin(numbers::PI * p[0]) * std::sin(numbers::PI * p[1]);
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_Assert(false, ExcNotImplemented());
         }
 
     return 0;
@@ -361,7 +361,7 @@ namespace Step46
         else if (cell_is_in_solid_domain(cell))
           cell->set_active_fe_index(1);
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       }
   }
 
@@ -608,7 +608,8 @@ namespace Step46
         if (cell_is_in_fluid_domain(cell))
           {
             const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-            Assert(dofs_per_cell == stokes_dofs_per_cell, ExcInternalError());
+            DEAL_II_Assert(dofs_per_cell == stokes_dofs_per_cell,
+                           ExcInternalError());
 
             for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
               {
@@ -634,8 +635,8 @@ namespace Step46
         else
           {
             const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-            Assert(dofs_per_cell == elasticity_dofs_per_cell,
-                   ExcInternalError());
+            DEAL_II_Assert(dofs_per_cell == elasticity_dofs_per_cell,
+                           ExcInternalError());
 
             for (unsigned int q = 0; q < fe_values.n_quadrature_points; ++q)
               {
@@ -830,9 +831,9 @@ namespace Step46
     std::vector<double> &                 stokes_phi_p,
     FullMatrix<double> &                  local_interface_matrix) const
   {
-    Assert(stokes_fe_face_values.n_quadrature_points ==
-             elasticity_fe_face_values.n_quadrature_points,
-           ExcInternalError());
+    DEAL_II_Assert(stokes_fe_face_values.n_quadrature_points ==
+                     elasticity_fe_face_values.n_quadrature_points,
+                   ExcInternalError());
     const unsigned int n_face_quadrature_points =
       elasticity_fe_face_values.n_quadrature_points;
 

@@ -558,9 +558,9 @@ general approach to this would go like this:
         PointHistory<dim> *local_quadrature_points_history
           = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
 
-        Assert (local_quadrature_points_history >= &quadrature_point_history.front(),
+        DEAL_II_Assert (local_quadrature_points_history >= &quadrature_point_history.front(),
                 ExcInternalError());
-        Assert (local_quadrature_points_history < &quadrature_point_history.back(),
+        DEAL_II_Assert (local_quadrature_points_history < &quadrature_point_history.back(),
                 ExcInternalError());
 
         for (unsigned int i=0; i<dim; i++)
@@ -603,9 +603,9 @@ general approach to this would go like this:
       PointHistory<dim> *local_quadrature_points_history
        = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
 
-      Assert (local_quadrature_points_history >= &quadrature_point_history.front(),
+      DEAL_II_Assert (local_quadrature_points_history >= &quadrature_point_history.front(),
               ExcInternalError());
-      Assert (local_quadrature_points_history < &quadrature_point_history.back(),
+      DEAL_II_Assert (local_quadrature_points_history < &quadrature_point_history.back(),
               ExcInternalError());
 
       for (unsigned int i=0; i<dim; i++)

@@ -93,8 +93,8 @@ namespace Step30
                             const unsigned int) const
   {
     (void)points;
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < values.size(); ++i)
       values[i] = 0;
@@ -115,8 +115,8 @@ namespace Step30
   void Beta<dim>::value_list(const std::vector<Point<dim>> &points,
                              std::vector<Point<dim>> &      values) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
@@ -139,8 +139,8 @@ namespace Step30
                                        std::vector<double> &          values,
                                        const unsigned int) const
   {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
+    DEAL_II_Assert(values.size() == points.size(),
+                   ExcDimensionMismatch(values.size(), points.size()));
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
@@ -495,8 +495,9 @@ namespace Step30
               }
             else
               {
-                Assert(cell->neighbor(face_no).state() == IteratorState::valid,
-                       ExcInternalError());
+                DEAL_II_Assert(cell->neighbor(face_no).state() ==
+                                 IteratorState::valid,
+                               ExcInternalError());
                 typename DoFHandler<dim>::cell_iterator neighbor =
                   cell->neighbor(face_no);
                 // Case b), we decide that there are finer cells as neighbors
@@ -524,8 +525,8 @@ namespace Step30
                         // anisotropic refinement and non-standard faces.
                         typename DoFHandler<dim>::cell_iterator neighbor_child =
                           cell->neighbor_child_on_subface(face_no, subface_no);
-                        Assert(!neighbor_child->has_children(),
-                               ExcInternalError());
+                        DEAL_II_Assert(!neighbor_child->has_children(),
+                                       ExcInternalError());
 
                         // The remaining part of this case is unchanged.
                         ue_vi_matrix = 0;
@@ -736,9 +737,9 @@ namespace Step30
 
               if (!face->at_boundary())
                 {
-                  Assert(cell->neighbor(face_no).state() ==
-                           IteratorState::valid,
-                         ExcInternalError());
+                  DEAL_II_Assert(cell->neighbor(face_no).state() ==
+                                   IteratorState::valid,
+                                 ExcInternalError());
                   typename DoFHandler<dim>::cell_iterator neighbor =
                     cell->neighbor(face_no);
 
@@ -766,8 +767,8 @@ namespace Step30
                             neighbor_child =
                               cell->neighbor_child_on_subface(face_no,
                                                               subface_no);
-                          Assert(!neighbor_child->has_children(),
-                                 ExcInternalError());
+                          DEAL_II_Assert(!neighbor_child->has_children(),
+                                         ExcInternalError());
                           // ... and reinit the respective FEFaceValues and
                           // FESubFaceValues objects.
                           fe_v_subface.reinit(cell, face_no, subface_no);
@@ -847,17 +848,19 @@ namespace Step30
                           std::pair<unsigned int, unsigned int>
                             neighbor_face_subface =
                               cell->neighbor_of_coarser_neighbor(face_no);
-                          Assert(neighbor_face_subface.first <
-                                   GeometryInfo<dim>::faces_per_cell,
-                                 ExcInternalError());
-                          Assert(neighbor_face_subface.second <
-                                   neighbor->face(neighbor_face_subface.first)
-                                     ->number_of_children(),
-                                 ExcInternalError());
-                          Assert(neighbor->neighbor_child_on_subface(
-                                   neighbor_face_subface.first,
-                                   neighbor_face_subface.second) == cell,
-                                 ExcInternalError());
+                          DEAL_II_Assert(neighbor_face_subface.first <
+                                           GeometryInfo<dim>::faces_per_cell,
+                                         ExcInternalError());
+                          DEAL_II_Assert(neighbor_face_subface.second <
+                                           neighbor
+                                             ->face(neighbor_face_subface.first)
+                                             ->number_of_children(),
+                                         ExcInternalError());
+                          DEAL_II_Assert(neighbor->neighbor_child_on_subface(
+                                           neighbor_face_subface.first,
+                                           neighbor_face_subface.second) ==
+                                           cell,
+                                         ExcInternalError());
 
                           fe_v_face.reinit(cell, face_no);
                           fe_v_subface.reinit(neighbor,
@@ -923,7 +926,7 @@ namespace Step30
 
     std::string filename = "grid-";
     filename += ('0' + cycle);
-    Assert(cycle < 10, ExcInternalError());
+    DEAL_II_Assert(cycle < 10, ExcInternalError());
 
     filename += refine_type + ".eps";
     std::cout << "Writing grid to <" << filename << ">..." << std::endl;
@@ -934,7 +937,7 @@ namespace Step30
 
     filename = "grid-";
     filename += ('0' + cycle);
-    Assert(cycle < 10, ExcInternalError());
+    DEAL_II_Assert(cycle < 10, ExcInternalError());
 
     filename += refine_type + ".gnuplot";
     std::cout << "Writing grid to <" << filename << ">..." << std::endl;
@@ -944,7 +947,7 @@ namespace Step30
 
     filename = "sol-";
     filename += ('0' + cycle);
-    Assert(cycle < 10, ExcInternalError());
+    DEAL_II_Assert(cycle < 10, ExcInternalError());
 
     filename += refine_type + ".gnuplot";
     std::cout << "Writing solution to <" << filename << ">..." << std::endl;

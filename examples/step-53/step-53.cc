@@ -188,9 +188,10 @@ namespace Step53
           }
         catch (...)
           {
-            AssertThrow(false,
-                        ExcMessage("Could not read all 83,600 data points "
-                                   "from the file <topography.txt.gz>!"));
+            DEAL_II_AssertThrow(false,
+                                ExcMessage(
+                                  "Could not read all 83,600 data points "
+                                  "from the file <topography.txt.gz>!"));
           }
       }
 

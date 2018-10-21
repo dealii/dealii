@@ -135,7 +135,7 @@ namespace Step41
                                    const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     return -10;
   }
@@ -159,7 +159,7 @@ namespace Step41
                                     const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     return 0;
   }
@@ -185,7 +185,7 @@ namespace Step41
                               const unsigned int component) const
   {
     (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
+    DEAL_II_Assert(component == 0, ExcIndexRange(component, 0, 1));
 
     if (p(0) < -0.5)
       return -0.2;
@@ -372,7 +372,7 @@ namespace Step41
   void ObstacleProblem<dim>::assemble_mass_matrix_diagonal(
     TrilinosWrappers::SparseMatrix &mass_matrix)
   {
-    Assert(fe.degree == 1, ExcNotImplemented());
+    DEAL_II_Assert(fe.degree == 1, ExcNotImplemented());
 
     const QTrapez<dim> quadrature_formula;
     FEValues<dim>      fe_values(fe,
@@ -481,9 +481,9 @@ namespace Step41
     for (; cell != endc; ++cell)
       for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
         {
-          Assert(dof_handler.get_fe().dofs_per_cell ==
-                   GeometryInfo<dim>::vertices_per_cell,
-                 ExcNotImplemented());
+          DEAL_II_Assert(dof_handler.get_fe().dofs_per_cell ==
+                           GeometryInfo<dim>::vertices_per_cell,
+                         ExcNotImplemented());
 
           const unsigned int dof_index = cell->vertex_dof_index(v, 0);
 
@@ -670,9 +670,9 @@ int main(int argc, char *argv[])
         argc, argv, numbers::invalid_unsigned_int);
 
       // This program can only be run in serial. Otherwise, throw an exception.
-      AssertThrow(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
-                  ExcMessage(
-                    "This program can only be run in serial, use ./step-41"));
+      DEAL_II_AssertThrow(
+        Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1,
+        ExcMessage("This program can only be run in serial, use ./step-41"));
 
       ObstacleProblem<2> obstacle_problem;
       obstacle_problem.run();

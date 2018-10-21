@@ -238,7 +238,7 @@ namespace Step35
     void Data_Storage::read_data(const std::string &filename)
     {
       std::ifstream file(filename);
-      AssertThrow(file, ExcFileNotOpen(filename));
+      DEAL_II_AssertThrow(file, ExcFileNotOpen(filename));
 
       prm.parse_input(file);
 
@@ -321,7 +321,7 @@ namespace Step35
     template <int dim>
     void MultiComponentFunction<dim>::set_component(const unsigned int d)
     {
-      Assert(d < dim, ExcIndexRange(d, 0, dim));
+      DEAL_II_Assert(d < dim, ExcIndexRange(d, 0, dim));
       comp = d;
     }
 
@@ -355,8 +355,8 @@ namespace Step35
                                    const unsigned int) const
     {
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points,
-             ExcDimensionMismatch(values.size(), n_points));
+      DEAL_II_Assert(values.size() == n_points,
+                     ExcDimensionMismatch(values.size(), n_points));
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Velocity<dim>::value(points[i]);
     }
@@ -402,7 +402,7 @@ namespace Step35
                                 const unsigned int component) const
     {
       (void)component;
-      AssertIndexRange(component, 1);
+      DEAL_II_AssertIndexRange(component, 1);
       return 25. - p(0);
     }
 
@@ -412,10 +412,10 @@ namespace Step35
                                    const unsigned int component) const
     {
       (void)component;
-      AssertIndexRange(component, 1);
+      DEAL_II_AssertIndexRange(component, 1);
       const unsigned int n_points = points.size();
-      Assert(values.size() == n_points,
-             ExcDimensionMismatch(values.size(), n_points));
+      DEAL_II_Assert(values.size() == n_points,
+                     ExcDimensionMismatch(values.size(), n_points));
       for (unsigned int i = 0; i < n_points; ++i)
         values[i] = Pressure<dim>::value(points[i]);
     }
@@ -492,12 +492,12 @@ namespace Step35
     SparseDirectUMFPACK prec_mass;
     SparseDirectUMFPACK prec_vel_mass;
 
-    DeclException2(ExcInvalidTimeStep,
-                   double,
-                   double,
-                   << " The time step " << arg1 << " is out of range."
-                   << std::endl
-                   << " The permitted range is (0," << arg2 << "]");
+    DEAL_II_DeclException2(ExcInvalidTimeStep,
+                           double,
+                           double,
+                           << " The time step " << arg1 << " is out of range."
+                           << std::endl
+                           << " The permitted range is (0," << arg2 << "]");
 
     void create_triangulation_and_dofs(const unsigned int n_refines);
 
@@ -708,7 +708,8 @@ namespace Step35
         << std::endl
         << " The obtained results will be nonsense" << std::endl;
 
-    AssertThrow(!((dt <= 0.) || (dt > .5 * T)), ExcInvalidTimeStep(dt, .5 * T));
+    DEAL_II_AssertThrow(!((dt <= 0.) || (dt > .5 * T)),
+                        ExcInvalidTimeStep(dt, .5 * T));
 
     create_triangulation_and_dofs(data.n_global_refines);
     initialize();
@@ -731,7 +732,7 @@ namespace Step35
     {
       std::string   filename = "nsbench2.inp";
       std::ifstream file(filename);
-      Assert(file, ExcFileNotOpen(filename.c_str()));
+      DEAL_II_Assert(file, ExcFileNotOpen(filename.c_str()));
       grid_in.read_ucd(file);
     }
 
@@ -1087,7 +1088,7 @@ namespace Step35
                     boundary_values);
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_Assert(false, ExcNotImplemented());
               }
           }
         MatrixTools::apply_boundary_values(boundary_values,
@@ -1267,7 +1268,7 @@ namespace Step35
           pres_n += phi_n;
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_Assert(false, ExcNotImplemented());
       };
   }
 
@@ -1301,10 +1302,10 @@ namespace Step35
       fe_velocity, dim, fe_pressure, 1, fe_velocity, 1);
     DoFHandler<dim> joint_dof_handler(triangulation);
     joint_dof_handler.distribute_dofs(joint_fe);
-    Assert(joint_dof_handler.n_dofs() ==
-             ((dim + 1) * dof_handler_velocity.n_dofs() +
-              dof_handler_pressure.n_dofs()),
-           ExcInternalError());
+    DEAL_II_Assert(joint_dof_handler.n_dofs() ==
+                     ((dim + 1) * dof_handler_velocity.n_dofs() +
+                      dof_handler_pressure.n_dofs()),
+                   ExcInternalError());
     Vector<double> joint_solution(joint_dof_handler.n_dofs());
     std::vector<types::global_dof_index> loc_joint_dof_indices(
       joint_fe.dofs_per_cell),
@@ -1324,28 +1325,31 @@ namespace Step35
           switch (joint_fe.system_to_base_index(i).first.first)
             {
               case 0:
-                Assert(joint_fe.system_to_base_index(i).first.second < dim,
-                       ExcInternalError());
+                DEAL_II_Assert(joint_fe.system_to_base_index(i).first.second <
+                                 dim,
+                               ExcInternalError());
                 joint_solution(loc_joint_dof_indices[i]) =
                   u_n[joint_fe.system_to_base_index(i).first.second](
                     loc_vel_dof_indices[joint_fe.system_to_base_index(i)
                                           .second]);
                 break;
               case 1:
-                Assert(joint_fe.system_to_base_index(i).first.second == 0,
-                       ExcInternalError());
+                DEAL_II_Assert(joint_fe.system_to_base_index(i).first.second ==
+                                 0,
+                               ExcInternalError());
                 joint_solution(loc_joint_dof_indices[i]) =
                   pres_n(loc_pres_dof_indices[joint_fe.system_to_base_index(i)
                                                 .second]);
                 break;
               case 2:
-                Assert(joint_fe.system_to_base_index(i).first.second == 0,
-                       ExcInternalError());
+                DEAL_II_Assert(joint_fe.system_to_base_index(i).first.second ==
+                                 0,
+                               ExcInternalError());
                 joint_solution(loc_joint_dof_indices[i]) = rot_u(
                   loc_vel_dof_indices[joint_fe.system_to_base_index(i).second]);
                 break;
               default:
-                Assert(false, ExcInternalError());
+                DEAL_II_Assert(false, ExcInternalError());
             }
       }
     std::vector<std::string> joint_solution_names(dim, "v");
@@ -1383,7 +1387,7 @@ namespace Step35
   template <int dim>
   void NavierStokesProjection<dim>::assemble_vorticity(const bool reinit_prec)
   {
-    Assert(dim == 2, ExcNotImplemented());
+    DEAL_II_Assert(dim == 2, ExcNotImplemented());
     if (reinit_prec)
       prec_vel_mass.initialize(vel_Mass);
 

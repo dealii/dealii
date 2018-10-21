@@ -190,8 +190,8 @@ namespace Step20
   void ExactSolution<dim>::vector_value(const Point<dim> &p,
                                         Vector<double> &  values) const
   {
-    Assert(values.size() == dim + 1,
-           ExcDimensionMismatch(values.size(), dim + 1));
+    DEAL_II_Assert(values.size() == dim + 1,
+                   ExcDimensionMismatch(values.size(), dim + 1));
 
     const double alpha = 0.3;
     const double beta  = 1;
@@ -259,7 +259,7 @@ namespace Step20
     // is defined empty and the compiler will complain that the `points` object
     // is unused. The following line silences this warning.
     (void)points;
-    AssertDimension(points.size(), values.size());
+    DEAL_II_AssertDimension(points.size(), values.size());
 
     for (auto &value : values)
       {

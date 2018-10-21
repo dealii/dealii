@@ -1034,7 +1034,7 @@ namespace Step32
         std::ofstream parameter_out(parameter_filename);
         prm.print_parameters(parameter_out, ParameterHandler::Text);
 
-        AssertThrow(
+        DEAL_II_AssertThrow(
           false,
           ExcMessage(
             "Input parameter file <" + parameter_filename +
@@ -1637,7 +1637,7 @@ namespace Step32
       return max_viscosity;
     else
       {
-        Assert(old_time_step > 0, ExcInternalError());
+        DEAL_II_Assert(old_time_step > 0, ExcInternalError());
 
         double entropy_viscosity;
         if (parameters.stabilization_alpha == 2)
@@ -3247,11 +3247,12 @@ namespace Step32
     std::vector<Vector<double>> &               computed_quantities) const
   {
     const unsigned int n_quadrature_points = inputs.solution_values.size();
-    Assert(inputs.solution_gradients.size() == n_quadrature_points,
-           ExcInternalError());
-    Assert(computed_quantities.size() == n_quadrature_points,
-           ExcInternalError());
-    Assert(inputs.solution_values[0].size() == dim + 2, ExcInternalError());
+    DEAL_II_Assert(inputs.solution_gradients.size() == n_quadrature_points,
+                   ExcInternalError());
+    DEAL_II_Assert(computed_quantities.size() == n_quadrature_points,
+                   ExcInternalError());
+    DEAL_II_Assert(inputs.solution_values[0].size() == dim + 2,
+                   ExcInternalError());
 
     for (unsigned int q = 0; q < n_quadrature_points; ++q)
       {
@@ -3329,9 +3330,10 @@ namespace Step32
 
     DoFHandler<dim> joint_dof_handler(triangulation);
     joint_dof_handler.distribute_dofs(joint_fe);
-    Assert(joint_dof_handler.n_dofs() ==
-             stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
-           ExcInternalError());
+    DEAL_II_Assert(joint_dof_handler.n_dofs() ==
+                     stokes_dof_handler.n_dofs() +
+                       temperature_dof_handler.n_dofs(),
+                   ExcInternalError());
 
     TrilinosWrappers::MPI::Vector joint_solution;
     joint_solution.reinit(joint_dof_handler.locally_owned_dofs(),
@@ -3361,9 +3363,9 @@ namespace Step32
             for (unsigned int i = 0; i < joint_fe.dofs_per_cell; ++i)
               if (joint_fe.system_to_base_index(i).first.first == 0)
                 {
-                  Assert(joint_fe.system_to_base_index(i).second <
-                           local_stokes_dof_indices.size(),
-                         ExcInternalError());
+                  DEAL_II_Assert(joint_fe.system_to_base_index(i).second <
+                                   local_stokes_dof_indices.size(),
+                                 ExcInternalError());
 
                   joint_solution(local_joint_dof_indices[i]) = stokes_solution(
                     local_stokes_dof_indices[joint_fe.system_to_base_index(i)
@@ -3371,11 +3373,12 @@ namespace Step32
                 }
               else
                 {
-                  Assert(joint_fe.system_to_base_index(i).first.first == 1,
-                         ExcInternalError());
-                  Assert(joint_fe.system_to_base_index(i).second <
-                           local_temperature_dof_indices.size(),
-                         ExcInternalError());
+                  DEAL_II_Assert(joint_fe.system_to_base_index(i).first.first ==
+                                   1,
+                                 ExcInternalError());
+                  DEAL_II_Assert(joint_fe.system_to_base_index(i).second <
+                                   local_temperature_dof_indices.size(),
+                                 ExcInternalError());
                   joint_solution(local_joint_dof_indices[i]) =
                     temperature_solution(
                       local_temperature_dof_indices

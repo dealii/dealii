@@ -182,8 +182,8 @@ Step6<dim>::Step6()
 // a more complete discussion of this topic). If we try to destroy the object
 // while the counter is larger than zero then the program will either abort
 // (the default) or print an error message and continue: see the documentation
-// of AssertNothrow for more details. In either case the program contains a
-// bug and this facility will, hopefully, point out where.
+// of DEAL_II_AssertNothrow for more details. In either case the program
+// contains a bug and this facility will, hopefully, point out where.
 //
 // To be fair, such errors due to object dependencies are not particularly
 // popular among programmers using deal.II, since they only tell us that
@@ -264,7 +264,7 @@ void Step6<dim>::setup_system()
   // we put all constraints on our function space in the ConstraintMatrix. We
   // can add constraints to the ConstraintMatrix in either order: if two
   // constraints conflict then the constraint matrix either abort or throw an
-  // exception via the Assert macro.
+  // exception via the DEAL_II_Assert macro.
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            Functions::ZeroFunction<dim>(),
