@@ -621,43 +621,33 @@ freedom leads to matrices with large numbers of nonzero entries in some
 rows. At the same time, because there are areas where we use low polynomial
 degree and consequently matrix rows with relatively few nonzero
 entries. Consequently, allocating the sparsity pattern for these matrices is a
-challenge.
+challenge: we cannot simply assemble a SparsityPattern by starting with an
+estimate of the bandwidth without using a lot of extra memory.
 
-Most programs built on deal.II use the DoFTools::make_sparsity_pattern
-function to allocate the sparsity pattern of a matrix, and later add a few
-more entries necessary to handle constrained degrees of freedom using
-AffineConstraints::condense. The sparsity pattern is then compressed using
-SparsityPattern::compress. This method is explained in step-6 and used in
-most tutorial programs. In order to work, it needs an initial upper estimate
-for the maximal number of nonzero entries per row, something that can be had
-from the DoFHandler::max_couplings_between_dofs function. This is necessary
-due to the data structure used in the SparsityPattern class.
+The way in which we create a SparsityPattern for the underlying linear system is
+tightly coupled to the strategy we use to enforce constraints. deal.II supports
+handling constraints in linear systems in two ways:
+<ol>
+  <li>Assembling the matrix without regard to the constraints and applying them
+  afterwards with AffineConstraints::condense, or</li>
+  <li>Applying constraints as we assemble the system with
+  AffineConstraints::distribute_local_to_global.</li>
+</ol>
+Most programs built on deal.II use the DoFTools::make_sparsity_pattern function
+to allocate a DynamicSparsityPattern that takes constraints into account. The
+system matrix then uses a SparsityPattern copied over from the
+DynamicSparsityPattern. This method is explained in step-2 and used in most
+tutorial programs.
 
-Unfortunately, DoFHandler::max_couplings_between_dofs is unable to produce an
-efficient upper estimate in 3d and for higher order elements. If used in these
-situations, it therefore leads the SparsityPattern class to allocate much too
-much memory, almost all of which will be released again when we call
-SparsityPattern::compress. This deficiency, caused by the fact that
-DoFHandler::max_couplings_between_dofs must produce a single number for the
-maximal number of elements per row even though most rows will be significantly
-shorter, can be so severe that the initial memory allocation for the
-SparsityPattern exceeds the actual need by a factor of 10 or larger, and can
-lead to a program running out of memory when in fact there would be plenty of
-memory for all computations.
-
-A solution to the problem has already been discussed in step-11
-and step-18. It used an intermediate object of type
-DynamicSparsityPattern. This class uses a different memory storage scheme
-that is optimized to <i>creating</i> a sparsity pattern when maximal numbers
-of entries per row are not accurately available, but is unsuitable for use as
-the sparsity pattern actually underlying a sparse matrix. After building the
-intermediate object, it is therefore copied into a true SparsityPattern
-object, something that can be done very efficient and without having to
-over-allocate memory. Typical code doing this is shown in the documentation of
-the DynamicSparsityPattern class. This solution is slower than directly
-building a SparsityPattern object, but only uses as much memory as is really
-necessary.
-
+The early tutorial programs use first or second degree finite elements, so
+removing entries in the sparsity pattern corresponding to constrained degrees of
+freedom does not have a large impact on the overall number of zeros explicitly
+stored by the matrix. However, since as many as a third of the degrees of
+freedom may be constrained in an hp discretization (and, with higher degree
+elements, these constraints can couple one DoF to as many as ten or twenty other
+DoFs), it is worthwhile to take these constraints into consideration since the
+resulting matrix will be much sparser (and, therefore, matrix-vector products or
+factorizations will be substantially faster too).
 
 <h4>Eliminating constrained degrees of freedom</h4>
 
