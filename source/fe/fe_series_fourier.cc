@@ -93,7 +93,7 @@ namespace
     const unsigned int                             fe,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
   {
-    AssertIndexRange(fe, fe_collection.size());
+    DEAL_II_AssertIndexRange(fe, fe_collection.size());
 
     if (fourier_transform_matrices[fe].m() == 0)
       {
@@ -116,7 +116,7 @@ namespace
     const unsigned int                             fe,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
   {
-    AssertIndexRange(fe, fe_collection.size());
+    DEAL_II_AssertIndexRange(fe, fe_collection.size());
 
     if (fourier_transform_matrices[fe].m() == 0)
       {
@@ -141,7 +141,7 @@ namespace
     const unsigned int                             fe,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
   {
-    AssertIndexRange(fe, fe_collection.size());
+    DEAL_II_AssertIndexRange(fe, fe_collection.size());
 
     if (fourier_transform_matrices[fe].m() == 0)
       {
@@ -201,10 +201,11 @@ namespace FESeries
               unrolled_coefficients.end(),
               std::complex<double>(0.));
 
-    Assert(unrolled_coefficients.size() == matrix.m(), ExcInternalError());
+    DEAL_II_Assert(unrolled_coefficients.size() == matrix.m(),
+                   ExcInternalError());
 
-    Assert(local_dof_values.size() == matrix.n(),
-           ExcDimensionMismatch(local_dof_values.size(), matrix.n()));
+    DEAL_II_Assert(local_dof_values.size() == matrix.n(),
+                   ExcDimensionMismatch(local_dof_values.size(), matrix.n()));
 
     for (unsigned int i = 0; i < unrolled_coefficients.size(); i++)
       for (unsigned int j = 0; j < local_dof_values.size(); j++)

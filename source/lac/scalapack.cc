@@ -134,7 +134,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
   (void)process_grid;
   (void)row_block_size;
   (void)column_block_size;
-  Assert(
+  DEAL_II_Assert(
     false,
     ExcMessage(
       "This function is only available when deal.II is configured with HDF5"));
@@ -152,21 +152,21 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
 
       // open file in read-only mode
       hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-      AssertThrow(file >= 0, ExcIO());
+      DEAL_II_AssertThrow(file >= 0, ExcIO());
 
       // get data set in file
       hid_t dataset = H5Dopen2(file, "/matrix", H5P_DEFAULT);
-      AssertThrow(dataset >= 0, ExcIO());
+      DEAL_II_AssertThrow(dataset >= 0, ExcIO());
 
       // determine file space
       hid_t filespace = H5Dget_space(dataset);
 
       // get number of dimensions in data set
       int rank = H5Sget_simple_extent_ndims(filespace);
-      AssertThrow(rank == 2, ExcIO());
+      DEAL_II_AssertThrow(rank == 2, ExcIO());
       hsize_t dims[2];
       status = H5Sget_simple_extent_dims(filespace, dims, nullptr);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
 
       // due to ScaLAPACK's column-major memory layout the dimensions are
       // swapped
@@ -175,25 +175,25 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
 
       // close/release resources
       status = H5Sclose(filespace);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       status = H5Dclose(dataset);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
       status = H5Fclose(file);
-      AssertThrow(status >= 0, ExcIO());
+      DEAL_II_AssertThrow(status >= 0, ExcIO());
     }
   int ierr = MPI_Bcast(&n_rows,
                        1,
                        Utilities::MPI::internal::mpi_type_id(&n_rows),
                        0 /*from root*/,
                        process_grid->mpi_communicator);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 
   ierr = MPI_Bcast(&n_columns,
                    1,
                    Utilities::MPI::internal::mpi_type_id(&n_columns),
                    0 /*from root*/,
                    process_grid->mpi_communicator);
-  AssertThrowMPI(ierr);
+  DEAL_II_AssertThrowMPI(ierr);
 
   // the property will be overwritten by the subsequent call to load()
   reinit(n_rows,

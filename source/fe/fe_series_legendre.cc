@@ -29,10 +29,11 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  DeclException2(ExcLegendre,
-                 int,
-                 double,
-                 << "x[" << arg1 << "] = " << arg2 << " is not in [0,1]");
+  DEAL_II_DeclException2(ExcLegendre,
+                         int,
+                         double,
+                         << "x[" << arg1 << "] = " << arg2
+                         << " is not in [0,1]");
 
   /*
    * dim dimensional Legendre function with indices @p indices
@@ -47,7 +48,8 @@ namespace
     for (unsigned int d = 0; d < dim; d++)
       {
         const double x = 2.0 * (x_q[d] - 0.5);
-        Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.), ExcLegendre(d, x_q[d]));
+        DEAL_II_Assert((x_q[d] <= 1.0) && (x_q[d] >= 0.),
+                       ExcLegendre(d, x_q[d]));
         const int ind = indices[d];
         res *= std::sqrt(2.0) * gsl_sf_legendre_Pl(ind, x);
       }
@@ -57,9 +59,9 @@ namespace
 
     (void)x_q;
     (void)indices;
-    AssertThrow(false,
-                ExcMessage("deal.II has to be configured with GSL"
-                           "in order to use Legendre transformation."));
+    DEAL_II_AssertThrow(false,
+                        ExcMessage("deal.II has to be configured with GSL"
+                                   "in order to use Legendre transformation."));
     return 0;
 #endif
   }
@@ -113,7 +115,7 @@ namespace
                    const unsigned int                   fe,
                    std::vector<FullMatrix<double>> &legendre_transform_matrices)
   {
-    AssertIndexRange(fe, fe_collection.size());
+    DEAL_II_AssertIndexRange(fe, fe_collection.size());
 
     if (legendre_transform_matrices[fe].m() == 0)
       {
@@ -135,7 +137,7 @@ namespace
                    const unsigned int                   fe,
                    std::vector<FullMatrix<double>> &legendre_transform_matrices)
   {
-    AssertIndexRange(fe, fe_collection.size());
+    DEAL_II_AssertIndexRange(fe, fe_collection.size());
 
     if (legendre_transform_matrices[fe].m() == 0)
       {
@@ -162,7 +164,7 @@ namespace
                    const unsigned int                   fe,
                    std::vector<FullMatrix<double>> &legendre_transform_matrices)
   {
-    AssertIndexRange(fe, fe_collection.size());
+    DEAL_II_AssertIndexRange(fe, fe_collection.size());
 
     if (legendre_transform_matrices[fe].m() == 0)
       {
@@ -219,10 +221,11 @@ namespace FESeries
 
     std::fill(unrolled_coefficients.begin(), unrolled_coefficients.end(), 0.);
 
-    Assert(unrolled_coefficients.size() == matrix.m(), ExcInternalError());
+    DEAL_II_Assert(unrolled_coefficients.size() == matrix.m(),
+                   ExcInternalError());
 
-    Assert(local_dof_values.size() == matrix.n(),
-           ExcDimensionMismatch(local_dof_values.size(), matrix.n()));
+    DEAL_II_Assert(local_dof_values.size() == matrix.n(),
+                   ExcDimensionMismatch(local_dof_values.size(), matrix.n()));
 
     for (unsigned int i = 0; i < unrolled_coefficients.size(); i++)
       for (unsigned int j = 0; j < local_dof_values.size(); j++)

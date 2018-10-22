@@ -1385,9 +1385,9 @@ namespace Differentiation
      *         const Tensor<2, dim, ADNumberType> F =
      *           unit_symmetric_tensor<dim>() + Grad_u[q_point];
      *         const Tensor<1, dim, ADNumberType> H = -Grad_msp[q_point];
-     *         Assert(numbers::value_is_greater_than(determinant(F), 0.0),
-     *                ExcMessage("Negative determinant of the deformation "
-     *                           "gradient detected!"));
+     *         DEAL_II_Assert(numbers::value_is_greater_than(determinant(F),
+     * 0.0), ExcMessage("Negative determinant of the deformation " "gradient
+     * detected!"));
      *
      *         // Extract some configuration dependent variables from our
      *         // nonlinear constitutive law for the current quadrature point.

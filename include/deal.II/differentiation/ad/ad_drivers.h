@@ -615,7 +615,7 @@ namespace Differentiation
     bool
     TapedDrivers<ADNumberType, ScalarType, T>::is_recording() const
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
       return false;
     }
 
@@ -624,7 +624,7 @@ namespace Differentiation
     typename Types<ADNumberType>::tape_index
     TapedDrivers<ADNumberType, ScalarType, T>::active_tape_index() const
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
       return Numbers<ADNumberType>::invalid_tape_index;
     }
 
@@ -634,7 +634,7 @@ namespace Differentiation
     TapedDrivers<ADNumberType, ScalarType, T>::is_registered_tape(
       const typename Types<ADNumberType>::tape_index) const
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
       return false;
     }
 
@@ -643,7 +643,7 @@ namespace Differentiation
     bool
     TapedDrivers<ADNumberType, ScalarType, T>::keep_independent_values() const
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
       return false;
     }
 
@@ -685,7 +685,7 @@ namespace Differentiation
     TapedDrivers<ADNumberType, ScalarType, T>::activate_tape(
       const typename Types<ADNumberType>::tape_index)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -693,7 +693,7 @@ namespace Differentiation
     void
     TapedDrivers<ADNumberType, ScalarType, T>::reset(const bool)
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -701,7 +701,7 @@ namespace Differentiation
     void
     TapedDrivers<ADNumberType, ScalarType, T>::print(std::ostream &) const
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
 
@@ -1263,14 +1263,14 @@ namespace Differentiation
       bool
       keep_independent_values() const
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
         return false;
       }
 
       bool
       is_registered_tape(const typename Types<ADNumberType>::tape_index) const
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
         return false;
       }
 
@@ -1281,19 +1281,19 @@ namespace Differentiation
         const typename Types<ADNumberType>::tape_buffer_sizes,
         const typename Types<ADNumberType>::tape_buffer_sizes)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       start_taping(const typename Types<ADNumberType>::tape_index, const bool)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
       stop_taping(const typename Types<ADNumberType>::tape_index, const bool)
       {
-        AssertThrow(false, ExcRequiresADOLC());
+        DEAL_II_AssertThrow(false, ExcRequiresADOLC());
       }
 
       void
@@ -1598,7 +1598,7 @@ namespace Differentiation
     TapelessDrivers<ADNumberType, ScalarType, T>::
       allow_dependent_variable_marking()
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
     template <typename ADNumberType, typename ScalarType, typename T>
@@ -1606,7 +1606,7 @@ namespace Differentiation
     TapelessDrivers<ADNumberType, ScalarType, T>::
       prevent_dependent_variable_marking()
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
     }
 
     template <typename ADNumberType, typename ScalarType, typename T>
@@ -1614,7 +1614,7 @@ namespace Differentiation
     TapelessDrivers<ADNumberType, ScalarType, T>::
       is_dependent_variable_marking_allowed() const
     {
-      AssertThrow(false, ExcRequiresADNumberSpecialization());
+      DEAL_II_AssertThrow(false, ExcRequiresADNumberSpecialization());
       return false;
     }
 
