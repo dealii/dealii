@@ -55,40 +55,88 @@ boundary conditions.
 Of maybe more interest is to look at the graphical output. First, here is the
 solution of the problem:
 
-<img src="https://www.dealii.org/images/steps/developer/step-27.solution.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-27-solution.png"
+     alt="Elevation plot of the solution, showing the lack of regularity near
+          the interior (reentrant) corners."
+     width="200" height="200">
 
 Secondly, let us look at the sequence of meshes generated:
 
-<table width="60%" align="center">
-  <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-0.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-1.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-2.png" alt=""></td>
-  </tr>
-  <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-3.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-4.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.mesh-5.png" alt=""></td>
-  </tr>
-</table>
+<div class="threecolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-0.svg"
+         alt="Triangulation containing reentrant corners without adaptive refinement."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-1.svg"
+         alt="Triangulation containing reentrant corners with one level of
+         refinement. New cells are placed near the corners."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-2.svg"
+         alt="Triangulation containing reentrant corners with two levels of
+         refinement. New cells are placed near the corners."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-3.svg"
+         alt="Triangulation containing reentrant corners with three levels of
+         refinement. New cells are placed near the corners."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-4.svg"
+         alt="Triangulation containing reentrant corners with four levels of
+         refinement. New cells are placed near the corners."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-mesh-5.svg"
+         alt="Triangulation containing reentrant corners with five levels of
+         refinement. New cells are placed near the corners."
+         width="200" height="200">
+  </div>
+</div>
 
 It is clearly visible how the mesh is refined near the corner singularities,
 as one would expect it. More interestingly, we should be curious to see the
-distribution of finite element polynomial degrees to these mesh cells:
+distribution of finite element polynomial degrees to these mesh cells, where
+grey corresponds to degree two and pink corresponds to degree seven:
 
-<table width="60%" align="center">
-  <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-0.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-1.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-2.png" alt=""></td>
-  </tr>
-
-  <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-3.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-4.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.fe_degree-5.png" alt=""></td>
-  </tr>
-</table>
+<div class="threecolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-0.png"
+         alt="Initial grid where all cells contain just biquadratic functions."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-1.png"
+         alt="Depiction of local approximation degrees after one refinement."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-2.png"
+         alt="Depiction of local approximation degrees after two refinements."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-3.png"
+         alt="Depiction of local approximation degrees after three refinements."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-4.png"
+         alt="Depiction of local approximation degrees after four refinements."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-cell-degree-5.png"
+         alt="Depiction of local approximation degrees after five refinements."
+         width="200" height="200">
+  </div>
+</div>
 
 While this is certainly not a perfect arrangement, it does make some sense: we
 use low order elements close to boundaries and corners where regularity is
@@ -98,26 +146,48 @@ singularities and in the top right corner where the solution is large, and
 (ii) where the solution is smooth, i.e. far away from the boundary.
 
 This arrangement of polynomial degrees of course follows from our smoothness
-estimator. Here is the estimated smoothness of the solution, with blue colors
-indicating least smoothness and red indicating the smoothest areas:
+estimator. Here is the estimated smoothness of the solution, with darker colors
+indicating least smoothness and lighter indicating the smoothest areas:
 
-<table width="60%" align="center">
-  <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-0.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-1.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-2.png" alt=""></td>
-  </tr>
+<div class="threecolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-0.png"
+         alt="Estimated regularity per cell on the initial grid."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-1.png"
+         alt="Depiction of the estimated regularity per cell after one refinement."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-2.png"
+         alt="Depiction of the estimated regularity per cell after two refinements."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-3.png"
+         alt="Depiction of the estimated regularity per cell after three refinements."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-4.png"
+         alt="Depiction of the estimated regularity per cell after four refinements."
+         width="200" height="200">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step-27-smoothness-5.png"
+         alt="Depiction of the estimated regularity per cell after five refinements."
+         width="200" height="200">
+  </div>
+</div>
 
-  <tr>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-3.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-4.png" alt=""></td>
-    <td><img src="https://www.dealii.org/images/steps/developer/step-27.smoothness-5.png" alt=""></td>
-  </tr>
-</table>
-
-The first conclusion one can draw from these images is that apparently the
-estimated smoothness is a fairly stable quantity under mesh refinement: what
-we get on the coarsest mesh is pretty close to what we get on the finest mesh.
+The primary conclusion one can draw from this is that the loss of regularity at
+the internal corners is a highly localized phenomenon; it only seems to impact
+the cells adjacent to the corner itself, so when we refine the mesh the black
+coloring is no longer visible. Besides the corners, this sequence of plots
+implies that the smoothness estimates are somewhat independent of the mesh
+refinement, particularly when we are far away from boundaries.
 It is also obvious that the smoothness estimates are independent of the actual
 size of the solution (see the picture of the solution above), as it should be.
 A point of larger concern, however, is that one realizes on closer inspection
