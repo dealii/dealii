@@ -1,0 +1,4 @@
+New: Add Functions::IncrementalFunction which returns the difference in values of
+a given function at two time steps.
+<br>
+(Denis Davydov, Jean-Paul Pelteret, 2018/10/05)

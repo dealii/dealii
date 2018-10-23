@@ -39,6 +39,7 @@ SET(_unity_include_src
   geometry_info.cc
   geometric_utilities.cc
   graph_coloring.cc
+  incremental_function.cc
   index_set.cc
   job_identifier.cc
   logstream.cc
@@ -112,6 +113,7 @@ SET(_inst
   data_out_base.inst.in
   function.inst.in
   function_time.inst.in
+  incremental_function.inst.in
   geometric_utilities.inst.in
   mpi.inst.in
   partitioner.inst.in
