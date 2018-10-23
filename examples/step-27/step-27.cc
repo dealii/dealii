@@ -379,7 +379,7 @@ namespace Step27
   void LaplaceProblem<dim>::solve()
   {
     SolverControl solver_control(system_rhs.size(),
-                                 1e-8 * system_rhs.l2_norm());
+                                 1e-12 * system_rhs.l2_norm());
     SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
@@ -605,7 +605,7 @@ namespace Step27
 
         setup_system();
 
-        std::cout << "   Number of active cells:       "
+        std::cout << "   Number of active cells      : "
                   << triangulation.n_active_cells() << std::endl
                   << "   Number of degrees of freedom: " << dof_handler.n_dofs()
                   << std::endl
