@@ -379,7 +379,7 @@ namespace Step27
   void LaplaceProblem<dim>::solve()
   {
     SolverControl solver_control(system_rhs.size(),
-                                 1e-8 * system_rhs.l2_norm());
+                                 1e-12 * system_rhs.l2_norm());
     SolverCG<>    cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
