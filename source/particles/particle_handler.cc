@@ -898,7 +898,7 @@ namespace Particles
         {
           const int ierr = MPI_Irecv(&(n_recv_data[i]),
                                      1,
-                                     MPI_INT,
+                                     MPI_UNSIGNED,
                                      neighbors[i],
                                      0,
                                      triangulation->get_communicator(),
@@ -909,7 +909,7 @@ namespace Particles
         {
           const int ierr = MPI_Isend(&(n_send_data[i]),
                                      1,
-                                     MPI_INT,
+                                     MPI_UNSIGNED,
                                      neighbors[i],
                                      0,
                                      triangulation->get_communicator(),
