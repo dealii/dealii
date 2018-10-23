@@ -21,6 +21,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/manifold.h>
 
@@ -114,24 +115,10 @@ public:
   push_forward_gradient(const Point<chartdim> &chart_point) const override;
 
 private:
-  SmartPointer<const ChartManifold<dim_A, spacedim_A, chartdim_A>,
-               TensorProductManifold<dim,
-                                     dim_A,
-                                     spacedim_A,
-                                     chartdim_A,
-                                     dim_B,
-                                     spacedim_B,
-                                     chartdim_B>>
+  std::unique_ptr<const ChartManifold<dim_A, spacedim_A, chartdim_A>>
     manifold_A;
 
-  SmartPointer<const ChartManifold<dim_B, spacedim_B, chartdim_B>,
-               TensorProductManifold<dim,
-                                     dim_A,
-                                     spacedim_A,
-                                     chartdim_A,
-                                     dim_B,
-                                     spacedim_B,
-                                     chartdim_B>>
+  std::unique_ptr<const ChartManifold<dim_B, spacedim_B, chartdim_B>>
     manifold_B;
 };
 
@@ -205,8 +192,12 @@ TensorProductManifold<dim,
       internal::TensorProductManifoldImplementation::concat(
         manifold_A.get_periodicity(),
         manifold_B.get_periodicity()))
-  , manifold_A(&manifold_A)
-  , manifold_B(&manifold_B)
+  , manifold_A(Utilities::dynamic_unique_cast<
+               ChartManifold<dim_A, spacedim_A, chartdim_A>,
+               Manifold<dim_A, spacedim_A>>(manifold_A.clone()))
+  , manifold_B(Utilities::dynamic_unique_cast<
+               ChartManifold<dim_B, spacedim_B, chartdim_B>,
+               Manifold<dim_B, spacedim_B>>(manifold_B.clone()))
 {}
 
 template <int dim,
