@@ -978,10 +978,10 @@ namespace Step44
     const unsigned int    n_q_points_f;
 
     // Objects that store the converged solution and right-hand side vectors,
-    // as well as the tangent matrix. There is a ConstraintMatrix object used
+    // as well as the tangent matrix. There is an AffineConstraints object used
     // to keep track of constraints.  We make use of a sparsity pattern
     // designed for a block system.
-    ConstraintMatrix          constraints;
+    AffineConstraints<double> constraints;
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> tangent_matrix;
     BlockVector<double>       system_rhs;
@@ -1114,7 +1114,7 @@ namespace Step44
   // indicating the hanging node constraints. We have none in this program
   // So we have to create a constraint object. In its original state, constraint
   // objects are unsorted, and have to be sorted (using the
-  // ConstraintMatrix::close function) before they can be used. Have a look at
+  // AffineConstraints::close function) before they can be used. Have a look at
   // step-21 for more information. We only need to enforce the initial condition
   // on the dilatation. In order to do this, we make use of a
   // ComponentSelectFunction which acts as a mask and sets the J_component of
@@ -1126,7 +1126,7 @@ namespace Step44
     make_grid();
     system_setup();
     {
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       constraints.close();
 
       const ComponentSelectFunction<dim> J_mask(J_component, n_components);

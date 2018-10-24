@@ -971,7 +971,7 @@ namespace Step59
 
   // The setup function differs in two aspects from step-37. The first is that
   // we do not need to interpolate any constraints for the discontinuous
-  // ansatz space, and simply pass a dummy ConstraintMatrix object into
+  // ansatz space, and simply pass a dummy AffineConstraints object into
   // Matrixfree::reinit(). The second change arises because we need to tell
   // MatrixFree to also initialize the data structures for faces. We do this
   // by setting update flags for the inner and boundary faces,
@@ -1004,7 +1004,7 @@ namespace Step59
                  << std::endl;
     time.restart();
 
-    ConstraintMatrix dummy;
+    AffineConstraints<double> dummy;
     dummy.close();
 
     {

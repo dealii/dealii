@@ -292,7 +292,7 @@ within the example.
 The example uses an ad hoc refinement indicator that shows some usefulness in shock-type problems, and
 in the downhill flow example included.  We refine according to the squared gradient of the density.
 Hanging nodes are handled by computing the numerical flux across cells that are of differing
-refinement levels, rather than using the ConstraintMatrix class as in
+refinement levels, rather than using the AffineConstraints class as in
 all other tutorial programs so far.  In this way, the example combines
 the continuous and DG methodologies. It also simplifies the generation
 of the Jacobian because we do not have to track constrained degrees of

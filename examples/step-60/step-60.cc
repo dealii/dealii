@@ -405,7 +405,7 @@ namespace Step60
     SparseMatrix<double> stiffness_matrix;
     SparseMatrix<double> coupling_matrix;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     Vector<double> solution;
     Vector<double> rhs;
@@ -929,7 +929,7 @@ namespace Step60
                                                   *embedded_dh,
                                                   quad,
                                                   dsp,
-                                                  ConstraintMatrix(),
+                                                  AffineConstraints<double>(),
                                                   ComponentMask(),
                                                   ComponentMask(),
                                                   *embedded_mapping);
@@ -974,7 +974,7 @@ namespace Step60
                                                *embedded_dh,
                                                quad,
                                                coupling_matrix,
-                                               ConstraintMatrix(),
+                                               AffineConstraints<double>(),
                                                ComponentMask(),
                                                ComponentMask(),
                                                *embedded_mapping);

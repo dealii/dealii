@@ -1515,15 +1515,15 @@ namespace Step33
           // to face terms either if we enforce hanging node constraints
           // strongly (as in all previous tutorial programs so far whenever we
           // used continuous finite elements -- this enforcement is done by the
-          // ConstraintMatrix class together with
+          // AffineConstraints class together with
           // DoFTools::make_hanging_node_constraints). In the current program,
           // however, we opt to enforce continuity weakly at faces between cells
           // of different refinement level, for two reasons: (i) because we can,
           // and more importantly (ii) because we would have to thread the
           // automatic differentiation we use to compute the elements of the
           // Newton matrix from the residual through the operations of the
-          // ConstraintMatrix class. This would be possible, but is not trivial,
-          // and so we choose this alternative approach.
+          // AffineConstraints class. This would be possible, but is not
+          // trivial, and so we choose this alternative approach.
           //
           // What needs to be decided is which side of an interface between two
           // cells of different refinement level we are sitting on.

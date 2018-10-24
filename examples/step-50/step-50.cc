@@ -129,7 +129,7 @@ namespace Step50
 
     IndexSet locally_relevant_set;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     vector_t solution;
     vector_t system_rhs;
@@ -523,17 +523,17 @@ namespace Step50
     // by calling <code>get_boundary_indices ()</code>.  The third
     // step is to construct constraints on all those degrees of
     // freedom: their value should be zero after each application of
-    // the level operators. To this end, we construct ConstraintMatrix
+    // the level operators. To this end, we construct AffineConstraints
     // objects for each level, and add to each of these constraints
-    // for each degree of freedom. Due to the way the ConstraintMatrix
+    // for each degree of freedom. Due to the way the AffineConstraints class
     // stores its data, the function to add a constraint on a single
     // degree of freedom and force it to be zero is called
-    // ConstraintMatrix::add_line(); doing so for several degrees of
+    // AffineConstraints::add_line(); doing so for several degrees of
     // freedom at once can be done using
-    // ConstraintMatrix::add_lines():
-    std::vector<ConstraintMatrix> boundary_constraints(
+    // AffineConstraints::add_lines():
+    std::vector<AffineConstraints<double>> boundary_constraints(
       triangulation.n_global_levels());
-    ConstraintMatrix empty_constraints;
+    AffineConstraints<double> empty_constraints;
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {

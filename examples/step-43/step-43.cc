@@ -476,7 +476,7 @@ namespace Step43
   // Darcy solution. We also need a helper function that figures out whether
   // we do indeed need to recompute the Darcy solution.
   //
-  // Unlike step-31, this step uses one more ConstraintMatrix object called
+  // Unlike step-31, this step uses one more AffineConstraints object called
   // darcy_preconditioner_constraints. This constraint object is used only for
   // assembling the matrix for the Darcy preconditioner and includes hanging
   // node constraints as well as Dirichlet boundary value constraints for the
@@ -541,12 +541,12 @@ namespace Step43
 
     const unsigned int degree;
 
-    const unsigned int darcy_degree;
-    FESystem<dim>      darcy_fe;
-    DoFHandler<dim>    darcy_dof_handler;
-    ConstraintMatrix   darcy_constraints;
+    const unsigned int        darcy_degree;
+    FESystem<dim>             darcy_fe;
+    DoFHandler<dim>           darcy_dof_handler;
+    AffineConstraints<double> darcy_constraints;
 
-    ConstraintMatrix darcy_preconditioner_constraints;
+    AffineConstraints<double> darcy_preconditioner_constraints;
 
     TrilinosWrappers::BlockSparseMatrix darcy_matrix;
     TrilinosWrappers::BlockSparseMatrix darcy_preconditioner_matrix;
@@ -558,10 +558,10 @@ namespace Step43
     TrilinosWrappers::MPI::BlockVector second_last_computed_darcy_solution;
 
 
-    const unsigned int saturation_degree;
-    FE_Q<dim>          saturation_fe;
-    DoFHandler<dim>    saturation_dof_handler;
-    ConstraintMatrix   saturation_constraints;
+    const unsigned int        saturation_degree;
+    FE_Q<dim>                 saturation_fe;
+    DoFHandler<dim>           saturation_dof_handler;
+    AffineConstraints<double> saturation_constraints;
 
     TrilinosWrappers::SparseMatrix saturation_matrix;
 
@@ -875,7 +875,7 @@ namespace Step43
   // applying the constraints (i.e. darcy_preconditioner_constraints) that
   // takes care of hanging node and zero Dirichlet boundary condition
   // constraints. By doing so, we don't have to do that afterwards, and we
-  // later don't have to use ConstraintMatrix::condense and
+  // later don't have to use AffineConstraints::condense and
   // MatrixTools::apply_boundary_values, both functions that would need to
   // modify matrix and vector entries and so are difficult to write for the
   // Trilinos classes where we don't immediately have access to individual
@@ -1112,8 +1112,8 @@ namespace Step43
     // The last step in the loop over all cells is to enter the local
     // contributions into the global matrix and vector structures to the
     // positions specified in local_dof_indices. Again, we let the
-    // ConstraintMatrix class do the insertion of the cell matrix elements to
-    // the global matrix, which already condenses the hanging node
+    // AffineConstraints class do the insertion of the cell matrix
+    // elements to the global matrix, which already condenses the hanging node
     // constraints.
     typename DoFHandler<dim>::active_cell_iterator cell = darcy_dof_handler
                                                             .begin_active(),
@@ -1227,7 +1227,7 @@ namespace Step43
   // matrix for the left hand side of the saturation linear system by basis
   // functions phi_i_s and phi_j_s only. Finally, as usual, we enter the local
   // contribution into the global matrix by specifying the position in
-  // local_dof_indices. This is done by letting the ConstraintMatrix class do
+  // local_dof_indices. This is done by letting the AffineConstraints class do
   // the insertion of the cell matrix elements to the global matrix, which
   // already condenses the hanging node constraints.
   template <int dim>

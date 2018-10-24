@@ -433,7 +433,7 @@ namespace Step56
     DoFHandler<dim>    dof_handler;
     DoFHandler<dim>    velocity_dof_handler;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
@@ -735,9 +735,9 @@ namespace Step56
 
     std::vector<SymmetricTensor<2, dim>> symgrad_phi_u(dofs_per_cell);
 
-    std::vector<ConstraintMatrix> boundary_constraints(
+    std::vector<AffineConstraints<double>> boundary_constraints(
       triangulation.n_levels());
-    std::vector<ConstraintMatrix> boundary_interface_constraints(
+    std::vector<AffineConstraints<double>> boundary_interface_constraints(
       triangulation.n_levels());
     for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
       {

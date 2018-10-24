@@ -498,7 +498,7 @@ namespace Step28
     Vector<double> system_rhs;
 
     std::map<types::global_dof_index, double> boundary_values;
-    ConstraintMatrix                          hanging_node_constraints;
+    AffineConstraints<double>                 hanging_node_constraints;
 
 
     // @sect5{Private member functions}

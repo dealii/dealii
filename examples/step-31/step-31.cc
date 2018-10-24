@@ -503,10 +503,10 @@ namespace Step31
     Triangulation<dim> triangulation;
     double             global_Omega_diameter;
 
-    const unsigned int stokes_degree;
-    FESystem<dim>      stokes_fe;
-    DoFHandler<dim>    stokes_dof_handler;
-    ConstraintMatrix   stokes_constraints;
+    const unsigned int        stokes_degree;
+    FESystem<dim>             stokes_fe;
+    DoFHandler<dim>           stokes_dof_handler;
+    AffineConstraints<double> stokes_constraints;
 
     std::vector<IndexSet>               stokes_partitioning;
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
@@ -517,10 +517,10 @@ namespace Step31
     TrilinosWrappers::MPI::BlockVector stokes_rhs;
 
 
-    const unsigned int temperature_degree;
-    FE_Q<dim>          temperature_fe;
-    DoFHandler<dim>    temperature_dof_handler;
-    ConstraintMatrix   temperature_constraints;
+    const unsigned int        temperature_degree;
+    FE_Q<dim>                 temperature_fe;
+    DoFHandler<dim>           temperature_dof_handler;
+    AffineConstraints<double> temperature_constraints;
 
     TrilinosWrappers::SparseMatrix temperature_mass_matrix;
     TrilinosWrappers::SparseMatrix temperature_stiffness_matrix;
@@ -1397,9 +1397,9 @@ namespace Step31
         // The last step in the loop over all cells is to enter the local
         // contributions into the global matrix and vector structures to the
         // positions specified in <code>local_dof_indices</code>.  Again, we
-        // let the ConstraintMatrix class do the insertion of the cell matrix
-        // elements to the global matrix, which already condenses the hanging
-        // node constraints.
+        // let the AffineConstraints class do the insertion of the cell
+        // matrix elements to the global matrix, which already condenses the
+        // hanging node constraints.
         cell->get_dof_indices(local_dof_indices);
 
         if (rebuild_stokes_matrix == true)

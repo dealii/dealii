@@ -385,12 +385,12 @@ namespace Step51
     // The degrees of freedom corresponding to the skeleton strongly enforce
     // Dirichlet boundary conditions, just as in a continuous Galerkin finite
     // element method.  We can enforce the boundary conditions in an analogous
-    // manner through the use of ConstraintMatrix constructs. In
+    // manner through the use of AffineConstraints constructs. In
     // addition, hanging nodes are handled in the same way as for
     // continuous finite elements: For the face elements which
     // only define degrees of freedom on the face, this process sets the
     // solution on the refined to be the one from the coarse side.
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     // The usage of the ChunkSparseMatrix class is similar to the usual sparse
     // matrices: You need a sparsity pattern of type ChunkSparsityPattern and

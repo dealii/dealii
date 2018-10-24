@@ -398,7 +398,7 @@ linear system
  F_{\mathcal{F}_k}\\ F_{\mathcal{A}_k}
 \end{pmatrix},
 @f}
-and then let the ConstraintMatrix class eliminate all constrained degrees of
+and then let the AffineConstraints class eliminate all constrained degrees of
 freedom, namely $U^k_{\mathcal{A}_k}=B^{-1}_{\mathcal{A}_k}G_{\mathcal{A}_k}$,
 in the same way as if the dofs in $\mathcal{A}_k$ were Dirichlet data. The
 result linear system (the second to last one above) is symmetric and positive

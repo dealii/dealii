@@ -109,7 +109,7 @@ elements and invert them only once at the beginning of the program.
 <h3>Implementation of constraints</h3>
 
 The usual way to handle constraints in <code>deal.II</code> is to use
-the ConstraintMatrix class that builds a sparse matrix storing
+the AffineConstraints class that builds a sparse matrix storing
 information about which degrees of freedom (DoF) are constrained and
 how they are constrained. This format uses an unnecessarily large
 amount of memory since there are not so many different types of
@@ -121,7 +121,7 @@ redundant information is not a problem in general because it is only
 needed once during matrix and right hand side assembly, it becomes a
 problem when we want to use the matrix-free approach since there this
 information has to be accessed every time we apply the operator. Thus,
-instead of a ConstraintMatrix, we use a variable that we call
+instead of an AffineConstraints object, we use a variable that we call
 <code>constraint_pool</code> that collects the weights of the
 different constraints. Then, we only have to store an identifier of
 each constraint in the mesh instead of all the weights. Moreover, we

@@ -134,7 +134,7 @@ namespace Step46
     hp::FECollection<dim> fe_collection;
     hp::DoFHandler<dim>   dof_handler;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -665,7 +665,7 @@ namespace Step46
 
         // Once we have the contributions from cell integrals, we copy them
         // into the global matrix (taking care of constraints right away,
-        // through the ConstraintMatrix::distribute_local_to_global
+        // through the AffineConstraints::distribute_local_to_global
         // function). Note that we have not written anything into the
         // <code>local_rhs</code> variable, though we still need to pass it
         // along since the elimination of nonzero boundary values requires the

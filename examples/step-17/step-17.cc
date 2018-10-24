@@ -170,7 +170,7 @@ namespace Step17
 
     FESystem<dim> fe;
 
-    ConstraintMatrix hanging_node_constraints;
+    AffineConstraints<double> hanging_node_constraints;
 
     PETScWrappers::MPI::SparseMatrix system_matrix;
 
@@ -440,15 +440,15 @@ namespace Step17
   // this is that we should not try to first assemble the matrix and
   // right hand side as if there were no hanging node constraints and
   // boundary values, and then eliminate these in a second step
-  // (using, for example, ConstraintMatrix::condense()). Rather, we
+  // (using, for example, AffineConstraints::condense()). Rather, we
   // should try to eliminate hanging node constraints before handing
   // these entries over to PETSc. This is easy: instead of copying
   // elements by hand into the global matrix (as we do in step-4), we
-  // use the ConstraintMatrix::distribute_local_to_global() functions
+  // use the AffineConstraints::distribute_local_to_global() functions
   // to take care of hanging nodes at the same time. We also already
   // did this in step-6. The second step, elimination of boundary
   // nodes, could also be done this way by putting the boundary values
-  // into the same ConstraintMatrix object as hanging nodes (see the
+  // into the same AffineConstraints object as hanging nodes (see the
   // way it is done in step-6, for example); however, it is not
   // strictly necessary to do this here because eliminating boundary
   // values can be done with only the data stored on each process
@@ -692,7 +692,7 @@ namespace Step17
     // show how to do this better in step-40.)  On the other hand,
     // distributing hanging node constraints is simple on this local
     // copy, using the usual function
-    // ConstraintMatrix::distributed(). In particular, we can compute
+    // AffineConstraints::distributed(). In particular, we can compute
     // the values of <i>all</i> constrained degrees of freedom,
     // whether the current process owns them or not:
     hanging_node_constraints.distribute(localized_solution);

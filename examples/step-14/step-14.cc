@@ -2134,7 +2134,7 @@ namespace Step14
       // interpolated into the finite element space in which we have solved
       // the dual problem: But, again as in the
       // <code>WeightedResidual::output_solution</code> function we first need
-      // to create a AffineConstraints object including the hanging node
+      // to create an AffineConstraints object including the hanging node
       // constraints, but this time of the dual finite element space.
       AffineConstraints<double> dual_hanging_node_constraints;
       DoFTools::make_hanging_node_constraints(DualSolver<dim>::dof_handler,

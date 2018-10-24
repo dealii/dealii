@@ -94,7 +94,7 @@ namespace Step26
     FE_Q<dim>          fe;
     DoFHandler<dim>    dof_handler;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> mass_matrix;
@@ -221,7 +221,7 @@ namespace Step26
   // matrix here by simply calling two functions in the library.
   //
   // Note that we do not take the hanging node constraints into account when
-  // assembling the matrices (both functions have a ConstraintMatrix argument
+  // assembling the matrices (both functions have an AffineConstraints argument
   // that defaults to an empty object). This is because we are going to
   // condense the constraints in run() after combining the matrices for the
   // current time-step.

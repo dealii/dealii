@@ -373,7 +373,7 @@ step-41 we will use the same methods but now in parallel.
 A difficulty is handling of the constraints from
 the Dirichlet conditions, hanging nodes and the inequality condition that
 arises from the contact. For this purpose we create three objects of type
-ConstraintMatrix that describe the various constraints and that we will
+AffineConstraints that describe the various constraints and that we will
 combine as appropriate in each iteration.
 
 Compared to step-41, the programs has a few new classes:

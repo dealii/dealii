@@ -116,7 +116,7 @@ private:
   // This is the new variable in the main class. We need an object which holds
   // a list of constraints to hold the hanging nodes and the boundary
   // conditions.
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
 
   // The sparsity pattern and sparse matrix are deliberately declared in the
   // opposite of the order used in step-2 through step-5 to demonstrate the
@@ -249,7 +249,7 @@ void Step6<dim>::setup_system()
   solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit(dof_handler.n_dofs());
 
-  // We may now populate the ConstraintMatrix with the hanging node
+  // We may now populate the AffineConstraints object with the hanging node
   // constraints. Since we will call this function in a loop we first clear
   // the current set of constraints from the last system and then compute new
   // ones:
@@ -261,10 +261,10 @@ void Step6<dim>::setup_system()
   // whole boundary) and store the resulting constraints in our
   // <code>constraints</code> object. Note that we do not to apply the
   // boundary conditions after assembly, like we did in earlier steps: instead
-  // we put all constraints on our function space in the ConstraintMatrix. We
-  // can add constraints to the ConstraintMatrix in either order: if two
-  // constraints conflict then the constraint matrix either abort or throw an
-  // exception via the Assert macro.
+  // we put all constraints on our function space in the AffineConstraints
+  // object. We can add constraints to the AffineConstraints object in either
+  // order: if two constraints conflict then the constraint matrix either abort
+  // or throw an exception via the Assert macro.
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            Functions::ZeroFunction<dim>(),
@@ -279,7 +279,7 @@ void Step6<dim>::setup_system()
   // Now we first build our compressed sparsity pattern like we did in the
   // previous examples. Nevertheless, we do not copy it to the final sparsity
   // pattern immediately.  Note that we call a variant of
-  // make_sparsity_pattern that takes the ConstraintMatrix as the third
+  // make_sparsity_pattern that takes the AffineConstraints object as the third
   // argument. We are letting the routine know that we will never write into
   // the locations given by <code>constraints</code> by setting the argument
   // <code>keep_constrained_dofs</code> to false (in other words, that we will
@@ -319,7 +319,7 @@ void Step6<dim>::setup_system()
 //
 // Second, to copy the local matrix and vector on each cell into the global
 // system, we are no longer using a hand-written loop. Instead, we use
-// ConstraintMatrix::distribute_local_to_global() that internally executes
+// AffineConstraints::distribute_local_to_global() that internally executes
 // this loop while performing Gaussian elimination on rows and columns
 // corresponding to constrained degrees on freedom.
 //
@@ -400,9 +400,9 @@ void Step6<dim>::assemble_system()
 // We continue with gradual improvements. The function that solves the linear
 // system again uses the SSOR preconditioner, and is again unchanged except
 // that we have to incorporate hanging node constraints. As mentioned above,
-// the degrees of freedom from the ConstraintMatrix corresponding to hanging
-// node constraints and boundary values have been removed from the linear
-// system by giving the rows and columns of the matrix a special
+// the degrees of freedom from the AffineConstraints object corresponding to
+// hanging node constraints and boundary values have been removed from the
+// linear system by giving the rows and columns of the matrix a special
 // treatment. This way, the values for these degrees of freedom have wrong,
 // but well-defined values after solving the linear system. What we then have
 // to do is to use the constraints to assign to them the values that they

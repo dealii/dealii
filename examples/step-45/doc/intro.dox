@@ -111,8 +111,8 @@ Here, again, the assignment of boundary indicators 0 and 1 stems from
 what GridGenerator::parallelogram() documents.
 
 The resulting @p matched_pairs can be used in
-DoFTools::make_periodicity_constraints for populating a AffineConstraints
-with periodicity constraints:
+DoFTools::make_periodicity_constraints for populating an AffineConstraints
+object with periodicity constraints:
 @code
 DoFTools::make_periodicity_constraints(matched_pairs, constraints);
 @endcode

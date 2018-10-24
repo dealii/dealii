@@ -302,7 +302,7 @@ namespace Step55
     std::vector<IndexSet> owned_partitioning;
     std::vector<IndexSet> relevant_partitioning;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     LA::MPI::BlockSparseMatrix system_matrix;
     LA::MPI::BlockSparseMatrix preconditioner_matrix;

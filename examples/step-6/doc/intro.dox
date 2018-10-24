@@ -236,7 +236,7 @@ contained in the deal.II library itself, and you do not need to worry
 about the details.
 
 The steps you need to make this work are essentially like this:
-- You have to create a ConstraintMatrix object, which (as the name
+- You have to create an AffineConstraints object, which (as the name
   suggests) will store all constraints on the finite element space. In
   the current context, these are the constraints due to our desire to
   keep the solution space continuous even in the presence of hanging
@@ -247,7 +247,7 @@ The steps you need to make this work are essentially like this:
   the elements of the finite element space.
 - You have to use this object when you copy the local contributions to
   the matrix and right hand side into the global objects, by using
-  ConstraintMatrix::distribute_local_to_global(). Up until
+  AffineConstraints::distribute_local_to_global(). Up until
   now, we have done this ourselves, but now with constraints, this
   is where the magic happens and we apply the constraints to the
   linear system. What this function does is make sure that the
@@ -263,7 +263,7 @@ The steps you need to make this work are essentially like this:
   on hanging nodes get their correct (constrained) value so that the
   solution you then visualize or evaluate in other ways in in
   fact continuous. This is done by calling
-  ConstraintMatrix::distribute() immediately after solving.
+  AffineConstraints::distribute() immediately after solving.
 
 These four steps are really all that is necessary -- it's that simple
 from a user perspective. The fact that, in the function calls mentioned
@@ -329,14 +329,14 @@ indeed: If $j$ is a degree of freedom on the boundary, with position
 $\mathbf x_j$, then imposing the boundary condition $u=g$ on $\partial\Omega$
 simply yields the constraint $U_j=g({\mathbf x}_j)$.
 
-The ConstraintMatrix can handle such constraints as well, which makes it
+The AffineConstraints class can handle such constraints as well, which makes it
 convenient to let the same object we use for hanging node constraints
 also deal with these Dirichlet boundary conditions.
 This way, we don't need to apply the boundary conditions after assembly 
 (like we did in the earlier steps).
 All that is necessary is that we call the variant of
 VectorTools::interpolate_boundary_values() that returns its information
-in a ConstraintMatrix object, rather than the `std::map` we have used
+in an AffineConstraints object, rather than the `std::map` we have used
 in previous tutorial programs.
  
 
