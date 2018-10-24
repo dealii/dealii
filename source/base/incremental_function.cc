@@ -36,6 +36,8 @@ namespace Functions
   IncrementalFunction<dim, RangeNumberType>::set_decrement(
     const time_type delta)
   {
+    Assert(delta >= 0.0,
+           ExcMessage("The decrement must be set to a non-negative value."));
     delta_t = delta;
   }
 
