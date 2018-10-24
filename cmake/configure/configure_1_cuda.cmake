@@ -57,7 +57,8 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # CUDA 8.0 requires C++11 support, CUDA 9.0 requires C++14 support.
+    # CUDA Toolkit 8 is incompatible with C++14,
+    # CUDA Toolkit 9 and CUDA Toolkit 10 are incompatible with C++17.
     # Make sure that deal.II is configured appropriately
     #
     MACRO(_cuda_ensure_feature_off _version _feature)
