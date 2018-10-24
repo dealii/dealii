@@ -28,7 +28,7 @@
 // In order to implement periodic boundary conditions only two functions
 // have to be modified:
 // - <code>StokesProblem<dim>::setup_dofs()</code>:
-//   To populate a AffineConstraints object with periodicity constraints
+//   To populate an AffineConstraints object with periodicity constraints
 // - <code>StokesProblem<dim>::run()</code>:
 //   To supply a distributed triangulation with periodicity information.
 //

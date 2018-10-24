@@ -94,7 +94,7 @@ the zero vector.
 
 In this example, the mean value along the boundary allows just such a
 representation, with $C$ being a matrix with just one row (i.e. there is only
-one constraint). In the implementation, we will create a AffineConstraints
+one constraint). In the implementation, we will create an AffineConstraints
 object, add one constraint (i.e. add another row to the matrix) referring to the
 first boundary node $i_0$, and insert the weights with which all the other nodes
 contribute, which in this example happens to be just $-1$.

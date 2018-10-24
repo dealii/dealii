@@ -91,11 +91,11 @@ namespace Step41
     void solve();
     void output_results(const unsigned int iteration) const;
 
-    Triangulation<dim> triangulation;
-    FE_Q<dim>          fe;
-    DoFHandler<dim>    dof_handler;
-    ConstraintMatrix   constraints;
-    IndexSet           active_set;
+    Triangulation<dim>        triangulation;
+    FE_Q<dim>                 fe;
+    DoFHandler<dim>           dof_handler;
+    AffineConstraints<double> constraints;
+    IndexSet                  active_set;
 
     TrilinosWrappers::SparseMatrix system_matrix;
     TrilinosWrappers::SparseMatrix complete_system_matrix;
@@ -413,7 +413,7 @@ namespace Step41
 
   // In a sense, this is the central function of this program.  It updates the
   // active set of constrained degrees of freedom as discussed in the
-  // introduction and computes a ConstraintMatrix object from it that can then
+  // introduction and computes an AffineConstraints object from it that can then
   // be used to eliminate constrained degrees of freedom from the solution of
   // the next iteration. At the same time we set the constrained degrees of
   // freedom of the solution to the correct value, namely the height of the
@@ -500,7 +500,7 @@ namespace Step41
           //
           // If we decide that the DoF should be part of the active set, we
           // add its index to the active set, introduce an inhomogeneous
-          // equality constraint in the ConstraintMatrix object, and reset the
+          // equality constraint in the AffineConstraints object, and reset the
           // solution value to the height of the obstacle. Finally, the
           // residual of the non-contact part of the system serves as an
           // additional control (the residual equals the remaining,

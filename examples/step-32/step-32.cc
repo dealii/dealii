@@ -869,9 +869,9 @@ namespace Step32
 
     const MappingQ<dim> mapping;
 
-    const FESystem<dim> stokes_fe;
-    DoFHandler<dim>     stokes_dof_handler;
-    ConstraintMatrix    stokes_constraints;
+    const FESystem<dim>       stokes_fe;
+    DoFHandler<dim>           stokes_dof_handler;
+    AffineConstraints<double> stokes_constraints;
 
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
@@ -881,9 +881,9 @@ namespace Step32
     TrilinosWrappers::MPI::BlockVector stokes_rhs;
 
 
-    FE_Q<dim>        temperature_fe;
-    DoFHandler<dim>  temperature_dof_handler;
-    ConstraintMatrix temperature_constraints;
+    FE_Q<dim>                 temperature_fe;
+    DoFHandler<dim>           temperature_dof_handler;
+    AffineConstraints<double> temperature_constraints;
 
     TrilinosWrappers::SparseMatrix temperature_mass_matrix;
     TrilinosWrappers::SparseMatrix temperature_stiffness_matrix;
@@ -1680,11 +1680,11 @@ namespace Step32
   // we won't even notice that this part is not parallelized by threads.
   //
   // Regarding the implementation of inhomogeneous Dirichlet boundary
-  // conditions: Since we use the temperature ConstraintMatrix, we could apply
-  // the boundary conditions directly when building the respective matrix and
-  // right hand side. In this case, the boundary conditions are inhomogeneous,
-  // which makes this procedure somewhat tricky since we get the matrix from
-  // some other function that uses its own integration and assembly
+  // conditions: Since we use the temperature AffineConstraints object, we
+  // could apply the boundary conditions directly when building the respective
+  // matrix and right hand side. In this case, the boundary conditions are
+  // inhomogeneous, which makes this procedure somewhat tricky since we get the
+  // matrix from some other function that uses its own integration and assembly
   // loop. However, the correct imposition of boundary conditions needs the
   // matrix data we work on plus the right hand side simultaneously, since the
   // right hand side is created by Gaussian elimination on the matrix rows. In
@@ -1692,14 +1692,15 @@ namespace Step32
   // having the matrix data available, we choose to create a dummy matrix
   // <code>matrix_for_bc</code> that we only fill with data when we need it
   // for imposing boundary conditions. These positions are exactly those where
-  // we have an inhomogeneous entry in the ConstraintMatrix. There are only a
-  // few such positions (on the boundary DoFs), so it is still much cheaper to
-  // use this function than to create the full matrix here. To implement this,
-  // we ask the constraint matrix whether the DoF under consideration is
-  // inhomogeneously constrained. In that case, we generate the respective
-  // matrix column that we need for creating the correct right hand side. Note
-  // that this (manually generated) matrix entry needs to be exactly the entry
-  // that we would fill the matrix with &mdash; otherwise, this will not work.
+  // we have an inhomogeneous entry in the AffineConstraints<double>. There are
+  // only a few such positions (on the boundary DoFs), so it is still much
+  // cheaper to use this function than to create the full matrix here. To
+  // implement this, we ask the constraint matrix whether the DoF under
+  // consideration is inhomogeneously constrained. In that case, we generate the
+  // respective matrix column that we need for creating the correct right hand
+  // side. Note that this (manually generated) matrix entry needs to be exactly
+  // the entry that we would fill the matrix with &mdash; otherwise, this will
+  // not work.
   template <int dim>
   void BoussinesqFlowProblem<dim>::project_temperature_field()
   {

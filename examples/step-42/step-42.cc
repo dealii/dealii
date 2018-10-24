@@ -588,19 +588,13 @@ namespace Step42
 
   // @sect3{The <code>PlasticityContactProblem</code> class template}
 
-  // This is the main class of this program and supplies all functions
-  // and variables needed to describe
-  // the nonlinear contact problem. It is
-  // close to step-41 but with some additional
-  // features like handling hanging nodes,
-  // a Newton method, using Trilinos and p4est
-  // for parallel distributed computing.
-  // To deal with hanging nodes makes
-  // life a bit more complicated since
-  // we need another ConstraintMatrix now.
-  // We create a Newton method for the
-  // active set method for the contact
-  // situation and to handle the nonlinear
+  // This is the main class of this program and supplies all functions and
+  // variables needed to describe the nonlinear contact problem. It is close to
+  // step-41 but with some additional features like handling hanging nodes, a
+  // Newton method, using Trilinos and p4est for parallel distributed computing.
+  // To deal with hanging nodes makes life a bit more complicated since we need
+  // another AffineConstraints object now. We create a Newton method for the
+  // active set method for the contact situation and to handle the nonlinear
   // operator for the constitutive law.
   //
   // The general layout of this class is very much like for most other tutorial
@@ -658,7 +652,7 @@ namespace Step42
     // also step-40 and the @ref distributed documentation module) as
     // well as a variety of constraints: those imposed by hanging nodes,
     // by Dirichlet boundary conditions, and by the active set of
-    // contact nodes. Of the three ConstraintMatrix variables defined
+    // contact nodes. Of the three AffineConstraints variables defined
     // here, the first only contains hanging node constraints, the
     // second also those associated with Dirichlet boundary conditions,
     // and the third these plus the contact constraints.
@@ -686,9 +680,9 @@ namespace Step42
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
 
-    ConstraintMatrix constraints_hanging_nodes;
-    ConstraintMatrix constraints_dirichlet_and_hanging_nodes;
-    ConstraintMatrix all_constraints;
+    AffineConstraints<double> constraints_hanging_nodes;
+    AffineConstraints<double> constraints_dirichlet_and_hanging_nodes;
+    AffineConstraints<double> all_constraints;
 
     IndexSet      active_set;
     Vector<float> fraction_of_plastic_q_points_per_cell;
@@ -1287,7 +1281,7 @@ namespace Step42
                   // between faces), we need to evaluate the gap between the
                   // deformed object and the obstacle. If the active set
                   // condition is true, then we add a constraint to the
-                  // ConstraintMatrix object that the next Newton update needs
+                  // AffineConstraints object that the next Newton update needs
                   // to satisfy, set the solution vector's corresponding element
                   // to the correct value, and add the index to the IndexSet
                   // object that stores which degree of freedom is part of the
@@ -1331,7 +1325,7 @@ namespace Step42
     // At the end of this function, we exchange data between processors updating
     // those ghost elements in the <code>solution</code> variable that have been
     // written by other processors. We then merge the Dirichlet constraints and
-    // those from hanging nodes into the ConstraintMatrix object that already
+    // those from hanging nodes into the AffineConstraints object that already
     // contains the active set. We finish the function by outputting the total
     // number of actively constrained degrees of freedom for which we sum over
     // the number of actively constrained degrees of freedom owned by each
@@ -1360,7 +1354,7 @@ namespace Step42
   // Newton right hand side and Newton matrix. It looks fairly innocent because
   // the heavy lifting happens in the call to
   // <code>ConstitutiveLaw::get_linearized_stress_strain_tensors()</code> and in
-  // particular in ConstraintMatrix::distribute_local_to_global(), using the
+  // particular in AffineConstraints::distribute_local_to_global(), using the
   // constraints we have previously computed.
   template <int dim>
   void PlasticityContactProblem<dim>::assemble_newton_system(
@@ -1642,7 +1636,7 @@ namespace Step42
   // mostly it is just setup then solve. Among the complications are:
   //
   // - For the hanging nodes we have to apply
-  //   the ConstraintMatrix::set_zero function to newton_rhs.
+  //   the AffineConstraints::set_zero function to newton_rhs.
   //   This is necessary if a hanging node with solution value $x_0$
   //   has one neighbor with value $x_1$ which is in contact with the
   //   obstacle and one neighbor $x_2$ which is not in contact. Because

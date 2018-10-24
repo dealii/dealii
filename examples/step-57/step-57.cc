@@ -82,9 +82,10 @@ namespace Step57
   // and the update. Additionally, the evaluation point is
   // for temporarily holding Newton update in line search. A sparse matrix
   // for the pressure mass matrix is created for the operator of a block Schur
-  // complement preconditioner. We use one ConstraintMatrix for Dirichlet
-  // boundary conditions at the initial step and a zero ConstraintMatrix for the
-  // Newton is defined by 1/Re which has been discussed in the introduction.
+  // complement preconditioner. We use one AffineConstraints object for
+  // Dirichlet boundary conditions at the initial step and a zero
+  // AffineConstraints object for the Newton is defined by 1/Re which has been
+  // discussed in the introduction.
 
   template <int dim>
   class StationaryNavierStokes
@@ -119,8 +120,8 @@ namespace Step57
     FESystem<dim>      fe;
     DoFHandler<dim>    dof_handler;
 
-    ConstraintMatrix zero_constraints;
-    ConstraintMatrix nonzero_constraints;
+    AffineConstraints<double> zero_constraints;
+    AffineConstraints<double> nonzero_constraints;
 
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
@@ -138,11 +139,11 @@ namespace Step57
   // is zero so we do not need to set the right hand side function in this
   // tutorial. The number of components of the boundary function is dim+1.
   // In practice, the boundary values are
-  // applied to our solution through ConstraintMatrix which is obtained by using
-  // VectorTools::interpolate_boundary_values. The components of boundary value
-  // functions are required to be chosen according to the finite element space.
-  // Therefore we have to define the boundary value of pressure even though we
-  // actually do not need it.
+  // applied to our solution through an AffineConstraints object which is
+  // obtained by using VectorTools::interpolate_boundary_values. The components
+  // of boundary value functions are required to be chosen according to the
+  // finite element space. Therefore we have to define the boundary value of
+  // pressure even though we actually do not need it.
 
   // The following function represents the boundary values:
   template <int dim>
@@ -490,7 +491,7 @@ namespace Step57
 
         cell->get_dof_indices(local_dof_indices);
 
-        const ConstraintMatrix &constraints_used =
+        const AffineConstraints<double> &constraints_used =
           initial_step ? nonzero_constraints : zero_constraints;
 
         if (assemble_matrix)
@@ -550,7 +551,7 @@ namespace Step57
   template <int dim>
   void StationaryNavierStokes<dim>::solve(const bool initial_step)
   {
-    const ConstraintMatrix &constraints_used =
+    const AffineConstraints<double> &constraints_used =
       initial_step ? nonzero_constraints : zero_constraints;
 
     SolverControl                     solver_control(system_matrix.m(),

@@ -689,7 +689,7 @@ namespace Step39
 
     // Since this assembler allows us to fill several vectors, the interface is
     // a little more complicated as above. The pointers to the vectors have to
-    // be stored in a AnyData object. While this seems to cause two extra
+    // be stored in an AnyData object. While this seems to cause two extra
     // lines of code here, it actually comes handy in more complex
     // applications.
     MeshWorker::Assembler::ResidualSimple<Vector<double>> assembler;

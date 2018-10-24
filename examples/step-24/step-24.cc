@@ -83,7 +83,7 @@ namespace Step24
     FE_Q<dim>          fe;
     DoFHandler<dim>    dof_handler;
 
-    ConstraintMatrix constraints;
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;

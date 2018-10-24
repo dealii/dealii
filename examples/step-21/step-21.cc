@@ -1201,11 +1201,11 @@ namespace Step21
   // program (we compute on a uniformly refined mesh), but the function
   // requires the argument anyway, of course. So we have to create a
   // constraint object. In its original state, constraint objects are
-  // unsorted, and have to be sorted (using the ConstraintMatrix::close
+  // unsorted, and have to be sorted (using the AffineConstraints::close
   // function) before they can be used. This is what we do here, and which is
   // why we can't simply call the VectorTools::project function with an
-  // anonymous temporary object <code>ConstraintMatrix()</code> as the second
-  // argument.
+  // anonymous temporary object <code>AffineConstraints<double>()</code> as the
+  // second argument.
   //
   // The second point worth mentioning is that we only compute the length of
   // the present time step in the middle of solving the linear system
@@ -1222,7 +1222,7 @@ namespace Step21
     make_grid_and_dofs();
 
     {
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       constraints.close();
 
       VectorTools::project(dof_handler,

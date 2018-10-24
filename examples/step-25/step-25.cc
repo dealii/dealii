@@ -597,7 +597,7 @@ namespace Step25
     // function requires a hanging node constraints object, but to be used we
     // first need to close it:
     {
-      ConstraintMatrix constraints;
+      AffineConstraints<double> constraints;
       constraints.close();
       VectorTools::project(dof_handler,
                            constraints,
