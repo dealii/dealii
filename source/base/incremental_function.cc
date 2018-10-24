@@ -44,6 +44,30 @@ namespace Functions
 
 
   template <int dim, typename RangeNumberType>
+  RangeNumberType
+  IncrementalFunction<dim, RangeNumberType>::value(const Point<dim> &p,
+                                                   unsigned int      comp) const
+  {
+    // Cache the time state of the base class in case it has been changed
+    // within the user code. We reset the wrapped function to the original
+    // state once we're done with our own evaluations.
+    const auto orig_time = base.get_time();
+
+    base.set_time(this->get_time());
+    const RangeNumberType current = base.value(p, comp);
+
+    base.set_time(this->get_time() - delta_t);
+    const RangeNumberType old = base.value(p, comp);
+
+    // Reset wrapped function time setting
+    base.set_time(orig_time);
+
+    return current - old;
+  }
+
+
+
+  template <int dim, typename RangeNumberType>
   void
   IncrementalFunction<dim, RangeNumberType>::vector_value(
     const Point<dim> &       p,
@@ -53,6 +77,11 @@ namespace Functions
     // the data via a mutex
     std::lock_guard<std::mutex> lock(mutex);
 
+    // Cache the time state of the base class in case it has been changed
+    // within the user code. We reset the wrapped function to the original
+    // state once we're done with our own evaluations.
+    const auto orig_time = base.get_time();
+
     base.set_time(this->get_time());
     base.vector_value(p, values);
 
@@ -60,22 +89,9 @@ namespace Functions
     base.vector_value(p, values_old);
 
     values -= values_old;
-  }
 
-
-
-  template <int dim, typename RangeNumberType>
-  RangeNumberType
-  IncrementalFunction<dim, RangeNumberType>::value(const Point<dim> &p,
-                                                   unsigned int      comp) const
-  {
-    base.set_time(this->get_time());
-    const RangeNumberType current = base.value(p, comp);
-
-    base.set_time(this->get_time() - delta_t);
-    const RangeNumberType old = base.value(p, comp);
-
-    return current - old;
+    // Reset wrapped function time setting
+    base.set_time(orig_time);
   }
 
 

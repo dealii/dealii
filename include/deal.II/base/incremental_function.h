@@ -62,6 +62,9 @@ namespace Functions
      * @note This class stores a non-constant reference to @p base
      * and will call <code>base.set_time()</code> during evaluation
      * in order to evaluate the @p base class at any arbitrary time.
+     * It is guaranteed that the temporal state of @p base is returned
+     * to its original settings after each function evaluation in this
+     * class.
      */
     IncrementalFunction(Function<dim, RangeNumberType> &base);
 
