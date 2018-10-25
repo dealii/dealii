@@ -420,30 +420,27 @@ DynamicSparsityPattern::compute_Tmmult_pattern(
   // row of matrix B with that row number. This means that we will insert
   // a lot of entries to each row, which is best handled by the
   // DynamicSparsityPattern class.
+
+  std::vector<size_type> new_cols;
+  new_cols.reserve(sp_B.max_entries_per_row());
+
+  // C_{kl} = A_{ik} B_{il}
   for (size_type i = 0; i < sp_A.n_rows(); ++i)
     {
-      const size_type *      rows     = &sp_A.colnums[sp_A.rowstart[i]];
-      const size_type *const end_rows = &sp_A.colnums[sp_A.rowstart[i + 1]];
-      // cast away constness to conform with dsp.add_entries interface
-      size_type *new_cols =
-        const_cast<size_type *>(&sp_B.colnums[sp_B.rowstart[i]]);
-      size_type *end_new_cols =
-        const_cast<size_type *>(&sp_B.colnums[sp_B.rowstart[i + 1]]);
+      // get all column numbers from sp_B in a temporary vector:
+      new_cols.resize(sp_B.row_length(i));
+      {
+        const auto last_il = sp_B.end(i);
+        auto *     col_ptr = new_cols.data();
+        for (auto il = sp_B.begin(i); il != last_il; ++il)
+          *col_ptr++ = il->column();
+      }
+      std::sort(new_cols.begin(), new_cols.end());
 
-      if (sp_B.n_rows() == sp_B.n_cols())
-        ++new_cols;
-
-      for (; rows != end_rows; ++rows)
-        {
-          const size_type row = *rows;
-
-          // if B has a diagonal, need to add that manually. this way,
-          // we maintain sortedness.
-          if (sp_B.n_rows() == sp_B.n_cols())
-            this->add(row, i);
-
-          this->add_entries(row, new_cols, end_new_cols, true);
-        }
+      // now for each k, add new_cols to the target sparsity
+      const auto last_ik = sp_A.end(i);
+      for (auto ik = sp_A.begin(i); ik != last_ik; ++ik)
+        this->add_entries(ik->column(), new_cols.begin(), new_cols.end(), true);
     }
 }
 
@@ -609,5 +606,14 @@ DynamicSparsityPattern::compute_mmult_pattern(const SparsityPattern &,
 template void
 DynamicSparsityPattern::compute_Tmmult_pattern(const SparsityPattern &,
                                                const SparsityPattern &);
+template void
+DynamicSparsityPattern::compute_Tmmult_pattern(const DynamicSparsityPattern &,
+                                               const SparsityPattern &);
+template void
+DynamicSparsityPattern::compute_Tmmult_pattern(const SparsityPattern &,
+                                               const DynamicSparsityPattern &);
+template void
+DynamicSparsityPattern::compute_Tmmult_pattern(const DynamicSparsityPattern &,
+                                               const DynamicSparsityPattern &);
 
 DEAL_II_NAMESPACE_CLOSE
