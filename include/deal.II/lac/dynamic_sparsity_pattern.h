@@ -32,7 +32,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 class DynamicSparsityPattern;
-class SparsityPattern;
 
 /*! @addtogroup Sparsity
  *@{
@@ -450,9 +449,10 @@ public:
    * Construct and store in this object the sparsity pattern corresponding to
    * the product of transposed @p left and and non-transpose @p right sparsity pattern.
    */
+  template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
   void
-  compute_Tmmult_pattern(const SparsityPattern &left,
-                         const SparsityPattern &right);
+  compute_Tmmult_pattern(const SparsityPatternTypeLeft & left,
+                         const SparsityPatternTypeRight &right);
 
   /**
    * Print the sparsity pattern. The output consists of one line per row of

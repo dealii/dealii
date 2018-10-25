@@ -405,9 +405,11 @@ DynamicSparsityPattern::symmetrize()
 
 
 
+template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
 void
-DynamicSparsityPattern::compute_Tmmult_pattern(const SparsityPattern &sp_A,
-                                               const SparsityPattern &sp_B)
+DynamicSparsityPattern::compute_Tmmult_pattern(
+  const SparsityPatternTypeLeft & sp_A,
+  const SparsityPatternTypeRight &sp_B)
 {
   Assert(sp_A.n_rows() == sp_B.n_rows(),
          ExcDimensionMismatch(sp_A.n_rows(), sp_B.n_rows()));
@@ -603,5 +605,9 @@ DynamicSparsityPattern::compute_mmult_pattern(const SparsityPattern &,
 template void
 DynamicSparsityPattern::compute_mmult_pattern(const SparsityPattern &,
                                               const SparsityPattern &);
+
+template void
+DynamicSparsityPattern::compute_Tmmult_pattern(const SparsityPattern &,
+                                               const SparsityPattern &);
 
 DEAL_II_NAMESPACE_CLOSE
