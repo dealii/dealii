@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -575,6 +576,38 @@ DynamicSparsityPattern::memory_consumption() const
 
   return mem;
 }
+
+
+
+types::global_dof_index
+DynamicSparsityPattern::column_index(
+  const DynamicSparsityPattern::size_type row,
+  const DynamicSparsityPattern::size_type col) const
+{
+  Assert(row < n_rows(),
+         ExcIndexRangeType<DynamicSparsityPattern::size_type>(row,
+                                                              0,
+                                                              n_rows()));
+  Assert(col < n_cols(),
+         ExcIndexRangeType<DynamicSparsityPattern::size_type>(row,
+                                                              0,
+                                                              n_cols()));
+  Assert(rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
+
+  const DynamicSparsityPattern::size_type local_row =
+    rowset.size() ? rowset.index_within_set(row) : row;
+
+  // now we need to do a binary search. Note that col indices are assumed to
+  // be sorted.
+  const auto &cols = lines[local_row].entries;
+  auto        it   = Utilities::lower_bound(cols.begin(), cols.end(), col);
+
+  if ((it != cols.end()) && (*it == col))
+    return (it - cols.begin());
+  else
+    return numbers::invalid_size_type;
+}
+
 
 
 // explicit instantiations
