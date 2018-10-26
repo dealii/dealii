@@ -46,14 +46,15 @@ FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int degree)
   create_polynomials(degree);
 }
 
+
+
 // Shape functions:
 template <int dim, int spacedim>
 double
 FE_NedelecSZ<dim, spacedim>::shape_value(const unsigned int /*i*/,
                                          const Point<dim> & /*p*/) const
 {
-  using FEE = FiniteElement<dim, dim>;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
   return 0.;
 }
 
@@ -78,8 +79,7 @@ Tensor<1, dim>
 FE_NedelecSZ<dim, spacedim>::shape_grad(const unsigned int /*i*/,
                                         const Point<dim> & /*p*/) const
 {
-  using FEE = FiniteElement<dim, dim>;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
   return Tensor<1, dim>();
 }
 
@@ -103,8 +103,7 @@ Tensor<2, dim>
 FE_NedelecSZ<dim, spacedim>::shape_grad_grad(const unsigned int /*i*/,
                                              const Point<dim> & /*p*/) const
 {
-  using FEE = FiniteElement<dim, dim>;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  Assert(false, (typename FiniteElement<dim, spacedim>::ExcFENotPrimitive()));
   return Tensor<2, dim>();
 }
 
