@@ -102,6 +102,11 @@ public:
   virtual void
   advance_time(const Number delta_t);
 
+  /**
+   * The type this class is initialized with and that is used to represent time.
+   */
+  using time_type = Number;
+
 private:
   /**
    * Store the present time.

@@ -145,7 +145,9 @@ class TensorFunction;
  * @author Wolfgang Bangerth, 1998, 1999, Luca Heltai 2014
  */
 template <int dim, typename RangeNumberType = double>
-class Function : public FunctionTime<RangeNumberType>, public Subscriptor
+class Function : public FunctionTime<
+                   typename numbers::NumberTraits<RangeNumberType>::real_type>,
+                 public Subscriptor
 {
 public:
   /**
@@ -160,12 +162,18 @@ public:
   const unsigned int n_components;
 
   /**
+   * The scalar-valued real type used for representing time.
+   */
+  using time_type = typename FunctionTime<
+    typename numbers::NumberTraits<RangeNumberType>::real_type>::time_type;
+
+  /**
    * Constructor. May take an initial value for the number of components
    * (which defaults to one, i.e. a scalar function), and the time variable,
    * which defaults to zero.
    */
-  Function(const unsigned int    n_components = 1,
-           const RangeNumberType initial_time = 0.0);
+  Function(const unsigned int n_components = 1,
+           const time_type    initial_time = 0.0);
 
   /**
    * Virtual destructor; absolutely necessary in this case.

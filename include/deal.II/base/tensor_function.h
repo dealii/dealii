@@ -54,21 +54,32 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 1999
  */
 template <int rank, int dim, typename Number = double>
-class TensorFunction : public FunctionTime<Number>, public Subscriptor
+class TensorFunction
+  : public FunctionTime<typename numbers::NumberTraits<Number>::real_type>,
+    public Subscriptor
 {
 public:
   /**
-   * Define alias for the return types of the <tt>value</tt> functions.
+   * Alias for the return types of the <tt>value</tt> function.
    */
   using value_type = Tensor<rank, dim, Number>;
 
+  /**
+   * Alias for the return types of the <tt>gradient</tt> functions.
+   */
   using gradient_type = Tensor<rank + 1, dim, Number>;
+
+  /**
+   * The scalar-valued real type used for representing time.
+   */
+  using time_type = typename FunctionTime<
+    typename numbers::NumberTraits<Number>::real_type>::time_type;
 
   /**
    * Constructor. May take an initial value for the time variable, which
    * defaults to zero.
    */
-  TensorFunction(const Number initial_time = Number(0.0));
+  TensorFunction(const time_type initial_time = time_type(0.0));
 
   /**
    * Virtual destructor; absolutely necessary in this case, as classes are
@@ -122,6 +133,11 @@ class ConstantTensorFunction : public TensorFunction<rank, dim, Number>
 {
 public:
   /**
+   * The scalar-valued real type used for representing time.
+   */
+  using time_type = typename TensorFunction<rank, dim, Number>::time_type;
+
+  /**
    * Constructor; takes the constant tensor value as an argument. The
    * reference value is copied internally.
    *
@@ -129,7 +145,7 @@ public:
    * defaults to zero.
    */
   ConstantTensorFunction(const dealii::Tensor<rank, dim, Number> &value,
-                         const Number initial_time = 0.0);
+                         const time_type initial_time = 0.0);
 
   virtual ~ConstantTensorFunction() override = default;
 
@@ -170,12 +186,18 @@ class ZeroTensorFunction : public ConstantTensorFunction<rank, dim, Number>
 {
 public:
   /**
+   * The scalar-valued real type used for representing time.
+   */
+  using time_type =
+    typename ConstantTensorFunction<rank, dim, Number>::time_type;
+
+  /**
    * Constructor.
    *
    * An initial value for the time variable may be specified, otherwise it
    * defaults to zero.
    */
-  ZeroTensorFunction(const Number initial_time = 0.0);
+  ZeroTensorFunction(const time_type initial_time = 0.0);
 };
 
 
