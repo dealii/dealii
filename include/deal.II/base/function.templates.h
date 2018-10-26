@@ -33,9 +33,11 @@ const unsigned int Function<dim, RangeNumberType>::dimension;
 
 
 template <int dim, typename RangeNumberType>
-Function<dim, RangeNumberType>::Function(const unsigned int    n_components,
-                                         const RangeNumberType initial_time)
-  : FunctionTime<RangeNumberType>(initial_time)
+Function<dim, RangeNumberType>::Function(
+  const unsigned int                                               n_components,
+  const typename numbers::NumberTraits<RangeNumberType>::real_type initial_time)
+  : FunctionTime<typename numbers::NumberTraits<RangeNumberType>::real_type>(
+      initial_time)
   , n_components(n_components)
 {
   // avoid the construction of function objects that don't return any

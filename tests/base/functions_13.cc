@@ -23,18 +23,16 @@
 
 #include "../tests.h"
 
-using namespace dealii;
-
 template <typename Number>
-class MyFunctionTime : dealii::FunctionTime<Number>
+class MyFunctionTime : public dealii::FunctionTime<Number>
 {};
 
 template <int dim, typename Number>
-class MyFunction : dealii::Function<dim, Number>
+class MyFunction : public dealii::Function<dim, Number>
 {};
 
 template <int rank, int dim, typename Number>
-class MyTensorFunction : dealii::TensorFunction<rank, dim, Number>
+class MyTensorFunction : public dealii::TensorFunction<rank, dim, Number>
 {};
 
 int
@@ -42,11 +40,30 @@ main()
 {
   initlog();
 
+  MyFunctionTime<std::complex<double>> function_time_1;
+  static_assert(std::is_same<decltype(function_time_1.get_time()),
+                             std::complex<double>>::value,
+                "Wrong return type for FunctionTime<double>::get_time().");
+  MyFunctionTime<std::complex<float>> function_time_2;
+  static_assert(std::is_same<decltype(function_time_2.get_time()),
+                             std::complex<float>>::value,
+                "Wrong return type for FunctionTime<float>::get_time().");
+
   MyFunction<1, std::complex<double>> function_1;
-  MyFunction<2, std::complex<float>>  function_2;
+  static_assert(std::is_same<decltype(function_1.get_time()), double>::value,
+                "Wrong return type for Function<double>::get_time().");
+  MyFunction<2, std::complex<float>> function_2;
+  static_assert(std::is_same<decltype(function_2.get_time()), float>::value,
+                "Wrong return type for Function<float>::get_time().");
 
   MyTensorFunction<1, 1, std::complex<double>> tensor_function_1;
-  MyTensorFunction<2, 2, std::complex<float>>  tensor_function_2;
+  static_assert(
+    std::is_same<decltype(tensor_function_1.get_time()), double>::value,
+    "Wrong return type for TensorFunction<double>::get_time().");
+  MyTensorFunction<2, 2, std::complex<float>> tensor_function_2;
+  static_assert(
+    std::is_same<decltype(tensor_function_2.get_time()), float>::value,
+    "Wrong return type for TensorFunction<float>::get_time().");
 
   deallog << "OK" << std::endl;
 }
