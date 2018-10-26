@@ -506,6 +506,14 @@ public:
   column_number(const size_type row, const size_type index) const;
 
   /**
+   * Return index of column @p col in row @p row. If the column does not
+   * exist in this sparsity pattern, the returned value will be
+   * 'numbers::invalid_size_type'.
+   */
+  size_type
+  column_index(const size_type row, const size_type col) const;
+
+  /**
    * @name Iterators
    */
   // @{
