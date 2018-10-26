@@ -162,13 +162,18 @@ public:
   const unsigned int n_components;
 
   /**
+   * The scalar-valued real type used for representing time.
+   */
+  using typename FunctionTime<
+    typename numbers::NumberTraits<RangeNumberType>::real_type>::time_type;
+
+  /**
    * Constructor. May take an initial value for the number of components
    * (which defaults to one, i.e. a scalar function), and the time variable,
    * which defaults to zero.
    */
   Function(const unsigned int n_components = 1,
-           const typename numbers::NumberTraits<RangeNumberType>::real_type
-             initial_time = 0.0);
+           const time_type    initial_time = 0.0);
 
   /**
    * Virtual destructor; absolutely necessary in this case.
