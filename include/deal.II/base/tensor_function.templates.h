@@ -85,8 +85,9 @@ TensorFunction<rank, dim, Number>::gradient_list(
 
 template <int rank, int dim, typename Number>
 ConstantTensorFunction<rank, dim, Number>::ConstantTensorFunction(
-  const Tensor<rank, dim, Number> &                           value,
-  const typename ConstantTensorFunction<rank, dim, Number>::time_type initial_time)
+  const Tensor<rank, dim, Number> &value,
+  const typename ConstantTensorFunction<rank, dim, Number>::time_type
+    initial_time)
   : TensorFunction<rank, dim, Number>(initial_time)
   , _value(value)
 {}

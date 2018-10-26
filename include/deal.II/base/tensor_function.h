@@ -72,7 +72,7 @@ public:
   /**
    * The scalar-valued real type used for representing time.
    */
-  using typename FunctionTime<
+  using time_type = typename FunctionTime<
     typename numbers::NumberTraits<Number>::real_type>::time_type;
 
   /**
@@ -135,7 +135,7 @@ public:
   /**
    * The scalar-valued real type used for representing time.
    */
-  using typename TensorFunction<rank, dim, Number>::time_type;
+  using time_type = typename TensorFunction<rank, dim, Number>::time_type;
 
   /**
    * Constructor; takes the constant tensor value as an argument. The
@@ -188,7 +188,8 @@ public:
   /**
    * The scalar-valued real type used for representing time.
    */
-  using typename ConstantTensorFunction<rank, dim, Number>::time_type;
+  using time_type =
+    typename ConstantTensorFunction<rank, dim, Number>::time_type;
 
   /**
    * Constructor.

@@ -164,7 +164,7 @@ public:
   /**
    * The scalar-valued real type used for representing time.
    */
-  using typename FunctionTime<
+  using time_type = typename FunctionTime<
     typename numbers::NumberTraits<RangeNumberType>::real_type>::time_type;
 
   /**
