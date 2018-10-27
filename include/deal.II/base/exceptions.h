@@ -930,6 +930,8 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the NetCDF library.
+   *
+   * @deprecated Support for NetCDF in deal.II is deprecated.
    */
   DeclExceptionMsg(
     ExcNeedsNetCDF,

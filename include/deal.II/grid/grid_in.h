@@ -462,8 +462,10 @@ public:
    * supported is the <tt>TAU grid format</tt>.
    *
    * This function requires the library to be linked with the NetCDF library.
+   *
+   * @deprecated Support for NetCDF in deal.II is deprecated.
    */
-  void
+  DEAL_II_DEPRECATED void
   read_netcdf(const std::string &filename);
 
   /**
