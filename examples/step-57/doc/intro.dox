@@ -41,12 +41,11 @@ solve is necessary.
 Moving the right-hand side terms to the left, a nonlinear function is created as
 
 @f{eqnarray*}
-F(\mathbf{u}, p) = \left(
-                \begin{array}{c}
-                  - \nu \Delta\mathbf{u} + (\mathbf{u} \cdot \nabla)\mathbf{u} + \nabla p - \mathbf{f} \\
-                  - \nabla \cdot \mathbf{u} \\
-                \end{array}
-              \right).
+F(\mathbf{u}, p) =
+  \begin{pmatrix}
+    - \nu \Delta\mathbf{u} + (\mathbf{u} \cdot \nabla)\mathbf{u} + \nabla p - \mathbf{f} \\
+    - \nabla \cdot \mathbf{u}
+  \end{pmatrix}.
 @f}
 
 $F(\textbf{u}, p)$ is a nonlinear function whose root is
@@ -93,26 +92,22 @@ directional gradient of $F(\textbf{x})$ along $\delta
       \right)\\
   \\
   &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon}
-      \left(
-      \begin{array}{c}
+      \begin{pmatrix}
         - \epsilon \nu \Delta \delta \mathbf{u}^{k}
         + \epsilon \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
         + \epsilon \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
         + \epsilon^{2} \delta \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
         + \epsilon \nabla \delta p^{k}\\
-        - \epsilon \nabla \cdot \delta \mathbf{u}^{k}\\
-      \end{array}
-      \right)\\
+        - \epsilon \nabla \cdot \delta \mathbf{u}^{k}
+      \end{pmatrix} \\
   \\
-  &=& \left(
-      \begin{array}{c}
+  &=& \begin{pmatrix}
         - \nu \Delta \delta \mathbf{u}^{k}
         + \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
         + \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
-        + \nabla\delta p^{k}\\
-        - \nabla \cdot \delta \mathbf{u}^{k}\\
-      \end{array}
-      \right).
+        + \nabla \delta p^{k}\\
+        - \nabla \cdot \delta \mathbf{u}^{k}
+      \end{pmatrix}.
 @f}
 
 Therefore, we arrive at the linearized system:
@@ -214,25 +209,19 @@ guess for the Newton iteration.
 At each step of Newton's iteration, the problem results in solving a
 saddle point systems of the form
 @f{eqnarray*}
-    \left(
-      \begin{array}{cc}
-        A & B^{T} \\
-        B & 0 \\
-      \end{array}
-    \right)
-    \left(
-      \begin{array}{c}
-        U \\
-        P \\
-      \end{array}
-    \right)
+    \begin{pmatrix}
+      A & B^{T} \\
+      B & 0
+    \end{pmatrix}
+    \begin{pmatrix}
+      U \\
+      P
+    \end{pmatrix}
     =
-    \left(
-      \begin{array}{c}
-        F \\
-        0 \\
-      \end{array}
-    \right).
+    \begin{pmatrix}
+      F \\
+      0
+    \end{pmatrix}.
 @f}
 
 This system matrix has the same block structure as the one in step-22. However,
@@ -240,25 +229,19 @@ the matrix $A$ at the top left corner is not symmetric because of the nonlinear 
 Instead of solving the above system, we can solve the equivalent system
 
 @f{eqnarray*}
-    \left(
-      \begin{array}{cc}
-        A + \gamma B^TW^{-1}B & B^{T} \\
-        B & 0 \\
-      \end{array}
-    \right)
-    \left(
-      \begin{array}{c}
-        U \\
-        P \\
-      \end{array}
-    \right)
+    \begin{pmatrix}
+      A + \gamma B^TW^{-1}B & B^{T} \\
+      B & 0
+    \end{pmatrix}
+    \begin{pmatrix}
+      U \\
+      P
+    \end{pmatrix}
     =
-    \left(
-      \begin{array}{c}
-        F \\
-        0 \\
-      \end{array}
-    \right)
+    \begin{pmatrix}
+      F \\
+      0
+    \end{pmatrix}
 @f}
 with a parameter $\gamma$ and an invertible matrix $W$. Here
 $\gamma B^TW^{-1}B$ is the Augmented Lagrangian term; see [1] for details.
@@ -268,12 +251,11 @@ side by $b$, we solve it iteratively with right preconditioning
 $P^{-1}$ as $GP^{-1}y = b$, where
 
 @f{eqnarray*}
-P^{-1} = \left(
-         \begin{array}{cc}
-           \tilde{A} & B^T \\
-           0         & \tilde{S}
-         \end{array}
-         \right)^{-1},
+P^{-1} =
+  \begin{pmatrix}
+    \tilde{A} & B^T \\
+    0         & \tilde{S}
+  \end{pmatrix}^{-1}
 @f}
 
 with $\tilde{A} = A + \gamma B^TW^{-1}B$ and $\tilde{S}$ is the
@@ -290,24 +272,18 @@ We decompose $P^{-1}$ as
 
 @f{eqnarray*}
 P^{-1} =
-  \left(
-  \begin{array}{cc}
+  \begin{pmatrix}
     \tilde{A}^{-1} & 0 \\
     0              & I
-  \end{array}
-  \right)
-  \left(
-  \begin{array}{cc}
+  \end{pmatrix}
+  \begin{pmatrix}
     I & -B^T \\
     0 & I
-  \end{array}
-  \right)
-  \left(
-  \begin{array}{cc}
+  \end{pmatrix}
+  \begin{pmatrix}
     I & 0 \\
     0 & \tilde{S}^{-1}
-  \end{array}
-  \right).
+  \end{pmatrix}.
 @f}
 
 Here two inexact solvers will be needed for $\tilde{A}^{-1}$ and
