@@ -109,8 +109,8 @@ namespace Step57
     void output_results(const unsigned int refinement_cycle) const;
 
     void newton_iteration(const double       tolerance,
-                          const unsigned int max_iteration,
-                          const unsigned int n_refinements,
+                          const unsigned int max_n_line_searches,
+                          const unsigned int max_n_refinements,
                           const bool         is_initial_step,
                           const bool         output_result);
 
@@ -334,10 +334,10 @@ namespace Step57
     }
     zero_constraints.close();
 
-    std::cout << "   Number of active cells: " << triangulation.n_active_cells()
+    std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl
-              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-              << " (" << dof_u << '+' << dof_p << ')' << std::endl;
+              << "Number of degrees of freedom: " << dof_handler.n_dofs()
+              << " (" << dof_u << " + " << dof_p << ')' << std::endl;
   }
 
   // @sect4{StationaryNavierStokes::initialize_system}
@@ -554,8 +554,7 @@ namespace Step57
       pmass_preconditioner);
 
     gmres.solve(system_matrix, newton_update, system_rhs, preconditioner);
-    std::cout << " ****FGMRES steps: " << solver_control.last_step()
-              << std::endl;
+    std::cout << "FGMRES steps: " << solver_control.last_step() << std::endl;
 
     constraints_used.distribute(newton_update);
   }
@@ -624,29 +623,24 @@ namespace Step57
   template <int dim>
   void StationaryNavierStokes<dim>::newton_iteration(
     const double       tolerance,
-    const unsigned int max_iteration,
-    const unsigned int max_refinement,
+    const unsigned int max_n_line_searches,
+    const unsigned int max_n_refinements,
     const bool         is_initial_step,
     const bool         output_result)
   {
-    double current_res;
-    double last_res;
-    bool   first_step = is_initial_step;
+    bool first_step = is_initial_step;
 
-    for (unsigned int refinement = 0; refinement < max_refinement + 1;
-         ++refinement)
+    for (unsigned int refinement_n = 0; refinement_n < max_n_refinements + 1;
+         ++refinement_n)
       {
-        unsigned int outer_iteration = 0;
-        last_res                     = 1.0;
-        current_res                  = 1.0;
-        std::cout << "*****************************************" << std::endl;
-        std::cout << "************  refinement = " << refinement
-                  << " ************ " << std::endl;
-        std::cout << "viscosity= " << viscosity << std::endl;
-        std::cout << "*****************************************" << std::endl;
+        unsigned int line_search_n = 0;
+        double       last_res      = 1.0;
+        double       current_res   = 1.0;
+        std::cout << "grid refinements: " << refinement_n << std::endl
+                  << "viscosity: " << viscosity << std::endl;
 
         while ((first_step || (current_res > tolerance)) &&
-               outer_iteration < max_iteration)
+               line_search_n < max_n_line_searches)
           {
             if (first_step)
               {
@@ -661,13 +655,10 @@ namespace Step57
                 evaluation_point = present_solution;
                 assemble_rhs(first_step);
                 current_res = system_rhs.l2_norm();
-                std::cout << "******************************" << std::endl;
-                std::cout << " The residual of initial guess is " << current_res
+                std::cout << "The residual of initial guess is " << current_res
                           << std::endl;
-                std::cout << " Initialization complete!  " << std::endl;
                 last_res = current_res;
               }
-
             else
               {
                 evaluation_point = present_solution;
@@ -687,36 +678,34 @@ namespace Step57
                     nonzero_constraints.distribute(evaluation_point);
                     assemble_rhs(first_step);
                     current_res = system_rhs.l2_norm();
-                    std::cout << " alpha = " << std::setw(6) << alpha
-                              << std::setw(0) << " res = " << current_res
+                    std::cout << "  alpha: " << std::setw(10) << alpha
+                              << std::setw(0) << "  residual: " << current_res
                               << std::endl;
                     if (current_res < last_res)
                       break;
                   }
                 {
                   present_solution = evaluation_point;
-                  std::cout << " ---- Iteration " << outer_iteration
-                            << " residual: " << current_res << std::endl;
+                  std::cout << "  number of line searches: " << line_search_n
+                            << "  residual: " << current_res << std::endl;
                   last_res = current_res;
                 }
+                ++line_search_n;
               }
-            ++outer_iteration;
 
             if (output_result)
               {
-                output_results(max_iteration * refinement + outer_iteration);
+                output_results(max_n_line_searches * refinement_n +
+                               line_search_n);
 
                 if (current_res <= tolerance)
-                  process_solution(refinement);
+                  process_solution(refinement_n);
               }
           }
 
-        if (refinement < max_refinement)
+        if (refinement_n < max_n_refinements)
           {
             refine_mesh();
-            std::cout << "*****************************************"
-                      << std::endl
-                      << "        Do refinement ------   " << std::endl;
           }
       }
   }
@@ -741,11 +730,8 @@ namespace Step57
          Re        = std::min(Re + step_size, target_Re))
       {
         viscosity = 1.0 / Re;
-        std::cout << "*****************************************" << std::endl;
-        std::cout << " Searching for initial guess with Re = " << Re
+        std::cout << "Searching for initial guess with Re = " << Re
                   << std::endl;
-        std::cout << "*****************************************" << std::endl;
-
         newton_iteration(1e-12, 50, 0, is_initial_step, false);
         is_initial_step = false;
       }
@@ -831,19 +817,11 @@ namespace Step57
     // transfer solutions, and repeat.
     if (Re > 1000.0)
       {
-        std::cout << "       Searching for initial guess ... " << std::endl;
+        std::cout << "Searching for initial guess ..." << std::endl;
         const double step_size = 2000.0;
         compute_initial_guess(step_size);
-        std::cout << "*****************************************" << std::endl
-                  << "       Initial guess obtained            " << std::endl
-                  << "                  *                      " << std::endl
-                  << "                  *                      " << std::endl
-                  << "                  *                      " << std::endl
-                  << "                  *                      " << std::endl
-                  << "*****************************************" << std::endl;
-
-        std::cout << "       Computing solution with target Re = " << Re
-                  << std::endl;
+        std::cout << "Found initial guess." << std::endl;
+        std::cout << "Computing solution with target Re = " << Re << std::endl;
         viscosity = 1.0 / Re;
         newton_iteration(1e-12, 50, refinement, false, true);
       }
