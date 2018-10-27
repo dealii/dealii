@@ -16,7 +16,7 @@ Award No. EAR-0949446 and The University of California-Davis.
 <h3> Navier Stokes Equations </h3>
 
 In this tutorial we show how to solve the incompressible Navier
-Stokes equations (NSE) by Newton's method. The flow we consider here
+Stokes equations (NSE) with Newton's method. The flow we consider here
 is assumed to be steady. In a domain $\Omega \subset
 \mathbb{R}^{d}$, $d=2,3$, with a piecewise smooth boundary
 $\partial \Omega$, and a given force field $\textbf{f}$, we seek
@@ -25,11 +25,11 @@ satisfying
 
 @f{eqnarray*}
 - \nu \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f}\\
-- \nabla \cdot \textbf{u} &=& 0
+- \nabla \cdot \textbf{u} &=& 0.
 @f}
 
-Different from the Stokes equations as discussed in step-22, the NSE are a
-nonlinear system because of the convective term $(\textbf{u} \cdot
+Unlike the Stokes equations as discussed in step-22, the NSE are a
+nonlinear system of equations because of the convective term $(\textbf{u} \cdot
 \nabla)\textbf{u}$. The first step of computing a numerical solution
 is to linearize the system and this will be done using Newton's method. A
 time-dependent problem is discussed in step-35, where the system is linearized
@@ -38,7 +38,7 @@ solve is necessary.
 
 <h3> Linearization of Navier-Stokes Equations </h3>
 
-Moving the right-hand side terms to the left, a nonlinear function is created as
+We define a nonlinear function whose root is a solution to the NSE by
 
 @f{eqnarray*}
 F(\mathbf{u}, p) =
@@ -48,32 +48,31 @@ F(\mathbf{u}, p) =
   \end{pmatrix}.
 @f}
 
-$F(\textbf{u}, p)$ is a nonlinear function whose root is
-the solution to the NSE. Assuming the initial guess is good enough to
+Assuming the initial guess is good enough to
 guarantee the convergence of Newton's iteration and denoting
-$\textbf{x} = (\textbf{u}, p)$, Newton's iteration on a vector field
+$\textbf{x} = (\textbf{u}, p)$, Newton's iteration on a vector function
 can be defined as
 @f{eqnarray*}
   \textbf{x}^{k+1} = \textbf{x}^{k} - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
 @f}
 where
-$\textbf{x}^{k+1}$ is the approximate solution in step k+1,
-$\textbf{x}^{k}$ represents the solution from the last step, and $\nabla
+$\textbf{x}^{k+1}$ is the approximate solution in step $k+1$,
+$\textbf{x}^{k}$ represents the solution from the previous step, and $\nabla
 F(\textbf{x}^{k})$ is the Jacobian matrix evaluated at
 $\textbf{x}^{k}$.
 A similar iteration can be found in step-15.
 
-From Newton's iteration formula, we can observe that the new
+The Newton iteration formula implies the new
 solution is obtained by adding an update term to the old solution. Instead
 of evaluating the Jacobian matrix and taking its inverse, we consider
 the update term as a whole, that is
 
 @f{eqnarray*}
-\delta \textbf{x}^{k} = - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
+  \delta \textbf{x}^{k} = - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
 @f}
 where $\textbf{x}^{k+1}=\textbf{x}^{k}+\delta \textbf{x}^{k}$.
 
-Then we can evaluate the update term by solving the system
+We can find the update term by solving the system
 @f{eqnarray*}
   \nabla F(\textbf{x}^{k}) \delta \textbf{x}^{k} = -F(\textbf{x}^{k}).
 @f}
@@ -117,22 +116,21 @@ Therefore, we arrive at the linearized system:
   + \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
   + \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
   + \nabla \delta p^{k}
-  = \mathbf{g}, \\
+  = -F(\mathbf{x}^k), \\
    -\nabla \cdot\delta \mathbf{u}^{k}
   = \nabla \cdot \mathbf{u}^{k},
 @f}
 
-where $\textbf{g} =\textbf{f} + \nu \Delta \textbf{u}^k - (\textbf{u}^k
-\cdot \nabla)\textbf{u}^k -\nabla p^k$ and $\textbf{u}^k$ and $p^k$ are the solutions from the
+where $\textbf{u}^k$ and $p^k$ are the solutions from the
 previous iteration. Additionally, the
 right hand side of the second equation is not zero since the discrete
 solution is not exactly divergence free (divergence free for the continuous
 solution). The right hand side here acts as a correction which leads the
 discrete solution of the velocity to be divergence free along Newton's
 iteration. In this linear system, the only unknowns are the
-update terms $\delta \textbf{u}^{k}$ and $\delta p^{k}$, and we can use a similar strategy
-to the one used in step-22. The weak form is
-derived like it is done in step-22.
+update terms $\delta \textbf{u}^{k}$ and $\delta p^{k}$, and we can use a
+similar strategy to the one used in step-22 (and derive the weak form in the
+same way).
 
 Now, Newton's iteration can be used to solve for the update terms:
 
@@ -152,8 +150,9 @@ Now, Newton's iteration can be used to solve for the update terms:
 
 <h3> Finding an Initial Guess </h3>
 
-Getting Newton's method to converge, the initial guess needs to be close
-enough to the solution, so it is crucial to find a good starting value.
+The initial guess needs to be close enough to the solution for Newton's method
+to converge; hence, finding a good starting value is crucial to the nonlinear
+solver.
 
 When the viscosity $\nu$ is large, a good initial guess can be obtained
 by solving the Stokes equation with viscosity $\nu$. While problem dependent,
@@ -298,8 +297,8 @@ M_p^{-1}B)_{ij}$, as explained in [2].
 
 <h3> Test Case </h3>
 
-Here we use the lid driven cavity flow as our test case, see [3] for details.
-The computational domain is the unit square and the right-hand side
+We use the lid driven cavity flow as our test case; see [3] for details.
+The computational domain is the unit square and the right-hand side is
 $f=0$. The boundary condition is
 
 @f{eqnarray*}
@@ -319,9 +318,9 @@ refinement.
 Inside the loop, we involve three solvers: one for $\tilde{A}^{-1}$,
 one for $M_p^{-1}$ and one for $Gx=b$. The first two
 solvers are invoked in the preconditioner and the outer solver gives us
-the update term. Overall convergence is controlled by the nonlinear residual 
-and Newton's method does not have to require an exact Jacobian, so for the outer 
-linear solver we employ FGMRES with a relative tolerance of only 1e-4. In fact,
+the update term. Overall convergence is controlled by the nonlinear residual;
+as Newton's method does not require an exact Jacobian, we employ FGMRES with a
+relative tolerance of only 1e-4 for the outer linear solver. In fact,
 we use the truncated Newton solve for this system.
 As described in step-22, the inner linear solves are also not required
 to be done very accurately. Here we use CG with a relative

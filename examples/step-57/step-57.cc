@@ -71,17 +71,14 @@ namespace Step57
 
   // @sect3{The <code>NavierStokesProblem</code> class template}
 
-  // This is the main function and its member functions.
-  // As explained in the introduction, what we obtain at each step is the
-  // Newton's update, so we define two variables: the present solution
-  // and the update. Additionally, the evaluation point is
-  // for temporarily holding Newton update in line search. A sparse matrix
-  // for the pressure mass matrix is created for the operator of a block Schur
-  // complement preconditioner. We use one AffineConstraints object for
-  // Dirichlet boundary conditions at the initial step and a zero
-  // AffineConstraints object for the Newton is defined by 1/Re which has been
-  // discussed in the introduction.
-
+  // This class manages the matrices and vectors described in the
+  // introduction: in particular, we store a BlockVector for the current
+  // solution, current Newton update, and the line search update.  We also
+  // store two AffineConstraints objects: one which enforces the Dirichlet
+  // boundary conditions and one that sets all boundary values to zero. The
+  // first constrains the solution vector while the second constraints the
+  // updates (i.e., we never update boundary values, so we force the relevant
+  // update vector values to be zero).
   template <int dim>
   class StationaryNavierStokes
   {
@@ -138,19 +135,16 @@ namespace Step57
     BlockVector<double> evaluation_point;
   };
 
-  // @sect3{Boundary values and right hand side}
-  // In this problem we set the velocity along the upper surface of the cavity
-  // to be one and zero on the other three walls. The right hand side function
-  // is zero so we do not need to set the right hand side function in this
-  // tutorial. The number of components of the boundary function is dim+1.
-  // In practice, the boundary values are
-  // applied to our solution through an AffineConstraints object which is
-  // obtained by using VectorTools::interpolate_boundary_values. The components
-  // of boundary value functions are required to be chosen according to the
-  // finite element space. Therefore we have to define the boundary value of
-  // pressure even though we actually do not need it.
-
-  // The following function represents the boundary values:
+  // @sect3{Boundary values and right hand side} In this problem we set the
+  // velocity along the upper surface of the cavity to be one and zero on the
+  // other three walls. The right hand side function is zero so we do not need
+  // to set the right hand side function in this tutorial. The number of
+  // components of the boundary function is <code>dim+1</code>. We will
+  // ultimately use VectorTools::interpolate_boundary_values to set boundary
+  // values, which requires the boundary value functions to have the same
+  // number of components as the solution, even if all are not used. Put
+  // another way: to make this function happy we define boundary values for
+  // the pressure even though we will never actually use them.
   template <int dim>
   class BoundaryValues : public Function<dim>
   {
@@ -176,20 +170,18 @@ namespace Step57
 
   // @sect3{BlockSchurPreconditioner for Navier Stokes equations}
   //
-  // The block
-  // Schur complement preconditioner is defined in this part. As discussed in
-  // the introduction, the preconditioner in Krylov iterative methods is
-  // implemented as a matrix-vector product operator. In practice, the Schur
-  // complement preconditioner is decomposed as a product of three matrices (as
-  // presented in the first section).  The $\tilde{A}^{-1}$ in the first factor
-  // involves a solve for the linear system $\tilde{A}x=b$. Here we solve
-  // this system via a direct solver for simplicity. The computation involved
-  // in the second factor is a simple matrix-vector multiplication. The Schur
-  // complement $\tilde{S}$ can be well approximated by the pressure mass
-  // matrix and its inverse can be obtained through an inexact solver. Because
-  // the pressure mass matrix is symmetric and positive definite, we can use
-  // CG to solve the corresponding linear system.
-  //
+  // As discussed in the introduction, the preconditioner in Krylov iterative
+  // methods is implemented as a matrix-vector product operator. In practice,
+  // the Schur complement preconditioner is decomposed as a product of three
+  // matrices (as presented in the first section). The $\tilde{A}^{-1}$ in the
+  // first factor involves a solve for the linear system $\tilde{A}x=b$. Here
+  // we solve this system via a direct solver for simplicity. The computation
+  // involved in the second factor is a simple matrix-vector
+  // multiplication. The Schur complement $\tilde{S}$ can be well approximated
+  // by the pressure mass matrix and its inverse can be obtained through an
+  // inexact solver. Because the pressure mass matrix is symmetric and
+  // positive definite, we can use CG to solve the corresponding linear
+  // system.
   template <class PreconditionerMp>
   class BlockSchurPreconditioner : public Subscriptor
   {
@@ -211,10 +203,10 @@ namespace Step57
     SparseDirectUMFPACK              A_inverse;
   };
 
-  // We can notice that the initialization of the inverse of the matrix at (0,0)
-  // corner is completed in the constructor. If so, every application of the
-  // preconditioner then no longer requires the computation of the matrix
-  // factors.
+  // We can notice that the initialization of the inverse of the matrix at the
+  // top left corner is completed in the constructor. If so, every application
+  // of the preconditioner then no longer requires the computation of the
+  // matrix factors.
 
   template <class PreconditionerMp>
   BlockSchurPreconditioner<PreconditionerMp>::BlockSchurPreconditioner(
@@ -264,9 +256,7 @@ namespace Step57
   // @sect4{StationaryNavierStokes::StationaryNavierStokes}
   // The constructor of this class looks very similar to the one in step-22. The
   // only difference is the viscosity and the Augmented Lagrangian coefficient
-  // gamma.
-  //
-
+  // <code>gamma</code>.
   template <int dim>
   StationaryNavierStokes<dim>::StationaryNavierStokes(const unsigned int degree)
     : viscosity(1.0 / 7500.0)
@@ -612,14 +602,14 @@ namespace Step57
   //
   // This function implements the Newton iteration with given tolerance, maximum
   // number of iterations, and the number of mesh refinements to do.
-  // "is_initial_step" is the flag to tell us whether "setup_system" is
-  // necessary, and which part, system matrix or right hand side vector, should
-  // be assembled. If we do a line search, the right hand side is already
-  // assembled while checking the residual norm in the last iteration.
-  // Therefore, we just need to assemble the system matrix at the current
-  // iteration. The last argument "output_result" is whether output should be
-  // produced.
-
+  //
+  // The argument <code>is_initial_step</code> tells us whether
+  // <code>setup_system</code> is necessary, and which part, system matrix or
+  // right hand side vector, should be assembled. If we do a line search, the
+  // right hand side is already assembled while checking the residual norm in
+  // the last iteration. Therefore, we just need to assemble the system matrix
+  // at the current iteration. The last argument <code>output_result</code>
+  // determines whether or not graphical output should be produced.
   template <int dim>
   void StationaryNavierStokes<dim>::newton_iteration(
     const double       tolerance,
@@ -666,11 +656,11 @@ namespace Step57
                 solve(first_step);
 
                 // To make sure our solution is getting close to the exact
-                // solution, we let the solution be updated with a weight alpha
-                // such that the new residual is smaller than the one of last
-                // step, which is done in the following loop. Also the line
-                // search method can be located in step-15.
-
+                // solution, we let the solution be updated with a weight
+                // <code>alpha</code> such that the new residual is smaller
+                // than the one of last step, which is done in the following
+                // loop. This is the same line search algorithm used in
+                // step-15.
                 for (double alpha = 1.0; alpha > 1e-5; alpha *= 0.5)
                   {
                     evaluation_point = present_solution;

@@ -326,7 +326,7 @@ The following picture presents the graphical result.
 <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Streamline.png" alt="">
 
 Furthermore, the error consists of the nonlinear error,
-which is decreasing as Newton's iteration going on, and the discretization error,
+which decreases as we perform Newton iterations, and the discretization error,
 which depends on the mesh size. That is why we have to refine the
 mesh and repeat Newton's iteration on the next finer mesh. From the table above, we can
 see that the residual (nonlinear error) is below 1e-12 on each mesh, but the
