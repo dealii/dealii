@@ -42,7 +42,6 @@ test(Utilities::CUDA::Handle &cuda_handle)
   structure.compress();
   A.reinit(structure);
   testproblem.five_point(A);
-  A.print(std::cout);
 
   // Solve on the device
   CUDAWrappers::SparseMatrix<Number>          A_dev(cuda_handle, A);
@@ -52,7 +51,8 @@ test(Utilities::CUDA::Handle &cuda_handle)
   for (unsigned int i = 0; i < size; ++i)
     rw_vector[i] = static_cast<Number>(i);
   rhs_dev.import(rw_vector, VectorOperation::insert);
-  SolverControl                                         control(100, 1.e-10);
+  const Number  tolerance = 1000. * std::numeric_limits<Number>::epsilon();
+  SolverControl control(100, tolerance);
   SolverCG<LinearAlgebra::CUDAWrappers::Vector<Number>> cg_dev(control);
 
   CUDAWrappers::PreconditionILU<Number> prec_ilu(cuda_handle);
@@ -61,19 +61,23 @@ test(Utilities::CUDA::Handle &cuda_handle)
   cg_dev.solve(A_dev, sol_dev, rhs_dev, prec_ilu);
 
   // Check the result
-  rw_vector.import(sol_dev, VectorOperation::insert);
-  for (unsigned int i = 0; i < size; ++i)
-    deallog << rw_vector[i] << std::endl;
+  LinearAlgebra::CUDAWrappers::Vector<Number> residual(size);
+  A_dev.residual(residual, sol_dev, rhs_dev);
+  Assert(residual.l2_norm() < 20 * tolerance, ExcInternalError());
+  deallog << "OK" << std::endl;
 }
 
 int
 main()
 {
   initlog();
+  deallog << std::setprecision(10);
   deallog.depth_console(0);
 
   Utilities::CUDA::Handle cuda_handle;
+  deallog << "Testing float" << std::endl;
   test<float>(cuda_handle);
+  deallog << "Testing double" << std::endl;
   test<double>(cuda_handle);
 
   deallog << "OK" << std::endl;
