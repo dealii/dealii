@@ -76,7 +76,7 @@ where $\textbf{x}^{k+1}=\textbf{x}^{k}+\delta \textbf{x}^{k}$.
 
 Then we can evaluate the update term by solving the system
 @f{eqnarray*}
-\nabla F(\textbf{x}^{k}) \delta \textbf{x}^{k} = -F(\textbf{x}^{k}).
+  \nabla F(\textbf{x}^{k}) \delta \textbf{x}^{k} = -F(\textbf{x}^{k}).
 @f}
 Here, the left of the previous equation represents the
 directional gradient of $F(\textbf{x})$ along $\delta
@@ -85,31 +85,49 @@ directional gradient of $F(\textbf{x})$ along $\delta
 @f{eqnarray*}
   & &\nabla F(\mathbf{u}^{k}, p^{k}) (\delta \mathbf{u}^{k}, \delta p^{k}) \\
   \\
-  &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon} (F(\mathbf{u}^{k}+\epsilon \delta \mathbf{u}^{k}, p^{k}+\epsilon\nabla\delta p^{k}) - (F(\mathbf{u}^{k}, p^{k}))\\
+  &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon}
+      \left(
+        F(\mathbf{u}^{k} + \epsilon \delta \mathbf{u}^{k},
+          p^{k} + \epsilon \nabla \delta p^{k})
+      - F(\mathbf{u}^{k}, p^{k})
+      \right)\\
   \\
-  &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon} \left(
-                \begin{array}{c}
-                  - \epsilon\nu\Delta\delta \mathbf{u}^{k} + \epsilon\mathbf{u}^{k}\cdot\nabla\delta\mathbf{u}^{k}+\epsilon\delta\mathbf{u}^{k}\cdot\nabla\mathbf{u}^{k}+\epsilon^{2}\delta\mathbf{u}^{k}\cdot\nabla\delta\mathbf{u}^{k}+\epsilon \nabla\delta p^{k}\\
-                  - \epsilon \nabla \cdot\delta \mathbf{u}^{k}\\
-                \end{array}
-              \right)\\
-              \\
+  &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon}
+      \left(
+      \begin{array}{c}
+        - \epsilon \nu \Delta \delta \mathbf{u}^{k}
+        + \epsilon \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
+        + \epsilon \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
+        + \epsilon^{2} \delta \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
+        + \epsilon \nabla \delta p^{k}\\
+        - \epsilon \nabla \cdot \delta \mathbf{u}^{k}\\
+      \end{array}
+      \right)\\
+  \\
   &=& \left(
-                \begin{array}{c}
-                  - \nu\Delta\delta \mathbf{u}^{k} + \mathbf{u}^{k}\cdot\nabla\delta\mathbf{u}^{k}+\delta\mathbf{u}^{k}\cdot\nabla\mathbf{u}^{k}+ \nabla\delta p^{k}\\
-                  - \nabla \cdot\delta \mathbf{u}^{k}\\
-                \end{array}
-              \right).
+      \begin{array}{c}
+        - \nu \Delta \delta \mathbf{u}^{k}
+        + \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
+        + \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
+        + \nabla\delta p^{k}\\
+        - \nabla \cdot \delta \mathbf{u}^{k}\\
+      \end{array}
+      \right).
 @f}
 
 Therefore, we arrive at the linearized system:
 
 @f{eqnarray*}
-- \nu\Delta\delta\mathbf{u}^{k} + \mathbf{u}^{k}\cdot\nabla\delta\mathbf{u}^{k}+\delta\mathbf{u}^{k}\cdot\nabla\mathbf{u}^{k}+ \nabla\delta p^{k} = \mathbf{g}, \\
-- \nabla \cdot\delta \mathbf{u}^{k} = \nabla\cdot\mathbf{u}^{k},
+   -\nu \Delta \delta \mathbf{u}^{k}
+  + \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
+  + \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
+  + \nabla \delta p^{k}
+  = \mathbf{g}, \\
+   -\nabla \cdot\delta \mathbf{u}^{k}
+  = \nabla \cdot \mathbf{u}^{k},
 @f}
 
-where $\textbf{g} =\textbf{f}+\nu \Delta\textbf{u}^k -(\textbf{u}^k
+where $\textbf{g} =\textbf{f} + \nu \Delta \textbf{u}^k - (\textbf{u}^k
 \cdot \nabla)\textbf{u}^k -\nabla p^k$ and $\textbf{u}^k$ and $p^k$ are the solutions from the
 previous iteration. Additionally, the
 right hand side of the second equation is not zero since the discrete
@@ -159,15 +177,15 @@ as a staircase from the Stokes equations to the NSE we want to solve.
 That is, we first solve a Stokes problem
 
 @f{eqnarray*}
-- \nu_{1} \Delta\textbf{u} + \nabla p &=& \textbf{f}\\
-- \nabla \cdot \textbf{u} &=& 0
+  -\nu_{1} \Delta \textbf{u} + \nabla p &=& \textbf{f}\\
+  -\nabla \cdot \textbf{u} &=& 0
 @f}
 
 to get the initial guess for
 
 @f{eqnarray*}
-- \nu_{1} \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
-- \nabla \cdot \textbf{u} &=& 0,
+  -\nu_{1} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
+  -\nabla \cdot \textbf{u} &=& 0,
 @f}
 which also acts as the initial guess of the continuation method.
 Here $\nu_{1}$ is relatively large so that the solution to the Stokes problem with viscosity $\nu_{1}$
@@ -176,15 +194,15 @@ can be used as an initial guess for the NSE in Newton's iteration.
 Then the solution to
 
 @f{eqnarray*}
-- \nu_{i} \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
-- \nabla \cdot \textbf{u} &=& 0.
+  -\nu_{i} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
+  -\nabla \cdot \textbf{u} &=& 0.
 @f}
 
 acts as the initial guess for
 
 @f{eqnarray*}
-- \nu_{i+1} \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
-- \nabla \cdot \textbf{u} &=& 0.
+  -\nu_{i+1} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
+  -\nabla \cdot \textbf{u} &=& 0.
 @f}
 
 This process is repeated with a sequence of viscosities $\{\nu_i\}$ that is
@@ -250,8 +268,12 @@ side by $b$, we solve it iteratively with right preconditioning
 $P^{-1}$ as $GP^{-1}y = b$, where
 
 @f{eqnarray*}
-P^{-1} = \left(\begin{array}{cc} \tilde{A} & B^T \\
-                                 0 & \tilde{S} \end{array}\right)^{-1},
+P^{-1} = \left(
+         \begin{array}{cc}
+           \tilde{A} & B^T \\
+           0         & \tilde{S}
+         \end{array}
+         \right)^{-1},
 @f}
 
 with $\tilde{A} = A + \gamma B^TW^{-1}B$ and $\tilde{S}$ is the
@@ -268,9 +290,24 @@ We decompose $P^{-1}$ as
 
 @f{eqnarray*}
 P^{-1} =
-\left(\begin{array}{cc} \tilde{A}^{-1} & 0 \\ 0 & I \end{array}\right)
-\left(\begin{array}{cc} I & -B^T \\ 0 & I \end{array}\right)
-\left(\begin{array}{cc} I & 0 \\ 0 & \tilde{S}^{-1} \end{array}\right).
+  \left(
+  \begin{array}{cc}
+    \tilde{A}^{-1} & 0 \\
+    0              & I
+  \end{array}
+  \right)
+  \left(
+  \begin{array}{cc}
+    I & -B^T \\
+    0 & I
+  \end{array}
+  \right)
+  \left(
+  \begin{array}{cc}
+    I & 0 \\
+    0 & \tilde{S}^{-1}
+  \end{array}
+  \right).
 @f}
 
 Here two inexact solvers will be needed for $\tilde{A}^{-1}$ and
@@ -290,10 +327,8 @@ The computational domain is the unit square and the right-hand side
 $f=0$. The boundary condition is
 
 @f{eqnarray*}
-(u(x, y), v(x,y)) &=& (1,0)
-  \qquad\qquad \textrm{if}\ y = 1 \\
-  (u(x, y), v(x,y)) &=& (0,0)
-  \qquad\qquad \textrm{otherwise}.
+  (u(x, y), v(x,y)) &=& (1,0) \qquad\qquad \textrm{if}\ y = 1 \\
+  (u(x, y), v(x,y)) &=& (0,0) \qquad\qquad \textrm{otherwise}.
 @f}
 
 When solving this problem, the error consists of the nonlinear error (from
