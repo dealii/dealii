@@ -1,18 +1,19 @@
 <h1>Results</h1>
 
 Now we use the method we discussed above to solve Navier Stokes equations with
-viscosity 1/400 and 1/7500.
+viscosity $1/400$ and $1/7500$.
 
-<h3> Test case 1: Re=400 </h3>
+<h3> Test case 1: Low Reynolds Number </h3>
 
-In the first test case the viscosity is set to be 1/400. As we discussed in the
+In the first test case the viscosity is set to be $1/400$. As we discussed in the
 introduction, the initial guess is the solution to the corresponding Stokes
 problem. In the following table, the residuals at each Newton's iteration on
-every mesh is shown. The data in the table shows that Newton's iteration converges quadratically.
+every mesh is shown. The data in the table shows that Newton's iteration
+converges quadratically.
 
 <table align="center" class="doxtable">
 <tr>
-    <th>Re=400</th>
+    <th>$\mathrm{Re}=400$</th>
     <th colspan="2">Mesh0</th>
     <th colspan="2">Mesh1</th>
     <th colspan="2">Mesh2</th>
@@ -48,7 +49,7 @@ every mesh is shown. The data in the table shows that Newton's iteration converg
 <tr>
   <td>2</td>
   <td>7.0849e-04</td>
-  <td>5.0000e+00</td>
+  <td>5</td>
   <td>9.9458e-04</td>
   <td>5</td>
   <td>1.1409e-04</td>
@@ -61,7 +62,7 @@ every mesh is shown. The data in the table shows that Newton's iteration converg
 <tr>
   <td>3</td>
   <td>1.9980e-05</td>
-  <td>5.0000e+00</td>
+  <td>5</td>
   <td>4.5007e-05</td>
   <td>5</td>
   <td>2.9020e-08</td>
@@ -74,7 +75,7 @@ every mesh is shown. The data in the table shows that Newton's iteration converg
 <tr>
   <td>4</td>
   <td>2.3165e-09</td>
-  <td>6.0000e+00</td>
+  <td>6</td>
   <td>1.6891e-07</td>
   <td>5</td>
   <td>1.2338e-14</td>
@@ -87,7 +88,7 @@ every mesh is shown. The data in the table shows that Newton's iteration converg
 <tr>
   <td>5</td>
   <td>1.2585e-13</td>
-  <td>7.0000e+00</td>
+  <td>7</td>
   <td>1.4520e-11</td>
   <td>6</td>
   <td>1.9044e-13</td>
@@ -118,9 +119,10 @@ every mesh is shown. The data in the table shows that Newton's iteration converg
 
 
 The following figures show the sequence of generated grids. For the case
-of Re=400, the initial guess is obtained by solving Stokes on an $8 \times 8$
-mesh, and the mesh is refined adaptively. Between meshes, the solution from
-the coarse mesh is interpolated to the fine mesh to be used as an initial guess.
+of $\mathrm{Re}=400$, the initial guess is obtained by solving Stokes on an
+$8 \times 8$ mesh, and the mesh is refined adaptively. Between meshes, the
+solution from the coarse mesh is interpolated to the fine mesh to be used as an
+initial guess.
 
 <TABLE ALIGN="center">
   <tr>
@@ -144,7 +146,8 @@ the coarse mesh is interpolated to the fine mesh to be used as an initial guess.
   </tr>
 </table>
 
-This picture is the graphical streamline result of lid-driven cavity with Re=400.
+This picture is the graphical streamline result of lid-driven cavity with
+$\mathrm{Re}=400$.
 <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Streamline.png" alt="">
 
 Then the solution is compared with a reference solution
@@ -152,22 +155,22 @@ from [4] and the reference solution data can be found in the file "ref_2d_ghia_u
 
 <img src="https://www.dealii.org/images/steps/developer/step-57.compare-Re400.svg" style="width:50%" alt="">
 
-<h3> Test case 2: Re=7500 </h3>
+<h3> Test case 2: High Reynolds Number </h3>
 
 Newton's iteration requires a good initial guess. However, the nonlinear term
-dominates when the Reynold number is large, so that the solution to the Stokes
+dominates when the Reynolds number is large, so that the solution to the Stokes
 equations may be far away from the exact solution. If the Stokes solution acts
 as the initial guess, the convergence will be lost. The following picture
-shows that the nonlinear iteration gets stuck and the residual no longer decreases 
+shows that the nonlinear iteration gets stuck and the residual no longer decreases
 in further iterations.
 
 <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_loss_convergence.svg" style="width:50%" alt="">
 
-The initial guess, therefore, has to be obtained via a continuation method 
+The initial guess, therefore, has to be obtained via a continuation method
 which has been discussed in the introduction. Here the step size in the continuation method, that is $|\nu_{i}-\nu_{i+1}|$, is 2000 and the initial
 mesh is of size $32 \times 32$. After obtaining an initial guess, the mesh is
 refined as in the previous test case. The following picture shows that at each
-refinement Newton's iteration has quadratic convergence. 52 steps of Newton's 
+refinement Newton's iteration has quadratic convergence. 52 steps of Newton's
 iterations are executed for solving this test case.
 
 <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_get_convergence.svg" style="width:50%" alt="">
@@ -177,7 +180,7 @@ mesh. The quadratic convergence is clearly visible in the table.
 
 <table align="center" class="doxtable">
   <tr>
-    <th>Re=7500</th>
+    <th>$\mathrm{Re}=7500$</th>
     <th colspan="2">Mesh0</th>
     <th colspan="2">Mesh1</th>
     <th colspan="2">Mesh2</th>
@@ -323,11 +326,11 @@ The following picture presents the graphical result.
 <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Streamline.png" alt="">
 
 Furthermore, the error consists of the nonlinear error,
-which is decreasing as Newton's iteration going on, and the discretization error, 
+which is decreasing as Newton's iteration going on, and the discretization error,
 which depends on the mesh size. That is why we have to refine the
 mesh and repeat Newton's iteration on the next finer mesh. From the table above, we can
 see that the residual (nonlinear error) is below 1e-12 on each mesh, but the
-following picture shows us the difference between solutions on subsequently finer 
+following picture shows us the difference between solutions on subsequently finer
 meshes.
 
 <img src="https://www.dealii.org/images/steps/developer/step-57.converge-Re7500.svg" style="width:50%" alt="">
@@ -346,14 +349,14 @@ out that the preconditioner here is very competitive, as can be seen in the
 paper [2].
 
 The following table shows the timing results between our iterative approach
- (FGMRES) compared to a direct solver (UMFPACK) for the whole system
+(FGMRES) compared to a direct solver (UMFPACK) for the whole system
 with viscosity set to 1/400. Even though we use the same direct solver for
 the velocity block in the iterative solver, it is considerably faster and
-consumes less memory. This will be even more pronounced in 3d. 
+consumes less memory. This will be even more pronounced in 3d.
 
-<table align="center" border="1">
+<table align="center" class="doxtable">
 <tr>
-  <th>Ref</th>
+  <th>Refinement Cycle</th>
   <th>DoFs</th>
   <th>Iterative: Total/s (Setup/s)</th>
   <th>Direct: Total/s (Setup/s)</th>
@@ -385,17 +388,17 @@ consumes less memory. This will be even more pronounced in 3d.
 </table>
 
 
-<h4>3D computations</h4>
+<h4>3d computations</h4>
 
 The code is set up to also run in 3d. Of course the reference values are
 different, see [6] for example. High resolution computations are not doable
 with this example as is, because a direct solver for the velocity block does
 not work well in 3d. Rather, a parallel solver based on algebraic or geometric
 multigrid is needed. See below.
- 
+
 <h4>Parallelization</h4>
 
-For larger computations, especially in 3D, it is necessary to implement MPI
+For larger computations, especially in 3d, it is necessary to implement MPI
 parallel solvers and preconditioners. A good starting point would be step-55,
 which uses algebraic multigrid for the velocity block for the Stokes
 equations.

@@ -1,7 +1,7 @@
 <br>
 
 <i>This program was contributed by Liang Zhao and Timo Heister.
- 
+
 This material is based upon work partially supported by National Science
 Foundation grant DMS1522191 and the Computational Infrastructure in
 Geodynamics initiative (CIG), through the National Science Foundation under
@@ -33,7 +33,7 @@ nonlinear system because of the convective term $(\textbf{u} \cdot
 \nabla)\textbf{u}$. The first step of computing a numerical solution
 is to linearize the system and this will be done using Newton's method. A
 time-dependent problem is discussed in step-35, where the system is linearized
-using the solution from the last time step and no nonlinear 
+using the solution from the last time step and no nonlinear
 solve is necessary.
 
 <h3> Linearization of Navier-Stokes Equations </h3>
@@ -49,13 +49,13 @@ F(\mathbf{u}, p) = \left(
               \right).
 @f}
 
-$F(\textbf{u}, p)$ is a nonlinear function whose root is 
+$F(\textbf{u}, p)$ is a nonlinear function whose root is
 the solution to the NSE. Assuming the initial guess is good enough to
 guarantee the convergence of Newton's iteration and denoting
 $\textbf{x} = (\textbf{u}, p)$, Newton's iteration on a vector field
 can be defined as
-@f{eqnarray*} \textbf{x}^{k+1} = \textbf{x}^{k} -
-(\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
+@f{eqnarray*}
+  \textbf{x}^{k+1} = \textbf{x}^{k} - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
 @f}
 where
 $\textbf{x}^{k+1}$ is the approximate solution in step k+1,
@@ -72,7 +72,7 @@ the update term as a whole, that is
 @f{eqnarray*}
 \delta \textbf{x}^{k} = - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
 @f}
-where $x^{k+1}=x^{k}+\delta x^{k}$.
+where $\textbf{x}^{k+1}=\textbf{x}^{k}+\delta \textbf{x}^{k}$.
 
 Then we can evaluate the update term by solving the system
 @f{eqnarray*}
@@ -112,10 +112,10 @@ Therefore, we arrive at the linearized system:
 where $\textbf{g} =\textbf{f}+\nu \Delta\textbf{u}^k -(\textbf{u}^k
 \cdot \nabla)\textbf{u}^k -\nabla p^k$ and $\textbf{u}^k$ and $p^k$ are the solutions from the
 previous iteration. Additionally, the
-right hand side of the second equation is not zero since the discrete 
-solution is not exactly divergence free (divergence free for the continuous 
-solution). The right hand side here acts as a correction which leads the 
-discrete solution of the velocity to be divergence free along Newton's 
+right hand side of the second equation is not zero since the discrete
+solution is not exactly divergence free (divergence free for the continuous
+solution). The right hand side here acts as a correction which leads the
+discrete solution of the velocity to be divergence free along Newton's
 iteration. In this linear system, the only unknowns are the
 update terms $\delta \textbf{u}^{k}$ and $\delta p^{k}$, and we can use a similar strategy
 to the one used in step-22. The weak form is
@@ -124,14 +124,17 @@ derived like it is done in step-22.
 Now, Newton's iteration can be used to solve for the update terms:
 
 <ol>
-  <li> Initialization: Initial guess $u_0$ and $p_0$, tolerance $\tau$;
-  <li> Linear solve to compute update term $\delta\textbf{u}^{k}$ and $\delta p^k$;
-  <li> Update the approximation: $\textbf{u}^{k+1} = \textbf{u}^{k} + \delta\textbf{u}^{k}$ and $p^{k+1} = p^{k} + \delta p^{k}$;
-  <li> Check residual norm: $E^{k+1} = \|F(\mathbf{u}^{k+1}, p^{k+1})\|$:
-       <ul>
-       <li>If $E^{k+1} \leq \tau$, STOP. 
-       <li>If $E^{k+1} > \tau$, back to step 2. 
-       </ul>
+  <li>Initialization: Initial guess $u_0$ and $p_0$, tolerance $\tau$;</li>
+  <li>Linear solve to compute update term $\delta\textbf{u}^{k}$ and
+      $\delta p^k$;</li>
+  <li>Update the approximation:
+      $\textbf{u}^{k+1} = \textbf{u}^{k} + \delta\textbf{u}^{k}$ and
+      $p^{k+1} = p^{k} + \delta p^{k}$;</li>
+  <li>Check residual norm: $E^{k+1} = \|F(\mathbf{u}^{k+1}, p^{k+1})\|$:
+      <ul>
+        <li>If $E^{k+1} \leq \tau$, STOP.</li>
+        <li>If $E^{k+1} > \tau$, back to step 2.</li>
+      </ul></li>
 </ol>
 
 <h3> Finding an Initial Guess </h3>
@@ -144,8 +147,8 @@ by solving the Stokes equation with viscosity $\nu$. While problem dependent,
 this works for $\nu \geq 1/400$ for the test problem considered here.
 
 However, the convective term $(\mathbf{u}\cdot\nabla)\mathbf{u}$ will be
-dominant if the viscosity is small, like 1/7500 in test case 2.  In this
-situation, we use a continuation method to set up a series of auxiliary NSE with
+dominant if the viscosity is small, like $1/7500$ in test case 2.  In this
+situation, we use a continuation method to set up a series of auxiliary NSEs with
 viscosity approaching the one in the target NSE. Correspondingly, we create a
 sequence $\{\nu_{i}\}$ with $\nu_{n}= \nu$, and accept that the solutions to
 two NSE with viscosity $\nu_{i}$ and $\nu_{i+1}$ are close if $|\nu_{i} -
@@ -168,7 +171,7 @@ to get the initial guess for
 @f}
 which also acts as the initial guess of the continuation method.
 Here $\nu_{1}$ is relatively large so that the solution to the Stokes problem with viscosity $\nu_{1}$
-can be used as an initial guess for the NSE in Newton's iteration. 
+can be used as an initial guess for the NSE in Newton's iteration.
 
 Then the solution to
 
@@ -184,11 +187,11 @@ acts as the initial guess for
 - \nabla \cdot \textbf{u} &=& 0.
 @f}
 
-This process is repeated with a sequence of viscosities, $\{\nu_i\}$ that is
+This process is repeated with a sequence of viscosities $\{\nu_i\}$ that is
 determined experimentally so that the final solution can used as a starting
 guess for the Newton iteration.
 
-<h3>The Solver and Preconditioner </h3>
+<h3>The %Solver and Preconditioner </h3>
 
 At each step of Newton's iteration, the problem results in solving a
 saddle point systems of the form
@@ -215,7 +218,7 @@ saddle point systems of the form
 @f}
 
 This system matrix has the same block structure as the one in step-22. However,
-the matrix $A$ at (1, 1) corner is not symmetric  because of the nonlinear term. 
+the matrix $A$ at the top left corner is not symmetric because of the nonlinear term.
 Instead of solving the above system, we can solve the equivalent system
 
 @f{eqnarray*}
@@ -239,16 +242,15 @@ Instead of solving the above system, we can solve the equivalent system
       \end{array}
     \right)
 @f}
-with a parameter $\gamma$ and an invertible matrix W. Here 
-$\gamma B^TW^{-1}B$ is the Augmented Lagrangian term and
- see [1] for details.
+with a parameter $\gamma$ and an invertible matrix $W$. Here
+$\gamma B^TW^{-1}B$ is the Augmented Lagrangian term; see [1] for details.
 
 Denoting the system matrix of the new system by $G$ and the right-hand
 side by $b$, we solve it iteratively with right preconditioning
 $P^{-1}$ as $GP^{-1}y = b$, where
 
 @f{eqnarray*}
-P^{-1} = \left(\begin{array}{cc} \tilde{A} & B^T \\ 
+P^{-1} = \left(\begin{array}{cc} \tilde{A} & B^T \\
                                  0 & \tilde{S} \end{array}\right)^{-1},
 @f}
 
@@ -264,7 +266,7 @@ See [1] for details.
 
 We decompose $P^{-1}$ as
 
-@f{eqnarray*} 
+@f{eqnarray*}
 P^{-1} =
 \left(\begin{array}{cc} \tilde{A}^{-1} & 0 \\ 0 & I \end{array}\right)
 \left(\begin{array}{cc} I & -B^T \\ 0 & I \end{array}\right)
@@ -274,7 +276,7 @@ P^{-1} =
 Here two inexact solvers will be needed for $\tilde{A}^{-1}$ and
 $\tilde{S}^{-1}$, respectively (see [1]). Since the pressure mass
 matrix is symmetric and positive definite,
-CG with ILU as a preconditioner is appropriate to use for $\tilde{S}^{-1}$. For simplicity, we use 
+CG with ILU as a preconditioner is appropriate to use for $\tilde{S}^{-1}$. For simplicity, we use
 the direct solver UMFPACK for $\tilde{A}^{-1}$. The last ingredient is a sparse
 matrix-vector product with $B^T$. Instead of computing the matrix product
 in the augmented Lagrangian term in $\tilde{A}$, we assemble Grad-Div stabilization
@@ -283,19 +285,19 @@ M_p^{-1}B)_{ij}$, as explained in [2].
 
 <h3> Test Case </h3>
 
-Here we use the lid driven cavity flow as our test case, see [3] for details. 
+Here we use the lid driven cavity flow as our test case, see [3] for details.
 The computational domain is the unit square and the right-hand side
 $f=0$. The boundary condition is
 
-@f{eqnarray*} 
-(u(x, y), v(x,y)) &=& (1,0)   
+@f{eqnarray*}
+(u(x, y), v(x,y)) &=& (1,0)
   \qquad\qquad \textrm{if}\ y = 1 \\
   (u(x, y), v(x,y)) &=& (0,0)
-  \qquad\qquad \textrm{else}.
+  \qquad\qquad \textrm{otherwise}.
 @f}
 
 When solving this problem, the error consists of the nonlinear error (from
-Newton's iteration) and the discretization error (depending on mesh size). The
+Newton's iteration) and the discretization error (dependent on mesh size). The
 nonlinear part decreases with each Newton iteration and the discretization error
 reduces with mesh refinement. In this example, the solution from the coarse
 mesh is transferred to successively finer meshes and used as an initial
@@ -310,21 +312,22 @@ the update term. Overall convergence is controlled by the nonlinear residual
 and Newton's method does not have to require an exact Jacobian, so for the outer 
 linear solver we employ FGMRES with a relative tolerance of only 1e-4. In fact,
 we use the truncated Newton solve for this system.
-As described in step-22, the inner linear solves are also not required 
-to be done very accurately. Here we use CG with a relative 
-tolerance of 1e-6 for the pressure mass matrix. As expected, we still see convergence 
+As described in step-22, the inner linear solves are also not required
+to be done very accurately. Here we use CG with a relative
+tolerance of 1e-6 for the pressure mass matrix. As expected, we still see convergence
 of the nonlinear residual down to 1e-14. Also, we use a simple line
 search algorithm for globalization of the Newton method.
 
-The cavity reference values for Re=400 and Re=7500 are from [4] and [5],
-respectively, where "Re" represents the Reynold number and can be located 
-at [8]. Here the viscosity is defined by 1/Re. 
-Even though we can still find a solution for Re=10000 and the
+The cavity reference values for $\mathrm{Re}=400$ and $\mathrm{Re}=7500$ are
+from [4] and [5], respectively, where $\mathrm{Re}$ is the Reynolds number and
+can be located at [8]. Here the viscosity is defined by $1/\mathrm{Re}$.
+Even though we can still find a solution for $\mathrm{Re}=10000$ and the
 references contain results for comparison, we limit our discussion here to
-Re=7500. This is because the solution is no longer stationary starting around
-Re=8000 but instead becomes periodic, see [7] for details.
+$\mathrm{Re}=7500$. This is because the solution is no longer stationary
+starting around $\mathrm{Re}=8000$ but instead becomes periodic, see [7] for
+details.
 
-<h3> Reference </h3>
+<h3> References </h3>
 <ol>
 
   <li>  An Augmented Lagrangian-Based Approach to the Oseen Problem, M. Benzi and M. Olshanskii, SIAM J. SCI. COMPUT. 2006

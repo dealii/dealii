@@ -96,19 +96,29 @@ namespace Step57
 
   private:
     void setup_dofs();
+
     void initialize_system();
+
     void assemble(const bool initial_step, const bool assemble_matrix);
+
     void assemble_system(const bool initial_step);
+
     void assemble_rhs(const bool initial_step);
+
     void solve(const bool initial_step);
+
     void refine_mesh();
+
     void process_solution(unsigned int refinement);
+
     void output_results(const unsigned int refinement_cycle) const;
+
     void newton_iteration(const double       tolerance,
                           const unsigned int max_iteration,
                           const unsigned int n_refinements,
                           const bool         is_initial_step,
                           const bool         output_result);
+
     void compute_initial_guess(double step_size);
 
     double                               viscosity;
@@ -287,7 +297,6 @@ namespace Step57
   // @sect4{StationaryNavierStokes::setup_dofs}
   // This function initializes the DoFHandler enumerating the degrees of freedom
   // and constraints on the current mesh.
-
   template <int dim>
   void StationaryNavierStokes<dim>::setup_dofs()
   {
@@ -300,7 +309,6 @@ namespace Step57
     // We renumber the components to have all velocity DoFs come before
     // the pressure DoFs to be able to split the solution vector in two blocks
     // which are separately accessed in the block preconditioner.
-    //
     std::vector<unsigned int> block_component(dim + 1, 0);
     block_component[dim] = 1;
     DoFRenumbering::component_wise(dof_handler, block_component);
@@ -317,7 +325,6 @@ namespace Step57
     // remain satisfied during Newton's iteration, zero boundary conditions are
     // used for the update $\delta u^k$. Therefore we set up two different
     // constraint objects.
-
     FEValuesExtractors::Vector velocities(0);
     {
       nonzero_constraints.clear();
@@ -351,9 +358,8 @@ namespace Step57
   }
 
   // @sect4{StationaryNavierStokes::initialize_system}
-  // On each mesh the sparsity pattern and the size of the linear system
+  // On each mesh the SparsityPattern and the size of the linear system
   // are different. This function initializes them after mesh refinement.
-
   template <int dim>
   void StationaryNavierStokes<dim>::initialize_system()
   {
@@ -375,10 +381,9 @@ namespace Step57
   // This function builds the system matrix and right hand side that we
   // currently work on. The @p initial_step argument is used to determine
   // which set of constraints we apply (nonzero for the initial step and zero
-  // for the others). The @p assemble_matrix flag determines whether to
+  // for the others). The @p assemble_matrix argument determines whether to
   // assemble the whole system or only the right hand side vector,
   // respectively.
-
   template <int dim>
   void StationaryNavierStokes<dim>::assemble(const bool initial_step,
                                              const bool assemble_matrix)
@@ -513,7 +518,6 @@ namespace Step57
     if (assemble_matrix)
       {
         // Finally we move pressure mass matrix into a separate matrix:
-
         pressure_mass_matrix.reinit(sparsity_pattern.block(1, 1));
         pressure_mass_matrix.copy_from(system_matrix.block(1, 1));
 
@@ -554,12 +558,12 @@ namespace Step57
     const AffineConstraints<double> &constraints_used =
       initial_step ? nonzero_constraints : zero_constraints;
 
-    SolverControl                     solver_control(system_matrix.m(),
+    SolverControl solver_control(system_matrix.m(),
                                  1e-4 * system_rhs.l2_norm(),
                                  true);
-    SolverFGMRES<BlockVector<double>> gmres(solver_control);
 
-    SparseILU<double> pmass_preconditioner;
+    SolverFGMRES<BlockVector<double>> gmres(solver_control);
+    SparseILU<double>                 pmass_preconditioner;
     pmass_preconditioner.initialize(pressure_mass_matrix,
                                     SparseILU<double>::AdditionalData());
 
@@ -608,8 +612,8 @@ namespace Step57
     triangulation.execute_coarsening_and_refinement();
 
     // First the DoFHandler is set up and constraints are generated. Then we
-    // create a temporary vector "tmp", whose size is according with the
-    // solution on the new mesh.
+    // create a temporary BlockVector <code>tmp</code>, whose size is
+    // according with the solution on the new mesh.
     setup_dofs();
 
     BlockVector<double> tmp(dofs_per_block);
@@ -799,7 +803,7 @@ namespace Step57
 
   // @sect4{StationaryNavierStokes::process_solution}
   // In our test case, we do not know the analytical solution. This function
-  // outputs the velocity components along x=0.5 and y from 0 to 1 so they
+  // outputs the velocity components along $x=0.5$ and $0 \leq y \leq 1$ so they
   // can be compared with data from the literature.
   template <int dim>
   void StationaryNavierStokes<dim>::process_solution(unsigned int refinement)
@@ -828,7 +832,6 @@ namespace Step57
       }
   }
 
-
   // @sect4{StationaryNavierStokes::run}
   // This is the last step of this program. In this part, we generate the grid
   // and run the other functions respectively. The max refinement can be set by
@@ -841,11 +844,11 @@ namespace Step57
 
     const double Re = 1.0 / viscosity;
 
-    // If the viscosity is smaller than 1/1000, we have to first search for an
+    // If the viscosity is smaller than $1/1000$, we have to first search for an
     // initial guess via a continuation method. What we should notice is the
     // search is always on the initial mesh, that is the $8 \times 8$ mesh in
     // this program. After that, we just do the same as we did when viscosity
-    // is larger than 1/1000: run Newton's iteration, refine the mesh,
+    // is larger than $1/1000$: run Newton's iteration, refine the mesh,
     // transfer solutions, and repeat.
     if (Re > 1000.0)
       {
