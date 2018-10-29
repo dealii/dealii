@@ -375,20 +375,6 @@ namespace HDF5
      * If true use parallel HDF5, if false use serial HDF5.
      */
     const bool mpi;
-
-    /**
-     * Return value of the last HDF5 C library call.
-     *
-     * The HDF5 calls return a non-negative value if successful; otherwise they
-     * return a negative value.
-     *
-     * Calls such as
-     * [H5DWrite](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5D.html#Dataset-Write)
-     * use this variable to store the return value. Other calls such as
-     * [H5Pcreate](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-Create)
-     * don't use this variable to store the return value.
-     */
-    herr_t ret;
   };
 
   /**
