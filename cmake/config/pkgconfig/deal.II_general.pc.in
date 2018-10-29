@@ -1,0 +1,10 @@
+DEAL_II_PATH=@DEAL_II_PATH_PC@
+Name: deal.II compiled in debug mode
+Description:  A C++ software library supporting the creation of finite element codes and an open community of users and developers. 
+Version: @DEAL_II_VERSION@
+URL: https://github.com/dealii/dealii
+Requires:deal.II_base
+Cflags: @DEAL_II_CXX_FLAGS_GENERAL@
+Libs: @DEAL_II_LINKER_FLAGS_GENERAL@  @CONFIG_LIBRARIES_GENERAL_PC@
+
+

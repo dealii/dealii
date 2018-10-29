@@ -134,6 +134,9 @@ SET(CONFIG_INCLUDE_DIRS
   ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
+
+SET(CONFIG_INCLUDE_DIRS_BUILD_PC ${CONFIG_INCLUDE_DIRS}) # for pkgconfig
+
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
@@ -155,6 +158,9 @@ SET(CONFIG_INCLUDE_DIRS
   \${DEAL_II_PATH}/\${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
+
+SET(CONFIG_INCLUDE_DIRS_INSTALL_PC ${CONFIG_INCLUDE_DIRS}) # for pkgconfig
+
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
@@ -218,5 +224,10 @@ FOREACH(_name ${_deal_ii_features_sorted})
     ENDIF()
   ENDFOREACH()
 ENDFOREACH()
+
+# just for mac and linux
+if(NOT MSVC)
+  add_subdirectory(pkgconfig)
+endif()
 
 MESSAGE(STATUS "Setting up project configuration - Done")
