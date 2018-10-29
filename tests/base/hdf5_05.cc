@@ -1174,8 +1174,11 @@ main(int argc, char **argv)
 
         write_test<float>(data_file, mpi_communicator, pcout);
         write_test<double>(data_file, mpi_communicator, pcout);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         write_test<std::complex<float>>(data_file, mpi_communicator, pcout);
         write_test<std::complex<double>>(data_file, mpi_communicator, pcout);
+#endif
       }
 
       {
@@ -1184,8 +1187,11 @@ main(int argc, char **argv)
                              HDF5::File::Mode::open);
         read_test<float>(data_file, mpi_communicator, pcout);
         read_test<double>(data_file, mpi_communicator, pcout);
+
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
         read_test<std::complex<float>>(data_file, mpi_communicator, pcout);
         read_test<std::complex<double>>(data_file, mpi_communicator, pcout);
+#endif
       }
     }
   catch (std::exception &exc)
