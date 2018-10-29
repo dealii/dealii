@@ -28,6 +28,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// It is necessary to turn clang-format off in order to maintain the Doxygen
+// links because the they are longer than 80 characters
+// clang-format off
 /**
  * Namespace containing the HDF5 interface.
  *
@@ -122,7 +125,8 @@ DEAL_II_NAMESPACE_OPEN
  * allows MPI to do optimizations. In these set of classes all the calls are set
  * to collective in order to maximize the performance. This means that all the
  * MPI processes have to contribute to every single call, even if they don't
- * have data to write.
+ * have data to write. MPI HDF5 requires that dealii and HDF5 have been compiled
+ * with MPI support.
  *
  * ## Write a hyperslab in parallel
  * Hyperslabs are portions of datasets. A hyperslab can be a contiguous
@@ -158,17 +162,10 @@ DEAL_II_NAMESPACE_OPEN
  *     dataset.write_none<double>();
  *   }
  * @endcode
- */
-// It is necessary to turn clang-format off in order to maintain the Doxygen
-// link
-// clang-format off
-/**
+ *
  * The function
  * DataSet::write_hyperslab(const Container<number> &,const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &)
  * can be used to write complex hyperslabs.
- */
-// clang-format on
-/**
  *
  * ## Write unordered data in parallel
  * The example below shows how to write a selection of data.
@@ -311,6 +308,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Daniel Garcia-Sanchez, 2018
  */
+// clang-format on
 namespace HDF5
 {
   /**
@@ -616,22 +614,15 @@ namespace HDF5
     write_selection(const std::vector<number> & data,
                     const std::vector<hsize_t> &coordinates);
 
+    // clang-format off
     /**
      * Writes a data hyperslab to the dataset. The parameters are summarized
      * below:
      *  - Offset: The starting location for the hyperslab.
      *  - Count: The number of elements to select along each dimension.
-     */
-    // It is necessary to turn clang-format off in order to maintain the Doxygen
-    // link
-    // clang-format off
-    /**
      *
      * Stride and block are set to NULL. For complex hyperslabs see
      * write_hyperslab(const Container<number> &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
-     */
-    // clang-format on
-    /**
      *
      * See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
@@ -646,6 +637,7 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
+    // clang-format on
     template <typename Container>
     void
     write_hyperslab(const Container &           data,
@@ -709,7 +701,7 @@ namespace HDF5
     write_none();
 
     /**
-     * This funcion returns the I/O mode that was used on the last
+     * This function returns the I/O mode that was used on the last
      * parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">H5Pget_mpio_actual_io_mode</a>.
      *
@@ -726,7 +718,7 @@ namespace HDF5
     get_io_mode();
 
     /**
-     * This funcion returns the I/O mode that was used on the last
+     * This function returns the I/O mode that was used on the last
      * parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">H5Pget_mpio_actual_io_mode</a>.
      * The return type is `H5D_mpio_actual_io_mode_t` which corresponds to the
@@ -746,7 +738,7 @@ namespace HDF5
 
 
     /**
-     * This funcion returns the local causes that broke collective I/O on the
+     * This function returns the local causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      *
@@ -767,7 +759,7 @@ namespace HDF5
     get_local_no_collective_cause();
 
     /**
-     * This funcion returns the local causes that broke collective I/O on the
+     * This function returns the local causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      * The return type is `uint32_t` and corresponds to the value returned by
@@ -790,8 +782,8 @@ namespace HDF5
     get_local_no_collective_cause_as_hdf5_type();
 
     /**
-     * This funcion retrieves the global causes that broke collective I/O on the
-     * last parallel I/O call. See <a
+     * This function retrieves the global causes that broke collective I/O on
+     * the last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      *
      * The return value is a std::string and can be
@@ -811,7 +803,7 @@ namespace HDF5
     get_global_no_collective_cause();
 
     /**
-     * This funcion returns the global causes that broke collective I/O on the
+     * This function returns the global causes that broke collective I/O on the
      * last parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause">H5Pget_mpio_no_collective_cause</a>.
      * The return type is `uint32_t` and corresponds to the value returned by
@@ -859,21 +851,21 @@ namespace HDF5
     set_query_io_mode(bool query_io_mode);
 
     /**
-     * This funcion returns the dimensions of the dataset. The vector dimensions
-     * is a one-dimensional array of size rank specifying the size of each
-     * dimension of the dataset.
+     * This function returns the dimensions of the dataset. The vector
+     * dimensions is a one-dimensional array of size rank specifying the size of
+     * each dimension of the dataset.
      */
     std::vector<hsize_t>
     get_dimensions() const;
 
     /**
-     * This funcion returns the total number of elements in the dataset.
+     * This function returns the total number of elements in the dataset.
      */
     unsigned int
     get_size() const;
 
     /**
-     * This funcion returns the rank of the dataset.
+     * This function returns the rank of the dataset.
      */
     unsigned int
     get_rank() const;
