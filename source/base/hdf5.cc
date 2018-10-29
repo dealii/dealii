@@ -1491,7 +1491,7 @@ namespace HDF5
 
 
   DataSet
-  Group::dataset(const std::string &name)
+  Group::open_dataset(const std::string &name)
   {
     return DataSet(name, *hdf5_reference, mpi);
   }

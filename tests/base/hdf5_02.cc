@@ -107,7 +107,7 @@ test()
             << std::endl;
 
     // Read attributes attached to a dataset
-    auto test_dataset = test_group.dataset("test_dataset");
+    auto test_dataset = test_group.open_dataset("test_dataset");
     deallog << "dataset_double read:"
             << test_dataset.get_attribute<double>("dataset_double")
             << std::endl;

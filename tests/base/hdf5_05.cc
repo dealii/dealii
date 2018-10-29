@@ -701,7 +701,7 @@ read_test(HDF5::Group        root_group,
     //  (3,0): 9, 10, 11,
     //  (4,0): 12, 13, 14
 
-    auto dataset = group.dataset(dataset_name);
+    auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
             << " (Read): " << dataset.get_dimensions() << std::endl;
@@ -808,7 +808,7 @@ read_test(HDF5::Group        root_group,
     //  (0,3,0): 9, 10, 11,       (1,3,0): 24, 25, 26,
     //  (0,4,0): 12, 13, 14,      (1,4,0): 27, 28, 29
 
-    auto dataset = group.dataset(dataset_name);
+    auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
             << " (Read): " << dataset.get_dimensions() << std::endl;
@@ -1002,7 +1002,7 @@ read_test(HDF5::Group        root_group,
     //  (0,3,0): 9, 10, 11,       (1,3,0): 18, 20, 22,
     //  (0,4,0): 12, 13, 14,      (1,4,0): 24, 26, 28
 
-    auto dataset = group.dataset(dataset_name);
+    auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
             << " (Read): " << dataset.get_dimensions() << std::endl;
@@ -1041,7 +1041,7 @@ read_test(HDF5::Group        root_group,
     //  (2,0,0): 8, 9, 10, 11,
     //  (2,1,0): 16, 18, 20, 22
 
-    auto dataset = group.dataset(dataset_name);
+    auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
             << " (Read): " << dataset.get_dimensions() << std::endl;
@@ -1081,7 +1081,7 @@ read_test(HDF5::Group        root_group,
     //  (2,1,0): 36, 35, 0, 33
 
 
-    auto dataset = group.dataset(dataset_name);
+    auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
             << " (Read): " << dataset.get_dimensions() << std::endl;
@@ -1122,7 +1122,7 @@ read_test(HDF5::Group        root_group,
     //  (6,0): -24, 40, 41, -25, 42, 43, -26, 44, 45, -27, 46, 47
 
 
-    auto dataset = group.dataset(dataset_name);
+    auto dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << "<" << type_name << ">"
             << " (Read): " << dataset.get_dimensions() << std::endl;

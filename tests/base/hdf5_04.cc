@@ -488,7 +488,7 @@ read_test(HDF5::Group root_group)
 
   {
     std::string dataset_name("dataset_1");
-    auto        dataset = group.dataset(dataset_name);
+    auto        dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
@@ -518,7 +518,7 @@ read_test(HDF5::Group root_group)
 
   {
     std::string dataset_name("dataset_2");
-    auto        dataset = group.dataset(dataset_name);
+    auto        dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
@@ -582,7 +582,7 @@ read_test(HDF5::Group root_group)
         std::is_same<Number, double>::value)
       {
         std::string dataset_name("dataset_3");
-        auto        dataset = group.dataset(dataset_name);
+        auto        dataset = group.open_dataset(dataset_name);
         dataset.set_query_io_mode(true);
         deallog << "Dimensions " + dataset_name << " " << container_name << "<"
                 << type_name << ">"
@@ -613,7 +613,7 @@ read_test(HDF5::Group root_group)
 
   {
     std::string dataset_name("dataset_4");
-    auto        dataset = group.dataset(dataset_name);
+    auto        dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"
@@ -689,7 +689,7 @@ read_test(HDF5::Group root_group)
 
   {
     std::string dataset_name("dataset_5");
-    auto        dataset = group.dataset(dataset_name);
+    auto        dataset = group.open_dataset(dataset_name);
     dataset.set_query_io_mode(true);
     deallog << "Dimensions " + dataset_name << " " << container_name << "<"
             << type_name << ">"

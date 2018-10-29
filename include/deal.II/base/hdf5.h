@@ -405,7 +405,7 @@ namespace HDF5
   protected:
     /**
      * Open dataset. This is an internal constructor. The function
-     * Group::dataset() should be used to open a dataset.
+     * Group::open_dataset() should be used to open a dataset.
      */
     DataSet(const std::string &name, const hid_t &parent_group_id, bool mpi);
 
@@ -989,7 +989,7 @@ namespace HDF5
      * Opens a dataset.
      */
     DataSet
-    dataset(const std::string &name);
+    open_dataset(const std::string &name);
 
     /**
      * Creates a dataset. @p number can be `float`, `double`,
