@@ -1434,10 +1434,10 @@ namespace HDF5
 
 
 
-  Group::Group(const std::string &name,
-               const Group &      parentGroup,
-               const bool         mpi,
-               const Mode         mode)
+  Group::Group(const std::string &   name,
+               const Group &         parentGroup,
+               const bool            mpi,
+               const GroupAccessMode mode)
     : HDF5Object(name, mpi)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
@@ -1447,7 +1447,7 @@ namespace HDF5
     });
     switch (mode)
       {
-        case (Mode::create):
+        case (GroupAccessMode::create):
           *hdf5_reference = H5Gcreate2(*(parentGroup.hdf5_reference),
                                        name.data(),
                                        H5P_DEFAULT,
@@ -1455,7 +1455,7 @@ namespace HDF5
                                        H5P_DEFAULT);
           Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Gcreate2"));
           break;
-        case (Mode::open):
+        case (GroupAccessMode::open):
           *hdf5_reference =
             H5Gopen2(*(parentGroup.hdf5_reference), name.data(), H5P_DEFAULT);
           Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Gopen2"));
@@ -1477,7 +1477,7 @@ namespace HDF5
   Group
   Group::group(const std::string &name)
   {
-    return Group(name, *this, mpi, Mode::open);
+    return Group(name, *this, mpi, GroupAccessMode::open);
   }
 
 
@@ -1485,7 +1485,7 @@ namespace HDF5
   Group
   Group::create_group(const std::string &name)
   {
-    return Group(name, *this, mpi, Mode::create);
+    return Group(name, *this, mpi, GroupAccessMode::create);
   }
 
 
@@ -1519,10 +1519,10 @@ namespace HDF5
     dataset.write(data);
   }
 
-  File::File(const std::string &name,
-             const bool         mpi,
-             const MPI_Comm     mpi_communicator,
-             const Mode         mode)
+  File::File(const std::string &  name,
+             const bool           mpi,
+             const MPI_Comm       mpi_communicator,
+             const FileAccessMode mode)
     : Group(name, mpi)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
@@ -1554,12 +1554,12 @@ namespace HDF5
 
     switch (mode)
       {
-        case (Mode::create):
+        case (FileAccessMode::create):
           *hdf5_reference =
             H5Fcreate(name.data(), H5F_ACC_TRUNC, H5P_DEFAULT, plist);
           Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Fcreate"));
           break;
-        case (Mode::open):
+        case (FileAccessMode::open):
           *hdf5_reference = H5Fopen(name.data(), H5F_ACC_RDWR, plist);
           Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Fopen"));
           break;
@@ -1578,15 +1578,15 @@ namespace HDF5
 
 
 
-  File::File(const std::string &name,
-             const MPI_Comm     mpi_communicator,
-             const Mode         mode)
+  File::File(const std::string &  name,
+             const MPI_Comm       mpi_communicator,
+             const FileAccessMode mode)
     : File(name, true, mpi_communicator, mode)
   {}
 
 
 
-  File::File(const std::string &name, const Mode mode)
+  File::File(const std::string &name, const FileAccessMode mode)
     : File(name, false, MPI_COMM_NULL, mode)
   {}
 

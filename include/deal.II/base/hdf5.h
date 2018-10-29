@@ -934,7 +934,7 @@ namespace HDF5
     /**
      * Group access mode
      */
-    enum class Mode
+    enum class GroupAccessMode
     {
       /**
        * Creates a new group
@@ -952,10 +952,10 @@ namespace HDF5
      * parallel. This is an internal constructor, the functions group() and
      * create_group() should be used to open or create a group.
      */
-    Group(const std::string &name,
-          const Group &      parent_group,
-          const bool         mpi,
-          const Mode         mode);
+    Group(const std::string &   name,
+          const Group &         parent_group,
+          const bool            mpi,
+          const GroupAccessMode mode);
 
     /**
      * Internal constructor used by File. The constructor sets the protected
@@ -1032,7 +1032,7 @@ namespace HDF5
     /**
      * File access mode
      */
-    enum class Mode
+    enum class FileAccessMode
     {
       /**
        * Create file, truncate if exists
@@ -1052,10 +1052,10 @@ namespace HDF5
      * File(const std::string &, const Mode)
      * should be used to open or create HDF5 files.
      */
-    File(const std::string &name,
-         const bool         mpi,
-         const MPI_Comm     mpi_communicator,
-         const Mode         mode);
+    File(const std::string &  name,
+         const bool           mpi,
+         const MPI_Comm       mpi_communicator,
+         const FileAccessMode mode);
 
   public:
     /**
@@ -1065,16 +1065,17 @@ namespace HDF5
      * defines the processes that participate in this call; `MPI_COMM_WORLD` is
      * a common value for the MPI communicator.
      */
-    File(const std::string &name,
-         const MPI_Comm     mpi_communicator,
-         const Mode         mode = Mode::create);
+    File(const std::string &  name,
+         const MPI_Comm       mpi_communicator,
+         const FileAccessMode mode = FileAccessMode::create);
 
     /**
      * Creates or opens a hdf5 file for serial operations. This call does not
      * require MPI support. It creates or opens a HDF5 file depending on the
      * value of @p mode.
      */
-    File(const std::string &name, const Mode mode = Mode::create);
+    File(const std::string &  name,
+         const FileAccessMode mode = FileAccessMode::create);
   };
 } // namespace HDF5
 

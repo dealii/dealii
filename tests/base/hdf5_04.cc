@@ -730,7 +730,7 @@ main()
       const std::vector<hsize_t> dataset_dimensions = {50, 30};
 
       {
-        HDF5::File data_file(filename, HDF5::File::Mode::create);
+        HDF5::File data_file(filename, HDF5::File::FileAccessMode::create);
 
         write_test<std::vector, float>(data_file, dataset_dimensions);
         write_test<std::vector, double>(data_file, dataset_dimensions);
@@ -764,7 +764,7 @@ main()
       }
 
       {
-        HDF5::File data_file(filename, HDF5::File::Mode::open);
+        HDF5::File data_file(filename, HDF5::File::FileAccessMode::open);
         read_test<std::vector, float>(data_file);
         read_test<std::vector, double>(data_file);
 
