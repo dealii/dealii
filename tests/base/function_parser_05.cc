@@ -1,23 +1,42 @@
-#include "../tests.h"
-#include <map>
-#include <deal.II/base/point.h>
-#include <deal.II/lac/vector.h>
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2003 - 2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
 #include <deal.II/base/function_parser.h>
+#include <deal.II/base/point.h>
 
-// simple function parser example (this is the basis for the example code in the documentation)
+#include <deal.II/lac/vector.h>
 
-void test1()
+#include <map>
+
+#include "../tests.h"
+
+// simple function parser example (this is the basis for the example code in the
+// documentation)
+
+void
+test1()
 {
   // set up problem:
-  std::string variables = "x,y";
-  std::string expression = "cos(x)+sqrt(y)";
-  std::map<std::string,double> constants;
+  std::string                   variables  = "x,y";
+  std::string                   expression = "cos(x)+sqrt(y)";
+  std::map<std::string, double> constants;
 
   // FunctionParser with 2 variables and 1 component:
   FunctionParser<2> fp(1);
-  fp.initialize(variables,
-                expression,
-                constants);
+  fp.initialize(variables, expression, constants);
 
   // Point at which we want to evaluate the function
   Point<2> point(0.0, 4.0);
@@ -26,15 +45,15 @@ void test1()
   double result = fp.value(point);
 
   deallog << "Function '" << expression << "'"
-          << " @ " << point
-          << " is " << result << std::endl;
+          << " @ " << point << " is " << result << std::endl;
 }
 
 
-void test2()
+void
+test2()
 {
   // Define some constants that will be used by the function parser
-  std::map<std::string,double> constants;
+  std::map<std::string, double> constants;
   constants["pi"] = numbers::PI;
 
   // Define the variables that will be used inside the expressions
@@ -50,9 +69,7 @@ void test2()
   FunctionParser<3> vector_function(2);
 
   // And populate it with the newly created objects.
-  vector_function.initialize(variables,
-                             expressions,
-                             constants);
+  vector_function.initialize(variables, expressions, constants);
 
   // Point at which we want to evaluate the function
   Point<3> point(0.0, 1.0, 1.0);
@@ -68,16 +85,15 @@ void test2()
 
   // Output the evaluated function
   deallog << "Function '" << expressions[0] << "," << expressions[1] << "'"
-          << " @ " << point
-          << " is " << result << std::endl;
+          << " @ " << point << " is " << result << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
   test1();
   test2();
-
 }

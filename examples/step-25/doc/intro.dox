@@ -64,7 +64,7 @@ formulation. To this end, by setting $v = u_t$, it is easy to see that the sine-
 \f}
 
 <h3>Discretization of the equations in time</h3>
-Now, we can discretize the split formulation in time using the the
+Now, we can discretize the split formulation in time using the
 $\theta$-method, which has a stencil of only two time steps. By
 choosing a $\theta\in [0,1]$, the latter discretization allows us to
 choose from a continuum of schemes. In particular, if we pick
@@ -73,7 +73,7 @@ or implicit Euler method, respectively. Another important choice is
 $\theta=\frac{1}{2}$, which gives the second-order accurate
 Crank-Nicolson scheme. Henceforth, a superscript $n$ denotes the
 values of the variables at the $n^{\mathrm{th}}$ time step, i.e. at
-$t=t_n:= n k$, where $k$ is the (fixed) time step size. Thus,
+$t=t_n \dealcoloneq n k$, where $k$ is the (fixed) time step size. Thus,
 the split formulation of the time-discretized sine-Gordon equation becomes
 \f{eqnarray*}
   \frac{u^n - u^{n-1}}{k} - \left[\theta v^n + (1-\theta) v^{n-1}\right] &=& 0,\\

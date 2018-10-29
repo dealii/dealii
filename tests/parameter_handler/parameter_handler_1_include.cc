@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,30 +17,35 @@
 
 // check that we can do include statements
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+#include "../tests.h"
+
+void
+check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_1", "-1,0",
-                     Patterns::List(Patterns::Integer(-1,1),2,3));
+  prm.declare_entry("test_1",
+                    "-1,0",
+                    Patterns::List(Patterns::Integer(-1, 1), 2, 3));
 
   std::ifstream in(p);
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   // go into the source dir to read files there. this
   // is necessary so that we can include files there
-  chdir (SOURCE_DIR);
-  check ("parameter_handler_1_include.prm");
+  const int chdir_return_code = chdir(SOURCE_DIR);
+  AssertThrow(chdir_return_code == 0, ExcInternalError());
+  check("parameter_handler_1_include.prm");
 
   return 0;
 }

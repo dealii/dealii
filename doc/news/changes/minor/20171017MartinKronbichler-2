@@ -1,6 +1,0 @@
-New: The class Utilities::MPI::Partitioner can now handle the MPI import and
-export calls that were previously hidden in the vector class. This allows to
-use MPI communication of integers besides the previously supported floating
-point data.
-<br>
-(Martin Kronbichler, 2017/10/17)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -127,13 +127,13 @@ namespace Physics
    * in the current (spatial) configuration through the nonlinear map
    * @f[
    *  \mathbf{x}
-   *   := \boldsymbol{\varphi} \left( \mathbf{X} \right)
+   *   \dealcoloneq \boldsymbol{\varphi} \left( \mathbf{X} \right)
    *    = \mathbf{X} + \mathbf{u}(\mathbf{X}) \, ,
    * @f]
    * where the $\mathbf{u}(\mathbf{X})$ represents the displacement vector.
    * From this we can compute the deformation gradient tensor as
    * @f[
-   *  \mathbf{F} := \mathbf{I} + \nabla_{0}\mathbf{u} \, ,
+   *  \mathbf{F} \dealcoloneq \mathbf{I} + \nabla_{0}\mathbf{u} \, ,
    * @f]
    * wherein the differential operator $\nabla_{0}$ is defined as
    * $\frac{\partial}{\partial \mathbf{X}}$ and $\mathbf{I}$ is the identity
@@ -171,9 +171,11 @@ namespace Physics
    *
    * We then define the symmetric and skew-symmetric fourth-order unit tensors by
    * @f[
-   *      \mathcal{S} := \dfrac{1}{2}[\mathcal{I} + \overline{\mathcal{I}}]
-   *    \qquad \text{and} \qquad
-   *      \mathcal{W} := \dfrac{1}{2}[\mathcal{I} - \overline{\mathcal{I}}] \, ,
+   * \mathcal{S} \dealcoloneq
+   * \dfrac{1}{2}[\mathcal{I} + \overline{\mathcal{I}}]
+   * \qquad \text{and} \qquad
+   * \mathcal{W} \dealcoloneq
+   * \dfrac{1}{2}[\mathcal{I} - \overline{\mathcal{I}}] \, ,
    * @f]
    * such that
    * @f[

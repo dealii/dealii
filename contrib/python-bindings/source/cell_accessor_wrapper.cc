@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,16 +8,16 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 #include <cell_accessor_wrapper.h>
 
+#include <boost/python.hpp>
 #include <point_wrapper.h>
 #include <triangulation_wrapper.h>
-#include <boost/python.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -398,7 +398,7 @@ namespace python
 
   void CellAccessorWrapper::set_material_id(const int material_id)
   {
-    AssertThrow(static_cast<const types::material_id>(material_id) < numbers::invalid_material_id,
+    AssertThrow(static_cast<types::material_id>(material_id) < numbers::invalid_material_id,
                 ExcMessage("material_id is too large."));
     if ((dim == 2) && (spacedim == 2))
       return internal::set_material_id<2,2>(material_id, cell_accessor);

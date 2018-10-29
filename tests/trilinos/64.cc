@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,65 +18,72 @@
 // This test should be run on multiple processors.
 
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <Epetra_Map.h>
-#include <Epetra_Comm.h>
 #include <deal.II/lac/vector.h>
+
+#include <Epetra_Comm.h>
+#include <Epetra_Map.h>
 
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
+
 
 template <typename MatrixType>
-void test (MatrixType &m)
+void
+test(MatrixType &m)
 {
-  m.set(0,0,1.);
+  m.set(0, 0, 1.);
   m.compress(VectorOperation::insert);
   m = 0;
   m.compress(VectorOperation::insert);
 
-  Assert(fabs(m.frobenius_norm())<1e-15, ExcInternalError());
+  Assert(fabs(m.frobenius_norm()) < 1e-15, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
 
   try
     {
       {
-        const unsigned int n_dofs=420;
+        const unsigned int n_dofs = 420;
         // check
         // TrilinosWrappers::SparseMatrix
-        TrilinosWrappers::SparseMatrix
-        v1 (n_dofs, n_dofs, 5U);
-        test (v1);
+        TrilinosWrappers::SparseMatrix v1(n_dofs, n_dofs, 5U);
+        test(v1);
 
         // check
         // TrilinosWrappers::SparseMatrix
-        const unsigned int n_jobs =
-          Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
-        Assert(n_dofs%n_jobs==0, ExcInternalError());
-        const unsigned int n_local_dofs=n_dofs/n_jobs;
+        const unsigned int n_jobs = Utilities::Trilinos::get_n_mpi_processes(
+          Utilities::Trilinos::comm_world());
+        Assert(n_dofs % n_jobs == 0, ExcInternalError());
+        const unsigned int n_local_dofs = n_dofs / n_jobs;
         Epetra_Map map(static_cast<TrilinosWrappers::types::int_type>(n_dofs),
-                       static_cast<TrilinosWrappers::types::int_type>(n_local_dofs),
+                       static_cast<TrilinosWrappers::types::int_type>(
+                         n_local_dofs),
                        Utilities::Trilinos::comm_world());
-        TrilinosWrappers::SparseMatrix v2 (map, 5);
-        test (v2);
+        TrilinosWrappers::SparseMatrix v2(map, 5);
+        test(v2);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -89,7 +96,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

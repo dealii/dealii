@@ -1,7 +1,7 @@
 <br>
 
 <i>This program was contributed by Liang Zhao and Timo Heister.
- 
+
 This material is based upon work partially supported by National Science
 Foundation grant DMS1522191 and the Computational Infrastructure in
 Geodynamics initiative (CIG), through the National Science Foundation under
@@ -16,136 +16,148 @@ Award No. EAR-0949446 and The University of California-Davis.
 <h3> Navier Stokes Equations </h3>
 
 In this tutorial we show how to solve the incompressible Navier
-Stokes equations (NSE) by Newton's method. The flow we consider here
+Stokes equations (NSE) with Newton's method. The flow we consider here
 is assumed to be steady. In a domain $\Omega \subset
 \mathbb{R}^{d}$, $d=2,3$, with a piecewise smooth boundary
 $\partial \Omega$, and a given force field $\textbf{f}$, we seek
 a velocity field $\textbf{u}$ and a pressure field $\textbf{p}$
 satisfying
-
 @f{eqnarray*}
 - \nu \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f}\\
-- \nabla \cdot \textbf{u} &=& 0
+- \nabla \cdot \textbf{u} &=& 0.
 @f}
 
-Different from the Stokes equations as discussed in step-22, the NSE are a
-nonlinear system because of the convective term $(\textbf{u} \cdot
+Unlike the Stokes equations as discussed in step-22, the NSE are a
+nonlinear system of equations because of the convective term $(\textbf{u} \cdot
 \nabla)\textbf{u}$. The first step of computing a numerical solution
 is to linearize the system and this will be done using Newton's method. A
 time-dependent problem is discussed in step-35, where the system is linearized
-using the solution from the last time step and no nonlinear 
+using the solution from the last time step and no nonlinear
 solve is necessary.
 
 <h3> Linearization of Navier-Stokes Equations </h3>
 
-Moving the right-hand side terms to the left, a nonlinear function is created as
-
+We define a nonlinear function whose root is a solution to the NSE by
 @f{eqnarray*}
-F(\mathbf{u}, p) = \left(
-                \begin{array}{c}
-                  - \nu \Delta\mathbf{u} + (\mathbf{u} \cdot \nabla)\mathbf{u} + \nabla p - \mathbf{f} \\
-                  - \nabla \cdot \mathbf{u} \\
-                \end{array}
-              \right).
+F(\mathbf{u}, p) =
+  \begin{pmatrix}
+    - \nu \Delta\mathbf{u} + (\mathbf{u} \cdot \nabla)\mathbf{u} + \nabla p - \mathbf{f} \\
+    - \nabla \cdot \mathbf{u}
+  \end{pmatrix}.
 @f}
 
-$F(\textbf{u}, p)$ is a nonlinear function whose root is 
-the solution to the NSE. Assuming the initial guess is good enough to
+Assuming the initial guess is good enough to
 guarantee the convergence of Newton's iteration and denoting
-$\textbf{x} = (\textbf{u}, p)$, Newton's iteration on a vector field
+$\textbf{x} = (\textbf{u}, p)$, Newton's iteration on a vector function
 can be defined as
-@f{eqnarray*} \textbf{x}^{k+1} = \textbf{x}^{k} -
-(\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
+@f{eqnarray*}
+  \textbf{x}^{k+1} = \textbf{x}^{k} - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
 @f}
-where
-$\textbf{x}^{k+1}$ is the approximate solution in step k+1,
-$\textbf{x}^{k}$ represents the solution from the last step, and $\nabla
+
+where $\textbf{x}^{k+1}$ is the approximate solution in step $k+1$,
+$\textbf{x}^{k}$ represents the solution from the previous step, and $\nabla
 F(\textbf{x}^{k})$ is the Jacobian matrix evaluated at
 $\textbf{x}^{k}$.
 A similar iteration can be found in step-15.
 
-From Newton's iteration formula, we can observe that the new
+The Newton iteration formula implies the new
 solution is obtained by adding an update term to the old solution. Instead
 of evaluating the Jacobian matrix and taking its inverse, we consider
 the update term as a whole, that is
-
 @f{eqnarray*}
-\delta \textbf{x}^{k} = - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
+  \delta \textbf{x}^{k} = - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
 @f}
-where $x^{k+1}=x^{k}+\delta x^{k}$.
 
-Then we can evaluate the update term by solving the system
+where $\textbf{x}^{k+1}=\textbf{x}^{k}+\delta \textbf{x}^{k}$.
+
+We can find the update term by solving the system
 @f{eqnarray*}
-\nabla F(\textbf{x}^{k}) \delta \textbf{x}^{k} = -F(\textbf{x}^{k}).
+  \nabla F(\textbf{x}^{k}) \delta \textbf{x}^{k} = -F(\textbf{x}^{k}).
 @f}
+
 Here, the left of the previous equation represents the
 directional gradient of $F(\textbf{x})$ along $\delta
 \textbf{x}^{k}$ at $\textbf{x}^{k}$. By definition, the directional gradient is given by
-
 @f{eqnarray*}
   & &\nabla F(\mathbf{u}^{k}, p^{k}) (\delta \mathbf{u}^{k}, \delta p^{k}) \\
   \\
-  &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon} (F(\mathbf{u}^{k}+\epsilon \delta \mathbf{u}^{k}, p^{k}+\epsilon\nabla\delta p^{k}) - (F(\mathbf{u}^{k}, p^{k}))\\
+  &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon}
+      \left(
+        F(\mathbf{u}^{k} + \epsilon \delta \mathbf{u}^{k},
+          p^{k} + \epsilon \nabla \delta p^{k})
+      - F(\mathbf{u}^{k}, p^{k})
+      \right)\\
   \\
-  &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon} \left(
-                \begin{array}{c}
-                  - \epsilon\nu\Delta\delta \mathbf{u}^{k} + \epsilon\mathbf{u}^{k}\cdot\nabla\delta\mathbf{u}^{k}+\epsilon\delta\mathbf{u}^{k}\cdot\nabla\mathbf{u}^{k}+\epsilon^{2}\delta\mathbf{u}^{k}\cdot\nabla\delta\mathbf{u}^{k}+\epsilon \nabla\delta p^{k}\\
-                  - \epsilon \nabla \cdot\delta \mathbf{u}^{k}\\
-                \end{array}
-              \right)\\
-              \\
-  &=& \left(
-                \begin{array}{c}
-                  - \nu\Delta\delta \mathbf{u}^{k} + \mathbf{u}^{k}\cdot\nabla\delta\mathbf{u}^{k}+\delta\mathbf{u}^{k}\cdot\nabla\mathbf{u}^{k}+ \nabla\delta p^{k}\\
-                  - \nabla \cdot\delta \mathbf{u}^{k}\\
-                \end{array}
-              \right).
+  &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon}
+      \begin{pmatrix}
+        - \epsilon \nu \Delta \delta \mathbf{u}^{k}
+        + \epsilon \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
+        + \epsilon \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
+        + \epsilon^{2} \delta \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
+        + \epsilon \nabla \delta p^{k}\\
+        - \epsilon \nabla \cdot \delta \mathbf{u}^{k}
+      \end{pmatrix} \\
+  \\
+  &=& \begin{pmatrix}
+        - \nu \Delta \delta \mathbf{u}^{k}
+        + \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
+        + \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
+        + \nabla \delta p^{k}\\
+        - \nabla \cdot \delta \mathbf{u}^{k}
+      \end{pmatrix}.
 @f}
 
 Therefore, we arrive at the linearized system:
-
 @f{eqnarray*}
-- \nu\Delta\delta\mathbf{u}^{k} + \mathbf{u}^{k}\cdot\nabla\delta\mathbf{u}^{k}+\delta\mathbf{u}^{k}\cdot\nabla\mathbf{u}^{k}+ \nabla\delta p^{k} = \mathbf{g}, \\
-- \nabla \cdot\delta \mathbf{u}^{k} = \nabla\cdot\mathbf{u}^{k},
+   -\nu \Delta \delta \mathbf{u}^{k}
+  + \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
+  + \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
+  + \nabla \delta p^{k}
+  = -F(\mathbf{x}^k), \\
+   -\nabla \cdot\delta \mathbf{u}^{k}
+  = \nabla \cdot \mathbf{u}^{k},
 @f}
 
-where $\textbf{g} =\textbf{f}+\nu \Delta\textbf{u}^k -(\textbf{u}^k
-\cdot \nabla)\textbf{u}^k -\nabla p^k$ and $\textbf{u}^k$ and $p^k$ are the solutions from the
+where $\textbf{u}^k$ and $p^k$ are the solutions from the
 previous iteration. Additionally, the
-right hand side of the second equation is not zero since the discrete 
-solution is not exactly divergence free (divergence free for the continuous 
-solution). The right hand side here acts as a correction which leads the 
-discrete solution of the velocity to be divergence free along Newton's 
+right hand side of the second equation is not zero since the discrete
+solution is not exactly divergence free (divergence free for the continuous
+solution). The right hand side here acts as a correction which leads the
+discrete solution of the velocity to be divergence free along Newton's
 iteration. In this linear system, the only unknowns are the
-update terms $\delta \textbf{u}^{k}$ and $\delta p^{k}$, and we can use a similar strategy
-to the one used in step-22. The weak form is
-derived like it is done in step-22.
+update terms $\delta \textbf{u}^{k}$ and $\delta p^{k}$, and we can use a
+similar strategy to the one used in step-22 (and derive the weak form in the
+same way).
 
 Now, Newton's iteration can be used to solve for the update terms:
 
 <ol>
-  <li> Initialization: Initial guess $u_0$ and $p_0$, tolerance $\tau$;
-  <li> Linear solve to compute update term $\delta\textbf{u}^{k}$ and $\delta p^k$;
-  <li> Update the approximation: $\textbf{u}^{k+1} = \textbf{u}^{k} + \delta\textbf{u}^{k}$ and $p^{k+1} = p^{k} + \delta p^{k}$;
-  <li> Check residual norm: $E^{k+1} = \|F(\mathbf{u}^{k+1}, p^{k+1})\|$:
-       <ul>
-       <li>If $E^{k+1} \leq \tau$, STOP. 
-       <li>If $E^{k+1} > \tau$, back to step 2. 
-       </ul>
+  <li>Initialization: Initial guess $u_0$ and $p_0$, tolerance $\tau$;</li>
+  <li>Linear solve to compute update term $\delta\textbf{u}^{k}$ and
+      $\delta p^k$;</li>
+  <li>Update the approximation:
+      $\textbf{u}^{k+1} = \textbf{u}^{k} + \delta\textbf{u}^{k}$ and
+      $p^{k+1} = p^{k} + \delta p^{k}$;</li>
+  <li>Check residual norm: $E^{k+1} = \|F(\mathbf{u}^{k+1}, p^{k+1})\|$:
+      <ul>
+        <li>If $E^{k+1} \leq \tau$, STOP.</li>
+        <li>If $E^{k+1} > \tau$, back to step 2.</li>
+      </ul></li>
 </ol>
 
 <h3> Finding an Initial Guess </h3>
 
-Getting Newton's method to converge, the initial guess needs to be close
-enough to the solution, so it is crucial to find a good starting value.
+The initial guess needs to be close enough to the solution for Newton's method
+to converge; hence, finding a good starting value is crucial to the nonlinear
+solver.
 
 When the viscosity $\nu$ is large, a good initial guess can be obtained
 by solving the Stokes equation with viscosity $\nu$. While problem dependent,
 this works for $\nu \geq 1/400$ for the test problem considered here.
 
 However, the convective term $(\mathbf{u}\cdot\nabla)\mathbf{u}$ will be
-dominant if the viscosity is small, like 1/7500 in test case 2.  In this
-situation, we use a continuation method to set up a series of auxiliary NSE with
+dominant if the viscosity is small, like $1/7500$ in test case 2.  In this
+situation, we use a continuation method to set up a series of auxiliary NSEs with
 viscosity approaching the one in the target NSE. Correspondingly, we create a
 sequence $\{\nu_{i}\}$ with $\nu_{n}= \nu$, and accept that the solutions to
 two NSE with viscosity $\nu_{i}$ and $\nu_{i+1}$ are close if $|\nu_{i} -
@@ -154,127 +166,121 @@ $\nu_{i}$ as the initial guess of the NSE with $\nu_{i+1}$. This can be thought 
 as a staircase from the Stokes equations to the NSE we want to solve.
 
 That is, we first solve a Stokes problem
-
 @f{eqnarray*}
-- \nu_{1} \Delta\textbf{u} + \nabla p &=& \textbf{f}\\
-- \nabla \cdot \textbf{u} &=& 0
+  -\nu_{1} \Delta \textbf{u} + \nabla p &=& \textbf{f}\\
+  -\nabla \cdot \textbf{u} &=& 0
 @f}
 
 to get the initial guess for
-
 @f{eqnarray*}
-- \nu_{1} \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
-- \nabla \cdot \textbf{u} &=& 0,
+  -\nu_{1} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
+  -\nabla \cdot \textbf{u} &=& 0,
 @f}
+
 which also acts as the initial guess of the continuation method.
 Here $\nu_{1}$ is relatively large so that the solution to the Stokes problem with viscosity $\nu_{1}$
-can be used as an initial guess for the NSE in Newton's iteration. 
+can be used as an initial guess for the NSE in Newton's iteration.
 
 Then the solution to
-
 @f{eqnarray*}
-- \nu_{i} \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
-- \nabla \cdot \textbf{u} &=& 0.
+  -\nu_{i} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
+  -\nabla \cdot \textbf{u} &=& 0.
 @f}
 
 acts as the initial guess for
-
 @f{eqnarray*}
-- \nu_{i+1} \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
-- \nabla \cdot \textbf{u} &=& 0.
+  -\nu_{i+1} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
+  -\nabla \cdot \textbf{u} &=& 0.
 @f}
 
-This process is repeated with a sequence of viscosities, $\{\nu_i\}$ that is
+This process is repeated with a sequence of viscosities $\{\nu_i\}$ that is
 determined experimentally so that the final solution can used as a starting
 guess for the Newton iteration.
 
-<h3>The Solver and Preconditioner </h3>
+<h3>The %Solver and Preconditioner </h3>
 
 At each step of Newton's iteration, the problem results in solving a
 saddle point systems of the form
 @f{eqnarray*}
-    \left(
-      \begin{array}{cc}
-        A & B^{T} \\
-        B & 0 \\
-      \end{array}
-    \right)
-    \left(
-      \begin{array}{c}
-        U \\
-        P \\
-      \end{array}
-    \right)
+    \begin{pmatrix}
+      A & B^{T} \\
+      B & 0
+    \end{pmatrix}
+    \begin{pmatrix}
+      U \\
+      P
+    \end{pmatrix}
     =
-    \left(
-      \begin{array}{c}
-        F \\
-        0 \\
-      \end{array}
-    \right).
+    \begin{pmatrix}
+      F \\
+      0
+    \end{pmatrix}.
 @f}
 
 This system matrix has the same block structure as the one in step-22. However,
-the matrix $A$ at (1, 1) corner is not symmetric  because of the nonlinear term. 
+the matrix $A$ at the top left corner is not symmetric because of the nonlinear term.
 Instead of solving the above system, we can solve the equivalent system
-
 @f{eqnarray*}
-    \left(
-      \begin{array}{cc}
-        A + \gamma B^TW^{-1}B & B^{T} \\
-        B & 0 \\
-      \end{array}
-    \right)
-    \left(
-      \begin{array}{c}
-        U \\
-        P \\
-      \end{array}
-    \right)
+    \begin{pmatrix}
+      A + \gamma B^TW^{-1}B & B^{T} \\
+      B & 0
+    \end{pmatrix}
+    \begin{pmatrix}
+      U \\
+      P
+    \end{pmatrix}
     =
-    \left(
-      \begin{array}{c}
-        F \\
-        0 \\
-      \end{array}
-    \right)
+    \begin{pmatrix}
+      F \\
+      0
+    \end{pmatrix}
 @f}
-with a parameter $\gamma$ and an invertible matrix W. Here 
-$\gamma B^TW^{-1}B$ is the Augmented Lagrangian term and
- see [1] for details.
+
+with a parameter $\gamma$ and an invertible matrix $W$. Here
+$\gamma B^TW^{-1}B$ is the Augmented Lagrangian term; see [1] for details.
 
 Denoting the system matrix of the new system by $G$ and the right-hand
 side by $b$, we solve it iteratively with right preconditioning
 $P^{-1}$ as $GP^{-1}y = b$, where
-
 @f{eqnarray*}
-P^{-1} = \left(\begin{array}{cc} \tilde{A} & B^T \\ 
-                                 0 & \tilde{S} \end{array}\right)^{-1},
+P^{-1} =
+  \begin{pmatrix}
+    \tilde{A} & B^T \\
+    0         & \tilde{S}
+  \end{pmatrix}^{-1}
 @f}
 
 with $\tilde{A} = A + \gamma B^TW^{-1}B$ and $\tilde{S}$ is the
 corresponding Schur complement $\tilde{S} = B^T \tilde{A}^{-1} B$. We
 let $W = M_p$ where $M_p$ is the pressure mass matrix, then
 $\tilde{S}^{-1}$ can be approximated by
-
 @f{eqnarray*}
 \tilde{S}^{-1} \approx -(\nu+\gamma)M_p^{-1}.
 @f}
+
 See [1] for details.
 
 We decompose $P^{-1}$ as
-
-@f{eqnarray*} 
+@f{eqnarray*}
 P^{-1} =
-\left(\begin{array}{cc} \tilde{A}^{-1} & 0 \\ 0 & I \end{array}\right)
-\left(\begin{array}{cc} I & -B^T \\ 0 & I \end{array}\right)
-\left(\begin{array}{cc} I & 0 \\ 0 & \tilde{S}^{-1} \end{array}\right).
+  \begin{pmatrix}
+    \tilde{A}^{-1} & 0 \\
+    0              & I
+  \end{pmatrix}
+  \begin{pmatrix}
+    I & -B^T \\
+    0 & I
+  \end{pmatrix}
+  \begin{pmatrix}
+    I & 0 \\
+    0 & \tilde{S}^{-1}
+  \end{pmatrix}.
 @f}
 
 Here two inexact solvers will be needed for $\tilde{A}^{-1}$ and
 $\tilde{S}^{-1}$, respectively (see [1]). Since the pressure mass
 matrix is symmetric and positive definite,
-CG with ILU as a preconditioner is appropriate to use for $\tilde{S}^{-1}$. For simplicity, we use 
+CG with ILU as a preconditioner is appropriate to use for $\tilde{S}^{-1}$. For simplicity, we use
 the direct solver UMFPACK for $\tilde{A}^{-1}$. The last ingredient is a sparse
 matrix-vector product with $B^T$. Instead of computing the matrix product
 in the augmented Lagrangian term in $\tilde{A}$, we assemble Grad-Div stabilization
@@ -283,19 +289,16 @@ M_p^{-1}B)_{ij}$, as explained in [2].
 
 <h3> Test Case </h3>
 
-Here we use the lid driven cavity flow as our test case, see [3] for details. 
-The computational domain is the unit square and the right-hand side
+We use the lid driven cavity flow as our test case; see [3] for details.
+The computational domain is the unit square and the right-hand side is
 $f=0$. The boundary condition is
-
-@f{eqnarray*} 
-(u(x, y), v(x,y)) &=& (1,0)   
-  \qquad\qquad \textrm{if}\ y = 1 \\
-  (u(x, y), v(x,y)) &=& (0,0)
-  \qquad\qquad \textrm{else}.
+@f{eqnarray*}
+  (u(x, y), v(x,y)) &=& (1,0) \qquad\qquad \textrm{if}\ y = 1 \\
+  (u(x, y), v(x,y)) &=& (0,0) \qquad\qquad \textrm{otherwise}.
 @f}
 
 When solving this problem, the error consists of the nonlinear error (from
-Newton's iteration) and the discretization error (depending on mesh size). The
+Newton's iteration) and the discretization error (dependent on mesh size). The
 nonlinear part decreases with each Newton iteration and the discretization error
 reduces with mesh refinement. In this example, the solution from the coarse
 mesh is transferred to successively finer meshes and used as an initial
@@ -306,25 +309,26 @@ refinement.
 Inside the loop, we involve three solvers: one for $\tilde{A}^{-1}$,
 one for $M_p^{-1}$ and one for $Gx=b$. The first two
 solvers are invoked in the preconditioner and the outer solver gives us
-the update term. Overall convergence is controlled by the nonlinear residual 
-and Newton's method does not have to require an exact Jacobian, so for the outer 
-linear solver we employ FGMRES with a relative tolerance of only 1e-4. In fact,
+the update term. Overall convergence is controlled by the nonlinear residual;
+as Newton's method does not require an exact Jacobian, we employ FGMRES with a
+relative tolerance of only 1e-4 for the outer linear solver. In fact,
 we use the truncated Newton solve for this system.
-As described in step-22, the inner linear solves are also not required 
-to be done very accurately. Here we use CG with a relative 
-tolerance of 1e-6 for the pressure mass matrix. As expected, we still see convergence 
+As described in step-22, the inner linear solves are also not required
+to be done very accurately. Here we use CG with a relative
+tolerance of 1e-6 for the pressure mass matrix. As expected, we still see convergence
 of the nonlinear residual down to 1e-14. Also, we use a simple line
 search algorithm for globalization of the Newton method.
 
-The cavity reference values for Re=400 and Re=7500 are from [4] and [5],
-respectively, where "Re" represents the Reynold number and can be located 
-at [8]. Here the viscosity is defined by 1/Re. 
-Even though we can still find a solution for Re=10000 and the
+The cavity reference values for $\mathrm{Re}=400$ and $\mathrm{Re}=7500$ are
+from [4] and [5], respectively, where $\mathrm{Re}$ is the Reynolds number and
+can be located at [8]. Here the viscosity is defined by $1/\mathrm{Re}$.
+Even though we can still find a solution for $\mathrm{Re}=10000$ and the
 references contain results for comparison, we limit our discussion here to
-Re=7500. This is because the solution is no longer stationary starting around
-Re=8000 but instead becomes periodic, see [7] for details.
+$\mathrm{Re}=7500$. This is because the solution is no longer stationary
+starting around $\mathrm{Re}=8000$ but instead becomes periodic, see [7] for
+details.
 
-<h3> Reference </h3>
+<h3> References </h3>
 <ol>
 
   <li>  An Augmented Lagrangian-Based Approach to the Oseen Problem, M. Benzi and M. Olshanskii, SIAM J. SCI. COMPUT. 2006

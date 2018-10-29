@@ -1,3 +1,0 @@
-Changed: The distribution of degrees of freedom along a refinement edge for a parallel::shared::Triangulation has been changed to mimic that of a parallel::distributed::Triangulation, that is, they are now all given to the processor with the smallest subdomain_id.
-<br>
-(Conrad Clevenger, 2017/11/13)

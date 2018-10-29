@@ -134,7 +134,7 @@ GENERATE_LATEX         = NO
 # but set a few flags for when processing formulas embedded
 # in the documentation.
 PAPER_TYPE             = a4wide
-EXTRA_PACKAGES         = amsmath amsfonts
+EXTRA_PACKAGES         = amsmath amsfonts mathtools
 LATEX_BATCHMODE        = YES
 
 #---------------------------------------------------------------------------
@@ -143,7 +143,7 @@ LATEX_BATCHMODE        = YES
 
 GENERATE_RTF           = NO
 GENERATE_MAN           = NO
-GENERATE_XML           = YES
+GENERATE_XML           = NO
 GENERATE_AUTOGEN_DEF   = NO
 GENERATE_PERLMOD       = NO
 
@@ -155,7 +155,7 @@ ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
 SEARCH_INCLUDES        = YES
-INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include
+INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/include @CMAKE_BINARY_DIR@/include @_inst_in_dirs@
 INCLUDE_FILE_PATTERNS  =
 
 # set a few variables that help us generate documentation for
@@ -176,22 +176,31 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_CXX14=1 \
                          DEAL_II_WITH_CXX17=1 \
                          DEAL_II_WITH_CUDA=1 \
+                         DEAL_II_COMPILER_CUDA_AWARE=1 \
                          DEAL_II_WITH_GSL=1 \
+                         DEAL_II_WITH_GMSH=1 \
                          DEAL_II_WITH_HDF5=1 \
                          DEAL_II_WITH_LAPACK=1 \
                          DEAL_II_WITH_METIS=1 \
                          DEAL_II_WITH_MPI=1 \
+                         DEAL_II_MPI_VERSION_MAJOR=3 \
+                         DEAL_II_MPI_VERSION_MINOR=0 \
                          DEAL_II_WITH_MUPARSER=1 \
                          DEAL_II_WITH_NANOFLANN=1 \
                          DEAL_II_WITH_NETCDF=1 \
                          DEAL_II_WITH_OPENCASCADE=1 \
                          DEAL_II_WITH_P4EST=1 \
+                         DEAL_II_P4EST_VERSION_MAJOR=2 \
+                         DEAL_II_P4EST_VERSION_MINOR=0 \
+                         DEAL_II_P4EST_VERSION_SUBMINOR=0 \
+                         DEAL_II_P4EST_VERSION_PATCH=0 \
                          DEAL_II_WITH_PETSC=1 \
                          DEAL_II_WITH_SCALAPACK=1 \
                          DEAL_II_WITH_SLEPC=1 \
                          DEAL_II_WITH_SUNDIALS=1 \
                          DEAL_II_WITH_THREADS=1 \
                          DEAL_II_WITH_TRILINOS=1 \
+                         DEAL_II_TRILINOS_WITH_ROL=1 \
                          DEAL_II_WITH_UMFPACK=1 \
                          DEAL_II_WITH_ZLIB=1 \
                          DEAL_II_NAMESPACE_OPEN= \

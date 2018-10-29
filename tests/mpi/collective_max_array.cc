@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,31 +17,33 @@
 
 // check Utilities::MPI::max() for arrays
 
-#include "../tests.h"
 #include <deal.II/base/utilities.h>
 
-void test()
+#include "../tests.h"
+
+void
+test()
 {
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int       myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  unsigned int values[2] = { 1+myid, numprocs+myid };
+  unsigned int values[2] = {1 + myid, numprocs + myid};
   unsigned int maxima[2];
-  Utilities::MPI::max (values,
-                       MPI_COMM_WORLD,
-                       maxima);
-  Assert (maxima[0] == numprocs, ExcInternalError());
-  Assert (maxima[1] == 2*numprocs-1, ExcInternalError());
+  Utilities::MPI::max(values, MPI_COMM_WORLD, maxima);
+  Assert(maxima[0] == numprocs, ExcInternalError());
+  Assert(maxima[1] == 2 * numprocs - 1, ExcInternalError());
 
-  if (myid==0)
+  if (myid == 0)
     deallog << maxima[0] << ' ' << maxima[1] << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 #else
   (void)argc;
   (void)argv;
@@ -49,7 +51,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       initlog();
 

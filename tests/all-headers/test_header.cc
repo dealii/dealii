@@ -8,21 +8,22 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
-//include header twice to see if the include guards are set correctly
+// include header twice to see if the include guards are set correctly
 #include HEADER
 #include HEADER
 
 #if !defined(DEAL_II_NAMESPACE_OPEN) && !defined(dealii_revision_h)
-#error "HEADER does not include config.h."
+#  error "HEADER does not include config.h."
 #endif
 
 
-int main()
+int
+main()
 {
   return 0;
 }

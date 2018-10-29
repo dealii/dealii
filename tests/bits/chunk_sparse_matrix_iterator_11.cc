@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,57 +18,60 @@
 // comparisons between chunk sparse matrix iterators, same as
 // sparse_matrix_iterators_11 otherwise.
 
-#include "../tests.h"
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
+#include "../tests.h"
 
-void test (const unsigned int chunk_size)
+
+void
+test(const unsigned int chunk_size)
 {
   deallog << "Chunk size: " << chunk_size << std::endl;
 
   // create a sparsity pattern with totally
   // empty lines (not even diagonals, since
   // not quadratic)
-  ChunkSparsityPattern sparsity(4,5,1,chunk_size);
-  sparsity.add (1,1);
-  sparsity.add (3,1);
-  sparsity.compress ();
+  ChunkSparsityPattern sparsity(4, 5, 1, chunk_size);
+  sparsity.add(1, 1);
+  sparsity.add(3, 1);
+  sparsity.compress();
 
   // attach a sparse matrix to it
   ChunkSparseMatrix<double> A(sparsity);
 
-  ChunkSparseMatrix<double>::iterator k = A.begin(),
-                                      j = ++A.begin();
+  ChunkSparseMatrix<double>::iterator k = A.begin(), j = ++A.begin();
 
-  AssertThrow (k < j, ExcInternalError());
-  AssertThrow (j > k, ExcInternalError());
+  AssertThrow(k < j, ExcInternalError());
+  AssertThrow(j > k, ExcInternalError());
 
-  AssertThrow (!(j < k), ExcInternalError());
-  AssertThrow (!(k > j), ExcInternalError());
+  AssertThrow(!(j < k), ExcInternalError());
+  AssertThrow(!(k > j), ExcInternalError());
 
-  AssertThrow (k != j, ExcInternalError());
-  AssertThrow (!(k == j), ExcInternalError());
+  AssertThrow(k != j, ExcInternalError());
+  AssertThrow(!(k == j), ExcInternalError());
 
-  AssertThrow (k == k, ExcInternalError());
-  AssertThrow (!(k != k), ExcInternalError());
+  AssertThrow(k == k, ExcInternalError());
+  AssertThrow(!(k != k), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      test (1);
-      test (3);
+      test(1);
+      test(3);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -81,7 +84,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

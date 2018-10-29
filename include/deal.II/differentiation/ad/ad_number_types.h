@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -26,27 +26,26 @@ namespace Differentiation
 {
   namespace AD
   {
-
     /**
      * An enumeration to indicate which type of auto-differentiable number
      * is to be used for computations. If a type that is selected for use
-     * is not available in the library, a compile-time error will be thrown.
+     * is not available in the library, a run-time error will be thrown.
      *
      * @author Jean-Paul Pelteret, 2017
      */
     enum class NumberTypes
     {
       /**
-       * Taped forward and reverse-mode Adol-C number type (n-differentiable).
+       * Taped forward and reverse-mode ADOL-C number type (n-differentiable).
        *
        * First derivatives will be computed using reverse mode, while the second
        * derivatives will be computed using forward mode. Even higher-order
-       * derivatives can be computed using Adol-C's own driver functions.
+       * derivatives can be computed using ADOL-C's own driver functions.
        */
       adolc_taped,
 
       /**
-       * Tapeless dynamic forward-mode Adol-C number type (once differentiable).
+       * Tapeless dynamic forward-mode ADOL-C number type (once differentiable).
        */
       adolc_tapeless,
 
@@ -56,9 +55,11 @@ namespace Differentiation
       sacado_dfad,
 
       /**
-       * Tapeless nested dynamic forward-mode Sacado number type (twice differentiable).
+       * Tapeless nested dynamic forward-mode Sacado number type (twice
+       * differentiable).
        *
-       * Both the first and second derivatives will be computed using forward mode.
+       * Both the first and second derivatives will be computed using forward
+       * mode.
        */
       sacado_dfad_dfad,
 
@@ -68,10 +69,11 @@ namespace Differentiation
       sacado_rad,
 
       /**
-       * Tapeless nested reverse-mode and dynamic forward-mode Sacado number type (twice differentiable).
+       * Tapeless nested reverse-mode and dynamic forward-mode Sacado number
+       * type (twice differentiable).
        *
-       * First derivatives will be computed using reverse mode, while the second derivatives
-       * will be computed using forward mode.
+       * First derivatives will be computed using reverse mode, while the second
+       * derivatives will be computed using forward mode.
        */
       sacado_rad_dfad
     };

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -21,21 +21,22 @@
 #include "project_parallel_qpmf_common.h"
 
 template <int dim>
-void test ()
+void
+test()
 {
-  test_with_hanging_nodes<1, 2,dim> (FE_Q<dim>(1), 1);
-  test_with_hanging_nodes<2, 3,dim> (FE_Q<dim>(2), 2);
-  test_with_hanging_nodes<3, 4,dim> (FE_Q<dim>(3), 3);
+  test_with_hanging_nodes<1, 2, dim>(FE_Q<dim>(1), 1);
+  test_with_hanging_nodes<2, 3, dim>(FE_Q<dim>(2), 2);
+  test_with_hanging_nodes<3, 4, dim>(FE_Q<dim>(3), 3);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv,
-                                                       numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, numbers::invalid_unsigned_int);
 
   initlog();
 
   test<2>();
   test<3>();
 }
-

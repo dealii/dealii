@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -538,7 +538,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        did not have the respective POSIX functions. This restriction is lifted
        for the special case that you give one as the number of parties that
        will be waiting for the barrier: in this case, a barrier is a
-       no-operation, so we do not need assistence from the operating
+       no-operation, so we do not need assistance from the operating
        system. This change makes it slightly simpler to write programs in a way
        such that they run in both single- and multithreaded environments.
        <br>

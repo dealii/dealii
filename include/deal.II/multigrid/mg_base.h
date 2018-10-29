@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -22,8 +22,10 @@
  */
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
+
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
+
 #include <deal.II/lac/vector.h>
 
 
@@ -50,45 +52,51 @@ public:
   /*
    * Virtual destructor.
    */
-  virtual ~MGMatrixBase() = default;
+  virtual ~MGMatrixBase() override = default;
 
   /**
    * Matrix-vector-multiplication on a certain level.
    */
-  virtual void vmult (const unsigned int level,
-                      VectorType         &dst,
-                      const VectorType   &src) const = 0;
+  virtual void
+  vmult(const unsigned int level,
+        VectorType &       dst,
+        const VectorType & src) const = 0;
 
   /**
    * Adding matrix-vector-multiplication on a certain level.
    */
-  virtual void vmult_add (const unsigned int level,
-                          VectorType         &dst,
-                          const VectorType   &src) const = 0;
+  virtual void
+  vmult_add(const unsigned int level,
+            VectorType &       dst,
+            const VectorType & src) const = 0;
 
   /**
    * Transpose matrix-vector-multiplication on a certain level.
    */
-  virtual void Tvmult (const unsigned int level,
-                       VectorType         &dst,
-                       const VectorType   &src) const = 0;
+  virtual void
+  Tvmult(const unsigned int level,
+         VectorType &       dst,
+         const VectorType & src) const = 0;
 
   /**
    * Adding transpose matrix-vector-multiplication on a certain level.
    */
-  virtual void Tvmult_add (const unsigned int level,
-                           VectorType         &dst,
-                           const VectorType   &src) const = 0;
+  virtual void
+  Tvmult_add(const unsigned int level,
+             VectorType &       dst,
+             const VectorType & src) const = 0;
 
   /**
    * Return the minimal level for which matrices are stored.
    */
-  virtual unsigned int get_minlevel() const = 0;
+  virtual unsigned int
+  get_minlevel() const = 0;
 
   /**
    * Return the minimal level for which matrices are stored.
    */
-  virtual unsigned int get_maxlevel() const = 0;
+  virtual unsigned int
+  get_maxlevel() const = 0;
 };
 
 
@@ -106,14 +114,15 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~MGCoarseGridBase () = default;
+  virtual ~MGCoarseGridBase() override = default;
 
   /**
    * Solution operator.
    */
-  virtual void operator() (const unsigned int level,
-                           VectorType         &dst,
-                           const VectorType   &src) const = 0;
+  virtual void
+  operator()(const unsigned int level,
+             VectorType &       dst,
+             const VectorType & src) const = 0;
 };
 
 
@@ -171,7 +180,7 @@ public:
   /**
    * Destructor. Does nothing here, but needs to be declared virtual anyway.
    */
-  virtual ~MGTransferBase() = default;
+  virtual ~MGTransferBase() override = default;
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
@@ -183,9 +192,10 @@ public:
    * @arg dst has as many elements as there are degrees of freedom on the
    * finer level.
    */
-  virtual void prolongate (const unsigned int to_level,
-                           VectorType         &dst,
-                           const VectorType   &src) const = 0;
+  virtual void
+  prolongate(const unsigned int to_level,
+             VectorType &       dst,
+             const VectorType & src) const = 0;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -202,9 +212,10 @@ public:
    * coarser level.
    *
    */
-  virtual void restrict_and_add (const unsigned int from_level,
-                                 VectorType         &dst,
-                                 const VectorType   &src) const = 0;
+  virtual void
+  restrict_and_add(const unsigned int from_level,
+                   VectorType &       dst,
+                   const VectorType & src) const = 0;
 };
 
 
@@ -237,20 +248,22 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~MGSmootherBase() = default;
+  virtual ~MGSmootherBase() override = default;
 
   /**
    * Release matrices.
    */
-  virtual void clear() = 0;
+  virtual void
+  clear() = 0;
 
   /**
    * Smoothing function that smooths the content in @p u given the right hand
    * side vector @p rhs. This is the function used in multigrid methods.
    */
-  virtual void smooth (const unsigned int level,
-                       VectorType         &u,
-                       const VectorType   &rhs) const = 0;
+  virtual void
+  smooth(const unsigned int level,
+         VectorType &       u,
+         const VectorType & rhs) const = 0;
 
   /**
    * As opposed to the smooth() function, this function applies the action of
@@ -270,9 +283,8 @@ public:
    * hand, all subsequent operations need to smooth the content already present
    * in the vector @p u given the right hand side, which is done by smooth().
    */
-  virtual void apply (const unsigned int level,
-                      VectorType         &u,
-                      const VectorType   &rhs) const;
+  virtual void
+  apply(const unsigned int level, VectorType &u, const VectorType &rhs) const;
 };
 
 /*@}*/

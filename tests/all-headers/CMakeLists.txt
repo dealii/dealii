@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -45,14 +45,6 @@ FILE(GLOB_RECURSE _headers RELATIVE ${_include_dir}/deal.II
   ${_include_dir}/deal.II/*.h
   )
 
-#
-# Files that contain CUDA code cannot be sent to the host compiler so we removed
-# them from the list
-#
-LIST(REMOVE_ITEM _headers "lac/cuda_atomic.h"
-  "matrix_free/cuda_fe_evaluation.h"
-  "matrix_free/cuda_matrix_free.templates.h"
-  "matrix_free/cuda_tensor_product_kernels.h")
 
 # Do not test bundled headers to avoid issues when tests are run
 # for an already installed library

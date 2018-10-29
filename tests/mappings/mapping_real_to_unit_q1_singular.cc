@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,26 +18,29 @@
 // check that MappingQ1::transform_real_to_unit_cell can handle the case of a
 // singular discriminant. Previously we used to have a division by zero
 
-#include "../tests.h"
-
 #include <deal.II/base/utilities.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test_real_to_unit_cell()
+void
+test_real_to_unit_cell()
 {
   deallog << "dim=" << dim << std::endl;
 
-  Triangulation<dim>   triangulation;
-  GridGenerator::hyper_ball (triangulation);
+  Triangulation<dim> triangulation;
+  GridGenerator::hyper_ball(triangulation);
 
-  Point<dim> point;
+  Point<dim>           point;
   MappingQGeneric<dim> mapping(1);
 
-  point[1] = -1./(1+std::sqrt(2.0))/std::sqrt(2);
+  point[1] = -1. / (1 + std::sqrt(2.0)) / std::sqrt(2);
 
   // check on cell 2
   typename Triangulation<dim>::cell_iterator cell = triangulation.begin();
@@ -46,10 +49,11 @@ void test_real_to_unit_cell()
     {
       mapping.transform_real_to_unit_cell(cell, point);
     }
-  catch (typename Mapping<dim>::ExcTransformationFailed)
+  catch (const typename Mapping<dim>::ExcTransformationFailed &)
     {
       deallog << "Transformation for point " << point << " on cell with "
-              << "center " << cell->center() << " is not invertible" << std::endl;
+              << "center " << cell->center() << " is not invertible"
+              << std::endl;
     }
   deallog << "OK" << std::endl;
 }
@@ -58,10 +62,7 @@ void test_real_to_unit_cell()
 int
 main()
 {
-  std::ofstream logfile ("output");
-  deallog.attach(logfile);
+  initlog();
 
   test_real_to_unit_cell<2>();
-
-  return 0;
 }

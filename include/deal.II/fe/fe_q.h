@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,7 +17,9 @@
 #define dealii_fe_q_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/fe/fe_q_base.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -548,8 +550,8 @@ DEAL_II_NAMESPACE_OPEN
  * 2001, 2004, 2005; Oliver Kayser-Herold, 2004; Katharina Kormann, 2008;
  * Martin Kronbichler, 2008
  */
-template <int dim, int spacedim=dim>
-class FE_Q : public FE_Q_Base<TensorProductPolynomials<dim>,dim,spacedim>
+template <int dim, int spacedim = dim>
+class FE_Q : public FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
 {
 public:
   /**
@@ -557,7 +559,7 @@ public:
    * Gauss-Lobatto support (node) points. For polynomial degrees of one and
    * two, these are the usual equidistant points.
    */
-  FE_Q (const unsigned int p);
+  FE_Q(const unsigned int p);
 
   /**
    * Constructor for tensor product polynomials with support points @p points
@@ -569,18 +571,18 @@ public:
    * equidistant nodes at <tt>fe_degree > 2</tt>, construct
    * <tt>FE_Q<dim>(QIterated<1>(QTrapez<1>(),fe_degree))</tt>.
    */
-  FE_Q (const Quadrature<1> &points);
+  FE_Q(const Quadrature<1> &points);
 
   /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_Q<dim>(degree)</tt>, with @p dim and @p degree replaced by
    * appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -589,10 +591,10 @@ public:
    * the current element is scalar, the support point values need to
    * be vectors of length 1.
    */
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 };
 
 

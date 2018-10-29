@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2017 by the deal.II authors
+// Copyright (C) 2005 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -23,26 +23,24 @@
 //
 // test this for a circle extruded to a cylinder
 
-#include "../tests.h"
-#include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/tria.h>
 
+#include "../tests.h"
 
-
-void test(std::ostream &out)
+void
+test()
 {
   Triangulation<2> tr;
-  GridGenerator::hyper_ball (tr);
+  GridGenerator::hyper_ball(tr);
 
-  for (Triangulation<2>::active_cell_iterator c=tr.begin_active();
-       c!=tr.end(); ++c)
+  for (Triangulation<2>::active_cell_iterator c = tr.begin_active();
+       c != tr.end();
+       ++c)
     {
-      deallog << "2d cell " << c << " has the following face orientations:"
-              << std::endl;
-      for (unsigned int l=0; l<GeometryInfo<2>::faces_per_cell; ++l)
+      deallog << "2d cell " << c
+              << " has the following face orientations:" << std::endl;
+      for (unsigned int l = 0; l < GeometryInfo<2>::faces_per_cell; ++l)
         deallog << "    " << (c->face_orientation(l) ? "true" : "false")
                 << std::endl;
     }
@@ -50,26 +48,30 @@ void test(std::ostream &out)
   Triangulation<3> tr3;
   GridGenerator::extrude_triangulation(tr, 2, 1.0, tr3);
 
-  for (Triangulation<3>::active_cell_iterator c=tr3.begin_active();
-       c!=tr3.end(); ++c)
+  for (Triangulation<3>::active_cell_iterator c = tr3.begin_active();
+       c != tr3.end();
+       ++c)
     {
-      deallog << "3d cell " << c << " has the following face orientation/flips and edge orientations:"
-              << std::endl;
-      for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
+      deallog
+        << "3d cell " << c
+        << " has the following face orientation/flips and edge orientations:"
+        << std::endl;
+      for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
         deallog << "    face=" << f
                 << (c->face_orientation(f) ? " -> true" : " -> false")
-                << (c->face_flip(f) ? "/true" : "/false")
-                << std::endl;
-      for (unsigned int e=0; e<GeometryInfo<3>::lines_per_cell; ++e)
-        deallog << "    edge=" << e << (c->line_orientation(e) ? " -> true" : " -> false")
+                << (c->face_flip(f) ? "/true" : "/false") << std::endl;
+      for (unsigned int e = 0; e < GeometryInfo<3>::lines_per_cell; ++e)
+        deallog << "    edge=" << e
+                << (c->line_orientation(e) ? " -> true" : " -> false")
                 << std::endl;
     }
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  test(deallog.get_file_stream());
+  test();
 }

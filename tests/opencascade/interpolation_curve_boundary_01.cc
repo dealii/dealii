@@ -1,53 +1,61 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2014 - 2017 by the deal.II authors
+// Copyright (C) 2014 - 2018 by the deal.II authors
 //
-//    This file is subject to LGPL and may not be distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// This file is part of the deal.II library.
 //
-//-----------------------------------------------------------
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
 
 // Create a Triangulation, interpolate its boundary points to a close
 // smooth BSpline, and use that as a Boundary Descriptor.
 
-#include "../tests.h"
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/opencascade/utilities.h>
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/grid/grid_tools.h>
+#include "../tests.h"
 
 using namespace OpenCASCADE;
 
-void remove_iges_header(const std::string &in_filename,
-                        const std::string &out_filename)
+void
+remove_iges_header(const std::string &in_filename,
+                   const std::string &out_filename)
 {
   std::ifstream in(in_filename);
   std::ofstream out(out_filename);
-  std::string line;
-  unsigned int counter = 5;
-  while (counter--) std::getline(in,line);
-  while (std::getline(in,line))
+  std::string   line;
+  unsigned int  counter = 5;
+  while (counter--)
+    std::getline(in, line);
+  while (std::getline(in, line))
     out << line << std::endl;
   in.close();
   out.close();
 }
 
-template<int spacedim>
-void test()
+template <int spacedim>
+void
+test()
 {
   deallog << "Testing <2," << spacedim << ">" << std::endl;
 
-  Triangulation<2,spacedim> tria1;
-  Triangulation<2,spacedim> tria2;
-  Triangulation<2,spacedim> tria3;
+  Triangulation<2, spacedim> tria1;
+  Triangulation<2, spacedim> tria2;
+  Triangulation<2, spacedim> tria3;
 
   GridGenerator::hyper_cube(tria1, 0, 1);
   GridGenerator::hyper_cube(tria2, 2, 3);
@@ -61,7 +69,7 @@ void test()
 
   if (spacedim == 3)
     {
-      Triangulation<2,3> tria4;
+      Triangulation<2, 3> tria4;
       GridGenerator::hyper_sphere(tria4);
       auto v4 = create_curves_from_triangulation_boundary(tria4);
 
@@ -94,7 +102,8 @@ void test()
   cat_file("edge31_noheader.iges");
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -103,4 +112,3 @@ int main ()
 
   return 0;
 }
-

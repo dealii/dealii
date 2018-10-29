@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -22,18 +22,22 @@ DEAL_II_NAMESPACE_OPEN
 template class SparseVanka<float>;
 template class SparseVanka<double>;
 
-template void SparseVanka<double>::vmult<float> (Vector<float>       &dst,
-                                                 const Vector<float> &src) const;
-template void SparseVanka<double>::vmult<double> (Vector<double>       &dst,
-                                                  const Vector<double> &src) const;
+template void
+SparseVanka<double>::vmult<float>(Vector<float> &      dst,
+                                  const Vector<float> &src) const;
+template void
+SparseVanka<double>::vmult<double>(Vector<double> &      dst,
+                                   const Vector<double> &src) const;
 
 
 template class SparseBlockVanka<float>;
 template class SparseBlockVanka<double>;
 
-template void SparseBlockVanka<double>::vmult<float> (Vector<float>       &dst,
-                                                      const Vector<float> &src) const;
-template void SparseBlockVanka<double>::vmult<double> (Vector<double>       &dst,
-                                                       const Vector<double> &src) const;
+template void
+SparseBlockVanka<double>::vmult<float>(Vector<float> &      dst,
+                                       const Vector<float> &src) const;
+template void
+SparseBlockVanka<double>::vmult<double>(Vector<double> &      dst,
+                                        const Vector<double> &src) const;
 
 DEAL_II_NAMESPACE_CLOSE

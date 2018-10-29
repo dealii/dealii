@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,17 +19,21 @@
 // the p4est data structure is correct, check that what we get back is
 // correct
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/distributed/tria.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream & /*out*/)
 {
   if (true)
     {
@@ -40,9 +44,8 @@ void test(std::ostream & /*out*/)
       GridGenerator::hyper_cube(tr);
 
       deallog << "Triangulation copied back from p4est has "
-              << tr.n_active_cells()
-              << " active cells" << std::endl;
-      GridOut().write_gnuplot (tr, deallog.get_file_stream());
+              << tr.n_active_cells() << " active cells" << std::endl;
+      GridOut().write_gnuplot(tr, deallog.get_file_stream());
     }
 
 
@@ -55,9 +58,8 @@ void test(std::ostream & /*out*/)
       GridGenerator::hyper_ball(tr, Point<dim>(), 3.);
 
       deallog << "Triangulation copied back from p4est has "
-              << tr.n_active_cells()
-              << " active cells" << std::endl;
-      GridOut().write_gnuplot (tr, deallog.get_file_stream());
+              << tr.n_active_cells() << " active cells" << std::endl;
+      GridOut().write_gnuplot(tr, deallog.get_file_stream());
     }
 
   if (true)
@@ -69,23 +71,20 @@ void test(std::ostream & /*out*/)
       GridGenerator::half_hyper_ball(tr, Point<dim>(), 3.);
 
       deallog << "Triangulation copied back from p4est has "
-              << tr.n_active_cells()
-              << " active cells" << std::endl;
-      GridOut().write_gnuplot (tr, deallog.get_file_stream());
+              << tr.n_active_cells() << " active cells" << std::endl;
+      GridOut().write_gnuplot(tr, deallog.get_file_stream());
     }
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  initlog();
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   deallog.push("2d");
-  test<2>(logfile);
+  test<2>(deallog.get_file_stream());
   deallog.pop();
-
-
 }

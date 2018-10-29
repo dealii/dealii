@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -62,9 +62,9 @@
 #                            directory (without actually running the
 #                            testsuite)
 #
-#       "Regression Tests" - Reserved for the "official" regression tester
+#       "Regression Tests" - Reserved for "official" regression testers
 #
-#       "Continuous"       - Reserved for the "official" regression tester
+#       "Continuous"       - Reserved for "official" regression testers
 #
 #   CONFIG_FILE
 #     - A configuration file (see ../doc/users/config.sample)
@@ -243,11 +243,10 @@ ENDIF()
 
 MESSAGE("-- CTEST_SITE:             ${CTEST_SITE}")
 
-IF( TRACK MATCHES "^(Regression Tests|Continuous)$"
-    AND NOT CTEST_SITE MATCHES "^(simserv04|tester)$" )
+IF(TRACK MATCHES "^Regression Tests$" AND NOT CTEST_SITE MATCHES "^tester$")
   MESSAGE(FATAL_ERROR "
 I'm sorry ${CTEST_SITE}, I'm afraid I can't do that.
-The TRACK \"Regression Tests\" or \"Continuous\" is not for you.
+The TRACK \"Regression Tests\" is not for you.
 "
     )
 ENDIF()
@@ -413,13 +412,20 @@ COVERAGE=TRUE.
       )
   ENDIF()
 
-  FIND_PROGRAM(GCOV_COMMAND NAMES gcov)
-  IF(GCOV_COMMAND MATCHES "-NOTFOUND")
-    MESSAGE(FATAL_ERROR "
-Coverage enabled but could not find the gcov executable. Please install
-gcov, which is part of the GNU Compiler Collection.
-"
-      )
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    FIND_PROGRAM(GCOV_COMMAND NAMES llvm-cov)
+    SET(GCOV_COMMAND "${GCOV_COMMAND} gcov")
+    IF(GCOV_COMMAND MATCHES "-NOTFOUND")
+      MESSAGE(FATAL_ERROR "Coverage enabled but could not find the
+                           llvm-cov executable, which is part of LLVM.")
+    ENDIF()
+  ELSE()
+    FIND_PROGRAM(GCOV_COMMAND NAMES gcov)
+    IF(GCOV_COMMAND MATCHES "-NOTFOUND")
+      MESSAGE(FATAL_ERROR "Coverage enabled but could not find the
+                           gcov executable, which is part of the
+                           GNU Compiler Collection.")
+    ENDIF()
   ENDIF()
 
   SET(CTEST_COVERAGE_COMMAND "${GCOV_COMMAND}")
@@ -542,6 +548,13 @@ IF("${_res}" STREQUAL "0")
       CREATE_TARGETDIRECTORIES_TXT()
       MESSAGE("-- Running CTEST_COVERAGE()")
       CTEST_COVERAGE()
+      SET (CODE_COV_BASH "${CMAKE_CURRENT_LIST_DIR}/../contrib/utilities/programs/codecov/codecov-bash.sh")
+      IF (EXISTS ${CODE_COV_BASH})
+        MESSAGE("-- Running codecov-bash")
+        EXECUTE_PROCESS(COMMAND bash "${CODE_COV_BASH}"
+                                     "-t ac85e7ce-5316-4bc1-a237-2fe724028c7b" "-x '${GCOV_COMMAND}'"
+                        OUTPUT_QUIET)
+      ENDIF()
       CLEAR_TARGETDIRECTORIES_TXT()
     ENDIF(COVERAGE)
 
@@ -584,4 +597,4 @@ IF("${_res}" STREQUAL "0")
   MESSAGE("-- Submission successful. Goodbye!")
 ENDIF()
 
-# .oO( This script is freaky 584 lines long... )
+# .oO( This script is freaky 600 lines long... )

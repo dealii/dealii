@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,8 +17,9 @@
 #define dealii_tensor_accessors_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/template_constraints.h>
+
 #include <deal.II/base/table_indices.h>
+#include <deal.II/base/template_constraints.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -48,14 +49,14 @@ DEAL_II_NAMESPACE_OPEN
  * The methods and algorithms implemented in this namespace, however, are
  * fully generic. More precisely, it can operate on nested c-style arrays, or
  * on class types <code>T</code> with a minimal interface that provides a
- * local typedef <code>value_type</code> and an index operator
+ * local alias <code>value_type</code> and an index operator
  * <code>operator[](unsigned int)</code> that returns a (const or non-const)
  * reference of <code>value_type</code>:
  * @code
  *   template <...>
  *   class T
  *   {
- *     typedef ... value_type;
+ *     using value_type = ...;
  *     value_type & operator[](unsigned int);
  *     const value_type & operator[](unsigned int) const;
  *   };
@@ -73,24 +74,28 @@ namespace TensorAccessors
   // forward declarations
   namespace internal
   {
-    template <int index, int rank, typename T> class ReorderedIndexView;
-    template <int position, int rank> struct ExtractHelper;
-    template <int no_contr, int rank_1, int rank_2, int dim> class Contract;
-    template <int rank_1, int rank_2, int dim> class Contract3;
-  }
+    template <int index, int rank, typename T>
+    class ReorderedIndexView;
+    template <int position, int rank>
+    struct ExtractHelper;
+    template <int no_contr, int rank_1, int rank_2, int dim>
+    class Contract;
+    template <int rank_1, int rank_2, int dim>
+    class Contract3;
+  } // namespace internal
 
 
   /**
-   * This class provides a local typedef @p value_type denoting the resulting
+   * This class provides a local alias @p value_type denoting the resulting
    * type of an access with operator[](unsigned int). More precisely, @p
    * value_type will be
-   *  - <code>T::value_type</code> if T is a tensorial class providing a
-   * typedef <code>value_type</code> and does not have a const qualifier.
+   *  - <code>T::value_type</code> if T is a tensorial class providing an
+   * alias <code>value_type</code> and does not have a const qualifier.
    *  - <code>const T::value_type</code> if T is a tensorial class
-   * providing a typedef <code>value_type</code> and does have a const
+   * providing an alias <code>value_type</code> and does have a const
    * qualifier.
    *  - <code>const T::value_type</code> if T is a tensorial class
-   * providing a typedef <code>value_type</code> and does have a const
+   * providing an alias <code>value_type</code> and does have a const
    * qualifier.
    *  - <code>A</code> if T is of array type <code>A[...]</code>
    *  - <code>const A</code> if T is of array type <code>A[...]</code> and
@@ -99,31 +104,31 @@ namespace TensorAccessors
   template <typename T>
   struct ValueType
   {
-    typedef typename T::value_type value_type;
+    using value_type = typename T::value_type;
   };
 
   template <typename T>
   struct ValueType<const T>
   {
-    typedef const typename T::value_type value_type;
+    using value_type = const typename T::value_type;
   };
 
   template <typename T, std::size_t N>
   struct ValueType<T[N]>
   {
-    typedef T value_type;
+    using value_type = T;
   };
 
   template <typename T, std::size_t N>
   struct ValueType<const T[N]>
   {
-    typedef const T value_type;
+    using value_type = const T;
   };
 
 
   /**
-   * This class provides a local typedef @p value_type that is equal to the
-   * typedef <code>value_type</code> after @p deref_steps recursive
+   * This class provides a local alias @p value_type that is equal to the
+   * alias <code>value_type</code> after @p deref_steps recursive
    * dereferences via ```operator[](unsigned int)```. Further, constness is
    * preserved via the ValueType type trait, i.e., if T is const,
    * ReturnType<rank, T>::value_type will also be const.
@@ -131,13 +136,15 @@ namespace TensorAccessors
   template <int deref_steps, typename T>
   struct ReturnType
   {
-    typedef typename ReturnType<deref_steps - 1, typename ValueType<T>::value_type>::value_type value_type;
+    using value_type =
+      typename ReturnType<deref_steps - 1,
+                          typename ValueType<T>::value_type>::value_type;
   };
 
   template <typename T>
   struct ReturnType<0, T>
   {
-    typedef T value_type;
+    using value_type = T;
   };
 
 
@@ -167,23 +174,22 @@ namespace TensorAccessors
    * tensors.
    *
    * @note This function returns an internal class object consisting of an
-   * array subscript operator <code>operator[](unsigned int)</code> and a
-   * typedef <code>value_type</code> describing its return value.
+   * array subscript operator <code>operator[](unsigned int)</code> and an
+   * alias <code>value_type</code> describing its return value.
    *
    * @tparam index The index to be shifted to the end. Indices are counted
    * from 0, thus the valid range is $0\le\text{index}<\text{rank}$.
    * @tparam rank Rank of the tensorial object @p t
    * @tparam T A tensorial object of rank @p rank. @p T must provide a local
-   * typedef <code>value_type</code> and an index operator
+   * alias <code>value_type</code> and an index operator
    * <code>operator[]()</code> that returns a (const or non-const) reference
    * of <code>value_type</code>.
    *
    * @author Matthias Maier, 2015
    */
   template <int index, int rank, typename T>
-  inline DEAL_II_ALWAYS_INLINE
-  internal::ReorderedIndexView<index, rank, T>
-  reordered_index_view(T &t)
+  inline DEAL_II_ALWAYS_INLINE internal::ReorderedIndexView<index, rank, T>
+                               reordered_index_view(T &t)
   {
     static_assert(0 <= index && index < rank,
                   "The specified index must lie within the range [0,rank)");
@@ -195,7 +201,8 @@ namespace TensorAccessors
   /**
    * Return a reference (const or non-const) to a subobject of a tensorial
    * object @p t of type @p T, as described by an array type @p ArrayType
-   * object @p indices. For example: @code
+   * object @p indices. For example:
+   * @code
    *   Tensor<5, dim> tensor;
    *   TableIndices<5> indices (0, 1, 2, 3, 4);
    *   TensorAccessors::extract(tensor, indices) = 42;
@@ -203,7 +210,7 @@ namespace TensorAccessors
    * This is equivalent to <code>tensor[0][1][2][3][4] = 42.</code>.
    *
    * @tparam T A tensorial object of rank @p rank. @p T must provide a local
-   * typedef <code>value_type</code> and an index operator
+   * alias <code>value_type</code> and an index operator
    * <code>operator[]()</code> that returns a (const or non-const) reference
    * of <code>value_type</code>. Further, its tensorial rank must be equal or
    * greater than @p rank.
@@ -214,11 +221,12 @@ namespace TensorAccessors
    *
    * @author Matthias Maier, 2015
    */
-  template <int rank, typename T, typename ArrayType> typename
-  ReturnType<rank, T>::value_type &
+  template <int rank, typename T, typename ArrayType>
+  typename ReturnType<rank, T>::value_type &
   extract(T &t, const ArrayType &indices)
   {
-    return internal::ExtractHelper<0, rank>::template extract<T, ArrayType>(t, indices);
+    return internal::ExtractHelper<0, rank>::template extract<T, ArrayType>(
+      t, indices);
   }
 
 
@@ -248,7 +256,9 @@ namespace TensorAccessors
    *                 for(unsigned int k_0 = 0; k_0 < dim; ++k_0)
    *                   ...
    *                     for(unsigned int k_ = 0; k_ < dim; ++k_)
-   *                       result[i_0]..[i_][j_0]..[j_] += left[i_0]..[i_][k_0]..[k_] * right[j_0]..[j_][k_0]..[k_];
+   *                       result[i_0]..[i_][j_0]..[j_] +=
+   *                         left[i_0]..[i_][k_0]..[k_]
+   *                           * right[j_0]..[j_][k_0]..[k_];
    *               }
    * @endcode
    * with r = rank_1 + rank_2 - 2 * no_contr, l = rank_1 - no_contr, l1 =
@@ -260,19 +270,27 @@ namespace TensorAccessors
    *
    * @author Matthias Maier, 2015
    */
-  template <int no_contr, int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3>
-  inline DEAL_II_ALWAYS_INLINE
-  void contract(T1 &result, const T2 &left, const T3 &right)
+  template <int no_contr,
+            int rank_1,
+            int rank_2,
+            int dim,
+            typename T1,
+            typename T2,
+            typename T3>
+  inline DEAL_II_ALWAYS_INLINE void
+  contract(T1 &result, const T2 &left, const T3 &right)
   {
-    static_assert(rank_1 >= no_contr, "The rank of the left tensor must be "
+    static_assert(rank_1 >= no_contr,
+                  "The rank of the left tensor must be "
                   "equal or greater than the number of "
                   "contractions");
-    static_assert(rank_2 >= no_contr, "The rank of the right tensor must be "
+    static_assert(rank_2 >= no_contr,
+                  "The rank of the right tensor must be "
                   "equal or greater than the number of "
                   "contractions");
 
-    internal::Contract<no_contr, rank_1, rank_2, dim>::template contract<T1, T2, T3>
-    (result, left, right);
+    internal::Contract<no_contr, rank_1, rank_2, dim>::
+      template contract<T1, T2, T3>(result, left, right);
   }
 
 
@@ -296,7 +314,9 @@ namespace TensorAccessors
    *         for(unsigned int j_0 = 0; j_0 < dim; ++j_0)
    *           ...
    *             for(unsigned int j_ = 0; j_ < dim; ++j_)
-   *               result += left[i_0]..[i_] * middle[i_0]..[i_][j_0]..[j_] * right[j_0]..[j_];
+   *               result += left[i_0]..[i_]
+   *                           * middle[i_0]..[i_][j_0]..[j_]
+   *                           * right[j_0]..[j_];
    * @endcode
    *
    * @note The Types @p T2, @p T3, and @p T4 must have rank rank_1, rank_1 +
@@ -304,11 +324,18 @@ namespace TensorAccessors
    *
    * @author Matthias Maier, 2015
    */
-  template <int rank_1, int rank_2, int dim, typename T1, typename T2, typename T3, typename T4>
-  T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
+  template <int rank_1,
+            int rank_2,
+            int dim,
+            typename T1,
+            typename T2,
+            typename T3,
+            typename T4>
+  T1
+  contract3(const T2 &left, const T3 &middle, const T4 &right)
   {
-    return internal::Contract3<rank_1, rank_2, dim>::template contract3<T1, T2, T3, T4>
-    (left, middle, right);
+    return internal::Contract3<rank_1, rank_2, dim>::
+      template contract3<T1, T2, T3, T4>(left, middle, right);
   }
 
 
@@ -318,9 +345,12 @@ namespace TensorAccessors
     // Forward declarations and type traits
     // -------------------------------------------------------------------------
 
-    template <int rank, typename S> class StoreIndex;
-    template <typename T> class Identity;
-    template <int no_contr, int dim> class Contract2;
+    template <int rank, typename S>
+    class StoreIndex;
+    template <typename T>
+    class Identity;
+    template <int no_contr, int dim>
+    class Contract2;
 
     /**
      * An internally used type trait to allow nested application of the
@@ -334,19 +364,19 @@ namespace TensorAccessors
     template <typename T>
     struct ReferenceType
     {
-      typedef T &type;
+      using type = T &;
     };
 
     template <int rank, typename S>
-    struct ReferenceType<StoreIndex<rank, S> >
+    struct ReferenceType<StoreIndex<rank, S>>
     {
-      typedef StoreIndex<rank, S> type;
+      using type = StoreIndex<rank, S>;
     };
 
     template <int index, int rank, typename T>
-    struct ReferenceType<ReorderedIndexView<index, rank, T> >
+    struct ReferenceType<ReorderedIndexView<index, rank, T>>
     {
-      typedef ReorderedIndexView<index, rank, T> type;
+      using type = ReorderedIndexView<index, rank, T>;
     };
 
 
@@ -382,14 +412,16 @@ namespace TensorAccessors
     class ReorderedIndexView
     {
     public:
-      ReorderedIndexView(typename ReferenceType<T>::type t) : t_(t) {}
+      ReorderedIndexView(typename ReferenceType<T>::type t)
+        : t_(t)
+      {}
 
-      typedef ReorderedIndexView<index - 1, rank - 1, typename ValueType<T>::value_type>
-      value_type;
+      using value_type = ReorderedIndexView<index - 1,
+                                            rank - 1,
+                                            typename ValueType<T>::value_type>;
 
       // Recurse by applying index j directly:
-      inline DEAL_II_ALWAYS_INLINE
-      value_type operator[](unsigned int j) const
+      inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
       {
         return value_type(t_[j]);
       }
@@ -413,12 +445,13 @@ namespace TensorAccessors
     class ReorderedIndexView<0, rank, T>
     {
     public:
-      ReorderedIndexView(typename ReferenceType<T>::type t) : t_(t) {}
+      ReorderedIndexView(typename ReferenceType<T>::type t)
+        : t_(t)
+      {}
 
-      typedef StoreIndex<rank - 1, internal::Identity<T> > value_type;
+      using value_type = StoreIndex<rank - 1, internal::Identity<T>>;
 
-      inline DEAL_II_ALWAYS_INLINE
-      value_type operator[](unsigned int j) const
+      inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
       {
         return value_type(Identity<T>(t_), j);
       }
@@ -434,12 +467,14 @@ namespace TensorAccessors
     class ReorderedIndexView<0, 1, T>
     {
     public:
-      ReorderedIndexView(typename ReferenceType<T>::type t) : t_(t) {}
+      ReorderedIndexView(typename ReferenceType<T>::type t)
+        : t_(t)
+      {}
 
-      typedef typename ReferenceType<typename ValueType<T>::value_type>::type value_type;
+      using value_type =
+        typename ReferenceType<typename ValueType<T>::value_type>::type;
 
-      inline DEAL_II_ALWAYS_INLINE
-      value_type operator[](unsigned int j) const
+      inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
       {
         return t_[j];
       }
@@ -457,12 +492,14 @@ namespace TensorAccessors
     class Identity
     {
     public:
-      Identity(typename ReferenceType<T>::type t) : t_(t) {}
+      Identity(typename ReferenceType<T>::type t)
+        : t_(t)
+      {}
 
-      typedef typename ValueType<T>::value_type return_type;
+      using return_type = typename ValueType<T>::value_type;
 
-      inline DEAL_II_ALWAYS_INLINE
-      typename ReferenceType<return_type>::type apply(unsigned int j) const
+      inline DEAL_II_ALWAYS_INLINE typename ReferenceType<return_type>::type
+      apply(unsigned int j) const
       {
         return t_[j];
       }
@@ -483,26 +520,29 @@ namespace TensorAccessors
     class StoreIndex
     {
     public:
-      StoreIndex(S s, int i) : s_(s), i_(i) {}
+      StoreIndex(S s, int i)
+        : s_(s)
+        , i_(i)
+      {}
 
-      typedef StoreIndex<rank - 1, StoreIndex<rank, S> > value_type;
+      using value_type = StoreIndex<rank - 1, StoreIndex<rank, S>>;
 
-      inline DEAL_II_ALWAYS_INLINE
-      value_type operator[](unsigned int j) const
+      inline DEAL_II_ALWAYS_INLINE value_type operator[](unsigned int j) const
       {
         return value_type(*this, j);
       }
 
-      typedef typename ValueType<typename S::return_type>::value_type return_type;
+      using return_type =
+        typename ValueType<typename S::return_type>::value_type;
 
-      inline
-      typename ReferenceType<return_type>::type apply(unsigned int j) const
+      inline typename ReferenceType<return_type>::type
+      apply(unsigned int j) const
       {
         return s_.apply(j)[i_];
       }
 
     private:
-      const S s_;
+      const S   s_;
       const int i_;
     };
 
@@ -514,19 +554,22 @@ namespace TensorAccessors
     class StoreIndex<1, S>
     {
     public:
-      StoreIndex(S s, int i) : s_(s), i_(i) {}
+      StoreIndex(S s, int i)
+        : s_(s)
+        , i_(i)
+      {}
 
-      typedef typename ValueType<typename S::return_type>::value_type return_type;
-      typedef return_type value_type;
+      using return_type =
+        typename ValueType<typename S::return_type>::value_type;
+      using value_type = return_type;
 
-      inline DEAL_II_ALWAYS_INLINE
-      return_type &operator[](unsigned int j) const
+      inline DEAL_II_ALWAYS_INLINE return_type &operator[](unsigned int j) const
       {
         return s_.apply(j)[i_];
       }
 
     private:
-      const S s_;
+      const S   s_;
       const int i_;
     };
 
@@ -542,15 +585,12 @@ namespace TensorAccessors
     struct ExtractHelper
     {
       template <typename T, typename ArrayType>
-      inline
-      static
-      typename ReturnType<rank - position, T>::value_type &
-      extract(T &t,
-              const ArrayType &indices)
+      inline static typename ReturnType<rank - position, T>::value_type &
+      extract(T &t, const ArrayType &indices)
       {
-        return ExtractHelper<position + 1, rank>::
-               template extract<typename ValueType<T>::value_type, ArrayType>
-        (t[indices[position]], indices);
+        return ExtractHelper<position + 1, rank>::template extract<
+          typename ValueType<T>::value_type,
+          ArrayType>(t[indices[position]], indices);
       }
     };
 
@@ -560,10 +600,8 @@ namespace TensorAccessors
     struct ExtractHelper<rank, rank>
     {
       template <typename T, typename ArrayType>
-      inline
-      static
-      T &extract(T &t,
-                 const ArrayType &)
+      inline static T &
+      extract(T &t, const ArrayType &)
       {
         return t;
       }
@@ -590,12 +628,13 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      inline DEAL_II_ALWAYS_INLINE static
-      void contract(T1 &result, const T2 &left, const T3 &right)
+      inline DEAL_II_ALWAYS_INLINE static void
+      contract(T1 &result, const T2 &left, const T3 &right)
       {
         for (unsigned int i = 0; i < dim; ++i)
-          Contract<no_contr, rank_1 - 1, rank_2, dim>::
-          contract(result[i], left[i], right);
+          Contract<no_contr, rank_1 - 1, rank_2, dim>::contract(result[i],
+                                                                left[i],
+                                                                right);
       }
     };
 
@@ -610,7 +649,8 @@ namespace TensorAccessors
     //          ...
     //            for(unsigned int j_ = 0; j_ < dim; ++j_)
     //             [...]
-    //               result[i_0]..[i_][j_0]..[j_] ... left[i_0]..[i_] ... right[j_0]..[j_]
+    //               result[i_0]..[i_][j_0]..[j_] ... left[i_0]..[i_] ...
+    //               right[j_0]..[j_]
     //
 
     template <int no_contr, int rank_2, int dim>
@@ -618,12 +658,13 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      inline DEAL_II_ALWAYS_INLINE static
-      void contract(T1 &result, const T2 &left, const T3 &right)
+      inline DEAL_II_ALWAYS_INLINE static void
+      contract(T1 &result, const T2 &left, const T3 &right)
       {
         for (unsigned int i = 0; i < dim; ++i)
-          Contract<no_contr, no_contr, rank_2 - 1, dim>::
-          contract(result[i], left, right[i]);
+          Contract<no_contr, no_contr, rank_2 - 1, dim>::contract(result[i],
+                                                                  left,
+                                                                  right[i]);
       }
     };
 
@@ -636,7 +677,8 @@ namespace TensorAccessors
     //     for(unsigned int k_0 = 0; k_0 < dim; ++k_0)
     //       ...
     //         for(unsigned int k_ = 0; k_ < dim; ++k_)
-    //           result[i_0]..[i_][j_0]..[j_] += left[i_0]..[i_][k_0]..[k_] * right[j_0]..[j_][k_0]..[k_];
+    //           result[i_0]..[i_][j_0]..[j_] += left[i_0]..[i_][k_0]..[k_] *
+    //           right[j_0]..[j_][k_0]..[k_];
     //   }
     //
     //  Relay this summation to another helper class.
@@ -646,8 +688,8 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      inline DEAL_II_ALWAYS_INLINE static
-      void contract(T1 &result, const T2 &left, const T3 &right)
+      inline DEAL_II_ALWAYS_INLINE static void
+      contract(T1 &result, const T2 &left, const T3 &right)
       {
         result = Contract2<no_contr, dim>::template contract2<T1>(left, right);
       }
@@ -662,14 +704,16 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      inline DEAL_II_ALWAYS_INLINE static
-      T1 contract2(const T2 &left, const T3 &right)
+      inline DEAL_II_ALWAYS_INLINE static T1
+      contract2(const T2 &left, const T3 &right)
       {
         // Some auto-differentiable numbers need explicit
         // zero initialization.
         T1 result = dealii::internal::NumberType<T1>::value(0.0);
         for (unsigned int i = 0; i < dim; ++i)
-          result += Contract2<no_contr - 1, dim>::template contract2<T1>(left[i], right[i]);
+          result +=
+            Contract2<no_contr - 1, dim>::template contract2<T1>(left[i],
+                                                                 right[i]);
         return result;
       }
     };
@@ -682,8 +726,8 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3>
-      inline DEAL_II_ALWAYS_INLINE static
-      T1 contract2(const T2 &left, const T3 &right)
+      inline DEAL_II_ALWAYS_INLINE static T1
+      contract2(const T2 &left, const T3 &right)
       {
         return left * right;
       }
@@ -709,14 +753,15 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3, typename T4>
-      static inline
-      T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
+      static inline T1
+      contract3(const T2 &left, const T3 &middle, const T4 &right)
       {
         // Some auto-differentiable numbers need explicit
         // zero initialization.
         T1 result = dealii::internal::NumberType<T1>::value(0.0);
         for (unsigned int i = 0; i < dim; ++i)
-          result += Contract3<rank_1 - 1, rank_2, dim>::template contract3<T1>(left[i], middle[i], right);
+          result += Contract3<rank_1 - 1, rank_2, dim>::template contract3<T1>(
+            left[i], middle[i], right);
         return result;
       }
     };
@@ -730,21 +775,25 @@ namespace TensorAccessors
     //         ...
     //           for(j_; j_ < dim; ++j_)
     //             [...]
-    //               left[i_0]..[i_] ... middle[i_0]..[i_][j_0]..[j_] ... right[j_0]..[j_]
+    //               left[i_0]..[i_] ... middle[i_0]..[i_][j_0]..[j_] ...
+    //               right[j_0]..[j_]
 
     template <int rank_2, int dim>
     class Contract3<0, rank_2, dim>
     {
     public:
       template <typename T1, typename T2, typename T3, typename T4>
-      static inline
-      T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
+      static inline T1
+      contract3(const T2 &left, const T3 &middle, const T4 &right)
       {
         // Some auto-differentiable numbers need explicit
         // zero initialization.
         T1 result = dealii::internal::NumberType<T1>::value(0.0);
         for (unsigned int i = 0; i < dim; ++i)
-          result += Contract3<0, rank_2 - 1, dim>::template contract3<T1>(left, middle[i], right[i]);
+          result +=
+            Contract3<0, rank_2 - 1, dim>::template contract3<T1>(left,
+                                                                  middle[i],
+                                                                  right[i]);
         return result;
       }
     };
@@ -757,8 +806,8 @@ namespace TensorAccessors
     {
     public:
       template <typename T1, typename T2, typename T3, typename T4>
-      static inline
-      T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
+      static inline T1
+      contract3(const T2 &left, const T3 &middle, const T4 &right)
       {
         return left * middle * right;
       }

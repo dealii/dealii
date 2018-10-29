@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2013 by the deal.II authors
+// Copyright (C) 2009 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ Currently, the geodynamics testsuite contains the following
 programs:
 
 - step-8: Elasticity
-- step-16: A %parallel elasticity solver
+- step-18: A %parallel elasticity solver
 - step-20: Porous media flow
 - step-21: Multiphase flow through porous media
 - step-22: Stokes flow

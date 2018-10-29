@@ -8,23 +8,24 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 
-// check that the QGaussChebyshev, QGaussRadauChebyshev and QGaussLobattoChebyshev,
-// can be constructed in all dimensions. Previously, this failed since the base class
-// constructor used required the one-dimensional quadrature formula to integrate
-// constants exactly. This is not true for the classes considered here.
+// check that the QGaussChebyshev, QGaussRadauChebyshev and
+// QGaussLobattoChebyshev, can be constructed in all dimensions. Previously,
+// this failed since the base class constructor used required the
+// one-dimensional quadrature formula to integrate constants exactly. This is
+// not true for the classes considered here.
 
+
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include "../tests.h"
-
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/quadrature.h>
 
 template <int dim>
 void
@@ -38,7 +39,8 @@ construct_quadrature()
   deallog << "QGaussLobattoChebyshev<" << dim << ">: OK" << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -46,4 +48,3 @@ int main()
   construct_quadrature<2>();
   construct_quadrature<3>();
 }
-

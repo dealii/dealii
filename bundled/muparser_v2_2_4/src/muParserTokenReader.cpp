@@ -147,7 +147,7 @@ namespace mu
   */
   ParserTokenReader* ParserTokenReader::Clone(ParserBase *a_pParent) const
   {
-    std::auto_ptr<ParserTokenReader> ptr(new ParserTokenReader(*this));
+    std::unique_ptr<ParserTokenReader> ptr(new ParserTokenReader(*this));
     ptr->SetParent(a_pParent);
     return ptr.release();
   }
@@ -902,7 +902,7 @@ namespace mu
     std::size_t iEnd(0), iSkip(0);
 
     // parser over escaped '\"' end replace them with '"'
-    for(iEnd=(int)strBuf.find( _T("\"") ); iEnd!=0 && iEnd!=string_type::npos; iEnd=(int)strBuf.find( _T("\""), iEnd))
+    for(iEnd=(int)strBuf.find( _T('\"') ); iEnd!=0 && iEnd!=string_type::npos; iEnd=(int)strBuf.find( _T('\"'), iEnd))
     {
       if (strBuf[iEnd-1]!='\\') break;
       strBuf.replace(iEnd-1, 2, _T("\"") );

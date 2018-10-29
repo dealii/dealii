@@ -1,6 +1,0 @@
-New: The classes FE_Q, FE_DGQ, and FE_DGQArbitraryNodes now implement
-the
-FiniteElement::convert_generalized_support_point_values_to_dof_values()
-interface.
-<br>
-(Wolfgang Bangerth, 2017/04/05)

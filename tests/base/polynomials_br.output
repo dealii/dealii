@@ -1,0 +1,299 @@
+
+DEAL::BR1<2> point 0 (0.00, 0.00)
+DEAL::BR1<2> shape fxn 0: 	1.00	0.00
+DEAL::BR1<2> shape fxn 1: 	0.00	1.00
+DEAL::BR1<2> shape fxn 2: 	0.00	0.00
+DEAL::BR1<2> shape fxn 3: 	0.00	0.00
+DEAL::BR1<2> shape fxn 4: 	0.00	0.00
+DEAL::BR1<2> shape fxn 5: 	0.00	0.00
+DEAL::BR1<2> shape fxn 6: 	0.00	0.00
+DEAL::BR1<2> shape fxn 7: 	0.00	0.00
+DEAL::BR1<2> point 1 (1.00, 0.00)
+DEAL::BR1<2> shape fxn 0: 	0.00	0.00
+DEAL::BR1<2> shape fxn 1: 	0.00	0.00
+DEAL::BR1<2> shape fxn 2: 	1.00	0.00
+DEAL::BR1<2> shape fxn 3: 	0.00	1.00
+DEAL::BR1<2> shape fxn 4: 	0.00	0.00
+DEAL::BR1<2> shape fxn 5: 	0.00	0.00
+DEAL::BR1<2> shape fxn 6: 	0.00	0.00
+DEAL::BR1<2> shape fxn 7: 	0.00	0.00
+DEAL::BR1<2> point 2 (0.00, 1.00)
+DEAL::BR1<2> shape fxn 0: 	0.00	0.00
+DEAL::BR1<2> shape fxn 1: 	0.00	0.00
+DEAL::BR1<2> shape fxn 2: 	0.00	0.00
+DEAL::BR1<2> shape fxn 3: 	0.00	0.00
+DEAL::BR1<2> shape fxn 4: 	1.00	0.00
+DEAL::BR1<2> shape fxn 5: 	0.00	1.00
+DEAL::BR1<2> shape fxn 6: 	0.00	0.00
+DEAL::BR1<2> shape fxn 7: 	0.00	0.00
+DEAL::BR1<2> point 3 (1.00, 1.00)
+DEAL::BR1<2> shape fxn 0: 	0.00	0.00
+DEAL::BR1<2> shape fxn 1: 	0.00	0.00
+DEAL::BR1<2> shape fxn 2: 	0.00	0.00
+DEAL::BR1<2> shape fxn 3: 	0.00	0.00
+DEAL::BR1<2> shape fxn 4: 	0.00	0.00
+DEAL::BR1<2> shape fxn 5: 	0.00	0.00
+DEAL::BR1<2> shape fxn 6: 	1.00	0.00
+DEAL::BR1<2> shape fxn 7: 	0.00	1.00
+DEAL::BR1<2> point 4 (0.00, 0.500)
+DEAL::BR1<2> shape fxn 8: 	1.00	0.00
+DEAL::BR1<2> shape fxn 9: 	0.00	0.00
+DEAL::BR1<2> shape fxn 10: 	0.00	0.00
+DEAL::BR1<2> shape fxn 11: 	0.00	0.00
+DEAL::BR1<2> point 5 (1.00, 0.500)
+DEAL::BR1<2> shape fxn 8: 	0.00	0.00
+DEAL::BR1<2> shape fxn 9: 	1.00	0.00
+DEAL::BR1<2> shape fxn 10: 	0.00	0.00
+DEAL::BR1<2> shape fxn 11: 	0.00	0.00
+DEAL::BR1<2> point 6 (0.500, 0.00)
+DEAL::BR1<2> shape fxn 8: 	0.00	0.00
+DEAL::BR1<2> shape fxn 9: 	0.00	0.00
+DEAL::BR1<2> shape fxn 10: 	0.00	1.00
+DEAL::BR1<2> shape fxn 11: 	0.00	0.00
+DEAL::BR1<2> point 7 (0.500, 1.00)
+DEAL::BR1<2> shape fxn 8: 	0.00	0.00
+DEAL::BR1<2> shape fxn 9: 	0.00	0.00
+DEAL::BR1<2> shape fxn 10: 	0.00	0.00
+DEAL::BR1<2> shape fxn 11: 	0.00	1.00
+DEAL::BR1<3> point 0 (0.00, 0.00, 0.00)
+DEAL::BR1<3> shape fxn 0: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 1: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 2: 	0.00	0.00	1.00
+DEAL::BR1<3> shape fxn 3: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 4: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 5: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 6: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 7: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 8: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 9: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 10: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 11: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 12: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 13: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 14: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 15: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 16: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 17: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 18: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 19: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 20: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 21: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 22: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 23: 	0.00	0.00	0.00
+DEAL::BR1<3> point 1 (1.00, 0.00, 0.00)
+DEAL::BR1<3> shape fxn 0: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 1: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 2: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 3: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 4: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 5: 	0.00	0.00	1.00
+DEAL::BR1<3> shape fxn 6: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 7: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 8: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 9: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 10: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 11: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 12: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 13: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 14: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 15: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 16: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 17: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 18: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 19: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 20: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 21: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 22: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 23: 	0.00	0.00	0.00
+DEAL::BR1<3> point 2 (0.00, 1.00, 0.00)
+DEAL::BR1<3> shape fxn 0: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 1: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 2: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 3: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 4: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 5: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 6: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 7: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 8: 	0.00	0.00	1.00
+DEAL::BR1<3> shape fxn 9: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 10: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 11: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 12: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 13: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 14: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 15: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 16: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 17: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 18: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 19: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 20: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 21: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 22: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 23: 	0.00	0.00	0.00
+DEAL::BR1<3> point 3 (1.00, 1.00, 0.00)
+DEAL::BR1<3> shape fxn 0: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 1: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 2: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 3: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 4: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 5: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 6: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 7: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 8: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 9: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 10: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 11: 	0.00	0.00	1.00
+DEAL::BR1<3> shape fxn 12: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 13: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 14: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 15: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 16: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 17: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 18: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 19: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 20: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 21: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 22: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 23: 	0.00	0.00	0.00
+DEAL::BR1<3> point 4 (0.00, 0.00, 1.00)
+DEAL::BR1<3> shape fxn 0: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 1: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 2: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 3: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 4: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 5: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 6: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 7: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 8: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 9: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 10: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 11: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 12: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 13: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 14: 	0.00	0.00	1.00
+DEAL::BR1<3> shape fxn 15: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 16: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 17: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 18: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 19: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 20: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 21: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 22: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 23: 	0.00	0.00	0.00
+DEAL::BR1<3> point 5 (1.00, 0.00, 1.00)
+DEAL::BR1<3> shape fxn 0: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 1: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 2: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 3: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 4: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 5: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 6: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 7: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 8: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 9: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 10: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 11: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 12: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 13: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 14: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 15: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 16: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 17: 	0.00	0.00	1.00
+DEAL::BR1<3> shape fxn 18: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 19: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 20: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 21: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 22: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 23: 	0.00	0.00	0.00
+DEAL::BR1<3> point 6 (0.00, 1.00, 1.00)
+DEAL::BR1<3> shape fxn 0: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 1: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 2: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 3: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 4: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 5: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 6: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 7: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 8: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 9: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 10: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 11: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 12: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 13: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 14: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 15: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 16: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 17: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 18: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 19: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 20: 	0.00	0.00	1.00
+DEAL::BR1<3> shape fxn 21: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 22: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 23: 	0.00	0.00	0.00
+DEAL::BR1<3> point 7 (1.00, 1.00, 1.00)
+DEAL::BR1<3> shape fxn 0: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 1: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 2: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 3: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 4: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 5: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 6: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 7: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 8: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 9: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 10: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 11: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 12: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 13: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 14: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 15: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 16: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 17: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 18: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 19: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 20: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 21: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 22: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 23: 	0.00	0.00	1.00
+DEAL::BR1<3> point 8 (0.00, 0.500, 0.500)
+DEAL::BR1<3> shape fxn 24: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 25: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 26: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 27: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 28: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 29: 	0.00	0.00	0.00
+DEAL::BR1<3> point 9 (1.00, 0.500, 0.500)
+DEAL::BR1<3> shape fxn 24: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 25: 	1.00	0.00	0.00
+DEAL::BR1<3> shape fxn 26: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 27: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 28: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 29: 	0.00	0.00	0.00
+DEAL::BR1<3> point 10 (0.500, 0.00, 0.500)
+DEAL::BR1<3> shape fxn 24: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 25: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 26: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 27: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 28: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 29: 	0.00	0.00	0.00
+DEAL::BR1<3> point 11 (0.500, 1.00, 0.500)
+DEAL::BR1<3> shape fxn 24: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 25: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 26: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 27: 	0.00	1.00	0.00
+DEAL::BR1<3> shape fxn 28: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 29: 	0.00	0.00	0.00
+DEAL::BR1<3> point 12 (0.500, 0.500, 0.00)
+DEAL::BR1<3> shape fxn 24: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 25: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 26: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 27: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 28: 	0.00	0.00	1.00
+DEAL::BR1<3> shape fxn 29: 	0.00	0.00	0.00
+DEAL::BR1<3> point 13 (0.500, 0.500, 1.00)
+DEAL::BR1<3> shape fxn 24: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 25: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 26: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 27: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 28: 	0.00	0.00	0.00
+DEAL::BR1<3> shape fxn 29: 	0.00	0.00	1.00

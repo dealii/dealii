@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -17,6 +17,8 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
   grid_refinement.cc
+  cell_weights.cc
+  active_fe_indices_transfer.cc
   solution_transfer.cc
   tria.cc
   tria_base.cc
@@ -38,6 +40,8 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
 
 SET(_inst
   grid_refinement.inst.in
+  cell_weights.inst.in
+  active_fe_indices_transfer.inst.in
   solution_transfer.inst.in
   tria.inst.in
   shared_tria.inst.in

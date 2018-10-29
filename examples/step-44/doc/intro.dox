@@ -99,9 +99,9 @@ The fourth-order unit tensors $\mathcal{I}$ and $\overline{\mathcal{I}}$ are def
 Note $\mathcal{I} \neq \overline{\mathcal{I}}^T$.
 Furthermore, we define the symmetric and skew-symmetric fourth-order unit tensors by
 @f[
-	\mathcal{S} := \dfrac{1}{2}[\mathcal{I} + \overline{\mathcal{I}}]
+	\mathcal{S} \dealcoloneq \dfrac{1}{2}[\mathcal{I} + \overline{\mathcal{I}}]
 		\qquad \text{and} \qquad
-	\mathcal{W} := \dfrac{1}{2}[\mathcal{I} - \overline{\mathcal{I}}] \, ,
+	\mathcal{W} \dealcoloneq \dfrac{1}{2}[\mathcal{I} - \overline{\mathcal{I}}] \, ,
 @f]
 such that
 @f[
@@ -130,12 +130,12 @@ The material description of the displacement of a particle is defined by
 The deformation gradient $\mathbf{F}$ is defined as the material gradient of the motion:
 @f[
 	\mathbf{F}(\mathbf{X},t)
-		:= \dfrac{\partial \boldsymbol{\varphi}(\mathbf{X},t)}{\partial \mathbf{X}}
+		\dealcoloneq \dfrac{\partial \boldsymbol{\varphi}(\mathbf{X},t)}{\partial \mathbf{X}}
 		= \textrm{Grad}\ \mathbf{x}(\mathbf{X},t)
 		= \mathbf{I} + \textrm{Grad}\ \mathbf{U} \, .
 @f]
 The determinant of the of the deformation gradient
-$J(\mathbf{X},t):= \textrm{det}\ \mathbf{F}(\mathbf{X},t) > 0$
+$J(\mathbf{X},t) \dealcoloneq \textrm{det}\ \mathbf{F}(\mathbf{X},t) > 0$
 maps corresponding volume elements in the reference and current configurations, denoted
 $\textrm{d}V$ and $\textrm{d}v$,
 respectively, as
@@ -143,13 +143,13 @@ respectively, as
 	\textrm{d}v = J(\mathbf{X},t)\; \textrm{d}V \, .
 @f]
 
-Two important measures of the deformation in terms of the spatial and material coordinates are the left and right Cauchy-Green tensors, respectively, 
-and denoted $\mathbf{b} := \mathbf{F}\mathbf{F}^T$ and $\mathbf{C} := \mathbf{F}^T\mathbf{F}$.
+Two important measures of the deformation in terms of the spatial and material coordinates are the left and right Cauchy-Green tensors, respectively,
+and denoted $\mathbf{b} \dealcoloneq \mathbf{F}\mathbf{F}^T$ and $\mathbf{C} \dealcoloneq \mathbf{F}^T\mathbf{F}$.
 They are both symmetric and positive definite.
 
 The Green-Lagrange strain tensor is defined by
 @f[
-	\mathbf{E}:= \frac{1}{2}[\mathbf{C} - \mathbf{I} ]
+	\mathbf{E} \dealcoloneq \frac{1}{2}[\mathbf{C} - \mathbf{I} ]
 		= \underbrace{\frac{1}{2}[\textrm{Grad}^T \mathbf{U} +	\textrm{Grad}\mathbf{U}]}_{\boldsymbol{\varepsilon}}
 			+ \frac{1}{2}[\textrm{Grad}^T\ \mathbf{U}][\textrm{Grad}\ \mathbf{U}] \, .
 @f]
@@ -175,7 +175,7 @@ The spatial velocity field is denoted $\mathbf{v}(\mathbf{x},t)$.
 The derivative of the spatial velocity field with respect to the spatial coordinates gives the spatial velocity gradient $\mathbf{l}(\mathbf{x},t)$, that is
 @f[
 	\mathbf{l}(\mathbf{x},t)
-		:= \dfrac{\partial \mathbf{v}(\mathbf{x},t)}{\partial \mathbf{x}}
+		\dealcoloneq \dfrac{\partial \mathbf{v}(\mathbf{x},t)}{\partial \mathbf{x}}
 		= \textrm{grad}\ \mathbf{v}(\mathbf{x},t) \, ,
 @f]
 where $\textrm{grad} \{\bullet \}
@@ -217,16 +217,16 @@ The stress measures used here are contravariant, while the strain measures are c
 
 The push-forward and-pull back operations for second-order covariant tensors $(\bullet)^{\text{cov}}$ are respectively given by:
 @f[
-	\chi_{*}(\bullet)^{\text{cov}}:= \mathbf{F}^{-T} (\bullet)^{\text{cov}} \mathbf{F}^{-1}
+	\chi_{*}(\bullet)^{\text{cov}} \dealcoloneq \mathbf{F}^{-T} (\bullet)^{\text{cov}} \mathbf{F}^{-1}
 	\qquad \text{and} \qquad
-	\chi^{-1}_{*}(\bullet)^{\text{cov}}:= \mathbf{F}^{T} (\bullet)^{\text{cov}} \mathbf{F} \, .
+	\chi^{-1}_{*}(\bullet)^{\text{cov}} \dealcoloneq \mathbf{F}^{T} (\bullet)^{\text{cov}} \mathbf{F} \, .
 @f]
 
 The push-forward and pull back operations for second-order contravariant tensors $(\bullet)^{\text{con}}$ are respectively given by:
 @f[
-	\chi_{*}(\bullet)^{\text{con}}:= \mathbf{F} (\bullet)^{\text{con}} \mathbf{F}^T
+	\chi_{*}(\bullet)^{\text{con}} \dealcoloneq \mathbf{F} (\bullet)^{\text{con}} \mathbf{F}^T
 	\qquad \text{and} \qquad
-	\chi^{-1}_{*}(\bullet)^{\text{con}}:= \mathbf{F}^{-1} (\bullet)^{\text{con}} \mathbf{F}^{-T} \, .
+	\chi^{-1}_{*}(\bullet)^{\text{con}} \dealcoloneq \mathbf{F}^{-1} (\bullet)^{\text{con}} \mathbf{F}^{-T} \, .
 @f]
 For example $\boldsymbol{\tau} = \chi_{*}(\mathbf{S})$.
 
@@ -263,12 +263,12 @@ Similarly, the Kirchhoff stress can be decomposed into volumetric and isochoric 
 		&= \underbrace{( \mathcal{I} - \dfrac{1}{3} \mathbf{I} \otimes \mathbf{I})}_{\mathbb{P}} : \overline{\boldsymbol{\tau}} \, ,
 @f}
 where
-$p := \dfrac{\partial \Psi_{\text{vol}}(J)}{\partial J}$ is the pressure response. 
-$\mathbb{P}$ is the projection tensor which provides the deviatoric operator in the Eulerian setting. 
+$p \dealcoloneq \dfrac{\partial \Psi_{\text{vol}}(J)}{\partial J}$ is the pressure response.
+$\mathbb{P}$ is the projection tensor which provides the deviatoric operator in the Eulerian setting.
 The fictitious Kirchhoff stress tensor $\overline{\boldsymbol{\tau}}$ is defined by
 @f[
 	\overline{\boldsymbol{\tau}}
-		:= 2 \overline{\mathbf{b}} \dfrac{\partial \Psi_{\textrm{iso}}(\overline{\mathbf{b}})}{\partial \overline{\mathbf{b}}} \, .
+		\dealcoloneq 2 \overline{\mathbf{b}} \dfrac{\partial \Psi_{\textrm{iso}}(\overline{\mathbf{b}})}{\partial \overline{\mathbf{b}}} \, .
 @f]
 
 
@@ -286,11 +286,11 @@ The Helmholtz free energy corresponding to a compressible <a href="http://en.wik
         \underbrace{\kappa [ \mathcal{G}(J) ] }_{\Psi_{\textrm{vol}}(J)}
         + \underbrace{\bigl[c_1 [ \overline{I}_1 - 3] \bigr]}_{\Psi_{\text{iso}}(\overline{\mathbf{b}})} \, ,
 @f]
-where $\kappa := \lambda + 2/3 \mu$ is the bulk modulus ($\lambda$ and $\mu$ are the Lame parameters)
-and $\overline{I}_1 := \textrm{tr}\ \overline{\mathbf{b}}$.
-The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the condition $\mathcal{G}(1) = 0$, 
+where $\kappa \dealcoloneq \lambda + 2/3 \mu$ is the bulk modulus ($\lambda$ and $\mu$ are the Lame parameters)
+and $\overline{I}_1 \dealcoloneq \textrm{tr}\ \overline{\mathbf{b}}$.
+The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the condition $\mathcal{G}(1) = 0$,
 among others, see Holzapfel (2001) for further details.
-In this work $\mathcal{G}:=\frac{1}{4} [ J^2 - 1 - 2\textrm{ln}J ]$.
+In this work $\mathcal{G} \dealcoloneq \frac{1}{4} [ J^2 - 1 - 2\textrm{ln}J ]$.
 
 Incompressibility imposes the isochoric constraint that $J=1$ for all motions $\boldsymbol{\varphi}$.
 The Helmholtz free energy corresponding to an incompressible neo-Hookean material is given by
@@ -298,7 +298,7 @@ The Helmholtz free energy corresponding to an incompressible neo-Hookean materia
     \Psi \equiv
         \underbrace{\bigl[ c_1 [ I_1 - 3] \bigr] }_{\Psi_{\textrm{iso}}(\mathbf{b})} \, ,
 @f]
-where $ I_1 := \textrm{tr}\mathbf{b} $.
+where $ I_1 \dealcoloneq \textrm{tr}\mathbf{b} $.
 Thus, the incompressible response is obtained by removing the volumetric component from the compressible free energy and enforcing $J=1$.
 
 
@@ -332,7 +332,7 @@ where
 		\\
 		&= J[\widehat{p}\, \mathbf{I} \otimes \mathbf{I} - 2p \mathcal{I}]
 			\qquad \text{where} \qquad
-		\widehat{p} := p + \dfrac{\textrm{d} p}{\textrm{d}J} \, ,
+		\widehat{p} \dealcoloneq p + \dfrac{\textrm{d} p}{\textrm{d}J} \, ,
 		\\
 	J \mathfrak{c}_{\text{iso}}
 		&=  4 \mathbf{b} \dfrac{\partial^2 \Psi_{\text{iso}}(\overline{\mathbf{b}})} {\partial \mathbf{b} \partial \mathbf{b}} \mathbf{b}
@@ -355,12 +355,12 @@ We wish to find the equilibrium configuration by minimising the potential energy
 
 As mentioned above, we adopt a three-field formulation.
 We denote the set of primary unknowns by
-$\mathbf{\Xi}:= \{ \mathbf{u}, \widetilde{p}, \widetilde{J} \}$.
+$\mathbf{\Xi} \dealcoloneq \{ \mathbf{u}, \widetilde{p}, \widetilde{J} \}$.
 The independent kinematic variable $\widetilde{J}$ enters the formulation as a constraint on $J$ enforced by the Lagrange multiplier $\widetilde{p}$ (the pressure, as we shall see).
 
 The three-field variational principle used here is given by
 @f[
-	\Pi(\mathbf{\Xi}) := \int_\Omega \bigl[
+	\Pi(\mathbf{\Xi}) \dealcoloneq \int_\Omega \bigl[
 		\Psi_{\textrm{vol}}(\widetilde{J})
 		+ \widetilde{p}\,[J(\mathbf{u}) - \widetilde{J}]
 		+ \Psi_{\textrm{iso}}(\overline{\mathbf{b}}(\mathbf{u}))
@@ -463,7 +463,7 @@ $\varDelta \{ \bullet \} = { \{ \bullet \} }^{\textrm{n}} - { \{ \bullet \} }^{\
 The value of a quantity at the current iteration $\textrm{i}$ is denoted 
 ${ \{ \bullet \} }^{\textrm{n}}_{\textrm{i}} = { \{ \bullet \} }_{\textrm{i}}$.
 The incremental change between iterations $\textrm{i}$ and $\textrm{i}+1$ is denoted
-$d \{ \bullet \} := \{ \bullet \}_{\textrm{i}+1} - \{ \bullet \}_{\textrm{i}}$.
+$d \{ \bullet \} \dealcoloneq \{ \bullet \}_{\textrm{i}+1} - \{ \bullet \}_{\textrm{i}}$.
 
 Assume that the state of the system is known for some iteration $\textrm{i}$.
 The linearised approximation to nonlinear governing equations to be solved using the  Newton-Raphson method is:
@@ -629,7 +629,7 @@ and thus
 @f]
 where
 @f[
-		\overline{\overline{\mathbf{\mathsf{K}}}} :=
+		\overline{\overline{\mathbf{\mathsf{K}}}} \dealcoloneq
 			\mathbf{\mathsf{K}}_{u\widetilde{p}} \overline{\mathbf{\mathsf{K}}} \mathbf{\mathsf{K}}_{\widetilde{p}u} \, .
 @f]
 Note that due to the choice of $\widetilde{p}$ and $\widetilde{J}$ as discontinuous at the element level, all matrices that need to be inverted are defined at the element level.
@@ -642,7 +642,7 @@ The procedure to construct the various contributions is as follows:
   That is
   @f[
         \mathbf{\mathsf{K}}_{\textrm{store}}
-:=
+\dealcoloneq
         \begin{bmatrix}
 			\mathbf{\mathsf{K}}_{\textrm{con}}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0}
 			\\
@@ -660,10 +660,10 @@ In this tutorial we simply have one Material class named Material_Compressible_N
 Ideally this class would derive from a class HyperelasticMaterial which would derive from the base class Material.
 The three-field nature of the formulation used here also complicates the matter. 
 
-The Helmholtz free energy function for the three field formulation is $\Psi = \Psi_\text{vol}(\widetilde{J}) + \Psi_\text{iso}(\overline{\mathbf{b}})$. 
-The isochoric part of the Kirchhoff stress ${\boldsymbol{\tau}}_{\text{iso}}(\overline{\mathbf{b}})$ is identical to that obtained using a one-field formulation for a hyperelastic material. 
-However, the volumetric part of the free energy is now a function of the primary variable $\widetilde{J}$. 
-Thus, for a three field formulation the constitutive response for the volumetric part of the Kirchhoff stress ${\boldsymbol{\tau}}_{\text{vol}}$ (and the tangent) is not given by the hyperelastic constitutive law as in a one-field formulation. 
+The Helmholtz free energy function for the three field formulation is $\Psi = \Psi_\text{vol}(\widetilde{J}) + \Psi_\text{iso}(\overline{\mathbf{b}})$.
+The isochoric part of the Kirchhoff stress ${\boldsymbol{\tau}}_{\text{iso}}(\overline{\mathbf{b}})$ is identical to that obtained using a one-field formulation for a hyperelastic material.
+However, the volumetric part of the free energy is now a function of the primary variable $\widetilde{J}$.
+Thus, for a three field formulation the constitutive response for the volumetric part of the Kirchhoff stress ${\boldsymbol{\tau}}_{\text{vol}}$ (and the tangent) is not given by the hyperelastic constitutive law as in a one-field formulation.
 One can label the term
 $\boldsymbol{\tau}_{\textrm{vol}} \equiv \widetilde{p} J \mathbf{I}$
 as the volumetric Kirchhoff stress, but the pressure $\widetilde{p}$ is not derived from the free energy; it is a primary field.  

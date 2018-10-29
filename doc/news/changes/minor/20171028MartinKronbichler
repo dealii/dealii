@@ -1,7 +1,0 @@
-Fixed: The member variable FEEvaluation::dofs_per_cell and the static variable
-FEEvaluation::tensor_dofs_per_cell only returned the number of degrees of
-freedom per scalar component also for vector-valued evaluators, rather than
-returning the number accumulated over all components in the evaluator. This is
-now fixed.
-<br>
-(Martin Kronbichler, 2017/10/28)

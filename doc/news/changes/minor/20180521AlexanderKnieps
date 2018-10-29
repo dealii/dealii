@@ -1,0 +1,5 @@
+Improved: MGTransferPrebuilt now supports
+PETScWrappers::MPI::Vector and
+PETScWrappers::MPI::SparseMatrix.
+<br>
+(Alexander Knieps, 2018/05/21)

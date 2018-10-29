@@ -1,0 +1,5 @@
+New: Added RTree class and pack_rtree() function to create a boost::gemoetry::index::rtree from 
+containers and/or iterators of BoundingBox, Point, or Segment objects. 
+<br>
+(Luca Heltai, 2018/10/06)
+

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,47 +17,41 @@
 // check TableBase::fill using an istream_iterator
 
 
-#include "../tests.h"
-
 #include <deal.II/base/table.h>
+
+#include "../tests.h"
 
 
 int
-main ()
+main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(0);
-  deallog.attach(logfile);
 
   const std::string elements = "1 2 3 4 5 6";
   {
     // create a 2x3 table from this
-    Table<2,double> t (2,3);
+    Table<2, double>   t(2, 3);
     std::istringstream in1(elements);
-    t.fill (std::istream_iterator<double>(in1),
-            true);
+    t.fill(std::istream_iterator<double>(in1), true);
 
-    for (unsigned int i=0; i<t.size()[0]; ++i)
+    for (unsigned int i = 0; i < t.size()[0]; ++i)
       {
-        for (unsigned int j=0; j<t.size()[1]; ++j)
+        for (unsigned int j = 0; j < t.size()[1]; ++j)
           deallog << t[i][j] << ' ';
         deallog << std::endl;
       }
 
     // same data, same table, but filled in transpose ordering
     std::istringstream in2(elements);
-    t.fill (std::istream_iterator<double>(in2),
-            false);
+    t.fill(std::istream_iterator<double>(in2), false);
 
-    for (unsigned int i=0; i<t.size()[0]; ++i)
+    for (unsigned int i = 0; i < t.size()[0]; ++i)
       {
-        for (unsigned int j=0; j<t.size()[1]; ++j)
+        for (unsigned int j = 0; j < t.size()[1]; ++j)
           deallog << t[i][j] << ' ';
         deallog << std::endl;
       }
   }
 }
-
-
-

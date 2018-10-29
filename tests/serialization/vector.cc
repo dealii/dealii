@@ -8,19 +8,22 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // check serialization for Vector
 
-#include "serialization.h"
 #include <deal.II/lac/vector.h>
+
 #include <boost/serialization/vector.hpp>
 
-void test ()
+#include "serialization.h"
+
+void
+test()
 {
   unsigned int n = 5;
 
@@ -29,26 +32,26 @@ void test ()
 
   Vector<double> v3;
 
-  for (unsigned int i = 0; i<n; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      v1(i) = i*1.;
-      v2(i) = i*1. + n*1.;
+      v1(i) = i * 1.;
+      v2(i) = i * 1. + n * 1.;
     }
 
 
-  verify (v1, v2);
+  verify(v1, v2);
 
-  verify (v1, v3);
+  verify(v1, v3);
 }
 
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

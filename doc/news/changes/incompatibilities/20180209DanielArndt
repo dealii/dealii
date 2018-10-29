@@ -1,4 +1,0 @@
-Changed: FETools::get_fe_by_name returns a std::unique_ptr instead of a
-owning raw pointer to prevent creating memory leaks.
-<br>
-(Daniel Arndt, 2018/02/09)

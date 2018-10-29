@@ -94,7 +94,7 @@ The graphical output of the program looks as follows:
 
 The first two pictures show the real and imaginary parts of
 $u$, whereas the last shows the intensity $|u|$. One can clearly
-see that the intensity is focussed around the focal point of the
+see that the intensity is focused around the focal point of the
 lens (0.5, 0.3), and that the focus
 is rather sharp in $x$-direction but more blurred in $y$-direction, which is a
 consequence of the geometry of the focusing lens, its finite aperture,

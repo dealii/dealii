@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,14 +8,15 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
+  affine_constraints.cc
   block_matrix_array.cc
   block_sparse_matrix.cc
   block_sparse_matrix_ez.cc
@@ -23,7 +24,6 @@ SET(_unity_include_src
   block_vector.cc
   chunk_sparse_matrix.cc
   chunk_sparsity_pattern.cc
-  constraint_matrix.cc
   dynamic_sparsity_pattern.cc
   exceptions.cc
   full_matrix.cc
@@ -62,10 +62,10 @@ SET(_separate_src
   )
 
 SET(_inst
+  affine_constraints.inst.in
   block_sparse_matrix.inst.in
   block_vector.inst.in
   chunk_sparse_matrix.inst.in
-  constraint_matrix.inst.in
   full_matrix.inst.in
   lapack_full_matrix.inst.in
   la_vector.inst.in
@@ -146,8 +146,13 @@ ENDIF()
 IF(DEAL_II_WITH_CUDA)
   SET(_separate_src
     ${_separate_src}
-    cuda_vector.cu
+    cuda_kernels.cu
+    cuda_precondition.cu
+    cuda_solver_direct.cu
     cuda_sparse_matrix.cu
+    cuda_vector.cu
+    la_parallel_vector.cu
+    read_write_vector.cu
   )
 ENDIF()
 

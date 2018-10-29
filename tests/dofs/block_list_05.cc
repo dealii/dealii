@@ -8,31 +8,35 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_q.h>
+
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/lac/sparsity_pattern.h>
 
 #include <algorithm>
 
+#include "../tests.h"
+
 void
-print_patches (const SparsityPattern &bl)
+print_patches(const SparsityPattern &bl)
 {
-  for (unsigned int i=0; i<bl.n_rows(); ++i)
+  for (unsigned int i = 0; i < bl.n_rows(); ++i)
     {
       deallog << "Block " << std::setw(3) << i;
       std::vector<unsigned int> entries;
@@ -41,7 +45,7 @@ print_patches (const SparsityPattern &bl)
 
       std::sort(entries.begin(), entries.end());
 
-      for (unsigned int i=0; i<entries.size(); ++i)
+      for (unsigned int i = 0; i < entries.size(); ++i)
         deallog << ' ' << std::setw(4) << entries[i];
       deallog << std::endl;
     }
@@ -55,23 +59,24 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   DoFHandler<dim> dof;
   dof.initialize(tr, fe);
-  dof.distribute_mg_dofs (fe);
+  dof.distribute_mg_dofs(fe);
 
-  const unsigned int level = tr.n_levels()-1;
+  const unsigned int level = tr.n_levels() - 1;
 
   {
     deallog.push("(tt)ffff");
-    SparsityPattern bl;
-    std::vector<bool> temp_vector(2,true);
-    BlockMask exclude_boundary_dofs (temp_vector);
+    SparsityPattern           bl;
+    std::vector<bool>         temp_vector(2, true);
+    BlockMask                 exclude_boundary_dofs(temp_vector);
     std::vector<unsigned int> vm;
-    std::cout<<exclude_boundary_dofs.size()<<std::endl;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, exclude_boundary_dofs, false, false, false, false);
+    std::cout << exclude_boundary_dofs.size() << std::endl;
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, exclude_boundary_dofs, false, false, false, false);
     bl.compress();
     print_patches(bl);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for (unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -79,17 +84,18 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("(tf)ffff");
-    SparsityPattern bl;
-    std::vector<bool> temp_vector(2,true);
+    SparsityPattern   bl;
+    std::vector<bool> temp_vector(2, true);
     temp_vector[1] = false;
-    BlockMask exclude_boundary_dofs (temp_vector);
+    BlockMask                 exclude_boundary_dofs(temp_vector);
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, exclude_boundary_dofs, false, false, false, false);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, exclude_boundary_dofs, false, false, false, false);
     bl.compress();
     print_patches(bl);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for (unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -97,17 +103,18 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("(ft)ffff");
-    SparsityPattern bl;
-    std::vector<bool> temp_vector(2,false);
+    SparsityPattern   bl;
+    std::vector<bool> temp_vector(2, false);
     temp_vector[1] = true;
-    BlockMask exclude_boundary_dofs (temp_vector);
+    BlockMask                 exclude_boundary_dofs(temp_vector);
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, exclude_boundary_dofs, false, false, false, false);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, exclude_boundary_dofs, false, false, false, false);
     bl.compress();
     print_patches(bl);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for (unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -115,16 +122,17 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   }
   {
     deallog.push("(ff)ffff");
-    SparsityPattern bl;
-    std::vector<bool> temp_vector(2,false);
-    BlockMask exclude_boundary_dofs (temp_vector);
+    SparsityPattern           bl;
+    std::vector<bool>         temp_vector(2, false);
+    BlockMask                 exclude_boundary_dofs(temp_vector);
     std::vector<unsigned int> vm;
-    vm = DoFTools::make_vertex_patches(bl, dof, level, exclude_boundary_dofs, false, false, false, false);
+    vm = DoFTools::make_vertex_patches(
+      bl, dof, level, exclude_boundary_dofs, false, false, false, false);
     bl.compress();
     print_patches(bl);
     deallog.push("vertex mapping");
-    for (unsigned int i=0; i < vm.size(); ++i)
-      deallog << " "<< vm[i];
+    for (unsigned int i = 0; i < vm.size(); ++i)
+      deallog << " " << vm[i];
     deallog << std::endl;
     deallog.pop();
     deallog.pop();
@@ -133,17 +141,23 @@ test_block_list(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 }
 
 template <int dim>
-void test_global_refinement(
-  void (*test_block_list)(const Triangulation<dim> &tr, const FiniteElement<dim> &fe))
+void
+test_global_refinement(void (*test_block_list)(const Triangulation<dim> &tr,
+                                               const FiniteElement<dim> &fe))
 {
-  Triangulation<dim> trc(Triangulation<dim>::limit_level_difference_at_vertices);
-  Triangulation<dim> trl(Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> trc(
+    Triangulation<dim>::limit_level_difference_at_vertices);
+  Triangulation<dim> trl(
+    Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(trc);
   trc.refine_global(2);
   GridGenerator::hyper_L(trl);
   trl.refine_global(1);
 
-  FESystem<dim, dim> fe1(FESystem<dim, dim>(FE_Q<dim, dim>(2), dim), 1, FE_Q<dim, dim>(1), 1);
+  FESystem<dim, dim> fe1(FESystem<dim, dim>(FE_Q<dim, dim>(2), dim),
+                         1,
+                         FE_Q<dim, dim>(1),
+                         1);
 
   deallog.push("Square");
   test_block_list(trc, fe1);
@@ -155,8 +169,8 @@ void test_global_refinement(
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
   deallog.push("2D");

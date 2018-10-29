@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,16 +19,19 @@
 // value of an entry doesn't match the pattern; but it should still
 // yield a properly declared entry
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+#include "../tests.h"
+
+void
+check(const char *p)
 {
   ParameterHandler prm;
   try
     {
-      prm.declare_entry ("test_1", "abc",
-                         Patterns::List(Patterns::Integer(-1,1),2,3));
+      prm.declare_entry("test_1",
+                        "abc",
+                        Patterns::List(Patterns::Integer(-1, 1), 2, 3));
     }
   catch (const ParameterHandler::ExcValueDoesNotMatchPattern &)
     {
@@ -36,17 +39,18 @@ void check (const char *p)
     }
 
   std::ifstream in(p);
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_1=" << prm.get ("test_1") << std::endl;
+  deallog << "test_1=" << prm.get("test_1") << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_1_exception.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_1_exception.prm");
 
   return 0;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2017 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,19 +8,21 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // Check SphericalManifold::normal_vector on a set of points of a
 // hypersphere mesh
 
-#include "../tests.h"
 #include <deal.II/base/point.h>
+
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
+
+#include "../tests.h"
 
 using namespace dealii;
 
@@ -31,7 +33,7 @@ main()
   deallog << std::setprecision(3);
 
   constexpr unsigned int dim = 3;
-  SphericalManifold<3> spherical;
+  SphericalManifold<3>   spherical;
 
   Triangulation<dim> tria;
   GridGenerator::hyper_shell(tria, Point<dim>(), 0.5, 1., 96, true);
@@ -39,38 +41,46 @@ main()
   tria.set_manifold(0, spherical);
 
   for (auto cell : tria.active_cell_iterators())
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         {
-          if (std::abs(cell->face(f)->vertex(1).norm()-1.) < 1e-1)
+          if (std::abs(cell->face(f)->vertex(1).norm() - 1.) < 1e-1)
             {
               // at outer boundary, the normal should point outwards and be
               // aligned with the point down to roundoff. Check this for the
               // second face vertex as well as the center.
-              deallog << "Outer normal correctness (should be 0): "
-                      << (1.0 - cell->face(f)->vertex(1) *
-                          spherical.normal_vector(cell->face(f),  cell->face(f)->vertex(1)))
-                      << " "
-                      << (1.0 - cell->face(f)->center(/*respect_manifold=*/true) *
-                          spherical.normal_vector(cell->face(f),  cell->face(f)->center(true)))
-                      << std::endl;
+              deallog
+                << "Outer normal correctness (should be 0): "
+                << (1.0 - cell->face(f)->vertex(1) *
+                            spherical.normal_vector(cell->face(f),
+                                                    cell->face(f)->vertex(1)))
+                << " "
+                << (1.0 -
+                    cell->face(f)->center(/*respect_manifold=*/true) *
+                      spherical.normal_vector(cell->face(f),
+                                              cell->face(f)->center(true)))
+                << std::endl;
             }
-          else if (std::abs(cell->face(f)->vertex(1).norm()-0.5) < 1e-1)
+          else if (std::abs(cell->face(f)->vertex(1).norm() - 0.5) < 1e-1)
             {
               // at inner boundary, the normal should point inwards and be
               // aligned with the point down to roundoff. Check this for the
               // second face vertex as well as the center.
-              deallog << "Inner normal correctness (should be 0): "
-                      << (0.5 - cell->face(f)->vertex(1) *
-                          spherical.normal_vector(cell->face(f),  cell->face(f)->vertex(1)))
-                      << " "
-                      << (0.5 - cell->face(f)->center(/*respect_manifold=*/true) *
-                          spherical.normal_vector(cell->face(f),  cell->face(f)->center(true)))
-                      << std::endl;
+              deallog
+                << "Inner normal correctness (should be 0): "
+                << (0.5 - cell->face(f)->vertex(1) *
+                            spherical.normal_vector(cell->face(f),
+                                                    cell->face(f)->vertex(1)))
+                << " "
+                << (0.5 -
+                    cell->face(f)->center(/*respect_manifold=*/true) *
+                      spherical.normal_vector(cell->face(f),
+                                              cell->face(f)->center(true)))
+                << std::endl;
             }
         }
   for (auto cell : tria.active_cell_iterators())
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         {
           // the first choice will contain perturbations in the normal because
@@ -79,14 +89,16 @@ main()
           // adjust the point to lie on the same radius as the vertex points
           // by a weighting where the normal should again be perfectly aligned
           // with the point itself.
-          deallog << "Approximate normal in "
-                  << cell->face(f)->center(false) << ":  "
-                  << spherical.normal_vector(cell->face(f),  cell->face(f)->center(false))
-                  << ", adjusted: "
-                  << spherical.normal_vector(cell->face(f),
-                                             cell->face(f)->center(false)/cell->face(f)->center(false).norm()
-                                             *cell->face(f)->vertex(1).norm())
-                  << std::endl;
+          deallog
+            << "Approximate normal in " << cell->face(f)->center(false) << ":  "
+            << spherical.normal_vector(cell->face(f),
+                                       cell->face(f)->center(false))
+            << ", adjusted: "
+            << spherical.normal_vector(cell->face(f),
+                                       cell->face(f)->center(false) /
+                                         cell->face(f)->center(false).norm() *
+                                         cell->face(f)->vertex(1).norm())
+            << std::endl;
         }
 
   return 0;

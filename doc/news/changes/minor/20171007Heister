@@ -1,3 +1,0 @@
-New: FiniteElement::get_sub_fe() allows you to return a contained FiniteElement based on a ComponentMask.
-<br>
-(Timo Heister, 2017/10/07)

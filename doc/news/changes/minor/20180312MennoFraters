@@ -1,5 +1,0 @@
-New: JSON files which are written out by the
-parameter handler can be read in again with the 
-function ParameterHandler::parse_input_from_json().
-<br>
-(Menno Fraters, 2018/03/12)

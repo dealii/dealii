@@ -8,20 +8,20 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // Identical to data_out_base_vtk, but outputs zero-dimensional features
 // in higher space dimensions.
 
-#include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "../tests.h"
 #include "patches.h"
 
 // Output data on repetitions of the unit hypercube
@@ -31,12 +31,12 @@
 
 
 template <int dim, int spacedim>
-void check(DataOutBase::VtkFlags flags,
-           std::ostream &out)
+void
+check(DataOutBase::VtkFlags flags, std::ostream &out)
 {
   const unsigned int np = 4;
 
-  std::vector<DataOutBase::Patch<dim, spacedim> > patches(np);
+  std::vector<DataOutBase::Patch<dim, spacedim>> patches(np);
 
   create_patches(patches);
 
@@ -46,39 +46,45 @@ void check(DataOutBase::VtkFlags flags,
   names[2] = "x3";
   names[3] = "x4";
   names[4] = "i";
-  std::vector<std::tuple<unsigned int, unsigned int, std::string> > vectors;
+  std::vector<
+    std::tuple<unsigned int,
+               unsigned int,
+               std::string,
+               DataComponentInterpretation::DataComponentInterpretation>>
+    vectors;
   DataOutBase::write_vtk(patches, names, vectors, flags, out);
 }
 
 
 template <int dim, int spacedim>
-void check_all(std::ostream &log)
+void
+check_all(std::ostream &log)
 {
 #if SEPARATE_FILES == 0
   std::ostream &out = log;
 #endif
 
-  char name[100];
+  char                  name[100];
   DataOutBase::VtkFlags flags;
   if (true)
     {
       sprintf(name, "%d%d.vtk", dim, spacedim);
-#if SEPARATE_FILES==1
+#if SEPARATE_FILES == 1
       std::ofstream out(name);
 #else
       out << "==============================\n"
-          << name
-          << "\n==============================\n";
+          << name << "\n==============================\n";
 #endif
-      check<dim,spacedim>(flags, out);
+      check<dim, spacedim>(flags, out);
     }
 }
 
-int main()
+int
+main()
 {
   std::ofstream logfile("output");
 
-  check_all<0,1>(logfile);
-  check_all<0,2>(logfile);
-  check_all<0,3>(logfile);
+  check_all<0, 1>(logfile);
+  check_all<0, 2>(logfile);
+  check_all<0, 3>(logfile);
 }

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -27,6 +27,7 @@
 #   DEAL_II_HAVE_SSE2                    *)
 #   DEAL_II_HAVE_AVX                     *)
 #   DEAL_II_HAVE_AVX512                  *)
+#   DEAL_II_HAVE_ALTIVEC                 *)
 #   DEAL_II_COMPILER_VECTORIZATION_LEVEL
 #   DEAL_II_HAVE_OPENMP_SIMD             *)
 #   DEAL_II_OPENMP_SIMD_PRAGMA
@@ -68,16 +69,11 @@ ENDIF()
 
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   #
-  # Take care that the following tests are rerun if CMAKE_REQUIRED_FLAGS
-  # changes..
+  # Take care that the following tests are rerun if the
+  # CMAKE_REQUIRED_FLAGS changes..
   #
-  IF(NOT "${CMAKE_REQUIRED_FLAGS}" STREQUAL "${DEAL_II_CHECK_CPU_FEATURES_SAVED}")
-    UNSET(DEAL_II_HAVE_SSE2 CACHE)
-    UNSET(DEAL_II_HAVE_AVX CACHE)
-    UNSET(DEAL_II_HAVE_AVX512 CACHE)
-  ENDIF()
-  SET(DEAL_II_CHECK_CPU_FEATURES_SAVED
-    "${CMAKE_REQUIRED_FLAGS}" CACHE INTERNAL "" FORCE
+  UNSET_IF_CHANGED(CHECK_CPU_FEATURES_FLAGS_SAVED "${CMAKE_REQUIRED_FLAGS}"
+    DEAL_II_HAVE_SSE2 DEAL_II_HAVE_AVX DEAL_II_HAVE_AVX512 DEAL_II_HAVE_ALTIVEC
     )
 
   CHECK_CXX_SOURCE_RUNS(
@@ -207,6 +203,48 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     }
     "
     DEAL_II_HAVE_AVX512)
+
+  CHECK_CXX_SOURCE_RUNS(
+    "
+    #ifndef __ALTIVEC__
+    #error \"__ALTIVEC__ flag not set, no support for Altivec\"
+    #endif
+    #include <altivec.h>
+    #undef vector
+    #undef pixel
+    #undef bool
+    int main()
+    {
+    __vector double a, b, data1, data2;
+    const int n_vectors = sizeof(a)/sizeof(double);
+    double * ptr = reinterpret_cast<double*>(&a);
+    ptr[0] = (volatile double)(1.0);
+    for (int i=1; i<n_vectors; ++i)
+      ptr[i] = 0.0;
+    b = vec_splats ((volatile double)(2.25));
+    data1 = vec_add (a, b);
+    data2 = vec_mul (b, data1);
+    ptr = reinterpret_cast<double*>(&data2);
+    unsigned int return_value = 0;
+    if (ptr[0] != 7.3125)
+      return_value += 1;
+    for (int i=1; i<n_vectors; ++i)
+      if (ptr[i] != 5.0625)
+        return_value += 2;
+    b = vec_splats ((volatile double)(-1.0));
+    data1 = vec_abs(vec_mul (b, data2));
+    vec_vsx_st(data1, 0, ptr);
+    b = vec_vsx_ld(0, ptr);
+    ptr = reinterpret_cast<double*>(&b);
+    if (ptr[0] != 7.3125)
+      return_value += 4;
+    for (int i=1; i<n_vectors; ++i)
+      if (ptr[i] != 5.0625)
+        return_value += 8;
+    return return_value;
+    }
+    "
+    DEAL_II_HAVE_ALTIVEC)
 ENDIF()
 
 IF(DEAL_II_HAVE_AVX512)
@@ -219,38 +257,32 @@ ELSE()
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
 ENDIF()
 
+IF(DEAL_II_HAVE_ALTIVEC)
+  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 1)
+ENDIF()
+
 
 #
-# OpenMP 4.0 can be used for vectorization (supported by gcc-4.9.1 and
-# later). Only the vectorization instructions
-# are allowed, the threading must be done through TBB.
+# OpenMP 4.0 can be used for vectorization. Only the vectorization
+# instructions are allowed, the threading must be done through TBB.
 #
 
-# Pick up the correct candidate keyword for the current compiler:
-SET(_keyword "")
+#
+# Choosing the right compiler flag is a bit of a mess:
+#
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-  IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "15" )
+  IF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "15" )
     SET(_keyword "qopenmp")
-  ELSEIF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "14" )
+  ELSEIF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "14" )
     SET(_keyword "openmp")
   ENDIF()
-
 ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  # clang-3.6.1 or newer, or XCode version 6.3, or newer.
-  IF( ( CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "3.6"
-        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.0" )
-      OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "6.2")
-    SET(_keyword "openmp")
-  ENDIF()
-
+  SET(_keyword "openmp")
 ELSE()
   SET(_keyword "fopenmp")
-
 ENDIF()
 
-IF(NOT "${_keyword}" STREQUAL "")
-  CHECK_CXX_COMPILER_FLAG("-${_keyword}-simd" DEAL_II_HAVE_OPENMP_SIMD)
-ENDIF()
+CHECK_CXX_COMPILER_FLAG("-${_keyword}-simd" DEAL_II_HAVE_OPENMP_SIMD)
 
 SET(DEAL_II_OPENMP_SIMD_PRAGMA " ")
 IF(DEAL_II_HAVE_OPENMP_SIMD)

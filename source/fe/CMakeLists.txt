@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -19,6 +19,7 @@ SET(_unity_include_src
   block_mask.cc
   component_mask.cc
   fe_abf.cc
+  fe_bernardi_raugel.cc
   fe_bdm.cc
   fe.cc
   fe_bernstein.cc
@@ -30,6 +31,7 @@ SET(_unity_include_src
   fe_dg_vector.cc
   fe_face.cc
   fe_nedelec.cc
+  fe_nedelec_sz.cc
   fe_nothing.cc
   fe_poly.cc
   fe_poly_tensor.cc
@@ -45,6 +47,8 @@ SET(_unity_include_src
   fe_raviart_thomas_nodal.cc
   fe_rt_bubbles.cc
   fe_series.cc
+  fe_series_fourier.cc
+  fe_series_legendre.cc
   fe_system.cc
   fe_enriched.cc
   fe_tools.cc
@@ -94,6 +98,7 @@ SET(_inst
   fe_face.inst.in
   fe.inst.in
   fe_nedelec.inst.in
+  fe_nedelec_sz.inst.in
   fe_nothing.inst.in
   fe_poly.inst.in
   fe_poly_tensor.inst.in
@@ -107,6 +112,8 @@ SET(_inst
   fe_raviart_thomas.inst.in
   fe_raviart_thomas_nodal.inst.in
   fe_rt_bubbles.inst.in
+  fe_series_fourier.inst.in
+  fe_series_legendre.inst.in
   fe_system.inst.in
   fe_enriched.inst.in
   fe_tools.inst.in

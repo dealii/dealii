@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2017 by the deal.II authors
+// Copyright (C) 1998 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,19 +8,20 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/job_identifier.h>
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/thread_management.h>
 
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <sstream>
+#include <thread>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -29,7 +30,7 @@ namespace
 {
   Threads::Mutex log_lock;
   Threads::Mutex write_lock;
-}
+} // namespace
 
 
 // The standard log object of deal.II:
@@ -37,20 +38,16 @@ LogStream deallog;
 
 
 
-
 LogStream::Prefix::Prefix(const std::string &text)
-  :
-  stream(&deallog)
+  : stream(&deallog)
 {
   stream->push(text);
 }
 
 
 
-LogStream::Prefix::Prefix(const std::string &text,
-                          LogStream &s)
-  :
-  stream(&s)
+LogStream::Prefix::Prefix(const std::string &text, LogStream &s)
+  : stream(&s)
 {
   stream->push(text);
 }
@@ -67,21 +64,21 @@ LogStream::Prefix::~Prefix()
     }
   catch (...)
     {
-      AssertNothrow (false,
-                     ExcMessage("An exception occurred in LogStream::Prefix::~Prefix."));
+      AssertNothrow(false,
+                    ExcMessage(
+                      "An exception occurred in LogStream::Prefix::~Prefix."));
     }
 }
 
 
 
 LogStream::LogStream()
-  :
-  std_out(&std::cout),
-  file(nullptr),
-  std_depth(0),
-  file_depth(10000),
-  print_thread_id(false),
-  at_newline(true)
+  : std_out(&std::cout)
+  , file(nullptr)
+  , std_depth(0)
+  , file_depth(10000)
+  , print_thread_id(false)
+  , at_newline(true)
 {
   get_prefixes().push("DEAL:");
 }
@@ -125,9 +122,8 @@ LogStream::~LogStream()
 
 
 LogStream &
-LogStream::operator<< (std::ostream& (*p) (std::ostream &))
+LogStream::operator<<(std::ostream &(*p)(std::ostream &))
 {
-
   std::ostringstream &stream = get_stream();
 
   // Print to the internal stringstream:
@@ -157,24 +153,29 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
     // whether overflow or sync was called
   public:
     QueryStreambuf()
-      : flushed_(false), newline_written_(false)
-    {
-    }
-    bool flushed()
+      : flushed_(false)
+      , newline_written_(false)
+    {}
+    bool
+    flushed()
     {
       return flushed_;
     }
-    bool newline_written()
+    bool
+    newline_written()
     {
       return newline_written_;
     }
+
   private:
-    int_type overflow(int_type ch)
+    int_type
+    overflow(int_type ch) override
     {
       newline_written_ = true;
       return ch;
     }
-    int sync()
+    int
+    sync() override
     {
       flushed_ = true;
       return 0;
@@ -185,13 +186,13 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
 
   {
     // and initialize an ostream with this streambuf:
-    std::ostream inject (&query_streambuf);
+    std::ostream inject(&query_streambuf);
     inject << p;
   }
 
   if (query_streambuf.flushed())
     {
-      Threads::Mutex::ScopedLock lock(write_lock);
+      std::lock_guard<std::mutex> lock(write_lock);
 
       // Print the line head in case of a previous newline:
       if (at_newline)
@@ -214,20 +215,22 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
 
 
 void
-LogStream::attach(std::ostream &o,
-                  const bool    print_job_id)
+LogStream::attach(std::ostream &                o,
+                  const bool                    print_job_id,
+                  const std::ios_base::fmtflags flags)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
+  std::lock_guard<std::mutex> lock(log_lock);
   file = &o;
-  o.setf(std::ios::showpoint | std::ios::left);
+  o.setf(flags);
   if (print_job_id)
     o << dealjobid();
 }
 
 
-void LogStream::detach ()
+void
+LogStream::detach()
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
+  std::lock_guard<std::mutex> lock(log_lock);
   file = nullptr;
 }
 
@@ -296,7 +299,7 @@ LogStream::get_prefix() const
 
 
 void
-LogStream::push (const std::string &text)
+LogStream::push(const std::string &text)
 {
   std::string pre;
   if (get_prefixes().size() > 0)
@@ -309,7 +312,8 @@ LogStream::push (const std::string &text)
 
 
 
-void LogStream::pop ()
+void
+LogStream::pop()
 {
   if (get_prefixes().size() > 0)
     get_prefixes().pop();
@@ -320,55 +324,55 @@ void LogStream::pop ()
 std::ios::fmtflags
 LogStream::flags(const std::ios::fmtflags f)
 {
-  return get_stream().flags (f);
+  return get_stream().flags(f);
 }
 
 
 
 std::streamsize
-LogStream::precision (const std::streamsize prec)
+LogStream::precision(const std::streamsize prec)
 {
-  return get_stream().precision (prec);
+  return get_stream().precision(prec);
 }
 
 
 
 std::streamsize
-LogStream::width (const std::streamsize wide)
+LogStream::width(const std::streamsize wide)
 {
-  return get_stream().width (wide);
+  return get_stream().width(wide);
 }
 
 
 
 unsigned int
-LogStream::depth_console (const unsigned int n)
+LogStream::depth_console(const unsigned int n)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-  const unsigned int h = std_depth;
-  std_depth = n;
+  std::lock_guard<std::mutex> lock(log_lock);
+  const unsigned int          h = std_depth;
+  std_depth                     = n;
   return h;
 }
 
 
 
 unsigned int
-LogStream::depth_file (const unsigned int n)
+LogStream::depth_file(const unsigned int n)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-  const unsigned int h = file_depth;
-  file_depth = n;
+  std::lock_guard<std::mutex> lock(log_lock);
+  const unsigned int          h = file_depth;
+  file_depth                    = n;
   return h;
 }
 
 
 
 bool
-LogStream::log_thread_id (const bool flag)
+LogStream::log_thread_id(const bool flag)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-  const bool h = print_thread_id;
-  print_thread_id = flag;
+  std::lock_guard<std::mutex> lock(log_lock);
+  const bool                  h = print_thread_id;
+  print_thread_id               = flag;
   return h;
 }
 
@@ -378,20 +382,20 @@ std::stack<std::string> &
 LogStream::get_prefixes() const
 {
 #ifdef DEAL_II_WITH_THREADS
-  bool exists = false;
+  bool                     exists         = false;
   std::stack<std::string> &local_prefixes = prefixes.get(exists);
 
   // If this is a new locally stored stack, copy the "blessed" prefixes
   // from the initial thread that created logstream.
-  if (! exists)
+  if (!exists)
     {
-      const tbb::enumerable_thread_specific<std::stack<std::string> > &impl
-        = prefixes.get_implementation();
+      const tbb::enumerable_thread_specific<std::stack<std::string>> &impl =
+        prefixes.get_implementation();
 
       // The thread that created this LogStream object should be the first
       // in tbb's enumerable_thread_specific container.
-      const tbb::enumerable_thread_specific<std::stack<std::string> >::const_iterator first_elem
-        = impl.begin();
+      const tbb::enumerable_thread_specific<
+        std::stack<std::string>>::const_iterator first_elem = impl.begin();
 
       if (first_elem != impl.end())
         {
@@ -411,8 +415,8 @@ LogStream::get_prefixes() const
 void
 LogStream::print_line_head()
 {
-  const std::string &head = get_prefix();
-  const unsigned int thread = Threads::this_thread_id();
+  const std::string &   head   = get_prefix();
+  const std::thread::id thread = std::this_thread::get_id();
 
   if (get_prefixes().size() <= std_depth)
     {
@@ -420,7 +424,7 @@ LogStream::print_line_head()
         *std_out << '[' << thread << ']';
 
       if (head.size() > 0)
-        *std_out <<  head << ':';
+        *std_out << head << ':';
     }
 
   if (file && (get_prefixes().size() <= file_depth))

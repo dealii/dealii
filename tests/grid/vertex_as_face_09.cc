@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,36 +19,38 @@
 // called to create a mesh that is a loop
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
 
-void test ()
+void
+test()
 {
-  Triangulation<2,2> volume_mesh;
-  GridGenerator::hyper_cube (volume_mesh);
+  Triangulation<2, 2> volume_mesh;
+  GridGenerator::hyper_cube(volume_mesh);
 
-  Triangulation<1,2> tria;
+  Triangulation<1, 2> tria;
 
-  GridGenerator::extract_boundary_mesh (volume_mesh, tria);
+  GridGenerator::extract_boundary_mesh(volume_mesh, tria);
 
   deallog << "n_cells = " << tria.n_active_cells() << std::endl;
-  deallog << "n_boundary_ids = " << tria.get_boundary_ids ().size()
-          << std::endl;
+  deallog << "n_boundary_ids = " << tria.get_boundary_ids().size() << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 
   return 0;
 }

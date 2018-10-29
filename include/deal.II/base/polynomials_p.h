@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,12 +18,12 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
-#include <deal.II/base/table.h>
+#include <deal.II/base/tensor.h>
 
 #include <vector>
 
@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann, 2004
  */
 template <int dim>
-class PolynomialsP: public PolynomialSpace<dim>
+class PolynomialsP : public PolynomialSpace<dim>
 {
 public:
   /**
@@ -58,7 +58,7 @@ public:
    * Constructor. Creates all basis functions of $P_p$. @arg p: the degree of
    * the polynomial space
    */
-  PolynomialsP (const unsigned int p);
+  PolynomialsP(const unsigned int p);
 
   /**
    * Return the degree <tt>p</tt> of the polynomial space <tt>P_p</tt>.
@@ -66,21 +66,24 @@ public:
    * Note, that this number is <tt>PolynomialSpace::degree()-1</tt>, compare
    * definition in PolynomialSpace.
    */
-  unsigned int degree() const;
+  unsigned int
+  degree() const;
 
   /**
    * For the <tt>n</tt>th polynomial $p_n(x,y,z)=x^i y^j z^k$ this function
    * gives the degrees i,j,k in the x,y,z directions.
+   *
+   * In 1d and 2d, obviously only i and i,j are returned.
    */
-  void directional_degrees(unsigned int n,
-                           unsigned int (&degrees)[dim]) const;
+  std::array<unsigned int, dim>
+  directional_degrees(unsigned int n) const;
 
 private:
-
   /**
    * Fills the <tt>index_map</tt>.
    */
-  void create_polynomial_ordering(std::vector<unsigned int> &index_map) const;
+  void
+  create_polynomial_ordering(std::vector<unsigned int> &index_map) const;
 
   /**
    * Degree <tt>p</tt> of the polynomial space $P_p$, i.e. the number
@@ -100,11 +103,10 @@ PolynomialsP<dim>::degree() const
 
 
 template <int dim>
-inline void
-PolynomialsP<dim>::directional_degrees(unsigned int n,
-                                       unsigned int (&degrees)[dim]) const
+inline std::array<unsigned int, dim>
+PolynomialsP<dim>::directional_degrees(unsigned int n) const
 {
-  this->compute_index(n,degrees);
+  return this->compute_index(n);
 }
 
 DEAL_II_NAMESPACE_CLOSE

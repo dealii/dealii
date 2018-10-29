@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2017 by the deal.II authors
+// Copyright (C) 2002 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,49 +18,49 @@
 // renumbered after coarsening, as the dx format uses an implicit vertex
 // numbering.
 
-#include "../tests.h"
 #include <deal.II/base/geometry_info.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_generator.h>
 
+#include "../tests.h"
 
-
-std::ofstream logfile("output");
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
   GridOut grid_out;
-  grid_out.write_dx (tria, logfile);
+  grid_out.write_dx(tria, deallog.get_file_stream());
 
-  typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
-  for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_cell; ++i)
+  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
+  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
     {
       cell->set_coarsen_flag();
       ++cell;
     }
   tria.execute_coarsening_and_refinement();
-  grid_out.write_dx (tria, logfile);
+  grid_out.write_dx(tria, deallog.get_file_stream());
 }
 
 
-int main ()
+int
+main()
 {
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2);
 
-  test<2> ();
-  test<3> ();
+  test<2>();
+  test<3>();
 }
-

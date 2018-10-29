@@ -502,12 +502,12 @@ solid cell is refined, yielding the following code:
 @endcode
 
 The call <code>constraints.add_line(t)</code> tells the
-ConstraintMatrix to start a new constraint for degree of freedom
+AffineConstraints to start a new constraint for degree of freedom
 <code>t</code> of the form $x_t=\sum_{l=0}^{N-1} c_{tl} x_l +
 b_t$. Typically, one would then proceed to set individual coefficients
-$c_{tl}$ to nonzero values (using ConstraintMatrix::add_entry) or set
+$c_{tl}$ to nonzero values (using AffineConstraints::add_entry) or set
 $b_t$ to something nonzero (using
-ConstraintMatrix::set_inhomogeneity); doing nothing as above, funny as
+AffineConstraints::set_inhomogeneity); doing nothing as above, funny as
 it looks, simply leaves the constraint to be $x_t=0$, which is exactly
 what we need in the current context. The call to
 FiniteElement::face_system_to_component_index makes sure that we only set
@@ -618,7 +618,7 @@ code like the following:
     stokes_component_mask[d] = true;
   KellyErrorEstimator<dim>::estimate (dof_handler,
                                       face_q_collection,
-                                      typename FunctionMap<dim>::type(),
+                                      std::map<types::boundary_id, const Function<dim>*>(),
                                       solution,
                                       stokes_estimated_error_per_cell,
                                       stokes_component_mask);
@@ -628,7 +628,7 @@ code like the following:
     elasticity_component_mask[dim+1+d] = true;
   KellyErrorEstimator<dim>::estimate (dof_handler,
                                       face_q_collection,
-                                      typename FunctionMap<dim>::type(),
+                                      std::map<types::boundary_id, const Function<dim>*>(),
                                       solution,
                                       elasticity_estimated_error_per_cell,
                                       elasticity_component_mask);

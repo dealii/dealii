@@ -1,11 +1,2 @@
 
-DEAL::
---------------------------------------------------------
-An error occurred in file <tria.cc> in function
-    dealii::parallel::distributed::Triangulation<1, 1>::Triangulation(MPI_Comm, const typename dealii::Triangulation<1, spacedim>::MeshSmoothing, const dealii::parallel::distributed::Triangulation<1, spacedim>::Settings) [dim = 1, spacedim = 1]
-The violated condition was: 
-    false
-Additional information: 
-    (none)
---------------------------------------------------------
-
+DEAL::This test has to throw an exception

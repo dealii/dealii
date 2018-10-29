@@ -78,10 +78,10 @@ protected:
         basic_text_oprimitive<std::wostream>::save(t);
     }
     void save(const version_type & t){
-        save(static_cast<const unsigned int>(t));
+        save(static_cast<unsigned int>(t));
     }
     void save(const boost::serialization::item_version_type & t){
-        save(static_cast<const unsigned int>(t));
+        save(static_cast<unsigned int>(t));
     }
     BOOST_WARCHIVE_DECL void
     save(const char * t);
@@ -136,7 +136,7 @@ public:
     text_woarchive(std::wostream & os, unsigned int flags = 0) :
         text_woarchive_impl<text_woarchive>(os, flags)
     {}
-    ~text_woarchive(){}
+    ~text_woarchive() override{}
 };
 
 } // namespace archive

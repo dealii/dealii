@@ -1,0 +1,8 @@
+
+DEAL:parameters::A mask: true, false, true
+DEAL::After ParameterHandler::set ==========================
+DEAL::
+DEAL:parameters::A mask: false,false,true
+DEAL::Actual variables            ==========================
+DEAL::
+DEAL::false, false, true

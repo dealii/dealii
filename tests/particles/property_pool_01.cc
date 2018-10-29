@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,22 +17,27 @@
 
 // check the creation, simplest usage, and destruction of a property pool
 
-#include "../tests.h"
 #include <deal.II/particles/property_pool.h>
+
 #include <fstream>
 #include <iomanip>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
   {
-    Particles::PropertyPool pool;
+    Particles::PropertyPool pool(1);
 
-    typename Particles::PropertyPool::Handle handle = pool.allocate_properties_array();
+    typename Particles::PropertyPool::Handle handle =
+      pool.allocate_properties_array();
 
     pool.get_properties(handle)[0] = 2.5;
 
-    deallog << "Pool properties: " << pool.get_properties(handle)[0] << std::endl;
+    deallog << "Pool properties: " << pool.get_properties(handle)[0]
+            << std::endl;
 
     pool.deallocate_properties_array(handle);
   }
@@ -42,7 +47,8 @@ void test ()
 
 
 
-int main ()
+int
+main()
 {
   initlog();
   test();

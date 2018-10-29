@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2013 by the deal.II authors
+// Copyright (C) 2005 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -62,11 +62,9 @@
  * arguments is supported and explicit instantiations are provided in
  * the library. In particular, this includes all the linear algebra
  * classes that are templatized on the type of the scalar underlying
- * stored values: we only support <code>double</code>,
- * <code>float</code>, and in some cases <code>long double</code>,
- * <code>std::complex@<double@></code>,
- * <code>std::complex@<float@></code>, and <code>std::complex@<long
- * double@></code>.
+ * stored values: we only support <code>double</code>, <code>float</code>,
+ * and in some cases <code>std::complex@<double@></code> and
+ * <code>std::complex@<float@></code>.
  * 
  *
  * @section Inst2 A few instantiations, most of which are known
@@ -83,7 +81,8 @@
  * the library for <code>Vector&lt;double&gt;</code>,
  * <code>Vector&lt;float&gt;</code>, <code>BlockVector&lt;double&gt;</code>,
  * and <code>BlockVector&lt;float&gt;</code>, for example. However, they may
- * also be used with other vector types as long as they satisfy certain
+ * also be used with other vector types, such as  <code>long double</code>
+ * and <code>std::complex@<long double@></code>, as long as they satisfy certain
  * interfaces, including vector types that are not part of the library but
  * possibly defined in an application program. In such a case, applications
  * can instantiate these templates by hand as described in the next section.
@@ -94,7 +93,7 @@
  * Choose one of your source files to provide the required
  * instantiations. Say that you want the class template <tt>XXXX</tt>,
  * defined in the header file <tt>xxxx.h</tt>, instantiated with the
- * template parameter <tt>Lager</tt>. Then, your file should contain
+ * template parameter <tt>long double</tt>. Then, your file should contain
  * the lines
  * @code
  *                   // Include class template declaration
@@ -104,7 +103,7 @@
  *
  * ...
  *
- * template class XXXX<Lager>;
+ * template class XXXX<long double>;
  * @endcode
  *
  * 

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,14 +17,18 @@
 #define dealii_matrix_lib_h
 
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/lac/vector_memory.h>
+
 #include <deal.II/lac/solver_richardson.h>
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number> class Vector;
-template <typename number> class BlockVector;
-template <typename number> class SparseMatrix;
+template <typename number>
+class Vector;
+template <typename number>
+class BlockVector;
+template <typename number>
+class SparseMatrix;
 
 /*! @addtogroup Matrix2
  *@{
@@ -45,15 +49,19 @@ template <typename number> class SparseMatrix;
  * 1n {\mathbf v} \cdot {\mathbf 1}_n\right]{\mathbf 1}_n$ subtracts from every
  * vector element the mean value of all elements.
  *
+ * @deprecated Use a LinearOperator, or a BlockLinearOperator instead. you
+ * can construct such a filter by using mean_value_filter, or
+ * block_diagonal_operator (with a mean_value_filter block), respectively.
+ *
  * @author Guido Kanschat, 2002, 2003
  */
-class MeanValueFilter : public Subscriptor
+class DEAL_II_DEPRECATED MeanValueFilter : public Subscriptor
 {
 public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * Constructor, optionally selecting a component.
@@ -64,56 +72,60 @@ public:
    * Subtract mean value from @p v.
    */
   template <typename number>
-  void filter (Vector<number> &v) const;
+  void
+  filter(Vector<number> &v) const;
 
   /**
    * Subtract mean value from @p v.
    */
   template <typename number>
-  void filter (BlockVector<number> &v) const;
+  void
+  filter(BlockVector<number> &v) const;
 
   /**
    * Return the source vector with subtracted mean value.
    */
   template <typename number>
-  void vmult (Vector<number>       &dst,
-              const Vector<number> &src) const;
+  void
+  vmult(Vector<number> &dst, const Vector<number> &src) const;
 
   /**
    * Add source vector with subtracted mean value to dest.
    */
   template <typename number>
-  void vmult_add (Vector<number>       &dst,
-                  const Vector<number> &src) const;
+  void
+  vmult_add(Vector<number> &dst, const Vector<number> &src) const;
 
   /**
    * Return the source vector with subtracted mean value in selected
    * component.
    */
   template <typename number>
-  void vmult (BlockVector<number>       &dst,
-              const BlockVector<number> &src) const;
+  void
+  vmult(BlockVector<number> &dst, const BlockVector<number> &src) const;
 
   /**
    * Add a source to dest, where the mean value in the selected component is
    * subtracted.
    */
   template <typename number>
-  void vmult_add (BlockVector<number>       &dst,
-                  const BlockVector<number> &src) const;
+  void
+  vmult_add(BlockVector<number> &dst, const BlockVector<number> &src) const;
 
 
   /**
    * Not implemented.
    */
   template <typename VectorType>
-  void Tvmult(VectorType &, const VectorType &) const;
+  void
+  Tvmult(VectorType &, const VectorType &) const;
 
   /**
    * Not implemented.
    */
   template <typename VectorType>
-  void Tvmult_add(VectorType &, const VectorType &) const;
+  void
+  Tvmult_add(VectorType &, const VectorType &) const;
 
 private:
   /**

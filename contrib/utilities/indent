@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2013, 2015, 2016 by the deal.II authors
+## Copyright (C) 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,84 +15,56 @@
 ## ---------------------------------------------------------------------
 
 #
-# This script indents all source files of deal.II according to our
-# usual code formatting standards. It is used to ensure that our
-# code base looks uniform, as uniformity helps make code easier to
-# read.
+# This script does the same thing as contrib/utilities/indent-all but only
+# reformats files which have changed (or have been added but neither
+# staged/commited) since the last merge commit to the master branch.
 #
-# While we're already touching every file, this script also makes
-# sure we set permissions correctly
-#
-# The script needs to be executed as 
+# The script needs to be executed as
 #   ./contrib/utilities/indent
 # from the top-level directory of the source tree, or via
 #   make indent
 # from a build directory.
 #
+# The script can be invoked with DEAL_II_CLANG_FORMAT to change
+# the default version of clang-format. For example:
+#   DEAL_II_CLANG_FORMAT=clang-format-6.0 ./contrib/utilities/indent
+# or,
+#   make DEAL_II_CLANG_FORMAT="clang-format-6.0" indent
+#
+# Note: If the script is invoked with REPORT_ONLY=true set,
+#   REPORT_ONLY=true ./contrib/utilities/indent
+# or,
+#   make REPORT_ONLY=true indent
+# then indentation errors will only be reported without any actual file
+# changes.
+#
 
-if test ! -d source -o ! -d include -o ! -d examples ; then
+if [ ! -f contrib/utilities/indent_common.sh ]; then
   echo "*** This script must be run from the top-level directory of deal.II."
   exit 1
 fi
 
-if test ! -f contrib/styles/astyle.rc ; then
-  echo "*** No style file contrib/styles/astyle.rc found."
-  exit 1
-fi
+source contrib/utilities/indent_common.sh
 
-if test -z "`which astyle`" ; then
-  echo "*** No astyle program found."
-  echo "***"
-  echo "*** You can download astyle from http://astyle.sourceforge.net/"
-  echo "*** Note that you will need exactly version 2.04 (no newer or"
-  echo "*** older version will yield the correct indentation)."
-  exit 1
-fi
+#
+# Run sanity checks:
+#
 
-if test "`astyle --version 2>&1`" != "Artistic Style Version 2.04" ; then
-  echo "*** Found a version of astyle different than the required version 2.04."
-  exit 1
-fi
+checks
 
+#
+# Process all source and header files:
+#
 
+process_changed "tests include source examples" ".*\.(cc|h|cu|cuh)" format_file
+process_changed "source" ".*\.inst.in" format_inst
 
-# collect all header and source files and process them in batches of 50 files
-# with up to 10 in parallel
-find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print | xargs -n 50 -P 10 astyle --options=contrib/styles/astyle.rc
+#
+# Fix permissions and convert to unix line ending if necessary:
+#
 
-# use the same process to set file permissions for all source files
-find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print | xargs -n 50 -P 10 chmod 644
+process_changed "tests include source examples" \
+  ".*\.(cc|h|cu|cuh|inst.in|output.*|cmake)" fix_permissions
 
-# convert dos formatted files to unix file format by stripping out 
-# carriage returns (15=0x0D):
-dos_to_unix()
-{
-    f=$1
-    tr -d '\015' <$f >$f.tmp
-    diff -q $f $f.tmp >/dev/null || mv $f.tmp $f
-    rm -f $f.tmp
-}
-export -f dos_to_unix
-find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print | xargs -n 1 -P 10 -I {} bash -c 'dos_to_unix "$@"' _ {} 
-
-# format .inst.in files. We need to replace \{ and \} because it confuses
-# astyle.
-format_inst()
-{
-    f=$1
-    cp $f $f.tmp
-    sed -i.orig 's#\\{#{ //#g' $f.tmp
-    sed -i.orig 's#\\}#} //#g' $f.tmp
-    astyle --options=none --quiet $f.tmp
-    sed -i.orig 's#{ //#\\{#g' $f.tmp
-    sed -i.orig 's#} //#\\}#g' $f.tmp
-    if ! diff -q $f $f.tmp >/dev/null
-    then
-	cp $f.tmp $f
-    fi
-    rm $f.tmp $f.tmp.orig
-}
-
-for i in `find source -name '*.inst.in'` ; do
-  format_inst $i
-done
+process_changed "tests include source examples" \
+  ".*\.(cc|h|cu|cuh|inst.in|cmake)" dos_to_unix

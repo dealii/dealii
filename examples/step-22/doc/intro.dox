@@ -177,7 +177,7 @@ of the bilinear form that the Stokes equations yield a symmetric bilinear
 form, and consequently a symmetric (if indefinite) system matrix.
 
 
-<h3>%Boundary conditions</h3>
+<h3>Boundary conditions</h3>
 
 @dealiiVideoLecture{21.5}
 (@dealiiVideoLectureSeeAlso{21.55,21.6,21.65})
@@ -473,33 +473,7 @@ program to see that indeed the number of CG iterations does not change as we
 refine the mesh).
 
 So all we need in addition to what we already have is the mass matrix on the
-pressure variables. We could do that by building this matrix on the
-side in a separate data structure. However, it is worth remembering
-that although we build the system matrix
-@f{eqnarray*}
-  \left(\begin{array}{cc}
-    A & B^T \\ B & 0
-  \end{array}\right)
-@f}
-as one object (of type BlockSparseMatrix), we never actually do
-matrix-vector products with this matrix, or any other operations that
-consider the entire matrix. Rather, we only build it in this form for
-convenience (because it reflects the structure of the FESystem finite
-element and associated DoFHandler object) but later only operate on
-the $(0,0),(0,1)$, and $(1,0)$ blocks of this matrix. In other words,
-our algorithm so far entirely ignores the $(1,1)$ (pressure-pressure)
-block as it is empty anyway.
-
-Now, as mentioned, we need a pressure mass matrix to precondition the
-Schur complement and that conveniently the pressure-pressure block of
-the matrix we build anyway is currently empty and ignored. So what we
-will do is to assemble the needed mass matrix in this space; this does
-change the global system matrix but since our algorithm never operates
-on the global matrix and instead only considers individual blocks,
-this fact does not affect what we actually compute. Later, when
-solving, we then precondition the Schur complement with $M_p^{-1}$ by
-doing a few CG iterations on the well-conditioned pressure mass matrix
-$M_p$ stored in the $(1,1)$ block.
+pressure variables and we will store it in a separate object.
 
 
 
@@ -580,13 +554,13 @@ struct InnerPreconditioner;
 template <>
 struct InnerPreconditioner<2>
 {
-    typedef SparseDirectUMFPACK type;
+  using type = SparseDirectUMFPACK;
 };
 
 template <>
 struct InnerPreconditioner<3>
 {
-    typedef SparseILU<double> type;
+  using type = SparseILU<double>;
 };
 @endcode
 
@@ -647,13 +621,13 @@ left by the outward motion of material at this location.
 
 <h4>Using imhomogeneous constraints for implementing Dirichlet boundary conditions</h4>
 
-In all the previous tutorial programs, we used the ConstraintMatrix merely
+In all the previous tutorial programs, we used the AffineConstraints object merely
 for handling hanging node constraints (with exception of step-11). However,
 the class can also be used to implement Dirichlet boundary conditions, as we
 will show in this program, by fixing some node values $x_i = b_i$. Note that
 these are inhomogeneous constraints, and we have to pay some special
 attention to that. The way we are going to implement this is to first read
-in the boundary values into the ConstraintMatrix object by using the call
+in the boundary values into the AffineConstraints object by using the call
 
 @code
   VectorTools::interpolate_boundary_values (dof_handler,
@@ -665,7 +639,7 @@ in the boundary values into the ConstraintMatrix object by using the call
 very similar to how we were making the list of boundary nodes
 before (note that we set Dirichlet conditions only on boundaries with
 boundary flag 1). The actual application of the boundary values is then
-handled by the ConstraintMatrix object directly, without any additional
+handled by the AffineConstraints object directly, without any additional
 interference.
 
 We could then proceed as before, namely by filling the matrix, and then
@@ -678,7 +652,7 @@ Note that we call this on the system matrix and system right hand side
 simultaneously, since resolving inhomogeneous constraints requires knowledge
 about both the matrix entries and the right hand side. For efficiency
 reasons, though, we choose another strategy: all the constraints collected
-in the ConstraintMatrix can be resolved on the fly while writing local data
+in the AffineConstraints object can be resolved on the fly while writing local data
 into the global matrix, by using the call
 @code
   constraints.distribute_local_to_global (local_matrix, local_rhs,
@@ -693,13 +667,13 @@ side, it distributes the hanging node constraints and additionally
 implements (inhomogeneous) Dirichlet boundary conditions. That's nice, isn't
 it?
 
-We can conclude that the ConstraintMatrix provides an alternative to using
+We can conclude that the AffineConstraints class provides an alternative to using
 MatrixTools::apply_boundary_values for implementing Dirichlet boundary
 conditions.
 
 
 <a name="constraint-matrix">
-<h4>Using ConstraintMatrix for increasing performance</h4>
+<h4>Using AffineConstraints for increasing performance</h4>
 </a>
 
 Frequently, a sparse matrix contains a substantial amount of elements that
@@ -778,10 +752,10 @@ consumption. Likewise, the implementation of the decomposition step in the
 SparseILU class was very inefficient and has been replaced by one that is
 about 10 times faster. Even the vmult function of the SparseILU has been
 improved to save about twenty percent of time. Small improvements were
-applied here and there. Moreover, the ConstraintMatrix object has been used
+applied here and there. Moreover, the AffineConstraints object has been used
 to eliminate a lot of entries in the sparse matrix that are eventually going
 to be zero, see <a href="#constraint-matrix">the section on using advanced
-features of the ConstraintMatrix class</a>.
+features of the AffineConstraints class</a>.
 
 A profile of how many CPU instructions are spent at the various
 different places in the program during refinement cycles

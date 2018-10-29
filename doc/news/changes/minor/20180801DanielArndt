@@ -1,0 +1,4 @@
+New: GridGenerator::merge_triangulations can merge multiple 
+Triangulation objects at once.
+<br>
+(Daniel Arndt, 2018/08/01)

@@ -1,0 +1,4 @@
+The class VectorizedArray has gained support for the intrinsics of Altivec
+of IBM Power processors.
+<br>
+(Martin Kronbichler, Bruno Turcksin, Sambit Das, 2018/10/05)

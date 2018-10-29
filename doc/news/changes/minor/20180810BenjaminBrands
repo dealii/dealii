@@ -1,0 +1,3 @@
+Fixed: Bug using ScaLAPACKMatrix::save() and load() for configurations with pHDF5 in combination with serial HDF5 matrices from user code.
+<br>
+(Benjamin Brands 2018/08/10)

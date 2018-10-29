@@ -1,0 +1,87 @@
+
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Error cell values:      0
+DEAL:2d::Error cell gradients:   0
+DEAL:2d::Error cell Hessians:    0
+DEAL:2d::Error face- values:     0
+DEAL:2d::Error face- gradients:  0
+DEAL:2d::Error face- grad*normal:0
+DEAL:2d::Error face+ values:     0
+DEAL:2d::Error face+ gradients:  0
+DEAL:2d::Error face+ grad*normal:0
+DEAL:2d::Error face b values:    0
+DEAL:2d::Error face b gradients: 0
+DEAL:2d::Error face b grad*norm: 0
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(3)
+DEAL:2d::Error cell values:      0
+DEAL:2d::Error cell gradients:   0
+DEAL:2d::Error cell Hessians:    0
+DEAL:2d::Error face- values:     0
+DEAL:2d::Error face- gradients:  0
+DEAL:2d::Error face- grad*normal:0
+DEAL:2d::Error face+ values:     0
+DEAL:2d::Error face+ gradients:  0
+DEAL:2d::Error face+ grad*normal:0
+DEAL:2d::Error face b values:    0
+DEAL:2d::Error face b gradients: 0
+DEAL:2d::Error face b grad*norm: 0
+DEAL:2d::
+DEAL:2d::Test without templates on FEEvaluation
+DEAL:2d::Testing FE_DGQ<2>(3)
+DEAL:2d::Error cell values:      0
+DEAL:2d::Error cell gradients:   0
+DEAL:2d::Error cell Hessians:    0
+DEAL:2d::Error face- values:     0
+DEAL:2d::Error face- gradients:  0
+DEAL:2d::Error face- grad*normal:0
+DEAL:2d::Error face+ values:     0
+DEAL:2d::Error face+ gradients:  0
+DEAL:2d::Error face+ grad*normal:0
+DEAL:2d::Error face b values:    0
+DEAL:2d::Error face b gradients: 0
+DEAL:2d::Error face b grad*norm: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(4)
+DEAL:2d::Error cell values:      0
+DEAL:2d::Error cell gradients:   0
+DEAL:2d::Error cell Hessians:    0
+DEAL:2d::Error face- values:     0
+DEAL:2d::Error face- gradients:  0
+DEAL:2d::Error face- grad*normal:0
+DEAL:2d::Error face+ values:     0
+DEAL:2d::Error face+ gradients:  0
+DEAL:2d::Error face+ grad*normal:0
+DEAL:2d::Error face b values:    0
+DEAL:2d::Error face b gradients: 0
+DEAL:2d::Error face b grad*norm: 0
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(4)
+DEAL:2d::Error cell values:      0
+DEAL:2d::Error cell gradients:   0
+DEAL:2d::Error cell Hessians:    0
+DEAL:2d::Error face- values:     0
+DEAL:2d::Error face- gradients:  0
+DEAL:2d::Error face- grad*normal:0
+DEAL:2d::Error face+ values:     0
+DEAL:2d::Error face+ gradients:  0
+DEAL:2d::Error face+ grad*normal:0
+DEAL:2d::Error face b values:    0
+DEAL:2d::Error face b gradients: 0
+DEAL:2d::Error face b grad*norm: 0
+DEAL:2d::
+DEAL:2d::Test without templates on FEEvaluation
+DEAL:2d::Testing FE_DGQ<2>(4)
+DEAL:2d::Error cell values:      0
+DEAL:2d::Error cell gradients:   0
+DEAL:2d::Error cell Hessians:    0
+DEAL:2d::Error face- values:     0
+DEAL:2d::Error face- gradients:  0
+DEAL:2d::Error face- grad*normal:0
+DEAL:2d::Error face+ values:     0
+DEAL:2d::Error face+ gradients:  0
+DEAL:2d::Error face+ grad*normal:0
+DEAL:2d::Error face b values:    0
+DEAL:2d::Error face b gradients: 0
+DEAL:2d::Error face b grad*norm: 0
+DEAL:2d::

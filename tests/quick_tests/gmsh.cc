@@ -1,13 +1,18 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2014 - 2017 by the deal.II authors
+// Copyright (C) 2014 - 2018 by the deal.II authors
 //
-//    This file is subject to LGPL and may not be distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// This file is part of the deal.II library.
 //
-//-----------------------------------------------------------
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
 
 // Test that the GMSH executable actually works.
 // This is a reduced version of gmsh/create_tria_01.
@@ -17,7 +22,8 @@
 
 #include <fstream>
 
-int main ()
+int
+main()
 {
   std::ofstream geo("file.geo");
 
@@ -43,11 +49,12 @@ int main ()
 
   geo.close();
 
-  const int ierr = std::system(DEAL_II_GMSH_EXECUTABLE_PATH " -2 file.geo 1>file.log 2>file_warn.log");
-  Assert(ierr==0, dealii::ExcInternalError());
+  const int ierr = std::system(DEAL_II_GMSH_EXECUTABLE_PATH
+                               " -2 file.geo 1>file.log 2>file_warn.log");
+  Assert(ierr == 0, dealii::ExcInternalError());
 
-  std::remove ("file.geo");
-  std::remove ("file.log");
-  std::remove ("file_warn.log");
+  std::remove("file.geo");
+  std::remove("file.log");
+  std::remove("file_warn.log");
   return 0;
 }

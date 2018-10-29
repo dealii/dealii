@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2017 by the deal.II authors
+// Copyright (C) 2015 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -21,13 +21,13 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
 
-#include <deal.II/lac/communication_pattern_base.h>
+#    include <deal.II/lac/communication_pattern_base.h>
 
-#  include <Epetra_Import.h>
+#    include <Epetra_Import.h>
 
-#include <memory>
+#    include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -55,19 +55,22 @@ namespace LinearAlgebra
       /**
        * Reinitialize the object.
        */
-      void reinit(const IndexSet &vector_space_vector_index_set,
-                  const IndexSet &read_write_vector_index_set,
-                  const MPI_Comm &communicator);
+      virtual void
+      reinit(const IndexSet &vector_space_vector_index_set,
+             const IndexSet &read_write_vector_index_set,
+             const MPI_Comm &communicator) override;
 
       /**
        * Return the underlying MPI communicator.
        */
-      const MPI_Comm &get_mpi_communicator() const;
+      virtual const MPI_Comm &
+      get_mpi_communicator() const override;
 
       /**
        * Return the underlying Epetra_Import object.
        */
-      const Epetra_Import &get_epetra_import() const;
+      const Epetra_Import &
+      get_epetra_import() const;
 
     private:
       /**
@@ -85,7 +88,7 @@ namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
+#  endif
 
 #endif
 

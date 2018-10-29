@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -20,34 +20,37 @@
 // here: ComponentMask::represents_the_all_selected_mask
 
 
-#include "../tests.h"
 #include <deal.II/fe/component_mask.h>
 
+#include "../tests.h"
 
 
 
-
-void test ()
+void
+test()
 {
   // test for an initialized mask
-  AssertThrow (ComponentMask(12,false).represents_the_all_selected_mask() == false,
-               ExcInternalError());
+  AssertThrow(ComponentMask(12, false).represents_the_all_selected_mask() ==
+                false,
+              ExcInternalError());
   // note the semantics of the following as
   // described in the documentation
-  AssertThrow (ComponentMask(12,true).represents_the_all_selected_mask() == false,
-               ExcInternalError());
+  AssertThrow(ComponentMask(12, true).represents_the_all_selected_mask() ==
+                false,
+              ExcInternalError());
   // test for an empty mask
-  AssertThrow (ComponentMask().represents_the_all_selected_mask() == true,
-               ExcInternalError());
+  AssertThrow(ComponentMask().represents_the_all_selected_mask() == true,
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (4);
+  std::ofstream logfile("output");
+  deallog << std::setprecision(4);
 
   deallog.attach(logfile);
 

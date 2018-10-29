@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2017 by the deal.II authors
+// Copyright (C) 2003 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,47 +18,48 @@
 // take a 3d mesh and check that we can find an arbitrary point's cell
 // in it.
 
-#include "../tests.h"
+#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
+
+#include "../tests.h"
 
 
-#include <deal.II/fe/mapping_q1.h>
-
-
-void check (Triangulation<3> &tria)
+void check(Triangulation<3> &tria)
 {
   MappingQGeneric<3> map(1);
-  Point<3> p (0.75,0.75,0.75);
+  Point<3>           p(0.75, 0.75, 0.75);
 
-  std::pair<Triangulation<3>::active_cell_iterator, Point<3> > cell
-    = GridTools::find_active_cell_around_point (map, tria, p);
+  std::pair<Triangulation<3>::active_cell_iterator, Point<3>> cell =
+    GridTools::find_active_cell_around_point(map, tria, p);
 
   deallog << cell.first << std::endl;
-  for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
+  for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_cell; ++v)
     deallog << "<" << cell.first->vertex(v) << "> ";
   deallog << "[ " << cell.second << "] ";
   deallog << std::endl;
 
-  Assert (GeometryInfo<3>::distance_to_unit_cell(cell.second) < 1e-10,
-          ExcInternalError());
+  Assert(GeometryInfo<3>::distance_to_unit_cell(cell.second) < 1e-10,
+         ExcInternalError());
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
       Triangulation<3> coarse_grid;
-      GridGenerator::hyper_cube (coarse_grid);
-      coarse_grid.refine_global (3);
-      check (coarse_grid);
+      GridGenerator::hyper_cube(coarse_grid);
+      coarse_grid.refine_global(3);
+      check(coarse_grid);
     }
   catch (const std::exception &exc)
     {
@@ -67,6 +68,3 @@ int main ()
       deallog << exc.what() << std::endl;
     }
 }
-
-
-

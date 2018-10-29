@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,34 +17,35 @@
 
 // check Vector<double>::add(s,V,s,V)
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v,
-           Vector<double> &w,
-           Vector<double> &x)
+
+void
+test(Vector<double> &v, Vector<double> &w, Vector<double> &x)
 {
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
       v(i) = i;
-      w(i) = i+1.;
-      x(i) = i+2.;
+      w(i) = i + 1.;
+      x(i) = i + 2.;
     }
 
-  v.compress ();
-  w.compress ();
-  x.compress ();
+  v.compress();
+  w.compress();
+  x.compress();
 
-  v.add (2, w, 3, x);
+  v.add(2, w, 3, x);
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     {
-      AssertThrow (w(i) == i+1., ExcInternalError());
-      AssertThrow (x(i) == i+2., ExcInternalError());
-      AssertThrow (v(i) == i+2*(i+1.)+3*(i+2.), ExcInternalError());
+      AssertThrow(w(i) == i + 1., ExcInternalError());
+      AssertThrow(x(i) == i + 2., ExcInternalError());
+      AssertThrow(v(i) == i + 2 * (i + 1.) + 3 * (i + 2.), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -52,20 +53,22 @@ void test (Vector<double> &v,
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      Vector<double> w (100);
-      Vector<double> x (100);
-      test (v,w,x);
+      Vector<double> v(100);
+      Vector<double> w(100);
+      Vector<double> x(100);
+      test(v, w, x);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -78,7 +81,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

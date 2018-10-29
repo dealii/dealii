@@ -8,30 +8,32 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // test IndexSet::read() and write()
 
-#include "../tests.h"
-#include <stdlib.h>
-
 #include <deal.II/base/index_set.h>
 
+#include <stdlib.h>
 
-void test ()
+#include "../tests.h"
+
+
+void
+test()
 {
-  IndexSet is1 (100);
+  IndexSet is1(100);
 
-  is1.add_range(0,10);
-  is1.add_range(20,100);
+  is1.add_range(0, 10);
+  is1.add_range(20, 100);
 
   std::ofstream out("a.idxset");
   is1.write(out);
-  IndexSet is2;
+  IndexSet      is2;
   std::ifstream in("a.idxset");
   is2.read(in);
 
@@ -39,7 +41,7 @@ void test ()
 
 
   IndexSet is3(11);
-  is3.add_range(3,5);
+  is3.add_range(3, 5);
   std::ifstream in2("a.idxset");
   is3.read(in2);
 
@@ -47,15 +49,15 @@ void test ()
 
   deallog << "OK" << std::endl;
 
-  std::remove ("a.idxset");
+  std::remove("a.idxset");
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,64 +17,69 @@
 
 // check SparseMatrix::matrix_norm_square
 
-#include "../tests.h"
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v)
+
+void
+test(Vector<double> &v)
 {
   // set some entries in the
   // matrix. actually, set them all
-  SparsityPattern sp (v.size(),v.size(),v.size());
-  for (unsigned int i=0; i<v.size(); ++i)
-    for (unsigned int j=0; j<v.size(); ++j)
-      sp.add (i,j);
-  sp.compress ();
+  SparsityPattern sp(v.size(), v.size(), v.size());
+  for (unsigned int i = 0; i < v.size(); ++i)
+    for (unsigned int j = 0; j < v.size(); ++j)
+      sp.add(i, j);
+  sp.compress();
 
   // then create a matrix from that
   SparseMatrix<double> m(sp);
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      m.set (i,j, i+2*j);
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.n(); ++j)
+      m.set(i, j, i + 2 * j);
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (unsigned int i = 0; i < v.size(); ++i)
     v(i) = i;
 
-  v.compress ();
+  v.compress();
 
   // <w,Mv>
-  const double s = m.matrix_norm_square (v);
+  const double s = m.matrix_norm_square(v);
 
   // make sure we get the expected result
-  for (unsigned int i=0; i<v.size(); ++i)
-    AssertThrow (v(i) == i, ExcInternalError());
+  for (unsigned int i = 0; i < v.size(); ++i)
+    AssertThrow(v(i) == i, ExcInternalError());
 
   double result = 0;
-  for (unsigned int i=0; i<m.m(); ++i)
-    for (unsigned int j=0; j<m.n(); ++j)
-      result += (i+2*j)*j*i;
+  for (unsigned int i = 0; i < m.m(); ++i)
+    for (unsigned int j = 0; j < m.n(); ++j)
+      result += (i + 2 * j) * j * i;
 
-  AssertThrow (s == result, ExcInternalError());
+  AssertThrow(s == result, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -87,7 +92,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

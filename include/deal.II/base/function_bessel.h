@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 
@@ -35,26 +36,38 @@ namespace Functions
   class Bessel1 : public Function<dim>
   {
   public:
+    /**
+     * Constructor. @p wave_number must be nonnegative.
+     */
     Bessel1(const unsigned int order,
-            const double wave_number,
-            const Point<dim> center = Point<dim>());
-    virtual double value (const Point<dim> &points, const unsigned int component) const;
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
-    virtual Tensor<1,dim> gradient (const Point<dim>   &p,
-                                    const unsigned int  component = 0) const;
-    virtual void gradient_list (const std::vector<Point<dim> > &points,
-                                std::vector<Tensor<1,dim> >    &gradients,
-                                const unsigned int              component = 0) const;
+            const double       wave_number,
+            const Point<dim>   center = Point<dim>());
+
+    virtual double
+    value(const Point<dim> & points,
+          const unsigned int component = 0) const override;
+
+    virtual void
+    value_list(const std::vector<Point<dim>> &points,
+               std::vector<double> &          values,
+               const unsigned int             component = 0) const override;
+
+    virtual Tensor<1, dim>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
+
+    virtual void
+    gradient_list(const std::vector<Point<dim>> &points,
+                  std::vector<Tensor<1, dim>> &  gradients,
+                  const unsigned int             component = 0) const override;
+
   private:
     unsigned int order;
-    double wave_number;
-    Point<dim> center;
+    double       wave_number;
+    Point<dim>   center;
   };
-}
+} // namespace Functions
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

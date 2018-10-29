@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,29 +18,34 @@
 // test vertex location
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include "../tests.h"
 
 
 
 template <int spacedim>
-void test ()
+void
+test()
 {
-  Triangulation<1,spacedim> tria;
-  GridGenerator::hyper_cube (tria);
+  Triangulation<1, spacedim> tria;
+  GridGenerator::hyper_cube(tria);
 
   deallog << "Coarse mesh:" << std::endl;
-  deallog << "Left vertex=" << tria.begin_active()->face(0)->boundary_id() << std::endl;
-  deallog << "Right vertex=" << tria.begin_active()->face(1)->boundary_id() << std::endl;
+  deallog << "Left vertex=" << tria.begin_active()->face(0)->boundary_id()
+          << std::endl;
+  deallog << "Right vertex=" << tria.begin_active()->face(1)->boundary_id()
+          << std::endl;
 
-  tria.refine_global (2);
+  tria.refine_global(2);
 
-  for (typename Triangulation<1,spacedim>::active_cell_iterator
-       cell = tria.begin_active();
-       cell != tria.end(); ++cell)
+  for (typename Triangulation<1, spacedim>::active_cell_iterator cell =
+         tria.begin_active();
+       cell != tria.end();
+       ++cell)
     {
       deallog << "Cell: " << cell << std::endl;
       deallog << "Left vertex=" << cell->face(0)->boundary_id() << std::endl;
@@ -50,12 +55,13 @@ void test ()
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
+  test<1>();
+  test<2>();
 
   return 0;
 }

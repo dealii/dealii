@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,18 +17,11 @@
 #define dealii_fe_base_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
-#include <deal.II/base/table.h>
-#include <deal.II/base/vector_slice.h>
-#include <deal.II/base/geometry_info.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/block_indices.h>
-#include <deal.II/fe/fe_update_flags.h>
 
-#include <string>
+#include <deal.II/base/exceptions.h>
+
+#include <deal.II/lac/block_indices.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -135,9 +128,8 @@ namespace FiniteElementDomination
    * <code>other_element_dominates</code>, then the returned value is
    * <code>neither_element_dominates</code>.
    */
-  inline Domination operator & (const Domination d1,
-                                const Domination d2);
-}
+  inline Domination operator&(const Domination d1, const Domination d2);
+} // namespace FiniteElementDomination
 
 
 /**
@@ -360,43 +352,49 @@ public:
    * these can therefore omit this argument. On the other hand, composed
    * elements such as FESystem will want to pass a different value here.
    */
-  FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
-                     const unsigned int               n_components,
-                     const unsigned int               degree,
-                     const Conformity                 conformity = unknown,
-                     const BlockIndices              &block_indices = BlockIndices());
+  FiniteElementData(const std::vector<unsigned int> &dofs_per_object,
+                    const unsigned int               n_components,
+                    const unsigned int               degree,
+                    const Conformity                 conformity = unknown,
+                    const BlockIndices &block_indices = BlockIndices());
 
   /**
    * Number of dofs per vertex.
    */
-  unsigned int n_dofs_per_vertex () const;
+  unsigned int
+  n_dofs_per_vertex() const;
 
   /**
    * Number of dofs per line. Not including dofs on lower dimensional objects.
    */
-  unsigned int n_dofs_per_line () const;
+  unsigned int
+  n_dofs_per_line() const;
 
   /**
    * Number of dofs per quad. Not including dofs on lower dimensional objects.
    */
-  unsigned int n_dofs_per_quad () const;
+  unsigned int
+  n_dofs_per_quad() const;
 
   /**
    * Number of dofs per hex. Not including dofs on lower dimensional objects.
    */
-  unsigned int n_dofs_per_hex () const;
+  unsigned int
+  n_dofs_per_hex() const;
 
   /**
    * Number of dofs per face, accumulating degrees of freedom of all lower
    * dimensional objects.
    */
-  unsigned int n_dofs_per_face () const;
+  unsigned int
+  n_dofs_per_face() const;
 
   /**
    * Number of dofs per cell, accumulating degrees of freedom of all lower
    * dimensional objects.
    */
-  unsigned int n_dofs_per_cell () const;
+  unsigned int
+  n_dofs_per_cell() const;
 
   /**
    * Return the number of degrees per structdim-dimensional object. For
@@ -407,26 +405,30 @@ public:
    * associated with these objects.
    */
   template <int structdim>
-  unsigned int n_dofs_per_object () const;
+  unsigned int
+  n_dofs_per_object() const;
 
   /**
    * Number of components. See
    * @ref GlossComponent "the glossary"
    * for more information.
    */
-  unsigned int n_components () const;
+  unsigned int
+  n_components() const;
 
   /**
    * Number of blocks. See
    * @ref GlossBlock "the glossary"
    * for more information.
    */
-  unsigned int n_blocks () const;
+  unsigned int
+  n_blocks() const;
 
   /**
    * Detailed information on block sizes.
    */
-  const BlockIndices &block_indices() const;
+  const BlockIndices &
+  block_indices() const;
 
   /**
    * Maximal polynomial degree of a shape function in a single coordinate
@@ -434,7 +436,8 @@ public:
    *
    * This function can be used to determine the optimal quadrature rule.
    */
-  unsigned int tensor_degree () const;
+  unsigned int
+  tensor_degree() const;
 
   /**
    * Test whether a finite element space conforms to a certain Sobolev space.
@@ -442,12 +445,14 @@ public:
    * @note This function will return a true value even if the finite element
    * space has higher regularity than asked for.
    */
-  bool conforms (const Conformity) const;
+  bool
+  conforms(const Conformity) const;
 
   /**
    * Comparison operator.
    */
-  bool operator == (const FiniteElementData &) const;
+  bool
+  operator==(const FiniteElementData &) const;
 };
 
 
@@ -459,9 +464,7 @@ public:
 
 namespace FiniteElementDomination
 {
-  inline
-  Domination operator & (const Domination d1,
-                         const Domination d2)
+  inline Domination operator&(const Domination d1, const Domination d2)
   {
     // go through the entire list of possibilities. note that if we were into
     // speed, obfuscation and cared enough, we could implement this operator
@@ -471,48 +474,45 @@ namespace FiniteElementDomination
     // =this_element_dominates|other_element_dominates
     switch (d1)
       {
-      case this_element_dominates:
-        if ((d2 == this_element_dominates) ||
-            (d2 == either_element_can_dominate) ||
-            (d2 == no_requirements))
-          return this_element_dominates;
-        else
+        case this_element_dominates:
+          if ((d2 == this_element_dominates) ||
+              (d2 == either_element_can_dominate) || (d2 == no_requirements))
+            return this_element_dominates;
+          else
+            return neither_element_dominates;
+
+        case other_element_dominates:
+          if ((d2 == other_element_dominates) ||
+              (d2 == either_element_can_dominate) || (d2 == no_requirements))
+            return other_element_dominates;
+          else
+            return neither_element_dominates;
+
+        case neither_element_dominates:
           return neither_element_dominates;
 
-      case other_element_dominates:
-        if ((d2 == other_element_dominates) ||
-            (d2 == either_element_can_dominate) ||
-            (d2 == no_requirements))
-          return other_element_dominates;
-        else
-          return neither_element_dominates;
+        case either_element_can_dominate:
+          if (d2 == no_requirements)
+            return either_element_can_dominate;
+          else
+            return d2;
 
-      case neither_element_dominates:
-        return neither_element_dominates;
-
-      case either_element_can_dominate:
-        if (d2 == no_requirements)
-          return either_element_can_dominate;
-        else
+        case no_requirements:
           return d2;
 
-      case no_requirements:
-        return d2;
-
-      default:
-        // shouldn't get here
-        Assert (false, ExcInternalError());
+        default:
+          // shouldn't get here
+          Assert(false, ExcInternalError());
       }
 
     return neither_element_dominates;
   }
-}
+} // namespace FiniteElementDomination
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::n_dofs_per_vertex () const
+inline unsigned int
+FiniteElementData<dim>::n_dofs_per_vertex() const
 {
   return dofs_per_vertex;
 }
@@ -520,9 +520,8 @@ FiniteElementData<dim>::n_dofs_per_vertex () const
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::n_dofs_per_line () const
+inline unsigned int
+FiniteElementData<dim>::n_dofs_per_line() const
 {
   return dofs_per_line;
 }
@@ -530,9 +529,8 @@ FiniteElementData<dim>::n_dofs_per_line () const
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::n_dofs_per_quad () const
+inline unsigned int
+FiniteElementData<dim>::n_dofs_per_quad() const
 {
   return dofs_per_quad;
 }
@@ -540,9 +538,8 @@ FiniteElementData<dim>::n_dofs_per_quad () const
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::n_dofs_per_hex () const
+inline unsigned int
+FiniteElementData<dim>::n_dofs_per_hex() const
 {
   return dofs_per_hex;
 }
@@ -550,9 +547,8 @@ FiniteElementData<dim>::n_dofs_per_hex () const
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::n_dofs_per_face () const
+inline unsigned int
+FiniteElementData<dim>::n_dofs_per_face() const
 {
   return dofs_per_face;
 }
@@ -560,9 +556,8 @@ FiniteElementData<dim>::n_dofs_per_face () const
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::n_dofs_per_cell () const
+inline unsigned int
+FiniteElementData<dim>::n_dofs_per_cell() const
 {
   return dofs_per_cell;
 }
@@ -571,22 +566,21 @@ FiniteElementData<dim>::n_dofs_per_cell () const
 
 template <int dim>
 template <int structdim>
-inline
-unsigned int
-FiniteElementData<dim>::n_dofs_per_object () const
+inline unsigned int
+FiniteElementData<dim>::n_dofs_per_object() const
 {
   switch (structdim)
     {
-    case 0:
-      return dofs_per_vertex;
-    case 1:
-      return dofs_per_line;
-    case 2:
-      return dofs_per_quad;
-    case 3:
-      return dofs_per_hex;
-    default:
-      Assert (false, ExcInternalError());
+      case 0:
+        return dofs_per_vertex;
+      case 1:
+        return dofs_per_line;
+      case 2:
+        return dofs_per_quad;
+      case 3:
+        return dofs_per_hex;
+      default:
+        Assert(false, ExcInternalError());
     }
   return numbers::invalid_unsigned_int;
 }
@@ -594,9 +588,8 @@ FiniteElementData<dim>::n_dofs_per_object () const
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::n_components () const
+inline unsigned int
+FiniteElementData<dim>::n_components() const
 {
   return components;
 }
@@ -604,9 +597,8 @@ FiniteElementData<dim>::n_components () const
 
 
 template <int dim>
-inline
-const BlockIndices &
-FiniteElementData<dim>::block_indices () const
+inline const BlockIndices &
+FiniteElementData<dim>::block_indices() const
 {
   return block_indices_data;
 }
@@ -614,9 +606,8 @@ FiniteElementData<dim>::block_indices () const
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::n_blocks () const
+inline unsigned int
+FiniteElementData<dim>::n_blocks() const
 {
   return block_indices_data.size();
 }
@@ -624,18 +615,16 @@ FiniteElementData<dim>::n_blocks () const
 
 
 template <int dim>
-inline
-unsigned int
-FiniteElementData<dim>::tensor_degree () const
+inline unsigned int
+FiniteElementData<dim>::tensor_degree() const
 {
   return degree;
 }
 
 
 template <int dim>
-inline
-bool
-FiniteElementData<dim>::conforms (const Conformity space) const
+inline bool
+FiniteElementData<dim>::conforms(const Conformity space) const
 {
   return ((space & conforming_space) == space);
 }

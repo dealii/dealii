@@ -1,3 +1,0 @@
-Changed: The <code>enum</code> VectorOperation is now declared in its own header instead of the header for Vector.
-<br>
-(David Wells, 2017/10/20)

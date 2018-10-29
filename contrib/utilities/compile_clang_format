@@ -1,0 +1,116 @@
+#!/bin/bash
+## ---------------------------------------------------------------------
+##
+## Copyright (C) 2018 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## The deal.II library is free software; you can use it, redistribute
+## it, and/or modify it under the terms of the GNU Lesser General
+## Public License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
+##
+## ---------------------------------------------------------------------
+
+#
+# This script downloads, compiles and installs the clang-format binary. The
+# destination directory is
+#   [contrib/utilities]/programs/clang-<VERSION>/bin.
+#
+# Compiling clang-format and all necessary parts of LLVM/CLANG might
+# require a significant amount of resources. Alternatively, you can use
+# download_clang_format to install a statically-linked binary.
+#
+
+set -e
+set -u
+
+PRG="$(cd "$(dirname "$0")" && pwd)/programs"
+
+CLANG_PATH="${PRG}/clang-6"
+
+RELEASE_DATE="2018-04-06"
+RELEASE_BRANCH="release_60"
+LLVM_REPOSITORY="https://github.com/llvm-mirror/llvm"
+CLANG_REPOSITORY="https://github.com/llvm-mirror/clang"
+LLVM_COMMIT="1a0dddf879aadfcfea409b3c0a9aa3c9da306945"
+CLANG_COMMIT="d5f48a217f404c3462537527f4169bb45eed3904"
+
+if [ ! -d "${PRG}" ]
+then
+    echo "create folder ${PRG}"
+    mkdir "${PRG}"
+fi
+
+if [ -d "${CLANG_PATH}" ]
+then
+    echo "${CLANG_PATH}  exists. Exiting."
+    exit 1
+fi
+
+echo "Downloading and compiling clang-format-6."
+mkdir -p "${CLANG_PATH}/bin"
+
+tmpdir="${TMPDIR:-/tmp}/dealiiclang${RANDOM}${RANDOM}"
+mkdir -p "${tmpdir}"
+cd "${tmpdir}"
+
+GIT_VERSION=$(git version)
+GIT_MAJOR_VERSION=$(echo "${GIT_VERSION}" | sed 's/^[^0-9]*\([0-9]*\).*$/\1/g')
+GIT_MINOR_VERSION=$(echo "${GIT_VERSION}" | sed 's/^[^0-9]*[0-9]*\.\([0-9]*\).*$/\1/g')
+
+if [ "$GIT_MAJOR_VERSION" -ge 2 ] && [ "$GIT_MINOR_VERSION" -ge 11 ]; then
+  GIT_SHALLOW_SINCE_AVAILABLE=true
+else
+  GIT_SHALLOW_SINCE_AVAILABLE=false
+fi
+
+git init
+git remote add origin "${LLVM_REPOSITORY}"
+if [ "$GIT_SHALLOW_SINCE_AVAILABLE" = true ]; then
+  git fetch --shallow-since="${RELEASE_DATE}" origin "${RELEASE_BRANCH}"
+else
+  git fetch --depth=1 origin "${RELEASE_BRANCH}"
+  i=1;
+  while ! git cat-file -e ${LLVM_COMMIT} 2> /dev/null; do
+    git fetch --depth=$((i+=10)) origin "${RELEASE_BRANCH}";
+  done
+fi
+git reset --hard "${LLVM_COMMIT}"
+
+git init tools/clang
+cd tools/clang
+git remote add origin "${CLANG_REPOSITORY}"
+if [ "$GIT_SHALLOW_SINCE_AVAILABLE" = true ]; then
+  git fetch --shallow-since="${RELEASE_DATE}" origin "${RELEASE_BRANCH}"
+else
+  git fetch --depth=1 origin "${RELEASE_BRANCH}"
+  i=1;
+  while ! git cat-file -e ${CLANG_COMMIT} 2> /dev/null; do
+    git fetch --depth=$((i+=10)) origin "${RELEASE_BRANCH}";
+  done
+fi
+git reset --hard "${CLANG_COMMIT}"
+
+cd ../../
+mkdir build
+cd build
+
+case "${OSTYPE}" in
+  darwin*)
+    cmake -DCMAKE_BUILD_TYPE=MinSizeRel ..
+    ;;
+  *)
+    cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DLLVM_BUILD_STATIC=true ..
+    ;;
+esac
+
+make -j4 clang-format
+cp bin/clang-format "${CLANG_PATH}"/bin
+cp ../{CODE_OWNERS,CREDITS,LICENSE}.TXT "${CLANG_PATH}"
+rm -rf "${tmpdir}"
+
+echo "All done. clang-format successfully installed into"
+echo "    ${CLANG_PATH}/bin"

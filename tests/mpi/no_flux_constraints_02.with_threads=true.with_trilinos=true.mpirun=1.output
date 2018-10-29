@@ -1,0 +1,7 @@
+
+DEAL:0:3d::# flagged cells = 288
+DEAL:0:3d::#cells = 8160
+DEAL:0:3d::#dofs = 28506
+DEAL:0:3d::checksum: 636865719
+DEAL:0:3d::#constraints on 0: 2376
+DEAL:0:3d::OK

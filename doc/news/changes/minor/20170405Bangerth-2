@@ -1,6 +1,0 @@
-New: The class FESystem now implements
-the
-FiniteElement::convert_generalized_support_point_values_to_dof_values()
-interface.
-<br>
-(Wolfgang Bangerth, Matthias Maier, 2017/08/31)

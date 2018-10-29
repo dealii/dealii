@@ -1,0 +1,4 @@
+Added support for high-order VTU output by using newly 
+introduced Lagrange VTK cells. 
+<br>
+(Alexander Grayver, 2018/08/01)

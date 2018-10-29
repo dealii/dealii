@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2016 by the deal.II authors
+// Copyright (C) 1998 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -32,30 +32,30 @@ code is written, without having to look up the exact definition of something.
 
 <h3>Notes on deal.II indentation</h3>
 
-<p>deal.II uses <code>astyle</code> 2.04 to normalize indentation. A
+<p>deal.II uses <code>clang-format</code> 6.0 to normalize indentation. A
 style file is provided at
-<code>
-<pre>
-  ./contrib/styles/astyle.rc
-</pre>
-</code>
+@code
+  \${SOURCE_DIR}/.clang-format
+@endcode
 
 <p>Before a commit, you should run
-<code>
-<pre>
-  astyle --options=&lt;SOURCE DIRECTORY&gt;/contrib/styles/astyle.rc &lt;file&gt;
-</pre>
-</code>
+@code
+  clang-format -i <file>
+@endcode
 on each of your files. This will make sure indentation is conforming to the
-style guidelines outlined in this page. Alternatively, if you are using a recent
-version of the library, you can run
-<code>
-<pre>
+style guidelines outlined in this page.
+
+This is cumbersome. Consequently, and more easily, you can just run
+@code
   make indent
-</pre>
-</code>
-in whatever directory you set up the library to be compiled in to indent all
-source files.
+@endcode
+in whatever directory you set up the library to be compiled in, to indent all
+source files that have been changed recently. If you want to make sure that
+the indenting is correct for all your commits, you might want to set up a
+pre-commit hook. One way to do so, is to copy
+<code>\${SOURCE_DIR}/contrib/scripts/pre-commit-clang-format</code> to
+<code>\${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
+executable.
 </p>
 
 <h3>Style issues</h3>
@@ -65,19 +65,19 @@ source files.
   degrees of freedom, etc) should start with <code>n_*</code>. Example:
   SparsityPattern::n_nonzero_entries().</li>
 
-<li> %Function which set a bit or flag should start with <code>set_*</code>;
-  functions which clear bits of flags should be named <code>clear_*</code>.
+<li> %Functions which set a bit or flag should start with <code>set_*</code>;
+  functions which clear bits or flags should be named <code>clear_*</code>.
   Example: CellIterator::set_refine_flag().</li>
 
 <li> Traditional logical operators should be used instead of their English
   equivalents (i.e., use <code>&&</code>, <code>||</code>, and <code>!</code>
   instead of <code>and</code>, <code>or</code>, and <code>not</code>).
 
-<li> In the implementation files, after each function, at least three
-  empty lines are expected to
-  enable better readability. One empty line occurs in functions to
-  group blocks of code, two empty lines are not enough to visibly
-  distinguish sufficiently that the code belongs to two different functions.</li>
+<li> In the implementation files, after each function, three empty lines are
+  expected to enable better readability. One empty line occurs in functions to
+  group blocks of code, since two empty lines are not enough to visibly
+  distinguish sufficiently that the code belongs to two different
+  functions.</li>
 
 <li> Whenever an integer variable can only assume nonnegative values,
   it is marked as unsigned. The same applies to functions that can only
@@ -95,6 +95,9 @@ source files.
 
 <li> %Function and variable names may not consist of only one or two
   letters, unless the variable is a pure counting index.</li>
+
+<li> Type aliases (<code>using</code>-declarations) are preferred to
+  <code>typedef</code>-declarations.</li>
 
 <li> Use the geometry information in GeometryInfo to get the
   number of faces per cell, the number of children per cell, the
@@ -133,29 +136,24 @@ source files.
 <li> Sometimes it makes sense to implement a class by using several
   non-member functions that are not part of the public interface and are only
   meant to be called in the current source file. Such free functions should be
-  put in an anonymous namespace structured in the following way:
-  <code>
-  <pre>
+  put in an internal namespace structured in the following way:
+  @code
   namespace internal
   {
-    namespace ClassName
+    namespace ClassNameImplementation
     {
-      namespace
-      {
-        // free functions go here
-      }
+      // free functions go here
     }
   }
-  </pre>
-  </code>
+  @endcode
   where <code>ClassName</code> is the name of the calling class.
 
-<li> Classes and types generally are named using uppercase letters to denote
-  word beginnings (e.g. TriaIterator) &mdash; sometimes called
+<li> Classes, namespaces and types generally are named using uppercase letters
+  to denote word beginnings (e.g. TriaIterator) &mdash; sometimes called
   <a href="http://en.wikipedia.org/wiki/Camel_case"><i>camel
   case</i></a> &mdash; while functions and variables
   use lowercase letters and underscores to separate words.
-  The only exception are the iterator typedefs in Triangulation
+  The only exception are the iterator alias in Triangulation
   and DoFHandler (named cell_iterator, active_line_iterator, etc)
   to make the connection to the standard library container classes clear.</li>
 
@@ -190,33 +188,35 @@ deal.II we adopt the following convention:</p>
 <ol>
 
 <li> If we can enumerate all possible template arguments (e.g., the dimension
-can only be 1, 2, or 3), then a function template goes into the <code>.cc</code> file and
-we explicitly instantiate all possibilities. Users will not have any need to
-ever see these function templates because they will not want to instantiate
-these functions for any other template arguments anyway. </li>
+can only be 1, 2, or 3), then a function template goes into the <code>.cc</code>
+file and we explicitly instantiate all possibilities. Users will not have any
+need to ever see these function templates because they will not want to
+instantiate these functions for any other template arguments anyway. </li>
 
 <li> If we can not enumerate all possible template arguments (e.g., vector
 types -- because users might want to define their own vector kinds) but at
 least know a few common usage cases, then the function is put into a
-<code>.templates.h</code> file. We #include it into the <code>.cc</code> file and instantiate the
-functions for all of the common arguments. For almost all users, this will be
-just fine -- they only use the (vector, matrix, ...) types we already
-instantiate, and for them the <code>.templates.h</code> file will not be of any interest.
-It will also not slow down their compilations because nothing they see will
-#include the <code>.templates.h</code> file. But users who define their own
-(vector, matrix, ...) types can instantiate the template functions with their
-own user-defined types by including the <code>.templates.h</code> files.
+<code>.templates.h</code> file. We #include it into the <code>.cc</code> file
+and instantiate the functions for all of the common arguments. For almost all
+users, this will be just fine -- they only use the (vector, matrix, ...) types
+we already instantiate, and for them the <code>.templates.h</code> file will not
+be of any interest. It will also not slow down their compilations because
+nothing they see will #include the <code>.templates.h</code> file. But users who
+define their own (vector, matrix, ...) types can instantiate the template
+functions with their own user-defined types by including the
+<code>.templates.h</code> files.
 
 <li> Finally, if we can not assume in advance which values template arguments
 will take (e.g., any class derived from Subscriptor can be used as an argument),
 the definitions of functions are provided at the bottom of the header
-file with declarations. The definitions should be guarded with <code>#ifndef DOXYGEN ...
-#endif</code> to prevent Doxygen from picking them up.</li>
+file with declarations. The definitions should be guarded with <code>#ifndef
+DOXYGEN ... #endif</code> to prevent Doxygen from picking them up.</li>
 
 </ol>
 
-<p> For the first two cases, instantiation instructions are defined in <code>.inst.in</code>
-files. They are processed by a binary called expand_instantiations (built from
+<p> For the first two cases, instantiation instructions are defined in
+<code>.inst.in</code> files. They are processed by a binary called
+expand_instantiations (built from
 <code>cmake/scripts/expand_instantiations.cc</code>) and the parameters are
 defined dynamically through cmake depending on your configuration (see
 <code>share/deal.II/template-arguments</code> in your build directory).
@@ -244,8 +244,7 @@ we list here:
 <li> <i>Assert preconditions on parameters:</i> People call functions with wrong
   or nonsensical parameters, all the time. As the prototypical example,
   consider a trivial implementation of vector addition:
-  <code>
-  <pre>
+  @code
     Vector &
     operator += (Vector       &lhs,
                  const Vector &rhs)
@@ -254,8 +253,7 @@ we list here:
         lhs(i) += rhs(i);
       return lhs;
     }
-  </pre>
-  </code>
+  @endcode
   While correct, this function will get into trouble if the two vectors
   do not have the same size. You think it is silly to call this function
   with vectors of different size? Yes, of course it is. But it happens
@@ -268,8 +266,7 @@ we list here:
   but you'll probably get random errors at a later time. It would be
   much easier if the program just stopped here right away. The following
   implementation will do exactly this:
-  <code>
-  <pre>
+  @code
     Vector &
     operator += (Vector       &lhs,
                  const Vector &rhs)
@@ -280,8 +277,7 @@ we list here:
         lhs(i) += rhs(i);
       return lhs;
     }
-  </pre>
-  </code>
+  @endcode
   The <code>Assert</code> macro ensures that the condition is true
   at run time, and otherwise prints a string containing information
   encoded by the second argument and aborts the program. This way,
@@ -315,8 +311,7 @@ we list here:
   return values to be. For example, a function that computes the norm of
   a vector would expect the norm to be positive. You can write this as
   follows:
-  <code>
-  <pre>
+  @code
     double norm (const Vector &v)
     {
       double s = 0;
@@ -326,8 +321,7 @@ we list here:
       Assert (s >= 0, ExcInternalError());
       return std::sqrt(s);
     }
-  </pre>
-  </code>
+  @endcode
   This function is too simple to really justify this assertion, but imagine
   the computation to be lengthier and you can see how the assertion helps
   you ensure (or <i>hedge</i>) yourself against mistakes. Note that one
@@ -345,10 +339,9 @@ we list here:
   of what is going on matches what is indeed true. For example, assume
   you are writing a function that ensures that mesh sizes do not change
   too much locally. You may end up with a code of the following kind:
-  <code>
-  <pre>
-    for (cell=triangulation.begin(); ...)
-      for (face=0; ...)
+  @code
+    for (const auto &cell = triangulation.active_cell_iterators())
+      for (unsigned int face=0; ...)
         {
           if (something)
             { ... }
@@ -358,8 +351,7 @@ we list here:
                 // be at the boundary if we got here
             }
         }
-  </pre>
-  </code>
+  @endcode
   The conditions that got us into the else-branch may be
   complicated, and while it may be true that we believed that the
   only possibility we got here is that the neighbor is at the boundary,
@@ -376,20 +368,20 @@ we list here:
   Traditional C required that variables are declared at the beginning of
   the function even if they are only used further below. This leads to
   code like this that we may imagine in a 1d code:
-  <code>
-  <pre>
-    template @<int dim@>
+  @code
+    template <int dim>
     void foo ()
     {
       Point<dim> cell_center;
       ... // something lengthy and complicated
-      for (cell = dof_handler.begin_active(); ...)
+      for (const auto &cell = dof_handler.active_cell_iterators())
         {
           cell_center = (cell->vertex(0) + cell->vertex(1)) / 2;
           ...
         }
-  </pre>
-  </code>
+      ...
+    }
+  @endcode
   The problem is that if the code between the declaration and initialization
   is long and complicated, you can't look up on one page what the type of
   a variable is and what it's value may be. In fact, it may not even be
@@ -397,19 +389,19 @@ we list here:
   is accidentally left uninitialized.
   <p>
   A better way to do this would be as follows:
-  <code>
-  <pre>
-    template @<int dim@>
+  @code
+    template <int dim>
     void foo ()
     {
       ... // something lengthy and complicated
-      for (cell = dof_handler.begin_active(); ...)
+      for (const auto &cell = dof_handler.active_cell_iterators())
         {
           Point<dim> cell_center = (cell->vertex(0) + cell->vertex(1)) / 2;
           ...
         }
-  </pre>
-  </code>
+      ...
+    }
+  @endcode
   This makes it much clearer what the type of the variable is
   and that it is in fact only ever used when initialized. Furthermore,
   if someone wants to read the code to see what the variable is in fact
@@ -432,27 +424,26 @@ we list here:
   that in most cases we will never change the variable so initialized
   any more. In other words, if this is the case, we may as well write
   things as follows:
-  <code>
-  <pre>
-    template @<int dim@>
+  @code
+    template <int dim>
     void foo ()
     {
       ... // something lengthy and complicated
-      for (cell = dof_handler.begin_active(); ...)
+      for (const auto &cell = dof_handler.active_cell_iterators())
         {
-          <b>const</b> Point<dim> cell_center = (cell->vertex(0) + cell->vertex(1)) / 2;
+          <b>const</b> Point<dim> cell_center = (cell->vertex(0) +
+                                                 cell->vertex(1)) / 2;
           ...
         }
-  </pre>
-  </code>
+      ...
+    }
+  @endcode
   By marking the variable as constant we make sure that we don't accidentally
   change it. For example, the compiler could catch code like this:
-  <code>
-  <pre>
+  @code
         if (cell_center[0] = 0)
           ...
-  </pre>
-  </code>
+  @endcode
   This was most likely meant to be a <code>==</code> rather than an
   assignment. By marking the variable as const, the compiler would have
   told us about this bug. Maybe equally importantly, human readers of the
@@ -466,17 +457,15 @@ we list here:
   of changing a variable (which is typically the case for input arguments),
   then mark it as constant. For example, the following function should take
   its argument as a constant value:
-  <code>
-  <pre>
-     template @<int dim@>
+  @code
+     template <int dim>
      typename Triangulation<dim>::cell_iterator
      CellAccessor<dim>::child (const unsigned int child_no)
      {
-       ...;
+       ...
        return something;
      }
-  </pre>
-  </code>
+  @endcode
   Here, the user calls <code>cell-@>child(3)</code>, for example. There really
   is no reason why the function would ever want to change the value of
   the <code>child_no</code> argument &mdash; so mark it as constant:

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2017 by the deal.II authors
+// Copyright (C) 2005 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,16 +17,19 @@
 #define dealii_tridiagonal_matrix_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/subscriptor.h>
+
 #include <deal.II/lac/lapack_support.h>
 
-#include <vector>
 #include <iomanip>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-template <typename number> class Vector;
+template <typename number>
+class Vector;
 
 
 /*! @addtogroup Matrix1
@@ -54,7 +57,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  using size_type = types::global_dof_index;
 
   /**
    * @name Constructors and initialization.
@@ -62,50 +65,53 @@ public:
   /**
    * Constructor generating an empty matrix of dimension <tt>n</tt>.
    */
-  TridiagonalMatrix(size_type    n = 0,
-                    bool symmetric = false);
+  TridiagonalMatrix(size_type n = 0, bool symmetric = false);
 
   /**
    * Reinitialize the matrix to a new size and reset all entries to zero. The
    * symmetry properties may be set as well.
    */
-  void reinit(size_type n,
-              bool symmetric = false);
+  void
+  reinit(size_type n, bool symmetric = false);
 
 
-//@}
-///@name Non-modifying operators
-//@{
+  //@}
+
+  ///@name Non-modifying operators
+  //@{
 
   /**
    * Number of rows of this matrix. Note that the matrix is an <i>m x
    * m</i> matrix.
    */
-  size_type m () const;
+  size_type
+  m() const;
 
   /**
    * Number of columns of this matrix. Note that the matrix is an <i>n x
    * n</i> matrix.
    */
-  size_type n () const;
+  size_type
+  n() const;
 
   /**
    * Return whether the matrix contains only elements with value zero. This
    * function is mainly for internal consistency checks and should seldom be
    * used when not in debug mode since it uses quite some time.
    */
-  bool all_zero () const;
+  bool
+  all_zero() const;
 
+  //@}
 
-
-//@}
-///@name Element access
-//@{
+  ///@name Element access
+  //@{
   /**
    * Read-only access to a value. This is restricted to the case where
    * <i>|i-j| <= 1</i>.
    */
-  number operator()(size_type i, size_type j) const;
+  number
+  operator()(size_type i, size_type j) const;
 
   /**
    * Read-write access to a value. This is restricted to the case where
@@ -116,11 +122,13 @@ public:
    * into account if adding up is used for matrix assembling in order not to
    * obtain doubled entries.
    */
-  number &operator()(size_type i, size_type j);
+  number &
+  operator()(size_type i, size_type j);
 
-//@}
-///@name Multiplications with vectors
-//@{
+  //@}
+
+  ///@name Multiplications with vectors
+  //@{
 
   /**
    * Matrix-vector-multiplication. Multiplies <tt>v</tt> from the right and
@@ -131,9 +139,10 @@ public:
    *
    * Source and destination must not be the same vector.
    */
-  void vmult (Vector<number>       &w,
-              const Vector<number> &v,
-              const bool            adding=false) const;
+  void
+  vmult(Vector<number> &      w,
+        const Vector<number> &v,
+        const bool            adding = false) const;
 
   /**
    * Adding Matrix-vector-multiplication. Same as vmult() with parameter
@@ -141,8 +150,8 @@ public:
    *
    * Source and destination must not be the same vector.
    */
-  void vmult_add (Vector<number>       &w,
-                  const Vector<number> &v) const;
+  void
+  vmult_add(Vector<number> &w, const Vector<number> &v) const;
 
   /**
    * Transpose matrix-vector-multiplication. Multiplies <tt>v<sup>T</sup></tt>
@@ -153,9 +162,10 @@ public:
    *
    * Source and destination must not be the same vector.
    */
-  void Tvmult (Vector<number>       &w,
-               const Vector<number> &v,
-               const bool            adding=false) const;
+  void
+  Tvmult(Vector<number> &      w,
+         const Vector<number> &v,
+         const bool            adding = false) const;
 
   /**
    * Adding transpose matrix-vector-multiplication. Same as Tvmult() with
@@ -164,16 +174,16 @@ public:
    *
    * Source and destination must not be the same vector.
    */
-  void Tvmult_add (Vector<number>       &w,
-                   const Vector<number> &v) const;
+  void
+  Tvmult_add(Vector<number> &w, const Vector<number> &v) const;
 
   /**
    * Build the matrix scalar product <tt>u^T M v</tt>. This function is mostly
    * useful when building the cellwise scalar product of two functions in the
    * finite element context.
    */
-  number matrix_scalar_product (const Vector<number> &u,
-                                const Vector<number> &v) const;
+  number
+  matrix_scalar_product(const Vector<number> &u, const Vector<number> &v) const;
 
   /**
    * Return the square of the norm of the vector <tt>v</tt> with respect to
@@ -184,32 +194,39 @@ public:
    *
    * Obviously, the matrix needs to be quadratic for this operation.
    */
-  number matrix_norm_square (const Vector<number> &v) const;
+  number
+  matrix_norm_square(const Vector<number> &v) const;
 
-//@}
-///@name LAPACK operations
-//@{
+  //@}
+
+  ///@name LAPACK operations
+  //@{
   /**
    * Compute the eigenvalues of the symmetric tridiagonal matrix.
    *
    * @note This function requires configuration of deal.II with LAPACK
    * support. Additionally, the matrix must use symmetric storage technique.
    */
-  void compute_eigenvalues();
+  void
+  compute_eigenvalues();
   /**
    * After calling compute_eigenvalues(), you can access each eigenvalue here.
    */
-  number eigenvalue(const size_type i) const;
-//@}
-///@name Miscellanea
-//@{
+  number
+  eigenvalue(const size_type i) const;
+  //@}
+
+  ///@name Miscellanea
+  //@{
   /**
    * Output of the matrix in user-defined format.
    */
   template <class OutputStream>
-  void print(OutputStream &s,
-             const unsigned int  width=5,
-             const unsigned int  precision=2) const;
+  void
+  print(OutputStream &     s,
+        const unsigned int width     = 5,
+        const unsigned int precision = 2) const;
+  //@}
 
 private:
   /**
@@ -271,57 +288,55 @@ TridiagonalMatrix<number>::n() const
 
 
 template <typename number>
-inline
-number
+inline number
 TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
 {
-  Assert(i<n(), ExcIndexRange(i,0,n()));
-  Assert(j<n(), ExcIndexRange(j,0,n()));
-  Assert (i<=j+1, ExcIndexRange(i,j-1,j+2));
-  Assert (j<=i+1, ExcIndexRange(j,i-1,i+2));
+  Assert(i < n(), ExcIndexRange(i, 0, n()));
+  Assert(j < n(), ExcIndexRange(j, 0, n()));
+  Assert(i <= j + 1, ExcIndexRange(i, j - 1, j + 2));
+  Assert(j <= i + 1, ExcIndexRange(j, i - 1, i + 2));
 
-  if (j==i)
+  if (j == i)
     return diagonal[i];
-  if (j==i-1)
+  if (j == i - 1)
     {
       if (is_symmetric)
-        return right[i-1];
+        return right[i - 1];
       else
         return left[i];
     }
 
-  if (j==i+1)
+  if (j == i + 1)
     return right[i];
 
-  Assert (false, ExcInternalError());
+  Assert(false, ExcInternalError());
   return 0;
 }
 
 
 template <typename number>
-inline
-number &
+inline number &
 TridiagonalMatrix<number>::operator()(size_type i, size_type j)
 {
-  Assert(i<n(), ExcIndexRange(i,0,n()));
-  Assert(j<n(), ExcIndexRange(j,0,n()));
-  Assert (i<=j+1, ExcIndexRange(i,j-1,j+2));
-  Assert (j<=i+1, ExcIndexRange(j,i-1,i+2));
+  Assert(i < n(), ExcIndexRange(i, 0, n()));
+  Assert(j < n(), ExcIndexRange(j, 0, n()));
+  Assert(i <= j + 1, ExcIndexRange(i, j - 1, j + 2));
+  Assert(j <= i + 1, ExcIndexRange(j, i - 1, i + 2));
 
-  if (j==i)
+  if (j == i)
     return diagonal[i];
-  if (j==i-1)
+  if (j == i - 1)
     {
       if (is_symmetric)
-        return right[i-1];
+        return right[i - 1];
       else
         return left[i];
     }
 
-  if (j==i+1)
+  if (j == i + 1)
     return right[i];
 
-  Assert (false, ExcInternalError());
+  Assert(false, ExcInternalError());
   return diagonal[0];
 }
 
@@ -329,22 +344,21 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j)
 template <typename number>
 template <class OutputStream>
 void
-TridiagonalMatrix<number>::print (
-  OutputStream &s,
-  const unsigned int width,
-  const unsigned int) const
+TridiagonalMatrix<number>::print(OutputStream &     s,
+                                 const unsigned int width,
+                                 const unsigned int) const
 {
-  for (size_type i=0; i<n(); ++i)
+  for (size_type i = 0; i < n(); ++i)
     {
-      if (i>0)
-        s << std::setw(width) << (*this)(i,i-1);
+      if (i > 0)
+        s << std::setw(width) << (*this)(i, i - 1);
       else
         s << std::setw(width) << "";
 
-      s << ' ' << (*this)(i,i) << ' ';
+      s << ' ' << (*this)(i, i) << ' ';
 
-      if (i<n()-1)
-        s << std::setw(width) << (*this)(i,i+1);
+      if (i < n() - 1)
+        s << std::setw(width) << (*this)(i, i + 1);
 
       s << std::endl;
     }

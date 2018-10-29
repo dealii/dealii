@@ -1,3 +1,0 @@
-New: Added random_value<T>() and random_point<dim>() in tests.h, to simplify and unify our way to generate random numbers and points. 
-<br> 
-(Luca Heltai, 2017/11/21)

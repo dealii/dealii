@@ -12,7 +12,7 @@ domain that repeat in one or more directions.
 An example is the simulation of the electronic structure of photonic
 crystals, because they have a lattice-like structure and, thus, it often
 suffices to do the actual computation on only one box of the lattice. To
-be able to proceed this way one has to assume that the computation can be
+be able to proceed this way one has to assume that the model can be
 periodically extended to the other boxes; this requires the solution to
 have a periodic structure.
 
@@ -31,11 +31,12 @@ three steps (see also the
    using parallel::distributed::Triangulation::add_periodicity()
 -# Add periodicity constraints using DoFTools::make_periodicity_constraints()
 
-The second and third step are necessary for distributed meshes
+The second and third step are necessary for parallel meshes using the
+parallel::distributed::Triangulation class
 to ensure that cells on opposite sides of the domain but connected by periodic
 faces are part of the ghost layer if one of them is stored on the local processor.
 If the Triangulation is not a parallel::distributed::Triangulation,
-these steps have to be omitted.
+these steps are not necessary.
 
 The first step consists of collecting matching periodic faces and storing them in
 a <code>std::vector</code> of GridTools::PeriodicFacePair. This is done with the
@@ -52,18 +53,30 @@ GridTools::collect_periodic_faces(dof_handler,
                                   first_vector_components = <default value>);
 @endcode
 
-This call loops over all faces of the container dof_handler on the opposing
+This call loops over all faces of the container dof_handler on the periodic
 boundaries with boundary indicator @p b_id1 and @p b_id2,
-respecitvely. If $\text{vertices}_{1/2}$ are the vertices of $\text{face}_{1/2}$,
-it matches pairs of faces (and dofs) such that the difference between $\text{vertices}_2$
-and $matrix\cdot \text{vertices}_1+\text{offset}$ vanishes in every component apart from direction
-and stores the resulting pairs with associated data in @p matched_pairs. (See
+respectively. (You can assign these boundary indicators by hand after
+creating the coarse mesh, see
+@ref GlossBoundaryIndicator "Boundary indicator". Alternatively, you
+can also let many of the functions in namespace GridGenerator do this
+for if you specify the "colorize" flag; in that case, these functions
+will assign different boundary indicators to different parts of the
+boundary, with the details typically spelled out in the documentation
+of these functions.)
+
+Concretely, if $\text{vertices}_{1/2}$ are the vertices of two faces
+$\text{face}_{1/2}$, then the function call above will match pairs of
+faces (and dofs) such that the difference between $\text{vertices}_2$
+and $matrix\cdot \text{vertices}_1+\text{offset}$ vanishes in every
+component apart from direction and stores the resulting pairs with
+associated data in @p matched_pairs. (See
 GridTools::orthogonal_equality() for detailed information about the
 matching process.)
 
 Consider, for example, the colored unit square $\Omega=[0,1]^2$ with boundary
 indicator 0 on the left, 1 on the right, 2 on the bottom and 3 on the top
-faces. Then,
+faces. (See the documentation of GridGenerator::hyper_cube() for this
+convention on how boundary indicators are assigned.) Then,
 @code
 GridTools::collect_periodic_faces(dof_handler,
                                   /*b_id1*/ 0,
@@ -94,10 +107,12 @@ GridTools::collect_periodic_faces(dof_handler,
                                   matched_pairs,
                                   Tensor<1, 2>(1.,1.));
 @endcode
+Here, again, the assignment of boundary indicators 0 and 1 stems from
+what GridGenerator::parallelogram() documents.
 
 The resulting @p matched_pairs can be used in
-DoFTools::make_periodicity_constraints for populating a ConstraintMatrix
-with periodicity constraints:
+DoFTools::make_periodicity_constraints for populating an AffineConstraints
+object with periodicity constraints:
 @code
 DoFTools::make_periodicity_constraints(matched_pairs, constraints);
 @endcode
@@ -114,7 +129,7 @@ constrained:
 using namespace DoFTools;
 make_periodicity_constraints(face_1,
                              face_2,
-                             constraint_matrix,
+                             affine_constraints,
                              component_mask = <default value>;
                              face_orientation = <default value>,
                              face_flip = <default value>,
@@ -125,7 +140,8 @@ Here, we need to specify the orientation of the two faces using
 @p face_orientation, @p face_flip and @p face_orientation. For a closer description
 have a look at the documentation of DoFTools::make_periodicity_constraints.
 The remaining parameters are the same as for the high level interface apart
-from the self-explaining @p component_mask and @p constraint_matrix.
+from the self-explaining @p component_mask and @p affine_constraints.
+
 
 <a name="problem"></a>
 <h1>A practical example</h1>
@@ -141,9 +157,13 @@ going to solve the Stokes problem
   -\textrm{div}\;  \textbf{u}&=&0,\\
   \textbf{u}|_{\Gamma_1}&=&{\bf 0},
 @f}
-where the boundary $\Gamma_1$ is defined as $\Gamma_1:=\{x\in \partial\Omega: \|x\|\in\{0.5,1\}\}$.
+where the boundary $\Gamma_1$ is defined as $\Gamma_1 \dealcoloneq \{x\in \partial\Omega: \|x\|\in\{0.5,1\}\}$.
 For the remaining parts of the boundary we are going to use periodic boundary conditions, i.e.
 @f{align*}
   u_x(0,\nu)&=-u_y(\nu,0)&\nu&\in[0,1]\\
   u_y(0,\nu)&=u_x(\nu,0)&\nu&\in[0,1].
 @f}
+
+The mesh will be generated by GridGenerator::quarter_hyper_shell(),
+which also documents how it assigns boundary indicators to its various
+boundaries if its `colorize` argument is set to `true`.

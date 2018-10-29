@@ -20,7 +20,7 @@ namespace boost
     class expired_slot: public bad_weak_ptr
     {
     public:
-      virtual char const * what() const throw()
+      virtual char const * what() const throw() override
       {
         return "boost::signals2::expired_slot";
       }

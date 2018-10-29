@@ -8,28 +8,31 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
+
 #include <memory>
 
-int main()
+#include "../tests.h"
+
+int
+main()
 {
   initlog();
 
   // create a pattern and match a string
-  std::vector<std::unique_ptr<Patterns::PatternBase> > ps;
+  std::vector<std::unique_ptr<Patterns::PatternBase>> ps;
   ps.push_back(std_cxx14::make_unique<Patterns::Integer>());
   ps.push_back(std_cxx14::make_unique<Patterns::Double>());
   ps.push_back(std_cxx14::make_unique<Patterns::Anything>());
 
-  Patterns::Tuple pattern(ps, ";");
+  Patterns::Tuple   pattern(ps, ";");
   const std::string desc = pattern.description();
 
   deallog << desc << std::endl;

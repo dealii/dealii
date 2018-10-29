@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,19 +17,19 @@
 // same as the test with number _01, but check for block vectors
 
 
-#include "../tests.h"
-#include "data_out_common.h"
 #include <deal.II/lac/sparsity_pattern.h>
+
 #include <deal.II/numerics/data_out_rotation.h>
 
-
+#include "../tests.h"
+#include "data_out_common.h"
 
 
 
 void
-my_check_this (const DoFHandler<3> &,
-               const Vector<double> &,
-               const Vector<double> &)
+my_check_this(const DoFHandler<3> &,
+              const Vector<double> &,
+              const Vector<double> &)
 {
   // nothing to check in 3d
 }
@@ -37,44 +37,48 @@ my_check_this (const DoFHandler<3> &,
 
 template <int dim>
 void
-my_check_this (const DoFHandler<dim> &dof_handler,
-               const Vector<double>  &v_node_x,
-               const Vector<double>  &v_cell_x)
+my_check_this(const DoFHandler<dim> &dof_handler,
+              const Vector<double> & v_node_x,
+              const Vector<double> & v_cell_x)
 {
   BlockVector<double> v_node, v_cell;
-  make_block_vector (v_node_x, v_node);
-  make_block_vector (v_cell_x, v_cell);
+  make_block_vector(v_node_x, v_node);
+  make_block_vector(v_cell_x, v_cell);
 
   DataOutRotation<dim> data_out_rotation;
-  data_out_rotation.attach_dof_handler (dof_handler);
-  data_out_rotation.add_data_vector (v_node, "node_data", DataOutRotation<dim>::type_dof_data);
-  data_out_rotation.add_data_vector (v_cell, "cell_data", DataOutRotation<dim>::type_cell_data);
-  data_out_rotation.build_patches (4);
+  data_out_rotation.attach_dof_handler(dof_handler);
+  data_out_rotation.add_data_vector(v_node,
+                                    "node_data",
+                                    DataOutRotation<dim>::type_dof_data);
+  data_out_rotation.add_data_vector(v_cell,
+                                    "cell_data",
+                                    DataOutRotation<dim>::type_cell_data);
+  data_out_rotation.build_patches(4);
 
-  data_out_rotation.write_dx (deallog.get_file_stream());
-  data_out_rotation.set_flags (DataOutBase::UcdFlags(true));
-  data_out_rotation.write_ucd (deallog.get_file_stream());
-  data_out_rotation.write_gmv (deallog.get_file_stream());
-  data_out_rotation.write_tecplot (deallog.get_file_stream());
-  data_out_rotation.write_vtk (deallog.get_file_stream());
-  data_out_rotation.write_gnuplot (deallog.get_file_stream());
-  data_out_rotation.write_deal_II_intermediate (deallog.get_file_stream());
+  data_out_rotation.write_dx(deallog.get_file_stream());
+  data_out_rotation.set_flags(DataOutBase::UcdFlags(true));
+  data_out_rotation.write_ucd(deallog.get_file_stream());
+  data_out_rotation.write_gmv(deallog.get_file_stream());
+  data_out_rotation.write_tecplot(deallog.get_file_stream());
+  data_out_rotation.write_vtk(deallog.get_file_stream());
+  data_out_rotation.write_gnuplot(deallog.get_file_stream());
+  data_out_rotation.write_deal_II_intermediate(deallog.get_file_stream());
 
   // following only implemented for
   // 1d+rotation=2d
   if (dim == 1)
     {
-      data_out_rotation.write_povray (deallog.get_file_stream());
-      data_out_rotation.write_eps (deallog.get_file_stream());
+      data_out_rotation.write_povray(deallog.get_file_stream());
+      data_out_rotation.write_eps(deallog.get_file_stream());
     }
 }
 
 
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler,
-            const Vector<double>  &v_node,
-            const Vector<double>  &v_cell)
+check_this(const DoFHandler<dim> &dof_handler,
+           const Vector<double> & v_node,
+           const Vector<double> & v_cell)
 {
   // since we can't forward declare
   // check_this in this file (it is forward
@@ -84,5 +88,5 @@ check_this (const DoFHandler<dim> &dof_handler,
   // errors, we can consequently not overload
   // check_this, and need this forwarder
   // function
-  my_check_this (dof_handler, v_node, v_cell);
+  my_check_this(dof_handler, v_node, v_cell);
 }

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -58,9 +58,15 @@ namespace DataComponentInterpretation
      * Indicates that a component of a data set is part of a vector-valued
      * quantity.
      */
-    component_is_part_of_vector
+    component_is_part_of_vector,
+
+    /**
+     * Indicates that a component of a data set is part of a tensor-valued
+     * (2nd order) quantity.
+     */
+    component_is_part_of_tensor
   };
-}
+} // namespace DataComponentInterpretation
 
 
 DEAL_II_NAMESPACE_CLOSE

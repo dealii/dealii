@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2017 by the deal.II authors
+// Copyright (C) 2011 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,12 +19,16 @@
 
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/vectorization.h>
 #include <deal.II/base/partitioner.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/base/vectorization.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/matrix_free/helper_functions.h>
+
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+
+#include <deal.II/matrix_free/face_info.h>
+#include <deal.II/matrix_free/task_info.h>
 
 #include <array>
 #include <memory>
@@ -36,14 +40,15 @@ namespace internal
 {
   namespace MatrixFreeFunctions
   {
-    template <typename Number> struct ConstraintValues;
+    template <typename Number>
+    struct ConstraintValues;
 
     /**
      * The class that stores the indices of the degrees of freedom for all the
      * cells. Essentially, this is a smart number cache in the style of a
      * DoFHandler that also embeds the description of constraints directly on
      * the cell level without the need to refer to the external
-     * ConstraintMatrix.
+     * AffineConstraints object.
      *
      * This class only stores index relations. The weights for hanging node
      * constraints are stored in a different field. This is because a
@@ -54,91 +59,48 @@ namespace internal
      * hanging nodes are the same and need to be stored only once. The
      * combination will be handled in the MatrixFree class.
      *
-     * @author Katharina Kormann and Martin Kronbichler, 2010, 2011
+     * @ingroup matrixfree
+     *
+     * @author Katharina Kormann and Martin Kronbichler, 2010, 2011, 2018
      */
     struct DoFInfo
     {
       /**
+       * This value is used to define subranges in the vectors which we can
+       * zero inside the MatrixFree::loop() call. The goal is to only clear a
+       * part of the vector at a time to keep the values that are zeroed in
+       * caches, saving one global vector access for the case where this is
+       * applied rather than `vector = 0.;`.
+       *
+       * Size of the chunk is set to 64 kByte which generally fits to current
+       * caches.
+       */
+      static const unsigned int chunk_size_zero_vector = 8192;
+
+      /**
        * Default empty constructor.
        */
-      DoFInfo ();
+      DoFInfo();
 
       /**
        * Copy constructor.
        */
-      DoFInfo (const DoFInfo &) = default;
+      DoFInfo(const DoFInfo &) = default;
 
       /**
        * Clear all data fields in this class.
        */
-      void clear ();
-
-
-      /**
-       * Return a pointer to the first index in the DoF row @p row.
-       */
-      const unsigned int *begin_indices (const unsigned int row) const;
-
-      /**
-       * Return a pointer to the one past the last DoF index in the row @p
-       * row.
-       */
-      const unsigned int *end_indices (const unsigned int row) const;
-
-      /**
-       * Return the number of entries in the indices field for the given row.
-       */
-      unsigned int row_length_indices (const unsigned int row) const;
-
-      /**
-       * Return a pointer to the first constraint indicator in the row @p
-       * row.
-       */
-      const std::pair<unsigned short,unsigned short> *
-      begin_indicators (const unsigned int row) const;
-
-      /**
-       * Return a pointer to the one past the last constraint indicator in
-       * the row @p row.
-       */
-      const std::pair<unsigned short,unsigned short> *
-      end_indicators (const unsigned int row) const;
-
-      /**
-       * Return the number of entries in the constraint indicator field for
-       * the given row.
-       */
-      unsigned int row_length_indicators (const unsigned int row) const;
-
-      /**
-       * Return a pointer to the first index in the DoF row @p row for plain
-       * indices (i.e., the entries where constraints are not embedded).
-       */
-      const unsigned int *begin_indices_plain (const unsigned int row) const;
-
-      /**
-       * Return a pointer to the one past the last DoF index in the row @p
-       * row (i.e., the entries where constraints are not embedded).
-       */
-      const unsigned int *end_indices_plain (const unsigned int row) const;
+      void
+      clear();
 
       /**
        * Return the FE index for a given finite element degree. If not in hp
        * mode, this function always returns index 0. If an index is not found
-       * in hp mode, it returns max_fe_degree, i.e., one index past the last
-       * valid one.
-       */
-      unsigned int fe_index_from_degree (const unsigned int fe_degree) const;
-
-
-      /**
-       * Return the FE index for a given finite element degree. If not in hp
-       * mode or if the index is not found, this function always returns index
-       * 0. Hence, this function does not check whether the given degree is
-       * actually present.
+       * in hp mode, it returns numbers::invalid_unsigned_int.
        */
       unsigned int
-      fe_index_from_dofs_per_cell (const unsigned int dofs_per_cell) const;
+      fe_index_from_degree(const unsigned int first_selected_component,
+                           const unsigned int fe_degree) const;
 
       /**
        * This internal method takes the local indices on a cell and fills them
@@ -148,12 +110,15 @@ namespace internal
        * assigned the correct index after all the ghost indices have been
        * collected by the call to @p assign_ghosts.
        */
-      void read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
-                             const std::vector<unsigned int> &lexicographic_inv,
-                             const ConstraintMatrix          &constraints,
-                             const unsigned int               cell_number,
-                             ConstraintValues<double> &constraint_values,
-                             bool                            &cell_at_boundary);
+      template <typename number>
+      void
+      read_dof_indices(
+        const std::vector<types::global_dof_index> &local_indices,
+        const std::vector<unsigned int> &           lexicographic_inv,
+        const AffineConstraints<number> &           constraints,
+        const unsigned int                          cell_number,
+        ConstraintValues<double> &                  constraint_values,
+        bool &                                      cell_at_boundary);
 
       /**
        * This method assigns the correct indices to ghost indices from the
@@ -162,36 +127,8 @@ namespace internal
        * start at the end of the locally owned range. This way, we get direct
        * access to all vector entries.
        */
-      void assign_ghosts(const std::vector<unsigned int> &boundary_cells);
-
-      /**
-       * Reorganizes cells for serial (non-thread-parallelized) such that
-       * boundary cells are places in the middle. This way, computations and
-       * communication can be overlapped. Should only be called by one DoFInfo
-       * object when used on a system of several DoFHandlers.
-       */
-      void compute_renumber_serial (const std::vector<unsigned int> &boundary_cells,
-                                    const SizeInfo                  &size_info,
-                                    std::vector<unsigned int>       &renumbering);
-
-      /**
-       * Reorganizes cells in the hp case without parallelism such that all
-       * cells with the same FE index are placed consecutively. Should only be
-       * called by one DoFInfo object when used on a system of several
-       * DoFHandlers.
-       */
-      void compute_renumber_hp_serial (SizeInfo                  &size_info,
-                                       std::vector<unsigned int> &renumbering,
-                                       std::vector<unsigned int> &irregular_cells);
-
-      /**
-       * Compute the initial renumbering of cells such that all cells with
-       * ghosts are put first. This is the first step before building the
-       * thread graph and used to overlap computations and communication.
-       */
-      void compute_renumber_parallel (const std::vector<unsigned int> &boundary_cells,
-                                      SizeInfo                        &size_info,
-                                      std::vector<unsigned int>       &renumbering);
+      void
+      assign_ghosts(const std::vector<unsigned int> &boundary_cells);
 
       /**
        * This method reorders the way cells are gone through based on a given
@@ -199,114 +136,240 @@ namespace internal
        * together and interprets them as one cell only, as is needed for
        * vectorization.
        */
-      void reorder_cells (const SizeInfo                  &size_info,
-                          const std::vector<unsigned int> &renumbering,
-                          const std::vector<unsigned int> &constraint_pool_row_index,
-                          const std::vector<unsigned int> &irregular_cells,
-                          const unsigned int               vectorization_length);
+      void
+      reorder_cells(const TaskInfo &                  task_info,
+                    const std::vector<unsigned int> & renumbering,
+                    const std::vector<unsigned int> & constraint_pool_row_index,
+                    const std::vector<unsigned char> &irregular_cells);
 
       /**
-       * This helper function determines a block size if the user decided not
-       * to force a block size through MatrixFree::AdditionalData. This is
-       * computed based on the number of hardware threads on the system and
-       * the number of macro cells that we should work on.
-       */
-      void guess_block_size (const SizeInfo &size_info,
-                             TaskInfo       &task_info);
-
-      /**
-       * This method goes through all cells that have been filled into @p
-       * dof_indices and finds out which cells can be worked on independently
-       * and which ones are neighboring and need to be done at different times
-       * when used in parallel.
-       *
-       * The strategy is based on a two-level approach. The outer level is
-       * subdivided into partitions similar to the type of neighbors in
-       * Cuthill-McKee, and the inner level is subdivided via colors (for
-       * chunks within the same color, can work independently). One task is
-       * represented by a chunk of cells. The cell chunks are formed before
-       * subdivision into partitions and colors.
+       * Finds possible compression for the cell indices that we can apply for
+       * increased efficiency. Run at the end of reorder_cells.
        */
       void
-      make_thread_graph_partition_color (SizeInfo                  &size_info,
-                                         TaskInfo                  &task_info,
-                                         std::vector<unsigned int> &renumbering,
-                                         std::vector<unsigned int> &irregular_cells,
-                                         const bool                 hp_bool);
+      compute_cell_index_compression(
+        const std::vector<unsigned char> &irregular_cells);
 
       /**
-       * This function goes through all cells that have been filled into @p
-       * dof_indices and finds out which cells can be worked on independently
-       * and which ones are neighboring and need to be done at different times
-       * when used in parallel.
-       *
-       * The strategy is based on a two-level approach. The outer level is
-       * subdivided into partitions similar to the type of neighbors in
-       * Cuthill-McKee, and the inner level is again subdivided into Cuthill-
-       * McKee-like partitions (partitions whose level differs by more than 2
-       * can be worked on independently). One task is represented by a chunk
-       * of cells. The cell chunks are formed after subdivision into the two
-       * levels of partitions.
+       * Finds possible compression for the face indices that we can apply for
+       * increased efficiency. Run at the end of reorder_cells.
        */
+      template <int length>
       void
-      make_thread_graph_partition_partition (SizeInfo                  &size_info,
-                                             TaskInfo                  &task_info,
-                                             std::vector<unsigned int> &renumbering,
-                                             std::vector<unsigned int> &irregular_cells,
-                                             const bool                 hp_bool);
+      compute_face_index_compression(
+        const std::vector<FaceToCellTopology<length>> &faces);
 
       /**
        * This function computes the connectivity of the currently stored
-       * indices and fills the structure into a sparsity pattern. The
-       * parameter block_size can be used to specify whether several cells
-       * should be treated as one.
+       * indices in terms of connections between the individual cells and
+       * fills the structure into a sparsity pattern.
        */
       void
-      make_connectivity_graph (const SizeInfo                  &size_info,
-                               const TaskInfo                  &task_info,
-                               const std::vector<unsigned int> &renumbering,
-                               const std::vector<unsigned int> &irregular_cells,
-                               const bool                       do_blocking,
-                               DynamicSparsityPattern &connectivity) const;
+      make_connectivity_graph(const TaskInfo &                 task_info,
+                              const std::vector<unsigned int> &renumbering,
+                              DynamicSparsityPattern &connectivity) const;
 
       /**
-       * Renumbers the degrees of freedom to give good access for this class.
+       * Compute a renumbering of the degrees of freedom to improve the data
+       * access patterns for this class that can be utilized by the categories
+       * in the IndexStorageVariants enum. For example, the index ordering can
+       * be improved for typical DG elements by interleaving the degrees of
+       * freedom from batches of cells, which avoids the explicit data
+       * transposition in IndexStorageVariants::contiguous. Currently, these
+       * more advanced features are not implemented, so there is only limited
+       * value of this function.
        */
-      void renumber_dofs (std::vector<types::global_dof_index> &renumbering);
+      void
+      compute_dof_renumbering(
+        std::vector<types::global_dof_index> &renumbering);
+
+      /**
+       * Fills the array that defines how to zero selected ranges in the result
+       * vector within the cell loop, filling the two member variables @p
+       * vector_zero_range_list_index and @p vector_zero_range_list.
+       *
+       * The intent of this pattern is to zero the vector entries in close
+       * temporal proximity to the first access and thus keeping the vector
+       * entries in cache.
+       */
+      template <int length>
+      void
+      compute_vector_zero_access_pattern(
+        const TaskInfo &                               task_info,
+        const std::vector<FaceToCellTopology<length>> &faces);
 
       /**
        * Return the memory consumption in bytes of this class.
        */
-      std::size_t memory_consumption() const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Prints a detailed summary of memory consumption in the different
        * structures of this class to the given output stream.
        */
       template <typename StreamType>
-      void print_memory_consumption(StreamType     &out,
-                                    const SizeInfo &size_info) const;
+      void
+      print_memory_consumption(StreamType &    out,
+                               const TaskInfo &size_info) const;
 
       /**
        * Prints a representation of the indices in the class to the given
        * output stream.
        */
       template <typename Number>
-      void print (const std::vector<Number>       &constraint_pool_data,
-                  const std::vector<unsigned int> &constraint_pool_row_index,
-                  std::ostream                    &out) const;
+      void
+      print(const std::vector<Number> &      constraint_pool_data,
+            const std::vector<unsigned int> &constraint_pool_row_index,
+            std::ostream &                   out) const;
+
+      /**
+       * Enum for various storage variants of the indices. This storage format
+       * is used to implement more efficient indexing schemes in case the
+       * underlying data structures allow for them, and to inform the access
+       * functions in FEEvaluationBase::read_write_operation() on which array
+       * to get the data from. One example of more efficient storage is the
+       * enum value IndexStorageVariants::contiguous, which means that one can
+       * get the indices to all degrees of freedom of a cell by reading only
+       * the first index for each cell, whereas all subsequent indices are
+       * merely an offset from the first index.
+       */
+      enum class IndexStorageVariants : unsigned char
+      {
+        /**
+         * This value indicates that no index compression was found and the
+         * only valid storage is to access all indices present on the cell,
+         * possibly including constraints. For a cell/face of this index type,
+         * the data access in FEEvaluationBase is directed to the array @p
+         * dof_indices with the index
+         * `row_starts[cell_index*n_vectorization*n_components].first`.
+         */
+        full,
+        /**
+         * This value indicates that the indices are interleaved for access
+         * with vectorized gather and scatter operation. This storage variant
+         * is possible in case there are no constraints on the cell and the
+         * indices in the batch of cells are not pointing to the same global
+         * index in different slots of a vectorized array (in order to support
+         * scatter operations). For a cell/face of this index type, the data
+         * access in FEEvaluationBase is directed to the array
+         * `dof_indices_interleaved` with the index
+         * `row_starts[cell_index*n_vectorization*n_components].first`.
+         */
+        interleaved,
+        /**
+         * This value indicates that the indices within a cell are all
+         * contiguous, and one can get the index to the cell by reading that
+         * single value for each of the cells in the cell batch. For a
+         * cell/face of this index type, the data access in FEEvaluationBase
+         * is directed to the array `dof_indices_contiguous` with the index
+         * `cell_index*n_vectorization*n_components`.
+         */
+        contiguous,
+        /**
+         * This value indicates that the indices with a cell are contiguous and
+         * interleaved for vectorization, i.e., the first DoF index on a cell
+         * to the four or eight cells in the vectorization batch come first,
+         * than the second DoF index, and so on. Furthermore, the interleaving
+         * between cells implies that only the batches for vectorization can be
+         * accessed efficiently, whereas there is a strided access for getting
+         * only some of the entries.
+         *
+         * The two additional categories `interleaved_contiguous_strided` and
+         * `interleaved_contiguous_mixed_strides` are a consequence of this
+         * storage type. The former is for faces where at least one of the two
+         * adjacent sides will break with the interleaved storage. We then have
+         * to make a strided access as described in the next category. The last
+         * category `interleaved_contiguous_mixed_strides` appears in the ghost
+         * layer, see the more detailed description of that category below.
+         * Again, this is something that cannot be avoided in general once we
+         * interleave the indices between cells.
+         *
+         * For a cell/face of this index type, the data access in
+         * FEEvaluationBase is directed to the array `dof_indices_contiguous`
+         * with the index `cell_index*n_vectorization*n_components`.
+         */
+        interleaved_contiguous,
+        /**
+         * Similar to interleaved_contiguous storage, but for the case when the
+         * interleaved indices are only contiguous within the degrees of
+         * freedom, but not also over the components of a vectorized array.
+         * This happens typically on faces with DG where the cells have
+         * `interleaved_contiguous` storage but the faces' numbering is not the
+         * same as the cell's numbering. For a
+         * cell/face of this index type, the data access in FEEvaluationBase
+         * is directed to the array `dof_indices_contiguous` with the index
+         * `cell_index*n_vectorization*n_components`.
+         */
+        interleaved_contiguous_strided,
+        /**
+         * Similar to interleaved_contiguous_separate storage, but for the case
+         * when the interleaved indices are not `n_vectorization apart`. This
+         * happens typically within the ghost layer of DG where the remote
+         * owner has applied an interleaved storage and the current processor
+         * only sees some of the cells. For a
+         * cell/face of this index type, the data access in FEEvaluationBase
+         * is directed to the array `dof_indices_contiguous` with the index
+         * `cell_index*n_vectorization*n_components`, including the array
+         * `dof_indices_interleave_strides` for the information about the
+         * actual stride.
+         */
+        interleaved_contiguous_mixed_strides
+      };
+
+      /**
+       * Enum used to distinguish the data arrays for the vectorization type
+       * in cells and faces.
+       */
+      enum DoFAccessIndex : unsigned char
+      {
+        /**
+         * The data index for the faces designated as interior
+         */
+        dof_access_face_interior = 0,
+        /**
+         * The data index for the faces designated as exterior
+         */
+        dof_access_face_exterior = 1,
+        /**
+         * The data index for the cells
+         */
+        dof_access_cell = 2
+      };
+
+      /**
+       * Stores the dimension of the underlying DoFHandler. Since the indices
+       * are not templated, this is the variable that makes the dimension
+       * accessible in the (rare) cases it is needed inside this class.
+       */
+      unsigned int dimension;
+
+      /**
+       * For efficiency reasons, always keep a fixed number of cells with
+       * similar properties together. This variable controls the number of
+       * cells batched together. As opposed to the other classes which are
+       * templated on the number type, this class as a pure index container is
+       * not templated, so we need to keep the information otherwise contained
+       * in VectorizedArray<Number>::n_array_elements.
+       */
+      unsigned int vectorization_length;
+
+      /**
+       * Stores the index storage variant of all cell and face batches.
+       *
+       * The three arrays given here address the types for the faces decorated
+       * as interior (0), the faces decorated with as exterior (1), and the
+       * cells (2) according to CellOrFaceAccess.
+       */
+      std::vector<IndexStorageVariants> index_storage_variants[3];
 
       /**
        * Stores the rowstart indices of the compressed row storage in the @p
        * dof_indices and @p constraint_indicator fields. These two fields are
        * always accessed together, so it is simpler to keep just one variable
-       * for them. This also obviates keeping two rowstart vectors in synch.
-       *
-       * In addition, the third field stores whether a particular cell has a
-       * certain structure in the indices, like indices for vector-valued
-       * problems or for cells where not all vector components are filled.
+       * for them. This also obviates keeping two rowstart vectors in sync.
        */
-      std::vector<std::array<unsigned int, 3> > row_starts;
+      std::vector<std::pair<unsigned int, unsigned int>> row_starts;
 
       /**
        * Stores the indices of the degrees of freedom for each cell. These
@@ -334,7 +397,44 @@ namespace internal
        * from or writing to a vector. The second number stores the index of
        * the constraint weights, stored in the variable constraint_pool_data.
        */
-      std::vector<std::pair<unsigned short,unsigned short> > constraint_indicator;
+      std::vector<std::pair<unsigned short, unsigned short>>
+        constraint_indicator;
+
+      /**
+       * Reordered index storage for `IndexStorageVariants::interleaved`.
+       */
+      std::vector<unsigned int> dof_indices_interleaved;
+
+      /**
+       * Compressed index storage for faster access than through @p
+       * dof_indices used according to the description in IndexStorageVariants.
+       *
+       * The three arrays given here address the types for the faces decorated
+       * as interior (0), the faces decorated with as exterior (1), and the
+       * cells (2) according to CellOrFaceAccess.
+       */
+      std::vector<unsigned int> dof_indices_contiguous[3];
+
+      /**
+       * Compressed index storage for faster access than through @p
+       * dof_indices used according to the description in IndexStorageVariants.
+       *
+       * The three arrays given here address the types for the faces decorated
+       * as minus (0), the faces decorated with as plus (1), and the cells
+       * (2).
+       */
+      std::vector<unsigned int> dof_indices_interleave_strides[3];
+
+      /**
+       * Caches the number of indices filled when vectorizing. This
+       * information can implicitly deduced from the row_starts data fields,
+       * but this field allows for faster access.
+       *
+       * The three arrays given here address the types for the faces decorated
+       * as interior (0), the faces decorated with as exterior (1), and the
+       * cells (2) according to CellOrFaceAccess.
+       */
+      std::vector<unsigned char> n_vectorization_lanes_filled[3];
 
       /**
        * This stores the parallel partitioning that can be used to set up
@@ -343,6 +443,20 @@ namespace internal
        * enables initialization of vectors based on the DoFInfo field.
        */
       std::shared_ptr<const Utilities::MPI::Partitioner> vector_partitioner;
+
+      /**
+       * This partitioning selects a subset of ghost indices to the full
+       * vector partitioner stored in @p vector_partitioner. These
+       * partitioners are used in specialized loops that only import parts of
+       * the ghosted region for reducing the amount of communication. There
+       * are three variants of the partitioner initialized, one that queries
+       * only the cell values, one that additionally describes the indices for
+       * evaluating the function values on the faces, and one that describes
+       * the indices for evaluation both the function values and the gradients
+       * on the faces adjacent to the locally owned cells.
+       */
+      std::array<std::shared_ptr<const Utilities::MPI::Partitioner>, 3>
+        vector_partitioner_face_variants;
 
       /**
        * This stores a (sorted) list of all locally owned degrees of freedom
@@ -367,17 +481,47 @@ namespace internal
       std::vector<unsigned int> plain_dof_indices;
 
       /**
-       * Stores the dimension of the underlying DoFHandler. Since the indices
-       * are not templated, this is the variable that makes the dimension
-       * accessible in the (rare) cases it is needed inside this class.
+       * Stores the offset in terms of the number of base elements over all
+       * DoFInfo objects.
        */
-      unsigned int dimension;
+      unsigned int global_base_element_offset;
 
       /**
-       * Stores the number of components in the DoFHandler where the indices
-       * have been read from.
+       * Stores the number of base elements in the DoFHandler where the
+       * indices have been read from.
        */
-      unsigned int n_components;
+      unsigned int n_base_elements;
+
+      /**
+       * Stores the number of components of each base element in the finite
+       * element where the indices have been read from.
+       */
+      std::vector<unsigned int> n_components;
+
+      /**
+       * The ith entry of this vector stores the component number of the given
+       * base element.
+       */
+      std::vector<unsigned int> start_components;
+
+      /**
+       * For a given component in an FESystem, this variable tells which base
+       * element the index belongs to.
+       */
+      std::vector<unsigned int> component_to_base_index;
+
+      /**
+       * For a vector-valued element, this gives the constant offset in the
+       * number of degrees of freedom starting at the given component, as the
+       * degrees are numbered by degrees of freedom. This data structure does
+       * not take possible constraints and thus, shorter or longer lists, into
+       * account. This information is encoded in the row_starts variables
+       * directly.
+       *
+       * The outer vector goes through the various fe indices in the hp case,
+       * similarly to the @p dofs_per_cell variable.
+       */
+      std::vector<std::vector<unsigned int>> component_dof_indices_offset;
 
       /**
        * Stores the number of degrees of freedom per cell.
@@ -406,11 +550,11 @@ namespace internal
       unsigned int max_fe_index;
 
       /**
-       * This variable stores the dofs per cell and the finite element degree
-       * associated for all fe indices in the underlying element for easier
-       * access to data in the hp case.
+       * To each of the slots in an hp adaptive case, the inner vector stores
+       * the corresponding element degree. This is used by the constructor of
+       * FEEvaluationBase to identify the correct data slot in the hp case.
        */
-      std::vector<std::pair<unsigned int,unsigned int> > fe_index_conversion;
+      std::vector<std::vector<unsigned int>> fe_index_conversion;
 
       /**
        * Temporarily stores the numbers of ghosts during setup. Cleared when
@@ -418,151 +562,43 @@ namespace internal
        * partitioner.
        */
       std::vector<types::global_dof_index> ghost_dofs;
+
+      /**
+       * Stores an integer to each partition in TaskInfo that indicates
+       * whether to clear certain parts in the result vector if the user
+       * requested it with the respective argument in the MatrixFree::loop.
+       */
+      std::vector<unsigned int> vector_zero_range_list_index;
+
+      /**
+       * Stores the actual ranges in the vector to be cleared.
+       */
+      std::vector<unsigned int> vector_zero_range_list;
     };
 
 
-    /*----------------------- Inline functions ----------------------------------*/
+    /*-------------------------- Inline functions ---------------------------*/
 
 #ifndef DOXYGEN
 
-    inline
-    const unsigned int *
-    DoFInfo::begin_indices (const unsigned int row) const
-    {
-      AssertIndexRange (row, row_starts.size()-1);
-      const unsigned int index = row_starts[row][0];
-      AssertIndexRange(index, dof_indices.size()+1);
-      return dof_indices.empty() ?
-             nullptr :
-             dof_indices.data()+index;
-    }
 
-
-
-    inline
-    const unsigned int *
-    DoFInfo::end_indices (const unsigned int row) const
-    {
-      AssertIndexRange (row, row_starts.size()-1);
-      const unsigned int index = row_starts[row+1][0];
-      AssertIndexRange(index, dof_indices.size()+1);
-      return dof_indices.empty() ?
-             nullptr :
-             dof_indices.data()+index;
-    }
-
-
-
-    inline
-    unsigned int
-    DoFInfo::row_length_indices (const unsigned int row) const
-    {
-      AssertIndexRange (row, row_starts.size()-1);
-      return (row_starts[row+1][0] - row_starts[row][0]);
-    }
-
-
-
-    inline
-    const std::pair<unsigned short,unsigned short> *
-    DoFInfo::begin_indicators (const unsigned int row) const
-    {
-      AssertIndexRange (row, row_starts.size()-1);
-      const unsigned int index = row_starts[row][1];
-      AssertIndexRange (index, constraint_indicator.size()+1);
-      return constraint_indicator.empty() ?
-             nullptr :
-             constraint_indicator.data()+index;
-    }
-
-
-
-    inline
-    const std::pair<unsigned short,unsigned short> *
-    DoFInfo::end_indicators (const unsigned int row) const
-    {
-      AssertIndexRange (row, row_starts.size()-1);
-      const unsigned int index = row_starts[row+1][1];
-      AssertIndexRange (index, constraint_indicator.size()+1);
-      return constraint_indicator.empty() ?
-             nullptr :
-             constraint_indicator.data()+index;
-    }
-
-
-
-    inline
-    unsigned int
-    DoFInfo::row_length_indicators (const unsigned int row) const
-    {
-      AssertIndexRange (row, row_starts.size()-1);
-      return (row_starts[row+1][1] - row_starts[row][1]);
-    }
-
-
-
-    inline
-    const unsigned int *
-    DoFInfo::begin_indices_plain (const unsigned int row) const
-    {
-      // if we have no constraints, should take the data from dof_indices
-      if (row_length_indicators(row) == 0)
-        {
-          Assert (row_starts_plain_indices[row]==numbers::invalid_unsigned_int,
-                  ExcInternalError());
-          return begin_indices(row);
-        }
-      else
-        {
-          AssertDimension (row_starts.size(), row_starts_plain_indices.size());
-          const unsigned int index = row_starts_plain_indices[row];
-          AssertIndexRange(index, plain_dof_indices.size()+1);
-          return plain_dof_indices.empty() ?
-                 nullptr :
-                 plain_dof_indices.data()+index;
-        }
-    }
-
-
-
-    inline
-    const unsigned int *
-    DoFInfo::end_indices_plain (const unsigned int row) const
-    {
-      return begin_indices_plain(row) +
-             dofs_per_cell[(cell_active_fe_index.size()==0)?
-                           0:cell_active_fe_index[row]];
-    }
-
-
-
-    inline
-    unsigned int
-    DoFInfo::fe_index_from_degree (const unsigned int fe_degree) const
+    inline unsigned int
+    DoFInfo::fe_index_from_degree(const unsigned int first_selected_component,
+                                  const unsigned int fe_degree) const
     {
       const unsigned int n_indices = fe_index_conversion.size();
-      for (unsigned int i=0; i<n_indices; ++i)
-        if (fe_index_conversion[i].first == fe_degree)
+      if (n_indices <= 1)
+        return 0;
+      for (unsigned int i = 0; i < n_indices; ++i)
+        if (fe_index_conversion[i][first_selected_component] == fe_degree)
           return i;
-      return n_indices;
+      return numbers::invalid_unsigned_int;
     }
 
-
-
-    inline
-    unsigned int
-    DoFInfo::fe_index_from_dofs_per_cell (const unsigned int dofs_per_cell) const
-    {
-      for (unsigned int i=0; i<fe_index_conversion.size(); ++i)
-        if (fe_index_conversion[i].second == dofs_per_cell)
-          return i;
-      return 0;
-    }
+#endif // ifndef DOXYGEN
 
   } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
-
-#endif  // ifndef DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

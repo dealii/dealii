@@ -1,4 +1,0 @@
-Fixed: Added convert_generalized_support_point_values_to_dof_values into 
-FE_FaceQ and FE_TraceQ. This is needed by VectorTools::interpolate
-<br>
-(Praveen Chandrashekar, 2017/11/19)

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2017 by the deal.II authors
+## Copyright (C) 2013 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -64,6 +64,15 @@ IF(DEFINED BLAS_LIBRARIES)
 ENDIF()
 IF(DEFINED LAPACK_LIBRARIES)
   LIST(REMOVE_ITEM LAPACK_LIBRARIES "FALSE")
+ENDIF()
+
+#
+# Work around a bug in CMake 3.11 by simply filtering out
+# "PkgConf::PKGC_BLAS". See bug
+#   https://gitlab.kitware.com/cmake/cmake/issues/17934
+#
+IF(DEFINED BLAS_LIBRARIES)
+  LIST(REMOVE_ITEM BLAS_LIBRARIES "PkgConfig::PKGC_BLAS")
 ENDIF()
 
 #

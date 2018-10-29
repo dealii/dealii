@@ -139,3 +139,5 @@ be written this way. A typical example is the need to use the keyword
 this already, then several of these difficulties are explained in the deal.II
 Frequently Asked Questions (FAQ) linked to from the <a
 href="http://www.dealii.org/">deal.II homepage</a>.
+
+<!--We need a blank line to end the above block properly.-->

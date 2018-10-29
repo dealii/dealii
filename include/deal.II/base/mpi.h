@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,18 +17,19 @@
 #define dealii_mpi_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/array_view.h>
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
 // without MPI, we would still like to use
 // some constructs with MPI data
 // types. Therefore, create some dummies
-typedef int MPI_Comm;
-typedef int MPI_Datatype;
-typedef int MPI_Op;
+using MPI_Comm     = int;
+using MPI_Datatype = int;
+using MPI_Op       = int;
 #  ifndef MPI_COMM_WORLD
 #    define MPI_COMM_WORLD 0
 #  endif
@@ -46,13 +47,49 @@ typedef int MPI_Op;
 #  endif
 #endif
 
+
+
+/**
+ * Helper macro to remove const from the pointer arguments to some MPI_*
+ * functions.
+ *
+ * This is needed as the input arguments of functions like MPI_Allgather() are
+ * not marked as const in OpenMPI 1.6.5. If using MPI 3 or newer, this macro
+ * is a NOOP, while we do the following otherwise:
+ *
+ * 1. remove * from type of @p expr
+ * 2. remove const from resulting type
+ * 3. add * to resulting type
+ * 4. const_cast the given expression @p expr to this new type.
+ */
+#ifdef DEAL_II_WITH_MPI
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
+
+#    define DEAL_II_MPI_CONST_CAST(expr) (expr)
+
+#  else
+
+#    include <type_traits>
+
+#    define DEAL_II_MPI_CONST_CAST(expr)     \
+      const_cast<typename std::remove_const< \
+        typename std::remove_pointer<decltype(expr)>::type>::type *>(expr)
+
+#  endif
+#endif
+
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
-//Forward type declarations to allow MPI sums over tensorial types
-template <int rank, int dim, typename Number> class Tensor;
-template <int rank, int dim, typename Number> class SymmetricTensor;
-
+// Forward type declarations to allow MPI sums over tensorial types
+template <int rank, int dim, typename Number>
+class Tensor;
+template <int rank, int dim, typename Number>
+class SymmetricTensor;
+template <typename Number>
+class SparseMatrix;
 
 namespace Utilities
 {
@@ -73,7 +110,8 @@ namespace Utilities
      * only one MPI process), then the communicator necessarily involves
      * only one process and the function returns 1.
      */
-    unsigned int n_mpi_processes (const MPI_Comm &mpi_communicator);
+    unsigned int
+    n_mpi_processes(const MPI_Comm &mpi_communicator);
 
     /**
      * Return the
@@ -83,7 +121,8 @@ namespace Utilities
      * This will be a unique value for each process between zero and (less
      * than) the number of all processes (given by get_n_mpi_processes()).
      */
-    unsigned int this_mpi_process (const MPI_Comm &mpi_communicator);
+    unsigned int
+    this_mpi_process(const MPI_Comm &mpi_communicator);
 
     /**
      * Consider an unstructured communication pattern where every process in
@@ -107,8 +146,33 @@ namespace Utilities
      * destination more than once in their destinations list.
      */
     std::vector<unsigned int>
-    compute_point_to_point_communication_pattern (const MPI_Comm &mpi_comm,
-                                                  const std::vector<unsigned int> &destinations);
+    compute_point_to_point_communication_pattern(
+      const MPI_Comm &                 mpi_comm,
+      const std::vector<unsigned int> &destinations);
+
+    /**
+     * Simplified (for efficiency) version of the
+     * compute_point_to_point_communication_pattern()
+     * which only computes the number of processes in an MPI universe to expect
+     * communication from.
+     *
+     * @param mpi_comm A
+     * @ref GlossMPICommunicator "communicator"
+     * that describes the processors that are going to communicate with each
+     * other.
+     *
+     * @param destinations The list of processors the current process wants to
+     * send information to. This list need not be sorted in any way. If it
+     * contains duplicate entries that means that multiple messages are
+     * intended for a given destination.
+     *
+     * @return A number of processors that want to send something to the current
+     * processor.
+     */
+    unsigned int
+    compute_n_point_to_point_communications(
+      const MPI_Comm &                 mpi_comm,
+      const std::vector<unsigned int> &destinations);
 
     /**
      * Given a
@@ -123,7 +187,43 @@ namespace Utilities
      * When no longer needed, the communicator created here needs to be
      * destroyed using <code>MPI_Comm_free</code>.
      */
-    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
+    MPI_Comm
+    duplicate_communicator(const MPI_Comm &mpi_communicator);
+
+    /**
+     * If @p comm is an intracommunicator, this function returns a new
+     * communicator @p newcomm with communication group defined by the
+     * @p group argument. The function is only collective over the group of
+     * processes that actually want to create the communicator, i.e., that
+     * are named in the @p group argument. If multiple threads at a given
+     * process perform concurrent create_group() operations, the user must
+     * distinguish these operations by providing different @p tag or @p comm
+     * arguments.
+     *
+     * This function was introduced in the MPI-3.0 standard. If available,
+     * the corresponding function in the provided MPI implementation is used.
+     * Otherwise, the implementation follows the one described in the
+     * following publication:
+     * @code{.bib}
+     * @inproceedings{dinan2011noncollective,
+     *   title        = {Noncollective communicator creation in MPI},
+     *   author       = {Dinan, James and Krishnamoorthy, Sriram and Balaji,
+     *                   Pavan and Hammond, Jeff R and Krishnan, Manojkumar and
+     *                   Tipparaju, Vinod and Vishnu, Abhinav},
+     *   booktitle    = {European MPI Users' Group Meeting},
+     *   pages        = {282--291},
+     *   year         = {2011},
+     *   organization = {Springer}
+     * }
+     * @endcode
+     */
+#ifdef DEAL_II_WITH_MPI
+    int
+    create_group(const MPI_Comm & comm,
+                 const MPI_Group &group,
+                 const int        tag,
+                 MPI_Comm *       new_comm);
+#endif
 
     /**
      * Return the sum over all processors of the value @p t. This function is
@@ -145,8 +245,8 @@ namespace Utilities
      * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
      */
     template <typename T>
-    T sum (const T &t,
-           const MPI_Comm &mpi_communicator);
+    T
+    sum(const T &t, const MPI_Comm &mpi_communicator);
 
     /**
      * Like the previous function, but take the sums over the elements of an
@@ -158,9 +258,8 @@ namespace Utilities
      * Input and output arrays may be the same.
      */
     template <typename T, typename U>
-    void sum (const T        &values,
-              const MPI_Comm &mpi_communicator,
-              U              &sums);
+    void
+    sum(const T &values, const MPI_Comm &mpi_communicator, U &sums);
 
     /**
      * Like the previous function, but take the sums over the elements of an
@@ -172,9 +271,10 @@ namespace Utilities
      * Input and output arrays may be the same.
      */
     template <typename T>
-    void sum (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &sums);
+    void
+    sum(const ArrayView<const T> &values,
+        const MPI_Comm &          mpi_communicator,
+        const ArrayView<T> &      sums);
 
     /**
      * Perform an MPI sum of the entries of a symmetric tensor.
@@ -182,9 +282,9 @@ namespace Utilities
      * @relatesalso SymmetricTensor
      */
     template <int rank, int dim, typename Number>
-    SymmetricTensor<rank,dim,Number>
-    sum (const SymmetricTensor<rank,dim,Number> &local,
-         const MPI_Comm &mpi_communicator);
+    SymmetricTensor<rank, dim, Number>
+    sum(const SymmetricTensor<rank, dim, Number> &local,
+        const MPI_Comm &                          mpi_communicator);
 
     /**
      * Perform an MPI sum of the entries of a tensor.
@@ -192,9 +292,23 @@ namespace Utilities
      * @relatesalso Tensor
      */
     template <int rank, int dim, typename Number>
-    Tensor<rank,dim,Number>
-    sum (const Tensor<rank,dim,Number> &local,
-         const MPI_Comm &mpi_communicator);
+    Tensor<rank, dim, Number>
+    sum(const Tensor<rank, dim, Number> &local,
+        const MPI_Comm &                 mpi_communicator);
+
+    /**
+     * Perform an MPI sum of the entries of a SparseMatrix.
+     *
+     * @note @p local and @p global should have the same sparsity
+     * pattern and it should be the same for all MPI processes.
+     *
+     * @relatesalso SparseMatrix
+     */
+    template <typename Number>
+    void
+    sum(const SparseMatrix<Number> &local,
+        const MPI_Comm &            mpi_communicator,
+        SparseMatrix<Number> &      global);
 
     /**
      * Return the maximum over all processors of the value @p t. This function
@@ -216,8 +330,8 @@ namespace Utilities
      * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
      */
     template <typename T>
-    T max (const T &t,
-           const MPI_Comm &mpi_communicator);
+    T
+    max(const T &t, const MPI_Comm &mpi_communicator);
 
     /**
      * Like the previous function, but take the maximum over the elements of an
@@ -229,9 +343,8 @@ namespace Utilities
      * Input and output vectors may be the same.
      */
     template <typename T, typename U>
-    void max (const T        &values,
-              const MPI_Comm &mpi_communicator,
-              U              &maxima);
+    void
+    max(const T &values, const MPI_Comm &mpi_communicator, U &maxima);
 
     /**
      * Like the previous function, but take the maximum over the elements of an
@@ -243,9 +356,10 @@ namespace Utilities
      * Input and output arrays may be the same.
      */
     template <typename T>
-    void max (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &maxima);
+    void
+    max(const ArrayView<const T> &values,
+        const MPI_Comm &          mpi_communicator,
+        const ArrayView<T> &      maxima);
 
     /**
      * Return the minimum over all processors of the value @p t. This function
@@ -267,8 +381,8 @@ namespace Utilities
      * <code>T</code>, namely <code>float, double, int, unsigned int</code>.
      */
     template <typename T>
-    T min (const T &t,
-           const MPI_Comm &mpi_communicator);
+    T
+    min(const T &t, const MPI_Comm &mpi_communicator);
 
     /**
      * Like the previous function, but take the minima over the elements of an
@@ -280,9 +394,8 @@ namespace Utilities
      * Input and output arrays may be the same.
      */
     template <typename T, typename U>
-    void min (const T        &values,
-              const MPI_Comm &mpi_communicator,
-              U              &minima);
+    void
+    min(const T &values, const MPI_Comm &mpi_communicator, U &minima);
 
     /**
      * Like the previous function, but take the minimum over the elements of an
@@ -294,16 +407,19 @@ namespace Utilities
      * Input and output arrays may be the same.
      */
     template <typename T>
-    void min (const ArrayView<const T> &values,
-              const MPI_Comm           &mpi_communicator,
-              const ArrayView<T>       &minima);
+    void
+    min(const ArrayView<const T> &values,
+        const MPI_Comm &          mpi_communicator,
+        const ArrayView<T> &      minima);
 
     /**
      * A data structure to store the result of the min_max_avg() function.
      * The structure stores the minimum, maximum, and average of one
      * value contributed by each processor that participates in an
-     * @ref GlossMPICommunicator "MPI communicator". The structure also stores
-     * the indices (or, more precisely, the @ref GlossMPIRank "MPI rank")
+     * @ref GlossMPICommunicator "MPI communicator".
+     * The structure also stores
+     * the indices (or, more precisely, the
+     * @ref GlossMPIRank "MPI rank")
      * of the processors that hold the minimum and maximum values,
      * as well as the sum over all values.
      *
@@ -314,19 +430,40 @@ namespace Utilities
     {
       /**
        * The sum over all values contributed by the processors that
-       * participate in the call to min_max_avg(), as well as the
-       * minimum and maximum value.
+       * participate in the call to min_max_avg().
        */
       double sum;
+
+      /**
+       * The minimum value over all values contributed by the processors that
+       * participate in the call to min_max_avg().
+       */
       double min;
+
+      /**
+       * The maximum value over all values contributed by the processors that
+       * participate in the call to min_max_avg().
+       */
       double max;
 
       /**
-       * The indices (i.e., @ref GlossMPIRank "MPI rank" within an
-       * @ref GlossMPICommunicator "MPI communicator") of the
-       * processors that hold the minimal and maximal values.
+       * One of the ranks (i.e.,
+       * @ref GlossMPIRank "MPI rank"
+       * within an
+       * @ref GlossMPICommunicator "MPI communicator")
+       * of the
+       * processors that hold the minimal value.
        */
       unsigned int min_index;
+
+      /**
+       * One of the ranks (i.e.,
+       * @ref GlossMPIRank "MPI rank"
+       * within an
+       * @ref GlossMPICommunicator "MPI communicator")
+       * of the
+       * processors that hold the maximal value.
+       */
       unsigned int max_index;
 
       /**
@@ -351,8 +488,7 @@ namespace Utilities
      * everywhere.
      */
     MinMaxAvg
-    min_max_avg (const double my_value,
-                 const MPI_Comm &mpi_communicator);
+    min_max_avg(const double my_value, const MPI_Comm &mpi_communicator);
 
     /**
      * A class that is used to initialize the MPI system at the beginning of a
@@ -445,9 +581,10 @@ namespace Utilities
        * create an object of this type is also at or close to the top of
        * <code>main()</code>.
        */
-      MPI_InitFinalize (int    &argc,
-                        char ** &argv,
-                        const unsigned int max_num_threads = numbers::invalid_unsigned_int);
+      MPI_InitFinalize(
+        int &              argc,
+        char **&           argv,
+        const unsigned int max_num_threads = numbers::invalid_unsigned_int);
 
       /**
        * Destructor. Calls <tt>MPI_Finalize()</tt> in case this class owns the
@@ -467,7 +604,8 @@ namespace Utilities
      * actually runs on more than one processor or is, in fact, a single-node
      * job that happens to run under MPI.
      */
-    bool job_supports_mpi ();
+    bool
+    job_supports_mpi();
 
     /**
      * Initiate a some-to-some communication, and exchange arbitrary objects
@@ -487,8 +625,8 @@ namespace Utilities
      */
     template <typename T>
     std::map<unsigned int, T>
-    some_to_some(const MPI_Comm                                &comm,
-                 const std::map <unsigned int, T>     &objects_to_send);
+    some_to_some(const MPI_Comm &                 comm,
+                 const std::map<unsigned int, T> &objects_to_send);
 
     /**
      * A generalization of the classic MPI_Allgather function, that accepts
@@ -507,8 +645,7 @@ namespace Utilities
      */
     template <typename T>
     std::vector<T>
-    all_gather(const MPI_Comm &comm,
-               const T        &object_to_send);
+    all_gather(const MPI_Comm &comm, const T &object_to_send);
 
     /**
      * A generalization of the classic MPI_Gather function, that accepts
@@ -517,8 +654,8 @@ namespace Utilities
      *
      * @param[in] comm MPI communicator.
      * @param[in] object_to_send an object to send to the root process
-     * @param[in] root_process The process, which receives the objects from all processes.
-     *  By default the process with rank 0 is the root process.
+     * @param[in] root_process The process, which receives the objects from all
+     * processes. By default the process with rank 0 is the root process.
      *
      * @return The @p root_process receives a vector of objects, with size equal to the number of
      *  processes in the MPI communicator. Each entry contains the object
@@ -529,85 +666,96 @@ namespace Utilities
      */
     template <typename T>
     std::vector<T>
-    gather(const MPI_Comm &comm,
-           const T &object_to_send,
-           const unsigned int root_process=0);
+    gather(const MPI_Comm &   comm,
+           const T &          object_to_send,
+           const unsigned int root_process = 0);
 
 #ifndef DOXYGEN
     // declaration for an internal function that lives in mpi.templates.h
     namespace internal
     {
       template <typename T>
-      void all_reduce (const MPI_Op             &mpi_op,
-                       const ArrayView<const T> &values,
-                       const MPI_Comm           &mpi_communicator,
-                       const ArrayView<T>       &output);
+      void
+      all_reduce(const MPI_Op &            mpi_op,
+                 const ArrayView<const T> &values,
+                 const MPI_Comm &          mpi_communicator,
+                 const ArrayView<T> &      output);
     }
 
     // Since these depend on N they must live in the header file
     template <typename T, unsigned int N>
-    void sum (const T (&values)[N],
-              const MPI_Comm &mpi_communicator,
-              T (&sums)[N])
+    void
+    sum(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&sums)[N])
     {
-      internal::all_reduce(MPI_SUM, ArrayView<const T>(values, N),
-                           mpi_communicator, ArrayView<T>(sums, N));
+      internal::all_reduce(MPI_SUM,
+                           ArrayView<const T>(values, N),
+                           mpi_communicator,
+                           ArrayView<T>(sums, N));
     }
 
     template <typename T, unsigned int N>
-    void max (const T (&values)[N],
-              const MPI_Comm &mpi_communicator,
-              T (&maxima)[N])
+    void
+    max(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&maxima)[N])
     {
-      internal::all_reduce(MPI_MAX, ArrayView<const T>(values, N),
-                           mpi_communicator, ArrayView<T>(maxima, N));
+      internal::all_reduce(MPI_MAX,
+                           ArrayView<const T>(values, N),
+                           mpi_communicator,
+                           ArrayView<T>(maxima, N));
     }
 
     template <typename T, unsigned int N>
-    void min (const T (&values)[N],
-              const MPI_Comm &mpi_communicator,
-              T (&minima)[N])
+    void
+    min(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&minima)[N])
     {
-      internal::all_reduce(MPI_MIN, ArrayView<const T>(values, N),
-                           mpi_communicator, ArrayView<T>(minima, N));
+      internal::all_reduce(MPI_MIN,
+                           ArrayView<const T>(values, N),
+                           mpi_communicator,
+                           ArrayView<T>(minima, N));
     }
 
-    template<typename T>
+    template <typename T>
     std::map<unsigned int, T>
-    some_to_some(const MPI_Comm &comm,
+    some_to_some(const MPI_Comm &                 comm,
                  const std::map<unsigned int, T> &objects_to_send)
     {
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
       (void)comm;
-      Assert(objects_to_send.size() == 0, ExcMessage("Cannot send to more than one processor."));
-      Assert(objects_to_send.find(0) != objects_to_send.end() || objects_to_send.size() == 0,
+      Assert(objects_to_send.size() == 0,
+             ExcMessage("Cannot send to more than one processor."));
+      Assert(objects_to_send.find(0) != objects_to_send.end() ||
+               objects_to_send.size() == 0,
              ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
-#else
+#  else
 
       std::vector<unsigned int> send_to(objects_to_send.size());
       {
-        unsigned int i=0;
-        for (const auto &m: objects_to_send)
+        unsigned int i = 0;
+        for (const auto &m : objects_to_send)
           send_to[i++] = m.first;
       }
       AssertDimension(send_to.size(), objects_to_send.size());
 
       const auto receive_from =
-        Utilities::MPI::compute_point_to_point_communication_pattern(comm, send_to);
+        Utilities::MPI::compute_point_to_point_communication_pattern(comm,
+                                                                     send_to);
 
       // Sending buffers
-      std::vector<std::vector<char> > buffers_to_send(send_to.size());
-      std::vector<MPI_Request> buffer_send_requests(send_to.size());
+      std::vector<std::vector<char>> buffers_to_send(send_to.size());
+      std::vector<MPI_Request>       buffer_send_requests(send_to.size());
       {
         unsigned int i = 0;
         for (const auto &rank_obj : objects_to_send)
           {
-            const auto &rank = rank_obj.first;
+            const auto &rank   = rank_obj.first;
             buffers_to_send[i] = Utilities::pack(rank_obj.second);
-            const int ierr = MPI_Isend(buffers_to_send[i].data(),
-                                       buffers_to_send[i].size(), MPI_CHAR,
-                                       rank, 21, comm, &buffer_send_requests[i]);
+            const int ierr     = MPI_Isend(buffers_to_send[i].data(),
+                                       buffers_to_send[i].size(),
+                                       MPI_CHAR,
+                                       rank,
+                                       21,
+                                       comm,
+                                       &buffer_send_requests[i]);
             AssertThrowMPI(ierr);
             ++i;
           }
@@ -618,11 +766,11 @@ namespace Utilities
       {
         std::vector<char> buffer;
         // We do this on a first come/first served basis
-        for (unsigned int i = 0; i<receive_from.size(); ++i)
+        for (unsigned int i = 0; i < receive_from.size(); ++i)
           {
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;
-            int ierr = MPI_Probe(MPI_ANY_SOURCE, 21, comm, &status);
+            int        ierr = MPI_Probe(MPI_ANY_SOURCE, 21, comm, &status);
             AssertThrowMPI(ierr);
 
             // Length of the message
@@ -635,31 +783,34 @@ namespace Utilities
             const unsigned int rank = status.MPI_SOURCE;
 
             // Actually receive the message
-            ierr = MPI_Recv(buffer.data(), len, MPI_CHAR,
-                            rank, 21, comm, MPI_STATUS_IGNORE);
+            ierr = MPI_Recv(
+              buffer.data(), len, MPI_CHAR, rank, 21, comm, MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
             Assert(received_objects.find(rank) == received_objects.end(),
-                   ExcInternalError("I should not receive again from this rank"));
+                   ExcInternalError(
+                     "I should not receive again from this rank"));
             received_objects[rank] = Utilities::unpack<T>(buffer);
           }
       }
 
       // Wait to have sent all objects.
-      MPI_Waitall(send_to.size(), buffer_send_requests.data(),MPI_STATUSES_IGNORE);
+      MPI_Waitall(send_to.size(),
+                  buffer_send_requests.data(),
+                  MPI_STATUSES_IGNORE);
 
       return received_objects;
-#endif // deal.II with MPI
+#  endif // deal.II with MPI
     }
 
-    template<typename T>
-    std::vector<T> all_gather(const MPI_Comm       &comm,
-                              const T &object)
+    template <typename T>
+    std::vector<T>
+    all_gather(const MPI_Comm &comm, const T &object)
     {
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
       (void)comm;
       std::vector<T> v(1, object);
       return v;
-#else
+#  else
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
 
       std::vector<char> buffer = Utilities::pack(object);
@@ -667,106 +818,125 @@ namespace Utilities
       int n_local_data = buffer.size();
 
       // Vector to store the size of loc_data_array for every process
-      std::vector<int> size_all_data(n_procs,0);
+      std::vector<int> size_all_data(n_procs, 0);
 
       // Exchanging the size of each buffer
-      MPI_Allgather(&n_local_data, 1, MPI_INT,
-                    &(size_all_data[0]), 1, MPI_INT,
-                    comm);
+      MPI_Allgather(
+        &n_local_data, 1, MPI_INT, &(size_all_data[0]), 1, MPI_INT, comm);
 
-      // Now computing the the displacement, relative to recvbuf,
+      // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer
       std::vector<int> rdispls(n_procs);
       rdispls[0] = 0;
-      for (unsigned int i=1; i < n_procs; ++i)
-        rdispls[i] = rdispls[i-1] + size_all_data[i-1];
+      for (unsigned int i = 1; i < n_procs; ++i)
+        rdispls[i] = rdispls[i - 1] + size_all_data[i - 1];
 
       // Step 3: exchange the buffer:
-      std::vector<char> received_unrolled_buffer(rdispls.back() + size_all_data.back());
+      std::vector<char> received_unrolled_buffer(rdispls.back() +
+                                                 size_all_data.back());
 
-      MPI_Allgatherv(buffer.data(), n_local_data, MPI_CHAR,
-                     received_unrolled_buffer.data(), size_all_data.data(),
-                     rdispls.data(), MPI_CHAR, comm);
+      MPI_Allgatherv(buffer.data(),
+                     n_local_data,
+                     MPI_CHAR,
+                     received_unrolled_buffer.data(),
+                     size_all_data.data(),
+                     rdispls.data(),
+                     MPI_CHAR,
+                     comm);
 
       std::vector<T> received_objects(n_procs);
-      for (unsigned int i= 0; i < n_procs; ++i)
+      for (unsigned int i = 0; i < n_procs; ++i)
         {
-          std::vector<char> local_buffer(received_unrolled_buffer.begin()+rdispls[i],
-                                         received_unrolled_buffer.begin()+rdispls[i]+size_all_data[i]);
+          std::vector<char> local_buffer(received_unrolled_buffer.begin() +
+                                           rdispls[i],
+                                         received_unrolled_buffer.begin() +
+                                           rdispls[i] + size_all_data[i]);
           received_objects[i] = Utilities::unpack<T>(local_buffer);
         }
 
       return received_objects;
-#endif
+#  endif
     }
 
     template <typename T>
     std::vector<T>
-    gather(const MPI_Comm &comm,
-           const T &object_to_send,
+    gather(const MPI_Comm &   comm,
+           const T &          object_to_send,
            const unsigned int root_process)
     {
-#ifndef DEAL_II_WITH_MPI
+#  ifndef DEAL_II_WITH_MPI
       (void)comm;
       (void)root_process;
       std::vector<T> v(1, object_to_send);
       return v;
-#else
+#  else
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
       const auto my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
 
-      Assert(root_process < n_procs, ExcIndexRange(root_process,0,n_procs));
+      Assert(root_process < n_procs, ExcIndexRange(root_process, 0, n_procs));
 
-      std::vector<char> buffer = Utilities::pack(object_to_send);
-      int n_local_data = buffer.size();
+      std::vector<char> buffer       = Utilities::pack(object_to_send);
+      int               n_local_data = buffer.size();
 
       // Vector to store the size of loc_data_array for every process
       // only the root process needs to allocate memory for that purpose
       std::vector<int> size_all_data;
-      if (my_rank==root_process)
-        size_all_data.resize(n_procs,0);
+      if (my_rank == root_process)
+        size_all_data.resize(n_procs, 0);
 
       // Exchanging the size of each buffer
-      int ierr = MPI_Gather(&n_local_data, 1, MPI_INT,
-                            size_all_data.data(), 1, MPI_INT,
-                            root_process, comm);
+      int ierr = MPI_Gather(&n_local_data,
+                            1,
+                            MPI_INT,
+                            size_all_data.data(),
+                            1,
+                            MPI_INT,
+                            root_process,
+                            comm);
       AssertThrowMPI(ierr);
 
       // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer; only for root
       std::vector<int> rdispls;
-      if (my_rank==root_process)
+      if (my_rank == root_process)
         {
-          rdispls.resize(n_procs,0);
-          for (unsigned int i=1; i<n_procs; ++i)
-            rdispls[i] = rdispls[i-1] + size_all_data[i-1];
+          rdispls.resize(n_procs, 0);
+          for (unsigned int i = 1; i < n_procs; ++i)
+            rdispls[i] = rdispls[i - 1] + size_all_data[i - 1];
         }
       // exchange the buffer:
       std::vector<char> received_unrolled_buffer;
-      if (my_rank==root_process)
+      if (my_rank == root_process)
         received_unrolled_buffer.resize(rdispls.back() + size_all_data.back());
 
-      ierr = MPI_Gatherv(buffer.data(), n_local_data, MPI_CHAR,
-                         received_unrolled_buffer.data(), size_all_data.data(),
-                         rdispls.data(), MPI_CHAR,
-                         root_process, comm);
+      ierr = MPI_Gatherv(buffer.data(),
+                         n_local_data,
+                         MPI_CHAR,
+                         received_unrolled_buffer.data(),
+                         size_all_data.data(),
+                         rdispls.data(),
+                         MPI_CHAR,
+                         root_process,
+                         comm);
       AssertThrowMPI(ierr);
 
       std::vector<T> received_objects;
 
-      if (my_rank==root_process)
+      if (my_rank == root_process)
         {
           received_objects.resize(n_procs);
 
-          for (unsigned int i=0; i<n_procs; ++i)
+          for (unsigned int i = 0; i < n_procs; ++i)
             {
-              const std::vector<char> local_buffer(received_unrolled_buffer.begin()+rdispls[i],
-                                                   received_unrolled_buffer.begin()+rdispls[i]+size_all_data[i]);
+              const std::vector<char> local_buffer(
+                received_unrolled_buffer.begin() + rdispls[i],
+                received_unrolled_buffer.begin() + rdispls[i] +
+                  size_all_data[i]);
               received_objects[i] = Utilities::unpack<T>(local_buffer);
             }
         }
       return received_objects;
-#endif
+#  endif
     }
 
 #endif

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2017 by the deal.II authors
+// Copyright (C) 1998 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,19 +18,20 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/patterns.h>
 
-#include <boost/property_tree/ptree_fwd.hpp>
-#include <boost/serialization/split_member.hpp>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/patterns.h>
+#include <deal.II/base/subscriptor.h>
+
 #include <boost/archive/basic_archive.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <map>
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -65,12 +66,12 @@ class MultipleParameterLoop;
  *     ...
  *     ParameterHandler prm;
  *     prm.declare_entry ("Time step size",
- *                       "0.2",
- *                       Patterns::Double(),
- *                       "Some documentation");
+ *                        "0.2",
+ *                        Patterns::Double(),
+ *                        "Some documentation");
  *     prm.declare_entry ("Geometry",
- *                       "[0,1]x[0,1]",
- *                       Patterns::Anything());
+ *                        "[0,1]x[0,1]",
+ *                        Patterns::Anything());
  *     ...
  *   @endcode
  * Each entry is declared using the function declare_entry(). The first
@@ -90,44 +91,45 @@ class MultipleParameterLoop;
  * example input parameters for linear solver routines should be classified in
  * a subsection named <tt>Linear solver</tt> or any other suitable name. This
  * is accomplished in the following way:
- *   @code
- *     ...
- *       LinEq eq;
- *       eq.declare_parameters (prm);
- *     ...
+ * @code
+ * ...
+ * LinEq eq;
+ * eq.declare_parameters (prm);
+ * ...
  *
- *     void LinEq::declare_parameters (ParameterHandler &prm) {
- *       prm.enter_subsection("Linear solver");
- *       {
- *         prm.declare_entry ("Solver",
- *                            "CG",
- *                            Patterns::Selection("CG|GMRES|GaussElim"),
- *                            "Name of a linear solver for the inner iteration");
- *         prm.declare_entry ("Maximum number of iterations",
- *                            "20",
- *                            ParameterHandler::RegularExpressions::Integer());
- *         ...
- *       }
- *       prm.leave_subsection ();
- *     }
- *   @endcode
+ * void LinEq::declare_parameters (ParameterHandler &prm)
+ * {
+ *   prm.enter_subsection("Linear solver");
+ *   {
+ *     prm.declare_entry ("Solver",
+ *                        "CG",
+ *                        Patterns::Selection("CG|GMRES|GaussElim"),
+ *                        "Name of a linear solver for the inner iteration");
+ *     prm.declare_entry ("Maximum number of iterations", "20",
+ *                        ParameterHandler::RegularExpressions::Integer());
+ *     ...
+ *   }
+ *   prm.leave_subsection ();
+ * }
+ * @endcode
  *
  * Subsections may be nested. For example a nonlinear solver may have a linear
  * solver as member object. Then the function call tree would be something
  * like (if the class <tt>NonLinEq</tt> has a member variables <tt>eq</tt> of
  * type <tt>LinEq</tt>):
- *   @code
- *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
- *       prm.enter_subsection ("Nonlinear solver");
- *       {
- *         prm.declare_entry ("Nonlinear method",
- *                            "Newton-Raphson",
- *                            ParameterHandler::RegularExpressions::Anything());
- *         eq.declare_parameters (prm);
- *       }
- *       prm.leave_subsection ();
- *     }
- *   @endcode
+ * @code
+ * void NonLinEq::declare_parameters (ParameterHandler &prm)
+ * {
+ *   prm.enter_subsection ("Nonlinear solver");
+ *   {
+ *     prm.declare_entry ("Nonlinear method",
+ *                        "Newton-Raphson",
+ *                        ParameterHandler::RegularExpressions::Anything());
+ *     eq.declare_parameters (prm);
+ *   }
+ *   prm.leave_subsection ();
+ * }
+ * @endcode
  *
  * For class member functions which declare the different entries we propose
  * to use the common name <tt>declare_parameters</tt>. In normal cases this
@@ -137,25 +139,26 @@ class MultipleParameterLoop;
  * has two or more member variables of the same type both of which should have
  * their own parameters, this parent class' method <tt>declare_parameters</tt>
  * is responsible to group them into different subsections:
- *   @code
- *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
- *       prm.enter_subsection ("Nonlinear solver");
- *       {
- *         prm.enter_subsection ("Linear solver 1");
- *         {
- *           eq1.declare_parameters (prm);
- *         }
- *         prm.leave_subsection ();
- *
- *         prm.enter_subsection ("Linear solver 2");
- *         {
- *           eq2.declare_parameters (prm);
- *         }
- *         prm.leave_subsection ();
- *       }
- *       prm.leave_subsection ();
+ * @code
+ * void NonLinEq::declare_parameters (ParameterHandler &prm)
+ * {
+ *   prm.enter_subsection ("Nonlinear solver");
+ *   {
+ *     prm.enter_subsection ("Linear solver 1");
+ *     {
+ *       eq1.declare_parameters (prm);
  *     }
- *   @endcode
+ *     prm.leave_subsection ();
+ *
+ *     prm.enter_subsection ("Linear solver 2");
+ *     {
+ *       eq2.declare_parameters (prm);
+ *     }
+ *     prm.leave_subsection ();
+ *   }
+ *   prm.leave_subsection ();
+ * }
+ * @endcode
  *
  *
  * <h3>Input files and special characters</h3>
@@ -257,7 +260,8 @@ class MultipleParameterLoop;
  * Each class gets its data out of a ParameterHandler object by calling the
  * get()  member functions like this:
  *   @code
- *      void NonLinEq::get_parameters (ParameterHandler &prm) {
+ *     void NonLinEq::get_parameters (ParameterHandler &prm)
+ *     {
  *       prm.enter_subsection ("Nonlinear solver");
  *       std::string method = prm.get ("Nonlinear method");
  *       eq.get_parameters (prm);
@@ -266,8 +270,34 @@ class MultipleParameterLoop;
  *   @endcode
  * get() returns the value of the given entry. If the entry was not specified
  * in the input source(s), the default value is returned. You have to enter
- * and leave subsections exactly as you did when declaring subsection. You may
- * chose the order in which to transverse the subsection tree.
+ * and leave subsections exactly as you did when declaring subsections. You may
+ * choose the order in which to traverse the subsection tree.
+ *
+ * It is possible to avoid calls to enter_subsection() and leave_subsection()
+ * by supplying get() with a vector of strings representing the path from
+ * which to get a value. For example, the following two versions of
+ * get_parameters() will produce the same result:
+ *   @code
+ *     void NonLinEq::get_parameters (ParameterHandler &prm)
+ *     {
+ *       prm.enter_subsection ("Equation 1 Settings");
+ *       prm.enter_subsection ("Linear solver");
+ *       solver_ = prm.get ("Solver");
+ *       prm.leave_subsection ();
+ *       prm.leave_subsection ();
+ *     }
+ *   @endcode
+ *
+ *   @code
+ *     void NonLinEq::get_parameters (const ParameterHandler &prm)
+ *     {
+ *       std::vector<std::string> path =
+ *         {"Equation 1 Settings", "Linear solver"};
+ *       solver_ = prm.get (path, "Solver");
+ *     }
+ *   @endcode
+ *
+ * The latter method allows the ParameterHandler reference to be @p const.
  *
  * It is guaranteed that only entries matching the given regular expression
  * are returned, i.e. an input entry value which does not match the regular
@@ -343,7 +373,7 @@ class MultipleParameterLoop;
  *     prm.declare_entry ("Number of iterations",  // name of parameter
  *                        "10",                    // default value
  *                        Patterns::Integer(1,100),// allowed values: 1...100
- *                        "The number of ...");    // some documentation, to be completed
+ *                        "The number of ...");    // some documentation
  *
  *     // next read the parameter from an input file...
  *     prm.parse_input ("my_algorithm.prm");
@@ -370,9 +400,10 @@ class MultipleParameterLoop;
  *     prm.declare_entry ("Number of iterations",  // name of parameter
  *                        "10",                    // default value
  *                        Patterns::Integer(1,100),// allowed values: 1...100
- *                        "The number of ...");    // some documentation, to be completed
+ *                        "The number of ...");    // some documentation
  *     prm.add_action ("Number of iterations",
- *                     [&](const std::string &value) {
+ *                     [&](const std::string &value)
+ *                     {
  *                       this->n_iterations = Utilities::string_to_int(value);
  *                     });
  *
@@ -494,13 +525,12 @@ class MultipleParameterLoop;
  *   void Problem::declare_parameters (ParameterHandler &prm)
  *   {
  *     // first some global parameter entries
- *     prm.declare_entry ("Output file",
- *                        "out",
- *                        Patterns::Anything(),
- *                        "Name of the output file, either relative to the present "
- *                        "path or absolute");
- *     prm.declare_entry ("Equation 1",
- *                        "Laplace",
+ *     prm.declare_entry (
+ *       "Output file",
+ *       "out",
+ *       Patterns::Anything(),
+ *       "Name of the output file, either relative or absolute");
+ *     prm.declare_entry ("Equation 1", "Laplace",
  *                        Patterns::Anything(),
  *                        "String identifying the equation we want to solve");
  *     prm.declare_entry ("Equation 2",
@@ -554,10 +584,11 @@ class MultipleParameterLoop;
  *       eq2.get_parameters (prm); // for eq2
  *     }
  *     prm.leave_subsection ();
- *     std::cout << "  Problem: outfile=" << outfile << '\n'
- *               << "           eq1="     << equation1 << ", eq2=" << equation2 << '\n'
- *               << "           matrix1=" << matrix1 << ", matrix2=" << matrix2
- *               << std::endl;
+ *     std::cout
+ *       << "  Problem: outfile=" << outfile << '\n'
+ *       << "           eq1="     << equation1 << ", eq2=" << equation2 << '\n'
+ *       << "           matrix1=" << matrix1 << ", matrix2=" << matrix2
+ *       << std::endl;
  *   }
  *
  *
@@ -693,16 +724,17 @@ class MultipleParameterLoop;
  *                        "up on a matrix.");
  *     prm.enter_subsection ("Preconditioner");
  *     {
- *       prm.declare_entry ("Kind",
- *                          "SSOR",
- *                          Patterns::Selection ("SSOR|Jacobi"),
- *                          "A string that describes the kind of preconditioner "
- *                          "to use.");
- *       prm.declare_entry ("Relaxation factor",
- *                          "1.0",
- *                          Patterns::Double (0, 1),
- *                          "The numerical value (between zero and one) for the "
- *                          "relaxation factor to use in the preconditioner.");
+ *       prm.declare_entry(
+ *         "Kind",
+ *         "SSOR",
+ *         Patterns::Selection ("SSOR|Jacobi"),
+ *         "A string that describes the kind of preconditioner to use.");
+ *       prm.declare_entry(
+ *         "Relaxation factor",
+ *         "1.0",
+ *         Patterns::Double (0, 1),
+ *         "The numerical value (between zero and one) for the "
+ *         "relaxation factor to use in the preconditioner.");
  *     }
  *     prm.leave_subsection ();
  *   @endcode
@@ -717,7 +749,7 @@ class MultipleParameterLoop;
  * parameter; initially, the content of the file equals the default value of
  * the parameter.
  * - <code>default_value</code>: The content of this file is the default value
- * value of the parameter.
+ * of the parameter.
  * - <code>pattern</code>: A textual representation of the pattern that
  * describes the parameter's possible values.
  * - <code>pattern_index</code>: A number that indexes the Patterns::PatternBase
@@ -754,23 +786,35 @@ class MultipleParameterLoop;
  *     <Maximal_20number_20of_20iterations>
  *       <value>10</value>
  *       <default_value>10</default_value>
- *       <documentation>A parameter that describes the maximal number of iterations the CG method is to take before giving up on a matrix.</documentation>
+ *       <documentation>
+ *         A parameter that describes the maximal number of iterations the CG
+ *         method is to take before giving up on a matrix.
+ *       </documentation>
  *       <pattern>0</pattern>
- *       <pattern_description>[Integer range 1...1000 (inclusive)]</pattern_description>
+ *       <pattern_description>
+ *         [Integer range 1...1000 (inclusive)]
+ *       </pattern_description>
  *     </Maximal_20number_20of_20iterations>
  *     <Preconditioner>
  *       <Kind><value>SSOR</value>
  *         <default_value>SSOR</default_value>
- *         <documentation>A string that describes the kind of preconditioner to use.</documentation>
+ *         <documentation>
+ *           A string that describes the kind of preconditioner to use.
+ *         </documentation>
  *         <pattern>1</pattern>
  *         <pattern_description>SSOR|Jacobi</pattern_description>
  *       </Kind>
  *       <Relaxation_20factor>
  *         <value>1.0</value>
  *         <default_value>1.0</default_value>
- *         <documentation>The numerical value (between zero and one) for the relaxation factor to use in the preconditioner.</documentation>
+ *         <documentation>
+ *           The numerical value (between zero and one) for the relaxation
+ *           factor to use in the preconditioner.
+ *         </documentation>
  *         <pattern>2</pattern>
- *         <pattern_description>[Floating point range 0...1 (inclusive)]</pattern_description>
+ *         <pattern_description>
+ *           [Floating point range 0...1 (inclusive)]
+ *         </pattern_description>
  *       </Relaxation_20factor>
  *     </Preconditioner>
  *   <ParameterHandler>
@@ -795,6 +839,7 @@ class MultipleParameterLoop;
  * @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011, 2017
  * @author Alberto Sartori, 2015
  * @author David Wells, 2016
+ * @author Denis Davydov, 2018
  */
 class ParameterHandler : public Subscriptor
 {
@@ -802,16 +847,18 @@ private:
   /**
    * Inhibit automatic CopyConstructor.
    */
-  ParameterHandler (const ParameterHandler &) = delete;
+  ParameterHandler(const ParameterHandler &) = delete;
 
   /**
    * Inhibit automatic assignment operator.
    */
-  ParameterHandler &operator= (const ParameterHandler &) = delete;
+  ParameterHandler &
+  operator=(const ParameterHandler &) = delete;
 
 public:
   /**
-   * List of possible output formats used for ParameterHandler::print_parameters().
+   * List of possible output formats used for
+   * ParameterHandler::print_parameters().
    */
   enum OutputStyle
   {
@@ -856,14 +903,14 @@ public:
   /**
    * Constructor.
    */
-  ParameterHandler ();
+  ParameterHandler();
 
   /**
    * Destructor. Declare this only to have a virtual destructor, which is
    * safer as we have virtual functions.  It actually does nothing
    * spectacular.
    */
-  virtual ~ParameterHandler () = default;
+  virtual ~ParameterHandler() override = default;
 
   /**
    * Parse each line from a stream until the stream returns the <tt>eof</tt>
@@ -875,6 +922,12 @@ public:
    * If non-empty @p last_line is provided, the ParameterHandler object
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
+   *
+   * If @p skip_undefined is <code>true</code>, the parameter handler
+   * will skip undefined sections and entries. This is useful for partially
+   * parsing a parameter file, for example to obtain only the spatial dimension
+   * of the problem. By default all entries and subsections are expected to be
+   * declared.
    *
    * The function sets the value of all parameters it encounters in the
    * input file to the provided value. Parameters not explicitly listed
@@ -893,9 +946,11 @@ public:
    * occurs, that is everything that comes after the parameter whose
    * value does not satisfy its pattern is ignored.
    */
-  virtual void parse_input (std::istream &input,
-                            const std::string &filename = "input file",
-                            const std::string &last_line = "");
+  virtual void
+  parse_input(std::istream &     input,
+              const std::string &filename       = "input file",
+              const std::string &last_line      = "",
+              const bool         skip_undefined = false);
 
   /**
    * Parse the given file to provide values for known parameter fields. The
@@ -934,14 +989,16 @@ public:
    *                   << "> with default values for you."
    *                   << std::endl;
    *         std::ofstream output (filename);
-   *         parameter_handler.print_parameters (output,
-   *                                             ParameterHandler::OutputStyle::Text);
+   *         parameter_handler.print_parameters(
+   *           output, ParameterHandler::OutputStyle::Text);
    *       }
    *   }
    * @endcode
    */
-  virtual void parse_input (const std::string &filename,
-                            const std::string &last_line = "");
+  virtual void
+  parse_input(const std::string &filename,
+              const std::string &last_line      = "",
+              const bool         skip_undefined = false);
 
   /**
    * Parse input from a string to populate known parameter fields. The lines
@@ -951,8 +1008,10 @@ public:
    * then calls the other parse_input() function with that stream. See
    * there for more information.
    */
-  virtual void parse_input_from_string (const char *s,
-                                        const std::string &last_line = "");
+  virtual void
+  parse_input_from_string(const char *       s,
+                          const std::string &last_line      = "",
+                          const bool         skip_undefined = false);
 
   /**
    * Parse input from an XML stream to populate known parameter fields. This
@@ -961,7 +1020,8 @@ public:
    * a file written using this method and then modified by the graphical
    * parameter GUI (see the general documentation of this class).
    */
-  virtual void parse_input_from_xml (std::istream &input);
+  virtual void
+  parse_input_from_xml(std::istream &input);
 
   /**
    * Parse input from a JSON stream to populate known parameter fields. This
@@ -970,12 +1030,14 @@ public:
    * a separate program that knows how to write JSON format for ParameterHandler
    * input.
    */
-  virtual void parse_input_from_json (std::istream &input);
+  virtual void
+  parse_input_from_json(std::istream &input);
 
   /**
    * Clear all contents.
    */
-  void clear ();
+  void
+  clear();
 
 
   /**
@@ -997,16 +1059,18 @@ public:
    * @note An entry can be declared more than once without generating an
    * error, for example to override an earlier default value.
    */
-  void declare_entry (const std::string           &entry,
-                      const std::string           &default_value,
-                      const Patterns::PatternBase &pattern = Patterns::Anything(),
-                      const std::string           &documentation = std::string());
+  void
+  declare_entry(const std::string &          entry,
+                const std::string &          default_value,
+                const Patterns::PatternBase &pattern = Patterns::Anything(),
+                const std::string &          documentation = "");
 
   /**
    * Attach an action to the parameter with name @p entry in the current
    * section. The action needs to be a function-like object that takes the
-   * value of the parameter as a (string) argument. See the general documentation
-   * of this class for a longer description of actions, as well as examples.
+   * value of the parameter as a (string) argument. See the general
+   * documentation of this class for a longer description of actions, as well as
+   * examples.
    *
    * The action is executed in three different circumstances:
    * - With the default value of the parameter with name @p name, at
@@ -1044,8 +1108,9 @@ public:
    *  stops to read any further content from the file. See
    *  ParameterHandler::parse_input() for more information.
    */
-  void add_action (const std::string &entry,
-                   const std::function<void (const std::string &value)> &action);
+  void
+  add_action(const std::string &                                  entry,
+             const std::function<void(const std::string &value)> &action);
 
   /**
    * Declare a new entry name @p entry, set its default value to the content of
@@ -1057,11 +1122,12 @@ public:
    * Patterns::Tools::Convert<T>::to_pattern(), but a custom one can be used.
    */
   template <class ParameterType>
-  void add_parameter(const std::string &entry,
-                     ParameterType &parameter,
-                     const std::string &documentation = std::string(),
-                     const Patterns::PatternBase &pattern =
-                       *Patterns::Tools::Convert<ParameterType>::to_pattern());
+  void
+  add_parameter(const std::string &          entry,
+                ParameterType &              parameter,
+                const std::string &          documentation = "",
+                const Patterns::PatternBase &pattern =
+                  *Patterns::Tools::Convert<ParameterType>::to_pattern());
 
   /**
    * Create an alias for an existing entry. This provides a way to refer to a
@@ -1106,45 +1172,99 @@ public:
    * (see above) but make it clear that this old name will eventually be
    * removed.
    */
-  void declare_alias (const std::string &existing_entry_name,
-                      const std::string &alias_name,
-                      const bool         alias_is_deprecated = false);
+  void
+  declare_alias(const std::string &existing_entry_name,
+                const std::string &alias_name,
+                const bool         alias_is_deprecated = false);
 
   /**
    * Enter a subsection. If it does not yet exist, create it.
    */
-  void enter_subsection (const std::string &subsection);
+  void
+  enter_subsection(const std::string &subsection);
 
   /**
    * Leave present subsection.
    */
-  void leave_subsection ();
+  void
+  leave_subsection();
 
   /**
-   * Return value of entry <tt>entry_string</tt>.  If the entry was changed,
+   * Return value of entry @p entry_string.  If the entry was changed,
    * then the changed value is returned, otherwise the default value. If the
-   * value of an undeclared entry is required, an exception will be thrown.
+   * value of an undeclared entry is required, an @p Assert will fail.
    */
-  std::string get (const std::string &entry_string) const;
+  std::string
+  get(const std::string &entry_string) const;
 
   /**
-   * Return value of entry <tt>entry_string</tt> as <tt>long int</tt>. (A long
+   * Return value of entry @p entry_string.  If the entry was changed,
+   * then the changed value is returned, otherwise the default value. If the
+   * value of an undeclared entry is required, an @p Assert will fail.
+   * If @p entry_subsection_path is non-empty, the value will be gotten
+   * from the subsection represented by that path instead of the current
+   * subsection. The first string in @p entry_subsection_path must be the name
+   * of a subsection of the current section, and each next string must be the
+   * name of a subsection of the one before it.
+   */
+  std::string
+  get(const std::vector<std::string> &entry_subsection_path,
+      const std::string &             entry_string) const;
+
+  /**
+   * Return value of entry @p entry_string as <code>long int</code>. (A long
    * int is chosen so that even very large unsigned values can be returned by
    * this function).
    */
-  long int       get_integer (const std::string &entry_string) const;
+  long int
+  get_integer(const std::string &entry_string) const;
 
   /**
-   * Return value of entry <tt>entry_name</tt> as <tt>double</tt>.
+   * Return value of entry @p entry_string as <code>long int</code>. (A long
+   * int is chosen so that even very large unsigned values can be returned by
+   * this function).
+   * If @p entry_subsection_path is non-empty, the value will be gotten
+   * from the subsection represented by that path instead of the current
+   * subsection.
    */
-  double         get_double (const std::string &entry_name) const;
+  long int
+  get_integer(const std::vector<std::string> &entry_subsection_path,
+              const std::string &             entry_string) const;
 
   /**
-   * Return value of entry <tt>entry_name</tt> as <tt>bool</tt>. The entry may
-   * be "true" or "yes" for <tt>true</tt>, "false" or "no" for <tt>false</tt>
+   * Return value of entry @p entry_name as @p double.
+   */
+  double
+  get_double(const std::string &entry_name) const;
+
+  /**
+   * Return value of entry @p entry_name as @p double.
+   * If @p entry_subsection_path is non-empty, the value will be gotten
+   * from the subsection represented by that path instead of the current
+   * subsection.
+   */
+  double
+  get_double(const std::vector<std::string> &entry_subsection_path,
+             const std::string &             entry_string) const;
+  /**
+   * Return value of entry @p entry_name as @p bool. The entry may
+   * be "true" or "yes" for @p true, "false" or "no" for @p false
    * respectively.
    */
-  bool           get_bool (const std::string &entry_name) const;
+  bool
+  get_bool(const std::string &entry_name) const;
+
+  /**
+   * Return value of entry @p entry_name as @p bool. The entry may
+   * be "true" or "yes" for @p true, "false" or "no" for @p false
+   * respectively.
+   * If @p entry_subsection_path is non-empty, the value will be gotten
+   * from the subsection represented by that path instead of the current
+   * subsection.
+   */
+  bool
+  get_bool(const std::vector<std::string> &entry_subsection_path,
+           const std::string &             entry_string) const;
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1155,8 +1275,8 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const std::string &new_value);
+  void
+  set(const std::string &entry_name, const std::string &new_value);
 
   /**
    * Same as above, but an overload where the second argument is a character
@@ -1168,8 +1288,8 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const char        *new_value);
+  void
+  set(const std::string &entry_name, const char *new_value);
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1180,8 +1300,8 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const long int    &new_value);
+  void
+  set(const std::string &entry_name, const long int new_value);
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1196,8 +1316,8 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const double      &new_value);
+  void
+  set(const std::string &entry_name, const double new_value);
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1208,8 +1328,8 @@ public:
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
    */
-  void           set (const std::string &entry_name,
-                      const bool        &new_value);
+  void
+  set(const std::string &entry_name, const bool new_value);
 
 
   /**
@@ -1262,7 +1382,8 @@ public:
    * @code
    * \usepackage{imakeidx}
    * \makeindex[name=prmindex, title=Index of run-time parameter entries]
-   * \makeindex[name=prmindexfull, title=Index of run-time parameters with section names]
+   * \makeindex[name=prmindexfull,
+   *            title=Index of run-time parameters with section names]
    * @endcode
    * and at the end of the file this:
    * @code
@@ -1271,8 +1392,7 @@ public:
    * @endcode
    */
   std::ostream &
-  print_parameters (std::ostream      &out,
-                    const OutputStyle  style) const;
+  print_parameters(std::ostream &out, const OutputStyle style) const;
 
   /**
    * Print out the parameters of the present subsection as given by the
@@ -1292,17 +1412,19 @@ public:
    *   outputs information, it is not a <code>const</code> function.
    */
   DEAL_II_DEPRECATED
-  void print_parameters_section (std::ostream       &out,
-                                 const OutputStyle   style,
-                                 const unsigned int  indent_level,
-                                 const bool          include_top_level_elements = false);
+  void
+  print_parameters_section(std::ostream &     out,
+                           const OutputStyle  style,
+                           const unsigned int indent_level,
+                           const bool include_top_level_elements = false);
 
   /**
    * Print parameters to a logstream. This function allows to print all
    * parameters into a log-file. Sections will be indented in the usual log-
    * file style.
    */
-  void log_parameters (LogStream &out);
+  void
+  log_parameters(LogStream &out);
 
   /**
    * Log parameters in the present subsection. The subsection is determined by
@@ -1313,34 +1435,39 @@ public:
    * In most cases, you will not want to use this function directly, but have
    * it called recursively by the previous function.
    */
-  void log_parameters_section (LogStream &out);
+  void
+  log_parameters_section(LogStream &out);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * Write the data of this object to a stream for the purpose of
    * serialization.
    */
   template <class Archive>
-  void save (Archive &ar, const unsigned int version) const;
+  void
+  save(Archive &ar, const unsigned int version) const;
 
   /**
    * Read the data of this object from a stream for the purpose of
    * serialization.
    */
   template <class Archive>
-  void load (Archive &ar, const unsigned int version);
+  void
+  load(Archive &ar, const unsigned int version);
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 
   /**
    * Test for equality.
    */
-  bool operator == (const ParameterHandler &prm2)  const;
+  bool
+  operator==(const ParameterHandler &prm2) const;
 
   /**
    * @addtogroup Exceptions
@@ -1350,28 +1477,31 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcEntryAlreadyExists,
-                  std::string,
-                  << "The following entry already exists: " << arg1 << ".");
+  DeclException1(ExcEntryAlreadyExists,
+                 std::string,
+                 << "The following entry already exists: " << arg1 << ".");
   /**
    * Exception
    */
-  DeclException2 (ExcValueDoesNotMatchPattern,
-                  std::string, std::string,
-                  << "The string <" << arg1
-                  << "> does not match the given pattern <" << arg2 << ">.");
+  DeclException2(ExcValueDoesNotMatchPattern,
+                 std::string,
+                 std::string,
+                 << "The string <" << arg1
+                 << "> does not match the given pattern <" << arg2 << ">.");
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcAlreadyAtTopLevel,
-                    "You can't leave a subsection if you are already at the top level "
-                    "of the subsection hierarchy.");
+  DeclExceptionMsg(
+    ExcAlreadyAtTopLevel,
+    "You can't leave a subsection if you are already at the top level "
+    "of the subsection hierarchy.");
   /**
    * Exception
    */
-  DeclException1 (ExcEntryUndeclared,
-                  std::string,
-                  << "You can't ask for entry <" << arg1 << "> you have not yet declared.");
+  DeclException1(ExcEntryUndeclared,
+                 std::string,
+                 << "You can't ask for entry <" << arg1
+                 << "> you have not yet declared.");
 
   /**
    * Exception for when there are an unequal number of 'subsection' and 'end'
@@ -1379,63 +1509,81 @@ public:
    * argument is a formatted list of the subsection path before and after
    * entering the parser.
    */
-  DeclException2 (ExcUnbalancedSubsections,
-                  std::string, std::string,
-                  << "There are unequal numbers of 'subsection' and 'end' "
-                  "statements in the parameter file <" << arg1 << ">."
-                  << (arg2.size() > 0 ? "\n" + arg2 : ""));
+  DeclException2(ExcUnbalancedSubsections,
+                 std::string,
+                 std::string,
+                 << "There are unequal numbers of 'subsection' and 'end' "
+                    "statements in the parameter file <"
+                 << arg1 << ">." << (arg2.size() > 0 ? "\n" + arg2 : ""));
 
   /**
    * Exception for when, during parsing of a parameter file, the parser
    * encounters a subsection in the file that was not previously declared.
    */
-  DeclException3 (ExcNoSubsection,
-                  int, std::string, std::string,
-                  << "Line <" << arg1 << "> of file <" << arg2 << ": There is "
-                  "no such subsection to be entered: " << arg3);
+  DeclException3(ExcNoSubsection,
+                 int,
+                 std::string,
+                 std::string,
+                 << "Line <" << arg1 << "> of file <" << arg2
+                 << ": There is "
+                    "no such subsection to be entered: "
+                 << arg3);
 
   /**
    * General exception for a line that could not be parsed, taking, as
    * arguments, the line number, file name, and a brief description of why the
    * line cannot be parsed.
    */
-  DeclException3 (ExcCannotParseLine,
-                  int, std::string, std::string, << "Line <" << arg1 <<
-                  "> of file <" << arg2 << ">: " << arg3);
+  DeclException3(ExcCannotParseLine,
+                 int,
+                 std::string,
+                 std::string,
+                 << "Line <" << arg1 << "> of file <" << arg2 << ">: " << arg3);
 
   /**
-   * Exception for an an entry in a parameter file that does not match the
+   * Exception for an entry in a parameter file that does not match the
    * provided pattern. The arguments are, in order, the line number, file
    * name, entry value, entry name, and a description of the pattern.
    */
-  DeclException5 (ExcInvalidEntryForPattern,
-                  int, std::string, std::string, std::string, std::string,
-                  << "Line <" << arg1 << "> of file <" << arg2 << ">:\n"
-                  "    The entry value \n" << "        " << arg3 << '\n' <<
-                  "    for the entry named\n" << "        " << arg4 << '\n' <<
-                  "    does not match the given pattern:\n" << "        " <<
-                  arg5);
+  DeclException5(ExcInvalidEntryForPattern,
+                 int,
+                 std::string,
+                 std::string,
+                 std::string,
+                 std::string,
+                 << "Line <" << arg1 << "> of file <" << arg2
+                 << ">:\n"
+                    "    The entry value \n"
+                 << "        " << arg3 << '\n'
+                 << "    for the entry named\n"
+                 << "        " << arg4 << '\n'
+                 << "    does not match the given pattern:\n"
+                 << "        " << arg5);
 
   /**
    * Exception for when an XML file cannot be read at all. This happens when
    * there is no top-level XML element called "ParameterHandler" or when there
    * are multiple top level elements.
    */
-  DeclExceptionMsg (ExcInvalidXMLParameterFile,
-                    "The provided file could not be parsed as a "
-                    "ParameterHandler description.");
+  DeclExceptionMsg(ExcInvalidXMLParameterFile,
+                   "The provided file could not be parsed as a "
+                   "ParameterHandler description.");
 
   /**
    * Exception for when an entry in an XML parameter file does not match the
    * provided pattern. The arguments are, in order, the entry value, entry
    * name, and a description of the pattern.
    */
-  DeclException3 (ExcInvalidEntryForPatternXML,
-                  std::string, std::string, std::string,
-                  << "    The entry value \n" << "        " << arg1 << '\n' <<
-                  "    for the entry named\n" << "        " << arg2 << '\n' <<
-                  "    does not match the given pattern:\n" << "        " <<
-                  arg3);
+  DeclException3(ExcInvalidEntryForPatternXML,
+                 std::string,
+                 std::string,
+                 std::string,
+                 << "    The entry value \n"
+                 << "        " << arg1 << '\n'
+                 << "    for the entry named\n"
+                 << "        " << arg2 << '\n'
+                 << "    does not match the given pattern:\n"
+                 << "        " << arg3);
 
   /**
    * Exception for when the file given in an include statement cannot be
@@ -1443,11 +1591,16 @@ public:
    * statement, current parameter file name, and the name of the file intended
    * for inclusion.
    */
-  DeclException3 (ExcCannotOpenIncludeStatementFile,
-                  int, std::string, std::string,
-                  << "Line <" << arg1 << "> of file <" << arg2 << ">: This line "
-                  "contains an 'include' or 'INCLUDE' statement, but the given "
-                  "file to include <" << arg3 << "> cannot be opened.");
+  DeclException3(
+    ExcCannotOpenIncludeStatementFile,
+    int,
+    std::string,
+    std::string,
+    << "Line <" << arg1 << "> of file <" << arg2
+    << ">: This line "
+       "contains an 'include' or 'INCLUDE' statement, but the given "
+       "file to include <"
+    << arg3 << "> cannot be opened.");
 
   //@}
 private:
@@ -1477,7 +1630,7 @@ private:
    * object. Every nodes in the property tree corresponding to a parameter
    * stores an index into this array.
    */
-  std::vector<std::unique_ptr<const Patterns::PatternBase> > patterns;
+  std::vector<std::unique_ptr<const Patterns::PatternBase>> patterns;
 
   /**
    * A list of actions that are associated with parameters. These
@@ -1485,7 +1638,7 @@ private:
    * tree corresponding to individual parameters
    * store indices into this array in order to reference specific actions.
    */
-  std::vector<std::function<void (const std::string &)> > actions;
+  std::vector<std::function<void(const std::string &)>> actions;
 
   /**
    * Given a list of directories and subdirectories that identify
@@ -1493,9 +1646,8 @@ private:
    * this place in the way the BOOST property tree libraries likes
    * to identify things.
    */
-  static
-  std::string
-  collate_path_string (const std::vector<std::string> &subsection_path);
+  static std::string
+  collate_path_string(const std::vector<std::string> &subsection_path);
 
   /**
    * Return the string that identifies the current path into the property
@@ -1505,13 +1657,23 @@ private:
    * This function simply calls collate_path_string() with
    * @p subsection_path as argument
    */
-  std::string get_current_path () const;
+  std::string
+  get_current_path() const;
 
   /**
    * Given the name of an entry as argument, the function computes a full path
    * into the parameter tree using the current subsection.
    */
-  std::string get_current_full_path (const std::string &name) const;
+  std::string
+  get_current_full_path(const std::string &name) const;
+
+  /**
+   * This function computes a full path into the parameter tree given a path
+   * from the current subsection and the name of an entry.
+   */
+  std::string
+  get_current_full_path(const std::vector<std::string> &sub_path,
+                        const std::string &             name) const;
 
   /**
    * Scan one line of input. <tt>input_filename</tt> and
@@ -1524,10 +1686,18 @@ private:
    *
    * The function modifies its argument, but also takes it by value, so the
    * caller's variable is not changed.
+   *
+   * If @p skip_undefined is <code>true</code>, the parser
+   * will skip undefined sections and entries. This is useful for partially
+   * parsing a parameter file, for example to obtain only the spatial dimension
+   * of the problem. By default all entries and subsections are expected to be
+   * declared.
    */
-  void scan_line (std::string         line,
-                  const std::string  &input_filename,
-                  const unsigned int  current_line_n);
+  void
+  scan_line(std::string        line,
+            const std::string &input_filename,
+            const unsigned int current_line_n,
+            const bool         skip_undefined);
 
   /**
    * Print out the parameters of the subsection given by the
@@ -1540,10 +1710,12 @@ private:
    * so that subsections properly nest inside the output of higher
    * sections.
    */
-  void recursively_print_parameters (const std::vector<std::string> &target_subsection_path,
-                                     const OutputStyle               style,
-                                     const unsigned int              indent_level,
-                                     std::ostream                   &out) const;
+  void
+  recursively_print_parameters(
+    const std::vector<std::string> &target_subsection_path,
+    const OutputStyle               style,
+    const unsigned int              indent_level,
+    std::ostream &                  out) const;
 
   friend class MultipleParameterLoop;
 };
@@ -1780,30 +1952,32 @@ public:
      * Destructor. It doesn't actually do anything, but is declared to force
      * derived classes to have a virtual destructor.
      */
-    virtual ~UserClass () = default;
+    virtual ~UserClass() = default;
 
     /**
      * <tt>create_new</tt> must provide a clean object, either by creating a
      * new one or by cleaning an old one.
      */
-    virtual void create_new (const unsigned int run_no) = 0;
+    virtual void
+    create_new(const unsigned int run_no) = 0;
 
     /**
      * Get the parameters and run any necessary action.
      */
-    virtual void run (ParameterHandler &prm) = 0;
+    virtual void
+    run(ParameterHandler &prm) = 0;
   };
 
   /**
    * Constructor
    */
-  MultipleParameterLoop ();
+  MultipleParameterLoop();
 
   /**
    * Destructor. Declare this only to have a virtual destructor, which is
    * safer as we have virtual functions. It actually does nothing spectacular.
    */
-  virtual ~MultipleParameterLoop () = default;
+  virtual ~MultipleParameterLoop() override = default;
 
   /**
    * Read input from a stream until the stream returns the <tt>eof</tt>
@@ -1815,14 +1989,22 @@ public:
    * will stop parsing lines after encountering @p last_line .
    * This is handy when adding extra data that shall be parsed manually.
    *
+   * If @p skip_undefined is <code>true</code>, the parameter handler
+   * will skip undefined sections and entries. This is useful for partially
+   * parsing a parameter file, for example to obtain only the spatial dimension
+   * of the problem. By default all entries and subsections are expected to be
+   * declared.
+   *
    * @note This is the only overload of the three <tt>parse_input</tt>
    * functions implemented by ParameterHandler overridden with new behavior by
    * this class. This is because the other two <tt>parse_input</tt> functions
    * just reformat their inputs and then call this version.
    */
-  virtual void parse_input (std::istream &input,
-                            const std::string &filename = "input file",
-                            const std::string &last_line = "") override;
+  virtual void
+  parse_input(std::istream &     input,
+              const std::string &filename       = "input file",
+              const std::string &last_line      = "",
+              const bool         skip_undefined = false) override;
 
   /**
    * Overriding virtual functions which are overloaded (like
@@ -1836,16 +2018,17 @@ public:
   /**
    * run the central loop.
    */
-  void loop (UserClass &uc);
+  void
+  loop(UserClass &uc);
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
 private:
-
   /**
    * An object in the list of entries with multiple values.
    */
@@ -1872,21 +2055,24 @@ private:
     /**
      * Constructor
      */
-    Entry () : type (array) {}
+    Entry()
+      : type(array)
+    {}
 
     /**
      * Construct an object with given subsection path, name and value. The
      * splitting up into the different variants is done later by
      * <tt>split_different_values</tt>.
      */
-    Entry (const std::vector<std::string> &Path,
-           const std::string              &Name,
-           const std::string              &Value);
+    Entry(const std::vector<std::string> &Path,
+          const std::string &             Name,
+          const std::string &             Value);
 
     /**
      * Split the entry value into the different branches.
      */
-    void split_different_values ();
+    void
+    split_different_values();
 
     /**
      * Path to variant entry.
@@ -1896,12 +2082,12 @@ private:
     /**
      * Name of entry.
      */
-    std::string         entry_name;
+    std::string entry_name;
 
     /**
      * Original variant value.
      */
-    std::string         entry_value;
+    std::string entry_value;
 
     /**
      * List of entry values constructed out of what was given in the input
@@ -1912,13 +2098,14 @@ private:
     /**
      * Store whether this entry is a variant entry or an array.
      */
-    MultipleEntryType      type;
+    MultipleEntryType type;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
   };
 
   /**
@@ -1935,7 +2122,8 @@ private:
   /**
    * Initialize the different branches, i.e.  construct the combinations.
    */
-  void init_branches ();
+  void
+  init_branches();
 
   /**
    * Traverse the section currently set by
@@ -1943,63 +2131,63 @@ private:
    * variant or array entries. Then fill the multiple_choices variable using
    * this information.
    */
-  void init_branches_current_section ();
+  void
+  init_branches_current_section();
 
   /**
    * Transfer the entry values for one run to the entry tree.
    */
-  void fill_entry_values (const unsigned int run_no);
+  void
+  fill_entry_values(const unsigned int run_no);
 };
 
 
 // ---------------------- inline and template functions --------------------
 template <class Archive>
-inline
-void
-ParameterHandler::save (Archive &ar, const unsigned int) const
+inline void
+ParameterHandler::save(Archive &ar, const unsigned int) const
 {
   // Forward to serialization
   // function in the base class.
-  ar   &static_cast<const Subscriptor &>(*this);
+  ar &static_cast<const Subscriptor &>(*this);
 
-  ar & *entries.get();
+  ar &*entries.get();
 
   std::vector<std::string> descriptions;
 
-  for (unsigned int j=0; j<patterns.size(); ++j)
-    descriptions.push_back (patterns[j]->description());
+  for (unsigned int j = 0; j < patterns.size(); ++j)
+    descriptions.push_back(patterns[j]->description());
 
   ar &descriptions;
 }
 
 
 template <class Archive>
-inline
-void
-ParameterHandler::load (Archive &ar, const unsigned int)
+inline void
+ParameterHandler::load(Archive &ar, const unsigned int)
 {
   // Forward to serialization
   // function in the base class.
-  ar   &static_cast<Subscriptor &>(*this);
+  ar &static_cast<Subscriptor &>(*this);
 
-  ar & *entries.get();
+  ar &*entries.get();
 
   std::vector<std::string> descriptions;
-  ar &descriptions;
+  ar &                     descriptions;
 
-  patterns.clear ();
-  for (unsigned int j=0; j<descriptions.size(); ++j)
-    patterns.push_back (Patterns::pattern_factory(descriptions[j]));
+  patterns.clear();
+  for (unsigned int j = 0; j < descriptions.size(); ++j)
+    patterns.push_back(Patterns::pattern_factory(descriptions[j]));
 }
 
 
 template <class ParameterType>
-void ParameterHandler::add_parameter(const std::string &entry,
-                                     ParameterType &parameter,
-                                     const std::string &documentation,
-                                     const Patterns::PatternBase &pattern)
+void
+ParameterHandler::add_parameter(const std::string &          entry,
+                                ParameterType &              parameter,
+                                const std::string &          documentation,
+                                const Patterns::PatternBase &pattern)
 {
-
   static_assert(std::is_const<ParameterType>::value == false,
                 "You tried to add a parameter using a type "
                 "that is const. Use a non-const type.");
@@ -2010,14 +2198,13 @@ void ParameterHandler::add_parameter(const std::string &entry,
                 pattern,
                 documentation);
 
-  std::string path = get_current_full_path(entry);
-  const unsigned int pattern_index
-    = entries->get<unsigned int> (path + path_separator + "pattern");
+  std::string        path = get_current_full_path(entry);
+  const unsigned int pattern_index =
+    entries->get<unsigned int>(path + path_separator + "pattern");
 
-  auto action = [ &, pattern_index](const std::string &val)
-  {
-    parameter =
-      Patterns::Tools::Convert<ParameterType>::to_value(val, patterns[pattern_index]->clone());
+  auto action = [&, pattern_index](const std::string &val) {
+    parameter = Patterns::Tools::Convert<ParameterType>::to_value(
+      val, patterns[pattern_index]->clone());
   };
   add_action(entry, action);
 }

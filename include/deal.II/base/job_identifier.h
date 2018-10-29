@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN
@@ -46,7 +47,8 @@ public:
    * avoid linking the library version. Unfortunately, this mechanism does not
    * work with shared libraries.
    */
-  static const char *program_id();
+  static const char *
+  program_id();
 
   /**
    * Obtain the base name of the filename passed as argument. That is,
@@ -55,12 +57,14 @@ public:
    * user program with argument <tt>__FILE__</tt> to create an
    * identifier for the program being run.
    */
-  static std::string base_name(const char *filename);
+  static std::string
+  base_name(const char *filename);
 
   /**
    * Return the value of <tt>id</tt>.
    */
-  const std::string operator () () const;
+  const std::string
+  operator()() const;
 
 private:
   /**
@@ -70,7 +74,7 @@ private:
 };
 
 
-/*------------------------------ Inline functions ------------------------------*/
+/*----------------------------- Inline functions ----------------------------*/
 
 
 /**

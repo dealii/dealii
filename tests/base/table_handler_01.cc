@@ -8,32 +8,34 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 // test the method set_tex_table_caption
 // it creates a caption for the whole table
 
-int main ()
+int
+main()
 {
   initlog();
 
   TableHandler table;
 
-  for (unsigned int i=1; i<=10; ++i)
+  for (unsigned int i = 1; i <= 10; ++i)
     {
       table.add_value("numbers", i);
-      table.add_value("squares", i*i);
+      table.add_value("squares", i * i);
       table.add_value("square roots", sqrt(i));
     }
 

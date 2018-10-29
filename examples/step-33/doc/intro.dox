@@ -16,7 +16,7 @@ too much trouble.
 </i>
 
 <b>Note:</b>The program uses the <a
-href="http://trilinos.sandia.gov">Trilinos</a> linear solvers (which
+href="http://trilinos.org">Trilinos</a> linear solvers (which
 are part of the Aztec/Amesos package of Trilinos) and an automatic
 differentiation package, Sacado, also part of Trilinos. deal.II must
 be configured to use this package. Refer to the <a
@@ -195,7 +195,7 @@ convergence order expected from a Newton method.
 Since computing the Jacobian matrix $\mathbf R'(\mathbf W^k)$ is a
 terrible beast, we use an automatic differentiation package, Sacado,
 to do this.  Sacado is a package within the <a
-href="http://trilinos.sandia.gov" target="_top">Trilinos</a> framework
+href="http://trilinos.org" target="_top">Trilinos</a> framework
 and offers a C++ template class <code>Sacado::Fad::DFad</code>
 (<code>Fad</code> standing for "forward automatic
 differentiation") that supports basic arithmetic operators and
@@ -250,7 +250,7 @@ used:
 #include <Sacado.hpp>
 #include <iostream>
 
-typedef Sacado::Fad::DFad<double> fad_double;
+using fad_double = Sacado::Fad::DFad<double>;
 
 main() {
 
@@ -292,7 +292,7 @@ within the example.
 The example uses an ad hoc refinement indicator that shows some usefulness in shock-type problems, and
 in the downhill flow example included.  We refine according to the squared gradient of the density.
 Hanging nodes are handled by computing the numerical flux across cells that are of differing
-refinement levels, rather than using the ConstraintMatrix class as in
+refinement levels, rather than using the AffineConstraints class as in
 all other tutorial programs so far.  In this way, the example combines
 the continuous and DG methodologies. It also simplifies the generation
 of the Jacobian because we do not have to track constrained degrees of
@@ -365,7 +365,6 @@ correctly done, and consequently nothing in the <code>ConservationLaw</code>
 would have to be modified.
 
 Similarly, if we wanted to improve on the linear or nonlinear solvers, or on
-the time stepping scheme (as hinted at at the end of the <a
+the time stepping scheme (as hinted at the end of the <a
 href="#Results">results section</a>), then this would not require changes in
 the <code>EulerEquations</code> at all.
-

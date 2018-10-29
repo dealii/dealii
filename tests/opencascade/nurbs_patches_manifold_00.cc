@@ -1,40 +1,47 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2014 - 2017 by the deal.II authors
+// Copyright (C) 2014 - 2018 by the deal.II authors
 //
-//    This file is subject to LGPL and may not be distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// This file is part of the deal.II library.
 //
-//-----------------------------------------------------------
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
 
 // Read goteborg.iges and dump its topological structure to the
 // logfile.
 
-#include "../tests.h"
-
 #include <deal.II/opencascade/boundary_lib.h>
 #include <deal.II/opencascade/utilities.h>
+
+#include <Standard_Stream.hxx>
 #include <TopTools.hxx>
 #include <TopoDS_Shape.hxx>
-#include <Standard_Stream.hxx>
+
+#include "../tests.h"
 
 using namespace OpenCASCADE;
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
+  deallog.precision(10);
 
-  std::vector<TopoDS_Face> faces;
-  std::vector<TopoDS_Edge> edges;
+  std::vector<TopoDS_Face>   faces;
+  std::vector<TopoDS_Edge>   edges;
   std::vector<TopoDS_Vertex> vertices;
 
   TopoDS_Shape sh = read_STEP(SOURCE_DIR "/step_files/goteborg.step");
   extract_geometrical_shapes(sh, faces, edges, vertices);
 
-  dealii::OpenCASCADE::NURBSPatchManifold<2,3> manifold(faces[0]);
+  dealii::OpenCASCADE::NURBSPatchManifold<2, 3> manifold(faces[0]);
 
   const double u_min = 1.96115;
   const double u_max = 10.0000;
@@ -45,10 +52,10 @@ int main ()
   int len = 10;
   for (unsigned int i = 0; i <= 10; ++i)
     {
-      double step = ((double)i)/10;
-      deallog << " pos = " <<  step << std::endl;
-      double u_pos = step * u_min + (1-step) * u_max;
-      double v_pos = step * v_min + (1-step) * v_max;
+      double step = ((double)i) / 10;
+      deallog << " pos = " << step << std::endl;
+      double   u_pos = step * u_min + (1 - step) * u_max;
+      double   v_pos = step * v_min + (1 - step) * v_max;
       Point<2> uv(u_pos, v_pos);
       deallog << " uv = " << uv << std::endl;
       Point<3> q = manifold.push_forward(uv);
@@ -58,16 +65,15 @@ int main ()
       deallog << "=======================================" << std::endl;
     }
 
-  double u_pos =  (u_min + u_max)/2;
-  double v_pos =  (v_min + v_max)/2;
-  Point<2> uv(u_pos, v_pos);
-  DerivativeForm<1,2,3> D = manifold.push_forward_gradient(uv);
+  double                  u_pos = (u_min + u_max) / 2;
+  double                  v_pos = (v_min + v_max) / 2;
+  Point<2>                uv(u_pos, v_pos);
+  DerivativeForm<1, 2, 3> D = manifold.push_forward_gradient(uv);
   deallog << "=======================================" << std::endl;
-  deallog << " | " <<  D[0][1] << " | " <<  D[0][0] <<" | " << std::endl;
-  deallog << " | " <<  D[1][1] << " | " <<  D[1][0] <<" | " << std::endl;
-  deallog << " | " <<  D[2][1] << " | " <<  D[2][0] <<" | " << std::endl;
+  deallog << " | " << D[0][1] << " | " << D[0][0] << " | " << std::endl;
+  deallog << " | " << D[1][1] << " | " << D[1][0] << " | " << std::endl;
+  deallog << " | " << D[2][1] << " | " << D[2][0] << " | " << std::endl;
   deallog << "=======================================" << std::endl;
 
   return 0;
 }
-

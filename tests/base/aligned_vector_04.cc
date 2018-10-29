@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -23,54 +23,56 @@
 // otherwise correct. When adjusting the output, make sure to check this test
 // with valgrind.
 
-#include "../tests.h"
-
 #include <deal.II/base/table.h>
+
+#include "../tests.h"
 
 // make function virtual to ensure that the function table is correctly copied
 class FunctionBase
 {
 public:
-  ~FunctionBase() {}
+  virtual ~FunctionBase()
+  {}
 
-  virtual void do_test() = 0;
+  virtual void
+  do_test() = 0;
 };
 
-class Function
+class Function : public FunctionBase
 {
 public:
-  Function ()
-    :
-    size_ (2)
+  Function()
+    : size_(2)
   {
     deallog << "Construct object" << std::endl;
   }
 
   Function(const Function &f)
-    :
-    size_ (f.size_),
-    vec (f.vec)
+    : size_(f.size_)
+    , vec(f.vec)
   {
     deallog << "Copy construct object" << std::endl;
   }
 
-  ~Function()
+  virtual ~Function() override
   {
     deallog << "Destruct with size " << vec.size() << std::endl;
   }
 
-  virtual void do_test()
+  virtual void
+  do_test() override
   {
     vec.resize(size_++);
     deallog << "Resize vector to " << vec.size() << std::endl;
   }
 
 private:
-  unsigned int size_;
+  unsigned int              size_;
   std::vector<unsigned int> vec;
 };
 
-int main()
+int
+main()
 {
   initlog();
   AlignedVector<Function> vec;

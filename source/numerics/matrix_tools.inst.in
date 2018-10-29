@@ -8,47 +8,41 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
-for (number: REAL_SCALARS)
-{
-    template
-    void MatrixTools::local_apply_boundary_values
-    (const std::map<types::global_dof_index,number> &boundary_values,
-     const std::vector<types::global_dof_index> &local_dof_indices,
-     FullMatrix<number> &local_matrix,
-     Vector<number>     &local_rhs,
-     const bool          eliminate_columns);
+for (number : REAL_SCALARS)
+  {
+    template void MatrixTools::local_apply_boundary_values(
+      const std::map<types::global_dof_index, number> &boundary_values,
+      const std::vector<types::global_dof_index> &     local_dof_indices,
+      FullMatrix<number> &                             local_matrix,
+      Vector<number> &                                 local_rhs,
+      const bool                                       eliminate_columns);
 
-    template
-    void MatrixTools::apply_boundary_values
-    (const std::map<types::global_dof_index,number> &boundary_values,
-     SparseMatrix<number>  &matrix,
-     Vector<number>   &solution,
-     Vector<number>   &right_hand_side,
-     const bool        eliminate_columns);
+    template void MatrixTools::apply_boundary_values(
+      const std::map<types::global_dof_index, number> &boundary_values,
+      SparseMatrix<number> &                           matrix,
+      Vector<number> &                                 solution,
+      Vector<number> &                                 right_hand_side,
+      const bool                                       eliminate_columns);
 
-    template
-    void MatrixTools::apply_boundary_values
-    (const std::map<types::global_dof_index,number> &boundary_values,
-     BlockSparseMatrix<number>  &matrix,
-     BlockVector<number>   &solution,
-     BlockVector<number>   &right_hand_side,
-     const bool        eliminate_columns);
+    template void MatrixTools::apply_boundary_values(
+      const std::map<types::global_dof_index, number> &boundary_values,
+      BlockSparseMatrix<number> &                      matrix,
+      BlockVector<number> &                            solution,
+      BlockVector<number> &                            right_hand_side,
+      const bool                                       eliminate_columns);
+  }
 
-}
-
-for (number: COMPLEX_SCALARS)
-{
-    template
-    void MatrixTools::apply_boundary_values
-    (const std::map<types::global_dof_index,number> &boundary_values,
-     SparseMatrix<number>  &matrix,
-     Vector<number>   &solution,
-     Vector<number>   &right_hand_side,
-     const bool        eliminate_columns);
-}
-
+for (number : COMPLEX_SCALARS)
+  {
+    template void MatrixTools::apply_boundary_values(
+      const std::map<types::global_dof_index, number> &boundary_values,
+      SparseMatrix<number> &                           matrix,
+      Vector<number> &                                 solution,
+      Vector<number> &                                 right_hand_side,
+      const bool                                       eliminate_columns);
+  }

@@ -1,0 +1,5 @@
+
+DEAL:0:2d::L2 norm = 0.959575
+DEAL:0:2d::L2 error = 3.84786e-16
+DEAL:0:3d::L2 norm = 1.35704
+DEAL:0:3d::L2 error = 6.75122e-16

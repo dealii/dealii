@@ -1,5 +1,0 @@
-New: The ParameterAcceptorProxy class allows you to wrap a class that provides a static member
-declare_parameters and a member parse_parameters into a ParameterAcceptor subclass. 
-<br>
-(Luca Heltai, 2018/03/06)
-

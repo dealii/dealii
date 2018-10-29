@@ -8,46 +8,34 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 
 for (SCALAR : REAL_AND_COMPLEX_SCALARS)
-{
+  {
     template class Vector<SCALAR>;
-}
+  }
 
 for (S1, S2 : REAL_SCALARS)
-{
-    template
-    bool
-    Vector<S1>::operator==<S2>(const Vector<S2>&) const;
-    template
-    S1
-    Vector<S1>::operator*<S2>(const Vector<S2>&) const;
-    template
-    void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
-}
+  {
+    template bool Vector<S1>::operator==<S2>(const Vector<S2> &) const;
+    template S1 Vector<S1>::operator*<S2>(const Vector<S2> &) const;
+    template void Vector<S1>::reinit<S2>(const Vector<S2> &, const bool);
+  }
 
 for (S1, S2 : COMPLEX_SCALARS)
-{
-    template
-    bool
-    Vector<S1>::operator==<S2>(const Vector<S2>&) const;
-    template
-    S1
-    Vector<S1>::operator*<S2>(const Vector<S2>&) const;
-    template
-    void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
-}
+  {
+    template bool Vector<S1>::operator==<S2>(const Vector<S2> &) const;
+    template S1 Vector<S1>::operator*<S2>(const Vector<S2> &) const;
+    template void Vector<S1>::reinit<S2>(const Vector<S2> &, const bool);
+  }
 
-for (S1: COMPLEX_SCALARS; S2: REAL_SCALARS)
-{
-    template
-    Vector<S1>& Vector<S1>::operator=<S2> (const Vector<S2> &);
-    template
-    void Vector<S1>::reinit<S2>(const Vector<S2>&, const bool);
-}
+for (S1 : COMPLEX_SCALARS; S2 : REAL_SCALARS)
+  {
+    template Vector<S1> &Vector<S1>::operator=<S2>(const Vector<S2> &);
+    template void Vector<S1>::reinit<S2>(const Vector<S2> &, const bool);
+  }

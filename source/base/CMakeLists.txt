@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -24,7 +24,6 @@ SET(_unity_include_src
   auto_derivative_function.cc
   bounding_box.cc
   conditional_ostream.cc
-  config.cc
   convergence_table.cc
   event.cc
   exceptions.cc
@@ -46,6 +45,7 @@ SET(_unity_include_src
   mpi.cc
   multithread_info.cc
   named_selection.cc
+  numbers.cc
   parallel.cc
   parameter_handler.cc
   parameter_acceptor.cc
@@ -58,6 +58,7 @@ SET(_unity_include_src
   polynomials_adini.cc
   polynomials_bernstein.cc
   polynomials_bdm.cc
+  polynomials_bernardi_raugel.cc
   polynomials_nedelec.cc
   polynomials_integrated_legendre_sz.cc
   polynomial_space.cc
@@ -81,12 +82,21 @@ SET(_unity_include_src
   timer.cc
   time_stepping.cc
   utilities.cc
+  vectorization.cc
   )
 
 SET(_separate_src
   data_out_base.cc
   symmetric_tensor.cc
   )
+
+# Add CUDA wrapper files
+IF(DEAL_II_WITH_CUDA)
+  SET(_separate_src
+    ${_separate_src}
+    cuda.cu
+  )
+ENDIF()
 
 # determined by profiling
 SET(_n_includes_per_unity_file 29)

@@ -8,50 +8,53 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // Test if block indices are handled properly
 
-#include "../tests.h"
 #include <deal.II/lac/block_indices.h>
 
+#include "../tests.h"
 
 
-void test (const BlockIndices &idx)
+
+void
+test(const BlockIndices &idx)
 {
   const unsigned int n = idx.size();
   deallog << "sizes: " << idx << std::endl;
   deallog << "start:   ";
-  for (unsigned i=0; i<n; ++i)
+  for (unsigned i = 0; i < n; ++i)
     deallog << ' ' << idx.block_start(i);
 
   deallog << std::endl << "string: " << idx.to_string() << std::endl;
 
-  for (unsigned int i=0; i<idx.total_size(); ++i)
+  for (unsigned int i = 0; i < idx.total_size(); ++i)
     {
       const unsigned int b = idx.global_to_local(i).first;
       const unsigned int j = idx.global_to_local(i).second;
-      deallog << ' '<< i << ':' << b << ':' << j;
+      deallog << ' ' << i << ':' << b << ':' << j;
     }
 
   deallog << std::endl;
 
-  for (unsigned int b=0; b<n; ++b)
-    for (unsigned int j=0; j<idx.block_size(b); ++j)
+  for (unsigned int b = 0; b < n; ++b)
+    for (unsigned int j = 0; j < idx.block_size(b); ++j)
       {
-        const unsigned int i = idx.local_to_global(b,j);
-        deallog << ' '<< i << ':' << b << ':' << j;
+        const unsigned int i = idx.local_to_global(b, j);
+        deallog << ' ' << i << ':' << b << ':' << j;
       }
 
   deallog << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -61,12 +64,12 @@ int main()
   deallog << "push:  " << bi0 << std::endl;
   bi0.push_back(2);
   deallog << "push:  " << bi0 << std::endl;
-  bi0.reinit(0,0);
+  bi0.reinit(0, 0);
   deallog << "empty: " << bi0 << std::endl;
 
   BlockIndices bi1(3);
   test(bi1);
-  bi1.reinit(3,4);
+  bi1.reinit(3, 4);
   test(bi1);
   bi1.push_back(2);
   deallog << "push: " << bi1 << std::endl;
@@ -76,8 +79,8 @@ int main()
   test(bi1);
 
   std::vector<types::global_dof_index> v(4);
-  for (unsigned int i=0; i<v.size(); ++i)
-    v[i] = 4-i;
+  for (unsigned int i = 0; i < v.size(); ++i)
+    v[i] = 4 - i;
 
   BlockIndices bi2(v);
   test(bi2);

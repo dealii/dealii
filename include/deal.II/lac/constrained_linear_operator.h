@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2017 by the deal.II authors
+// Copyright (C) 2015 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,17 +8,17 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 #ifndef dealii_constrained_linear_operator_h
 #define dealii_constrained_linear_operator_h
 
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
-#include <deal.II/lac/constraint_matrix.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -31,16 +31,16 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * This function takes a ConstraintMatrix @p constraint_matrix and an operator
- * exemplar @p exemplar (this exemplar is usually a linear operator that
- * describes the system matrix - it is only used to create domain and range
- * vectors of appropriate sizes, its action <tt>vmult</tt> is never used). A
- * LinearOperator object associated with the "homogeneous action" of the
- * underlying ConstraintMatrix object is returned:
+ * This function takes an AffineConstraints object @p constraints and
+ * an operator exemplar @p exemplar (this exemplar is usually a linear
+ * operator that describes the system matrix - it is only used to create
+ * domain and range vectors of appropriate sizes, its action <tt>vmult</tt>
+ * is never used). A LinearOperator object associated with the "homogeneous
+ * action" of the underlying AffineConstraints object is returned:
  *
  * Applying the LinearOperator object on a vector <code>u</code> results in a
  * vector <code>v</code> that stores the result of calling
- * ConstraintMatrix::distribute() on <code>u</code> - with one important
+ * AffineConstraints::distribute() on <code>u</code> - with one important
  * difference: inhomogeneities are not applied, but always treated as 0
  * instead.
  *
@@ -59,15 +59,15 @@ DEAL_II_NAMESPACE_OPEN
  * @relatesalso LinearOperator
  * @ingroup constraints
  */
-template <typename Range, typename Domain>
-LinearOperator<Range, Domain> distribute_constraints_linear_operator(
-  const ConstraintMatrix &constraint_matrix,
-  const LinearOperator<Range, Domain> &exemplar)
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
+distribute_constraints_linear_operator(
+  const AffineConstraints<typename Range::value_type> &constraints,
+  const LinearOperator<Range, Domain, Payload> &       exemplar)
 {
-  LinearOperator<Range, Domain> return_op = exemplar;
+  LinearOperator<Range, Domain, Payload> return_op = exemplar;
 
-  return_op.vmult_add = [&constraint_matrix](Range &v, const Domain &u)
-  {
+  return_op.vmult_add = [&constraints](Range &v, const Domain &u) {
     Assert(!dealii::PointerComparison::equal(&v, &u),
            dealii::ExcMessage("The domain and range vectors must be different "
                               "storage locations"));
@@ -77,7 +77,7 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
     v += u;
 
     const auto &locally_owned_elements = v.locally_owned_elements();
-    for (const auto &line : constraint_matrix.get_lines())
+    for (const auto &line : constraints.get_lines())
       {
         const auto i = line.index;
         if (locally_owned_elements.is_element(i))
@@ -95,8 +95,7 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
     v.compress(VectorOperation::add);
   };
 
-  return_op.Tvmult_add = [&constraint_matrix](Domain &v, const Range &u)
-  {
+  return_op.Tvmult_add = [&constraints](Domain &v, const Range &u) {
     Assert(!dealii::PointerComparison::equal(&v, &u),
            dealii::ExcMessage("The domain and range vectors must be different "
                               "storage locations"));
@@ -106,7 +105,7 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
     v += u;
 
     const auto &locally_owned_elements = v.locally_owned_elements();
-    for (const auto &line : constraint_matrix.get_lines())
+    for (const auto &line : constraints.get_lines())
       {
         const auto i = line.index;
 
@@ -129,16 +128,14 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
 
   // lambda capture expressions are a C++14 feature...
   const auto vmult_add = return_op.vmult_add;
-  return_op.vmult = [vmult_add](Range &v, const Domain &u)
-  {
+  return_op.vmult      = [vmult_add](Range &v, const Domain &u) {
     v = 0.;
     vmult_add(v, u);
   };
 
   // lambda capture expressions are a C++14 feature...
   const auto Tvmult_add = return_op.Tvmult_add;
-  return_op.Tvmult = [Tvmult_add](Domain &v, const Range &u)
-  {
+  return_op.Tvmult      = [Tvmult_add](Domain &v, const Range &u) {
     v = 0.;
     Tvmult_add(v, u);
   };
@@ -148,7 +145,7 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
 
 
 /**
- * Given a ConstraintMatrix @p constraint_matrix and an operator exemplar @p
+ * Given a AffineConstraints @p constraints and an operator exemplar @p
  * exemplar, return a LinearOperator that is the projection to the subspace of
  * constrained degrees of freedom, i.e. all entries of the result vector that
  * correspond to unconstrained degrees of freedom are set to zero.
@@ -158,17 +155,17 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
  * @relatesalso LinearOperator
  * @ingroup constraints
  */
-template <typename Range, typename Domain>
-LinearOperator<Range, Domain> project_to_constrained_linear_operator(
-  const ConstraintMatrix &constraint_matrix,
-  const LinearOperator<Range, Domain> &exemplar)
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
+project_to_constrained_linear_operator(
+  const AffineConstraints<typename Range::value_type> &constraints,
+  const LinearOperator<Range, Domain, Payload> &       exemplar)
 {
-  LinearOperator<Range, Domain> return_op = exemplar;
+  LinearOperator<Range, Domain, Payload> return_op = exemplar;
 
-  return_op.vmult_add = [&constraint_matrix](Range &v, const Domain &u)
-  {
+  return_op.vmult_add = [&constraints](Range &v, const Domain &u) {
     const auto &locally_owned_elements = v.locally_owned_elements();
-    for (const auto &line : constraint_matrix.get_lines())
+    for (const auto &line : constraints.get_lines())
       {
         const auto i = line.index;
         if (locally_owned_elements.is_element(i))
@@ -180,10 +177,9 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
     v.compress(VectorOperation::add);
   };
 
-  return_op.Tvmult_add = [&constraint_matrix](Domain &v, const Range &u)
-  {
+  return_op.Tvmult_add = [&constraints](Domain &v, const Range &u) {
     const auto &locally_owned_elements = v.locally_owned_elements();
-    for (const auto &line : constraint_matrix.get_lines())
+    for (const auto &line : constraints.get_lines())
       {
         const auto i = line.index;
         if (locally_owned_elements.is_element(i))
@@ -197,16 +193,14 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
 
   // lambda capture expressions are a C++14 feature...
   const auto vmult_add = return_op.vmult_add;
-  return_op.vmult = [vmult_add](Range &v, const Domain &u)
-  {
+  return_op.vmult      = [vmult_add](Range &v, const Domain &u) {
     v = 0.;
     vmult_add(v, u);
   };
 
   // lambda capture expressions are a C++14 feature...
   const auto Tvmult_add = return_op.Tvmult_add;
-  return_op.Tvmult = [Tvmult_add](Domain &v, const Range &u)
-  {
+  return_op.Tvmult      = [Tvmult_add](Domain &v, const Range &u) {
     v = 0.;
     Tvmult_add(v, u);
   };
@@ -216,7 +210,7 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
 
 
 /**
- * Given a ConstraintMatrix object @p constraint_matrix and a LinearOperator
+ * Given a AffineConstraints object @p constraints and a LinearOperator
  * @p linop, this function creates a LinearOperator object consisting of the
  * composition of three operations and a regularization:
  * @code
@@ -224,12 +218,12 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  * @endcode
  * with
  * @code
- *   C = distribute_constraints_linear_operator(constraint_matrix, linop);
+ *   C = distribute_constraints_linear_operator(constraints, linop);
  *   Ct = transpose_operator(C);
- *   Id_c = project_to_constrained_linear_operator(constraint_matrix, linop);
+ *   Id_c = project_to_constrained_linear_operator(constraints, linop);
  * @endcode
  * and <code>Id_c</code> is the projection to the subspace consisting of all
- * vector entries associated with constrained degrees of freedoms.
+ * vector entries associated with constrained degrees of freedom.
  *
  * This LinearOperator object is used together with
  * constrained_right_hand_side() to build up the following modified system of
@@ -252,22 +246,21 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  * @relatesalso LinearOperator
  * @ingroup constraints
  */
-template <typename Range, typename Domain>
-LinearOperator<Range, Domain>
-constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
-                            const LinearOperator<Range, Domain> &linop)
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
+constrained_linear_operator(
+  const AffineConstraints<typename Range::value_type> &constraints,
+  const LinearOperator<Range, Domain, Payload> &       linop)
 {
-  const auto C =
-    distribute_constraints_linear_operator(constraint_matrix, linop);
-  const auto Ct = transpose_operator(C);
-  const auto Id_c =
-    project_to_constrained_linear_operator(constraint_matrix, linop);
+  const auto C    = distribute_constraints_linear_operator(constraints, linop);
+  const auto Ct   = transpose_operator(C);
+  const auto Id_c = project_to_constrained_linear_operator(constraints, linop);
   return Ct * linop * C + Id_c;
 }
 
 
 /**
- * Given a ConstraintMatrix object @p constraint_matrix, a LinearOperator @p
+ * Given a AffineConstraints object @p constraints, a LinearOperator @p
  * linop and a right-hand side @p right_hand_side, this function creates a
  * PackagedOperation that stores the following computation:
  * @code
@@ -275,7 +268,7 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  * @endcode
  * with
  * @code
- *   C = distribute_constraints_linear_operator(constraint_matrix, linop);
+ *   C = distribute_constraints_linear_operator(constraints, linop);
  *   Ct = transpose_operator(C);
  * @endcode
  *
@@ -300,35 +293,32 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  * @relatesalso LinearOperator
  * @ingroup constraints
  */
-template <typename Range, typename Domain>
+template <typename Range, typename Domain, typename Payload>
 PackagedOperation<Range>
-constrained_right_hand_side(const ConstraintMatrix &constraint_matrix,
-                            const LinearOperator<Range, Domain> &linop,
-                            const Range &right_hand_side)
+constrained_right_hand_side(
+  const AffineConstraints<typename Range::value_type> &constraints,
+  const LinearOperator<Range, Domain, Payload> &       linop,
+  const Range &                                        right_hand_side)
 {
   PackagedOperation<Range> return_comp;
 
   return_comp.reinit_vector = linop.reinit_range_vector;
 
-  return_comp.apply_add =
-    [&constraint_matrix, &linop, &right_hand_side](Range &v)
-  {
-    const auto C =
-      distribute_constraints_linear_operator(constraint_matrix, linop);
+  return_comp.apply_add = [&constraints, &linop, &right_hand_side](Range &v) {
+    const auto C  = distribute_constraints_linear_operator(constraints, linop);
     const auto Ct = transpose_operator(C);
 
-    GrowingVectorMemory<Domain> vector_memory;
-    typename VectorMemory<Domain>::Pointer k (vector_memory);
-    linop.reinit_domain_vector(*k, /*bool fast=*/ false);
-    constraint_matrix.distribute(*k);
+    GrowingVectorMemory<Domain>            vector_memory;
+    typename VectorMemory<Domain>::Pointer k(vector_memory);
+    linop.reinit_domain_vector(*k, /*bool fast=*/false);
+    constraints.distribute(*k);
 
-    v += Ct * (right_hand_side - linop **k);
+    v += Ct * (right_hand_side - linop * *k);
   };
 
   // lambda capture expressions are a C++14 feature...
   const auto apply_add = return_comp.apply_add;
-  return_comp.apply = [apply_add](Range &v)
-  {
+  return_comp.apply    = [apply_add](Range &v) {
     v = 0.;
     apply_add(v);
   };

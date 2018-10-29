@@ -8,32 +8,34 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // Tests LAPACKFullMatrix::operator*= and operator/=
 
-#include "../tests.h"
 #include <deal.II/lac/lapack_full_matrix.h>
 
 #include <iostream>
 
+#include "../tests.h"
 
 
-void test(const bool is_singular)
+
+void
+test(const bool is_singular)
 {
-  const unsigned int n=10;
-  LAPACKFullMatrix<double> A(n,n);
+  const unsigned int       n = 10;
+  LAPACKFullMatrix<double> A(n, n);
   A = 0;
 
   // generate a singular matrix if is_singular == true
-  for (unsigned int i=0; i<n; ++i)
-    for (unsigned int j=0; j<n; ++j)
-      if (i==j && (i != n-1 || !is_singular))
-        A(i,j) = 1.0;
+  for (unsigned int i = 0; i < n; ++i)
+    for (unsigned int j = 0; j < n; ++j)
+      if (i == j && (i != n - 1 || !is_singular))
+        A(i, j) = 1.0;
 
   try
     {
@@ -46,24 +48,24 @@ void test(const bool is_singular)
       // down to the compute_factorization call is compatible with a singular
       // matrix and divide by zero that triggers a floating point exception,
       // so we add a small number to the diagonal of the matrix.
-      A(n-1,n-1) += 1e-50;
+      A(n - 1, n - 1) += 1e-50;
     }
 
   Vector<double> v(n);
-  v = 1.0;
-  v(n-1) = 0.0;
+  v        = 1.0;
+  v(n - 1) = 0.0;
   // LU factorization can only be applied if state == lu!
-  A.apply_lu_factorization(v,false);
+  A.apply_lu_factorization(v, false);
 
-  deallog << "apply lu factorization succeeded with norm " << v.l2_norm() << std::endl;
+  deallog << "apply lu factorization succeeded with norm " << v.l2_norm()
+          << std::endl;
 }
 
-int main()
+int
+main()
 {
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   test(false);
   test(true);

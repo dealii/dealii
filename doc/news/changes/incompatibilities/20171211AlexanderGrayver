@@ -1,6 +1,0 @@
-Changed: Change the logic of DoFTools::get_subdomain_association to have the 
-degrees of freedom along a refinement edge be now all given to the processor 
-with the smallest subdomain_id.
-<br>
-(Alexander Grayver, 2017/12/11)
-

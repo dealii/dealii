@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2017 by the deal.II authors
+// Copyright (C) 2005 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,13 +17,15 @@
 #define dealii_q_collection_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/subscriptor.h>
-#include <deal.II/base/quadrature.h>
+
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/subscriptor.h>
+
 #include <deal.II/fe/fe.h>
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -50,7 +52,7 @@ namespace hp
      * Default constructor. Leads to an empty collection that can later be
      * filled using push_back().
      */
-    QCollection () = default;
+    QCollection() = default;
 
     /**
      * Conversion constructor. This constructor creates a QCollection from a
@@ -58,22 +60,31 @@ namespace hp
      * push_back(), if desired, though it would probably be clearer to add all
      * mappings the same way.
      */
-    explicit QCollection (const Quadrature<dim> &quadrature);
+    explicit QCollection(const Quadrature<dim> &quadrature);
 
     /**
-     * Adds a new quadrature rule to the QCollection. In most cases, you will
+     * Constructor. This constructor creates a QCollection from one or
+     * more quadrature objects passed to the constructor. For this
+     * call to be valid, all arguments need to be of types derived
+     * from class Quadrature<dim>.
+     */
+    template <class... QTypes>
+    explicit QCollection(const QTypes &... quadrature_objects);
+
+    /**
+     * Add a new quadrature rule to the QCollection. In most cases, you will
      * want to add quadrature rules in the same order as the elements were
-     * added to the hp::FECollection for which this quadrature rule collection is
-     * meant. If done this way, the hp::FEValues objects with which you will
+     * added to the hp::FECollection for which this quadrature rule collection
+     * is meant. If done this way, the hp::FEValues objects with which you will
      * use both hp::FECollection and hp::QCollection objects will automatically
      * choose corresponding elements and quadrature formulas. On the other hand,
      * it is possible to use arbitrary combinations of elements and quadrature
-     * formulas in hp::FECollection and hp::QCollection objects when specifically
-     * specifying appropriate indices in calls to hp::FEValues::reinit()
-     * or hp::FEFaceValues::reinit(). In those cases, there need not be a
-     * correspondence between elements of the hp::FECollection and
-     * hp::QCollection objects; they need not even be of the same size in this
-     * case.
+     * formulas in hp::FECollection and hp::QCollection objects when
+     * specifically specifying appropriate indices in calls to
+     * hp::FEValues::reinit() or hp::FEFaceValues::reinit(). In those cases,
+     * there need not be a correspondence between elements of the
+     * hp::FECollection and hp::QCollection objects; they need not even be of
+     * the same size in this case.
      *
      * The same arguments about the order of elements of collections can, by
      * the way, also be made about the elements of hp::MappingCollection
@@ -84,7 +95,8 @@ namespace hp
      * is later destroyed by this object upon destruction of the entire
      * collection.
      */
-    void push_back (const Quadrature<dim> &new_quadrature);
+    void
+    push_back(const Quadrature<dim> &new_quadrature);
 
     /**
      * Return a reference to the quadrature rule specified by the argument.
@@ -92,13 +104,13 @@ namespace hp
      * @pre @p index must be between zero and the number of elements of the
      * collection.
      */
-    const Quadrature<dim> &
-    operator[] (const unsigned int index) const;
+    const Quadrature<dim> &operator[](const unsigned int index) const;
 
     /**
      * Return the number of quadrature pointers stored in this object.
      */
-    unsigned int size () const;
+    unsigned int
+    size() const;
 
     /**
      * Return the maximum number of quadrature points over all the elements of
@@ -106,25 +118,27 @@ namespace hp
      * the maximum amount of memory that may be used when re-sizing later on
      * to a articular quadrature formula from within this collection.
      */
-    unsigned int max_n_quadrature_points () const;
+    unsigned int
+    max_n_quadrature_points() const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
-    std::size_t memory_consumption () const;
+    std::size_t
+    memory_consumption() const;
 
     /**
      * Exception
      */
-    DeclException0 (ExcNoQuadrature);
+    DeclException0(ExcNoQuadrature);
 
   private:
     /**
      * The real container, which stores pointers to the different quadrature
      * objects.
      */
-    std::vector<std::shared_ptr<const Quadrature<dim> > > quadratures;
+    std::vector<std::shared_ptr<const Quadrature<dim>>> quadratures;
   };
 
 
@@ -132,9 +146,26 @@ namespace hp
   /* --------------- inline functions ------------------- */
 
   template <int dim>
-  inline
-  unsigned int
-  QCollection<dim>::size () const
+  template <class... QTypes>
+  QCollection<dim>::QCollection(const QTypes &... quadrature_objects)
+  {
+    static_assert(is_base_of_all<Quadrature<dim>, QTypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from Quadrature<dim>!");
+
+    // loop over all of the given arguments and add the quadrature objects to
+    // this collection. Inlining the definition of q_pointers causes internal
+    // compiler errors on GCC 7.1.1 so we define it separately:
+    const auto q_pointers = {&quadrature_objects...};
+    for (auto p : q_pointers)
+      push_back(*p);
+  }
+
+
+
+  template <int dim>
+  inline unsigned int
+  QCollection<dim>::size() const
   {
     return quadratures.size();
   }
@@ -142,15 +173,14 @@ namespace hp
 
 
   template <int dim>
-  inline
-  unsigned int
-  QCollection<dim>::max_n_quadrature_points () const
+  inline unsigned int
+  QCollection<dim>::max_n_quadrature_points() const
   {
-    Assert (quadratures.size() > 0,
-            ExcMessage ("You can't call this function for an empty collection"));
+    Assert(quadratures.size() > 0,
+           ExcMessage("You can't call this function for an empty collection"));
 
     unsigned int m = 0;
-    for (unsigned int i=0; i<quadratures.size(); ++i)
+    for (unsigned int i = 0; i < quadratures.size(); ++i)
       if (quadratures[i]->size() > m)
         m = quadratures[i]->size();
 
@@ -160,42 +190,38 @@ namespace hp
 
 
   template <int dim>
-  inline
-  const Quadrature<dim> &
-  QCollection<dim>::operator[] (const unsigned int index) const
+  inline const Quadrature<dim> &QCollection<dim>::
+                                operator[](const unsigned int index) const
   {
-    Assert (index < quadratures.size (),
-            ExcIndexRange (index, 0, quadratures.size ()));
+    Assert(index < quadratures.size(),
+           ExcIndexRange(index, 0, quadratures.size()));
     return *quadratures[index];
   }
 
 
 
   template <int dim>
-  inline
-  QCollection<dim>::QCollection (const Quadrature<dim> &quadrature)
+  inline QCollection<dim>::QCollection(const Quadrature<dim> &quadrature)
   {
-    quadratures.push_back (std::make_shared<const Quadrature<dim> >(quadrature));
+    quadratures.push_back(std::make_shared<const Quadrature<dim>>(quadrature));
   }
 
 
 
   template <int dim>
-  inline
-  std::size_t
-  QCollection<dim>::memory_consumption () const
+  inline std::size_t
+  QCollection<dim>::memory_consumption() const
   {
-    return (sizeof(*this) +
-            MemoryConsumption::memory_consumption (quadratures));
+    return (sizeof(*this) + MemoryConsumption::memory_consumption(quadratures));
   }
 
 
   template <int dim>
-  inline
-  void
-  QCollection<dim>::push_back (const Quadrature<dim> &new_quadrature)
+  inline void
+  QCollection<dim>::push_back(const Quadrature<dim> &new_quadrature)
   {
-    quadratures.push_back (std::make_shared<const Quadrature<dim> >(new_quadrature));
+    quadratures.push_back(
+      std::make_shared<const Quadrature<dim>>(new_quadrature));
   }
 
 } // namespace hp

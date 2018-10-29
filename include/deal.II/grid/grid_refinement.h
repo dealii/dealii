@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2017 by the deal.II authors
+// Copyright (C) 2000 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
 
 #include <limits>
@@ -25,8 +26,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-template <int dim, int spacedim> class Triangulation;
-template <typename Number> class Vector;
+template <int dim, int spacedim>
+class Triangulation;
+template <typename Number>
+class Vector;
 
 /**
  * This namespace provides a collection of functions that aid in refinement
@@ -81,10 +84,11 @@ namespace GridRefinement
    */
   template <int dim>
   std::pair<double, double>
-  adjust_refine_and_coarsen_number_fraction (const unsigned int  current_n_cells,
-                                             const unsigned int  max_n_cells,
-                                             const double        top_fraction_of_cells,
-                                             const double        bottom_fraction_of_cells);
+  adjust_refine_and_coarsen_number_fraction(
+    const unsigned int current_n_cells,
+    const unsigned int max_n_cells,
+    const double       top_fraction_of_cells,
+    const double       bottom_fraction_of_cells);
 
   /**
    * This function provides a strategy to mark cells for refinement and
@@ -152,12 +156,12 @@ namespace GridRefinement
    */
   template <int dim, typename Number, int spacedim>
   void
-  refine_and_coarsen_fixed_number
-  (Triangulation<dim,spacedim> &triangulation,
-   const Vector<Number>        &criteria,
-   const double                top_fraction_of_cells,
-   const double                bottom_fraction_of_cells,
-   const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
+  refine_and_coarsen_fixed_number(
+    Triangulation<dim, spacedim> &triangulation,
+    const Vector<Number> &        criteria,
+    const double                  top_fraction_of_cells,
+    const double                  bottom_fraction_of_cells,
+    const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max());
 
   /**
    * This function provides a strategy to mark cells for refinement and
@@ -217,12 +221,12 @@ namespace GridRefinement
    */
   template <int dim, typename Number, int spacedim>
   void
-  refine_and_coarsen_fixed_fraction
-  (Triangulation<dim,spacedim> &tria,
-   const Vector<Number>        &criteria,
-   const double                top_fraction,
-   const double                bottom_fraction,
-   const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
+  refine_and_coarsen_fixed_fraction(
+    Triangulation<dim, spacedim> &tria,
+    const Vector<Number> &        criteria,
+    const double                  top_fraction,
+    const double                  bottom_fraction,
+    const unsigned int max_n_cells = std::numeric_limits<unsigned int>::max());
 
 
 
@@ -301,16 +305,16 @@ namespace GridRefinement
    */
   template <int dim, typename Number, int spacedim>
   void
-  refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
-                               const Vector<Number>        &criteria,
-                               const unsigned int          order=2);
+  refine_and_coarsen_optimize(Triangulation<dim, spacedim> &tria,
+                              const Vector<Number> &        criteria,
+                              const unsigned int            order = 2);
 
   /**
    * Mark all mesh cells for which the value in @p criteria exceeds @p
    * threshold for refinement, but only flag up to @p max_to_mark cells.
    *
    * The vector @p criteria contains a nonnegative value for each active cell,
-   * ordered in the canonical order of of Triangulation::active_cell_iterator.
+   * ordered in the canonical order of Triangulation::active_cell_iterator.
    *
    * The cells are only flagged for refinement, they are not actually refined.
    * To do so, you have to call
@@ -320,17 +324,18 @@ namespace GridRefinement
    * helper function for the actual strategies.
    */
   template <int dim, typename Number, int spacedim>
-  void refine (Triangulation<dim,spacedim> &tria,
-               const Vector<Number>        &criteria,
-               const double                threshold,
-               const unsigned int          max_to_mark = numbers::invalid_unsigned_int);
+  void
+  refine(Triangulation<dim, spacedim> &tria,
+         const Vector<Number> &        criteria,
+         const double                  threshold,
+         const unsigned int max_to_mark = numbers::invalid_unsigned_int);
 
   /**
    * Mark all mesh cells for which the value in @p criteria is less than @p
    * threshold for coarsening.
    *
    * The vector @p criteria contains a nonnegative value for each active cell,
-   * ordered in the canonical order of of Triangulation::active_cell_iterator.
+   * ordered in the canonical order of Triangulation::active_cell_iterator.
    *
    * The cells are only flagged for coarsening, they are not actually
    * coarsened. To do so, you have to call
@@ -340,9 +345,10 @@ namespace GridRefinement
    * helper function for the actual strategies.
    */
   template <int dim, typename Number, int spacedim>
-  void coarsen (Triangulation<dim,spacedim> &tria,
-                const Vector<Number>        &criteria,
-                const double                threshold);
+  void
+  coarsen(Triangulation<dim, spacedim> &tria,
+          const Vector<Number> &        criteria,
+          const double                  threshold);
 
   /**
    * An exception thrown if the vector with cell criteria contains negative
@@ -354,11 +360,11 @@ namespace GridRefinement
    * One of the threshold parameters causes trouble. Or the refinement and
    * coarsening thresholds overlap.
    */
-  DeclException0 (ExcInvalidParameterValue);
-}
+  DeclException0(ExcInvalidParameterValue);
+} // namespace GridRefinement
 
 
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif //dealii_grid_refinement_h
+#endif // dealii_grid_refinement_h

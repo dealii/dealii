@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2013 by the deal.II authors
+// Copyright (C) 2003 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -21,10 +21,10 @@
  * deal.II.
  *
  * <h2>Brief overview</h2>
- * 
+ *
  * Exceptions are used in two different ways:
  * <ul>
- * 
+ *
  *   <li> Static assertions: These are checks that are only enabled in debug
  *   mode, not in release (or optimized, production) mode. In deal.II, static
  *   assertions are typically used to check that parameters to functions satisfy
@@ -114,7 +114,7 @@
  *     DeclException2 (ExcDomain, int, int,
  *                     << "Index= " << arg1 << "Upper Bound= " << arg2);
  *  @endcode
- *  
+ *
  *  This declares an exception class named <tt>ExcDomain</tt>, which
  *  has two variables as additional information (named <tt>arg1</tt>
  *  and <tt>arg2</tt> by default) and which outputs the given sequence
@@ -147,7 +147,9 @@
  *  @code
  *    #ifdef DEBUG
  *        if (!(cond))
- *              issue error of class ExcDomain(n,dim)
+ *          {
+ *            // issue error of class ExcDomain(n,dim)
+ *          }
  *    #else
  *        // do nothing
  *    #endif
@@ -168,52 +170,44 @@
  *  following sequence:
  *  @code
  *    if (!(cond))
- *      deal_II_exceptions::internals::issue_error_assert_1
+ *      deal_II_exceptions::internals::issue_error_noreturn
  *             (__FILE__,
  *              __LINE__,
  *              __PRETTY_FUNCTION__,
  *              #cond,
  *              #exc,
- *              &exc);
+ *              exc);
  *  @endcode
- *  
+ *
  *  (Note that function names and exact calling sequences may change
  *  over time, but the general principle remains the same.) I.e., if
  *  the given condition is violated, then the file and line in which
  *  the exception occurred as well as the condition itself and the call
  *  sequence of the exception object is passed to the
- *  deal_II_exceptions::internals::issue_error_assert_1()
+ *  deal_II_exceptions::internals::issue_error_noreturn()
  *  function. Additionally an object of the form given by <tt>exc</tt>
  *  is created (this is normally an unnamed object like in
  *  <tt>ExcDomain (n, dim)</tt> of class <tt>ExcDomain</tt>) and
  *  transferred to this function.
  *
- *  <tt>__PRETTY__FUNCTION__</tt> is a macro defined by some compilers and
+ *  <tt>__PRETTY_FUNCTION__</tt> is a macro defined by some compilers and
  *  gives the name of the function. If another compiler is used, we
  *  try to set this function to something reasonable, if the compiler
  *  provides us with that, and <tt>"(not available)"</tt> otherwise.
  *
- *  In <tt>issue_error_assert</tt>, the given data is transferred into
- *  the <tt>exc</tt> object by calling the set_fields() function;
- *  after that, the general error info is printed onto
- *  <tt>std::cerr</tt> using the PrintError() function of <tt>exc</tt>
- *  and finally the exception specific data is printed using the user
- *  defined function PrintError() (which is normally created using the
- *  <tt>DeclException (...)</tt> macro family. If it can be obtained
- *  from the operating system, the output may also contain a
- *  stacktrace to show where the error happened. Several of the
- *  @ref Tutorial programs show a typical output.
+ *  In <tt>issue_error_noreturn</tt>, the given data is transferred into the
+ *  <tt>exc</tt> object by calling the set_fields() function; Afterwards the
+ *  program is either aborted (and information about the exception is printed
+ *  to deallog) or the exception is thrown. The <tt>Assert</tt> macro does the
+ *  first path (print and abort); <tt>AssertThrow</tt> does the second
+ *  (throw). This behavior is consistent with the descriptions of static and
+ *  dynamic assertions earlier in this document. If it can be obtained from
+ *  the operating system, the output may also contain a stacktrace to show
+ *  where the error happened. Several of the @ref Tutorial programs show a
+ *  typical output.
  *
- *  After printing all this information,
- *  deal_II_exceptions::internals::abort() is called (with one
- *  exception, see the end of this section). This terminates the
- *  program, which is the right thing to do for this kind of error
- *  checking since it is used to detect programming errors rather than
- *  run-time errors; a program can, by definition, not recover from
- *  programming errors.
- *
- *  If the preprocessor variable <tt>DEBUG</tt> is not set, then nothing
- *  happens, i.e. the <tt>Assert</tt> macro is expanded to <tt>{}</tt>.
+ *  If the preprocessor variable <tt>DEBUG</tt> is not set then the
+ *  <tt>Assert</tt> macro is expanded to <tt>{}</tt>.
  *
  *  Sometimes, there is no useful condition for an exception other
  *  than that the program flow should not have reached a certain point,
@@ -274,15 +268,17 @@
  *  @endcode
  *  and catch it using the statement
  *  @code
- *    try {
- *      do_something ();
- *    }
- *    catch (std::exception &e) {
- *      std::cerr << "Exception occurred:" << std::endl
- *           << e.what ()
- *           << std::endl;
- *      do_something_to_reciver ();
- *    };
+ *    try
+ *      {
+ *        do_something ();
+ *      }
+ *    catch (std::exception &e)
+ *      {
+ *        std::cerr << "Exception occurred:" << std::endl
+ *                  << e.what ()
+ *                  << std::endl;
+ *        do_something_to_receiver ();
+ *      }
  *  @endcode
  *  <tt>std::exception</tt> is a standard <tt>C++</tt> class providing basic functionality for
  *  exceptions, such as the virtual function <tt>what()</tt> that returns some
@@ -340,24 +336,27 @@
  *  case there two types, corresponding to the <tt>X</tt> in
  *  <tt>DeclExceptionX</tt>) and finally the output
  *  sequence with which you can print additional information.
- *  
+ *
  *  The syntax of the output sequence is a bit weird but gets
  *  clearer once you see how this macro is defined (again schematically, actual
  *  function names and definitions may change over time and be different):
  *  @code
- *  class name : public ExceptionBase {
- *    public:
- *      name (const type1 a1, const type2 a2) :
- *                     arg1 (a1), arg2(a2) {};
- *      virtual void print_info (std::ostream &out) const {
- *        out outsequence << std::endl;
- *      };
- *    private:
- *      type1 arg1;
- *      type2 arg2;
+ *  class name : public ExceptionBase
+ *  {
+ *  public:
+ *    name (const type1 a1, const type2 a2) : arg1 (a1), arg2(a2)
+ *    {}
+ *
+ *    virtual void print_info (std::ostream &out) const
+ *    {
+ *      out << "    " outsequence << std::endl;
+ *    }
+ *  private:
+ *    type1 arg1;
+ *    type2 arg2;
  *  };
  *  @endcode
- *   
+ *
  *  If declared as specified, you can later use this exception class
  *  in the following manner:
  *  @code
@@ -369,15 +368,15 @@
  *  @code
  *    --------------------------------------------------------
  *    An error occurred in line <301> of file <exc-test.cc>.
- *    The violated condition was: 
+ *    The violated condition was:
  *      i<m
  *    The name and call sequence of the exception was:
  *      MyExc2(i,m)
- *    Additional Information: 
+ *    Additional Information:
  *      i=5, m=3
  *    --------------------------------------------------------
  *  @endcode
- *  
+ *
  *  Obviously for the <tt>DeclException0(name)</tt> macro, no types and
  *  also no output sequence is allowed.
  *

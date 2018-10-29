@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,14 +18,16 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
+
 #include <deal.II/base/auto_derivative_function.h>
-#include <deal.II/base/tensor.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/thread_local_storage.h>
-#include <vector>
+
 #include <map>
 #include <memory>
+#include <vector>
 
 namespace mu
 {
@@ -35,7 +37,8 @@ namespace mu
 DEAL_II_NAMESPACE_OPEN
 
 
-template <typename> class Vector;
+template <typename>
+class Vector;
 
 
 /**
@@ -52,14 +55,36 @@ template <typename> class Vector;
  * sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh,
  * atan2, log2, log10, log, ln, exp, sqrt, sign, rint, abs, min, max, sum, avg
  * @endcode
- * this class also supports:
- * - <tt>if(condition, then-value, else-value)</tt>
- * - <tt>|</tt> and <tt>&</tt> (logic or and and)
- * - <tt>int(x)</tt>, <tt>ceil(x)</tt>, <tt>floor(x)</tt> (rounding)
- * - <tt>cot(x)</tt>, <tt>csc(x)</tt>, <tt>sec(x)</tt>
- * - <tt>pow(x,n)</tt>, <tt>log(x)</tt>
- * - <tt>erfc(x)</tt>
- * - <tt>rand()</tt>, <tt>rand_seed(seed)</tt>
+ * this class also supports the following operations:
+ * - <code>if(condition, then-value, else-value)</code>
+ * - <code>|</code> and <code>&</code> (logic or and and)
+ * - <code>int(x)</code>, <code>ceil(x)</code>, <code>floor(x)</code> (rounding)
+ * - <code>cot(x)</code>, <code>csc(x)</code>, <code>sec(x)</code>
+ * - <code>pow(x,n)</code>, <code>log(x)</code>
+ * - <code>erfc(x)</code>
+ * - <code>rand()</code>, <code>rand_seed(seed)</code>
+ *
+ * @note This class implements the list of functions just mentioned as
+ *   user-defined functions by extending muparser. This means, in particular,
+ *   that the `if(condition, then-value, else-value)` syntax evaluates all
+ *   three arguments before determining whether the condition is true, and
+ *   then discarding either the "then" or the "else" expressions. In almost
+ *   all situations, this is not a problem except if the evaluation of
+ *   one of the expressions throws a floating point exception in cases
+ *   where it will later be discarded. (Assuming floating point exceptions
+ *   are switched on, as is the default for deal.II in debug mode on most
+ *   systems.) An example would be the expression `if(x>0, sqrt(x), 0)`
+ *   which is mathematically well defined, but on systems where this is
+ *   enabled will abort the program with a floating point exception when
+ *   evaluated with a negative `x`. This is because the square root of
+ *   `x` is computed before the `if` statement's condition is considered
+ *   to determine whether the result should be the second or third
+ *   argument. If this kind of behavior is a problem, you can resort to
+ *   the muparser built-in syntax `(condition ? then-value : else-value)`,
+ *   using the ternary syntax familiar to C++ programmers. If this
+ *   syntax is used, muparser uses lazy evaluation in which only one of the
+ *   branches is evaluated, depending on whether the `condition` is
+ *   true or false.
  *
  * The following examples shows how to use this class:
  * @code
@@ -196,7 +221,7 @@ class FunctionParser : public AutoDerivativeFunction<dim>
 {
 public:
   /**
-   * Constructor for Parsed functions. Its arguments are the same of
+   * Constructor for parsed functions. Its arguments are the same of
    * the base class Function, with the additional parameter @p h, used
    * for the computation of gradients using finite differences. This
    * object needs to be initialized with the initialize() method
@@ -204,25 +229,37 @@ public:
    * before the initialize() method has been called, then an exception
    * is thrown.
    */
-  FunctionParser (const unsigned int n_components = 1,
-                  const double       initial_time = 0.0,
-                  const double       h = 1e-8);
+  FunctionParser(const unsigned int n_components = 1,
+                 const double       initial_time = 0.0,
+                 const double       h            = 1e-8);
+
+  /**
+   * Constructor for parsed functions. Takes directly a semi-colon separated
+   * list of expressions (one for each component of the function), an optional
+   * comma-separated list of constants, variable names and step size for the
+   * computation of first order derivatives by finite difference.
+   */
+  FunctionParser(const std::string &expression,
+                 const std::string &constants      = "",
+                 const std::string &variable_names = default_variable_names() +
+                                                     ",t",
+                 const double h = 1e-8);
 
   /**
    * Destructor. Explicitly delete the FunctionParser objects (there is one
    * for each component of the function).
    */
-  ~FunctionParser();
+  ~FunctionParser() override;
 
   /**
    * Type for the constant map. Used by the initialize() method.
    */
-  typedef std::map<std::string, double> ConstMap;
+  using ConstMap = std::map<std::string, double>;
 
   /**
    * Iterator for the constants map. Used by the initialize() method.
    */
-  typedef ConstMap::iterator ConstMapIterator;
+  using ConstMapIterator = ConstMap::iterator;
 
   /**
    * Initialize the function.  This methods accepts the following parameters:
@@ -234,8 +271,8 @@ public:
    * component of the point in which the function is evaluated, the second
    * variable to the second component and so forth. If this function is also
    * time dependent, then it is necessary to specify it by setting the
-   * <tt>time_dependent</tt> parameter to true.  An exception is thrown if the
-   * number of variables specified here is different from dim (if this
+   * <code>time_dependent</code> parameter to true.  An exception is thrown if
+   * the number of variables specified here is different from dim (if this
    * function is not time-dependent) or from dim+1 (if it is time- dependent).
    *
    * <b>expressions</b>: a list of strings containing the expressions that
@@ -249,7 +286,7 @@ public:
    * number pi). An expression is valid if and only if it contains only
    * defined variables and defined constants (other than the functions
    * specified above). If a constant is given whose name is not valid (eg:
-   * <tt>constants["sin"] = 1.5;</tt>) an exception is thrown.
+   * <code>constants["sin"] = 1.5;</code>) an exception is thrown.
    *
    * <b>time_dependent</b>. If this is a time dependent function, then the
    * last variable declared in <b>vars</b> is assumed to be the time variable,
@@ -258,10 +295,11 @@ public:
    * method in this case is dim+1. The value of this parameter defaults to
    * false, i.e. do not consider time.
    */
-  void initialize (const std::string              &vars,
-                   const std::vector<std::string> &expressions,
-                   const ConstMap                 &constants,
-                   const bool time_dependent = false);
+  void
+  initialize(const std::string &             vars,
+             const std::vector<std::string> &expressions,
+             const ConstMap &                constants,
+             const bool                      time_dependent = false);
 
   /**
    * Initialize the function. Same as above, but accepts a string rather than
@@ -270,19 +308,19 @@ public:
    * this method is called and the number of components successfully parsed
    * does not match the number of components of the base function.
    */
-  void initialize (const std::string &vars,
-                   const std::string &expression,
-                   const ConstMap    &constants,
-                   const bool time_dependent = false);
+  void
+  initialize(const std::string &vars,
+             const std::string &expression,
+             const ConstMap &   constants,
+             const bool         time_dependent = false);
 
   /**
    * A function that returns default names for variables, to be used in the
    * first argument of the initialize() functions: it returns "x" in 1d, "x,y"
    * in 2d, and "x,y,z" in 3d.
    */
-  static
-  std::string
-  default_variable_names ();
+  static std::string
+  default_variable_names();
 
   /**
    * Return the value of the function at the given point. Unless there is only
@@ -290,32 +328,42 @@ public:
    * component you want to have evaluated; it defaults to zero, i.e. the first
    * component.
    */
-  virtual double value (const Point<dim>   &p,
-                        const unsigned int  component = 0) const;
+  virtual double
+  value(const Point<dim> &p, const unsigned int component = 0) const override;
 
   /**
    * Return all components of a vector-valued function at the given point @p
    * p.
    *
-   * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
+   * <code>values</code> shall have the right size beforehand, i.e.
+   * #n_components.
    */
-  virtual void vector_value (const Point<dim>   &p,
-                             Vector<double>     &values) const;
+  virtual void
+  vector_value(const Point<dim> &p, Vector<double> &values) const override;
+
+  /**
+   * Return an array of function expressions (one per component), used to
+   * initialize this function.
+   */
+  const std::vector<std::string> &
+  get_expressions() const;
 
   /**
    * @addtogroup Exceptions
    * @{
    */
-  DeclException2 (ExcParseError,
-                  int, char *,
-                  << "Parsing Error at Column " << arg1
-                  << ". The parser said: " << arg2);
+  DeclException2(ExcParseError,
+                 int,
+                 std::string,
+                 << "Parsing Error at Column " << arg1
+                 << ". The parser said: " << arg2);
 
-  DeclException2 (ExcInvalidExpressionSize,
-                  int, int,
-                  << "The number of components (" << arg1
-                  << ") is not equal to the number of expressions ("
-                  << arg2 << ").");
+  DeclException2(ExcInvalidExpressionSize,
+                 int,
+                 int,
+                 << "The number of components (" << arg1
+                 << ") is not equal to the number of expressions (" << arg2
+                 << ").");
 
   //@}
 
@@ -324,21 +372,23 @@ private:
   /**
    * Place for the variables for each thread
    */
-  mutable Threads::ThreadLocalStorage<std::vector<double> > vars;
+  mutable Threads::ThreadLocalStorage<std::vector<double>> vars;
 
   /**
    * The muParser objects for each thread (and one for each component). We are
    * storing a unique_ptr so that we don't need to include the definition of
    * mu::Parser in this header.
    */
-#if TBB_VERSION_MAJOR >= 4
-  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser> > > fp;
-#else
+#  if TBB_VERSION_MAJOR >= 4
+  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser>>>
+    fp;
+#  else
   // older TBBs have a bug in which they want to return thread-local
   // objects by value. this doesn't work for std::unique_ptr, so use a
   // std::shared_ptr
-  mutable Threads::ThreadLocalStorage<std::vector<std::shared_ptr<mu::Parser> > > fp;
-#endif
+  mutable Threads::ThreadLocalStorage<std::vector<std::shared_ptr<mu::Parser>>>
+    fp;
+#  endif
 
   /**
    * An array to keep track of all the constants, required to initialize fp in
@@ -353,19 +403,20 @@ private:
   std::vector<std::string> var_names;
 
   /**
-   * An array of function expressions (one per component), required to
-   * initialize fp in each thread.
-   */
-  std::vector<std::string> expressions;
-
-  /**
    * Initialize fp and vars on the current thread. This function may only be
    * called once per thread. A thread can test whether the function has
    * already been called by testing whether 'fp.get().size()==0' (not
    * initialized) or >0 (already initialized).
    */
-  void init_muparser() const;
+  void
+  init_muparser() const;
 #endif
+
+  /**
+   * An array of function expressions (one per component), required to
+   * initialize fp in each thread.
+   */
+  std::vector<std::string> expressions;
 
   /**
    * State of usability. This variable is checked every time the function is
@@ -386,18 +437,18 @@ private:
 
 template <int dim>
 std::string
-FunctionParser<dim>::default_variable_names ()
+FunctionParser<dim>::default_variable_names()
 {
   switch (dim)
     {
-    case 1:
-      return "x";
-    case 2:
-      return "x,y";
-    case 3:
-      return "x,y,z";
-    default:
-      Assert (false, ExcNotImplemented());
+      case 1:
+        return "x";
+      case 2:
+        return "x,y";
+      case 3:
+        return "x,y,z";
+      default:
+        Assert(false, ExcNotImplemented());
     }
   return "";
 }
@@ -407,5 +458,3 @@ FunctionParser<dim>::default_variable_names ()
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
-

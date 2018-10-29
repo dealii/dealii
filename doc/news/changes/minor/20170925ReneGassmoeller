@@ -1,9 +1,0 @@
-New: There are new signals in the Triangulation class
-that signal the beginning and end of a parallel::distributed
-refinement and serialization. This allows to connect functions
-that should be called uniquely once before and after
-refinement and serialization for parallel distributed
-Triangulations (something not possible with the existing
-signals).
-<br>
-(Rene Gassmoeller, 2017/09/25)

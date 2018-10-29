@@ -1,5 +1,0 @@
-New: Created a new method OpenCASCADE::Utilities::create_curves_from_triangulation_boundary
-that smoothly interpolates the boundary of two dimensional triangulations into a vector of 
-OpenCASCADE TopoDS_Edge closed curves, representing the connected components of the boundary. 
-<br> 
-(Dirk Peschka, Luca Heltai, 2017/12/05)

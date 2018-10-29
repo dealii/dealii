@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,14 +19,15 @@
 // since boost/math/special_functions/erf.hpp uses it. this test is a
 // reminder that we can't do this again in the future
 
-#include "../tests.h"
-
 #include <boost/math/special_functions/erf.hpp>
 
+#include "../tests.h"
 
-int main()
+
+int
+main()
 {
   initlog();
 
-  deallog << boost::math::erf (0.5) << std::endl;
+  deallog << boost::math::erf(0.5) << std::endl;
 }

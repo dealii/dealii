@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2017 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,19 +8,19 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 #ifndef dealii_particles_particle_h
 #define dealii_particles_particle_h
 
-#include <deal.II/particles/property_pool.h>
-
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/types.h>
-#include <deal.II/base/array_view.h>
+
+#include <deal.II/particles/property_pool.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -40,15 +40,15 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    */
-  typedef unsigned long long int particle_index;
+  using particle_index = unsigned long long int;
 
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
-#  define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
-#endif
+#    define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#  endif
 #else
   /**
    * The type used for indices of particles. While in
@@ -61,17 +61,17 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    */
-  typedef unsigned int particle_index;
+  using particle_index = unsigned int;
 
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
-#  define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
+#    define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
+#  endif
 #endif
-#endif
-}
+} // namespace types
 
 /**
  * A namespace that contains all classes that are related to the particle
@@ -82,10 +82,10 @@ namespace Particles
   namespace internal
   {
     /**
-     * Internal typedef of cell level/index pair.
+     * Internal alias of cell level/index pair.
      */
-    typedef std::pair<int, int> LevelInd;
-  }
+    using LevelInd = std::pair<int, int>;
+  } // namespace internal
 
   /**
    * Base class of particles - represents a particle with position,
@@ -97,7 +97,7 @@ namespace Particles
    * @author Rene Gassmoeller, 2017
    *
    */
-  template <int dim, int spacedim=dim>
+  template <int dim, int spacedim = dim>
   class Particle
   {
   public:
@@ -105,7 +105,7 @@ namespace Particles
      * Empty constructor for Particle, creates a particle at the
      * origin.
      */
-    Particle ();
+    Particle();
 
     /**
      * Constructor for Particle, creates a particle with the specified
@@ -118,9 +118,9 @@ namespace Particles
      * in the coordinate system of the reference cell.
      * @param[in] id Globally unique ID number of particle.
      */
-    Particle (const Point<spacedim> &location,
-              const Point<dim> &reference_location,
-              const types::particle_index id);
+    Particle(const Point<spacedim> &     location,
+             const Point<dim> &          reference_location,
+             const types::particle_index id);
 
     /**
      * Copy-Constructor for Particle, creates a particle with exactly the
@@ -129,12 +129,12 @@ namespace Particles
      * for registering and freeing this memory in the property pool this
      * constructor registers a new chunk, and copies the properties.
      */
-    Particle (const Particle<dim,spacedim> &particle);
+    Particle(const Particle<dim, spacedim> &particle);
 
     /**
      * Constructor for Particle, creates a particle from a data vector.
      * This constructor is usually called after serializing a particle by
-     * calling the write_data function.
+     * calling the write_data() function.
      *
      * @param[in,out] begin_data A pointer to a memory location from which
      * to read the information that completely describes a particle. This
@@ -147,24 +147,25 @@ namespace Particles
      * contains serialized data of the same length and type that is allocated
      * by @p property_pool.
      */
-    Particle (const void *&begin_data,
-              PropertyPool &property_pool);
+    Particle(const void *&begin_data, PropertyPool *const = nullptr);
 
     /**
      * Move constructor for Particle, creates a particle from an existing
      * one by stealing its state.
      */
-    Particle (Particle<dim,spacedim> &&particle) noexcept;
+    Particle(Particle<dim, spacedim> &&particle) noexcept;
 
     /**
      * Copy assignment operator.
      */
-    Particle<dim,spacedim> &operator=(const Particle<dim,spacedim> &particle);
+    Particle<dim, spacedim> &
+    operator=(const Particle<dim, spacedim> &particle);
 
     /**
      * Move assignment operator.
      */
-    Particle<dim,spacedim> &operator=(Particle<dim,spacedim> &&particle) noexcept;
+    Particle<dim, spacedim> &
+    operator=(Particle<dim, spacedim> &&particle) noexcept;
 
     /**
      * Destructor. Releases the property handle if it is valid, and
@@ -172,14 +173,14 @@ namespace Particles
      * the memory is managed by the property pool, and the pool is responsible
      * for what happens to the memory.
      */
-    ~Particle ();
+    ~Particle();
 
     /**
      * Write particle data into a data array. The array is expected
      * to be large enough to take the data, and the void pointer should
-     * point to the first element in which the data should be written. This
-     * function is meant for serializing all particle properties and
-     * afterwards de-serializing the properties by calling the appropriate
+     * point to the first entry of the array to which the data should be
+     * written. This function is meant for serializing all particle properties
+     * and later de-serializing the properties by calling the appropriate
      * constructor Particle(void *&data, PropertyPool *property_pool = NULL);
      *
      * @param [in,out] data The memory location to write particle data
@@ -191,13 +192,13 @@ namespace Particles
     write_data(void *&data) const;
 
     /**
-      * Set the location of this particle. Note that this does not check
-      * whether this is a valid location in the simulation domain.
-      *
-      * @param [in] new_location The new location for this particle.
-      */
+     * Set the location of this particle. Note that this does not check
+     * whether this is a valid location in the simulation domain.
+     *
+     * @param [in] new_location The new location for this particle.
+     */
     void
-    set_location (const Point<spacedim> &new_location);
+    set_location(const Point<spacedim> &new_location);
 
     /**
      * Get the location of this particle.
@@ -205,7 +206,7 @@ namespace Particles
      * @return The location of this particle.
      */
     const Point<spacedim> &
-    get_location () const;
+    get_location() const;
 
     /**
      * Set the reference location of this particle.
@@ -214,19 +215,19 @@ namespace Particles
      * this particle.
      */
     void
-    set_reference_location (const Point<dim> &new_reference_location);
+    set_reference_location(const Point<dim> &new_reference_location);
 
     /**
      * Return the reference location of this particle in its current cell.
      */
     const Point<dim> &
-    get_reference_location () const;
+    get_reference_location() const;
 
     /**
      * Return the ID number of this particle.
      */
     types::particle_index
-    get_id () const;
+    get_id() const;
 
     /**
      * Tell the particle where to store its properties (even if it does not
@@ -239,11 +240,11 @@ namespace Particles
     set_property_pool(PropertyPool &property_pool);
 
     /**
-      * Return whether this particle has a valid property pool and a valid
-      * handle to properties.
-      */
+     * Return whether this particle has a valid property pool and a valid
+     * handle to properties.
+     */
     bool
-    has_properties () const;
+    has_properties() const;
 
     /**
      * Set the properties of this particle.
@@ -252,7 +253,7 @@ namespace Particles
      * new properties for this particle.
      */
     void
-    set_properties (const ArrayView<const double> &new_properties);
+    set_properties(const ArrayView<const double> &new_properties);
 
     /**
      * Get write-access to properties of this particle.
@@ -260,7 +261,7 @@ namespace Particles
      * @return An ArrayView of the properties of this particle.
      */
     const ArrayView<double>
-    get_properties ();
+    get_properties();
 
     /**
      * Get read-access to properties of this particle.
@@ -268,7 +269,7 @@ namespace Particles
      * @return An ArrayView of the properties of this particle.
      */
     const ArrayView<const double>
-    get_properties () const;
+    get_properties() const;
 
     /**
      * Return the size in bytes this particle occupies if all of its data is
@@ -283,14 +284,16 @@ namespace Particles
      * serialization.
      */
     template <class Archive>
-    void save (Archive &ar, const unsigned int version) const;
+    void
+    save(Archive &ar, const unsigned int version) const;
 
     /**
      * Read the data of this object from a stream for the purpose of
      * serialization.
      */
     template <class Archive>
-    void load (Archive &ar, const unsigned int version);
+    void
+    load(Archive &ar, const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -298,17 +301,17 @@ namespace Particles
     /**
      * Current particle location.
      */
-    Point<spacedim>             location;
+    Point<spacedim> location;
 
     /**
      * Current particle location in the reference cell.
      */
-    Point<dim>             reference_location;
+    Point<dim> reference_location;
 
     /**
      * Globally unique ID of particle.
      */
-    types::particle_index  id;
+    types::particle_index id;
 
     /**
      * A pointer to the property pool. Necessary to translate from the
@@ -322,18 +325,16 @@ namespace Particles
     PropertyPool::Handle properties;
   };
 
-  /* -------------------------- inline and template functions ---------------------- */
+  /* ---------------------- inline and template functions ------------------ */
 
   template <int dim, int spacedim>
   template <class Archive>
-  void Particle<dim,spacedim>::load (Archive &ar, const unsigned int)
+  void
+  Particle<dim, spacedim>::load(Archive &ar, const unsigned int)
   {
     unsigned int n_properties = 0;
 
-    ar &location
-    & reference_location
-    & id
-    & n_properties;
+    ar &location &reference_location &id &n_properties;
 
     if (n_properties > 0)
       {
@@ -344,24 +345,21 @@ namespace Particles
 
   template <int dim, int spacedim>
   template <class Archive>
-  void Particle<dim,spacedim>::save (Archive &ar, const unsigned int) const
+  void
+  Particle<dim, spacedim>::save(Archive &ar, const unsigned int) const
   {
     unsigned int n_properties = 0;
-    if ((property_pool != nullptr) && (properties != PropertyPool::invalid_handle))
+    if ((property_pool != nullptr) &&
+        (properties != PropertyPool::invalid_handle))
       n_properties = get_properties().size();
 
-    ar &location
-    & reference_location
-    & id
-    & n_properties;
+    ar &location &reference_location &id &n_properties;
 
     if (n_properties > 0)
       ar &boost::serialization::make_array(properties, n_properties);
-
   }
-}
+} // namespace Particles
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

@@ -1,0 +1,7 @@
+Changed: The ConstraintMatrix class has been renamed to AffineConstraints.
+Further, AffineConstraints gained a template parameter for the underlying
+storage type. This in particular enables the definition of complex-valued
+constraints (for example, complex-valued Dirichlet boundary conditions, or
+periodic boundary conditions with an additional phase shift).
+<br>
+(2018/05/31, Matthias Maier, Daniel Arndt, David Wells)

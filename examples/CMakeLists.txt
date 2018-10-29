@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -92,6 +92,18 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
             PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
             )
+          #
+          # In case CMake is instructed to add rpaths to the library and
+          # exectuble on installation, make sure that we add an additional
+          # rpath to the library location as well:
+          #
+          IF(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+            SET_TARGET_PROPERTIES(${_name}.${_build_lowercase}
+              PROPERTIES
+              INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
+              )
+          ENDIF()
+
           ADD_DEPENDENCIES(examples ${_name}.${_build_lowercase})
           INSTALL(TARGETS ${_name}.${_build_lowercase}
             DESTINATION ${DEAL_II_EXAMPLES_RELDIR}/${_name}

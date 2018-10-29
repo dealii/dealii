@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2014 by the deal.II authors
+// Copyright (C) 2006 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -251,7 +251,7 @@
  * After that, find the key <code>TAGFILES</code> in your Doxygen options file and write something like
  * <pre>
  * TAGFILES = deal.tag=http://www.dealii.org/X.Y.Z/doxygen/deal.II
- *</pre>
+ * </pre>
  * where <code>X.Y.Z</code> refers to the release you want to link to. Be sure you use
  * the matching tag file. In theory, you can also link against the developing revisions
  * of deal.II, but then you have to fear that your links may become invalid if

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,44 +18,41 @@
 // test setting some elements and reading them back from a const matrix
 // iterator
 
-#include "../tests.h"
 #include <deal.II/lac/chunk_sparse_matrix.h>
 
+#include "../tests.h"
 
-void test (const unsigned int chunk_size)
+
+void
+test(const unsigned int chunk_size)
 {
   deallog << "Chunk size: " << chunk_size << std::endl;
-  ChunkSparsityPattern sp (5,5,3,chunk_size);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if (((i+2*j+1) % 3 == 0)
-          ||
-          (i==j))
-        sp.add (i,j);
-  sp.compress ();
+  ChunkSparsityPattern sp(5, 5, 3, chunk_size);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 5; ++j)
+      if (((i + 2 * j + 1) % 3 == 0) || (i == j))
+        sp.add(i, j);
+  sp.compress();
 
   ChunkSparseMatrix<double> m(sp);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      if (((i+2*j+1) % 3 == 0)
-          ||
-          (i==j))
-        m.set (i,j, i*j);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 5; ++j)
+      if (((i + 2 * j + 1) % 3 == 0) || (i == j))
+        m.set(i, j, i * j);
 
   ChunkSparseMatrix<double>::const_iterator i = m.begin();
-  for (; i!=m.end(); ++i)
+  for (; i != m.end(); ++i)
     {
-      deallog << i->row() << ' ' << i->column() << ' '
-              << i->value() << std::endl;
-      if (((i->row()+2*i->column()+1) % 3 == 0)
-          ||
-          (i->row()==i->column()))
+      deallog << i->row() << ' ' << i->column() << ' ' << i->value()
+              << std::endl;
+      if (((i->row() + 2 * i->column() + 1) % 3 == 0) ||
+          (i->row() == i->column()))
         {
-          AssertThrow (std::fabs(i->value() - i->row()*i->column()) < 1e-14,
-                       ExcInternalError());
+          AssertThrow(std::fabs(i->value() - i->row() * i->column()) < 1e-14,
+                      ExcInternalError());
         }
       else
-        AssertThrow (i->value() == 0, ExcInternalError());
+        AssertThrow(i->value() == 0, ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -63,21 +60,22 @@ void test (const unsigned int chunk_size)
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      const unsigned int chunk_sizes[] = { 1, 2, 4, 5, 7 };
-      for (unsigned int i=0;
-           i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]);
+      const unsigned int chunk_sizes[] = {1, 2, 4, 5, 7};
+      for (unsigned int i = 0; i < sizeof(chunk_sizes) / sizeof(chunk_sizes[0]);
            ++i)
-        test (chunk_sizes[i]);
+        test(chunk_sizes[i]);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -90,7 +88,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

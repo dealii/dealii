@@ -8,32 +8,35 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 
-#include "../tests.h"
 #include <deal.II/base/timer.h>
+
+#include "../tests.h"
 
 // burn computer time
 
 double s = 0.;
-void burn (unsigned int n)
+void
+burn(unsigned int n)
 {
-  for (unsigned int i=0 ; i<n ; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j=1 ; j<100000 ; ++j)
+      for (unsigned int j = 1; j < 100000; ++j)
         {
-          s += 1./j * i;
+          s += 1. / j * i;
         }
     }
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
@@ -93,6 +96,4 @@ int main ()
     deallog << "OK" << std::endl;
   else
     deallog << "ERROR - s6 should be zero" << std::endl;
-
 }
-

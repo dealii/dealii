@@ -1,0 +1,4 @@
+Fixed: The eigenvalue approximation in SolverGMRES failed if no iterations
+were performed. Now, there is simply no output in this case.
+<br>
+(Daniel Arndt, 2018/06/15)

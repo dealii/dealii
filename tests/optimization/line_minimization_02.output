@@ -1,0 +1,40 @@
+DEAL::Case 1:
+DEAL::Bracketing phase: 1
+DEAL::13.0000 -0.618070 -0.0128665 1 1 -1.14750
+DEAL::Satisfied both Wolfe conditions during Bracketing.
+DEAL::Solution: 13.0000
+DEAL::Distance: 11.5255
+DEAL::Case 2:
+DEAL::Bracketing phase: 1
+DEAL::0.100000 -0.152254 -1.50769 1 0 -1.14750
+DEAL::Bracketing phase: 2
+DEAL::1.00000 -1.03000 -0.363333 1 0 -1.14750
+DEAL::Bracketing phase: 3
+DEAL::9.10000 -0.594896 0.00370484 1 1 -1.14750
+DEAL::Sectioning phase: 4
+DEAL::1.00000 -1.03000 -0.363333 1 0
+DEAL::9.10000 -0.594896 0.00370484 1 1
+DEAL::3.09290 -0.895024 0.139676 1 1
+DEAL::Sectioning phase: 5
+DEAL::1.00000 -1.03000 -0.363333 1 0
+DEAL::3.09290 -0.895024 0.139676 1 1
+DEAL::1.60613 -1.10031 0.0529144 1 1
+DEAL::Satisfied both Wolfe conditions.
+DEAL::Solution: 1.60613
+DEAL::Distance: 0.131601
+DEAL::Case 3:
+DEAL::Bracketing phase: 1
+DEAL::1.00000 -1.03000 -0.363333 1 0 -1.14750
+DEAL::Bracketing phase: 2
+DEAL::10.0000 -0.594118 -0.00174164 1 1 -1.14750
+DEAL::Sectioning phase: 3
+DEAL::1.00000 -1.03000 -0.363333 1 0
+DEAL::10.0000 -0.594118 -0.00174164 1 1
+DEAL::3.36365 -0.858821 0.127629 1 1
+DEAL::Sectioning phase: 4
+DEAL::1.00000 -1.03000 -0.363333 1 0
+DEAL::3.36365 -0.858821 0.127629 1 1
+DEAL::1.65166 -1.09756 0.0676998 1 1
+DEAL::Satisfied both Wolfe conditions.
+DEAL::Solution: 1.65166
+DEAL::Distance: 0.177131

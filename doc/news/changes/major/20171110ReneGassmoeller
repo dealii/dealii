@@ -1,5 +1,0 @@
-New: The new ParticleHandler class can store and organize a collection of particles,
-and provide information about their properties. It is currently limited to parallel
-distributed computations and specific applications, but will be extended over time.
-<br>
-(Rene Gassmoeller, 2017/11/10)

@@ -1,0 +1,5 @@
+New: Extend get_vector_data_ranges() to return extra element in
+the tuple to represent DataComponentInterpretation. The functions
+were renamed to get_nonscalar_data_ranges().
+<br>
+(Denis Davydov 2018/06/21)

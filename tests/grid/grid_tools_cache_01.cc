@@ -8,24 +8,25 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // Validate grid_tools_cache
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools_cache.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 template <int dim, int spacedim>
-void test ()
+void
+test()
 {
-  deallog << "dim = " << dim
-          << ", spacedim = " << spacedim << std::endl;
+  deallog << "dim = " << dim << ", spacedim = " << spacedim << std::endl;
 
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
@@ -35,7 +36,7 @@ void test ()
 
   auto m = cache.get_vertex_to_cell_map();
 
-  unsigned int i=0;
+  unsigned int i = 0;
   for (auto &v : m)
     {
       for (auto &c : v)
@@ -45,15 +46,16 @@ void test ()
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1,1> ();
-  test<1,2>();
-  test<2,2> ();
-  test<2,3> ();
-  test<3,3> ();
+  test<1, 1>();
+  test<1, 2>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
 
   return 0;
 }

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ namespace Functions
    * @author Luca Heltai, 2006
    */
   template <int dim>
-  class ParsedFunction :  public AutoDerivativeFunction<dim>
+  class ParsedFunction : public AutoDerivativeFunction<dim>
   {
   public:
     /**
@@ -85,7 +85,7 @@ namespace Functions
      * to initialize the AutoDerivativeFunction class from which this class is
      * derived.
      */
-    ParsedFunction (const unsigned int n_components = 1, const double h=1e-8);
+    ParsedFunction(const unsigned int n_components = 1, const double h = 1e-8);
 
     /**
      * Declare parameters needed by this class. The additional parameter @p
@@ -105,8 +105,9 @@ namespace Functions
      *  @endcode
      *
      */
-    static void declare_parameters(ParameterHandler &prm,
-                                   const unsigned int n_components = 1);
+    static void
+    declare_parameters(ParameterHandler & prm,
+                       const unsigned int n_components = 1);
 
     /**
      * Parse parameters needed by this class.  If the number of components
@@ -143,7 +144,7 @@ namespace Functions
      *
      *  @code
      *
-     *  set Function expression = cos(pi*x) ; cos(pi*y)
+     *  set Function expression = cos(pi*x); cos(pi*y)
      *
      *  @endcode
      *
@@ -177,14 +178,15 @@ namespace Functions
      * The time variable can be set according to specifications in the
      * FunctionTime base class.
      */
-    void parse_parameters(ParameterHandler &prm);
+    void
+    parse_parameters(ParameterHandler &prm);
 
     /**
      * Return all components of a vector-valued function at the given point @p
      * p.
      */
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &values) const;
+    virtual void
+    vector_value(const Point<dim> &p, Vector<double> &values) const override;
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -192,8 +194,8 @@ namespace Functions
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component.
      */
-    virtual double value (const Point< dim >     &p,
-                          const unsigned int  component = 0)    const;
+    virtual double
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Set the time to a specific value for time-dependent functions.
@@ -201,7 +203,8 @@ namespace Functions
      * We need to overwrite this to set the time also in the accessor
      * FunctionParser<dim>.
      */
-    virtual void set_time(const double newtime);
+    virtual void
+    set_time(const double newtime) override;
 
   private:
     /**
@@ -209,7 +212,7 @@ namespace Functions
      */
     FunctionParser<dim> function_object;
   };
-}
+} // namespace Functions
 
 DEAL_II_NAMESPACE_CLOSE
 

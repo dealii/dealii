@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,14 +17,16 @@
 
 // test assemble_flags.h
 
-#include "../tests.h"
 #include <deal.II/meshworker/assemble_flags.h>
 
 #include <fstream>
 
+#include "../tests.h"
+
 using namespace MeshWorker;
 
-int main()
+int
+main()
 {
   initlog();
   AssembleFlags flag = assemble_own_cells | assemble_boundary_faces;

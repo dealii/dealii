@@ -10,7 +10,7 @@ This program was contributed by Martin Kronbichler and Scott Miller.
 This tutorial program presents the implementation of a hybridizable
 discontinuous Galkerin method for the convection-diffusion equation.
 
-<h3>  Hybridizable discontinuous Galerkin methods</h3>
+<h3> Hybridizable discontinuous Galerkin methods </h3>
 
 One common argument against the use of discontinuous Galerkin elements
 is the large number of globally coupled degrees of freedom that one
@@ -18,8 +18,7 @@ must solve in an implicit system.  This is because, unlike continuous finite
 elements, in typical discontinuous elements there is one degree of freedom at
 each vertex <i>for each of the adjacent elements</i>, rather than just one,
 and similarly for edges and faces.  As an example of how fast the number of
-unknowns grows,
-consider the <code>FE_DGP_Monomial</code> basis:  each
+unknowns grows, consider the FE_DGPMonomial basis: each
 scalar solution component is represented by polynomials of degree $p$
 with $(1/dim!)*\prod_{i=1}^{dim}(p+i)$ degrees of freedom per
 element. Typically, all degrees of freedom in an element are coupled
@@ -41,8 +40,15 @@ The HDG method achieves
 this goal by formulating the mathematical problem using Dirichlet-to-Neumann
 mappings.  The partial differential equations are first written as a first
 order system, and each field is then discretized via a DG method.  At this
-point the  single-valued "trace" values on the skeleton of the
+point, the  single-valued "trace" values on the skeleton of the
 mesh, i.e. element faces, are taken to be independent unknown quantities.
+This yields unknowns in the discrete formulation that fall into two categories:
+- Face unknowns that only couple with the cell unknowns from both sides of the face;
+- Cell unknowns that only couple with the cell and face unknowns
+  defined within the same cell. Crucially, no cell interior degree of freedom
+  on one cell ever couples to any interior cell degree of freedom of a
+  different cell.
+
 The Dirichlet-to-Neumann map concept then permits the following solution procedure:
 <ol>
   <li>  Use local element interior data to enforce a Neumann condition on the
@@ -56,8 +62,9 @@ solution process.
 
 The above procedure also has a linear algebra interpretation and is referred to
 as static condensation. Let us write the complete linear system associated to
-the HDG problem as a block system with the discrete DG variables $U$ as
-first block and the skeleton variables $\Lambda$ as the second block:
+the HDG problem as a block system with the discrete DG (cell interior)
+variables $U$ as first block and the skeleton (face) variables $\Lambda$ as the
+second block:
 @f{eqnarray*}
 \begin{pmatrix} A & B \\ C & D \end{pmatrix}
 \begin{pmatrix} U \\ \Lambda \end{pmatrix}
@@ -310,7 +317,7 @@ separately and uses the gradient as the main source of information.
 <h3> Problem specific data </h3>
 
 For this tutorial program, we consider almost the same test case as in
-step-7. The computational domain is $\Omega := [-1,1]^d$ and the exact
+step-7. The computational domain is $\Omega \dealcoloneq [-1,1]^d$ and the exact
 solution corresponds to the one in step-7, except for a scaling. We use the
 following source centers $x_i$ for the exponentials
 <ul>

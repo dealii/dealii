@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -27,44 +27,48 @@
 // listen to the creation of triangulations.
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/hp/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
+
 #include <deal.II/fe/fe_dgq.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/hp/dof_handler.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  Triangulation<dim> tria;
+  Triangulation<dim>  tria;
   hp::DoFHandler<dim> dof_handler(tria);
 
   GridGenerator::hyper_cube(tria);
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-       cell=dof_handler.begin_active();
-       cell!=dof_handler.end(); ++cell)
-    cell->set_active_fe_index (0);
+  for (typename hp::DoFHandler<dim>::active_cell_iterator cell =
+         dof_handler.begin_active();
+       cell != dof_handler.end();
+       ++cell)
+    cell->set_active_fe_index(0);
 }
 
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(2);
+  initlog();
+  deallog.get_file_stream().precision(2);
 
-  deallog.attach(logfile);
-
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

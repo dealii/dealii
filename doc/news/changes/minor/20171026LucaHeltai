@@ -1,4 +1,0 @@
-New: Created a new Patterns::Tuple class, that allows parsing arbitrary tuples 
-of objects in parameter files. 
-<br> 
-(Luca Heltai, 2017/10/26)

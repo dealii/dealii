@@ -1,0 +1,46 @@
+
+DEAL:0::writing with 3
+DEAL:0::#cells: 19
+DEAL:0::norm: 7114.44
+DEAL:0::Checksum: 136119115
+DEAL:0::reading with 5
+DEAL:0::#cells: 19
+DEAL:0::norm: 7114.44
+DEAL:0::Checksum: 136119115
+DEAL:0::OK
+
+DEAL:1::writing with 3
+DEAL:1::#cells: 19
+DEAL:1::norm: 7114.44
+DEAL:1::Checksum: 0
+DEAL:1::reading with 5
+DEAL:1::#cells: 19
+DEAL:1::norm: 7114.44
+DEAL:1::Checksum: 0
+DEAL:1::OK
+
+
+DEAL:2::writing with 3
+DEAL:2::#cells: 19
+DEAL:2::norm: 7114.44
+DEAL:2::Checksum: 0
+DEAL:2::reading with 5
+DEAL:2::#cells: 19
+DEAL:2::norm: 7114.44
+DEAL:2::Checksum: 0
+DEAL:2::OK
+
+
+DEAL:3::reading with 5
+DEAL:3::#cells: 19
+DEAL:3::norm: 7114.44
+DEAL:3::Checksum: 0
+DEAL:3::OK
+
+
+DEAL:4::reading with 5
+DEAL:4::#cells: 19
+DEAL:4::norm: 7114.44
+DEAL:4::Checksum: 0
+DEAL:4::OK
+

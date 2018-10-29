@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -28,32 +28,33 @@ ans =
    0.027836
 */
 
-#include "../tests.h"
-#include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+
+#include "../tests.h"
+#include "create_matrix.h"
 
 
 template <typename NumberType>
 void
 test()
 {
-  const unsigned int size = 3;
+  const unsigned int           size = 3;
   LAPACKFullMatrix<NumberType> M(size);
   M.set_property(LAPACKSupport::symmetric);
 
-  M(0,0) = 10;
-  M(0,1) = 2;
-  M(1,0) = 2;
-  M(0,2) = 3;
-  M(2,0) = 3;
-  M(1,1) = 20;
-  M(1,2) = 6;
-  M(2,1) = 6;
-  M(2,2) = 90;
+  M(0, 0) = 10;
+  M(0, 1) = 2;
+  M(1, 0) = 2;
+  M(0, 2) = 3;
+  M(2, 0) = 3;
+  M(1, 1) = 20;
+  M(1, 2) = 6;
+  M(2, 1) = 6;
+  M(2, 2) = 90;
 
   Vector<NumberType> x(size), y(size);
   x[0] = 2;
@@ -67,13 +68,11 @@ test()
 }
 
 
-int main()
+int
+main()
 {
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
   test<double>();
-
 }

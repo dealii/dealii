@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2017 by the deal.II authors
+// Copyright (C) 2010 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,7 +18,9 @@
 #define dealii_operator_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/any_data.h>
+
 #include <deal.II/base/event.h>
 
 #include <fstream>
@@ -73,28 +75,31 @@ namespace Algorithms
     /**
      * The virtual destructor.
      */
-    virtual ~OperatorBase() = default;
+    virtual ~OperatorBase() override = default;
 
     /**
      * The actual operation, which is implemented in a derived class.
      */
-    virtual void operator() (AnyData &out, const AnyData &in) = 0;
+    virtual void
+    operator()(AnyData &out, const AnyData &in) = 0;
 
     /**
      * Register an event triggered by an outer iteration.
      */
-    virtual void notify(const Event &);
+    virtual void
+    notify(const Event &);
     /**
      * Clear all #notifications.
      */
-    void clear_events();
+    void
+    clear_events();
+
   protected:
     /**
      * Accumulate events here. If any of those is set, the function solve() of
      * a terminal application must take care of reassembling the matrix.
      */
     Event notifications;
-
   };
 
   /**
@@ -110,7 +115,7 @@ namespace Algorithms
     /**
      * Constructor initializing member variables with invalid data.
      */
-    OutputOperator ();
+    OutputOperator();
 
     /**
      * The copy constructor is deleted since objects of this class
@@ -121,32 +126,35 @@ namespace Algorithms
     /**
      * Empty virtual destructor.
      */
-    virtual ~OutputOperator() = default;
+    virtual ~OutputOperator() override = default;
 
     /**
      * Set the stream @p os to which data is written. If no stream is selected
      * with this function, data goes to @p deallog.
      */
-    void initialize_stream(std::ostream &stream);
+    void
+    initialize_stream(std::ostream &stream);
     /**
      * Set the current step.
      */
-    void set_step(const unsigned int step);
+    void
+    set_step(const unsigned int step);
     /**
      * Output all the vectors in AnyData.
      */
-    virtual OutputOperator<VectorType> &operator<< (const AnyData &vectors);
+    virtual OutputOperator<VectorType> &
+    operator<<(const AnyData &vectors);
 
   protected:
     unsigned int step;
+
   private:
     std::ostream *os;
   };
 
   template <typename VectorType>
-  inline
-  void
-  OutputOperator<VectorType>::set_step (const unsigned int s)
+  inline void
+  OutputOperator<VectorType>::set_step(const unsigned int s)
   {
     step = s;
   }
@@ -158,14 +166,13 @@ namespace Algorithms
    * @relatesalso OutputOperator
    */
   template <typename VectorType>
-  inline
-  OutputOperator<VectorType> &
-  operator<< (OutputOperator<VectorType> &out, unsigned int step)
+  inline OutputOperator<VectorType> &
+  operator<<(OutputOperator<VectorType> &out, unsigned int step)
   {
     out.set_step(step);
     return out;
   }
-}
+} // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2017 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,8 +17,9 @@
 #define dealii_process_grid_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/mpi.h>
+
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/mpi.h>
 
 #ifdef DEAL_II_WITH_SCALAPACK
 
@@ -26,7 +27,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // Forward declaration of class ScaLAPACKMatrix for ProcessGrid
-template <typename NumberType> class ScaLAPACKMatrix;
+template <typename NumberType>
+class ScaLAPACKMatrix;
 
 
 namespace Utilities
@@ -60,18 +62,19 @@ namespace Utilities
     class ProcessGrid
     {
     public:
-
       /**
        * Declare class ScaLAPACK as friend to provide access to private members.
        */
-      template <typename NumberType> friend class dealii::ScaLAPACKMatrix;
+      template <typename NumberType>
+      friend class dealii::ScaLAPACKMatrix;
 
       /**
        * Constructor for a process grid with @p n_rows and @p n_columns for a given @p mpi_communicator.
-       * The product of rows and columns should be less or equal to the total number of cores
+       * The product of rows and columns should be less or equal to the total
+       * number of cores
        * in the @p mpi_communicator.
        */
-      ProcessGrid(MPI_Comm mpi_communicator,
+      ProcessGrid(MPI_Comm           mpi_communicator,
                   const unsigned int n_rows,
                   const unsigned int n_columns);
 
@@ -81,36 +84,39 @@ namespace Utilities
        * dimensions and block-cyclic distribution of a target matrix provided
        * in @p n_rows_matrix, @p n_columns_matrix, @p row_block_size and @p column_block_size.
        *
-       * The maximum number of MPI cores one can utilize is $\min\{\frac{M}{MB}\frac{N}{NB}, Np\}$, where $M,N$
-       * are the matrix dimension and $MB,NB$ are the block sizes and $Np$ is the number of
+       * The maximum number of MPI cores one can utilize is
+       * $\min\{\frac{M}{MB}\frac{N}{NB}, Np\}$, where $M,N$ are the matrix
+       * dimension and $MB,NB$ are the block sizes and $Np$ is the number of
        * processes in the @p mpi_communicator. This function then creates a 2D processor grid
-       * assuming the ratio between number of process row $p$ and columns $q$ to be
-       * equal the ratio between matrix dimensions $M$ and $N$.
+       * assuming the ratio between number of process row $p$ and columns $q$ to
+       * be equal the ratio between matrix dimensions $M$ and $N$.
        *
        * For example, a square matrix $640x640$ with the block size $32$
        * and the @p mpi_communicator with 11 cores will result in the $3x3$
        * process grid.
        */
-      ProcessGrid(MPI_Comm mpi_communicator,
+      ProcessGrid(MPI_Comm           mpi_communicator,
                   const unsigned int n_rows_matrix,
                   const unsigned int n_columns_matrix,
                   const unsigned int row_block_size,
                   const unsigned int column_block_size);
 
       /**
-      * Destructor.
-      */
+       * Destructor.
+       */
       ~ProcessGrid();
 
       /**
-      * Return the number of rows in the processes grid.
-      */
-      unsigned int get_process_grid_rows() const;
+       * Return the number of rows in the processes grid.
+       */
+      unsigned int
+      get_process_grid_rows() const;
 
       /**
-      * Return the number of columns in the processes grid.
-      */
-      unsigned int get_process_grid_columns() const;
+       * Return the number of columns in the processes grid.
+       */
+      unsigned int
+      get_process_grid_columns() const;
 
       /**
        * Send @p count values stored consequently starting at @p value from
@@ -118,105 +124,108 @@ namespace Utilities
        * are not in the process grid.
        */
       template <typename NumberType>
-      void send_to_inactive(NumberType *value, const int count=1) const;
+      void
+      send_to_inactive(NumberType *value, const int count = 1) const;
 
       /**
        * Return <code>true</code> if the process is active within the grid.
        */
-      bool is_process_active() const;
+      bool
+      is_process_active() const;
 
     private:
-
       /**
-       * A private constructor which takes grid dimensions as an <code>std::pair</code>.
+       * A private constructor which takes grid dimensions as an
+       * <code>std::pair</code>.
        */
-      ProcessGrid(MPI_Comm mpi_communicator,
-                  const std::pair<unsigned int,unsigned int> &grid_dimensions);
+      ProcessGrid(MPI_Comm                                     mpi_communicator,
+                  const std::pair<unsigned int, unsigned int> &grid_dimensions);
 
       /**
-      * An MPI communicator with all processes (active and inactive).
-      */
+       * An MPI communicator with all processes (active and inactive).
+       */
       MPI_Comm mpi_communicator;
 
       /**
-      * An MPI communicator with inactive processes and the process with rank zero.
-      */
+       * An MPI communicator with inactive processes and the process with rank
+       * zero.
+       */
       MPI_Comm mpi_communicator_inactive_with_root;
 
       /**
-      * BLACS context. This is equivalent to MPI communicators and is
-      * used by ScaLAPACK.
-      */
+       * BLACS context. This is equivalent to MPI communicators and is
+       * used by ScaLAPACK.
+       */
       int blacs_context;
 
       /**
-      * Rank of this MPI process.
-      */
+       * Rank of this MPI process.
+       */
       const unsigned int this_mpi_process;
 
       /**
-      * Total number of MPI processes.
-      */
+       * Total number of MPI processes.
+       */
       const unsigned int n_mpi_processes;
 
       /**
-      * Number of rows in the processes grid.
-      */
+       * Number of rows in the processes grid.
+       */
       int n_process_rows;
 
       /**
-      * Number of columns in the processes grid.
-      */
+       * Number of columns in the processes grid.
+       */
       int n_process_columns;
 
       /**
-      * Row of this process in the grid.
-      *
-      * It's negative for in-active processes.
-      */
+       * Row of this process in the grid.
+       *
+       * It's negative for in-active processes.
+       */
       int this_process_row;
 
       /**
-      * Column of this process in the grid.
-      *
-      * It's negative for in-active processes.
-      */
+       * Column of this process in the grid.
+       *
+       * It's negative for in-active processes.
+       */
       int this_process_column;
 
       /**
-      * A flag which is true for processes within the 2D process grid.
-      */
+       * A flag which is true for processes within the 2D process grid.
+       */
       bool mpi_process_is_active;
     };
 
-    /*----------------------- Inline functions ----------------------------------*/
+    /*--------------------- Inline functions --------------------------------*/
 
-#ifndef DOXYGEN
+#  ifndef DOXYGEN
 
-    inline
-    unsigned int ProcessGrid::get_process_grid_rows() const
+    inline unsigned int
+    ProcessGrid::get_process_grid_rows() const
     {
       return n_process_rows;
     }
 
 
 
-    inline
-    unsigned int ProcessGrid::get_process_grid_columns() const
+    inline unsigned int
+    ProcessGrid::get_process_grid_columns() const
     {
       return n_process_columns;
     }
 
 
 
-    inline
-    bool ProcessGrid::is_process_active() const
+    inline bool
+    ProcessGrid::is_process_active() const
     {
       return mpi_process_is_active;
     }
 
 
-#endif  // ifndef DOXYGEN
+#  endif // ifndef DOXYGEN
 
   } // end of namespace MPI
 

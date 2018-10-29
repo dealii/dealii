@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,16 +17,17 @@
 // Check that we can catch some standard PETSc error codes and print
 // appropriate exception messages to the screen.
 
-#include "../tests.h"
 #include <deal.II/lac/exceptions.h>
 
 #include <petscconf.h>
 #include <petscsys.h>
-#include <petscerror.h>
 
 #include <vector>
 
-int main (int argc, char **argv)
+#include "../tests.h"
+
+int
+main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 

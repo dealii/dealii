@@ -1,7 +1,0 @@
-New: Math operations for some automatically differentiable numbers have been
-extended. We also import some math functions for these number types into the 
-standard namespace. This gives full compatibility with the Tensor and
-SymmetricTensor classes, and facilitates the integration of these number types
-into existing code.
-<br>
-(Jean-Paul Pelteret, 2017/11/16)

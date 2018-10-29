@@ -1,0 +1,33 @@
+
+DEAL:0:2d::Level: 0
+DEAL:0:2d::Interior faces: 1 1 0 0 
+DEAL:0:2d::Exterior faces: 1 1 0 0 
+DEAL:0:2d::Boundary faces: 0 0 2 2 
+DEAL:0:2d::Level: 1
+DEAL:0:2d::Interior faces: 6 2 4 0 
+DEAL:0:2d::Exterior faces: 2 6 0 4 
+DEAL:0:2d::Boundary faces: 0 0 4 4 
+DEAL:0:2d::Level: 2
+DEAL:0:2d::Interior faces: 28 4 24 0 
+DEAL:0:2d::Exterior faces: 4 28 0 24 
+DEAL:0:2d::Boundary faces: 0 0 8 8 
+DEAL:0:2d::Level: 3
+DEAL:0:2d::Interior faces: 120 8 112 0 
+DEAL:0:2d::Exterior faces: 8 120 0 112 
+DEAL:0:2d::Boundary faces: 0 0 16 16 
+DEAL:0:2d::Level: 4
+DEAL:0:2d::Interior faces: 496 16 480 0 
+DEAL:0:2d::Exterior faces: 16 496 0 480 
+DEAL:0:2d::Boundary faces: 0 0 32 32 
+DEAL:0:3d::Level: 0
+DEAL:0:3d::Interior faces: 1 1 0 0 0 2 
+DEAL:0:3d::Exterior faces: 1 1 0 0 2 0 
+DEAL:0:3d::Boundary faces: 0 0 2 2 0 0 
+DEAL:0:3d::Level: 1
+DEAL:0:3d::Interior faces: 12 4 8 0 8 8 
+DEAL:0:3d::Exterior faces: 4 12 0 8 8 8 
+DEAL:0:3d::Boundary faces: 0 0 8 8 0 0 
+DEAL:0:3d::Level: 2
+DEAL:0:3d::Interior faces: 112 16 96 0 96 32 
+DEAL:0:3d::Exterior faces: 16 112 0 96 32 96 
+DEAL:0:3d::Boundary faces: 0 0 32 32 0 0 

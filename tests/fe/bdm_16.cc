@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -23,25 +23,25 @@
 // consisting of faces_per_cell * dofs_per_face zeros, followed by
 // interior_dofs ones.
 
-#include "../tests.h"
 #include <deal.II/fe/fe_bdm.h>
 
 #include <string>
 
+#include "../tests.h"
 
-std::ofstream logfile ("output");
+
+std::ofstream logfile("output");
 
 template <int dim>
 void
-test (const unsigned int degree)
+test(const unsigned int degree)
 {
   FE_BDM<dim> fe_bdm(degree);
 
   deallog << "Degree=" << degree
-          << ", restriction is additive flags:"
-          << std::endl;
+          << ", restriction is additive flags:" << std::endl;
 
-  for (unsigned int i=0; i<fe_bdm.dofs_per_cell; ++i)
+  for (unsigned int i = 0; i < fe_bdm.dofs_per_cell; ++i)
     deallog << fe_bdm.restriction_is_additive(i) << " ";
 
   deallog << std::endl;
@@ -54,15 +54,12 @@ main()
   initlog();
 
   deallog << "Dimension 2: " << std::endl;
-  for (unsigned int i=1; i<4; ++i)
+  for (unsigned int i = 1; i < 4; ++i)
     test<2>(i);
 
   deallog << "Dimension 3: " << std::endl;
-  for (unsigned int i=1; i<4; ++i)
+  for (unsigned int i = 1; i < 4; ++i)
     test<3>(i);
 
   return 0;
 }
-
-
-

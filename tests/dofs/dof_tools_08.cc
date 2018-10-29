@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -23,14 +23,13 @@
 
 
 
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
   std::vector<types::global_dof_index> map(dof_handler.n_dofs());
-  DoFTools::map_dof_to_boundary_indices (dof_handler, map);
-  for (unsigned int i=0; i<map.size(); ++i)
+  DoFTools::map_dof_to_boundary_indices(dof_handler, map);
+  for (unsigned int i = 0; i < map.size(); ++i)
     deallog << (int)map[i] << " ";
   deallog << std::endl;
 }

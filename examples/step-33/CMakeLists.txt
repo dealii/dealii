@@ -26,7 +26,7 @@ SET(TARGET_RUN ${TARGET} input.prm)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
-FIND_PACKAGE(deal.II 9.0.0 QUIET
+FIND_PACKAGE(deal.II 9.1.0 QUIET
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 IF(NOT ${deal.II_FOUND})
@@ -40,12 +40,14 @@ ENDIF()
 #
 # Are all dependencies fulfilled?
 #
-IF(NOT DEAL_II_WITH_TRILINOS) # keep in one line
+IF(NOT DEAL_II_TRILINOS_WITH_SACADO OR NOT DEAL_II_WITH_MUPARSER) # keep in one line
   MESSAGE(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
-    DEAL_II_WITH_TRILINOS = ON
+    DEAL_II_WITH_MUPARSER = ON
+    DEAL_II_TRILINOS_WITH_SACADO = ON
 However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
-    DEAL_II_WITH_TRILINOS = ${DEAL_II_WITH_TRILINOS}
+    DEAL_II_WITH_MUPARSER = ${DEAL_II_WITH_MUPARSER}
+    DEAL_II_TRILINOS_WITH_SACADO = ${DEAL_II_TRILINOS_WITH_SACADO}
 which conflict with the requirements."
     )
 ENDIF()

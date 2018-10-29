@@ -1,0 +1,8 @@
+Improved: MatrixFree::cell_loop() and MatrixFree::loop() directly use
+LinearAlgebra::distributed::BlockVector::update_ghost_values() and
+LinearAlgebra::distributed::BlockVector::compress() calls on block vectors
+with many blocks, rather than splitting each method into two parts for
+overlapping communication and computation. The latter is inefficient as soon
+as too many MPI requests are in flight.
+<br>
+(Martin Kronbichler, Denis Davydov 2018/05/24)

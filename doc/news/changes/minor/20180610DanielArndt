@@ -1,0 +1,5 @@
+Fixed: BlockLinearOperator::vmult(), BlockLinearOperator::vmult_add(),
+BlockLinearOperator::Tvmult() and BlockLinearOperator::Tvmult_add()
+can be used with identical source and destination vectors.
+<br>
+(Daniel Arndt, 2018/06/10)

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,36 +17,40 @@
 
 // check PETScWrappers::MPI::Vector::l1_norm()
 
-#include "../tests.h"
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test (PETScWrappers::MPI::Vector &v)
+
+void
+test(PETScWrappers::MPI::Vector &v)
 {
   // set some elements of the vector
   double norm = 0;
-  for (unsigned int k=0; k<v.size(); k+=1+k)
+  for (unsigned int k = 0; k < v.size(); k += 1 + k)
     {
-      const PetscScalar  s(1.*k,2.*k);
+      const PetscScalar s(1. * k, 2. * k);
       v(k) = s;
-#if DEAL_II_PETSC_VERSION_LT(3,7,0)
-      norm += std::fabs (1.*k)+std::fabs(2.*k);
+#if DEAL_II_PETSC_VERSION_LT(3, 7, 0)
+      norm += std::fabs(1. * k) + std::fabs(2. * k);
 #else
-      norm += std::abs (s);
+      norm += std::abs(s);
 #endif
     }
-  v.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
 
   // then check the norm
-  AssertThrow (v.l1_norm() == norm, ExcInternalError());
+  AssertThrow(v.l1_norm() == norm, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main (int argc,char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -55,13 +59,14 @@ int main (int argc,char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        PETScWrappers::MPI::Vector v (MPI_COMM_WORLD, 100, 100);
-        test (v);
+        PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, 100, 100);
+        test(v);
       }
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -74,7 +79,8 @@ int main (int argc,char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

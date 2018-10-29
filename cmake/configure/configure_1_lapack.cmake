@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -30,8 +30,9 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     # Clear the test flags because the following test will use a C compiler
     #
     CLEAR_CMAKE_REQUIRED()
-    SET(CMAKE_REQUIRED_FLAGS "${LAPACK_LINKER_FLAGS}")
-    SET(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
+    SET(CMAKE_REQUIRED_LIBRARIES
+      ${DEAL_II_LINKER_FLAGS_SAVED} ${LAPACK_LINKER_FLAGS} ${LAPACK_LIBRARIES}
+      )
     # Push -pthread as well:
     ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-pthread")
 

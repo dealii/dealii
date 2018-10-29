@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 by the deal.II authors
+// Copyright (C) 2013 - 2014 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -66,10 +66,9 @@
  * <dd>
  * The numbers of row and column are types::global_dof_index even if it is not
  * expected that someone will create a FullMatrix with so many entries.
- * However, some functions of ConstraintMatrix are templated on the matrix
- * type and thus, the
- * size of a FullMatrix has to be of the same type than the size of
- * SparseMatrix.
+ * However, some methods of the AffineConstraints class are templated on
+ * the matrix type and thus, the size of a FullMatrix has to be of the same
+ * type than the size of SparseMatrix.
  * </dd>
  *
  * <dt class="glossary">@anchor GlobalDoFIndexSparseMatrix

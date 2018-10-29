@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -43,9 +43,9 @@ IF (SCALAPACK_LIBRARY)
   MESSAGE(STATUS "Check if BLACS is embedded in ScaLAPACK library")
 
   CLEAR_CMAKE_REQUIRED()
-  SET(CMAKE_REQUIRED_FLAGS ${MPI_CXX_COMPILE_FLAGS} ${MPI_CXX_LINK_FLAGS})
+  SET(CMAKE_REQUIRED_FLAGS ${DEAL_II_CXX_FLAGS_SAVED} ${MPI_CXX_COMPILE_FLAGS} ${MPI_CXX_LINK_FLAGS})
   SET(CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
-  SET(CMAKE_REQUIRED_LIBRARIES ${MPI_LIBRARIES} ${SCALAPACK_LIBRARY} ${LAPACK_LIBRARIES})
+  SET(CMAKE_REQUIRED_LIBRARIES ${DEAL_II_LINKER_FLAGS_SAVED} ${MPI_LIBRARIES} ${SCALAPACK_LIBRARY} ${LAPACK_LIBRARIES})
   CHECK_CXX_SOURCE_COMPILES(
     "
     #include <mpi.h>

@@ -125,7 +125,7 @@ problems and that you may want to investigate before trying to morph step-31
 into something that can solve whatever you want to solve.
 
 
-<h3>%Boundary and initial conditions</h3>
+<h3>Boundary and initial conditions</h3>
 
 Since the Boussinesq equations are derived under the assumption that inertia
 of the fluid's motion does not play a role, the flow field is at each time
@@ -957,7 +957,7 @@ multigrid have been removed.
 
 In much the same way as we used PETSc to support our linear algebra needs in
 step-17 and step-18, we use interfaces to the <a
-href="http://trilinos.sandia.gov">Trilinos</a> library (see the
+href="http://trilinos.org">Trilinos</a> library (see the
 deal.II README file for installation instructions) in this program. Trilinos
 is a very large collection of
 everything that has to do with linear and nonlinear algebra, as well as all

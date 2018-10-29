@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,7 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//TODO: Thread safety
+// TODO: Thread safety
 
 namespace Algorithms
 {
@@ -40,15 +40,14 @@ namespace Algorithms
   }
 
 
-  Event::Event ()
-    :
-    all_true(false),
-    flags(names.size(), false)
+  Event::Event()
+    : all_true(false)
+    , flags(names.size(), false)
   {}
 
 
   void
-  Event::clear ()
+  Event::clear()
   {
     all_true = false;
     std::fill(flags.begin(), flags.end(), false);
@@ -56,19 +55,19 @@ namespace Algorithms
 
 
   void
-  Event::all ()
+  Event::all()
   {
     all_true = true;
   }
 
   namespace Events
   {
-    const Event initial = Event::assign("Initial");
-    const Event remesh = Event::assign("Remesh");
-    const Event bad_derivative = Event::assign("Bad Derivative");
-    const Event new_time = Event::assign("New Time");
+    const Event initial           = Event::assign("Initial");
+    const Event remesh            = Event::assign("Remesh");
+    const Event bad_derivative    = Event::assign("Bad Derivative");
+    const Event new_time          = Event::assign("New Time");
     const Event new_timestep_size = Event::assign("New Time Step Size");
-  }
-}
+  } // namespace Events
+} // namespace Algorithms
 
 DEAL_II_NAMESPACE_CLOSE

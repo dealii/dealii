@@ -40,7 +40,7 @@ class bad_weak_ptr: public std::exception
 {
 public:
 
-    virtual char const * what() const throw()
+    virtual char const * what() const throw() override
     {
         return "tr1::bad_weak_ptr";
     }

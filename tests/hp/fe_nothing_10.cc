@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,36 +19,38 @@
 // with an internal error
 
 
-#include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_system.h>
+
 #include <deal.II/hp/fe_values.h>
 
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   FESystem<dim> fe(FE_Nothing<dim>(), 2);
-  FEValues<dim> fe_values (fe, QGauss<dim>(2), update_values);
+  FEValues<dim> fe_values(fe, QGauss<dim>(2), update_values);
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(2);
+  initlog();
+  deallog.get_file_stream().precision(2);
 
-  deallog.attach(logfile);
-
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

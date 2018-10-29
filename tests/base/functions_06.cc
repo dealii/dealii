@@ -8,42 +8,43 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // Test VectorFunctionFromScalarFunctionObject
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
+
 #include <deal.II/lac/vector.h>
 
+#include "../tests.h"
+
 
 template <int dim>
-void check1 ()
+void
+check1()
 {
-  VectorFunctionFromScalarFunctionObject<dim>
-  object (&Point<dim>::norm, 1, 3);
+  VectorFunctionFromScalarFunctionObject<dim> object(&Point<dim>::norm, 1, 3);
 
-  Assert (object.n_components == 3, ExcInternalError());
+  Assert(object.n_components == 3, ExcInternalError());
 
-  for (unsigned int i=0; i<10; ++i)
+  for (unsigned int i = 0; i < 10; ++i)
     {
       Point<dim> p;
-      for (unsigned int d=0; d<dim; ++d)
-        p[d] = i+d;
+      for (unsigned int d = 0; d < dim; ++d)
+        p[d] = i + d;
 
-      for (unsigned int c=0; c<3; ++c)
-        AssertThrow (object.value(p,c) == (c==1 ? p.norm() : 0),
-                     ExcInternalError());
+      for (unsigned int c = 0; c < 3; ++c)
+        AssertThrow(object.value(p, c) == (c == 1 ? p.norm() : 0),
+                    ExcInternalError());
 
       Vector<double> v(3);
-      object.vector_value (p, v);
-      for (unsigned int c=0; c<3; ++c)
-        AssertThrow (v(c) == (c==1 ? p.norm() : 0),
-                     ExcInternalError());
+      object.vector_value(p, v);
+      for (unsigned int c = 0; c < 3; ++c)
+        AssertThrow(v(c) == (c == 1 ? p.norm() : 0), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
@@ -51,44 +52,39 @@ void check1 ()
 
 
 template <int dim>
-void check2 ()
+void
+check2()
 {
   Point<dim> q;
-  for (unsigned int d=0; d<dim; ++d)
+  for (unsigned int d = 0; d < dim; ++d)
     q[d] = d;
 
-  ScalarFunctionFromFunctionObject<dim>
-  object (std::bind (&Point<dim>::distance,
-                     q,
-                     std::placeholders::_1));
+  ScalarFunctionFromFunctionObject<dim> object(
+    std::bind(&Point<dim>::distance, q, std::placeholders::_1));
 
-  for (unsigned int i=0; i<10; ++i)
+  for (unsigned int i = 0; i < 10; ++i)
     {
       Point<dim> p;
-      for (unsigned int d=0; d<dim; ++d)
-        p[d] = i+d;
+      for (unsigned int d = 0; d < dim; ++d)
+        p[d] = i + d;
 
-      AssertThrow (object.value(p) == q.distance (p),
-                   ExcInternalError());
+      AssertThrow(object.value(p) == q.distance(p), ExcInternalError());
     }
 
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
-  std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
-  check1<1> ();
-  check1<2> ();
-  check1<3> ();
+  check1<1>();
+  check1<2>();
+  check1<3>();
 
-  check2<1> ();
-  check2<2> ();
-  check2<3> ();
+  check2<1>();
+  check2<2>();
+  check2<3>();
 }
-
-

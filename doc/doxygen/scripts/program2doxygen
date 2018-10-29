@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -26,25 +26,45 @@ if ($ARGV[0] =~ /step-\d+.cc/)
 }
 
 
-# have three states, in which the program can be:
-# comment-mode, program-mode and skip-mode
-$comment_mode = 0;
-$program_mode = 1;
-$skip_mode    = 2;
+# have four states, in which the program can be:
+# comment-mode, program-mode, skip-mode, and code-fragment-mode
+$comment_mode          = 0;
+$program_mode          = 1;
+$skip_mode             = 2;
+$code_fragment_mode    = 3;
 $state =  $comment_mode;
 
 print " * \n";
 
 do {
-    # substitute tabs. also make sure that we don't output comment end
-    # markers that might confuse doxygen
+
+    # Make sure that we don't output comment end markers that might confuse
+    # doxygen.
     s!/\*!/ \*!g;
     s!\*/!\* /!g;
 
+    # substitute tabs
     s/\t/        /g;
 
+    # Remove "//" if it is present at the end of a line. These comments exist
+    # to force a specific formatting of the line for clang-format.
+    s!//$!!g;
+
+    # We are entering code fragments
+    if (($state != $code_fragment_mode) && m!^\s*//\s*\@code!)
+    {
+        # Cleanly close @code segments in program mode:
+        if ($state == $program_mode)
+        {
+            print " * \@endcode\n";
+            print " * \n";
+        }
+        $state = $code_fragment_mode;
+        # Make sure we distinguish from the other code style
+        print " * <div class=CodeFragmentInTutorialComment>\n";
+    }
     # We shall skip something...
-    if (($state != $skip_mode) && m!^\s*//\s*\@cond SKIP!)
+    elsif (($state != $skip_mode) && m!^\s*//\s*\@cond SKIP!)
     {
         # Cleanly close @code segments in program mode:
         if ($state == $program_mode)
@@ -114,7 +134,27 @@ do {
             $state = $comment_mode;
         }
     }
-} while (<>);
+    elsif ($state == $code_fragment_mode)
+    {
+        # If this is the end of a @code - @endcode block, go back to
+        # comment_mode:
+        if (m!^\s*//\s*\@endcode!)
+        {
+            $state = $comment_mode;
+        }
+        # in code fragment mode: only skip leading whitespace and
+        # comment // signs
+        s!^\s*//(.*)\n!$1!;
+
+        # finally print this line
+        print " *$_\n";
+
+        if (m!^ *\s*\@endcode!)
+        {
+            print " * </div>\n";
+        }
+   }
+ } while (<>);
 
 if ($state == $program_mode) {
    print " * \@endcode\n";

@@ -59,7 +59,7 @@ a damping parameter $\alpha^n$ to get better global convergence behavior:
   @f}
 with
   @f[
-    F(u):= -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right)
+    F(u) \dealcoloneq -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right)
   @f]
 and $F'(u,\delta u)$ the derivative of F in direction of $\delta u$:
 @f[
@@ -115,7 +115,7 @@ Reducing this space to a finite dimensional space with basis $\left\{
   \delta u^{n}=\sum_{j=0}^{N-1} \delta U_{j} \varphi_{j}.
 @f]
 
-Using the basis functions as test functions and defining $a_{n}:=\frac{1}
+Using the basis functions as test functions and defining $a_{n} \dealcoloneq \frac{1}
 {\sqrt{1+|\nabla u^{n}|^{2}}}$, we can rewrite the weak formulation:
 
 @f[
@@ -135,7 +135,7 @@ This linear system of equations can be rewritten as:
 where the entries of the matrix $A^{n}$ are given by:
 
 @f[
-  A^{n}_{ij}:= \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
+  A^{n}_{ij} \dealcoloneq \left( \nabla \varphi_{i} , a_{n} \nabla \varphi_{j} \right) -
   \left(\nabla u^{n}\cdot \nabla \varphi_{i} , a_{n}^{3} \nabla u^{n} \cdot \nabla
   \varphi_{j} \right),
 @f]
@@ -143,7 +143,7 @@ where the entries of the matrix $A^{n}$ are given by:
 and the right hand side $b^{n}$ is given by:
 
 @f[
-  b^{n}_{i}:=-\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right).
+  b^{n}_{i} \dealcoloneq -\left( \nabla \varphi_{i} , a_{n} \nabla u^{n}\right).
 @f]
 
 
@@ -301,4 +301,5 @@ follows:
 The testcase we solve is chosen as follows: We seek to find the solution of
 minimal surface over the unit disk $\Omega=\{\mathbf x: \|\mathbf
 x\|<1\}\subset {\mathbb R}^2$ where the surface attains the values
-$u(x,y)|{\partial\Omega} = g(x,y):=\sin(2 \pi (x+y))$ along the boundary.
+$u(x,y)|{\partial\Omega} = g(x,y) \dealcoloneq \sin(2 \pi (x+y))$ along the
+boundary.

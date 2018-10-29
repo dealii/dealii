@@ -8,21 +8,22 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // test LAPACKFullMatrix::add() by comparing to FullMatrix
 
-#include "../tests.h"
-#include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+
+#include "../tests.h"
+#include "create_matrix.h"
 
 
 template <typename NumberType>
@@ -41,8 +42,8 @@ test(const unsigned int size)
 
   // do addition
   NumberType val = 0.1234;
-  A.add(val,B);
-  C.add(val,D);
+  A.add(val, B);
+  C.add(val, D);
 
   FullMatrix<NumberType> diff(size);
   diff = C;
@@ -53,14 +54,13 @@ test(const unsigned int size)
 }
 
 
-int main()
+int
+main()
 {
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
-  const std::vector<unsigned int> sizes = {{17,391}};
+  const std::vector<unsigned int> sizes = {{17, 391}};
   for (const auto &s : sizes)
     {
       deallog << "size=" << s << std::endl;

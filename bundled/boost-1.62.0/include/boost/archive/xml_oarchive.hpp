@@ -65,11 +65,11 @@ protected:
     }
     void 
     save(const version_type & t){
-        save(static_cast<const unsigned int>(t));
+        save(static_cast<unsigned int>(t));
     }
     void 
     save(const boost::serialization::item_version_type & t){
-        save(static_cast<const unsigned int>(t));
+        save(static_cast<unsigned int>(t));
     }
     BOOST_ARCHIVE_DECL void 
     save(const char * t);
@@ -86,7 +86,7 @@ protected:
     BOOST_ARCHIVE_DECL 
     xml_oarchive_impl(std::ostream & os, unsigned int flags);
     BOOST_ARCHIVE_DECL 
-    ~xml_oarchive_impl();
+    ~xml_oarchive_impl() override;
 public:
     BOOST_ARCHIVE_DECL
     void save_binary(const void *address, std::size_t count);
@@ -121,7 +121,7 @@ public:
     xml_oarchive(std::ostream & os, unsigned int flags = 0) :
         xml_oarchive_impl<xml_oarchive>(os, flags)
     {}
-    ~xml_oarchive(){}
+    ~xml_oarchive() override{}
 };
 
 } // namespace archive

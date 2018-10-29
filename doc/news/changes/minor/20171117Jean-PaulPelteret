@@ -1,4 +1,0 @@
-Changed: The specializations of the scalar_product function for Sacado::Fad::DFad
-numbers were redundant and have been removed.
-<br>
-(Jean-Paul Pelteret, 2017/11/17)

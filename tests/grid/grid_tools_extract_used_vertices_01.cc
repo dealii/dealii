@@ -8,27 +8,28 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // Check extract used_vertices.
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 template <int dim, int spacedim>
-void test ()
+void
+test()
 {
-  deallog << "dim: " << dim << ", spacedim: "
-          << spacedim << std::endl;
+  deallog << "dim: " << dim << ", spacedim: " << spacedim << std::endl;
 
-  Triangulation<dim,spacedim> tria;
+  Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria);
 
   tria.refine_global(1);
@@ -42,20 +43,20 @@ void test ()
 
   auto m = GridTools::extract_used_vertices(tria);
 
-  for (auto &e: m)
+  for (auto &e : m)
     deallog << "Vertex: " << e.first << ": " << e.second << std::endl;
 };
 
 
-int main ()
+int
+main()
 {
   initlog();
-  test<1,1> ();
-  test<1,2> ();
-  test<1,3> ();
-  test<2,2> ();
-  test<2,3> ();
-  test<3,3> ();
+  test<1, 1>();
+  test<1, 2>();
+  test<1, 3>();
+  test<2, 2>();
+  test<2, 3>();
+  test<3, 3>();
   return 0;
 }
-

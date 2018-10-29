@@ -1,0 +1,6 @@
+#
+# The clang-format (Clang 6) style file used by deal.II.
+# This directory shall not be formatted.
+#
+
+DisableFormat: true

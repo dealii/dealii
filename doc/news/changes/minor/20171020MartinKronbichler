@@ -1,5 +1,0 @@
-New: DoFHandler::renumber_dofs() for multigrid levels is now implemented for
-parallel::distributed::Triangulation for the special case that the numbering
-does not change over processor boundaries.
-<br>
-(Martin Kronbichler, 2017/10/20)

@@ -1,0 +1,4 @@
+Fixed: Minor issues when using matrix-free cell categorization
+with multi-grid operators.
+<br>
+(Denis Davydov 2018/08/02)

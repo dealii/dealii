@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -21,11 +21,13 @@
 // pointer, which leads to an ambiguity. Fix this by having an additional
 // operator= in the iterator/reference class
 
-#include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
 
+#include "../tests.h"
 
-int main ()
+
+int
+main()
 {
   initlog();
 
@@ -33,7 +35,7 @@ int main ()
   if (false)
     {
       SparseMatrix<double>::iterator *i;
-      (*i)->value () = (int)0;
+      (*i)->value() = (int)0;
     }
 
   deallog << "OK" << std::endl;

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -22,47 +22,38 @@
 //
 // for this grid, check that vertex numbers still match up
 
-#include "../tests.h"
-#include "mesh_3d.h"
-
+#include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_reordering.h>
+
+#include "../tests.h"
+#include "mesh_3d.h"
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   Triangulation<3> coarse_grid;
-  create_two_cubes (coarse_grid);
+  create_two_cubes(coarse_grid);
 
-  const Triangulation<3>::active_cell_iterator
-  cells[2] = { coarse_grid.begin_active(),
-               ++coarse_grid.begin_active()
-             };
+  const Triangulation<3>::active_cell_iterator cells[2] = {
+    coarse_grid.begin_active(), ++coarse_grid.begin_active()};
 
   // output all vertices
-  for (unsigned int c=0; c<2; ++c)
-    for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
-      deallog << "Cell " << c << ", vertex " << v
-              << ": " << cells[c]->vertex_index(v)
-              << "  @  " << cells[c]->vertex(v)
+  for (unsigned int c = 0; c < 2; ++c)
+    for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_cell; ++v)
+      deallog << "Cell " << c << ", vertex " << v << ": "
+              << cells[c]->vertex_index(v) << "  @  " << cells[c]->vertex(v)
               << std::endl;
 
   // make sure by hand that certain
   // vertices match up
-  AssertThrow (cells[0]->vertex(1) == cells[1]->vertex(4),
-               ExcInternalError());
-  AssertThrow (cells[0]->vertex(3) == cells[1]->vertex(6),
-               ExcInternalError());
-  AssertThrow (cells[0]->vertex(5) == cells[1]->vertex(5),
-               ExcInternalError());
-  AssertThrow (cells[0]->vertex(7) == cells[1]->vertex(7),
-               ExcInternalError());
+  AssertThrow(cells[0]->vertex(1) == cells[1]->vertex(4), ExcInternalError());
+  AssertThrow(cells[0]->vertex(3) == cells[1]->vertex(6), ExcInternalError());
+  AssertThrow(cells[0]->vertex(5) == cells[1]->vertex(5), ExcInternalError());
+  AssertThrow(cells[0]->vertex(7) == cells[1]->vertex(7), ExcInternalError());
 }
-
-
-

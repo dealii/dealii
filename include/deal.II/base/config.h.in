@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -38,8 +38,10 @@
 #cmakedefine DEAL_II_WITH_ADOLC
 #cmakedefine DEAL_II_WITH_ARPACK
 #cmakedefine DEAL_II_WITH_ASSIMP
+#cmakedefine DEAL_II_WITH_COMPLEX_VALUES
 #cmakedefine DEAL_II_WITH_CUDA
 #cmakedefine DEAL_II_WITH_CXX14
+#cmakedefine DEAL_II_WITH_CXX17
 #cmakedefine DEAL_II_WITH_GSL
 #cmakedefine DEAL_II_WITH_GMSH
 #cmakedefine DEAL_II_WITH_HDF5
@@ -87,7 +89,6 @@
 #cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
 #cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
 #cmakedefine DEAL_II_HAVE_BUILTIN_EXPECT
-#cmakedefine DEAL_II_HAVE_VERBOSE_TERMINATE
 #cmakedefine DEAL_II_HAVE_GLIBC_STACKTRACE
 #cmakedefine DEAL_II_HAVE_LIBSTDCXX_DEMANGLER
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
@@ -96,6 +97,13 @@
 #cmakedefine DEAL_II_RESTRICT @DEAL_II_RESTRICT@
 #cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
 
+/*
+ * A variable to tell if the compiler used in the current compilation process
+ * understands CUDA code.
+ */
+#if defined(DEAL_II_WITH_CUDA) && defined(__CUDACC__)
+#  define DEAL_II_COMPILER_CUDA_AWARE
+#endif
 
 /***********************************************************************
  * CPU features:
@@ -115,6 +123,8 @@
  */
 
 #cmakedefine DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+#cmakedefine DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#cmakedefine DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 #cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
@@ -145,6 +155,7 @@
 /* cmake/modules/FindADOLC.cmake */
 #cmakedefine DEAL_II_ADOLC_WITH_ATRIG_ERF
 #cmakedefine DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+#cmakedefine DEAL_II_ADOLC_WITH_TAPELESS_REFCOUNTING
 
 /* cmake/modules/FindARPACK.cmake */
 #cmakedefine DEAL_II_ARPACK_WITH_PARPACK
@@ -162,22 +173,10 @@
 
 /* cmake/configure/configure_2_trilinos.cmake */
 #cmakedefine DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
+#cmakedefine DEAL_II_TRILINOS_WITH_EPETRAEXT
 #cmakedefine DEAL_II_TRILINOS_WITH_ROL
+#cmakedefine DEAL_II_TRILINOS_WITH_SACADO
 #cmakedefine DEAL_II_TRILINOS_WITH_ZOLTAN
-
-/*
- * Depending on the use of threads, we will have to make some variables
- * volatile. We do this here in a very old-fashioned C-style, but still
- * convenient way.
- *
- * @deprecated This macro is deprecated in favor of using the
- * <code>std::atomic</code> template class.
- */
-#ifdef DEAL_II_WITH_THREADS
-#  define DEAL_VOLATILE volatile
-#else
-#  define DEAL_VOLATILE
-#endif
 
 
 /***********************************************************************
@@ -200,7 +199,7 @@
 
 
 /*
- * gmsh:
+ * Gmsh:
  */
 #ifdef DEAL_II_WITH_GMSH
 #  define DEAL_II_GMSH_EXECUTABLE_PATH "@GMSH_EXECUTABLE@"
@@ -317,6 +316,20 @@
     (major)*10000 + (minor)*100 + (subminor))
 #endif
 
+/*
+ * MPI
+ */
+
+#ifdef DEAL_II_WITH_MPI
+#  define DEAL_II_MPI_VERSION_MAJOR @MPI_VERSION_MAJOR@
+#  define DEAL_II_MPI_VERSION_MINOR @MPI_VERSION_MINOR@
+
+#  define DEAL_II_MPI_VERSION_GTE(major,minor) \
+ ((DEAL_II_MPI_VERSION_MAJOR * 100 + \
+    DEAL_II_MPI_VERSION_MINOR) \
+    >=  \
+    (major)*100 + (minor))
+#endif
 
 /***********************************************************************
  * Two macro names that we put at the top and bottom of all deal.II files
@@ -381,6 +394,21 @@ _Pragma("GCC diagnostic pop")
 
 #endif
 
+/***********************************************************************
+ * Define a portable preprocessor macro that generates custom warnings
+ * reporting the line and the file where the warning appears. Taken from:
+ * http://goodliffe.blogspot.com/2009/07/c-how-to-say-warning-to-visual-studio-c.html
+ */
+
+#ifdef _MSC_VER
+  #define DEAL_II_STRINGIZE_HELPER(x) #x
+  #define DEAL_II_STRINGIZE(x) DEAL_II_STRINGIZE_HELPER(x)
+  #define DEAL_II_DO_PRAGMA(x) __pragma(x)
+  #define DEAL_II_WARNING(desc) DEAL_II_DO_PRAGMA(message(__FILE__ "(" DEAL_II_STRINGIZE(__LINE__) ") : warning: " #desc))
+#else
+  #define DEAL_II_DO_PRAGMA(x) _Pragma(#x)
+  #define DEAL_II_WARNING(desc) DEAL_II_DO_PRAGMA(message(#desc))
+#endif
 
 /***********************************************************************
  * Final inclusions:

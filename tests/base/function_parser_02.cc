@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -20,73 +20,89 @@
 // because units are deprecated and muparser can not deal with this,
 // recycle the test to use constants instead of units
 
-#include "../tests.h"
-#include <map>
-#include <deal.II/base/point.h>
-#include <deal.II/lac/vector.h>
 #include <deal.II/base/function_parser.h>
+#include <deal.II/base/point.h>
+
+#include <deal.II/lac/vector.h>
+
+#include <map>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
 
 
-  std::vector<std::string> function(1);
+  std::vector<std::string>      function(1);
   std::map<std::string, double> constants;
 
   constants["PI"] = 3.141592654;
   constants["cm"] = 10;
-  constants["m"] = 1000;
+  constants["m"]  = 1000;
 
   Point<2> point(2.0, 3.0);
 
-  //initialized with units
+  // initialized with units
   FunctionParser<2> fp;
   function[0] = "x * cm + y * m + PI";
   fp.initialize(FunctionParser<2>::default_variable_names(),
-                function, constants);
+                function,
+                constants);
 
-  deallog << "Function " << "[" << function[0] << "]" <<
-          " @point " << "[" << point << "]" << " is " <<
-          "[" <<  fp.value(point) << "]" << std::endl;
+  deallog << "Function "
+          << "[" << function[0] << "]"
+          << " @point "
+          << "[" << point << "]"
+          << " is "
+          << "[" << fp.value(point) << "]" << std::endl;
 
-  //now initialize with a function
-  //that's a string, not vector of
-  //strings
+  // now initialize with a function
+  // that's a string, not vector of
+  // strings
   FunctionParser<2> fp4;
   fp4.initialize(FunctionParser<2>::default_variable_names(),
-                 function[0], constants);
+                 function[0],
+                 constants);
 
-  deallog << "Function " << "[" << function[0] << "]" <<
-          " @point " << "[" << point << "]" << " is " <<
-          "[" <<  fp4.value(point) << "]" << std::endl;
+  deallog << "Function "
+          << "[" << function[0] << "]"
+          << " @point "
+          << "[" << point << "]"
+          << " is "
+          << "[" << fp4.value(point) << "]" << std::endl;
 
-  //now initialize a function without
-  //units to check backwards
-  //compatibility
+  // now initialize a function without
+  // units to check backwards
+  // compatibility
   FunctionParser<2> fp2;
   function[0] = "x + y + PI";
   fp2.initialize(FunctionParser<2>::default_variable_names(),
-                 function, constants);
-  deallog << "Function " << "[" << function[0] << "]" <<
-          " @point " << "[" << point << "]" << " is " <<
-          "[" <<  fp2.value(point) << "]" << std::endl;
+                 function,
+                 constants);
+  deallog << "Function "
+          << "[" << function[0] << "]"
+          << " @point "
+          << "[" << point << "]"
+          << " is "
+          << "[" << fp2.value(point) << "]" << std::endl;
 
 
 
-  //same as above but the function is
-  //a string, not a vector
+  // same as above but the function is
+  // a string, not a vector
   FunctionParser<2> fp3;
   fp3.initialize(FunctionParser<2>::default_variable_names(),
-                 function[0], constants);
+                 function[0],
+                 constants);
 
-  deallog << "Function " << "[" << function[0] << "]" <<
-          " @point " << "[" << point << "]" << " is " <<
-          "[" <<  fp3.value(point) << "]" << std::endl;
+  deallog << "Function "
+          << "[" << function[0] << "]"
+          << " @point "
+          << "[" << point << "]"
+          << " is "
+          << "[" << fp3.value(point) << "]" << std::endl;
 }
-
-
-
-

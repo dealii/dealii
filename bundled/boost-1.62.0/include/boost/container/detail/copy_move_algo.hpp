@@ -34,7 +34,12 @@
 // other
 #include <boost/core/no_exceptions_support.hpp>
 // std
-#include <cstring> //for emmove/memcpy
+#include <cstring> //for memmove/memcpy
+
+#if defined(BOOST_GCC) && (BOOST_GCC >= 80000)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
 
 namespace boost {
 namespace container {
@@ -1140,5 +1145,10 @@ void move_assign_range_alloc_n( Allocator &a, I inp_start, typename allocator_tr
 
 }  //namespace container {
 }  //namespace boost {
+
+#if defined(BOOST_GCC) && (BOOST_GCC >= 80000)
+#pragma GCC diagnostic pop
+#endif
+
 
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_COPY_MOVE_ALGO_HPP

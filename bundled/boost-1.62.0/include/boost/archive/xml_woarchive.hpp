@@ -74,11 +74,11 @@ protected:
     }
     void
     save(const version_type & t){
-        save(static_cast<const unsigned int>(t));
+        save(static_cast<unsigned int>(t));
     }
     void 
     save(const boost::serialization::item_version_type & t){
-        save(static_cast<const unsigned int>(t));
+        save(static_cast<unsigned int>(t));
     }
     BOOST_WARCHIVE_DECL void
     save(const char * t);
@@ -95,7 +95,7 @@ protected:
     BOOST_WARCHIVE_DECL 
     xml_woarchive_impl(std::wostream & os, unsigned int flags);
     BOOST_WARCHIVE_DECL
-    ~xml_woarchive_impl();
+    ~xml_woarchive_impl() override;
 public:
     BOOST_WARCHIVE_DECL void
     save_binary(const void *address, std::size_t count);
@@ -115,7 +115,7 @@ public:
     xml_woarchive(std::wostream & os, unsigned int flags = 0) :
         xml_woarchive_impl<xml_woarchive>(os, flags)
     {}
-    ~xml_woarchive(){}
+    ~xml_woarchive() override{}
 };
 
 } // namespace archive

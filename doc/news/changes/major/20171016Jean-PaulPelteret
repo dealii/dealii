@@ -1,4 +1,0 @@
-New: Using the Physics::Notation::Kelvin class, it is possible to store and
-retrieve tensors and symmetric tensors in or from a compressed format.
-<br>
-(Jean-Paul Pelteret, 2017/10/16)

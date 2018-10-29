@@ -1,0 +1,169 @@
+
+DEAL::Testing dim=1, spacedim=1
+DEAL::Default
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 0, manifold id: -1
+DEAL::f: 1, boundary id: 1, manifold id: -1
+DEAL::All manifold ids to 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 0, manifold id: 0
+DEAL::f: 1, boundary id: 1, manifold id: 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 1, manifold id: 2
+DEAL::f: 1, boundary id: 1, manifold id: 2
+DEAL::Testing dim=1, spacedim=2
+DEAL::Default
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 0, manifold id: -1
+DEAL::f: 1, boundary id: 1, manifold id: -1
+DEAL::All manifold ids to 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 0, manifold id: 0
+DEAL::f: 1, boundary id: 1, manifold id: 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 1, manifold id: 2
+DEAL::f: 1, boundary id: 1, manifold id: 2
+DEAL::Testing dim=1, spacedim=3
+DEAL::Default
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 0, manifold id: -1
+DEAL::f: 1, boundary id: 1, manifold id: -1
+DEAL::All manifold ids to 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 0, manifold id: 0
+DEAL::f: 1, boundary id: 1, manifold id: 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 0, boundary id: 1, manifold id: 2
+DEAL::f: 1, boundary id: 1, manifold id: 2
+DEAL::Testing dim=2, spacedim=2
+DEAL::Default
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 1, boundary id: 0, manifold id: -1
+DEAL::f: 2, boundary id: 1, manifold id: -1
+DEAL::f: 0, boundary id: 2, manifold id: -1
+DEAL::f: 3, boundary id: 3, manifold id: -1
+DEAL::All manifold ids to 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 1, boundary id: 0, manifold id: 0
+DEAL::f: 2, boundary id: 1, manifold id: 0
+DEAL::f: 0, boundary id: 2, manifold id: 0
+DEAL::f: 3, boundary id: 3, manifold id: 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 1, boundary id: 1, manifold id: 2
+DEAL::f: 2, boundary id: 1, manifold id: 2
+DEAL::f: 0, boundary id: 1, manifold id: 2
+DEAL::f: 3, boundary id: 1, manifold id: 2
+DEAL::Testing dim=2, spacedim=3
+DEAL::Default
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 1, boundary id: 0, manifold id: -1
+DEAL::f: 2, boundary id: 1, manifold id: -1
+DEAL::f: 0, boundary id: 2, manifold id: -1
+DEAL::f: 3, boundary id: 3, manifold id: -1
+DEAL::All manifold ids to 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 1, boundary id: 0, manifold id: 0
+DEAL::f: 2, boundary id: 1, manifold id: 0
+DEAL::f: 0, boundary id: 2, manifold id: 0
+DEAL::f: 3, boundary id: 3, manifold id: 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 1, boundary id: 1, manifold id: 2
+DEAL::f: 2, boundary id: 1, manifold id: 2
+DEAL::f: 0, boundary id: 1, manifold id: 2
+DEAL::f: 3, boundary id: 1, manifold id: 2
+DEAL::Testing dim=3, spacedim=3
+DEAL::Default
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 2, boundary id: 0, manifold id: -1
+DEAL::e: 2, boundary id: 0, manifold id: -1
+DEAL::e: 6, boundary id: 0, manifold id: -1
+DEAL::e: 1, boundary id: 0, manifold id: -1
+DEAL::e: 9, boundary id: 0, manifold id: -1
+DEAL::f: 3, boundary id: 1, manifold id: -1
+DEAL::e: 4, boundary id: 0, manifold id: -1
+DEAL::e: 7, boundary id: 0, manifold id: -1
+DEAL::e: 3, boundary id: 0, manifold id: -1
+DEAL::e: 10, boundary id: 0, manifold id: -1
+DEAL::f: 0, boundary id: 2, manifold id: -1
+DEAL::e: 0, boundary id: 0, manifold id: -1
+DEAL::e: 8, boundary id: 0, manifold id: -1
+DEAL::e: 2, boundary id: 0, manifold id: -1
+DEAL::e: 4, boundary id: 0, manifold id: -1
+DEAL::f: 4, boundary id: 3, manifold id: -1
+DEAL::e: 5, boundary id: 0, manifold id: -1
+DEAL::e: 11, boundary id: 0, manifold id: -1
+DEAL::e: 6, boundary id: 0, manifold id: -1
+DEAL::e: 7, boundary id: 0, manifold id: -1
+DEAL::f: 1, boundary id: 4, manifold id: -1
+DEAL::e: 1, boundary id: 0, manifold id: -1
+DEAL::e: 3, boundary id: 0, manifold id: -1
+DEAL::e: 0, boundary id: 0, manifold id: -1
+DEAL::e: 5, boundary id: 0, manifold id: -1
+DEAL::f: 5, boundary id: 5, manifold id: -1
+DEAL::e: 9, boundary id: 0, manifold id: -1
+DEAL::e: 10, boundary id: 0, manifold id: -1
+DEAL::e: 8, boundary id: 0, manifold id: -1
+DEAL::e: 11, boundary id: 0, manifold id: -1
+DEAL::All manifold ids to 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 2, boundary id: 0, manifold id: 0
+DEAL::e: 2, boundary id: 0, manifold id: 0
+DEAL::e: 6, boundary id: 0, manifold id: 0
+DEAL::e: 1, boundary id: 0, manifold id: 0
+DEAL::e: 9, boundary id: 0, manifold id: 0
+DEAL::f: 3, boundary id: 1, manifold id: 0
+DEAL::e: 4, boundary id: 0, manifold id: 0
+DEAL::e: 7, boundary id: 0, manifold id: 0
+DEAL::e: 3, boundary id: 0, manifold id: 0
+DEAL::e: 10, boundary id: 0, manifold id: 0
+DEAL::f: 0, boundary id: 2, manifold id: 0
+DEAL::e: 0, boundary id: 0, manifold id: 0
+DEAL::e: 8, boundary id: 0, manifold id: 0
+DEAL::e: 2, boundary id: 0, manifold id: 0
+DEAL::e: 4, boundary id: 0, manifold id: 0
+DEAL::f: 4, boundary id: 3, manifold id: 0
+DEAL::e: 5, boundary id: 0, manifold id: 0
+DEAL::e: 11, boundary id: 0, manifold id: 0
+DEAL::e: 6, boundary id: 0, manifold id: 0
+DEAL::e: 7, boundary id: 0, manifold id: 0
+DEAL::f: 1, boundary id: 4, manifold id: 0
+DEAL::e: 1, boundary id: 0, manifold id: 0
+DEAL::e: 3, boundary id: 0, manifold id: 0
+DEAL::e: 0, boundary id: 0, manifold id: 0
+DEAL::e: 5, boundary id: 0, manifold id: 0
+DEAL::f: 5, boundary id: 5, manifold id: 0
+DEAL::e: 9, boundary id: 0, manifold id: 0
+DEAL::e: 10, boundary id: 0, manifold id: 0
+DEAL::e: 8, boundary id: 0, manifold id: 0
+DEAL::e: 11, boundary id: 0, manifold id: 0
+DEAL::C: 0.0, manifold id: -1
+DEAL::f: 2, boundary id: 1, manifold id: 2
+DEAL::e: 2, boundary id: 1, manifold id: 2
+DEAL::e: 6, boundary id: 1, manifold id: 2
+DEAL::e: 1, boundary id: 1, manifold id: 2
+DEAL::e: 9, boundary id: 1, manifold id: 2
+DEAL::f: 3, boundary id: 1, manifold id: 2
+DEAL::e: 4, boundary id: 1, manifold id: 2
+DEAL::e: 7, boundary id: 1, manifold id: 2
+DEAL::e: 3, boundary id: 1, manifold id: 2
+DEAL::e: 10, boundary id: 1, manifold id: 2
+DEAL::f: 0, boundary id: 1, manifold id: 2
+DEAL::e: 0, boundary id: 1, manifold id: 2
+DEAL::e: 8, boundary id: 1, manifold id: 2
+DEAL::e: 2, boundary id: 1, manifold id: 2
+DEAL::e: 4, boundary id: 1, manifold id: 2
+DEAL::f: 4, boundary id: 1, manifold id: 2
+DEAL::e: 5, boundary id: 1, manifold id: 2
+DEAL::e: 11, boundary id: 1, manifold id: 2
+DEAL::e: 6, boundary id: 1, manifold id: 2
+DEAL::e: 7, boundary id: 1, manifold id: 2
+DEAL::f: 1, boundary id: 1, manifold id: 2
+DEAL::e: 1, boundary id: 1, manifold id: 2
+DEAL::e: 3, boundary id: 1, manifold id: 2
+DEAL::e: 0, boundary id: 1, manifold id: 2
+DEAL::e: 5, boundary id: 1, manifold id: 2
+DEAL::f: 5, boundary id: 1, manifold id: 2
+DEAL::e: 9, boundary id: 1, manifold id: 2
+DEAL::e: 10, boundary id: 1, manifold id: 2
+DEAL::e: 8, boundary id: 1, manifold id: 2
+DEAL::e: 11, boundary id: 1, manifold id: 2

@@ -161,7 +161,7 @@ coordinate of a mesh with a sine curve:
 
 Similarly, we can transform a regularly refined
 unit square to a wall-adapted mesh in y direction using the formula
-$(x,y) \mapsto (x,\tanh(2*y)/\tanh(2))$. This is done in <code>grid_6()</code>
+$(x,y) \mapsto (x,\tanh(2 y)/\tanh(2))$. This is done in <code>grid_6()</code>
 of this tutorial:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>

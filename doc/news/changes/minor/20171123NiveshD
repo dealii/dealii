@@ -1,4 +1,0 @@
-Extend: partition_triangulation with options for choosing between METIS or ZOLTAN partitioners.
-METIS (the original partitioner) is the default.
-<br>
-(Nivesh Dommaraju, 2017/11/23)

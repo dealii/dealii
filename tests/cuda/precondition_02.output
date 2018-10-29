@@ -1,0 +1,10 @@
+
+DEAL::Testing float
+DEAL:cg::Starting value 416.9891968
+DEAL:cg::Convergence step 11 value 3.993944847e-05
+DEAL::OK
+DEAL::Testing double
+DEAL:cg::Starting value 416.9892085
+DEAL:cg::Convergence step 20 value 9.834484941e-14
+DEAL::OK
+DEAL::OK

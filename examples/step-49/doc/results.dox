@@ -40,16 +40,18 @@ to use a curved geometry. The way to do this requires three steps:
   <code>manifold_id</code> with a Manifold object. For more information on this
   see the @ref GlossManifoldIndicator "glossary entry on this topic".
 - Finally, you must mark cells and cell faces with the correct
-  <code>manifold_id</code>. For example, you could get an annular domain with
+  <code>manifold_id</code>. For example, you could get an annular sector with
   curved cells in Cartesian coordinates (but rectangles in polar coordinates)
   by doing the following:
   @code
-  PolarManifold<2> polar_manifold;
-  Triangulation<2> triangulation;
-  const types::manifold_id polar_id = 42;
-  GridGenerator::hyper_shell(triangulation, Point<2>(), 0.5, 1.0, 10);
-  triangulation.set_manifold(polar_id, polar_manifold);
-  triangulation.set_all_manifold_ids(polar_id);
+  Triangulation<2> tria;
+  GridGenerator::hyper_cube(tria);
+  const auto cell = tria.begin_active();
+  cell->vertex(2) = Point<2>(-0.5, 1.0);
+  cell->vertex(3) = Point<2>(1.5, 1.0);
+  tria.set_all_manifold_ids(42);
+  tria.set_manifold(42, PolarManifold<2>(Point<2>(0.5, -1.0)));
+  tria.refine_global(3);
   @endcode
   Now, when the grid is refined, all cell splitting calculations will be done in
   polar coordinates.
@@ -72,170 +74,150 @@ third direction, and gluing them together. The following code does this, using
 the techniques previously described:
 
 @code
-// Given a list of points and how vertices connect to cells,
-// create a mesh. This is in the same way as we do in step 14.
-void create_2d_grid (const Point<2> vertices_1[],
-	  	     const unsigned int n_vertices,
-		     const int cell_vertices[][4],
-		     const unsigned int n_cells,
-                     Triangulation<2> &coarse_grid)
+// Given a list of points and how vertices connect to cells, create a
+// mesh. This is in the same way as we do in step 14.
+void create_2d_grid(
+  const std::vector<Point<2>> &vertices,
+  const std::vector<
+    std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>>
+    &               vertex_indices,
+  Triangulation<2> &coarse_grid)
 {
-  const std::vector<Point<2> > vertices (&vertices_1[0],
-			    	         &vertices_1[n_vertices]);
-
-  std::vector<CellData<2> > cells (n_cells, CellData<2>());
-  for (unsigned int i=0; i<n_cells; ++i)
+  std::vector<CellData<2>> cells(vertex_indices.size());
+  for (unsigned int i = 0; i < cells.size(); ++i)
     {
-      for (unsigned int j=0;
-	   j<GeometryInfo<2>::vertices_per_cell;
-	   ++j)
-	cells[i].vertices[j] = cell_vertices[i][j];
+      for (unsigned int j = 0; j < GeometryInfo<2>::vertices_per_cell; ++j)
+        cells[i].vertices[j] = vertex_indices[i][j];
     }
 
-  coarse_grid.create_triangulation (vertices,
-				    cells,
-				    SubCellData());
+  coarse_grid.create_triangulation(vertices, cells, SubCellData());
 }
 
 
 // Create a triangulation that covers the entire volume
-void create_3d_grid (Triangulation<3> &triangulation)
+void create_3d_grid(Triangulation<3> &triangulation)
 {
   // Generate first cross section
-  const Point<2> vertices_1[]
-    = {  Point<2> (-1.5,   0.),
-	 Point<2> (-0.5,   0.),
-	 Point<2> ( 0.5,   0.),
-	 Point<2> ( 1.5,   0.),
+  const std::vector<Point<2>> vertices_1{{-1.5, 0.},
+                                         {-0.5, 0.},
+                                         {0.5, 0.},
+                                         {1.5, 0.},
 
-	 Point<2> (-1.5,  1.5),
-	 Point<2> (-0.5,  1.5),
-	 Point<2> ( 0.5,  1.5),
-	 Point<2> ( 1.5,  1.5),
+                                         {-1.5, 1.5},
+                                         {-0.5, 1.5},
+                                         {0.5, 1.5},
+                                         {1.5, 1.5},
 
-	 Point<2> (-1.5,   3.),
-	 Point<2> (-0.5,   3.),
-	 Point<2> ( 0.5,   3.),
-	 Point<2> ( 1.5,   3.),
+                                         {-1.5, 3.},
+                                         {-0.5, 3.},
+                                         {0.5, 3.},
+                                         {1.5, 3.},
 
-	 Point<2> (-0.5,   3+0.5*sqrt(3)),
-	 Point<2> ( 0.5,   3+0.5*sqrt(3)),
+                                         {-0.5, 3 + 0.5 * sqrt(3)},
+                                         {0.5, 3 + 0.5 * sqrt(3)},
 
-	 Point<2> (-0.75,  3+0.75*sqrt(3)),
-	 Point<2> ( 0.75,  3+0.75*sqrt(3))
-  };
-  const int cell_vertices_1[][GeometryInfo<2>::vertices_per_cell]
-    = {{0, 1, 4, 5},
-       {1, 2, 5, 6},
-       {3, 7, 2, 6},
-       {4, 5, 8, 9},
-       {5, 6, 9, 10},
-       {7,11, 6,10},
-       {8, 9, 14,12},
-       {9, 10,12,13},
-       {11,15,10,13},
-       {14,12,15,13}
-  };
+                                         {-0.75, 3 + 0.75 * sqrt(3)},
+                                         {0.75, 3 + 0.75 * sqrt(3)}};
+
+  const std::vector<std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>>
+    cell_vertices_1 = {{{0, 1, 4, 5}},
+                       {{1, 2, 5, 6}},
+                       {{3, 7, 2, 6}},
+                       {{4, 5, 8, 9}},
+                       {{5, 6, 9, 10}},
+                       {{7, 11, 6, 10}},
+                       {{8, 9, 14, 12}},
+                       {{9, 10, 12, 13}},
+                       {{11, 15, 10, 13}},
+                       {{14, 12, 15, 13}}};
 
   // Copy vertices into a 2d triangulation
   Triangulation<2> triangulation_2d_1;
-  create_2d_grid (vertices_1,
-                  sizeof(vertices_1)/sizeof(vertices_1[0]),
-		  cell_vertices_1,
-                  sizeof(cell_vertices_1)/sizeof(cell_vertices_1[0]),
-                  triangulation_2d_1);
+  create_2d_grid(vertices_1, cell_vertices_1, triangulation_2d_1);
 
   // Then extrude it into a 3d piece
   Triangulation<3> triangulation_3d_1;
-  GridGenerator::extrude_triangulation (triangulation_2d_1,
-                                        5, 2.5,
-                                        triangulation_3d_1);
+  GridGenerator::extrude_triangulation(triangulation_2d_1,
+                                       5,
+                                       2.5,
+                                       triangulation_3d_1);
 
   // Now do the same with the second volume
-  const Point<2> vertices_2[]
-    = {  Point<2> (-2.5,   0.),
-	 Point<2> (-1.5,   0.),
-	 Point<2> (-0.5,   0.),
-	 Point<2> ( 0.5,   0.),
-	 Point<2> ( 1.5,   0.),
-	 Point<2> ( 2.5,   0.),
+  const std::vector<Point<2>> vertices_2{{-2.5, 0.},
+                                         {-1.5, 0.},
+                                         {-0.5, 0.},
+                                         {0.5, 0.},
+                                         {1.5, 0.},
+                                         {2.5, 0.},
 
-	 Point<2> (-2.5,  1.5),
-	 Point<2> (-1.5,  1.5),
-	 Point<2> (-0.5,  1.5),
-	 Point<2> ( 0.5,  1.5),
-	 Point<2> ( 1.5,  1.5),
-	 Point<2> ( 2.5,  1.5),
+                                         {-2.5, 1.5},
+                                         {-1.5, 1.5},
+                                         {-0.5, 1.5},
+                                         {0.5, 1.5},
+                                         {1.5, 1.5},
+                                         {2.5, 1.5},
 
-	 Point<2> (-2.5,  3.),
-	 Point<2> (-1.5,  3.),
-	 Point<2> (-0.5,  3.),
-	 Point<2> ( 0.5,  3.),
-	 Point<2> ( 1.5,  3.),
-	 Point<2> ( 2.5,  3.),
+                                         {-2.5, 3.},
+                                         {-1.5, 3.},
+                                         {-0.5, 3.},
+                                         {0.5, 3.},
+                                         {1.5, 3.},
+                                         {2.5, 3.},
 
-	 Point<2> (-0.5,   3.+0.5*sqrt(3)),
-	 Point<2> ( 0.5,   3.+0.5*sqrt(3)),
+                                         {-0.5, 3. + 0.5 * sqrt(3)},
+                                         {0.5, 3. + 0.5 * sqrt(3)},
 
-	 Point<2> (-0.75,  3.+0.75*sqrt(3)),
-	 Point<2> ( 0.75,  3.+0.75*sqrt(3)),
+                                         {-0.75, 3. + 0.75 * sqrt(3)},
+                                         {0.75, 3. + 0.75 * sqrt(3)},
 
-	 Point<2> (-1.25,  3.+1.25*sqrt(3)),
-	 Point<2> ( 1.25,  3.+1.25*sqrt(3))
-  };
-  const int cell_vertices_2[][GeometryInfo<2>::vertices_per_cell]
-    = {{0, 1, 6, 7},
-       {1, 2, 7, 8},
-       {2, 3, 8, 9},
-       {4, 10, 3, 9},
-       {5, 11, 4, 10},
-       {6, 7, 12, 13},
-       {7, 8, 13, 14},
-       {8, 9, 14, 15},
-       {10, 16, 9, 15},
-       {11, 17, 10, 16},
-       {12, 13, 22, 20},
-       {13, 14, 20, 18},
-       {14, 15, 18, 19},
-       {16, 21, 15, 19},
-       {17, 23, 16, 21},
-       {20, 18, 21, 19},
-       {22, 20, 23, 21}
-  };
+                                         {-1.25, 3. + 1.25 * sqrt(3)},
+                                         {1.25, 3. + 1.25 * sqrt(3)}};
+
+  const std::vector<std::array<unsigned int, GeometryInfo<2>::vertices_per_cell>>
+    cell_vertices_2 = {{{0, 1, 6, 7}},
+                       {{1, 2, 7, 8}},
+                       {{2, 3, 8, 9}},
+                       {{4, 10, 3, 9}},
+                       {{5, 11, 4, 10}},
+                       {{6, 7, 12, 13}},
+                       {{7, 8, 13, 14}},
+                       {{8, 9, 14, 15}},
+                       {{10, 16, 9, 15}},
+                       {{11, 17, 10, 16}},
+                       {{12, 13, 22, 20}},
+                       {{13, 14, 20, 18}},
+                       {{14, 15, 18, 19}},
+                       {{16, 21, 15, 19}},
+                       {{17, 23, 16, 21}},
+                       {{20, 18, 21, 19}},
+                       {{22, 20, 23, 21}}};
 
   Triangulation<2> triangulation_2d_2;
-  create_2d_grid (vertices_2,
-                  sizeof(vertices_2)/sizeof(vertices_2[0]),
-		  cell_vertices_2,
-                  sizeof(cell_vertices_2)/sizeof(cell_vertices_2[0]),
-                  triangulation_2d_2);
+  create_2d_grid(vertices_2, cell_vertices_2, triangulation_2d_2);
 
   Triangulation<3> triangulation_3d_2;
-  GridGenerator::extrude_triangulation (triangulation_2d_2,
-                                        5, 2.5,
-                                        triangulation_3d_2);
+  GridGenerator::extrude_triangulation(triangulation_2d_2,
+                                       5,
+                                       2.5,
+                                       triangulation_3d_2);
 
-  // Also shift this triangulation in the z-direction so
-  // that it matches the end face of the first part
-  GridTools::shift (Point<3>(0,0,2.5),
-                    triangulation_3d_2);
+  // Also shift this triangulation in the z-direction so that it matches the
+  // end face of the first part
+  GridTools::shift(Point<3>(0, 0, 2.5), triangulation_3d_2);
 
-
-  // Now first merge these two pieces, then shift the
-  // first piece in z-direction beyond the second, and
-  // merge the shifted piece with the two previously
-  // merged one into the final one:
+  // Now first merge these two pieces, then shift the first piece in
+  // z-direction beyond the second, and merge the shifted piece with the two
+  // previously merged one into the final one:
   Triangulation<3> triangulation_3d_tmp;
-  GridGenerator::merge_triangulations (triangulation_3d_1,
-                                       triangulation_3d_2,
-                                       triangulation_3d_tmp);
+  GridGenerator::merge_triangulations(triangulation_3d_1,
+                                      triangulation_3d_2,
+                                      triangulation_3d_tmp);
 
-  GridTools::shift (Point<3>(0,0,5),
-                    triangulation_3d_1);
+  GridTools::shift(Point<3>(0, 0, 5), triangulation_3d_1);
 
-  GridGenerator::merge_triangulations (triangulation_3d_tmp,
-                                       triangulation_3d_1,
-                                       triangulation);
+  GridGenerator::merge_triangulations(triangulation_3d_tmp,
+                                      triangulation_3d_1,
+                                      triangulation);
 }
 @endcode
 
@@ -280,20 +262,20 @@ mark all cells with centers above the $y = 3$ line as being cylindrical in
 nature:
 
 @code
-  const Tensor<1, 3> axis({0.0, 0.0, 1.0});
-  const Point<3> axial_point(0, 3.0, 0.0);
-  const CylindricalManifold<3> cylinder(axis, axial_point);
-  const types::manifold_id cylinder_id = 8;
+const Tensor<1, 3>           axis({0.0, 0.0, 1.0});
+const Point<3>               axial_point(0, 3.0, 0.0);
+const CylindricalManifold<3> cylinder(axis, axial_point);
+const types::manifold_id     cylinder_id = 8;
 
-  Triangulation<3> triangulation;
-  create_3d_grid(triangulation);
-  triangulation.set_manifold (cylinder_id, cylinder);
+Triangulation<3> triangulation;
+create_3d_grid(triangulation);
+triangulation.set_manifold(cylinder_id, cylinder);
 
-  for (auto cell : triangulation.active_cell_iterators())
-    if (cell->center()[1] >= 3.0)
-      cell->set_all_manifold_ids(cylinder_id);
+for (auto cell : triangulation.active_cell_iterators())
+  if (cell->center()[1] >= 3.0)
+    cell->set_all_manifold_ids(cylinder_id);
 
-  triangulation.refine_global (1);
+triangulation.refine_global(1);
 @endcode
 
 With this code, we get a mesh that looks like this:
@@ -309,29 +291,30 @@ this, we go back and overwrite the <code>manifold_id</code>s on these cells to
 be zero (which is the default):
 
 @code
-  const Tensor<1, 3> axis({0.0, 0.0, 1.0});
-  const Point<3> axial_point(0, 3.0, 0.0);
-  const CylindricalManifold<3> cylinder(axis, axial_point);
-  const types::manifold_id cylinder_id = 8;
+const Tensor<1, 3>           axis({0.0, 0.0, 1.0});
+const Point<3>               axial_point(0, 3.0, 0.0);
+const CylindricalManifold<3> cylinder(axis, axial_point);
+const types::manifold_id     cylinder_id = 8;
 
-  Triangulation<3> triangulation;
-  create_3d_grid(triangulation);
-  triangulation.set_manifold (cylinder_id, cylinder);
+Triangulation<3> triangulation;
+create_3d_grid(triangulation);
+triangulation.set_manifold(cylinder_id, cylinder);
 
-  for (auto cell : triangulation.active_cell_iterators())
-    if (cell->center()[1] >= 3.0)
-      cell->set_all_manifold_ids(cylinder_id);
+for (auto cell : triangulation.active_cell_iterators())
+  if (cell->center()[1] >= 3.0)
+    cell->set_all_manifold_ids(cylinder_id);
 
-  for (auto cell : triangulation.active_cell_iterators())
-    for (unsigned int face_n = 0; face_n < GeometryInfo<3>::faces_per_cell; ++face_n)
-      {
-        const Point<3> face_center = cell->face(face_n)->center();
-        if (std::abs(face_center[0]) < 1.0e-5 &&
-            std::abs(face_center[1] - 3.0) < 1.0e-5)
-          cell->set_all_manifold_ids(numbers::flat_manifold_id);
-      }
+for (auto cell : triangulation.active_cell_iterators())
+  for (unsigned int face_n = 0; face_n < GeometryInfo<3>::faces_per_cell;
+       ++face_n)
+    {
+      const Point<3> face_center = cell->face(face_n)->center();
+      if (std::abs(face_center[0]) < 1.0e-5 &&
+          std::abs(face_center[1] - 3.0) < 1.0e-5)
+        cell->set_all_manifold_ids(numbers::flat_manifold_id);
+    }
 
-  triangulation.refine_global (1);
+triangulation.refine_global(1);
 @endcode
 
 This gives us the following grid:

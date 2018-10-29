@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -22,27 +22,32 @@
 // https://github.com/trilinos/Trilinos/blob/master/packages/sacado/example/dfad_example.cpp
 
 
-#include "../tests.h"
-
 #include <Sacado.hpp>
+
+#include "../tests.h"
 
 // The function to differentiate
 template <typename NumberType>
-NumberType f(const NumberType &x, const NumberType &y, const NumberType &z)
+NumberType
+f(const NumberType &x, const NumberType &y, const NumberType &z)
 {
-  return z*(x + z*y + x*y);
+  return z * (x + z * y + x * y);
 }
 
 // The analytic derivative of f(x,y,z) with respect to x and y
 void
-df(const double &x, const double &y, const double &z,
-   double &df_dx, double &df_dy)
+df(const double &x,
+   const double &y,
+   const double &z,
+   double &      df_dx,
+   double &      df_dy)
 {
-  df_dx = z*(1.0 + y);
-  df_dy = z*(z + x);
+  df_dx = z * (1.0 + y);
+  df_dy = z * (z + x);
 }
 
-int main()
+int
+main()
 {
   initlog();
 
@@ -77,15 +82,13 @@ int main()
   deallog << "f_fad: " << f_fad << std::endl;
 
   // Extract value and derivatives
-  const double f_ad = f_fad.val();     // f
+  const double f_ad     = f_fad.val(); // f
   const double df_dx_ad = f_fad.dx(0); // df/dx
   const double df_dy_ad = f_fad.dx(1); // df/dy
 
   const double tol = 1.0e-14;
-  Assert(std::fabs(f - f_ad) < tol,
-         ExcMessage("Computation incorrect: Value"));
-  Assert(std::fabs(df_dx - df_dx_ad) < tol &&
-         std::fabs(df_dy - df_dy_ad) < tol,
+  Assert(std::fabs(f - f_ad) < tol, ExcMessage("Computation incorrect: Value"));
+  Assert(std::fabs(df_dx - df_dx_ad) < tol && std::fabs(df_dy - df_dy_ad) < tol,
          ExcMessage("Computation incorrect: First derivative"));
 
   deallog << "OK" << std::endl;

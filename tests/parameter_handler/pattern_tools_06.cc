@@ -8,19 +8,21 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/numbers.h>
+
 #include <boost/core/demangle.hpp>
 
 #include <memory>
+
+#include "../tests.h"
 
 using namespace dealii;
 using namespace Patterns::Tools;
@@ -28,28 +30,30 @@ using namespace Patterns::Tools;
 // Try conversion on complex map types
 
 template <class T>
-void test(T t)
+void
+test(T t)
 {
   auto p = Convert<T>::to_pattern();
   deallog << "Pattern  : " << p->description() << std::endl;
   auto s = Convert<T>::to_string(t);
   deallog << "To String: " << s << std::endl;
-  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s)) << std::endl;
-
+  deallog << "To value : " << Convert<T>::to_string(Convert<T>::to_value(s))
+          << std::endl;
 }
 
-int main()
+int
+main()
 {
   initlog();
 
-  std::map<int, double>                 t0;
-  std::unordered_map<int, double>       t1;
-  std::multimap<int, double>            t2;
-  std::unordered_multimap<int, double>  t3;
+  std::map<int, double>                t0;
+  std::unordered_map<int, double>      t1;
+  std::multimap<int, double>           t2;
+  std::unordered_multimap<int, double> t3;
 
-  auto p = std::make_pair(5,1.0);
-  auto p2 = std::make_pair(5,2.0);
-  auto p3 = std::make_pair(1,3.0);
+  auto p  = std::make_pair(5, 1.0);
+  auto p2 = std::make_pair(5, 2.0);
+  auto p3 = std::make_pair(1, 3.0);
 
   t0.insert(p);
   t1.insert(p);

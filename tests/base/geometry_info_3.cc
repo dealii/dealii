@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,43 +17,46 @@
 
 // check GeometryInfo::face_to_cell_vertices
 
-#include "../tests.h"
 #include <deal.II/base/geometry_info.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << "Checking in " << dim << "d" << std::endl;
 
-  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
       {
         deallog << "Face " << f << ", vertex=" << v << ": ";
-        deallog << GeometryInfo<dim>::face_to_cell_vertices(f,v,true)
+        deallog << GeometryInfo<dim>::face_to_cell_vertices(f, v, true)
                 << std::endl;
       }
 
   if (dim == 3)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
         {
           deallog << "Face " << f << ", vertex=" << v
                   << " (reverse orientation): ";
-          deallog << GeometryInfo<dim>::face_to_cell_vertices(f,v,false)
+          deallog << GeometryInfo<dim>::face_to_cell_vertices(f, v, false)
                   << std::endl;
         }
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   return 0;
 }

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,8 +17,10 @@
 #define dealii_fe_q_iso_q1_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/base/polynomials_piecewise.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+
 #include <deal.II/fe/fe_q_base.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -107,8 +109,12 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Martin Kronbichler, 2013
  */
-template <int dim, int spacedim=dim>
-class FE_Q_iso_Q1 : public FE_Q_Base<TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double> >,dim,spacedim>
+template <int dim, int spacedim = dim>
+class FE_Q_iso_Q1
+  : public FE_Q_Base<
+      TensorProductPolynomials<dim, Polynomials::PiecewisePolynomial<double>>,
+      dim,
+      spacedim>
 {
 public:
   /**
@@ -123,11 +129,11 @@ public:
    * returns <tt>FE_Q_iso_q1<dim>(equivalent_degree)</tt>, with @p dim and @p
    * equivalent_degree replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -136,10 +142,10 @@ public:
    * the current element is scalar, the support point values need to
    * be vectors of length 1.
    */
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
   /**
    * @name Functions to support hp
@@ -155,9 +161,9 @@ public:
    * and in particular the
    * @ref hp_paper "hp paper".
    */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
   //@}
 };
 

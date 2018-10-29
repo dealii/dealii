@@ -7,7 +7,7 @@ the UMFPACK sparse direct solver. Refer to the <a
 href="../../readme.html#umfpack">ReadMe</a> for instructions how to do this.
 
 <a name="Intro"></a>
-<h1>Introducion</h1>
+<h1>Introduction</h1>
 
 This program shows how to use Runge-Kutta methods to solve a time-dependent
 problem. It solves a small variation of the heat equation discussed first in
@@ -216,7 +216,7 @@ where
   {\cal S}_{i}(t)  &=& (\psi_i,S(x,t))_\Omega.
 @f}
 See also step-24 and step-26 to understand how we arrive here.
-%Boundary terms are not necessary due to the chosen boundary conditions for
+Boundary terms are not necessary due to the chosen boundary conditions for
 the current problem. To use the Runge-Kutta methods, we recast this
 as follows:
 @f{eqnarray*}

@@ -1,5 +1,0 @@
-Fixed: The transformation operation for rank-2 and rank-4 (non-symmetric) tensors
-in the  Physics::Transformations was incorrectly implemented. 
-This has now been fixed.
-<br>
-(Jean-Paul Pelteret, 2017/10/17)

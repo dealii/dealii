@@ -1,4 +1,0 @@
-New: The Utilities::dealii_version_string() function returns a string
-representation of the deal.II version being used.
-<br>
-(Wolfgang Bangerth, 2018/03/09)

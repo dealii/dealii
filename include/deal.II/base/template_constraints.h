@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2017 by the deal.II authors
+// Copyright (C) 2003 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/complex_overloads.h>
 
 #include <complex>
@@ -30,22 +31,23 @@ namespace internal
   namespace TemplateConstraints
   {
     // helper struct for is_base_of_all and all_same_as
-    template <bool... Values> struct BoolStorage;
+    template <bool... Values>
+    struct BoolStorage;
 
 
     /**
      * A helper class whose `value` member is true or false depending on
-    // whether all of the given boolean template arguments are true.
+     * whether all of the given boolean template arguments are true.
      */
     template <bool... Values>
     struct all_true
     {
       static constexpr bool value =
         std::is_same<BoolStorage<Values..., true>,
-        BoolStorage<true, Values...>>::value;
+                     BoolStorage<true, Values...>>::value;
     };
-  }
-}
+  } // namespace TemplateConstraints
+} // namespace internal
 
 /**
  * This struct is a generalization of std::is_base_of<Base, Derived>
@@ -56,8 +58,8 @@ namespace internal
 template <class Base, class... Derived>
 struct is_base_of_all
 {
-  static constexpr bool value =
-    internal::TemplateConstraints::all_true<std::is_base_of<Base,Derived>::value...>::value;
+  static constexpr bool value = internal::TemplateConstraints::all_true<
+    std::is_base_of<Base, Derived>::value...>::value;
 };
 
 
@@ -71,8 +73,8 @@ struct is_base_of_all
 template <class Type, class... Types>
 struct all_same_as
 {
-  static constexpr bool value =
-    internal::TemplateConstraints::all_true<std::is_same<Type, Types>::value...>::value;
+  static constexpr bool value = internal::TemplateConstraints::all_true<
+    std::is_same<Type, Types>::value...>::value;
 };
 
 
@@ -83,17 +85,19 @@ struct all_same_as
  * true.
  */
 template <bool... Values>
-struct enable_if_all : std::enable_if<internal::TemplateConstraints::all_true<Values...>::value>
+struct enable_if_all
+  : std::enable_if<internal::TemplateConstraints::all_true<Values...>::value>
 {};
 
 
 
-template <bool, typename> struct constraint_and_return_value;
+template <bool, typename>
+struct constraint_and_return_value;
 
 
 /**
  * This specialization of the general template for the case of a <tt>true</tt>
- * first template argument declares a local typedef <tt>type</tt> to the
+ * first template argument declares a local alias <tt>type</tt> to the
  * second template argument. It is used in order to construct constraints on
  * template arguments in template (and member template) functions. The
  * negative specialization is missing.
@@ -105,7 +109,10 @@ template <bool, typename> struct constraint_and_return_value;
  * particular call. Example:
  * @code
  *   template <typename T>
- *   typename T::type  foo(T) {...};
+ *   typename T::type  foo(T)
+ *   {
+ *     ...
+ *   };
  *   ...
  *   foo(1);
  * @endcode
@@ -118,25 +125,40 @@ template <bool, typename> struct constraint_and_return_value;
  * The idea is then to make the return type un-instantiatable if certain
  * constraints on the template types are not satisfied:
  * @code
- *   template <bool, typename> struct constraint_and_return_value;
- *   template <typename T> struct constraint_and_return_value<true,T> {
- *     typedef T type;
+ *   template <bool, typename>
+ *   struct constraint_and_return_value;
+ *
+ *   template <typename T>
+ *   struct constraint_and_return_value<true,T>
+ *   {
+ *     using type = T;
  *   };
  * @endcode
  * constraint_and_return_value<false,T> is not defined. Given something like
  * @code
  *   template <typename>
- *   struct int_or_double         { static const bool value = false;};
+ *   struct int_or_double
+ *   {
+ *     static const bool value = false;
+ *   };
+ *
  *   template <>
- *   struct int_or_double<int>    { static const bool value = true; };
+ *   struct int_or_double<int>
+ *   {
+ *     static const bool value = true;
+ *   };
+ *
  *   template <>
- *   struct int_or_double<double> { static const bool value = true; };
+ *   struct int_or_double<double>
+ *   {
+ *     static const bool value = true;
+ *   };
  * @endcode
  * we can write a template
  * @code
  *   template <typename T>
  *   typename constraint_and_return_value<int_or_double<T>::value,void>::type
- *   f (T);
+ *     f (T);
  * @endcode
  * which can only be instantiated if T=int or T=double. A call to f('c') will
  * just fail with a compiler error: "no instance of f(char) found". On the
@@ -149,26 +171,28 @@ template <bool, typename> struct constraint_and_return_value;
  * @author Wolfgang Bangerth, 2003
  */
 template <typename T>
-struct DEAL_II_DEPRECATED constraint_and_return_value<true,T>
+struct DEAL_II_DEPRECATED constraint_and_return_value<true, T>
 {
-  typedef T type;
+  using type = T;
 };
 
 
 
 /**
  * A template class that simply exports its template argument as a local
- * typedef. This class, while at first appearing useless, makes sense in the
+ * alias. This class, while at first appearing useless, makes sense in the
  * following context: if you have a function template as follows:
  * @code
- *   template <typename T> void f(T, T);
+ * template <typename T>
+ * void f(T, T);
  * @endcode
  * then it can't be called in an expression like <code>f(1, 3.141)</code>
  * because the type <code>T</code> of the template can not be deduced in a
  * unique way from the types of the arguments. However, if the template is
  * written as
  * @code
- *   template <typename T> void f(T, typename identity<T>::type);
+ * template <typename T>
+ * void f(T, typename identity<T>::type);
  * @endcode
  * then the call becomes valid: the type <code>T</code> is not deducible from
  * the second argument to the function, so only the first argument
@@ -177,7 +201,10 @@ struct DEAL_II_DEPRECATED constraint_and_return_value<true,T>
  * The context for this feature is as follows: consider
  * @code
  * template <typename RT, typename A>
- * void forward_call(RT (*p) (A), A a)  { p(a); }
+ * void forward_call(RT (*p) (A), A a)
+ * {
+ *   p(a);
+ * }
  *
  * void h (double);
  *
@@ -195,7 +222,10 @@ struct DEAL_II_DEPRECATED constraint_and_return_value<true,T>
  * this by writing the code as follows:
  * @code
  * template <typename RT, typename A>
- * void forward_call(RT (*p) (A), typename identity<A>::type a)  { p(a); }
+ * void forward_call(RT (*p) (A), typename identity<A>::type a)
+ * {
+ *   p(a);
+ * }
  *
  * void h (double);
  *
@@ -210,7 +240,7 @@ struct DEAL_II_DEPRECATED constraint_and_return_value<true,T>
 template <typename T>
 struct identity
 {
-  typedef T type;
+  using type = T;
 };
 
 
@@ -240,9 +270,10 @@ struct PointerComparison
    * two pointers are equal.
    */
   template <typename T>
-  static bool equal (const T *p1, const T *p2)
+  static bool
+  equal(const T *p1, const T *p2)
   {
-    return (p1==p2);
+    return (p1 == p2);
   }
 
 
@@ -253,11 +284,11 @@ struct PointerComparison
    * can't be the same, so we always return @p false.
    */
   template <typename T, typename U>
-  static bool equal (const T *, const U *)
+  static bool
+  equal(const T *, const U *)
   {
     return false;
   }
-
 };
 
 
@@ -270,7 +301,8 @@ namespace internal
    *
    * @code
    *   template <int dim>
-   *   class X {
+   *   class X
+   *   {
    *     // do something on subdim-dimensional sub-objects of the big
    *     // dim-dimensional thing (for example on vertices/lines/quads of
    *     // cells):
@@ -279,9 +311,13 @@ namespace internal
    *
    *   template <int dim>
    *   template <>
-   *   void X<dim>::f<0> () { ...operate on the vertices of a cell... }
+   *   void X<dim>::f<0> ()
+   *   {
+   *     ...operate on the vertices of a cell...
+   *   }
    *
-   *   template <int dim, int subdim> void g(X<dim> &x) {
+   *   template <int dim, int subdim> void g(X<dim> &x)
+   *   {
    *     x.f<subdim> ();
    *   }
    * @endcode
@@ -291,10 +327,13 @@ namespace internal
    * the common tricks is therefore to use something like this:
    *
    * @code
-   *   template <int N> struct int2type {};
+   *   template <int N>
+   *   struct int2type
+   *   {};
    *
    *   template <int dim>
-   *   class X {
+   *   class X
+   *   {
    *     // do something on subdim-dimensional sub-objects of the big
    *     // dim-dimensional thing (for example on vertices/lines/quads of
    *     // cells):
@@ -305,12 +344,20 @@ namespace internal
    *   };
    *
    *   template <int dim>
-   *   void X<dim>::f (int2type<0>) { ...operate on the vertices of a cell... }
+   *   void X<dim>::f (int2type<0>)
+   *   {
+   *     ...operate on the vertices of a cell...
+   *   }
    *
    *   template <int dim>
-   *   void X<dim>::f (int2type<1>) { ...operate on the lines of a cell... }
+   *   void X<dim>::f (int2type<1>)
+   *   {
+   *     ...operate on the lines of a cell...
+   *   }
    *
-   *   template <int dim, int subdim> void g(X<dim> &x) {
+   *   template <int dim, int subdim>
+   *   void g(X<dim> &x)
+   *   {
    *     x.f (int2type<subdim>());
    *   }
    * @endcode
@@ -339,7 +386,7 @@ namespace internal
   template <bool B>
   struct DEAL_II_DEPRECATED bool2type
   {};
-}
+} // namespace internal
 
 
 
@@ -348,7 +395,8 @@ namespace internal
  * to write code like
  * @code
  *   template <typename T>
- *   void Vector<T>::some_operation () {
+ *   void Vector<T>::some_operation ()
+ *   {
  *     if (std::is_same<T,double>::value == true)
  *       call_some_blas_function_for_doubles;
  *     else
@@ -363,14 +411,13 @@ namespace internal
  * instead of this class.
  */
 template <typename T, typename U>
-struct DEAL_II_DEPRECATED types_are_equal : std::is_same<T,U>
+struct DEAL_II_DEPRECATED types_are_equal : std::is_same<T, U>
 {};
 
 
 
 namespace internal
 {
-
   /**
    * A struct that implements the default product type resulting from the
    * multiplication of two types.
@@ -386,15 +433,15 @@ namespace internal
   template <typename T, typename U>
   struct ProductTypeImpl
   {
-    typedef decltype(std::declval<T>() * std::declval<U>()) type;
+    using type = decltype(std::declval<T>() * std::declval<U>());
   };
 
-}
+} // namespace internal
 
 
 
 /**
- * A class with a local typedef that represents the type that results from the
+ * A class with a local alias that represents the type that results from the
  * product of two variables of type @p T and @p U. In other words, we would
  * like to infer the type of the <code>product</code> variable in code like
  * this:
@@ -403,7 +450,7 @@ namespace internal
  *   U u;
  *   auto product = t*u;
  * @endcode
- * The local typedef of this structure represents the type the variable
+ * The local alias of this structure represents the type the variable
  * <code>product</code> would have.
  *
  *
@@ -444,72 +491,75 @@ namespace internal
 template <typename T, typename U>
 struct ProductType
 {
-  typedef typename internal::ProductTypeImpl<
-  typename std::decay<T>::type, typename std::decay<U>::type>::type type;
+  using type =
+    typename internal::ProductTypeImpl<typename std::decay<T>::type,
+                                       typename std::decay<U>::type>::type;
 };
 
 namespace internal
 {
-
   // Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
   // other than T (not even in C++11, or C++14). We provide our own overloads
   // in base/complex_overloads.h, but in order for them to work, we have to
   // manually specify all products we want to allow:
 
   template <typename T>
-  struct ProductTypeImpl<std::complex<T>,std::complex<T> >
+  struct ProductTypeImpl<std::complex<T>, std::complex<T>>
   {
-    typedef std::complex<T> type;
+    using type = std::complex<T>;
   };
 
   template <typename T, typename U>
-  struct ProductTypeImpl<std::complex<T>,std::complex<U> >
+  struct ProductTypeImpl<std::complex<T>, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<T,U>::type> type;
+    using type = std::complex<typename ProductType<T, U>::type>;
   };
 
   template <typename U>
-  struct ProductTypeImpl<double,std::complex<U> >
+  struct ProductTypeImpl<double, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<double,U>::type> type;
+    using type = std::complex<typename ProductType<double, U>::type>;
   };
 
   template <typename T>
-  struct ProductTypeImpl<std::complex<T>,double>
+  struct ProductTypeImpl<std::complex<T>, double>
   {
-    typedef std::complex<typename ProductType<T,double>::type> type;
+    using type = std::complex<typename ProductType<T, double>::type>;
   };
 
   template <typename U>
-  struct ProductTypeImpl<float,std::complex<U> >
+  struct ProductTypeImpl<float, std::complex<U>>
   {
-    typedef std::complex<typename ProductType<float,U>::type> type;
+    using type = std::complex<typename ProductType<float, U>::type>;
   };
 
   template <typename T>
-  struct ProductTypeImpl<std::complex<T>,float>
+  struct ProductTypeImpl<std::complex<T>, float>
   {
-    typedef std::complex<typename ProductType<T,float>::type> type;
+    using type = std::complex<typename ProductType<T, float>::type>;
   };
 
-}
+} // namespace internal
 
 
 
 /**
- * This class provides a local typedef @p type that is equal to the template
+ * This class provides a local alias @p type that is equal to the template
  * argument but only if the template argument corresponds to a scalar type
  * (i.e., one of the floating point types, signed or unsigned integer, or a
  * complex number). If the template type @p T is not a scalar, then no class
  * <code>EnableIfScalar@<T@></code> is declared and, consequently, no local
- * typedef is available.
+ * alias is available.
  *
  * The purpose of the class is to disable certain template functions if one of
  * the arguments is not a scalar number. By way of (nonsensical) example,
  * consider the following function:
  * @code
  *   template <typename T>
- *   T multiply (const T t1, const T t2) { return t1*t2; }
+ *   T multiply (const T t1, const T t2)
+ *   {
+ *     return t1*t2;
+ *   }
  * @endcode
  * This function can be called with any two arguments of the same type @p T.
  * This includes arguments for which this clearly makes no sense.
@@ -518,7 +568,10 @@ namespace internal
  * @code
  *   template <typename T>
  *   typename EnableIfScalar<T>::type
- *   multiply (const T t1, const T t2) { return t1*t2; }
+ *   multiply (const T t1, const T t2)
+ *   {
+ *     return t1*t2;
+ *   }
  * @endcode
  * At a place where you call the function, the compiler will deduce the type
  * @p T from the arguments. For example, in
@@ -551,34 +604,40 @@ template <typename T>
 struct EnableIfScalar;
 
 
-template <> struct EnableIfScalar<double>
+template <>
+struct EnableIfScalar<double>
 {
-  typedef double type;
+  using type = double;
 };
 
-template <> struct EnableIfScalar<float>
+template <>
+struct EnableIfScalar<float>
 {
-  typedef float type;
+  using type = float;
 };
 
-template <> struct EnableIfScalar<long double>
+template <>
+struct EnableIfScalar<long double>
 {
-  typedef long double type;
+  using type = long double;
 };
 
-template <> struct EnableIfScalar<int>
+template <>
+struct EnableIfScalar<int>
 {
-  typedef int type;
+  using type = int;
 };
 
-template <> struct EnableIfScalar<unsigned int>
+template <>
+struct EnableIfScalar<unsigned int>
 {
-  typedef unsigned int type;
+  using type = unsigned int;
 };
 
-template <typename T> struct EnableIfScalar<std::complex<T> >
+template <typename T>
+struct EnableIfScalar<std::complex<T>>
 {
-  typedef std::complex<T> type;
+  using type = std::complex<T>;
 };
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2016 by the deal.II authors
+// Copyright (C) 2005 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -279,7 +279,7 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossBoundaryForm <b>%Boundary form</b></dt>
+ * <dt class="glossary">@anchor GlossBoundaryForm <b>Boundary form</b></dt>
  *
  * <dd>For a dim-dimensional triangulation in dim-dimensional space,
  * the boundary form is a vector defined on faces. It is the vector
@@ -307,7 +307,7 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossBoundaryIndicator <b>%Boundary indicator</b></dt>
+ * <dt class="glossary">@anchor GlossBoundaryIndicator <b>Boundary indicator</b></dt>
  *
  * <dd> In a Triangulation object, every part of the boundary may be
  * associated with a unique number (of type types::boundary_id) that
@@ -319,7 +319,9 @@
  * By default, all boundary indicators of a mesh are zero, unless you are
  * reading from a mesh file that specifically sets them to something different,
  * or unless you use one of the mesh generation functions in namespace GridGenerator
- * that have a 'colorize' option. A typical piece of code that sets the boundary
+ * that have a
+ * @ref GlossColorization "colorize"
+ * option. A typical piece of code that sets the boundary
  * indicator on part of the boundary to something else would look like
  * this, here setting the boundary indicator to 42 for all faces located at
  * $x=-1$:
@@ -345,7 +347,7 @@
  * particular boundary indicator. This method is still supported, and
  * it allows the Triangulation object to use a different method of
  * finding new points on faces and edges to be refined; the default is
- * to use a StraightBoundary object for all faces and edges. The
+ * to use a FlatManifold object for all faces and edges. The
  * results section of step-49 has a worked example that shows all of
  * this in action.
  *
@@ -375,7 +377,65 @@
  * parallel::distributed::Triangulation .
  * </dd>
  *
- * @see @ref boundary "The module on boundaries"
+ * @see @ref boundary "The module on boundaries".
+ *
+ *
+ * <dt class="glossary">@anchor GlossCoarseMesh <b>Coarse mesh</b></dt>
+ * <dd>
+ *   A "coarse mesh" in deal.II is a triangulation object that consists only
+ *   of cells that are not refined, i.e., a mesh in which no cell is a child
+ *   of another cell. This is generally how triangulations are first
+ *   constructed in deal.II, for example using (most of) the functions in
+ *   namespace GridGenerator, the functions in class GridIn, or directly
+ *   using the function Triangulation::create_triangulation(). One can of
+ *   course do computations on such meshes, but most of the time (see, for
+ *   example, almost any of the tutorial programs) one first refines the
+ *   coarse mesh globally (using Triangulation::refine_global()),
+ *   or adaptively (in that case first computing a refinement
+ *   criterion, then one of the functions in namespace GridRefinement,
+ *   and finally calling
+ *   Triangulation::execute_coarsening_and_refinement()). The mesh is
+ *   then no longer a "coarse mesh", but a "refined mesh".
+ *
+ *   In some contexts, we also use the phrase "the coarse mesh of a
+ *   triangulation", and by that mean that set of cells that the triangulation
+ *   started out with, i.e., from which all the currently
+ *   @ref GlossActive "active cells" of the triangulation have been obtained
+ *   by mesh refinement. (Some of the coarse mesh cells may of course also
+ *   be active if they have never been refined.)
+ *
+ *   Triangulation objects store cells in <i>levels</i>: in
+ *   particular, all cells of a coarse mesh are on level zero. Their
+ *   children (if we executed Triangulation::refine_global(1) on a
+ *   coarse mesh) would then be at level one, etc. The coarse mesh of a
+ *   triangulation (in the sense of the previous paragraph) then
+ *   consists of exactly the level-zero cells of a triangulation. (Whether
+ *   they are active (i.e., have no children) or have been refined is not
+ *   important for this definition.)
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossColorization <b>Colorization</b></dt>
+ * <dd><em>Colorization</em> is the process of marking certain parts of a
+ * Triangulation with different labels. The use of the word <em>color</em>
+ * comes from cartography, where countries on a map are made visually distinct
+ * from each other by assigning them different colors. Using the same term
+ * <em>coloring</em> is common in mathematics, even though we assign integers
+ * and not hues to different regions. deal.II refers to two processes as
+ * coloring:
+ *
+ * <ol>
+ *   <li> Most of the functions in the GridGenerator namespace take an optional
+ *   argument <code>colorize</code>. This argument controls whether or not the
+ *   different parts of the boundary will be assigned different
+ *   @ref GlossBoundaryIndicator "boundary indicators". Some functions also assign
+ *   different
+ *   @ref GlossMaterialId "material indicators" as well.</li>
+ *   <li> The function GraphColoring::make_graph_coloring() computes a
+ *   decomposition of a Triangulation (more exactly, a range of iterators). No
+ *   two adjacent cells are given the same color.</li>
+ * </ol>
+ * </dd>
  *
  *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
@@ -424,7 +484,7 @@
  * FEValues::shape_value_component() and FEValues::shape_grad_component()
  * functions do the same on a real cell. See also the documentation of the
  * FiniteElement and FEValues classes.
-  *
+ *
  * <i>Selecting components:</i>
  * Many functions allow you to restrict their operation to certain
  * vector components or blocks. For example, this is the case for
@@ -547,7 +607,8 @@
  * the operation that these <code>compress()</code> functions invoke applies
  * to adding elements or setting them.  In some cases, not all processors may
  * be adding elements, for example if a processor does not own any cells when
- * using a very coarse (initial) mesh.  For this reason, compress() takes an
+ * using a very @ref GlossCoarseMesh "coarse (initial) mesh".
+ * For this reason, compress() takes an
  * argument of type VectorOperation, which can be either ::%add, or ::%insert.
  * This argument is required for vectors and matrices starting with the 7.3
  * release.
@@ -558,7 +619,7 @@
  *
  * 1. At the end of your assembly loop on matrices and vectors. This needs to
  * be done if you write entries directly or if you use
- * ConstraintMatrix::distribute_local_to_global. Use VectorOperation::add.
+ * AffineConstraints::distribute_local_to_global. Use VectorOperation::add.
  *
  * 2. When you are done setting individual elements in a matrix/vector before
  * any other operations are done (adding to elements, other operations like
@@ -568,8 +629,8 @@
  * VectorOperation::add.
  *
  * All other operations like scaling or adding vectors, assignments, calls
- * into deal.II (VectorTools, ConstraintMatrix, ...) or solvers do not require
- * calls to compress().
+ * into deal.II (VectorTools, AffineConstraints, ...) or solvers do not
+ * require calls to compress().
  * </dd>
  *
  * @note Compressing is an operation that only applies to vectors whose
@@ -585,6 +646,47 @@
  * constraints are called <em>concepts</em> in C++. See the discussion in
  * @ref Concepts for more information and a list of concepts in deal.II.
  * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossDimension <b>Dimensions @p dim and @p spacedim</b></dt>
+ *
+ * <dd>
+ * Many classes and functions in deal.II have two template parameters,
+ * @p dim and @p spacedim. An example is the basic Triangulation class:
+ * @code
+ *   template <int dim, int spacedim=dim>
+ *   class Triangulation {...};
+ * @endcode
+ * In all of these contexts where you see @p dim and @p spacedim referenced,
+ * these arguments have the following meaning:
+ * - @p dim denotes the dimensionality of the mesh. For example, a mesh that
+ *   consists of line segments is one-dimensional and consequently corresponds
+ *   to `dim==1`. A mesh consisting of quadrilaterals then has `dim==2` and a
+ *   mesh of hexahedra has `dim==3`.
+ * - @p spacedim denotes the dimensionality of the space in which such a mesh
+ *   lives. Generally, one-dimensional meshes live in a one-dimensional space,
+ *   and similarly for two-dimensional and three-dimensional meshes that
+ *   subdivide two- and three-dimensional domains. Consequently, the
+ *   @p spacedim template argument has a default equal to @p dim. But this need
+ *   not be the case: For example, we may want to solve an equation for
+ *   sediment transport on the surface of the Earth. In this case, the domain
+ *   is the two-dimensional surface of the Earth (`dim==2`) that lives in a
+ *   three-dimensional coordinate system (`spacedim==3`).
+ * More generally, deal.II can be used to solve partial differential
+ * equations on <a href="https://en.wikipedia.org/wiki/Manifold">manifolds</a>
+ * that are embedded in higher dimensional space. In other words,
+ * these two template arguments need to satisfy `dim <= spacedim`,
+ * though in many applications one simply has `dim == spacedim`.
+ *
+ * Following the convention in geometry, we say that the "codimension" is
+ * defined as `spacedim-dim`. In other words, a triangulation consisting of
+ * quadrilaterals whose coordinates are three-dimensional (for which we
+ * would then use a `Triangulation<2,3>` object) has "codimension one".
+ *
+ * Examples of uses where these two arguments are not the same are shown in
+ * step-34, step-38, step-54.
+ * </dd>
+ *
  *
  * <dt class="glossary">@anchor GlossDoF <b>Degree of freedom</b></dt>
  *
@@ -692,15 +794,15 @@
  * @image html distorted_3d.png "A well-formed, a pinched, and a twisted cell in 3d."
  *
  * Distorted cells can appear in two different ways: The original
- * coarse mesh can already contain such cells, or they can be created
- * as the result of mesh refinement if the boundary description in use
- * is sufficiently irregular.
+ * @ref GlossCoarseMesh "coarse mesh" can already contain such cells,
+ * or they can be created as the result of moving or distorting a mesh by a
+ * relatively large amount.
  *
  * If the appropriate flag is given upon creation of a triangulation,
  * the function Triangulation::create_triangulation, which is called
  * by the various functions in GridGenerator and GridIn (but can also
- * be called from user code, see step-14, will signal
- * the creation of coarse meshes with distorted cells by throwing an
+ * be called from user code, see step-14 and the example at the end of step-49),
+ * will signal the creation of coarse meshes with distorted cells by throwing an
  * exception of type Triangulation::DistortedCellList. There are
  * legitimate cases for creating meshes with distorted cells (in
  * particular collapsed/pinched cells) if you don't intend to assemble
@@ -718,60 +820,9 @@
  * that you can ignore this condition, you can react by doing nothing
  * with the caught exception.
  *
- * The second case in which distorted cells can appear is through mesh
- * refinement when we have curved boundaries. Consider, for example, the
- * following case where the dashed line shows the exact boundary that the
- * lower edge of the cell is supposed to approximate (let's assume for
- * simplicity that the left, top and right edges are interior edges and
- * therefore will be considered as straight; in fact, for this particular case
- * in 2d where only one side of a cell is at the boundary we have special code
- * that avoids the situation depicted, but you will get the general idea of
- * the problem that holds in 3d or if more than one side of the cell is at the
- * boundary):
- *
- * @image html distorted_2d_refinement_01.png "One cell with an edge approximating a curved boundary"
- *
- * Now, if this cell is refined, we first split all edges and place
- * new mid-points on them. For the left, top and right edge, this is
- * trivial: because they are considered straight, we just take the
- * point in the middle between the two vertices. For the lower edge,
- * the Triangulation class asks the Boundary object associated with
- * this boundary (and in particular the Boundary::new_point_on_line
- * function) where the new point should lie. The four old vertices and
- * the four new points are shown here:
- *
- * @image html distorted_2d_refinement_02.png "Cell after edge refinement"
- *
- * The last step is to compute the location of the new point in the interior
- * of the cell. By default, it is chosen as the average location (arithmetic
- * mean of the coordinates) of these 8 points (in 3d, the 26 surrounding
- * points have different weights, but the idea is the same):
- *
- * @image html distorted_2d_refinement_03.png "Cell after edge refinement"
- *
- * The problem with that is, of course, that the bottom two child cells are
- * twisted, whereas the top two children are well-shaped. While such
- * meshes can happen with sufficiently irregular boundary descriptions
- * (and if the coarse mesh is entirely inadequate to resolve the
- * complexity of the boundary), the Triangulation class does not know
- * what to do in such situations unless one attaches an appropriate manifold
- * object to the cells in question (see the
- * @ref manifold "documentation module on manifolds"). Consequently, absent
- * such a manifold description or if the manifold description does not
- * provide a sufficient description of the geometry, the
- * Triangulation::execute_coarsening_and_refinement function does
- * create such meshes, but it keeps a list of cells whose children are
- * distorted. If this list is non-empty at the end of a refinement
- * step, it will throw an exception of type
- * Triangulation::DistortedCellList that contains those cells that
- * have distorted children. The caller of
- * Triangulation::execute_coarsening_and_refinement can then decide
- * what to do with this situation.
- *
- * One way to deal with this problem is to use the
- * GridTools::fix_up_distorted_child_cells function that attempts to
- * fix up exactly these cells if possible by moving around the node at
- * the center of the cell.
+ * The function GridTools::fix_up_distorted_child_cells can, in some cases,
+ * fix distorted cells on refined meshes by moving around the vertices of a
+ * distorted child cell that has an undistorted parent.
  *
  * Note that the Triangulation class does not test for the presence of
  * distorted cells by default, since the determination whether a cell
@@ -920,10 +971,10 @@
  * If a mesh is distributed across multiple MPI processes using the
  * parallel::distributed::Triangulation class, each processor stores
  * only the cells it owns, one layer of adjacent cells that are owned
- * by other processors, all coarse level cells, and all cells that are
- * necessary to maintain the invariant that adjacent cells must differ
- * by at most one refinement level. The cells stored on each process
- * that are not owned by this process but that are adjacent to the
+ * by other processors, all @ref GlossCoarseMesh "coarse level cells",
+ * and all cells that are necessary to maintain the invariant that adjacent
+ * cells must differ by at most one refinement level. The cells stored on
+ * each process that are not owned by this process but that are adjacent to the
  * ones owned by this process are called "ghost cells", and for these
  * cells the predicate <code>cell-@>is_ghost()</code> returns
  * true. Ghost cells are guaranteed to exist in the globally
@@ -1123,7 +1174,7 @@
  * is responsible to generate new points when the mesh is refined.
  *
  * By default, all manifold indicators of a mesh are set to
- * numbers::invalid_manifold_id. A typical piece of code that sets the
+ * numbers::flat_manifold_id. A typical piece of code that sets the
  * manifold indicator on a object to something else would look like
  * this, here setting the manifold indicator to 42 for all cells whose
  * center has an $x$ component less than zero:
@@ -1607,7 +1658,8 @@
  * subdomain ids are only assigned to cells that the current processor
  * owns as well as the immediately adjacent @ref GlossGhostCell "ghost cells".
  * Cells further away are held on each processor to ensure
- * that every MPI process has access to the full coarse grid as well
+ * that every MPI process has access to the full
+ * @ref GlossCoarseMesh "coarse grid" as well
  * as to ensure the invariant that neighboring cells differ by at most
  * one refinement level. These cells are called "artificial" (see
  * @ref GlossArtificialCell "here") and have the special subdomain id value
@@ -1798,8 +1850,9 @@
  *
  *  By default, if you write a loop over all cells in deal.II, the cells
  *  will be traversed in an order where coarser cells (i.e., cells that were
- *  obtained from coarse mesh cells with fewer refinement steps) come before
- *  cells that are finer (i.e., cells that were obtained with more refinement
+ *  obtained from
+ *  @ref GlossCoarseMesh "coarse mesh" cells with fewer refinement steps) come
+ *  before cells that are finer (i.e., cells that were obtained with more refinement
  *  steps). Within each refinement level, cells are traversed in an order
  *  that has something to do with the order in which they were created;
  *  in essence, however, this order is best of thought of as "unspecified":
@@ -1829,7 +1882,7 @@
  *  To explain the concept of the Z order, consider the following sequence
  *  of meshes (with each cell numbered using the "level.index" notation,
  *  where "level" is the number of refinements necessary to get from a
- *  coarse mesh cell to a particular cell, and "index" the index of this
+ *  @ref GlossCoarseMesh "coarse mesh" cell to a particular cell, and "index" the index of this
  *  cell within a particular refinement level):
  *
  *  @image html simple-mesh-0.png "A coarse mesh"

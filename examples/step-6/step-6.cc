@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2017 by the deal.II authors
+ * Copyright (C) 2000 - 2018 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -8,8 +8,8 @@
  * it, and/or modify it under the terms of the GNU Lesser General
  * Public License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE at
- * the top level of the deal.II distribution.
+ * The full text of the license can be found in the file LICENSE.md at
+ * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
 
@@ -23,29 +23,27 @@
 // The first few files have already been covered in previous examples and will
 // thus not be further commented on.
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/grid/tria.h>
+#include <deal.II/base/function_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/manifold_lib.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
-#include <iostream>
 
 // From the following include file we will import the declaration of
 // H1-conforming finite element shape functions. This family of finite
@@ -68,7 +66,7 @@
 // the global solution is continuous. We are also going to store the boundary
 // conditions in this object. The following file contains a class which is
 // used to handle these constraints:
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 
 // In order to refine our grids locally, we need a function from the library
 // that decides which cells to flag for refinement or coarsening based on the
@@ -97,34 +95,37 @@ template <int dim>
 class Step6
 {
 public:
-  Step6 ();
-  ~Step6 ();
+  Step6();
+  ~Step6();
 
-  void run ();
+  void run();
 
 private:
-  void setup_system ();
-  void assemble_system ();
-  void solve ();
-  void refine_grid ();
-  void output_results (const unsigned int cycle) const;
+  void setup_system();
+  void assemble_system();
+  void solve();
+  void refine_grid();
+  void output_results(const unsigned int cycle) const;
 
-  Triangulation<dim>           triangulation;
-  const SphericalManifold<dim> boundary;
+  Triangulation<dim> triangulation;
 
-  FE_Q<dim>            fe;
-  DoFHandler<dim>      dof_handler;
+  FE_Q<dim>       fe;
+  DoFHandler<dim> dof_handler;
+
 
   // This is the new variable in the main class. We need an object which holds
   // a list of constraints to hold the hanging nodes and the boundary
   // conditions.
-  ConstraintMatrix     constraints;
+  AffineConstraints<double> constraints;
 
-  SparsityPattern      sparsity_pattern;
+  // The sparsity pattern and sparse matrix are deliberately declared in the
+  // opposite of the order used in step-2 through step-5 to demonstrate the
+  // primary use of the Subscriptor and SmartPointer classes.
   SparseMatrix<double> system_matrix;
+  SparsityPattern      sparsity_pattern;
 
-  Vector<double>       solution;
-  Vector<double>       system_rhs;
+  Vector<double> solution;
+  Vector<double> system_rhs;
 };
 
 
@@ -133,9 +134,9 @@ private:
 // The implementation of nonconstant coefficients is copied verbatim from
 // step-5:
 template <int dim>
-double coefficient (const Point<dim> &p)
+double coefficient(const Point<dim> &p)
 {
-  if (p.square() < 0.5*0.5)
+  if (p.square() < 0.5 * 0.5)
     return 20;
   else
     return 1;
@@ -152,150 +153,133 @@ double coefficient (const Point<dim> &p)
 // constructor argument (which was <code>1</code> in all previous examples) by
 // the desired polynomial degree (here <code>2</code>):
 template <int dim>
-Step6<dim>::Step6 ()
-  :
-  fe (2),
-  dof_handler (triangulation)
+Step6<dim>::Step6()
+  : fe(2)
+  , dof_handler(triangulation)
 {}
 
 
 // @sect4{Step6::~Step6}
 
-// Here comes the added destructor of the class. The reason why we want to add
-// it is to pick up an issue we already started to discuss in step-1:
-// the <code>boundary</code> object was defined before and not after the
-// <code>triangulation</code> object. Of course we could have left this order
-// unchanged, but we would like to show what happens if the order is reversed
-// since this produces a rather nasty side-effect and results in an error which
-// is difficult to track down if one does not know what happens.
+// Here comes the added destructor of the class. Some objects in deal.II store
+// pointers to other objects: in particular a SparseMatrix stores a SmartPointer
+// pointing to the SparsityPattern with which it was initialized. This example
+// deliberately declares the SparseMatrix before the SparsityPattern to make
+// this dependency clearer. Of course we could have left this order unchanged,
+// but we would like to show what happens if the order is reversed since this
+// produces a rather nasty side-effect and results in an error which is
+// difficult to track down if one does not know what happens.
 //
-// Basically what happens is the following: when we set a manifold description
-// to the triangulation using the function call
-// <code>triangulation.set_manifold (0, boundary)</code>, the
-// <code>Triangulation</code> object also stores a pointer to the
-// <code>Manifold</code> object in use. Since this pointer is used until either
-// another <code>Manifold</code> object is set as boundary description or until
-// the <code>Triangulation</code> object is destroyed, it would be unwise if we
-// would allow the <code>boundary</code> to be deleted before the
-// <code>triangulation</code>. To disallow this, the <code>triangulation</code>
-// increases a counter inside the <code>boundary</code> which counts how many
-// objects use it (this is what the
+// What happens is the following: when we initialize a SparseMatrix,
+// the matrix stores a pointer to the provided SparsityPattern instead of
+// copying it.  Since this pointer is used until either another
+// SparsityPattern is attached or the SparseMatrix is destructed, it would be
+// unwise to allow the SparsityPattern to be destructed before the
+// SparseMatrix. To disallow this, the SparseMatrix increases a counter inside
+// the SparsityPattern which counts how many objects use it (this is what the
 // <code>Subscriptor</code>/<code>SmartPointer</code> class pair is used for,
 // in case you want something like this for your own programs; see step-7 for
-// a more complete discussion of this topic). The <code>boundary</code> will
-// refuse its destruction if that counter is larger than zero, since then some
-// other objects might rely on its persistence. An exception will then be
-// thrown and the program will usually abort upon the attempt to destroy
-// <code>boundary</code>.
+// a more complete discussion of this topic). If we try to destroy the object
+// while the counter is larger than zero then the program will either abort
+// (the default) or print an error message and continue: see the documentation
+// of AssertNothrow for more details. In either case the program contains a
+// bug and this facility will, hopefully, point out where.
 //
-// To be fair, such exceptions about still used objects are not particularly
+// To be fair, such errors due to object dependencies are not particularly
 // popular among programmers using deal.II, since they only tell us that
-// something is wrong, namely that <i>some</i> other object is still using the object
-// that is presently being destroyed, but most of the time not <i>which</i> object is
-// still using it. It is therefore often rather time-consuming to find out where the
-// problem exactly is, although it is then usually straightforward to remedy
-// the situation. However, we believe that the effort to find invalid
-// references to objects that do no longer exist is less if the problem is
-// detected once the reference becomes invalid, rather than when non-existent
-// objects are actually accessed again, since then usually only invalid data
-// is accessed, but no error is immediately raised.
+// something is wrong, namely that <i>some</i> other object is still using the
+// object that is presently being destroyed, but most of the time not
+// <em>which</em> object is still using it. It is therefore often rather
+// time-consuming to find out where the problem exactly is, although it is
+// then usually straightforward to remedy the situation. However, we believe
+// that the effort to find invalid pointers to objects that no longer exist is
+// less if the problem is detected once the pointer becomes invalid, rather
+// than when non-existent objects are actually accessed again, since then
+// usually only invalid data is accessed, but no error is immediately raised.
 //
 // Coming back to the present situation, if we did not write this destructor,
-// the compiler will generate code that triggers exactly the behavior sketched
-// above. The reason is that member variables of the <code>Step6</code> class
-// are destroyed bottom-up (i.e., in reverse order of their declaration in the
-// class), as always in C++. Thus, the boundary object will be
-// destroyed before the triangulation object, since its declaration is below
-// the one of the triangulation. This triggers the situation above, and an
-// exception will be raised when the boundary object is
-// destroyed. What needs to be done is to tell the <code>triangulation</code>
-// object to release its lock to <code>boundary</code>. Of course, the
-// <code>triangulation</code> will only release its lock if it really does not
-// need the <code>boundary</code> any more. For this purpose, the
-// <code>Triangulation</code> class has a function <code>clear</code> which
-// resets the object into a virgin state by deleting all data and releases its
-// lock to the finite element. After this, you can safely destruct the
-// <code>boundary</code> object since its internal counter is then zero.
+// then the compiler would generate code that triggers exactly the behavior
+// described above. The reason is that member variables of the
+// <code>Step6</code> class are destroyed bottom-up (i.e., in reverse order of
+// their declaration in the class), as always in C++. Thus, the
+// SparsityPattern will be destroyed before the SparseMatrix, since its
+// declaration is below the declaration of the sparsity pattern. This triggers
+// the situation above, and without manual intervention the program will abort
+// when the SparsityPattern is destroyed. What needs to be done is to
+// tell the SparseMatrix to release its pointer to the SparsityPattern. Of
+// course, the SparseMatrix will only release its pointer if it really does
+// not need the SparsityPattern any more. For this purpose, the SparseMatrix
+// class has a function SparseMatrix::clear() which resets the object to its
+// default-constructed state by deleting all data and resetting its pointer to
+// the SparsityPattern to 0. After this, you can safely destruct the
+// SparsityPattern since its internal counter will be zero.
 //
-// For completeness, we add the output of the exception that would have been
-// triggered without this destructor, to the end of the results section of
-// this example.
+// We show the output of the other case (where we do not call
+// SparseMatrix::clear()) in the results section below.
 template <int dim>
-Step6<dim>::~Step6 ()
+Step6<dim>::~Step6()
 {
-  triangulation.clear ();
+  system_matrix.clear();
 }
 
 
 // @sect4{Step6::setup_system}
 
-// The next function is setting up all the variables that describe the linear
-// finite element problem, such as the DoF handler, the matrices, and
+// The next function sets up all the variables that describe the linear
+// finite element problem, such as the DoFHandler, matrices, and
 // vectors. The difference to what we did in step-5 is only that we now also
 // have to take care of hanging node constraints. These constraints are
-// handled almost transparently by the library, i.e. you only need to know
+// handled almost exclusively by the library, i.e. you only need to know
 // that they exist and how to get them, but you do not have to know how they
 // are formed or what exactly is done with them.
 //
 // At the beginning of the function, you find all the things that are the same
 // as in step-5: setting up the degrees of freedom (this time we have
 // quadratic elements, but there is no difference from a user code perspective
-// to the linear -- or cubic, for that matter -- case), generating the
-// sparsity pattern, and initializing the solution and right hand side
+// to the linear -- or any other degree, for that matter -- case), generating
+// the sparsity pattern, and initializing the solution and right hand side
 // vectors. Note that the sparsity pattern will have significantly more
-// entries per row now, since there are now 9 degrees of freedom per cell, not
-// only four, that can couple with each other.
+// entries per row now, since there are now 9 degrees of freedom per cell
+// (rather than only four), that can couple with each other.
 template <int dim>
-void Step6<dim>::setup_system ()
+void Step6<dim>::setup_system()
 {
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
+  solution.reinit(dof_handler.n_dofs());
+  system_rhs.reinit(dof_handler.n_dofs());
+
+  // We may now populate the AffineConstraints object with the hanging node
+  // constraints. Since we will call this function in a loop we first clear
+  // the current set of constraints from the last system and then compute new
+  // ones:
+  constraints.clear();
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
 
-  // After setting up all the degrees of freedoms, here are now the
-  // differences compared to step-5, all of which are related to constraints
-  // associated with the hanging nodes. In the class declaration, we have
-  // already allocated space for an object <code>constraints</code> that will
-  // hold a list of these constraints (they form a matrix, which is reflected
-  // in the name of the class, but that is immaterial for the moment). Now we
-  // have to fill this object. This is done using the following function calls
-  // (the first clears the contents of the object that may still be left over
-  // from computations on the previous mesh before the last adaptive
-  // refinement):
-  constraints.clear ();
-  DoFTools::make_hanging_node_constraints (dof_handler,
+  // Now we are ready to interpolate the boundary values with indicator 0 (the
+  // whole boundary) and store the resulting constraints in our
+  // <code>constraints</code> object. Note that we do not to apply the
+  // boundary conditions after assembly, like we did in earlier steps: instead
+  // we put all constraints on our function space in the AffineConstraints
+  // object. We can add constraints to the AffineConstraints object in either
+  // order: if two constraints conflict then the constraint matrix either abort
+  // or throw an exception via the Assert macro.
+  VectorTools::interpolate_boundary_values(dof_handler,
+                                           0,
+                                           Functions::ZeroFunction<dim>(),
                                            constraints);
 
-
-  // Now we are ready to interpolate the Functions::ZeroFunction to our boundary with
-  // indicator 0 (the whole boundary) and store the resulting constraints in
-  // our <code>constraints</code> object. Note that we do not to apply the
-  // boundary conditions after assembly, like we did in earlier steps.  As
-  // almost all the stuff, the interpolation of boundary values works also for
-  // higher order elements without the need to change your code for that. We
-  // note that for proper results, it is important that the elimination of
-  // boundary nodes from the system of equations happens *after* the
-  // elimination of hanging nodes. For that reason we are filling the boundary
-  // values into the ContraintMatrix after the hanging node constraints.
-  VectorTools::interpolate_boundary_values (dof_handler,
-                                            0,
-                                            Functions::ZeroFunction<dim>(),
-                                            constraints);
-
-
-  // The next step is <code>closing</code> this object. After all constraints
-  // have been added, they need to be sorted and rearranged to perform some
-  // actions more efficiently. This postprocessing is done using the
-  // <code>close()</code> function, after which no further constraints may be
-  // added any more:
-  constraints.close ();
+  // After all constraints have been added, they need to be sorted and
+  // rearranged to perform some actions more efficiently. This postprocessing
+  // is done using the <code>close()</code> function, after which no further
+  // constraints may be added any more:
+  constraints.close();
 
   // Now we first build our compressed sparsity pattern like we did in the
   // previous examples. Nevertheless, we do not copy it to the final sparsity
   // pattern immediately.  Note that we call a variant of
-  // make_sparsity_pattern that takes the ConstraintMatrix as the third
+  // make_sparsity_pattern that takes the AffineConstraints object as the third
   // argument. We are letting the routine know that we will never write into
   // the locations given by <code>constraints</code> by setting the argument
   // <code>keep_constrained_dofs</code> to false (in other words, that we will
@@ -312,13 +296,12 @@ void Step6<dim>::setup_system ()
 
   // Now all non-zero entries of the matrix are known (i.e. those from
   // regularly assembling the matrix and those that were introduced by
-  // eliminating constraints). We can thus copy our intermediate object to the
+  // eliminating constraints). We may copy our intermediate object to the
   // sparsity pattern:
   sparsity_pattern.copy_from(dsp);
 
-  // Finally, the so-constructed sparsity pattern serves as the basis on top
-  // of which we will create the sparse matrix:
-  system_matrix.reinit (sparsity_pattern);
+  // We may now, finally, initialize the sparse matrix:
+  system_matrix.reinit(sparsity_pattern);
 }
 
 
@@ -336,8 +319,9 @@ void Step6<dim>::setup_system ()
 //
 // Second, to copy the local matrix and vector on each cell into the global
 // system, we are no longer using a hand-written loop. Instead, we use
-// <code>ConstraintMatrix::distribute_local_to_global</code> that internally
-// executes this loop and eliminates all the constraints at the same time.
+// AffineConstraints::distribute_local_to_global() that internally executes
+// this loop while performing Gaussian elimination on rows and columns
+// corresponding to constrained degrees on freedom.
 //
 // The rest of the code that forms the local contributions remains
 // unchanged. It is worth noting, however, that under the hood several things
@@ -348,67 +332,64 @@ void Step6<dim>::setup_system ()
 // code. Secondly, the <code>fe_values</code> object of course needs to do
 // other things as well, since the shape functions are now quadratic, rather
 // than linear, in each coordinate variable. Again, however, this is something
-// that is completely transparent to user code and nothing that you have to
-// worry about.
+// that is completely handled by the library.
 template <int dim>
-void Step6<dim>::assemble_system ()
+void Step6<dim>::assemble_system()
 {
-  const QGauss<dim>  quadrature_formula(3);
+  const QGauss<dim> quadrature_formula(3);
 
-  FEValues<dim> fe_values (fe, quadrature_formula,
-                           update_values    |  update_gradients |
-                           update_quadrature_points  |  update_JxW_values);
+  FEValues<dim> fe_values(fe,
+                          quadrature_formula,
+                          update_values | update_gradients |
+                            update_quadrature_points | update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.size();
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
+  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  Vector<double>     cell_rhs(dofs_per_cell);
 
-  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  typename DoFHandler<dim>::active_cell_iterator cell =
+                                                   dof_handler.begin_active(),
+                                                 endc = dof_handler.end();
+  for (; cell != endc; ++cell)
     {
       cell_matrix = 0;
-      cell_rhs = 0;
+      cell_rhs    = 0;
 
-      fe_values.reinit (cell);
+      fe_values.reinit(cell);
 
-      for (unsigned int q_index=0; q_index<n_q_points; ++q_index)
+      for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
         {
-          const double current_coefficient = coefficient<dim>
-                                             (fe_values.quadrature_point (q_index));
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+          const double current_coefficient =
+            coefficient<dim>(fe_values.quadrature_point(q_index));
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              for (unsigned int j=0; j<dofs_per_cell; ++j)
-                cell_matrix(i,j) += (current_coefficient *
-                                     fe_values.shape_grad(i,q_index) *
-                                     fe_values.shape_grad(j,q_index) *
-                                     fe_values.JxW(q_index));
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                cell_matrix(i, j) +=
+                  (current_coefficient * fe_values.shape_grad(i, q_index) *
+                   fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
 
-              cell_rhs(i) += (fe_values.shape_value(i,q_index) *
-                              1.0 *
+              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
                               fe_values.JxW(q_index));
             }
         }
 
       // Finally, transfer the contributions from @p cell_matrix and
       // @p cell_rhs into the global objects.
-      cell->get_dof_indices (local_dof_indices);
-      constraints.distribute_local_to_global (cell_matrix,
-                                              cell_rhs,
-                                              local_dof_indices,
-                                              system_matrix,
-                                              system_rhs);
+      cell->get_dof_indices(local_dof_indices);
+      constraints.distribute_local_to_global(
+        cell_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
     }
   // Now we are done assembling the linear system. The constraint matrix took
   // care of applying the boundary conditions and also eliminated hanging node
   // constraints. The constrained nodes are still in the linear system (there
-  // is a one on the diagonal of the matrix and all other entries for this
-  // line are set to zero) but the computed values are invalid. We compute the
+  // is a nonzero entry, chosen in a way that the matrix is well conditioned,
+  // on the diagonal of the matrix and all other entries for this line are set
+  // to zero) but the computed values are invalid (i.e., the correspond entry
+  // in <code>system_rhs</code> is currently meaningless). We compute the
   // correct values for these nodes at the end of the <code>solve</code>
   // function.
 }
@@ -419,9 +400,9 @@ void Step6<dim>::assemble_system ()
 // We continue with gradual improvements. The function that solves the linear
 // system again uses the SSOR preconditioner, and is again unchanged except
 // that we have to incorporate hanging node constraints. As mentioned above,
-// the degrees of freedom from the ConstraintMatrix corresponding to hanging
-// node constraints and boundary values have been removed from the linear
-// system by giving the rows and columns of the matrix a special
+// the degrees of freedom from the AffineConstraints object corresponding to
+// hanging node constraints and boundary values have been removed from the
+// linear system by giving the rows and columns of the matrix a special
 // treatment. This way, the values for these degrees of freedom have wrong,
 // but well-defined values after solving the linear system. What we then have
 // to do is to use the constraints to assign to them the values that they
@@ -431,25 +412,24 @@ void Step6<dim>::assemble_system ()
 // that you find at the end of this function:
 
 template <int dim>
-void Step6<dim>::solve ()
+void Step6<dim>::solve()
 {
-  SolverControl      solver_control (1000, 1e-12);
-  SolverCG<>         solver (solver_control);
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<>    solver(solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
-  solver.solve (system_matrix, solution, system_rhs,
-                preconditioner);
+  solver.solve(system_matrix, solution, system_rhs, preconditioner);
 
-  constraints.distribute (solution);
+  constraints.distribute(solution);
 }
 
 
 // @sect4{Step6::refine_grid}
 
-// Instead of global refinement, we now use a slightly more elaborate
-// scheme. We will use the <code>KellyErrorEstimator</code> class which
+// We use a sophisticated error estimation scheme to refine the mesh instead
+// of global refinement. We will use the KellyErrorEstimator class which
 // implements an error estimator for the Laplace equation; it can in principle
 // handle variable coefficients, but we will not use these advanced features,
 // but rather use its most simple form since we are not interested in
@@ -459,8 +439,8 @@ void Step6<dim>::solve ()
 // Although the error estimator derived by Kelly et al. was originally
 // developed for the Laplace equation, we have found that it is also well
 // suited to quickly generate locally refined grids for a wide class of
-// problems. Basically, it looks at the jumps of the gradients of the solution
-// over the faces of cells (which is a measure for the second derivatives) and
+// problems. This error estimator uses the solution gradient's jump at
+// cell faces (which is a measure for the second derivatives) and
 // scales it by the size of the cell. It is therefore a measure for the local
 // smoothness of the solution at the place of each cell and it is thus
 // understandable that it yields reasonable grids also for hyperbolic
@@ -472,12 +452,11 @@ void Step6<dim>::solve ()
 // The way the estimator works is to take a <code>DoFHandler</code> object
 // describing the degrees of freedom and a vector of values for each degree of
 // freedom as input and compute a single indicator value for each active cell
-// of the triangulation (i.e. one value for each of the
-// <code>triangulation.n_active_cells()</code> cells). To do so, it needs two
-// additional pieces of information: a quadrature formula on the faces
-// (i.e. quadrature formula on <code>dim-1</code> dimensional objects. We use
-// a 3-point Gauss rule again, a pick that is consistent and appropriate with
-// the choice bi-quadratic finite element shape functions in this program.
+// of the triangulation (i.e. one value for each of the active cells). To do
+// so, it needs two additional pieces of information: a face quadrature formula,
+// i.e., a quadrature formula on <code>dim-1</code> dimensional objects. We use
+// a 3-point Gauss rule again, a choice that is consistent and appropriate with
+// the bi-quadratic finite element shape functions in this program.
 // (What constitutes a suitable quadrature rule here of course depends on
 // knowledge of the way the error estimator evaluates the solution field. As
 // said above, the jump of the gradient is integrated over each face, which
@@ -489,31 +468,31 @@ void Step6<dim>::solve ()
 //
 // Secondly, the function wants a list of boundary indicators for those
 // boundaries where we have imposed Neumann values of the kind
-// $\partial_n u(\mathbf x) = h(\mathbf x)$, along with a function $h(\mathbf x)$
-// for each such boundary. This information is
-// represented by an object of type <code>FunctionMap::type</code> that is
-// a typedef to a map from boundary indicators to function objects describing
-// the Neumann boundary values. In the present example program, we do not use
-// Neumann boundary values, so this map is empty, and in fact constructed
-// using the default constructor of the map in the place where the function
-// call expects the respective function argument.
+// $\partial_n u(\mathbf x) = h(\mathbf x)$, along with a function $h(\mathbf
+// x)$ for each such boundary. This information is represented by a map from
+// boundary indicators to function objects describing the Neumann boundary
+// values. In the present example program, we do not use Neumann boundary
+// values, so this map is empty, and in fact constructed using the default
+// constructor of the map in the place where the function call expects the
+// respective function argument.
 //
-// The output, as mentioned is a vector of values for all cells. While it may
+// The output is a vector of values for all active cells. While it may
 // make sense to compute the <b>value</b> of a solution degree of freedom
-// very accurately, it is usually not necessary to compute the <b>error indicator</b>
-// corresponding to the solution on a cell particularly accurately. We therefore
-// typically use a vector of floats instead of a vector of doubles to represent
-// error indicators.
+// very accurately, it is usually not necessary to compute the <b>error
+// indicator</b> corresponding to the solution on a cell particularly
+// accurately. We therefore typically use a vector of floats instead of a vector
+// of doubles to represent error indicators.
 template <int dim>
-void Step6<dim>::refine_grid ()
+void Step6<dim>::refine_grid()
 {
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate (dof_handler,
-                                      QGauss<dim-1>(3),
-                                      typename FunctionMap<dim>::type(),
-                                      solution,
-                                      estimated_error_per_cell);
+  KellyErrorEstimator<dim>::estimate(
+    dof_handler,
+    QGauss<dim - 1>(3),
+    std::map<types::boundary_id, const Function<dim> *>(),
+    solution,
+    estimated_error_per_cell);
 
   // The above function returned one error indicator value for each cell in
   // the <code>estimated_error_per_cell</code> array. Refinement is now done
@@ -542,9 +521,10 @@ void Step6<dim>::refine_grid ()
   // method described above. It is from a class that implements several
   // different algorithms to refine a triangulation based on cell-wise error
   // indicators.
-  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                   estimated_error_per_cell,
-                                                   0.3, 0.03);
+  GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                  estimated_error_per_cell,
+                                                  0.3,
+                                                  0.03);
 
   // After the previous function has exited, some cells are flagged for
   // refinement, and some other for coarsening. The refinement or coarsening
@@ -552,7 +532,7 @@ void Step6<dim>::refine_grid ()
   // further modifications of these flags is useful. Here, we don't want to do
   // any such thing, so we can tell the triangulation to perform the actions
   // for which the cells are flagged:
-  triangulation.execute_coarsening_and_refinement ();
+  triangulation.execute_coarsening_and_refinement();
 }
 
 
@@ -572,22 +552,22 @@ void Step6<dim>::refine_grid ()
 // We also output the solution in the same way as we did before, with
 // a similarly constructed file name.
 template <int dim>
-void Step6<dim>::output_results (const unsigned int cycle) const
+void Step6<dim>::output_results(const unsigned int cycle) const
 {
   {
-    GridOut grid_out;
-    std::ofstream output ("grid-" + std::to_string(cycle) + ".eps");
-    grid_out.write_eps (triangulation, output);
+    GridOut       grid_out;
+    std::ofstream output("grid-" + std::to_string(cycle) + ".eps");
+    grid_out.write_eps(triangulation, output);
   }
 
   {
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
-    data_out.build_patches ();
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "solution");
+    data_out.build_patches();
 
-    std::ofstream output ("solution-" + std::to_string(cycle) + ".vtk");
-    data_out.write_vtk (output);
+    std::ofstream output("solution-" + std::to_string(cycle) + ".vtk");
+    data_out.write_vtk(output);
   }
 }
 
@@ -619,38 +599,32 @@ void Step6<dim>::output_results (const unsigned int cycle) const
 //
 // The rest of the loop looks as before:
 template <int dim>
-void Step6<dim>::run ()
+void Step6<dim>::run()
 {
-  for (unsigned int cycle=0; cycle<8; ++cycle)
+  for (unsigned int cycle = 0; cycle < 8; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
         {
-          GridGenerator::hyper_ball (triangulation);
-
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-
-          triangulation.refine_global (1);
+          GridGenerator::hyper_ball(triangulation);
+          triangulation.refine_global(1);
         }
       else
-        refine_grid ();
+        refine_grid();
 
 
       std::cout << "   Number of active cells:       "
-                << triangulation.n_active_cells()
+                << triangulation.n_active_cells() << std::endl;
+
+      setup_system();
+
+      std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
                 << std::endl;
 
-      setup_system ();
-
-      std::cout << "   Number of degrees of freedom: "
-                << dof_handler.n_dofs()
-                << std::endl;
-
-      assemble_system ();
-      solve ();
-      output_results (cycle);
+      assemble_system();
+      solve();
+      output_results(cycle);
     }
 }
 
@@ -675,15 +649,14 @@ void Step6<dim>::run ()
 // program in this way, and you can do so by more or less copying this
 // function except for the <code>try</code> block that actually encodes the
 // functionality particular to the present application.
-int main ()
+int main()
 {
-
   // The general idea behind the layout of this function is as follows: let's
   // try to run the program as we did before...
   try
     {
       Step6<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
+      laplace_problem_2d.run();
     }
   // ...and if this should fail, try to gather as much information as
   // possible. Specifically, if the exception that was thrown is an object of
@@ -706,7 +679,8 @@ int main ()
   // does):
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -722,7 +696,8 @@ int main ()
   // anything at all. We then simply print an error message and exit.
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

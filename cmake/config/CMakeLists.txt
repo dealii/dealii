@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -74,7 +74,16 @@ STRIP_FLAG(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 # Strip -Wno-deprecated-declarations from DEAL_II_CXX_FLAGS so that
 # deprecation warnings are actually shown for user code:
 #
+
 STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wno-deprecated-declarations")
+
+#
+# Strip -Wsuggest-override. Enabling this warning is a stylistic choice
+# that might create a substantial amount of warnings in user codebases.
+# Let's be nice and disable the flag for now.
+#
+
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wsuggest-override")
 
 #
 # Populate a bunch of CONFIG_* variables with useful information:

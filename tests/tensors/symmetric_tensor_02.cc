@@ -8,24 +8,26 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // test symmetric 3x3 tensors
 
-#include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 
-int main ()
+#include "../tests.h"
+
+int
+main()
 {
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  SymmetricTensor<2,3> t;
+  SymmetricTensor<2, 3> t;
   t[0][0] = 1;
   t[1][1] = 2;
   t[2][2] = 3;
@@ -33,27 +35,28 @@ int main ()
   t[0][2] = 5;
   t[1][2] = 6;
 
-  AssertThrow (t[0][1] == t[1][0], ExcInternalError());
+  AssertThrow(t[0][1] == t[1][0], ExcInternalError());
 
   // check that if a single element is
   // accessed, its transpose element gets the
   // same value
   t[1][0] = 14;
-  AssertThrow (t[0][1] == 14, ExcInternalError());
+  AssertThrow(t[0][1] == 14, ExcInternalError());
 
   // make sure transposition doesn't change
   // anything
-  AssertThrow (t == transpose(t), ExcInternalError());
+  AssertThrow(t == transpose(t), ExcInternalError());
 
   // check norm of tensor
-  AssertThrow (std::fabs(t.norm() - std::sqrt(1.*1+2*2+3*3+2*14*14+2*5*5+2*6*6))
-               < 1e-14,
-               ExcInternalError());
+  AssertThrow(std::fabs(t.norm() -
+                        std::sqrt(1. * 1 + 2 * 2 + 3 * 3 + 2 * 14 * 14 +
+                                  2 * 5 * 5 + 2 * 6 * 6)) < 1e-14,
+              ExcInternalError());
 
   // make sure norm is induced by scalar
   // product
-  AssertThrow (std::fabs (t.norm()*t.norm() - t*t) < 1e-14,
-               ExcInternalError());
+  AssertThrow(std::fabs(t.norm() * t.norm() - t * t) < 1e-14,
+              ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

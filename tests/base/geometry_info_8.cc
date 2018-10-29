@@ -8,16 +8,16 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
 #include <deal.II/base/geometry_info.h>
 
-
 #include <bitset>
+
+#include "../tests.h"
 
 using namespace dealii;
 
@@ -28,28 +28,30 @@ using namespace dealii;
 
 
 template <int dim>
-void test_vertices()
+void
+test_vertices()
 {
   deallog << dim << "D:" << std::endl;
 
   for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
     {
-
       deallog << "face " << i << ":" << std::endl;
 
       for (unsigned int o = 0; o < 8; ++o)
         {
           const std::bitset<3> orientation = o;
 
-          deallog << "orientation " << orientation[0]
-                  << ", flip " << orientation[1]
-                  << ", rotation " << orientation[2]
-                  << ":" << std::endl << "    ";
+          deallog << "orientation " << orientation[0] << ", flip "
+                  << orientation[1] << ", rotation " << orientation[2] << ":"
+                  << std::endl
+                  << "    ";
 
-          for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_face; ++j)
+          for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_face;
+               ++j)
             {
               deallog << " (" << j << " -> "
-                      << GeometryInfo<dim>::face_to_cell_vertices(i, j, orientation[0], orientation[1], orientation[2])
+                      << GeometryInfo<dim>::face_to_cell_vertices(
+                           i, j, orientation[0], orientation[1], orientation[2])
                       << " )";
             }
           deallog << std::endl;
@@ -59,28 +61,29 @@ void test_vertices()
 
 
 template <int dim>
-void test_lines()
+void
+test_lines()
 {
   deallog << dim << "D:" << std::endl;
 
   for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
     {
-
       deallog << "face " << i << ":" << std::endl;
 
       for (unsigned int o = 0; o < 8; ++o)
         {
           const std::bitset<3> orientation = o;
 
-          deallog << "orientation " << orientation[0]
-                  << ", flip " << orientation[1]
-                  << ", rotation " << orientation[2]
-                  << ":" << std::endl << "    ";
+          deallog << "orientation " << orientation[0] << ", flip "
+                  << orientation[1] << ", rotation " << orientation[2] << ":"
+                  << std::endl
+                  << "    ";
 
           for (unsigned int j = 0; j < GeometryInfo<dim>::lines_per_face; ++j)
             {
               deallog << " (" << j << " -> "
-                      << GeometryInfo<dim>::face_to_cell_lines(i, j, orientation[0], orientation[1], orientation[2])
+                      << GeometryInfo<dim>::face_to_cell_lines(
+                           i, j, orientation[0], orientation[1], orientation[2])
                       << " )";
             }
           deallog << std::endl;
@@ -89,21 +92,24 @@ void test_lines()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  deallog << std::endl << "GeometryInfo<dim>::face_to_cell_vertices:" << std::endl;
+  deallog << std::endl
+          << "GeometryInfo<dim>::face_to_cell_vertices:" << std::endl;
 
   test_vertices<1>();
   test_vertices<2>();
   test_vertices<3>();
 
-  deallog << std::endl << std::endl << "GeometryInfo<dim>::face_to_cell_lines:" << std::endl;
+  deallog << std::endl
+          << std::endl
+          << "GeometryInfo<dim>::face_to_cell_lines:" << std::endl;
 
   test_lines<2>();
   test_lines<3>();
 
   return 0;
 }
-

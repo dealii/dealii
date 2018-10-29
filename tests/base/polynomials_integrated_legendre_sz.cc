@@ -8,31 +8,34 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
-// This tests the stability of the polynomial evaluation of IntegratedLegendreSZ.
-
-#include "../tests.h"
+// This tests the stability of the polynomial evaluation of
+// IntegratedLegendreSZ.
 
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include "../tests.h"
+
 
 using namespace Polynomials;
 
 
-void check_at_one (const std::vector<Polynomial<double> > &p)
+void
+check_at_one(const std::vector<Polynomial<double>> &p)
 {
-  // Ignore first two polynomials as the integrated Legendre polynomials are only defined
-  // for degree > 1, it is only added to maintain the recursive relation.
+  // Ignore first two polynomials as the integrated Legendre polynomials are
+  // only defined for degree > 1, it is only added to maintain the recursive
+  // relation.
 
   deallog << "Function value of polynomial at right end point: ";
-  for (unsigned int i=2; i<p.size(); ++i)
+  for (unsigned int i = 2; i < p.size(); ++i)
     {
       deallog << '.';
       const double y = p[i].value(1.);
@@ -44,13 +47,15 @@ void check_at_one (const std::vector<Polynomial<double> > &p)
 
 
 
-void check_at_half (const std::vector<Polynomial<double> > &p)
+void
+check_at_half(const std::vector<Polynomial<double>> &p)
 {
-  // Ignore first two polynomials as the integrated Legendre polynomials are only defined
-  // for degree > 1, it is only added to maintain the recursive relation.
+  // Ignore first two polynomials as the integrated Legendre polynomials are
+  // only defined for degree > 1, it is only added to maintain the recursive
+  // relation.
 
   deallog << "Function value of polynomial at -0.5 | 0.5:" << std::endl;
-  for (unsigned int i=2; i<p.size(); ++i)
+  for (unsigned int i = 2; i < p.size(); ++i)
     {
       const double y = p[i].value(0.5);
       const double z = p[i].value(-0.5);
@@ -62,21 +67,22 @@ void check_at_half (const std::vector<Polynomial<double> > &p)
 
 
 void
-check_poly (const unsigned int n)
+check_poly(const unsigned int n)
 {
-  deallog << "Degree: " << n+1 << std::endl;
-  std::vector<Polynomial<double> > p = IntegratedLegendreSZ::generate_complete_basis(n);
-  check_at_one (p);
-  check_at_half (p);
+  deallog << "Degree: " << n + 1 << std::endl;
+  std::vector<Polynomial<double>> p =
+    IntegratedLegendreSZ::generate_complete_basis(n);
+  check_at_one(p);
+  check_at_half(p);
 }
 
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   check_poly(25);
 }

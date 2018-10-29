@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2017 by the deal.II authors
+// Copyright (C) 2006 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,6 +17,7 @@
 #define dealii_tria_faces_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/grid/tria_object.h>
 #include <deal.II/grid/tria_objects.h>
 
@@ -25,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     /**
      * General template for information belonging to the faces of a
@@ -50,8 +51,8 @@ namespace internal
     {
     public:
       /**
-       * Constructor. This constructor is deleted to prevent the use of this template,
-       * as only the specializations should be used
+       * Constructor. This constructor is deleted to prevent the use of this
+       * template, as only the specializations should be used
        */
       TriaFaces() = delete;
     };
@@ -67,21 +68,21 @@ namespace internal
     template <>
     class TriaFaces<1>
     {
-
     public:
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object. Of course this returns 0.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar, const unsigned int version);
     };
 
     /**
@@ -94,22 +95,23 @@ namespace internal
       /**
        * The TriaObject containing the data of lines.
        */
-      TriaObjects<TriaObject<1> > lines;
+      TriaObjects<TriaObject<1>> lines;
 
     public:
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar, const unsigned int version);
     };
 
     /**
@@ -129,38 +131,37 @@ namespace internal
       /**
        * The TriaObject containing the data of lines.
        */
-      TriaObjects<TriaObject<1> > lines;
+      TriaObjects<TriaObject<1>> lines;
 
     public:
       /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
-      std::size_t memory_consumption () const;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * Read or write the data of this object to or from a stream for the
        * purpose of serialization
        */
       template <class Archive>
-      void serialize(Archive &ar,
-                     const unsigned int version);
+      void
+      serialize(Archive &ar, const unsigned int version);
     };
 
 
 
     template <class Archive>
     void
-    TriaFaces<1>::serialize (Archive &,
-                             const unsigned int)
+    TriaFaces<1>::serialize(Archive &, const unsigned int)
     {}
 
 
 
     template <class Archive>
     void
-    TriaFaces<2>::serialize (Archive &ar,
-                             const unsigned int)
+    TriaFaces<2>::serialize(Archive &ar, const unsigned int)
     {
       ar &lines;
     }
@@ -169,13 +170,12 @@ namespace internal
 
     template <class Archive>
     void
-    TriaFaces<3>::serialize (Archive &ar,
-                             const unsigned int)
+    TriaFaces<3>::serialize(Archive &ar, const unsigned int)
     {
       ar &quads &lines;
     }
-  }
-}
+  } // namespace TriangulationImplementation
+} // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 

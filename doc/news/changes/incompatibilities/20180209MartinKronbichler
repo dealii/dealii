@@ -1,8 +1,0 @@
-New: The class FE_DGQHermite has been switched to the more stable polynomial
-basis Polynomials::HermiteLikeInterpolation. This changes the representation
-of the numbers by the FE_DGQHermite class. The change is yet highly beneficial
-because it significantly improves the accuracy (in terms of roundoff) for this
-basis and also reduces iteration counts for some iterative solvers with simple
-preconditioner ingredients such as point-Jacobi or point-Jacobi smoothing.
-<br>
-(Martin Kronbichler, 2018/02/09)

@@ -8,32 +8,34 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // test the determinant code for n>3
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test ()
+void
+test()
 {
-  Tensor<2,dim> t;
+  Tensor<2, dim> t;
 
   // choose the same symmetric tensor
   // as in symmetric_tensor_10
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = 0; j < dim; ++j)
       t[i][j] = random_value<double>();
 
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      deallog << "A[" << i+1 << ',' << j+1 << "] := " << t[i][j] << ';'
+  for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int j = 0; j < dim; ++j)
+      deallog << "A[" << i + 1 << ',' << j + 1 << "] := " << t[i][j] << ';'
               << std::endl;
 
   deallog << determinant(t) << std::endl;
@@ -41,18 +43,17 @@ void test ()
 
 
 
-
-int main ()
+int
+main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
-  test<4> ();
-  test<5> ();
-  test<6> ();
-  test<7> ();
-  test<8> ();
+  test<4>();
+  test<5>();
+  test<6>();
+  test<7>();
+  test<8>();
 
   deallog << "OK" << std::endl;
 }

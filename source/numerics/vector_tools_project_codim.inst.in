@@ -8,39 +8,41 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
-for (VEC : REAL_VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
-{
+for (VEC : REAL_VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
 #if deal_II_dimension < deal_II_space_dimension
-    namespace VectorTools \{
+    namespace VectorTools
+    \{
 
-    template
-    void project<deal_II_dimension, VEC, deal_II_space_dimension>
-    (const Mapping<deal_II_dimension,deal_II_space_dimension>      &,
-     const DoFHandler<deal_II_dimension,deal_II_space_dimension>   &,
-     const ConstraintMatrix                &,
-     const Quadrature<deal_II_dimension>   &,
-     const Function<deal_II_space_dimension,VEC::value_type>     &,
-     VEC                                   &,
-     const bool,
-     const Quadrature<deal_II_dimension-1> &,
-     const bool);
+      template void
+      project<deal_II_dimension, VEC, deal_II_space_dimension>(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const AffineConstraints<VEC::value_type> &,
+        const Quadrature<deal_II_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const bool,
+        const Quadrature<deal_II_dimension - 1> &,
+        const bool);
 
-    template
-    void project<deal_II_dimension, VEC, deal_II_space_dimension>
-    (const DoFHandler<deal_II_dimension,deal_II_space_dimension>   &,
-     const ConstraintMatrix                &,
-     const Quadrature<deal_II_dimension>   &,
-     const Function<deal_II_space_dimension,VEC::value_type>     &,
-     VEC                                   &,
-     const bool,
-     const Quadrature<deal_II_dimension-1> &,
-     const bool);
+      template void
+      project<deal_II_dimension, VEC, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const AffineConstraints<VEC::value_type> &,
+        const Quadrature<deal_II_dimension> &,
+        const Function<deal_II_space_dimension, VEC::value_type> &,
+        VEC &,
+        const bool,
+        const Quadrature<deal_II_dimension - 1> &,
+        const bool);
     \}
 #endif
-}
+  }

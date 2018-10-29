@@ -1,6 +1,0 @@
-New: The majority of deal.II classes that deal with solution vectors
-are now also instantiated for complex-valued vectors. In other words,
-complex-valued vectors should now be supported at the same level as
-real-valued vectors.
-<br>
-(Wolfgang Bangerth, 2017/11/08)

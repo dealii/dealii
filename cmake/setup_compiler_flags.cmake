@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -53,11 +53,11 @@
 #
 # belong the corresponding file:
 #
-#   ./cmake/checks/check_01_compiler_features.cmake
 #   ./cmake/checks/check_01_cpu_features.cmake
 #   ./cmake/checks/check_01_cxx_features.cmake
-#   ./cmake/checks/check_01_system_features.cmake
-#   ./cmake/checks/check_02_compiler_bugs.cmake
+#   ./cmake/checks/check_02_compiler_features.cmake
+#   ./cmake/checks/check_02_system_features.cmake
+#   ./cmake/checks/check_03_compiler_bugs.cmake
 #
 
 

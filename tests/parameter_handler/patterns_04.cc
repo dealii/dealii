@@ -8,16 +8,18 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // pattern_factory tests
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
+
 #include <memory>
+
+#include "../tests.h"
 
 
 void
@@ -47,12 +49,13 @@ test(const Patterns::PatternBase &p)
 
 using namespace Patterns;
 
-int main()
+int
+main()
 {
   initlog();
   test(Integer());
   test(Integer(-1));
-  test(Integer(-1,50));
+  test(Integer(-1, 50));
 
   test(Double());
   test(Double(0.0, 50.0));
@@ -64,10 +67,10 @@ int main()
   test(List(Bool()));
 
   test(Selection("alpha|beta"));
-  test(List(Double(),0,3,";"));
+  test(List(Double(), 0, 3, ";"));
 
   test(Map(Integer(), Double()));
-  test(Map(Integer(0,10), Double(), 0, 10, ";", "="));
+  test(Map(Integer(0, 10), Double(), 0, 10, ";", "="));
 
   deallog << "OK" << std::endl;
 }

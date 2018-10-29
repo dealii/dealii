@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -27,8 +27,6 @@ SET(_unity_include_src
   manifold_lib.cc
   persistent_tria.cc
   tria_accessor.cc
-  tria_boundary.cc
-  tria_boundary_lib.cc
   tria_faces.cc
   tria_levels.cc
   tria_objects.cc
@@ -63,8 +61,6 @@ SET(_inst
   manifold.inst.in
   manifold_lib.inst.in
   tria_accessor.inst.in
-  tria_boundary.inst.in
-  tria_boundary_lib.inst.in
   tria.inst.in
   tria_objects.inst.in
   )

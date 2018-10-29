@@ -8,49 +8,54 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
 #include <iostream>
 
-std::ofstream logfile ("output");
+#include "../tests.h"
 
-void check_remove_anisotropy ()
+void
+check_remove_anisotropy()
 {
-  Point<3> (corners) [3];
+  Point<3>(corners)[3];
 
-  corners[0] = Point<3> (1, 0, 0);
-  corners[1] = Point<3> (0, 4, 0);
-  corners[2] = Point<3> (0, 0, 2);
+  corners[0] = Point<3>(1, 0, 0);
+  corners[1] = Point<3>(0, 4, 0);
+  corners[2] = Point<3>(0, 0, 2);
 
   const unsigned int n_subdivisions = 1;
 
   Triangulation<3> triangulation;
-  GridGenerator::subdivided_parallelepiped (triangulation, n_subdivisions, corners);
+  GridGenerator::subdivided_parallelepiped(triangulation,
+                                           n_subdivisions,
+                                           corners);
   dealii::GridTools::remove_anisotropy<3>(triangulation,
-                                          /*max ratio =*/ 1.2);
+                                          /*max ratio =*/1.2);
 
   GridOut grid_out;
-  grid_out.write_vtk (triangulation, logfile);
+  grid_out.write_vtk(triangulation, deallog.get_file_stream());
 
-  triangulation.clear ();
+  triangulation.clear();
 }
 
-int main ()
+int
+main()
 {
+  initlog();
   check_remove_anisotropy();
 }

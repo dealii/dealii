@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -17,8 +17,8 @@
 ##                                                                    ##
 #            The cmake build system for the deal.II project            #
 #                                                                      #
-#    See doc/readme.html and doc/development/cmake.html for further    #
-#    details on how to use the cmake build system of deal.II.          #
+#   See doc/readme.html and doc/developers/cmake-internals.html for    #
+#   further details on how to use the cmake build system of deal.II.   #
 ##                                                                    ##
 
 ########################################################################
@@ -45,7 +45,7 @@ IF( "${CMAKE_VERSION}" VERSION_EQUAL "3.1" OR
   CMAKE_POLICY(VERSION 3.1.0)
 ENDIF()
 
-IF(POLICY CMP0037)
+IF("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
   # allow to override "test" target for quick tests
   CMAKE_POLICY(SET CMP0037 OLD)
 ENDIF()

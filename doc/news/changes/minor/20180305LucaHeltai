@@ -1,5 +1,0 @@
-New: NonMatching::create_coupling_sparsity_pattern and NonMatching::create_coupling_mass_matrix functions 
-to handle L2 projections between arbitrary non-aligned grids.
-<br>
-(Luca Heltai, 2018/03/05)
-

@@ -1,0 +1,11 @@
+
+DEAL:0::numproc=2
+DEAL:0::l2 norm: 7.483
+DEAL:0::l1 norm: 12.00
+DEAL:0::linfty norm: 6.00
+DEAL:0::Mean value:3.000
+DEAL:0::Inner product: 56.00
+DEAL:0:: v==0 ? 0
+DEAL:0:: v2==0 ? 1
+DEAL:0:: v2==0 ? 0
+DEAL:0::OK

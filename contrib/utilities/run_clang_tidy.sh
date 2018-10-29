@@ -9,8 +9,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -46,15 +46,24 @@ echo "SRC-DIR=$SRC"
 ARGS="-D DEAL_II_WITH_MUPARSER=OFF -D DEAL_II_WITH_MPI=ON -D CMAKE_EXPORT_COMPILE_COMMANDS=ON @$"
 
 # disable performance-inefficient-string-concatenation because we don't care about "a"+to_string(5)+...
-CHECKS="-*,mpi-*,performance-*,modernize-use-emplace,-performance-inefficient-string-concatenation"
+CHECKS="-*,
+        mpi-*,
+        performance-*,
+        -performance-inefficient-string-concatenation,
+        modernize-use-emplace,
+        modernize-deprecated-headers,
+        modernize-use-using"
 
-if test -z "$(which run-clang-tidy.py)" -o -z "$(which clang++)" ; then
-    echo "make sure clang, clang++, and run-clang-tidy.py (part of clang) is in the path"
+CHECKS="$(echo "${CHECKS}" | tr -d '[:space:]')"
+echo "$CHECKS"
+
+if ! [ -x "$(command -v run-clang-tidy.py)" ] || ! [ -x "$(command -v clang++)" ]; then
+    echo "make sure clang, clang++, and run-clang-tidy.py (part of clang) are in the path"
     exit 2
 fi
 
 CC=clang CXX=clang++ cmake "$ARGS" "$SRC" || (echo "cmake failed!"; false) || exit 2
 
-make expand_all_instantiations -j 4 || (echo "make expand_all_instantiations failed!"; false) || exit 3
+cmake --build . --target expand_all_instantiations || (echo "make expand_all_instantiations failed!"; false) || exit 3
 
 run-clang-tidy.py -p . -checks="$CHECKS" -quiet -header-filter="$SRC/include/*"

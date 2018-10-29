@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -20,40 +20,42 @@
 // object
 
 
-#include "../tests.h"
-#include <deal.II/hp/mapping_collection.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/hp/mapping_collection.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   hp::MappingCollection<dim> mapping_collection;
-  mapping_collection.push_back (MappingQ<dim>(2));
-  mapping_collection.push_back (MappingQ<dim>(1));
+  mapping_collection.push_back(MappingQ<dim>(2));
+  mapping_collection.push_back(MappingQ<dim>(1));
 
   // now create a copy and make sure
   // it goes out of scope before the
   // original
   {
-    hp::MappingCollection<dim> copy (mapping_collection);
+    hp::MappingCollection<dim> copy(mapping_collection);
   }
 }
 
 
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile("output");
-  logfile.precision(2);
+  initlog();
+  deallog.get_file_stream().precision(2);
 
-  deallog.attach(logfile);
-
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 
   deallog << "OK" << std::endl;
 }

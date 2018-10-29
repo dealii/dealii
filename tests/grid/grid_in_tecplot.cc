@@ -8,43 +8,45 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
-#include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_out.h>
+
 #include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
 
 #include <string>
 
-std::ofstream logfile("output");
-
+#include "../tests.h"
 
 template <int dim>
-void test (const std::string &infilename)
+void
+test(const std::string &infilename)
 {
   Triangulation<dim> tria;
-  GridIn<dim> gi;
-  gi.attach_triangulation (tria);
-  gi.read (infilename);
+  GridIn<dim>        gi;
+  gi.attach_triangulation(tria);
+  gi.read(infilename);
 
-  logfile<<"------------------------------------------"<<std::endl;
+  deallog.get_file_stream()
+    << "------------------------------------------" << std::endl;
 
   GridOut grid_out;
-  grid_out.set_flags (GridOutFlags::Ucd(true));
-  grid_out.write_ucd (tria, logfile);
+  grid_out.set_flags(GridOutFlags::Ucd(true));
+  grid_out.write_ucd(tria, deallog.get_file_stream());
 }
 
-int main ()
+int
+main()
 {
-  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/1.dat"));
-  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/2.dat"));
-  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/3.dat"));
-  test<2> (std::string(SOURCE_DIR "/grid_in_tecplot/4.dat"));
+  initlog();
+  test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/1.dat"));
+  test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/2.dat"));
+  test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/3.dat"));
+  test<2>(std::string(SOURCE_DIR "/grid_in_tecplot/4.dat"));
 }
-

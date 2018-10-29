@@ -1,6 +1,0 @@
-Changed: The GridRefinement::hyper_sphere() function used to have two
-template arguments (`dim` and `spacedim`), but it really only existed
-if <code>dim == spacedim-1</code>. Consequently, it now has lost its
-`dim` template argument and has only retained `spacedim`.
-<br>
-(Wolfgang Bangerth, 2018/01/25)

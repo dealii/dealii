@@ -8,27 +8,30 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // Test output for GridGenerator::simplex()
 
-#include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
+
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 
-void dim_2(std::ostream &os)
+void
+dim_2(std::ostream &os)
 {
-  const unsigned int d=2;
-  Triangulation<d> tr;
+  const unsigned int d = 2;
+  Triangulation<d>   tr;
 
-  std::vector<Point<d> > vertices(d+1);
+  std::vector<Point<d>> vertices(d + 1);
   vertices[1](0) = 0.5;
   vertices[1](1) = .85;
   vertices[2](0) = -0.5;
@@ -39,12 +42,13 @@ void dim_2(std::ostream &os)
   gout.write_vtk(tr, os);
 }
 
-void dim_3(std::ostream &os)
+void
+dim_3(std::ostream &os)
 {
-  const unsigned int d=3;
-  Triangulation<d> tr;
+  const unsigned int d = 3;
+  Triangulation<d>   tr;
 
-  std::vector<Point<d> > vertices(d+1);
+  std::vector<Point<d>> vertices(d + 1);
   vertices[0](0) = 1.;
   vertices[0](1) = 0.;
   vertices[0](2) = .7;
@@ -64,7 +68,8 @@ void dim_3(std::ostream &os)
 }
 
 
-int main()
+int
+main()
 {
   initlog(true);
   std::ostream &logfile = deallog.get_file_stream();

@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -81,11 +81,57 @@ ELSE()
 ENDIF()
 
 
+# Collect where the build system will write the .inst files after
+# expansion from the .inst.in files. We need this because we let
+# doxygen read the .cc files and they #include the .inst files.
+#
+# To get at this, find all of the .inst.in files, strip all but the
+# directory name under $CMAKE_SOURCE_DIR/source, and then prepend
+# the build directory to it
+FILE(GLOB _inst_in_files
+     "${CMAKE_SOURCE_DIR}/source/*/*.inst.in")
+STRING(REPLACE "${CMAKE_SOURCE_DIR}/source/" "" _inst_in_dirs_x "${_inst_in_files}")
+STRING(REGEX REPLACE "/[a-zA-Z0-9_\\.]*.inst.in" "/" _inst_in_dirs_y "${_inst_in_dirs_x}")
+LIST(REMOVE_DUPLICATES _inst_in_dirs_y)
+SET(_inst_in_dirs "")
+FOREACH (_dir ${_inst_in_dirs_y})
+  SET(_inst_in_dirs "${_inst_in_dirs} ${CMAKE_BINARY_DIR}/source/${_dir}")
+ENDFOREACH()
+
+MESSAGE(STATUS "translated this into")
+MESSAGE(STATUS "found ${_inst_in_dirs}")
+
+# Generate the input files for doxygen using template .in files in which
+# we have to substitute some CMake variables
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
   )
 
+# Figure out the last copyright date of any of the deal.II source
+# files. We will use this then to set the copyright date of the
+# doxygen-generated HTML files.
+SET(_last_year "1997")
+FILE(GLOB _source_files
+     "${CMAKE_SOURCE_DIR}/source/*/*.cc" 
+     "${CMAKE_SOURCE_DIR}/include/deal.II/*/*.h" 
+     "${CMAKE_SOURCE_DIR}/examples/*/*.cc")
+FOREACH (_source ${_source_files})
+  FILE(READ "${_source}" contents)
+  STRING(REGEX MATCH "Copyright .C. +([0-9]+ - )?([0-9]+)" _copyright "${contents}")
+  IF (NOT _copright STREQUAL "")
+    STRING(REGEX MATCH "[0-9]+\$" _year "${_copyright}")
+
+    IF (NOT _year STREQUAL ""   AND   _year GREATER _last_year)
+      SET (_last_year "${_year}")
+    ENDIF()
+  ENDIF()
+ENDFOREACH()
+SET(DEAL_II_PACKAGE_YEAR ${_last_year})
+MESSAGE(STATUS "doxygen output will have copyright date ${_last_year}")
+
+
+# Put the copyright year into the correct files
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_header.pl.in
   ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
@@ -113,8 +159,8 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${CMAKE_COMMAND} -E touch header.html
   COMMAND ${CMAKE_COMMAND} -E touch footer.html
   COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html style.css options.dox
-  COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl header.html
-  COMMAND ${PERL_EXECUTABLE} -pi~ ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl footer.html
+  COMMAND ${PERL_EXECUTABLE} -pi ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl header.html
+  COMMAND ${PERL_EXECUTABLE} -pi ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl footer.html
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
@@ -245,6 +291,7 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/scripts/filter
     ${_doxygen_depend}
+    expand_all_instantiations
   COMMENT "Generating documentation via doxygen."
   VERBATIM
   )

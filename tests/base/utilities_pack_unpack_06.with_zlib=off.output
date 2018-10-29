@@ -1,0 +1,10 @@
+
+DEAL::check packed array with compression: Failed
+DEAL::check packed point with compression: Failed
+DEAL::check packed array without compression: OK
+DEAL::check packed point without compression: OK
+DEAL::check unpacked array with compression: OK
+DEAL::check unpacked point with compression: OK
+DEAL::check unpacked array without compression: OK
+DEAL::check unpacked point without compression: OK
+DEAL::OK!

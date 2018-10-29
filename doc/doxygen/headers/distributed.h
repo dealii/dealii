@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2016 by the deal.II authors
+// Copyright (C) 2009 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -332,7 +332,7 @@
  * When creating the sparsity pattern as well as when assembling the linear
  * system, we need to know about constraints on degrees of freedom, for
  * example resulting from hanging nodes or boundary conditions. Like the
- * DynamicSparsityPattern class, the ConstraintMatrix can also take
+ * DynamicSparsityPattern class, the AffineConstraints container can also take
  * an IndexSet upon construction that indicates for which of the possibly very
  * large number of degrees of freedom it should actually store
  * constraints. Unlike for the sparsity pattern, these are now only those
@@ -347,8 +347,8 @@
  * this chain of constraints, it may not be sufficient to only store
  * constraints on locally active degrees of freedom but one may also need to
  * have constraints available on locally relevant ones. In that case, the
- * ConstraintMatrix object needs to be initialized with the IndexSet produced
- * by DoFTools::extract_locally_relevant_dofs() .
+ * AffineConstraints object needs to be initialized with the IndexSet
+ * produced by DoFTools::extract_locally_relevant_dofs() .
  *
  * In general, your program will continue to do something if you happen to not
  * store all necessary constraints on each processor: you will just generate

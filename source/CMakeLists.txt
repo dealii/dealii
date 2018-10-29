@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,12 +8,28 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
 MESSAGE(STATUS "Setting up library")
+
+#
+# This happens surprisingly often:
+#
+IF("${DEAL_II_PACKAGE_NAME}" STREQUAL  "")
+  MESSAGE(FATAL_ERROR
+    "\nWrong source directory specified.\n"
+    "You pointed cmake to the subdirectory \"source\" instead of the base "
+    "directory (the one containing the file \"README.md\"). Make sure that "
+    "the path in the cmake invocation does not end in \".../source\". If you "
+    "have created a \"build\" subdirectory, the cmake invocation should simply "
+    "be of the form:\n"
+    "  $ cmake  [...options...]  ../\n"
+    "(path not ending in \".../source\")"
+    )
+ENDIF()
 
 #
 # Compile the deal.II library
@@ -40,6 +56,7 @@ ADD_SUBDIRECTORY(fe)
 ADD_SUBDIRECTORY(dofs)
 ADD_SUBDIRECTORY(lac)
 ADD_SUBDIRECTORY(base)
+ADD_SUBDIRECTORY(gmsh)
 ADD_SUBDIRECTORY(grid)
 ADD_SUBDIRECTORY(hp)
 ADD_SUBDIRECTORY(multigrid)
@@ -102,6 +119,14 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
+
+  IF(DEAL_II_WITH_CUDA)
+    # We need to use the CUDA linker to avoid confusing nvlink with sonaming.
+    SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+    PROPERTIES
+    LINKER_LANGUAGE "CUDA"
+    )
+  ENDIF()
 
   IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}

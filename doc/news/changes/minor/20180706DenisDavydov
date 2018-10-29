@@ -1,0 +1,4 @@
+New: Add GridGenerator::plate_with_a_hole() that generates a
+rectangular plate with an (offset) cylindrical hole.
+<br>
+(Denis Davydov 2018/06/21)

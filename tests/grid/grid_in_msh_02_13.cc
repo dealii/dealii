@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2017 by the deal.II authors
+// Copyright (C) 2002 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -24,48 +24,49 @@
 // instantiated at the time)
 
 
-#include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/grid_generator.h>
 
 #include <string>
 
-std::ofstream logfile("output");
+#include "../tests.h"
 
-
-void check_file ()
+void
+check_file()
 {
-  Triangulation<1,3> tria;
-  GridIn<1,3> gi;
-  gi.attach_triangulation (tria);
-  std::ifstream in (SOURCE_DIR "/../grid/grids/grid_in_msh_02.msh");
+  Triangulation<1, 3> tria;
+  GridIn<1, 3>        gi;
+  gi.attach_triangulation(tria);
+  std::ifstream in(SOURCE_DIR "/../grid/grids/grid_in_msh_02.msh");
   gi.read_msh(in);
 
-  for (Triangulation<1,3>::active_cell_iterator cell = tria.begin_active(); cell != tria.end(); ++cell)
+  for (Triangulation<1, 3>::active_cell_iterator cell = tria.begin_active();
+       cell != tria.end();
+       ++cell)
     {
       for (unsigned int face = 0; face < 2; ++face)
         {
           if (cell->at_boundary(face))
             deallog << "vertex " << cell->face_index(face)
-                    << " has boundary indicator " << (int)cell->face(face)->boundary_id()
-                    << std::endl;
+                    << " has boundary indicator "
+                    << (int)cell->face(face)->boundary_id() << std::endl;
         }
     }
 }
 
 
-int main ()
+int
+main()
 {
-  deallog << std::setprecision (2);
-  logfile << std::setprecision (2);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2);
 
-  check_file ();
+  check_file();
 }
-

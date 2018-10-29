@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -24,35 +24,37 @@
 // node).
 
 
+#include <deal.II/lac/affine_constraints.h>
+
 #include "../tests.h"
-#include <deal.II/lac/constraint_matrix.h>
 
 
 
-void test ()
+void
+test()
 {
-
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
   // a "regular" constraint
-  cm.add_line (1);
-  cm.add_entry (1, 2, 42.);
+  cm.add_line(1);
+  cm.add_entry(1, 2, 42.);
 
   // a "singular" constraint
-  cm.add_line (4);
+  cm.add_line(4);
 
-  cm.print (deallog.get_file_stream());
+  cm.print(deallog.get_file_stream());
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

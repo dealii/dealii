@@ -106,7 +106,7 @@ protected:
     BOOST_WARCHIVE_DECL 
     xml_wiarchive_impl(std::wistream & is, unsigned int flags) ;
     BOOST_WARCHIVE_DECL 
-    ~xml_wiarchive_impl();
+    ~xml_wiarchive_impl() override;
 };
 
 } // namespace archive
@@ -132,7 +132,7 @@ public:
     xml_wiarchive(std::wistream & is, unsigned int flags = 0) :
         xml_wiarchive_impl<xml_wiarchive>(is, flags)
     {}
-    ~xml_wiarchive(){}
+    ~xml_wiarchive() override{}
 };
 
 } // namespace archive

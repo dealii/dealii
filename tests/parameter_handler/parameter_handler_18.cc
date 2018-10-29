@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -22,10 +22,12 @@
 // this is a variant of parameter_handler_15 but in fact reads data
 // from a file
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void test ()
+#include "../tests.h"
+
+void
+test()
 {
   ParameterHandler foo;
   foo.enter_subsection("bar");
@@ -35,15 +37,16 @@ void test ()
   foo.parse_input(SOURCE_DIR "/parameter_handler_18.prm");
 
   foo.enter_subsection("bar");
-  deallog << foo.get ("val") << std::endl;
+  deallog << foo.get("val") << std::endl;
   foo.leave_subsection();
 }
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 
   return 0;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2017 by the deal.II authors
+// Copyright (C) 2010 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,14 +17,18 @@
 #ifndef dealii_mesh_worker_assembler_h
 #define dealii_mesh_worker_assembler_h
 
-#include <deal.II/base/smartpointer.h>
+#include <deal.II/algorithms/any_data.h>
+
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/smartpointer.h>
+
 #include <deal.II/lac/block_vector.h>
+
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/functional.h>
 #include <deal.II/meshworker/simple.h>
+
 #include <deal.II/multigrid/mg_constrained_dofs.h>
-#include <deal.II/algorithms/any_data.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -110,42 +114,50 @@ namespace MeshWorker
       /**
        * Copy the BlockInfo and the matrix pointers into local variables.
        */
-      void initialize(const BlockInfo *block_info,
-                      AnyData &residuals);
+      void
+      initialize(const BlockInfo *block_info, AnyData &residuals);
+
       /**
        * Initialize the constraints.
        */
-      void initialize(const ConstraintMatrix &constraints);
+      void
+      initialize(
+        const AffineConstraints<typename VectorType::value_type> &constraints);
+
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
-      void initialize_info(DOFINFO &info, bool face) const;
+      void
+      initialize_info(DOFINFO &info, bool face) const;
 
 
       /**
        * Assemble the local residuals into the global residuals.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info);
+      void
+      assemble(const DOFINFO &info);
 
       /**
        * Assemble both local residuals into the global residuals.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info1,
-                    const DOFINFO &info2);
+      void
+      assemble(const DOFINFO &info1, const DOFINFO &info2);
+
     private:
       /**
        * Assemble a single local residual into the global.
        */
-      void assemble(VectorType                                 &global,
-                    const BlockVector<double>                  &local,
-                    const std::vector<types::global_dof_index> &dof);
+      void
+      assemble(VectorType &                                global,
+               const BlockVector<double> &                 local,
+               const std::vector<types::global_dof_index> &dof);
 
       /**
        * The global vectors, stored as an AnyData container of pointers.
@@ -156,12 +168,15 @@ namespace MeshWorker
        * A pointer to the object containing the block structure.
        */
       SmartPointer<const BlockInfo,
-                   ResidualLocalBlocksToGlobalBlocks<VectorType> > block_info;
+                   ResidualLocalBlocksToGlobalBlocks<VectorType>>
+        block_info;
+
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix,
-                   ResidualLocalBlocksToGlobalBlocks<VectorType> > constraints;
+      SmartPointer<const AffineConstraints<typename VectorType::value_type>,
+                   ResidualLocalBlocksToGlobalBlocks<VectorType>>
+        constraints;
     };
 
 
@@ -206,64 +221,75 @@ namespace MeshWorker
        * Copy the BlockInfo and the matrix pointers into local variables and
        * initialize cell matrix vectors.
        */
-      void initialize(const BlockInfo *block_info,
-                      MatrixBlockVector<MatrixType> &matrices);
+      void
+      initialize(const BlockInfo *              block_info,
+                 MatrixBlockVector<MatrixType> &matrices);
 
       /**
        * Initialize the constraints.
        */
-      void initialize(const ConstraintMatrix &constraints);
+      void
+      initialize(
+        const AffineConstraints<typename MatrixType::value_type> &constraints);
+
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
-      void initialize_info(DOFINFO &info, bool face) const;
+      void
+      initialize_info(DOFINFO &info, bool face) const;
 
 
       /**
        * Assemble the local matrices into the global matrices.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info);
+      void
+      assemble(const DOFINFO &info);
 
       /**
        * Assemble all local matrices into the global matrices.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info1,
-                    const DOFINFO &info2);
+      void
+      assemble(const DOFINFO &info1, const DOFINFO &info2);
 
     private:
       /**
        * Assemble a single local matrix into a global one.
        */
-      void assemble(MatrixBlock<MatrixType>                    &global,
-                    const FullMatrix<number>                   &local,
-                    const unsigned int                          block_row,
-                    const unsigned int                          block_col,
-                    const std::vector<types::global_dof_index> &dof1,
-                    const std::vector<types::global_dof_index> &dof2);
+      void
+      assemble(MatrixBlock<MatrixType> &                   global,
+               const FullMatrix<number> &                  local,
+               const unsigned int                          block_row,
+               const unsigned int                          block_col,
+               const std::vector<types::global_dof_index> &dof1,
+               const std::vector<types::global_dof_index> &dof2);
 
       /**
        * The global matrices, stored as a vector of pointers.
        */
       SmartPointer<MatrixBlockVector<MatrixType>,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number> > matrices;
+                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+        matrices;
 
       /**
        * A pointer to the object containing the block structure.
        */
       SmartPointer<const BlockInfo,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number> > block_info;
+                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+        block_info;
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const ConstraintMatrix,
-                   MatrixLocalBlocksToGlobalBlocks<MatrixType,number> > constraints;
+
+      SmartPointer<const AffineConstraints<typename MatrixType::value_type>,
+                   MatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+        constraints;
 
       /**
        * The smallest positive number that will be entered into the global
@@ -271,7 +297,6 @@ namespace MeshWorker
        * not be assembled.
        */
       const double threshold;
-
     };
 
     /**
@@ -302,9 +327,10 @@ namespace MeshWorker
     class MGMatrixLocalBlocksToGlobalBlocks
     {
     public:
-      typedef MGMatrixBlockVector<MatrixType> MatrixPtrVector;
-      typedef SmartPointer<MatrixPtrVector, MGMatrixLocalBlocksToGlobalBlocks<MatrixType,number> >
-      MatrixPtrVectorPtr;
+      using MatrixPtrVector = MGMatrixBlockVector<MatrixType>;
+      using MatrixPtrVectorPtr =
+        SmartPointer<MatrixPtrVector,
+                     MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>;
 
       /**
        * Constructor, initializing the #threshold, which limits how small
@@ -316,124 +342,136 @@ namespace MeshWorker
        * Copy the BlockInfo and the matrix pointers into local variables and
        * initialize cell matrix vectors.
        */
-      void initialize(const BlockInfo *block_info,
-                      MatrixPtrVector &matrices);
+      void
+      initialize(const BlockInfo *block_info, MatrixPtrVector &matrices);
 
       /**
        * Initialize the multilevel constraints.
        */
-      void initialize(const MGConstrainedDoFs &mg_constrained_dofs);
+      void
+      initialize(const MGConstrainedDoFs &mg_constrained_dofs);
 
       /**
        * Multigrid methods on locally refined meshes need additional matrices.
        * For discontinuous Galerkin methods, these are two flux matrices
        * across the refinement edge, which are set by this method.
        */
-      void initialize_edge_flux(MatrixPtrVector &up, MatrixPtrVector &down);
+      void
+      initialize_edge_flux(MatrixPtrVector &up, MatrixPtrVector &down);
 
       /**
        * Multigrid methods on locally refined meshes need additional matrices.
        * For discontinuous Galerkin methods, these are two flux matrices
        * across the refinement edge, which are set by this method.
        */
-      void initialize_interfaces (MatrixPtrVector &interface_in, MatrixPtrVector &interface_out);
+      void
+      initialize_interfaces(MatrixPtrVector &interface_in,
+                            MatrixPtrVector &interface_out);
       /**
        * Initialize the local data in the DoFInfo object used later for
        * assembling.
        *
-       * The info object refers to a cell if <code>!face</code>, or else to an
+       * The @p info object refers to a cell if <code>!face</code>, or else to an
        * interior or boundary face.
        */
       template <class DOFINFO>
-      void initialize_info(DOFINFO &info, bool face) const;
+      void
+      initialize_info(DOFINFO &info, bool face) const;
 
 
       /**
        * Assemble the local matrices into the global matrices.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info);
+      void
+      assemble(const DOFINFO &info);
 
       /**
        * Assemble all local matrices into the global matrices.
        */
       template <class DOFINFO>
-      void assemble(const DOFINFO &info1,
-                    const DOFINFO &info2);
+      void
+      assemble(const DOFINFO &info1, const DOFINFO &info2);
 
     private:
       /**
        * Assemble a single local matrix into a global one.
        */
-      void assemble(MatrixType                                 &global,
-                    const FullMatrix<number>                   &local,
+      void
+      assemble(MatrixType &                                global,
+               const FullMatrix<number> &                  local,
+               const unsigned int                          block_row,
+               const unsigned int                          block_col,
+               const std::vector<types::global_dof_index> &dof1,
+               const std::vector<types::global_dof_index> &dof2,
+               const unsigned int                          level1,
+               const unsigned int                          level2,
+               bool                                        transpose = false);
+
+      /**
+       * Assemble a single local matrix into a global one.
+       */
+      void
+      assemble_fluxes(MatrixType &                                global,
+                      const FullMatrix<number> &                  local,
+                      const unsigned int                          block_row,
+                      const unsigned int                          block_col,
+                      const std::vector<types::global_dof_index> &dof1,
+                      const std::vector<types::global_dof_index> &dof2,
+                      const unsigned int                          level1,
+                      const unsigned int                          level2);
+
+      /**
+       * Assemble a single local matrix into a global one.
+       */
+      void
+      assemble_up(MatrixType &                                global,
+                  const FullMatrix<number> &                  local,
+                  const unsigned int                          block_row,
+                  const unsigned int                          block_col,
+                  const std::vector<types::global_dof_index> &dof1,
+                  const std::vector<types::global_dof_index> &dof2,
+                  const unsigned int                          level1,
+                  const unsigned int                          level2);
+
+      /**
+       * Assemble a single local matrix into a global one.
+       */
+      void
+      assemble_down(MatrixType &                                global,
+                    const FullMatrix<number> &                  local,
                     const unsigned int                          block_row,
                     const unsigned int                          block_col,
                     const std::vector<types::global_dof_index> &dof1,
                     const std::vector<types::global_dof_index> &dof2,
                     const unsigned int                          level1,
-                    const unsigned int                          level2,
-                    bool                                        transpose = false);
+                    const unsigned int                          level2);
 
       /**
        * Assemble a single local matrix into a global one.
        */
-      void assemble_fluxes(MatrixType                                 &global,
-                           const FullMatrix<number>                   &local,
-                           const unsigned int                          block_row,
-                           const unsigned int                          block_col,
-                           const std::vector<types::global_dof_index> &dof1,
-                           const std::vector<types::global_dof_index> &dof2,
-                           const unsigned int                          level1,
-                           const unsigned int                          level2);
+      void
+      assemble_in(MatrixType &                                global,
+                  const FullMatrix<number> &                  local,
+                  const unsigned int                          block_row,
+                  const unsigned int                          block_col,
+                  const std::vector<types::global_dof_index> &dof1,
+                  const std::vector<types::global_dof_index> &dof2,
+                  const unsigned int                          level1,
+                  const unsigned int                          level2);
 
       /**
        * Assemble a single local matrix into a global one.
        */
-      void assemble_up(MatrixType                                 &global,
-                       const FullMatrix<number>                   &local,
-                       const unsigned int                          block_row,
-                       const unsigned int                          block_col,
-                       const std::vector<types::global_dof_index> &dof1,
-                       const std::vector<types::global_dof_index> &dof2,
-                       const unsigned int                          level1,
-                       const unsigned int                          level2);
-
-      /**
-       * Assemble a single local matrix into a global one.
-       */
-      void assemble_down(MatrixType                                 &global,
-                         const FullMatrix<number>                   &local,
-                         const unsigned int                          block_row,
-                         const unsigned int                          block_col,
-                         const std::vector<types::global_dof_index> &dof1,
-                         const std::vector<types::global_dof_index> &dof2,
-                         const unsigned int                          level1,
-                         const unsigned int                          level2);
-
-      /**
-       * Assemble a single local matrix into a global one.
-       */
-      void assemble_in(MatrixType                                 &global,
-                       const FullMatrix<number>                   &local,
-                       const unsigned int                          block_row,
-                       const unsigned int                          block_col,
-                       const std::vector<types::global_dof_index> &dof1,
-                       const std::vector<types::global_dof_index> &dof2,
-                       const unsigned int                          level1,
-                       const unsigned int                          level2);
-
-      /**
-       * Assemble a single local matrix into a global one.
-       */
-      void assemble_out(MatrixType                                 &global,
-                        const FullMatrix<number>                   &local,
-                        const unsigned int                          block_row,
-                        const unsigned int                          block_col,
-                        const std::vector<types::global_dof_index> &dof1,
-                        const std::vector<types::global_dof_index> &dof2,
-                        const unsigned int                          level1,
-                        const unsigned int                          level2);
+      void
+      assemble_out(MatrixType &                                global,
+                   const FullMatrix<number> &                  local,
+                   const unsigned int                          block_row,
+                   const unsigned int                          block_col,
+                   const std::vector<types::global_dof_index> &dof1,
+                   const std::vector<types::global_dof_index> &dof2,
+                   const unsigned int                          level1,
+                   const unsigned int                          level2);
 
       /**
        * The level matrices, stored as a vector of pointers.
@@ -467,12 +505,16 @@ namespace MeshWorker
       /**
        * A pointer to the object containing the block structure.
        */
-      SmartPointer<const BlockInfo, MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number> > block_info;
+      SmartPointer<const BlockInfo,
+                   MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+        block_info;
 
       /**
        * A pointer to the object containing constraints.
        */
-      SmartPointer<const MGConstrainedDoFs,MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number> > mg_constrained_dofs;
+      SmartPointer<const MGConstrainedDoFs,
+                   MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>>
+        mg_constrained_dofs;
 
 
       /**
@@ -481,24 +523,24 @@ namespace MeshWorker
        * not be assembled.
        */
       const double threshold;
-
     };
 
-//----------------------------------------------------------------------//
+    //----------------------------------------------------------------------//
 
     template <typename VectorType>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize(const BlockInfo *b,
-                                                              AnyData         &m)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize(
+      const BlockInfo *b,
+      AnyData &        m)
     {
       block_info = b;
-      residuals = m;
+      residuals  = m;
     }
 
     template <typename VectorType>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize
-    (const ConstraintMatrix &c)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize(
+      const AffineConstraints<typename VectorType::value_type> &c)
     {
       constraints = &c;
     }
@@ -507,23 +549,24 @@ namespace MeshWorker
     template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize_info
-    (DOFINFO &info, bool) const
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::initialize_info(
+      DOFINFO &info,
+      bool) const
     {
       info.initialize_vectors(residuals.size());
     }
 
     template <typename VectorType>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble
-    (VectorType                                 &global,
-     const BlockVector<double>                  &local,
-     const std::vector<types::global_dof_index> &dof)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble(
+      VectorType &                                global,
+      const BlockVector<double> &                 local,
+      const std::vector<types::global_dof_index> &dof)
     {
       if (constraints == 0)
         {
-          for (unsigned int b=0; b<local.n_blocks(); ++b)
-            for (unsigned int j=0; j<local.block(b).size(); ++j)
+          for (unsigned int b = 0; b < local.n_blocks(); ++b)
+            for (unsigned int j = 0; j < local.block(b).size(); ++j)
               {
                 // The coordinates of
                 // the current entry in
@@ -533,7 +576,8 @@ namespace MeshWorker
                 // block-wise local
                 // numbering we use in
                 // our local vectors
-                const unsigned int jcell = this->block_info->local().local_to_global(b, j);
+                const unsigned int jcell =
+                  this->block_info->local().local_to_global(b, j);
                 global(dof[jcell]) += local.block(b)(j);
               }
         }
@@ -545,68 +589,71 @@ namespace MeshWorker
     template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble
-    (const DOFINFO &info)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble(const DOFINFO &info)
     {
-      for (unsigned int i=0; i<residuals.size(); ++i)
-        assemble(*(residuals.entry<VectorType>(i)), info.vector(i), info.indices);
+      for (unsigned int i = 0; i < residuals.size(); ++i)
+        assemble(*(residuals.entry<VectorType>(i)),
+                 info.vector(i),
+                 info.indices);
     }
 
 
     template <typename VectorType>
     template <class DOFINFO>
     inline void
-    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble
-    (const DOFINFO &info1,
-     const DOFINFO &info2)
+    ResidualLocalBlocksToGlobalBlocks<VectorType>::assemble(
+      const DOFINFO &info1,
+      const DOFINFO &info2)
     {
-      for (unsigned int i=0; i<residuals.size(); ++i)
+      for (unsigned int i = 0; i < residuals.size(); ++i)
         {
-          assemble(*(residuals.entry<VectorType>(i)), info1.vector(i), info1.indices);
-          assemble(*(residuals.entry<VectorType>(i)), info2.vector(i), info2.indices);
+          assemble(*(residuals.entry<VectorType>(i)),
+                   info1.vector(i),
+                   info1.indices);
+          assemble(*(residuals.entry<VectorType>(i)),
+                   info2.vector(i),
+                   info2.indices);
         }
     }
 
 
-//----------------------------------------------------------------------//
+    //----------------------------------------------------------------------//
 
     template <typename MatrixType, typename number>
-    inline
-    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::MatrixLocalBlocksToGlobalBlocks
-    (double threshold)
-      :
-      threshold(threshold)
+    inline MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::
+      MatrixLocalBlocksToGlobalBlocks(double threshold)
+      : threshold(threshold)
     {}
 
 
     template <typename MatrixType, typename number>
     inline void
-    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize
-    (const BlockInfo               *b,
-     MatrixBlockVector<MatrixType> &m)
+    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize(
+      const BlockInfo *              b,
+      MatrixBlockVector<MatrixType> &m)
     {
       block_info = b;
-      matrices = &m;
+      matrices   = &m;
     }
 
 
 
     template <typename MatrixType, typename number>
     inline void
-    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize
-    (const ConstraintMatrix &c)
+    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize(
+      const AffineConstraints<typename MatrixType::value_type> &c)
     {
       constraints = &c;
     }
 
 
 
-    template <typename MatrixType,typename number>
+    template <typename MatrixType, typename number>
     template <class DOFINFO>
     inline void
-    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_info
-    (DOFINFO &info,
-     bool face) const
+    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_info(
+      DOFINFO &info,
+      bool     face) const
     {
       info.initialize_matrices(*matrices, face);
     }
@@ -615,19 +662,19 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline void
-    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble
-    (MatrixBlock<MatrixType>                    &global,
-     const FullMatrix<number>                   &local,
-     const unsigned int                          block_row,
-     const unsigned int                          block_col,
-     const std::vector<types::global_dof_index> &dof1,
-     const std::vector<types::global_dof_index> &dof2)
+    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble(
+      MatrixBlock<MatrixType> &                   global,
+      const FullMatrix<number> &                  local,
+      const unsigned int                          block_row,
+      const unsigned int                          block_col,
+      const std::vector<types::global_dof_index> &dof1,
+      const std::vector<types::global_dof_index> &dof2)
     {
       if (constraints == nullptr)
         {
-          for (unsigned int j=0; j<local.n_rows(); ++j)
-            for (unsigned int k=0; k<local.n_cols(); ++k)
-              if (std::fabs(local(j,k)) >= threshold)
+          for (unsigned int j = 0; j < local.n_rows(); ++j)
+            for (unsigned int k = 0; k < local.n_cols(); ++k)
+              if (std::fabs(local(j, k)) >= threshold)
                 {
                   // The coordinates of
                   // the current entry in
@@ -637,25 +684,31 @@ namespace MeshWorker
                   // block-wise local
                   // numbering we use in
                   // our local matrices
-                  const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-                  const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+                  const unsigned int jcell =
+                    this->block_info->local().local_to_global(block_row, j);
+                  const unsigned int kcell =
+                    this->block_info->local().local_to_global(block_col, k);
 
-                  global.add(dof1[jcell], dof2[kcell], local(j,k));
+                  global.add(dof1[jcell], dof2[kcell], local(j, k));
                 }
         }
       else
         {
-          const BlockIndices &bi = this->block_info->local();
-          std::vector<types::global_dof_index> sliced_row_indices (bi.block_size(block_row));
-          for (unsigned int i=0; i<sliced_row_indices.size(); ++i)
-            sliced_row_indices[i] = dof1[bi.block_start(block_row)+i];
+          const BlockIndices &                 bi = this->block_info->local();
+          std::vector<types::global_dof_index> sliced_row_indices(
+            bi.block_size(block_row));
+          for (unsigned int i = 0; i < sliced_row_indices.size(); ++i)
+            sliced_row_indices[i] = dof1[bi.block_start(block_row) + i];
 
-          std::vector<types::global_dof_index> sliced_col_indices (bi.block_size(block_col));
-          for (unsigned int i=0; i<sliced_col_indices.size(); ++i)
-            sliced_col_indices[i] = dof2[bi.block_start(block_col)+i];
+          std::vector<types::global_dof_index> sliced_col_indices(
+            bi.block_size(block_col));
+          for (unsigned int i = 0; i < sliced_col_indices.size(); ++i)
+            sliced_col_indices[i] = dof2[bi.block_start(block_col) + i];
 
           constraints->distribute_local_to_global(local,
-                                                  sliced_row_indices, sliced_col_indices, global);
+                                                  sliced_row_indices,
+                                                  sliced_col_indices,
+                                                  global);
         }
     }
 
@@ -663,16 +716,22 @@ namespace MeshWorker
     template <typename MatrixType, typename number>
     template <class DOFINFO>
     inline void
-    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble (const DOFINFO &info)
+    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble(
+      const DOFINFO &info)
     {
-      for (unsigned int i=0; i<matrices->size(); ++i)
+      for (unsigned int i = 0; i < matrices->size(); ++i)
         {
           // Row and column index of
           // the block we are dealing with
           const types::global_dof_index row = matrices->block(i).row;
           const types::global_dof_index col = matrices->block(i).column;
 
-          assemble(matrices->block(i), info.matrix(i,false).matrix, row, col, info.indices, info.indices);
+          assemble(matrices->block(i),
+                   info.matrix(i, false).matrix,
+                   row,
+                   col,
+                   info.indices,
+                   info.indices);
         }
     }
 
@@ -680,40 +739,59 @@ namespace MeshWorker
     template <typename MatrixType, typename number>
     template <class DOFINFO>
     inline void
-    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble (const DOFINFO &info1,
-        const DOFINFO &info2)
+    MatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble(
+      const DOFINFO &info1,
+      const DOFINFO &info2)
     {
-      for (unsigned int i=0; i<matrices->size(); ++i)
+      for (unsigned int i = 0; i < matrices->size(); ++i)
         {
           // Row and column index of
           // the block we are dealing with
           const types::global_dof_index row = matrices->block(i).row;
           const types::global_dof_index col = matrices->block(i).column;
 
-          assemble(matrices->block(i), info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices);
-          assemble(matrices->block(i), info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices);
-          assemble(matrices->block(i), info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices);
-          assemble(matrices->block(i), info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices);
+          assemble(matrices->block(i),
+                   info1.matrix(i, false).matrix,
+                   row,
+                   col,
+                   info1.indices,
+                   info1.indices);
+          assemble(matrices->block(i),
+                   info1.matrix(i, true).matrix,
+                   row,
+                   col,
+                   info1.indices,
+                   info2.indices);
+          assemble(matrices->block(i),
+                   info2.matrix(i, false).matrix,
+                   row,
+                   col,
+                   info2.indices,
+                   info2.indices);
+          assemble(matrices->block(i),
+                   info2.matrix(i, true).matrix,
+                   row,
+                   col,
+                   info2.indices,
+                   info1.indices);
         }
     }
 
 
-// ----------------------------------------------------------------------//
+    // ----------------------------------------------------------------------//
 
     template <typename MatrixType, typename number>
-    inline
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::MGMatrixLocalBlocksToGlobalBlocks
-    (double threshold)
-      :
-      threshold(threshold)
+    inline MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::
+      MGMatrixLocalBlocksToGlobalBlocks(double threshold)
+      : threshold(threshold)
     {}
 
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize
-    (const BlockInfo *b,
-     MatrixPtrVector &m)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize(
+      const BlockInfo *b,
+      MatrixPtrVector &m)
     {
       block_info = b;
       AssertDimension(block_info->local().size(), block_info->global().size());
@@ -723,19 +801,19 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize
-    (const MGConstrainedDoFs &mg_c)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize(
+      const MGConstrainedDoFs &mg_c)
     {
       mg_constrained_dofs = &mg_c;
     }
 
 
-    template <typename MatrixType,typename number>
+    template <typename MatrixType, typename number>
     template <class DOFINFO>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_info
-    (DOFINFO &info,
-     bool face) const
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_info(
+      DOFINFO &info,
+      bool     face) const
     {
       info.initialize_matrices(*matrices, face);
     }
@@ -744,42 +822,41 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_edge_flux
-    (MatrixPtrVector &up,
-     MatrixPtrVector &down)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_edge_flux(
+      MatrixPtrVector &up,
+      MatrixPtrVector &down)
     {
-      flux_up = up;
+      flux_up   = up;
       flux_down = down;
     }
 
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::initialize_interfaces
-    (MatrixPtrVector &in,
-     MatrixPtrVector &out)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::
+      initialize_interfaces(MatrixPtrVector &in, MatrixPtrVector &out)
     {
-      interface_in = in;
+      interface_in  = in;
       interface_out = out;
     }
 
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble
-    (MatrixType                                 &global,
-     const FullMatrix<number>                   &local,
-     const unsigned int                          block_row,
-     const unsigned int                          block_col,
-     const std::vector<types::global_dof_index> &dof1,
-     const std::vector<types::global_dof_index> &dof2,
-     const unsigned int                          level1,
-     const unsigned int                          level2,
-     bool                                        transpose)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble(
+      MatrixType &                                global,
+      const FullMatrix<number> &                  local,
+      const unsigned int                          block_row,
+      const unsigned int                          block_col,
+      const std::vector<types::global_dof_index> &dof1,
+      const std::vector<types::global_dof_index> &dof2,
+      const unsigned int                          level1,
+      const unsigned int                          level2,
+      bool                                        transpose)
     {
-      for (unsigned int j=0; j<local.n_rows(); ++j)
-        for (unsigned int k=0; k<local.n_cols(); ++k)
-          if (std::fabs(local(j,k)) >= threshold)
+      for (unsigned int j = 0; j < local.n_rows(); ++j)
+        for (unsigned int k = 0; k < local.n_cols(); ++k)
+          if (std::fabs(local(j, k)) >= threshold)
             {
               // The coordinates of
               // the current entry in
@@ -789,8 +866,10 @@ namespace MeshWorker
               // block-wise local
               // numbering we use in
               // our local matrices
-              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+              const unsigned int jcell =
+                this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell =
+                this->block_info->local().local_to_global(block_col, k);
 
               // The global dof
               // indices to assemble
@@ -800,42 +879,50 @@ namespace MeshWorker
               // different cells, we
               // provide two sets of
               // dof indices.
-              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+              const unsigned int jglobal = this->block_info->level(level1)
+                                             .global_to_local(dof1[jcell])
+                                             .second;
+              const unsigned int kglobal = this->block_info->level(level2)
+                                             .global_to_local(dof2[kcell])
+                                             .second;
 
               if (mg_constrained_dofs == 0)
                 {
                   if (transpose)
-                    global.add(kglobal, jglobal, local(j,k));
+                    global.add(kglobal, jglobal, local(j, k));
                   else
-                    global.add(jglobal, kglobal, local(j,k));
+                    global.add(jglobal, kglobal, local(j, k));
                 }
               else
                 {
-                  if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                  if (!mg_constrained_dofs->at_refinement_edge(level1,
+                                                               jglobal) &&
                       !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                     {
                       if (mg_constrained_dofs->set_boundary_values())
                         {
-                          if ((!mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
-                               !mg_constrained_dofs->is_boundary_index(level2, kglobal))
-                              ||
-                              (mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
-                               mg_constrained_dofs->is_boundary_index(level2, kglobal) &&
+                          if ((!mg_constrained_dofs->is_boundary_index(
+                                 level1, jglobal) &&
+                               !mg_constrained_dofs->is_boundary_index(
+                                 level2, kglobal)) ||
+                              (mg_constrained_dofs->is_boundary_index(
+                                 level1, jglobal) &&
+                               mg_constrained_dofs->is_boundary_index(
+                                 level2, kglobal) &&
                                jglobal == kglobal))
                             {
                               if (transpose)
-                                global.add(kglobal, jglobal, local(j,k));
+                                global.add(kglobal, jglobal, local(j, k));
                               else
-                                global.add(jglobal, kglobal, local(j,k));
+                                global.add(jglobal, kglobal, local(j, k));
                             }
                         }
                       else
                         {
                           if (transpose)
-                            global.add(kglobal, jglobal, local(j,k));
+                            global.add(kglobal, jglobal, local(j, k));
                           else
-                            global.add(jglobal, kglobal, local(j,k));
+                            global.add(jglobal, kglobal, local(j, k));
                         }
                     }
                 }
@@ -845,19 +932,19 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_fluxes
-    (MatrixType                                 &global,
-     const FullMatrix<number>                   &local,
-     const unsigned int                          block_row,
-     const unsigned int                          block_col,
-     const std::vector<types::global_dof_index> &dof1,
-     const std::vector<types::global_dof_index> &dof2,
-     const unsigned int                          level1,
-     const unsigned int                          level2)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_fluxes(
+      MatrixType &                                global,
+      const FullMatrix<number> &                  local,
+      const unsigned int                          block_row,
+      const unsigned int                          block_col,
+      const std::vector<types::global_dof_index> &dof1,
+      const std::vector<types::global_dof_index> &dof2,
+      const unsigned int                          level1,
+      const unsigned int                          level2)
     {
-      for (unsigned int j=0; j<local.n_rows(); ++j)
-        for (unsigned int k=0; k<local.n_cols(); ++k)
-          if (std::fabs(local(j,k)) >= threshold)
+      for (unsigned int j = 0; j < local.n_rows(); ++j)
+        for (unsigned int k = 0; k < local.n_cols(); ++k)
+          if (std::fabs(local(j, k)) >= threshold)
             {
               // The coordinates of
               // the current entry in
@@ -867,8 +954,10 @@ namespace MeshWorker
               // block-wise local
               // numbering we use in
               // our local matrices
-              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+              const unsigned int jcell =
+                this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell =
+                this->block_info->local().local_to_global(block_col, k);
 
               // The global dof
               // indices to assemble
@@ -878,19 +967,27 @@ namespace MeshWorker
               // different cells, we
               // provide two sets of
               // dof indices.
-              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+              const unsigned int jglobal = this->block_info->level(level1)
+                                             .global_to_local(dof1[jcell])
+                                             .second;
+              const unsigned int kglobal = this->block_info->level(level2)
+                                             .global_to_local(dof2[kcell])
+                                             .second;
 
               if (mg_constrained_dofs == 0)
-                global.add(jglobal, kglobal, local(j,k));
+                global.add(jglobal, kglobal, local(j, k));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                  if (!mg_constrained_dofs->non_refinement_edge_index(
+                        level1, jglobal) &&
+                      !mg_constrained_dofs->non_refinement_edge_index(level2,
+                                                                      kglobal))
                     {
-                      if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
-                          !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
-                        global.add(jglobal, kglobal, local(j,k));
+                      if (!mg_constrained_dofs->at_refinement_edge(level1,
+                                                                   jglobal) &&
+                          !mg_constrained_dofs->at_refinement_edge(level2,
+                                                                   kglobal))
+                        global.add(jglobal, kglobal, local(j, k));
                     }
                 }
             }
@@ -898,19 +995,19 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_up
-    (MatrixType                                 &global,
-     const FullMatrix<number>                   &local,
-     const unsigned int                          block_row,
-     const unsigned int                          block_col,
-     const std::vector<types::global_dof_index> &dof1,
-     const std::vector<types::global_dof_index> &dof2,
-     const unsigned int                          level1,
-     const unsigned int                          level2)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_up(
+      MatrixType &                                global,
+      const FullMatrix<number> &                  local,
+      const unsigned int                          block_row,
+      const unsigned int                          block_col,
+      const std::vector<types::global_dof_index> &dof1,
+      const std::vector<types::global_dof_index> &dof2,
+      const unsigned int                          level1,
+      const unsigned int                          level2)
     {
-      for (unsigned int j=0; j<local.n_rows(); ++j)
-        for (unsigned int k=0; k<local.n_cols(); ++k)
-          if (std::fabs(local(j,k)) >= threshold)
+      for (unsigned int j = 0; j < local.n_rows(); ++j)
+        for (unsigned int k = 0; k < local.n_cols(); ++k)
+          if (std::fabs(local(j, k)) >= threshold)
             {
               // The coordinates of
               // the current entry in
@@ -920,8 +1017,10 @@ namespace MeshWorker
               // block-wise local
               // numbering we use in
               // our local matrices
-              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+              const unsigned int jcell =
+                this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell =
+                this->block_info->local().local_to_global(block_col, k);
 
               // The global dof
               // indices to assemble
@@ -931,19 +1030,27 @@ namespace MeshWorker
               // different cells, we
               // provide two sets of
               // dof indices.
-              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+              const unsigned int jglobal = this->block_info->level(level1)
+                                             .global_to_local(dof1[jcell])
+                                             .second;
+              const unsigned int kglobal = this->block_info->level(level2)
+                                             .global_to_local(dof2[kcell])
+                                             .second;
 
               if (mg_constrained_dofs == 0)
-                global.add(jglobal, kglobal, local(j,k));
+                global.add(jglobal, kglobal, local(j, k));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                  if (!mg_constrained_dofs->non_refinement_edge_index(
+                        level1, jglobal) &&
+                      !mg_constrained_dofs->non_refinement_edge_index(level2,
+                                                                      kglobal))
                     {
-                      if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
-                          !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
-                        global.add(jglobal, kglobal, local(j,k));
+                      if (!mg_constrained_dofs->at_refinement_edge(level1,
+                                                                   jglobal) &&
+                          !mg_constrained_dofs->at_refinement_edge(level2,
+                                                                   kglobal))
+                        global.add(jglobal, kglobal, local(j, k));
                     }
                 }
             }
@@ -951,19 +1058,19 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_down
-    (MatrixType                                 &global,
-     const FullMatrix<number>                   &local,
-     const unsigned int                          block_row,
-     const unsigned int                          block_col,
-     const std::vector<types::global_dof_index> &dof1,
-     const std::vector<types::global_dof_index> &dof2,
-     const unsigned int                          level1,
-     const unsigned int                          level2)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_down(
+      MatrixType &                                global,
+      const FullMatrix<number> &                  local,
+      const unsigned int                          block_row,
+      const unsigned int                          block_col,
+      const std::vector<types::global_dof_index> &dof1,
+      const std::vector<types::global_dof_index> &dof2,
+      const unsigned int                          level1,
+      const unsigned int                          level2)
     {
-      for (unsigned int j=0; j<local.n_rows(); ++j)
-        for (unsigned int k=0; k<local.n_cols(); ++k)
-          if (std::fabs(local(k,j)) >= threshold)
+      for (unsigned int j = 0; j < local.n_rows(); ++j)
+        for (unsigned int k = 0; k < local.n_cols(); ++k)
+          if (std::fabs(local(k, j)) >= threshold)
             {
               // The coordinates of
               // the current entry in
@@ -973,8 +1080,10 @@ namespace MeshWorker
               // block-wise local
               // numbering we use in
               // our local matrices
-              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+              const unsigned int jcell =
+                this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell =
+                this->block_info->local().local_to_global(block_col, k);
 
               // The global dof
               // indices to assemble
@@ -984,19 +1093,27 @@ namespace MeshWorker
               // different cells, we
               // provide two sets of
               // dof indices.
-              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+              const unsigned int jglobal = this->block_info->level(level1)
+                                             .global_to_local(dof1[jcell])
+                                             .second;
+              const unsigned int kglobal = this->block_info->level(level2)
+                                             .global_to_local(dof2[kcell])
+                                             .second;
 
               if (mg_constrained_dofs == 0)
-                global.add(jglobal, kglobal, local(k,j));
+                global.add(jglobal, kglobal, local(k, j));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                  if (!mg_constrained_dofs->non_refinement_edge_index(
+                        level1, jglobal) &&
+                      !mg_constrained_dofs->non_refinement_edge_index(level2,
+                                                                      kglobal))
                     {
-                      if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
-                          !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
-                        global.add(jglobal, kglobal, local(k,j));
+                      if (!mg_constrained_dofs->at_refinement_edge(level1,
+                                                                   jglobal) &&
+                          !mg_constrained_dofs->at_refinement_edge(level2,
+                                                                   kglobal))
+                        global.add(jglobal, kglobal, local(k, j));
                     }
                 }
             }
@@ -1004,22 +1121,22 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_in
-    (MatrixType                                 &global,
-     const FullMatrix<number>                   &local,
-     const unsigned int                          block_row,
-     const unsigned int                          block_col,
-     const std::vector<types::global_dof_index> &dof1,
-     const std::vector<types::global_dof_index> &dof2,
-     const unsigned int                          level1,
-     const unsigned int                          level2)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_in(
+      MatrixType &                                global,
+      const FullMatrix<number> &                  local,
+      const unsigned int                          block_row,
+      const unsigned int                          block_col,
+      const std::vector<types::global_dof_index> &dof1,
+      const std::vector<types::global_dof_index> &dof2,
+      const unsigned int                          level1,
+      const unsigned int                          level2)
     {
-//      AssertDimension(local.n(), dof1.size());
-//      AssertDimension(local.m(), dof2.size());
+      //      AssertDimension(local.n(), dof1.size());
+      //      AssertDimension(local.m(), dof2.size());
 
-      for (unsigned int j=0; j<local.n_rows(); ++j)
-        for (unsigned int k=0; k<local.n_cols(); ++k)
-          if (std::fabs(local(j,k)) >= threshold)
+      for (unsigned int j = 0; j < local.n_rows(); ++j)
+        for (unsigned int k = 0; k < local.n_cols(); ++k)
+          if (std::fabs(local(j, k)) >= threshold)
             {
               // The coordinates of
               // the current entry in
@@ -1029,8 +1146,10 @@ namespace MeshWorker
               // block-wise local
               // numbering we use in
               // our local matrices
-              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+              const unsigned int jcell =
+                this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell =
+                this->block_info->local().local_to_global(block_col, k);
 
               // The global dof
               // indices to assemble
@@ -1040,28 +1159,36 @@ namespace MeshWorker
               // different cells, we
               // provide two sets of
               // dof indices.
-              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+              const unsigned int jglobal = this->block_info->level(level1)
+                                             .global_to_local(dof1[jcell])
+                                             .second;
+              const unsigned int kglobal = this->block_info->level(level2)
+                                             .global_to_local(dof2[kcell])
+                                             .second;
 
               if (mg_constrained_dofs == 0)
-                global.add(jglobal, kglobal, local(j,k));
+                global.add(jglobal, kglobal, local(j, k));
               else
                 {
-                  if (mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                  if (mg_constrained_dofs->at_refinement_edge(level1,
+                                                              jglobal) &&
                       !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                     {
                       if (mg_constrained_dofs->set_boundary_values())
                         {
-                          if ((!mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
-                               !mg_constrained_dofs->is_boundary_index(level2, kglobal))
-                              ||
-                              (mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
-                               mg_constrained_dofs->is_boundary_index(level2, kglobal) &&
+                          if ((!mg_constrained_dofs->is_boundary_index(
+                                 level1, jglobal) &&
+                               !mg_constrained_dofs->is_boundary_index(
+                                 level2, kglobal)) ||
+                              (mg_constrained_dofs->is_boundary_index(
+                                 level1, jglobal) &&
+                               mg_constrained_dofs->is_boundary_index(
+                                 level2, kglobal) &&
                                jglobal == kglobal))
-                            global.add(jglobal, kglobal, local(j,k));
+                            global.add(jglobal, kglobal, local(j, k));
                         }
                       else
-                        global.add(jglobal, kglobal, local(j,k));
+                        global.add(jglobal, kglobal, local(j, k));
                     }
                 }
             }
@@ -1069,22 +1196,22 @@ namespace MeshWorker
 
     template <typename MatrixType, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_out
-    (MatrixType                                 &global,
-     const FullMatrix<number>                   &local,
-     const unsigned int                          block_row,
-     const unsigned int                          block_col,
-     const std::vector<types::global_dof_index> &dof1,
-     const std::vector<types::global_dof_index> &dof2,
-     const unsigned int                          level1,
-     const unsigned int                          level2)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble_out(
+      MatrixType &                                global,
+      const FullMatrix<number> &                  local,
+      const unsigned int                          block_row,
+      const unsigned int                          block_col,
+      const std::vector<types::global_dof_index> &dof1,
+      const std::vector<types::global_dof_index> &dof2,
+      const unsigned int                          level1,
+      const unsigned int                          level2)
     {
-//      AssertDimension(local.n(), dof1.size());
-//      AssertDimension(local.m(), dof2.size());
+      //      AssertDimension(local.n(), dof1.size());
+      //      AssertDimension(local.m(), dof2.size());
 
-      for (unsigned int j=0; j<local.n_rows(); ++j)
-        for (unsigned int k=0; k<local.n_cols(); ++k)
-          if (std::fabs(local(k,j)) >= threshold)
+      for (unsigned int j = 0; j < local.n_rows(); ++j)
+        for (unsigned int k = 0; k < local.n_cols(); ++k)
+          if (std::fabs(local(k, j)) >= threshold)
             {
               // The coordinates of
               // the current entry in
@@ -1094,8 +1221,10 @@ namespace MeshWorker
               // block-wise local
               // numbering we use in
               // our local matrices
-              const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
-              const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+              const unsigned int jcell =
+                this->block_info->local().local_to_global(block_row, j);
+              const unsigned int kcell =
+                this->block_info->local().local_to_global(block_col, k);
 
               // The global dof
               // indices to assemble
@@ -1105,28 +1234,36 @@ namespace MeshWorker
               // different cells, we
               // provide two sets of
               // dof indices.
-              const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
-              const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+              const unsigned int jglobal = this->block_info->level(level1)
+                                             .global_to_local(dof1[jcell])
+                                             .second;
+              const unsigned int kglobal = this->block_info->level(level2)
+                                             .global_to_local(dof2[kcell])
+                                             .second;
 
               if (mg_constrained_dofs == 0)
-                global.add(jglobal, kglobal, local(k,j));
+                global.add(jglobal, kglobal, local(k, j));
               else
                 {
-                  if (mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                  if (mg_constrained_dofs->at_refinement_edge(level1,
+                                                              jglobal) &&
                       !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                     {
                       if (mg_constrained_dofs->set_boundary_values())
                         {
-                          if ((!mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
-                               !mg_constrained_dofs->is_boundary_index(level2, kglobal))
-                              ||
-                              (mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
-                               mg_constrained_dofs->is_boundary_index(level2, kglobal) &&
+                          if ((!mg_constrained_dofs->is_boundary_index(
+                                 level1, jglobal) &&
+                               !mg_constrained_dofs->is_boundary_index(
+                                 level2, kglobal)) ||
+                              (mg_constrained_dofs->is_boundary_index(
+                                 level1, jglobal) &&
+                               mg_constrained_dofs->is_boundary_index(
+                                 level2, kglobal) &&
                                jglobal == kglobal))
-                            global.add(jglobal, kglobal, local(k,j));
+                            global.add(jglobal, kglobal, local(k, j));
                         }
                       else
-                        global.add(jglobal, kglobal, local(k,j));
+                        global.add(jglobal, kglobal, local(k, j));
                     }
                 }
             }
@@ -1136,32 +1273,63 @@ namespace MeshWorker
     template <typename MatrixType, typename number>
     template <class DOFINFO>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble(const DOFINFO &info)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble(
+      const DOFINFO &info)
     {
       const unsigned int level = info.cell->level();
 
-      for (unsigned int i=0; i<matrices->size(); ++i)
+      for (unsigned int i = 0; i < matrices->size(); ++i)
         {
           // Row and column index of
           // the block we are dealing with
           const unsigned int row = matrices->block(i)[level].row;
           const unsigned int col = matrices->block(i)[level].column;
 
-          assemble(matrices->block(i)[level].matrix, info.matrix(i,false).matrix, row, col,
-                   info.indices, info.indices, level, level);
+          assemble(matrices->block(i)[level].matrix,
+                   info.matrix(i, false).matrix,
+                   row,
+                   col,
+                   info.indices,
+                   info.indices,
+                   level,
+                   level);
           if (mg_constrained_dofs != 0)
             {
               if (interface_in != 0)
-                assemble_in(interface_in->block(i)[level], info.matrix(i,false).matrix, row, col,
-                            info.indices, info.indices, level, level);
+                assemble_in(interface_in->block(i)[level],
+                            info.matrix(i, false).matrix,
+                            row,
+                            col,
+                            info.indices,
+                            info.indices,
+                            level,
+                            level);
               if (interface_out != 0)
-                assemble_in(interface_out->block(i)[level], info.matrix(i,false).matrix, row, col,
-                            info.indices, info.indices, level, level);
+                assemble_in(interface_out->block(i)[level],
+                            info.matrix(i, false).matrix,
+                            row,
+                            col,
+                            info.indices,
+                            info.indices,
+                            level,
+                            level);
 
-              assemble_in(matrices->block_in(i)[level], info.matrix(i,false).matrix, row, col,
-                          info.indices, info.indices, level, level);
-              assemble_out(matrices->block_out(i)[level], info.matrix(i,false).matrix, row, col,
-                           info.indices, info.indices, level, level);
+              assemble_in(matrices->block_in(i)[level],
+                          info.matrix(i, false).matrix,
+                          row,
+                          col,
+                          info.indices,
+                          info.indices,
+                          level,
+                          level);
+              assemble_out(matrices->block_out(i)[level],
+                           info.matrix(i, false).matrix,
+                           row,
+                           col,
+                           info.indices,
+                           info.indices,
+                           level,
+                           level);
             }
         }
     }
@@ -1170,16 +1338,16 @@ namespace MeshWorker
     template <typename MatrixType, typename number>
     template <class DOFINFO>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble
-    (const DOFINFO &info1,
-     const DOFINFO &info2)
+    MGMatrixLocalBlocksToGlobalBlocks<MatrixType, number>::assemble(
+      const DOFINFO &info1,
+      const DOFINFO &info2)
     {
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
 
-      for (unsigned int i=0; i<matrices->size(); ++i)
+      for (unsigned int i = 0; i < matrices->size(); ++i)
         {
-          MGLevelObject<MatrixBlock<MatrixType> > &o = matrices->block(i);
+          MGLevelObject<MatrixBlock<MatrixType>> &o = matrices->block(i);
 
           // Row and column index of
           // the block we are dealing with
@@ -1190,25 +1358,73 @@ namespace MeshWorker
             {
               if (mg_constrained_dofs == 0)
                 {
-                  assemble(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
-                           info1.indices, info1.indices, level1, level1);
-                  assemble(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
-                           info1.indices, info2.indices, level1, level2);
-                  assemble(o[level1].matrix, info2.matrix(i,false).matrix, row, col,
-                           info2.indices, info2.indices, level2, level2);
-                  assemble(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
-                           info2.indices, info1.indices, level2, level1);
+                  assemble(o[level1].matrix,
+                           info1.matrix(i, false).matrix,
+                           row,
+                           col,
+                           info1.indices,
+                           info1.indices,
+                           level1,
+                           level1);
+                  assemble(o[level1].matrix,
+                           info1.matrix(i, true).matrix,
+                           row,
+                           col,
+                           info1.indices,
+                           info2.indices,
+                           level1,
+                           level2);
+                  assemble(o[level1].matrix,
+                           info2.matrix(i, false).matrix,
+                           row,
+                           col,
+                           info2.indices,
+                           info2.indices,
+                           level2,
+                           level2);
+                  assemble(o[level1].matrix,
+                           info2.matrix(i, true).matrix,
+                           row,
+                           col,
+                           info2.indices,
+                           info1.indices,
+                           level2,
+                           level1);
                 }
               else
                 {
-                  assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
-                                  info1.indices, info1.indices, level1, level1);
-                  assemble_fluxes(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
-                                  info1.indices, info2.indices, level1, level2);
-                  assemble_fluxes(o[level1].matrix, info2.matrix(i,false).matrix, row, col,
-                                  info2.indices, info2.indices, level2, level2);
-                  assemble_fluxes(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
-                                  info2.indices, info1.indices, level2, level1);
+                  assemble_fluxes(o[level1].matrix,
+                                  info1.matrix(i, false).matrix,
+                                  row,
+                                  col,
+                                  info1.indices,
+                                  info1.indices,
+                                  level1,
+                                  level1);
+                  assemble_fluxes(o[level1].matrix,
+                                  info1.matrix(i, true).matrix,
+                                  row,
+                                  col,
+                                  info1.indices,
+                                  info2.indices,
+                                  level1,
+                                  level2);
+                  assemble_fluxes(o[level1].matrix,
+                                  info2.matrix(i, false).matrix,
+                                  row,
+                                  col,
+                                  info2.indices,
+                                  info2.indices,
+                                  level2,
+                                  level2);
+                  assemble_fluxes(o[level1].matrix,
+                                  info2.matrix(i, true).matrix,
+                                  row,
+                                  col,
+                                  info2.indices,
+                                  info1.indices,
+                                  level2,
+                                  level1);
                 }
             }
           else
@@ -1219,18 +1435,36 @@ namespace MeshWorker
                   // Do not add M22,
                   // which is done by
                   // the coarser cell
-                  assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
-                                  info1.indices, info1.indices, level1, level1);
-                  assemble_up(flux_up->block(i)[level1].matrix, info1.matrix(i,true).matrix, row, col,
-                              info1.indices, info2.indices, level1, level2);
-                  assemble_down(flux_down->block(i)[level1].matrix, info2.matrix(i,true).matrix, row, col,
-                                info2.indices, info1.indices, level2, level1);
+                  assemble_fluxes(o[level1].matrix,
+                                  info1.matrix(i, false).matrix,
+                                  row,
+                                  col,
+                                  info1.indices,
+                                  info1.indices,
+                                  level1,
+                                  level1);
+                  assemble_up(flux_up->block(i)[level1].matrix,
+                              info1.matrix(i, true).matrix,
+                              row,
+                              col,
+                              info1.indices,
+                              info2.indices,
+                              level1,
+                              level2);
+                  assemble_down(flux_down->block(i)[level1].matrix,
+                                info2.matrix(i, true).matrix,
+                                row,
+                                col,
+                                info2.indices,
+                                info1.indices,
+                                level2,
+                                level1);
                 }
             }
         }
     }
-  }
-}
+  } // namespace Assembler
+} // namespace MeshWorker
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -154,7 +154,7 @@ $\mathbb{R}^n\backslash\Omega$, whose boundary is $ \Gamma_\infty \cup
 \Gamma$, where the "boundary" at infinity is defined as
 
 \f[
-\Gamma_\infty := \lim_{r\to\infty} \partial B_r(0).
+\Gamma_\infty \dealcoloneq \lim_{r\to\infty} \partial B_r(0).
 \f]
 
 In our program the normals are defined as <i>outer</i> to the domain
@@ -230,7 +230,7 @@ $\Omega$:
   \quad \mathbf{x}\in \partial\Omega,
 \f]
 
-which is the %Boundary Integral Equation (BIE) we were looking for,
+which is the Boundary Integral Equation (BIE) we were looking for,
 where the quantity $\alpha(\mathbf{x})$ is the fraction of angle or
 solid angle by which the point $\mathbf{x}$ sees the domain of
 integration $\mathbb{R}^n\backslash\Omega$.
@@ -265,7 +265,7 @@ Notice that the fraction of angle (in 2d) or solid angle (in 3d)
 $\alpha(\mathbf{x})$ by which the point $\mathbf{x}$ sees the domain
 $\Omega$ can be defined using the double layer potential itself:
 \f[
-\alpha(\mathbf{x}) := 1 -
+\alpha(\mathbf{x}) \dealcoloneq 1 -
 \frac{1}{2(n-1)\pi}\int_{\partial \Omega} \frac{ (\mathbf{y}-\mathbf{x})\cdot\mathbf{n}_y  }
 { |\mathbf{y}-\mathbf{x}|^{n} }\phi(\mathbf{y})\,ds_y = 1+
 \int_{\partial \Omega} \frac{ \partial G(\mathbf{y}-\mathbf{x}) }{\partial \mathbf{n}_y} \, ds_y.
@@ -312,7 +312,7 @@ the velocity as $\mathbf{\tilde v}=\nabla \phi$.
 
 Notice that the evaluation of the above formula for $\mathbf{x} \in
 \Omega$ should yield zero as a result, since the integration of the
-the Dirac delta $\delta(\mathbf{x})$ in the domain
+Dirac delta $\delta(\mathbf{x})$ in the domain
 $\mathbb{R}^n\backslash\Omega$ is always zero by definition.
 
 As a final test, let us verify that this velocity indeed satisfies the
@@ -472,7 +472,7 @@ This is exactly Bernoulli's law mentioned above.
 
 <h3>The numerical approximation</h3>
 
-Numerical approximations of %Boundary Integral Equations (BIE) are commonly
+Numerical approximations of Boundary Integral Equations (BIE) are commonly
 referred to as the boundary element method or panel method (the latter
 expression being used mostly in the computational fluid dynamics community).
 The goal of the following test problem is to solve the integral
@@ -490,7 +490,7 @@ dimension $n$ of the surrounding space $\mathbb{R}^n$.
 We define the finite dimensional space $V_h$ as
 \f[
   \label{eq:definition-Vh}
-  V_h := \{ v \in C^0(\Gamma) \text{ s.t. } v|_{K_i} \in \mathcal{Q}^1(K_i),
+  V_h \dealcoloneq \{ v \in C^0(\Gamma) \text{ s.t. } v|_{K_i} \in \mathcal{Q}^1(K_i),
   \forall i\},
 \f]
 with basis functions $\psi_i(\mathbf{x})$ for which we will use the usual FE_Q
@@ -504,8 +504,8 @@ identified by the vector $\boldsymbol{\phi}$ of its coefficients
 $\phi_i$, that is:
 \f[
   \label{eq:definition-of-element}
-  \phi_h(\mathbf{x}) := \phi_i \psi_i(\mathbf{x}), \qquad
-  \boldsymbol{\phi} := \{ \phi_i \},
+  \phi_h(\mathbf{x}) \dealcoloneq \phi_i \psi_i(\mathbf{x}), \qquad
+  \boldsymbol{\phi} \dealcoloneq \{ \phi_i \},
 \f]
 where summation  is implied over repeated indexes. Note that we could use
 discontinuous elements here &mdash; in fact, there is no real reason to use
@@ -593,7 +593,7 @@ As usual in these cases, all integrations are performed on a reference
 simple domain, i.e., we assume that each element $K_i$ of
 $\mathcal{T}_h$ can be expressed as a linear (in two dimensions) or
 bi-linear (in three dimensions) transformation of the reference
-boundary element $\hat K := [0,1]^{n-1}$, and we perform the integrations after a
+boundary element $\hat K \dealcoloneq [0,1]^{n-1}$, and we perform the integrations after a
 change of variables from the real element $K_i$ to the reference
 element $\hat K$.
 
@@ -670,7 +670,7 @@ derivatives.
 
 The testcase we will be solving is for a circular (in 2d) or spherical
 (in 3d) obstacle. Meshes for these geometries will be read in from
-files in the current directory and an object of type HyperBallBoundary
+files in the current directory and an object of type SphericalManifold
 will then be attached to the triangulation to allow mesh refinement
 that respects the continuous geometry behind the discrete initial
 mesh.

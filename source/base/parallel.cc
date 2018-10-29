@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace Vector
+  namespace VectorImplementation
   {
     // set minimum grain size. this value has been determined by experiments
     // with the actual dealii::Vector implementation and takes vectorization
@@ -32,10 +32,10 @@ namespace internal
     // split into enough chunks and the problem becomes badly balanced. the
     // tests are documented at https://github.com/dealii/dealii/issues/2496
     unsigned int minimum_parallel_grain_size = 4096;
-  }
+  } // namespace VectorImplementation
 
 
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     // set this value to 1/16 of the value of the minimum grain size of
     // vectors (a factor of 4 because we assume that sparse matrix-vector
@@ -46,8 +46,8 @@ namespace internal
     // any more for anything but very small matrices that we don't care that
     // much about anyway.
     unsigned int minimum_parallel_grain_size = 256;
-  }
-}
+  } // namespace SparseMatrixImplementation
+} // namespace internal
 
 namespace parallel
 {
@@ -55,9 +55,8 @@ namespace parallel
   {
 #ifdef DEAL_II_WITH_THREADS
     TBBPartitioner::TBBPartitioner()
-      :
-      my_partitioner(std::make_shared<tbb::affinity_partitioner>()),
-      in_use(false)
+      : my_partitioner(std::make_shared<tbb::affinity_partitioner>())
+      , in_use(false)
     {}
 
 
@@ -65,8 +64,9 @@ namespace parallel
     TBBPartitioner::~TBBPartitioner()
     {
       AssertNothrow(in_use == false,
-                    ExcInternalError("A vector partitioner goes out of scope, but "
-                                     "it appears to be still in use."));
+                    ExcInternalError(
+                      "A vector partitioner goes out of scope, but "
+                      "it appears to be still in use."));
     }
 
 
@@ -74,7 +74,7 @@ namespace parallel
     std::shared_ptr<tbb::affinity_partitioner>
     TBBPartitioner::acquire_one_partitioner()
     {
-      dealii::Threads::Mutex::ScopedLock lock(mutex);
+      std::lock_guard<std::mutex> lock(mutex);
       if (in_use)
         return std::make_shared<tbb::affinity_partitioner>();
 
@@ -85,20 +85,20 @@ namespace parallel
 
 
     void
-    TBBPartitioner::release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p)
+    TBBPartitioner::release_one_partitioner(
+      std::shared_ptr<tbb::affinity_partitioner> &p)
     {
       if (p.get() == my_partitioner.get())
         {
-          dealii::Threads::Mutex::ScopedLock lock(mutex);
+          std::lock_guard<std::mutex> lock(mutex);
           in_use = false;
         }
     }
 #else
     TBBPartitioner::TBBPartitioner() = default;
 #endif
-  }
-}
-
+  } // namespace internal
+} // namespace parallel
 
 
 

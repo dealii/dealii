@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -22,13 +22,14 @@ rcond(R)
 ans =  0.055556
 */
 
-#include "../tests.h"
-#include "create_matrix.h"
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <iostream>
+
+#include "../tests.h"
+#include "create_matrix.h"
 
 
 template <typename NumberType>
@@ -38,13 +39,13 @@ test(const unsigned int size)
   LAPACKFullMatrix<NumberType> M(size);
   M.set_property(LAPACKSupport::upper_triangular);
 
-  M = 0.;
+  M                    = 0.;
   unsigned int counter = 1;
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = 0; j < size; ++j)
       {
         if (j >= i)
-          M(i,j) = counter;
+          M(i, j) = counter;
 
         counter++;
       }
@@ -56,14 +57,13 @@ test(const unsigned int size)
 }
 
 
-int main()
+int
+main()
 {
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  logfile.precision(3);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
-  const std::vector<unsigned int> sizes = {{1,3,11}};
+  const std::vector<unsigned int> sizes = {{1, 3, 11}};
   for (const auto &s : sizes)
     {
       deallog << "size=" << s << std::endl;

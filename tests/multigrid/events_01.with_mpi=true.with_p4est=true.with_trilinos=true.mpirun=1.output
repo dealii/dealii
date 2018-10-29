@@ -1,0 +1,82 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       147
+DEAL::   Number of degrees of freedom: 1406 (by level: 361, 1369, 49)
+DEAL::transfer_to_mg started
+DEAL::transfer_to_mg finished
+DEAL::pre_smoother_step started on level 2
+DEAL::pre_smoother_step finished on level 2
+DEAL::restriction started on level 2
+DEAL::restriction finished on level 2
+DEAL::pre_smoother_step started on level 1
+DEAL::pre_smoother_step finished on level 1
+DEAL::restriction started on level 1
+DEAL::restriction finished on level 1
+DEAL::coarse_solve started on level 0
+DEAL::coarse_solve finished on level 0
+DEAL::prolongation started on level 1
+DEAL::prolongation finished on level 1
+DEAL::post_smoother_step started on level 1
+DEAL::post_smoother_step finished on level 1
+DEAL::prolongation started on level 2
+DEAL::prolongation finished on level 2
+DEAL::post_smoother_step started on level 2
+DEAL::post_smoother_step finished on level 2
+DEAL::transfer_to_global started
+DEAL::transfer_to_global finished
+DEAL::check residual: 0.00154307
+DEAL::coarse iterations: 31
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       487
+DEAL::   Number of degrees of freedom: 4526 (by level: 1156, 4489, 49)
+DEAL::transfer_to_mg started
+DEAL::transfer_to_mg finished
+DEAL::pre_smoother_step started on level 2
+DEAL::pre_smoother_step finished on level 2
+DEAL::restriction started on level 2
+DEAL::restriction finished on level 2
+DEAL::pre_smoother_step started on level 1
+DEAL::pre_smoother_step finished on level 1
+DEAL::restriction started on level 1
+DEAL::restriction finished on level 1
+DEAL::coarse_solve started on level 0
+DEAL::coarse_solve finished on level 0
+DEAL::prolongation started on level 1
+DEAL::prolongation finished on level 1
+DEAL::post_smoother_step started on level 1
+DEAL::post_smoother_step finished on level 1
+DEAL::prolongation started on level 2
+DEAL::prolongation finished on level 2
+DEAL::post_smoother_step started on level 2
+DEAL::post_smoother_step finished on level 2
+DEAL::transfer_to_global started
+DEAL::transfer_to_global finished
+DEAL::check residual: 0.000788123
+DEAL::coarse iterations: 56
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       1027
+DEAL::   Number of degrees of freedom: 9446 (by level: 2401, 9409, 49)
+DEAL::transfer_to_mg started
+DEAL::transfer_to_mg finished
+DEAL::pre_smoother_step started on level 2
+DEAL::pre_smoother_step finished on level 2
+DEAL::restriction started on level 2
+DEAL::restriction finished on level 2
+DEAL::pre_smoother_step started on level 1
+DEAL::pre_smoother_step finished on level 1
+DEAL::restriction started on level 1
+DEAL::restriction finished on level 1
+DEAL::coarse_solve started on level 0
+DEAL::coarse_solve finished on level 0
+DEAL::prolongation started on level 1
+DEAL::prolongation finished on level 1
+DEAL::post_smoother_step started on level 1
+DEAL::post_smoother_step finished on level 1
+DEAL::prolongation started on level 2
+DEAL::prolongation finished on level 2
+DEAL::post_smoother_step started on level 2
+DEAL::post_smoother_step finished on level 2
+DEAL::transfer_to_global started
+DEAL::transfer_to_global finished
+DEAL::check residual: 0.000522658
+DEAL::coarse iterations: 81

@@ -1,39 +1,171 @@
 #
-# An approximation of deal.II indent style as "defined" by
-#   ./contrib/styles/astyle.rc
+# The clang-format (Clang 6) style file used by deal.II.
 #
 
-BasedOnStyle: "LLVM"
+AccessModifierOffset: -2
 
-AlignOperands:   true
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignEscapedNewlines: Left
+AlignOperands: true
 AlignTrailingComments: true
-AllowAllParametersOfDeclarationOnNextLine: true
+
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+AlwaysBreakAfterReturnType: All
+AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: true
 
 BinPackArguments: false
 BinPackParameters: false
 
-BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass: true
   AfterControlStatement: true
   AfterEnum: true
+  AfterExternBlock: true
   AfterFunction: true
   AfterNamespace: true
-  AfterObjCDeclaration: false
   AfterStruct: true
   AfterUnion: true
   BeforeCatch: true
   BeforeElse: true
   IndentBraces: true
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
 
-ColumnLimit:     80
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Custom
+BreakBeforeInheritanceComma: false
+BreakBeforeTernaryOperators: false
+BreakConstructorInitializers: BeforeComma
+BreakStringLiterals: false
+
+ColumnLimit: 80
+
+CompactNamespaces: false
+
 ConstructorInitializerIndentWidth: 2
-ContinuationIndentWidth: 2
-IndentWidth:     2
-NamespaceIndentation: All
-Standard:        Cpp11
 
-TabWidth:        4
-UseTab:          Never
+ContinuationIndentWidth: 2
+
+Cpp11BracedListStyle: true
+
+DerivePointerAlignment: false
+
+FixNamespaceComments: true
+
+IncludeBlocks: Regroup
+IncludeCategories:
+# config.h must always be first:
+  - Regex:    "deal.II/base/config.h"
+    Priority: -1
+# deal.II folders in sorted order:
+  - Regex:    "deal.II/algorithms/.*\\.h"
+    Priority: 110
+  - Regex:    "deal.II/base/.*\\.h"
+    Priority: 120
+  - Regex:    "deal.II/boost_adaptors/.*\\.h"
+    Priority: 125
+  - Regex:    "deal.II/differentiation/.*\\.h"
+    Priority: 130
+  - Regex:    "deal.II/distributed/.*\\.h"
+    Priority: 140
+  - Regex:    "deal.II/dofs/.*\\.h"
+    Priority: 150
+  - Regex:    "deal.II/fe/.*\\.h"
+    Priority: 160
+  - Regex:    "deal.II/gmsh/.*\\.h"
+    Priority: 170
+  - Regex:    "deal.II/grid/.*\\.h"
+    Priority: 180
+  - Regex:    "deal.II/hp/.*\\.h"
+    Priority: 190
+  - Regex:    "deal.II/integrators/.*\\.h"
+    Priority: 200
+  - Regex:    "deal.II/lac/.*\\.h"
+    Priority: 210
+  - Regex:    "deal.II/matrix_free/.*\\.h"
+    Priority: 220
+  - Regex:    "deal.II/meshworker/.*\\.h"
+    Priority: 230
+  - Regex:    "deal.II/multigrid/.*\\.h"
+    Priority: 240
+  - Regex:    "deal.II/non_matching/.*\\.h"
+    Priority: 250
+  - Regex:    "deal.II/numerics/.*\\.h"
+    Priority: 260
+  - Regex:    "deal.II/opencascade/.*\\.h"
+    Priority: 270
+  - Regex:    "deal.II/optimization/.*\\.h"
+    Priority: 280
+  - Regex:    "deal.II/particles/.*\\.h"
+    Priority: 290
+  - Regex:    "deal.II/physics/.*\\.h"
+    Priority: 300
+  - Regex:    "deal.II/sundials/.*\\.h"
+    Priority: 310
+# put boost right after deal:
+  - Regex: "<boost.*>"
+    Priority: 500
+# try to group PETSc headers:
+  - Regex: "<petsc.*\\.h>"
+    Priority: 1000
+# try to catch all third party headers and put them after deal.II but before
+# standard headers:
+  - Regex: "<.*\\.(h|hpp|hxx)>"
+    Priority: 2000
+# match all standard headers. Things like '#include <armadillo>' should be
+# surrounded by #ifdef checks (which will not be merged by clang-format) so they
+# should not be caught here
+  - Regex: "<[a-z_]+>"
+    Priority: 100000
+
+IndentCaseLabels: true
+IndentPPDirectives: AfterHash
+IndentWidth: 2
+
+IndentWrappedFunctionNames: false
+
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+Language: Cpp
+
+MaxEmptyLinesToKeep: 3
+
+NamespaceIndentation: All
+
+PenaltyBreakBeforeFirstCallParameter: 90
+
+PointerAlignment: Right
+
+ReflowComments: true
+CommentPragmas: '( \| |\*--|<li>|@ref | @p | @param  |@returns |@warning |@ingroup |@author |@date |@related |@relates |@relatesalso |@deprecated |@image |@return |@brief |@attention |@copydoc |@addtogroup |@todo |@tparam |@see |@note |@skip |@skipline |@until |@line |@dontinclude |@include)'
+
+SortIncludes: true
+SortUsingDeclarations: true
+
+SpaceAfterCStyleCast: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+Standard: Cpp11
+
+TabWidth: 2
+
+UseTab: Never

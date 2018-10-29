@@ -9,16 +9,18 @@ BOOL            := { true; false }
 REAL_SCALARS    := { double; float }
 
 // complex scalar types
-COMPLEX_SCALARS := { std::complex<double>;
-                     std::complex<float> }
+COMPLEX_SCALARS := { 
+    @DEAL_II_EXPAND_COMPLEX_SCALARS@;
+    }
 
 // real scalar floating point types
-REAL_AND_COMPLEX_SCALARS    := { double;
-                                 float; 
-                                 std::complex<double>;
-                                 std::complex<float> }
+REAL_AND_COMPLEX_SCALARS    := { 
+        double;
+        float; 
+        @DEAL_II_EXPAND_COMPLEX_SCALARS@;
+        }
 
-// differentiable Adol-C scalar types
+// differentiable ADOL-C scalar types
 DIFFERENTIABLE_ADOLC_REAL_SCALARS := {
         @DEAL_II_EXPAND_ADOLC_TYPES@;
         }
@@ -44,7 +46,9 @@ DIFFERENTIABLE_REAL_SCALARS := {
 
 // all possible scalar types
 ALL_SCALAR_TYPES := {
-    double; float ; std::complex<double>; std::complex<float>;
+    double;
+    float;
+    @DEAL_II_EXPAND_COMPLEX_SCALARS@;
     @DEAL_II_EXPAND_ADOLC_TYPES@;
     @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD@;
     @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD@;
@@ -60,8 +64,8 @@ MPI_SCALARS     := { int;
                      float;
                      double;
                      long double; 
-                     std::complex<double>;
-                     std::complex<float> }
+                     @DEAL_II_EXPAND_COMPLEX_SCALARS@;
+                   }
 
 // template names for serial vectors that we can instantiate as T<S> where
 // S=REAL_SCALARS for example
@@ -71,32 +75,23 @@ DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
 VECTOR_TYPES := {   Vector<double>;
                     Vector<float> ;
 
-                    Vector<std::complex<double> >;
-                    Vector<std::complex<float> >;
-
                     BlockVector<double>;
                     BlockVector<float>;
-
-                    BlockVector<std::complex<double> >;
-                    BlockVector<std::complex<float> >;
 
                     LinearAlgebra::Vector<double>;
                     LinearAlgebra::Vector<float> ;
 
-                    LinearAlgebra::Vector<std::complex<double> >;
-                    LinearAlgebra::Vector<std::complex<float> > ;
-
                     LinearAlgebra::distributed::Vector<double>;
                     LinearAlgebra::distributed::Vector<float> ;
-
-                    LinearAlgebra::distributed::Vector<std::complex<double> >;
-                    LinearAlgebra::distributed::Vector<std::complex<float> > ;
 
                     LinearAlgebra::distributed::BlockVector<double>;
                     LinearAlgebra::distributed::BlockVector<float> ;
 
-                    LinearAlgebra::distributed::BlockVector<std::complex<double> >;
-                    LinearAlgebra::distributed::BlockVector<std::complex<float> > ;
+                    @DEAL_II_EXPAND_COMPLEX_VECTORS@;
+                    @DEAL_II_EXPAND_COMPLEX_BLOCK_VECTORS@;
+                    @DEAL_II_EXPAND_COMPLEX_LA_VECTORS@;
+                    @DEAL_II_EXPAND_COMPLEX_LA_PARALLEL_VECTORS@;
+                    @DEAL_II_EXPAND_COMPLEX_LA_PARALLEL_BLOCK_VECTORS@;
 
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                     @DEAL_II_EXPAND_EPETRA_VECTOR@;
@@ -168,23 +163,30 @@ VECTORS_WITH_MATRIX := { Vector<double>;
 
                          @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                          @DEAL_II_EXPAND_EPETRA_VECTOR@;
+                         @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
                        }
 
 // Matrices
 SPARSE_MATRICES := { SparseMatrix<double>;
-	             SparseMatrix<float>;
+                     SparseMatrix<float>;
 
-	             BlockSparseMatrix<double>;
-	             BlockSparseMatrix<float>;
-	           
-	             @DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES@;
-	             @DEAL_II_EXPAND_PETSC_SPARSE_MATRICES@;
-	           }
+                     BlockSparseMatrix<double>;
+                     BlockSparseMatrix<float>;
+                     @DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES@;
+                     @DEAL_II_EXPAND_PETSC_SPARSE_MATRICES@;
+                   }
+
+// Special lists for AffineConstraints:
+AFFINE_CONSTRAINTS_MATRIX_TEMPL := { FullMatrix;
+                                     SparseMatrix;
+                                     SparseMatrixEZ;
+                                     ChunkSparseMatrix;
+                                   }
 
 // General container types
-GENERAL_CONTAINER_TYPES := {std::vector;
-                            ArrayView
-                       }
+GENERAL_CONTAINER_TYPES := { std::vector;
+                             ArrayView
+                           }
 
 // DoFHandler and hp::DoFHandler templates
 DOFHANDLER_TEMPLATES := { DoFHandler;
@@ -225,6 +227,16 @@ SPARSITY_PATTERNS := { SparsityPattern;
                        BlockSparsityPattern;
                        BlockDynamicSparsityPattern;
                        @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
+
+// Special lists for AffineConstraints:
+AFFINE_CONSTRAINTS_SP := { SparsityPattern;
+                           DynamicSparsityPattern;
+                           @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@;
+                         }
+AFFINE_CONSTRAINTS_SP_BLOCK := { BlockSparsityPattern;
+                                 BlockDynamicSparsityPattern;
+                                 @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@;
+                               }
 
 // all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }

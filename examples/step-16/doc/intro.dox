@@ -1,61 +1,61 @@
 <br>
 
+<i> Note: A variant called step-16b of this tutorial exists, that uses
+MeshWorker and LocalIntegrators instead of assembling matrices manually as it
+is done in this tutorial.
+</i>
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
 
-This example shows the basic usage of the multilevel functions in
-deal.II. It solves almost the same problem as used in step-6,
-but demonstrating the things one has to provide when using multigrid
-as a preconditioner. In particular, this requires that we define a
-hierarchy of levels, provide transfer operators from one level to the
-next and back, and provide representations of the Laplace operator on
-each level.
+This example shows the basic usage of the multilevel functions in deal.II. It
+solves almost the same problem as used in step-6, but demonstrating the things
+one has to provide when using multigrid as a preconditioner. In particular, this
+requires that we define a hierarchy of levels, provide transfer operators from
+one level to the next and back, and provide representations of the Laplace
+operator on each level.
 
 In order to allow sufficient flexibility in conjunction with systems of
 differential equations and block preconditioners, quite a few different objects
 have to be created before starting the multilevel method, although
 most of what needs to be done is provided by deal.II itself. These are
-<ul>
-<li>An the object handling transfer between grids; we use the
-    MGTransferPrebuilt class for this that does almost all of the work
-    inside the library.
-<li>The solver on the coarsest level; here, we use MGCoarseGridHouseholder.
-<li>The smoother on all other levels, which in our case will be the
-    mg::SmootherRelaxation class using SOR as the underlying method
-<li>And mg::Matrix, a class having a special level multiplication, i.e. we
-    basically store one matrix per grid level and allow multiplication
-    with it.
-</ul>
+  - the object handling transfer between grids; we use the MGTransferPrebuilt
+    class for this that does almost all of the work inside the library,
+  - the solver on the coarsest level; here, we use MGCoarseGridHouseholder,
+  - the smoother on all other levels, which in our case will be the
+    mg::SmootherRelaxation class using SOR as the underlying method,
+  - and mg::Matrix, a class having a special level multiplication, i.e. we
+    basically store one matrix per grid level and allow multiplication with it.
+
 Most of these objects will only be needed inside the function that
 actually solves the linear system. There, these objects are combined
 in an object of type Multigrid, containing the implementation of the
 V-cycle, which is in turn used by the preconditioner PreconditionMG,
 ready for plug-in into a linear solver of the LAC library.
 
-The multigrid method implemented here for adaptively refined meshes
-follows the outline in the @ref mg_paper "Multigrid paper by Janssen and Kanschat",
-which describes the underlying implementation in
-deal.II and also introduces a lot of the nomenclature. First, we have
-to distinguish between level meshes, namely cells that have the same
-refinement distance from the coarse mesh, and the leaf mesh consisting
-of active cells of the hierarchy (in older work we refer to this as
-the global mesh, but this term is overused). Most importantly, the
-leaf mesh is not identical with the level mesh on the finest level.
-The following image shows what we consider to be a "level mesh":
+The multigrid method implemented here for adaptively refined meshes follows the
+outline in the @ref mg_paper "Multigrid paper", which describes the underlying
+implementation in deal.II and also introduces a lot of the nomenclature. First,
+we have to distinguish between level meshes, namely cells that have the same
+refinement distance from the coarse mesh, and the leaf mesh consisting of active
+cells of the hierarchy (in older work we refer to this as the global mesh, but
+this term is overused). Most importantly, the leaf mesh is not identical with
+the level mesh on the finest level. The following image shows what we consider
+to be a "level mesh":
 
 <p align="center">
   @image html "multigrid.png" ""
 </p>
 
-The fine level in this mesh consists only of the
-degrees of freedom that are defined on the refined cells, but does not
-extend to that part of the domain that is not refined. While this
-guarantees that the overall effort grows as ${\cal O}(N)$ as necessary
-for optimal multigrid complexity, it leads to problems when defining
-where to smooth and what boundary conditions to pose for the operators
-defined on individual levels if the level boundary is not an external
-boundary. These questions are discussed in detail in the article cited above.
+The fine level in this mesh consists only of the degrees of freedom that are
+defined on the refined cells, but does not extend to that part of the domain
+that is not refined. While this guarantees that the overall effort grows as
+${\cal O}(N)$ as necessary for optimal multigrid complexity, it leads to
+problems when defining where to smooth and what boundary conditions to pose for
+the operators defined on individual levels if the level boundary is not an
+external boundary. These questions are discussed in detail in the article cited
+above.
 
 <h3>The testcase</h3>
 

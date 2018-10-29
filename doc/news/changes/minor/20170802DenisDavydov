@@ -1,4 +1,0 @@
-New: Add Utilities::LinearAlgebra::chebyshev_filter() to apply Chebyshev filter of a
-given degree.
-<br>
-(Denis Davydov, 2017/08/02)

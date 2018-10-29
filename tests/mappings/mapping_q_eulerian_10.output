@@ -1,0 +1,21 @@
+
+DEAL::dim, spacedim: 1, 1
+DEAL::cells: 1, dofs: 2
+DEAL::After refine:
+DEAL::cells: 2, dofs: 3
+DEAL::dim, spacedim: 1, 2
+DEAL::cells: 1, dofs: 4
+DEAL::After refine:
+DEAL::cells: 2, dofs: 6
+DEAL::dim, spacedim: 2, 2
+DEAL::cells: 1, dofs: 8
+DEAL::After refine:
+DEAL::cells: 4, dofs: 18
+DEAL::dim, spacedim: 2, 3
+DEAL::cells: 1, dofs: 12
+DEAL::After refine:
+DEAL::cells: 4, dofs: 27
+DEAL::dim, spacedim: 3, 3
+DEAL::cells: 1, dofs: 24
+DEAL::After refine:
+DEAL::cells: 8, dofs: 81

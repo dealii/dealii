@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,28 +17,31 @@
 
 // check DynamicSparsityPattern::empty
 
-#include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  const unsigned int N = 1000;
+  const unsigned int     N = 1000;
   DynamicSparsityPattern csp;
-  AssertThrow (csp.empty() == true, ExcInternalError());
+  AssertThrow(csp.empty() == true, ExcInternalError());
 
-  csp.reinit (N, N);
-  AssertThrow (csp.empty() == false, ExcInternalError());
+  csp.reinit(N, N);
+  AssertThrow(csp.empty() == false, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
   return 0;
 }

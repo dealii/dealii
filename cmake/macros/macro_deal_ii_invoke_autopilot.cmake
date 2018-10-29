@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -42,6 +42,11 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     SET(_make_command "$ ninja")
   ELSE()
     SET(_make_command " $ make")
+  ENDIF()
+
+  # Make sure we can treat CUDA targets if available
+  IF(DEAL_II_WITH_CUDA)
+    ENABLE_LANGUAGE(CUDA)
   ENDIF()
 
   # Define and setup a compilation target:
@@ -209,7 +214,7 @@ ${_switch_targets}#
   IF(PERL_FOUND)
     FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
 "#      ${_make_command} strip_comments - to strip the source files in this
-#                               directory off the documentation comments
+#                               directory off their comments; this is irreversible
 ")
   ENDIF()
   FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -23,24 +23,26 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
 {
-#include "la_vector.inst"
+#  include "la_vector.inst"
 
-// do a few functions that currently don't fit the scheme because they have
-// two template arguments that need to be different (the case of same
-// arguments is covered by the default copy constructor and copy operator that
-// is declared separately)
+  // do a few functions that currently don't fit the scheme because they have
+  // two template arguments that need to be different (the case of same
+  // arguments is covered by the default copy constructor and copy operator that
+  // is declared separately)
 
-#define TEMPL_COPY_CONSTRUCTOR(S1,S2)                           \
-  template Vector<S1>& Vector<S1>::operator=<S2> (const Vector<S2> &)
+#  define TEMPL_COPY_CONSTRUCTOR(S1, S2) \
+    template Vector<S1> &Vector<S1>::operator=<S2>(const Vector<S2> &)
 
-  TEMPL_COPY_CONSTRUCTOR(double,float);
-  TEMPL_COPY_CONSTRUCTOR(float,double);
+  TEMPL_COPY_CONSTRUCTOR(double, float);
+  TEMPL_COPY_CONSTRUCTOR(float, double);
 
-  TEMPL_COPY_CONSTRUCTOR(std::complex<double>,std::complex<float>);
-  TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<double>);
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
+  TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>);
+  TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>);
+#  endif
 
-#undef TEMPL_COPY_CONSTRUCTOR
-}
+#  undef TEMPL_COPY_CONSTRUCTOR
+} // namespace LinearAlgebra
 
 #endif // ! DEAL_II_MSVC
 

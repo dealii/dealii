@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2016 by the deal.II authors
+// Copyright (C) 2005 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -101,7 +101,7 @@
  *       <td>step-3</td>
  *       <td> Actually solve Laplace's
  *       problem. Object-orientation. Assembling matrices and
- *       vectors. %Boundary values.
+ *       vectors. Boundary values.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -199,6 +199,12 @@
  *       </td></tr>
  *
  *   <tr valign="top">
+ *       <td>step-16b</td>
+ *       <td> A variant of step-16 but with MeshWorker for assembly: Multigrid
+ *       preconditioning of the Laplace equation on adaptive meshes.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
  *       <td>step-17</td>
  *       <td> Using PETSc for linear algebra; running
  *       in parallel on clusters of computers linked together by MPI.
@@ -235,7 +241,7 @@
  *       <td>step-22</td>
  *       <td> Solving the Stokes equations of slow fluid flow on adaptive
  *       meshes. More on Schur complement solvers. Advanced use of the
- *       ConstraintMatrix class.
+ *       AffineConstraints class.
  *       </td></tr>
  *
  *   <tr valign="top">
@@ -303,7 +309,7 @@
  *
  *   <tr valign="top">
  *       <td>step-34</td>
- *       <td> %Boundary element methods (BEM) of low order: Exterior irrotational
+ *       <td> Boundary element methods (BEM) of low order: Exterior irrotational
  *       flow. The ParsedFunction class.
  *       </td></tr>
  *
@@ -424,6 +430,19 @@
  *   <tr valign="top">
  *       <td>step-57</td>
  *       <td> Incompressible, stationary Navier Stokes equations.
+ *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-59</td>
+ *       <td> Solving a Poisson problem discretized with an interior penalty DG
+ *       method and a multilevel preconditioner in a matrix-free fashion using
+ *       a massively parallel implementation.
+ *
+ *   <tr valign="top">
+ *       <td>step-60</td>
+ *       <td> Distributed Lagrange multipliers for the solution of
+ *       Poisson problems in complex domains with constraints defined
+ *       on non-matching grids.
  *       </td></tr>
  *
  * </table>
@@ -556,9 +575,11 @@
  *     </td>
  *     <td>
  *       step-32,
+ *       step-37,
  *       step-40,
  *       step-42,
- *       step-55
+ *       step-55,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -575,7 +596,8 @@
  *       step-35,
  *       step-36,
  *       step-42,
- *       step-44
+ *       step-44,
+ *       step-60
  *     </td>
  *   </tr>
  *
@@ -585,7 +607,8 @@
  *     <td>
  *       step-10,
  *       step-11,
- *       step-32
+ *       step-32,
+ *       step-60
  *     </td>
  *   </tr>
  *
@@ -623,7 +646,8 @@
  *       step-21,
  *       step-39,
  *       step-46,
- *       step-51
+ *       step-51,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -649,7 +673,7 @@
  *   </tr>
  *
  *   <tr valign="top">
- *     <td> %Boundary element methods, curved manifolds
+ *     <td> Boundary element methods, curved manifolds
  *     </td>
  *     <td>
  *       step-32,
@@ -664,7 +688,8 @@
  *     <td> Periodic boundary conditions
  *     </td>
  *     <td>
- *       step-45
+ *       step-45,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -673,7 +698,8 @@
  *     </td>
  *     <td>
  *       step-37,
- *       step-48
+ *       step-48,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -684,6 +710,14 @@
  *       step-49,
  *       step-53,
  *       step-54
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
+ *     <td> Non matching algorithms
+ *     </td>
+ *     <td>
+ *       step-60
  *     </td>
  *   </tr>
  *
@@ -714,6 +748,7 @@
  *     </td>
  *     <td>
  *       step-16,
+ *       step-16b
  *       step-31,
  *       step-32,
  *       step-37,
@@ -721,7 +756,8 @@
  *       step-41,
  *       step-42,
  *       step-43,
- *       step-56
+ *       step-56,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -735,7 +771,8 @@
  *       step-37,
  *       step-40,
  *       step-42,
- *       step-55
+ *       step-55,
+ *       step-59
  *     </td>
  *   </tr>
  *
@@ -751,7 +788,8 @@
  *       step-43,
  *       step-55,
  *       step-56,
- *       step-57
+ *       step-57,
+ *       step-60
  *     </td>
  *   </tr>
  *
@@ -782,7 +820,10 @@
  *   <tr valign="top">
  *     <td> Linear operators
  *     </td>
- *     <td>step-44</td>
+ *     <td>
+ *       step-44,
+ *       step-60
+ *     </td>
  *   </tr>
  *
  * </table>

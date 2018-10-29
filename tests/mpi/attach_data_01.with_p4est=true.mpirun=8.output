@@ -1,0 +1,97 @@
+
+DEAL:0::cells before: 16
+DEAL:0::myid=0 cellid=0_1:0 refining
+DEAL:0::myid=0 cellid=0_1:1         
+DEAL:0::myid=0 cellid=0_1:2         
+DEAL:0::myid=0 cellid=0_1:3         
+DEAL:0::handle=1                    
+DEAL:0::packing cell 0_1:0 with data=0 status=REFINE
+DEAL:0::packing cell 0_1:1 with data=1 status=PERSIST
+DEAL:0::packing cell 0_1:2 with data=2 status=PERSIST
+DEAL:0::packing cell 0_1:3 with data=3 status=PERSIST
+DEAL:0::cells after: 16                              
+DEAL:0::unpacking cell 0_1:0 with data=0 status=REFINE
+DEAL:0::Checksum: 2822439380                          
+DEAL:0::OK                                            
+
+DEAL:1::cells before: 16
+DEAL:1::handle=1        
+DEAL:1::cells after: 16 
+DEAL:1::Checksum: 0     
+DEAL:1::OK              
+
+
+DEAL:2::cells before: 16
+DEAL:2::myid=2 cellid=1_1:0
+DEAL:2::myid=2 cellid=1_1:1
+DEAL:2::myid=2 cellid=1_1:2
+DEAL:2::myid=2 cellid=1_1:3
+DEAL:2::handle=1           
+DEAL:2::packing cell 1_1:0 with data=0 status=PERSIST
+DEAL:2::packing cell 1_1:1 with data=1 status=PERSIST
+DEAL:2::packing cell 1_1:2 with data=2 status=PERSIST
+DEAL:2::packing cell 1_1:3 with data=3 status=PERSIST
+DEAL:2::cells after: 16                              
+DEAL:2::unpacking cell 0_1:1 with data=1 status=PERSIST
+DEAL:2::unpacking cell 0_1:2 with data=2 status=PERSIST
+DEAL:2::Checksum: 0
+DEAL:2::OK
+
+
+DEAL:3::cells before: 16
+DEAL:3::handle=1
+DEAL:3::cells after: 16
+DEAL:3::unpacking cell 0_1:3 with data=3 status=PERSIST
+DEAL:3::Checksum: 0
+DEAL:3::OK
+
+
+DEAL:4::cells before: 16
+DEAL:4::myid=4 cellid=2_1:0
+DEAL:4::myid=4 cellid=2_1:1
+DEAL:4::myid=4 cellid=2_1:2
+DEAL:4::myid=4 cellid=2_1:3
+DEAL:4::handle=1
+DEAL:4::packing cell 2_1:0 with data=0 status=PERSIST
+DEAL:4::packing cell 2_1:1 with data=1 status=PERSIST
+DEAL:4::packing cell 2_1:2 with data=2 status=PERSIST
+DEAL:4::packing cell 2_1:3 with data=3 status=PERSIST
+DEAL:4::cells after: 16
+DEAL:4::unpacking cell 1_1:0 with data=0 status=PERSIST
+DEAL:4::unpacking cell 1_1:1 with data=1 status=PERSIST
+DEAL:4::unpacking cell 1_1:2 with data=2 status=PERSIST
+DEAL:4::unpacking cell 1_1:3 with data=3 status=PERSIST
+DEAL:4::Checksum: 0
+DEAL:4::OK
+
+
+DEAL:5::cells before: 16
+DEAL:5::handle=1
+DEAL:5::cells after: 16
+DEAL:5::Checksum: 0
+DEAL:5::OK
+
+
+DEAL:6::cells before: 16
+DEAL:6::myid=6 cellid=3_1:0 coarsening
+DEAL:6::myid=6 cellid=3_1:1 coarsening
+DEAL:6::myid=6 cellid=3_1:2 coarsening
+DEAL:6::myid=6 cellid=3_1:3 coarsening
+DEAL:6::handle=1
+DEAL:6::packing cell 3_0: with data=0 status=COARSEN
+DEAL:6::cells after: 16
+DEAL:6::unpacking cell 2_1:0 with data=0 status=PERSIST
+DEAL:6::unpacking cell 2_1:1 with data=1 status=PERSIST
+DEAL:6::unpacking cell 2_1:2 with data=2 status=PERSIST
+DEAL:6::unpacking cell 2_1:3 with data=3 status=PERSIST
+DEAL:6::Checksum: 0
+DEAL:6::OK
+
+
+DEAL:7::cells before: 16
+DEAL:7::handle=1
+DEAL:7::cells after: 16
+DEAL:7::unpacking cell 3_0: with data=0 status=COARSEN
+DEAL:7::Checksum: 0
+DEAL:7::OK
+

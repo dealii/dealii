@@ -1,0 +1,5 @@
+Bugfix: Fixed bugs for TrilinosWrapper::SparseMatrix::add(factor, other_matrix)
+and TrilinosWrapper::SparseMatrix::copy_from(other_matrix) for the case of
+non-contiguous rows.
+<br>
+(Uwe Koecher 2018/06/14)

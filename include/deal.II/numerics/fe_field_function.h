@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2017 by the deal.II authors
+// Copyright (C) 2007 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,13 +17,15 @@
 #define dealii_fe_function_h
 
 #include <deal.II/base/function.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/thread_local_storage.h>
+
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/mapping_q1.h>
+
 #include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/lac/vector.h>
@@ -40,7 +42,6 @@ namespace VectorTools
 
 namespace Functions
 {
-
   /**
    * This is an interpolation function for the given dof handler and the given
    * solution vector. The points at which this function can be evaluated MUST
@@ -91,7 +92,8 @@ namespace Functions
    *
    * // Now project it to the second domain
    * FEFieldFunction<dim> fe_function_1 (dh_1, solution_1);
-   * VectorTools::project (dh_2, constraints_2, quad, fe_function_1, solution_2);
+   * VectorTools::project (dh_2, constraints_2, quad,
+   *                       fe_function_1, solution_2);
    *
    * // Or interpolate it...
    * Vector<double> solution_3;
@@ -123,16 +125,10 @@ namespace Functions
    * @ref GlossArtificialCell
    * and
    * @ref GlossGhostCell).
-   * If the cell is artificial, we have no access to the solution there and
+   * The solution can be evaluated on ghost cells, but for artificial cells
+   * we have no access to the solution there and
    * functions that evaluate the solution at such a point will trigger an
-   * exception of type VectorTools::ExcPointNotAvailableHere. The same kind of
-   * exception will also be produced if the cell is a ghost cell: On such
-   * cells, one could in principle evaluate the solution, but it becomes
-   * easier if we do not allow to do so because then there is exactly one
-   * processor in a parallel distributed computation that can indeed evaluate
-   * the solution. Consequently, it is clear which processor is responsible
-   * for producing output if the point evaluation is done as a postprocessing
-   * step.
+   * exception of type VectorTools::ExcPointNotAvailableHere.
    *
    * To deal with this situation, you will want to use code as follows when,
    * for example, evaluating the solution at the origin (here using a parallel
@@ -161,9 +157,9 @@ namespace Functions
    * @author Luca Heltai, 2006, Markus Buerg, 2012, Wolfgang Bangerth, 2013
    */
   template <int dim,
-            typename DoFHandlerType=DoFHandler<dim>,
-            typename VectorType=Vector<double> >
-  class FEFieldFunction :  public Function<dim, typename VectorType::value_type>
+            typename DoFHandlerType = DoFHandler<dim>,
+            typename VectorType     = Vector<double>>
+  class FEFieldFunction : public Function<dim, typename VectorType::value_type>
   {
   public:
     /**
@@ -174,16 +170,19 @@ namespace Functions
      * mapping is specified, that is what is used to find out where the points
      * lay. Otherwise the standard Q1 mapping is used.
      */
-    FEFieldFunction (const DoFHandlerType &dh,
-                     const VectorType     &data_vector,
-                     const Mapping<dim>   &mapping = StaticMappingQ1<dim>::mapping);
+    FEFieldFunction(
+      const DoFHandlerType &dh,
+      const VectorType &    data_vector,
+      const Mapping<dim> &  mapping = StaticMappingQ1<dim>::mapping);
 
     /**
      * Set the current cell. If you know in advance where your points lie, you
      * can tell this object by calling this function. This will speed things
      * up a little.
      */
-    void set_active_cell (const typename DoFHandlerType::active_cell_iterator &newcell);
+    void
+    set_active_cell(
+      const typename DoFHandlerType::active_cell_iterator &newcell);
 
     /**
      * Get one vector value at the given point. It is inefficient to use
@@ -194,14 +193,16 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<typename VectorType::value_type>   &values) const;
+    virtual void
+    vector_value(
+      const Point<dim> &                       p,
+      Vector<typename VectorType::value_type> &values) const override;
 
     /**
      * Return the value of the function at the given point. Unless there is
@@ -214,14 +215,14 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual typename VectorType::value_type value (const Point< dim > &p,
-                                                   const unsigned int  component = 0)    const;
+    virtual typename VectorType::value_type
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Set @p values to the point values of the specified component of the
@@ -232,15 +233,16 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual void value_list (const std::vector<Point< dim > >     &points,
-                             std::vector<typename VectorType::value_type > &values,
-                             const unsigned int  component = 0)    const;
+    virtual void
+    value_list(const std::vector<Point<dim>> &               points,
+               std::vector<typename VectorType::value_type> &values,
+               const unsigned int component = 0) const override;
 
 
     /**
@@ -252,14 +254,16 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual void vector_value_list (const std::vector<Point< dim > >     &points,
-                                    std::vector<Vector<typename VectorType::value_type> > &values) const;
+    virtual void
+    vector_value_list(const std::vector<Point<dim>> &points,
+                      std::vector<Vector<typename VectorType::value_type>>
+                        &values) const override;
 
     /**
      * Return the gradient of all components of the function at the given
@@ -270,15 +274,16 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
     virtual void
-    vector_gradient (const Point< dim > &p,
-                     std::vector< Tensor< 1, dim,typename VectorType::value_type > > &gradients) const;
+    vector_gradient(const Point<dim> &p,
+                    std::vector<Tensor<1, dim, typename VectorType::value_type>>
+                      &gradients) const override;
 
     /**
      * Return the gradient of the specified component of the function at the
@@ -289,14 +294,15 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
-    virtual Tensor<1,dim,typename VectorType::value_type> gradient(const Point< dim > &p,
-        const unsigned int component = 0)const;
+    virtual Tensor<1, dim, typename VectorType::value_type>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
 
     /**
      * Return the gradient of all components of the function at all the given
@@ -305,16 +311,17 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
     virtual void
-    vector_gradient_list (const std::vector< Point< dim > > &p,
-                          std::vector<
-                          std::vector< Tensor< 1, dim,typename VectorType::value_type > > > &gradients) const;
+    vector_gradient_list(
+      const std::vector<Point<dim>> &p,
+      std::vector<std::vector<Tensor<1, dim, typename VectorType::value_type>>>
+        &gradients) const override;
 
     /**
      * Return the gradient of the specified component of the function at all
@@ -323,16 +330,17 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
     virtual void
-    gradient_list (const std::vector< Point< dim > > &p,
-                   std::vector< Tensor< 1, dim,typename VectorType::value_type > > &gradients,
-                   const unsigned int component=0) const;
+    gradient_list(
+      const std::vector<Point<dim>> &                               p,
+      std::vector<Tensor<1, dim, typename VectorType::value_type>> &gradients,
+      const unsigned int component = 0) const override;
 
 
     /**
@@ -340,15 +348,15 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
     virtual typename VectorType::value_type
-    laplacian (const Point<dim>   &p,
-               const unsigned int  component = 0) const;
+    laplacian(const Point<dim> & p,
+              const unsigned int component = 0) const override;
 
     /**
      * Compute the Laplacian of all components at point <tt>p</tt> and store
@@ -356,46 +364,48 @@ namespace Functions
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
     virtual void
-    vector_laplacian (const Point<dim>   &p,
-                      Vector<typename VectorType::value_type>     &values) const;
+    vector_laplacian(
+      const Point<dim> &                       p,
+      Vector<typename VectorType::value_type> &values) const override;
 
     /**
      * Compute the Laplacian of one component at a set of points.
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
     virtual void
-    laplacian_list (const std::vector<Point<dim> > &points,
-                    std::vector<typename VectorType::value_type>            &values,
-                    const unsigned int              component = 0) const;
+    laplacian_list(const std::vector<Point<dim>> &               points,
+                   std::vector<typename VectorType::value_type> &values,
+                   const unsigned int component = 0) const override;
 
     /**
      * Compute the Laplacians of all components at a set of points.
      *
      * @note When using this function on a
      * parallel::distributed::Triangulation you may get an exception when
-     * trying to evaluate the solution at a point that does not lie in a
-     * locally owned cell (see
+     * trying to evaluate the solution at a point that lies on an artificial
+     * cell (see
      * @ref GlossLocallyOwnedCell).
      * See the section in the general documentation of this class for more
      * information.
      */
     virtual void
-    vector_laplacian_list (const std::vector<Point<dim> > &points,
-                           std::vector<Vector<typename VectorType::value_type> >   &values) const;
+    vector_laplacian_list(const std::vector<Point<dim>> &points,
+                          std::vector<Vector<typename VectorType::value_type>>
+                            &values) const override;
 
     /**
      * Given a set of points located in the domain (or, in the case of
@@ -420,24 +430,25 @@ namespace Functions
      * new Cache at every function call.
      */
     unsigned int
-    compute_point_locations
-    (const std::vector<Point<dim> >                              &points,
-     std::vector<typename DoFHandlerType::active_cell_iterator > &cells,
-     std::vector<std::vector<Point<dim> > >                      &qpoints,
-     std::vector<std::vector<unsigned int> >                     &maps) const;
+    compute_point_locations(
+      const std::vector<Point<dim>> &                             points,
+      std::vector<typename DoFHandlerType::active_cell_iterator> &cells,
+      std::vector<std::vector<Point<dim>>> &                      qpoints,
+      std::vector<std::vector<unsigned int>> &                    maps) const;
 
   private:
     /**
      * Typedef holding the local cell_hint.
      */
-    typedef
-    Threads::ThreadLocalStorage <typename DoFHandlerType::active_cell_iterator >
-    cell_hint_t;
+    using cell_hint_t = Threads::ThreadLocalStorage<
+      typename DoFHandlerType::active_cell_iterator>;
 
     /**
      * Pointer to the dof handler.
      */
-    SmartPointer<const DoFHandlerType,FEFieldFunction<dim, DoFHandlerType, VectorType> > dh;
+    SmartPointer<const DoFHandlerType,
+                 FEFieldFunction<dim, DoFHandlerType, VectorType>>
+      dh;
 
     /**
      * A reference to the actual data vector.
@@ -452,7 +463,7 @@ namespace Functions
     /**
      * The Cache object
      */
-    GridTools::Cache<dim,DoFHandlerType::space_dimension> cache;
+    GridTools::Cache<dim, DoFHandlerType::space_dimension> cache;
 
     /**
      * The latest cell hint.
@@ -464,11 +475,12 @@ namespace Functions
      * within this cell if it indeed lies within the cell. Otherwise return an
      * uninitialized boost::optional object.
      */
-    boost::optional<Point<dim> >
-    get_reference_coordinates (const typename DoFHandlerType::active_cell_iterator &cell,
-                               const Point<dim>                                    &point) const;
+    boost::optional<Point<dim>>
+    get_reference_coordinates(
+      const typename DoFHandlerType::active_cell_iterator &cell,
+      const Point<dim> &                                   point) const;
   };
-}
+} // namespace Functions
 
 DEAL_II_NAMESPACE_CLOSE
 

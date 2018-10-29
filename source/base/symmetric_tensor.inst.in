@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2016 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,137 +8,80 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
-{
-    template
-    class SymmetricTensor<2,deal_II_dimension,number>;
+  {
+    template class SymmetricTensor<2, deal_II_dimension, number>;
 
-    template
-    class SymmetricTensor<4,deal_II_dimension,number>;
+    template class SymmetricTensor<4, deal_II_dimension, number>;
 
-    namespace internal
-    \{
-    namespace SymmetricTensor
-    \{
-    template
-    void
-    tridiagonalize<deal_II_dimension, number>
-    (const dealii::SymmetricTensor<2,deal_II_dimension,number> &,
-     dealii::Tensor<2,deal_II_dimension,number>                &,
-     std::array<number,deal_II_dimension>                      &,
-     std::array<number,deal_II_dimension-1>                    &);
+    template std::array<number, deal_II_dimension> eigenvalues(
+      const SymmetricTensor<2, deal_II_dimension, number> &);
 
-    template
-    std::array<std::pair<number, Tensor<1,deal_II_dimension,number> >,deal_II_dimension>
-    ql_implicit_shifts<deal_II_dimension, number>
-    (const dealii::SymmetricTensor<2,deal_II_dimension,number> &);
+    template std::array<std::pair<number, Tensor<1, deal_II_dimension, number>>,
+                        std::integral_constant<int, deal_II_dimension>::value>
+    eigenvectors(const SymmetricTensor<2, deal_II_dimension, number> &,
+                 const SymmetricTensorEigenvectorMethod);
+  }
 
-    template
-    std::array<std::pair<number, Tensor<1,deal_II_dimension,number> >,deal_II_dimension>
-    jacobi<deal_II_dimension, number>
-    (dealii::SymmetricTensor<2,deal_II_dimension,number>);
+for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
+  {
+    template class SymmetricTensor<2, deal_II_dimension, number>;
 
-#ifdef DEAL_II_WITH_TRILINOS
-    template
-    void
-    tridiagonalize<deal_II_dimension,Sacado::Fad::DFad<number> >
-    (const dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> > &,
-     dealii::Tensor<2,deal_II_dimension,Sacado::Fad::DFad<number> >                &,
-     std::array<Sacado::Fad::DFad<number>,deal_II_dimension>                       &,
-     std::array<Sacado::Fad::DFad<number>,deal_II_dimension-1>                     &);
+    template class SymmetricTensor<4, deal_II_dimension, number>;
 
-    template
-    std::array<std::pair<Sacado::Fad::DFad<number>, Tensor<1,deal_II_dimension,Sacado::Fad::DFad<number> > >,deal_II_dimension>
-    ql_implicit_shifts<deal_II_dimension,Sacado::Fad::DFad<number> >
-    (const dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> > &);
+    template std::array<number, deal_II_dimension> eigenvalues(
+      const SymmetricTensor<2, deal_II_dimension, number> &);
 
-    template
-    std::array<std::pair<Sacado::Fad::DFad<number>, Tensor<1,deal_II_dimension,Sacado::Fad::DFad<number> > >,deal_II_dimension>
-    jacobi<deal_II_dimension,Sacado::Fad::DFad<number> >
-    (dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> >);
-#endif
-    \}
-    \}
-}
+    template std::array<std::pair<number, Tensor<1, deal_II_dimension, number>>,
+                        std::integral_constant<int, deal_II_dimension>::value>
+    eigenvectors(const SymmetricTensor<2, deal_II_dimension, number> &,
+                 const SymmetricTensorEigenvectorMethod);
+  }
+
+for (deal_II_dimension : DIMENSIONS;
+     number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
+  {
+    template class SymmetricTensor<2, deal_II_dimension, number>;
+
+    template class SymmetricTensor<4, deal_II_dimension, number>;
+
+    template std::array<number, deal_II_dimension> eigenvalues(
+      const SymmetricTensor<2, deal_II_dimension, number> &);
+
+    template std::array<std::pair<number, Tensor<1, deal_II_dimension, number>>,
+                        std::integral_constant<int, deal_II_dimension>::value>
+    eigenvectors(const SymmetricTensor<2, deal_II_dimension, number> &,
+                 const SymmetricTensorEigenvectorMethod);
+  }
 
 for (deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
-{
-    template
-    class SymmetricTensor<2,deal_II_dimension,number>;
+  {
+    template class SymmetricTensor<2, deal_II_dimension, number>;
 
-    template
-    class SymmetricTensor<4,deal_II_dimension,number>;
-}
+    template class SymmetricTensor<4, deal_II_dimension, number>;
+  }
 
 
 for (number : REAL_SCALARS)
-{
-    namespace internal
-    \{
-    namespace SymmetricTensor
-    \{
-    template
-    struct Inverse<4,3,number>;
-    \}
-    \}
+  {
+    template SymmetricTensor<4, 3, number> invert(
+      const SymmetricTensor<4, 3, number> &t);
+  }
 
-    template
-    SymmetricTensor<4,3,number>
-    invert (const SymmetricTensor<4,3,number> &t);
+for (number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
+  {
+    template SymmetricTensor<4, 3, number> invert(
+      const SymmetricTensor<4, 3, number> &t);
+  }
 
-    template
-    std::array<number,1>
-    eigenvalues (const SymmetricTensor<2,1,number> &);
-
-    template
-    std::array<number,2>
-    eigenvalues (const SymmetricTensor<2,2,number> &);
-
-    template
-    std::array<number,3>
-    eigenvalues (const SymmetricTensor<2,3,number> &);
-
-#ifdef DEAL_II_WITH_TRILINOS
-    template
-    std::array<Sacado::Fad::DFad<number>,1>
-    eigenvalues (const SymmetricTensor<2,1,Sacado::Fad::DFad<number> > &);
-
-    template
-    std::array<Sacado::Fad::DFad<number>,2>
-    eigenvalues (const SymmetricTensor<2,2,Sacado::Fad::DFad<number> > &);
-
-    template
-    std::array<Sacado::Fad::DFad<number>,3>
-    eigenvalues (const SymmetricTensor<2,3,Sacado::Fad::DFad<number> > &);
-#endif
-
-    namespace internal
-    \{
-    namespace SymmetricTensor
-    \{
-    template
-    std::array<std::pair<number, Tensor<1,2,number> >,2>
-    hybrid (const dealii::SymmetricTensor<2,2,number> &);
-
-    template
-    std::array<std::pair<number, Tensor<1,3,number> >,3>
-    hybrid (const dealii::SymmetricTensor<2,3,number> &A);
-
-#ifdef DEAL_II_WITH_TRILINOS
-    template
-    std::array<std::pair<Sacado::Fad::DFad<number>, Tensor<1,2,Sacado::Fad::DFad<number> > >,2>
-    hybrid (const dealii::SymmetricTensor<2,2,Sacado::Fad::DFad<number> > &);
-
-    template
-    std::array<std::pair<Sacado::Fad::DFad<number>, Tensor<1,3,Sacado::Fad::DFad<number> > >,3>
-    hybrid (const dealii::SymmetricTensor<2,3,Sacado::Fad::DFad<number> > &A);
-#endif
-    \}
-    \}
-}
+for (number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
+  {
+    template SymmetricTensor<4, 3, number> invert(
+      const SymmetricTensor<4, 3, number> &t);
+  }

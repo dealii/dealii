@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,47 +17,49 @@
 // test that if multiple threads are waiting for one single thread, all of the
 // waiting ones will be woken up.
 
-#include "../tests.h"
-#include <unistd.h>
-
 #include <deal.II/base/thread_management.h>
 
+#include "../tests.h"
 
-void worker ()
+
+void
+worker()
 {
   deallog << "Worker thread is starting." << std::endl;
-  sleep (3);
+  std::this_thread::sleep_for(std::chrono::seconds(3));
   deallog << "Worker thread is finished." << std::endl;
 }
 
 Threads::Thread<> worker_thread;
 
-void waiter (int i)
+void
+waiter(int i)
 {
-  worker_thread.join ();
+  worker_thread.join();
 
-  deallog << "Waiting thread " << i << " was woken up."
-          << std::endl;
+  deallog << "Waiting thread " << i << " was woken up." << std::endl;
 }
 
 
 
-
-int main()
+int
+main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
-  worker_thread = Threads::new_thread (worker);
+  worker_thread = Threads::new_thread(worker);
 
   Threads::ThreadGroup<> waiter_threads;
-  for (unsigned int i=0; i<20; ++i)
-    waiter_threads += Threads::new_thread (waiter, i);
+  for (unsigned int i = 0; i < 20; ++i)
+    waiter_threads += Threads::new_thread(waiter, i);
 
-  waiter_threads.join_all ();
+  waiter_threads.join_all();
   deallog << "All waiting threads finished." << std::endl;
 
-  deallog.detach ();
-  logfile.close ();
-  sort_file_contents ("output");
+  std::ofstream *out_stream =
+    dynamic_cast<std::ofstream *>(&deallog.get_file_stream());
+  Assert(out_stream != nullptr, ExcInternalError());
+  deallog.detach();
+  out_stream->close();
+  sort_file_contents("output");
 }

@@ -8,8 +8,8 @@
  * it, and/or modify it under the terms of the GNU Lesser General
  * Public License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE at
- * the top level of the deal.II distribution.
+ * The full text of the license can be found in the file LICENSE.md at
+ * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
 
@@ -39,7 +39,8 @@
 // if we are using PETSc (see solve() for an example where this is necessary)
 namespace LA
 {
-#if defined(DEAL_II_WITH_PETSC) && !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
+#if defined(DEAL_II_WITH_PETSC) && \
+  !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
   using namespace dealii::LinearAlgebraPETSc;
 #  define USE_PETSC_LA
 #elif defined(DEAL_II_WITH_TRILINOS)
@@ -47,18 +48,13 @@ namespace LA
 #else
 #  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
 #endif
-}
+} // namespace LA
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
-#include <deal.II/lac/petsc_solver.h>
-#include <deal.II/lac/petsc_precondition.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -135,53 +131,55 @@ namespace Step40
   //   this will be MPI_COMM_WORLD, i.e. all processors the batch scheduling
   //   system has assigned to this particular job.
   // - The presence of the <code>pcout</code> variable of type ConditionOStream.
-  // - The obvious use of parallel::distributed::Triangulation instead of Triangulation.
+  // - The obvious use of parallel::distributed::Triangulation instead of
+  // Triangulation.
   // - The presence of two IndexSet objects that denote which sets of degrees of
   //   freedom (and associated elements of solution and right hand side vectors)
   //   we own on the current processor and which we need (as ghost elements) for
   //   the algorithms in this program to work.
   // - The fact that all matrices and vectors are now distributed. We use
-  //   their PETScWrapper versions for this since deal.II's own classes do not
-  //   provide %parallel functionality. Note that as part of this class, we
-  //   store a solution vector that does not only contain the degrees of freedom
-  //   the current processor owns, but also (as ghost elements) all those vector
-  //   elements that correspond to "locally relevant" degrees of freedom
-  //   (i.e. all those that live on locally owned cells or the layer of ghost
-  //   cells that surround it).
+  //   either the PETSc or Trilinos wrapper classes so that we can use one of
+  //   the sophisticated preconditioners offered by Hypre (with PETSc) or ML
+  //   (with Trilinos). Note that as part of this class, we store a solution
+  //   vector that does not only contain the degrees of freedom the current
+  //   processor owns, but also (as ghost elements) all those vector elements
+  //   that correspond to "locally relevant" degrees of freedom (i.e. all
+  //   those that live on locally owned cells or the layer of ghost cells that
+  //   surround it).
   template <int dim>
   class LaplaceProblem
   {
   public:
-    LaplaceProblem ();
-    ~LaplaceProblem ();
+    LaplaceProblem();
+    ~LaplaceProblem();
 
-    void run ();
+    void run();
 
   private:
-    void setup_system ();
-    void assemble_system ();
-    void solve ();
-    void refine_grid ();
-    void output_results (const unsigned int cycle) const;
+    void setup_system();
+    void assemble_system();
+    void solve();
+    void refine_grid();
+    void output_results(const unsigned int cycle) const;
 
-    MPI_Comm                                  mpi_communicator;
+    MPI_Comm mpi_communicator;
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    DoFHandler<dim>                           dof_handler;
-    FE_Q<dim>                                 fe;
+    DoFHandler<dim> dof_handler;
+    FE_Q<dim>       fe;
 
-    IndexSet                                  locally_owned_dofs;
-    IndexSet                                  locally_relevant_dofs;
+    IndexSet locally_owned_dofs;
+    IndexSet locally_relevant_dofs;
 
-    ConstraintMatrix                          constraints;
+    AffineConstraints<double> constraints;
 
-    LA::MPI::SparseMatrix                     system_matrix;
-    LA::MPI::Vector                           locally_relevant_solution;
-    LA::MPI::Vector                           system_rhs;
+    LA::MPI::SparseMatrix system_matrix;
+    LA::MPI::Vector       locally_relevant_solution;
+    LA::MPI::Vector       system_rhs;
 
-    ConditionalOStream                        pcout;
-    TimerOutput                               computing_timer;
+    ConditionalOStream pcout;
+    TimerOutput        computing_timer;
   };
 
 
@@ -198,30 +196,28 @@ namespace Step40
   // use to determine how much compute time the different parts of the program
   // take:
   template <int dim>
-  LaplaceProblem<dim>::LaplaceProblem ()
-    :
-    mpi_communicator (MPI_COMM_WORLD),
-    triangulation (mpi_communicator,
-                   typename Triangulation<dim>::MeshSmoothing
-                   (Triangulation<dim>::smoothing_on_refinement |
-                    Triangulation<dim>::smoothing_on_coarsening)),
-    dof_handler (triangulation),
-    fe (2),
-    pcout (std::cout,
-           (Utilities::MPI::this_mpi_process(mpi_communicator)
-            == 0)),
-    computing_timer (mpi_communicator,
-                     pcout,
-                     TimerOutput::summary,
-                     TimerOutput::wall_times)
+  LaplaceProblem<dim>::LaplaceProblem()
+    : mpi_communicator(MPI_COMM_WORLD)
+    , triangulation(mpi_communicator,
+                    typename Triangulation<dim>::MeshSmoothing(
+                      Triangulation<dim>::smoothing_on_refinement |
+                      Triangulation<dim>::smoothing_on_coarsening))
+    , dof_handler(triangulation)
+    , fe(2)
+    , pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+    , computing_timer(mpi_communicator,
+                      pcout,
+                      TimerOutput::summary,
+                      TimerOutput::wall_times)
   {}
 
 
 
   template <int dim>
-  LaplaceProblem<dim>::~LaplaceProblem ()
+  LaplaceProblem<dim>::~LaplaceProblem()
   {
-    dof_handler.clear ();
+    dof_handler.clear();
   }
 
 
@@ -242,11 +238,11 @@ namespace Step40
   // cells that are further away, consistent with the basic philosophy of
   // distributed computing that no processor can know everything.
   template <int dim>
-  void LaplaceProblem<dim>::setup_system ()
+  void LaplaceProblem<dim>::setup_system()
   {
     TimerOutput::Scope t(computing_timer, "setup");
 
-    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs(fe);
 
     // The next two lines extract some information we will need later on,
     // namely two index sets that provide information about which degrees of
@@ -258,9 +254,8 @@ namespace Step40
     // cells that the current processor owns or on the layer of ghost cells
     // around the locally owned cells; we need all of these degrees of
     // freedom, for example, to estimate the error on the local cells).
-    locally_owned_dofs = dof_handler.locally_owned_dofs ();
-    DoFTools::extract_locally_relevant_dofs (dof_handler,
-                                             locally_relevant_dofs);
+    locally_owned_dofs = dof_handler.locally_owned_dofs();
+    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
     // Next, let us initialize the solution and right hand side vectors. As
     // mentioned above, the solution vector we seek does not only store
@@ -270,9 +265,10 @@ namespace Step40
     // locally owned cells (of course the linear solvers will read from it,
     // but they do not care about the geometric location of degrees of
     // freedom).
-    locally_relevant_solution.reinit (locally_owned_dofs,
-                                      locally_relevant_dofs, mpi_communicator);
-    system_rhs.reinit (locally_owned_dofs, mpi_communicator);
+    locally_relevant_solution.reinit(locally_owned_dofs,
+                                     locally_relevant_dofs,
+                                     mpi_communicator);
+    system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
     // The next step is to compute hanging node and boundary value
     // constraints, which we combine into a single object storing all
@@ -280,39 +276,39 @@ namespace Step40
     //
     // As with all other things in %parallel, the mantra must be that no
     // processor can store all information about the entire universe. As a
-    // consequence, we need to tell the constraints object for which degrees
-    // of freedom it can store constraints and for which it may not expect any
-    // information to store. In our case, as explained in the @ref distributed
-    // module, the degrees of freedom we need to care about on each processor
-    // are the locally relevant ones, so we pass this to the
-    // ConstraintMatrix::reinit function. As a side note, if you forget to
-    // pass this argument, the ConstraintMatrix class will allocate an array
+    // consequence, we need to tell the AffineConstraints object for which
+    // degrees of freedom it can store constraints and for which it may not
+    // expect any information to store. In our case, as explained in the
+    // @ref distributed module, the degrees of freedom we need to care about on
+    // each processor are the locally relevant ones, so we pass this to the
+    // AffineConstraints::reinit function. As a side note, if you forget to
+    // pass this argument, the AffineConstraints class will allocate an array
     // with length equal to the largest DoF index it has seen so far. For
     // processors with high MPI process number, this may be very large --
     // maybe on the order of billions. The program would then allocate more
     // memory than for likely all other operations combined for this single
     // array.
-    constraints.clear ();
-    constraints.reinit (locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
-    VectorTools::interpolate_boundary_values (dof_handler,
-                                              0,
-                                              Functions::ZeroFunction<dim>(),
-                                              constraints);
-    constraints.close ();
+    constraints.clear();
+    constraints.reinit(locally_relevant_dofs);
+    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             0,
+                                             Functions::ZeroFunction<dim>(),
+                                             constraints);
+    constraints.close();
 
     // The last part of this function deals with initializing the matrix with
     // accompanying sparsity pattern. As in previous tutorial programs, we use
     // the DynamicSparsityPattern as an intermediate with which we
-    // then initialize the PETSc matrix. To do so we have to tell the sparsity
+    // then initialize the system matrix. To do so we have to tell the sparsity
     // pattern its size but as above there is no way the resulting object will
     // be able to store even a single pointer for each global degree of
     // freedom; the best we can hope for is that it stores information about
     // each locally relevant degree of freedom, i.e. all those that we may
-    // ever touch in the process of assembling the matrix (the @ref
-    // distributed_paper "distributed computing paper" has a long discussion
-    // why one really needs the locally relevant, and not the small set of
-    // locally active degrees of freedom in this context).
+    // ever touch in the process of assembling the matrix (the
+    // @ref distributed_paper "distributed computing paper" has a long
+    // discussion why one really needs the locally relevant, and not the small
+    // set of locally active degrees of freedom in this context).
     //
     // So we tell the sparsity pattern its size and what DoFs to store
     // anything for and then ask DoFTools::make_sparsity_pattern to fill it
@@ -323,19 +319,19 @@ namespace Step40
     // entries that will exist in that part of the finite element matrix that
     // it will own. The final step is to initialize the matrix with the
     // sparsity pattern.
-    DynamicSparsityPattern dsp (locally_relevant_dofs);
+    DynamicSparsityPattern dsp(locally_relevant_dofs);
 
-    DoFTools::make_sparsity_pattern (dof_handler, dsp,
-                                     constraints, false);
-    SparsityTools::distribute_sparsity_pattern (dsp,
-                                                dof_handler.n_locally_owned_dofs_per_processor(),
-                                                mpi_communicator,
-                                                locally_relevant_dofs);
+    DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
+    SparsityTools::distribute_sparsity_pattern(
+      dsp,
+      dof_handler.n_locally_owned_dofs_per_processor(),
+      mpi_communicator,
+      locally_relevant_dofs);
 
-    system_matrix.reinit (locally_owned_dofs,
-                          locally_owned_dofs,
-                          dsp,
-                          mpi_communicator);
+    system_matrix.reinit(locally_owned_dofs,
+                         locally_owned_dofs,
+                         dsp,
+                         mpi_communicator);
   }
 
 
@@ -357,83 +353,80 @@ namespace Step40
   //   distributing constraints and boundary values. In other words, we cannot
   //   (as we did in step-6) first copy every local contribution into the global
   //   matrix and only in a later step take care of hanging node constraints and
-  //   boundary values. The reason is, as discussed in step-17, that PETSc does
-  //   not provide access to arbitrary elements of the matrix once they have
-  //   been assembled into it -- in parts because they may simply no longer
-  //   reside on the current processor but have instead been shipped to a
-  //   different machine.
+  //   boundary values. The reason is, as discussed in step-17, that the
+  //   parallel vector classes do not provide access to arbitrary elements of
+  //   the matrix once they have been assembled into it -- in parts because they
+  //   may simply no longer reside on the current processor but have instead
+  //   been shipped to a different machine.
   // - The way we compute the right hand side (given the
   //   formula stated in the introduction) may not be the most elegant but will
   //   do for a program whose focus lies somewhere entirely different.
   template <int dim>
-  void LaplaceProblem<dim>::assemble_system ()
+  void LaplaceProblem<dim>::assemble_system()
   {
     TimerOutput::Scope t(computing_timer, "assembly");
 
-    const QGauss<dim>  quadrature_formula(3);
+    const QGauss<dim> quadrature_formula(3);
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-                             update_values    |  update_gradients |
-                             update_quadrature_points |
-                             update_JxW_values);
+    FEValues<dim> fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
 
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    Vector<double>       cell_rhs (dofs_per_cell);
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-    for (; cell!=endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          cell_matrix = 0;
-          cell_rhs = 0;
+          cell_matrix = 0.;
+          cell_rhs    = 0.;
 
-          fe_values.reinit (cell);
+          fe_values.reinit(cell);
 
-          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+          for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
             {
-              const double
-              rhs_value
-                = (fe_values.quadrature_point(q_point)[1]
-                   >
-                   0.5+0.25*std::sin(4.0 * numbers::PI *
-                                     fe_values.quadrature_point(q_point)[0])
-                   ? 1 : -1);
+              const double rhs_value =
+                (fe_values.quadrature_point(q_point)[1] >
+                     0.5 +
+                       0.25 * std::sin(4.0 * numbers::PI *
+                                       fe_values.quadrature_point(q_point)[0]) ?
+                   1. :
+                   -1.);
 
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  for (unsigned int j=0; j<dofs_per_cell; ++j)
-                    cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-                                         fe_values.shape_grad(j,q_point) *
-                                         fe_values.JxW(q_point));
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                    cell_matrix(i, j) += fe_values.shape_grad(i, q_point) *
+                                         fe_values.shape_grad(j, q_point) *
+                                         fe_values.JxW(q_point);
 
-                  cell_rhs(i) += (rhs_value *
-                                  fe_values.shape_value(i,q_point) *
-                                  fe_values.JxW(q_point));
+                  cell_rhs(i) += rhs_value *                         //
+                                 fe_values.shape_value(i, q_point) * //
+                                 fe_values.JxW(q_point);
                 }
             }
 
-          cell->get_dof_indices (local_dof_indices);
-          constraints.distribute_local_to_global (cell_matrix,
-                                                  cell_rhs,
-                                                  local_dof_indices,
-                                                  system_matrix,
-                                                  system_rhs);
+          cell->get_dof_indices(local_dof_indices);
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 cell_rhs,
+                                                 local_dof_indices,
+                                                 system_matrix,
+                                                 system_rhs);
         }
 
     // Notice that the assembling above is just a local operation. So, to
     // form the "global" linear system, a synchronization between all
     // processors is needed. This could be done by invoking the function
-    // compress(). See @ref GlossCompress  "Compressing distributed objects"
+    // compress(). See @ref GlossCompress "Compressing distributed objects"
     // for more information on what is compress() designed to do.
-    system_matrix.compress (VectorOperation::add);
-    system_rhs.compress (VectorOperation::add);
+    system_matrix.compress(VectorOperation::add);
+    system_rhs.compress(VectorOperation::add);
   }
 
 
@@ -445,18 +438,19 @@ namespace Step40
   // at least at the outside -- relatively simple. Most of the parts you've
   // seen before. There are really only two things worth mentioning:
   // - Solvers and preconditioners are built on the deal.II wrappers of PETSc
-  //   functionality. It is relatively well known that the primary bottleneck of
-  //   massively %parallel linear solvers is not actually the communication
-  //   between processors, but the fact that it is difficult to produce
-  //   preconditioners that scale well to large numbers of processors. Over the
-  //   second half of the first decade of the 21st century, it has become clear
-  //   that algebraic multigrid (AMG) methods turn out to be extremely efficient
-  //   in this context, and we will use one of them -- the BoomerAMG
-  //   implementation of the Hypre package that can be interfaced to through
-  //   PETSc -- for the current program. The rest of the solver itself is
-  //   boilerplate and has been shown before. Since the linear system is
-  //   symmetric and positive definite, we can use the CG method as the outer
-  //   solver.
+  //   and Trilinos functionality. It is relatively well known that the
+  //   primary bottleneck of massively %parallel linear solvers is not
+  //   actually the communication between processors, but the fact that it is
+  //   difficult to produce preconditioners that scale well to large numbers
+  //   of processors. Over the second half of the first decade of the 21st
+  //   century, it has become clear that algebraic multigrid (AMG) methods
+  //   turn out to be extremely efficient in this context, and we will use one
+  //   of them -- either the BoomerAMG implementation of the Hypre package
+  //   that can be interfaced to through PETSc, or a preconditioner provided
+  //   by ML, which is part of Trilinos -- for the current program. The rest
+  //   of the solver itself is boilerplate and has been shown before. Since
+  //   the linear system is symmetric and positive definite, we can use the CG
+  //   method as the outer solver.
   // - Ultimately, we want a vector that stores not only the elements
   //   of the solution for degrees of freedom the current processor owns, but
   //   also all other locally relevant degrees of freedom. On the other hand,
@@ -467,13 +461,13 @@ namespace Step40
   //   end. This last step ensures that all ghost elements are also copied as
   //   necessary.
   template <int dim>
-  void LaplaceProblem<dim>::solve ()
+  void LaplaceProblem<dim>::solve()
   {
     TimerOutput::Scope t(computing_timer, "solve");
-    LA::MPI::Vector
-    completely_distributed_solution (locally_owned_dofs, mpi_communicator);
+    LA::MPI::Vector    completely_distributed_solution(locally_owned_dofs,
+                                                    mpi_communicator);
 
-    SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
+    SolverControl solver_control(dof_handler.n_dofs(), 1e-12);
 
 #ifdef USE_PETSC_LA
     LA::SolverCG solver(solver_control, mpi_communicator);
@@ -492,13 +486,15 @@ namespace Step40
 #endif
     preconditioner.initialize(system_matrix, data);
 
-    solver.solve (system_matrix, completely_distributed_solution, system_rhs,
-                  preconditioner);
+    solver.solve(system_matrix,
+                 completely_distributed_solution,
+                 system_rhs,
+                 preconditioner);
 
-    pcout << "   Solved in " << solver_control.last_step()
-          << " iterations." << std::endl;
+    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+          << std::endl;
 
-    constraints.distribute (completely_distributed_solution);
+    constraints.distribute(completely_distributed_solution);
 
     locally_relevant_solution = completely_distributed_solution;
   }
@@ -520,21 +516,20 @@ namespace Step40
   // and artificial ones), but it only fills those entries that correspond to
   // cells that are locally owned.
   template <int dim>
-  void LaplaceProblem<dim>::refine_grid ()
+  void LaplaceProblem<dim>::refine_grid()
   {
     TimerOutput::Scope t(computing_timer, "refine");
 
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss<dim-1>(3),
-                                        typename FunctionMap<dim>::type(),
-                                        locally_relevant_solution,
-                                        estimated_error_per_cell);
-    parallel::distributed::GridRefinement::
-    refine_and_coarsen_fixed_number (triangulation,
-                                     estimated_error_per_cell,
-                                     0.3, 0.03);
-    triangulation.execute_coarsening_and_refinement ();
+    Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+    KellyErrorEstimator<dim>::estimate(
+      dof_handler,
+      QGauss<dim - 1>(3),
+      std::map<types::boundary_id, const Function<dim> *>(),
+      locally_relevant_solution,
+      estimated_error_per_cell);
+    parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, estimated_error_per_cell, 0.3, 0.03);
+    triangulation.execute_coarsening_and_refinement();
   }
 
 
@@ -556,8 +551,8 @@ namespace Step40
   // sensible approach, namely creating individual files for each MPI process
   // and leaving it to the visualization program to make sense of that.
   //
-  // To start, the top of the function looks like always. In addition to
-  // attaching the solution vector (the one that has entries for all locally
+  // To start, the top of the function looks like it usually does. In addition
+  // to attaching the solution vector (the one that has entries for all locally
   // relevant, not only the locally owned, elements), we attach a data vector
   // that stores, for each cell, the subdomain the cell belongs to. This is
   // slightly tricky, because of course not every processor knows about every
@@ -572,18 +567,18 @@ namespace Step40
   // to locally owned cells, while providing the wrong value for all other
   // elements -- but these are then ignored anyway.
   template <int dim>
-  void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+  void LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   {
     DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (locally_relevant_solution, "u");
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(locally_relevant_solution, "u");
 
-    Vector<float> subdomain (triangulation.n_active_cells());
-    for (unsigned int i=0; i<subdomain.size(); ++i)
+    Vector<float> subdomain(triangulation.n_active_cells());
+    for (unsigned int i = 0; i < subdomain.size(); ++i)
       subdomain(i) = triangulation.locally_owned_subdomain();
-    data_out.add_data_vector (subdomain, "subdomain");
+    data_out.add_data_vector(subdomain, "subdomain");
 
-    data_out.build_patches ();
+    data_out.build_patches();
 
     // The next step is to write this data to disk. We choose file names of
     // the form <code>solution-XX.PPPP.vtu</code> where <code>XX</code>
@@ -591,14 +586,13 @@ namespace Step40
     // processor number (enough for up to 10,000 processors, though we hope
     // that nobody ever tries to generate this much data -- you would likely
     // overflow all file system quotas), and <code>.vtu</code> indicates the
-    // XML-based Visualization Toolkit (VTK) file format.
-    const std::string filename = ("solution-" +
-                                  Utilities::int_to_string (cycle, 2) +
-                                  "." +
-                                  Utilities::int_to_string
-                                  (triangulation.locally_owned_subdomain(), 4));
-    std::ofstream output ((filename + ".vtu").c_str());
-    data_out.write_vtu (output);
+    // XML-based Visualization Toolkit for Unstructured grids (VTU) file
+    // format.
+    const std::string filename =
+      ("solution-" + Utilities::int_to_string(cycle, 2) + "." +
+       Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
+    std::ofstream output(filename + ".vtu");
+    data_out.write_vtu(output);
 
     // The last step is to write a "master record" that lists for the
     // visualization program the names of the various files that combined
@@ -610,19 +604,15 @@ namespace Step40
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
         std::vector<std::string> filenames;
-        for (unsigned int i=0;
-             i<Utilities::MPI::n_mpi_processes(mpi_communicator);
+        for (unsigned int i = 0;
+             i < Utilities::MPI::n_mpi_processes(mpi_communicator);
              ++i)
-          filenames.push_back ("solution-" +
-                               Utilities::int_to_string (cycle, 2) +
-                               "." +
-                               Utilities::int_to_string (i, 4) +
-                               ".vtu");
+          filenames.push_back("solution-" + Utilities::int_to_string(cycle, 2) +
+                              "." + Utilities::int_to_string(i, 4) + ".vtu");
 
-        std::ofstream master_output (("solution-" +
-                                      Utilities::int_to_string (cycle, 2) +
-                                      ".pvtu").c_str());
-        data_out.write_pvtu_record (master_output, filenames);
+        std::ofstream master_output(
+          "solution-" + Utilities::int_to_string(cycle, 2) + ".pvtu");
+        data_out.write_pvtu_record(master_output, filenames);
       }
   }
 
@@ -645,7 +635,7 @@ namespace Step40
   // on 4 cells (although admittedly the point is only slightly stronger
   // starting on 1024).
   template <int dim>
-  void LaplaceProblem<dim>::run ()
+  void LaplaceProblem<dim>::run()
   {
     pcout << "Running with "
 #ifdef USE_PETSC_LA
@@ -653,65 +643,72 @@ namespace Step40
 #else
           << "Trilinos"
 #endif
-          << " on "
-          << Utilities::MPI::n_mpi_processes(mpi_communicator)
+          << " on " << Utilities::MPI::n_mpi_processes(mpi_communicator)
           << " MPI rank(s)..." << std::endl;
 
     const unsigned int n_cycles = 8;
-    for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
+    for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
       {
         pcout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
           {
-            GridGenerator::hyper_cube (triangulation);
-            triangulation.refine_global (5);
+            GridGenerator::hyper_cube(triangulation);
+            triangulation.refine_global(5);
           }
         else
-          refine_grid ();
+          refine_grid();
 
-        setup_system ();
+        setup_system();
 
         pcout << "   Number of active cells:       "
-              << triangulation.n_global_active_cells()
-              << std::endl
-              << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
+              << triangulation.n_global_active_cells() << std::endl
+              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl;
 
-        assemble_system ();
-        solve ();
+        assemble_system();
+        solve();
 
         if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
           {
             TimerOutput::Scope t(computing_timer, "output");
-            output_results (cycle);
+            output_results(cycle);
           }
 
-        computing_timer.print_summary ();
-        computing_timer.reset ();
+        computing_timer.print_summary();
+        computing_timer.reset();
 
         pcout << std::endl;
       }
   }
-}
+} // namespace Step40
 
 
 
 // @sect4{main()}
 
 // The final function, <code>main()</code>, again has the same structure as in
-// all other programs, in particular step-6. Like in the other programs that
-// use PETSc, we have to initialize and finalize PETSc, which is done using the
-// helper object MPI_InitFinalize.
+// all other programs, in particular step-6. Like the other programs that use
+// MPI, we have to initialize and finalize MPI, which is done using the helper
+// object Utilities::MPI::MPI_InitFinalize. The constructor of that class also
+// initializes libraries that depend on MPI, such as p4est, PETSc, SLEPc, and
+// Zoltan (though the last two are not used in this tutorial). The order here
+// is important: we cannot use any of these libraries until they are
+// initialized, so it does not make sense to do anything before creating an
+// instance of Utilities::MPI::MPI_InitFinalize.
 //
-// Note how we enclose the use the use of the LaplaceProblem class in a pair
-// of braces. This makes sure that all member variables of the object are
-// destroyed by the time we destroy the mpi_initialization object. Not doing
-// this will lead to strange and hard to debug errors when
-// <code>PetscFinalize</code> first deletes all PETSc vectors that are still
-// around, and the destructor of the LaplaceProblem class then tries to delete
-// them again.
+// After the solver finishes, the LaplaceProblem destructor will run followed
+// by Utilities::MPI::MPI_InitFinalize::~MPI_InitFinalize(). This order is
+// also important: Utilities::MPI::MPI_InitFinalize::~MPI_InitFinalize() calls
+// <code>PetscFinalize</code> (and finalization functions for other
+// libraries), which will delete any in-use PETSc objects. This must be done
+// after we destruct the Laplace solver to avoid double deletion
+// errors. Fortunately, due to the order of destructor call rules of C++, we
+// do not need to worry about any of this: everything happens in the correct
+// order (i.e., the reverse of the order of construction). The last function
+// called by Utilities::MPI::MPI_InitFinalize::~MPI_InitFinalize() is
+// <code>MPI_Finalize</code>: i.e., once this object is destructed the program
+// should exit since MPI will no longer be available.
 int main(int argc, char *argv[])
 {
   try
@@ -722,11 +719,12 @@ int main(int argc, char *argv[])
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       LaplaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
+      laplace_problem_2d.run();
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -739,7 +737,8 @@ int main(int argc, char *argv[])
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

@@ -1,4 +1,0 @@
-Fixed: GridTools::distort_random works with 
-parallel::shared::Triangulation objects.
-<br>
-(Daniel Arndt, 2018/03/05)

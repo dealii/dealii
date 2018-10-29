@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -21,57 +21,59 @@
 // we condense a matrix with this then the right thing happens
 
 
-#include "../tests.h"
-#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparse_matrix.h>
 
+#include "../tests.h"
 
 
-void test ()
+
+void
+test()
 {
-
   // constrain each dof to zero. this
   // should yield a diagonal matrix
-  ConstraintMatrix cm;
+  AffineConstraints<double> cm;
 
-  for (unsigned int i=0; i<5; ++i)
-    cm.add_line (i);
-  cm.close ();
+  for (unsigned int i = 0; i < 5; ++i)
+    cm.add_line(i);
+  cm.close();
 
   // completely fill a 5x5 matrix
   // with some values
-  SparsityPattern sp (5,5,5);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      sp.add(i,j);
-  sp.compress ();
+  SparsityPattern sp(5, 5, 5);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 5; ++j)
+      sp.add(i, j);
+  sp.compress();
 
   SparseMatrix<double> m(sp);
-  for (unsigned int i=0; i<5; ++i)
-    for (unsigned int j=0; j<5; ++j)
-      m.set(i,j, i+j+2);
+  for (unsigned int i = 0; i < 5; ++i)
+    for (unsigned int j = 0; j < 5; ++j)
+      m.set(i, j, i + j + 2);
 
   // now condense it
-  cm.condense (m);
+  cm.condense(m);
 
   // and print it
-  for (unsigned int i=0; i<5; ++i)
+  for (unsigned int i = 0; i < 5; ++i)
     {
-      for (unsigned int j=0; j<5; ++j)
-        deallog << m(i,j) << ' ';
+      for (unsigned int j = 0; j < 5; ++j)
+        deallog << m(i, j) << ' ';
       deallog << std::endl;
     }
 }
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
-  deallog << std::setprecision (2);
+  deallog << std::setprecision(2);
 
   deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2017 by the deal.II authors
+## Copyright (C) 2013 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -37,6 +37,14 @@
 #
 #     TEST_TARGET or
 #     TEST_TARGET_DEBUG and TEST_TARGET_RELEASE
+#
+# - If the parameter file in the second test variant is named
+#   "${test_name}.prm.in" it will be configured/preprocessed to a
+#   "${test_name}.prm" file. This preprocessing is done with the CMake
+#   macro CONFIGURE_FILE that replaces all strings @VARIABLE@ with the
+#   contents of the corresponding CMake variable. This is useful in
+#   particular to conveniently substitute @SOURCE_DIR@ with the full source
+#   directory path of the test.
 #
 # For every deal.II build type (given by the variable DEAL_II_BUILD_TYPES)
 # that is a (case insensitive) substring of CMAKE_BUILD_TYPE a test is
@@ -180,7 +188,20 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
         SET(_target ${_test_name}.${_build_lowercase}) # target name
         SET(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
 
-      ELSEIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm")
+      ELSEIF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm" OR
+              EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm.in" )
+
+        IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm.in")
+          SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+          CONFIGURE_FILE(
+            "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.prm"
+            @ONLY
+            )
+          SET(_prm_file "${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.prm")
+        ELSE()
+          SET(_prm_file "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm")
+        ENDIF()
 
         IF(NOT "${TEST_TARGET_${_build}}" STREQUAL "")
           SET(_target ${TEST_TARGET_${_build}})
@@ -188,14 +209,14 @@ MACRO(DEAL_II_ADD_TEST _category _test_name _comparison_file)
           SET(_target ${TEST_TARGET})
         ELSE()
           MESSAGE(FATAL_ERROR
-            "\nFor ${_comparison_file}: \"${_test_name}.prm\" provided, but "
-            "neither \"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}"
+            "\nFor ${_comparison_file}: \"${_test_name}.prm(.in)\" provided, "
+            "but neither \"\${TEST_TARGET}\", nor \"\${TEST_TARGET_${_build}}"
             "\" is defined.\n\n"
             )
         ENDIF()
         SET(_run_args
           "$<TARGET_FILE:${_target}>"
-          "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.prm"
+          "${_prm_file}"
           )
 
       ELSE()

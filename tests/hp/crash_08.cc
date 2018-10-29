@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2017 by the deal.II authors
+// Copyright (C) 2006 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,37 +19,39 @@
 // constraint between degrees of freedom 3->14->17->6->3 with the algorithm
 // that is presently in make_hanging_node_constraints
 
-char logname[] = "output";
-
-
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/hp/dof_handler.h>
-#include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/vector_tools.h>
+
 #include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/hp/dof_handler.h>
+
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/vector.h>
+
+#include <deal.II/numerics/vector_tools.h>
 
 #include <vector>
 
+#include "../tests.h"
 
 
-int main ()
+
+int
+main()
 {
-  std::ofstream logfile(logname);
-  logfile.precision (3);
-
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream().precision(3);
 
 
   // create a mesh like this:
@@ -61,91 +63,89 @@ int main ()
   // *---*---*---*
   // | 0 | 1 | 2 |
   // *---*---*---*
-  Triangulation<2>     triangulation;
-  GridGenerator::subdivided_hyper_cube (triangulation, 3);
+  Triangulation<2> triangulation;
+  GridGenerator::subdivided_hyper_cube(triangulation, 3);
 
   hp::FECollection<2> fe;
-  fe.push_back (FE_Q<2>(1));
-  fe.push_back (FE_Q<2>(2));
-  fe.push_back (FE_Q<2>(QIterated<1>(QTrapez<1>(),3)));
+  fe.push_back(FE_Q<2>(1));
+  fe.push_back(FE_Q<2>(2));
+  fe.push_back(FE_Q<2>(QIterated<1>(QTrapez<1>(), 3)));
 
-  hp::DoFHandler<2>        dof_handler(triangulation);
+  hp::DoFHandler<2> dof_handler(triangulation);
 
   // subdivide cells 1, 3, 5, 7
-  hp::DoFHandler<2>::active_cell_iterator
-  cell = dof_handler.begin_active();
+  hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
   ++cell;
-  cell->set_refine_flag ();
-  ++cell;
-  ++cell;
-  cell->set_refine_flag ();
+  cell->set_refine_flag();
   ++cell;
   ++cell;
-  cell->set_refine_flag ();
+  cell->set_refine_flag();
   ++cell;
   ++cell;
-  cell->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement ();
+  cell->set_refine_flag();
+  ++cell;
+  ++cell;
+  cell->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement();
 
   // now set fe_index as described in the
   // paper
   cell = dof_handler.begin_active();
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (1);
+  cell->set_active_fe_index(1);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
 
   // one set of small cells
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (2);
+  cell->set_active_fe_index(2);
 
   // one set of small cells
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (2);
+  cell->set_active_fe_index(2);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
 
   // one set of small cells
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (2);
+  cell->set_active_fe_index(2);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
 
   // one set of small cells
   ++cell;
-  cell->set_active_fe_index (2);
+  cell->set_active_fe_index(2);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
   ++cell;
-  cell->set_active_fe_index (0);
+  cell->set_active_fe_index(0);
 
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs(fe);
 
-  ConstraintMatrix constraints;
-  DoFTools::make_hanging_node_constraints (dof_handler,
-                                           constraints);
-  constraints.close ();
+  AffineConstraints<double> constraints;
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  constraints.close();
 
-  constraints.print (deallog.get_file_stream());
+  constraints.print(deallog.get_file_stream());
 }

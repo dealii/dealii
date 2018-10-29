@@ -178,28 +178,28 @@ basic_oarchive_impl::find(const serialization::extended_type_info & ti) const {
     class bosarg : 
         public basic_oserializer
     {
-        bool class_info() const {
+        bool class_info() const override {
             BOOST_ASSERT(false); 
             return false;
         }
         // returns true if objects should be tracked
-        bool tracking(const unsigned int) const {
+        bool tracking(const unsigned int) const override {
             BOOST_ASSERT(false);
             return false;
         }
         // returns class version
-        version_type version() const {
+        version_type version() const override {
             BOOST_ASSERT(false);
             return version_type(0);
         }
         // returns true if this class is polymorphic
-        bool is_polymorphic() const{
+        bool is_polymorphic() const override{
             BOOST_ASSERT(false);
             return false;
         }
         void save_object_data(      
             basic_oarchive & /*ar*/, const void * /*x*/
-        ) const {
+        ) const override {
             BOOST_ASSERT(false);
         }
     public:

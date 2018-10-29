@@ -1,0 +1,3 @@
+Improved: TimerOutput now dynamically adjust to the the width of Section column.
+<br>
+(Denis Davydov 2018/05/29)

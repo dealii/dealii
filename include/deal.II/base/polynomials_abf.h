@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,13 +18,13 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomial_space.h>
+#include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_product_polynomials.h>
-#include <deal.II/base/table.h>
 #include <deal.II/base/thread_management.h>
 
 #include <memory>
@@ -62,7 +62,7 @@ public:
    * the largest tensor product polynomial space <i>Q<sub>k</sub></i>
    * contained.
    */
-  PolynomialsABF (const unsigned int k);
+  PolynomialsABF(const unsigned int k);
 
   /**
    * Compute the value and the first and second derivatives of each Raviart-
@@ -76,35 +76,40 @@ public:
    * <tt>compute_grad</tt> or <tt>compute_grad_grad</tt> functions, see below,
    * in a loop over all tensor product polynomials.
    */
-  void compute (const Point<dim>            &unit_point,
-                std::vector<Tensor<1,dim> > &values,
-                std::vector<Tensor<2,dim> > &grads,
-                std::vector<Tensor<3,dim> > &grad_grads,
-                std::vector<Tensor<4,dim> > &third_derivatives,
-                std::vector<Tensor<5,dim> > &fourth_derivatives) const;
+  void
+  compute(const Point<dim> &           unit_point,
+          std::vector<Tensor<1, dim>> &values,
+          std::vector<Tensor<2, dim>> &grads,
+          std::vector<Tensor<3, dim>> &grad_grads,
+          std::vector<Tensor<4, dim>> &third_derivatives,
+          std::vector<Tensor<5, dim>> &fourth_derivatives) const;
 
   /**
    * Return the number of ABF polynomials.
    */
-  unsigned int n () const;
+  unsigned int
+  n() const;
 
   /**
    * Return the degree of the ABF space, which is two less than the highest
    * polynomial degree.
    */
-  unsigned int degree () const;
+  unsigned int
+  degree() const;
 
   /**
    * Return the name of the space, which is <tt>ABF</tt>.
    */
-  std::string name () const;
+  std::string
+  name() const;
 
   /**
    * Return the number of polynomials in the space <tt>RT(degree)</tt> without
    * requiring to build an object of PolynomialsABF. This is required by the
    * FiniteElement classes.
    */
-  static unsigned int compute_n_pols(unsigned int degree);
+  static unsigned int
+  compute_n_pols(unsigned int degree);
 
 private:
   /**
@@ -137,22 +142,22 @@ private:
   /**
    * Auxiliary memory.
    */
-  mutable std::vector<Tensor<1,dim> > p_grads;
+  mutable std::vector<Tensor<1, dim>> p_grads;
 
   /**
    * Auxiliary memory.
    */
-  mutable std::vector<Tensor<2,dim> > p_grad_grads;
+  mutable std::vector<Tensor<2, dim>> p_grad_grads;
 
   /**
    * Auxiliary memory.
    */
-  mutable std::vector<Tensor<3,dim> > p_third_derivatives;
+  mutable std::vector<Tensor<3, dim>> p_third_derivatives;
 
   /**
    * Auxiliary memory.
    */
-  mutable std::vector<Tensor<4,dim> > p_fourth_derivatives;
+  mutable std::vector<Tensor<4, dim>> p_fourth_derivatives;
 };
 
 

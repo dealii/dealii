@@ -1,6 +1,0 @@
-Fixed: The hp version of DoFTools::make_flux_sparsity_pattern() with masks for 
-DoF couplings now works with non-primitive FE spaces, similarly to its non-hp version.
-The hp version of VectorTools::project_boundary_values() is modified to work properly with Hdiv
-conforming finite elements. 
-<br>
-(Eldar Khattatov, 2017/09/26)

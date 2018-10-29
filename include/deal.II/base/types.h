@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,13 +18,14 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <cstddef>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A namespace in which we declare typedefs for types used in deal.II, as well
+ * A namespace in which we declare alias for types used in deal.II, as well
  * as special values for these types.
  */
 namespace types
@@ -39,18 +40,18 @@ namespace types
    * There is a special value, numbers::invalid_subdomain_id that is used to
    * indicate an invalid value of this type.
    */
-  typedef unsigned int subdomain_id;
+  using subdomain_id = unsigned int;
 
   /**
    * The type used for global indices of vertices.
    */
-  typedef unsigned long long int global_vertex_index;
+  using global_vertex_index = unsigned long long int;
 
   /**
    * An identifier that denotes the MPI type associated with
    * types::global_vertex_index.
    */
-#  define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#define DEAL_II_VERTEX_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
   /**
@@ -68,7 +69,7 @@ namespace types
    */
   // TODO: we should check that unsigned long long int
   // has the same size as uint64_t
-  typedef unsigned long long int global_dof_index;
+  using global_dof_index = unsigned long long int;
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -85,7 +86,7 @@ namespace types
    *
    * The data type always indicates an unsigned integer type.
    */
-  typedef unsigned int global_dof_index;
+  using global_dof_index = unsigned int;
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -107,7 +108,7 @@ namespace types
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  typedef unsigned int boundary_id;
+  using boundary_id = unsigned int;
 
   /**
    * The type used to denote manifold indicators associated with every object
@@ -119,7 +120,7 @@ namespace types
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  typedef unsigned int manifold_id;
+  using manifold_id = unsigned int;
 
   /**
    * The type used to denote material indicators associated with every cell.
@@ -130,13 +131,13 @@ namespace types
    * @see
    * @ref GlossMaterialId "Glossary entry on material indicators"
    */
-  typedef unsigned int material_id;
-}
+  using material_id = unsigned int;
+} // namespace types
 
 /**
  * Declare type used in Epetra.
  */
-typedef double TrilinosScalar;
+using TrilinosScalar = double;
 
 
 namespace TrilinosWrappers
@@ -147,15 +148,15 @@ namespace TrilinosWrappers
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    typedef long long int_type;
+    using int_type = long long;
 #else
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
-    typedef int int_type;
+    using int_type = int;
 #endif
-  }
-}
+  } // namespace types
+} // namespace TrilinosWrappers
 
 
 // this part of the namespace numbers got moved to the bottom types.h file,
@@ -169,8 +170,8 @@ namespace numbers
    * an invalid unsigned integer value, such as an invalid array index, an
    * invalid array size, and the like.
    */
-  static const unsigned int
-  invalid_unsigned_int = static_cast<unsigned int> (-1);
+  static const unsigned int invalid_unsigned_int =
+    static_cast<unsigned int>(-1);
 
   /**
    * Representation of the largest number that can be put into a size_type.
@@ -178,20 +179,22 @@ namespace numbers
    * size_type value, such as an invalid array index, an invalid array size,
    * and the like. Invalid_size_type is equivalent to invalid_dof_index.
    */
-  const types::global_dof_index
-  invalid_size_type = static_cast<types::global_dof_index> (-1);
+  const types::global_dof_index invalid_size_type =
+    static_cast<types::global_dof_index>(-1);
 
   /**
    * An invalid value for indices of degrees of freedom.
    */
-  const types::global_dof_index invalid_dof_index = static_cast<types::global_dof_index>(-1);
+  const types::global_dof_index invalid_dof_index =
+    static_cast<types::global_dof_index>(-1);
 
   /**
    * Invalid material_id which we need in several places as a default value.
    * We assume that all material_ids lie in the range [0,
    * invalid_material_id).
    */
-  const types::material_id invalid_material_id = static_cast<types::material_id>(-1);
+  const types::material_id invalid_material_id =
+    static_cast<types::material_id>(-1);
 
   /**
    * Invalid boundary_id which we need in several places as a default value.
@@ -201,7 +204,8 @@ namespace numbers
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const types::boundary_id invalid_boundary_id = static_cast<types::boundary_id>(-1);
+  const types::boundary_id invalid_boundary_id =
+    static_cast<types::boundary_id>(-1);
 
   /**
    * A boundary indicator number that we reserve for internal faces.  We
@@ -216,17 +220,22 @@ namespace numbers
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const types::boundary_id internal_face_boundary_id = static_cast<types::boundary_id>(-1);
+  const types::boundary_id internal_face_boundary_id =
+    static_cast<types::boundary_id>(-1);
 
   /**
    * Invalid manifold_id which we need in several places as a default value.
    * We assume that all valid manifold_ids lie in the range [0,
    * invalid_manifold_id).
    *
+   * @deprecated Use flat_manifold_id instead.
+   *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  const types::manifold_id invalid_manifold_id = static_cast<types::manifold_id>(-1);
+  DEAL_II_DEPRECATED
+  const types::manifold_id invalid_manifold_id =
+    static_cast<types::manifold_id>(-1);
 
   /**
    * A manifold_id we reserve for the default flat Cartesian manifold.
@@ -234,7 +243,8 @@ namespace numbers
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
    */
-  const types::manifold_id flat_manifold_id = static_cast<types::manifold_id>(-1);
+  const types::manifold_id flat_manifold_id =
+    static_cast<types::manifold_id>(-1);
 
   /**
    * A special id for an invalid subdomain id. This value may not be used as a
@@ -245,7 +255,8 @@ namespace numbers
    * @ref GlossSubdomainId "glossary"
    * for more information.
    */
-  const types::subdomain_id invalid_subdomain_id = static_cast<types::subdomain_id>(-1);
+  const types::subdomain_id invalid_subdomain_id =
+    static_cast<types::subdomain_id>(-1);
 
   /**
    * The subdomain id assigned to a cell whose true subdomain id we don't
@@ -261,9 +272,9 @@ namespace numbers
    * @ref distributed
    * module for more information.
    */
-  const types::subdomain_id artificial_subdomain_id = static_cast<types::subdomain_id>(-2);
-}
-
+  const types::subdomain_id artificial_subdomain_id =
+    static_cast<types::subdomain_id>(-2);
+} // namespace numbers
 
 DEAL_II_NAMESPACE_CLOSE
 

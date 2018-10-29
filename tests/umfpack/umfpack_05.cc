@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,56 +17,56 @@
 // test the umfpack sparse direct solver on a simple 2x2 block matrix
 // that equals the unit matrix
 
-#include "../tests.h"
-#include <iostream>
-
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/vector.h>
+
+#include <iostream>
+
+#include "../tests.h"
 
 
-void test ()
+void
+test()
 {
-  std::vector<unsigned int> size (2,2U);
+  std::vector<unsigned int> size(2, 2U);
 
   BlockSparsityPattern b_sparsity_pattern;
-  b_sparsity_pattern.reinit(size.size(),size.size());
-  for (unsigned int k=0; k<size.size(); ++k)
-    for (unsigned int l=0; l<size.size(); ++l)
-      b_sparsity_pattern.block(k,l).reinit(size[k],
-                                           size[l],
-                                           2);
+  b_sparsity_pattern.reinit(size.size(), size.size());
+  for (unsigned int k = 0; k < size.size(); ++k)
+    for (unsigned int l = 0; l < size.size(); ++l)
+      b_sparsity_pattern.block(k, l).reinit(size[k], size[l], 2);
   b_sparsity_pattern.collect_sizes();
-  for (unsigned int i=0; i<4; ++i)
-    for (unsigned int j=0; j<4; ++j)
-      b_sparsity_pattern.add (i,j);
+  for (unsigned int i = 0; i < 4; ++i)
+    for (unsigned int j = 0; j < 4; ++j)
+      b_sparsity_pattern.add(i, j);
   b_sparsity_pattern.compress();
 
-  BlockSparseMatrix<double> Bb (b_sparsity_pattern);
-  for (unsigned int i=0; i<4; ++i)
-    Bb.add (i,i,1);
+  BlockSparseMatrix<double> Bb(b_sparsity_pattern);
+  for (unsigned int i = 0; i < 4; ++i)
+    Bb.add(i, i, 1);
 
   SparseDirectUMFPACK umfpackb;
   umfpackb.factorize(Bb);
 
   Vector<double> ubb(4);
-  for (unsigned int i=0; i<4; ++i)
+  for (unsigned int i = 0; i < 4; ++i)
     ubb(i) = i;
 
   umfpackb.solve(ubb);
 
-  for (unsigned int i=0; i<4; ++i)
-    AssertThrow (std::fabs (ubb(i) - i) < 1e-12,
-                 ExcInternalError());
+  for (unsigned int i = 0; i < 4; ++i)
+    AssertThrow(std::fabs(ubb(i) - i) < 1e-12, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

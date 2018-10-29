@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2017 by the deal.II authors
+// Copyright (C) 2010 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,53 +19,56 @@
 // curves, the normal vectors at different quadrature points should no longer
 // be parallel
 
-#include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/grid/tria.h>
+
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
+
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/mapping_q.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 template <int dim>
-void test (unsigned int degree)
+void
+test(unsigned int degree)
 {
-  Triangulation<dim-1, dim> mesh;
+  Triangulation<dim - 1, dim> mesh;
   GridGenerator::hyper_cube(mesh);
 
-  QGauss<dim-1> quadrature(dim == 2 ? 3 : 2);
-  MappingQ<dim-1,dim> mapping(degree);
-  Point<dim> p;
+  QGauss<dim - 1>        quadrature(dim == 2 ? 3 : 2);
+  MappingQ<dim - 1, dim> mapping(degree);
+  Point<dim>             p;
 
   // Try to project a point on the
   // surface
-  for (unsigned int i=0; i<dim; ++i)
+  for (unsigned int i = 0; i < dim; ++i)
     p[i] = .2;
 
-  Point<dim-1> q =
+  Point<dim - 1> q =
     mapping.transform_real_to_unit_cell(mesh.begin_active(), p);
 
-  deallog << "Mapping Q("<< degree<< "): P: " << p
-          << ", on unit: " << q << std::endl;
-
+  deallog << "Mapping Q(" << degree << "): P: " << p << ", on unit: " << q
+          << std::endl;
 }
 
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  test<2> (1);
-  test<2> (2);
+  test<2>(1);
+  test<2>(2);
 
-  test<3> (1);
-  test<3> (2);
+  test<3>(1);
+  test<3>(2);
 
   return 0;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2014 by the deal.II authors
+// Copyright (C) 2003 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -52,7 +52,7 @@
  * In addition to the DoF handler classes, this module holds a number of
  * auxiliary classes not commonly used in application programs, as well as
  * three classes that are not directly associated with the data structures of
- * the DoFHandler class. The first of these is the ConstraintMatrix class that
+ * the DoFHandler class. The first of these is the AffineConstraints class that
  * stores and treats the constraints associated with hanging nodes. Secondly,
  * the DoFRenumbering namespace offers functions that can reorder degrees of
  * freedom; among its functions are ones that sort degrees of freedom in

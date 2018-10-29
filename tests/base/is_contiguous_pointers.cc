@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 by the deal.II authors
+// Copyright (C) 2017 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,19 +8,20 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // test that is_contiguous works correctly for pointers
 
-#include "../tests.h"
-
 #include <deal.II/base/array_view.h>
 
-void test ()
+#include "../tests.h"
+
+void
+test()
 {
   constexpr int *p = nullptr;
   constexpr int *q = nullptr;
@@ -28,15 +29,16 @@ void test ()
   // the following code would fail if we tried to call the
   // non-constexpr version of the function, so this really must be the
   // pointer overload which we know always returns true
-  constexpr bool b = internal::ArrayViewHelper::is_contiguous (p, q);
+  constexpr bool b = internal::ArrayViewHelper::is_contiguous(p, q);
 
-  Assert (b == true, ExcInternalError());
+  Assert(b == true, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main()
+int
+main()
 {
   deal_II_exceptions::disable_abort_on_exception();
   initlog();

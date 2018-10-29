@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2017 by the deal.II authors
+// Copyright (C) 2007 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,24 +8,26 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#include "../tests.h"
+
 template <typename number>
 void
-checkApply_Constraints(FullMatrix<number> &A, Vector<number> &V,
-                       bool matrix_is_symmetric = false)
+checkApply_Constraints(FullMatrix<number> &A,
+                       Vector<number> &    V,
+                       bool                matrix_is_symmetric = false)
 {
   deallog << "apply_constraints" << std::endl;
 
-  FilteredMatrix < Vector<double> > F;
+  FilteredMatrix<Vector<double>> F;
   F.initialize(A);
   F.add_constraint(0, 1);
 
@@ -44,8 +46,7 @@ main()
   deallog << std::setprecision(4);
   deallog.attach(logfile);
 
-  const double Adata[] =
-  { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  const double Adata[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
   FullMatrix<double> A(3, 3);
 

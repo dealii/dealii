@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2017 by the deal.II authors
+// Copyright (C) 1998 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,23 +17,31 @@
 #define dealii_fe_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/fe/fe_base.h>
-#include <deal.II/fe/fe_values_extractors.h>
-#include <deal.II/fe/fe_update_flags.h>
-#include <deal.II/fe/component_mask.h>
+
 #include <deal.II/fe/block_mask.h>
+#include <deal.II/fe/component_mask.h>
+#include <deal.II/fe/fe_base.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/fe_values_extractors.h>
 #include <deal.II/fe/mapping.h>
+
+#include <deal.II/lac/full_matrix.h>
 
 #include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class FEValuesBase;
-template <int dim, int spacedim> class FEValues;
-template <int dim, int spacedim> class FEFaceValues;
-template <int dim, int spacedim> class FESubfaceValues;
-template <int dim, int spacedim> class FESystem;
+template <int dim, int spacedim>
+class FEValuesBase;
+template <int dim, int spacedim>
+class FEValues;
+template <int dim, int spacedim>
+class FEFaceValues;
+template <int dim, int spacedim>
+class FESubfaceValues;
+template <int dim, int spacedim>
+class FESystem;
 
 /**
  * This is the base class for finite elements in arbitrary dimensions. It
@@ -159,8 +167,8 @@ template <int dim, int spacedim> class FESystem;
  * If, for example, this system were used to discretize a problem in fluid
  * dynamics then one could think of the first two components representing a
  * vector-valued velocity field whereas the last one corresponds to the scalar
- * pressure field. Without degree-of-freedom (DoF) renumbering this finite element will
- * produce the following distribution of local DoFs:
+ * pressure field. Without degree-of-freedom (DoF) renumbering this finite
+ * element will produce the following distribution of local DoFs:
  *
  * @image html fe_system_example.png DoF indices
  *
@@ -168,11 +176,16 @@ template <int dim, int spacedim> class FESystem;
  * FiniteElement::system_to_base_index() one can get the
  * following information for each degree-of-freedom "i":
  * @code
- * const unsigned int component     = fe_basis.system_to_component_index(i).first;
- * const unsigned int within_base   = fe_basis.system_to_component_index(i).second;
- * const unsigned int base          = fe_basis.system_to_base_index(i).first.first;
- * const unsigned int multiplicity  = fe_basis.system_to_base_index(i).first.second;
- * const unsigned int within_base_  = fe_basis.system_to_base_index(i).second; // same as above
+ * const unsigned int component =
+ *   fe_basis.system_to_component_index(i).first;
+ * const unsigned int within_base =
+ *   fe_basis.system_to_component_index(i).second;
+ * const unsigned int base =
+ *   fe_basis.system_to_base_index(i).first.first;
+ * const unsigned int multiplicity =
+ *   fe_basis.system_to_base_index(i).first.second;
+ * const unsigned int within_base_  =
+ *   fe_basis.system_to_base_index(i).second; // same as above
  * @endcode
  * which will result in:
  *
@@ -201,15 +214,16 @@ template <int dim, int spacedim> class FESystem;
  * |     20 |          0 |            0 |                          8 |            0 |
  * |     21 |          1 |            0 |                          8 |            1 |
  *
- * What we see is the following: there are a total of 22 degrees-of-freedom on this
- * element with components ranging from 0 to 2. Each DoF corresponds to
- * one of the two base elements used to build FESystem : $\mathbb Q_2$ or $\mathbb Q_1$.
- * Since FE_Q are primitive elements, we have a total of 9 distinct
- * scalar-valued shape functions for the quadratic element and 4 for the linear element.
- * Finally, for DoFs corresponding to the first base element multiplicity
- * is either zero or one, meaning that we use the same scalar valued $\mathbb Q_2$
- * for both $x$ and $y$ components of the velocity field $\mathbb Q_2 \otimes \mathbb Q_2$.
- * For DoFs corresponding to the second base element multiplicity is zero.
+ * What we see is the following: there are a total of 22 degrees-of-freedom on
+ * this element with components ranging from 0 to 2. Each DoF corresponds to one
+ * of the two base elements used to build FESystem : $\mathbb Q_2$ or $\mathbb
+ * Q_1$. Since FE_Q are primitive elements, we have a total of 9 distinct
+ * scalar-valued shape functions for the quadratic element and 4 for the linear
+ * element. Finally, for DoFs corresponding to the first base element
+ * multiplicity is either zero or one, meaning that we use the same scalar
+ * valued $\mathbb Q_2$ for both $x$ and $y$ components of the velocity field
+ * $\mathbb Q_2 \otimes \mathbb Q_2$. For DoFs corresponding to the second base
+ * element multiplicity is zero.
  *
  * <h4>Support points</h4>
  *
@@ -239,10 +253,10 @@ template <int dim, int spacedim> class FESystem;
  * Alternatively, the points can be transformed one-by-one:
  * @code
  * const vector<Point<dim> > &unit_points =
- *    fe.get_unit_support_points();
+ *   fe.get_unit_support_points();
  *
  * Point<dim> mapped_point =
- *    mapping.transform_unit_to_real_cell (cell, unit_points[i]);
+ *   mapping.transform_unit_to_real_cell (cell, unit_points[i]);
  * @endcode
  *
  * @note Finite elements' implementation of the get_unit_support_points()
@@ -290,8 +304,8 @@ template <int dim, int spacedim> class FESystem;
  *
  * <h4>Interpolation matrices in two dimensions</h4>
  *
- * In addition to the fields discussed above for 1D, a constraint matrix is
- * needed to describe hanging node constraints if the finite element has
+ * In addition to the fields discussed above for 1D, a constraint matrix
+ * is needed to describe hanging node constraints if the finite element has
  * degrees of freedom located on edges or vertices. These constraints are
  * represented by an $m\times n$-matrix #interface_constraints, where <i>m</i>
  * is the number of degrees of freedom on the refined side without the corner
@@ -401,12 +415,12 @@ template <int dim, int spacedim> class FESystem;
  * weights. This is sometimes tricky since the nodes on the edge may have
  * different local numbers.
  *
- * For the constraint matrix this means the following: if a degree of freedom
- * on one edge of a face is constrained by some other nodes on the same edge
- * with some weights, then the weights have to be exactly the same as those
+ * For the constraint matrix this means the following: if a degree of
+ * freedom on one edge of a face is constrained by some other nodes on the same
+ * edge with some weights, then the weights have to be exactly the same as those
  * for constrained nodes on the three other edges with respect to the
  * corresponding nodes on these edges. If this isn't the case, you will get
- * into trouble with the ConstraintMatrix class that is the primary consumer
+ * into trouble with the AffineConstraints class that is the primary consumer
  * of the constraint information: while that class is able to handle
  * constraints that are entered more than once (as is necessary for the case
  * above), it insists that the weights are exactly the same.
@@ -415,9 +429,9 @@ template <int dim, int spacedim> class FESystem;
  * parent face degrees of freedom that contain those on the edges of the
  * parent face; it is possible that some of them are in turn constrained
  * themselves, leading to longer chains of constraints that the
- * ConstraintMatrix class will eventually have to sort out. (The constraints
+ * AffineConstraints class will eventually have to sort out. (The constraints
  * described above are used by the DoFTools::make_hanging_node_constraints()
- * function that constructs a ConstraintMatrix object.) However, this is of no
+ * function that constructs an AffineConstraints object.) However, this is of no
  * concern for the FiniteElement and derived classes since they only act
  * locally on one cell and its immediate neighbor, and do not see the bigger
  * picture. The
@@ -461,22 +475,22 @@ template <int dim, int spacedim> class FESystem;
  * <i>w<sub>j</sub></i>.
  * </ol>
  *
- * The matrix <i>M</i> may be computed using FETools::compute_node_matrix().
- * This function relies on the existence of #generalized_support_points and an
- * implementation of the FiniteElement::interpolate() function with
- * VectorSlice argument. (See the
- * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
- * for more information.) With this, one can then use the following piece of
- * code in the constructor of a class derived from FiniteElement to compute the
- * $M$ matrix:
+ * The matrix <i>M</i> may be computed with FETools::compute_node_matrix().
+ * This function relies on the existence of #generalized_support_points and
+ * FiniteElement::convert_generalized_support_point_values_to_dof_values()
+ * (see the @ref GlossGeneralizedSupport "glossary entry on generalized
+ * support points" for more information). With this, one can then use the
+ * following piece of code in the constructor of a class derived from
+ * FiniteElement to compute the $M$ matrix:
  * @code
  * FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
  * FETools::compute_node_matrix(M, *this);
  * this->inverse_node_matrix.reinit(this->dofs_per_cell, this->dofs_per_cell);
  * this->inverse_node_matrix.invert(M);
  * @endcode
- * Don't forget to make sure that #unit_support_points or
- * #generalized_support_points are initialized before this!
+ * Don't forget to make sure
+ * that #unit_support_points or #generalized_support_points are initialized
+ * before this!
  *
  * <h5>Computing prolongation matrices</h5>
  *
@@ -580,9 +594,9 @@ template <int dim, int spacedim> class FESystem;
  * otherwise arbitrary convention). For example, in the example above, the
  * restriction matrices will be
  * @f[
- *   R_0 = \left(\begin{matrix}1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 1 & 0 \end{matrix}\right),
- *   \qquad\qquad
- *   R_1 = \left(\begin{matrix}0 & 0 & 0 \\ 0 & 1 & 0 \\ 1 & 0 & 0 \end{matrix}\right),
+ *   R_0 = \left(\begin{matrix}1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 1 & 0
+ * \end{matrix}\right), \qquad\qquad R_1 = \left(\begin{matrix}0 & 0 & 0 \\ 0 &
+ * 1 & 0 \\ 1 & 0 & 0 \end{matrix}\right),
  * @f]
  * and the compatibility condition is the $R_{0,21}=R_{1,20}$ because they
  * both indicate that $U^\text{coarse}|_\text{parent,2}$ should be set to one
@@ -629,9 +643,8 @@ template <int dim, int spacedim> class FESystem;
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001,
  * 2005, 2015
  */
-template <int dim, int spacedim=dim>
-class FiniteElement : public Subscriptor,
-  public FiniteElementData<dim>
+template <int dim, int spacedim = dim>
+class FiniteElement : public Subscriptor, public FiniteElementData<dim>
 {
 public:
   /**
@@ -671,19 +684,19 @@ public:
     /**
      * Copy construction is forbidden.
      */
-    InternalDataBase (const InternalDataBase &) = delete;
+    InternalDataBase(const InternalDataBase &) = delete;
 
   public:
     /**
      * Constructor. Sets update_flags to @p update_default and @p first_cell
      * to @p true.
      */
-    InternalDataBase ();
+    InternalDataBase();
 
     /**
      * Destructor. Made virtual to allow polymorphism.
      */
-    virtual ~InternalDataBase () = default;
+    virtual ~InternalDataBase() = default;
 
     /**
      * A set of update flags specifying the kind of information that an
@@ -699,12 +712,13 @@ public:
      * FiniteElement::get_data() -- or an implementation of that interface --
      * need not be stored here because it has already been taken care of.)
      */
-    UpdateFlags          update_each;
+    UpdateFlags update_each;
 
     /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
-    virtual std::size_t memory_consumption () const;
+    virtual std::size_t
+    memory_consumption() const;
   };
 
 public:
@@ -750,25 +764,25 @@ public:
    * where each element equals the component mask provided in the single
    * element given.
    */
-  FiniteElement (const FiniteElementData<dim>     &fe_data,
-                 const std::vector<bool>          &restriction_is_additive_flags,
-                 const std::vector<ComponentMask> &nonzero_components);
+  FiniteElement(const FiniteElementData<dim> &    fe_data,
+                const std::vector<bool> &         restriction_is_additive_flags,
+                const std::vector<ComponentMask> &nonzero_components);
 
   /**
    * Move constructor.
    */
-  FiniteElement (FiniteElement<dim, spacedim> &&) = default; // NOLINT
+  FiniteElement(FiniteElement<dim, spacedim> &&) = default; // NOLINT
 
   /**
    * Copy constructor.
    */
-  FiniteElement (const FiniteElement<dim, spacedim> &) = default;
+  FiniteElement(const FiniteElement<dim, spacedim> &) = default;
 
   /**
    * Virtual destructor. Makes sure that pointers to this class are deleted
    * properly.
    */
-  virtual ~FiniteElement () = default;
+  virtual ~FiniteElement() override = default;
 
   /**
    * Creates information for creating a FESystem with this class as
@@ -778,8 +792,8 @@ public:
    * This function calls clone() and hence creates a copy of the
    * current object.
    */
-  std::pair<std::unique_ptr<FiniteElement<dim, spacedim> >, unsigned int>
-  operator^ (const unsigned int multiplicity) const;
+  std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>
+  operator^(const unsigned int multiplicity) const;
 
   /**
    * A sort of virtual copy constructor, this function returns a copy of
@@ -792,8 +806,7 @@ public:
    * class, need to make copies of finite elements without knowing their exact
    * type. They do so through this function.
    */
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const = 0;
 
   /**
@@ -806,7 +819,8 @@ public:
    * Systems of elements have their own naming convention, see the FESystem
    * class.
    */
-  virtual std::string get_name () const = 0;
+  virtual std::string
+  get_name() const = 0;
 
   /**
    * This operator returns a reference to the present object if the argument
@@ -814,8 +828,8 @@ public:
    * helpful in writing code that works with both ::DoFHandler and the hp
    * version hp::DoFHandler, since one can then write code like this:
    * @code
-   *   dofs_per_cell
-   *     = dof_handler->get_fe()[cell->active_fe_index()].dofs_per_cell;
+   * dofs_per_cell =
+   *   dof_handler->get_fe()[cell->active_fe_index()].dofs_per_cell;
    * @endcode
    *
    * This code doesn't work in both situations without the present operator
@@ -829,7 +843,8 @@ public:
    * with index zero within its collection (that, of course, consists only of
    * the present finite element anyway).
    */
-  const FiniteElement<dim,spacedim> &operator[] (const unsigned int fe_index) const;
+  const FiniteElement<dim, spacedim> &
+  operator[](const unsigned int fe_index) const;
 
   /**
    * @name Shape function access
@@ -856,8 +871,8 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual double shape_value (const unsigned int  i,
-                              const Point<dim>   &p) const;
+  virtual double
+  shape_value(const unsigned int i, const Point<dim> &p) const;
 
   /**
    * Just like for shape_value(), but this function will be called when the
@@ -865,9 +880,10 @@ public:
    * this function should return the value of the @p component-th vector
    * component of the @p ith shape function at point @p p.
    */
-  virtual double shape_value_component (const unsigned int i,
-                                        const Point<dim>   &p,
-                                        const unsigned int component) const;
+  virtual double
+  shape_value_component(const unsigned int i,
+                        const Point<dim> & p,
+                        const unsigned int component) const;
 
   /**
    * Return the gradient of the @p ith shape function at the point @p p. @p p
@@ -890,8 +906,8 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<1,dim> shape_grad (const unsigned int  i,
-                                    const Point<dim>   &p) const;
+  virtual Tensor<1, dim>
+  shape_grad(const unsigned int i, const Point<dim> &p) const;
 
   /**
    * Just like for shape_grad(), but this function will be called when the
@@ -899,9 +915,10 @@ public:
    * this function should return the gradient of the @p component-th vector
    * component of the @p ith shape function at point @p p.
    */
-  virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-                                              const Point<dim>   &p,
-                                              const unsigned int component) const;
+  virtual Tensor<1, dim>
+  shape_grad_component(const unsigned int i,
+                       const Point<dim> & p,
+                       const unsigned int component) const;
 
   /**
    * Return the tensor of second derivatives of the @p ith shape function at
@@ -924,8 +941,8 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<2,dim> shape_grad_grad (const unsigned int  i,
-                                         const Point<dim>   &p) const;
+  virtual Tensor<2, dim>
+  shape_grad_grad(const unsigned int i, const Point<dim> &p) const;
 
   /**
    * Just like for shape_grad_grad(), but this function will be called when
@@ -933,9 +950,10 @@ public:
    * case, this function should return the gradient of the @p component-th
    * vector component of the @p ith shape function at point @p p.
    */
-  virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim>   &p,
-                                                   const unsigned int component) const;
+  virtual Tensor<2, dim>
+  shape_grad_grad_component(const unsigned int i,
+                            const Point<dim> & p,
+                            const unsigned int component) const;
 
   /**
    * Return the tensor of third derivatives of the @p ith shape function at
@@ -958,8 +976,8 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<3,dim> shape_3rd_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const;
+  virtual Tensor<3, dim>
+  shape_3rd_derivative(const unsigned int i, const Point<dim> &p) const;
 
   /**
    * Just like for shape_3rd_derivative(), but this function will be called
@@ -967,9 +985,10 @@ public:
    * that case, this function should return the gradient of the @p component-
    * th vector component of the @p ith shape function at point @p p.
    */
-  virtual Tensor<3,dim> shape_3rd_derivative_component (const unsigned int i,
-                                                        const Point<dim>   &p,
-                                                        const unsigned int component) const;
+  virtual Tensor<3, dim>
+  shape_3rd_derivative_component(const unsigned int i,
+                                 const Point<dim> & p,
+                                 const unsigned int component) const;
 
   /**
    * Return the tensor of fourth derivatives of the @p ith shape function at
@@ -992,8 +1011,8 @@ public:
    * The default implementation of this virtual function does exactly this,
    * i.e., it simply throws an exception of type ExcUnitShapeValuesDoNotExist.
    */
-  virtual Tensor<4,dim> shape_4th_derivative (const unsigned int  i,
-                                              const Point<dim>   &p) const;
+  virtual Tensor<4, dim>
+  shape_4th_derivative(const unsigned int i, const Point<dim> &p) const;
 
   /**
    * Just like for shape_4th_derivative(), but this function will be called
@@ -1001,9 +1020,10 @@ public:
    * that case, this function should return the gradient of the @p component-
    * th vector component of the @p ith shape function at point @p p.
    */
-  virtual Tensor<4,dim> shape_4th_derivative_component (const unsigned int i,
-                                                        const Point<dim>   &p,
-                                                        const unsigned int component) const;
+  virtual Tensor<4, dim>
+  shape_4th_derivative_component(const unsigned int i,
+                                 const Point<dim> & p,
+                                 const unsigned int component) const;
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index. The
@@ -1014,8 +1034,9 @@ public:
    * A default implementation is provided in this base class which always
    * returns @p true. This is the safe way to go.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const;
 
   //@}
   /**
@@ -1039,8 +1060,9 @@ public:
    * isotropic_restriction_is_implemented() function.
    */
   virtual const FullMatrix<double> &
-  get_restriction_matrix (const unsigned int child,
-                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+  get_restriction_matrix(const unsigned int         child,
+                         const RefinementCase<dim> &refinement_case =
+                           RefinementCase<dim>::isotropic_refinement) const;
 
   /**
    * Prolongation/embedding matrix between grids.
@@ -1053,7 +1075,7 @@ public:
    * here.
    *
    * The matrix @p P is the concatenation, not the sum of the cell matrices @p
-   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in in two
+   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in two
    * different child matrices @p P_i, the value should be the same in both
    * matrices and it is copied into the matrix @p P only once.
    *
@@ -1072,8 +1094,9 @@ public:
    * isotropic_prolongation_is_implemented() function.
    */
   virtual const FullMatrix<double> &
-  get_prolongation_matrix (const unsigned int child,
-                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+  get_prolongation_matrix(const unsigned int         child,
+                          const RefinementCase<dim> &refinement_case =
+                            RefinementCase<dim>::isotropic_refinement) const;
 
   /**
    * Return whether this element implements its prolongation matrices. The
@@ -1096,7 +1119,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool prolongation_is_implemented () const;
+  bool
+  prolongation_is_implemented() const;
 
   /**
    * Return whether this element implements its prolongation matrices for
@@ -1113,7 +1137,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool isotropic_prolongation_is_implemented () const;
+  bool
+  isotropic_prolongation_is_implemented() const;
 
   /**
    * Return whether this element implements its restriction matrices. The
@@ -1136,7 +1161,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool restriction_is_implemented () const;
+  bool
+  restriction_is_implemented() const;
 
   /**
    * Return whether this element implements its restriction matrices for
@@ -1153,7 +1179,8 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool isotropic_restriction_is_implemented () const;
+  bool
+  isotropic_restriction_is_implemented() const;
 
 
   /**
@@ -1164,7 +1191,8 @@ public:
    * The index must be between zero and the number of shape functions of this
    * element.
    */
-  bool restriction_is_additive (const unsigned int index) const;
+  bool
+  restriction_is_additive(const unsigned int index) const;
 
   /**
    * Return a read only reference to the matrix that describes the constraints
@@ -1177,7 +1205,9 @@ public:
    * function to check up front whether this function will succeed or generate
    * the exception.
    */
-  const FullMatrix<double> &constraints (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
+  const FullMatrix<double> &
+  constraints(const dealii::internal::SubfaceCase<dim> &subface_case =
+                dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
   /**
    * Return whether this element implements its hanging node constraints. The
@@ -1194,7 +1224,10 @@ public:
    * however, one then still needs to cope with the lack of information this
    * just expresses.
    */
-  bool constraints_are_implemented (const dealii::internal::SubfaceCase<dim> &subface_case=dealii::internal::SubfaceCase<dim>::case_isotropic) const;
+  bool
+  constraints_are_implemented(
+    const dealii::internal::SubfaceCase<dim> &subface_case =
+      dealii::internal::SubfaceCase<dim>::case_isotropic) const;
 
 
   /**
@@ -1218,7 +1251,8 @@ public:
    * assumption is that a finite element does not provide hp capable face
    * interpolation, and the default implementation therefore returns @p false.
    */
-  virtual bool hp_constraints_are_implemented () const;
+  virtual bool
+  hp_constraints_are_implemented() const;
 
 
   /**
@@ -1233,8 +1267,8 @@ public:
    * ExcInterpolationNotImplemented.
    */
   virtual void
-  get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                            FullMatrix<double>       &matrix) const;
+  get_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                           FullMatrix<double> &                matrix) const;
   //@}
 
   /**
@@ -1244,7 +1278,7 @@ public:
 
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.#dofs_per_face</tt> times <tt>this->#dofs_per_face</tt>.
    *
@@ -1255,12 +1289,12 @@ public:
    * ExcInterpolationNotImplemented.
    */
   virtual void
-  get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const;
+  get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                FullMatrix<double> &matrix) const;
 
 
   /**
-   * Return the matrix interpolating from a face of of one element to the
+   * Return the matrix interpolating from a face of one element to the
    * subface of the neighboring element.  The size of the matrix is then
    * <tt>source.#dofs_per_face</tt> times <tt>this->#dofs_per_face</tt>.
    *
@@ -1271,9 +1305,9 @@ public:
    * ExcInterpolationNotImplemented.
    */
   virtual void
-  get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                    const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const;
+  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                   const unsigned int                  subface,
+                                   FullMatrix<double> &matrix) const;
   //@}
 
 
@@ -1297,25 +1331,22 @@ public:
    * the vertex dofs of the present element, whereas the second is the
    * corresponding index of the other finite element.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_vertex_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on lines.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_line_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const;
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
    * of freedom on quads.
    */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
+  virtual std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other) const;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -1326,22 +1357,51 @@ public:
    * and in particular the
    * @ref hp_paper "hp paper".
    */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim, spacedim> &fe_other) const;
 
   //@}
 
   /**
-   * Comparison operator. We also check for equality of the constraint matrix,
-   * which is quite an expensive operation.  Do therefore use this function
-   * with care, if possible only for debugging purposes.
+   * Comparison operator.
    *
-   * Since this function is not that important, we avoid an implementational
-   * question about comparing arrays and do not compare the matrix arrays
-   * #restriction and #prolongation.
+   * The implementation in the current class checks for equality of the
+   * following pieces of information between the current object and the one
+   * given as argument, in this order:
+   * - the dynamic type (i.e., the type of the most derived class) of the
+   *   current object and of the given object,
+   * - the name returned by get_name(),
+   * - as all of the fields in FiniteElementData,
+   * - constraint matrices.
+   *
+   * This covers most cases where elements can differ, but there are
+   * cases of derived elements that are different and for which the
+   * current function still returns @p true. For these cases, derived
+   * classes should overload this function.
+   *
+   * @note This operator specifically does not check the following
+   *   member variables of the current class:
+   *   - restriction matrices,
+   *   - prolongation matrices of this object and the argument.
+   *  This is because these member variables may be initialized only
+   *  on demand by derived classes, rather than being available immediately.
+   *  Consequently, comparing these members would not only be costly because
+   *  these are generally big arrays, but also because their computation may
+   *  be expensive. On the other hand, derived classes for which these
+   *  arrays may differ for two objects even though the above list compares
+   *  as equal, will probably want to implement their own operator==()
+   *  anyway.
    */
-  bool operator == (const FiniteElement<dim,spacedim> &) const;
+  virtual bool
+  operator==(const FiniteElement<dim, spacedim> &fe) const;
+
+  /**
+   * Non-equality comparison operator. Defined in terms of the equality
+   * comparison operator.
+   */
+  bool
+  operator!=(const FiniteElement<dim, spacedim> &) const;
 
   /**
    * @name Index computations
@@ -1369,7 +1429,8 @@ public:
    * than one vector-component). For this information, refer to the
    * #system_to_base_table field and the system_to_base_index() function.
    *
-   * See the class description above for an example of how this function is typically used.
+   * See the class description above for an example of how this function is
+   * typically used.
    *
    * The use of this function is explained extensively in the step-8 and
    * @ref step_20 "step-20"
@@ -1378,7 +1439,7 @@ public:
    * module.
    */
   std::pair<unsigned int, unsigned int>
-  system_to_component_index (const unsigned int index) const;
+  system_to_component_index(const unsigned int index) const;
 
   /**
    * Compute the shape function for the given vector component and index.
@@ -1389,8 +1450,9 @@ public:
    * This is the opposite operation from the system_to_component_index()
    * function.
    */
-  unsigned int component_to_system_index(const unsigned int component,
-                                         const unsigned int index) const;
+  unsigned int
+  component_to_system_index(const unsigned int component,
+                            const unsigned int index) const;
 
   /**
    * Same as system_to_component_index(), but do it for shape functions and
@@ -1402,7 +1464,7 @@ public:
    * indices. The function is mainly there for use inside the library.
    */
   std::pair<unsigned int, unsigned int>
-  face_system_to_component_index (const unsigned int index) const;
+  face_system_to_component_index(const unsigned int index) const;
 
   /**
    * For faces with non-standard face_orientation in 3D, the dofs on faces
@@ -1412,10 +1474,11 @@ public:
    * face_rotation. In 2D and 1D there is no need for permutation and
    * consequently an exception is thrown.
    */
-  unsigned int adjust_quad_dof_index_for_face_orientation (const unsigned int index,
-                                                           const bool face_orientation,
-                                                           const bool face_flip,
-                                                           const bool face_rotation) const;
+  unsigned int
+  adjust_quad_dof_index_for_face_orientation(const unsigned int index,
+                                             const bool face_orientation,
+                                             const bool face_flip,
+                                             const bool face_rotation) const;
 
   /**
    * Given an index in the natural ordering of indices on a face, return the
@@ -1471,12 +1534,12 @@ public:
    * will need to be provided by a derived class that knows what degrees of
    * freedom actually represent.
    */
-  virtual
-  unsigned int face_to_cell_index (const unsigned int face_dof_index,
-                                   const unsigned int face,
-                                   const bool face_orientation = true,
-                                   const bool face_flip        = false,
-                                   const bool face_rotation    = false) const;
+  virtual unsigned int
+  face_to_cell_index(const unsigned int face_dof_index,
+                     const unsigned int face,
+                     const bool         face_orientation = true,
+                     const bool         face_flip        = false,
+                     const bool         face_rotation    = false) const;
 
   /**
    * For lines with non-standard line_orientation in 3D, the dofs on lines
@@ -1485,8 +1548,9 @@ public:
    * if the line has non-standard line_orientation. In 2D and 1D there is no
    * need for permutation, so the given index is simply returned.
    */
-  unsigned int adjust_line_dof_index_for_line_orientation (const unsigned int index,
-                                                           const bool line_orientation) const;
+  unsigned int
+  adjust_line_dof_index_for_line_orientation(const unsigned int index,
+                                             const bool line_orientation) const;
 
   /**
    * Return in which of the vector components of this finite element the @p
@@ -1505,7 +1569,7 @@ public:
    * @ref GlossPrimitive).
    */
   const ComponentMask &
-  get_nonzero_components (const unsigned int i) const;
+  get_nonzero_components(const unsigned int i) const;
 
   /**
    * Return in how many vector components the @p ith shape function is non-
@@ -1518,7 +1582,7 @@ public:
    * make them divergence-free.
    */
   unsigned int
-  n_nonzero_components (const unsigned int i) const;
+  n_nonzero_components(const unsigned int i) const;
 
   /**
    * Return whether the entire finite element is primitive, in the sense that
@@ -1528,7 +1592,8 @@ public:
    * Since this is an extremely common operation, the result is cached and
    * returned by this function.
    */
-  bool is_primitive () const;
+  bool
+  is_primitive() const;
 
   /**
    * Return whether the @p ith shape function is primitive in the sense that
@@ -1541,7 +1606,7 @@ public:
    * <tt>n_nonzero_components(i)</tt> is equal to one.
    */
   bool
-  is_primitive (const unsigned int i) const;
+  is_primitive(const unsigned int i) const;
 
   /**
    * Number of base elements in a mixed discretization.
@@ -1554,15 +1619,15 @@ public:
    * still one, although the number of components of the finite element is
    * equal to the multiplicity.
    */
-  unsigned int n_base_elements () const;
+  unsigned int
+  n_base_elements() const;
 
   /**
    * Access to base element objects. If the element is atomic, then
    * <code>base_element(0)</code> is @p this.
    */
-  virtual
-  const FiniteElement<dim,spacedim> &
-  base_element (const unsigned int index) const;
+  virtual const FiniteElement<dim, spacedim> &
+  base_element(const unsigned int index) const;
 
   /**
    * This index denotes how often the base element @p index is used in a
@@ -1571,10 +1636,11 @@ public:
    * for more details.
    */
   unsigned int
-  element_multiplicity (const unsigned int index) const;
+  element_multiplicity(const unsigned int index) const;
 
   /**
-   * Return a reference to a contained finite element that matches the components
+   * Return a reference to a contained finite element that matches the
+   * components
    * selected by the given ComponentMask @p mask.
    *
    * For an arbitrarily nested FESystem, this function returns the inner-most
@@ -1644,20 +1710,20 @@ public:
    * </tr>
    * </table>
    */
-  const FiniteElement<dim,spacedim> &
-  get_sub_fe (const ComponentMask &mask) const;
+  const FiniteElement<dim, spacedim> &
+  get_sub_fe(const ComponentMask &mask) const;
 
   /**
-   * Return a reference to a contained finite element that matches the components
+   * Return a reference to a contained finite element that matches the
+   * components
    * @p n_selected_components components starting at component with index
    * @p first_component.
    *
    * See the other get_sub_fe() function above for more details.
    */
-  virtual
-  const FiniteElement<dim,spacedim> &
-  get_sub_fe (const unsigned int first_component,
-              const unsigned int n_selected_components) const;
+  virtual const FiniteElement<dim, spacedim> &
+  get_sub_fe(const unsigned int first_component,
+             const unsigned int n_selected_components) const;
 
   /**
    * Return for shape function @p index the base element it belongs to, the
@@ -1674,14 +1740,15 @@ public:
    * composed of other elements and at least one of them is vector-valued
    * itself.
    *
-   * See the class documentation above for an example of how this function is typically used.
+   * See the class documentation above for an example of how this function is
+   * typically used.
    *
    * This function returns valid values also in the case of vector-valued
    * (i.e. non-primitive) shape functions, in contrast to the
    * system_to_component_index() function.
    */
   std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-  system_to_base_index (const unsigned int index) const;
+  system_to_base_index(const unsigned int index) const;
 
   /**
    * Same as system_to_base_index(), but for degrees of freedom located on a
@@ -1692,13 +1759,14 @@ public:
    * indices. The function is mainly there for use inside the library.
    */
   std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-  face_system_to_base_index (const unsigned int index) const;
+  face_system_to_base_index(const unsigned int index) const;
 
   /**
    * Given a base element number, return the first block of a BlockVector it
    * would generate.
    */
-  types::global_dof_index first_block_of_base (const unsigned int b) const;
+  types::global_dof_index
+  first_block_of_base(const unsigned int b) const;
 
   /**
    * For each vector component, return which base element implements this
@@ -1713,27 +1781,27 @@ public:
    * to a pair of zeros.
    */
   std::pair<unsigned int, unsigned int>
-  component_to_base_index (const unsigned int component) const;
+  component_to_base_index(const unsigned int component) const;
 
 
   /**
    * Return the base element for this block and the number of the copy of the
    * base element.
    */
-  std::pair<unsigned int,unsigned int>
-  block_to_base_index (const unsigned int block) const;
+  std::pair<unsigned int, unsigned int>
+  block_to_base_index(const unsigned int block) const;
 
   /**
    * The vector block and the index inside the block for this shape function.
    */
-  std::pair<unsigned int,types::global_dof_index>
-  system_to_block_index (const unsigned int component) const;
+  std::pair<unsigned int, types::global_dof_index>
+  system_to_block_index(const unsigned int component) const;
 
   /**
    * The vector block for this component.
    */
   unsigned int
-  component_to_block_index (const unsigned int component) const;
+  component_to_block_index(const unsigned int component) const;
 
   //@}
 
@@ -1755,7 +1823,7 @@ public:
    * one that corresponds to the argument.
    */
   ComponentMask
-  component_mask (const FEValuesExtractors::Scalar &scalar) const;
+  component_mask(const FEValuesExtractors::Scalar &scalar) const;
 
   /**
    * Return a component mask with as many elements as this object has vector
@@ -1770,7 +1838,7 @@ public:
    * ones that corresponds to the argument.
    */
   ComponentMask
-  component_mask (const FEValuesExtractors::Vector &vector) const;
+  component_mask(const FEValuesExtractors::Vector &vector) const;
 
   /**
    * Return a component mask with as many elements as this object has vector
@@ -1786,7 +1854,8 @@ public:
    * ones that corresponds to the argument.
    */
   ComponentMask
-  component_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
+  component_mask(
+    const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
   /**
    * Given a block mask (see
@@ -1803,7 +1872,7 @@ public:
    * selected blocks of the input argument.
    */
   ComponentMask
-  component_mask (const BlockMask &block_mask) const;
+  component_mask(const BlockMask &block_mask) const;
 
   /**
    * Return a block mask with as many elements as this object has blocks and
@@ -1826,7 +1895,7 @@ public:
    * one that corresponds to the argument.
    */
   BlockMask
-  block_mask (const FEValuesExtractors::Scalar &scalar) const;
+  block_mask(const FEValuesExtractors::Scalar &scalar) const;
 
   /**
    * Return a component mask with as many elements as this object has vector
@@ -1845,7 +1914,7 @@ public:
    * ones that corresponds to the argument.
    */
   BlockMask
-  block_mask (const FEValuesExtractors::Vector &vector) const;
+  block_mask(const FEValuesExtractors::Vector &vector) const;
 
   /**
    * Return a component mask with as many elements as this object has vector
@@ -1865,7 +1934,7 @@ public:
    * ones that corresponds to the argument.
    */
   BlockMask
-  block_mask (const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
+  block_mask(const FEValuesExtractors::SymmetricTensor<2> &sym_tensor) const;
 
   /**
    * Given a component mask (see
@@ -1890,7 +1959,7 @@ public:
    * blocks of the input argument.
    */
   BlockMask
-  block_mask (const ComponentMask &component_mask) const;
+  block_mask(const ComponentMask &component_mask) const;
 
   /**
    * Return a list of constant modes of the element. The number of rows in
@@ -1907,8 +1976,8 @@ public:
    * components as there are constant modes on the element that contains the
    * component number.
    */
-  virtual std::pair<Table<2,bool>,std::vector<unsigned int> >
-  get_constant_modes () const;
+  virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
+  get_constant_modes() const;
 
   //@}
 
@@ -1947,8 +2016,8 @@ public:
    * <code>FESystem(FE_Q(1),3)</code> for which each support point would
    * appear three times in the returned array.
    */
-  const std::vector<Point<dim> > &
-  get_unit_support_points () const;
+  const std::vector<Point<dim>> &
+  get_unit_support_points() const;
 
   /**
    * Return whether a finite element has defined support points. If the result
@@ -1962,12 +2031,13 @@ public:
    * points associated with the other shape functions.
    *
    * In composed elements (i.e. for the FESystem class), the result will be
-   * true if all all the base elements have defined support points. FE_Nothing
+   * true if all the base elements have defined support points. FE_Nothing
    * is a special case in FESystems, because it has 0 support points and
    * has_support_points() is false, but an FESystem containing an FE_Nothing
    * among other elements will return true.
    */
-  bool has_support_points () const;
+  bool
+  has_support_points() const;
 
   /**
    * Return the position of the support point of the @p indexth shape
@@ -1981,9 +2051,8 @@ public:
    * way, you can still ask for certain support points, even if
    * get_unit_support_points() only returns an empty array.
    */
-  virtual
-  Point<dim>
-  unit_support_point (const unsigned int index) const;
+  virtual Point<dim>
+  unit_support_point(const unsigned int index) const;
 
   /**
    * Return the support points of the trial functions on the unit face, if the
@@ -2011,8 +2080,8 @@ public:
    *
    * See the class documentation for details on support points.
    */
-  const std::vector<Point<dim-1> > &
-  get_unit_face_support_points () const;
+  const std::vector<Point<dim - 1>> &
+  get_unit_face_support_points() const;
 
   /**
    * Return whether a finite element has defined support points on faces. If
@@ -2022,15 +2091,15 @@ public:
    * For more information, see the documentation for the has_support_points()
    * function.
    */
-  bool has_face_support_points () const;
+  bool
+  has_face_support_points() const;
 
   /**
    * The function corresponding to the unit_support_point() function, but for
    * faces. See there for more information.
    */
-  virtual
-  Point<dim-1>
-  unit_face_support_point (const unsigned int index) const;
+  virtual Point<dim - 1>
+  unit_face_support_point(const unsigned int index) const;
 
   /**
    * Return a vector of generalized support points.
@@ -2044,8 +2113,8 @@ public:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  const std::vector<Point<dim> > &
-  get_generalized_support_points () const;
+  const std::vector<Point<dim>> &
+  get_generalized_support_points() const;
 
   /**
    * Return whether a finite element has defined generalized support
@@ -2056,7 +2125,8 @@ public:
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
    */
-  bool has_generalized_support_points () const;
+  bool
+  has_generalized_support_points() const;
 
   /**
    * Return the equivalent to get_generalized_support_points(), except
@@ -2067,8 +2137,8 @@ public:
    * a given face. Don't use this function
    */
   DEAL_II_DEPRECATED
-  const std::vector<Point<dim-1> > &
-  get_generalized_face_support_points () const;
+  const std::vector<Point<dim - 1>> &
+  get_generalized_face_support_points() const;
 
   /**
    * Return whether a finite element has defined generalized support points on
@@ -2084,7 +2154,7 @@ public:
    */
   DEAL_II_DEPRECATED
   bool
-  has_generalized_face_support_points () const;
+  has_generalized_face_support_points() const;
 
   /**
    * For a given degree of freedom, return whether it is logically associated
@@ -2130,7 +2200,7 @@ public:
    * dimensionality of a vertex).
    */
   GeometryPrimitive
-  get_associated_geometry_primitive (const unsigned int cell_dof_index) const;
+  get_associated_geometry_primitive(const unsigned int cell_dof_index) const;
 
 
   /**
@@ -2138,7 +2208,8 @@ public:
    * support points of the reference cell, this function then computes what
    * the nodal values of the element are, i.e., $\Psi_i[f]$, where $\Psi_i$
    * are the node functionals of the element
-   * (see also @ref GlossNodes "Node values or node functionals").
+   * (see also
+   * @ref GlossNodes "Node values or node functionals").
    * The values $\Psi_i[f]$ are then the expansion coefficients
    * for the shape functions of the finite element function that
    * <i>interpolates</i> the given function $f(x)$, i.e.,
@@ -2163,7 +2234,8 @@ public:
    * of information.
    *
    * The exact form of $f_i$ depends on the element. For example, for scalar
-   * @ref GlossLagrange "Lagrange elements", we have that in fact
+   * @ref GlossLagrange "Lagrange elements",
+   * we have that in fact
    * $\Psi_i[\varphi] = \varphi(\hat{\mathbf x}_i)$. If you combine multiple
    * scalar Lagrange elements via an FESystem object, then
    * $\Psi_i[\varphi] = \varphi(\hat{\mathbf x}_i)_{c(i)}$ where $c(i)$
@@ -2208,10 +2280,10 @@ public:
    * sense of the operation that is required for this function. They
    * consequently may not implement it.
    */
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const;
 
   //@}
 
@@ -2223,38 +2295,40 @@ public:
    * accessed through pointers to their base class, rather than the class
    * itself.
    */
-  virtual std::size_t memory_consumption () const;
+  virtual std::size_t
+  memory_consumption() const;
 
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException1 (ExcShapeFunctionNotPrimitive,
-                  int,
-                  << "The shape function with index " << arg1
-                  << " is not primitive, i.e. it is vector-valued and "
-                  << "has more than one non-zero vector component. This "
-                  << "function cannot be called for these shape functions. "
-                  << "Maybe you want to use the same function with the "
-                  << "_component suffix?");
+  DeclException1(ExcShapeFunctionNotPrimitive,
+                 int,
+                 << "The shape function with index " << arg1
+                 << " is not primitive, i.e. it is vector-valued and "
+                 << "has more than one non-zero vector component. This "
+                 << "function cannot be called for these shape functions. "
+                 << "Maybe you want to use the same function with the "
+                 << "_component suffix?");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcFENotPrimitive);
+  DeclException0(ExcFENotPrimitive);
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg (ExcUnitShapeValuesDoNotExist,
-                    "You are trying to access the values or derivatives of shape functions "
-                    "on the reference cell of an element that does not define its shape "
-                    "functions through mapping from the reference cell. Consequently, "
-                    "you cannot ask for shape function values or derivatives on the "
-                    "reference cell.");
+  DeclExceptionMsg(
+    ExcUnitShapeValuesDoNotExist,
+    "You are trying to access the values or derivatives of shape functions "
+    "on the reference cell of an element that does not define its shape "
+    "functions through mapping from the reference cell. Consequently, "
+    "you cannot ask for shape function values or derivatives on the "
+    "reference cell.");
 
   /**
    * Attempt to access support points of a finite element that is not
@@ -2262,10 +2336,10 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg (ExcFEHasNoSupportPoints,
-                    "You are trying to access the support points of a finite "
-                    "element that either has no support points at all, or for "
-                    "which the corresponding tables have not been implemented.");
+  DeclExceptionMsg(ExcFEHasNoSupportPoints,
+                   "You are trying to access the support points of a finite "
+                   "element that either has no support points at all, or for "
+                   "which the corresponding tables have not been implemented.");
 
   /**
    * Attempt to access embedding matrices of a finite element that did not
@@ -2273,13 +2347,13 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclExceptionMsg (ExcEmbeddingVoid,
-                    "You are trying to access the matrices that describe how "
-                    "to embed a finite element function on one cell into the "
-                    "finite element space on one of its children (i.e., the "
-                    "'embedding' or 'prolongation' matrices). However, the "
-                    "current finite element can either not define this sort of "
-                    "operation, or it has not yet been implemented.");
+  DeclExceptionMsg(ExcEmbeddingVoid,
+                   "You are trying to access the matrices that describe how "
+                   "to embed a finite element function on one cell into the "
+                   "finite element space on one of its children (i.e., the "
+                   "'embedding' or 'prolongation' matrices). However, the "
+                   "current finite element can either not define this sort of "
+                   "operation, or it has not yet been implemented.");
 
   /**
    * Attempt to access restriction matrices of a finite element that did not
@@ -2288,33 +2362,32 @@ public:
    * Exception
    * @ingroup Exceptions
    */
-  DeclExceptionMsg (ExcProjectionVoid,
-                    "You are trying to access the matrices that describe how "
-                    "to restrict a finite element function from the children "
-                    "of one cell to the finite element space defined on their "
-                    "parent (i.e., the 'restriction' or 'projection' matrices). "
-                    "However, the current finite element can either not define "
-                    "this sort of operation, or it has not yet been "
-                    "implemented.");
+  DeclExceptionMsg(ExcProjectionVoid,
+                   "You are trying to access the matrices that describe how "
+                   "to restrict a finite element function from the children "
+                   "of one cell to the finite element space defined on their "
+                   "parent (i.e., the 'restriction' or 'projection' matrices). "
+                   "However, the current finite element can either not define "
+                   "this sort of operation, or it has not yet been "
+                   "implemented.");
 
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException2 (ExcWrongInterfaceMatrixSize,
-                  int, int,
-                  << "The interface matrix has a size of " << arg1
-                  << "x" << arg2
-                  << ", which is not reasonable for the current element "
-                  "in the present dimension.");
+  DeclException2(ExcWrongInterfaceMatrixSize,
+                 int,
+                 int,
+                 << "The interface matrix has a size of " << arg1 << "x" << arg2
+                 << ", which is not reasonable for the current element "
+                    "in the present dimension.");
   /**
    * Exception
    * @ingroup Exceptions
    */
-  DeclException0 (ExcInterpolationNotImplemented);
+  DeclException0(ExcInterpolationNotImplemented);
 
 protected:
-
   /**
    * Reinit the vectors of restriction and prolongation matrices to the right
    * sizes: For every refinement case, except for
@@ -2328,8 +2401,10 @@ protected:
    * @param isotropic_prolongation_only only the prolongation matrices
    * required for isotropic refinement are reinited to the right size.
    */
-  void reinit_restriction_and_prolongation_matrices(const bool isotropic_restriction_only=false,
-                                                    const bool isotropic_prolongation_only=false);
+  void
+  reinit_restriction_and_prolongation_matrices(
+    const bool isotropic_restriction_only  = false,
+    const bool isotropic_prolongation_only = false);
 
   /**
    * Vector of projection matrices. See get_restriction_matrix() above. The
@@ -2343,7 +2418,7 @@ protected:
    * RefinementCase::no_refinement(=0) there are no restriction matrices
    * available.
    */
-  std::vector<std::vector<FullMatrix<double> > > restriction;
+  std::vector<std::vector<FullMatrix<double>>> restriction;
 
   /**
    * Vector of embedding matrices. See <tt>get_prolongation_matrix()</tt>
@@ -2357,7 +2432,7 @@ protected:
    * for RefinementCase::no_refinement(=0) there are no prolongation matrices
    * available.
    */
-  std::vector<std::vector<FullMatrix<double> > > prolongation;
+  std::vector<std::vector<FullMatrix<double>>> prolongation;
 
   /**
    * Specify the constraints which the dofs on the two sides of a cell
@@ -2381,26 +2456,26 @@ protected:
    * degrees of freedom by, for example, moments on faces, or as derivatives,
    * don't have support points. In that case, this field remains empty.
    */
-  std::vector<Point<dim> > unit_support_points;
+  std::vector<Point<dim>> unit_support_points;
 
   /**
    * Same for the faces. See the description of the
    * get_unit_face_support_points() function for a discussion of what
    * contributes a face support point.
    */
-  std::vector<Point<dim-1> > unit_face_support_points;
+  std::vector<Point<dim - 1>> unit_face_support_points;
 
   /**
    * Support points used for interpolation functions of non-Lagrangian
    * elements.
    */
-  std::vector<Point<dim> > generalized_support_points;
+  std::vector<Point<dim>> generalized_support_points;
 
   /**
    * Face support points used for interpolation functions of non-Lagrangian
    * elements.
    */
-  std::vector<Point<dim-1> > generalized_face_support_points;
+  std::vector<Point<dim - 1>> generalized_face_support_points;
 
   /**
    * For faces with non-standard face_orientation in 3D, the dofs on faces
@@ -2413,11 +2488,11 @@ protected:
    * can be in (all combinations of the three bool flags face_orientation,
    * face_flip and face_rotation).
    *
-   * The standard implementation fills this with zeros, i.e. no permutation at
-   * all. Derived finite element classes have to fill this Table with the
-   * correct values.
+   * The constructor of this class fills this table with zeros, i.e.,
+   * no permutation at all. Derived finite element classes have to
+   * fill this Table with the correct values.
    */
-  Table<2,int> adjust_quad_dof_index_for_face_orientation_table;
+  Table<2, int> adjust_quad_dof_index_for_face_orientation_table;
 
   /**
    * For lines with non-standard line_orientation in 3D, the dofs on lines
@@ -2428,16 +2503,16 @@ protected:
    * for permutation so the vector is empty. In 3D it has the size of
    * #dofs_per_line.
    *
-   * The standard implementation fills this with zeros, i.e. no permutation at
-   * all. Derived finite element classes have to fill this vector with the
-   * correct values.
+   * The constructor of this class fills this table with zeros, i.e.,
+   * no permutation at all. Derived finite element classes have to
+   * fill this vector with the correct values.
    */
   std::vector<int> adjust_line_dof_index_for_line_orientation_table;
 
   /**
    * Store what system_to_component_index() will return.
    */
-  std::vector<std::pair<unsigned int, unsigned int> > system_to_component_table;
+  std::vector<std::pair<unsigned int, unsigned int>> system_to_component_table;
 
   /**
    * Map between linear dofs and component dofs on face. This is filled with
@@ -2448,7 +2523,8 @@ protected:
    * information thus makes only sense if a shape function is non-zero in only
    * one component.
    */
-  std::vector<std::pair<unsigned int, unsigned int> > face_system_to_component_table;
+  std::vector<std::pair<unsigned int, unsigned int>>
+    face_system_to_component_table;
 
   /**
    * For each shape function, store to which base element and which instance
@@ -2466,14 +2542,14 @@ protected:
    * primitive) shape functions, in contrast to the
    * #system_to_component_table.
    */
-  std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> >
-  system_to_base_table;
+  std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>
+    system_to_base_table;
 
   /**
    * Likewise for the indices on faces.
    */
-  std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> >
-  face_system_to_base_table;
+  std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>
+    face_system_to_base_table;
 
   /**
    * For each base element, store the number of blocks generated by the base
@@ -2501,8 +2577,8 @@ protected:
    *
    * @note This table is filled by FETools::Compositing::build_cell_tables().
    */
-  std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int> >
-  component_to_base_table;
+  std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int>>
+    component_to_base_table;
 
   /**
    * A flag determining whether restriction matrices are to be concatenated or
@@ -2548,16 +2624,16 @@ protected:
    * are empty.
    */
   TableIndices<2>
-  interface_constraints_size () const;
+  interface_constraints_size() const;
 
   /**
    * Given the pattern of nonzero components for each shape function, compute
    * for each entry how many components are non-zero for each shape function.
    * This function is used in the constructor of this class.
    */
-  static
-  std::vector<unsigned int>
-  compute_n_nonzero_components (const std::vector<ComponentMask> &nonzero_components);
+  static std::vector<unsigned int>
+  compute_n_nonzero_components(
+    const std::vector<ComponentMask> &nonzero_components);
 
   /**
    * Given a set of update flags, compute which other quantities <i>also</i>
@@ -2579,9 +2655,8 @@ protected:
    *
    * @see UpdateFlags
    */
-  virtual
-  UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const = 0;
+  virtual UpdateFlags
+  requires_update_flags(const UpdateFlags update_flags) const = 0;
 
   /**
    * Create an internal data object and return a pointer to it of which the
@@ -2599,13 +2674,13 @@ protected:
    * FEValues object for a given mapping and finite element object. The
    * returned object will later be passed to FiniteElement::fill_fe_values()
    * for a concrete cell, which will itself place its output into an object of
-   * type internal::FEValues::FiniteElementRelatedData. Since there may be
-   * data that can already be computed in its <i>final</i> form on the
-   * reference cell, this function also receives a reference to the
-   * internal::FEValues::FiniteElementRelatedData object as its last argument.
-   * This output argument is guaranteed to always be the same one when used
-   * with the InternalDataBase object returned by this function. In other
-   * words, the subdivision of scratch data and final data in the returned
+   * type internal::FEValuesImplementation::FiniteElementRelatedData. Since
+   * there may be data that can already be computed in its <i>final</i> form on
+   * the reference cell, this function also receives a reference to the
+   * internal::FEValuesImplementation::FiniteElementRelatedData object as its
+   * last argument. This output argument is guaranteed to always be the same one
+   * when used with the InternalDataBase object returned by this function. In
+   * other words, the subdivision of scratch data and final data in the returned
    * object and the @p output_data object is as follows: If data can be pre-
    * computed on the reference cell in the exact form in which it will later
    * be needed on a concrete cell, then this function should already emplace
@@ -2659,12 +2734,12 @@ protected:
    * The calling site assumes ownership of this object and will delete it when
    * it is no longer necessary.
    */
-  virtual
-  InternalDataBase *
-  get_data (const UpdateFlags                                                    update_flags,
-            const Mapping<dim,spacedim>                                         &mapping,
-            const Quadrature<dim>                                               &quadrature,
-            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+  virtual std::unique_ptr<InternalDataBase>
+  get_data(const UpdateFlags             update_flags,
+           const Mapping<dim, spacedim> &mapping,
+           const Quadrature<dim> &       quadrature,
+           dealii::internal::FEValuesImplementation::
+             FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2707,12 +2782,12 @@ protected:
    * The calling site assumes ownership of this object and will delete it when
    * it is no longer necessary.
    */
-  virtual
-  InternalDataBase *
-  get_face_data (const UpdateFlags                                                    update_flags,
-                 const Mapping<dim,spacedim>                                         &mapping,
-                 const Quadrature<dim-1>                                             &quadrature,
-                 dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+  virtual std::unique_ptr<InternalDataBase>
+  get_face_data(const UpdateFlags             update_flags,
+                const Mapping<dim, spacedim> &mapping,
+                const Quadrature<dim - 1> &   quadrature,
+                dealii::internal::FEValuesImplementation::
+                  FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Like get_data(), but return an object that will later be used for
@@ -2755,12 +2830,14 @@ protected:
    * The calling site assumes ownership of this object and will delete it when
    * it is no longer necessary.
    */
-  virtual
-  InternalDataBase *
-  get_subface_data (const UpdateFlags                                                    update_flags,
-                    const Mapping<dim,spacedim>                                         &mapping,
-                    const Quadrature<dim-1>                                             &quadrature,
-                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+  virtual std::unique_ptr<InternalDataBase>
+  get_subface_data(
+    const UpdateFlags             update_flags,
+    const Mapping<dim, spacedim> &mapping,
+    const Quadrature<dim - 1> &   quadrature,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      &output_data) const;
 
   /**
    * Compute information about the shape functions on the cell denoted by the
@@ -2842,16 +2919,20 @@ protected:
    * copy it there again in a later call if the implementation knows that this
    * is the same value.
    */
-  virtual
-  void
-  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                  const CellSimilarity::Similarity                                     cell_similarity,
-                  const Quadrature<dim>                                               &quadrature,
-                  const Mapping<dim,spacedim>                                         &mapping,
-                  const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
-                  const InternalDataBase                                              &fe_internal,
-                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+  virtual void
+  fill_fe_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const CellSimilarity::Similarity                            cell_similarity,
+    const Quadrature<dim> &                                     quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       spacedim>
+      &                     mapping_data,
+    const InternalDataBase &fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      &output_data) const = 0;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but
@@ -2895,16 +2976,20 @@ protected:
    * filled; which ones need to be filled is determined by the update flags
    * stored inside the @p fe_internal object.
    */
-  virtual
-  void
-  fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                       const unsigned int                                                   face_no,
-                       const Quadrature<dim-1>                                             &quadrature,
-                       const Mapping<dim,spacedim>                                         &mapping,
-                       const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
-                       const InternalDataBase                                              &fe_internal,
-                       dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+  virtual void
+  fill_fe_face_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       spacedim>
+      &                     mapping_data,
+    const InternalDataBase &fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      &output_data) const = 0;
 
   /**
    * This function is the equivalent to FiniteElement::fill_fe_values(), but
@@ -2951,33 +3036,36 @@ protected:
    * filled; which ones need to be filled is determined by the update flags
    * stored inside the @p fe_internal object.
    */
-  virtual
-  void
-  fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator           &cell,
-                          const unsigned int                                                   face_no,
-                          const unsigned int                                                   sub_no,
-                          const Quadrature<dim-1>                                             &quadrature,
-                          const Mapping<dim,spacedim>                                         &mapping,
-                          const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
-                          const InternalDataBase                                              &fe_internal,
-                          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const = 0;
+  virtual void
+  fill_fe_subface_values(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                          face_no,
+    const unsigned int                                          sub_no,
+    const Quadrature<dim - 1> &                                 quadrature,
+    const Mapping<dim, spacedim> &                              mapping,
+    const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
+    const dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
+                                                                       spacedim>
+      &                     mapping_data,
+    const InternalDataBase &fe_internal,
+    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
+                                                                       spacedim>
+      &output_data) const = 0;
 
   friend class InternalDataBase;
-  friend class FEValuesBase<dim,spacedim>;
-  friend class FEValues<dim,spacedim>;
-  friend class FEFaceValues<dim,spacedim>;
-  friend class FESubfaceValues<dim,spacedim>;
-  friend class FESystem<dim,spacedim>;
+  friend class FEValuesBase<dim, spacedim>;
+  friend class FEValues<dim, spacedim>;
+  friend class FEFaceValues<dim, spacedim>;
+  friend class FESubfaceValues<dim, spacedim>;
+  friend class FESystem<dim, spacedim>;
 
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation
 #ifndef DEAL_II_MSVC
-  static_assert (dim<=spacedim,
-                 "The dimension <dim> of a FiniteElement must be less than or "
-                 "equal to the space dimension <spacedim> in which it lives.");
+  static_assert(dim <= spacedim,
+                "The dimension <dim> of a FiniteElement must be less than or "
+                "equal to the space dimension <spacedim> in which it lives.");
 #endif
-
 };
 
 
@@ -2985,36 +3073,35 @@ protected:
 
 
 template <int dim, int spacedim>
-inline
-const FiniteElement<dim,spacedim> &
-FiniteElement<dim,spacedim>::operator[] (const unsigned int fe_index) const
+inline const FiniteElement<dim, spacedim> &FiniteElement<dim, spacedim>::
+                                           operator[](const unsigned int fe_index) const
 {
   (void)fe_index;
-  Assert (fe_index == 0,
-          ExcMessage ("A fe_index of zero is the only index allowed here"));
+  Assert(fe_index == 0,
+         ExcMessage("A fe_index of zero is the only index allowed here"));
   return *this;
 }
 
 
 
 template <int dim, int spacedim>
-inline
-std::pair<unsigned int,unsigned int>
-FiniteElement<dim,spacedim>::system_to_component_index (const unsigned int index) const
+inline std::pair<unsigned int, unsigned int>
+FiniteElement<dim, spacedim>::system_to_component_index(
+  const unsigned int index) const
 {
-  Assert (index < system_to_component_table.size(),
-          ExcIndexRange(index, 0, system_to_component_table.size()));
-  Assert (is_primitive (index),
-          ( typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(index)) );
+  Assert(index < system_to_component_table.size(),
+         ExcIndexRange(index, 0, system_to_component_table.size()));
+  Assert(is_primitive(index),
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+           index)));
   return system_to_component_table[index];
 }
 
 
 
 template <int dim, int spacedim>
-inline
-unsigned int
-FiniteElement<dim,spacedim>::n_base_elements () const
+inline unsigned int
+FiniteElement<dim, spacedim>::n_base_elements() const
 {
   return base_to_block_indices.size();
 }
@@ -3022,9 +3109,9 @@ FiniteElement<dim,spacedim>::n_base_elements () const
 
 
 template <int dim, int spacedim>
-inline
-unsigned int
-FiniteElement<dim,spacedim>::element_multiplicity (const unsigned int index) const
+inline unsigned int
+FiniteElement<dim, spacedim>::element_multiplicity(
+  const unsigned int index) const
 {
   return static_cast<unsigned int>(base_to_block_indices.block_size(index));
 }
@@ -3032,31 +3119,36 @@ FiniteElement<dim,spacedim>::element_multiplicity (const unsigned int index) con
 
 
 template <int dim, int spacedim>
-inline
-unsigned int
-FiniteElement<dim,spacedim>::component_to_system_index (const unsigned int component,
-                                                        const unsigned int index) const
+inline unsigned int
+FiniteElement<dim, spacedim>::component_to_system_index(
+  const unsigned int component,
+  const unsigned int index) const
 {
   AssertIndexRange(component, this->n_components());
-  const std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
-  it = std::find(system_to_component_table.begin(), system_to_component_table.end(),
-                 std::pair<unsigned int, unsigned int>(component, index));
+  const std::vector<std::pair<unsigned int, unsigned int>>::const_iterator it =
+    std::find(system_to_component_table.begin(),
+              system_to_component_table.end(),
+              std::pair<unsigned int, unsigned int>(component, index));
 
   Assert(it != system_to_component_table.end(),
-         ExcMessage ("You are asking for the number of the shape function "
-                     "within a system element that corresponds to vector "
-                     "component " + Utilities::int_to_string(component) + " and within this to "
-                     "index " + Utilities::int_to_string(index) + ". But no such "
-                     "shape function exists."));
+         ExcMessage("You are asking for the number of the shape function "
+                    "within a system element that corresponds to vector "
+                    "component " +
+                    Utilities::int_to_string(component) +
+                    " and within this to "
+                    "index " +
+                    Utilities::int_to_string(index) +
+                    ". But no such "
+                    "shape function exists."));
   return std::distance(system_to_component_table.begin(), it);
 }
 
 
 
 template <int dim, int spacedim>
-inline
-std::pair<unsigned int,unsigned int>
-FiniteElement<dim,spacedim>::face_system_to_component_index (const unsigned int index) const
+inline std::pair<unsigned int, unsigned int>
+FiniteElement<dim, spacedim>::face_system_to_component_index(
+  const unsigned int index) const
 {
   Assert(index < face_system_to_component_table.size(),
          ExcIndexRange(index, 0, face_system_to_component_table.size()));
@@ -3074,32 +3166,31 @@ FiniteElement<dim,spacedim>::face_system_to_component_index (const unsigned int 
   //
   // in 1d, the face index is equal
   // to the cell index
-  Assert (is_primitive(this->face_to_cell_index(index, 0)),
-          (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(index)) );
+  Assert(is_primitive(this->face_to_cell_index(index, 0)),
+         (typename FiniteElement<dim, spacedim>::ExcShapeFunctionNotPrimitive(
+           index)));
 
   return face_system_to_component_table[index];
 }
 
 
 
-
 template <int dim, int spacedim>
-inline
-std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
-FiniteElement<dim,spacedim>::system_to_base_index (const unsigned int index) const
+inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+FiniteElement<dim, spacedim>::system_to_base_index(
+  const unsigned int index) const
 {
-  Assert (index < system_to_base_table.size(),
-          ExcIndexRange(index, 0, system_to_base_table.size()));
+  Assert(index < system_to_base_table.size(),
+         ExcIndexRange(index, 0, system_to_base_table.size()));
   return system_to_base_table[index];
 }
 
 
 
-
 template <int dim, int spacedim>
-inline
-std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
-FiniteElement<dim,spacedim>::face_system_to_base_index (const unsigned int index) const
+inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+FiniteElement<dim, spacedim>::face_system_to_base_index(
+  const unsigned int index) const
 {
   Assert(index < face_system_to_base_table.size(),
          ExcIndexRange(index, 0, face_system_to_base_table.size()));
@@ -3109,9 +3200,9 @@ FiniteElement<dim,spacedim>::face_system_to_base_index (const unsigned int index
 
 
 template <int dim, int spacedim>
-inline
-types::global_dof_index
-FiniteElement<dim,spacedim>::first_block_of_base (const unsigned int index) const
+inline types::global_dof_index
+FiniteElement<dim, spacedim>::first_block_of_base(
+  const unsigned int index) const
 {
   return base_to_block_indices.block_start(index);
 }
@@ -3119,9 +3210,9 @@ FiniteElement<dim,spacedim>::first_block_of_base (const unsigned int index) cons
 
 
 template <int dim, int spacedim>
-inline
-std::pair<unsigned int,unsigned int>
-FiniteElement<dim,spacedim>::component_to_base_index (const unsigned int index) const
+inline std::pair<unsigned int, unsigned int>
+FiniteElement<dim, spacedim>::component_to_base_index(
+  const unsigned int index) const
 {
   Assert(index < component_to_base_table.size(),
          ExcIndexRange(index, 0, component_to_base_table.size()));
@@ -3132,9 +3223,9 @@ FiniteElement<dim,spacedim>::component_to_base_index (const unsigned int index) 
 
 
 template <int dim, int spacedim>
-inline
-std::pair<unsigned int,unsigned int>
-FiniteElement<dim,spacedim>::block_to_base_index (const unsigned int index) const
+inline std::pair<unsigned int, unsigned int>
+FiniteElement<dim, spacedim>::block_to_base_index(
+  const unsigned int index) const
 {
   return base_to_block_indices.global_to_local(index);
 }
@@ -3142,27 +3233,27 @@ FiniteElement<dim,spacedim>::block_to_base_index (const unsigned int index) cons
 
 
 template <int dim, int spacedim>
-inline
-std::pair<unsigned int,types::global_dof_index>
-FiniteElement<dim,spacedim>::system_to_block_index (const unsigned int index) const
+inline std::pair<unsigned int, types::global_dof_index>
+FiniteElement<dim, spacedim>::system_to_block_index(
+  const unsigned int index) const
 {
-  Assert (index < this->dofs_per_cell,
-          ExcIndexRange(index, 0, this->dofs_per_cell));
+  Assert(index < this->dofs_per_cell,
+         ExcIndexRange(index, 0, this->dofs_per_cell));
   // The block is computed simply as
   // first block of this base plus
   // the index within the base blocks
   return std::pair<unsigned int, types::global_dof_index>(
-           first_block_of_base(system_to_base_table[index].first.first)
-           + system_to_base_table[index].first.second,
-           system_to_base_table[index].second);
+    first_block_of_base(system_to_base_table[index].first.first) +
+      system_to_base_table[index].first.second,
+    system_to_base_table[index].second);
 }
 
 
 
 template <int dim, int spacedim>
-inline
-bool
-FiniteElement<dim,spacedim>::restriction_is_additive (const unsigned int index) const
+inline bool
+FiniteElement<dim, spacedim>::restriction_is_additive(
+  const unsigned int index) const
 {
   Assert(index < this->dofs_per_cell,
          ExcIndexRange(index, 0, this->dofs_per_cell));
@@ -3172,31 +3263,28 @@ FiniteElement<dim,spacedim>::restriction_is_additive (const unsigned int index) 
 
 
 template <int dim, int spacedim>
-inline
-const ComponentMask &
-FiniteElement<dim,spacedim>::get_nonzero_components (const unsigned int i) const
+inline const ComponentMask &
+FiniteElement<dim, spacedim>::get_nonzero_components(const unsigned int i) const
 {
-  Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
+  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return nonzero_components[i];
 }
 
 
 
 template <int dim, int spacedim>
-inline
-unsigned int
-FiniteElement<dim,spacedim>::n_nonzero_components (const unsigned int i) const
+inline unsigned int
+FiniteElement<dim, spacedim>::n_nonzero_components(const unsigned int i) const
 {
-  Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
+  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   return n_nonzero_components_table[i];
 }
 
 
 
 template <int dim, int spacedim>
-inline
-bool
-FiniteElement<dim,spacedim>::is_primitive () const
+inline bool
+FiniteElement<dim, spacedim>::is_primitive() const
 {
   return cached_primitivity;
 }
@@ -3204,11 +3292,10 @@ FiniteElement<dim,spacedim>::is_primitive () const
 
 
 template <int dim, int spacedim>
-inline
-bool
-FiniteElement<dim,spacedim>::is_primitive (const unsigned int i) const
+inline bool
+FiniteElement<dim, spacedim>::is_primitive(const unsigned int i) const
 {
-  Assert (i < this->dofs_per_cell, ExcIndexRange (i, 0, this->dofs_per_cell));
+  Assert(i < this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
 
   // return primitivity of a shape
   // function by checking whether it
@@ -3222,19 +3309,18 @@ FiniteElement<dim,spacedim>::is_primitive (const unsigned int i) const
   //
   // for good measure, short circuit the test
   // if the entire FE is primitive
-  return (is_primitive() ||
-          (n_nonzero_components_table[i] == 1));
+  return (is_primitive() || (n_nonzero_components_table[i] == 1));
 }
 
 
 
 template <int dim, int spacedim>
-inline
-GeometryPrimitive
-FiniteElement<dim,spacedim>::get_associated_geometry_primitive (const unsigned int cell_dof_index) const
+inline GeometryPrimitive
+FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
+  const unsigned int cell_dof_index) const
 {
-  Assert (cell_dof_index < this->dofs_per_cell,
-          ExcIndexRange (cell_dof_index, 0, this->dofs_per_cell));
+  Assert(cell_dof_index < this->dofs_per_cell,
+         ExcIndexRange(cell_dof_index, 0, this->dofs_per_cell));
 
   // just go through the usual cases, taking into account how DoFs
   // are enumerated on the reference cell

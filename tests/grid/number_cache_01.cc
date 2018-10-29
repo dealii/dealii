@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2017 by the deal.II authors
+// Copyright (C) 2008 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,25 +19,23 @@
 // store them in the number cache of the Triangulation class. use a simple
 // grid for this
 
-#include "../tests.h"
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/grid_generator.h>
 
-
-std::ofstream logfile("output");
-
+#include "../tests.h"
 
 
 template <int dim>
-void output (const Triangulation<dim> &tria)
+void
+output(const Triangulation<dim> &tria)
 {
-
   deallog << "  " << tria.n_active_cells() << std::endl;
   deallog << "  " << tria.n_cells() << std::endl;
   deallog << "  " << tria.n_active_lines() << std::endl;
@@ -47,7 +45,7 @@ void output (const Triangulation<dim> &tria)
   deallog << "  " << tria.n_active_hexs() << std::endl;
   deallog << "  " << tria.n_hexs() << std::endl;
 
-  for (unsigned int i=0; i<tria.n_levels(); ++i)
+  for (unsigned int i = 0; i < tria.n_levels(); ++i)
     {
       deallog << "  " << tria.n_active_cells(i) << std::endl;
       deallog << "  " << tria.n_cells(i) << std::endl;
@@ -73,31 +71,32 @@ void output (const Triangulation<dim> &tria)
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   deallog << dim << "d" << std::endl;
 
   Triangulation<dim> tria;
-  GridGenerator::hyper_cube (tria);
+  GridGenerator::hyper_cube(tria);
 
-  output (tria);
+  output(tria);
 
   deallog << "Refining..." << std::endl;
 
-  tria.begin_active()->set_refine_flag ();
-  tria.execute_coarsening_and_refinement ();
+  tria.begin_active()->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
 
-  output (tria);
+  output(tria);
 }
 
 
-int main ()
+int
+main()
 {
-  deallog << std::setprecision (2);
-  deallog.attach(logfile);
+  initlog();
+  deallog << std::setprecision(2);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test<1>();
+  test<2>();
+  test<3>();
 }
-

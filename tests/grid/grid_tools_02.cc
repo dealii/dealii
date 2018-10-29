@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,50 +18,43 @@
 // check GridTools::diameter for codim-1 meshes
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
 
-
-std::ofstream logfile("output");
-
-
+#include "../tests.h"
 
 template <int dim>
-void test1 ()
+void
+test1()
 {
   // test 1: hypercube
   if (true)
     {
-      Triangulation<dim,dim+1> tria;
+      Triangulation<dim, dim + 1> tria;
       GridGenerator::hyper_cube(tria);
 
-      for (unsigned int i=0; i<2; ++i)
+      for (unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "hypercube diameter, "
-                  << i*2
-                  << " refinements: "
-                  << GridTools::diameter (tria)
-                  << std::endl;
+                  << "hypercube diameter, " << i * 2
+                  << " refinements: " << GridTools::diameter(tria) << std::endl;
         }
     }
 }
 
 
 
-int main ()
+int
+main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile);
 
-  test1<1> ();
-  test1<2> ();
+  test1<1>();
+  test1<2>();
 
   return 0;
 }
-

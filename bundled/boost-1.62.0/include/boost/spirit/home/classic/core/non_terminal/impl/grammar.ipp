@@ -156,8 +156,13 @@ struct grammar_definition
             if (definitions[id]!=0)
                 return *definitions[id];
 
+#if defined(BOOST_NO_CXX11_SMART_PTR)
             std::auto_ptr<definition_t>
                 result(new definition_t(target_grammar->derived()));
+#else
+            std::unique_ptr<definition_t>
+                result(new definition_t(target_grammar->derived()));
+#endif
 
 #ifdef BOOST_SPIRIT_THREADSAFE
             boost::unique_lock<boost::mutex> lock(helpers.mutex());
@@ -286,18 +291,10 @@ struct grammar_definition
         helper_list_t&  helpers =
         grammartract_helper_list::do_(self);
 
-# if defined(BOOST_INTEL_CXX_VERSION)
         typedef typename helper_list_t::vector_t::reverse_iterator iterator_t;
 
         for (iterator_t i = helpers.rbegin(); i != helpers.rend(); ++i)
             (*i)->undefine(self);
-# else
-        typedef impl::grammar_helper_base<GrammarT> helper_base_t;
-
-        std::for_each(helpers.rbegin(), helpers.rend(),
-            std::bind2nd(std::mem_fun(&helper_base_t::undefine), self));
-# endif
-
 #else
         (void)self;
 #endif

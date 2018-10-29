@@ -1,0 +1,94 @@
+#!/bin/bash
+## ---------------------------------------------------------------------
+##
+## Copyright (C) 2018 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## The deal.II library is free software; you can use it, redistribute
+## it, and/or modify it under the terms of the GNU Lesser General
+## Public License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
+##
+## ---------------------------------------------------------------------
+
+#
+# This script downloads and installs the clang-format binary. The
+# destination directory is
+#   [contrib/utilities]/programs/clang-<VERSION>/bin.
+#
+# This script only works on Linux (amd64) and macOS. For other
+# architectures it is necessary to compile the clang-format binary by hand.
+# This can be done with the compile_clang_format script.
+#
+
+PRG="$(cd "$(dirname "$0")" && pwd)/programs"
+CLANG_PATH="${PRG}/clang-6"
+
+URL="https://github.com/dealii/dealii/releases/download/v9.0.0"
+
+# Find out which kind of OS we are running and set the appropriate settings
+case "${OSTYPE}" in
+  linux*)
+    FILENAME="clang-format-6-linux.tar.gz"
+    CHECKSUM_CMD="sha256sum"
+    CHECKSUM="26c046456d0a8c109df74e890f46bbe4ad50b035a9febc13ec41c22dabd005a5  $FILENAME"
+    ;;
+  darwin*)
+    FILENAME="clang-format-6-darwin.tar.gz"
+    CHECKSUM_CMD="shasum"
+    CHECKSUM="8eaf852cc96947245de706f1059e764b7086a82e8bd769da2654936acb1d63e0  $FILENAME"
+    ;;
+  *)
+    echo "unknown: ${OSTYPE}"
+    exit 1
+    ;;
+esac
+
+if [ ! -d "${PRG}" ]
+then
+    echo "create folder ${PRG}"
+    mkdir "${PRG}"
+fi
+
+if [ -d "${CLANG_PATH}" ]
+then
+    echo "${CLANG_PATH}  exists. Exiting."
+    exit 1
+fi
+
+echo "Downloading and installing clang-format-6 from ${URL}/${FILENAME}"
+mkdir "${CLANG_PATH}"
+
+tmpdir="${TMPDIR:-/tmp}/dealiiclang${RANDOM}${RANDOM}"
+mkdir -p "${tmpdir}"
+cd "${tmpdir}"
+if [ -x "$(command -v wget)" ]; then
+  echo "Using wget to download..."
+  # set progress option if available
+  wget --help | grep -q '\--show-progress' && \
+        _PROGRESS_OPT="--show-progress" || _PROGRESS_OPT=""
+
+  wget -q $_PROGRESS_OPT -L "${URL}/${FILENAME}" > /dev/null
+else
+  if [ -x "$(command -v curl)" ]; then
+    echo "Using curl to download..."
+    curl --progress-bar -L "${URL}/${FILENAME}" -O > /dev/null
+  else
+    echo "Error: Neither wget nor curl is available..."
+    exit 1
+  fi
+fi
+
+if echo "${CHECKSUM}" | "${CHECKSUM_CMD}" -c; then
+  tar xfz "${FILENAME}" -C "${PRG}" > /dev/null
+else
+  echo "*** The downloaded file has the wrong SHA256 checksum!"
+  exit 1
+fi
+rm -r "${tmpdir}"
+
+echo "All done. clang-format successfully installed into"
+echo "    ${CLANG_PATH}/bin"

@@ -1,5 +1,0 @@
-Changed: The parameters contained in struct SolverQMRS::AdditionalData have
-been changed in order to meet the rewritten algorithm. See the class documentation 
-for more details.
-<br>
-(Ingo Kligge, 2017/12/06)

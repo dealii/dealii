@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2017 by the deal.II authors
+## Copyright (C) 2013 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -30,10 +30,35 @@ MACRO(SET_IF_EMPTY _variable)
 ENDMACRO()
 
 SET_IF_EMPTY(MAKEOPTS $ENV{MAKEOPTS})
+SET_IF_EMPTY(DEAL_II_DIR $ENV{DEAL_II_DIR})
+
+#
+# A bit of necessary setup if tests are configured as a stand-alone
+# project:
+#
+
+IF(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
+  FIND_PACKAGE(deal.II 9.1.0 REQUIRED HINTS ${DEAL_II_DIR})
+  DEAL_II_INITIALIZE_CACHED_VARIABLES()
+  PROJECT(TESTSUITE CXX)
+  FILE(WRITE ${CMAKE_BINARY_DIR}/detailed.log
+    "#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}"
+    )
+ENDIF()
+
+#
+# A bit of necessary setup if tests are included via ADD_SUBDIRECTORY from
+# the top-level CMake project:
+#
 
 IF(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
 
-  IF(POLICY CMP0037)
+  #
+  # We have to repeat the policy statement here because the new
+  # CMAKE_MINIMUM_REQUIRED call resets our previous policy set in the main
+  # CMakeLists.txt file.
+  #
+  IF("${CMAKE_VERSION}" VERSION_LESS "3.11" AND POLICY CMP0037)
     # allow to override "test" target for quick tests
     CMAKE_POLICY(SET CMP0037 OLD)
   ENDIF()

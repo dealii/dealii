@@ -1,4 +1,0 @@
-New: ArrayView has a data() member function making it more similar to the
-standard containers.
-<br>
-(Daniel Arndt, 2017/11/17)

@@ -1,0 +1,11 @@
+
+DEAL::dim: 2
+DEAL::cells: 20, dofs: 674
+DEAL::L2=142.998
+DEAL::L1=3043.68
+DEAL::Linfty=12.0000
+DEAL::dim: 3
+DEAL::cells: 3584, dofs: 697827
+DEAL::L2=3538.82
+DEAL::L1=2.38344e+06
+DEAL::Linfty=12.0000

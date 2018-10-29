@@ -1,5 +1,0 @@
-Fixed: ConvergenceTable::evaluate_convergence_rates now also supports values
-and keys of type 'unsigned long long int' as used for types::global_dof_index
-with 64 bit integers enabled.
-<br>
-(Martin Kronbichler, 2017/11/19)

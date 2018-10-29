@@ -1,0 +1,5 @@
+New: Add a mask argument to filter out some vector lanes in FEEvaluationBase
+This is required for local time stepping using the MatrixFree framework,
+because some cells of batches must be excluded from read/write operations
+when operating on different time steps compared to their neighbor cells.
+(Svenja Schoeder, 2018/08/21)

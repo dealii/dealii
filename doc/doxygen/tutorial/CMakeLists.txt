@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -140,7 +140,6 @@ FOREACH(_step ${_deal_ii_steps})
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxyplain
       ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox

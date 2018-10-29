@@ -1,0 +1,17 @@
+
+DEAL:0::0:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:
+DEAL:0::1:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:
+DEAL:0::2:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:
+DEAL:0::3:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:
+DEAL:0::4:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:
+DEAL:0::5:predicates=0:0:1:(color, enrichment_func_id):(1,2)::fe_active_index:1:fe_set:1:
+DEAL:0::6:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:
+DEAL:0::7:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:
+DEAL:0::8:predicates=0:1:0:(color, enrichment_func_id):(2,1)::fe_active_index:2:fe_set:2:
+DEAL:0::9:predicates=1:1:0:(color, enrichment_func_id):(1,0):(2,1)::fe_active_index:3:fe_set:1:2:
+DEAL:0::10:predicates=0:1:0:(color, enrichment_func_id):(2,1)::fe_active_index:2:fe_set:2:
+DEAL:0::11:predicates=1:1:0:(color, enrichment_func_id):(1,0):(2,1)::fe_active_index:3:fe_set:1:2:
+DEAL:0::12:predicates=1:0:0:(color, enrichment_func_id):(1,0)::fe_active_index:1:fe_set:1:
+DEAL:0::13:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:
+DEAL:0::14:predicates=1:0:0:(color, enrichment_func_id):(1,0)::fe_active_index:1:fe_set:1:
+DEAL:0::15:predicates=0:0:0:(color, enrichment_func_id)::fe_active_index:0:fe_set:

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
 
     FOREACH(_module
-      Amesos Epetra Ifpack AztecOO Sacado Teuchos ML MueLu
+        Amesos Epetra Ifpack AztecOO Teuchos ML MueLu
       )
       ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
@@ -143,35 +143,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
-    #
-    # Some versions of Sacado_cmath.hpp do things that aren't compatible
-    # with the -std=c++0x flag of GCC, see deal.II FAQ.
-    # Test whether that is indeed the case
-    #
-    IF(NOT TRILINOS_SUPPORTS_CPP11)
-
-      IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
-        LIST(APPEND TRILINOS_DEFINITIONS "HAS_C99_TR1_CMATH")
-        LIST(APPEND TRILINOS_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
-      ELSE()
-        MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
-          "The installation is not compatible with the C++ standard selected for "
-          "this compiler."
-          )
-        SET(TRILINOS_ADDITIONAL_ERROR_STRING
-          ${TRILINOS_ADDITIONAL_ERROR_STRING}
-          "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
-          "is not compatible with the C++ standard selected for\n"
-          "this compiler. See the deal.II FAQ page for a solution.\n\n"
-          )
-        SET(${var} FALSE)
-      ENDIF()
-    ENDIF()
-
     CHECK_MPI_INTERFACE(TRILINOS ${var})
 
     IF (${var})
-      FOREACH(_optional_module ROL Zoltan)
+      FOREACH(_optional_module EpetraExt ROL Sacado Zoltan)
       ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
           MESSAGE(STATUS "Found ${_optional_module}")
@@ -181,6 +156,62 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
           MESSAGE(STATUS "Module ${_optional_module} not found!")
       ENDIF()
       ENDFOREACH()
+    ENDIF()
+
+    IF(${DEAL_II_TRILINOS_WITH_SACADO})
+      #
+      # Look for Sacado_config.h - we'll query it to determine C++11 support:
+      #
+      DEAL_II_FIND_FILE(SACADO_CONFIG_H Sacado_config.h
+        HINTS ${Trilinos_INCLUDE_DIRS}
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
+        NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
+        )
+      
+      IF(EXISTS ${SACADO_CONFIG_H})
+        #
+        # Determine whether Trilinos was configured with C++11 support and
+        # enabling C++11 in deal.II is mandatory.
+        #
+        FILE(STRINGS "${SACADO_CONFIG_H}" SACADO_CXX11_STRING
+          REGEX "#define HAVE_SACADO_CXX11")
+      ENDIF()
+
+      #
+      # GCC 6.3.0 has a bug that prevents the creation of complex
+      # numbers templated on Sacado::Rad::ADvar types:
+      #
+      # include/c++/6.3.0/complex: In instantiation of
+      # ‘struct std::complex<Sacado::Rad::ADvar<double> >’:
+      # include/c++/6.3.0/complex:206:16: error: ‘std::complex<_Tp>& std::complex<_Tp>::operator=(const std::complex<_Tp>&) [with _Tp = Sacado::Rad::ADvar<double>]’ declared to take const reference, but implicit declaration would take non-const
+      #
+      # Test whether the compiler hits this issue
+      #
+      DEAL_II_FIND_FILE(SACADO_TRAD_HPP Sacado_trad.hpp
+        HINTS ${Trilinos_INCLUDE_DIRS}
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
+        NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
+        )
+
+      IF(EXISTS ${SACADO_TRAD_HPP})
+        LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+        ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+
+        CHECK_CXX_SOURCE_COMPILES(
+          "
+          #include <Sacado_trad.hpp>
+          int main ()
+          {
+            Sacado::Rad::ADvar<double> sacado_rad_double; // Works
+            std::complex<Sacado::Rad::ADvar<double> > complex_sacado_rad_double; // Doesn't work
+            return 0;
+          }
+          "
+          TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
+          )
+        RESET_CMAKE_REQUIRED()
+      ENDIF()
+
     ENDIF()
   ENDIF()
 ENDMACRO()
@@ -194,24 +225,26 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
       "TrilinosWrappers::BlockSparseMatrix")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-  # Note: Only CMake 3.0 and greater support line continuation with the "\" character
-  #       Elements of string lists are naturally separated by a ";"
-  SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
-      "Sacado::Fad::DFad<double>"
-      "Sacado::Fad::DFad<float>"
-      "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
-      "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
-  SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
-      "Sacado::Rad::ADvar<double>"
-      "Sacado::Rad::ADvar<float>"
-      "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
-      "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>")
-
   IF (TRILINOS_WITH_MPI)
     SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
   ENDIF()
-  IF (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
-    SET(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
+  IF(${DEAL_II_TRILINOS_WITH_SACADO})
+    # Note: Only CMake 3.0 and greater support line continuation with the "\" character
+    #       Elements of string lists are naturally separated by a ";"
+    SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
+        "Sacado::Fad::DFad<double>"
+        "Sacado::Fad::DFad<float>"
+        "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
+        "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
+    SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
+        "Sacado::Rad::ADvar<double>"
+        "Sacado::Rad::ADvar<float>"
+        "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
+        "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>")
+
+    IF (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
+      SET(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
+    ENDIF()
   ENDIF()
 ENDMACRO()
 

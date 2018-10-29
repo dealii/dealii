@@ -8,37 +8,39 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/lac/affine_constraints.h>
+
 #include "../tests.h"
-#include <deal.II/lac/constraint_matrix.h>
 
 
-int main ()
+int
+main()
 {
   std::ofstream logfile("output");
   logfile.precision(2);
 
   deallog.attach(logfile);
 
-  ConstraintMatrix constraints;
-  unsigned int IDs[] = {1, 2, 3, 5, 8, 13, 21};
-  double vals[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
-  for (unsigned int i=0; i < sizeof(IDs) / sizeof(IDs[0]); ++i)
+  AffineConstraints<double> constraints;
+  unsigned int              IDs[]  = {1, 2, 3, 5, 8, 13, 21};
+  double                    vals[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+  for (unsigned int i = 0; i < sizeof(IDs) / sizeof(IDs[0]); ++i)
     {
       constraints.add_line(IDs[i]);
       constraints.set_inhomogeneity(IDs[i], vals[i]);
     }
 
-  constraints.print (deallog.get_file_stream());
+  constraints.print(deallog.get_file_stream());
   deallog << std::endl;
 
-  ConstraintMatrix cm(std::move(constraints));
-  cm.print (deallog.get_file_stream());
+  AffineConstraints<double> cm(std::move(constraints));
+  cm.print(deallog.get_file_stream());
   deallog << constraints.n_constraints() << std::endl << std::endl;
 
   constraints = std::move(cm);

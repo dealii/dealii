@@ -8,14 +8,12 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // Test scaling with a number which might be 0
-
-#include "../tests.h"
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
@@ -24,27 +22,30 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#define PRINTME(name, var) \
+#include "../tests.h"
+
+#define PRINTME(name, var)                              \
   deallog << "Block vector: " name << ":" << std::endl; \
-  for (unsigned int i = 0; i < var.n_blocks(); ++i) \
+  for (unsigned int i = 0; i < var.n_blocks(); ++i)     \
     deallog << "[block " << i << " ]  " << var.block(i);
 
 
 using namespace dealii;
 
-int main()
+int
+main()
 {
   initlog();
   deallog << std::setprecision(10);
 
   // SparseMatrix:
   {
-    SparsityPattern sparsity_pattern (10, 5, 0);
+    SparsityPattern sparsity_pattern(10, 5, 0);
     sparsity_pattern.compress();
 
-    SparseMatrix<double> a (sparsity_pattern);
+    SparseMatrix<double> a(sparsity_pattern);
 
-    auto op_a = 0*linear_operator(a);
+    auto op_a = 0 * linear_operator(a);
 
     Vector<double> u;
     op_a.reinit_domain_vector(u, false);
@@ -58,4 +59,3 @@ int main()
     deallog << "OK" << std::endl;
   }
 }
-

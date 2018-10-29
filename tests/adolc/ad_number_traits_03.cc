@@ -8,15 +8,14 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
-// Test that all of the Adol-C number traits return the correct information
+// Test that all of the ADOL-C number traits return the correct information
 
-#include "../tests.h"
 #include <deal.II/differentiation/ad.h>
 
 #include <complex>
@@ -24,39 +23,78 @@
 #include <iomanip>
 #include <type_traits>
 
+#include "../tests.h"
+
 using namespace dealii;
 namespace AD = Differentiation::AD;
 
 template <typename ADNumber>
-void print ()
+void
+print()
 {
   deallog << "is_ad_number: " << AD::is_ad_number<ADNumber>::value << std::endl;
-  deallog << "is_adolc_number: " << AD::is_adolc_number<ADNumber>::value << std::endl;
-  deallog << "is_taped_ad_number: " << AD::is_taped_ad_number<ADNumber>::value << std::endl;
-  deallog << "is_tapeless_ad_number: " << AD::is_tapeless_ad_number<ADNumber>::value << std::endl;
+  deallog << "is_adolc_number: " << AD::is_adolc_number<ADNumber>::value
+          << std::endl;
+  deallog << "is_taped_ad_number: " << AD::is_taped_ad_number<ADNumber>::value
+          << std::endl;
+  deallog << "is_tapeless_ad_number: "
+          << AD::is_tapeless_ad_number<ADNumber>::value << std::endl;
 
-  Assert(AD::is_ad_number<const ADNumber>::value == AD::is_ad_number<ADNumber>::value, ExcMessage("Error const"));
-  Assert(AD::is_adolc_number<const ADNumber>::value == AD::is_adolc_number<ADNumber>::value, ExcMessage("Error const"));
-  Assert(AD::is_taped_ad_number<const ADNumber>::value == AD::is_taped_ad_number<ADNumber>::value, ExcMessage("Error const"));
-  Assert(AD::is_tapeless_ad_number<const ADNumber>::value == AD::is_tapeless_ad_number<ADNumber>::value, ExcMessage("Error const"));
+  Assert(AD::is_ad_number<const ADNumber>::value ==
+           AD::is_ad_number<ADNumber>::value,
+         ExcMessage("Error const"));
+  Assert(AD::is_adolc_number<const ADNumber>::value ==
+           AD::is_adolc_number<ADNumber>::value,
+         ExcMessage("Error const"));
+  Assert(AD::is_taped_ad_number<const ADNumber>::value ==
+           AD::is_taped_ad_number<ADNumber>::value,
+         ExcMessage("Error const"));
+  Assert(AD::is_tapeless_ad_number<const ADNumber>::value ==
+           AD::is_tapeless_ad_number<ADNumber>::value,
+         ExcMessage("Error const"));
 
-  Assert(AD::is_ad_number<ADNumber &>::value == AD::is_ad_number<ADNumber>::value, ExcMessage("Error reference"));
-  Assert(AD::is_adolc_number<ADNumber &>::value == AD::is_adolc_number<ADNumber>::value, ExcMessage("Error reference"));
-  Assert(AD::is_taped_ad_number<ADNumber &>::value == AD::is_taped_ad_number<ADNumber>::value, ExcMessage("Error reference"));
-  Assert(AD::is_tapeless_ad_number<ADNumber &>::value == AD::is_tapeless_ad_number<ADNumber>::value, ExcMessage("Error reference"));
+  Assert(AD::is_ad_number<ADNumber &>::value ==
+           AD::is_ad_number<ADNumber>::value,
+         ExcMessage("Error reference"));
+  Assert(AD::is_adolc_number<ADNumber &>::value ==
+           AD::is_adolc_number<ADNumber>::value,
+         ExcMessage("Error reference"));
+  Assert(AD::is_taped_ad_number<ADNumber &>::value ==
+           AD::is_taped_ad_number<ADNumber>::value,
+         ExcMessage("Error reference"));
+  Assert(AD::is_tapeless_ad_number<ADNumber &>::value ==
+           AD::is_tapeless_ad_number<ADNumber>::value,
+         ExcMessage("Error reference"));
 
-  Assert(AD::is_ad_number<const ADNumber &>::value == AD::is_ad_number<ADNumber>::value, ExcMessage("Error const reference"));
-  Assert(AD::is_adolc_number<const ADNumber &>::value == AD::is_adolc_number<ADNumber>::value, ExcMessage("Error const reference"));
-  Assert(AD::is_taped_ad_number<const ADNumber &>::value == AD::is_taped_ad_number<ADNumber>::value, ExcMessage("Error const reference"));
-  Assert(AD::is_tapeless_ad_number<const ADNumber &>::value == AD::is_tapeless_ad_number<ADNumber>::value, ExcMessage("Error const reference"));
+  Assert(AD::is_ad_number<const ADNumber &>::value ==
+           AD::is_ad_number<ADNumber>::value,
+         ExcMessage("Error const reference"));
+  Assert(AD::is_adolc_number<const ADNumber &>::value ==
+           AD::is_adolc_number<ADNumber>::value,
+         ExcMessage("Error const reference"));
+  Assert(AD::is_taped_ad_number<const ADNumber &>::value ==
+           AD::is_taped_ad_number<ADNumber>::value,
+         ExcMessage("Error const reference"));
+  Assert(AD::is_tapeless_ad_number<const ADNumber &>::value ==
+           AD::is_tapeless_ad_number<ADNumber>::value,
+         ExcMessage("Error const reference"));
 
-  Assert(AD::is_ad_number<ADNumber&&>::value == AD::is_ad_number<ADNumber>::value, ExcMessage("Error rvalue"));
-  Assert(AD::is_adolc_number<ADNumber&&>::value == AD::is_adolc_number<ADNumber>::value, ExcMessage("Error rvalue"));
-  Assert(AD::is_taped_ad_number<ADNumber&&>::value == AD::is_taped_ad_number<ADNumber>::value, ExcMessage("Error rvalue"));
-  Assert(AD::is_tapeless_ad_number<ADNumber&&>::value == AD::is_tapeless_ad_number<ADNumber>::value, ExcMessage("Error rvalue"));
+  Assert(AD::is_ad_number<ADNumber &&>::value ==
+           AD::is_ad_number<ADNumber>::value,
+         ExcMessage("Error rvalue"));
+  Assert(AD::is_adolc_number<ADNumber &&>::value ==
+           AD::is_adolc_number<ADNumber>::value,
+         ExcMessage("Error rvalue"));
+  Assert(AD::is_taped_ad_number<ADNumber &&>::value ==
+           AD::is_taped_ad_number<ADNumber>::value,
+         ExcMessage("Error rvalue"));
+  Assert(AD::is_tapeless_ad_number<ADNumber &&>::value ==
+           AD::is_tapeless_ad_number<ADNumber>::value,
+         ExcMessage("Error rvalue"));
 }
 
-int main ()
+int
+main()
 {
   initlog();
 

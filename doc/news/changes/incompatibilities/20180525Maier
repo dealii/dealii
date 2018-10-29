@@ -1,0 +1,9 @@
+Changed: The AffineConstraints object (formerly ConstraintMatrix) gained a
+template parameter for the underlying storage type. In order to facilitate
+this change, the interface for AffineConstraints has become more strict: In
+particular, the AffineConstraints::distribute_local_to_global(),
+AffineConstraints::add_entries_local_to_global(), and other functions now
+require that all matrix and vector arguments have the same matching number
+type as the AffineConstraints object.
+<br>
+(Matthias Maier, 2018/05/25)

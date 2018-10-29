@@ -8,54 +8,51 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // it turns out that FE_Q::face_to_cell_index() had a bug for elements beyond
-// Q2XQ2 when using the face flip flag. this test is for the 2d case for the Q2XQ2
-// case
-
-#include "../tests.h"
-#include <iostream>
+// Q2XQ2 when using the face flip flag. this test is for the 2d case for the
+// Q2XQ2 case
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
+#include <iostream>
+
+#include "../tests.h"
+
 template <int dim>
-void test()
+void
+test()
 {
-  FESystem<dim> fe(FE_Q<dim>(2), 1,
-                   FE_Q<dim>(2), 1);
+  FESystem<dim>      fe(FE_Q<dim>(2), 1, FE_Q<dim>(2), 1);
   const unsigned int dofs_per_face = fe.dofs_per_face;
 
-  for (unsigned int face=0; face<4; ++face)
+  for (unsigned int face = 0; face < 4; ++face)
     {
       deallog << "Face=" << face << std::endl;
 
-      for (int flip=0; flip<2; ++flip)
+      for (int flip = 0; flip < 2; ++flip)
         {
-          deallog << "  flip=" << (flip == 0 ? "false" : "true")
-                  << std::endl
+          deallog << "  flip=" << (flip == 0 ? "false" : "true") << std::endl
                   << "    ";
           for (unsigned int i = 0; i < dofs_per_face; ++i)
-            deallog << fe.face_to_cell_index(i, face,
-                                             true,
-                                             (flip == 0 ? false : true),
-                                             false) << " - ";
+            deallog << fe.face_to_cell_index(
+                         i, face, true, (flip == 0 ? false : true), false)
+                    << " - ";
           deallog << std::endl;
         }
     }
 }
 
-int main()
+int
+main()
 {
   initlog();
 
   test<2>();
 }
-
-
-

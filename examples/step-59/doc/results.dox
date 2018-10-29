@@ -1,0 +1,342 @@
+<h1>Results</h1>
+
+<h3>Program output</h3>
+
+Like in step-37, we evaluate the multigrid solver in terms of run time.  In
+two space dimensions with elements of degree 8, a possible output could look
+as follows:
+@code
+Running with 12 MPI processes, element FE_DGQHermite<2>(8)
+
+Cycle 0
+Number of degrees of freedom: 5184
+Total setup time              0.0282445 s
+Time solve (14 iterations)    0.0110712 s
+Verification via L2 error:    1.66232e-07
+
+Cycle 1
+Number of degrees of freedom: 20736
+Total setup time              0.0126282 s
+Time solve (14 iterations)    0.0157021 s
+Verification via L2 error:    2.91505e-10
+
+Cycle 2
+Number of degrees of freedom: 82944
+Total setup time              0.0227573 s
+Time solve (14 iterations)    0.026568 s
+Verification via L2 error:    6.64514e-13
+
+Cycle 3
+Number of degrees of freedom: 331776
+Total setup time              0.0604685 s
+Time solve (14 iterations)    0.0628356 s
+Verification via L2 error:    5.57513e-13
+
+Cycle 4
+Number of degrees of freedom: 1327104
+Total setup time              0.154359 s
+Time solve (13 iterations)    0.219555 s
+Verification via L2 error:    3.08139e-12
+
+Cycle 5
+Number of degrees of freedom: 5308416
+Total setup time              0.467764 s
+Time solve (13 iterations)    1.1821 s
+Verification via L2 error:    3.90334e-12
+
+Cycle 6
+Number of degrees of freedom: 21233664
+Total setup time              1.73263 s
+Time solve (13 iterations)    5.21054 s
+Verification via L2 error:    4.94543e-12
+@endcode
+
+Like in step-37, the number of CG iterations remains constant with increasing
+problem size. The iteration counts are a bit higher, which is because we use a
+lower degree of the Chebyshev polynomial (2 vs 5 in step-37) and because the
+interior penalty discretization has a somewhat larger spread in
+eigenvalues. Nonetheless, 13 iterations to reduce the residual by 12 orders of
+magnitude, or almost a factor of 9 per iteration, indicates an overall very
+efficient method. In particular, we can solve a system with 21 million degrees
+of freedom in 5 seconds when using 12 cores, which is a very good
+efficiency. Of course, in 2D we are well inside the regime of roundoff for a
+polynomial degree of 8 &ndash; as a matter of fact, around 83k DoFs or 0.025s
+would have been enough to fully converge this (simple) analytic solution
+here.
+
+Not much changes if we run the program in three spatial dimensions, except for
+the fact that we now use do something more useful with the higher polynomial
+degree and increasing mesh sizes, as the roundoff errors are only obtained at
+the finest mesh. Still, it is remarkable that we can solve a 3D Laplace
+problem with a wave of three periods to roundoff accuracy on a twelve-core
+machine pretty easily - using about 3.5 GB of memory in total for the second
+to largest case with 24m DoFs, taking not more than eight seconds. The largest
+case uses 30GB of memory with 191m DoFs.
+
+@code
+Running with 12 MPI processes, element FE_DGQHermite<3>(8)
+
+Cycle 0
+Number of degrees of freedom: 5832
+Total setup time              0.0210681 s
+Time solve (15 iterations)    0.0956945 s
+Verification via L2 error:    0.0297194
+
+Cycle 1
+Number of degrees of freedom: 46656
+Total setup time              0.0452428 s
+Time solve (15 iterations)    0.113827 s
+Verification via L2 error:    9.55733e-05
+
+Cycle 2
+Number of degrees of freedom: 373248
+Total setup time              0.190423 s
+Time solve (15 iterations)    0.218309 s
+Verification via L2 error:    2.6868e-07
+
+Cycle 3
+Number of degrees of freedom: 2985984
+Total setup time              0.627914 s
+Time solve (15 iterations)    1.0595 s
+Verification via L2 error:    4.6918e-10
+
+Cycle 4
+Number of degrees of freedom: 23887872
+Total setup time              2.85215 s
+Time solve (15 iterations)    8.30576 s
+Verification via L2 error:    9.38583e-13
+
+Cycle 5
+Number of degrees of freedom: 191102976
+Total setup time              16.1324 s
+Time solve (15 iterations)    65.57 s
+Verification via L2 error:    3.17875e-13
+@endcode
+
+<h3>Comparison of efficiency at different polynomial degrees</h3>
+
+In the introduction and in-code comments, it was mentioned several times that
+high orders are treated very efficiently with the FEEvaluation and
+FEFaceEvaluation evaluators. Now, we want to substantiate these claims by
+looking at the throughput of the 3D multigrid solver for various polynomial
+degrees. We collect the times as follows: We first run a solver at problem
+size close to ten million, indicated in the first four table rows, and record
+the timings. Then, we normalize the throughput by recording the number of
+million degrees of freedom solved per second (MDoFs/s) to be able to compare
+the efficiency of the different degrees, which is computed by dividing the
+number of degrees of freedom by the solver time.
+
+<table align="center" border="1">
+  <tr>
+   <th>degree</th>
+   <td>1</td>
+   <td>2</td>
+   <td>3</td>
+   <td>4</td>
+   <td>5</td>
+   <td>6</td>
+   <td>7</td>
+   <td>8</td>
+   <td>9</td>
+   <td>10</td>
+   <td>11</td>
+   <td>12</td>
+  </tr>
+  <tr>
+   <th>Number of DoFs</th>
+   <td>2097152</td>
+   <td>7077888</td>
+   <td>16777216</td>
+   <td>32768000</td>
+   <td>7077888</td>
+   <td>11239424</td>
+   <td>16777216</td>
+   <td>23887872</td>
+   <td>32768000</td>
+   <td>43614208</td>
+   <td>7077888</td>
+   <td>8998912</td>
+  </tr>
+  <tr>
+   <th>Number of iterations</th>
+   <td>13</td>
+   <td>12</td>
+   <td>12</td>
+   <td>12</td>
+   <td>13</td>
+   <td>13</td>
+   <td>15</td>
+   <td>15</td>
+   <td>17</td>
+   <td>19</td>
+   <td>18</td>
+   <td>18</td>
+  </tr>
+  <tr>
+   <th>Solver time [s]</th>
+   <td>0.713</td>
+   <td>2.150</td>
+   <td>4.638</td>
+   <td>8.803</td>
+   <td>2.041</td>
+   <td>3.295</td>
+   <td>5.723</td>
+   <td>8.306</td>
+   <td>12.75</td>
+   <td>19.25</td>
+   <td>3.530</td>
+   <td>4.814</td>
+  </tr>
+  <tr>
+   <th>MDoFs/s</th>
+   <td>2.94</td>
+   <td>3.29</td>
+   <td>3.62</td>
+   <td>3.72</td>
+   <td>3.47</td>
+   <td>3.41</td>
+   <td>2.93</td>
+   <td>2.88</td>
+   <td>2.57</td>
+   <td>2.27</td>
+   <td>2.01</td>
+   <td>1.87</td>
+  </tr>
+</table>
+
+We clearly see how the efficiency per DoF initially improves until it reaches
+a maximum for the polynomial degree $k=4$. This effect is surprising, not only
+because higher polynomial degrees often yield a vastly better solution, but
+especially also when having matrix-based schemes in mind where the denser
+coupling at higher degree leads to a monotonously decreasing throughput (and a
+drastic one in 3D, with $k=4$ being more than ten times slower than
+$k=1$!). For higher degres, the throughput decreases a bit, which is both due
+to an increase in the number of iterations (going from 12 at $k=2,3,4$ to 19
+at $k=10$) and due to the $\mathcal O(k)$ complexity of operator
+evaluation. Nonetheless, efficiency as the time to solution would be still
+better at higher degrees because they have better convergence rates (at least
+for problems as simple as this one). For $k=12$, we reach roundoff accuracy
+already at 1 million Dofs (solver time less than a second), whereas for $k=8$
+we need 24 million DoFs and 8 seconds. For $k=5$, the error is around
+$10^{-9}$ at 57m DoFs and thus still far away from roundoff, despite taking 16
+seconds.
+
+Note that the above numbers are a bit pessimistic because they
+include the time it takes the Chebyshev smoother to compute an eigenvalue
+estimate, which is around 10 percent of the solver time.
+
+<h3>Evaluation of efficiency of ingredients</h3>
+
+Finally, we take a look at some of the special ingredients presented in this
+tutorial program, namely the FE_DGQHermite basis in particular and the
+specification of MatrixFree::DataAccessOnFaces. In the following table, the
+third row shows the optimized solver above, the fourth row shows the timings
+with only the MatrixFree::DataAccessOnFaces set to `unspecified` rather than
+the optimal `gradients`, and the last one with replacing FE_DGQHermite by the
+basic FE_DGQ elements where both the MPI exchange are more expensive and the
+operations done by FEFaceEvaluation::gather_evaluate() and
+FEFaceEvaluation::integrate_scatter().
+
+<table align="center" border="1">
+  <tr>
+   <th>degree</th>
+   <td>1</td>
+   <td>2</td>
+   <td>3</td>
+   <td>4</td>
+   <td>5</td>
+   <td>6</td>
+   <td>7</td>
+   <td>8</td>
+   <td>9</td>
+   <td>10</td>
+   <td>11</td>
+   <td>12</td>
+  </tr>
+  <tr>
+   <th>Number of DoFs</th>
+   <td>2097152</td>
+   <td>7077888</td>
+   <td>16777216</td>
+   <td>32768000</td>
+   <td>7077888</td>
+   <td>11239424</td>
+   <td>16777216</td>
+   <td>23887872</td>
+   <td>32768000</td>
+   <td>43614208</td>
+   <td>7077888</td>
+   <td>8998912</td>
+  </tr>
+  <tr>
+   <th>Solver time optimized as in tutorial [s]</th>
+   <td>0.713</td>
+   <td>2.150</td>
+   <td>4.638</td>
+   <td>8.803</td>
+   <td>2.041</td>
+   <td>3.295</td>
+   <td>5.723</td>
+   <td>8.306</td>
+   <td>12.75</td>
+   <td>19.25</td>
+   <td>3.530</td>
+   <td>4.814</td>
+  </tr>
+  <tr>
+   <th>Solver time MatrixFree::DataAccessOnFaces::unspecified [s]</th>
+   <td>0.711</td>
+   <td>2.151</td>
+   <td>4.675</td>
+   <td>8.968</td>
+   <td>2.243</td>
+   <td>3.655</td>
+   <td>6.277</td>
+   <td>9.082</td>
+   <td>13.50</td>
+   <td>20.05</td>
+   <td>3.817</td>
+   <td>5.178</td>
+  </tr>
+  <tr>
+   <th>Solver time FE_DGQ [s]</th>
+   <td>0.712</td>
+   <td>2.041</td>
+   <td>5.066</td>
+   <td>9.335</td>
+   <td>2.379</td>
+   <td>3.802</td>
+   <td>6.564</td>
+   <td>9.714</td>
+   <td>14.54</td>
+   <td>22.76</td>
+   <td>4.148</td>
+   <td>5.857</td>
+  </tr>
+</table>
+
+The data in the table shows that not using MatrixFree::DataAccessOnFaces
+increases timings by around 10% for higher polynomial degrees. For lower
+degrees, the difference is obviously less pronounced because the
+volume-to-surface ratio is more beneficial and less data needs to be
+exchanged. The difference is larger when looking at the matrix-vector product
+only, rather than the full multigrid solver shown here, with around 20% worse
+timings just because of the MPI communication.
+
+For $k=1$ and $k=2$, the Hermite-like basis functions do obviously not really
+pay off (indeed, for $k=1$ the polynomials are exactly the same as for FE_DGQ)
+and the results are similar as with the FE_DGQ basis. However, for degrees
+starting at three, we see an increasing advantage for FE_DGQHermite, showing
+the effectiveness of these basis functions.
+
+<h3>Possibilities for extension</h3>
+
+As mentioned in the introduction, the fast diagonalization method is tied to a
+Cartesian mesh with constant coefficients. If we wanted to solve
+variable-coefficient problems, we would need to invest a bit more time in the
+design of the smoother parameters by selecting better values.
+
+Another way of extending the program would be to include support for adaptive
+meshes, for which an interface operation at edges of different refinement
+level becomes necessary, as discussed in step-39.
+

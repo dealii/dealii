@@ -1,9 +1,27 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2003 - 2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
 
-#include "../tests.h"
+
 #include <deal.II/base/exceptions.h>
-#include <iostream>
+
 #include <deal.II/lac/petsc_matrix_free.h>
 #include <deal.II/lac/vector.h>
+
+#include <iostream>
+
+#include "../tests.h"
 
 // A variant of the tests/lac/testmatrix.h file that uses the PETSc
 // matrix free interface
@@ -30,8 +48,9 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  void vmult (dealii::PETScWrappers::VectorBase       &dst,
-              const dealii::PETScWrappers::VectorBase &src) const;
+  void
+  vmult(dealii::PETScWrappers::VectorBase &      dst,
+        const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
    * Matrix-vector multiplication: let
@@ -43,8 +62,9 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  void Tvmult (dealii::PETScWrappers::VectorBase       &dst,
-               const dealii::PETScWrappers::VectorBase &src) const;
+  void
+  Tvmult(dealii::PETScWrappers::VectorBase &      dst,
+         const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
    * Adding Matrix-vector
@@ -56,8 +76,9 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  void vmult_add (dealii::PETScWrappers::VectorBase       &dst,
-                  const dealii::PETScWrappers::VectorBase &src) const;
+  void
+  vmult_add(dealii::PETScWrappers::VectorBase &      dst,
+            const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
    * Adding Matrix-vector
@@ -72,8 +93,9 @@ public:
    * Source and destination must
    * not be the same vector.
    */
-  void Tvmult_add (dealii::PETScWrappers::VectorBase       &dst,
-                   const dealii::PETScWrappers::VectorBase &src) const;
+  void
+  Tvmult_add(dealii::PETScWrappers::VectorBase &      dst,
+             const dealii::PETScWrappers::VectorBase &src) const;
 
 private:
   /**
@@ -90,37 +112,38 @@ private:
 
 // --------------- inline and template functions -----------------
 
-inline
-PetscFDMatrix::PetscFDMatrix(unsigned int size, unsigned int dim)
-  : PETScWrappers::MatrixFree (dim, dim, dim, dim),
-    nx (size), ny (size)
+inline PetscFDMatrix::PetscFDMatrix(unsigned int size, unsigned int dim)
+  : PETScWrappers::MatrixFree(dim, dim, dim, dim)
+  , nx(size)
+  , ny(size)
 {}
 
 
 
-inline
-void
-PetscFDMatrix::vmult_add (dealii::PETScWrappers::VectorBase       &dst,
-                          const dealii::PETScWrappers::VectorBase &src) const
+inline void
+PetscFDMatrix::vmult_add(dealii::PETScWrappers::VectorBase &      dst,
+                         const dealii::PETScWrappers::VectorBase &src) const
 {
-  for (unsigned int i=0; i<=ny-2; i++)
+  for (unsigned int i = 0; i <= ny - 2; i++)
     {
-      for (unsigned int j=0; j<=nx-2; j++)
+      for (unsigned int j = 0; j <= nx - 2; j++)
         {
           // Number of the row to be entered
-          unsigned int row = j+(nx-1)*i;
+          unsigned int row = j + (nx - 1) * i;
 
-          dst(row) += 4. * src(row);              // A.set(row, row, 4.);
+          dst(row) += 4. * src(row); // A.set(row, row, 4.);
 
-          if (j>0)
+          if (j > 0)
             {
-              dst(row-1) += -1. * src(row);       // A.set(row-1, row, -1.);
-              dst(row) += -1. * src(row-1);       // A.set(row, row-1, -1.);
+              dst(row - 1) += -1. * src(row); // A.set(row-1, row, -1.);
+              dst(row) += -1. * src(row - 1); // A.set(row, row-1, -1.);
             }
-          if (i>0)
+          if (i > 0)
             {
-              dst(row-(nx-1)) += -1. * src(row);  // A.set(row-(nx-1), row, -1.);
-              dst(row) += -1. * src(row-(nx-1));  // A.set(row, row-(nx-1), -1.);
+              dst(row - (nx - 1)) +=
+                -1. * src(row); // A.set(row-(nx-1), row, -1.);
+              dst(row) +=
+                -1. * src(row - (nx - 1)); // A.set(row, row-(nx-1), -1.);
             }
         }
     }
@@ -128,34 +151,29 @@ PetscFDMatrix::vmult_add (dealii::PETScWrappers::VectorBase       &dst,
 
 
 
-inline
-void
-PetscFDMatrix::vmult (dealii::PETScWrappers::VectorBase       &dst,
+inline void
+PetscFDMatrix::vmult(dealii::PETScWrappers::VectorBase &      dst,
+                     const dealii::PETScWrappers::VectorBase &src) const
+{
+  dst = 0;
+  vmult_add(dst, src);
+}
+
+
+
+inline void
+PetscFDMatrix::Tvmult(dealii::PETScWrappers::VectorBase &      dst,
                       const dealii::PETScWrappers::VectorBase &src) const
 {
   dst = 0;
-  vmult_add (dst, src);
+  vmult_add(dst, src);
 }
 
 
 
-inline
-void
-PetscFDMatrix::Tvmult (dealii::PETScWrappers::VectorBase       &dst,
-                       const dealii::PETScWrappers::VectorBase &src) const
+inline void
+PetscFDMatrix::Tvmult_add(dealii::PETScWrappers::VectorBase &      dst,
+                          const dealii::PETScWrappers::VectorBase &src) const
 {
-  dst = 0;
-  vmult_add (dst, src);
+  vmult_add(dst, src);
 }
-
-
-
-inline
-void
-PetscFDMatrix::Tvmult_add (dealii::PETScWrappers::VectorBase       &dst,
-                           const dealii::PETScWrappers::VectorBase &src) const
-{
-  vmult_add (dst, src);
-}
-
-

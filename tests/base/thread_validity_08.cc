@@ -8,43 +8,45 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // see if we can detach from threads
 
-#include "../tests.h"
-#include <atomic>
-#include <unistd.h>
-
 #include <deal.II/base/thread_management.h>
 
+#include <atomic>
 
-Threads::Mutex mutex;
+#include "../tests.h"
+
+
+Threads::Mutex          mutex;
 static std::atomic<int> spin_lock(0);
 
 
-void worker ()
+void
+worker()
 {
   // wait for the mutex to make sure the main
   // thread has already moved on. we can immediately
   // release the mutex again.
-  mutex.acquire ();
-  mutex.release ();
+  mutex.acquire();
+  mutex.release();
   deallog << "OK." << std::endl;
   spin_lock = 1;
 }
 
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  mutex.acquire ();
+  mutex.acquire();
   // start and abandon the
   // thread. because we hold the
   // lock, the started task can not
@@ -59,12 +61,12 @@ int main()
   // won't be able to acquire the
   // mutex
   {
-    Threads::new_thread (worker);
+    Threads::new_thread(worker);
   }
-  sleep (1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // let abandoned thread continue
-  mutex.release ();
+  mutex.release();
 
   // wait for thread to finish
   while (spin_lock == 0)

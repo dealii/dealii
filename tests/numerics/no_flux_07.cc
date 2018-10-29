@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -27,39 +27,46 @@
 // constraints for a Q2^3 field for which there are DoFs on edge
 // midpoints.
 
-#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/grid/grid_generator.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/lac/constraint_matrix.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/vector.h>
+
 #include <deal.II/numerics/vector_tools.h>
+
+#include "../tests.h"
 
 
 
 template <int dim>
-void test (const Triangulation<dim> &tr,
-           const FiniteElement<dim> &fe)
+void
+test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 {
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
   std::set<types::boundary_id> boundary_ids;
-  boundary_ids.insert (0);
+  boundary_ids.insert(0);
 
-  ConstraintMatrix cm;
-  VectorTools::compute_no_normal_flux_constraints (dof, 0, boundary_ids, cm);
+  AffineConstraints<double> cm;
+  VectorTools::compute_no_normal_flux_constraints(dof, 0, boundary_ids, cm);
 
-  cm.print (deallog.get_file_stream ());
+  cm.print(deallog.get_file_stream());
 }
 
 
 template <int dim>
-void test_hyper_cube()
+void
+test_hyper_cube()
 {
   Triangulation<dim> tr;
 
@@ -68,21 +75,22 @@ void test_hyper_cube()
   // result non-square
   GridGenerator::hyper_cube(tr);
   Point<dim> shift;
-  for (unsigned int i=GeometryInfo<dim>::vertices_per_cell/2;
-       i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (unsigned int i = GeometryInfo<dim>::vertices_per_cell / 2;
+       i < GeometryInfo<dim>::vertices_per_cell;
+       ++i)
     tr.begin_active()->vertex(i)[0] += 0.5;
 
-  FESystem<dim> fe (FE_Q<dim>(2), dim);
+  FESystem<dim> fe(FE_Q<dim>(2), dim);
   test(tr, fe);
 }
 
 
-int main()
+int
+main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
+  initlog();
+  deallog << std::setprecision(2);
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   test_hyper_cube<3>();
 }

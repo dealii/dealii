@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -21,7 +21,10 @@
 #   DEAL_II_WITH_CXX14
 #   DEAL_II_WITH_CXX17
 #
+#   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
 #   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+#   DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+#   DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #
@@ -34,6 +37,17 @@
 #                         C++ Version Support:                         #
 #                                                                      #
 ########################################################################
+
+
+#
+#                              BIG DISCLAIMER
+#
+# Frankly speaking - this whole file is a mess and has to be rewritten and
+# restructured at some point. So, if you are the lucky one who wants to add
+# DEAL_II_WITH_CXX2X support, do not add yet another 300 lines of spaghetti
+# code but restructure the whole thing to something sane.
+#
+
 
 #
 IF(DEAL_II_WITH_CXX17 AND DEFINED DEAL_II_WITH_CXX14 AND NOT DEAL_II_WITH_CXX14)
@@ -112,8 +126,13 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
   IF(NOT "${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
     # Set CMAKE_REQUIRED_FLAGS for the unit tests
     MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
-    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-    PUSH_CMAKE_REQUIRED("-Werror")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG} -Werror")
+
+    UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX17_SAVED
+      "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
+      DEAL_II_HAVE_CXX17_ATTRIBUTES
+      DEAL_II_HAVE_CXX17_IF_CONSTEXPR
+      )
 
     #
     # Test that the c++17 attributes are supported.
@@ -144,10 +163,57 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
       "
       DEAL_II_HAVE_CXX17_ATTRIBUTES)
 
+    #
+    # Test that the c++17 if constexpr is supported.
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      int main()
+      {
+        constexpr bool flag = false;
+        if constexpr(flag)
+          return 1;
+        return 0;
+      }
+      "
+      DEAL_II_HAVE_CXX17_IF_CONSTEXPR)
+
+    #
+    # Some compilers treat lambdas as constexpr functions when compiling
+    # with C++17 support even if they don't fulfill all the constexpr
+    # function requirements. Consequently, these compilers don't allow
+    # try-blocks or non-literal return types in lambdas. This is a bug.
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <string>
+
+      int main()
+      {
+        auto c = []()
+        {
+          return std::string{};
+        }();
+        (void) c;
+
+        return []()
+        {
+          try
+          {}
+          catch(...)
+          {}
+          return 0;
+        }();
+      }
+      "
+      DEAL_II_NON_CONSTEXPR_LAMBDA)
+
     RESET_CMAKE_REQUIRED()
   ENDIF()
 
-  IF( DEAL_II_HAVE_CXX17_ATTRIBUTES )
+  IF( DEAL_II_HAVE_CXX17_ATTRIBUTES AND
+      DEAL_II_HAVE_CXX17_IF_CONSTEXPR AND
+      DEAL_II_NON_CONSTEXPR_LAMBDA)
     SET(DEAL_II_HAVE_CXX17 TRUE)
   ELSE()
     IF(NOT _user_provided_cxx_version_flag)
@@ -165,27 +231,35 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
   _check_version("14" "1y")
 
   IF(NOT "${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
+
+    UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX14_SAVED
+      "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
+      DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
+      DEAL_II_HAVE_CXX14_CONSTEXPR_STDMAXMIN
+      DEAL_II_HAVE_CXX14_MAKE_UNIQUE
+      )
+
     # Set CMAKE_REQUIRED_FLAGS for the unit tests
-    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 
     #
-    # This test does not guarantee full C++14 support, but virtually every
-    # compiler with some C++14 support implements this.
+    # We assume std::make_unique works
     #
     CHECK_CXX_SOURCE_COMPILES(
       "
       #include <memory>
+
       int main()
       {
-          auto ptr = std::make_unique<int>(42);
-          return 0;
+        auto ptr = std::make_unique<int>(42);
+        return 0;
       }
       "
       DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
 
     #
     # This test checks constexpr std::max/min support. Unfortunately,
-    # gcc-4.9 does claim to support C++14 but fails to provide a constexpr
+    # gcc-4.9 claims to support C++14 but fails to provide a constexpr
     # compatible std::max/min. Disable C++14 support in this case.
     #
     CHECK_CXX_SOURCE_COMPILES(
@@ -194,6 +268,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
       int main()
       {
           constexpr int max = std::max(0,1);
+          (void) max;
       }
       "
       DEAL_II_HAVE_CXX14_CONSTEXPR_STDMAXMIN)
@@ -205,7 +280,9 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
     #
     # https://llvm.org/bugs/show_bug.cgi?id=16876
     #
-    PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_FLAGS_DEBUG}")
+    SET(_flags "${DEAL_II_CXX_FLAGS_DEBUG}")
+    STRIP_FLAG(_flags "-Wa,--compress-debug-sections")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_flags}")
     CHECK_CXX_SOURCE_COMPILES(
       "
       struct foo
@@ -215,6 +292,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
       int main()
       {
         foo bar;
+        (void) bar;
       }
       "
       DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
@@ -245,7 +323,16 @@ IF("${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
   _check_version("11" "0x")
 ENDIF()
 
-PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX11_SAVED
+  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
+  DEAL_II_HAVE_CXX11_FEATURES
+  DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
+  DEAL_II_HAVE_CXX11_ICCLIBSTDCPP47CXX11BUG_OK
+  DEAL_II_HAVE_CXX11_ICCNUMERICLIMITSBUG_OK
+  DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK
+  )
+
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 CHECK_CXX_SOURCE_COMPILES(
   "
   // common C++11 include files
@@ -253,14 +340,8 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <condition_variable>
   #include <type_traits>
 
-  // type traits functionality
-  constexpr auto m0 = std::is_trivial<double>::value;
-  constexpr auto m1 = std::is_standard_layout<double>::value;
-  constexpr auto m2 = std::is_pod<double>::value;
-
   // thread_local storage specification
-  thread_local std::array<int,3> p;
-  std::condition_variable c;
+  static thread_local std::array<int,3> p;
 
   // Check the version language macro, but skip MSVC because
   // MSVC reports 199711 even in MSVC 2017.
@@ -270,8 +351,17 @@ CHECK_CXX_SOURCE_COMPILES(
 
   int main()
   {
+    std::condition_variable c;
     p[0];
     c.notify_all();
+
+   // type traits functionality
+   constexpr auto m0 = std::is_trivial<double>::value;
+   (void) m0;
+   constexpr auto m1 = std::is_standard_layout<double>::value;
+   (void) m1;
+   constexpr auto m2 = std::is_pod<double>::value;
+   (void) m2;
   }
   "
   DEAL_II_HAVE_CXX11_FEATURES)
@@ -299,7 +389,8 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <ctype.h>
   int main ()
   {
-    char c = toupper('a');
+    int c = toupper('a');
+    (void) c;
   }
   "
   DEAL_II_HAVE_CXX11_MACOSXC99BUG_OK)
@@ -456,6 +547,23 @@ ELSE()
     "DEAL_II_WITH_CXX17 and DEAL_II_WITH_CXX14 are both disabled")
 ENDIF()
 
+
+########################################################################
+#                                                                      #
+#                   Check for various C++ features:                    #
+#                                                                      #
+########################################################################
+
+UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
+  "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}${DEAL_II_WITH_CXX14}${DEAL_II_WITH_CXX17}"
+  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
+  DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
+  DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
+  DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS
+  DEAL_II_HAVE_FP_EXCEPTIONS
+  DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+  )
+
 #
 # Try to enable a fallthrough attribute. This is a language feature in C++17,
 # but a compiler extension in earlier language versions: check both
@@ -466,9 +574,7 @@ IF(DEAL_II_WITH_CXX17)
 ELSE()
   # see if the current compiler configuration supports the GCC extension
   # __attribute__((fallthrough)) syntax instead
-  PUSH_CMAKE_REQUIRED("-Werror")
-  PUSH_CMAKE_REQUIRED("-Wextra")
-  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wextra ${DEAL_II_CXX_VERSION_FLAG}")
   CHECK_CXX_SOURCE_COMPILES(
     "
     int main()
@@ -497,21 +603,14 @@ ELSE()
   ENDIF()
 ENDIF()
 
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 
-########################################################################
-#                                                                      #
-#                   Check for various C++ features:                    #
-#                                                                      #
-########################################################################
-
-PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <type_traits>
   int main(){ std::is_trivially_copyable<int> bob; }
   "
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
-
 
 #
 # Check that we can use feenableexcept through the C++11 header file cfenv:
@@ -522,9 +621,7 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # - Timo Heister, 2015
 #
-
-IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-  CHECK_CXX_SOURCE_RUNS(
+SET(_snippet
     "
     #include <cfenv>
     #include <limits>
@@ -541,30 +638,15 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
       return 0;
     }
     "
-    DEAL_II_HAVE_FP_EXCEPTIONS)
+    )
+IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  CHECK_CXX_SOURCE_RUNS("${_snippet}" DEAL_II_HAVE_FP_EXCEPTIONS)
 ELSE()
   #
   # If we are not allowed to do platform introspection, just test whether
   # we can compile above code.
   #
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <cfenv>
-    #include <limits>
-    #include <sstream>
-
-    int main()
-    {
-      feenableexcept(FE_DIVBYZERO|FE_INVALID);
-      std::ostringstream description;
-      const double lower_bound = -std::numeric_limits<double>::max();
-
-      description << lower_bound;
-
-      return 0;
-    }
-    "
-    DEAL_II_HAVE_FP_EXCEPTIONS)
+  CHECK_CXX_SOURCE_COMPILES("${_snippet}" DEAL_II_HAVE_FP_EXCEPTIONS)
 ENDIF()
 
 #
@@ -590,4 +672,50 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
+
+#
+# As long as there exists an argument value such that an invocation of the
+# function or constructor could be an evaluated subexpression of a core constant
+# expression, C++14 allows to call non-constexpr functions from constexpr
+# functions. Unfortunately, not all compilers obey the standard in this regard.
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  void bar()
+  {}
+
+  constexpr int
+  foo(const int n)
+  {
+    if(!(n >= 0))
+      bar();
+    return n;
+  }
+
+  int main()
+  {
+    constexpr unsigned int n=foo(1);
+    return n;
+  }
+  "
+  DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+
+#
+# Not all compilers with C++17 support include the new special math
+# functions. Check this separately so that we can use C++17 compilers that don't
+# support it.
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <cmath>
+
+  int main()
+  {
+    std::cyl_bessel_j(1.0, 1.0);
+    std::cyl_bessel_jf(1.0f, 1.0f);
+    std::cyl_bessel_jl(1.0, 1.0);
+  }
+  "
+  DEAL_II_HAVE_CXX17_SPECIAL_MATH_FUNCTIONS)
+
 RESET_CMAKE_REQUIRED()

@@ -1,4 +1,0 @@
-New: LAPACKFullMatrix::rank1_update(const number, const Vector<number> &) performs
-a rank-1 update of a matrix.
-<br>
-(Denis Davydov, 2017/12/17)

@@ -45,3 +45,50 @@ div.image img[src="fe_enriched_1d.png"] {
 div.image img[src="fe_enriched_h-refinement.png"] {
     width:500px;
 }
+
+/*
+ * environment for aligning pictures in three columns.
+ */
+.threecolumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
+/*
+ * environment for aligning pictures in two columns.
+ */
+.twocolumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
+/*
+ * environment for aligning pictures in one column.
+ */
+.onecolumn {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+}
+
+
+/*
+ * environment for code fragments in tutorial comments
+ */
+.CodeFragmentInTutorialComment {
+    /* background-color: #FF33F0; */
+}

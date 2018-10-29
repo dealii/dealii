@@ -1,0 +1,30 @@
+200 32 2 2
+comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK p_syevr:
+   with respect to the given tolerance the eigenvalues coincide
+   with respect to the given tolerance also the eigenvectors coincide
+
+200 64 2 2
+comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK p_syevr:
+   with respect to the given tolerance the eigenvalues coincide
+   with respect to the given tolerance also the eigenvectors coincide
+
+400 32 2 2
+comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK p_syevr:
+   with respect to the given tolerance the eigenvalues coincide
+   with respect to the given tolerance also the eigenvectors coincide
+
+400 64 2 2
+comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK p_syevr:
+   with respect to the given tolerance the eigenvalues coincide
+   with respect to the given tolerance also the eigenvectors coincide
+
+600 32 2 2
+comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK p_syevr:
+   with respect to the given tolerance the eigenvalues coincide
+   with respect to the given tolerance also the eigenvectors coincide
+
+600 64 2 2
+comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK p_syevr:
+   with respect to the given tolerance the eigenvalues coincide
+   with respect to the given tolerance also the eigenvectors coincide
+

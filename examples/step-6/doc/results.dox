@@ -55,46 +55,53 @@ The final solution, as written by the program at the end of the
 In each cycle, the program furthermore writes the grid in EPS
 format. These are shown in the following:
 
-
-
-<TABLE WIDTH="100%">
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-0.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-1.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-2.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-3.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-4.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-5.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-6.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.grid-7.png" alt="">
-</td>
-</tr>
-</table>
-
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_0.svg"
+         alt="Initial grid: the five-cell circle grid with one global refinement."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_1.svg"
+         alt="First grid: the five-cell circle grid with two global refinements."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_2.svg"
+         alt="Second grid: the five-cell circle grid with one adaptive refinement."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_3.svg"
+         alt="Third grid: the five-cell circle grid with two adaptive
+         refinements, showing clustering around the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_4.svg"
+         alt="Fourth grid: the five-cell circle grid with three adaptive
+         refinements, showing clustering around the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_5.svg"
+         alt="Fifth grid: the five-cell circle grid with four adaptive
+         refinements, showing clustering around the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_6.svg"
+         alt="Sixth grid: the five-cell circle grid with five adaptive
+         refinements, showing clustering around the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_7.svg"
+         alt="Last grid: the five-cell circle grid with six adaptive
+         refinements, showing that most cells are clustered around the inner circle."
+         width="300" height="300">
+  </div>
+</div>
 
 
 It is clearly visible that the region where the solution has a kink,
@@ -103,7 +110,7 @@ refined most. Furthermore, the central region where the solution is
 very smooth and almost flat, is almost not refined at all, but this
 results from the fact that we did not take into account that the
 coefficient is large there. The region outside is refined rather
-randomly, since the second derivative is constant there and refinement
+arbitrarily, since the second derivative is constant there and refinement
 is therefore mostly based on the size of the cells and their deviation
 from the optimal square.
 
@@ -111,18 +118,18 @@ from the optimal square.
 
 For completeness, we show what happens if the code we commented about
 in the destructor of the <code>Step6</code> class is omitted
-from this example.
+from this example:
 
-@code
---------------------------------------------------------
-An error occurred in line <104> of file <source/base/subscriptor.cc> in function
+~~~{}
+An error occurred in line <104> of file <.../source/base/subscriptor.cc> in function
     void dealii::Subscriptor::check_no_subscribers() const
 The violated condition was:
     counter == 0
 Additional information:
-Object of class N6dealii17SphericalManifoldILi2ELi2EEE is still used by 1 other objects.
+    Object of class N6dealii15SparsityPatternE is still used by 1 other objects.
 
-(Additional information: <none>)
+(Additional information:
+  from Subscriber SparseMatrix)
 
 See the entry in the Frequently Asked Questions of deal.II (linked to from
 http://www.dealii.org/) for a lot more information on what this error means and
@@ -130,32 +137,31 @@ how to fix programs in which it happens.
 
 Stacktrace:
 -----------
-#0  /lib/libdeal_II.g.so: dealii::Subscriptor::check_no_subscribers() const
-#1  /lib/libdeal_II.g.so: dealii::Subscriptor::~Subscriptor()
-#2  /lib/libdeal_II.g.so: dealii::Manifold<2, 2>::~Manifold()
-#3  ./step-6: Step6<2>::~Step6()
-#4  ./step-6: main
+#0  .../lib/libdeal_II.g.so.9.0.0: dealii::Subscriptor::check_no_subscribers() const noexcept
+#   .../lib/libdeal_II.g.so.9.0.0: dealii::Subscriptor::~Subscriptor()
+#2  ./step-6: Step6<2>::~Step6()
+#3  ./step-6: main
 --------------------------------------------------------
-@endcode
+~~~
 
 From the above error message, we conclude that something is still using an
-object with type <code>N6dealii4FE_QILi2EE</code>. This is of course the <a
+object with type <code>N6dealii15SparsityPatternE</code>. This is of course the <a
 href="http://en.wikipedia.org/wiki/Name_mangling">"mangled" name</a> for
-<code>FE_Q</code>. The mangling works as follows: the <code>N6</code> indicates
+<code>SparsityPattern</code>. The mangling works as follows: the <code>N6</code> indicates
 a namespace with six characters (i.e., <code>dealii</code>) and the
-<code>4</code> indicates the number of characters of the template class (i.e.,
-<code>FE_Q</code>).
+<code>15</code> indicates the number of characters of the template class (i.e.,
+<code>SparsityPattern</code>).
 
-The rest of the text is then template arguments. From this we can already glean
-a little bit who's the culprit here, and who the victim: The one object that
-still uses the finite element is the <code>dof_handler</code> object.
+From this we can already glean a little bit who is the culprit here, and who the
+victim: The one object that still uses the SparsityPattern is the
+SparseMatrix.
 
 The stacktrace gives an indication of where the problem happened. We
-see that the exception was triggered in the
-destructor of the <code>FiniteElement</code> class that was called
+see that the AssertNothrow macro was triggered in the
+destructor of the SparseMatrix class (which inherits from Subscriptor) that was called
 through a few more functions from the destructor of the
 <code>Step6</code> class, exactly where we have commented out
-the call to <code>DoFHandler::clear()</code>.
+the call to SparseMatrix::clear().
 
 
 
@@ -196,7 +202,7 @@ we can use Jacobi as a preconditioner. And by using
   SparseILU<double> preconditioner;
   preconditioner.initialize(system_matrix);
 @endcode
-we can use a very simply incomplete LU decomposition without any
+we can use a simple incomplete LU decomposition without any
 thresholding or strengthening of the diagonal.
 
 Using these various different preconditioners, we can compare the
@@ -224,7 +230,7 @@ O}(N^{1/2})$ and because each iteration requires around ${\cal
 O}(N)$ operations the total CPU time grows like ${\cal
 O}(N^{3/2})$ (for the few smallest meshes, the CPU time is so small
 that it doesn't record). Note that even though it is the simplest
-method, Jacobi is the fastest for this problem. 
+method, Jacobi is the fastest for this problem.
 
 The situation changes slightly when the finite element is not a
 bi-quadratic one as set in the constructor of this program, but a
@@ -249,7 +255,7 @@ operations it has to perform. This is not to say that Jacobi
 is actually a good preconditioner -- for problems of appreciable size, it is
 definitely not, and other methods will be substantially better -- but really
 only that it is fast because its implementation is so simple that it can
-compensate for a larger number of iterations. 
+compensate for a larger number of iterations.
 
 The message to take away from this is not that simplicity in
 preconditioners is always best. While this may be true for the current
@@ -266,14 +272,14 @@ of preconditioners that can achieve this, namely geometric (step-16,
 step-37, step-39)
 or algebraic multigrid (step-31, step-40, and several others)
 preconditioners. They are, however, significantly more complex than
-the preconditioners outlined above. 
+the preconditioners outlined above.
 
 Finally, the last message to take
-home is that when the data shown above was generated (in 2008), linear
+home is that when the data shown above was generated (in 2018), linear
 systems with 100,000 unknowns are
-easily solved on a desktop machine in well under 10 seconds, making
+easily solved on a desktop machine in about a second, making
 the solution of relatively simple 2d problems even to very high
-accuracy not that big a task as it used to be even in the recent
+accuracy not that big a task as it used to be even in the
 past. At the time, the situation for 3d problems was entirely different,
 but even that has changed substantially in the intervening time -- though
 solving problems in 3d to high accuracy remains a challenge.
@@ -281,8 +287,8 @@ solving problems in 3d to high accuracy remains a challenge.
 
 <h4>A better mesh</h4>
 
-If you look at the meshes above, you will see even though the domain is the 
-unit disk, and the jump in the coefficient lies along a circle, the cells 
+If you look at the meshes above, you will see even though the domain is the
+unit disk, and the jump in the coefficient lies along a circle, the cells
 that make up the mesh do not track this geometry well. The reason, already hinted
 at in step-1, is that by default the Triangulation class only sees a bunch of
 coarse grid cells but has, of course, no real idea what kind of geometry they
@@ -291,54 +297,40 @@ the Triangulation what to do when a cell is refined: where should the new
 vertices at the edge midpoints and the cell midpoint be located so that the
 child cells better represent the desired geometry than the parent cell.
 
-In the code above, we already do this for faces that sit at the boundary:
-There, we use the code
-@code
-          static const SphericalManifold<dim> boundary;
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-@endcode
-to tell the Triangulation where to ask when refining a boundary face.
-To make the mesh <i>interior</i> also track a circular domain, we need to work
-a bit harder, though.
-
-First, recall that our coarse mesh consists of a central square
+In the code above, we already do this for faces that sit at the boundary: this
+happens automatically since we use GridGenerator::hyper_ball, which attaches a
+SphericalManifold to the boundary of the domain. To make the mesh
+<i>interior</i> also track a circular domain, we need to work a bit harder,
+though. First, recall that our coarse mesh consists of a central square
 cell and four cells around it. Now first consider what would happen if we
 also attached the SphericalManifold object not only to the four exterior faces
 but also the four cells at the perimeter as well as all of their faces. We can
-do this by replacing the existing mesh creation code
-@code
-          GridGenerator::hyper_ball (triangulation);
-
-          static const SphericalManifold<dim> boundary;
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-
-          triangulation.refine_global (1);
-@endcode
-by the following snippet (testing that the center of a cell is larger
-than a small multiple, say one tenth, of the cell diameter away from
+do this by adding the following snippet (testing that the center of a cell is
+larger than a small multiple, say one tenth, of the cell diameter away from
 center of the mesh only fails for the central square of the mesh):
 @code
           GridGenerator::hyper_ball (triangulation);
-
-          static const SphericalManifold<dim> boundary;
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-
+          // after GridGenerator::hyper_ball is called the Triangulation has
+          // a SphericalManifold with id 0. We can use it again on the interior.
           const Point<dim> mesh_center;
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             if (mesh_center.distance (cell->center()) > cell->diameter()/10)
               cell->set_all_manifold_ids (0);
-	  
+
           triangulation.refine_global (1);
 @endcode
 
 After a few global refinement steps, this would lead to a mesh of the following
 kind:
 
-<img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-4-bad.png" alt="">
+
+  <div class="onecolumn" style="width: 80%">
+    <div>
+      <img src="https://www.dealii.org/images/steps/developer/step_6_bad_grid_4.svg"
+           alt="Grid where some central cells are nearly triangular."
+           width="300" height="300">
+    </div>
+  </div>
 
 This is not a good mesh: the central cell has been refined in such a way that
 the children located in the four corners of the original central cell
@@ -355,10 +347,6 @@ originally developed by Konstantin Ladutenko. We will use the following code:
 @code
           GridGenerator::hyper_ball (triangulation);
 
-          static const SphericalManifold<dim> boundary;
-          triangulation.set_all_manifold_ids_on_boundary(0);
-          triangulation.set_manifold (0, boundary);
-
           const Point<dim> mesh_center;
           const double core_radius  = 1.0/5.0,
                        inner_radius = 1.0/3.0;
@@ -374,8 +362,7 @@ originally developed by Konstantin Ladutenko. We will use the following code:
           // We do this shrinking by just scaling the location of each
           // of the vertices, given that the center of the circle is
           // simply the origin of the coordinate system.
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             if (mesh_center.distance (cell->center()) < 1e-5)
               {
                 for (unsigned int v=0;
@@ -385,12 +372,10 @@ originally developed by Konstantin Ladutenko. We will use the following code:
               }
 
           // Step 2: Refine all cells except the central one
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             if (mesh_center.distance (cell->center()) >= 1e-5)
               cell->set_refine_flag ();
           triangulation.execute_coarsening_and_refinement ();
-
 
           // Step 3: Resize the inner children of the outer cells
           //
@@ -400,8 +385,7 @@ originally developed by Konstantin Ladutenko. We will use the following code:
           // steps. Consequently, move the vertices that were just
           // created in radial direction to a place where we need
           // them.
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
               {
                 const double dist = mesh_center.distance (cell->vertex(v));
@@ -420,8 +404,7 @@ originally developed by Konstantin Ladutenko. We will use the following code:
           // and all of its bounding faces to the one that describes
           // the spherical manifold already introduced above and that
           // will be used for all further mesh refinement.
-          for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-               cell != triangulation.end(); ++cell)
+          for (const auto &cell : triangulation.active_cell_iterators())
             {
               bool is_in_inner_circle = false;
               for (unsigned int v=0; v < GeometryInfo<2>::vertices_per_cell; ++v)
@@ -432,50 +415,51 @@ originally developed by Konstantin Ladutenko. We will use the following code:
                   }
 
               if (is_in_inner_circle == false)
+              // The Triangulation already has a SphericalManifold with
+              // manifold id 0 (see the documentation of
+              // GridGenerator::hyper_ball) so we just attach it to the outer
+              // ring here:
                 cell->set_all_manifold_ids (0);
             }
 @endcode
 
 This code then generates the following, much better sequence of meshes:
 
-<TABLE WIDTH="100%">
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-0.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-1.png" alt="">
-</td>
-</tr>
+<div class="twocolumn" style="width: 80%">
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_0_ladutenko.svg"
+         alt="Initial grid: the Ladutenko grid with one global refinement."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_1_ladutenko.svg"
+         alt="First adaptively refined Ladutenko grid."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_2_ladutenko.svg"
+         alt="Second adaptively refined Ladutenko grid."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_3_ladutenko.svg"
+         alt="Third adaptively refined Ladutenko grid."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_4_ladutenko.svg"
+         alt="Fourth adaptively refined Ladutenko grid. The cells are clustered
+         along the inner circle."
+         width="300" height="300">
+  </div>
+  <div>
+    <img src="https://www.dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
+         alt="Fifth adaptively refined Ladutenko grid: the cells are clustered
+         along the inner circle."
+         width="300" height="300">
+  </div>
+</div>
 
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-2.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-3.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-4.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-5.png" alt="">
-</td>
-</tr>
-
-<tr>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-6.png" alt="">
-</td>
-<td>
-  <img src="https://www.dealii.org/images/steps/developer/step-6.manifold-grid-7.png" alt="">
-</td>
-</tr>
-</table>
- 
 Creating good meshes, and in particular making them fit the geometry you
 want, is a complex topic in itself. You can find much more on this in
 step-49, step-53, and step-54, among other tutorial programs that cover
@@ -532,7 +516,7 @@ on how smooth exactly the boundary of the domain is, and how smooth the right
 hand side is. Some regularity of the solution may be lost at the boundary, but
 one generally has that the solution is twice more differentiable in
 compact subsets of the domain than the right hand side.
-If, in particular, the right hand side satisfies $f\in C^\infty(\Omega)$, then   
+If, in particular, the right hand side satisfies $f\in C^\infty(\Omega)$, then
 $u \in C^\infty(\Omega_i)$ where $\Omega_i$ is any compact subset of $\Omega$
 ($\Omega$ is an open domain, so a compact subset needs to keep a positive distance
 from $\partial\Omega$).
@@ -542,12 +526,12 @@ at an equation with a non-constant coefficient $a(\mathbf x)$:
 @f[
   -\nabla \cdot (a \nabla u) = f.
 @f]
-Here, if $a$ is not smooth, then the solution will not be smooth either, 
+Here, if $a$ is not smooth, then the solution will not be smooth either,
 regardless of $f$. In particular, we expect that wherever $a$ is discontinuous
 along a line (or along a plane in 3d),
 the solution will have a kink. This is easy to see: if for example $f$
-is continuous, then $f=-\nabla \cdot (a \nabla u)$ needs to be 
-continuous. This means that $a \nabla u$ must be continuously differentiable 
+is continuous, then $f=-\nabla \cdot (a \nabla u)$ needs to be
+continuous. This means that $a \nabla u$ must be continuously differentiable
 (not have a kink). Consequently, if $a$ has a discontinuity, then $\nabla u$
 must have an opposite discontinuity so that the two exactly cancel and their
 product yields a function without a discontinuity. But for $\nabla u$ to have
@@ -566,7 +550,7 @@ $W^{1,\infty}$. It is not very difficult to create cases where
 the solution is in a space $H^{1+s}$ where we can get $s$ to become as small
 as we want. Such cases are often used to test adaptive finite element
 methods because the mesh will have to resolve the singularity that causes
-the solution to not be in $W^{1,\infty}$ any more. 
+the solution to not be in $W^{1,\infty}$ any more.
 
 The typical example one uses for this is called the <i>Kellogg problem</i>
 (referring to the paper "On the Poisson equation with intersecting interfaces"
@@ -599,8 +583,9 @@ double coefficient (const Point<dim> &p)
     }
 }
 @endcode
-(Adding the <code>Assert</code> at the end ensures that an exception
-is thrown if we ever get to that point -- which of course we shouldn't,
+(Adding the <code>Assert</code> at the end ensures that either an exception
+is thrown or that the program aborts if we ever get to that point
+-- which of course we shouldn't,
 but this is a good way to insure yourself: we all make mistakes by
 sometimes not thinking of all cases, for example by checking
 for <code>p[0]</code> to be less than and greater than zero,

@@ -147,7 +147,7 @@ Matrixfree<dim>::vmult (Vector<double>       &dst,
 
 Here we neglected boundary conditions as well as any hanging nodes we may
 have, though neither would be very difficult to include using the
-ConstraintMatrix class. Note how we first generate the local matrix in the
+AffineConstraints class. Note how we first generate the local matrix in the
 usual way as a sum over all quadrature points for each local matrix entry.
 To form the actual product as expressed in the above formula, we
 extract the values of <code>src</code> of the cell-related degrees of freedom
@@ -428,7 +428,7 @@ their implementation requires knowledge of the elements of the system matrix.
 One solution is to use geometric multigrid methods as shown in step-16. They
 are known to be very fast, and they are suitable for our purpose since all
 ingredients, including the transfer between different grid levels, can be
-expressed in terms of matrix-vector products related to a colletion of
+expressed in terms of matrix-vector products related to a collection of
 cells. All one needs to do is to find a smoother that is based on
 matrix-vector products rather than all the matrix entries. One such candidate
 would be a damped Jacobi iteration that requires access to the matrix
@@ -514,7 +514,8 @@ FEEvaluation for your computer, you should compile deal.II with the so-called
 enabled by setting the variable <tt>CMAKE_CXX_FLAGS</tt> to
 <tt>"-march=native"</tt> in the cmake build settings (on the command line,
 specify <tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>, see the deal.II README for
-more information). Similar options exist for other compilers.
+more information). Similar options exist for other compilers. We output
+the current vectorization length in the run() function of this example.
 
 
 <h3>Running multigrid on large-scale parallel computers</h3>
@@ -543,7 +544,7 @@ MPI metadata for DoFs that are owned locally but needed by other
 processors. A benefit of the design of this vector class is the way ghosted
 entries are accessed. In the storage scheme of the vector, the data array
 extends beyond the processor-local part of the solution with further vector
-entries available for the ghosted degrees of freedom. This gives a continguous
+entries available for the ghosted degrees of freedom. This gives a contiguous
 index range for all locally active degrees of freedom. (Note that the index
 range depends on the exact configuration of the mesh.) Since matrix-free
 operations can be thought of doing linear algebra that is performance

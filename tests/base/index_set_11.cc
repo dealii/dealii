@@ -8,47 +8,51 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // test IndexSet::add_indices
 
-#include "../tests.h"
-
 #include <deal.II/base/index_set.h>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  IndexSet index_set (10);
+  IndexSet index_set(10);
 
   {
-    const unsigned int array[] = { 2, 3, 4 };
-    index_set.add_indices ((const unsigned int *)array, array+sizeof(array)/sizeof(array[0]));
+    const unsigned int array[] = {2, 3, 4};
+    index_set.add_indices((const unsigned int *)array,
+                          array + sizeof(array) / sizeof(array[0]));
   }
   {
-    const unsigned int array[] = { 7,6 };
-    index_set.add_indices ((const unsigned int *)array, array+sizeof(array)/sizeof(array[0]));
+    const unsigned int array[] = {7, 6};
+    index_set.add_indices((const unsigned int *)array,
+                          array + sizeof(array) / sizeof(array[0]));
   }
 
-  Assert (index_set.is_contiguous() == false, ExcInternalError());
+  Assert(index_set.is_contiguous() == false, ExcInternalError());
 
-  for (unsigned int i=0; i<index_set.size(); ++i)
+  for (unsigned int i = 0; i < index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
             << std::endl;
 
 
   {
-    const unsigned int array[] = { 5 };
-    index_set.add_indices ((const unsigned int *)array, array+sizeof(array)/sizeof(array[0]));
+    const unsigned int array[] = {5};
+    index_set.add_indices((const unsigned int *)array,
+                          array + sizeof(array) / sizeof(array[0]));
   }
 
-  Assert (index_set.is_contiguous() == true, ExcInternalError());
+  Assert(index_set.is_contiguous() == true, ExcInternalError());
 
-  for (unsigned int i=0; i<index_set.size(); ++i)
+  for (unsigned int i = 0; i < index_set.size(); ++i)
     deallog << i << ' ' << (index_set.is_element(i) ? "true" : "false")
             << std::endl;
 
@@ -58,10 +62,10 @@ void test ()
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

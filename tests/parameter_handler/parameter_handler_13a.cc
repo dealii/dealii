@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,29 +17,35 @@
 
 // check the Patterns::Map pattern with a separator other than the default ','
 
-#include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 
-void check (const char *p)
+#include "../tests.h"
+
+void
+check(const char *p)
 {
   ParameterHandler prm;
-  prm.declare_entry ("test_13", "-1:a xyz 0:b xyz 1:c",
-                     Patterns::Map(Patterns::Integer(-1,1),
-                                   Patterns::Selection("a|b|c"),
-                                   2,3, "xyz"));
+  prm.declare_entry("test_13",
+                    "-1:a xyz 0:b xyz 1:c",
+                    Patterns::Map(Patterns::Integer(-1, 1),
+                                  Patterns::Selection("a|b|c"),
+                                  2,
+                                  3,
+                                  "xyz"));
 
   std::ifstream in(p);
-  prm.parse_input (in);
+  prm.parse_input(in);
 
-  deallog << "test_13=" << prm.get ("test_13") << std::endl;
+  deallog << "test_13=" << prm.get("test_13") << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
-  check (SOURCE_DIR "/prm/parameter_handler_13a.prm");
+  check(SOURCE_DIR "/prm/parameter_handler_13a.prm");
 
   return 0;
 }

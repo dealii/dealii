@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -26,6 +26,18 @@
 #    General setup:    #
 #                      #
 ########################
+
+# Notice how intelligent the version numbering of "Microsoft Visual Studio 2017
+# version 15.0" is, the c++ compiler is advertised as "MSVC++ 14.1" but the
+# version information is 19.10.x (this is the numbering used by CMake), see
+# https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B#Internal_version_numbering
+IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.10" )
+  MESSAGE(FATAL_ERROR "\n"
+    "You're using an old version of the Visual Studio C++ Compiler!\n"
+    "You need at least version Visual Studio 2017.\n"
+    )
+ENDIF()
+
 
 # enable exception handling:
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/EHsc")

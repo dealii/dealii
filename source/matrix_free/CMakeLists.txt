@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2017 by the deal.II authors
+## Copyright (C) 2013 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,21 +8,24 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
-  matrix_free.cc
   evaluation_selector.cc
+  mapping_info.cc
+  matrix_free.cc
+  task_info.cc
   )
 
 SET(_inst
-  matrix_free.inst.in
   evaluation_selector.inst.in
+  mapping_info.inst.in
+  matrix_free.inst.in
   )
 
 FILE(GLOB _header
@@ -35,12 +38,7 @@ IF(DEAL_II_WITH_CUDA)
     ${_src}
     )
   SET(_inst
-    cuda_matrix_free.inst.in
     ${_inst}
-    )
-  FILE(GLOB _header
-    ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.cuh
-    ${_header}
     )
 ENDIF()
 

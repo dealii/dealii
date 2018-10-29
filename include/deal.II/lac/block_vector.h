@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2017 by the deal.II authors
+// Copyright (C) 1999 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,7 +18,9 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/exceptions.h>
+
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/vector_operation.h>
@@ -37,7 +39,7 @@ namespace TrilinosWrappers
   {
     class BlockVector;
   }
-}
+} // namespace TrilinosWrappers
 #endif
 
 
@@ -63,31 +65,31 @@ namespace TrilinosWrappers
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <typename Number>
-class BlockVector : public BlockVectorBase<Vector<Number> >
+class BlockVector : public BlockVectorBase<Vector<Number>>
 {
 public:
   /**
-   * Typedef the base class for simpler access to its own typedefs.
+   * Typedef the base class for simpler access to its own alias.
    */
-  typedef BlockVectorBase<Vector<Number> > BaseClass;
+  using BaseClass = BlockVectorBase<Vector<Number>>;
 
   /**
    * Typedef the type of the underlying vector.
    */
-  typedef typename BaseClass::BlockType  BlockType;
+  using BlockType = typename BaseClass::BlockType;
 
   /**
-   * Import the typedefs from the base class.
+   * Import the alias from the base class.
    */
-  typedef typename BaseClass::value_type      value_type;
-  typedef typename BaseClass::real_type       real_type;
-  typedef typename BaseClass::pointer         pointer;
-  typedef typename BaseClass::const_pointer   const_pointer;
-  typedef typename BaseClass::reference       reference;
-  typedef typename BaseClass::const_reference const_reference;
-  typedef typename BaseClass::size_type       size_type;
-  typedef typename BaseClass::iterator        iterator;
-  typedef typename BaseClass::const_iterator  const_iterator;
+  using value_type      = typename BaseClass::value_type;
+  using real_type       = typename BaseClass::real_type;
+  using pointer         = typename BaseClass::pointer;
+  using const_pointer   = typename BaseClass::const_pointer;
+  using reference       = typename BaseClass::reference;
+  using const_reference = typename BaseClass::const_reference;
+  using size_type       = typename BaseClass::size_type;
+  using iterator        = typename BaseClass::iterator;
+  using const_iterator  = typename BaseClass::const_iterator;
 
   /**
    * Constructor. There are three ways to use this constructor. First, without
@@ -99,21 +101,21 @@ public:
    * Confer the other constructor further down if you intend to use blocks of
    * different sizes.
    */
-  explicit BlockVector (const unsigned int n_blocks = 0,
-                        const size_type block_size = 0);
+  explicit BlockVector(const unsigned int n_blocks   = 0,
+                       const size_type    block_size = 0);
 
   /**
    * Copy Constructor. Dimension set to that of @p v, all components are
    * copied from @p v.
    */
-  BlockVector (const BlockVector<Number> &V);
+  BlockVector(const BlockVector<Number> &V);
 
 
   /**
    * Move constructor. Creates a new vector by stealing the internal data of
    * the given argument vector.
    */
-  BlockVector (BlockVector<Number> &&/*v*/) noexcept = default;
+  BlockVector(BlockVector<Number> && /*v*/) noexcept = default;
 
   /**
    * Copy constructor taking a BlockVector of another data type. This will
@@ -128,28 +130,27 @@ public:
    * a broken compiler during configuration.
    */
   template <typename OtherNumber>
-  explicit
-  BlockVector (const BlockVector<OtherNumber> &v);
+  explicit BlockVector(const BlockVector<OtherNumber> &v);
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
    * A copy constructor taking a (parallel) Trilinos block vector and copying
    * it into the deal.II own format.
    */
-  BlockVector (const TrilinosWrappers::MPI::BlockVector &v);
+  BlockVector(const TrilinosWrappers::MPI::BlockVector &v);
 
 #endif
   /**
    * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt> and
    * initialize each block with <tt>block_sizes[i]</tt> zero elements.
    */
-  BlockVector (const std::vector<size_type> &block_sizes);
+  BlockVector(const std::vector<size_type> &block_sizes);
 
   /**
    * Constructor. Initialize vector to the structure found in the BlockIndices
    * argument.
    */
-  BlockVector (const BlockIndices &block_indices);
+  BlockVector(const BlockIndices &block_indices);
 
   /**
    * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>.
@@ -161,14 +162,14 @@ public:
    * blocks.
    */
   template <typename InputIterator>
-  BlockVector (const std::vector<size_type>    &block_sizes,
-               const InputIterator              first,
-               const InputIterator              end);
+  BlockVector(const std::vector<size_type> &block_sizes,
+              const InputIterator           first,
+              const InputIterator           end);
 
   /**
    * Destructor. Clears memory
    */
-  ~BlockVector () = default;
+  ~BlockVector() override = default;
 
   /**
    * Call the compress() function on all the subblocks.
@@ -180,27 +181,39 @@ public:
    * @ref GlossCompress "Compressing distributed objects"
    * for more information.
    */
-  void compress (::dealii::VectorOperation::values operation
-                 =::dealii::VectorOperation::unknown);
+  void
+  compress(::dealii::VectorOperation::values operation =
+             ::dealii::VectorOperation::unknown);
+
+  /**
+   * Returns `false` as this is a serial block vector.
+   *
+   * This functionality only needs to be called if using MPI based vectors and
+   * exists in other objects for compatibility.
+   */
+  bool
+  has_ghost_elements() const;
 
   /**
    * Copy operator: fill all components of the vector with the given scalar
    * value.
    */
-  BlockVector &operator= (const value_type s);
+  BlockVector &
+  operator=(const value_type s);
 
   /**
    * Copy operator for arguments of the same type. Resize the present vector
    * if necessary.
    */
   BlockVector<Number> &
-  operator= (const BlockVector<Number> &v);
+  operator=(const BlockVector<Number> &v);
 
   /**
    * Move the given vector. This operator replaces the present vector with
    * the contents of the given argument vector.
    */
-  BlockVector<Number> &operator= (BlockVector<Number> &&/*v*/) = default; // NOLINT
+  BlockVector<Number> &
+  operator=(BlockVector<Number> && /*v*/) = default; // NOLINT
 
   /**
    * Copy operator for template arguments of different types. Resize the
@@ -208,13 +221,13 @@ public:
    */
   template <class Number2>
   BlockVector<Number> &
-  operator= (const BlockVector<Number2> &V);
+  operator=(const BlockVector<Number2> &V);
 
   /**
    * Copy a regular vector into a block vector.
    */
   BlockVector<Number> &
-  operator= (const Vector<Number> &V);
+  operator=(const Vector<Number> &V);
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
@@ -222,7 +235,7 @@ public:
    * vector.
    */
   BlockVector<Number> &
-  operator= (const TrilinosWrappers::MPI::BlockVector &V);
+  operator=(const TrilinosWrappers::MPI::BlockVector &V);
 #endif
 
   /**
@@ -237,9 +250,10 @@ public:
    *
    * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
    */
-  void reinit (const unsigned int n_blocks,
-               const size_type block_size = 0,
-               const bool omit_zeroing_entries = false);
+  void
+  reinit(const unsigned int n_blocks,
+         const size_type    block_size           = 0,
+         const bool         omit_zeroing_entries = false);
 
   /**
    * Reinitialize the BlockVector such that it contains
@@ -257,8 +271,9 @@ public:
    * reinit() on one of the blocks, then subsequent actions on this object may
    * yield unpredictable results since they may be routed to the wrong block.
    */
-  void reinit (const std::vector<size_type> &block_sizes,
-               const bool                    omit_zeroing_entries=false);
+  void
+  reinit(const std::vector<size_type> &block_sizes,
+         const bool                    omit_zeroing_entries = false);
 
   /**
    * Reinitialize the BlockVector to reflect the structure found in
@@ -269,8 +284,9 @@ public:
    *
    * If <tt>omit_zeroing_entries==false</tt>, the vector is filled with zeros.
    */
-  void reinit (const BlockIndices &block_indices,
-               const bool omit_zeroing_entries=false);
+  void
+  reinit(const BlockIndices &block_indices,
+         const bool          omit_zeroing_entries = false);
 
   /**
    * Change the dimension to that of the vector <tt>V</tt>. The same applies
@@ -286,15 +302,17 @@ public:
    * yield unpredictable results since they may be routed to the wrong block.
    */
   template <typename Number2>
-  void reinit (const BlockVector<Number2> &V,
-               const bool                 omit_zeroing_entries=false);
+  void
+  reinit(const BlockVector<Number2> &V,
+         const bool                  omit_zeroing_entries = false);
 
   /**
    * Multiply each element of this vector by the corresponding element of
    * <tt>v</tt>.
    */
   template <class BlockVector2>
-  void scale (const BlockVector2 &v);
+  void
+  scale(const BlockVector2 &v);
 
   /**
    * Swap the contents of this vector and the other vector <tt>v</tt>. One
@@ -307,22 +325,25 @@ public:
    * containers. Also, there is a global function swap(u,v) that simply calls
    * <tt>u.swap(v)</tt>, again in analogy to standard functions.
    */
-  void swap (BlockVector<Number> &v);
+  void
+  swap(BlockVector<Number> &v);
 
   /**
    * Print to a stream.
    */
-  void print (std::ostream       &out,
-              const unsigned int  precision = 3,
-              const bool          scientific = true,
-              const bool          across = true) const;
+  void
+  print(std::ostream &     out,
+        const unsigned int precision  = 3,
+        const bool         scientific = true,
+        const bool         across     = true) const;
 
   /**
    * Write the vector en bloc to a stream. This is done in a binary mode, so
    * the output is neither readable by humans nor (probably) by other
    * computers using a different operating system or number format.
    */
-  void block_write (std::ostream &out) const;
+  void
+  block_write(std::ostream &out) const;
 
   /**
    * Read a vector en block from a file. This is done using the inverse
@@ -335,7 +356,8 @@ public:
    * bluntest attempts to interpret some data as a vector stored bitwise to a
    * file, but not more.
    */
-  void block_read (std::istream &in);
+  void
+  block_read(std::istream &in);
 
   /**
    * @addtogroup Exceptions
@@ -345,7 +367,7 @@ public:
   /**
    * Exception
    */
-  DeclException0 (ExcIteratorRangeDoesNotMatchVectorSize);
+  DeclException0(ExcIteratorRangeDoesNotMatchVectorSize);
   //@}
 };
 
@@ -358,60 +380,56 @@ public:
 
 template <typename Number>
 template <typename InputIterator>
-BlockVector<Number>::BlockVector (const std::vector<size_type>    &block_sizes,
-                                  const InputIterator              first,
-                                  const InputIterator              end)
+BlockVector<Number>::BlockVector(const std::vector<size_type> &block_sizes,
+                                 const InputIterator           first,
+                                 const InputIterator           end)
 {
   // first set sizes of blocks, but
   // don't initialize them as we will
   // copy elements soon
   (void)end;
-  reinit (block_sizes, true);
+  reinit(block_sizes, true);
   InputIterator start = first;
-  for (size_type b=0; b<block_sizes.size(); ++b)
+  for (size_type b = 0; b < block_sizes.size(); ++b)
     {
       InputIterator end = start;
-      std::advance (end, static_cast<signed int>(block_sizes[b]));
-      std::copy (start, end, this->block(b).begin());
+      std::advance(end, static_cast<signed int>(block_sizes[b]));
+      std::copy(start, end, this->block(b).begin());
       start = end;
     };
-  Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
+  Assert(start == end, ExcIteratorRangeDoesNotMatchVectorSize());
 }
 
 
 
 template <typename Number>
-inline
-BlockVector<Number> &
-BlockVector<Number>::operator= (const value_type s)
+inline BlockVector<Number> &
+BlockVector<Number>::operator=(const value_type s)
 {
-
   AssertIsFinite(s);
 
-  BaseClass::operator= (s);
+  BaseClass::operator=(s);
   return *this;
 }
 
 
 
 template <typename Number>
-inline
-BlockVector<Number> &
-BlockVector<Number>::operator= (const BlockVector<Number> &v)
+inline BlockVector<Number> &
+BlockVector<Number>::operator=(const BlockVector<Number> &v)
 {
-  reinit (v, true);
-  BaseClass::operator= (v);
+  reinit(v, true);
+  BaseClass::operator=(v);
   return *this;
 }
 
 
 
 template <typename Number>
-inline
-BlockVector<Number> &
-BlockVector<Number>::operator= (const Vector<Number> &v)
+inline BlockVector<Number> &
+BlockVector<Number>::operator=(const Vector<Number> &v)
 {
-  BaseClass::operator= (v);
+  BaseClass::operator=(v);
   return *this;
 }
 
@@ -419,30 +437,39 @@ BlockVector<Number>::operator= (const Vector<Number> &v)
 
 template <typename Number>
 template <typename Number2>
-inline
-BlockVector<Number> &
-BlockVector<Number>::operator= (const BlockVector<Number2> &v)
+inline BlockVector<Number> &
+BlockVector<Number>::operator=(const BlockVector<Number2> &v)
 {
-  reinit (v, true);
-  BaseClass::operator= (v);
+  reinit(v, true);
+  BaseClass::operator=(v);
   return *this;
 }
 
 template <typename Number>
-inline
-void BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
+inline void
+BlockVector<Number>::compress(::dealii::VectorOperation::values operation)
 {
-  for (size_type i=0; i<this->n_blocks(); ++i)
+  for (size_type i = 0; i < this->n_blocks(); ++i)
     this->components[i].compress(operation);
 }
 
 
 
 template <typename Number>
-template <class BlockVector2>
-void BlockVector<Number>::scale (const BlockVector2 &v)
+inline bool
+BlockVector<Number>::has_ghost_elements() const
 {
-  BaseClass::scale (v);
+  return false;
+}
+
+
+
+template <typename Number>
+template <class BlockVector2>
+void
+BlockVector<Number>::scale(const BlockVector2 &v)
+{
+  BaseClass::scale(v);
 }
 
 #endif // DOXYGEN
@@ -457,48 +484,48 @@ void BlockVector<Number>::scale (const BlockVector2 &v)
  * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>
-inline
-void swap (BlockVector<Number> &u,
-           BlockVector<Number> &v)
+inline void
+swap(BlockVector<Number> &u, BlockVector<Number> &v)
 {
-  u.swap (v);
+  u.swap(v);
 }
 
 
 namespace internal
 {
-  namespace LinearOperator
+  namespace LinearOperatorImplementation
   {
-    template <typename> class ReinitHelper;
+    template <typename>
+    class ReinitHelper;
 
     /**
      * A helper class used internally in linear_operator.h. Specialization for
      * BlockVector<number>.
      */
     template <typename number>
-    class ReinitHelper<BlockVector<number> >
+    class ReinitHelper<BlockVector<number>>
     {
     public:
       template <typename Matrix>
-      static
-      void reinit_range_vector (const Matrix &matrix,
-                                BlockVector<number> &v,
-                                bool omit_zeroing_entries)
+      static void
+      reinit_range_vector(const Matrix &       matrix,
+                          BlockVector<number> &v,
+                          bool                 omit_zeroing_entries)
       {
         v.reinit(matrix.get_row_indices(), omit_zeroing_entries);
       }
 
       template <typename Matrix>
-      static
-      void reinit_domain_vector(const Matrix &matrix,
-                                BlockVector<number> &v,
-                                bool omit_zeroing_entries)
+      static void
+      reinit_domain_vector(const Matrix &       matrix,
+                           BlockVector<number> &v,
+                           bool                 omit_zeroing_entries)
       {
         v.reinit(matrix.get_column_indices(), omit_zeroing_entries);
       }
     };
 
-  } /* namespace LinearOperator */
+  } // namespace LinearOperatorImplementation
 } /* namespace internal */
 
 
@@ -508,9 +535,8 @@ namespace internal
  * @author Uwe Koecher, 2017
  */
 template <typename Number>
-struct is_serial_vector< BlockVector< Number > > : std::true_type
-{
-};
+struct is_serial_vector<BlockVector<Number>> : std::true_type
+{};
 
 DEAL_II_NAMESPACE_CLOSE
 

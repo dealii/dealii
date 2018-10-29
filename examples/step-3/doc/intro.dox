@@ -3,7 +3,7 @@
 
 @dealiiVideoLecture{10}
 
-<h3>The basic functioning of finite elements</h3>
+<h3>The basic set up of finite element methods</h3>
 
 This is the first example where we actually use finite elements to compute
 something. We
@@ -81,8 +81,8 @@ we need the following:
   have to worry about this step.
 
 Through these steps, we now have a set of functions $\varphi_i$, and we can
-define the weak form of the discrete problem: Find a function $u_h$, i.e. find
-the expansion coefficients $U_i$ mentioned above, so that
+define the weak form of the discrete problem: Find a function $u_h$, i.e., find
+the expansion coefficients $U_j$ mentioned above, so that
 @f{align*}
   (\nabla\varphi_i, \nabla u_h)
    = (\varphi_i, f),
@@ -91,9 +91,18 @@ the expansion coefficients $U_i$ mentioned above, so that
 @f}
 Note that we here follow the convention that everything is counted starting at
 zero, as common in C and C++. This equation can be rewritten as a linear
-system by inserting the representation $u_h(\mathbf x)=\sum_j U_j
-\varphi_j(\mathbf x)$: Find a vector $U$ so that
-@f{align*}
+system if you insert the representation $u_h(\mathbf x)=\sum_j U_j
+\varphi_j(\mathbf x)$ and then observe that
+@f{align*}{
+  (\nabla\varphi_i, \nabla u_h)
+  &= \left(\nabla\varphi_i, \nabla \Bigl[\sum_j U_j \varphi_j\Bigr]\right)
+\\
+  &= \sum_j \left(\nabla\varphi_i, \nabla \left[U_j \varphi_j\right]\right)
+\\
+  &= \sum_j \left(\nabla\varphi_i, \nabla \varphi_j \right) U_j.
+@f}
+With this, the problem reads: Find a vector $U$ so that
+@f{align*}{
   A U = F,
 @f}
 where the matrix $A$ and the right hand side $F$ are defined as
@@ -102,19 +111,24 @@ where the matrix $A$ and the right hand side $F$ are defined as
   \\
   F_i &= (\varphi_i, f).
 @f}
+
+
+<h3> Should we multiply by a test function from the left or from the right? </h3>
+
 Before we move on with describing how these quantities can be computed, note
 that if we had multiplied the original equation from the <i>right</i> by a
 test function rather than from the left, then we would have obtained a linear
 system of the form
 @f{align*}
-  U^T A = F
+  U^T A = F^T
 @f}
-with a row vector $F$. By transposing this system, this is of course
+with a row vector $F^T$. By transposing this system, this is of course
 equivalent to solving
 @f{align*}
   A^T U = F
 @f}
-which here is the same as above since $A=A^T$ but in general is not. To avoid
+which here is the same as above since $A=A^T$. But in general is not,
+and in order to avoid
 any sort of confusion, experience has shown that simply getting into the habit
 of multiplying the equation from the left rather than from the right (as is
 often done in the mathematical literature) avoids a common class of errors as
@@ -123,7 +137,10 @@ comparing theory and implementation. See step-9 for the first example in this
 tutorial where we have a non-symmetric bilinear form for which it makes a
 difference whether we multiply from the right or from the left.
 
-Now we know what we need (namely objects that hold the matrix and
+
+<h3> Computing the matrix and right hand side vector </h3>
+
+Now we know what we need (namely: objects that hold the matrix and
 vectors, as well as ways to compute $A_{ij},F_i$), and we can look at what it
 takes to make that happen:
 
@@ -318,20 +335,19 @@ following tutorial programs.
 
 <h3> A note on types </h3>
 
-deal.II defines a number of integral %types via <code>typedef</code>s in
-namespace types. In particular, in this program you will see
-types::global_dof_index in a couple of places: an integer type that is used to
-denote the <i>global</i> index of a degree of freedom, i.e., the index of a
-particular degree of freedom within the DoFHandler object that is defined on
-top of a triangulation (as opposed to the index of a particular degree of
-freedom within a particular cell). For the current program
-(as well as almost all of the tutorial programs), you will have a few thousand
-to maybe a few million unknowns globally (and, for $Q_1$ elements, you will
-have 4 <i>locally on each cell</i> in 2d and 8 in 3d). Consequently, a data
-type that allows to store sufficiently large numbers for global DoF indices is
-<code>unsigned int</code> given that it allows to store numbers between 0 and
-slightly more than 4 billion (on most systems, where integers are 32-bit). In
-fact, this is what types::global_dof_index is.
+deal.II defines a number of integral %types via alias in namespace types. In
+particular, in this program you will see types::global_dof_index in a couple of
+places: an integer type that is used to denote the <i>global</i> index of a
+degree of freedom, i.e., the index of a particular degree of freedom within the
+DoFHandler object that is defined on top of a triangulation (as opposed to the
+index of a particular degree of freedom within a particular cell). For the
+current program (as well as almost all of the tutorial programs), you will have
+a few thousand to maybe a few million unknowns globally (and, for $Q_1$
+elements, you will have 4 <i>locally on each cell</i> in 2d and 8 in 3d).
+Consequently, a data type that allows to store sufficiently large numbers for
+global DoF indices is <code>unsigned int</code> given that it allows to store
+numbers between 0 and slightly more than 4 billion (on most systems, where
+integers are 32-bit). In fact, this is what types::global_dof_index is.
 
 So, why not just use <code>unsigned int</code> right away? deal.II used to do
 this until version 7.3. However, deal.II supports very large computations (via
@@ -375,13 +391,12 @@ global indices of those degrees of freedom locally defined on the current
 cell" -- but variables that hold this information are universally named this
 way throughout the library.
 
-@note types::global_dof_index is not the only type defined in this
-namespace. Rather, there is a whole family, including types::subdomain_id,
-types::boundary_id, and types::material_id. All of these are
-<code>typedef</code>s for integer data types but, as explained above, they are
-used throughout the library so that (i) the intent of a variable becomes more
-easily discerned, and (ii) so that it becomes possible to change the actual
-type to a larger one if necessary without having to go through the entire
-library and figure out whether a particular use of <code>unsigned int</code>
-corresponds to, say, a material indicator.
+@note types::global_dof_index is not the only type defined in this namespace.
+Rather, there is a whole family, including types::subdomain_id,
+types::boundary_id, and types::material_id. All of these are alias for integer
+data types but, as explained above, they are used throughout the library so that
+(i) the intent of a variable becomes more easily discerned, and (ii) so that it
+becomes possible to change the actual type to a larger one if necessary without
+having to go through the entire library and figure out whether a particular use
+of <code>unsigned int</code> corresponds to, say, a material indicator.
 

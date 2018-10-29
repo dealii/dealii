@@ -8,24 +8,26 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // Test of basic functionality:
 //  - Tapeless doubles
 //  - Function and gradient computations
-// Adapted from https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb
-// See Adol-C manual v2.6 p65 figure 8
+// Adapted from
+// https://github.com/Homebrew/homebrew-science/blob/master/adol-c.rb See ADOL-C
+// manual v2.6 p65 figure 8
 
-#include "../tests.h"
 #include <adolc/adtl.h>
 #include <adolc/drivers/drivers.h>
-
 #include <math.h>
 
-int main(void)
+#include "../tests.h"
+
+int
+main(void)
 {
   initlog();
 
@@ -36,10 +38,10 @@ int main(void)
   for (unsigned int i = 0; i < n; i++)
     {
       x[i] = (i + 1.0) / (2.0 + i);
-      x[i].setADValue(i,1);
+      x[i].setADValue(i, 1);
     }
 
-  adtl::adouble  y = 1.0;
+  adtl::adouble y = 1.0;
   for (unsigned int i = 0; i < n; i++)
     y *= x[i];
 
@@ -55,7 +57,7 @@ int main(void)
   for (unsigned int i = 0; i < n; i++)
     err_grad += std::abs(y.getADValue(i) - y.getValue() / x[i].getValue());
 
-  deallog << "Error (gradient): " <<  err_grad << std::endl;
+  deallog << "Error (gradient): " << err_grad << std::endl;
 
   // -- Cleanup ---
 

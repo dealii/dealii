@@ -1,0 +1,103 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2016 - 2017 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+// TODO: Include complex types
+
+for (number : REAL_SCALARS)
+{
+  namespace Differentiation
+  \{
+  namespace AD
+  \{
+    // -------------------------- ADHelperBase ----------------------
+
+    template
+    class ADHelperBase<NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperBase<NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperCellLevelBase ----------------------
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperEnergyFunctional ----------------------
+
+    template
+    class ADHelperEnergyFunctional<NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperEnergyFunctional<NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperResidualLinearization ----------------------
+
+    template
+    class ADHelperResidualLinearization<NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperResidualLinearization<NumberTypes::adolc_tapeless,number>;
+
+    \}
+    \}
+}
+
+// Instantiations for ADHelpers for which the underlying number type is fixed
+for ()
+{
+    namespace Differentiation
+    \{
+    namespace AD
+    \{
+
+    // -------------------------- ADHelperBase ----------------------
+
+    template
+    class ADHelperBase<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperCellLevelBase ----------------------
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperCellLevelBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperEnergyFunctional ----------------------
+
+    template
+    class ADHelperEnergyFunctional<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperEnergyFunctional<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperResidualLinearization ----------------------
+
+    template
+    class ADHelperResidualLinearization<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperResidualLinearization<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+
+    \}
+    \}
+}

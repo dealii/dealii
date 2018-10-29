@@ -8,27 +8,29 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 // Test TensorAccessors::contract
 
-#include "../tests.h"
+#include <deal.II/base/table_indices.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/tensor_accessors.h>
-#include <deal.II/base/table_indices.h>
+
+#include "../tests.h"
 
 
-int main()
+int
+main()
 {
   initlog();
 
-  int c_left1 [5] = {0, 1, 2, 3, 4};
-  Tensor<1, 5, int> left1 (c_left1);
-  int c_right1 [5] = {0, 10, 20, 30, 40};
-  Tensor<1, 5, int> right1 (c_right1);
+  int               c_left1[5] = {0, 1, 2, 3, 4};
+  Tensor<1, 5, int> left1(c_left1);
+  int               c_right1[5] = {0, 10, 20, 30, 40};
+  Tensor<1, 5, int> right1(c_right1);
 
   deallog << "left1: " << left1 << std::endl;
   deallog << "right1: " << right1 << std::endl;
@@ -81,8 +83,9 @@ int main()
     //     for (unsigned int k = 0; k < 4; ++k)
     //       for (unsigned int l = 0; l < 4; ++l)
     //         {
-    //           deallog << "(" << i << "," << j << "," << k << "," << l << "):  ";
-    //           deallog << result[i][j][k][l] << " = " << left2[i][j] << " * " << right2[k][l] << std::endl;
+    //           deallog << "(" << i << "," << j << "," << k << "," << l << "):
+    //           "; deallog << result[i][j][k][l] << " = " << left2[i][j] << " *
+    //           " << right2[k][l] << std::endl;
     //         }
   }
 
@@ -90,13 +93,16 @@ int main()
   // corresponds to a contraction of the last index of left2 with the first
   // index of right2:
   {
-    dealii::TensorAccessors::internal::ReorderedIndexView<0, 2, dealii::Tensor<2, 5, int> >
-    reordered = TensorAccessors::reordered_index_view<0, 2>(right2);
+    dealii::TensorAccessors::internal::
+      ReorderedIndexView<0, 2, dealii::Tensor<2, 5, int>>
+        reordered = TensorAccessors::reordered_index_view<0, 2>(right2);
 
     Tensor<2, 5, int> result;
     TensorAccessors::contract<1, 2, 2, 5>(result, left2, reordered);
 
-    deallog << "Contract the last index of left2 with the first index of right2:" << std::endl;
+    deallog
+      << "Contract the last index of left2 with the first index of right2:"
+      << std::endl;
     deallog << result << std::endl;
     // Verified to be the same as the old implementation
     // deallog << contract(left2, right2) << std::endl;

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2017 by the deal.II authors
+ * Copyright (C) 1999 - 2018 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -8,8 +8,8 @@
  * it, and/or modify it under the terms of the GNU Lesser General
  * Public License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * The full text of the license can be found in the file LICENSE at
- * the top level of the deal.II distribution.
+ * The full text of the license can be found in the file LICENSE.md at
+ * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
 
@@ -66,49 +66,29 @@ using namespace dealii;
 // This is the function that produced the circular grid in the previous step-1
 // example program with fewer refinements steps. The sole difference is that it
 // returns the grid it produces via its argument.
-//
-// The details of what the function does are explained in step-1. The only
-// thing we would like to comment on is this:
-//
-// Since we want to export the triangulation through this function's
-// parameter, we need to make sure that the manifold object lives at least as
-// long as the triangulation does. However, in step-1, the manifold object is
-// a local variable, and it would be deleted at the end of the function, which
-// is too early. We avoid the problem by declaring it 'static' which makes
-// sure that the object is initialized the first time control the program
-// passes this point, but at the same time assures that it lives until the end
-// of the program.
-void make_grid (Triangulation<2> &triangulation)
+void make_grid(Triangulation<2> &triangulation)
 {
-  const Point<2> center (1,0);
-  const double inner_radius = 0.5,
-               outer_radius = 1.0;
-  GridGenerator::hyper_shell (triangulation,
-                              center, inner_radius, outer_radius,
-                              5 );
+  const Point<2> center(1, 0);
+  const double   inner_radius = 0.5, outer_radius = 1.0;
+  GridGenerator::hyper_shell(
+    triangulation, center, inner_radius, outer_radius, 5);
 
-  static const SphericalManifold<2> manifold_description(center);
-  triangulation.set_manifold (0, manifold_description);
-  triangulation.set_all_manifold_ids(0);
-
-  for (unsigned int step=0; step<3; ++step)
+  for (unsigned int step = 0; step < 3; ++step)
     {
-      for (auto cell: triangulation.active_cell_iterators())
-        for (unsigned int v=0;
-             v < GeometryInfo<2>::vertices_per_cell;
-             ++v)
+      for (auto cell : triangulation.active_cell_iterators())
+        for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
           {
-            const double distance_from_center
-              = center.distance (cell->vertex(v));
+            const double distance_from_center =
+              center.distance(cell->vertex(v));
 
             if (std::fabs(distance_from_center - inner_radius) < 1e-10)
               {
-                cell->set_refine_flag ();
+                cell->set_refine_flag();
                 break;
               }
           }
 
-      triangulation.execute_coarsening_and_refinement ();
+      triangulation.execute_coarsening_and_refinement();
     }
 }
 
@@ -141,21 +121,12 @@ void make_grid (Triangulation<2> &triangulation)
 //
 // We first need to create an object of this class and then pass it on to the
 // <code>DoFHandler</code> object to allocate storage for the degrees of
-// freedom (in deal.II lingo: we <code>distribute degrees of
-// freedom</code>). Note that the DoFHandler object will store a reference to
-// this finite element object, so we have to make sure its lifetime is at
-// least as long as that of the <code>DoFHandler</code>; one way to make sure
-// this is so is to make it static as well, in order to prevent its preemptive
-// destruction. (However, the library would warn us if we forgot about this
-// and abort the program if that occurred. You can check this, if you want, by
-// removing the 'static' declaration.)
-void distribute_dofs (DoFHandler<2> &dof_handler)
+// freedom (in deal.II lingo: we <i>distribute degrees of
+// freedom</i>).
+void distribute_dofs(DoFHandler<2> &dof_handler)
 {
-  // As described above, let us first create a finite element object, and then
-  // use it to allocate degrees of freedom on the triangulation with which the
-  // dof_handler object is associated:
-  static const FE_Q<2> finite_element(1);
-  dof_handler.distribute_dofs (finite_element);
+  const FE_Q<2> finite_element(1);
+  dof_handler.distribute_dofs(finite_element);
 
   // Now that we have associated a degree of freedom with a global number to
   // each vertex, we wonder how to visualize this?  There is no simple way to
@@ -203,20 +174,20 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 
   // We then fill this object with the places where nonzero elements will be
   // located given the present numbering of degrees of freedom:
-  DoFTools::make_sparsity_pattern (dof_handler, dynamic_sparsity_pattern);
+  DoFTools::make_sparsity_pattern(dof_handler, dynamic_sparsity_pattern);
 
   // Now we are ready to create the actual sparsity pattern that we could
   // later use for our matrix. It will just contain the data already assembled
   // in the DynamicSparsityPattern.
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (dynamic_sparsity_pattern);
+  sparsity_pattern.copy_from(dynamic_sparsity_pattern);
 
   // With this, we can now write the results to a file:
-  std::ofstream out ("sparsity_pattern1.svg");
-  sparsity_pattern.print_svg (out);
-  // The result is stored in an <code>.svg</code> file, where each nonzero entry in the
-  // matrix corresponds with a red square in the image. The output will be
-  // shown below.
+  std::ofstream out("sparsity_pattern1.svg");
+  sparsity_pattern.print_svg(out);
+  // The result is stored in an <code>.svg</code> file, where each nonzero entry
+  // in the matrix corresponds with a red square in the image. The output will
+  // be shown below.
   //
   // If you look at it, you will note that the sparsity pattern is
   // symmetric. This should not come as a surprise, since we have not given
@@ -257,19 +228,19 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 // more localized around the diagonal. The only interesting part of the
 // function is the first call to <code>DoFRenumbering::Cuthill_McKee</code>,
 // the rest is essentially as before:
-void renumber_dofs (DoFHandler<2> &dof_handler)
+void renumber_dofs(DoFHandler<2> &dof_handler)
 {
-  DoFRenumbering::Cuthill_McKee (dof_handler);
+  DoFRenumbering::Cuthill_McKee(dof_handler);
 
   DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
                                                   dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, dynamic_sparsity_pattern);
+  DoFTools::make_sparsity_pattern(dof_handler, dynamic_sparsity_pattern);
 
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from (dynamic_sparsity_pattern);
+  sparsity_pattern.copy_from(dynamic_sparsity_pattern);
 
-  std::ofstream out ("sparsity_pattern2.svg");
-  sparsity_pattern.print_svg (out);
+  std::ofstream out("sparsity_pattern2.svg");
+  sparsity_pattern.print_svg(out);
 }
 
 // Again, the output is shown below. Note that the nonzero entries are
@@ -295,13 +266,13 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 // and create the triangulation, then create a <code>DoFHandler</code> object
 // and associate it to the triangulation, and finally call above two functions
 // on it:
-int main ()
+int main()
 {
   Triangulation<2> triangulation;
-  make_grid (triangulation);
+  make_grid(triangulation);
 
-  DoFHandler<2> dof_handler (triangulation);
+  DoFHandler<2> dof_handler(triangulation);
 
-  distribute_dofs (dof_handler);
-  renumber_dofs (dof_handler);
+  distribute_dofs(dof_handler);
+  renumber_dofs(dof_handler);
 }

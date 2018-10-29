@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2017 by the deal.II authors
+// Copyright (C) 1998 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,44 +19,41 @@
 // and tria.last_active() still produce something sensible in that
 // case
 
-#include "../tests.h"
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
-
-std::ofstream logfile("output");
-
-
+#include "../tests.h"
 
 template <int dim>
-void test ()
+void
+test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(3);
-  for (unsigned int i=0; i<2; ++i)
+  for (unsigned int i = 0; i < 2; ++i)
     {
-      for (typename Triangulation<dim>::active_cell_iterator
-           cell = tria.begin_active(2); cell != tria.end(); ++cell)
-        cell->set_coarsen_flag ();
-      tria.execute_coarsening_and_refinement ();
+      for (typename Triangulation<dim>::active_cell_iterator cell =
+             tria.begin_active(2);
+           cell != tria.end();
+           ++cell)
+        cell->set_coarsen_flag();
+      tria.execute_coarsening_and_refinement();
     }
 
   deallog << tria.n_levels() << ' ' << tria.n_global_levels() << ' '
-          << tria.last() << ' '
-          << tria.last_active()
-          << std::endl;
+          << tria.last() << ' ' << tria.last_active() << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
+  initlog();
   deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
 
   test<1>();
   test<2>();

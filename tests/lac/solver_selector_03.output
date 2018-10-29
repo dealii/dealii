@@ -1,0 +1,6 @@
+
+DEAL::Size 37 Unknowns 1296
+DEAL:cg::Starting value 36.00
+DEAL:cg::Convergence step 39 value 7.335e-08
+DEAL:GMRES::Starting value 34.45
+DEAL:GMRES::Convergence step 39 value 6.627e-08

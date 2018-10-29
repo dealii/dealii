@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -22,15 +22,14 @@
 
 
 
-
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler)
+check_this(const DoFHandler<dim> &dof_handler)
 {
-  std::vector<types::global_dof_index> n_dofs(dof_handler.get_fe().n_components());
-  DoFTools::count_dofs_per_component (dof_handler,
-                                      n_dofs);
-  for (unsigned int i=0; i<n_dofs.size(); ++i)
+  std::vector<types::global_dof_index> n_dofs(
+    dof_handler.get_fe().n_components());
+  DoFTools::count_dofs_per_component(dof_handler, n_dofs);
+  for (unsigned int i = 0; i < n_dofs.size(); ++i)
     deallog << n_dofs[i] << " ";
   deallog << std::endl;
 }

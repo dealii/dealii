@@ -1,6 +1,0 @@
-New: A uniform interface to automatically differentiable numbers that will
-be supported by the deal.II library has been implemented. A corresponding
-set of type traits classes that help query information about these numbers
-has also been implemented.
-<br>
-(Jean-Paul Pelteret, 2017/11/03)

@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -24,12 +24,13 @@ char logname[] = "output";
 
 
 template <int dim>
-void test ()
+void
+test()
 {
   if (dim != 1)
     // this is interesting also in 3d, but is
     // exceedingly slow there. limit to the
     // case of RT(0) elements in 3d
-    for (unsigned int p=0; p<(dim == 2 ? 3 : 1); ++p)
-      test_with_wrong_face_orientation (FE_RaviartThomas<dim>(p), p+1, 1);
+    for (unsigned int p = 0; p < (dim == 2 ? 3 : 1); ++p)
+      test_with_wrong_face_orientation(FE_RaviartThomas<dim>(p), p + 1, 1);
 }

@@ -1,0 +1,4 @@
+Fixed: CMake now supports again in-source builds (This functionality was
+accidentally broken in the previous release).
+<br>
+(Matthias Maier 2018/06/11)

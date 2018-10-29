@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,40 +17,45 @@
 // check Vector::operator = (scalar) with setting to a
 // nonzero value
 
-#include "../tests.h"
 #include <deal.II/lac/vector.h>
+
 #include <vector>
 
+#include "../tests.h"
 
-void test (Vector<double> &v)
+
+void
+test(Vector<double> &v)
 {
   // set some entries of the vector
-  for (unsigned int i=0; i<v.size(); ++i)
-    if (i%3 == 0)
-      v(i) = i+1.;
-  v.compress ();
+  for (unsigned int i = 0; i < v.size(); ++i)
+    if (i % 3 == 0)
+      v(i) = i + 1.;
+  v.compress();
 
   const unsigned int sz = v.size();
-  v = 2;
-  AssertThrow (v.size() == sz, ExcInternalError());
-  AssertThrow (v.l2_norm() == std::sqrt(4.*sz), ExcInternalError());
+  v                     = 2;
+  AssertThrow(v.size() == sz, ExcInternalError());
+  AssertThrow(v.l2_norm() == std::sqrt(4. * sz), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   try
     {
-      Vector<double> v (100);
-      test (v);
+      Vector<double> v(100);
+      test(v);
     }
   catch (std::exception &exc)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Exception on processing: " << std::endl
@@ -63,7 +68,8 @@ int main ()
     }
   catch (...)
     {
-      deallog << std::endl << std::endl
+      deallog << std::endl
+              << std::endl
               << "----------------------------------------------------"
               << std::endl;
       deallog << "Unknown exception!" << std::endl

@@ -8,23 +8,22 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // test IndexSet::add_indices(IndexSet)
 
-#include "../tests.h"
-#include <stdlib.h>
-
 #include <deal.II/base/index_set.h>
 
-void testor(IndexSet &a,
-            IndexSet &other,
-            unsigned int offset,
-            bool verbose)
+#include <stdlib.h>
+
+#include "../tests.h"
+
+void
+testor(IndexSet &a, IndexSet &other, unsigned int offset, bool verbose)
 {
   IndexSet merged(a);
 
@@ -40,20 +39,19 @@ void testor(IndexSet &a,
       merged.print(deallog);
     }
 
-  for (unsigned int i=0; i<merged.size(); ++i)
+  for (unsigned int i = 0; i < merged.size(); ++i)
     {
-      Assert(
-        merged.is_element(i)
-        ==
-        (a.is_element(i) || (i>=offset && other.is_element(i-offset))),
-        ExcInternalError());
+      Assert(merged.is_element(i) ==
+               (a.is_element(i) ||
+                (i >= offset && other.is_element(i - offset))),
+             ExcInternalError());
     }
 }
 
 
 
-
-void test()
+void
+test()
 {
   const int size = 10;
 
@@ -80,12 +78,10 @@ void test()
 
 
 
-
-
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

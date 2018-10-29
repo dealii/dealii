@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,24 +17,26 @@
 // document a bug in IndexSet::block_read() and block_write(),
 // because largest_range was not serialized/reset.
 
-#include "../tests.h"
-#include <stdlib.h>
-
 #include <deal.II/base/index_set.h>
 
+#include <stdlib.h>
 
-void test ()
+#include "../tests.h"
+
+
+void
+test()
 {
   IndexSet is1(250);
-  is1.add_range(125,200);
-  is1.add_range(0,75);
+  is1.add_range(125, 200);
+  is1.add_range(0, 75);
 
   {
     std::ofstream out("a.idxset");
     is1.block_write(out);
   }
 
-  IndexSet is2;
+  IndexSet      is2;
   std::ifstream in("a.idxset");
   is2.block_read(in);
 
@@ -44,15 +46,15 @@ void test ()
 
   deallog << "OK" << std::endl;
 
-  std::remove ("a.idxset");
+  std::remove("a.idxset");
 }
 
 
 
-
-int main()
+int
+main()
 {
   initlog();
 
-  test ();
+  test();
 }

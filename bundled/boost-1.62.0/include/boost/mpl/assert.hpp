@@ -185,14 +185,12 @@ template< typename P > struct assert_arg_pred_not
 };
 
 template< typename Pred >
-failed ************ (Pred::************ 
-      assert_arg( void (*)(Pred), typename assert_arg_pred<Pred>::type )
-    );
+failed ************ Pred::************
+      assert_arg( void (*)(Pred), typename assert_arg_pred<Pred>::type );
 
 template< typename Pred >
-failed ************ (boost::mpl::not_<Pred>::************ 
-      assert_not_arg( void (*)(Pred), typename assert_arg_pred_not<Pred>::type )
-    );
+failed ************ boost::mpl::not_<Pred>::************
+      assert_not_arg( void (*)(Pred), typename assert_arg_pred_not<Pred>::type );
 
 template< typename Pred >
 AUX778076_ASSERT_ARG(assert<false>)

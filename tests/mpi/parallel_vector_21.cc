@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,26 +17,32 @@
 // when doing reinit() from another vector and manually setting the local
 // range
 
-#include "../tests.h"
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/read_write_vector.h>
+
 #include <iostream>
 #include <vector>
 
-void test()
-{
-  unsigned int my_id = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int n_procs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+#include "../tests.h"
 
-  IndexSet locally_owned(n_procs*2);
-  locally_owned.add_range(my_id*2, my_id*2+2);
-  IndexSet ghost_set(n_procs*2);
+void
+test()
+{
+  unsigned int my_id   = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+
+  IndexSet locally_owned(n_procs * 2);
+  locally_owned.add_range(my_id * 2, my_id * 2 + 2);
+  IndexSet ghost_set(n_procs * 2);
   ghost_set.add_index(0);
   ghost_set.add_index(2);
 
-  LinearAlgebra::distributed::Vector<double> v(locally_owned, ghost_set, MPI_COMM_WORLD);
+  LinearAlgebra::distributed::Vector<double> v(locally_owned,
+                                               ghost_set,
+                                               MPI_COMM_WORLD);
 
   // create vector without actually setting the entries since they will be
   // overwritten soon anyway
@@ -44,7 +50,7 @@ void test()
   v2.reinit(v, true);
 
   // set locally owned range of v2 manually
-  for (unsigned int i=0; i<v2.local_size(); ++i)
+  for (unsigned int i = 0; i < v2.local_size(); ++i)
     v2.local_element(i) = 1.;
 
   // add entries to ghost values
@@ -62,9 +68,11 @@ void test()
 
 
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(
+    argc, argv, testing_max_num_threads());
 
   MPILogInitAll log;
   test();

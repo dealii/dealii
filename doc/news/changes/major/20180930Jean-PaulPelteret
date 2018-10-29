@@ -1,0 +1,5 @@
+New: A new class Differentiation::AD::ADHelperResidualLinearization has been
+added to help compute the linearization of a residual vector defined on the 
+level of a cell (a finite element residual), or for local nonlinear equations. 
+<br>
+(Jean-Paul Pelteret, 2018/09/30)

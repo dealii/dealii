@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2016 by the deal.II authors
+## Copyright (C) 2013 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -100,11 +100,21 @@ IF(NOT DEAL_II_COMPONENT_PACKAGE)
 ENDIF()
 
 #
-# Provide "indent" target for indenting all headers and source files
+# Provide an indentation target for indenting uncommitted changes and changes on
+# the current feature branch
 #
 ADD_CUSTOM_TARGET(indent
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   COMMAND ./contrib/utilities/indent
+  COMMENT "Indenting recently changed files in the deal.II directories"
+  )
+
+#
+# Provide "indent" target for indenting all headers and source files
+#
+ADD_CUSTOM_TARGET(indent-all
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMAND ./contrib/utilities/indent-all
   COMMENT "Indenting all files in the deal.II directories"
   )
 
@@ -145,7 +155,9 @@ FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 #    setup_tests    - set up testsuite subprojects
 #    prune_tests    - remove all testsuite subprojects
 #
-#    indent         - indent all headers and source file
+#    indent         - indent all headers and source files that changed since the
+#                     last commit to master, including untracked ones
+#    indent-all     - indent all headers and source files
 ")
 
 #

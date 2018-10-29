@@ -8,29 +8,36 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 
 for (S1, S2, S3 : REAL_SCALARS)
-{
-    template class RelaxationBlock<SparseMatrix<S1>, S2, Vector<S3> >;
-    template class RelaxationBlockJacobi<SparseMatrix<S1>, S2, Vector<S3> >;
-    template class RelaxationBlockSOR<SparseMatrix<S1>, S2, Vector<S3> >;
-    template class RelaxationBlockSSOR<SparseMatrix<S1>, S2, Vector<S3> >;
-}
+  {
+    template class RelaxationBlock<SparseMatrix<S1>, S2, Vector<S3>>;
+    template class RelaxationBlockJacobi<SparseMatrix<S1>, S2, Vector<S3>>;
+    template class RelaxationBlockSOR<SparseMatrix<S1>, S2, Vector<S3>>;
+    template class RelaxationBlockSSOR<SparseMatrix<S1>, S2, Vector<S3>>;
+  }
 
 
 for (S1 : REAL_SCALARS)
-{
+  {
 #ifdef DEAL_II_WITH_TRILINOS
-    template class RelaxationBlock<TrilinosWrappers::SparseMatrix, S1, TrilinosWrappers::MPI::Vector>;
-    template class RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix, S1, TrilinosWrappers::MPI::Vector>;
-    template class RelaxationBlockSOR<TrilinosWrappers::SparseMatrix, S1, TrilinosWrappers::MPI::Vector>;
-    template class RelaxationBlockSSOR<TrilinosWrappers::SparseMatrix, S1, TrilinosWrappers::MPI::Vector>;
+    template class RelaxationBlock<TrilinosWrappers::SparseMatrix,
+                                   S1,
+                                   TrilinosWrappers::MPI::Vector>;
+    template class RelaxationBlockJacobi<TrilinosWrappers::SparseMatrix,
+                                         S1,
+                                         TrilinosWrappers::MPI::Vector>;
+    template class RelaxationBlockSOR<TrilinosWrappers::SparseMatrix,
+                                      S1,
+                                      TrilinosWrappers::MPI::Vector>;
+    template class RelaxationBlockSSOR<TrilinosWrappers::SparseMatrix,
+                                       S1,
+                                       TrilinosWrappers::MPI::Vector>;
 #endif
-}
-
+  }

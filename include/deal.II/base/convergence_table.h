@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/table_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -59,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup textoutput
  * @author Ralf Hartmann, 1999
  */
-class ConvergenceTable: public TableHandler
+class ConvergenceTable : public TableHandler
 {
 public:
   /**
@@ -130,10 +131,10 @@ public:
    * fill, you will have to re-enable it after calling this function.
    */
   void
-  evaluate_convergence_rates (const std::string &data_column_key,
-                              const std::string &reference_column_key,
-                              const RateMode     rate_mode,
-                              const unsigned int dim = 2);
+  evaluate_convergence_rates(const std::string &data_column_key,
+                             const std::string &reference_column_key,
+                             const RateMode     rate_mode,
+                             const unsigned int dim = 2);
 
 
   /**
@@ -153,8 +154,8 @@ public:
    * fill, you will have to re-enable it after calling this function.
    */
   void
-  evaluate_convergence_rates (const std::string &data_column_key,
-                              const RateMode     rate_mode);
+  evaluate_convergence_rates(const std::string &data_column_key,
+                             const RateMode     rate_mode);
 
   /**
    * Omit this column <tt>key</tt> (not supercolumn!) from the evaluation of
@@ -208,9 +209,9 @@ public:
   /**
    * Exception
    */
-  DeclException1 (ExcRateColumnAlreadyExists,
-                  std::string,
-                  << "Rate column <" << arg1 << "> does already exist.");
+  DeclException1(ExcRateColumnAlreadyExists,
+                 std::string,
+                 << "Rate column <" << arg1 << "> does already exist.");
   //@}
 };
 

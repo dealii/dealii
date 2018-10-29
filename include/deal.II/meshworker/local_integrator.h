@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,18 +18,21 @@
 #define dealii_mesh_worker_local_integrator_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/subscriptor.h>
 
 #include <functional>
-#include <vector>
 #include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
-  template <int dim, int spacedim, typename number> class DoFInfo;
-  template <int dim, int spacedim> class IntegrationInfo;
+  template <int dim, int spacedim, typename number>
+  class DoFInfo;
+  template <int dim, int spacedim>
+  class IntegrationInfo;
 
   /**
    * A local integrator object, which can be used to simplify the call of
@@ -48,7 +51,7 @@ namespace MeshWorker
    * @author Guido Kanschat
    * @date 2012
    */
-  template <int dim, int spacedim=dim, typename number=double>
+  template <int dim, int spacedim = dim, typename number = double>
   class LocalIntegrator : public Subscriptor
   {
   public:
@@ -66,28 +69,31 @@ namespace MeshWorker
     /**
      * The empty virtual destructor.
      */
-    virtual ~LocalIntegrator() = default;
+    virtual ~LocalIntegrator() override = default;
 
     /**
      * Virtual function for integrating on cells. Throws exception
      * PureFunctionCalled if not overloaded by a derived class.
      */
-    virtual void cell(DoFInfo<dim, spacedim, number> &dinfo,
-                      IntegrationInfo<dim, spacedim> &info) const;
+    virtual void
+    cell(DoFInfo<dim, spacedim, number> &dinfo,
+         IntegrationInfo<dim, spacedim> &info) const;
     /**
      * Virtual function for integrating on boundary faces. Throws exception
      * PureFunctionCalled if not overloaded by a derived class.
      */
-    virtual void boundary(DoFInfo<dim, spacedim, number> &dinfo,
-                          IntegrationInfo<dim, spacedim> &info) const;
+    virtual void
+    boundary(DoFInfo<dim, spacedim, number> &dinfo,
+             IntegrationInfo<dim, spacedim> &info) const;
     /**
      * Virtual function for integrating on interior faces. Throws exception
      * PureFunctionCalled if not overloaded by a derived class.
      */
-    virtual void face(DoFInfo<dim, spacedim, number> &dinfo1,
-                      DoFInfo<dim, spacedim, number> &dinfo2,
-                      IntegrationInfo<dim, spacedim> &info1,
-                      IntegrationInfo<dim, spacedim> &info2) const;
+    virtual void
+    face(DoFInfo<dim, spacedim, number> &dinfo1,
+         DoFInfo<dim, spacedim, number> &dinfo2,
+         IntegrationInfo<dim, spacedim> &info1,
+         IntegrationInfo<dim, spacedim> &info2) const;
 
     /**
      * The flag indicating whether the cell integrator cell() is to be used in
@@ -137,7 +143,7 @@ namespace MeshWorker
      */
     DeclException0(ExcPureFunction);
   };
-}
+} // namespace MeshWorker
 
 
 

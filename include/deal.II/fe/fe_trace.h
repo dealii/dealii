@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2017 by the deal.II authors
+// Copyright (C) 2000 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,10 +17,12 @@
 #define dealii_fe_trace_h
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/base/tensor_product_polynomials.h>
+
+#include <deal.II/fe/fe_face.h>
 #include <deal.II/fe/fe_poly_face.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_face.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -40,8 +42,9 @@ DEAL_II_NAMESPACE_OPEN
  * values extracted will equal to zero.
  */
 
-template <int dim, int spacedim=dim>
-class FE_TraceQ : public FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim>
+template <int dim, int spacedim = dim>
+class FE_TraceQ
+  : public FE_PolyFace<TensorProductPolynomials<dim - 1>, dim, spacedim>
 {
 public:
   /**
@@ -56,11 +59,11 @@ public:
    * returns <tt>FE_DGQ<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by appropriate values.
    */
-  virtual std::string get_name () const;
+  virtual std::string
+  get_name() const override;
 
-  virtual
-  std::unique_ptr<FiniteElement<dim,spacedim> >
-  clone() const;
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
 
   /**
    * Implementation of the corresponding function in the FiniteElement
@@ -69,33 +72,35 @@ public:
    * the current element is scalar, the support point values need to
    * be vectors of length 1.
    */
-  virtual
-  void
-  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+  virtual void
+  convert_generalized_support_point_values_to_dof_values(
+    const std::vector<Vector<double>> &support_point_values,
+    std::vector<double> &              nodal_values) const override;
 
   /**
    * This function returns @p true, if the shape function @p shape_index has
    * non-zero function values somewhere on the face @p face_index.
    */
-  virtual bool has_support_on_face (const unsigned int shape_index,
-                                    const unsigned int face_index) const;
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const override;
 
   /**
    * Return a list of constant modes of the element. For this element, it
    * simply returns one row with all entries set to true.
    */
-  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
+  virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
+  get_constant_modes() const override;
 
   /**
    * Return whether this element implements its hanging node constraints in
    * the new way, which has to be used to make elements "hp compatible".
    */
-  virtual bool hp_constraints_are_implemented () const;
+  virtual bool
+  hp_constraints_are_implemented() const override;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
    * element only provides interpolation matrices for elements of the same
@@ -103,11 +108,11 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
-  get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const;
+  get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                FullMatrix<double> &matrix) const override;
 
   /**
-   * Return the matrix interpolating from a face of of one element to the face
+   * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
    * element only provides interpolation matrices for elements of the same
@@ -115,9 +120,9 @@ public:
    * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
-  get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                    const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const;
+  get_subface_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                   const unsigned int                  subface,
+                                   FullMatrix<double> &matrix) const override;
 
   /**
    * Return whether this element dominates the one given as argument when they
@@ -128,9 +133,9 @@ public:
    * and in particular the
    * @ref hp_paper "hp paper".
    */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
+  virtual FiniteElementDomination::Domination
+  compare_for_face_domination(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
 private:
   /**
@@ -141,7 +146,8 @@ private:
   /**
    * Return vector with dofs per vertex, line, quad, hex.
    */
-  static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
+  static std::vector<unsigned int>
+  get_dpo_vector(const unsigned int deg);
 };
 
 
@@ -150,18 +156,19 @@ private:
  * FE_TraceQ in 1D, i.e., with degrees of freedom on the element vertices.
  */
 template <int spacedim>
-class FE_TraceQ<1,spacedim> : public FE_FaceQ<1,spacedim>
+class FE_TraceQ<1, spacedim> : public FE_FaceQ<1, spacedim>
 {
 public:
   /**
    * Constructor.
    */
-  FE_TraceQ (const unsigned int p);
+  FE_TraceQ(const unsigned int p);
 
   /**
    * Return the name of the element
    */
-  std::string get_name() const;
+  std::string
+  get_name() const override;
 };
 
 

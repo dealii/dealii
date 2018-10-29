@@ -8,36 +8,35 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
-#include "../tests.h"
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 
-#include <iostream>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
-std::ofstream logfile ("output");
+#include "../tests.h"
 
-void check_remove_hanging_nodes ()
+void
+check_remove_hanging_nodes()
 {
   Point<2> corners[2];
 
-  corners[0] = Point<2> (1, 0);
-  corners[1] = Point<2> (0, 4);
+  corners[0]                        = Point<2>(1, 0);
+  corners[1]                        = Point<2>(0, 4);
   const unsigned int n_subdivisions = 1;
 
 
   Triangulation<2> tria;
-  GridGenerator::subdivided_parallelepiped (tria, n_subdivisions, corners);
+  GridGenerator::subdivided_parallelepiped(tria, n_subdivisions, corners);
 
   tria.refine_global();
 
@@ -49,12 +48,14 @@ void check_remove_hanging_nodes ()
   dealii::GridTools::remove_hanging_nodes(tria, /*isotropic=*/false);
 
   GridOut grid_out;
-  grid_out.write_vtk (tria, logfile);
+  grid_out.write_vtk(tria, deallog.get_file_stream());
 
-  tria.clear ();
+  tria.clear();
 }
 
-int main ()
+int
+main()
 {
+  initlog();
   check_remove_hanging_nodes();
 }

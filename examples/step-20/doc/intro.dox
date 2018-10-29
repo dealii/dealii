@@ -262,10 +262,7 @@ see step-22 for a realization of that approach).
 The final result then looks like this, working in every space dimension:
 
 @code
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  for (const auto &cell : dof_handler.active_cell_iterators())
     {
       fe_values.reinit (cell);
       local_matrix = 0;

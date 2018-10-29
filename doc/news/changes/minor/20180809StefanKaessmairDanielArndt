@@ -1,0 +1,4 @@
+Improved: Triangulation::prepare_coarsening_and_refinement also takes care of
+limiting the level difference across periodic boundary faces.
+<br>
+(Daniel Arndt, Stefan Kaessmair, 2018/08/09)

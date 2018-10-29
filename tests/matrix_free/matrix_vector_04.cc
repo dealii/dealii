@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -28,23 +28,23 @@ std::ofstream logfile("output");
 
 
 template <int dim, int fe_degree>
-void test ()
+void
+test()
 {
   const SphericalManifold<dim> manifold;
-  Triangulation<dim> tria;
-  GridGenerator::hyper_shell (tria, Point<dim>(),
-                              0.5, 1., 96, true);
+  Triangulation<dim>           tria;
+  GridGenerator::hyper_shell(tria, Point<dim>(), 0.5, 1., 96, true);
   tria.set_all_manifold_ids(0);
-  tria.set_manifold (0, manifold);
+  tria.set_manifold(0, manifold);
   if (dim == 2)
-    tria.refine_global (2);
+    tria.refine_global(2);
 
-  FE_Q<dim> fe (fe_degree);
-  DoFHandler<dim> dof (tria);
+  FE_Q<dim>       fe(fe_degree);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  ConstraintMatrix constraints;
+  AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 
-  do_test<dim, fe_degree, double, fe_degree+1> (dof, constraints);
+  do_test<dim, fe_degree, double, fe_degree + 1>(dof, constraints);
 }

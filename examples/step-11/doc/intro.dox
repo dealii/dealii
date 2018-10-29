@@ -21,7 +21,7 @@ The compatibility condition allows a solution of the above equation, but it
 nevertheless retains an ambiguity: since only derivatives of the solution
 appear in the equations, the solution is only determined up to a constant. For
 this reason, we have to pose another condition for the numerical solution,
-which fixes this constant. 
+which fixes this constant.
 
 For this, there are various possibilities:
 <ol>
@@ -33,13 +33,13 @@ For this, there are various possibilities:
   functions. Therefore, even though fixing one node is allowed for
   discretized functions, it is not for continuous functions, and one can
   often see this in a resulting error spike at this point in the numerical
-  solution. 
-  
+  solution.
+
 <li> Fixing the mean value over the domain to zero or any other value. This
   is allowed on the continuous level, since $H^1(\Omega)\subset L^1(\Omega)$
   by Sobolev's inequality, and thus also on the discrete level since we
   there only consider subsets of $H^1$.
-  
+
 <li> Fixing the mean value over the boundary of the domain to zero or any
   other value. This is also allowed on the continuous level, since
   $H^{1/2}(\partial\Omega)\subset L^1(\partial\Omega)$, again by Sobolev's
@@ -79,24 +79,25 @@ index), then the constraint can also be represented by
   u_{i_0} = \sum_{i\in\partial\Omega_h\backslash i_0} -u_i.
 @f]
 This, luckily, is exactly the form of constraints for which the
-ConstraintMatrix class was designed. Note that we have used this
+AffineConstraints class was designed. Note that we have used this
 class in several previous examples for the representation of hanging nodes
 constraints, which also have this form: there, the middle vertex shall have
 the mean of the values of the adjacent vertices. In general, the
-ConstraintMatrix class is designed to handle homogeneous constraints
+AffineConstraints class is designed to handle affine constraints
 of the form
 @f[
-  CU = 0
+  CU = b
 @f]
-where $C$ denotes a matrix, and $U$ the vector of nodal values.
+where $C$ denotes a matrix, $b$ denotes a vector, and $U$ the vector of nodal
+values. In this case, since $C$ represents one homogeneous constraint, $b$ is
+the zero vector.
 
 In this example, the mean value along the boundary allows just such a
 representation, with $C$ being a matrix with just one row (i.e. there is only
-one constraint). In the implementation, we will create a
-ConstraintMatrix object, add one constraint (i.e. add another row to
-the matrix) referring to the first boundary node $i_0$, and insert the weights
-with which all the other nodes contribute, which in this example happens to be
-just $-1$.
+one constraint). In the implementation, we will create an AffineConstraints
+object, add one constraint (i.e. add another row to the matrix) referring to the
+first boundary node $i_0$, and insert the weights with which all the other nodes
+contribute, which in this example happens to be just $-1$.
 
 Later, we will use this object to eliminate the first boundary node from the
 linear system of equations, reducing it to one which has a solution without

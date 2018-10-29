@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,25 +17,28 @@
 
 // check assignment of elements in Vector
 
-#include "../tests.h"
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/vector.h>
+
 #include <iostream>
 #include <vector>
 
+#include "../tests.h"
 
-void test ()
+
+void
+test()
 {
-  const unsigned int s = 10;
-  PETScWrappers::MPI::Vector  v(MPI_COMM_WORLD, s, s);
-  for (unsigned int k=0; k<v.size(); ++k)
+  const unsigned int         s = 10;
+  PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, s, s);
+  for (unsigned int k = 0; k < v.size(); ++k)
     v(k) = k;
 
-  v.compress (VectorOperation::insert);
+  v.compress(VectorOperation::insert);
 
   PETScWrappers::MPI::Vector v2(MPI_COMM_WORLD, s, s);
-  for (int k=0; k<v2.size(); ++k)
-    v2(k) = PetscScalar (k,-k);
+  for (int k = 0; (unsigned int)k < v2.size(); ++k)
+    v2(k) = PetscScalar(k, -k);
 
   v2.compress(VectorOperation::insert);
 
@@ -44,28 +47,29 @@ void test ()
   // original vector back.
 
   deallog << "before: " << std::endl;
-  for (unsigned int k=0; k<s; ++k)
-    deallog << "(" << v(k).real () << "," << v(k).imag () << "i) ";
+  for (unsigned int k = 0; k < s; ++k)
+    deallog << "(" << v(k).real() << "," << v(k).imag() << "i) ";
   deallog << std::endl;
 
-  v.add(1.0,v2);
+  v.add(1.0, v2);
 
   deallog << "after: " << std::endl;
-  for (unsigned int k=0; k<s; ++k)
-    deallog << "(" << v(k).real () << "," << v(k).imag () << "i) ";
+  for (unsigned int k = 0; k < s; ++k)
+    deallog << "(" << v(k).real() << "," << v(k).imag() << "i) ";
   deallog << std::endl;
 
-  v.add(-1.0,v2);
+  v.add(-1.0, v2);
 
   deallog << "back to original: " << std::endl;
-  for (unsigned int k=0; k<s; ++k)
-    deallog << "(" << v(k).real () << "," << v(k).imag () << "i) ";
+  for (unsigned int k = 0; k < s; ++k)
+    deallog << "(" << v(k).real() << "," << v(k).imag() << "i) ";
   deallog << std::endl;
 
   deallog << "OK" << std::endl;
 }
 
-int main (int argc, char **argv)
+int
+main(int argc, char **argv)
 {
   initlog();
   deallog.depth_console(0);
@@ -74,13 +78,13 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        test ();
+        test();
       }
-
     }
   catch (std::exception &exc)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Exception on processing: " << std::endl
@@ -93,7 +97,8 @@ int main (int argc, char **argv)
     }
   catch (...)
     {
-      std::cerr << std::endl << std::endl
+      std::cerr << std::endl
+                << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
       std::cerr << "Unknown exception!" << std::endl

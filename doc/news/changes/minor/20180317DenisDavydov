@@ -1,4 +1,0 @@
-New: Add LAPACKFullMatrix<number>::set(const size_type, const size_type, const number)
-to set an element of the matrix.
-<br>
-(Denis Davydov, 2018/03/17)

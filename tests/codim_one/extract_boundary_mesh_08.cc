@@ -8,34 +8,35 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // A test that used to fail because of mis-oriented faces
 
-#include "../tests.h"
-
-#include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
 
 
 
-void test()
+void
+test()
 {
-  const int dim=3;
+  const int dim = 3;
 
-  Triangulation<dim>   triangulation;
+  Triangulation<dim> triangulation;
   GridGenerator::cylinder(triangulation);
 
   GridOut().write_gnuplot(triangulation, deallog.get_file_stream());
 
-  Triangulation<dim-1,dim> triangulation_surface;
-  GridGenerator::extract_boundary_mesh(triangulation,triangulation_surface);
-  triangulation_surface.refine_global (2);
+  Triangulation<dim - 1, dim> triangulation_surface;
+  GridGenerator::extract_boundary_mesh(triangulation, triangulation_surface);
+  triangulation_surface.refine_global(2);
 
   GridOut().write_gnuplot(triangulation_surface, deallog.get_file_stream());
 
@@ -44,7 +45,8 @@ void test()
 }
 
 
-int main ()
+int
+main()
 {
   initlog();
 

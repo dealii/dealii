@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2017 by the deal.II authors
+## Copyright (C) 2016 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -22,8 +22,9 @@
 #
 #   ADOLC_INCLUDE_DIR
 #   ADOLC_LIBRARY
-#   ADOLC_WITH_ATRIG_ERF
 #   ADOLC_WITH_ADVANCED_BRANCHING
+#   ADOLC_WITH_ATRIG_ERF
+#   ADOLC_WITH_BOOST_ALLOCATOR
 #
 
 SET(ADOLC_DIR "" CACHE PATH "An optional hint to an ADOL-C installation")
@@ -75,13 +76,47 @@ IF(EXISTS ${ADOLC_SETTINGS_H})
   ELSE()
     SET(ADOLC_WITH_ADVANCED_BRANCHING FALSE)
   ENDIF()
+
+  #
+  # Check whether ADOL-C is configured with tapeless number reference counting
+  #
+  FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_WITH_TAPELESS_REFCOUNTING_STRING
+    REGEX "#define USE_ADTL_REFCOUNTING 1"
+    )
+  IF(NOT "${ADOLC_WITH_TAPELESS_REFCOUNTING_STRING}" STREQUAL "")
+    SET(ADOLC_WITH_TAPELESS_REFCOUNTING TRUE)
+  ELSE()
+    SET(ADOLC_WITH_TAPELESS_REFCOUNTING FALSE)
+  ENDIF()
+
+  #
+  # Check whether ADOL-C is configured to use the Boost pool allocator
+  #
+  FILE(STRINGS "${ADOLC_SETTINGS_H}" ADOLC_BOOST_POOL_STRING
+    REGEX "#define USE_BOOST_POOL 1"
+    )
+  IF(NOT "${ADOLC_BOOST_POOL_STRING}" STREQUAL "")
+    SET(ADOLC_WITH_BOOST_ALLOCATOR TRUE)
+    SET(_additional_include_dirs OPTIONAL BOOST_INCLUDE_DIRS)
+    SET(_additional_library OPTIONAL BOOST_LIBRARIES)
+  ELSE()
+    SET(ADOLC_WITH_BOOST_ALLOCATOR FALSE)
+    SET(_additional_include_dirs)
+    SET(_additional_library)
+  ENDIF()
 ENDIF()
 
 
 DEAL_II_PACKAGE_HANDLE(ADOLC
-  LIBRARIES REQUIRED ADOLC_LIBRARY
-  INCLUDE_DIRS REQUIRED ADOLC_INCLUDE_DIR
-  USER_INCLUDE_DIRS REQUIRED ADOLC_INCLUDE_DIR
+  LIBRARIES
+    REQUIRED ADOLC_LIBRARY
+    ${_additional_library}
+  INCLUDE_DIRS 
+    REQUIRED ADOLC_INCLUDE_DIR
+    ${_additional_include_dirs}
+  USER_INCLUDE_DIRS 
+    REQUIRED ADOLC_INCLUDE_DIR
+    ${_additional_include_dirs}
   CLEAR ADOLC_INCLUDE_DIR ADOLC_LIBRARY ADOLC_SETTINGS_H
     ADOLC_DOUBLE_CAST_CHECK ADOLC_ADOUBLE_OSTREAM_CHECK # clean up checks in configure_adolc.cmake
   )

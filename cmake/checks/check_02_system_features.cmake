@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -18,7 +18,6 @@
 #
 #   DEAL_II_HAVE_GETHOSTNAME
 #   DEAL_II_HAVE_GETPID
-#   DEAL_II_HAVE_JN
 #   DEAL_II_HAVE_SYS_RESOURCE_H
 #   DEAL_II_HAVE_UNISTD_H
 #   DEAL_II_MSVC
@@ -39,23 +38,6 @@ CHECK_INCLUDE_FILE_CXX("sys/resource.h" DEAL_II_HAVE_SYS_RESOURCE_H)
 CHECK_INCLUDE_FILE_CXX("unistd.h" DEAL_II_HAVE_UNISTD_H)
 CHECK_CXX_SYMBOL_EXISTS("gethostname" "unistd.h" DEAL_II_HAVE_GETHOSTNAME)
 CHECK_CXX_SYMBOL_EXISTS("getpid" "unistd.h" DEAL_II_HAVE_GETPID)
-
-#
-# Do we have the Bessel function jn?
-#
-FIND_SYSTEM_LIBRARY(m_LIBRARY NAMES m)
-MARK_AS_ADVANCED(m_LIBRARY)
-
-IF(NOT m_LIBRARY MATCHES "-NOTFOUND")
-  LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${m_LIBRARY})
-  CHECK_CXX_SYMBOL_EXISTS("jn" "math.h" DEAL_II_HAVE_JN)
-  RESET_CMAKE_REQUIRED()
-  IF(DEAL_II_HAVE_JN)
-    LIST(APPEND DEAL_II_LIBRARIES ${m_LIBRARY})
-  ENDIF()
-ENDIF()
-
-
 
 ########################################################################
 #                                                                      #

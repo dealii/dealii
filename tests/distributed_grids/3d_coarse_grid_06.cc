@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,41 +18,40 @@
 // Test interaction with p4est with a 3d mesh. this is for a rather
 // complex 3d grid
 
+#include <deal.II/base/tensor.h>
+
+#include <deal.II/distributed/tria.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+
 #include "../tests.h"
 #include "coarse_grid_common.h"
-#include <deal.II/base/tensor.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/distributed/tria.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/grid_in.h>
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void
+test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridIn<dim> gi;
-  gi.attach_triangulation (tr);
-  gi.read (SOURCE_DIR "/../grid/grid_in_3d_02/747.ucd");
+  gi.attach_triangulation(tr);
+  gi.read(SOURCE_DIR "/../grid/grid_in_3d_02/747.ucd");
 
-  deallog << "Checksum: "
-          << tr.get_checksum ()
-          << std::endl;
+  deallog << "Checksum: " << tr.get_checksum() << std::endl;
 }
 
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   deallog.push("3d");
-  test<3>(logfile);
+  test<3>(deallog.get_file_stream());
   deallog.pop();
-
-
 }

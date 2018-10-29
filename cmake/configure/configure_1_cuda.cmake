@@ -8,8 +8,8 @@
 ## it, and/or modify it under the terms of the GNU Lesser General
 ## Public License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
-## The full text of the license can be found in the file LICENSE at
-## the top level of the deal.II distribution.
+## The full text of the license can be found in the file LICENSE.md at
+## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
 
@@ -23,6 +23,12 @@
 SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
+
+  # We need to set CUDA_USE_STATIC_CUDA_RUNTIME before FIND_PACKAGE(CUDA) and to
+  # force the value otherwise it is overwritten by FIND_PACKAGE(CUDA)
+  IF(BUILD_SHARED_LIBS)
+    SET(CUDA_USE_STATIC_CUDA_RUNTIME OFF CACHE BOOL "" FORCE)
+  ENDIF()
 
   #
   # TODO: Ultimately, this find_package call is not needed any more. We
@@ -51,7 +57,8 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # CUDA 8.0 requires C++11 support, CUDA 9.0 requires C++14 support.
+    # CUDA Toolkit 8 is incompatible with C++14,
+    # CUDA Toolkit 9 and CUDA Toolkit 10 are incompatible with C++17.
     # Make sure that deal.II is configured appropriately
     #
     MACRO(_cuda_ensure_feature_off _version _feature)
@@ -71,6 +78,7 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
     ENDMACRO()
     _cuda_ensure_feature_off(8 DEAL_II_WITH_CXX14)
     _cuda_ensure_feature_off(9 DEAL_II_WITH_CXX17)
+    _cuda_ensure_feature_off(10 DEAL_II_WITH_CXX17)
 
 
     IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
@@ -95,6 +103,12 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
+
+    # cuSOLVER requires OpenMP
+    FIND_PACKAGE(OpenMP)
+    SET(DEAL_II_LINKER_FLAGS "${DEAL_II_LINKER_FLAGS} ${OpenMP_CXX_FLAGS}")
+
+    ADD_FLAGS(DEAL_II_CUDA_FLAGS_DEBUG "-G")
   ENDIF()
 ENDMACRO()
 

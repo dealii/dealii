@@ -209,17 +209,17 @@ private:
       
     protected:
       
-      virtual char_type do_decimal_point() const
+      virtual char_type do_decimal_point() const override
       {
         return m_cDecPoint;
       }
 
-      virtual char_type do_thousands_sep() const
+      virtual char_type do_thousands_sep() const override
       {
         return m_cThousandsSep;
       }
 
-      virtual std::string do_grouping() const 
+      virtual std::string do_grouping() const override
       { 
 		// fix for issue 4: https://code.google.com/p/muparser/issues/detail?id=4
 		// courtesy of Jens Bartsch
@@ -288,7 +288,7 @@ private:
     mutable stringbuf_type  m_vStringBuf; ///< String buffer, used for storing string function arguments
     stringbuf_type  m_vStringVarBuf;
 
-    std::auto_ptr<token_reader_type> m_pTokenReader; ///< Managed pointer to the token reader object.
+    std::unique_ptr<token_reader_type> m_pTokenReader; ///< Managed pointer to the token reader object.
 
     funmap_type  m_FunDef;         ///< Map of function names and pointers.
     funmap_type  m_PostOprtDef;    ///< Postfix operator callbacks

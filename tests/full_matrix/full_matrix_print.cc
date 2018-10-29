@@ -8,23 +8,24 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // verify that FullMatrix::print saves the stream state around the output
 
-#include "../tests.h"
-
 #include <deal.II/lac/full_matrix.h>
 
-const double entries[9] = { 11.1,12.2,13.3,21.456,22.12345678901,23,31,32,33 };
+#include "../tests.h"
+
+const double entries[9] =
+  {11.1, 12.2, 13.3, 21.456, 22.12345678901, 23, 31, 32, 33};
 
 
 int
-main ()
+main()
 {
   initlog();
   std::ostream &logfile = deallog.get_file_stream();
@@ -32,7 +33,7 @@ main ()
   deallog << std::setprecision(3);
   logfile << numbers::PI << std::endl;
 
-  FullMatrix<double> T(3,3,entries);
+  FullMatrix<double> T(3, 3, entries);
 
   // try writing to a regular stream
   T.print(logfile, 15, 8);

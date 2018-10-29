@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2017 by the deal.II authors
+// Copyright (C) 2001 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,20 +17,18 @@
 // check GridTools::volume
 
 
-#include "../tests.h"
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+#include <deal.II/grid/tria.h>
 
-
-std::ofstream logfile("output");
-
+#include "../tests.h"
 
 
 template <int dim>
-void test1 ()
+void
+test1()
 {
   // test 1: hypercube
   if (true)
@@ -38,15 +36,12 @@ void test1 ()
       Triangulation<dim> tria;
       GridGenerator::hyper_cube(tria);
 
-      for (unsigned int i=0; i<2; ++i)
+      for (unsigned int i = 0; i < 2; ++i)
         {
           tria.refine_global(2);
           deallog << dim << "d, "
-                  << "hypercube volume, "
-                  << i*2
-                  << " refinements: "
-                  << GridTools::volume (tria)
-                  << std::endl;
+                  << "hypercube volume, " << i * 2
+                  << " refinements: " << GridTools::volume(tria) << std::endl;
         };
     };
 
@@ -57,36 +52,30 @@ void test1 ()
       GridGenerator::hyper_ball(tria, Point<dim>(), 1);
 
       static const SphericalManifold<dim> boundary;
-      tria.set_manifold (0, boundary);
+      tria.set_manifold(0, boundary);
 
-      for (unsigned int i=0; i<4; ++i)
+      for (unsigned int i = 0; i < 4; ++i)
         {
           tria.refine_global(1);
           deallog << dim << "d, "
-                  << "hyperball volume, "
-                  << i
-                  << " refinements: "
-                  << GridTools::volume (tria)
-                  << std::endl;
+                  << "hyperball volume, " << i
+                  << " refinements: " << GridTools::volume(tria) << std::endl;
         }
       deallog << "exact value="
-              << (dim==2 ? numbers::PI :
-                  4./3.*numbers::PI)
-              << std::endl;
+              << (dim == 2 ? numbers::PI : 4. / 3. * numbers::PI) << std::endl;
     }
 }
 
 
-int main ()
+int
+main()
 {
+  initlog();
   deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile);
 
-  test1<1> ();
-  test1<2> ();
-  test1<3> ();
+  test1<1>();
+  test1<2>();
+  test1<3>();
 
   return 0;
 }
-

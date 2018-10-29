@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -18,31 +18,30 @@
 
 #include <deal.II/base/config.h>
 
-
-#include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/precondition.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * A namespace in which the deal.II linear algebra classes are typedef'ed to
+ * A namespace in which the deal.II linear algebra classes are aliased to
  * generic names. There are similar namespaces LinearAlgebraPETSc and
- * LinearAlgebraTrilinos for typedefs to classes that interface with the PETSc
+ * LinearAlgebraTrilinos for alias to classes that interface with the PETSc
  * and Trilinos libraries.
  */
 namespace LinearAlgebraDealII
 {
-  typedef Vector<double> Vector;
-  typedef BlockVector<double> BlockVector;
+  using Vector      = Vector<double>;
+  using BlockVector = BlockVector<double>;
 
-  typedef SparseMatrix<double> SparseMatrix;
+  using SparseMatrix = SparseMatrix<double>;
 
-  typedef PreconditionSSOR<SparseMatrix > PreconditionSSOR;
-}
+  using PreconditionSSOR = PreconditionSSOR<SparseMatrix>;
+} // namespace LinearAlgebraDealII
 
 
 DEAL_II_NAMESPACE_CLOSE
@@ -50,29 +49,29 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_WITH_PETSC
 
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
-#include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
-#include <deal.II/lac/petsc_precondition.h>
-#include <deal.II/lac/petsc_solver.h>
+#  include <deal.II/lac/block_sparsity_pattern.h>
+#  include <deal.II/lac/petsc_block_sparse_matrix.h>
+#  include <deal.II/lac/petsc_precondition.h>
+#  include <deal.II/lac/petsc_solver.h>
+#  include <deal.II/lac/petsc_sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace in which the wrappers to the PETSc linear algebra classes are
- * typedef'ed to generic names. There are similar namespaces
- * LinearAlgebraDealII and LinearAlgebraTrilinos for typedefs to deal.II's own
+ * aliased to generic names. There are similar namespaces
+ * LinearAlgebraDealII and LinearAlgebraTrilinos for alias to deal.II's own
  * classes and classes that interface with Trilinos.
  */
 namespace LinearAlgebraPETSc
 {
   using namespace dealii;
 
-  typedef PETScWrappers::SolverCG SolverCG;
-  typedef PETScWrappers::SolverGMRES SolverGMRES;
+  using SolverCG    = PETScWrappers::SolverCG;
+  using SolverGMRES = PETScWrappers::SolverGMRES;
 
   /**
-   * A namespace with typedefs to generic names for parallel PETSc linear
+   * A namespace with alias to generic names for parallel PETSc linear
    * algebra objects.
    */
   namespace MPI
@@ -80,55 +79,55 @@ namespace LinearAlgebraPETSc
     /**
      * Typedef for the vector type used.
      */
-    typedef PETScWrappers::MPI::Vector Vector;
+    using Vector = PETScWrappers::MPI::Vector;
 
     /**
      * Typedef for the type used to describe vectors that consist of multiple
      * blocks.
      */
-    typedef PETScWrappers::MPI::BlockVector BlockVector;
+    using BlockVector = PETScWrappers::MPI::BlockVector;
 
     /**
      * Typedef for the sparse matrix type used.
      */
-    typedef PETScWrappers::MPI::SparseMatrix SparseMatrix;
+    using SparseMatrix = PETScWrappers::MPI::SparseMatrix;
 
     /**
      * Typedef for the type used to describe sparse matrices that consist of
      * multiple blocks.
      */
-    typedef PETScWrappers::MPI::BlockSparseMatrix BlockSparseMatrix;
+    using BlockSparseMatrix = PETScWrappers::MPI::BlockSparseMatrix;
 
-    typedef dealii::BlockDynamicSparsityPattern BlockCompressedSparsityPattern;
+    using BlockCompressedSparsityPattern = dealii::BlockDynamicSparsityPattern;
 
     /**
      * Typedef for the AMG preconditioner type.
      */
-    typedef PETScWrappers::PreconditionBoomerAMG PreconditionAMG;
+    using PreconditionAMG = PETScWrappers::PreconditionBoomerAMG;
 
     /**
      * Typedef for the Incomplete Cholesky preconditioner.
      */
-    typedef PETScWrappers::PreconditionICC PreconditionIC;
+    using PreconditionIC = PETScWrappers::PreconditionICC;
 
     /**
      * Typedef for the Incomplete LU decomposition preconditioner.
      */
-    typedef PETScWrappers::PreconditionILU PreconditionILU;
+    using PreconditionILU = PETScWrappers::PreconditionILU;
 
     /**
      * Typedef for the Incomplete Jacobi decomposition preconditioner.
      */
-    typedef PETScWrappers::PreconditionJacobi PreconditionJacobi;
+    using PreconditionJacobi = PETScWrappers::PreconditionJacobi;
 
     /**
      * Typedef for the SSOR preconditioner.
      */
-    typedef PETScWrappers::PreconditionSSOR PreconditionSSOR;
+    using PreconditionSSOR = PETScWrappers::PreconditionSSOR;
 
-  }
+  } // namespace MPI
 
-}
+} // namespace LinearAlgebraPETSc
 DEAL_II_NAMESPACE_CLOSE
 
 
@@ -136,29 +135,29 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-#include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
-#include <deal.II/lac/trilinos_precondition.h>
-#include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/trilinos_solver.h>
+#  include <deal.II/lac/block_sparsity_pattern.h>
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_precondition.h>
+#  include <deal.II/lac/trilinos_solver.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace in which the wrappers to the Trilinos linear algebra classes
- * are typedef'ed to generic names. There are similar namespaces
- * LinearAlgebraDealII and LinearAlgebraPETSc for typedefs to deal.II's own
+ * are aliased to generic names. There are similar namespaces
+ * LinearAlgebraDealII and LinearAlgebraPETSc for alias to deal.II's own
  * classes and classes that interface with PETSc.
  */
 namespace LinearAlgebraTrilinos
 {
   using namespace dealii;
 
-  typedef TrilinosWrappers::SolverCG SolverCG;
-  typedef TrilinosWrappers::SolverGMRES SolverGMRES;
+  using SolverCG    = TrilinosWrappers::SolverCG;
+  using SolverGMRES = TrilinosWrappers::SolverGMRES;
 
   /**
-   * A namespace with typedefs to generic names for parallel Trilinos linear
+   * A namespace with alias to generic names for parallel Trilinos linear
    * algebra objects.
    */
   namespace MPI
@@ -166,56 +165,57 @@ namespace LinearAlgebraTrilinos
     /**
      * Typedef for the vector type used.
      */
-    typedef TrilinosWrappers::MPI::Vector Vector;
+    using Vector = TrilinosWrappers::MPI::Vector;
 
     /**
      * Typedef for the type used to describe vectors that consist of multiple
      * blocks.
      */
-    typedef TrilinosWrappers::MPI::BlockVector BlockVector;
+    using BlockVector = TrilinosWrappers::MPI::BlockVector;
 
     /**
      * Typedef for the sparse matrix type used.
      */
-    typedef TrilinosWrappers::SparseMatrix SparseMatrix;
+    using SparseMatrix = TrilinosWrappers::SparseMatrix;
 
     /**
      * Typedef for the type used to describe sparse matrices that consist of
      * multiple blocks.
      */
-    typedef TrilinosWrappers::BlockSparseMatrix BlockSparseMatrix;
+    using BlockSparseMatrix = TrilinosWrappers::BlockSparseMatrix;
 
-    typedef TrilinosWrappers::BlockSparsityPattern BlockCompressedSparsityPattern;
+    using BlockCompressedSparsityPattern =
+      TrilinosWrappers::BlockSparsityPattern;
 
     /**
      * Typedef for the AMG preconditioner type.
      */
-    typedef TrilinosWrappers::PreconditionAMG PreconditionAMG;
+    using PreconditionAMG = TrilinosWrappers::PreconditionAMG;
 
     /**
      * Typedef for the Incomplete Cholesky preconditioner.
      */
-    typedef TrilinosWrappers::PreconditionIC PreconditionIC;
+    using PreconditionIC = TrilinosWrappers::PreconditionIC;
 
     /**
      * Typedef for the Incomplete LU decomposition preconditioner.
      */
-    typedef TrilinosWrappers::PreconditionILU PreconditionILU;
+    using PreconditionILU = TrilinosWrappers::PreconditionILU;
 
     /**
      * Typedef for the Incomplete Jacobi decomposition preconditioner.
      */
-    typedef TrilinosWrappers::PreconditionJacobi PreconditionJacobi;
+    using PreconditionJacobi = TrilinosWrappers::PreconditionJacobi;
 
     /**
      * Typedef for the SSOR preconditioner
      */
-    typedef TrilinosWrappers::PreconditionSSOR PreconditionSSOR;
+    using PreconditionSSOR = TrilinosWrappers::PreconditionSSOR;
 
 
-  }
+  } // namespace MPI
 
-}
+} // namespace LinearAlgebraTrilinos
 
 DEAL_II_NAMESPACE_CLOSE
 

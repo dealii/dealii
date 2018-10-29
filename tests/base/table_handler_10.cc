@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -17,22 +17,24 @@
 // test changing header style after adding entries
 
 
-#include "../tests.h"
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "../tests.h"
 
 
-int main ()
+int
+main()
 {
   initlog();
 
   TableHandler table;
-  table.set_auto_fill_mode (true);
+  table.set_auto_fill_mode(true);
 
-  std::string keys[3] = { "key1", "key2", "key3" };
+  std::string keys[3] = {"key1", "key2", "key3"};
 
   // fill rows 1 and 2 partially
   table.add_value(keys[0], 0.0);
@@ -55,5 +57,4 @@ int main ()
 
   table.write_text(deallog.get_file_stream(),
                    TableHandler::table_with_separate_column_description);
-
 }

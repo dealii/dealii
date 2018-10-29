@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2017 by the deal.II authors
+// Copyright (C) 1999 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,8 +8,8 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
@@ -19,6 +19,7 @@
 
 
 #include <deal.II/base/config.h>
+
 #include <deal.II/numerics/data_out_dof_data.h>
 
 #include <memory>
@@ -27,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DataOut
+  namespace DataOutImplementation
   {
     /**
      * A derived class for use in the DataOut class. This is a class for the
@@ -35,22 +36,25 @@ namespace internal
      * the WorkStream context.
      */
     template <int dim, int spacedim>
-    struct ParallelData : public ParallelDataBase<dim,spacedim>
+    struct ParallelData : public ParallelDataBase<dim, spacedim>
     {
-      ParallelData (const unsigned int n_datasets,
-                    const unsigned int n_subdivisions,
-                    const std::vector<unsigned int> &n_postprocessor_outputs,
-                    const Mapping<dim,spacedim> &mapping,
-                    const std::vector<std::shared_ptr<dealii::hp::FECollection<dim,spacedim> > > &finite_elements,
-                    const UpdateFlags update_flags,
-                    const std::vector<std::vector<unsigned int> > &cell_to_patch_index_map);
+      ParallelData(
+        const unsigned int               n_datasets,
+        const unsigned int               n_subdivisions,
+        const std::vector<unsigned int> &n_postprocessor_outputs,
+        const Mapping<dim, spacedim> &   mapping,
+        const std::vector<
+          std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
+          &                                           finite_elements,
+        const UpdateFlags                             update_flags,
+        const std::vector<std::vector<unsigned int>> &cell_to_patch_index_map);
 
-      std::vector<Point<spacedim> > patch_evaluation_points;
+      std::vector<Point<spacedim>> patch_evaluation_points;
 
-      const std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
+      const std::vector<std::vector<unsigned int>> *cell_to_patch_index_map;
     };
-  }
-}
+  } // namespace DataOutImplementation
+} // namespace internal
 
 
 
@@ -152,18 +156,24 @@ namespace internal
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim, typename DoFHandlerType=DoFHandler<dim> >
-class DataOut : public DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension, DoFHandlerType::space_dimension>
+template <int dim, typename DoFHandlerType = DoFHandler<dim>>
+class DataOut : public DataOut_DoFData<DoFHandlerType,
+                                       DoFHandlerType::dimension,
+                                       DoFHandlerType::space_dimension>
 {
 public:
   /**
    * Typedef to the iterator type of the dof handler class under
    * consideration.
    */
-  typedef typename DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension, DoFHandlerType::space_dimension>::cell_iterator
-  cell_iterator;
-  typedef typename DataOut_DoFData<DoFHandlerType, DoFHandlerType::dimension, DoFHandlerType::space_dimension>::active_cell_iterator
-  active_cell_iterator;
+  using cell_iterator =
+    typename DataOut_DoFData<DoFHandlerType,
+                             DoFHandlerType::dimension,
+                             DoFHandlerType::space_dimension>::cell_iterator;
+  using active_cell_iterator = typename DataOut_DoFData<
+    DoFHandlerType,
+    DoFHandlerType::dimension,
+    DoFHandlerType::space_dimension>::active_cell_iterator;
 
   /**
    * Enumeration describing the part of the domain in which cells
@@ -248,8 +258,26 @@ public:
    * In other words, using this parameter can not help you plot the solution
    * exactly, but it can get you closer if you use finite elements of higher
    * polynomial degree.
+   *
+   * @note Specifying `n_subdivisions>1` is useful when using higher order
+   *   finite elements, but in general it does not actually result in the
+   *   visualization showing higher order polynomial surfaces -- rather, you
+   *   just get a (bi-, tri-)linear interpolation of that higher order
+   *   surface on a finer mesh. However, when outputting the solution in the
+   *   VTK and VTU file formats via DataOutInterface::write_vtk() or
+   *   DataOutInterface::write_vtu() (where DataOutInterface is a base
+   *   class of the current class) as we often do in the tutorials,
+   *   you can provide a set of flags via the DataOutBase::VtkFlags
+   *   structure that includes the
+   *   DataOutBase::VtkFlags::write_higher_order_cells flag. When set, the
+   *   subdivisions produced by this function will be interpreted as
+   *   support point for a higher order polynomial that will then actually
+   *   be visualized as such. On the other hand, this requires a
+   *   sufficiently new version of one of the VTK-based visualization
+   *   programs.
    */
-  virtual void build_patches (const unsigned int n_subdivisions = 0);
+  virtual void
+  build_patches(const unsigned int n_subdivisions = 0);
 
   /**
    * Same as above, except that the additional first parameter defines a
@@ -282,16 +310,19 @@ public:
    * @todo The @p mapping argument should be replaced by a
    * hp::MappingCollection in case of a hp::DoFHandler.
    */
-  virtual void build_patches (const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &mapping,
-                              const unsigned int n_subdivisions = 0,
-                              const CurvedCellRegion curved_region = curved_boundary);
+  virtual void
+  build_patches(const Mapping<DoFHandlerType::dimension,
+                              DoFHandlerType::space_dimension> &mapping,
+                const unsigned int     n_subdivisions = 0,
+                const CurvedCellRegion curved_region  = curved_boundary);
 
   /**
    * Return the first cell which we want output for. The default
    * implementation returns the first active cell, but you might want to
    * return other cells in a derived class.
    */
-  virtual cell_iterator first_cell ();
+  virtual cell_iterator
+  first_cell();
 
   /**
    * Return the next cell after @p cell which we want output for.  If there
@@ -304,23 +335,25 @@ public:
    * implementation. Overloading only one of the two functions might not be a
    * good idea.
    */
-  virtual cell_iterator next_cell (const cell_iterator &cell);
+  virtual cell_iterator
+  next_cell(const cell_iterator &cell);
 
 private:
-
   /**
    * Return the first cell produced by the first_cell()/next_cell() function
    * pair that is locally owned. If this object operates on a non-distributed
    * triangulation, the result equals what first_cell() returns.
    */
-  virtual cell_iterator first_locally_owned_cell ();
+  virtual cell_iterator
+  first_locally_owned_cell();
 
   /**
    * Return the next cell produced by the next_cell() function that is locally
    * owned. If this object operates on a non-distributed triangulation, the
    * result equals what first_cell() returns.
    */
-  virtual cell_iterator next_locally_owned_cell (const cell_iterator &cell);
+  virtual cell_iterator
+  next_locally_owned_cell(const cell_iterator &cell);
 
   /**
    * Build one patch. This function is called in a WorkStream context.
@@ -331,11 +364,13 @@ private:
    * rather allocates one on its own stack for memory access efficiency
    * reasons.
    */
-  void build_one_patch
-  (const std::pair<cell_iterator, unsigned int>                 *cell_and_index,
-   internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>  &scratch_data,
-   const unsigned int                                            n_subdivisions,
-   const CurvedCellRegion                                        curved_cell_region);
+  void
+  build_one_patch(const std::pair<cell_iterator, unsigned int> *cell_and_index,
+                  internal::DataOutImplementation::ParallelData<
+                    DoFHandlerType::dimension,
+                    DoFHandlerType::space_dimension> &scratch_data,
+                  const unsigned int                  n_subdivisions,
+                  const CurvedCellRegion              curved_cell_region);
 };
 
 

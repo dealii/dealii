@@ -3,70 +3,356 @@
 
 @dealiiVideoLecture{15,16,17,17.25,17.5,17.75}
 
-The main emphasis in this example is the handling of locally refined
-grids. The approach to adaptivity chosen in deal.II is to use grids in which
-neighboring cells may be refined a different number of times. This then
+This program is finally about one of the main features of deal.II:
+the use of adaptively (locally) refined meshes. The program is still
+based on step-4 and step-5, and, as you will see, it does not actually
+take very much code to enable adaptivity. Indeed, while we do a great
+deal of explaining, adaptive meshes can be added to an existing program
+with barely a dozen lines of additional code. The program shows what
+these lines are, as well as another important ingredient of adaptive
+mesh refinement (AMR): a criterion that can be used to determine whether
+it is necessary to refine a cell because the error is large on it,
+whether the cell can be coarsened because the error is particularly
+small on it, or whether we should just leave the cell as it is. We
+will discuss all of these issues in the following.
+
+
+<h3> What adaptively refined meshes look like </h3>
+
+There are a number of ways how one can adaptively refine meshes. The
+basic structure of the overall algorithm is always the same and consists
+of a loop over the following steps:
+- Solve the PDE on the current mesh;
+- Estimate the error on each cell using some criterion that is indicative
+  of the error;
+- Mark those cells that have large errors for refinement, mark those that have
+  particularly small errors for coarsening, and leave the rest alone;
+- Refine and coarsen the cells so marked to obtain a new mesh;
+- Repeat the steps above on the new mesh until the overall error is
+  sufficiently small.
+
+For reasons that are probably lost to history (maybe that these functions
+used to be implemented in FORTRAN, a language that does not care about
+whether something is spelled in lower or UPPER case letters, with programmers
+often choosing upper case letters habitually), the loop above is often
+referenced in publications about mesh adaptivity as the 
+SOLVE-ESTIMATE-MARK-REFINE loop (with this spelling).
+
+Beyond this structure, however, there are a variety of ways to achieve
+this. Fundamentally, they differ in how exactly one generates one mesh
+from the previous one.
+
+If one were to use triangles (which deal.II does not do), then there are
+two essential possibilities:
+- Longest-edge refinement: In this strategy, a triangle marked for refinement
+  is cut into two by introducing one new edge from the midpoint of the longest
+  edge to the opposite vertex. Of course, the midpoint from the longest edge
+  has to somehow be balanced by *also* refining the cell on the other side of
+  that edge (if there is one). If the edge in question is also the longest
+  edge of the neighboring cell, then we can just run a new edge through the
+  neighbor to the opposite vertex; otherwise a slightly more involved
+  construction is necessary that adds more new vertices on at least one
+  other edge of the neighboring cell, and then may propagate to the neighbors
+  of the neighbor until the algorithm terminates. This is hard to describe 
+  in words, and because deal.II does not use triangles not worth the time here.
+  But if you're curious, you can always watch video lecture 15 at the link
+  shown at the top of this introduction.
+- Red-green refinement: An alternative is what is called "red-green refinement".
+  This strategy is even more difficult to describe (but also discussed in the
+  video lecture) and has the advantage that the refinement does not propagate
+  beyond the immediate neighbors of the cell that we want to refine. It is,
+  however, substantially more difficult to implement.
+
+There are other variations of these approaches, but the important point is
+that they always generate a mesh where the lines where two cells touch
+are entire edges of both adjacent cells. With a bit of work, this strategy
+is readily adapted to three-dimensional meshes made from tetrahedra.
+
+Neither of these methods works for quadrilaterals in 2d and hexahedra in 3d,
+or at least not easily. The reason is that the transition elements created
+out of the quadrilateral neighbors of a quadrilateral cell that is to be refined
+would be triangles, and we don't want this. Consequently,
+the approach to adaptivity chosen in deal.II is to use grids in which
+neighboring cells may differ in refinement level by one. This then
 results in nodes on the interfaces of cells which belong to one
 side, but are unbalanced on the other. The common term for these is
-&ldquo;hanging nodes&rdquo;.
+&ldquo;hanging nodes&rdquo;, and these meshes then look like this in a very
+simple situation:
 
+@image html hanging_nodes.png "A simple mesh with hanging nodes"
+
+A more complicated two-dimensional mesh would look like this (and is
+discussed in the "Results" section below):
+
+<img src="https://www.dealii.org/images/steps/developer/step_6_grid_5_ladutenko.svg"
+     alt="Fifth adaptively refined Ladutenko grid: the cells are clustered
+          along the inner circle."
+     width="300" height="300">
+
+Finally, a three-dimensional mesh (from step-43) with such hanging nodes is shown here:
+
+<img src="https://www.dealii.org/images/steps/developer/step-43.3d.mesh.png" alt=""
+     width="300" height="300">
+
+The first and third mesh are of course based on a square and a cube, but as the
+second mesh shows, this is not necessary. The important point is simply that we
+can refine a mesh independently of its neighbors (subject to the constraint
+that a cell can be only refined once more than its neighbors), but that we end
+up with these &ldquo;hanging nodes&rdquo; if we do this.
+
+
+<h3> Why adapatively refined meshes? </h3>
+
+Now that you have seen what these adaptively refined meshes look like,
+you should ask <i>why</i> we would want to do this. After all, we know from
+theory that if we refine the mesh globally, the error will go down to zero
+as
+@f{align*}{
+  \|\nabla(u-u_h)\|_{\Omega} \le C h_\text{max}^p \| \nabla^{p+1} u \|_{\Omega},
+@f}
+where $C$ is some constant independent of $h$ and $u$,
+$p$ is the polynomial degree of the finite element in use, and
+$h_\text{max}$ is the diameter of the largest cell. So if the
+<i>largest</i> cell is important, then why would we want to make
+the mesh fine in some parts of the domain but not all?
+
+The answer lies in the observation that the formula above is not
+optimal. In fact, some more work shows that the following
+is a better estimate (which you should compare to the square of
+the estimate above):
+@f{align*}{
+  \|\nabla(u-u_h)\|_{\Omega}^2 \le C \sum_K h_K^{2p} \| \nabla^{p+1} u \|^2_K.
+@f}
+(Because $h_K\le h_\text{max}$, this formula immediately implies the
+previous one if you just pull the mesh size out of the sum.)
+What this formula suggests is that it is not necessary to make
+the <i>largest</i> cell small, but that the cells really only
+need to be small <i>where $\| \nabla^{p+1} u \|_K$ is large</i>!
+In other words: The mesh really only has to be fine where the
+solution has large variations, as indicated by the $p+1$st derivative.
+This makes intuitive sense: if, for example, we use a linear element
+$p=1$, then places where the solution is nearly linear (as indicated
+by $\nabla^2 u$ being small) will be well resolved even if the mesh
+is coarse. Only those places where the second derivative is large
+will be poorly resolved by large elements, and consequently
+that's where we should make the mesh small.
+
+Of course, this <i>a priori estimate</i> is not very useful
+in practice since we don't know the exact solution $u$ of the
+problem, and consequently, we cannot compute $\nabla^{p+1}u$.
+But, and that is the approach commonly taken, we can compute
+numerical approximations of $\nabla^{p+1}u$ based only on
+the discrete solution $u_h$ that we have computed before. We
+will discuss this in slightly more detail below. This will then
+help us determine which cells have a large $p+1$st derivative,
+and these are then candidates for refining the mesh.
+
+
+<h3> How to deal with hanging nodes in theory </h3>
+
+The methods using triangular meshes mentioned above go to great
+lengths to make sure that each vertex is a vertex of all adjacent
+cells -- i.e., that there are no hanging nodes. This then
+automatically makes sure that we can define shape functions in such a
+way that they are globally continuous (if we use the common $Q_p$
+Lagrange finite element methods we have been using so far in the
+tutorial programs, as represented by the FE_Q class).
+
+On the other hand, if we define shape functions on meshes with hanging
+nodes, we may end up with shape functions that are not continuous. To
+see this, think about the situation above where the top right cell is
+not refined, and consider for a moment the use of a bilinear finite
+element. In that case, the shape functions associated with the hanging
+nodes are defined in the obvious way on the two small cells adjacent
+to each of the hanging nodes. But how do we extend them to the big
+adjacent cells? Clearly, the function's extension to the big cell
+cannot be bilinear because then it needs to be linear along each edge
+of the large cell, and that means that it needs to be zero on the
+entire edge because it needs to be zero on the two vertices of the
+large cell on that edge. But it is not zero at the hanging node itself
+when seen from the small cells' side -- so it is not continuous. The
+following three figures show three of the shape functions along the
+edges in question that turn out to not be continuous when defined in
+the usual way simply based on the cells they are adjacent to:
+
+<div class="threecolumn" style="width: 80%">
+  <div class="parent">
+    <div class="img" align="center">
+      @image html hanging_nodes_shape_functions_1.png "A discontinuous shape function adjacent to a hanging node"
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      @image html hanging_nodes_shape_functions_2.png "A discontinuous shape function at a hanging node"
+    </div>
+  </div>
+  <div class="parent">
+    <div class="img" align="center">
+      @image html hanging_nodes_shape_functions_3.png "A discontinuous shape function adjacent to a hanging node"
+    </div>
+  </div>
+</div>
+
+
+But we do want the finite element solution to be continuous so that we
+have a &ldquo;conforming finite element method&rdquo; where the
+discrete finite element space is a proper subset of the $H^1$ function
+space in which we seek the solution of the Laplace equation.
 To guarantee that the global solution is continuous at these nodes as well, we
 have to state some additional constraints on the values of the solution at
-these nodes. In the program below, we will show how we can get these
-constraints from the library, and how to use them in the solution of the
+these nodes. The trick is to realize that while the shape functions shown
+above are discontinuous (and consequently an <i>arbitrary</i> linear combination
+of them is also discontinuous), that linear combinations in which the shape
+functions are added up as $u_h(\mathbf x)=\sum_j U_j \varphi_j(\mathbf x)$
+can be continuous <i>if the coefficients $U_j$ satisfy certain relationships</i>.
+In other words, the coefficients $U_j$ can not be chosen arbitrarily
+but have to satisfy certain constraints so that the function $u_h$ is in fact
+continuous.
+What these constraints have to look is relatively easy to
+understand conceptually, but the implementation in software is
+complicated and takes several thousand lines of code. On the other
+hand, in user code, it is only about half a dozen lines you have to
+add when dealing with hanging nodes.
+
+In the program below, we will show how we can get these
+constraints from deal.II, and how to use them in the solution of the
 linear system of equations. Before going over the details of the program
 below, you may want to take a look at the @ref constraints documentation
 module that explains how these constraints can be computed and what classes in
 deal.II work on them.
 
-The locally refined grids are produced using an error estimator class
-which estimates the energy error with respect to the Laplace
-operator. This error estimator, although developed for Laplace's
-equation has proven to be a suitable tool to generate locally refined
-meshes for a wide range of equations, not restricted to elliptic
-problems. Although it will create non-optimal meshes for other
-equations, it is often a good way to quickly produce meshes that are
-well adapted to the features of solutions, such as regions of great
-variation or discontinuities. Since it was developed by Kelly and
+
+<h3> How to deal with hanging nodes in practice </h3>
+
+The practice of hanging node constraints is rather simpler than the
+theory we have outlined above. In reality, you will really only have to
+add about half a dozen lines of additional code to a program like step-4
+to make it work with adaptive meshes that have hanging nodes. The
+interesting part about this is that it is entirely independent of the
+equation you are solving: The algebraic nature of these constraints has nothing
+to do with the equation and only depends on the choice of finite element.
+As a consequence, the code to deal with these constraints is entirely
+contained in the deal.II library itself, and you do not need to worry
+about the details.
+
+The steps you need to make this work are essentially like this:
+- You have to create an AffineConstraints object, which (as the name
+  suggests) will store all constraints on the finite element space. In
+  the current context, these are the constraints due to our desire to
+  keep the solution space continuous even in the presence of hanging
+  nodes. (Below we will also briefly mention that we will also put
+  boundary values into this same object, but that is a separate matter.)
+- You have to fill this object using the function
+  DoFTools::make_hanging_node_constraints() to ensure continuity of
+  the elements of the finite element space.
+- You have to use this object when you copy the local contributions to
+  the matrix and right hand side into the global objects, by using
+  AffineConstraints::distribute_local_to_global(). Up until
+  now, we have done this ourselves, but now with constraints, this
+  is where the magic happens and we apply the constraints to the
+  linear system. What this function does is make sure that the
+  degrees of freedom located at hanging nodes are not, in fact,
+  really free. Rather, they are factually eliminated from the
+  linear system by setting their rows and columns to zero and putting
+  something on the diagonal to ensure the matrix remains invertible.
+  The matrix resulting from this process remains symmetric and
+  positive definite for the Laplace equation we solve here, so we can
+  continue to use the Conjugate Gradient method for it.
+- You then solve the linear system as usual, but at the end of this
+  step, you need to make sure that the degrees of "freedom" located
+  on hanging nodes get their correct (constrained) value so that the
+  solution you then visualize or evaluate in other ways in in
+  fact continuous. This is done by calling
+  AffineConstraints::distribute() immediately after solving.
+
+These four steps are really all that is necessary -- it's that simple
+from a user perspective. The fact that, in the function calls mentioned
+above, you will run through several thousand lines of not-so-trivial
+code is entirely immaterial to this: In user code, there are really
+only four additional steps.
+
+
+<h3> How we obtain locally refined meshes </h3>
+
+The next question, now that we know how to <i>deal</i> with meshes that
+have these hanging nodes is how we <i>obtain</i> them.
+
+A simple way has already been shown in step-1: If you <i>know</i> where
+it is necessary to refine the mesh, then you can create one by hand. But
+in reality, we don't know this: We don't know the solution of the PDE
+up front (because, if we did, we wouldn't have to use the finite element
+method), and consequently we do not know where it is necessary to
+add local mesh refinement to better resolve areas where the solution
+has strong variations. But the discussion above shows that maybe we
+can get away with using the discrete solution $u_h$ on one mesh to
+estimate the derivatives $\nabla^{p+1} u$, and then use this to determine
+which cells are too large and which already small enough. We can then
+generate a new mesh from the current one using local mesh refinement.
+If necessary, this step is then repeated until we are happy with our
+numerical solution -- or, more commonly, until we run out of computational
+resources or patience.
+
+So that's exactly what we will do.
+The locally refined grids are produced using an <i>error estimator</i>
+which estimates the energy error for numerical solutions of the Laplace
+operator. Since it was developed by Kelly and
 co-workers, we often refer to it as the &ldquo;Kelly refinement
 indicator&rdquo; in the library, documentation, and mailing list. The
 class that implements it is called
-KellyErrorEstimator. Although the error estimator (and
-its
-implementation in the deal.II library) is capable of handling variable
-coefficients in the equation, we will not use this feature since we
-are only interested in a quick and simple way to generate locally
-refined grids.
+KellyErrorEstimator, and there is a great deal of information to
+be found in the documentation of that class that need not be repeated
+here. The summary, however, is that the class computes a vector with
+as many entries as there are @ref GlossActive "active cells", and
+where each entry contains an estimate of the error on that cell.
+This estimate is then used to refine the cells of the mesh: those
+cells that have a large error will be marked for refinement, those
+that have a particularly small estimate will be marked for
+coarsening. We don't have to do this by hand: The functions in
+namespace GridRefinement will do all of this for us once we have
+obtained the vector of error estimates.
+
+It is worth noting that while the Kelly error estimator was developed
+for Laplace's equation, it has proven to be a suitable tool to generate
+locally refined meshes for a wide range of equations, not even restricted
+to elliptic only problems. Although it will create non-optimal meshes for other
+equations, it is often a good way to quickly produce meshes that are
+well adapted to the features of solutions, such as regions of great
+variation or discontinuities. 
 
 
 
+<h3> Boundary conditions </h3>
+
+It turns out that one can see Dirichlet boundary conditions as just another
+constraint on the degrees of freedom. It's a particularly simple one,
+indeed: If $j$ is a degree of freedom on the boundary, with position
+$\mathbf x_j$, then imposing the boundary condition $u=g$ on $\partial\Omega$
+simply yields the constraint $U_j=g({\mathbf x}_j)$.
+
+The AffineConstraints class can handle such constraints as well, which makes it
+convenient to let the same object we use for hanging node constraints
+also deal with these Dirichlet boundary conditions.
+This way, we don't need to apply the boundary conditions after assembly 
+(like we did in the earlier steps).
+All that is necessary is that we call the variant of
+VectorTools::interpolate_boundary_values() that returns its information
+in an AffineConstraints object, rather than the `std::map` we have used
+in previous tutorial programs.
+ 
+
+ <h3> Other things this program shows </h3>
+ 
+ 
 Since the concepts used for locally refined grids are so important,
-we do not show much additional new stuff in this example. The most
+we do not show much other material in this example. The most
 important exception is that we show how to use biquadratic elements
 instead of the bilinear ones which we have used in all previous
-examples. In fact, The use of higher order elements is accomplished by
-only replacing three lines of the program, namely the declaration of
-the <code>fe</code> variable, and the use of an appropriate quadrature formula
+examples. In fact, the use of higher order elements is accomplished by
+only replacing three lines of the program, namely the initialization of
+the <code>fe</code> member variable in the constructor of the main
+class of this program, and the use of an appropriate quadrature formula
 in two places. The rest of the program is unchanged.
-
-
 
 The only other new thing is a method to catch exceptions in the
 <code>main</code> function in order to output some information in case the
-program crashes for some reason.
-
-
-<h3>The ConstraintMatrix</h3>
-
-As explained above, we are going to use an object called ConstraintMatrix
-that will store the constraints at the hanging nodes to insure the solution
-is continuous at these nodes. We could first assemble the system as normal
-and then condense out the degrees of freedom that need to be constrained.
-This is also explained  @ref constraints documentation
-module. Instead we will go the more efficient route and eliminate the
-constrained entries while we are copying from the local to the global system.
-Because boundary conditions can be treated in the same way, we will
-incorporate the them as constraints in the same ConstraintMatrix object.
-This way, we don't need to apply the boundary conditions after assembly 
-(like we did in the earlier steps).
- 
+program crashes for some reason. This is discussed below in more detail.

@@ -38,7 +38,7 @@ of the domain.  Here, ${\mathbf \beta}={\mathbf \beta}({\bf x})$ denotes a
 vector field, $u$ the (scalar) solution
 function, $g$ a boundary value function,
 @f[
-\Gamma_-:=\{{\bf x}\in\Gamma, {\mathbf \beta}({\bf x})\cdot{\bf n}({\bf x})<0\}
+\Gamma_- \dealcoloneq \{{\bf x}\in\Gamma, {\mathbf \beta}({\bf x})\cdot{\bf n}({\bf x})<0\}
 @f]
 the inflow part of the boundary of the domain and ${\bf n}$ denotes
 the unit outward normal to the boundary $\Gamma$. This equation is the
@@ -47,7 +47,7 @@ step-9 of this tutorial.
 In particular, we solve the advection equation on
 $\Omega=[0,1]^2$ with ${\mathbf \beta}=\frac{1}{|x|}(-x_2, x_1)$
 representing a circular counterclockwise flow field, and $g=1$
-on ${\bf x}\in\Gamma_-^1:=[0,0.5]\times\{0\}$ and $g=0$ on ${\bf x}\in
+on ${\bf x}\in\Gamma_-^1 \dealcoloneq [0,0.5]\times\{0\}$ and $g=0$ on ${\bf x}\in
 \Gamma_-\setminus \Gamma_-^1$.
 
 We apply the well-known upwind discontinuous Galerkin method. To this

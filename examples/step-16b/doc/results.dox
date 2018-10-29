@@ -1,0 +1,52 @@
+<h1>Results</h1>
+
+As in step-16, the solution looks like this on the finest mesh:
+
+<p align="center">
+  <img src="https://www.dealii.org/images/steps/developer/step-16.solution.png" alt="">
+</p>
+
+The output is formatted in a slightly different way compared to step-16 but is
+functionally the same and shows the same convergence properties:
+<pre>
+DEAL::Cycle 0
+DEAL::   Number of active cells:       20
+DEAL::   Number of degrees of freedom: 25 (by level: 8, 25)
+DEAL:cg::Starting value 0.510691
+DEAL:cg::Convergence step 6 value 4.59193e-14
+DEAL::Cycle 1
+DEAL::   Number of active cells:       41
+DEAL::   Number of degrees of freedom: 52 (by level: 8, 25, 41)
+DEAL:cg::Starting value 0.455356
+DEAL:cg::Convergence step 8 value 3.09682e-13
+DEAL::Cycle 2
+DEAL::   Number of active cells:       80
+DEAL::   Number of degrees of freedom: 100 (by level: 8, 25, 61, 52)
+DEAL:cg::Starting value 0.394469
+DEAL:cg::Convergence step 9 value 1.96993e-13
+DEAL::Cycle 3
+DEAL::   Number of active cells:       161
+DEAL::   Number of degrees of freedom: 190 (by level: 8, 25, 77, 160)
+DEAL:cg::Starting value 0.322156
+DEAL:cg::Convergence step 9 value 2.94418e-13
+DEAL::Cycle 4
+DEAL::   Number of active cells:       311
+DEAL::   Number of degrees of freedom: 364 (by level: 8, 25, 86, 227, 174)
+DEAL:cg::Starting value 0.279667
+DEAL:cg::Convergence step 10 value 3.45746e-13
+DEAL::Cycle 5
+DEAL::   Number of active cells:       593
+DEAL::   Number of degrees of freedom: 667 (by level: 8, 25, 89, 231, 490, 96)
+DEAL:cg::Starting value 0.215917
+DEAL:cg::Convergence step 10 value 1.03758e-13
+DEAL::Cycle 6
+DEAL::   Number of active cells:       1127
+DEAL::   Number of degrees of freedom: 1251 (by level: 8, 25, 89, 274, 760, 417, 178)
+DEAL:cg::Starting value 0.185906
+DEAL:cg::Convergence step 10 value 3.40351e-13
+DEAL::Cycle 7
+DEAL::   Number of active cells:       2144
+DEAL::   Number of degrees of freedom: 2359 (by level: 8, 25, 89, 308, 779, 1262, 817)
+DEAL:cg::Starting value 0.141519
+DEAL:cg::Convergence step 10 value 5.74965e-13
+</pre>

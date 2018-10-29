@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2017 by the deal.II authors
+// Copyright (C) 1999 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -8,25 +8,28 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 #ifndef dealii_solution_transfer_h
-#define dealii_solution_transfer_h
+#  define dealii_solution_transfer_h
 
 
 /*----------------------------   solutiontransfer.h     ----------------------*/
 
 
-#include <deal.II/base/config.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/dofs/dof_handler.h>
+#  include <deal.II/base/config.h>
 
-#include <vector>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/smartpointer.h>
+
+#  include <deal.II/dofs/dof_handler.h>
+
+#  include <deal.II/lac/vector.h>
+
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -47,41 +50,45 @@ DEAL_II_NAMESPACE_OPEN
  * use @p SolutionTransfer as follows:
  * @code
  * SolutionTransfer<dim, double> soltrans(*dof_handler);
- *                                     // flag some cells for refinement, e.g.
- * GridRefinement::refine_and_coarsen_fixed_fraction(
- *   *tria, error_indicators, 0.3, 0);
- *                                     // prepare the triangulation
- *                                     // for refinement,
+ *
+ * // flag some cells for refinement, e.g.
+ * GridRefinement::refine_and_coarsen_fixed_fraction(*tria,
+ *                                                   error_indicators,
+ *                                                   0.3,
+ *                                                   0);
+ * // prepare the triangulation for refinement,
  * tria->prepare_coarsening_and_refinement();
- *                                     // tell the SolutionTransfer object
- *                                     // that we intend to do pure refinement,
+ *
+ * // tell the SolutionTransfer object that we intend to do pure refinement,
  * soltrans.prepare_for_pure_refinement();
- *                                     // actually execute the refinement,
+ *
+ * // actually execute the refinement,
  * tria->execute_coarsening_and_refinement();
- *                                     // and redistribute dofs.
+ *
+ * // and redistribute dofs.
  * dof_handler->distribute_dofs (fe);
  * @endcode
  *
  * Then to proceed do
  * @code
- *                                     // take a copy of the solution vector
+ * // take a copy of the solution vector
  * Vector<double> solution_old(solution);
- *                                     // resize solution vector to the correct
- *                                     // size, as the @p refine_interpolate
- *                                     // function requires the vectors to be
- *                                     // of right sizes
+ *
+ * // resize solution vector to the correct size, as the @p refine_interpolate
+ * // function requires the vectors to be of right sizes
  * solution.reinit(dof_handler->n_dofs());
- *                                     // and finally interpolate
+ *
+ * // and finally interpolate
  * soltrans.refine_interpolate(solution_old, solution);
  * @endcode
  *
  * Although the @p refine_interpolate functions are allowed to be called
  * multiple times, e.g. for interpolating several solution vectors, there is
- * following possibility of interpolating several functions simultaneously.
+ * the following possibility of interpolating several functions simultaneously.
  * @code
- * vector<Vector<double> > solutions_old(n_vectors, Vector<double> (n));
+ * std::vector<Vector<double> > solutions_old(n_vectors, Vector<double> (n));
  * ...
- * vector<Vector<double> > solutions(n_vectors, Vector<double> (n));
+ * std::vector<Vector<double> > solutions(n_vectors, Vector<double> (n));
  * soltrans.refine_interpolate(solutions_old, solutions);
  * @endcode
  * This is used in several of the tutorial programs, for example step-31.
@@ -90,24 +97,58 @@ DEAL_II_NAMESPACE_OPEN
  * SolutionTransfer as follows:
  * @code
  * SolutionTransfer<dim, Vector<double> > soltrans(*dof_handler);
- *                                     // flag some cells for refinement
- *                                     // and coarsening, e.g.
- * GridRefinement::refine_and_coarsen_fixed_fraction(
- *   *tria, error_indicators, 0.3, 0.05);
- *                                     // prepare the triangulation,
+ *
+ * // flag some cells for refinement and coarsening, e.g.
+ * GridRefinement::refine_and_coarsen_fixed_fraction(*tria,
+ *                                                   error_indicators,
+ *                                                   0.3,
+ *                                                   0.05);
+ *
+ * // prepare the triangulation,
  * tria->prepare_coarsening_and_refinement();
- *                                     // prepare the SolutionTransfer object
- *                                     // for coarsening and refinement and give
- *                                     // the solution vector that we intend to
- *                                     // interpolate later,
+ *
+ * // prepare the SolutionTransfer object for coarsening and refinement and give
+ * // the solution vector that we intend to interpolate later,
  * soltrans.prepare_for_coarsening_and_refinement(solution);
- *                                     // actually execute the refinement,
+ *
+ * // actually execute the refinement,
  * tria->execute_coarsening_and_refinement ();
- *                                     // redistribute dofs,
+ *
+ * // redistribute dofs,
  * dof_handler->distribute_dofs (fe);
- *                                     // and interpolate the solution
+ *
+ * // and interpolate the solution
  * Vector<double> interpolate_solution(dof_handler->n_dofs());
  * soltrans.interpolate(solution, interpolated_solution);
+ * @endcode
+ *
+ * If the grid is partitioned across several MPI processes, then it is
+ * important to note that the old solution(s) must be copied to one that
+ * also provides access to the locally relevant DoF values (these values
+ * required for the interpolation process):
+ * @code
+ * // Create initial indexsets pertaining to the grid before refinement
+ * IndexSet locally_owned_dofs, locally_relevant_dofs;
+ * locally_owned_dofs = dof_handler.locally_owned_dofs();
+ * DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+ *
+ * // The solution vector only knows about locally owned DoFs
+ * TrilinosWrappers::MPI::Vector solution;
+ * solution.reinit(locally_owned_dofs,
+ *                 mpi_communicator);
+ * ...
+ * // Transfer solution to vector that provides access to locally relevant DoFs
+ * TrilinosWrappers::MPI::Vector old_solution;
+ * old_solution.reinit(locally_owned_dofs,
+ *                     locally_relevant_dofs,
+ *                     mpi_communicator);
+ * old_solution = solution;
+ * ...
+ * // Refine grid
+ * // Recreate locally_owned_dofs and locally_relevant_dofs index sets
+ * ...
+ * solution.reinit(locally_owned_dofs, mpi_communicator);
+ * soltrans.refine_interpolate(old_solution, solution);
  * @endcode
  *
  * Multiple calls to the function <code>interpolate (const Vector<number> &in,
@@ -236,18 +277,18 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Whether this is a problem you need to worry about or not depends on your
  * application. The situation is easily corrected, of course, by applying
- * ConstraintMatrix::distribute() to your solution vector after transfer,
- * using a constraint matrix object computed on the new DoFHandler object (you
+ * AffineConstraints::distribute() to your solution vector after transfer,
+ * using a constraints object computed on the new DoFHandler object (you
  * probably need to create this object anyway if you have hanging nodes). This
  * is also what is done, for example, in step-15.
  *
  * @note This situation can only happen if you do coarsening. If all cells
  * remain as they are or are refined, then SolutionTransfer::interpolate()
- * computes a new vector of nodel values, but the function represented is of
+ * computes a new vector of nodal values, but the function represented is of
  * course exactly the same because the old finite element space is a subspace
  * of the new one. Thus, if the old function was conforming (i.e., satisfied
  * hanging node constraints), then so does the new one, and it is not
- * necessary to call ConstraintMatrix::distribute().
+ * necessary to call AffineConstraints::distribute().
  *
  *
  * <h3>Implementation in the context of hp finite elements</h3>
@@ -281,7 +322,7 @@ DEAL_II_NAMESPACE_OPEN
  * polynomial degree is lowered on some cells, then the old finite element
  * space is not a subspace of the new space and you may run into the same
  * situation as discussed above with hanging nodes. You may want to consider
- * calling ConstraintMatrix::distribute() on the vector obtained by
+ * calling AffineConstraints::distribute() on the vector obtained by
  * transferring the solution.
  *
  * @ingroup numerics
@@ -289,18 +330,17 @@ DEAL_II_NAMESPACE_OPEN
  * 2006, Wolfgang Bangerth 2014
  */
 template <int dim,
-          typename VectorType = Vector<double>,
-          typename DoFHandlerType = DoFHandler<dim> >
+          typename VectorType     = Vector<double>,
+          typename DoFHandlerType = DoFHandler<dim>>
 class SolutionTransfer
 {
-#ifndef DEAL_II_MSVC
-  static_assert (dim == DoFHandlerType::dimension,
-                 "The dimension explicitly provided as a template "
-                 "argument, and the dimension of the DoFHandlerType "
-                 "template argument must match.");
-#endif
+#  ifndef DEAL_II_MSVC
+  static_assert(dim == DoFHandlerType::dimension,
+                "The dimension explicitly provided as a template "
+                "argument, and the dimension of the DoFHandlerType "
+                "template argument must match.");
+#  endif
 public:
-
   /**
    * Constructor, takes the current DoFHandler as argument.
    */
@@ -315,14 +355,16 @@ public:
    * Reinit this class to the state that it has directly after calling the
    * Constructor
    */
-  void clear();
+  void
+  clear();
 
   /**
    * Prepares the @p SolutionTransfer for pure refinement. It stores the dof
    * indices of each cell. After calling this function only calling the @p
    * refine_interpolate functions is allowed.
    */
-  void prepare_for_pure_refinement();
+  void
+  prepare_for_pure_refinement();
 
   /**
    * Prepares the @p SolutionTransfer for coarsening and refinement. It stores
@@ -331,13 +373,15 @@ public:
    * vectors that are to be interpolated onto the new (refined and/or
    * coarsenend) grid.
    */
-  void prepare_for_coarsening_and_refinement (const std::vector<VectorType> &all_in);
+  void
+  prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in);
 
   /**
    * Same as previous function but for only one discrete function to be
    * interpolated.
    */
-  void prepare_for_coarsening_and_refinement (const VectorType &in);
+  void
+  prepare_for_coarsening_and_refinement(const VectorType &in);
 
   /**
    * This function interpolates the discrete function @p in, which is a vector
@@ -350,8 +394,8 @@ public:
    * is called and the refinement is executed before. Multiple calling of this
    * function is allowed. e.g. for interpolating several functions.
    */
-  void refine_interpolate (const VectorType &in,
-                           VectorType       &out) const;
+  void
+  refine_interpolate(const VectorType &in, VectorType &out) const;
 
   /**
    * This function interpolates the discrete functions that are stored in @p
@@ -372,8 +416,9 @@ public:
    * the right size (@p n_dofs_refined). Otherwise an assertion will be
    * thrown.
    */
-  void interpolate (const std::vector<VectorType> &all_in,
-                    std::vector<VectorType>       &all_out) const;
+  void
+  interpolate(const std::vector<VectorType> &all_in,
+              std::vector<VectorType> &      all_out) const;
 
   /**
    * Same as the previous function. It interpolates only one function. It
@@ -384,14 +429,15 @@ public:
    * functions can be performed in one step by using <tt>interpolate (all_in,
    * all_out)</tt>
    */
-  void interpolate (const VectorType &in,
-                    VectorType       &out) const;
+  void
+  interpolate(const VectorType &in, VectorType &out) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  std::size_t
+  memory_consumption() const;
 
   /**
    * Exception
@@ -406,27 +452,30 @@ public:
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcAlreadyPrepForRef,
-                   "You are attempting to call one of the prepare_*() functions "
-                   "of this object to prepare it for an operation for which it "
-                   "is already prepared. Specifically, the object was "
-                   "previously prepared for pure refinement.");
+  DeclExceptionMsg(
+    ExcAlreadyPrepForRef,
+    "You are attempting to call one of the prepare_*() functions "
+    "of this object to prepare it for an operation for which it "
+    "is already prepared. Specifically, the object was "
+    "previously prepared for pure refinement.");
 
   /**
    * Exception
    */
-  DeclExceptionMsg(ExcAlreadyPrepForCoarseAndRef,
-                   "You are attempting to call one of the prepare_*() functions "
-                   "of this object to prepare it for an operation for which it "
-                   "is already prepared. Specifically, the object was "
-                   "previously prepared for both coarsening and refinement.");
+  DeclExceptionMsg(
+    ExcAlreadyPrepForCoarseAndRef,
+    "You are attempting to call one of the prepare_*() functions "
+    "of this object to prepare it for an operation for which it "
+    "is already prepared. Specifically, the object was "
+    "previously prepared for both coarsening and refinement.");
 
 private:
-
   /**
    * Pointer to the degree of freedom handler to work with.
    */
-  SmartPointer<const DoFHandlerType, SolutionTransfer<dim,VectorType, DoFHandlerType> > dof_handler;
+  SmartPointer<const DoFHandlerType,
+               SolutionTransfer<dim, VectorType, DoFHandlerType>>
+    dof_handler;
 
   /**
    * Stores the number of DoFs before the refinement and/or coarsening.
@@ -465,7 +514,7 @@ private:
    * repare_for_refining_and_coarsening) and stores all dof indices of the
    * cells that'll be refined
    */
-  std::vector<std::vector<types::global_dof_index> > indices_on_cell;
+  std::vector<std::vector<types::global_dof_index>> indices_on_cell;
 
   /**
    * All cell data (the dof indices and the dof values) should be accessible
@@ -480,23 +529,30 @@ private:
    */
   struct Pointerstruct
   {
-    Pointerstruct() : indices_ptr(nullptr), dof_values_ptr(nullptr), active_fe_index(0) {};
+    Pointerstruct()
+      : indices_ptr(nullptr)
+      , dof_values_ptr(nullptr)
+      , active_fe_index(0)
+    {}
     Pointerstruct(std::vector<types::global_dof_index> *indices_ptr_in,
-                  const unsigned int active_fe_index_in = 0)
-      :
-      indices_ptr(indices_ptr_in),
-      dof_values_ptr (nullptr),
-      active_fe_index(active_fe_index_in) {};
-    Pointerstruct(std::vector<Vector<typename VectorType::value_type> > *dof_values_ptr_in,
-                  const unsigned int active_fe_index_in = 0) :
-      indices_ptr (nullptr),
-      dof_values_ptr(dof_values_ptr_in),
-      active_fe_index(active_fe_index_in) {};
-    std::size_t memory_consumption () const;
+                  const unsigned int                    active_fe_index_in = 0)
+      : indices_ptr(indices_ptr_in)
+      , dof_values_ptr(nullptr)
+      , active_fe_index(active_fe_index_in)
+    {}
+    Pointerstruct(
+      std::vector<Vector<typename VectorType::value_type>> *dof_values_ptr_in,
+      const unsigned int active_fe_index_in = 0)
+      : indices_ptr(nullptr)
+      , dof_values_ptr(dof_values_ptr_in)
+      , active_fe_index(active_fe_index_in)
+    {}
+    std::size_t
+    memory_consumption() const;
 
-    std::vector<types::global_dof_index>    *indices_ptr;
-    std::vector<Vector<typename VectorType::value_type> > *dof_values_ptr;
-    unsigned int active_fe_index;
+    std::vector<types::global_dof_index> *                indices_ptr;
+    std::vector<Vector<typename VectorType::value_type>> *dof_values_ptr;
+    unsigned int                                          active_fe_index;
   };
 
   /**
@@ -511,13 +567,12 @@ private:
    * Is used for @p prepare_for_refining_and_coarsening The interpolated dof
    * values of all cells that'll be coarsened will be stored in this vector.
    */
-  std::vector<std::vector<Vector<typename VectorType::value_type> > > dof_values_on_cell;
+  std::vector<std::vector<Vector<typename VectorType::value_type>>>
+    dof_values_on_cell;
 };
 
 
 DEAL_II_NAMESPACE_CLOSE
 
-
-/*----------------------------   solutiontransfer.h     ---------------------------*/
-#endif
-/*----------------------------   solutiontransfer.h     ---------------------------*/
+#endif // dealii_solutiontransfer_h
+/*---------------------------- solutiontransfer.h ---------------------------*/

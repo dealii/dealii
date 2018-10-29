@@ -8,23 +8,26 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // check serialization for Table<5, int>
 
-#include "serialization.h"
 #include <deal.II/base/table.h>
+
 #include <boost/serialization/vector.hpp>
 
-void test ()
+#include "serialization.h"
+
+void
+test()
 {
-  unsigned int index1 = 3, index2 = 4, index3 = 2, index4 = 5, index5 = 1;
+  unsigned int    index1 = 3, index2 = 4, index3 = 2, index4 = 5, index5 = 1;
   TableIndices<5> indices1(index1, index2, index3, index4, index5);
-  unsigned int sum_of_indices = index1 + index2 + index3 + index4 + index5;
+  unsigned int    sum_of_indices = index1 + index2 + index3 + index4 + index5;
 
   Table<5, int> t1(index1, index2, index3, index4, index5);
   Table<5, int> t2(index1, index2, index3, index4, index5);
@@ -47,7 +50,7 @@ void test ()
                 {
                   for (unsigned int i5 = 0; i5 < indices1[4]; ++i5)
                     {
-                      t1[i1][i2][i3][i4][i5] = counter ++;
+                      t1[i1][i2][i3][i4][i5] = counter++;
                       t2[i1][i2][i3][i4][i5] = counter + sum_of_indices;
                     }
                 }
@@ -55,19 +58,19 @@ void test ()
         }
     }
 
-  verify (t1, t2);
+  verify(t1, t2);
 
-  verify (t1, t3);
+  verify(t1, t3);
 }
 
 
-int main ()
+int
+main()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
-  test ();
+  test();
 
   deallog << "OK" << std::endl;
 }

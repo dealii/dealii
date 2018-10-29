@@ -1,5 +1,5 @@
 
-DEAL::Checking ConstraintMatrix::merge
+DEAL::Checking AffineConstraints<double>::merge
 DEAL::Checking with open objects
     0 11:  1.0
     1 12:  0.12

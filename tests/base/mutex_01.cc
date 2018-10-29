@@ -8,24 +8,24 @@
 // it, and/or modify it under the terms of the GNU Lesser General
 // Public License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE at
-// the top level of the deal.II distribution.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
 // ---------------------------------------------------------------------
 
 
 // verify that mutexes work correctly in MT context
 
-#include "../tests.h"
-#include <unistd.h>
-
 #include <deal.II/base/thread_management.h>
+
+#include "../tests.h"
 
 
 Threads::Mutex mutex;
 
 
-void test ()
+void
+test()
 {
   // get the mutex, but note that it is first
   // held by main() which will therefore
@@ -35,26 +35,27 @@ void test ()
 }
 
 
-int main()
+int
+main()
 {
   initlog();
 
 #ifdef DEAL_II_WITH_THREADS
 
-  mutex.acquire ();
+  mutex.acquire();
 
-  Threads::Thread<> t = Threads::new_thread (&test);
+  Threads::Thread<> t = Threads::new_thread(&test);
 
-  sleep (2);
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   deallog << "1" << std::endl;
 
-  mutex.release ();
-  t.join ();
+  mutex.release();
+  t.join();
 
   // the other thread should now have acquired the mutex, so release it
   // again (destroying an acquired lock invokes undefined behavior in
   // pthread_mutex_destroy)
-  mutex.release ();
+  mutex.release();
 
 #else
 

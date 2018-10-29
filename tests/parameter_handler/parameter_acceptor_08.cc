@@ -8,16 +8,17 @@
 //    it, and/or modify it under the terms of the GNU Lesser General
 //    Public License as published by the Free Software Foundation; either
 //    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE at
-//    the top level of the deal.II distribution.
+//    The full text of the license can be found in the file LICENSE.md at
+//    the top level directory of deal.II.
 //
 //-----------------------------------------------------------
 
 
 
-#include "../tests.h"
-#include <deal.II/base/path_search.h>
 #include <deal.II/base/parameter_acceptor.h>
+#include <deal.II/base/path_search.h>
+
+#include "../tests.h"
 
 // Test subsectioning
 
@@ -26,10 +27,10 @@ class Test : public ParameterAcceptor
 public:
   Test(const std::string &sec_name  = "First Class",
        const std::string &par_name  = "Parameter name",
-       const std::string &par_value = "Parameter value"):
-    ParameterAcceptor(sec_name),
-    par_name(par_name),
-    par_value(par_value)
+       const std::string &par_value = "Parameter value")
+    : ParameterAcceptor(sec_name)
+    , par_name(par_name)
+    , par_value(par_value)
   {
     add_parameter(par_name, this->par_value);
 
@@ -46,7 +47,8 @@ private:
   std::string par_value;
 };
 
-int main ()
+int
+main()
 {
   initlog();
   auto &prm = ParameterAcceptor::prm;
