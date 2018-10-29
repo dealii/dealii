@@ -35,6 +35,25 @@ for (number : REAL_AND_COMPLEX_SCALARS)
     template FullMatrix<number> DataSet::read_hyperslab<FullMatrix<number>>(
       const std::vector<hsize_t> &offset, const std::vector<hsize_t> &count);
 
+    template std::vector<number> DataSet::read_hyperslab<std::vector<number>>(
+      const std::vector<hsize_t> &data_dimensions,
+      const std::vector<hsize_t> &offset,
+      const std::vector<hsize_t> &stride,
+      const std::vector<hsize_t> &count,
+      const std::vector<hsize_t> &block);
+    template Vector<number> DataSet::read_hyperslab<Vector<number>>(
+      const std::vector<hsize_t> &data_dimensions,
+      const std::vector<hsize_t> &offset,
+      const std::vector<hsize_t> &stride,
+      const std::vector<hsize_t> &count,
+      const std::vector<hsize_t> &block);
+    template FullMatrix<number> DataSet::read_hyperslab<FullMatrix<number>>(
+      const std::vector<hsize_t> &data_dimensions,
+      const std::vector<hsize_t> &offset,
+      const std::vector<hsize_t> &stride,
+      const std::vector<hsize_t> &count,
+      const std::vector<hsize_t> &block);
+
     template void DataSet::read_none<number>();
 
     template void DataSet::write<std::vector<number>>(

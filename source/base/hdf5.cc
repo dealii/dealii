@@ -882,6 +882,76 @@ namespace HDF5
 
 
 
+  template <typename Container>
+  Container
+  DataSet::read_hyperslab(const std::vector<hsize_t> &data_dimensions,
+                          const std::vector<hsize_t> &offset,
+                          const std::vector<hsize_t> &stride,
+                          const std::vector<hsize_t> &count,
+                          const std::vector<hsize_t> &block)
+  {
+    const std::shared_ptr<hid_t> t_type =
+      internal::get_hdf5_datatype<typename Container::value_type>();
+    hid_t plist;
+    hid_t memory_dataspace;
+
+    Container data = internal::initialize_container<Container>(data_dimensions);
+
+    memory_dataspace =
+      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
+    Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
+    ret = H5Sselect_hyperslab(*dataspace,
+                              H5S_SELECT_SET,
+                              offset.data(),
+                              stride.data(),
+                              count.data(),
+                              block.data());
+    Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
+
+    if (mpi)
+      {
+        plist = H5Pcreate(H5P_DATASET_XFER);
+        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
+        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
+      }
+    else
+      {
+        plist = H5P_DEFAULT;
+      }
+
+    ret = H5Dread(*hdf5_reference,
+                  *t_type,
+                  memory_dataspace,
+                  *dataspace,
+                  plist,
+                  internal::get_container_pointer(data));
+    Assert(ret >= 0, ExcMessage("Error at H5Dread"));
+
+    if (mpi)
+      {
+        if (query_io_mode)
+          {
+            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
+            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
+            ret = H5Pget_mpio_no_collective_cause(plist,
+                                                  &local_no_collective_cause,
+                                                  &global_no_collective_cause);
+            Assert(ret >= 0,
+                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
+          }
+        ret = H5Pclose(plist);
+        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
+      }
+
+    ret = H5Sclose(memory_dataspace);
+    Assert(ret >= 0, ExcMessage("Error at H5SClose"));
+
+    return data;
+  }
+
+
+
   template <typename number>
   void
   DataSet::read_none()
@@ -1564,6 +1634,21 @@ namespace HDF5
   DataSet::read_hyperslab<std::vector<unsigned int>>(
     const std::vector<hsize_t> &offset,
     const std::vector<hsize_t> &count);
+
+  template std::vector<int>
+  DataSet::read_hyperslab<std::vector<int>>(
+    const std::vector<hsize_t> &data_dimensions,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &stride,
+    const std::vector<hsize_t> &count,
+    const std::vector<hsize_t> &block);
+  template std::vector<unsigned int>
+  DataSet::read_hyperslab<std::vector<unsigned int>>(
+    const std::vector<hsize_t> &data_dimensions,
+    const std::vector<hsize_t> &offset,
+    const std::vector<hsize_t> &stride,
+    const std::vector<hsize_t> &count,
+    const std::vector<hsize_t> &block);
 
   template void
   DataSet::read_none<int>();

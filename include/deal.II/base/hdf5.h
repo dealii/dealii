@@ -507,6 +507,46 @@ namespace HDF5
                    const std::vector<hsize_t> &count);
 
     /**
+     * * Writes a data hyperslab to the dataset. The parameters are summarized
+     * below:
+     *  - Dataset_dimensions: the dimensions of the data memory block.
+     *  - Offset: The starting location for the hyperslab.
+     *  - Stride: The number of elements to separate each element or block to be
+     * selected.
+     *  - Count: The number of elements or blocks to select along each
+     * dimension.
+     *  - Block: The size of the block selected from the dataspace.
+     *
+     * See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
+     * and Data Transfer</a>  section in the HDF5 User's Guide. See as well the
+     * <a
+     * href="https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab">H5Sselect_hyperslab
+     * definition</a>.
+     *
+     * Datatype conversion takes place at the time of a read or write and is
+     * automatic. See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
+     * User's Guide.
+     *
+     * `Container` can be `std::vector<float>`, `std::vector<double>`,
+     * `std::vector<std::complex<float>>`, `std::vector<std::complex<double>>`,
+     * `std::vector<int>`, `std::vector<unsigned int>`, `Vector<float>`,
+     * `Vector<double>`, `Vector<std::complex<float>>`,
+     * `Vector<std::complex<double>>`, `FullMatrix<float>`,
+     * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
+     * `FullMatrix<std::complex<double>>`.
+     */
+    template <typename Container>
+    Container
+    read_hyperslab(const std::vector<hsize_t> &data_dimensions,
+                   const std::vector<hsize_t> &offset,
+                   const std::vector<hsize_t> &stride,
+                   const std::vector<hsize_t> &count,
+                   const std::vector<hsize_t> &block);
+
+    /**
      * This function does not read any data, but it can contribute to a
      * collective read call. @p number can be `float`, `double`,
      * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
