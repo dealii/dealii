@@ -214,6 +214,8 @@ namespace DoFTools
      * Two components couple only if their shape functions are both nonzero on
      * a given face. This flag is only used when computing integrals over
      * faces of cells, e.g., in DoFTools::make_flux_sparsity_pattern().
+     * Use Coupling::always in general cases where gradients etc. occur on face
+     * integrals.
      */
     nonzero
   };
