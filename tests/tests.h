@@ -600,9 +600,10 @@ struct MPILogInitAll
 // Also initialize a dummy handle that makes sure that unused memory is released
 // before the device shuts down.
 void
-init_cuda(bool use_mpi = false)
+init_cuda(const bool use_mpi = false)
 {
   static Utilities::CUDA::Handle cuda_handle;
+
 #  ifndef DEAL_II_WITH_MPI
   Assert(use_mpi == false, ExcInternalError());
 #  endif
@@ -611,10 +612,10 @@ init_cuda(bool use_mpi = false)
   int         device_id       = 0;
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
+  AssertCuda(cuda_error_code);
   if (my_id == 0)
     {
       Testing::srand(std::time(nullptr));
-      AssertCuda(cuda_error_code);
       device_id = Testing::rand() % n_devices;
     }
 #  ifdef DEAL_II_WITH_MPI
