@@ -35,7 +35,7 @@ namespace Functions
    * delta_t)</code> denotes the function evaluated at time <code>t -
    * delta_t</code>. The decrement <code>delta_t</code> is set by the method
    * set_decrement(). The main application of this class is to transform a given
-   * Dirichlet boundary condition function into the incremental form, as is
+   * Dirichlet boundary condition function into incremental form, as is
    * required by some implementations of non-linear solution schemes.
    *
    * @ingroup functions
