@@ -104,9 +104,9 @@ namespace Utilities
     const int                                          bits_per_dim = 64);
 
   /**
-   * Interleave first @p bits_per_dim bits from each element of @p index
+   * Interleave the least significant @p bits_per_dim bits from each element of @p index
    * (starting from last) into a single unsigned integer. The last element
-   * of @p index will be used to set the first @p bits_per_dim in the the
+   * of @p index will be used to set the first @p bits_per_dim in the
    * resulting integer, the pre last element is used to set the next @p bits_per_dim,
    * etc. Clearly, the following should hold <code>bits\_per\_dim * dim <=
    * 64</code>.
