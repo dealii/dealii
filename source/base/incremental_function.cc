@@ -50,6 +50,10 @@ namespace Functions
     const Point<dim> & p,
     const unsigned int comp) const
   {
+    // since we modify a mutable member variable, lock the
+    // the data via a mutex
+    std::lock_guard<std::mutex> lock(mutex);
+
     // Cache the time state of the base class in case it has been changed
     // within the user code. We reset the wrapped function to the original
     // state once we're done with our own evaluations.
