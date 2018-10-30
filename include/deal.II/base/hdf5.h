@@ -452,8 +452,8 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename number>
-    std::vector<number>
+    template <typename Container>
+    Container
     read_selection(const std::vector<hsize_t> &coordinates);
 
     /**
@@ -595,9 +595,9 @@ namespace HDF5
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
      */
-    template <typename number>
+    template <typename Container>
     void
-    write_selection(const std::vector<number> & data,
+    write_selection(const Container &           data,
                     const std::vector<hsize_t> &coordinates);
 
     // clang-format off

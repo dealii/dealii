@@ -734,23 +734,23 @@ namespace HDF5
 
 
 
-  template <typename number>
-  std::vector<number>
+  template <typename Container>
+  Container
   DataSet::read_selection(const std::vector<hsize_t> &coordinates)
   {
     Assert(coordinates.size() % rank == 0,
            ExcMessage(
              "The dimension of coordinates has to be divisible by the rank"));
-    const std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    hid_t                        plist;
-    hid_t                        memory_dataspace;
-    herr_t                       ret;
+    const std::shared_ptr<hid_t> t_type =
+      internal::get_hdf5_datatype<typename Container::value_type>();
+    hid_t  plist;
+    hid_t  memory_dataspace;
+    herr_t ret;
 
     std::vector<hsize_t> data_dimensions{
       static_cast<hsize_t>(coordinates.size() / rank)};
 
-    std::vector<number> data(
-      static_cast<unsigned int>(coordinates.size() / rank));
+    Container data = internal::initialize_container<Container>(data_dimensions);
 
     memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
@@ -777,7 +777,7 @@ namespace HDF5
                   memory_dataspace,
                   *dataspace,
                   plist,
-                  data.data());
+                  internal::get_container_pointer(data));
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
     if (mpi)
@@ -1055,14 +1055,16 @@ namespace HDF5
 
 
 
-  template <typename number>
+  template <typename Container>
   void
-  DataSet::write_selection(const std::vector<number> & data,
+  DataSet::write_selection(const Container &           data,
                            const std::vector<hsize_t> &coordinates)
   {
     AssertDimension(coordinates.size(), data.size() * rank);
-    const std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    const std::vector<hsize_t>   data_dimensions = {data.size()};
+    const std::shared_ptr<hid_t> t_type =
+      internal::get_hdf5_datatype<typename Container::value_type>();
+    const std::vector<hsize_t> data_dimensions =
+      internal::get_container_dimensions(data);
 
     hid_t  memory_dataspace;
     hid_t  plist;
@@ -1094,7 +1096,7 @@ namespace HDF5
                    memory_dataspace,
                    *dataspace,
                    plist,
-                   data.data());
+                   internal::get_container_const_pointer(data));
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
@@ -1637,9 +1639,10 @@ namespace HDF5
   DataSet::read<std::vector<unsigned int>>();
 
   template std::vector<int>
-  DataSet::read_selection<int>(const std::vector<hsize_t> &coordinates);
+  DataSet::read_selection<std::vector<int>>(
+    const std::vector<hsize_t> &coordinates);
   template std::vector<unsigned int>
-  DataSet::read_selection<unsigned int>(
+  DataSet::read_selection<std::vector<unsigned int>>(
     const std::vector<hsize_t> &coordinates);
 
   template std::vector<int>
@@ -1677,10 +1680,11 @@ namespace HDF5
     const std::vector<unsigned int> &data);
 
   template void
-  DataSet::write_selection<int>(const std::vector<int> &    data,
-                                const std::vector<hsize_t> &coordinates);
+  DataSet::write_selection<std::vector<int>>(
+    const std::vector<int> &    data,
+    const std::vector<hsize_t> &coordinates);
   template void
-  DataSet::write_selection<unsigned int>(
+  DataSet::write_selection<std::vector<unsigned int>>(
     const std::vector<unsigned int> &data,
     const std::vector<hsize_t> &     coordinates);
 

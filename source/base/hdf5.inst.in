@@ -25,7 +25,9 @@ for (number : REAL_AND_COMPLEX_SCALARS)
     template Vector<number>      DataSet::read<Vector<number>>();
     template FullMatrix<number>  DataSet::read<FullMatrix<number>>();
 
-    template std::vector<number> DataSet::read_selection<number>(
+    template std::vector<number> DataSet::read_selection<std::vector<number>>(
+      const std::vector<hsize_t> &coordinates);
+    template Vector<number> DataSet::read_selection<Vector<number>>(
       const std::vector<hsize_t> &coordinates);
 
     template std::vector<number> DataSet::read_hyperslab<std::vector<number>>(
@@ -62,8 +64,10 @@ for (number : REAL_AND_COMPLEX_SCALARS)
     template void DataSet::write<FullMatrix<number>>(
       const FullMatrix<number> &data);
 
-    template void DataSet::write_selection<number>(
+    template void DataSet::write_selection<std::vector<number>>(
       const std::vector<number> &data, const std::vector<hsize_t> &coordinates);
+    template void DataSet::write_selection<Vector<number>>(
+      const Vector<number> &data, const std::vector<hsize_t> &coordinates);
 
     template void DataSet::write_hyperslab<std::vector<number>>(
       const std::vector<number> & data,

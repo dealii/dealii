@@ -602,7 +602,8 @@ read_test(HDF5::Group        root_group,
                                             4, // third point
                                             25,
                                             12}; // fourth point
-      auto data_a = dataset.template read_selection<Number>(coordinates_a);
+      auto                 data_a =
+        dataset.template read_selection<std::vector<Number>>(coordinates_a);
       deallog << "Selection " + dataset_name << " " << container_name << "<"
               << type_name << ">"
               << " (Read): " << data_a[0] << ", " << data_a[1] << ", "

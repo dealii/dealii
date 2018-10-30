@@ -972,7 +972,7 @@ read_test(HDF5::Group        root_group,
                                           3,
                                           2}; // fith point
 
-      auto data = dataset.read_selection<Number>(coordinates);
+      auto data = dataset.read_selection<std::vector<Number>>(coordinates);
 
       pcout << "Sub-matrix" << std::endl;
       pcout << "IO mode " + dataset_name << "<" << type_name << ">"
