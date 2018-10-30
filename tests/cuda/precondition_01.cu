@@ -74,6 +74,8 @@ main()
   deallog << std::setprecision(10);
   deallog.depth_console(0);
 
+  init_cuda();
+
   Utilities::CUDA::Handle cuda_handle;
   deallog << "Testing float" << std::endl;
   test<float>(cuda_handle);

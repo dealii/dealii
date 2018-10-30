@@ -159,6 +159,8 @@ main()
 
   deallog << std::setprecision(3);
 
+  init_cuda();
+
   {
     deallog.push("2d");
     test<2, 1>();

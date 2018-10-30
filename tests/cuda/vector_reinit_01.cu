@@ -110,9 +110,9 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
-  Utilities::CUDA::Handle cuda_handle;
 
   initlog();
+  init_cuda();
 
   do_test<
     LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::CUDA>>();
