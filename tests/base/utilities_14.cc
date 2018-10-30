@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test Utilities::interleave() for indices from
+// test Utilities::pack_integers() for indices from
 // Utilities::inverse_Hilbert_space_filling_curve in 2D on the following points
 // with bits=2:
 
@@ -60,7 +60,7 @@ test()
 
   for (const auto &p : res)
     deallog << p[0] << " " << p[1] << " "
-            << Utilities::interleave<2>(p, bit_depth) << std::endl;
+            << Utilities::pack_integers<2>(p, bit_depth) << std::endl;
 }
 
 int

@@ -270,8 +270,8 @@ namespace Utilities
 
   template <int dim>
   std::uint64_t
-  interleave(const std::array<std::uint64_t, dim> &index,
-             const int                             bits_per_dim)
+  pack_integers(const std::array<std::uint64_t, dim> &index,
+                const int                             bits_per_dim)
   {
     using Integer = std::uint64_t;
 
@@ -1131,11 +1131,11 @@ namespace Utilities
     const int);
 
   template std::uint64_t
-  interleave<1>(const std::array<std::uint64_t, 1> &, const int);
+  pack_integers<1>(const std::array<std::uint64_t, 1> &, const int);
   template std::uint64_t
-  interleave<2>(const std::array<std::uint64_t, 2> &, const int);
+  pack_integers<2>(const std::array<std::uint64_t, 2> &, const int);
   template std::uint64_t
-  interleave<3>(const std::array<std::uint64_t, 3> &, const int);
+  pack_integers<3>(const std::array<std::uint64_t, 3> &, const int);
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE
