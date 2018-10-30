@@ -69,11 +69,6 @@ namespace Functions
     IncrementalFunction(Function<dim, RangeNumberType> &base);
 
     /**
-     * Virtual destructor
-     */
-    virtual ~IncrementalFunction() = default;
-
-    /**
      * Return the value of the function at the given point.
      *
      * Unless there is only one component (i.e. the function is scalar), you

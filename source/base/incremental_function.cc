@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/incremental_function.h>
+#include <deal.II/base/signaling_nan.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -25,7 +26,7 @@ namespace Functions
   IncrementalFunction<dim, RangeNumberType>::IncrementalFunction(
     Function<dim, RangeNumberType> &base)
     : base(base)
-    , delta_t(time_type())
+    , delta_t(numbers::signaling_nan<time_type>())
     , values_old(base.n_components)
   {}
 
@@ -45,8 +46,9 @@ namespace Functions
 
   template <int dim, typename RangeNumberType>
   RangeNumberType
-  IncrementalFunction<dim, RangeNumberType>::value(const Point<dim> &p,
-                                                   unsigned int      comp) const
+  IncrementalFunction<dim, RangeNumberType>::value(
+    const Point<dim> & p,
+    const unsigned int comp) const
   {
     // Cache the time state of the base class in case it has been changed
     // within the user code. We reset the wrapped function to the original
