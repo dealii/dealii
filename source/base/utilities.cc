@@ -268,6 +268,30 @@ namespace Utilities
 
 
 
+  template <int dim>
+  std::uint64_t
+  interleave(const std::array<std::uint64_t, dim> &index,
+             const int                             bits_per_dim)
+  {
+    using Integer = std::uint64_t;
+
+    AssertIndexRange(bits_per_dim * dim, 65);
+    Assert(bits_per_dim > 0, ExcMessage("bits_per_dim should be positive"));
+
+    const Integer mask = (1 << bits_per_dim) - 1;
+
+    Integer res = 0;
+    for (unsigned int i = 0; i < dim; ++i)
+      {
+        // take @bits_per_dim from each integer and shift them
+        const Integer v = (mask & index[dim - 1 - i]) << (bits_per_dim * i);
+        res |= v;
+      }
+    return res;
+  }
+
+
+
   std::string
   int_to_string(const unsigned int value, const unsigned int digits)
   {
@@ -1106,6 +1130,12 @@ namespace Utilities
     const std::vector<std::array<std::uint64_t, 3>> &,
     const int);
 
+  template std::uint64_t
+  interleave<1>(const std::array<std::uint64_t, 1> &, const int);
+  template std::uint64_t
+  interleave<2>(const std::array<std::uint64_t, 2> &, const int);
+  template std::uint64_t
+  interleave<3>(const std::array<std::uint64_t, 3> &, const int);
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE

@@ -104,6 +104,22 @@ namespace Utilities
     const int                                          bits_per_dim = 64);
 
   /**
+   * Interleave first @p bits_per_dim bits from each element of @p index
+   * (starting from last) into a single unsigned integer. The function is useful
+   * in debugging and visualization of indices returned by
+   * inverse_Hilbert_space_filling_curve(). Clearly, the following should hold
+   * <code>bits\_per\_dim * dim <= 64</code>.
+   *
+   * @note There is no need to use this function in order to compare indices
+   * returned by inverse_Hilbert_space_filling_curve(), that can be easily done
+   * via <code>std::lexicographical_compare()</code>.
+   */
+  template <int dim>
+  std::uint64_t
+  interleave(const std::array<std::uint64_t, dim> &index,
+             const int                             bits_per_dim);
+
+  /**
    * Convert a number @p value to a string, with as many digits as given to
    * fill with leading zeros.
    *
