@@ -116,35 +116,27 @@ namespace HDF5
     //
     // Instead of using functions with std::enable_if, "constexpr if" from C++17
     // could be used
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container,
-                   std::vector<typename Container::value_type>>::value,
-      std::vector<hsize_t>>::type
-    get_container_dimensions(const Container &data)
+    template <typename number>
+    std::vector<hsize_t>
+    get_container_dimensions(const std::vector<number> &data)
     {
       return std::vector<hsize_t>{data.size()};
     }
 
 
 
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container, Vector<typename Container::value_type>>::value,
-      std::vector<hsize_t>>::type
-    get_container_dimensions(const Container &data)
+    template <typename number>
+    std::vector<hsize_t>
+    get_container_dimensions(const Vector<number> &data)
     {
       return std::vector<hsize_t>{data.size()};
     }
 
 
 
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container,
-                   FullMatrix<typename Container::value_type>>::value,
-      std::vector<hsize_t>>::type
-    get_container_dimensions(const Container &data)
+    template <typename number>
+    std::vector<hsize_t>
+    get_container_dimensions(const FullMatrix<number> &data)
     {
       return std::vector<hsize_t>{data.m(), data.n()};
     }
@@ -155,35 +147,27 @@ namespace HDF5
     // For a std::vector the function returns int(vector_size)
     // For a Vector the function returns int(vector_size)
     // For a FullMatrix the function returns int(rows*columns)
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container,
-                   std::vector<typename Container::value_type>>::value,
-      unsigned int>::type
-    get_container_size(const Container &data)
+    template <typename number>
+    unsigned int
+    get_container_size(const std::vector<number> &data)
     {
       return static_cast<unsigned int>(data.size());
     }
 
 
 
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container, Vector<typename Container::value_type>>::value,
-      unsigned int>::type
-    get_container_size(const Container &data)
+    template <typename number>
+    unsigned int
+    get_container_size(const Vector<number> &data)
     {
       return static_cast<unsigned int>(data.size());
     }
 
 
 
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container,
-                   FullMatrix<typename Container::value_type>>::value,
-      unsigned int>::type
-    get_container_size(const Container &data)
+    template <typename number>
+    unsigned int
+    get_container_size(const FullMatrix<number> &data)
     {
       return static_cast<unsigned int>(data.m() * data.n());
     }
@@ -191,12 +175,9 @@ namespace HDF5
 
 
     // This function returns the pointer to the raw data of a container
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container,
-                   std::vector<typename Container::value_type>>::value,
-      void *>::type
-    get_container_pointer(Container &data)
+    template <typename number>
+    void *
+    get_container_pointer(std::vector<number> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong
@@ -205,11 +186,9 @@ namespace HDF5
 
 
 
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container, Vector<typename Container::value_type>>::value,
-      void *>::type
-    get_container_pointer(Container &data)
+    template <typename number>
+    void *
+    get_container_pointer(Vector<number> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -219,12 +198,9 @@ namespace HDF5
 
 
 
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container,
-                   FullMatrix<typename Container::value_type>>::value,
-      void *>::type
-    get_container_pointer(Container &data)
+    template <typename number>
+    void *
+    get_container_pointer(FullMatrix<number> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -237,12 +213,9 @@ namespace HDF5
     // This function returns the pointer to the raw data of a container
     // The returned pointer is const, which means that it can be used only to
     // read the data
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container,
-                   std::vector<typename Container::value_type>>::value,
-      const void *>::type
-    get_container_const_pointer(const Container &data)
+    template <typename number>
+    const void *
+    get_container_const_pointer(const std::vector<number> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong
@@ -251,11 +224,9 @@ namespace HDF5
 
 
 
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container, Vector<typename Container::value_type>>::value,
-      const void *>::type
-    get_container_const_pointer(const Container &data)
+    template <typename number>
+    const void *
+    get_container_const_pointer(const Vector<number> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
@@ -265,12 +236,9 @@ namespace HDF5
 
 
 
-    template <typename Container>
-    typename std::enable_if<
-      std::is_same<Container,
-                   FullMatrix<typename Container::value_type>>::value,
-      const void *>::type
-    get_container_const_pointer(const Container &data)
+    template <typename number>
+    const void *
+    get_container_const_pointer(const FullMatrix<number> &data)
     {
       // It is very important to pass the variable "data" by reference otherwise
       // the pointer will be wrong.
