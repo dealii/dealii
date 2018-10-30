@@ -2575,11 +2575,14 @@ namespace VectorTools
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
-   * given DoFHandler and nodal vector at the given point, and return the
-   * (vector) value of this function through the last argument.
+   * given DoFHandler and nodal vector @p fe_function at the given point @p
+   * point, and return the (vector) value of this function through the last
+   * argument.
    *
-   * This is a wrapper function using a Q1-mapping for cell boundaries to call
-   * the other point_difference() function.
+   * This function uses a Q1-mapping for the cell the point is evaluated
+   * in. If you need to evaluate using a different mapping (for example when
+   * using curved boundaries), use the point_difference() function that takes
+   * a mapping.
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
@@ -2628,11 +2631,13 @@ namespace VectorTools
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
-   * and nodal vector at the given point, and return the value of this
-   * function.
+   * and nodal vector @p fe_function at the given point @p point, and return
+   * the value of this function.
    *
-   * Compared with the other function of the same name, this is a wrapper
-   * function using a Q1-mapping for cells.
+   * This function uses a Q1-mapping for the cell the point is evaluated
+   * in. If you need to evaluate using a different mapping (for example when
+   * using curved boundaries), use the point_difference() function that takes
+   * a mapping.
    *
    * This function is used in the "Possibilities for extensions" part of the
    * results section of
@@ -2683,11 +2688,12 @@ namespace VectorTools
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
-   * given DoFHandler and nodal vector at the given point, and return the
-   * (vector) value of this function through the last argument.
+   * given DoFHandler and nodal vector @p fe_function at the given point @p
+   * point, and return the (vector) value of this function through the last
+   * argument.
    *
    * Compared with the other function of the same name, this function uses an
-   * arbitrary mapping to evaluate the difference.
+   * arbitrary mapping to evaluate the point value.
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
@@ -2738,8 +2744,8 @@ namespace VectorTools
 
   /**
    * Evaluate a scalar finite element function defined by the given DoFHandler
-   * and nodal vector at the given point, and return the value of this
-   * function.
+   * and nodal vector @p fe_function at the given point @p point, and return
+   * the value of this function.
    *
    * Compared with the other function of the same name, this function uses an
    * arbitrary mapping to evaluate the difference.
