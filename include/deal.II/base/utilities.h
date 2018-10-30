@@ -111,7 +111,7 @@ namespace Utilities
    * <code>bits\_per\_dim * dim <= 64</code>.
    *
    * @note There is no need to use this function in order to compare indices
-   * returned by inverse_Hilbert_space_filling_curve(), that can be easily done
+   * returned by inverse_Hilbert_space_filling_curve(), as that can easily be done
    * via <code>std::lexicographical_compare()</code>.
    */
   template <int dim>

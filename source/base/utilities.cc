@@ -283,7 +283,7 @@ namespace Utilities
     Integer res = 0;
     for (unsigned int i = 0; i < dim; ++i)
       {
-        // take @bits_per_dim from each integer and shift them
+        // take bits_per_dim from each integer and shift them
         const Integer v = (mask & index[dim - 1 - i]) << (bits_per_dim * i);
         res |= v;
       }
