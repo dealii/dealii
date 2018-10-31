@@ -17,7 +17,7 @@
 for (number : REAL_AND_COMPLEX_SCALARS)
   {
     template number HDF5Object::get_attribute<number>(
-      const std::string &attr_name);
+      const std::string &attr_name) const;
     template void HDF5Object::set_attribute<number>(
       const std::string &attr_name, number value);
 

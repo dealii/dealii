@@ -340,7 +340,7 @@ namespace HDF5
      */
     template <typename T>
     T
-    get_attribute(const std::string &attr_name);
+    get_attribute(const std::string &attr_name) const;
 
     /**
      * Writes an attribute. @p T can be `float`, `double`, `std::complex<float>`,
