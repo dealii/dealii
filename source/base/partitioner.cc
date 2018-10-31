@@ -320,7 +320,8 @@ namespace Utilities
         n_import_indices_data);
       {
         unsigned int             current_index_start = 0;
-        std::vector<MPI_Request> import_requests(import_targets_data.size());
+        std::vector<MPI_Request> import_requests(import_targets_data.size() +
+                                                 n_ghost_targets);
         for (unsigned int i = 0; i < import_targets_data.size(); i++)
           {
             const int ierr =
@@ -336,17 +337,19 @@ namespace Utilities
           }
         AssertDimension(current_index_start, n_import_indices_data);
 
-        // use blocking send for ghost indices stored in expanded_ghost_indices
+        // use non-blocking send for ghost indices stored in
+        // expanded_ghost_indices
         current_index_start = 0;
         for (unsigned int i = 0; i < n_ghost_targets; i++)
           {
             const int ierr =
-              MPI_Send(&expanded_ghost_indices[current_index_start],
-                       ghost_targets_data[i].second,
-                       DEAL_II_DOF_INDEX_MPI_TYPE,
-                       ghost_targets_data[i].first,
-                       my_pid,
-                       communicator);
+              MPI_Isend(&expanded_ghost_indices[current_index_start],
+                        ghost_targets_data[i].second,
+                        DEAL_II_DOF_INDEX_MPI_TYPE,
+                        ghost_targets_data[i].first,
+                        my_pid,
+                        communicator,
+                        &import_requests[import_targets_data.size() + i]);
             AssertThrowMPI(ierr);
             current_index_start += ghost_targets_data[i].second;
           }

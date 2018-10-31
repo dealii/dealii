@@ -21,6 +21,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
@@ -419,7 +420,7 @@ namespace Utilities
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::update_ghost_values().
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       export_to_ghosted_array_start(
         const unsigned int             communication_channel,
@@ -529,7 +530,7 @@ namespace Utilities
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::compress().
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       import_from_ghosted_array_finish(
         const VectorOperation::values  vector_operation,
