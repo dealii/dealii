@@ -104,12 +104,12 @@ namespace Utilities
     const int                                          bits_per_dim = 64);
 
   /**
-   * Interleave the least significant @p bits_per_dim bits from each element of @p index
+   * Pack the least significant @p bits_per_dim bits from each element of @p index
    * (starting from last) into a single unsigned integer. The last element
-   * of @p index will be used to set the first @p bits_per_dim in the
-   * resulting integer, the pre last element is used to set the next @p bits_per_dim,
-   * etc. Clearly, the following should hold <code>bits\_per\_dim * dim <=
-   * 64</code>.
+   * of @p index will be used to set the first @p bits_per_dim bits in the
+   * resulting integer, the second to last element is used to set the next @p bits_per_dim bits,
+   * etc.. To fit all the data into the output, the following should hold
+   * <code>bits\_per\_dim * dim <= 64</code>.
    *
    * The function is useful in debugging and visualization of indices returned
    * by inverse_Hilbert_space_filling_curve().
