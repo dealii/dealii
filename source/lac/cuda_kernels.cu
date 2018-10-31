@@ -31,11 +31,11 @@ namespace LinearAlgebra
       vec_scale<float>(float *, const float a, const size_type);
       template __global__ void
       vector_bin_op<float, Binop_Addition>(float *         v1,
-                                           float *         v2,
+                                           const float *   v2,
                                            const size_type N);
       template __global__ void
       vector_bin_op<float, Binop_Subtraction>(float *         v1,
-                                              float *         v2,
+                                              const float *   v2,
                                               const size_type N);
       template struct ElemSum<float>;
       template struct L1Norm<float>;
@@ -126,11 +126,11 @@ namespace LinearAlgebra
       vec_scale<double>(double *, const double a, const size_type);
       template __global__ void
       vector_bin_op<double, Binop_Addition>(double *        v1,
-                                            double *        v2,
+                                            const double *  v2,
                                             const size_type N);
       template __global__ void
       vector_bin_op<double, Binop_Subtraction>(double *        v1,
-                                               double *        v2,
+                                               const double *  v2,
                                                const size_type N);
       template struct ElemSum<double>;
       template struct L1Norm<double>;

@@ -26,6 +26,8 @@
 
 #  include <deal.II/lac/cuda_atomic.h>
 
+#  include <assert.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
@@ -57,13 +59,25 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
+      template <typename Number>
       struct Binop_Addition
       {
-        template <typename Number>
         __device__ static inline Number
         operation(const Number a, const Number b)
         {
           return a + b;
+        }
+      };
+
+      template <typename Number>
+      struct Binop_Addition<std::complex<Number>>
+      {
+        __device__ static inline std::complex<Number>
+        operation(const std::complex<Number> a, const std::complex<Number> b)
+        {
+          printf("This function is not implemented for std::complex<Number>!");
+          assert(false);
+          return {};
         }
       };
 
@@ -74,9 +88,9 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
+      template <typename Number>
       struct Binop_Subtraction
       {
-        template <typename Number>
         __device__ static inline Number
         operation(const Number a, const Number b)
         {
@@ -91,9 +105,9 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
-      template <typename Number, typename Binop>
+      template <typename Number, template <typename> class Binop>
       __global__ void
-      vector_bin_op(Number *v1, Number *v2, const size_type N);
+      vector_bin_op(Number *v1, const Number *v2, const size_type N);
 
 
 
