@@ -1,7 +1,6 @@
 DEAL_II_PATH=@DEAL_II_PATH_PC@
 DEAL_II_INCLUDE_RELDIR=@DEAL_II_INCLUDE_RELDIR@
 libdir=${DEAL_II_PATH}/@DEAL_II_LIBRARY_RELDIR@
-includedir=@CONFIG_INCLUDE_DIRS_PC@
 
 Name: deal.II_base
 Description: base file used by the debug and release versions
