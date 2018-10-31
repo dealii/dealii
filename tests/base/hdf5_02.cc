@@ -30,8 +30,8 @@ test()
   {
     // Create file
     HDF5::File data_file(filename,
-                         MPI_COMM_WORLD,
-                         HDF5::File::FileAccessMode::create);
+                         HDF5::File::FileAccessMode::create,
+                         MPI_COMM_WORLD);
 
     // Create attributes attached to the root
     const float        root_float        = 2.45681934e5;
@@ -76,8 +76,8 @@ test()
   {
     // Read attributes attached to the root
     HDF5::File data_file(filename,
-                         MPI_COMM_WORLD,
-                         HDF5::File::FileAccessMode::open);
+                         HDF5::File::FileAccessMode::open,
+                         MPI_COMM_WORLD);
     auto       root_float  = data_file.get_attribute<float>("root_float");
     auto       root_double = data_file.get_attribute<double>("root_double");
     auto       root_int    = data_file.get_attribute<int>("root_int");

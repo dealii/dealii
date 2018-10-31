@@ -1409,8 +1409,8 @@ main(int argc, char **argv)
 
       {
         HDF5::File data_file(filename,
-                             mpi_communicator,
-                             HDF5::File::FileAccessMode::create);
+                             HDF5::File::FileAccessMode::create,
+                             mpi_communicator);
 
         write_test<float>(data_file, mpi_communicator, pcout);
         write_test<double>(data_file, mpi_communicator, pcout);
@@ -1423,8 +1423,8 @@ main(int argc, char **argv)
 
       {
         HDF5::File data_file(filename,
-                             mpi_communicator,
-                             HDF5::File::FileAccessMode::open);
+                             HDF5::File::FileAccessMode::open,
+                             mpi_communicator);
         read_test<float>(data_file, mpi_communicator, pcout);
         read_test<double>(data_file, mpi_communicator, pcout);
 

@@ -1461,6 +1461,11 @@ namespace HDF5
     });
     switch (mode)
       {
+        case (GroupAccessMode::open):
+          *hdf5_reference =
+            H5Gopen2(*(parentGroup.hdf5_reference), name.data(), H5P_DEFAULT);
+          Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Gopen2"));
+          break;
         case (GroupAccessMode::create):
           *hdf5_reference = H5Gcreate2(*(parentGroup.hdf5_reference),
                                        name.data(),
@@ -1468,11 +1473,6 @@ namespace HDF5
                                        H5P_DEFAULT,
                                        H5P_DEFAULT);
           Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Gcreate2"));
-          break;
-        case (GroupAccessMode::open):
-          *hdf5_reference =
-            H5Gopen2(*(parentGroup.hdf5_reference), name.data(), H5P_DEFAULT);
-          Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Gopen2"));
           break;
         default:
           Assert(false, ExcInternalError());
@@ -1533,10 +1533,26 @@ namespace HDF5
     dataset.write(data);
   }
 
+
+
+  File::File(const std::string &name, const FileAccessMode mode)
+    : File(name, mode, false, MPI_COMM_NULL)
+  {}
+
+
+
   File::File(const std::string &  name,
+             const FileAccessMode mode,
+             const MPI_Comm       mpi_communicator)
+    : File(name, mode, true, mpi_communicator)
+  {}
+
+
+
+  File::File(const std::string &  name,
+             const FileAccessMode mode,
              const bool           mpi,
-             const MPI_Comm       mpi_communicator,
-             const FileAccessMode mode)
+             const MPI_Comm       mpi_communicator)
     : Group(name, mpi)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
@@ -1569,14 +1585,14 @@ namespace HDF5
 
     switch (mode)
       {
+        case (FileAccessMode::open):
+          *hdf5_reference = H5Fopen(name.data(), H5F_ACC_RDWR, plist);
+          Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Fopen"));
+          break;
         case (FileAccessMode::create):
           *hdf5_reference =
             H5Fcreate(name.data(), H5F_ACC_TRUNC, H5P_DEFAULT, plist);
           Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Fcreate"));
-          break;
-        case (FileAccessMode::open):
-          *hdf5_reference = H5Fopen(name.data(), H5F_ACC_RDWR, plist);
-          Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Fopen"));
           break;
         default:
           Assert(false, ExcInternalError());
@@ -1592,20 +1608,6 @@ namespace HDF5
 
     (void)ret;
   }
-
-
-
-  File::File(const std::string &  name,
-             const MPI_Comm       mpi_communicator,
-             const FileAccessMode mode)
-    : File(name, true, mpi_communicator, mode)
-  {}
-
-
-
-  File::File(const std::string &name, const FileAccessMode mode)
-    : File(name, false, MPI_COMM_NULL, mode)
-  {}
 
 
 

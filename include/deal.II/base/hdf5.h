@@ -923,13 +923,13 @@ namespace HDF5
     enum class GroupAccessMode
     {
       /**
-       * Creates a new group
-       */
-      create,
-      /**
        * Opens an existing group
        */
-      open
+      open,
+      /**
+       * Creates a new group
+       */
+      create
     };
     /**
      * This constructor creates or opens a group depending on the value of
@@ -1021,14 +1021,32 @@ namespace HDF5
     enum class FileAccessMode
     {
       /**
-       * Create file, truncate if exists
-       */
-      create,
-      /**
        * Read/write, file must exist
        */
-      open
+      open,
+      /**
+       * Create file, truncate if exists
+       */
+      create
     };
+
+    /**
+     * Creates or opens a hdf5 file for serial operations. This call does not
+     * require MPI support. It creates or opens a HDF5 file depending on the
+     * value of @p mode.
+     */
+    File(const std::string &name, const FileAccessMode mode);
+
+    /**
+     * Creates or opens an HDF5 file in parallel using MPI. This requires that
+     * deal.ii and HDF5 were compiled with MPI support. It creates or opens a
+     * HDF5 file depending on the value of @p mode. @p mpi_communicator
+     * defines the processes that participate in this call; `MPI_COMM_WORLD` is
+     * a common value for the MPI communicator.
+     */
+    File(const std::string &  name,
+         const FileAccessMode mode,
+         const MPI_Comm       mpi_communicator);
 
   private:
     /**
@@ -1039,29 +1057,9 @@ namespace HDF5
      * should be used to open or create HDF5 files.
      */
     File(const std::string &  name,
+         const FileAccessMode mode,
          const bool           mpi,
-         const MPI_Comm       mpi_communicator,
-         const FileAccessMode mode);
-
-  public:
-    /**
-     * Creates or opens an HDF5 file in parallel using MPI. This requires that
-     * deal.ii and HDF5 were compiled with MPI support. It creates or opens a
-     * HDF5 file depending on the value of @p mode. @p mpi_communicator
-     * defines the processes that participate in this call; `MPI_COMM_WORLD` is
-     * a common value for the MPI communicator.
-     */
-    File(const std::string &  name,
-         const MPI_Comm       mpi_communicator,
-         const FileAccessMode mode = FileAccessMode::create);
-
-    /**
-     * Creates or opens a hdf5 file for serial operations. This call does not
-     * require MPI support. It creates or opens a HDF5 file depending on the
-     * value of @p mode.
-     */
-    File(const std::string &  name,
-         const FileAccessMode mode = FileAccessMode::create);
+         const MPI_Comm       mpi_communicator);
   };
 } // namespace HDF5
 

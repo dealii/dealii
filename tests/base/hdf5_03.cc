@@ -770,8 +770,8 @@ main(int argc, char **argv)
 
       {
         HDF5::File data_file(filename,
-                             mpi_communicator,
-                             HDF5::File::FileAccessMode::create);
+                             HDF5::File::FileAccessMode::create,
+                             mpi_communicator);
 
         write_test<std::vector, float>(data_file,
                                        dataset_dimensions,
@@ -844,8 +844,8 @@ main(int argc, char **argv)
 
       {
         HDF5::File data_file(filename,
-                             mpi_communicator,
-                             HDF5::File::FileAccessMode::open);
+                             HDF5::File::FileAccessMode::open,
+                             mpi_communicator);
         read_test<std::vector, float>(data_file, mpi_communicator, pcout);
         read_test<std::vector, double>(data_file, mpi_communicator, pcout);
 
