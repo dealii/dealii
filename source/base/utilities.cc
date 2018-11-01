@@ -132,7 +132,7 @@ namespace Utilities
     // based on that get the maximum integer:
     const Integer max_int = (min_bits == std::numeric_limits<Integer>::digits ?
                                std::numeric_limits<Integer>::max() :
-                               ((Integer)1 << min_bits) - 1);
+                               (Integer(1) << min_bits) - 1);
 
     std::vector<std::array<Integer, dim>> int_points(points.size());
 
@@ -193,7 +193,7 @@ namespace Utilities
            ExcMessage("This integer type can not hold " +
                       std::to_string(bits_per_dim) + " bits."));
 
-    const Integer M = 1 << (bits_per_dim - 1); // largest bit
+    const Integer M = Integer(1) << (bits_per_dim - 1); // largest bit
 
     for (unsigned int index = 0; index < int_points.size(); ++index)
       {
