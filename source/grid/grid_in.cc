@@ -3224,6 +3224,8 @@ GridIn<dim, spacedim>::get_format_names()
   return "dbmesh|msh|unv|vtk|ucd|abaqus|xda|netcdf|tecplot|assimp";
 }
 
+
+
 namespace
 {
   template <int dim, int spacedim>
@@ -3234,6 +3236,8 @@ namespace
     AssertThrow(spacedim == 2 || spacedim == 3, ExcNotImplemented());
   }
 
+
+
   // Convert from a string to some other data type
   // Reference: http://www.codeguru.com/forum/showthread.php?t=231054
   template <class T>
@@ -3243,6 +3247,8 @@ namespace
     std::istringstream iss(s);
     return !(iss >> f >> t).fail();
   }
+
+
 
   // Extract an integer from a string
   int
@@ -3261,6 +3267,8 @@ namespace
     from_string(number, tmp, std::dec);
     return number;
   }
+
+
 
   template <int dim, int spacedim>
   void
@@ -3486,19 +3494,41 @@ namespace
                 char               comma;
                 int                elid_start;
                 int                elid_end;
-                int                elis_step =
-                  1; // Default value set in case stride not provided
+                int elis_step = 1; // Default if case stride not provided
+
                 // Some files don't have the stride size
                 // Compare mesh test cases ./grids/abaqus/3d/other_simple.inp to
                 // ./grids/abaqus/2d/2d_test_abaqus.inp
                 iss >> elid_start >> comma >> elid_end;
+                AssertThrow(comma == ',',
+                            ExcMessage(
+                              std::string(
+                                "While reading an ABAQUS file, the reader "
+                                "expected a comma but found a <") +
+                              comma + "> in the line <" + line + ">."));
+                AssertThrow(
+                  elid_start <= elid_end,
+                  ExcMessage(
+                    std::string(
+                      "While reading an ABAQUS file, the reader encountered "
+                      "a GENERATE statement in which the upper bound <") +
+                    Utilities::int_to_string(elid_end) +
+                    "> for the element numbers is not larger or equal "
+                    "than the lower bound <" +
+                    Utilities::int_to_string(elid_start) + ">."));
+
                 // https://stackoverflow.com/questions/8046357/how-do-i-check-if-a-stringstream-variable-is-empty-null
                 if (iss.rdbuf()->in_avail() != 0)
                   iss >> comma >> elis_step;
+                AssertThrow(comma == ',',
+                            ExcMessage(
+                              std::string(
+                                "While reading an ABAQUS file, the reader "
+                                "expected a comma but found a <") +
+                              comma + "> in the line <" + line + ">."));
+
                 for (int i = elid_start; i <= elid_end; i += elis_step)
-                  {
-                    elements.push_back(i);
-                  }
+                  elements.push_back(i);
                 elsets_list[elset_name] = elements;
 
                 std::getline(input_stream, line);
@@ -3518,6 +3548,14 @@ namespace
                     while (!iss.eof())
                       {
                         iss >> elid >> comma;
+                        AssertThrow(
+                          comma == ',',
+                          ExcMessage(
+                            std::string(
+                              "While reading an ABAQUS file, the reader "
+                              "expected a comma but found a <") +
+                            comma + "> in the line <" + line + ">."));
+
                         elements.push_back(elid);
                       }
 
