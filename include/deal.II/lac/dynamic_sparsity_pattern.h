@@ -1037,7 +1037,10 @@ DynamicSparsityPattern::column_number(const size_type row,
 inline DynamicSparsityPattern::iterator
 DynamicSparsityPattern::begin() const
 {
-  return begin(0);
+  if (n_rows() > 0)
+    return begin(0);
+  else
+    return end();
 }
 
 
