@@ -446,7 +446,7 @@ namespace Utilities
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::update_ghost_values().
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       export_to_ghosted_array_finish(const ArrayView<Number> & ghost_array,
                                      std::vector<MPI_Request> &requests) const;
@@ -487,7 +487,7 @@ namespace Utilities
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::compress().
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       import_from_ghosted_array_start(
         const VectorOperation::values vector_operation,

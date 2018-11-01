@@ -25,14 +25,16 @@ for (SCALAR : MPI_SCALARS)
                          const ArrayView<SCALAR> &,
                          const ArrayView<SCALAR> &,
                          std::vector<MPI_Request> &) const;
-    template void Utilities::MPI::Partitioner::export_to_ghosted_array_finish<
-      SCALAR>(const ArrayView<SCALAR> &, std::vector<MPI_Request> &) const;
+    template void Utilities::MPI::Partitioner::
+      export_to_ghosted_array_finish<SCALAR, MemorySpace::Host>(
+        const ArrayView<SCALAR> &, std::vector<MPI_Request> &) const;
     template void Utilities::MPI::Partitioner::import_from_ghosted_array_start<
-      SCALAR>(const VectorOperation::values,
-              const unsigned int,
-              const ArrayView<SCALAR> &,
-              const ArrayView<SCALAR> &,
-              std::vector<MPI_Request> &) const;
+      SCALAR,
+      MemorySpace::Host>(const VectorOperation::values,
+                         const unsigned int,
+                         const ArrayView<SCALAR> &,
+                         const ArrayView<SCALAR> &,
+                         std::vector<MPI_Request> &) const;
     template void Utilities::MPI::Partitioner::import_from_ghosted_array_finish<
       SCALAR,
       MemorySpace::Host>(const VectorOperation::values,

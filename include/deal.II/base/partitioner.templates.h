@@ -150,7 +150,7 @@ namespace Utilities
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpaceType>
     void
     Partitioner::export_to_ghosted_array_finish(
       const ArrayView<Number> & ghost_array,
@@ -182,28 +182,60 @@ namespace Utilities
           unsigned int offset =
             n_ghost_indices_in_larger_set - n_ghost_indices();
           // must copy ghost data into extended ghost array
-          for (std::vector<std::pair<unsigned int, unsigned int>>::
-                 const_iterator my_ghosts = ghost_indices_subset_data.begin();
-               my_ghosts != ghost_indices_subset_data.end();
-               ++my_ghosts)
-            if (offset > my_ghosts->first)
-              for (unsigned int j = my_ghosts->first; j < my_ghosts->second;
-                   ++j, ++offset)
+          for (const auto ghost_range : ghost_indices_subset_data)
+            {
+              if (offset > ghost_range.first)
                 {
-                  ghost_array[j]      = ghost_array[offset];
-                  ghost_array[offset] = Number();
+                  const unsigned int chunk_size =
+                    ghost_range.second - ghost_range.first;
+                  if (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
+                    {
+                      std::copy(ghost_array.data() + offset,
+                                ghost_array.data() + offset + chunk_size,
+                                ghost_array.data() + ghost_range.first);
+                      std::fill(ghost_array.data() +
+                                  std::max(ghost_range.second, offset),
+                                ghost_array.data() + offset + chunk_size,
+                                Number{});
+                    }
+                  else
+                    {
+#    if defined(DEAL_II_COMPILER_CUDA_AWARE)
+                      cudaError_t cuda_error =
+                        cudaMemcpy(ghost_array.data() + ghost_range.first,
+                                   ghost_array.data() + offset,
+                                   chunk_size * sizeof(Number),
+                                   cudaMemcpyDeviceToDevice);
+                      AssertCuda(cuda_error);
+                      cuda_error =
+                        cudaMemset(ghost_array.data() +
+                                     std::max(ghost_range.second, offset),
+                                   0,
+                                   (offset + chunk_size -
+                                    std::max(ghost_range.second, offset)) *
+                                     sizeof(Number));
+                      AssertCuda(cuda_error);
+#    else
+                      Assert(
+                        false,
+                        ExcMessage(
+                          "If the compiler doesn't understand CUDA code, only MemorySpace::Host is allowed!"));
+#    endif
+                    }
+                  offset += chunk_size;
                 }
-            else
-              {
-                AssertDimension(offset, my_ghosts->first);
-                break;
-              }
+              else
+                {
+                  AssertDimension(offset, ghost_range.first);
+                  break;
+                }
+            }
         }
     }
 
 
 
-    template <typename Number>
+    template <typename Number, typename MemorySpaceType>
     void
     Partitioner::import_from_ghosted_array_start(
       const VectorOperation::values vector_operation,
@@ -294,16 +326,52 @@ namespace Utilities
                                 ghost_indices_subset_chunks_by_rank_data[i + 1];
               unsigned int offset = 0;
               for (; my_ghosts != end_my_ghosts; ++my_ghosts)
-                if (ghost_array_ptr + offset !=
-                    ghost_array.data() + my_ghosts->first)
-                  for (unsigned int j = my_ghosts->first; j < my_ghosts->second;
-                       ++j, ++offset)
+                {
+                  const unsigned int chunk_size =
+                    my_ghosts->second - my_ghosts->first;
+                  if (ghost_array_ptr + offset !=
+                      ghost_array.data() + my_ghosts->first)
                     {
-                      ghost_array_ptr[offset] = ghost_array[j];
-                      ghost_array[j]          = Number();
+                      if (std::is_same<MemorySpaceType,
+                                       MemorySpace::Host>::value)
+                        {
+                          std::copy(ghost_array.data() + my_ghosts->first,
+                                    ghost_array.data() + my_ghosts->second,
+                                    ghost_array_ptr + offset);
+                          std::fill(
+                            std::max(ghost_array.data() + my_ghosts->first,
+                                     ghost_array_ptr + offset + chunk_size),
+                            ghost_array.data() + my_ghosts->second,
+                            Number{});
+                        }
+                      else
+                        {
+#    if defined(DEAL_II_COMPILER_CUDA_AWARE)
+                          cudaError_t cuda_error =
+                            cudaMemcpy(ghost_array_ptr + offset,
+                                       ghost_array.data() + my_ghosts->first,
+                                       chunk_size * sizeof(Number),
+                                       cudaMemcpyDeviceToDevice);
+                          AssertCuda(cuda_error);
+                          cuda_error = cudaMemset(
+                            std::max(ghost_array.data() + my_ghosts->first,
+                                     ghost_array_ptr + offset + chunk_size),
+                            0,
+                            (ghost_array.data() + my_ghosts->second -
+                             std::max(ghost_array.data() + my_ghosts->first,
+                                      ghost_array_ptr + offset + chunk_size)) *
+                              sizeof(Number));
+                          AssertCuda(cuda_error);
+#    else
+                          Assert(
+                            false,
+                            ExcMessage(
+                              "If the compiler doesn't understand CUDA code, only MemorySpace::Host is allowed!"));
+#    endif
+                        }
                     }
-                else
-                  offset += my_ghosts->second - my_ghosts->first;
+                  offset += chunk_size;
+                }
               AssertDimension(offset, ghost_targets_data[i].second);
             }
 
@@ -526,7 +594,41 @@ namespace Utilities
                   read_position += chunk_size;
                 }
             }
-          else
+          else if (vector_operation == dealii::VectorOperation::min)
+            for (const auto &import_range : import_indices_data)
+              {
+                const auto chunk_size =
+                  import_range.second - import_range.first;
+                const int n_blocks =
+                  1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
+                                          ::dealii::CUDAWrappers::block_size);
+                dealii::LinearAlgebra::CUDAWrappers::kernel::vector_bin_op<
+                  Number,
+                  dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Min>
+                  <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
+                    locally_owned_array.data() + import_range.first,
+                    read_position,
+                    chunk_size);
+                read_position += chunk_size;
+              }
+          else if (vector_operation == dealii::VectorOperation::max)
+            for (const auto &import_range : import_indices_data)
+              {
+                const auto chunk_size =
+                  import_range.second - import_range.first;
+                const int n_blocks =
+                  1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
+                                          ::dealii::CUDAWrappers::block_size);
+                dealii::LinearAlgebra::CUDAWrappers::kernel::vector_bin_op<
+                  Number,
+                  dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Max>
+                  <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
+                    locally_owned_array.data() + import_range.first,
+                    read_position,
+                    chunk_size);
+                read_position += chunk_size;
+              }
+          else // TODO
             for (const auto &import_range : import_indices_data)
               {
                 const auto chunk_size =
@@ -539,13 +641,6 @@ namespace Utilities
                 AssertCuda(cuda_error_code);
                 read_position += chunk_size;
               }
-
-          static_assert(
-            std::is_same<MemorySpaceType, MemorySpace::CUDA>::value,
-            "If we are using the CPU implementation, we should not trigger the restriction");
-          Assert(vector_operation == dealii::VectorOperation::insert ||
-                   vector_operation == dealii::VectorOperation::add,
-                 ExcNotImplemented());
 #    endif
           AssertDimension(read_position - temporary_storage.data(),
                           n_import_indices());

@@ -1,0 +1,47 @@
+
+DEAL:0::v ghost entries (should be zero up to index 12):
+DEAL:0::0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL:0::From all ghosts: 0 3 3 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 3 3 
+DEAL:0::w ghost entries (should be zero up to index 5):
+DEAL:0::0 0 0 0 0 0 1 1 1 0 0 0 0 
+DEAL:0::From reduced ghosts 1: 0 3 3 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 3 3 
+DEAL:0::x ghost entries (should be zero up to index 0):
+DEAL:0::1 1 1 1 1 1 1 1 1 1 1 1 1 
+DEAL:0::From reduced ghosts 2: 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 
+DEAL:0::From tight reduced ghosts 2: 0 0 6 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 2 2 2 2 2 2 2 2 
+
+DEAL:1::v ghost entries (should be zero up to index 22):
+DEAL:1::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL:1::From all ghosts: 3 3 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 
+DEAL:1::w ghost entries (should be zero up to index 9):
+DEAL:1::0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 1 0 1 1 1 1 0 
+DEAL:1::From reduced ghosts 1: 3 3 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 
+DEAL:1::x ghost entries (should be zero up to index 11):
+DEAL:1::0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 
+DEAL:1::From reduced ghosts 2: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 
+DEAL:1::From tight reduced ghosts 2: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 2 2 2 2 2 2 2 2 
+
+
+DEAL:2::v ghost entries (should be zero up to index 26):
+DEAL:2::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL:2::From all ghosts: 1 3 3 1 3 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 
+DEAL:2::w ghost entries (should be zero up to index 8):
+DEAL:2::0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 
+DEAL:2::From reduced ghosts 1: 0 3 3 0 3 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 
+DEAL:2::x ghost entries (should be zero up to index 11):
+DEAL:2::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 
+DEAL:2::From reduced ghosts 2: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 
+DEAL:2::From tight reduced ghosts 2: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 2 2 2 2 2 2 2 2 2 
+
+
+DEAL:3::v ghost entries (should be zero up to index 19):
+DEAL:3::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL:3::From all ghosts: 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL:3::w ghost entries (should be zero up to index 10):
+DEAL:3::0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 
+DEAL:3::From reduced ghosts 1: 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL:3::x ghost entries (should be zero up to index 11):
+DEAL:3::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL:3::From reduced ghosts 2: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+DEAL:3::From tight reduced ghosts 2: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+

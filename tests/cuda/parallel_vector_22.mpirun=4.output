@@ -1,0 +1,45 @@
+
+DEAL:0::numproc=4
+DEAL:0::0:first owned entry: 0.00000
+DEAL:0::0:second owned entry: 2.00000
+DEAL:0::0:ghost entry after max from owner: 21.0000
+DEAL:0::0:ghost entry after min from zero: 0.00000
+DEAL:0::0:ghost entry after min from : -1.00000
+DEAL:0::0:ghost entry after max and partly init: 0.00000
+DEAL:0::0:ghost entry after max and full init: -1.00000
+DEAL:0::0:ghost entry after first max: -1.00000
+DEAL:0::0:ghost entry after second max: 0.00000
+DEAL:0::OK
+
+DEAL:1::1:first owned entry: 4.00000
+DEAL:1::1:second owned entry: 6.00000
+DEAL:1::1:ghost entry after max from owner: 21.0000
+DEAL:1::1:ghost entry after min from zero: 0.00000
+DEAL:1::1:ghost entry after min from : -1.00000
+DEAL:1::1:ghost entry after max and partly init: 0.00000
+DEAL:1::1:ghost entry after max and full init: -1.00000
+DEAL:1::1:ghost entry after first max: 0.00000
+DEAL:1::1:ghost entry after second max: 0.00000
+
+
+DEAL:2::2:first owned entry: 8.00000
+DEAL:2::2:second owned entry: 10.0000
+DEAL:2::2:ghost entry after max from owner: 21.0000
+DEAL:2::2:ghost entry after min from zero: 0.00000
+DEAL:2::2:ghost entry after min from : -1.00000
+DEAL:2::2:ghost entry after max and partly init: 0.00000
+DEAL:2::2:ghost entry after max and full init: -1.00000
+DEAL:2::2:ghost entry after first max: 0.00000
+DEAL:2::2:ghost entry after second max: 0.00000
+
+
+DEAL:3::3:first owned entry: 12.0000
+DEAL:3::3:second owned entry: 14.0000
+DEAL:3::3:ghost entry after max from owner: 21.0000
+DEAL:3::3:ghost entry after min from zero: 0.00000
+DEAL:3::3:ghost entry after min from : -1.00000
+DEAL:3::3:ghost entry after max and partly init: 0.00000
+DEAL:3::3:ghost entry after max and full init: -1.00000
+DEAL:3::3:ghost entry after first max: 0.00000
+DEAL:3::3:ghost entry after second max: 0.00000
+
