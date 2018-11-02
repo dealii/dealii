@@ -36,76 +36,23 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The [Hierarchical Data Format (HDF)](https://www.hdfgroup.org/) is a cross
  * platform and high I/O performance format designed to store large amounts of
- * data. It supports serial and MPI I/O access. This set of classes provide an
- * interface to the [C HDF5 library](https://www.hdfgroup.org/downloads/hdf5/).
- *
- * # Data exchange with python scripts
- * The HDF5 format can be used to exchange data with python scripts. The strings
- * are stored as HDF5 variable-length UTF-8 strings and the complex numbers are
- * stored as HDF5 compound datatypes compatible with
- * [h5py](https://www.h5py.org/) and [numpy](http://www.numpy.org/).
- *
- * This python script writes the parameters for a deal.ii simulation:
- * ~~~~~~~~~~~~~{.py}
- * h5_file = h5py.File('simulation.hdf5','w')
- * data = h5_file.create_group('data')
- * data.attrs['nb_frequency_points'] = 50 # int
- * data.attrs['rho'] = 2300.5 # double
- * data.attrs['save_vtk_files'] = True # bool
- * data.attrs['simulation_type'] = 'elastic_equation' # utf8 string
- * ~~~~~~~~~~~~~
- *
- * C++ deal.ii simulation with MPI HDF5:
- * @code
- * hdf5::File data_file("simulation.hdf5",
- *                      MPI_COMM_WORLD,
- *                      HDF5::File::Mode::open);
- * hdf5::Group data = data_file.group("data");
- *
- * auto nb_frequency_points = data.get_attribute<int>("nb_frequency_points");
- * auto rho = data.get_attribute<double>("rho");
- * auto save_vtk_files = data.get_attribute<bool>("save_vtk_files");
- * auto simulation_type = data.get_attribute<std::string>("simulation_type");
- *
- * std::vector<std::complex<double>> displacement = {...};
- *
- * auto some_data = data.write_dataset("displacement", displacement);
- *
- * // Write the simulation metadata
- * data.set_attribute("active_cells", triangulation.n_active_cells());
- * @endcode
- *
- * Read the simulation results with python:
- * ~~~~~~~~~~~~~{.py}
- * h5_file = h5py.File('simulation.hdf5','r+')
- * data = h5_file['data']
- * displacement = data['displacement'] # complex128 dtype
- * active_cells = data.attrs['degrees_of_freedom'])
- * ~~~~~~~~~~~~~
+ * data. It supports serial and MPI I/O access. This set of classes provides an
+ * interface to the [HDF5 library](https://www.hdfgroup.org/downloads/hdf5/).
  *
  * # Groups, Datasets and attributes
  * The HDF5 file is organized in
  * [groups](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Groups/HDF5_Groups.htm)
  * and
  * [datasets](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Datasets/HDF5_Datasets.htm).
- * In the most comon case the file structure is a tree. Groups can contain
- * datasets and other groups. Datasets are objects composed of a collection of
- * data elements which can be seen as tensors or a matrices. The methods of the
- * DataSet class have been instantiated for the types: `float`, `double`,
- * `std::complex<float>`, `std::complex<double>`, `int` and `unsigned int`.
- *
+ * Groups can contain datasets and other groups. Datasets are objects composed by
+ * a collection of data elements. Datasets are equivalent to tensors and matrices.
  * In addition, attributes can be attached to the root file, a group or a
  * dataset. An [HDF5
  * attribute](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Attributes/HDF5_Attributes.htm)
- * is a small meta data. The methods
- * HDF5Object::get_attribute(const std::string) and
- * HDF5Object::set_attribute(const std::string, const T) have
- * been instantiated for the types: `float`, `double`, `std::complex<float>`,
- * `std::complex<double>`, `int`, `unsigned int`, `bool`, and `std::string`.
+ * is a small meta data. The methods HDF5Object::get_attribute() and
+ * HDF5Object::set_attribute() can be used to get and set attributes.
  *
- * Below an example code can be found. Note that, if the group already exists
- * the method Group::group(std::string) should be used instead of
- * Group::create_group(std::string).
+ * An example is below
  * @code
  * HDF5::File data_file(filename, HDF5::File::Mode::create);
  * double double_attribute = 2.2;
@@ -118,22 +65,26 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * # MPI I/O
- * The HDF5 calls that modify the structure of the file are
- * always collective, whereas writing and reading raw data in a dataset can be
- * done independently or collectively. [Collective access is usually
- * faster](https://www.hdfgroup.org/2015/08/parallel-io-with-hdf5/) since it
- * allows MPI to do optimizations. In these set of classes all the calls are set
- * to collective in order to maximize the performance. This means that all the
- * MPI processes have to contribute to every single call, even if they don't
- * have data to write. MPI HDF5 requires that dealii and HDF5 have been compiled
- * with MPI support.
+ * An HDF5 file can be opened/created with serial (one single process) or
+ * MPI support (several processes access the same HDF5 file).
+ * File::File(const std::string &, const FileAccessMode)
+ * opens/creates a HDF5 file for serial operations.
+ * File::File(const std::string &, const FileAccessMode, const MPI_Comm)
+ * creates or opens an HDF5 file in parallel using MPI. The HDF5 calls that
+ * modify the structure of the file are always collective, whereas writing
+ * and reading raw data in a dataset can be done independently or collectively.
+ * [Collective access is usually faster](https://www.hdfgroup.org/2015/08/parallel-io-with-hdf5/)
+ * since it allows MPI to do optimizations. In the deal.II's HDF5 interface all
+ * the calls are set to collective in order to maximize the performance. This
+ * means that all the MPI processes have to contribute to every single call, even
+ * if they don't have data to write. MPI HDF5 requires that deal.II and HDF5 have
+ * been compiled with MPI support.
  *
  * ## Write a hyperslab in parallel
  * Hyperslabs are portions of datasets. A hyperslab can be a contiguous
  * collection of points in a dataset, or it can be a regular pattern of points
  * or blocks in a datataset. Hyperslabs are equivalent to python numpy and h5py
  * [slices](http://docs.h5py.org/en/latest/high/dataset.html#reading-writing-data).
- *
  * See the <a
  * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
  * and Data Transfer</a>  section in the HDF5 User's Guide. See as well the
@@ -164,8 +115,10 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * The function
- * DataSet::write_hyperslab(const Container<number> &,const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &)
- * can be used to write complex hyperslabs.
+ * DataSet::write_hyperslab(const Container &,const std::vector<hsize_t> &, const std::vector<hsize_t> &)
+ * is used to write and simple hyperslabs and the function
+ * DataSet::write_hyperslab(const Container &,const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &)
+ * is used to write complex hyperslabs.
  *
  * ## Write unordered data in parallel
  * The example below shows how to write a selection of data.
@@ -175,29 +128,29 @@ DEAL_II_NAMESPACE_OPEN
  *
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
  *   {
- *     std::vector<hsize_t> coordinates_a = {0,
- *                                           0, // first point
- *                                           0,
- *                                           2, // second point
- *                                           3,
- *                                           4, // third point
- *                                           25,
- *                                           12}; // fourth point
- *     std::vector<double>  data_a        = {2, 3, 5, 6};
- *     dataset.write_selection(data_a, coordinates_a);
+ *     std::vector<hsize_t> coordinates = {0,
+ *                                         0, // first point
+ *                                         0,
+ *                                         2, // second point
+ *                                         3,
+ *                                         4, // third point
+ *                                         25,
+ *                                         12}; // fourth point
+ *     std::vector<double>  data        = {2, 3, 5, 6};
+ *     dataset.write_selection(data, coordinates);
  *   }
  * else if (Utilities::MPI::this_mpi_process(mpi_communicator) == 1)
  *   {
- *     std::vector<hsize_t> coordinates_b = {5,
- *                                           0, // first point
- *                                           0,
- *                                           4, // second point
- *                                           5,
- *                                           4, // third point
- *                                           26,
- *                                           12}; // fourth point
- *     std::vector<double>  data_b        = {9, 4, 7, 6};
- *     dataset.write_selection(data_b, coordinates_b);
+ *     std::vector<hsize_t> coordinates = {5,
+ *                                         0, // first point
+ *                                         0,
+ *                                         4, // second point
+ *                                         5,
+ *                                         4, // third point
+ *                                         26,
+ *                                         12}; // fourth point
+ *     std::vector<double>  data        = {9, 4, 7, 6};
+ *     dataset.write_selection(data, coordinates);
  *   }
  * else
  *   {
@@ -206,18 +159,17 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * ## Query the I/O mode that HDF5 used on the last parallel I/O call
- * The default access mode in the HDF5 C++ interface of deal.ii is collective
+ * The default access mode in the deal.II's HDF5 C++ interface  is collective
  * which is typically faster since it allows MPI to do more optimizations. In
  * some cases, such as when there is type conversion, the HDF5 library can
  * decide to do independent I/O instead of collective I/O, even if the user asks
  * for collective I/O. See the following
- * [article](https://www.hdfgroup.org/2015/08/parallel-io-with-hdf5/)
- *
+ * [article](https://www.hdfgroup.org/2015/08/parallel-io-with-hdf5/).
  * In cases where maximum performance is a requirement, it is important to
  * make sure that all MPI read/write operations are collective. The HDF5 library
  * provides API routines that can be used after the read/write I/O operations to
  * query the I/O mode. If DataSet::query_io_mode() is set to True, then after
- * every read/write operation the HDF5 deal.ii interface calls the routines
+ * every read/write operation the deal.II's HDF5 interface calls the routines
  * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
  * and
  * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
@@ -243,11 +195,11 @@ DEAL_II_NAMESPACE_OPEN
  *   }
  *
  * if(dataset.query_io_mode()){
- *   pcout << "IO mode: " << dataset.io_mode<std::string>() << std::endl;
+ *   pcout << "IO mode: " << dataset.io_mode() << std::endl;
  *   pcout << "Local no collective cause: "
- *         << dataset.local_no_collective_cause<std::string>() << std::endl;
+ *         << dataset.local_no_collective_cause() << std::endl;
  *   pcout << "Global no collective cause: "
- *         << dataset.get_global_no_collective_cause<std::string>() <<
+ *         << dataset.get_global_no_collective_cause() <<
  * std::endl;
  * }
  * @endcode
@@ -262,12 +214,12 @@ DEAL_II_NAMESPACE_OPEN
  * DataSet::get_global_no_collective_cause() for all the possible return
  * codes.
  *
- * # Rank of the HDF5 datasets and hyperslabs
- * The deal.ii HDF5 interface can be used to write/read data to datasets and
+ * # Rank of HDF5 datasets and hyperslabs
+ * The deal.II's HDF5 interface can be used to write/read data to datasets and
  * hyperslabs of any particular rank. `FullMatrix` can only be used to
- * write/read data to datasets and hyperslabs of rank 2. `std::vector` and
- * `Vector` can be used to write/read data to datasets and hyperslabs of
- * rank 1, 2, 3 and higher, the data is organized in
+ * write/read data to datasets and hyperslabs of rank 2. In the other hand,
+ * `std::vector` and `Vector` can be used to write/read data to datasets and
+ * hyperslabs of rank 1, 2, 3 and higher, the data is organized in
  * [row-major order](https://en.wikipedia.org/wiki/Row-_and_column-major_order)
  * which is commonly used in C and C++ matrices. We can re-write the code from
  * the previous section using std::vector
@@ -297,6 +249,50 @@ DEAL_II_NAMESPACE_OPEN
  * 2 3
  * 4 5
  * @endcode
+ *
+ * # Data exchange with python scripts
+ * The HDF5 format can be used to exchange data with python scripts. The strings
+ * are stored as HDF5 variable-length UTF-8 strings and the complex numbers are
+ * stored as HDF5 compound datatypes compatible with
+ * [h5py](https://www.h5py.org/) and [numpy](http://www.numpy.org/).
+ *
+ * This python script writes the parameters for a deal.II simulation:
+ * ~~~~~~~~~~~~~{.py}
+ * h5_file = h5py.File('simulation.hdf5','w')
+ * data = h5_file.create_group('data')
+ * data.attrs['nb_frequency_points'] = 50 # int
+ * data.attrs['rho'] = 2300.5 # double
+ * data.attrs['save_vtk_files'] = True # bool
+ * data.attrs['simulation_type'] = 'elastic_equation' # utf8 string
+ * ~~~~~~~~~~~~~
+ *
+ * C++ deal.II simulation with MPI HDF5:
+ * @code
+ * hdf5::File data_file("simulation.hdf5",
+ *                      MPI_COMM_WORLD,
+ *                      HDF5::FileAccessMode::Mode::open);
+ * hdf5::Group data = data_file.open_group("data");
+ *
+ * auto nb_frequency_points = data.get_attribute<int>("nb_frequency_points");
+ * auto rho = data.get_attribute<double>("rho");
+ * auto save_vtk_files = data.get_attribute<bool>("save_vtk_files");
+ * auto simulation_type = data.get_attribute<std::string>("simulation_type");
+ *
+ * std::vector<std::complex<double>> displacement = {...};
+ *
+ * data.write_dataset("displacement", displacement);
+ *
+ * // Write the simulation metadata
+ * data.set_attribute("active_cells", triangulation.n_active_cells());
+ * @endcode
+ *
+ * Read the simulation results with python:
+ * ~~~~~~~~~~~~~{.py}
+ * h5_file = h5py.File('simulation.hdf5','r+')
+ * data = h5_file['data']
+ * displacement = data['displacement'] # complex128 dtype
+ * active_cells = data.attrs['degrees_of_freedom'])
+ * ~~~~~~~~~~~~~
  *
  * # HDF5 and thread safety
  * By default HDF5 is not thread-safe. The HDF5 library can be configured to be
@@ -364,7 +360,7 @@ namespace HDF5
   protected:
     /**
      * HDF5 identifier for the objects File, Group and DataSet. The
-     * `std::share_ptr<>` pointer allows the object to be copied. For example
+     * `std::shared_ptr<>` pointer allows the object to be copied. For example
      * several parts of the program can share and access the same group; when
      * all the functions that access the group are closed, the HDF5 resources of
      * the group will be automatically released.
@@ -407,7 +403,7 @@ namespace HDF5
     /**
      * Reads data of the dataset.
      *
-     * Datatype conversion takes place at the time of a read or write and is
+     * Datatype conversion takes place at the time of the read operation and is
      * automatic. See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
@@ -428,6 +424,12 @@ namespace HDF5
     /**
      * Reads data of a subset of the dataset.
      *
+     * Datatype conversion takes place at the time of the read operation and is
+     * automatic. See the <a
+     * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
+     * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
+     * User's Guide.
+     *
      * The selected elements can be scattered and take any shape in the dataset.
      * For example, in the case of a dataset with rank 4 a selection of 3 points
      * will be described by a 3-by-4 array. Note the indexing is zero-based. To
@@ -446,7 +448,7 @@ namespace HDF5
      * href="https://support.hdfgroup.org/newsletters/newsletter140.html">Parallel
      * HDF5 supports collective I/O on point selections.</a>
      *
-     * Datatype conversion takes place at the time of a read or write and is
+     * Datatype conversion takes place at the time of the read operation and is
      * automatic. See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
@@ -456,13 +458,18 @@ namespace HDF5
     Container
     read_selection(const std::vector<hsize_t> &coordinates);
 
+    // clang-format off
     /**
      * Reads a hyperslab from the dataset. The parameters are summarized
      * below:
-     *  - Offset: The starting location for the hyperslab.
-     *  - Count: The number of elements to select along each dimension.
+     *  - @p offset: The starting location for the hyperslab.
+     *  - @p count: The number of elements to select along each dimension.
      *
-     * Stride and block are set to NULL.
+     * When reading a hyperslab, HDF5 also allows to provide "stride" and
+     * "block" parameters (see the [HDF5 documentation](https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab)).
+     * These are not used by the current function and set to `NULL`. However
+     * these parameters can be used with the function
+     * read_hyperslab(const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &)
      *
      * See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
@@ -485,21 +492,22 @@ namespace HDF5
      * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
      * `FullMatrix<std::complex<double>>`.
      */
+    // clang-format on
     template <typename Container>
     Container
     read_hyperslab(const std::vector<hsize_t> &offset,
                    const std::vector<hsize_t> &count);
 
     /**
-     * * Writes a data hyperslab to the dataset. The parameters are summarized
+     * Writes a data hyperslab to the dataset. The parameters are summarized
      * below:
-     *  - Dataset_dimensions: the dimensions of the data memory block.
-     *  - Offset: The starting location for the hyperslab.
-     *  - Stride: The number of elements to separate each element or block to be
-     * selected.
-     *  - Count: The number of elements or blocks to select along each
-     * dimension.
-     *  - Block: The size of the block selected from the dataspace.
+     *  - @p dataset_dimensions: the dimensions of the data memory block.
+     *  - @p offset: The starting location for the hyperslab.
+     *  - @p stride: The number of elements to separate each element or block to
+     *               be selected.
+     *  - @p count: The number of elements or blocks to select along each
+     *              dimension.
+     *  - @p block: The size of the block selected from the dataspace.
      *
      * See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
@@ -604,11 +612,14 @@ namespace HDF5
     /**
      * Writes a data hyperslab to the dataset. The parameters are summarized
      * below:
-     *  - Offset: The starting location for the hyperslab.
-     *  - Count: The number of elements to select along each dimension.
+     *  - @p offset: The starting location for the hyperslab.
+     *  - @p count: The number of elements to select along each dimension.
      *
-     * Stride and block are set to NULL. For complex hyperslabs see
-     * write_hyperslab(const Container<number> &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
+     * When writing a hyperslab, HDF5 also allows to provide "stride" and
+     * "block" parameters (see the [HDF5 documentation](https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab)).
+     * These are not used by the current function and set to `NULL`. However
+     * these parameters can be used with the function
+     * write_hyperslab(const Container &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
      *
      * See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
@@ -633,13 +644,13 @@ namespace HDF5
     /**
      * Writes a data hyperslab to the dataset. The parameters are summarized
      * below:
-     *  - Dataset_dimensions: the dimensions of the data memory block.
-     *  - Offset: The starting location for the hyperslab.
-     *  - Stride: The number of elements to separate each element or block to be
-     * selected.
-     *  - Count: The number of elements or blocks to select along each
-     * dimension.
-     *  - Block: The size of the block selected from the dataspace.
+     *  - @p dataset_dimensions: the dimensions of the data memory block.
+     *  - @p offset: The starting location for the hyperslab.
+     *  - @p stride: The number of elements to separate each element or block to be
+     *               selected.
+     *  - @p count: The number of elements or blocks to select along each
+     *              dimension.
+     *  - @p block: The size of the block selected from the dataspace.
      *
      * See the <a
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Dataspaces/HDF5_Dataspaces_and_Partial_I_O.htm?rhtocid=7.2#TOC_7_4_Dataspaces_and_Databc-6">Dataspaces
@@ -818,7 +829,7 @@ namespace HDF5
      * make sure that all MPI read/write operations are collective. The HDF5
      * library provides API routines that can be used after the read/write I/O
      * operations to query the I/O mode. If query_io_mode is set to true, then
-     * after every read/write operation the HDF5 deal.ii interface calls the
+     * after every read/write operation the deal.II's HDF5 interface calls the
      * routines
      * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
      * and
@@ -880,7 +891,7 @@ namespace HDF5
 
     /**
      * If query_io_mode is set to true, then after every read/write operation
-     * the HDF5 deal.ii interface calls the routines
+     * the deal.II's HDF5 interface calls the routines
      * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
      * and
      * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
@@ -936,7 +947,8 @@ namespace HDF5
      * @p mode. The group will be placed insided the group @p parent_group. The
      * parameter @p mpi defines if the the I/O operations are serial or
      * parallel. This is an internal constructor, the functions open_group() and
-     * create_group() should be used to open or create a group.
+     * create_group() of the current class should be used to open or create a
+     * group.
      */
     Group(const std::string &   name,
           const Group &         parent_group,
@@ -952,13 +964,13 @@ namespace HDF5
 
   public:
     /**
-     * Opens a group.
+     * Opens a sub-group of the current Group or File.
      */
     Group
     open_group(const std::string &name);
 
     /**
-     * Creates a group.
+     * Creates a sub-group in the current Group or File.
      */
     Group
     create_group(const std::string &name);
@@ -985,7 +997,7 @@ namespace HDF5
                    const std::vector<hsize_t> &dimensions) const;
 
     /**
-     * Creates and writes data to a dataset. @p number can be `float`, `double`,
+     * Create and write data to a dataset. @p number can be `float`, `double`,
      * `std::complex<float>`, `std::complex<double>`, `int` or `unsigned int`.
      *
      * Datatype conversion takes place at the time of a read or write and is
@@ -1031,7 +1043,7 @@ namespace HDF5
     };
 
     /**
-     * Creates or opens a hdf5 file for serial operations. This call does not
+     * Creates or opens a HDF5 file for serial operations. This call does not
      * require MPI support. It creates or opens a HDF5 file depending on the
      * value of @p mode.
      */
@@ -1039,7 +1051,7 @@ namespace HDF5
 
     /**
      * Creates or opens an HDF5 file in parallel using MPI. This requires that
-     * deal.ii and HDF5 were compiled with MPI support. It creates or opens a
+     * deal.II and HDF5 were compiled with MPI support. It creates or opens a
      * HDF5 file depending on the value of @p mode. @p mpi_communicator
      * defines the processes that participate in this call; `MPI_COMM_WORLD` is
      * a common value for the MPI communicator.

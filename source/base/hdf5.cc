@@ -40,7 +40,7 @@ namespace HDF5
     // std::shared_ptr is used instead of std::unique_ptr because the destructor
     // of std::shared_ptr doesn't have to be defined in the template argument.
     // In the other hand, the destructor of std::unique has to be defined in the
-    // template argument. Native types such as H5T_NATIVE_DOUBLE does not
+    // template argument. Native types such as H5T_NATIVE_DOUBLE do not
     // require a destructor, but compound types such as std::complex<double>
     // require a destructor to free the HDF5 resources.
     template <typename number>
@@ -113,9 +113,6 @@ namespace HDF5
     // For a std::vector the function returns std::vector<hsize_t>{vector_size}
     // For a Vector the function returns std::vector<hsize_t>{vector_size}
     // For a FullMatrix the function returns std::vector<hsize_t>{rows, columns}
-    //
-    // Instead of using functions with std::enable_if, "constexpr if" from C++17
-    // could be used
     template <typename number>
     std::vector<hsize_t>
     get_container_dimensions(const std::vector<number> &data)
