@@ -96,7 +96,6 @@ class Step6
 {
 public:
   Step6();
-  ~Step6();
 
   void run();
 
@@ -118,9 +117,6 @@ private:
   // conditions.
   AffineConstraints<double> constraints;
 
-  // The sparsity pattern and sparse matrix are deliberately declared in the
-  // opposite of the order used in step-2 through step-5 to demonstrate the
-  // primary use of the Subscriptor and SmartPointer classes.
   SparseMatrix<double> system_matrix;
   SparsityPattern      sparsity_pattern;
 
@@ -158,69 +154,6 @@ Step6<dim>::Step6()
   , dof_handler(triangulation)
 {}
 
-
-// @sect4{Step6::~Step6}
-
-// Here comes the added destructor of the class. Some objects in deal.II store
-// pointers to other objects: in particular a SparseMatrix stores a SmartPointer
-// pointing to the SparsityPattern with which it was initialized. This example
-// deliberately declares the SparseMatrix before the SparsityPattern to make
-// this dependency clearer. Of course we could have left this order unchanged,
-// but we would like to show what happens if the order is reversed since this
-// produces a rather nasty side-effect and results in an error which is
-// difficult to track down if one does not know what happens.
-//
-// What happens is the following: when we initialize a SparseMatrix,
-// the matrix stores a pointer to the provided SparsityPattern instead of
-// copying it.  Since this pointer is used until either another
-// SparsityPattern is attached or the SparseMatrix is destructed, it would be
-// unwise to allow the SparsityPattern to be destructed before the
-// SparseMatrix. To disallow this, the SparseMatrix increases a counter inside
-// the SparsityPattern which counts how many objects use it (this is what the
-// <code>Subscriptor</code>/<code>SmartPointer</code> class pair is used for,
-// in case you want something like this for your own programs; see step-7 for
-// a more complete discussion of this topic). If we try to destroy the object
-// while the counter is larger than zero then the program will either abort
-// (the default) or print an error message and continue: see the documentation
-// of AssertNothrow for more details. In either case the program contains a
-// bug and this facility will, hopefully, point out where.
-//
-// To be fair, such errors due to object dependencies are not particularly
-// popular among programmers using deal.II, since they only tell us that
-// something is wrong, namely that <i>some</i> other object is still using the
-// object that is presently being destroyed, but most of the time not
-// <em>which</em> object is still using it. It is therefore often rather
-// time-consuming to find out where the problem exactly is, although it is
-// then usually straightforward to remedy the situation. However, we believe
-// that the effort to find invalid pointers to objects that no longer exist is
-// less if the problem is detected once the pointer becomes invalid, rather
-// than when non-existent objects are actually accessed again, since then
-// usually only invalid data is accessed, but no error is immediately raised.
-//
-// Coming back to the present situation, if we did not write this destructor,
-// then the compiler would generate code that triggers exactly the behavior
-// described above. The reason is that member variables of the
-// <code>Step6</code> class are destroyed bottom-up (i.e., in reverse order of
-// their declaration in the class), as always in C++. Thus, the
-// SparsityPattern will be destroyed before the SparseMatrix, since its
-// declaration is below the declaration of the sparsity pattern. This triggers
-// the situation above, and without manual intervention the program will abort
-// when the SparsityPattern is destroyed. What needs to be done is to
-// tell the SparseMatrix to release its pointer to the SparsityPattern. Of
-// course, the SparseMatrix will only release its pointer if it really does
-// not need the SparsityPattern any more. For this purpose, the SparseMatrix
-// class has a function SparseMatrix::clear() which resets the object to its
-// default-constructed state by deleting all data and resetting its pointer to
-// the SparsityPattern to 0. After this, you can safely destruct the
-// SparsityPattern since its internal counter will be zero.
-//
-// We show the output of the other case (where we do not call
-// SparseMatrix::clear()) in the results section below.
-template <int dim>
-Step6<dim>::~Step6()
-{
-  system_matrix.clear();
-}
 
 
 // @sect4{Step6::setup_system}

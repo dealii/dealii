@@ -373,16 +373,12 @@ namespace Step7
     // beginning of the program or an outer loop, and they are destroyed at
     // the very end. The question is: can we guarantee that the two objects
     // which the DoFHandler uses, live at least as long as they are in use?
-    // This means that the DoFHandler must have some kind of lock on the
-    // destruction of the other objects, and it can only release this lock
-    // once it has cleared all active references to these objects. We have
-    // seen what happens if we violate this order of destruction in the
-    // previous example program: an exception is thrown that terminates the
-    // program in order to notify the programmer of this potentially dangerous
-    // state where an object is pointed to that no longer persists.
+    // This means that the DoFHandler must have some kind of knowledge on the
+    // destruction of the other objects.
     //
     // We will show here how the library managed to find out that there are
-    // still active references to an object. Basically, the method is along
+    // still active references to an object and the object is still alive
+    // frome the point of view of a using object. Basically, the method is along
     // the following line: all objects that are subject to such potentially
     // dangerous pointers are derived from a class called Subscriptor. For
     // example, the Triangulation, DoFHandler, and a base class of the
@@ -392,40 +388,24 @@ namespace Step7
     // a pointer to that object, we can increase its use counter, and when we
     // move away our pointer or do not need it any more, we decrease the
     // counter again. This way, we can always check how many objects still use
-    // that object.
+    // that object. Additionally, the class requires to know about a pointer
+    // that it can use to tell the subscribing object about its invalidation.
     //
-    // On the other hand, if an object of a class that is derived from the
-    // Subscriptor class is destroyed, it also has to call the destructor of
-    // the Subscriptor class. In this destructor, there will then be a check
-    // whether the counter is really zero. If yes, then there are no active
-    // references to this object any more, and we can safely destroy it. If
-    // the counter is non-zero, however, then the destruction would result in
-    // stale and thus potentially dangerous pointers, and we rather throw an
-    // exception to alert the programmer that this is doing something
-    // dangerous and the program better be fixed.
+    // If an object of a class that is derived from the Subscriptor class is
+    // destroyed, it also has to call the destructor of the Subscriptor class.
+    // In this destructor, we tell all the subscribing objects about the
+    // invalidation of the object using the stored pointers. The same happens
+    // when the object appears on the right hand side of a move expression,
+    // i.e., it will no longer contain valid content after the operation. The
+    // subscribing class is expected to check the value stored in its
+    // corresponding pointer before trying to access the object subscribed to.
     //
-    // While this certainly all sounds very well, it has some problems in
-    // terms of usability: what happens if I forget to increase the counter
-    // when I let a pointer point to such an object? And what happens if I
-    // forget to decrease it again? Note that this may lead to extremely
-    // difficult to find bugs, since the place where we have forgotten
-    // something may be far away from the place where the check for zeroness
-    // of the counter upon destruction actually fails. This kind of bug is
-    // rather annoying and usually very hard to fix.
-    //
-    // The solution to this problem is to again use some C++ trickery: we
-    // create a class that acts just like a pointer, i.e. can be dereferenced,
-    // can be assigned to and from other pointers, and so on. This can be done
-    // by overloading the several dereferencing operators of that
-    // class. Within the constructors, destructors, and assignment operators
-    // of that class, we can however also manage increasing or decreasing the
-    // use counters of the objects we point to. Objects of that class
-    // therefore can be used just like ordinary pointers to objects, but they
-    // also serve to change the use counters of those objects without the need
-    // for the programmer to do so herself. The class that actually does all
-    // this is called SmartPointer and takes as template parameter the data
-    // type of the object which it shall point to. The latter type may be any
-    // class, as long as it is derived from the Subscriptor class.
+    // This is exactly what the SmartPointer class is doing. It basically acts
+    // just like a pointer, i.e. it can be dereferenced, can be assigned to and
+    // from other pointers, and so on. On top of that it uses the mechanism
+    // described above to find out if the pointer this class is representing is
+    // dangling when we try to dereference it. In that case an exception is
+    // thrown.
     //
     // In the present example program, we want to protect the finite element
     // object from the situation that for some reason the finite element

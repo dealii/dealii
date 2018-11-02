@@ -116,55 +116,6 @@ from the optimal square.
 
 
 
-For completeness, we show what happens if the code we commented about
-in the destructor of the <code>Step6</code> class is omitted
-from this example:
-
-~~~{}
-An error occurred in line <104> of file <.../source/base/subscriptor.cc> in function
-    void dealii::Subscriptor::check_no_subscribers() const
-The violated condition was:
-    counter == 0
-Additional information:
-    Object of class N6dealii15SparsityPatternE is still used by 1 other objects.
-
-(Additional information:
-  from Subscriber SparseMatrix)
-
-See the entry in the Frequently Asked Questions of deal.II (linked to from
-http://www.dealii.org/) for a lot more information on what this error means and
-how to fix programs in which it happens.
-
-Stacktrace:
------------
-#0  .../lib/libdeal_II.g.so.9.0.0: dealii::Subscriptor::check_no_subscribers() const noexcept
-#   .../lib/libdeal_II.g.so.9.0.0: dealii::Subscriptor::~Subscriptor()
-#2  ./step-6: Step6<2>::~Step6()
-#3  ./step-6: main
---------------------------------------------------------
-~~~
-
-From the above error message, we conclude that something is still using an
-object with type <code>N6dealii15SparsityPatternE</code>. This is of course the <a
-href="http://en.wikipedia.org/wiki/Name_mangling">"mangled" name</a> for
-<code>SparsityPattern</code>. The mangling works as follows: the <code>N6</code> indicates
-a namespace with six characters (i.e., <code>dealii</code>) and the
-<code>15</code> indicates the number of characters of the template class (i.e.,
-<code>SparsityPattern</code>).
-
-From this we can already glean a little bit who is the culprit here, and who the
-victim: The one object that still uses the SparsityPattern is the
-SparseMatrix.
-
-The stacktrace gives an indication of where the problem happened. We
-see that the AssertNothrow macro was triggered in the
-destructor of the SparseMatrix class (which inherits from Subscriptor) that was called
-through a few more functions from the destructor of the
-<code>Step6</code> class, exactly where we have commented out
-the call to SparseMatrix::clear().
-
-
-
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
