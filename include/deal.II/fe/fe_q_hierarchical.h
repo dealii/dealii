@@ -630,6 +630,13 @@ public:
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
+  /**
+   * @copydoc FiniteElement::compare_for_domination()
+   */
+  virtual FiniteElementDomination::Domination
+  compare_for_domination(const FiniteElement<dim> &fe_other,
+                         const unsigned int codim = 0) const override final;
+
   /*@}*/
 
   /**
@@ -662,19 +669,6 @@ public:
   get_subface_interpolation_matrix(const FiniteElement<dim> &source,
                                    const unsigned int        subface,
                                    FullMatrix<double> &matrix) const override;
-
-  /**
-   * Return whether this element dominates the one given as argument when they
-   * meet at a common face, whether it is the other way around, whether
-   * neither dominates, or if either could dominate.
-   *
-   * For a definition of domination, see FiniteElementDomination::Domination
-   * and in particular the
-   * @ref hp_paper "hp paper".
-   */
-  virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim> &fe_other) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this

@@ -16,7 +16,7 @@ DEAL:0::name:FE_Enriched<2>[FE_Q<2>(2)-FE_Nothing<2>(dominating)-FE_Nothing<2>(d
 DEAL:0::n_blocks:4
 DEAL:0::n_comp:1
 DEAL:0::n_dofs:13
-DEAL:0::Dominating set for 1 and 2: 3
+DEAL:0::Face dominating set for 1 and 2: 3
     9 = 0
     10 = 0
     12 = 0

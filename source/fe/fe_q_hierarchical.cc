@@ -16,6 +16,7 @@
 
 #include <deal.II/base/std_cxx14/memory.h>
 
+#include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 
@@ -333,17 +334,30 @@ FE_Q_Hierarchical<dim>::hp_quad_dof_identities(
 
 template <int dim>
 FiniteElementDomination::Domination
-FE_Q_Hierarchical<dim>::compare_for_face_domination(
-  const FiniteElement<dim> &fe_other) const
+FE_Q_Hierarchical<dim>::compare_for_domination(
+  const FiniteElement<dim> &fe_other,
+  const unsigned int        codim) const
 {
-  if (const FE_Q_Hierarchical<dim> *fe_q_other =
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+
+  // vertex/line/face domination
+  // (if fe_other is derived from FE_DGQ)
+  // ------------------------------------
+  if (codim > 0)
+    if (dynamic_cast<const FE_DGQ<dim> *>(&fe_other) != nullptr)
+      // there are no requirements between continuous and discontinuous elements
+      return FiniteElementDomination::no_requirements;
+
+  // vertex/line/face domination
+  // (if fe_other is not derived from FE_DGQ)
+  // & cell domination
+  // ----------------------------------------
+  if (const FE_Q_Hierarchical<dim> *fe_hierarchical_other =
         dynamic_cast<const FE_Q_Hierarchical<dim> *>(&fe_other))
     {
-      // the element with lowest polynomial degree
-      // dominates the other.
-      if (this->degree < fe_q_other->degree)
+      if (this->degree < fe_hierarchical_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_other->degree)
+      else if (this->degree == fe_hierarchical_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -352,16 +366,12 @@ FE_Q_Hierarchical<dim>::compare_for_face_domination(
              dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
     {
       if (fe_nothing->is_dominating())
-        {
-          return FiniteElementDomination::other_element_dominates;
-        }
+        return FiniteElementDomination::other_element_dominates;
       else
-        {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
-          return FiniteElementDomination::no_requirements;
-        }
+        // the FE_Nothing has no degrees of freedom and it is typically used
+        // in a context where we don't require any continuity along the
+        // interface
+        return FiniteElementDomination::no_requirements;
     }
 
   Assert(false, ExcNotImplemented());

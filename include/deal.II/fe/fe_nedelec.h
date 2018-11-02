@@ -150,12 +150,11 @@ public:
   hp_constraints_are_implemented() const override;
 
   /**
-   * Return whether this element dominates the one, which is given as
-   * argument.
+   * @copydoc FiniteElement::compare_for_domination()
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim> &fe_other) const override;
+  compare_for_domination(const FiniteElement<dim> &fe_other,
+                         const unsigned int codim = 0) const override final;
 
   /**
    * If, on a vertex, several finite elements are active, the hp code first
@@ -219,6 +218,7 @@ public:
   get_subface_interpolation_matrix(const FiniteElement<dim> &source,
                                    const unsigned int        subface,
                                    FullMatrix<double> &matrix) const override;
+
   /**
    * Projection from a fine grid space onto a coarse grid space. If this
    * projection operator is associated with a matrix @p P, then the

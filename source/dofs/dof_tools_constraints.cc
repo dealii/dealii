@@ -1145,8 +1145,8 @@ namespace DoFTools
                         {
                           mother_face_dominates =
                             mother_face_dominates &
-                            (cell->get_fe().compare_for_face_domination(
-                              subcell->get_fe()));
+                            (cell->get_fe().compare_for_domination(
+                              subcell->get_fe(), /*codim=*/1));
                           fe_ind_face_subface.insert(
                             subcell->active_fe_index());
                         }
@@ -1199,8 +1199,9 @@ namespace DoFTools
                             // subface between FE_Q(1) and FE_Nothing, there are
                             // no constraints that we need to take care of. in
                             // that case, just continue
-                            if (cell->get_fe().compare_for_face_domination(
-                                  subface->get_fe(subface_fe_index)) ==
+                            if (cell->get_fe().compare_for_domination(
+                                  subface->get_fe(subface_fe_index),
+                                  /*codim=*/1) ==
                                 FiniteElementDomination::no_requirements)
                               continue;
 
@@ -1284,21 +1285,20 @@ namespace DoFTools
                         // 2) there is no dominating FE among sub faces (e.g.
                         // Q1xQ2 vs Q2xQ1), but subfaces still dominate mother
                         // face (e.g. Q2xQ2). To cover this case we would have
-                        // to use find_least_face_dominating_fe_in_collection()
+                        // to use find_least_dominating_fe_in_collection()
                         // of FECollection with fe_indices of sub faces. 3)
                         // Finally, it could happen that we got here because
                         // neither_element_dominates (e.g. Q1xQ1xQ2 and Q1xQ2xQ1
                         // for subfaces and Q2xQ1xQ1 for mother face). This
                         // requires usage of
-                        // find_least_face_dominating_fe_in_collection() with
+                        // find_least_dominating_fe_in_collection() with
                         // fe_indices of sub-faces and the mother face.
                         // Note that the last solution covers the first two
                         // scenarios, thus we stick with it assuming that we
                         // won't lose much time/efficiency.
                         const unsigned int dominating_fe_index =
-                          fe_collection
-                            .find_least_face_dominating_fe_in_collection(
-                              fe_ind_face_subface);
+                          fe_collection.find_least_dominating_fe_in_collection(
+                            fe_ind_face_subface, /*codim=*/1);
                         AssertThrow(
                           dominating_fe_index != numbers::invalid_unsigned_int,
                           ExcMessage(
@@ -1494,8 +1494,9 @@ namespace DoFTools
                       neighbor = cell->neighbor(face);
 
                     // see which side of the face we have to constrain
-                    switch (cell->get_fe().compare_for_face_domination(
-                      neighbor->get_fe()))
+                    switch (
+                      cell->get_fe().compare_for_domination(neighbor->get_fe(),
+                                                            /*codim=*/1))
                       {
                         case FiniteElementDomination::this_element_dominates:
                           {
@@ -1597,8 +1598,8 @@ namespace DoFTools
                               &fe_collection = dof_handler.get_fe_collection();
                             const unsigned int dominating_fe_index =
                               fe_collection
-                                .find_least_face_dominating_fe_in_collection(
-                                  fes);
+                                .find_least_dominating_fe_in_collection(
+                                  fes, /*codim=*/1);
 
                             AssertThrow(
                               dominating_fe_index !=

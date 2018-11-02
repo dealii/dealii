@@ -39,24 +39,19 @@ namespace FiniteElementDomination
    * strictly larger than that of the dominating element. For example, in 2-d
    * Q(2) elements dominate Q(4) elements, because the traces of Q(4) elements
    * are quartic polynomials which is a space strictly larger than the
-   * quadratic polynomials (the restriction of the Q(2) element). In general,
-   * Q(k) dominates Q(k') if $k\le k'$.
+   * quadratic polynomials (the restriction of the Q(2) element). Similar
+   * reasonings apply for vertices and cells as well. In general, Q(k) dominates
+   * Q(k') if $k\le k'$.
    *
-   * This enum is used in the FiniteElement::compare_for_face_domination()
-   * function that is used in the context of hp finite element methods when
-   * determining what to do at faces where two different finite elements meet
-   * (see the
+   * This enum is used in the FiniteElement::compare_for_domination() function
+   * that is used in the context of hp finite element methods when determining
+   * what to do at faces where two different finite elements meet (see the
    * @ref hp_paper "hp paper"
    * for a more detailed description of the following). In that case, the
    * degrees of freedom of one side need to be constrained to those on the
    * other side. The determination which side is which is based on the outcome
    * of a comparison for mutual domination: the dominated side is constrained
    * to the dominating one.
-   *
-   * A similar situation happens in 3d, where we have to consider different
-   * elements meeting at only an edge, not an entire face. Such comparisons
-   * are then implemented in the FiniteElement::compare_for_line_domination()
-   * function.
    *
    * Note that there are situations where neither side dominates. The
    * @ref hp_paper "hp paper"

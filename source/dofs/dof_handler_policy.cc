@@ -968,7 +968,8 @@ namespace internal
                       // the ones that are used on this line
                       const unsigned int most_dominating_fe_index =
                         dof_handler.get_fe_collection()
-                          .find_face_dominating_fe_in_subset(fe_indices);
+                          .find_dominating_fe_in_subset(fe_indices,
+                                                        /*codim=*/dim - 1);
 
                       // if we found the most dominating element, then use this
                       // to eliminate some of the degrees of freedom by
@@ -1127,7 +1128,8 @@ namespace internal
                   // element of the ones that are used on this quad
                   const unsigned int most_dominating_fe_index =
                     dof_handler.get_fe_collection()
-                      .find_face_dominating_fe_in_subset(fe_indices);
+                      .find_dominating_fe_in_subset(fe_indices,
+                                                    /*codim=*/dim - 2);
 
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom
@@ -1681,7 +1683,8 @@ namespace internal
                       // the ones that are used on this line
                       const unsigned int most_dominating_fe_index =
                         dof_handler.get_fe_collection()
-                          .find_face_dominating_fe_in_subset(fe_indices);
+                          .find_dominating_fe_in_subset(fe_indices,
+                                                        /*codim=*/dim - 1);
 
                       // if we found the most dominating element, then use this
                       // to eliminate some of the degrees of freedom by
@@ -1823,7 +1826,8 @@ namespace internal
                   // element of the ones that are used on this quad
                   const unsigned int most_dominating_fe_index =
                     dof_handler.get_fe_collection()
-                      .find_face_dominating_fe_in_subset(fe_indices);
+                      .find_dominating_fe_in_subset(fe_indices,
+                                                    /*codim=*/dim - 2);
 
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom

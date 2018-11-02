@@ -150,8 +150,9 @@ namespace parallel
                 cell->child(child_index)->active_fe_index());
 
             fe_index =
-              dof_handler->get_fe().find_least_face_dominating_fe_in_collection(
-                fe_indices_children);
+              dof_handler->get_fe_collection()
+                .find_least_dominating_fe_in_collection(fe_indices_children,
+                                                        /*codim=*/0);
 
             Assert(fe_index != numbers::invalid_unsigned_int,
                    ExcMessage(

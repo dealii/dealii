@@ -177,15 +177,21 @@ FE_TraceQ<dim, spacedim>::hp_constraints_are_implemented() const
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_TraceQ<dim, spacedim>::compare_for_face_domination(
-  const FiniteElement<dim, spacedim> &fe_other) const
+FE_TraceQ<dim, spacedim>::compare_for_domination(
+  const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int                  codim) const
 {
-  if (const FE_TraceQ<dim, spacedim> *fe_q_other =
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+  (void)codim;
+
+  // vertex/line/face/cell domination
+  // --------------------------------
+  if (const FE_TraceQ<dim, spacedim> *fe_traceq_other =
         dynamic_cast<const FE_TraceQ<dim, spacedim> *>(&fe_other))
     {
-      if (this->degree < fe_q_other->degree)
+      if (this->degree < fe_traceq_other->degree)
         return FiniteElementDomination::this_element_dominates;
-      else if (this->degree == fe_q_other->degree)
+      else if (this->degree == fe_traceq_other->degree)
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
@@ -194,16 +200,12 @@ FE_TraceQ<dim, spacedim>::compare_for_face_domination(
              dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
     {
       if (fe_nothing->is_dominating())
-        {
-          return FiniteElementDomination::other_element_dominates;
-        }
+        return FiniteElementDomination::other_element_dominates;
       else
-        {
-          // the FE_Nothing has no degrees of freedom and it is typically used
-          // in a context where we don't require any continuity along the
-          // interface
-          return FiniteElementDomination::no_requirements;
-        }
+        // the FE_Nothing has no degrees of freedom and it is typically used
+        // in a context where we don't require any continuity along the
+        // interface
+        return FiniteElementDomination::no_requirements;
     }
 
   Assert(false, ExcNotImplemented());

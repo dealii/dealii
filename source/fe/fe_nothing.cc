@@ -206,24 +206,22 @@ operator==(const FiniteElement<dim, spacedim> &f) const
 
 template <int dim, int spacedim>
 FiniteElementDomination::Domination
-FE_Nothing<dim, spacedim>::compare_for_face_domination(
-  const FiniteElement<dim, spacedim> &fe) const
+FE_Nothing<dim, spacedim>::compare_for_domination(
+  const FiniteElement<dim, spacedim> &fe,
+  const unsigned int                  codim) const
 {
-  // if FE_Nothing does not dominate, there are no requirements
+  Assert(codim <= dim, ExcImpossibleInDim(dim));
+  (void)codim;
+
   if (!dominate)
-    {
-      return FiniteElementDomination::no_requirements;
-    }
-  // if it does and the other is FE_Nothing, either can dominate
+    // if FE_Nothing does not dominate, there are no requirements
+    return FiniteElementDomination::no_requirements;
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe) != nullptr)
-    {
-      return FiniteElementDomination::either_element_can_dominate;
-    }
-  // otherwise we dominate whatever fe is provided
+    // if it does and the other is FE_Nothing, either can dominate
+    return FiniteElementDomination::either_element_can_dominate;
   else
-    {
-      return FiniteElementDomination::this_element_dominates;
-    }
+    // otherwise we dominate whatever fe is provided
+    return FiniteElementDomination::this_element_dominates;
 }
 
 

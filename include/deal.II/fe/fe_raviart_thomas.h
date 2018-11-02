@@ -292,9 +292,12 @@ public:
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_quad_dof_identities(const FiniteElement<dim> &fe_other) const override;
 
+  /**
+   * @copydoc FiniteElement::compare_for_domination()
+   */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim> &fe_other) const override;
+  compare_for_domination(const FiniteElement<dim> &fe_other,
+                         const unsigned int codim = 0) const override final;
 
 private:
   /**

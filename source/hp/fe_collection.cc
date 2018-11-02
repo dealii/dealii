@@ -24,9 +24,22 @@ namespace hp
 {
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim, spacedim>::find_least_face_dominating_fe_in_collection(
+  FECollection<dim, spacedim>::find_least_face_dominating_fe(
     const std::set<unsigned int> &fes) const
   {
+    return find_least_dominating_fe_in_collection(fes, /*codim*/ 1);
+  }
+
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  FECollection<dim, spacedim>::find_least_dominating_fe_in_collection(
+    const std::set<unsigned int> &fes,
+    const unsigned int            codim) const
+  {
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
+
     for (auto it = fes.cbegin(); it != fes.cend(); ++it)
       AssertIndexRange(*it, finite_elements.size());
 
@@ -52,8 +65,8 @@ namespace hp
         // check if cur_fe can dominate all FEs in @p fes:
         for (const auto &other_fe : fes)
           domination =
-            domination & finite_elements[cur_fe]->compare_for_face_domination(
-                           *finite_elements[other_fe]);
+            domination & finite_elements[cur_fe]->compare_for_domination(
+                           *finite_elements[other_fe], codim);
 
         // if we found dominating element, keep them in a set.
         if (
@@ -76,10 +89,9 @@ namespace hp
 
           for (const auto &other_fe : candidate_fes)
             if (current_fe != other_fe)
-              domination =
-                domination &
-                finite_elements[current_fe]->compare_for_face_domination(
-                  *finite_elements[other_fe]);
+              domination = domination &
+                           finite_elements[current_fe]->compare_for_domination(
+                             *finite_elements[other_fe], codim);
 
           if ((domination ==
                FiniteElementDomination::other_element_dominates) ||
@@ -96,19 +108,12 @@ namespace hp
 
   template <int dim, int spacedim>
   unsigned int
-  FECollection<dim, spacedim>::find_least_face_dominating_fe(
-    const std::set<unsigned int> &fes) const
+  FECollection<dim, spacedim>::find_dominating_fe_in_subset(
+    const std::set<unsigned int> &fes,
+    const unsigned int            codim) const
   {
-    return find_least_face_dominating_fe_in_collection(fes);
-  }
+    Assert(codim <= dim, ExcImpossibleInDim(dim));
 
-
-
-  template <int dim, int spacedim>
-  unsigned int
-  FECollection<dim, spacedim>::find_face_dominating_fe_in_subset(
-    const std::set<unsigned int> &fes) const
-  {
     for (auto it = fes.cbegin(); it != fes.cend(); ++it)
       AssertIndexRange(*it, finite_elements.size());
 
@@ -131,9 +136,8 @@ namespace hp
         for (const auto &other_fe : fes)
           if (other_fe != current_fe)
             domination =
-              domination &
-              finite_elements[current_fe]->compare_for_face_domination(
-                *finite_elements[other_fe]);
+              domination & finite_elements[current_fe]->compare_for_domination(
+                             *finite_elements[other_fe], codim);
 
         // see if this element is able to dominate all the other
         // ones, and if so take it

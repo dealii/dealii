@@ -86,11 +86,11 @@ public:
    * finite element (default = 1).
    *
    * Second argument decides whether FE_Nothing will dominate any other FE in
-   * compare_for_face_domination() (default = false). Therefore at interfaces
-   * where, for example, a Q1 meets an FE_Nothing, we will force the traces of
-   * the two functions to be the same. Because the FE_Nothing encodes a space
-   * that is zero everywhere, this means that the Q1 field will be forced to
-   * become zero at this interface.
+   * compare_for_domination() (default = false). Therefore at interfaces where,
+   * for example, a Q1 meets an FE_Nothing, we will force the traces of the two
+   * functions to be the same. Because the FE_Nothing encodes a space that is
+   * zero everywhere, this means that the Q1 field will be forced to become zero
+   * at this interface.
    */
   FE_Nothing(const unsigned int n_components = 1, const bool dominate = false);
 
@@ -184,13 +184,7 @@ public:
       &output_data) const override;
 
   /**
-   * Return whether this element dominates the one given as argument when they
-   * meet at a common face, whether it is the other way around, whether
-   * neither dominates, or if either could dominate.
-   *
-   * For a definition of domination, see FiniteElementDomination::Domination
-   * and in particular the
-   * @ref hp_paper "hp paper".
+   * @copydoc FiniteElement::compare_for_domination()
    *
    * In the current case, this element is assumed to dominate if the second
    * argument in the constructor @p dominate is true. When this argument is
@@ -198,8 +192,8 @@ public:
    * dominate. Otherwise there are no_requirements.
    */
   virtual FiniteElementDomination::Domination
-  compare_for_face_domination(
-    const FiniteElement<dim, spacedim> &fe_other) const override;
+  compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int codim = 0) const override final;
 
 
 
@@ -277,7 +271,9 @@ public:
 private:
   /**
    * If true, this element will dominate any other apart from itself in
-   * compare_for_face_domination();
+   * compare_for_domination(). This is because a space that only contains the
+   * zero function is definitely smaller (and consequently dominant) when
+   * compared to any other finite element space.
    */
   const bool dominate;
 };
