@@ -133,7 +133,8 @@ namespace internal
     LinearAlgebra::TpetraWrappers::Vector<double> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<double>            vector = V.trilinos_vector();
+    Tpetra::Vector<double, int, types::global_dof_index> vector =
+      V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
@@ -144,7 +145,8 @@ namespace internal
     // We're going to modify the data on host.
     vector.modify<Kokkos::HostSpace>();
     vector_1d(trilinos_i) += value;
-    vector.sync<Tpetra::Vector<double>::device_type::memory_space>();
+    vector.sync<Tpetra::Vector<double, int, types::global_dof_index>::
+                  device_type::memory_space>();
   }
 
 
@@ -157,7 +159,8 @@ namespace internal
     LinearAlgebra::TpetraWrappers::Vector<float> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<float>             vector = V.trilinos_vector();
+    Tpetra::Vector<float, int, types::global_dof_index> vector =
+      V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
@@ -168,7 +171,8 @@ namespace internal
     // We're going to modify the data on host.
     vector.modify<Kokkos::HostSpace>();
     vector_1d(trilinos_i) += value;
-    vector.sync<Tpetra::Vector<float>::device_type::memory_space>();
+    vector.sync<Tpetra::Vector<float, int, types::global_dof_index>::
+                  device_type::memory_space>();
   }
 
 
@@ -181,7 +185,8 @@ namespace internal
     LinearAlgebra::TpetraWrappers::Vector<double> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<double>            vector = V.trilinos_vector();
+    Tpetra::Vector<double, int, types::global_dof_index> vector =
+      V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
@@ -192,7 +197,8 @@ namespace internal
     // We're going to modify the data on host.
     vector.modify<Kokkos::HostSpace>();
     vector_1d(trilinos_i) = value;
-    vector.sync<Tpetra::Vector<double>::device_type::memory_space>();
+    vector.sync<Tpetra::Vector<double, int, types::global_dof_index>::
+                  device_type::memory_space>();
   }
 
 
@@ -205,7 +211,8 @@ namespace internal
     LinearAlgebra::TpetraWrappers::Vector<float> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<float>             vector = V.trilinos_vector();
+    Tpetra::Vector<float, int, types::global_dof_index> vector =
+      V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
@@ -216,7 +223,8 @@ namespace internal
     // We're going to modify the data on host.
     vector.modify<Kokkos::HostSpace>();
     vector_1d(trilinos_i) = value;
-    vector.sync<Tpetra::Vector<float>::device_type::memory_space>();
+    vector.sync<Tpetra::Vector<float, int, types::global_dof_index>::
+                  device_type::memory_space>();
   }
 
 
@@ -228,7 +236,8 @@ namespace internal
     const types::global_dof_index                        i)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<double>            vector = V.trilinos_vector();
+    Tpetra::Vector<double, int, types::global_dof_index> vector =
+      V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
@@ -249,7 +258,8 @@ namespace internal
     const types::global_dof_index                       i)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<float>             vector = V.trilinos_vector();
+    Tpetra::Vector<float, int, types::global_dof_index> vector =
+      V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));

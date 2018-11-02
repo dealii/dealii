@@ -70,13 +70,13 @@ namespace LinearAlgebra
       /**
        * Return the underlying Tpetra::Import object.
        */
-      const Tpetra::Import<> &
+      const Tpetra::Import<int, types::global_dof_index> &
       get_tpetra_import() const;
 
       /**
        * Return the underlying Tpetra::Export object.
        */
-      const Tpetra::Export<> &
+      const Tpetra::Export<int, types::global_dof_index> &
       get_tpetra_export() const;
 
     private:
@@ -88,12 +88,14 @@ namespace LinearAlgebra
       /**
        * Shared pointer to the Tpetra::Import object used.
        */
-      std::unique_ptr<Tpetra::Import<>> tpetra_import;
+      std::unique_ptr<Tpetra::Import<int, types::global_dof_index>>
+        tpetra_import;
 
       /**
        * Shared pointer to the Tpetra::Export object used.
        */
-      std::unique_ptr<Tpetra::Export<>> tpetra_export;
+      std::unique_ptr<Tpetra::Export<int, types::global_dof_index>>
+        tpetra_export;
     };
   } // end of namespace TpetraWrappers
 } // end of namespace LinearAlgebra

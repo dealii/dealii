@@ -42,8 +42,12 @@ namespace LinearAlgebra
   {
     template <typename Number>
     Vector<Number>::Vector()
-      : vector(new Tpetra::Vector<Number>(Teuchos::RCP<Tpetra::Map<>>(
-          new Tpetra::Map<>(0, 0, Utilities::Trilinos::tpetra_comm_self()))))
+      : vector(new Tpetra::Vector<Number, int, types::global_dof_index>(
+          Teuchos::RCP<Tpetra::Map<int, types::global_dof_index>>(
+            new Tpetra::Map<int, types::global_dof_index>(
+              0,
+              0,
+              Utilities::Trilinos::tpetra_comm_self()))))
     {}
 
 
@@ -51,7 +55,9 @@ namespace LinearAlgebra
     template <typename Number>
     Vector<Number>::Vector(const Vector<Number> &V)
       : Subscriptor()
-      , vector(new Tpetra::Vector<Number>(V.trilinos_vector(), Teuchos::Copy))
+      , vector(new Tpetra::Vector<Number, int, types::global_dof_index>(
+          V.trilinos_vector(),
+          Teuchos::Copy))
     {}
 
 
@@ -59,8 +65,9 @@ namespace LinearAlgebra
     template <typename Number>
     Vector<Number>::Vector(const IndexSet &parallel_partitioner,
                            const MPI_Comm &communicator)
-      : vector(new Tpetra::Vector<Number>(Teuchos::rcp(new Tpetra::Map<>(
-          parallel_partitioner.make_tpetra_map(communicator, false)))))
+      : vector(new Tpetra::Vector<Number, int, types::global_dof_index>(
+          Teuchos::rcp(new Tpetra::Map<int, types::global_dof_index>(
+            parallel_partitioner.make_tpetra_map(communicator, false)))))
     {}
 
 
@@ -71,11 +78,12 @@ namespace LinearAlgebra
                            const MPI_Comm &communicator,
                            const bool      omit_zeroing_entries)
     {
-      Tpetra::Map<> input_map =
+      Tpetra::Map<int, types::global_dof_index> input_map =
         parallel_partitioner.make_tpetra_map(communicator, false);
       if (vector->getMap()->isSameAs(input_map) == false)
-        vector = std_cxx14::make_unique<Tpetra::Vector<Number>>(
-          Teuchos::rcp(new Tpetra::Map<>(input_map)));
+        vector = std_cxx14::make_unique<
+          Tpetra::Vector<Number, int, types::global_dof_index>>(Teuchos::rcp(
+          new Tpetra::Map<int, types::global_dof_index>(input_map)));
       else if (omit_zeroing_entries == false)
         {
           vector->putScalar(0.);
@@ -117,15 +125,16 @@ namespace LinearAlgebra
         {
           if (size() == V.size())
             {
-              Tpetra::Import<> data_exchange(vector->getMap(),
-                                             V.trilinos_vector().getMap());
+              Tpetra::Import<int, types::global_dof_index> data_exchange(
+                vector->getMap(), V.trilinos_vector().getMap());
 
               vector->doImport(V.trilinos_vector(),
                                data_exchange,
                                Tpetra::REPLACE);
             }
           else
-            vector = std_cxx14::make_unique<Tpetra::Vector<Number>>(
+            vector = std_cxx14::make_unique<
+              Tpetra::Vector<Number, int, types::global_dof_index>>(
               V.trilinos_vector());
         }
 
@@ -185,8 +194,10 @@ namespace LinearAlgebra
               "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
         }
 
-      Tpetra::Export<> tpetra_export(tpetra_comm_pattern->get_tpetra_export());
-      Tpetra::Vector<Number> source_vector(tpetra_export.getSourceMap());
+      Tpetra::Export<int, types::global_dof_index> tpetra_export(
+        tpetra_comm_pattern->get_tpetra_export());
+      Tpetra::Vector<Number, int, types::global_dof_index> source_vector(
+        tpetra_export.getSourceMap());
 
       source_vector.template sync<Kokkos::HostSpace>();
       auto x_2d = source_vector.template getLocalView<Kokkos::HostSpace>();
@@ -197,7 +208,8 @@ namespace LinearAlgebra
       for (size_t k = 0; k < localLength; ++k)
         x_1d(k) = *values_it++;
       source_vector.template sync<
-        typename Tpetra::Vector<Number>::device_type::memory_space>();
+        typename Tpetra::Vector<Number, int, types::global_dof_index>::
+          device_type::memory_space>();
       if (operation == VectorOperation::insert)
         vector->doExport(source_vector, tpetra_export, Tpetra::REPLACE);
       else if (operation == VectorOperation::add)
@@ -254,15 +266,16 @@ namespace LinearAlgebra
                  ExcDimensionMismatch(this->size(), down_V.size()));
 
           // TODO: The code doesn't work as expected so we use a workaround.
-          /*Tpetra::Export<> data_exchange(vector->getMap(),
-                                         down_V.trilinos_vector().getMap());
+          /*Tpetra::Export<int, types::global_dof_index>
+          data_exchange(vector->getMap(), down_V.trilinos_vector().getMap());
           vector->doExport(down_V.trilinos_vector(),
                            data_exchange,
                            Tpetra::ADD);*/
 
-          Tpetra::Vector<Number> dummy(vector->getMap(), false);
-          Tpetra::Import<>       data_exchange(dummy.getMap(),
-                                         down_V.trilinos_vector().getMap());
+          Tpetra::Vector<Number, int, types::global_dof_index> dummy(
+            vector->getMap(), false);
+          Tpetra::Import<int, types::global_dof_index> data_exchange(
+            dummy.getMap(), down_V.trilinos_vector().getMap());
 
           dummy.doExport(down_V.trilinos_vector(),
                          data_exchange,
@@ -322,7 +335,8 @@ namespace LinearAlgebra
           vector_1d(k) += a;
         }
       vector->template sync<
-        typename Tpetra::Vector<Number>::device_type::memory_space>();
+        typename Tpetra::Vector<Number, int, types::global_dof_index>::
+          device_type::memory_space>();
     }
 
 
@@ -577,7 +591,7 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    const Tpetra::Vector<Number> &
+    const Tpetra::Vector<Number, int, types::global_dof_index> &
     Vector<Number>::trilinos_vector() const
     {
       return *vector;
@@ -586,7 +600,7 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    Tpetra::Vector<Number> &
+    Tpetra::Vector<Number, int, types::global_dof_index> &
     Vector<Number>::trilinos_vector()
     {
       return *vector;

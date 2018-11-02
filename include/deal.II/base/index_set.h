@@ -448,7 +448,7 @@ public:
   make_trilinos_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
                     const bool      overlapping  = false) const;
 
-  Tpetra::Map<>
+  Tpetra::Map<int, types::global_dof_index>
   make_tpetra_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
                   const bool      overlapping  = false) const;
 #endif

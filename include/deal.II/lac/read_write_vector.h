@@ -615,12 +615,13 @@ namespace LinearAlgebra
      * used directly.
      */
     void
-    import(const Tpetra::Vector<Number> &tpetra_vector,
-           const IndexSet &              locally_owned_elements,
-           VectorOperation::values       operation,
-           const MPI_Comm &              mpi_comm,
-           const std::shared_ptr<const CommunicationPatternBase>
-             &communication_pattern);
+    import(
+      const Tpetra::Vector<Number, int, types::global_dof_index> &tpetra_vector,
+      const IndexSet &        locally_owned_elements,
+      VectorOperation::values operation,
+      const MPI_Comm &        mpi_comm,
+      const std::shared_ptr<const CommunicationPatternBase>
+        &communication_pattern);
 
     /**
      * Import all the elements present in the vector's IndexSet from the input
