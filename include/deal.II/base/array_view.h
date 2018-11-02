@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
@@ -72,7 +73,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup data
  * @author Wolfgang Bangerth, 2015, David Wells, 2017
  */
-template <typename ElementType>
+template <typename ElementType, typename MemorySpaceType = MemorySpace::Host>
 class ArrayView
 {
 public:
@@ -122,7 +123,8 @@ public:
    * non-@p const view to a @p const view, akin to converting a non-@p const
    * pointer to a @p const pointer.
    */
-  ArrayView(const ArrayView<typename std::remove_cv<value_type>::type> &view);
+  ArrayView(const ArrayView<typename std::remove_cv<value_type>::type,
+                            MemorySpaceType> &view);
 
   /**
    * A constructor that automatically creates a view from a std::vector object.
@@ -163,7 +165,8 @@ public:
    * This version always compares with the const value_type.
    */
   bool
-  operator==(const ArrayView<const value_type> &other_view) const;
+  operator==(
+    const ArrayView<const value_type, MemorySpaceType> &other_view) const;
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
@@ -171,8 +174,8 @@ public:
    * This version always compares with the non-const value_type.
    */
   bool
-  operator==(const ArrayView<typename std::remove_cv<value_type>::type>
-               &other_view) const;
+  operator==(const ArrayView<typename std::remove_cv<value_type>::type,
+                             MemorySpaceType> &other_view) const;
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
@@ -180,7 +183,8 @@ public:
    * This version always compares with the const value_type.
    */
   bool
-  operator!=(const ArrayView<const value_type> &other_view) const;
+  operator!=(
+    const ArrayView<const value_type, MemorySpaceType> &other_view) const;
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
@@ -188,8 +192,8 @@ public:
    * This version always compares with the non-const value_type.
    */
   bool
-  operator!=(const ArrayView<typename std::remove_cv<value_type>::type>
-               &other_view) const;
+  operator!=(const ArrayView<typename std::remove_cv<value_type>::type,
+                             MemorySpaceType> &other_view) const;
 
   /**
    * Return the size (in elements) of the view of memory this object
@@ -252,7 +256,7 @@ private:
    */
   const std::size_t n_elements;
 
-  friend class ArrayView<const ElementType>;
+  friend class ArrayView<const ElementType, MemorySpaceType>;
 };
 
 
@@ -261,26 +265,28 @@ private:
 
 
 
-template <typename ElementType>
-inline ArrayView<ElementType>::ArrayView(value_type *      starting_element,
-                                         const std::size_t n_elements)
+template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  value_type *      starting_element,
+  const std::size_t n_elements)
   : starting_element(starting_element)
   , n_elements(n_elements)
 {}
 
 
 
-template <typename ElementType>
-inline ArrayView<ElementType>::ArrayView(
-  const ArrayView<typename std::remove_cv<value_type>::type> &view)
+template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
+    &view)
   : starting_element(view.starting_element)
   , n_elements(view.n_elements)
 {}
 
 
 
-template <typename ElementType>
-inline ArrayView<ElementType>::ArrayView(
+template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const std::vector<typename std::remove_cv<value_type>::type> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
@@ -303,8 +309,8 @@ inline ArrayView<ElementType>::ArrayView(
 
 
 
-template <typename ElementType>
-inline ArrayView<ElementType>::ArrayView(
+template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   std::vector<typename std::remove_cv<value_type>::type> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
@@ -312,10 +318,10 @@ inline ArrayView<ElementType>::ArrayView(
 
 
 
-template <typename ElementType>
+template <typename ElementType, typename MemorySpaceType>
 inline bool
-ArrayView<ElementType>::
-operator==(const ArrayView<const value_type> &other_view) const
+ArrayView<ElementType, MemorySpaceType>::
+operator==(const ArrayView<const value_type, MemorySpaceType> &other_view) const
 {
   return (other_view.data() == starting_element) &&
          (other_view.size() == n_elements);
@@ -323,10 +329,11 @@ operator==(const ArrayView<const value_type> &other_view) const
 
 
 
-template <typename ElementType>
+template <typename ElementType, typename MemorySpaceType>
 inline bool
-ArrayView<ElementType>::operator==(
-  const ArrayView<typename std::remove_cv<value_type>::type> &other_view) const
+ArrayView<ElementType, MemorySpaceType>::
+operator==(const ArrayView<typename std::remove_cv<value_type>::type,
+                           MemorySpaceType> &other_view) const
 {
   return (other_view.data() == starting_element) &&
          (other_view.size() == n_elements);
@@ -334,19 +341,19 @@ ArrayView<ElementType>::operator==(
 
 
 
-template <typename ElementType>
+template <typename ElementType, typename MemorySpaceType>
 inline bool
-ArrayView<ElementType>::
-operator!=(const ArrayView<const value_type> &other_view) const
+ArrayView<ElementType, MemorySpaceType>::
+operator!=(const ArrayView<const value_type, MemorySpaceType> &other_view) const
 {
   return !(*this == other_view);
 }
 
 
 
-template <typename ElementType>
-inline typename ArrayView<ElementType>::value_type *
-ArrayView<ElementType>::data() const noexcept
+template <typename ElementType, typename MemorySpaceType>
+inline typename ArrayView<ElementType, MemorySpaceType>::value_type *
+ArrayView<ElementType, MemorySpaceType>::data() const noexcept
 {
   if (n_elements == 0)
     return nullptr;
@@ -356,62 +363,63 @@ ArrayView<ElementType>::data() const noexcept
 
 
 
-template <typename ElementType>
+template <typename ElementType, typename MemorySpaceType>
 inline bool
-ArrayView<ElementType>::operator!=(
-  const ArrayView<typename std::remove_cv<value_type>::type> &other_view) const
+ArrayView<ElementType, MemorySpaceType>::
+operator!=(const ArrayView<typename std::remove_cv<value_type>::type,
+                           MemorySpaceType> &other_view) const
 {
   return !(*this == other_view);
 }
 
 
 
-template <typename ElementType>
+template <typename ElementType, typename MemorySpaceType>
 inline std::size_t
-ArrayView<ElementType>::size() const
+ArrayView<ElementType, MemorySpaceType>::size() const
 {
   return n_elements;
 }
 
-template <typename ElementType>
-inline typename ArrayView<ElementType>::iterator
-ArrayView<ElementType>::begin() const
+template <typename ElementType, typename MemorySpaceType>
+inline typename ArrayView<ElementType, MemorySpaceType>::iterator
+ArrayView<ElementType, MemorySpaceType>::begin() const
 {
   return starting_element;
 }
 
 
 
-template <typename ElementType>
-inline typename ArrayView<ElementType>::iterator
-ArrayView<ElementType>::end() const
+template <typename ElementType, typename MemorySpaceType>
+inline typename ArrayView<ElementType, MemorySpaceType>::iterator
+ArrayView<ElementType, MemorySpaceType>::end() const
 {
   return starting_element + n_elements;
 }
 
 
 
-template <typename ElementType>
-inline typename ArrayView<ElementType>::const_iterator
-ArrayView<ElementType>::cbegin() const
+template <typename ElementType, typename MemorySpaceType>
+inline typename ArrayView<ElementType, MemorySpaceType>::const_iterator
+ArrayView<ElementType, MemorySpaceType>::cbegin() const
 {
   return starting_element;
 }
 
 
 
-template <typename ElementType>
-inline typename ArrayView<ElementType>::const_iterator
-ArrayView<ElementType>::cend() const
+template <typename ElementType, typename MemorySpaceType>
+inline typename ArrayView<ElementType, MemorySpaceType>::const_iterator
+ArrayView<ElementType, MemorySpaceType>::cend() const
 {
   return starting_element + n_elements;
 }
 
 
 
-template <typename ElementType>
-inline typename ArrayView<ElementType>::value_type &ArrayView<ElementType>::
-                                                    operator[](const std::size_t i) const
+template <typename ElementType, typename MemorySpaceType>
+inline typename ArrayView<ElementType, MemorySpaceType>::value_type &
+  ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 {
   Assert(i < n_elements, ExcIndexRange(i, 0, n_elements));
 
@@ -481,9 +489,10 @@ namespace internal
  *
  * @relatesalso ArrayView
  */
-template <typename Iterator>
+template <typename Iterator, typename MemorySpaceType = MemorySpace::Host>
 ArrayView<typename std::remove_reference<
-  typename std::iterator_traits<Iterator>::reference>::type>
+            typename std::iterator_traits<Iterator>::reference>::type,
+          MemorySpaceType>
 make_array_view(const Iterator begin, const Iterator end)
 {
   static_assert(
@@ -497,8 +506,8 @@ make_array_view(const Iterator begin, const Iterator end)
          ExcMessage("The provided range isn't contiguous in memory!"));
   // the reference type, not the value type, knows the constness of the iterator
   return ArrayView<typename std::remove_reference<
-    typename std::iterator_traits<Iterator>::reference>::type>(
-    std::addressof(*begin), end - begin);
+                     typename std::iterator_traits<Iterator>::reference>::type,
+                   MemorySpaceType>(std::addressof(*begin), end - begin);
 }
 
 
@@ -512,14 +521,14 @@ make_array_view(const Iterator begin, const Iterator end)
  *
  * @relatesalso ArrayView
  */
-template <typename ElementType>
-ArrayView<ElementType>
+template <typename ElementType, typename MemorySpaceType = MemorySpace::Host>
+ArrayView<ElementType, MemorySpaceType>
 make_array_view(ElementType *const begin, ElementType *const end)
 {
   Assert(begin <= end,
          ExcMessage(
            "The beginning of the array view should be before the end."));
-  return ArrayView<ElementType>(begin, end - begin);
+  return ArrayView<ElementType, MemorySpaceType>(begin, end - begin);
 }
 
 
@@ -534,9 +543,9 @@ make_array_view(ElementType *const begin, ElementType *const end)
  *
  * @relatesalso ArrayView
  */
-template <typename Number>
-inline ArrayView<const Number>
-make_array_view(const ArrayView<Number> &array_view)
+template <typename Number, typename MemorySpaceType>
+inline ArrayView<const Number, MemorySpaceType>
+make_array_view(const ArrayView<Number, MemorySpaceType> &array_view)
 {
   return make_array_view(array_view.cbegin(), array_view.cend());
 }
@@ -553,9 +562,9 @@ make_array_view(const ArrayView<Number> &array_view)
  *
  * @relatesalso ArrayView
  */
-template <typename Number>
-inline ArrayView<Number>
-make_array_view(ArrayView<Number> &array_view)
+template <typename Number, typename MemorySpaceType>
+inline ArrayView<Number, MemorySpaceType>
+make_array_view(ArrayView<Number, MemorySpaceType> &array_view)
 {
   return make_array_view(array_view.begin(), array_view.end());
 }
