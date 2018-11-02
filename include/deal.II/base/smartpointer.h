@@ -24,10 +24,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Smart pointers avoid destruction of an object in use. They can be used just
+ * Smart pointers avoid using dangling pointers. They can be used just
  * like a pointer (i.e. using the <tt>*</tt> and <tt>-></tt> operators and
- * through casting) but make sure that the object pointed to is not deleted in
- * the course of use of the pointer by signaling the pointee its use.
+ * through casting) but make sure that the object pointed to is not deleted or
+ * moved from in the course of use of the pointer by signaling the pointee its
+ * use.
  *
  * Objects pointed to, i.e. the class T, should inherit Subscriptor or must
  * implement the same functionality. Null pointers are an exception from this
@@ -84,7 +85,7 @@ public:
   SmartPointer(const SmartPointer<T, P> &tt);
 
   /**
-   * Constructor taking a normal pointer.  If possible, i.e. if the pointer is
+   * Constructor taking a normal pointer. If possible, i.e. if the pointer is
    * not a null pointer, the constructor subscribes to the given object to
    * lock it, i.e. to prevent its destruction before the end of its use.
    *
@@ -94,13 +95,12 @@ public:
   SmartPointer(T *t, const char *id);
 
   /**
-   * Constructor taking a normal pointer.  If possible, i.e. if the pointer is
+   * Constructor taking a normal pointer. If possible, i.e. if the pointer is
    * not a null pointer, the constructor subscribes to the given object to
    * lock it, i.e. to prevent its destruction before the end of its use. The
    * id of this pointer is set to the name of the class P.
    */
   SmartPointer(T *t);
-
 
   /**
    * Destructor, removing the subscription.
@@ -117,7 +117,7 @@ public:
   operator=(T *tt);
 
   /**
-   * Assignment operator for SmartPointer.  The pointer subscribes to the new
+   * Assignment operator for SmartPointer. The pointer subscribes to the new
    * object automatically and unsubscribes to an old one if it exists.
    */
   template <class Q>
@@ -125,7 +125,7 @@ public:
   operator=(const SmartPointer<T, Q> &tt);
 
   /**
-   * Assignment operator for SmartPointer.  The pointer subscribes to the new
+   * Assignment operator for SmartPointer. The pointer subscribes to the new
    * object automatically and unsubscribes to an old one if it exists.
    */
   SmartPointer<T, P> &
@@ -143,13 +143,13 @@ public:
   operator T *() const;
 
   /**
-   * Dereferencing operator. This operator throws an ExcNotInitialized if the
+   * Dereferencing operator. This operator throws an ExcNotInitialized() if the
    * pointer is a null pointer.
    */
   T &operator*() const;
 
   /**
-   * Dereferencing operator. This operator throws an ExcNotInitialized if the
+   * Dereferencing operator. This operator throws an ExcNotInitializedi() if the
    * pointer is a null pointer.
    */
   T *operator->() const;
@@ -198,6 +198,12 @@ private:
    * The identification for the subscriptor.
    */
   const char *const id;
+
+  /**
+   * The Smartpointer is invalidated when the object pointed to is destroyed
+   * or moved from.
+   */
+  bool pointed_to_object_is_alive;
 };
 
 
@@ -208,6 +214,7 @@ template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer()
   : t(nullptr)
   , id(typeid(P).name())
+  , pointed_to_object_is_alive(false)
 {}
 
 
@@ -216,9 +223,10 @@ template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer(T *t)
   : t(t)
   , id(typeid(P).name())
+  , pointed_to_object_is_alive(false)
 {
   if (t != nullptr)
-    t->subscribe(id);
+    t->subscribe(&pointed_to_object_is_alive, id);
 }
 
 
@@ -227,9 +235,10 @@ template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer(T *t, const char *id)
   : t(t)
   , id(id)
+  , pointed_to_object_is_alive(false)
 {
   if (t != nullptr)
-    t->subscribe(id);
+    t->subscribe(&pointed_to_object_is_alive, id);
 }
 
 
@@ -239,9 +248,10 @@ template <class Q>
 inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, Q> &tt)
   : t(tt.t)
   , id(tt.id)
+  , pointed_to_object_is_alive(false)
 {
-  if (t != nullptr)
-    t->subscribe(id);
+  if (tt.pointed_to_object_is_alive && t != nullptr)
+    t->subscribe(&pointed_to_object_is_alive, id);
 }
 
 
@@ -250,9 +260,10 @@ template <typename T, typename P>
 inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &tt)
   : t(tt.t)
   , id(tt.id)
+  , pointed_to_object_is_alive(false)
 {
-  if (t != nullptr)
-    t->subscribe(id);
+  if (tt.pointed_to_object_is_alive && t != nullptr)
+    t->subscribe(&pointed_to_object_is_alive, id);
 }
 
 
@@ -260,8 +271,8 @@ inline SmartPointer<T, P>::SmartPointer(const SmartPointer<T, P> &tt)
 template <typename T, typename P>
 inline SmartPointer<T, P>::~SmartPointer()
 {
-  if (t != nullptr)
-    t->unsubscribe(id);
+  if (pointed_to_object_is_alive && t != nullptr)
+    t->unsubscribe(&pointed_to_object_is_alive, id);
 }
 
 
@@ -270,12 +281,13 @@ template <typename T, typename P>
 inline void
 SmartPointer<T, P>::clear()
 {
-  if (t != nullptr)
+  if (pointed_to_object_is_alive && t != nullptr)
     {
-      t->unsubscribe(id);
+      t->unsubscribe(&pointed_to_object_is_alive, id);
       delete t;
-      t = nullptr;
+      Assert(pointed_to_object_is_alive == false, ExcInternalError());
     }
+  t = nullptr;
 }
 
 
@@ -289,11 +301,11 @@ SmartPointer<T, P>::operator=(T *tt)
   if (t == tt)
     return *this;
 
-  if (t != nullptr)
-    t->unsubscribe(id);
+  if (pointed_to_object_is_alive && t != nullptr)
+    t->unsubscribe(&pointed_to_object_is_alive, id);
   t = tt;
   if (tt != nullptr)
-    tt->subscribe(id);
+    tt->subscribe(&pointed_to_object_is_alive, id);
   return *this;
 }
 
@@ -310,11 +322,11 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, Q> &tt)
   if (&tt == this)
     return *this;
 
-  if (t != nullptr)
-    t->unsubscribe(id);
+  if (pointed_to_object_is_alive && t != nullptr)
+    t->unsubscribe(&pointed_to_object_is_alive, id);
   t = static_cast<T *>(tt);
-  if (tt != nullptr)
-    tt->subscribe(id);
+  if (tt.pointed_to_object_is_alive && tt != nullptr)
+    tt->subscribe(&pointed_to_object_is_alive, id);
   return *this;
 }
 
@@ -330,11 +342,11 @@ SmartPointer<T, P>::operator=(const SmartPointer<T, P> &tt)
   if (&tt == this)
     return *this;
 
-  if (t != nullptr)
-    t->unsubscribe(id);
+  if (pointed_to_object_is_alive && t != nullptr)
+    t->unsubscribe(&pointed_to_object_is_alive, id);
   t = static_cast<T *>(tt);
-  if (tt != nullptr)
-    tt->subscribe(id);
+  if (tt.pointed_to_object_is_alive && tt != nullptr)
+    tt->subscribe(&pointed_to_object_is_alive, id);
   return *this;
 }
 
@@ -352,6 +364,8 @@ template <typename T, typename P>
 inline T &SmartPointer<T, P>::operator*() const
 {
   Assert(t != nullptr, ExcNotInitialized());
+  Assert(pointed_to_object_is_alive,
+         ExcMessage("The object pointed to is not valid anymore."));
   return *t;
 }
 
@@ -361,6 +375,8 @@ template <typename T, typename P>
 inline T *SmartPointer<T, P>::operator->() const
 {
   Assert(t != nullptr, ExcNotInitialized());
+  Assert(pointed_to_object_is_alive,
+         ExcMessage("The object pointed to is not valid anymore."));
   return t;
 }
 
@@ -386,13 +402,13 @@ template <typename T, typename P>
 inline void
 SmartPointer<T, P>::swap(T *&tt)
 {
-  if (t != nullptr)
-    t->unsubscribe(id);
+  if (pointed_to_object_is_alive && t != nullptr)
+    t->unsubscribe(pointed_to_object_is_alive, id);
 
   std::swap(t, tt);
 
   if (t != nullptr)
-    t->subscribe(id);
+    t->subscribe(pointed_to_object_is_alive, id);
 }
 
 

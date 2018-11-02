@@ -15,7 +15,8 @@
 
 
 
-// check that Subscriptor objects need to be empty before assigning.
+// Check the behavior of the SmartPointer-Subscriptor pair
+// for copy and move semantics.
 
 
 #include <deal.II/base/smartpointer.h>
@@ -36,55 +37,112 @@ main()
 
   initlog();
 
-  // should work
   {
-    Subscriptor subscriptor_1;
-    Subscriptor subscriptor_2;
+    deallog << "Checking copy assignment" << std::endl;
 
-    SmartPointer<Subscriptor> smart(&subscriptor_1);
+    Subscriptor               subscriptor_1;
+    Subscriptor               subscriptor_2;
+    SmartPointer<Subscriptor> smart_pointer_1(&subscriptor_1);
+    SmartPointer<Subscriptor> smart_pointer_2(&subscriptor_2);
 
     subscriptor_2 = subscriptor_1;
+
+    deallog << "Checking smart_pointer_1" << std::endl;
+    try
+      {
+        const auto dummy_1 = *smart_pointer_1;
+        (void)dummy_1;
+      }
+    catch (ExceptionBase &e)
+      {
+        deallog << e.get_exc_name() << std::endl;
+      }
+
+    deallog << "Checking smart_pointer_2" << std::endl;
+    try
+      {
+        const auto dummy_2 = *smart_pointer_2;
+        (void)dummy_2;
+      }
+    catch (ExceptionBase &e)
+      {
+        deallog << e.get_exc_name() << std::endl;
+      }
+    deallog << std::endl;
   }
 
-  try
-    {
-      Subscriptor subscriptor_1;
-      Subscriptor subscriptor_2;
+  {
+    deallog << "Checking copy construction" << std::endl;
 
-      SmartPointer<Subscriptor> smart(&subscriptor_2);
+    Subscriptor               subscriptor_1;
+    SmartPointer<Subscriptor> smart_pointer_1(&subscriptor_1);
 
-      subscriptor_2 = subscriptor_1;
-    }
-  catch (ExceptionBase &e)
-    {
-      deallog << e.get_exc_name() << std::endl;
-    }
+    Subscriptor subscriptor_2(subscriptor_1);
 
-  try
-    {
-      Subscriptor subscriptor_1;
-      Subscriptor subscriptor_2;
+    deallog << "Checking smart_pointer_1" << std::endl;
+    try
+      {
+        const auto dummy_1 = *smart_pointer_1;
+        (void)dummy_1;
+      }
+    catch (ExceptionBase &e)
+      {
+        deallog << e.get_exc_name() << std::endl;
+      }
+    deallog << std::endl;
+  }
 
-      SmartPointer<Subscriptor> smart(&subscriptor_1);
+  {
+    deallog << "Checking move assignement" << std::endl;
 
-      subscriptor_2 = std::move(subscriptor_1);
-    }
-  catch (ExceptionBase &e)
-    {
-      deallog << e.get_exc_name() << std::endl;
-    }
+    Subscriptor               subscriptor_1;
+    Subscriptor               subscriptor_2;
+    SmartPointer<Subscriptor> smart_pointer_1(&subscriptor_1);
+    SmartPointer<Subscriptor> smart_pointer_2(&subscriptor_2);
 
-  try
-    {
-      Subscriptor subscriptor_1;
-      Subscriptor subscriptor_2;
+    subscriptor_2 = std::move(subscriptor_1);
 
-      SmartPointer<Subscriptor> smart(&subscriptor_2);
+    deallog << "Checking smart_pointer_1" << std::endl;
+    try
+      {
+        const auto dummy_1 = *smart_pointer_1;
+        (void)dummy_1;
+      }
+    catch (ExceptionBase &e)
+      {
+        deallog << e.get_exc_name() << std::endl;
+      }
 
-      subscriptor_2 = std::move(subscriptor_1);
-    }
-  catch (ExceptionBase &e)
-    {
-      deallog << e.get_exc_name() << std::endl;
-    }
+    deallog << "Checking smart_pointer_2" << std::endl;
+    try
+      {
+        const auto dummy_2 = *smart_pointer_2;
+        (void)dummy_2;
+      }
+    catch (ExceptionBase &e)
+      {
+        deallog << e.get_exc_name() << std::endl;
+      }
+    deallog << std::endl;
+  }
+
+  {
+    deallog << "Checking move construction" << std::endl;
+
+    Subscriptor               subscriptor_1;
+    SmartPointer<Subscriptor> smart_pointer_1(&subscriptor_1);
+
+    Subscriptor subscriptor_2(std::move(subscriptor_1));
+
+    deallog << "Checking smart_pointer_1" << std::endl;
+    try
+      {
+        const auto dummy_1 = *smart_pointer_1;
+        (void)dummy_1;
+      }
+    catch (ExceptionBase &e)
+      {
+        deallog << e.get_exc_name() << std::endl;
+      }
+  }
 }

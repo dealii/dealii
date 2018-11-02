@@ -37,9 +37,10 @@ main()
   initlog();
 
   Subscriptor subscriptor;
-  subscriptor.subscribe("a");
-  subscriptor.unsubscribe("b");
-  subscriptor.unsubscribe("a");
+  bool        dummy_a;
+  subscriptor.subscribe(&dummy_a, "a");
+  subscriptor.unsubscribe(&dummy_a, "b");
+  subscriptor.unsubscribe(&dummy_a, "a");
 
   return 0;
 }
