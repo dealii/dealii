@@ -1254,7 +1254,10 @@ namespace SparsityPatternIterators
 inline SparsityPattern::iterator
 SparsityPattern::begin() const
 {
-  return iterator(this, rowstart[0]);
+  if (n_rows() > 0)
+    return iterator(this, rowstart[0]);
+  else
+    return end();
 }
 
 
@@ -1262,7 +1265,10 @@ SparsityPattern::begin() const
 inline SparsityPattern::iterator
 SparsityPattern::end() const
 {
-  return iterator(this, rowstart[rows]);
+  if (n_rows() > 0)
+    return iterator(this, rowstart[rows]);
+  else
+    return iterator(nullptr, 0);
 }
 
 

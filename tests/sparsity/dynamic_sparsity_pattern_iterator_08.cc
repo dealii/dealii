@@ -15,8 +15,8 @@
 
 
 
-// test DynamicSparsityPattern::iterator with sparsity patterns that
-// have an associated IndexSet
+// test that DynamicSparsityPattern::iterator yields something
+// sensible for empty sparsity patterns with zero rows/columns
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
@@ -26,24 +26,14 @@
 void
 test()
 {
-  IndexSet rows(5);
-  rows.add_index(1);
-  rows.add_index(2);
-  rows.add_index(4);
-  DynamicSparsityPattern sp(5, 5, rows);
-  sp.add(1, 1);
-  sp.add(2, 2);
-  sp.add(4, 4);
+  DynamicSparsityPattern sp;
+  // put nothing into the sparsity pattern
   sp.compress();
 
   DynamicSparsityPattern::const_iterator i = sp.begin();
   for (; i != sp.end(); ++i)
     deallog << i->row() << ' ' << i->column() << std::endl;
 
-  deallog << "OK" << std::endl;
-
-  i = sp.begin(1);
-  deallog << i->row() << ' ' << i->column() << std::endl;
   deallog << "OK" << std::endl;
 }
 
