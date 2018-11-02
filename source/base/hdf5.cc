@@ -1489,7 +1489,7 @@ namespace HDF5
 
 
   Group
-  Group::group(const std::string &name)
+  Group::open_group(const std::string &name)
   {
     return Group(name, *this, mpi, GroupAccessMode::open);
   }

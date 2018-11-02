@@ -87,7 +87,7 @@ test()
             << data_file.get_attribute<double>("root_total") << std::endl;
 
     // Read attributes attached to a group
-    auto test_group = data_file.group("test_group");
+    auto test_group = data_file.open_group("test_group");
 
 #ifdef DEAL_II_WITH_COMPLEX_VALUES
     auto group_complex_float =

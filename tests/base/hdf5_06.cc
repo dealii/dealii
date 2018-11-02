@@ -762,7 +762,7 @@ read_test(HDF5::Group root_group)
 
   deallog << "Read tests for " << type_name << " datasets" << std::endl;
 
-  auto group = root_group.group(type_name);
+  auto group = root_group.open_group(type_name);
 
   {
     std::string dataset_name("dataset_1");
