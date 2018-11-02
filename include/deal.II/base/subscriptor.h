@@ -107,7 +107,8 @@ public:
    * subscriber may be identified by text supplied as @p identifier.
    */
   void
-  subscribe(bool *const validity, const char *identifier = nullptr) const;
+  subscribe(std::atomic<bool> *const validity,
+            const char *             identifier = nullptr) const;
 
   /**
    * Unsubscribes a user from the object.
@@ -116,7 +117,8 @@ public:
    * the one supplied to subscribe().
    */
   void
-  unsubscribe(bool *const validity, const char *identifier = nullptr) const;
+  unsubscribe(std::atomic<bool> *const validity,
+              const char *             identifier = nullptr) const;
 
   /**
    * Return the present number of subscriptions to this object. This allows to
@@ -227,7 +229,7 @@ private:
    * In this vector, we store pointers to the validity bool in the SmartPointer
    * objects that subscribe to this class.
    */
-  mutable std::vector<bool *> validity_pointers;
+  mutable std::vector<std::atomic<bool> *> validity_pointers;
 
   /**
    * Pointer to the typeinfo object of this object, from which we can later

@@ -36,8 +36,8 @@ main()
 
   initlog();
 
-  Subscriptor subscriptor;
-  bool        dummy_a;
+  Subscriptor       subscriptor;
+  std::atomic<bool> dummy_a;
   subscriptor.subscribe(&dummy_a, "a");
   subscriptor.unsubscribe(&dummy_a, "b");
   subscriptor.unsubscribe(&dummy_a, "a");

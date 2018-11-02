@@ -153,7 +153,7 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 
 
 void
-Subscriptor::subscribe(bool *const validity, const char *id) const
+Subscriptor::subscribe(std::atomic<bool> *const validity, const char *id) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -175,7 +175,8 @@ Subscriptor::subscribe(bool *const validity, const char *id) const
 
 
 void
-Subscriptor::unsubscribe(bool *const validity, const char *id) const
+Subscriptor::unsubscribe(std::atomic<bool> *const validity,
+                         const char *             id) const
 {
   const char *name = (id != nullptr) ? id : unknown_subscriber;
   AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));

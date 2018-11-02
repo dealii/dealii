@@ -20,6 +20,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/thread_local_storage.h>
 
 #include <cmath>
