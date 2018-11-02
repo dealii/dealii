@@ -28,7 +28,7 @@
 
 template <typename Number>
 void
-print_cuda_view(const ArrayView<Number> cuda_view)
+print_cuda_view(const ArrayView<Number, MemorySpace::CUDA> cuda_view)
 {
   std::vector<Number> cpu_values(cuda_view.size());
   Utilities::CUDA::copy_to_host(cuda_view.data(), cpu_values);
@@ -110,8 +110,8 @@ test()
     nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
   locally_owned_data.reset(
     Utilities::CUDA::allocate_device_data<unsigned int>(local_size));
-  ArrayView<unsigned int> locally_owned_data_view(locally_owned_data.get(),
-                                                  local_size);
+  ArrayView<unsigned int, MemorySpace::CUDA> locally_owned_data_view(
+    locally_owned_data.get(), local_size);
   Utilities::CUDA::copy_to_dev(cpu_locally_owned_data,
                                locally_owned_data.get());
 
@@ -120,14 +120,15 @@ test()
     nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
   ghosts.reset(
     Utilities::CUDA::allocate_device_data<unsigned int>(v.n_ghost_indices()));
-  ArrayView<unsigned int> ghosts_view(ghosts.get(), v.n_ghost_indices());
+  ArrayView<unsigned int, MemorySpace::CUDA> ghosts_view(ghosts.get(),
+                                                         v.n_ghost_indices());
 
   std::unique_ptr<unsigned int[], void (*)(unsigned int *)> temp_array(
     nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
   temp_array.reset(
     Utilities::CUDA::allocate_device_data<unsigned int>(v.n_import_indices()));
-  ArrayView<unsigned int> temp_array_view(temp_array.get(),
-                                          v.n_import_indices());
+  ArrayView<unsigned int, MemorySpace::CUDA> temp_array_view(
+    temp_array.get(), v.n_import_indices());
 
   std::vector<MPI_Request> requests;
 
@@ -147,8 +148,8 @@ test()
   AssertCuda(cuda_error);
 
   Assert(temp_array_view.size() >= w.n_import_indices(), ExcInternalError());
-  ArrayView<unsigned int> temp_array_view_w(temp_array_view.data(),
-                                            w.n_import_indices());
+  ArrayView<unsigned int, MemorySpace::CUDA> temp_array_view_w(
+    temp_array_view.data(), w.n_import_indices());
   w.export_to_ghosted_array_start<unsigned int, MemorySpace::CUDA>(
     3, locally_owned_data_view, temp_array_view_w, ghosts_view, requests);
 
@@ -158,14 +159,15 @@ test()
     nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
   temp_array2.reset(
     Utilities::CUDA::allocate_device_data<unsigned int>(x.n_import_indices()));
-  ArrayView<unsigned int> temp_array2_view(temp_array2.get(),
-                                           x.n_import_indices());
+  ArrayView<unsigned int, MemorySpace::CUDA> temp_array2_view(
+    temp_array2.get(), x.n_import_indices());
 
   std::unique_ptr<unsigned int[], void (*)(unsigned int *)> ghosts2(
     nullptr, Utilities::CUDA::delete_device_data<unsigned int>);
   ghosts2.reset(
     Utilities::CUDA::allocate_device_data<unsigned int>(x.n_ghost_indices()));
-  ArrayView<unsigned int> ghosts2_view(ghosts2.get(), x.n_ghost_indices());
+  ArrayView<unsigned int, MemorySpace::CUDA> ghosts2_view(ghosts2.get(),
+                                                          x.n_ghost_indices());
 
   std::vector<MPI_Request> requests2;
   x.export_to_ghosted_array_start<unsigned int, MemorySpace::CUDA>(
@@ -182,8 +184,8 @@ test()
   AssertCuda(cuda_error);
 
   Assert(temp_array_view.size() >= x.n_import_indices(), ExcInternalError());
-  ArrayView<unsigned int> temp_array_view_x(temp_array_view.data(),
-                                            x.n_import_indices());
+  ArrayView<unsigned int, MemorySpace::CUDA> temp_array_view_x(
+    temp_array_view.data(), x.n_import_indices());
   x.export_to_ghosted_array_start<unsigned int, MemorySpace::CUDA>(
     3, locally_owned_data_view, temp_array_view_x, ghosts_view, requests);
   x.export_to_ghosted_array_finish<unsigned int, MemorySpace::CUDA>(ghosts_view,

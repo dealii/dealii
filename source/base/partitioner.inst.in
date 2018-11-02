@@ -21,26 +21,27 @@ for (SCALAR : MPI_SCALARS)
     template void Utilities::MPI::Partitioner::export_to_ghosted_array_start<
       SCALAR,
       MemorySpace::Host>(const unsigned int,
-                         const ArrayView<const SCALAR> &,
-                         const ArrayView<SCALAR> &,
-                         const ArrayView<SCALAR> &,
+                         const ArrayView<const SCALAR, MemorySpace::Host> &,
+                         const ArrayView<SCALAR, MemorySpace::Host> &,
+                         const ArrayView<SCALAR, MemorySpace::Host> &,
                          std::vector<MPI_Request> &) const;
-    template void Utilities::MPI::Partitioner::
-      export_to_ghosted_array_finish<SCALAR, MemorySpace::Host>(
-        const ArrayView<SCALAR> &, std::vector<MPI_Request> &) const;
+    template void Utilities::MPI::Partitioner::export_to_ghosted_array_finish<
+      SCALAR,
+      MemorySpace::Host>(const ArrayView<SCALAR, MemorySpace::Host> &,
+                         std::vector<MPI_Request> &) const;
     template void Utilities::MPI::Partitioner::import_from_ghosted_array_start<
       SCALAR,
       MemorySpace::Host>(const VectorOperation::values,
                          const unsigned int,
-                         const ArrayView<SCALAR> &,
-                         const ArrayView<SCALAR> &,
+                         const ArrayView<SCALAR, MemorySpace::Host> &,
+                         const ArrayView<SCALAR, MemorySpace::Host> &,
                          std::vector<MPI_Request> &) const;
     template void Utilities::MPI::Partitioner::import_from_ghosted_array_finish<
       SCALAR,
       MemorySpace::Host>(const VectorOperation::values,
-                         const ArrayView<const SCALAR> &,
-                         const ArrayView<SCALAR> &,
-                         const ArrayView<SCALAR> &,
+                         const ArrayView<const SCALAR, MemorySpace::Host> &,
+                         const ArrayView<SCALAR, MemorySpace::Host> &,
+                         const ArrayView<SCALAR, MemorySpace::Host> &,
                          std::vector<MPI_Request> &) const;
 #endif
   }

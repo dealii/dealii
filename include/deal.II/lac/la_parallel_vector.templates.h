@@ -944,19 +944,21 @@ namespace LinearAlgebra
       partitioner->import_from_ghosted_array_start(
         operation,
         counter,
-        ArrayView<Number>(data.values.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
-        ArrayView<Number>(import_data.values.get(),
-                          partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::Host>(data.values.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
+        ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
+                                             partitioner->n_import_indices()),
         compress_requests);
 #  else
       partitioner->import_from_ghosted_array_start(
         operation,
         counter,
-        ArrayView<Number>(data.values_dev.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
-        ArrayView<Number>(import_data.values_dev.get(),
-                          partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
+        ArrayView<Number, MemorySpace::CUDA>(import_data.values_dev.get(),
+                                             partitioner->n_import_indices()),
         compress_requests);
 #  endif
 #endif
@@ -985,11 +987,13 @@ namespace LinearAlgebra
              ExcNotInitialized());
       partitioner->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
         operation,
-        ArrayView<const Number>(import_data.values.get(),
-                                partitioner->n_import_indices()),
-        ArrayView<Number>(data.values.get(), partitioner->local_size()),
-        ArrayView<Number>(data.values.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
+        ArrayView<const Number, MemorySpace::Host>(
+          import_data.values.get(), partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::Host>(data.values.get(),
+                                             partitioner->local_size()),
+        ArrayView<Number, MemorySpace::Host>(data.values.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
         compress_requests);
 #  else
       Assert(partitioner->n_import_indices() == 0 ||
@@ -997,11 +1001,13 @@ namespace LinearAlgebra
              ExcNotInitialized());
       partitioner->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
         operation,
-        ArrayView<const Number>(import_data.values_dev.get(),
-                                partitioner->n_import_indices()),
-        ArrayView<Number>(data.values_dev.get(), partitioner->local_size()),
-        ArrayView<Number>(data.values_dev.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
+        ArrayView<const Number, MemorySpace::CUDA>(
+          import_data.values_dev.get(), partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get(),
+                                             partitioner->local_size()),
+        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
         compress_requests);
 #  endif
 
@@ -1095,23 +1101,26 @@ namespace LinearAlgebra
 
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
         defined(DEAL_II_WITH_CUDA_AWARE_MPI))
-      partitioner->export_to_ghosted_array_start<Number, MemorySpaceType>(
+      partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
         counter,
-        ArrayView<const Number>(data.values.get(), partitioner->local_size()),
-        ArrayView<Number>(import_data.values.get(),
-                          partitioner->n_import_indices()),
-        ArrayView<Number>(data.values.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
+        ArrayView<const Number, MemorySpace::Host>(data.values.get(),
+                                                   partitioner->local_size()),
+        ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
+                                             partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::Host>(data.values.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
         update_ghost_values_requests);
 #  else
-      partitioner->export_to_ghosted_array_start<Number, MemorySpaceType>(
+      partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
         counter,
-        ArrayView<const Number>(data.values_dev.get(),
-                                partitioner->local_size()),
-        ArrayView<Number>(import_data.values_dev.get(),
-                          partitioner->n_import_indices()),
-        ArrayView<Number>(data.values_dev.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
+        ArrayView<const Number, MemorySpace::CUDA>(data.values_dev.get(),
+                                                   partitioner->local_size()),
+        ArrayView<Number, MemorySpace::CUDA>(import_data.values_dev.get(),
+                                             partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
         update_ghost_values_requests);
 #  endif
 
@@ -1140,13 +1149,15 @@ namespace LinearAlgebra
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
         defined(DEAL_II_WITH_CUDA_AWARE_MPI))
           partitioner->export_to_ghosted_array_finish(
-            ArrayView<Number>(data.values.get() + partitioner->local_size(),
-                              partitioner->n_ghost_indices()),
+            ArrayView<Number, MemorySpace::Host>(
+              data.values.get() + partitioner->local_size(),
+              partitioner->n_ghost_indices()),
             update_ghost_values_requests);
 #  else
           partitioner->export_to_ghosted_array_finish(
-            ArrayView<Number>(data.values_dev.get() + partitioner->local_size(),
-                              partitioner->n_ghost_indices()),
+            ArrayView<Number, MemorySpace::CUDA>(
+              data.values_dev.get() + partitioner->local_size(),
+              partitioner->n_ghost_indices()),
             update_ghost_values_requests);
 #  endif
         }

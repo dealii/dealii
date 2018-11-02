@@ -25,7 +25,7 @@
 
 template <typename Number>
 void
-print_cuda_view(const ArrayView<Number> cuda_view)
+print_cuda_view(const ArrayView<Number, MemorySpace::CUDA> cuda_view)
 {
   std::vector<Number> cpu_values(cuda_view.size());
   Utilities::CUDA::copy_to_host(cuda_view.data(), cpu_values);
@@ -95,19 +95,21 @@ test()
 
   // create vector
   std::vector<Number> cpu_owned(rank == 0 ? 8 : 0);
-  for (int i = 0; i < cpu_owned.size(); ++i)
+  for (unsigned int i = 0; i < cpu_owned.size(); ++i)
     cpu_owned[i] = i;
   std::unique_ptr<Number[], void (*)(Number *)> owned(
     Utilities::CUDA::allocate_device_data<Number>(cpu_owned.size()),
     Utilities::CUDA::delete_device_data<Number>);
-  ArrayView<Number> owned_view(owned.get(), cpu_owned.size());
+  ArrayView<Number, MemorySpace::CUDA> owned_view(owned.get(),
+                                                  cpu_owned.size());
   Utilities::CUDA::copy_to_dev(cpu_owned, owned.get());
 
   std::vector<Number>                           cpu_ghost(4, 0);
   std::unique_ptr<Number[], void (*)(Number *)> ghost(
     Utilities::CUDA::allocate_device_data<Number>(cpu_ghost.size()),
     Utilities::CUDA::delete_device_data<Number>);
-  ArrayView<Number> ghost_view(ghost.get(), cpu_ghost.size());
+  ArrayView<Number, MemorySpace::CUDA> ghost_view(ghost.get(),
+                                                  cpu_ghost.size());
   Utilities::CUDA::copy_to_dev(cpu_ghost, ghost.get());
 
   // update ghost values
@@ -120,8 +122,8 @@ test()
     Utilities::CUDA::allocate_device_data<Number>(
       tight_partitioner->n_import_indices()),
     Utilities::CUDA::delete_device_data<Number>);
-  ArrayView<Number> tmp_data_view(tmp_data.get(),
-                                  tight_partitioner->n_import_indices());
+  ArrayView<Number, MemorySpace::CUDA> tmp_data_view(
+    tmp_data.get(), tight_partitioner->n_import_indices());
 
   // begin exchange, and ...
   tight_partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
@@ -145,8 +147,8 @@ test()
     Utilities::CUDA::allocate_device_data<Number>(
       tight_partitioner->n_import_indices()),
     Utilities::CUDA::delete_device_data<Number>);
-  ArrayView<Number> import_data_view(tmp_data.get(),
-                                     tight_partitioner->n_import_indices());
+  ArrayView<Number, MemorySpace::CUDA> import_data_view(
+    tmp_data.get(), tight_partitioner->n_import_indices());
 
   // now do insert:
   auto compress = [&](VectorOperation::values operation) {

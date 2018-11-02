@@ -423,11 +423,11 @@ namespace Utilities
       template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       export_to_ghosted_array_start(
-        const unsigned int             communication_channel,
-        const ArrayView<const Number> &locally_owned_array,
-        const ArrayView<Number> &      temporary_storage,
-        const ArrayView<Number> &      ghost_array,
-        std::vector<MPI_Request> &     requests) const;
+        const unsigned int                              communication_channel,
+        const ArrayView<const Number, MemorySpaceType> &locally_owned_array,
+        const ArrayView<Number, MemorySpaceType> &      temporary_storage,
+        const ArrayView<Number, MemorySpaceType> &      ghost_array,
+        std::vector<MPI_Request> &                      requests) const;
 
       /**
        * Finish the exports of the data in a locally owned array to the range
@@ -448,8 +448,9 @@ namespace Utilities
        */
       template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
-      export_to_ghosted_array_finish(const ArrayView<Number> & ghost_array,
-                                     std::vector<MPI_Request> &requests) const;
+      export_to_ghosted_array_finish(
+        const ArrayView<Number, MemorySpaceType> &ghost_array,
+        std::vector<MPI_Request> &                requests) const;
 
       /**
        * Start importing the data on an array indexed by the ghost indices of
@@ -490,11 +491,11 @@ namespace Utilities
       template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       import_from_ghosted_array_start(
-        const VectorOperation::values vector_operation,
-        const unsigned int            communication_channel,
-        const ArrayView<Number> &     ghost_array,
-        const ArrayView<Number> &     temporary_storage,
-        std::vector<MPI_Request> &    requests) const;
+        const VectorOperation::values             vector_operation,
+        const unsigned int                        communication_channel,
+        const ArrayView<Number, MemorySpaceType> &ghost_array,
+        const ArrayView<Number, MemorySpaceType> &temporary_storage,
+        std::vector<MPI_Request> &                requests) const;
 
       /**
        * Finish importing the data from an array indexed by the ghost
@@ -533,11 +534,11 @@ namespace Utilities
       template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       import_from_ghosted_array_finish(
-        const VectorOperation::values  vector_operation,
-        const ArrayView<const Number> &temporary_storage,
-        const ArrayView<Number> &      locally_owned_storage,
-        const ArrayView<Number> &      ghost_array,
-        std::vector<MPI_Request> &     requests) const;
+        const VectorOperation::values                   vector_operation,
+        const ArrayView<const Number, MemorySpaceType> &temporary_storage,
+        const ArrayView<Number, MemorySpaceType> &      locally_owned_storage,
+        const ArrayView<Number, MemorySpaceType> &      ghost_array,
+        std::vector<MPI_Request> &                      requests) const;
 #endif
 
       /**
