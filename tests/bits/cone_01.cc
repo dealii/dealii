@@ -66,7 +66,7 @@ check<3>()
   static const CylindricalManifold<dim> boundary;
   triangulation.set_manifold(0, boundary);
 
-  triangulation.refine_global(2);
+  triangulation.refine_global(1);
 
   GridOut().write_gnuplot(triangulation, deallog.get_file_stream());
 }

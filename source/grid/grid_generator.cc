@@ -3381,82 +3381,46 @@ namespace GridGenerator
                       const double      radius_1,
                       const double      half_length)
   {
-    // Determine number of cells and vertices
-    const unsigned int n_cells = static_cast<unsigned int>(
-      std::ceil(half_length / std::max(radius_0, radius_1)));
-    const unsigned int    n_vertices = 4 * (n_cells + 1);
-    std::vector<Point<3>> vertices_tmp(n_vertices);
+    Assert(triangulation.n_cells() == 0,
+           ExcMessage("The output triangulation object needs to be empty."));
+    Assert(0 < radius_0, ExcMessage("The radii must be positive."));
+    Assert(0 < radius_1, ExcMessage("The radii must be positive."));
+    Assert(0 < half_length, ExcMessage("The half length must be positive."));
 
-    vertices_tmp[0] = Point<3>(-half_length, 0, -radius_0);
-    vertices_tmp[1] = Point<3>(-half_length, radius_0, 0);
-    vertices_tmp[2] = Point<3>(-half_length, -radius_0, 0);
-    vertices_tmp[3] = Point<3>(-half_length, 0, radius_0);
+    const auto n_slices = 1 + static_cast<unsigned int>(std::ceil(
+                                half_length / std::max(radius_0, radius_1)));
 
-    const double dx = 2 * half_length / n_cells;
+    Triangulation<2> triangulation_2;
+    GridGenerator::hyper_ball(triangulation_2, Point<2>(), radius_0);
+    GridGenerator::extrude_triangulation(triangulation_2,
+                                         n_slices,
+                                         2 * half_length,
+                                         triangulation);
+    GridTools::rotate(numbers::PI / 2, 1, triangulation);
+    GridTools::shift(Tensor<1, 3>({-half_length, 0.0, 0.0}), triangulation);
+    // At this point we have a cylinder. Multiply the y and z coordinates by a
+    // factor that scales (with x) linearly between radius_0 and radius_1 to fix
+    // the circle radii and interior points:
+    auto shift_radii = [=](const Point<3> &p) {
+      const double slope  = (radius_1 / radius_0 - 1.0) / (2.0 * half_length);
+      const double factor = slope * (p[0] - -half_length) + 1.0;
+      return Point<3>(p[0], factor * p[1], factor * p[2]);
+    };
+    GridTools::transform(shift_radii, triangulation);
 
-    for (unsigned int i = 0; i < n_cells; ++i)
-      {
-        vertices_tmp[4 * (i + 1)] =
-          vertices_tmp[4 * i] +
-          Point<3>(dx, 0, 0.5 * (radius_0 - radius_1) * dx / half_length);
-        vertices_tmp[4 * i + 5] =
-          vertices_tmp[4 * i + 1] +
-          Point<3>(dx, 0.5 * (radius_1 - radius_0) * dx / half_length, 0);
-        vertices_tmp[4 * i + 6] =
-          vertices_tmp[4 * i + 2] +
-          Point<3>(dx, 0.5 * (radius_0 - radius_1) * dx / half_length, 0);
-        vertices_tmp[4 * i + 7] =
-          vertices_tmp[4 * i + 3] +
-          Point<3>(dx, 0, 0.5 * (radius_1 - radius_0) * dx / half_length);
-      }
-
-    const std::vector<Point<3>> vertices(vertices_tmp.begin(),
-                                         vertices_tmp.end());
-    Table<2, unsigned int>      cell_vertices(n_cells,
-                                         GeometryInfo<3>::vertices_per_cell);
-
-    for (unsigned int i = 0; i < n_cells; ++i)
-      for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
-        cell_vertices[i][j] = 4 * i + j;
-
-    std::vector<CellData<3>> cells(n_cells, CellData<3>());
-
-    for (unsigned int i = 0; i < n_cells; ++i)
-      {
-        for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
-          cells[i].vertices[j] = cell_vertices[i][j];
-
-        cells[i].material_id = 0;
-      }
-
-    triangulation.create_triangulation(vertices, cells, SubCellData());
-    triangulation.set_all_manifold_ids_on_boundary(0);
-
-    for (Triangulation<3>::cell_iterator cell = triangulation.begin();
-         cell != triangulation.end();
-         ++cell)
-      {
-        if (cell->vertex(0)(0) == -half_length)
-          {
-            cell->face(4)->set_boundary_id(1);
-            cell->face(4)->set_manifold_id(numbers::flat_manifold_id);
-
-            for (unsigned int i = 0; i < 4; ++i)
-              cell->line(i)->set_boundary_id(0);
-          }
-
-        if (cell->vertex(4)(0) == half_length)
-          {
-            cell->face(5)->set_boundary_id(2);
-            cell->face(5)->set_manifold_id(numbers::flat_manifold_id);
-
-            for (unsigned int i = 4; i < 8; ++i)
-              cell->line(i)->set_boundary_id(0);
-          }
-
-        for (unsigned int i = 0; i < 4; ++i)
-          cell->face(i)->set_boundary_id(0);
-      }
+    // Set boundary ids at -half_length to 1 and at half_length to 2. Set the
+    // manifold id on hull faces (i.e., faces not on either end) to 0.
+    for (auto face : triangulation.active_face_iterators())
+      if (face->at_boundary())
+        {
+          if (std::abs(face->center()[0] - -half_length) < 1e-8 * half_length)
+            face->set_boundary_id(1);
+          else if (std::abs(face->center()[0] - half_length) <
+                   1e-8 * half_length)
+            face->set_boundary_id(2);
+          else
+            face->set_all_manifold_ids(0);
+        }
 
     triangulation.set_manifold(0, CylindricalManifold<3>());
   }
