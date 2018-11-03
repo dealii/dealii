@@ -264,6 +264,60 @@ private:
 //---------------------------------------------------------------------------
 
 
+namespace internal
+{
+  namespace ArrayViewHelper
+  {
+    template <typename MemorySpaceType>
+    inline bool
+    correct_memory_space(const void *const)
+    {
+      return std::is_same<MemorySpaceType, MemorySpace::Host>::value;
+    }
+
+#ifdef DEAL_II_COMPILER_CUDA_AWARE
+    template <>
+    inline bool
+    correct_memory_space<MemorySpace::Host>(const void *ptr)
+    {
+      cudaPointerAttributes attributes;
+      const cudaError_t cuda_error = cudaPointerGetAttributes(&attributes, ptr);
+      if (cuda_error != cudaErrorInvalidValue)
+        {
+          AssertCuda(cuda_error);
+          return attributes.memoryType == cudaMemoryTypeHost;
+        }
+      else
+        {
+          // ignore and reset the error since host pointers produce an error
+          cudaGetLastError();
+          return true;
+        }
+    }
+
+    template <>
+    inline bool
+    correct_memory_space<MemorySpace::CUDA>(const void *ptr)
+    {
+      cudaPointerAttributes attributes;
+      const cudaError_t cuda_error = cudaPointerGetAttributes(&attributes, ptr);
+      if (cuda_error != cudaErrorInvalidValue)
+        {
+          AssertCuda(cuda_error);
+          return attributes.memoryType == cudaMemoryTypeDevice;
+        }
+      else
+        {
+          // ignore and reset the error since host pointers produce an error
+          cudaGetLastError();
+          return false;
+        }
+    }
+#endif
+  } // namespace ArrayViewHelper
+} // namespace internal
+
+
 
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
@@ -271,7 +325,13 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const std::size_t n_elements)
   : starting_element(starting_element)
   , n_elements(n_elements)
-{}
+{
+  Assert(internal::ArrayViewHelper::correct_memory_space<MemorySpaceType>(
+           starting_element),
+         ExcMessage(
+           "The memory space indicated by the template parameter "
+           "and the one derived from the pointer value do not match!"));
+}
 
 
 
@@ -305,6 +365,11 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
                 "object has a const value_type. In other words, you can "
                 "only create an ArrayView to const values from a const "
                 "std::vector.");
+  Assert(internal::ArrayViewHelper::correct_memory_space<MemorySpaceType>(
+           vector.data()),
+         ExcMessage(
+           "The memory space indicated by the template parameter "
+           "and the one derived from the pointer value do not match!"));
 }
 
 
@@ -380,6 +445,8 @@ ArrayView<ElementType, MemorySpaceType>::size() const
 {
   return n_elements;
 }
+
+
 
 template <typename ElementType, typename MemorySpaceType>
 inline typename ArrayView<ElementType, MemorySpaceType>::iterator
