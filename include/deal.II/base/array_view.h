@@ -34,15 +34,15 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * A class that represents a window of memory locations of type @p ElementType
- * and presents it as if it was an array that can be accessed via an
- * <code>operator[]</code>. In essence, this class is nothing more than just a
- * pointer to the first location and an integer that represents the length of
- * the array in elements. The memory remains owned by whoever allocated it, as
- * this class does not take over ownership.
+ * and presents it as if it was an array. In essence, this class is nothing more
+ * than just a pointer to the first location and an integer that represents the
+ * length of the array in elements. The memory remains owned by whoever
+ * allocated it, as this class does not take over ownership.
  *
  * The advantage of using this class is that you don't have to pass around
  * pairs of pointers and that <code>operator[]</code> checks for the validity
- * of the index with which you subscript this array view.
+ * of the index with which you subscript this array view. Note that accessing
+ * elements is only allowed if the underlying data is stored in CPU memory.
  *
  * This class can handle views to both non-constant and constant memory
  * locations. If you want to represent a view of a constant array, then the
@@ -241,6 +241,9 @@ public:
    * <em>view object</em>. It may however return a reference to a non-@p const
    * memory location depending on whether the template type of the class is @p
    * const or not.
+   *
+   * This function is only allowed to be called if the underlying data is indeed
+   * stored in CPU memory.
    */
   value_type &operator[](const std::size_t i) const;
 
@@ -488,6 +491,10 @@ template <typename ElementType, typename MemorySpaceType>
 inline typename ArrayView<ElementType, MemorySpaceType>::value_type &
   ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 {
+  Assert(
+    (std::is_same<MemorySpaceType, MemorySpace::Host>::value),
+    ExcMessage(
+      "Accessing elements is only allowed if the data is stored in CPU memory!"));
   Assert(i < n_elements, ExcIndexRange(i, 0, n_elements));
 
   return *(starting_element + i);

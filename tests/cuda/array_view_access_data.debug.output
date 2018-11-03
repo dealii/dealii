@@ -1,0 +1,11 @@
+
+DEAL::
+--------------------------------------------------------
+An error occurred in file <array_view.h> in function
+    dealii::ArrayView<ElementType, MemorySpaceType>::value_type& dealii::ArrayView<ElementType, MemorySpaceType>::operator[](std::size_t) const [with ElementType = unsigned int; MemorySpaceType = dealii::MemorySpace::CUDA; dealii::ArrayView<ElementType, MemorySpaceType>::value_type = unsigned int; std::size_t = long unsigned int]
+The violated condition was: 
+    (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
+Additional information: 
+    Accessing elements is only allowed if the data is stored in CPU memory!
+--------------------------------------------------------
+
