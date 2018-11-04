@@ -25,7 +25,8 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   IncrementalFunction<dim, RangeNumberType>::IncrementalFunction(
     Function<dim, RangeNumberType> &base)
-    : base(base)
+    : Function<dim, RangeNumberType>(base.n_components)
+    , base(base)
     , delta_t(numbers::signaling_nan<time_type>())
     , values_old(base.n_components)
   {}
