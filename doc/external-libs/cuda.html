@@ -37,6 +37,8 @@
 
         -DDEAL_II_WITH_CXX14=OFF
       </pre>
+      If you are using CUDA 9 or CUDA 10, you will need to turn off support for
+      C++17 similarly.
       By default, we assume that your GPU has compute capability 3.5 but you 
       can easily set your own CUDA flags:
       <pre>
@@ -45,10 +47,12 @@
       </pre>
       <code>-DDEAL_II_CUDA_FLAGS_DEBUG</code> and 
       <code>-DDEAL_II_CUDA_FLAGS_RELEASE</code> are also available if you want
-      a finer control on the CUDA flags. Finally, the CUDA compiler and the
+      a finer control on the CUDA flags. The CUDA compiler and the
       CUDA toolkit root directory can be set using 
       <code>-DDEAL_II_CUDA_COMPILER</code> and 
       <code>-DDEAL_II_CUDA_TOOLKIT_ROOT_DIR</code>.
+      Finally, the CUDA host compiler is the same as the C++ compiler
+      by default, but can be changed using CUDA flags as well.
     </p>
 
   </body>
