@@ -273,50 +273,33 @@ namespace internal
   {
     template <typename MemorySpaceType>
     inline bool
-    correct_memory_space(const void *const)
+    is_in_correct_memory_space(const void *const ptr)
     {
-      return std::is_same<MemorySpaceType, MemorySpace::Host>::value;
-    }
-
-#ifdef DEAL_II_COMPILER_CUDA_AWARE
-    template <>
-    inline bool
-    correct_memory_space<MemorySpace::Host>(const void *ptr)
-    {
+#ifndef DEAL_II_COMPILER_CUDA_AWARE
+      (void)ptr;
+      static_assert(std::is_same<MemorySpaceType, MemorySpace::Host>::value,
+                    "If the compiler doesn't understand CUDA code, "
+                    "the only possible memory space is 'MemorySpace::Host'!");
+      return true;
+#else
       cudaPointerAttributes attributes;
       const cudaError_t cuda_error = cudaPointerGetAttributes(&attributes, ptr);
       if (cuda_error != cudaErrorInvalidValue)
         {
           AssertCuda(cuda_error);
-          return attributes.memoryType == cudaMemoryTypeHost;
+          if (std::is_same<MemorySpaceType, MemorySpace::Host>::value)
+            return attributes.memoryType == cudaMemoryTypeHost;
+          else
+            return attributes.memoryType == cudaMemoryTypeDevice;
         }
       else
         {
           // ignore and reset the error since host pointers produce an error
           cudaGetLastError();
-          return true;
+          return std::is_same<MemorySpaceType, MemorySpace::Host>::value;
         }
-    }
-
-    template <>
-    inline bool
-    correct_memory_space<MemorySpace::CUDA>(const void *ptr)
-    {
-      cudaPointerAttributes attributes;
-      const cudaError_t cuda_error = cudaPointerGetAttributes(&attributes, ptr);
-      if (cuda_error != cudaErrorInvalidValue)
-        {
-          AssertCuda(cuda_error);
-          return attributes.memoryType == cudaMemoryTypeDevice;
-        }
-      else
-        {
-          // ignore and reset the error since host pointers produce an error
-          cudaGetLastError();
-          return false;
-        }
-    }
 #endif
+    }
   } // namespace ArrayViewHelper
 } // namespace internal
 
@@ -329,7 +312,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   : starting_element(starting_element)
   , n_elements(n_elements)
 {
-  Assert(internal::ArrayViewHelper::correct_memory_space<MemorySpaceType>(
+  Assert(internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>(
            starting_element),
          ExcMessage(
            "The memory space indicated by the template parameter "
@@ -368,7 +351,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
                 "object has a const value_type. In other words, you can "
                 "only create an ArrayView to const values from a const "
                 "std::vector.");
-  Assert(internal::ArrayViewHelper::correct_memory_space<MemorySpaceType>(
+  Assert(internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>(
            vector.data()),
          ExcMessage(
            "The memory space indicated by the template parameter "

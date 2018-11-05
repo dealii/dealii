@@ -6,7 +6,7 @@ DEAL::
 An error occurred in file <array_view.h> in function
     dealii::ArrayView<ElementType, MemorySpaceType>::ArrayView(dealii::ArrayView<ElementType, MemorySpaceType>::value_type*, std::size_t) [with ElementType = unsigned int; MemorySpaceType = dealii::MemorySpace::CUDA; dealii::ArrayView<ElementType, MemorySpaceType>::value_type = unsigned int; std::size_t = long unsigned int]
 The violated condition was: 
-    internal::ArrayViewHelper::correct_memory_space<MemorySpaceType>( starting_element)
+    internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>( starting_element)
 Additional information: 
     The memory space indicated by the template parameter and the one derived from the pointer value do not match!
 --------------------------------------------------------
@@ -17,7 +17,7 @@ DEAL::
 An error occurred in file <array_view.h> in function
     dealii::ArrayView<ElementType, MemorySpaceType>::ArrayView(dealii::ArrayView<ElementType, MemorySpaceType>::value_type*, std::size_t) [with ElementType = unsigned int; MemorySpaceType = dealii::MemorySpace::Host; dealii::ArrayView<ElementType, MemorySpaceType>::value_type = unsigned int; std::size_t = long unsigned int]
 The violated condition was: 
-    internal::ArrayViewHelper::correct_memory_space<MemorySpaceType>( starting_element)
+    internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>( starting_element)
 Additional information: 
     The memory space indicated by the template parameter and the one derived from the pointer value do not match!
 --------------------------------------------------------
