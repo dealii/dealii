@@ -1360,7 +1360,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
       in >> version >> file_type >> data_size;
 
-      Assert(version >= 2.0, ExcNotImplemented());
+      Assert((version >= 2.0) && (version <= 4.0), ExcNotImplemented());
       gmsh_file_format = version;
       Assert(file_type == 0, ExcNotImplemented());
       Assert(data_size == sizeof(double), ExcNotImplemented());
