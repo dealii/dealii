@@ -476,12 +476,9 @@ namespace Step13
     // therefore just declare such an abstract base class, taking a pointer to
     // a triangulation in the constructor and storing it henceforth. Since
     // this triangulation will be used throughout all computations, we have to
-    // make sure that the triangulation exists until the destructor exits. We
+    // make sure that the triangulation is valid until it is last used. We
     // do this by keeping a <code>SmartPointer</code> to this triangulation,
-    // which uses a counter in the triangulation class to denote the fact that
-    // there is still an object out there using this triangulation, thus
-    // leading to an abort in case the triangulation is attempted to be
-    // destroyed while this object still uses it.
+    // as explained in step-7.
     //
     // Note that while the pointer itself is declared constant
     // (i.e. throughout the lifetime of this object, the pointer points to the

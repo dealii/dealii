@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/subscriptor.h>
 
 #include <string>
 

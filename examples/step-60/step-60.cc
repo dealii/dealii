@@ -362,27 +362,6 @@ namespace Step60
     ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>
       embedded_configuration_function;
 
-
-    // The embedded mapping. Notice that the order in which we construct these
-    // unique pointers is important. They will be destroyed in reversed order,
-    // so it is important that we respect the dependency tree. In particular,
-    // the embedded mapping will depend on both the `embedded_dh` and the
-    // `embedded_configuration`. If we declare it after the above two, we are
-    // fine, otherwise we would have do release this pointer manually in the
-    // destructor, or we'd get an error like
-    //
-    // @code
-    // --------------------------------------------------------
-    // An error occurred in line <104> of file <../source/base/subscriptor.cc>
-    // in function
-    //     void dealii::Subscriptor::check_no_subscribers() const
-    // The violated condition was:
-    //     counter == 0
-    // Additional information:
-    //     (none)
-    // @endcode
-    //
-    // at the end of the program.
     std::unique_ptr<Mapping<dim, spacedim>> embedded_mapping;
 
     // We do the same thing to specify the value of the function $g$,

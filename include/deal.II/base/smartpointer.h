@@ -19,7 +19,10 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/exceptions.h>
+
+#include <atomic>
+#include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -203,7 +206,7 @@ private:
    * The Smartpointer is invalidated when the object pointed to is destroyed
    * or moved from.
    */
-  bool pointed_to_object_is_alive;
+  std::atomic<bool> pointed_to_object_is_alive;
 };
 
 
