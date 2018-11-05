@@ -159,6 +159,8 @@ main()
   std::ofstream logfile("output");
   deallog.attach(logfile);
 
+  init_cuda();
+
   deallog.push("values");
   test<4, 4, 0, false>();
   test<3, 3, 0, false>();

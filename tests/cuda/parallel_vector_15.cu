@@ -111,17 +111,7 @@ main(int argc, char **argv)
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
-  Utilities::CUDA::Handle cuda_handle;
-  // By default, all the ranks will try to access the device 0. This is fine if
-  // we have one rank per node _and_ one gpu per node. If we have multiple GPUs
-  // on one node, we need each process to access a different GPU. We assume that
-  // each node has the same number of GPUs.
-  int         n_devices       = 0;
-  cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-  AssertCuda(cuda_error_code);
-  int device_id   = myid % n_devices;
-  cuda_error_code = cudaSetDevice(device_id);
-  AssertCuda(cuda_error_code);
+  init_cuda(true);
 
   if (myid == 0)
     {

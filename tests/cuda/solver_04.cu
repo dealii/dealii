@@ -77,6 +77,8 @@ main()
   initlog();
   deallog.depth_console(0);
 
+  init_cuda();
+
   Utilities::CUDA::Handle cuda_handle;
   test(cuda_handle);
 

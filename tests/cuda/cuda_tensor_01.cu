@@ -101,6 +101,8 @@ main()
   deallog << std::setprecision(5);
   deallog.attach(logfile);
 
+  init_cuda();
+
   test_cpu();
 
   test_gpu();

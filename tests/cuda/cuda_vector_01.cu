@@ -115,6 +115,8 @@ main(int argc, char **argv)
   initlog();
   deallog.depth_console(0);
 
+  init_cuda();
+
   test();
 
   deallog << "OK" << std::endl;
