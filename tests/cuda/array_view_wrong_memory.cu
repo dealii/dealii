@@ -27,6 +27,8 @@ main(int argc, char **argv)
 
   initlog();
 
+  init_cuda();
+
   std::vector<unsigned int>                                 dummy_host(2);
   std::unique_ptr<unsigned int[], void (*)(unsigned int *)> dummy_cuda(
     Utilities::CUDA::allocate_device_data<unsigned int>(2),

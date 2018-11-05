@@ -28,6 +28,8 @@ main(int argc, char **argv)
 
   initlog();
 
+  init_cuda();
+
   std::unique_ptr<unsigned int[], void (*)(unsigned int *)> dummy_cuda(
     Utilities::CUDA::allocate_device_data<unsigned int>(2),
     Utilities::CUDA::delete_device_data<unsigned int>);
