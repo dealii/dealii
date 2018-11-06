@@ -152,11 +152,6 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
     ENDIF()
   ENDFOREACH()
 
-  # Remove petsc's own include directories:
-  IF(NOT "${_petsc_includes}" STREQUAL "")
-    LIST(REMOVE_AT _petsc_includes 0 1)
-  ENDIF()
-
   #
   # Link line:
   #
