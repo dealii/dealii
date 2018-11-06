@@ -7,7 +7,7 @@ This program is devoted to two aspects: the use of mixed finite elements -- in
 particular Raviart-Thomas elements -- and using block matrices to define
 solvers, preconditioners, and nested versions of those that use the
 substructure of the system matrix. The equation we are going to solve is again
-the Laplace equation, though with a matrix-valued coefficient:
+the Poisson equation, though with a matrix-valued coefficient:
 @f{eqnarray*}
   -\nabla \cdot K({\mathbf x}) \nabla p &=& f \qquad {\textrm{in}\ } \Omega, \\
   p &=& g \qquad {\textrm{on}\ }\partial\Omega.
@@ -30,27 +30,48 @@ The equations covered here fall into the class of vector-valued problems. A
 toplevel overview of this topic can be found in the @ref vector_valued module.
 
 
-<h3>Formulation, weak form, and discrete problem</h3>
+<h3>The equations</h3>
 
-In the form above, the Laplace equation is generally considered a good model equation
-for fluid flow in porous media. In particular, if flow is so slow that all
-dynamic effects such as the acceleration terms in the Navier-Stokes equation
-become irrelevant, and if the flow pattern is stationary, then the
-Laplace
-equation models the pressure that drives the flow reasonably well. (Because the
+In the form above, the Poisson equation (i.e., the Laplace equation with a nonzero
+right hand side) is generally considered a good model equation
+for fluid flow in porous media. Of course, one typically models fluid flow through
+the <a href="https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations">Navier-Stokes
+equations</a> or, if fluid velocities are slow or the viscosity is large, the
+<a href="https://en.wikipedia.org/wiki/Stokes_flow">Stokes equations</a>.
+In the first of these two models, the forces that act are inertia and
+viscous friction, whereas in the second it is only viscous friction -- i.e.,
+forces that one fluid particle exerts on a nearby one. This is appropriate
+if you have free flow in a large domain, say a pipe, a river, or in the air.
+On the other hand, if the fluid is confined in pores, then friction forces
+exerted by the pore walls on the fluid become more and more important and
+internal viscous friction becomes less and less important. Modeling this
+then first leads to the 
+<a href="https://en.wikipedia.org/wiki/Darcy%27s_law#Brinkman_form_of_Darcy's_law">Brinkman
+model</a> if both effects are important, and in the limit of very small pores
+to the <a href="https://en.wikipedia.org/wiki/Darcy%27s_law">Darcy equations</a>.
+The latter is just a different name for the Poisson or Laplace equation, 
+connotating it with the area to which one wants to apply it: slow flow
+in a porous medium. In essence it says that the velocity is proportional
+to the pressure gradient that drives the fluid through the porous medium.
+
+The Darcy equation models this pressure that drives the flow. (Because the
 solution variable is a pressure, we here use the name $p$ instead of the
 name $u$ more commonly used for the solution of partial differential equations.)
-
 Typical applications of this view of the Laplace equation are then modeling
 groundwater flow, or the flow of hydrocarbons in oil reservoirs. In these
-applications, $K$ is then the permeability tensor, i.e. a measure for how much
+applications, $K$ is the permeability tensor, i.e., a measure for how much
 resistance the soil or rock matrix asserts on the fluid flow. In the
 applications just named, a desirable feature is that the numerical scheme is
-locally conservative, i.e. that whatever flows into a cell also flows out of
+locally conservative, i.e., that whatever flows into a cell also flows out of
 it (or the difference is equal to the integral over the source terms over each
 cell, if the sources are nonzero). However, as it turns out, the usual
-discretizations of the Laplace equation do not satisfy this property. On the
-other hand, one can achieve this by choosing a different formulation.
+discretizations of the Laplace equation (such as those used in step-3, step-4,
+or step-6) do not satisfy this property. But, one can achieve this by choosing
+a different formulation of the problem and a particular combination of finite
+element spaces.
+
+
+<h3>Formulation, weak form, and discrete problem</h3>
 
 To this end, one first introduces a second variable, called the flux,
 ${\mathbf u}=-K\nabla p$. By its definition, the flux is a vector in the
@@ -59,7 +80,7 @@ direction of the pressure gradient, multiplied by the permeability tensor. If
 the permeability tensor is proportional to the unit matrix, this equation is
 easy to understand and intuitive: the higher the permeability, the higher the
 flux; and the flux is proportional to the gradient of the pressure, going from
-areas of high pressure to areas of low pressure.
+areas of high pressure to areas of low pressure (thus the negative sign).
 
 With this second variable, one then finds an alternative version of the
 Laplace equation, called the mixed formulation:
