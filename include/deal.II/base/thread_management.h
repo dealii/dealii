@@ -215,7 +215,7 @@ namespace Threads
     std::condition_variable condition_variable;
   };
 
-
+#  ifdef DEAL_II_USE_MT_POSIX
   /**
    * Implementation of a thread barrier class, based on the POSIX thread
    * functions. POSIX barriers are a relatively new feature and are not
@@ -263,11 +263,11 @@ namespace Threads
      * Data object storing the POSIX data which we need to call the POSIX
      * functions.
      */
-#  ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
+#    ifndef DEAL_II_USE_MT_POSIX_NO_BARRIERS
     pthread_barrier_t barrier;
-#  else
+#    else
     unsigned int count;
-#  endif
+#    endif
   };
 
 
@@ -279,6 +279,7 @@ namespace Threads
    *   is deprecated.
    */
   using Barrier DEAL_II_DEPRECATED = PosixThreadBarrier;
+#  endif
 } // namespace Threads
 
 
