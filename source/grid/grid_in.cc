@@ -1351,9 +1351,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   else
     AssertThrow(false, ExcInvalidGMSHInput(line));
 
-  // if file format is 2 or greater
-  // then we also have to read the
-  // rest of the header
+  // if file format is 2 or greater then we also have to read the rest of the
+  // header
   if (gmsh_file_format == 2)
     {
       double       version;
@@ -1361,21 +1360,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
 
       in >> version >> file_type >> data_size;
 
-      Assert((version >= 2.0) && (version <= 2.2), ExcNotImplemented());
+      Assert((version >= 2.0) && (version <= 4.0), ExcNotImplemented());
+      gmsh_file_format = version;
       Assert(file_type == 0, ExcNotImplemented());
       Assert(data_size == sizeof(double), ExcNotImplemented());
 
-      // read the end of the header
-      // and the first line of the
-      // nodes description to synch
-      // ourselves with the format 1
-      // handling above
+      // read the end of the header and the first line of the nodes description
+      // to synch ourselves with the format 1 handling above
       in >> line;
       AssertThrow(line == "$EndMeshFormat", ExcInvalidGMSHInput(line));
 
       in >> line;
-      // if the next block is of kind
-      // $PhysicalNames, ignore it
+      // if the next block is of kind $PhysicalNames, ignore it
       if (line == "$PhysicalNames")
         {
           do
@@ -1386,6 +1382,28 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           in >> line;
         }
 
+      // if the next block is of kind $Entities, ignore it
+      if (line == "$Entities")
+        {
+          do
+            {
+              in >> line;
+            }
+          while (line != "$EndEntities");
+          in >> line;
+        }
+
+      // if the next block is of kind $PartitionedEntities, ignore it
+      if (line == "$PartitionedEntities")
+        {
+          do
+            {
+              in >> line;
+            }
+          while (line != "$EndPartitionedEntities");
+          in >> line;
+        }
+
       // but the next thing should,
       // in any case, be the list of
       // nodes:
@@ -1393,40 +1411,87 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
     }
 
   // now read the nodes list
-  in >> n_vertices;
+  int n_entity_blocks = 1;
+  if (gmsh_file_format >= 4)
+    {
+      in >> n_entity_blocks >> n_vertices;
+    }
+  else
+    in >> n_vertices;
   std::vector<Point<spacedim>> vertices(n_vertices);
   // set up mapping between numbering
   // in msh-file (nod) and in the
   // vertices vector
   std::map<int, int> vertex_indices;
 
-  for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
-    {
-      int    vertex_number;
-      double x[3];
+  {
+    unsigned int global_vertex = 0;
+    for (int entity_block = 0; entity_block < n_entity_blocks; ++entity_block)
+      {
+        int           tagEntity;
+        int           dimEntity;
+        int           parametric;
+        unsigned long numNodes;
 
-      // read vertex
-      in >> vertex_number >> x[0] >> x[1] >> x[2];
+        if (gmsh_file_format < 4)
+          {
+            tagEntity  = 0;
+            dimEntity  = 0;
+            numNodes   = n_vertices;
+            parametric = 0;
+          }
+        else
+          in >> tagEntity >> dimEntity >> parametric >> numNodes;
+        for (unsigned long vertex_per_entity = 0; vertex_per_entity < numNodes;
+             ++vertex_per_entity, ++global_vertex)
+          {
+            int    vertex_number;
+            double x[3];
 
-      for (unsigned int d = 0; d < spacedim; ++d)
-        vertices[vertex](d) = x[d];
-      // store mapping
-      vertex_indices[vertex_number] = vertex;
-    }
+            // read vertex
+            in >> vertex_number >> x[0] >> x[1] >> x[2];
+
+            for (unsigned int d = 0; d < spacedim; ++d)
+              vertices[global_vertex](d) = x[d];
+            // store mapping
+            vertex_indices[vertex_number] = global_vertex;
+
+            // ignore parametric coordinates
+            if (parametric != 0)
+              {
+                double u = 0.;
+                double v = 0.;
+                in >> u >> v;
+                (void)u;
+                (void)v;
+              }
+          }
+      }
+    AssertDimension(global_vertex, n_vertices);
+  }
 
   // Assert we reached the end of the block
   in >> line;
   static const std::string end_nodes_marker[] = {"$ENDNOD", "$EndNodes"};
-  AssertThrow(line == end_nodes_marker[gmsh_file_format - 1],
+  AssertThrow(line == end_nodes_marker[gmsh_file_format == 1 ? 0 : 1],
               ExcInvalidGMSHInput(line));
 
   // Now read in next bit
   in >> line;
   static const std::string begin_elements_marker[] = {"$ELM", "$Elements"};
-  AssertThrow(line == begin_elements_marker[gmsh_file_format - 1],
+  AssertThrow(line == begin_elements_marker[gmsh_file_format == 1 ? 0 : 1],
               ExcInvalidGMSHInput(line));
 
-  in >> n_cells;
+  // now read the nodes list
+  if (gmsh_file_format >= 4)
+    {
+      in >> n_entity_blocks >> n_cells;
+    }
+  else
+    {
+      n_entity_blocks = 1;
+      in >> n_cells;
+    }
 
   // set up array of cells and subcells (faces). In 1d, there is currently no
   // standard way in deal.II to pass boundary indicators attached to individual
@@ -1435,265 +1500,321 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   SubCellData                                subcelldata;
   std::map<unsigned int, types::boundary_id> boundary_ids_1d;
 
-  for (unsigned int cell = 0; cell < n_cells; ++cell)
-    {
-      // note that since in the input
-      // file we found the number of
-      // cells at the top, there
-      // should still be input here,
-      // so check this:
-      AssertThrow(in, ExcIO());
+  {
+    unsigned int global_cell = 0;
+    for (int entity_block = 0; entity_block < n_entity_blocks; ++entity_block)
+      {
+        unsigned int  material_id;
+        int           dimEntity;
+        unsigned long numElements;
+        int           cell_type;
 
-      unsigned int cell_type;
-      unsigned int material_id;
-      unsigned int nod_num;
+        if (gmsh_file_format < 4)
+          {
+            material_id = 0;
+            dimEntity   = 0;
+            cell_type   = 0;
+            numElements = n_cells;
+          }
+        else
+          in >> material_id >> dimEntity >> cell_type >> numElements;
 
-      /*
-        For file format version 1, the format of each cell is as follows:
-          elm-number elm-type reg-phys reg-elem number-of-nodes node-number-list
+        for (unsigned int cell_per_entity = 0; cell_per_entity < numElements;
+             ++cell_per_entity, ++global_cell)
+          {
+            // note that since in the input
+            // file we found the number of
+            // cells at the top, there
+            // should still be input here,
+            // so check this:
+            AssertThrow(in, ExcIO());
 
-        However, for version 2, the format reads like this:
-          elm-number elm-type number-of-tags < tag > ... node-number-list
+            unsigned int nod_num;
 
-        In the following, we will ignore the element number (we simply enumerate
-        them in the order in which we read them, and we will take reg-phys
-        (version 1) or the first tag (version 2, if any tag is given at all) as
-        material id.
-      */
+            /*
+              For file format version 1, the format of each cell is as follows:
+                elm-number elm-type reg-phys reg-elem number-of-nodes
+              node-number-list
 
-      unsigned int elm_number;
-      in >> elm_number // ELM-NUMBER
-        >> cell_type;  // ELM-TYPE
+              However, for version 2, the format reads like this:
+                elm-number elm-type number-of-tags < tag > ... node-number-list
 
-      switch (gmsh_file_format)
-        {
-          case 1:
-            {
-              in >> material_id // REG-PHYS
-                >> dummy        // reg_elm
-                >> nod_num;
-              break;
-            }
+              For version 4, we have:
+                tag(int) numVert(int) ...
 
-          case 2:
-            {
-              // read the tags; ignore all but the first one which we will
-              // interpret as the material_id (for cells) or boundary_id
-              // (for faces)
-              unsigned int n_tags;
-              in >> n_tags;
-              if (n_tags > 0)
-                in >> material_id;
-              else
-                material_id = 0;
+              In the following, we will ignore the element number (we simply
+              enumerate them in the order in which we read them, and we will
+              take reg-phys (version 1) or the first tag (version 2, if any tag
+              is given at all) as material id. For version 4, we already read
+              the material and the cell type in above.
+            */
 
-              for (unsigned int i = 1; i < n_tags; ++i)
-                in >> dummy;
-
-              nod_num = GeometryInfo<dim>::vertices_per_cell;
-
-              break;
-            }
-
-          default:
-            AssertThrow(false, ExcNotImplemented());
-        }
-
-
-      /*       `ELM-TYPE'
-               defines the geometrical type of the N-th element:
-               `1'
-               Line (2 nodes, 1 edge).
-
-               `3'
-               Quadrangle (4 nodes, 4 edges).
-
-               `5'
-               Hexahedron (8 nodes, 12 edges, 6 faces).
-
-               `15'
-               Point (1 node).
-      */
-
-      if (((cell_type == 1) && (dim == 1)) ||
-          ((cell_type == 3) && (dim == 2)) || ((cell_type == 5) && (dim == 3)))
-        // found a cell
-        {
-          AssertThrow(nod_num == GeometryInfo<dim>::vertices_per_cell,
-                      ExcMessage("Number of nodes does not coincide with the "
-                                 "number required for this object"));
-
-          // allocate and read indices
-          cells.emplace_back();
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
-            in >> cells.back().vertices[i];
-
-          // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::material_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::material_id>::max()));
-          // we use only material_ids in the range from 0 to
-          // numbers::invalid_material_id-1
-          Assert(material_id < numbers::invalid_material_id,
-                 ExcIndexRange(material_id, 0, numbers::invalid_material_id));
-
-          cells.back().material_id =
-            static_cast<types::material_id>(material_id);
-
-          // transform from ucd to
-          // consecutive numbering
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
-            {
-              AssertThrow(vertex_indices.find(cells.back().vertices[i]) !=
-                            vertex_indices.end(),
-                          ExcInvalidVertexIndexGmsh(cell,
-                                                    elm_number,
-                                                    cells.back().vertices[i]));
-
-              // vertex with this index exists
-              cells.back().vertices[i] =
-                vertex_indices[cells.back().vertices[i]];
-            }
-        }
-      else if ((cell_type == 1) && ((dim == 2) || (dim == 3)))
-        // boundary info
-        {
-          subcelldata.boundary_lines.emplace_back();
-          in >> subcelldata.boundary_lines.back().vertices[0] >>
-            subcelldata.boundary_lines.back().vertices[1];
-
-          // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::boundary_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::boundary_id>::max()));
-          // we use only boundary_ids in the range from 0 to
-          // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
-
-          subcelldata.boundary_lines.back().boundary_id =
-            static_cast<types::boundary_id>(material_id);
-
-          // transform from ucd to
-          // consecutive numbering
-          for (unsigned int i = 0; i < 2; ++i)
-            if (vertex_indices.find(
-                  subcelldata.boundary_lines.back().vertices[i]) !=
-                vertex_indices.end())
-              // vertex with this index exists
-              subcelldata.boundary_lines.back().vertices[i] =
-                vertex_indices[subcelldata.boundary_lines.back().vertices[i]];
-            else
+            unsigned int elm_number = 0;
+            if (gmsh_file_format < 4)
               {
-                // no such vertex index
-                AssertThrow(false,
-                            ExcInvalidVertexIndex(
-                              cell,
-                              subcelldata.boundary_lines.back().vertices[i]));
-                subcelldata.boundary_lines.back().vertices[i] =
-                  numbers::invalid_unsigned_int;
-              };
-        }
-      else if ((cell_type == 3) && (dim == 3))
-        // boundary info
-        {
-          subcelldata.boundary_quads.emplace_back();
-          in >> subcelldata.boundary_quads.back().vertices[0] >>
-            subcelldata.boundary_quads.back().vertices[1] >>
-            subcelldata.boundary_quads.back().vertices[2] >>
-            subcelldata.boundary_quads.back().vertices[3];
-
-          // to make sure that the cast won't fail
-          Assert(material_id <= std::numeric_limits<types::boundary_id>::max(),
-                 ExcIndexRange(material_id,
-                               0,
-                               std::numeric_limits<types::boundary_id>::max()));
-          // we use only boundary_ids in the range from 0 to
-          // numbers::internal_face_boundary_id-1
-          Assert(material_id < numbers::internal_face_boundary_id,
-                 ExcIndexRange(material_id,
-                               0,
-                               numbers::internal_face_boundary_id));
-
-          subcelldata.boundary_quads.back().boundary_id =
-            static_cast<types::boundary_id>(material_id);
-
-          // transform from gmsh to
-          // consecutive numbering
-          for (unsigned int i = 0; i < 4; ++i)
-            if (vertex_indices.find(
-                  subcelldata.boundary_quads.back().vertices[i]) !=
-                vertex_indices.end())
-              // vertex with this index exists
-              subcelldata.boundary_quads.back().vertices[i] =
-                vertex_indices[subcelldata.boundary_quads.back().vertices[i]];
-            else
-              {
-                // no such vertex index
-                Assert(false,
-                       ExcInvalidVertexIndex(
-                         cell, subcelldata.boundary_quads.back().vertices[i]));
-                subcelldata.boundary_quads.back().vertices[i] =
-                  numbers::invalid_unsigned_int;
+                in >> elm_number // ELM-NUMBER
+                  >> cell_type;  // ELM-TYPE
               }
-        }
-      else if (cell_type == 15)
-        {
-          // read the indices of nodes given
-          unsigned int node_index = 0;
-          switch (gmsh_file_format)
-            {
-              case 1:
-                {
-                  for (unsigned int i = 0; i < nod_num; ++i)
-                    in >> node_index;
-                  break;
-                }
-              case 2:
-                {
-                  in >> node_index;
-                  break;
-                }
-              default:
-                Assert(false, ExcInternalError());
-            }
 
-          // we only care about boundary indicators assigned to individual
-          // vertices in 1d (because otherwise the vertices are not faces)
-          if (dim == 1)
-            boundary_ids_1d[vertex_indices[node_index]] = material_id;
-        }
-      else
-        // cannot read this, so throw
-        // an exception. treat
-        // triangles and tetrahedra
-        // specially since this
-        // deserves a more explicit
-        // error message
-        {
-          AssertThrow(cell_type != 2,
-                      ExcMessage("Found triangles while reading a file "
-                                 "in gmsh format. deal.II does not "
-                                 "support triangles"));
-          AssertThrow(cell_type != 11,
-                      ExcMessage("Found tetrahedra while reading a file "
-                                 "in gmsh format. deal.II does not "
-                                 "support tetrahedra"));
+            switch (gmsh_file_format)
+              {
+                case 1:
+                  {
+                    in >> material_id // REG-PHYS
+                      >> dummy        // reg_elm
+                      >> nod_num;
+                    break;
+                  }
 
-          AssertThrow(false, ExcGmshUnsupportedGeometry(cell_type));
-        }
-    }
+                case 2:
+                  {
+                    // read the tags; ignore all but the first one which we will
+                    // interpret as the material_id (for cells) or boundary_id
+                    // (for faces)
+                    unsigned int n_tags;
+                    in >> n_tags;
+                    if (n_tags > 0)
+                      in >> material_id;
+                    else
+                      material_id = 0;
 
+                    for (unsigned int i = 1; i < n_tags; ++i)
+                      in >> dummy;
+
+                    nod_num = GeometryInfo<dim>::vertices_per_cell;
+
+                    break;
+                  }
+
+                case 4:
+                  {
+                    // ignore tag
+                    int tag;
+                    in >> tag;
+                    nod_num = GeometryInfo<dim>::vertices_per_cell;
+                    break;
+                  }
+
+
+                default:
+                  AssertThrow(false, ExcNotImplemented());
+              }
+
+
+            /*       `ELM-TYPE'
+                     defines the geometrical type of the N-th element:
+                     `1'
+                     Line (2 nodes, 1 edge).
+
+                     `3'
+                     Quadrangle (4 nodes, 4 edges).
+
+                     `5'
+                     Hexahedron (8 nodes, 12 edges, 6 faces).
+
+                     `15'
+                     Point (1 node).
+            */
+
+            if (((cell_type == 1) && (dim == 1)) ||
+                ((cell_type == 3) && (dim == 2)) ||
+                ((cell_type == 5) && (dim == 3)))
+              // found a cell
+              {
+                AssertThrow(nod_num == GeometryInfo<dim>::vertices_per_cell,
+                            ExcMessage(
+                              "Number of nodes does not coincide with the "
+                              "number required for this object"));
+
+                // allocate and read indices
+                cells.emplace_back();
+                for (unsigned int i = 0;
+                     i < GeometryInfo<dim>::vertices_per_cell;
+                     ++i)
+                  in >> cells.back().vertices[i];
+
+                // to make sure that the cast won't fail
+                Assert(material_id <=
+                         std::numeric_limits<types::material_id>::max(),
+                       ExcIndexRange(
+                         material_id,
+                         0,
+                         std::numeric_limits<types::material_id>::max()));
+                // we use only material_ids in the range from 0 to
+                // numbers::invalid_material_id-1
+                Assert(material_id < numbers::invalid_material_id,
+                       ExcIndexRange(material_id,
+                                     0,
+                                     numbers::invalid_material_id));
+
+                cells.back().material_id =
+                  static_cast<types::material_id>(material_id);
+
+                // transform from ucd to
+                // consecutive numbering
+                for (unsigned int i = 0;
+                     i < GeometryInfo<dim>::vertices_per_cell;
+                     ++i)
+                  {
+                    AssertThrow(
+                      vertex_indices.find(cells.back().vertices[i]) !=
+                        vertex_indices.end(),
+                      ExcInvalidVertexIndexGmsh(cell_per_entity,
+                                                elm_number,
+                                                cells.back().vertices[i]));
+
+                    // vertex with this index exists
+                    cells.back().vertices[i] =
+                      vertex_indices[cells.back().vertices[i]];
+                  }
+              }
+            else if ((cell_type == 1) && ((dim == 2) || (dim == 3)))
+              // boundary info
+              {
+                subcelldata.boundary_lines.emplace_back();
+                in >> subcelldata.boundary_lines.back().vertices[0] >>
+                  subcelldata.boundary_lines.back().vertices[1];
+
+                // to make sure that the cast won't fail
+                Assert(material_id <=
+                         std::numeric_limits<types::boundary_id>::max(),
+                       ExcIndexRange(
+                         material_id,
+                         0,
+                         std::numeric_limits<types::boundary_id>::max()));
+                // we use only boundary_ids in the range from 0 to
+                // numbers::internal_face_boundary_id-1
+                Assert(material_id < numbers::internal_face_boundary_id,
+                       ExcIndexRange(material_id,
+                                     0,
+                                     numbers::internal_face_boundary_id));
+
+                subcelldata.boundary_lines.back().boundary_id =
+                  static_cast<types::boundary_id>(material_id);
+
+                // transform from ucd to
+                // consecutive numbering
+                for (unsigned int i = 0; i < 2; ++i)
+                  if (vertex_indices.find(
+                        subcelldata.boundary_lines.back().vertices[i]) !=
+                      vertex_indices.end())
+                    // vertex with this index exists
+                    subcelldata.boundary_lines.back().vertices[i] =
+                      vertex_indices[subcelldata.boundary_lines.back()
+                                       .vertices[i]];
+                  else
+                    {
+                      // no such vertex index
+                      AssertThrow(
+                        false,
+                        ExcInvalidVertexIndex(
+                          cell_per_entity,
+                          subcelldata.boundary_lines.back().vertices[i]));
+                      subcelldata.boundary_lines.back().vertices[i] =
+                        numbers::invalid_unsigned_int;
+                    };
+              }
+            else if ((cell_type == 3) && (dim == 3))
+              // boundary info
+              {
+                subcelldata.boundary_quads.emplace_back();
+                in >> subcelldata.boundary_quads.back().vertices[0] >>
+                  subcelldata.boundary_quads.back().vertices[1] >>
+                  subcelldata.boundary_quads.back().vertices[2] >>
+                  subcelldata.boundary_quads.back().vertices[3];
+
+                // to make sure that the cast won't fail
+                Assert(material_id <=
+                         std::numeric_limits<types::boundary_id>::max(),
+                       ExcIndexRange(
+                         material_id,
+                         0,
+                         std::numeric_limits<types::boundary_id>::max()));
+                // we use only boundary_ids in the range from 0 to
+                // numbers::internal_face_boundary_id-1
+                Assert(material_id < numbers::internal_face_boundary_id,
+                       ExcIndexRange(material_id,
+                                     0,
+                                     numbers::internal_face_boundary_id));
+
+                subcelldata.boundary_quads.back().boundary_id =
+                  static_cast<types::boundary_id>(material_id);
+
+                // transform from gmsh to
+                // consecutive numbering
+                for (unsigned int i = 0; i < 4; ++i)
+                  if (vertex_indices.find(
+                        subcelldata.boundary_quads.back().vertices[i]) !=
+                      vertex_indices.end())
+                    // vertex with this index exists
+                    subcelldata.boundary_quads.back().vertices[i] =
+                      vertex_indices[subcelldata.boundary_quads.back()
+                                       .vertices[i]];
+                  else
+                    {
+                      // no such vertex index
+                      Assert(false,
+                             ExcInvalidVertexIndex(
+                               cell_per_entity,
+                               subcelldata.boundary_quads.back().vertices[i]));
+                      subcelldata.boundary_quads.back().vertices[i] =
+                        numbers::invalid_unsigned_int;
+                    }
+              }
+            else if (cell_type == 15)
+              {
+                // read the indices of nodes given
+                unsigned int node_index = 0;
+                switch (gmsh_file_format)
+                  {
+                    case 1:
+                      {
+                        for (unsigned int i = 0; i < nod_num; ++i)
+                          in >> node_index;
+                        break;
+                      }
+                    case 2:
+                    case 4:
+                      {
+                        in >> node_index;
+                        break;
+                      }
+                    default:
+                      Assert(false, ExcInternalError());
+                  }
+
+                // we only care about boundary indicators assigned to individual
+                // vertices in 1d (because otherwise the vertices are not faces)
+                if (dim == 1)
+                  boundary_ids_1d[vertex_indices[node_index]] = material_id;
+              }
+            else
+              // cannot read this, so throw
+              // an exception. treat
+              // triangles and tetrahedra
+              // specially since this
+              // deserves a more explicit
+              // error message
+              {
+                AssertThrow(cell_type != 2,
+                            ExcMessage("Found triangles while reading a file "
+                                       "in gmsh format. deal.II does not "
+                                       "support triangles"));
+                AssertThrow(cell_type != 11,
+                            ExcMessage("Found tetrahedra while reading a file "
+                                       "in gmsh format. deal.II does not "
+                                       "support tetrahedra"));
+
+                AssertThrow(false, ExcGmshUnsupportedGeometry(cell_type));
+              }
+          }
+      }
+    AssertDimension(global_cell, n_cells);
+  }
   // Assert we reached the end of the block
   in >> line;
   static const std::string end_elements_marker[] = {"$ENDELM", "$EndElements"};
-  AssertThrow(line == end_elements_marker[gmsh_file_format - 1],
+  AssertThrow(line == end_elements_marker[gmsh_file_format == 1 ? 0 : 1],
               ExcInvalidGMSHInput(line));
 
   // check that no forbidden arrays are used
