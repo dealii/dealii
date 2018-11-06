@@ -52,10 +52,11 @@ div.image img[src="fe_enriched_h-refinement.png"] {
 .threecolumn {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-column-gap: 5%;
-  grid-row-gap: 5%;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 25px;
 }
 
 /*
@@ -64,10 +65,11 @@ div.image img[src="fe_enriched_h-refinement.png"] {
 .twocolumn {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-column-gap: 5%;
-  grid-row-gap: 5%;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 25px;
 }
 
 /*
@@ -76,10 +78,11 @@ div.image img[src="fe_enriched_h-refinement.png"] {
 .onecolumn {
   display: grid;
   grid-template-columns: 1fr;
-  grid-column-gap: 5%;
-  grid-row-gap: 5%;
+  grid-column-gap: 25px;
+  grid-row-gap: 25px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 25px;
 }
 
 
