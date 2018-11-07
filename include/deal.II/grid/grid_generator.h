@@ -764,6 +764,11 @@ namespace GridGenerator
    * In three dimensions, the manifold id of the hull is set to zero, and a
    * CylindricalManifold is attached to it.
    *
+   * Here are the grids in 2D and 3D after two mesh refinements:
+   *
+   * @image html truncated_cone_2d.png
+   * @image html truncated_cone_3d.png
+   *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    *
    * @author Markus B&uuml;rg, 2009
