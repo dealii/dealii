@@ -1146,21 +1146,42 @@ public:
                std::ostream &                      out) const;
 
   /**
-   * Write triangulation in VTK format.
+   * Write triangulation in VTK format. This function writes a
+   * UNSTRUCTURED_GRID file, that contains the following VTK cell types:
+   * VTK_HEXAHEDRON, VTK_QUAD, and VTK_LINE, depending on the template
+   * dimension.
    *
-   * Due to the way this function writes data to the output stream,
-   * the resulting output files correspond to a faithful representation
-   * of the mesh in that all cells are visible for visualization. However,
-   * the data is not in a format that allows reading this file in again
-   * through the GridIn class. This is because every vertex of the mesh is
-   * duplicated as many times as there are adjacent cells. In other words,
-   * every cell has its own, separate set of vertices that are at the
-   * same location as the vertices of other cells, but are separately
-   * numbered. If such a file is read in through the GridIn class, then
-   * that will result in a mesh that has the correct cells and vertex
-   * locations, but because the vertices are logically separate (though at
-   * the same locations) all cells are unconnected and have no neighbors
-   * across faces.
+   * In three dimensions, this function writes a file that contains
+   *
+   * - VTK_HEXAHEDRON cell types, containing the cell information of the
+   *   Triangulation
+   * - VTK_QUAD cell types, containing all boundary faces with non-zero
+   *   boundary ids, and all faces with non-flat manifold ids
+   * - VTK_LINE cell types, containing all boundary edges with non-zero
+   *   boundary ids, and all edges with non-flat manifold ids
+   *
+   * In two dimensions:
+   *
+   * - VTK_QUAD cell types, containing the cell information of the
+   *   Triangulation
+   * - VTK_LINE cell types, containing all boundary faces with non-zero
+   *   boundary ids, and all faces with non-flat manifold ids
+   *
+   * In one dimension
+   *
+   * - VTK_LINE cell types, containing the cell information of the
+   *   Triangulation
+   *
+   * The output file will contain two CELL_DATA sections, `MaterialID` and
+   * `ManifoldID`, recording for each VTK cell type the material or boundary id,
+   * and the manifold. See the
+   * [VTK file format](http://www.vtk.org/VTK/img/file-formats.pdf)
+   * documentation for an explanation of the generated output.
+   *
+   * The companion GridIn::read_vtk function can be used to read VTK files
+   * generated with this method.
+   *
+   * @author Luca Heltai, 2018
    */
   template <int dim, int spacedim>
   void
