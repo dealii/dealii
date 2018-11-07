@@ -31,7 +31,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename ElementType>
+template <typename ElementType, typename MemorySpaceType>
 class ArrayView;
 template <int dim>
 class Quadrature;
