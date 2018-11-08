@@ -611,7 +611,6 @@ init_cuda(const bool use_mpi = false)
 #  endif
   const unsigned int my_id =
     use_mpi ? Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) : 0;
-  int         device_id       = 0;
   int         n_devices       = 0;
   cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
   AssertCuda(cuda_error_code);
