@@ -312,11 +312,12 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   : starting_element(starting_element)
   , n_elements(n_elements)
 {
-  Assert(internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>(
-           starting_element),
-         ExcMessage(
-           "The memory space indicated by the template parameter "
-           "and the one derived from the pointer value do not match!"));
+  Assert(
+    n_elements == 0 ||
+      internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>(
+        starting_element),
+    ExcMessage("The memory space indicated by the template parameter "
+               "and the one derived from the pointer value do not match!"));
 }
 
 
@@ -351,11 +352,6 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
                 "object has a const value_type. In other words, you can "
                 "only create an ArrayView to const values from a const "
                 "std::vector.");
-  Assert(internal::ArrayViewHelper::is_in_correct_memory_space<MemorySpaceType>(
-           vector.data()),
-         ExcMessage(
-           "The memory space indicated by the template parameter "
-           "and the one derived from the pointer value do not match!"));
 }
 
 
@@ -474,11 +470,11 @@ template <typename ElementType, typename MemorySpaceType>
 inline typename ArrayView<ElementType, MemorySpaceType>::value_type &
   ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 {
+  Assert(i < n_elements, ExcIndexRange(i, 0, n_elements));
   Assert(
     (std::is_same<MemorySpaceType, MemorySpace::Host>::value),
     ExcMessage(
       "Accessing elements is only allowed if the data is stored in CPU memory!"));
-  Assert(i < n_elements, ExcIndexRange(i, 0, n_elements));
 
   return *(starting_element + i);
 }

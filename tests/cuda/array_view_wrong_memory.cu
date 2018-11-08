@@ -60,5 +60,11 @@ main(int argc, char **argv)
   deallog << "Testing device ArrayView with device memory" << std::endl;
   ArrayView<unsigned int, MemorySpace::CUDA> view_4(dummy_cuda.get(), 2);
 
+  deallog << "Testing host ArrayView to a nullptr with length 0" << std::endl;
+  ArrayView<unsigned int, MemorySpace::Host> view_5(nullptr, 0);
+
+  deallog << "Testing device ArrayView to a nullptr with length 0" << std::endl;
+  ArrayView<unsigned int, MemorySpace::CUDA> view_6(nullptr, 0);
+
   return 0;
 }
