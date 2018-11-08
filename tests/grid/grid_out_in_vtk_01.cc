@@ -74,13 +74,14 @@ check(Triangulation<dim, spacedim> &tria)
             AssertDimension(obj1->manifold_id(), obj2->manifold_id());
             AssertDimension(obj1->boundary_id(), obj2->boundary_id());
           }
-      for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
-        {
-          auto obj1 = cell1->face(i);
-          auto obj2 = cell2->face(i);
-          AssertDimension(obj1->boundary_id(), obj2->boundary_id());
-          AssertDimension(obj1->manifold_id(), obj2->manifold_id());
-        }
+      if (dim > 1)
+        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+          {
+            auto obj1 = cell1->face(i);
+            auto obj2 = cell2->face(i);
+            AssertDimension(obj1->boundary_id(), obj2->boundary_id());
+            AssertDimension(obj1->manifold_id(), obj2->manifold_id());
+          }
       ++cell2;
     }
   deallog << "OK" << std::endl;

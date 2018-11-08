@@ -2953,7 +2953,7 @@ namespace
       for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_face; ++l)
         {
           auto line = face->line(l);
-          if (line->user_flag_set())
+          if (line->user_flag_set() || line->has_children())
             continue;
           else
             line->set_user_flag();
@@ -2974,9 +2974,7 @@ namespace
   std::vector<typename Triangulation<dim, spacedim>::active_line_iterator>
   relevant_co_faces(const Triangulation<dim, spacedim> &)
   {
-    std::vector<typename Triangulation<dim, spacedim>::active_line_iterator>
-      res;
-    return res;
+    return {};
   }
 
 
@@ -3018,11 +3016,11 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
 
   const auto n_vertices = vertices.size();
 
-  out << "# vtk DataFile Version 3.0" << std::endl
-      << "Triangulation generated with deal.II" << std::endl
-      << "ASCII" << std::endl
-      << "DATASET UNSTRUCTURED_GRID" << std::endl
-      << "POINTS " << n_vertices << " double" << std::endl;
+  out << "# vtk DataFile Version 3.0\n"
+      << "Triangulation generated with deal.II\n"
+      << "ASCII\n"
+      << "DATASET UNSTRUCTURED_GRID\n"
+      << "POINTS " << n_vertices << " double\n";
 
   // actually write the vertices.
   for (auto v : vertices)
@@ -3039,13 +3037,19 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   // Write cells preamble
   const int n_cells = tria.n_active_cells() + faces.size() + co_faces.size();
 
+  // VTK now expects a number telling the total storage requirement to read all
+  // cell connectivity information. The connectivity information is read cell by
+  // cell, first specifying how many vertices are required to describe the cell,
+  // and then specifying the index of every vertex. This means that for every
+  // deal.II object type, we always need n_vertices + 1 integer per cell.
+  // Compute the total number here.
   const int cells_size =
     tria.n_active_cells() * (GeometryInfo<dim>::vertices_per_cell + 1) +
     faces.size() * (GeometryInfo<dim>::vertices_per_face + 1) +
     co_faces.size() * (3); // only in 3d, otherwise it is always zero.
 
 
-  out << std::endl << "CELLS " << n_cells << " " << cells_size << std::endl;
+  out << "\nCELLS " << n_cells << ' ' << cells_size << '\n';
   /*
    * VTK cells:
    *
@@ -3065,88 +3069,84 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
       out << GeometryInfo<dim>::vertices_per_cell;
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
         {
-          out << " " << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
+          out << ' ' << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
         }
-      out << std::endl;
+      out << '\n';
     }
   for (auto face : faces)
     {
       out << GeometryInfo<dim>::vertices_per_face;
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
         {
-          out << " "
+          out << ' '
               << face->vertex_index(
                    GeometryInfo < (dim > 1) ? dim - 1 : dim > ::ucd_to_deal[i]);
         }
-      out << std::endl;
+      out << '\n';
     }
   for (auto co_face : co_faces)
     {
       out << 2;
       for (unsigned int i = 0; i < 2; ++i)
-        out << " " << co_face->vertex_index(i);
-      out << std::endl;
+        out << ' ' << co_face->vertex_index(i);
+      out << '\n';
     }
 
   // write cell types
-  out << std::endl << "CELL_TYPES " << n_cells << std::endl;
+  out << "\nCELL_TYPES " << n_cells << '\n';
   for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
     {
-      out << cell_type << " ";
+      out << cell_type << ' ';
     }
-  out << std::endl;
+  out << '\n';
   for (unsigned int i = 0; i < faces.size(); ++i)
     {
-      out << face_type << " ";
+      out << face_type << ' ';
     }
-  out << std::endl;
+  out << '\n';
   for (unsigned int i = 0; i < co_faces.size(); ++i)
     {
-      out << co_face_type << " ";
+      out << co_face_type << ' ';
     }
-  out << std::endl
-      << std::endl
-      << "CELL_DATA " << n_cells << std::endl
-      << "SCALARS MaterialID int 1" << std::endl
-      << "LOOKUP_TABLE default" << std::endl;
+  out << "\n\nCELL_DATA " << n_cells << '\n'
+      << "SCALARS MaterialID int 1\n"
+      << "LOOKUP_TABLE default\n";
 
   // Now material id and boundary id
   for (auto cell : tria.active_cell_iterators())
     {
-      out << static_cast<int>(cell->material_id()) << " ";
+      out << static_cast<int>(cell->material_id()) << ' ';
     }
-  out << std::endl;
+  out << '\n';
   for (auto face : faces)
     {
-      out << static_cast<int>(face->boundary_id()) << " ";
+      out << static_cast<int>(face->boundary_id()) << ' ';
     }
-  out << std::endl;
+  out << '\n';
   for (auto co_face : co_faces)
     {
-      out << static_cast<int>(co_face->boundary_id()) << " ";
+      out << static_cast<int>(co_face->boundary_id()) << ' ';
     }
 
-  out << std::endl
-      << std::endl
-      << "SCALARS ManifoldID int 1" << std::endl
-      << "LOOKUP_TABLE default" << std::endl;
+  out << "\n\nSCALARS ManifoldID int 1\n"
+      << "LOOKUP_TABLE default\n";
 
   // Now material id and boundary id
   for (auto cell : tria.active_cell_iterators())
     {
-      out << static_cast<int>(cell->manifold_id()) << " ";
+      out << static_cast<int>(cell->manifold_id()) << ' ';
     }
-  out << std::endl;
+  out << '\n';
   for (auto face : faces)
     {
-      out << static_cast<int>(face->manifold_id()) << " ";
+      out << static_cast<int>(face->manifold_id()) << ' ';
     }
-  out << std::endl;
+  out << '\n';
   for (auto co_face : co_faces)
     {
-      out << static_cast<int>(co_face->manifold_id()) << " ";
+      out << static_cast<int>(co_face->manifold_id()) << ' ';
     }
-  out << std::endl;
+  out << '\n';
 
   out.flush();
 

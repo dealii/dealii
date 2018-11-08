@@ -293,20 +293,16 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
               unsigned int type;
               in >> type;
 
-              if (type == 2)
-                {
-                  cells.emplace_back();
+              AssertThrow(
+                type == 2,
+                ExcMessage(
+                  "While reading VTK file, unknown cell type encountered"));
+              cells.emplace_back();
 
-                  for (unsigned int j = 0; j < type; j++) // loop to feed data
-                    in >> cells.back().vertices[j];
+              for (unsigned int j = 0; j < type; j++) // loop to feed data
+                in >> cells.back().vertices[j];
 
-                  cells.back().material_id = 0;
-                }
-              else
-                AssertThrow(
-                  false,
-                  ExcMessage(
-                    "While reading VTK file, unknown cell type encountered"));
+              cells.back().material_id = 0;
             }
         }
       else
@@ -319,20 +315,30 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       in >> keyword;
 
-      if (keyword ==
-          "CELL_TYPES") // Entering the cell_types section and ignoring data.
-        {
-          in >> n_ints;
-          int tmp_int;
-          for (unsigned int i = 0; i < n_ints; ++i)
-            in >> tmp_int;
-        }
-      else
-        AssertThrow(
-          false,
-          ExcMessage(std::string(
-            "While reading VTK file, missing CELL_TYPES section. Found <" +
-            keyword + "> instead.")));
+      AssertThrow(
+        keyword == "CELL_TYPES",
+        ExcMessage(std::string(
+          "While reading VTK file, missing CELL_TYPES section. Found <" +
+          keyword + "> instead.")));
+
+      in >> n_ints;
+      AssertThrow(
+        n_ints == n_geometric_objects,
+        ExcMessage("The VTK reader found a CELL_DATA statement "
+                   "that lists a total of " +
+                   Utilities::int_to_string(n_ints) +
+                   " cell data objects, but this needs to "
+                   "equal the number of cells (which is " +
+                   Utilities::int_to_string(cells.size()) +
+                   ") plus the number of quads (" +
+                   Utilities::int_to_string(subcelldata.boundary_quads.size()) +
+                   " in 3d or the number of lines (" +
+                   Utilities::int_to_string(subcelldata.boundary_lines.size()) +
+                   ") in 2d."));
+
+      int tmp_int;
+      for (unsigned int i = 0; i < n_ints; ++i)
+        in >> tmp_int;
 
       // Ignore everything up to CELL_DATA
       while (in >> keyword)
@@ -372,7 +378,10 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       in >> keyword;
                       for (auto set_cmp : data_sets)
                         if (keyword == set_cmp)
-                          set = keyword;
+                          {
+                            set = keyword;
+                            break;
+                          }
                       if (set == "")
                         // keep ignoring everything until the next SCALARS
                         // keyword
@@ -380,7 +389,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
                       // Now we got somewhere. Proceed from here.
                       // Ignore everything till the end of the line.
-                      // SCALARS MaterialID 1 // this "1" is optional
+                      // SCALARS MaterialID 1
+                      // (the last number is optional)
                       in.ignore(256, '\n');
 
                       in >> keyword;
