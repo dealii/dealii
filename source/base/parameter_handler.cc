@@ -461,7 +461,7 @@ ParameterHandler::parse_input(const std::string &filename,
 
 
 void
-ParameterHandler::parse_input_from_string(const char *       s,
+ParameterHandler::parse_input_from_string(const std::string &s,
                                           const std::string &last_line,
                                           const bool         skip_undefined)
 {

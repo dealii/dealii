@@ -463,17 +463,6 @@ public:
                         numbers::invalid_unsigned_int)) const;
 
   /**
-   * Same as above but takes a filename as a <code>char</code> pointer.
-   *
-   * @deprecated This function is deprecated. Use the one taking <code>std::string</code> instead.
-   */
-  DEAL_II_DEPRECATED void
-  save(const char *                                 filename,
-       const std::pair<unsigned int, unsigned int> &chunk_size =
-         std::make_pair(numbers::invalid_unsigned_int,
-                        numbers::invalid_unsigned_int)) const;
-
-  /**
    * Loads the distributed matrix from file @p filename using HDF5.
    * In case that deal.II was built without HDF5
    * a call to this function will cause an exception to be thrown.
@@ -486,14 +475,6 @@ public:
    */
   void
   load(const std::string &filename);
-
-  /**
-   * Same as above but takes a filename as a <code>char</code> pointer.
-   *
-   * @deprecated This function is deprecated. Use the one taking <code>std::string</code> instead.
-   */
-  DEAL_II_DEPRECATED void
-  load(const char *filename);
 
   /**
    * Compute the Cholesky factorization of the matrix using ScaLAPACK

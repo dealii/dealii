@@ -587,7 +587,7 @@ namespace parallel
        * interface between deal.II and p4est.
        */
       void
-      write_mesh_vtk(const char *file_basename) const;
+      write_mesh_vtk(const std::string &file_basename) const;
 
       /**
        * Produce a check sum of the triangulation.  This is a collective
@@ -604,7 +604,7 @@ namespace parallel
        * cell-based data can be saved using register_data_attach().
        */
       void
-      save(const char *filename) const;
+      save(const std::string &filename) const;
 
       /**
        * Load the refinement information saved with save() back in. The mesh
@@ -625,7 +625,7 @@ namespace parallel
        * if a different number of MPI processes is encountered).
        */
       void
-      load(const char *filename, const bool autopartition = true);
+      load(const std::string &filename, const bool autopartition = true);
 
       /**
        * Register a function that can be used to attach data of fixed size
@@ -1043,8 +1043,8 @@ namespace parallel
          */
         void
         save(const typename dealii::internal::p4est::types<dim>::forest
-               *         parallel_forest,
-             const char *filename) const;
+               *                parallel_forest,
+             const std::string &filename) const;
 
         /**
          * Transfer data from file system.
@@ -1067,7 +1067,7 @@ namespace parallel
         void
         load(const typename dealii::internal::p4est::types<dim>::forest
                *                parallel_forest,
-             const char *       filename,
+             const std::string &filename,
              const unsigned int n_attached_deserialize_fixed,
              const unsigned int n_attached_deserialize_variable);
 
@@ -1302,14 +1302,14 @@ namespace parallel
        * compiler.
        */
       void
-      load(const char *filename, const bool autopartition = true);
+      load(const std::string &filename, const bool autopartition = true);
 
       /**
        * This function is not implemented, but needs to be present for the
        * compiler.
        */
       void
-      save(const char *filename) const;
+      save(const std::string &filename) const;
 
       /**
        * This function is not implemented, but needs to be present for the

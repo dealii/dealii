@@ -54,7 +54,7 @@ namespace Algorithms
      * later use.
      */
     static Event
-    assign(const char *name);
+    assign(const std::string &name);
 
     /**
      * If you forgot to store the result of assign, here is how to retrieve it

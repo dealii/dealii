@@ -1788,8 +1788,8 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::DataTransfer::save(
       const typename dealii::internal::p4est::types<dim>::forest
-        *         parallel_forest,
-      const char *filename) const
+        *                parallel_forest,
+      const std::string &filename) const
     {
       // Large fractions of this function have been copied from
       // DataOutInterface::write_vtu_in_parallel.
@@ -1964,7 +1964,7 @@ namespace parallel
     Triangulation<dim, spacedim>::DataTransfer::load(
       const typename dealii::internal::p4est::types<dim>::forest
         *                parallel_forest,
-      const char *       filename,
+      const std::string &filename,
       const unsigned int n_attached_deserialize_fixed,
       const unsigned int n_attached_deserialize_variable)
     {
@@ -2689,20 +2689,19 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::write_mesh_vtk(
-      const char *file_basename) const
+      const std::string &file_basename) const
     {
       Assert(parallel_forest != nullptr,
              ExcMessage("Can't produce output when no forest is created yet."));
-      dealii::internal::p4est::functions<dim>::vtk_write_file(parallel_forest,
-                                                              nullptr,
-                                                              file_basename);
+      dealii::internal::p4est::functions<dim>::vtk_write_file(
+        parallel_forest, nullptr, file_basename.c_str());
     }
 
 
 
     template <int dim, int spacedim>
     void
-    Triangulation<dim, spacedim>::save(const char *filename) const
+    Triangulation<dim, spacedim>::save(const std::string &filename) const
     {
       Assert(
         cell_attached_data.n_attached_deserialize == 0,
@@ -2757,7 +2756,7 @@ namespace parallel
           tria->data_transfer.clear();
         }
 
-      dealii::internal::p4est::functions<dim>::save(filename,
+      dealii::internal::p4est::functions<dim>::save(filename.c_str(),
                                                     parallel_forest,
                                                     false);
 
@@ -2778,8 +2777,8 @@ namespace parallel
 
     template <int dim, int spacedim>
     void
-    Triangulation<dim, spacedim>::load(const char *filename,
-                                       const bool  autopartition)
+    Triangulation<dim, spacedim>::load(const std::string &filename,
+                                       const bool         autopartition)
     {
       Assert(
         this->n_cells() > 0,
@@ -2827,7 +2826,7 @@ namespace parallel
         attached_count_fixed + attached_count_variable;
 
       parallel_forest = dealii::internal::p4est::functions<dim>::load_ext(
-        filename,
+        filename.c_str(),
         this->mpi_communicator,
         0,
         false,
@@ -5070,7 +5069,7 @@ namespace parallel
 
     template <int spacedim>
     void
-    Triangulation<1, spacedim>::load(const char *, const bool)
+    Triangulation<1, spacedim>::load(const std::string &, const bool)
     {
       Assert(false, ExcNotImplemented());
     }
@@ -5079,7 +5078,7 @@ namespace parallel
 
     template <int spacedim>
     void
-    Triangulation<1, spacedim>::save(const char *) const
+    Triangulation<1, spacedim>::save(const std::string &) const
     {
       Assert(false, ExcNotImplemented());
     }
