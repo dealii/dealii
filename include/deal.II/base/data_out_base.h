@@ -1067,7 +1067,7 @@ namespace DataOutBase
     /**
      * Constructor.
      *
-     * @deprecated Usig this constructor is deprecated. Set the member variables
+     * @deprecated Using this constructor is deprecated. Set the member variables
      * directly instead.
      */
     DEAL_II_DEPRECATED
