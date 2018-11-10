@@ -1046,8 +1046,10 @@ namespace DataOutBase
      * This variable is needed to hold the output file name when using the
      * Tecplot API to write binary files.  If the user doesn't set the file
      * name with this variable only ASCII Tecplot output will be produced.
+     *
+     * @deprecated Using Tecplot binary output is deprecated.
      */
-    const char *tecplot_binary_file_name;
+    DEAL_II_DEPRECATED const char *tecplot_binary_file_name;
 
     /**
      * Tecplot allows to assign names to zones. This variable stores this
@@ -1064,7 +1066,11 @@ namespace DataOutBase
 
     /**
      * Constructor.
+     *
+     * @deprecated Usig this constructor is deprecated. Set the member variables
+     * directly instead.
      */
+    DEAL_II_DEPRECATED
     TecplotFlags(const char * tecplot_binary_file_name = nullptr,
                  const char * zone_name                = nullptr,
                  const double solution_time            = -1.0);
@@ -1540,42 +1546,52 @@ namespace DataOutBase
      * Use the format already stored in the object.
      */
     default_format,
+
     /**
      * Do not write any output.
      */
     none,
+
     /**
      * Output for OpenDX.
      */
     dx,
+
     /**
      * Output in the UCD format for AVS.
      */
     ucd,
+
     /**
      * Output for the Gnuplot tool.
      */
     gnuplot,
+
     /**
      * Output for the Povray raytracer.
      */
     povray,
+
     /**
      * Output in encapsulated PostScript.
      */
     eps,
+
     /**
      * Output for GMV.
      */
     gmv,
+
     /**
      * Output for Tecplot in text format.
      */
-
     tecplot,
+
     /**
      * Output for Tecplot in binary format. Faster and smaller than text
      * format.
+     *
+     * @deprecated Using Tecplot binary output is deprecated.
      */
     tecplot_binary,
 
@@ -2003,7 +2019,7 @@ namespace DataOutBase
    * Write the given list of patches to the output stream in Tecplot binary
    * format.
    *
-   * @deprecated Use the version suing DataComponentInterpretation instead.
+   * @deprecated Using Tecplot binary output is deprecated.
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED void
@@ -2033,9 +2049,11 @@ namespace DataOutBase
    * produced.
    *
    * For more information consult the Tecplot Users and Reference manuals.
+   *
+   * @deprecated Using Tecplot binary output is deprecated.
    */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   write_tecplot_binary(
     const std::vector<Patch<dim, spacedim>> &patches,
     const std::vector<std::string> &         data_names,
@@ -2699,6 +2717,8 @@ namespace DataOutBase
    * <li> <tt>svg</tt>: <tt>.svg</tt>
    * <li> <tt>deal_II_intermediate</tt>: <tt>.d2</tt>.
    * </ul>
+   *
+   * @deprecated Using Tecplot binary output is deprecated.
    */
   std::string
   default_suffix(const OutputFormat output_format);
@@ -2912,7 +2932,10 @@ public:
    * Obtain data through get_patches() and write it in the Tecplot binary
    * output format. Note that the name of the output file must be specified
    * through the TecplotFlags interface.
+   *
+   * @deprecated Using Tecplot binary output is deprecated.
    */
+  DEAL_II_DEPRECATED
   void
   write_tecplot_binary(std::ostream &out) const;
 
