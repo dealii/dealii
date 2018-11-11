@@ -817,8 +817,11 @@ namespace internal
                       dof_indices[j * ndofs + 1] - dof_indices[j * ndofs];
                   for (unsigned int k = 0; k < ndofs; ++k)
                     for (unsigned int j = 0; j < n_comp; ++j)
-                      if (dof_indices[j * ndofs + k] !=
-                          dof_indices[j * ndofs] + k * offsets[j])
+                      // the first if case is to avoid negative offsets
+                      // (invalid)
+                      if (dof_indices[j * ndofs + 1] < dof_indices[j * ndofs] ||
+                          dof_indices[j * ndofs + k] !=
+                            dof_indices[j * ndofs] + k * offsets[j])
                         {
                           indices_are_interleaved_and_mixed = 0;
                           break;
