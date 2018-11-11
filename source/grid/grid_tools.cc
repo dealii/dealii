@@ -429,6 +429,184 @@ namespace GridTools
 
 
 
+  // Generic functions for appending face data in 2D or 3D. TODO: we can
+  // remove these once we have 'if constexpr'.
+  namespace
+  {
+    void
+    append_face_data(const CellData<0> & /*face_data*/,
+                     SubCellData & /*subcell_data*/)
+    {
+      Assert(false, ExcInternalError());
+    }
+
+
+
+    void
+    append_face_data(const CellData<1> &face_data, SubCellData &subcell_data)
+    {
+      subcell_data.boundary_lines.push_back(face_data);
+    }
+
+
+
+    void
+    append_face_data(const CellData<2> &face_data, SubCellData &subcell_data)
+    {
+      subcell_data.boundary_quads.push_back(face_data);
+    }
+
+
+
+    // Lexical comparison for sorting CellData objects.
+    template <int structdim>
+    struct CellDataComparator
+    {
+      bool
+      operator()(const CellData<structdim> &a,
+                 const CellData<structdim> &b) const
+      {
+        // Check vertices:
+        if (std::lexicographical_compare(std::begin(a.vertices),
+                                         std::end(a.vertices),
+                                         std::begin(b.vertices),
+                                         std::end(b.vertices)))
+          return true;
+          // it should never be necessary to check the material or manifold
+          // ids as a 'tiebreaker' (since they must be equal if the vertex
+          // indices are equal). Assert it anyway:
+#ifdef DEBUG
+        if (std::equal(std::begin(a.vertices),
+                       std::end(a.vertices),
+                       std::begin(b.vertices)))
+          {
+            Assert(a.material_id == b.material_id &&
+                     a.manifold_id == b.manifold_id,
+                   ExcMessage(
+                     "Two CellData objects with equal vertices must "
+                     "have the same material/boundary ids and manifold "
+                     "ids."));
+          }
+#endif
+        return false;
+      }
+    };
+  } // namespace
+
+
+
+  template <int dim, int spacedim>
+  std::
+    tuple<std::vector<Point<spacedim>>, std::vector<CellData<dim>>, SubCellData>
+    get_coarse_mesh_description(const Triangulation<dim, spacedim> &tria)
+  {
+    Assert(1 <= tria.n_levels(),
+           ExcMessage("The input triangulation must be non-empty."));
+
+    std::vector<Point<spacedim>> vertices;
+    std::vector<CellData<dim>>   cells;
+    SubCellData                  subcell_data;
+
+    unsigned int max_level_0_vertex_n = 0;
+    for (const auto &cell : tria.cell_iterators_on_level(0))
+      for (unsigned int cell_vertex_n = 0;
+           cell_vertex_n < GeometryInfo<dim>::vertices_per_cell;
+           ++cell_vertex_n)
+        max_level_0_vertex_n =
+          std::max(cell->vertex_index(cell_vertex_n), max_level_0_vertex_n);
+    vertices.resize(max_level_0_vertex_n + 1);
+    std::set<CellData<dim - 1>, CellDataComparator<dim - 1>> face_data;
+    std::set<CellData<1>, CellDataComparator<1>> line_data; // only used in 3D
+    for (const auto &cell : tria.cell_iterators_on_level(0))
+      {
+        // Save cell data
+        CellData<dim> cell_data;
+        for (unsigned int cell_vertex_n = 0;
+             cell_vertex_n < GeometryInfo<dim>::vertices_per_cell;
+             ++cell_vertex_n)
+          {
+            Assert(cell->vertex_index(cell_vertex_n) < vertices.size(),
+                   ExcInternalError());
+            vertices[cell->vertex_index(cell_vertex_n)] =
+              cell->vertex(cell_vertex_n);
+            cell_data.vertices[cell_vertex_n] =
+              cell->vertex_index(cell_vertex_n);
+          }
+        cell_data.material_id = cell->material_id();
+        cell_data.manifold_id = cell->manifold_id();
+        cells.push_back(cell_data);
+
+        // Save face data
+        if (dim != 1)
+          {
+            for (unsigned int face_n = 0;
+                 face_n < GeometryInfo<dim>::faces_per_cell;
+                 ++face_n)
+              {
+                const auto        face = cell->face(face_n);
+                CellData<dim - 1> face_cell_data;
+                for (unsigned int vertex_n = 0;
+                     vertex_n < GeometryInfo<dim>::vertices_per_face;
+                     ++vertex_n)
+                  face_cell_data.vertices[vertex_n] =
+                    face->vertex_index(vertex_n);
+                face_cell_data.boundary_id = face->boundary_id();
+                face_cell_data.manifold_id = face->manifold_id();
+
+                face_data.insert(face_cell_data);
+              }
+          }
+        // Save line data
+        if (dim == 3)
+          {
+            for (unsigned int line_n = 0;
+                 line_n < GeometryInfo<dim>::lines_per_cell;
+                 ++line_n)
+              {
+                const auto  line = cell->line(line_n);
+                CellData<1> line_cell_data;
+                for (unsigned int vertex_n = 0;
+                     vertex_n < GeometryInfo<2>::vertices_per_face;
+                     ++vertex_n)
+                  line_cell_data.vertices[vertex_n] =
+                    line->vertex_index(vertex_n);
+                line_cell_data.boundary_id = line->boundary_id();
+                line_cell_data.manifold_id = line->manifold_id();
+
+                line_data.insert(line_cell_data);
+              }
+          }
+      }
+      // Double-check that there are no unused vertices:
+#ifdef DEBUG
+    {
+      std::vector<bool> used_vertices(vertices.size());
+      for (const CellData<dim> &cell_data : cells)
+        for (unsigned int cell_vertex_n = 0;
+             cell_vertex_n < GeometryInfo<dim>::vertices_per_cell;
+             ++cell_vertex_n)
+          used_vertices[cell_data.vertices[cell_vertex_n]] = true;
+      Assert(std::find(used_vertices.begin(), used_vertices.end(), false) ==
+               used_vertices.end(),
+             ExcMessage("The level zero vertices should form a contiguous "
+                        "range."));
+    }
+#endif
+
+    for (const CellData<dim - 1> &face_cell_data : face_data)
+      append_face_data(face_cell_data, subcell_data);
+    if (dim == 3)
+      for (const CellData<1> &face_line_data : line_data)
+        subcell_data.boundary_lines.push_back(face_line_data);
+    return std::tuple<std::vector<Point<spacedim>>,
+                      std::vector<CellData<dim>>,
+                      SubCellData>(std::move(vertices),
+                                   std::move(cells),
+                                   std::move(subcell_data));
+  }
+
+
+
   template <int dim, int spacedim>
   void
   delete_unused_vertices(std::vector<Point<spacedim>> &vertices,
