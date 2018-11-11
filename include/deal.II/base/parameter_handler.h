@@ -1009,7 +1009,7 @@ public:
    * there for more information.
    */
   virtual void
-  parse_input_from_string(const char *       s,
+  parse_input_from_string(const std::string &s,
                           const std::string &last_line      = "",
                           const bool         skip_undefined = false);
 

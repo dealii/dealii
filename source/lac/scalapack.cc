@@ -2651,17 +2651,6 @@ ScaLAPACKMatrix<NumberType>::save(
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::save(
-  const char *                                 filename,
-  const std::pair<unsigned int, unsigned int> &chunk_size) const
-{
-  save(std::string(filename), chunk_size);
-}
-
-
-
-template <typename NumberType>
-void
 ScaLAPACKMatrix<NumberType>::save_serial(
   const std::string &                          filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
@@ -3069,15 +3058,6 @@ ScaLAPACKMatrix<NumberType>::load(const std::string &filename)
   load_serial(filename);
 #    endif
 #  endif
-}
-
-
-
-template <typename NumberType>
-void
-ScaLAPACKMatrix<NumberType>::load(const char *filename)
-{
-  load(std::string(filename));
 }
 
 

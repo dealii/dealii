@@ -296,12 +296,11 @@ FunctionParser<dim>::init_muparser() const
            constant != constants.end();
            ++constant)
         {
-          fp.get()[component]->DefineConst(constant->first.c_str(),
-                                           constant->second);
+          fp.get()[component]->DefineConst(constant->first, constant->second);
         }
 
       for (unsigned int iv = 0; iv < var_names.size(); ++iv)
-        fp.get()[component]->DefineVar(var_names[iv].c_str(), &vars.get()[iv]);
+        fp.get()[component]->DefineVar(var_names[iv], &vars.get()[iv]);
 
       // define some compatibility functions:
       fp.get()[component]->DefineFun("if", internal::mu_if, true);
@@ -411,7 +410,7 @@ FunctionParser<dim>::init_muparser() const
           std::cerr << "Token:    <" << e.GetToken() << ">\n";
           std::cerr << "Position: <" << e.GetPos() << ">\n";
           std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
-          AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
+          AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
         }
     }
 }
@@ -462,7 +461,7 @@ FunctionParser<dim>::value(const Point<dim> & p,
       std::cerr << "Token:    <" << e.GetToken() << ">\n";
       std::cerr << "Position: <" << e.GetPos() << ">\n";
       std::cerr << "Errc:     <" << e.GetCode() << ">" << std::endl;
-      AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg().c_str()));
+      AssertThrow(false, ExcParseError(e.GetCode(), e.GetMsg()));
       return 0.0;
     }
 }

@@ -58,7 +58,7 @@ public:
    * identifier for the program being run.
    */
   static std::string
-  base_name(const char *filename);
+  base_name(const std::string &filename);
 
   /**
    * Return the value of <tt>id</tt>.

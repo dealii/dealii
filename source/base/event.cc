@@ -25,7 +25,7 @@ namespace Algorithms
   std::vector<std::string> Event::names;
 
   Event
-  Event::assign(const char *name)
+  Event::assign(const std::string &name)
   {
     unsigned int index = names.size();
     names.emplace_back(name);

@@ -7552,8 +7552,9 @@ DataOutInterface<dim, spacedim>::write_svg(std::ostream &out) const
 
 template <int dim, int spacedim>
 void
-DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
-                                                       MPI_Comm    comm) const
+DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
+  const std::string &filename,
+  MPI_Comm           comm) const
 {
 #ifndef DEAL_II_WITH_MPI
   // without MPI fall back to the normal way to write a vtu file:
@@ -7570,7 +7571,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
   AssertThrowMPI(ierr);
   MPI_File fh;
   ierr = MPI_File_open(comm,
-                       const_cast<char *>(filename),
+                       DEAL_II_MPI_CONST_CAST(filename.c_str()),
                        MPI_MODE_CREATE | MPI_MODE_WRONLY,
                        info,
                        &fh);
@@ -7594,7 +7595,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
       DataOutBase::write_vtu_header(ss, vtk_flags);
       header_size = ss.str().size();
       ierr = MPI_File_write(fh,
-                            const_cast<char *>(ss.str().c_str()),
+                            DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
                             header_size,
                             MPI_CHAR,
                             MPI_STATUS_IGNORE);
@@ -7614,7 +7615,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
                                 vtk_flags,
                                 ss);
     ierr = MPI_File_write_ordered(fh,
-                                  const_cast<char *>(ss.str().c_str()),
+                                  DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
                                   ss.str().size(),
                                   MPI_CHAR,
                                   MPI_STATUS_IGNORE);
@@ -7628,7 +7629,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(const char *filename,
       DataOutBase::write_vtu_footer(ss);
       unsigned int footer_size = ss.str().size();
       ierr = MPI_File_write_shared(fh,
-                                   const_cast<char *>(ss.str().c_str()),
+                                   DEAL_II_MPI_CONST_CAST(ss.str().c_str()),
                                    footer_size,
                                    MPI_CHAR,
                                    MPI_STATUS_IGNORE);

@@ -2963,7 +2963,7 @@ public:
    * DataOutInterface::write_vtu().
    */
   void
-  write_vtu_in_parallel(const char *filename, MPI_Comm comm) const;
+  write_vtu_in_parallel(const std::string &filename, MPI_Comm comm) const;
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
