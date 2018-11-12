@@ -333,8 +333,12 @@ namespace GridGenerator
    * Here is the non-symmetric grid (after one global refinement, colored
    * according to manifold id) in 2D and 3D, respectively:
    *
-   * <img src="plate_with_a_hole.png" title="2d plate" width="600px">
-   * <img src="plate_with_a_hole_3D.png" title="3d plate" width="600px">
+   * \htmlonly <style>div.image
+   * img[src="plate_with_a_hole.png"]{width:25%;}</style> \endhtmlonly
+   * @image html plate_with_a_hole.png
+   * \htmlonly <style>div.image
+   * img[src="plate_with_a_hole_3D.png"]{width:25%;}</style> \endhtmlonly
+   * @image html plate_with_a_hole_3D.png
    *
    * In 3D, triangulation will be extruded in the z-direction by the total
    * height of @p L using @p n_slices slices (minimum is 2).
