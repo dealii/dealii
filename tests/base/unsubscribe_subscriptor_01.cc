@@ -15,7 +15,9 @@
 
 
 
-// check that unsubscribing with a wrong id is handled correctly
+// check that unsubscribing with a wrong id is handled correctly. This time,
+// we check that unsubscribung with a different pointer with the same content
+// works as well
 
 
 #include <deal.II/base/smartpointer.h>
@@ -38,13 +40,17 @@ main()
 
   Subscriptor       subscriptor;
   std::atomic<bool> dummy_a;
-  const char *      foo_a = "a";
-  const char *      foo_b = "b";
-  subscriptor.subscribe(&dummy_a, foo_a);
-  subscriptor.unsubscribe(&dummy_a, foo_b);
-  std::atomic<bool> dummy_b;
-  subscriptor.unsubscribe(&dummy_b, foo_a);
-  subscriptor.unsubscribe(&dummy_a, foo_a);
+  const char *      foo        = "a";
+  const std::string foo_string = "a";
+  subscriptor.subscribe(&dummy_a, foo);
+  subscriptor.unsubscribe(&dummy_a, foo_string.c_str());
+
+  deallog << "OK" << std::endl;
+
+  subscriptor.subscribe(&dummy_a, foo);
+  subscriptor.unsubscribe(&dummy_a, "a");
+
+  deallog << "OK" << std::endl;
 
   return 0;
 }

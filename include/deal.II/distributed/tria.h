@@ -442,7 +442,7 @@ namespace parallel
        * Override the implementation of prepare_coarsening_and_refinement from
        * the base class. This is necessary if periodic boundaries are enabled
        * and the level difference over vertices over the periodic boundary
-       * must be not more than 2:1.
+       * must not be more than 2:1.
        */
       virtual bool
       prepare_coarsening_and_refinement() override;

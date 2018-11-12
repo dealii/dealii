@@ -153,8 +153,10 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 
 
 
+template <>
 void
-Subscriptor::subscribe(std::atomic<bool> *const validity, const char *id) const
+Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
+                                     const char *             id) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -175,30 +177,34 @@ Subscriptor::subscribe(std::atomic<bool> *const validity, const char *id) const
 }
 
 
+
 void
 Subscriptor::unsubscribe(std::atomic<bool> *const validity,
                          const char *             id) const
 {
   const char *name = (id != nullptr) ? id : unknown_subscriber;
-  AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
-  // This is for the case that we do
-  // not abort after the exception
   if (counter == 0)
-    return;
+    {
+      AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
+      // This is for the case that we do not abort after the exception
+      return;
+    }
 
   std::lock_guard<std::mutex> lock(mutex);
 
   map_iterator it = counter_map.find(name);
-  if (it == counter_map.end() || it->second == 0)
+  if (it == counter_map.end())
     {
       AssertNothrow(it != counter_map.end(),
                     ExcNoSubscriber(object_info->name(), name));
-      AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
+      // This is for the case that we do not abort after the exception
+      return;
     }
-  else
+  if (it->second == 0)
     {
-      --counter;
-      it->second--;
+      AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
+      // This is for the case that we do not abort after the exception
+      return;
     }
 
   auto validity_ptr_it =
@@ -209,9 +215,12 @@ Subscriptor::unsubscribe(std::atomic<bool> *const validity,
         validity_ptr_it != validity_pointers.end(),
         ExcMessage(
           "This Subscriptor object does not know anything about the supplied pointer!"));
+      return;
     }
-  else
-    validity_pointers.erase(validity_ptr_it);
+
+  validity_pointers.erase(validity_ptr_it);
+  --counter;
+  --it->second;
 }
 
 
