@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
  * $\text{MB}=\text{NB}=2$ is displayed.
  *
  * \htmlonly <style>div.image
- * img[src="scalapack_block_cycling.png" align="left"]{width:15%;}</style>
+ * img[src="scalapack_block_cycling.png"]{width:35%;}</style>
  * \endhtmlonly
  * @image html scalapack_block_cycling.png "Block-Cyclic Distribution"
  *
