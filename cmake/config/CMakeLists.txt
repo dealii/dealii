@@ -135,7 +135,6 @@ SET(CONFIG_INCLUDE_DIRS
   ${DEAL_II_USER_INCLUDE_DIRS}
   )
 
-
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
@@ -222,8 +221,13 @@ FOREACH(_name ${_deal_ii_features_sorted})
   ENDFOREACH()
 ENDFOREACH()
 
-#####################################################################
-# pkgconfig files
+
+########################################################################
+#                                                                      #
+#                           pkgconfig files                            #
+#                                                                      #
+########################################################################
+
 #
 # Set up the pkgconfig configuration files consisting of
 #
@@ -244,144 +248,137 @@ ENDFOREACH()
 #
 
 #
-# For binary dir (AKA build dir):
+# Build up the link line from our list of libraries:
 #
 
-set(DEAL_II_PATH_PC ${CMAKE_BINARY_DIR})
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  STRING(TOLOWER ${_build} _build_lowercase)
 
-set (CONFIG_INCLUDE_DIRS_PC "")
-foreach(_dir ${CONFIG_INCLUDE_DIRS})
-  string(CONCAT CONFIG_INCLUDE_DIRS_PC "${CONFIG_INCLUDE_DIRS_PC} -I${_dir} "  )
-endforeach()
+  SET(_name "${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}")
 
-# populate the variables
-# CONFIG_LIBRARIES_DEBUG_PC 
-# CONFIG_LIBRARIES_RELEASE_PC
+  SET(CONFIG_RPATH_${_build}_PC "")
+  SET(CONFIG_LIBRARIES_${_build}_PC "-L\${libdir} -l${_name}")
 
-foreach (_build ${DEAL_II_BUILD_TYPES})
-  if(_build MATCHES DEBUG)
-    set(_build "debug")
-  else()
-    set(_build "release")
-  endif()
+  FOREACH(_lib ${DEAL_II_LIBRARIES_${_build}} ${DEAL_II_LIBRARIES})
 
-  string(TOUPPER ${_build} _B)
-  set(PC_LIBRARIES ${CONFIG_LIBRARIES_${_B}})
-  set(CONFIG_LIBRARIES_PC "")
-  foreach(_lib ${PC_LIBRARIES})
-    # _lib can be of two types
-    #  1. something like "/home/alberto/opt/lib/trilinos/lib/libteuchoscore.so"
-    #  2. or simply "m" for the math lib
+    GET_FILENAME_COMPONENT(_name ${_lib} NAME)
+    GET_FILENAME_COMPONENT(_dir ${_lib} PATH)
 
-    get_filename_component(_libname ${_s} NAME)
-    get_filename_component(_libdir ${_s} PATH)
+    IF("${_dir}" STREQUAL "")
+      # ${_lib} is a simple library name, just add it to the link line:
+      SET(_library_string "-l${_lib}")
 
-    if(IS_DIRECTORY ${_libdir}) # i.e., we are in the first case
-      # we have to add -L flag
-      string(CONCAT CONFIG_LIBRARIES_PC " ${CONFIG_LIBRARIES_PC} -L${_libdir} ")
-      # and add the path to the rpath
-      list(APPEND PC_RPATH ${_libdir})
-    endif()
+    ELSE()
+      # ${_lib} is a full library path:
 
-    # check if the library name begins with lib
-    # we are dealing with the first case
-    string(SUBSTRING ${_libname} 0 3 _beg)
+      #
+      # Only append a library directory if it is new ...
+      #
 
-    if(${_beg} MATCHES "lib")
-      string(CONCAT CONFIG_LIBRARIES_PC " ${CONFIG_LIBRARIES_PC} ${_libname} ")
-    else()
-      # second case
-      string(CONCAT CONFIG_LIBRARIES_PC " ${CONFIG_LIBRARIES_PC} -l${_libname} "  )
-    endif()
-  endforeach()
+      list (FIND CONFIG_RPATH_${_build}_PC "${_dir}" _index)
+      IF (${_index} EQUAL -1)
+        SET(_library_string "-L${_dir} ")
+        LIST(APPEND CONFIG_RPATH_${_build}_PC ${_dir})
+      ELSE()
+        SET(_library_string "")
+      ENDIF()
 
-  set(CONFIG_LIBRARIES_${_B}_PC ${CONFIG_LIBRARIES_PC})
-  
-  list(REMOVE_DUPLICATES PC_RPATH)
-  foreach(_dir ${PC_RPATH})
-    string(CONCAT CONFIG_LIBRARIES_${_B}_PC " ${CONFIG_LIBRARIES_${_B}_PC} -Wl,-rpath,${_dir} "  )
-  endforeach()
+      # Recover short name:
+      STRING(REGEX REPLACE
+        "^(${CMAKE_STATIC_LIBRARY_PREFIX}|${CMAKE_SHARED_LIBRARY_PREFIX})"
+        "" _name "${_name}"
+        )
+      STRING(REGEX REPLACE
+        "(${CMAKE_STATIC_LIBRARY_SUFFIX}|${CMAKE_SHARED_LIBRARY_SUFFIX})$"
+        "" _name "${_name}"
+        )
+      SET(_library_string "${_library_string}-l${_name}")
+    ENDIF()
 
-endforeach()
+    SET(CONFIG_LIBRARIES_${_build}_PC
+      "${CONFIG_LIBRARIES_${_build}_PC} ${_library_string}"
+      )
+  ENDFOREACH()
 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/deal.II_base.pc.in
-  ${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}/pkgconfig/${DEAL_II_PROJECT_CONFIG_NAME}_base.pc
+  TO_STRING_AND_ADD_PREFIX(CONFIG_RPATH_${_build}_PC
+    "-Wl,-rpath," ${CONFIG_RPATH_${_build}_PC}
+    )
+ENDFOREACH()
+
+
+#
+# For binary dir (aka build dir):
+#
+
+SET(CONFIG_PATH_PC "${CMAKE_BINARY_DIR}")
+
+TO_STRING_AND_ADD_PREFIX(CONFIG_INCLUDE_DIRS_PC "-I"
+  \\\${prefix}/include
+  ${CMAKE_SOURCE_DIR}/include
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_USER_INCLUDE_DIRS}
+  )
+
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  STRING(TOLOWER ${_build} _build_lowercase)
+
+  SET(_config_directory "${CMAKE_BINARY_DIR}/${DEAL_II_PKGCONF_RELDIR}")
+
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/config_${_build_lowercase}.pc.in
+    ${_config_directory}/${DEAL_II_PROJECT_CONFIG_NAME}_${_build_lowercase}.pc
+    @ONLY
+    )
+ENDFOREACH()
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/config_base.pc.in
+  ${_config_directory}/${DEAL_II_PROJECT_CONFIG_NAME}_base.pc
   @ONLY
   )
 
-# generate the requested .pc files
-foreach (_build ${DEAL_II_BUILD_TYPES})
-  if(_build MATCHES DEBUG)
-    set(_build "debug")
-  else()
-    set(_build "release")
-  endif()
-
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/deal.II_${_build}.pc.in
-    ${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}/pkgconfig/${DEAL_II_PROJECT_CONFIG_NAME}_${_build}.pc
-    @ONLY
-    )
-endforeach()
-
-#############################################################################
 #
 # For installation:
 #
 
-set(DEAL_II_PATH_PC ${CMAKE_INSTALL_PREFIX})
+SET(CONFIG_PATH_PC "${CMAKE_INSTALL_PREFIX}")
 
-set (CONFIG_INCLUDE_DIRS_PC "")
-foreach(_dir ${CONFIG_INCLUDE_DIRS})
-  string(CONCAT CONFIG_INCLUDE_DIRS_PC "${CONFIG_INCLUDE_DIRS_PC} -I${_dir} "  )
-endforeach()
+TO_STRING_AND_ADD_PREFIX(CONFIG_INCLUDE_DIRS_PC "-I"
+  \\\${prefix}/include
+  ${CMAKE_SOURCE_DIR}/include
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
+  ${DEAL_II_USER_INCLUDE_DIRS}
+  )
 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/deal.II_base.pc.in
+FOREACH(_build ${DEAL_II_BUILD_TYPES})
+  STRING(TOLOWER ${_build} _build_lowercase)
+
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/config_${_build_lowercase}.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}_${_build_lowercase}.pc
+    @ONLY
+    )
+  INSTALL(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}_${_build_lowercase}.pc
+    DESTINATION ${DEAL_II_PKGCONF_RELDIR}
+    COMPONENT library
+    )
+ENDFOREACH()
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/config_base.pc.in
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}_base.pc
   @ONLY
   )
-
-install(FILES
+INSTALL(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}_base.pc
-  DESTINATION ${DEAL_II_LIBRARY_RELDIR}/pkgconfig
+  DESTINATION ${DEAL_II_PKGCONF_RELDIR}
   COMPONENT library
   )
 
-
-# generate the requested .pc files
-foreach (_build ${DEAL_II_BUILD_TYPES})
-  if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
-    set(_build "general")
-  else()
-    if(_build MATCHES DEBUG)
-      set(_build "debug")
-    else()
-      set(_build "release")
-    endif()
-  endif()
-
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/deal.II_${_build}.pc.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}_${_build}.pc
-    @ONLY
-    )
-  install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}_${_build}.pc
-    DESTINATION ${DEAL_II_LIBRARY_RELDIR}/pkgconfig
-    COMPONENT library
-    )
-endforeach()
-
-
-
-
-
-
-
-
-# end of pkgconfig files
-####################################################################
+#
+# Jobs done.
+#
 
 MESSAGE(STATUS "Setting up project configuration - Done")
+
