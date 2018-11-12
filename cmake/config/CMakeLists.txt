@@ -268,28 +268,38 @@ foreach (_build ${DEAL_II_BUILD_TYPES})
   string(TOUPPER ${_build} _B)
   set(PC_LIBRARIES ${CONFIG_LIBRARIES_${_B}})
   set(CONFIG_LIBRARIES_PC "")
-  foreach(_s ${PC_LIBRARIES})
-    # check if _s contains lib
-    # if _s is somethink like /path/to/trilinos/lib/libteuchos.so
-    # we have  to add /path/to/trilinos/lib to the runpath
-    if(${_s} MATCHES "lib")
-      string(CONCAT CONFIG_LIBRARIES_PC " ${CONFIG_LIBRARIES_PC} ${_s} ")
+  foreach(_lib ${PC_LIBRARIES})
+    # _lib can be of two types
+    #  1. something like "/home/alberto/opt/lib/trilinos/lib/libteuchoscore.so"
+    #  2. or simply "m" for the math lib
 
-      # work for the runpath
-      string(FIND ${_s} "/" _i REVERSE)
-      string(SUBSTRING ${_s} 0 ${_i} _p)
-      list(APPEND PC_RPATH ${_p})
+    get_filename_component(_libname ${_s} NAME)
+    get_filename_component(_libdir ${_s} PATH)
+
+    if(IS_DIRECTORY ${_libdir}) # i.e., we are in the first case
+      # we have to add -L flag
+      string(CONCAT CONFIG_LIBRARIES_PC " ${CONFIG_LIBRARIES_PC} -L${_libdir} ")
+      # and add the path to the rpath
+      list(APPEND PC_RPATH ${_libdir})
+    endif()
+
+    # check if the library name begins with lib
+    # we are dealing with the first case
+    string(SUBSTRING ${_libname} 0 3 _beg)
+
+    if(${_beg} MATCHES "lib")
+      string(CONCAT CONFIG_LIBRARIES_PC " ${CONFIG_LIBRARIES_PC} ${_libname} ")
     else()
-      # here _s is something like "m" for the libm.so so we add the -l flag
-      string(CONCAT CONFIG_LIBRARIES_PC " ${CONFIG_LIBRARIES_PC} -l${_s} "  )
+      # second case
+      string(CONCAT CONFIG_LIBRARIES_PC " ${CONFIG_LIBRARIES_PC} -l${_libname} "  )
     endif()
   endforeach()
 
   set(CONFIG_LIBRARIES_${_B}_PC ${CONFIG_LIBRARIES_PC})
   
   list(REMOVE_DUPLICATES PC_RPATH)
-  foreach(_r ${PC_RPATH})
-    string(CONCAT CONFIG_LIBRARIES_${_B}_PC " ${CONFIG_LIBRARIES_${_B}_PC} -Wl,-rpath,${_r} "  )
+  foreach(_dir ${PC_RPATH})
+    string(CONCAT CONFIG_LIBRARIES_${_B}_PC " ${CONFIG_LIBRARIES_${_B}_PC} -Wl,-rpath,${_dir} "  )
   endforeach()
 
 endforeach()
