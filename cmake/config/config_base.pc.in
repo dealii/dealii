@@ -1,4 +1,5 @@
 prefix=@CONFIG_PATH_PC@
+includedir=${prefix}/@DEAL_II_INCLUDE_RELDIR@
 libdir=${prefix}/@DEAL_II_LIBRARY_RELDIR@
 
 Name: deal.II_base
