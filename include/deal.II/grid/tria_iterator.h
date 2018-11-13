@@ -237,7 +237,8 @@ public:
   using AccessorType = Accessor;
 
   /**
-   * Empty constructor. Such an object is not usable!
+   * Default constructor. This constructor creates an iterator pointing
+   * to an invalid object. The iterator is consequently not usable.
    */
   TriaRawIterator();
 
@@ -573,7 +574,8 @@ class TriaIterator : public TriaRawIterator<Accessor>
 {
 public:
   /**
-   * Empty constructor. Such an object is not usable!
+   * Default constructor. This constructor creates an iterator pointing
+   * to an invalid object. The iterator is consequently not usable.
    */
   TriaIterator();
 
@@ -583,21 +585,24 @@ public:
   TriaIterator(const TriaIterator<Accessor> &);
 
   /**
-   * Cross copy constructor from iterators pointing also to non-active
-   * objects.
+   * Conversion constructor from iterators potentially pointing to non-active
+   * objects (i.e., for objects for which we can't tell that the object is
+   * used just by looking at its type).
    *
-   * If the object pointed to is not past-the-end and is not used, the debug
-   * version raises an error!
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   a used object. All other cases will result in an exception.
    */
   TriaIterator(const TriaRawIterator<Accessor> &);
 
   /**
-   * Proper constructor, initialized with the triangulation, the level and
+   * Constructor, initialized with the triangulation, the level and
    * index of the object pointed to. The last parameter is of a type declared
    * by the accessor class.
    *
-   * If the object pointed to is not past-the-end and is not used, the debug
-   * version raises an error!
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   a used object. All other cases will result in an exception.
    */
   TriaIterator(
     const Triangulation<Accessor::dimension, Accessor::space_dimension> *parent,
@@ -716,7 +721,7 @@ public:
   /*@}*/
 
   /**
-   * Declare some alias which are standard for iterators and are used
+   * Declare some aliases which are standard for iterators and are used
    * by algorithms to enquire about the specifics of the iterators they
    * work on.
    */
@@ -748,7 +753,8 @@ class TriaActiveIterator : public TriaIterator<Accessor>
 {
 public:
   /**
-   * Empty constructor. Such an object is not usable!
+   * Default constructor. This constructor creates an iterator pointing
+   * to an invalid object. The iterator is consequently not usable.
    */
   TriaActiveIterator();
 
@@ -758,30 +764,35 @@ public:
   TriaActiveIterator(const TriaActiveIterator<Accessor> &);
 
   /**
-   * Cross copy constructor from iterators pointing also to non-active
-   * objects.
+   * Conversion constructor creating an active iterator from an iterators
+   * pointing to a potentially non-active object (or at least from which
+   * it is not apparent from the type alone that it is active).
    *
-   * If the object pointed to is not past-the-end and is not active, the debug
-   * version raises an error!
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   an active object. All other cases will result in an exception.
    */
   TriaActiveIterator(const TriaRawIterator<Accessor> &);
 
   /**
-   * Cross copy constructor from iterators pointing also to non-active
-   * objects.
+   * Conversion constructor creating an active iterator from an iterators
+   * pointing to a potentially non-active object (or at least from which
+   * it is not apparent from the type alone that it is active).
    *
-   * If the object pointed to is not past-the-end and is not active, the debug
-   * version raises an error!
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   an active object. All other cases will result in an exception.
    */
   TriaActiveIterator(const TriaIterator<Accessor> &);
 
   /**
-   * Proper constructor, initialized with the triangulation, the level and
+   * Constructor, initialized with the triangulation, the level and
    * index of the object pointed to. The last parameter is of a type declared
-   * by the accessor class.
+   * by the accessor class used by the current iterator.
    *
-   * If the object pointed to is not past-the-end and is not active, the debug
-   * version raises an error!
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   an active object. All other cases will result in an exception.
    */
   TriaActiveIterator(
     const Triangulation<Accessor::dimension, Accessor::space_dimension> *parent,
@@ -818,6 +829,10 @@ public:
    * for raw iterators. Since usual iterators are also raw iterators, this
    * constructor works also for parameters of type
    * <tt>TriaIterator<OtherAccessor></tt>.
+   *
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   an active object. All other cases will result in an exception.
    */
   template <typename OtherAccessor>
   TriaActiveIterator(const TriaRawIterator<OtherAccessor> &i);
