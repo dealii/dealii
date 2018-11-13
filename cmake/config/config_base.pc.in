@@ -1,5 +1,4 @@
 prefix=@CONFIG_PATH_PC@
-includedir=${prefix}/@DEAL_II_INCLUDE_RELDIR@
 libdir=${prefix}/@DEAL_II_LIBRARY_RELDIR@
 
 Name: deal.II_base
@@ -7,4 +6,4 @@ Description: base file used by the debug and release versions
 Version: @DEAL_II_VERSION@
 URL: https://github.com/dealii/dealii
 Cflags: @DEAL_II_CXX_FLAGS@ @CONFIG_INCLUDE_DIRS_PC@
-Libs: @DEAL_II_LINKER_FLAGS@
+Libs: @DEAL_II_LINKER_FLAGS@ -L${libdir} -Wl,-rpath,${libdir}

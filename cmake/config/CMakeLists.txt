@@ -257,7 +257,7 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
   SET(_name "${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}")
 
   SET(CONFIG_RPATH_${_build}_PC "")
-  SET(CONFIG_LIBRARIES_${_build}_PC "-L\${libdir} -l${_name}")
+  SET(CONFIG_LIBRARIES_${_build}_PC "-l${_name}")
 
   FOREACH(_lib ${DEAL_II_LIBRARIES_${_build}} ${DEAL_II_LIBRARIES})
 
