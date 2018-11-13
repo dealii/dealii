@@ -589,10 +589,9 @@ public:
    * objects (i.e., for objects for which we can't tell that the object is
    * used just by looking at its type).
    *
-   * @pre This constructor will throw an exception if not one of the
-   *   following two conditions are satisfied: (i) the object
-   *   represented by the argument is past-the-end; or (ii) the
-   *   argument represents a used object.
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   a used object. All other cases will result in an exception.
    */
   TriaIterator(const TriaRawIterator<Accessor> &);
 
@@ -601,10 +600,9 @@ public:
    * index of the object pointed to. The last parameter is of a type declared
    * by the accessor class.
    *
-   * @pre This constructor will throw an exception if not one of the
-   *   following two conditions are satisfied: (i) the object
-   *   represented by the argument is past-the-end; or (ii) the
-   *   argument represents a used object.
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   a used object. All other cases will result in an exception.
    */
   TriaIterator(
     const Triangulation<Accessor::dimension, Accessor::space_dimension> *parent,
@@ -770,10 +768,9 @@ public:
    * pointing to a potentially non-active object (or at least from which
    * it is not apparent from the type alone that it is active).
    *
-   * @pre This constructor will throw an exception if not one of the
-   *   following two conditions are satisfied: (i) the object
-   *   represented by the argument is past-the-end; or (ii) the
-   *   argument represents an active object.
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   an active object. All other cases will result in an exception.
    */
   TriaActiveIterator(const TriaRawIterator<Accessor> &);
 
@@ -782,10 +779,9 @@ public:
    * pointing to a potentially non-active object (or at least from which
    * it is not apparent from the type alone that it is active).
    *
-   * @pre This constructor will throw an exception if not one of the
-   *   following two conditions are satisfied: (i) the object
-   *   represented by the argument is past-the-end; or (ii) the
-   *   argument represents an active object.
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   an active object. All other cases will result in an exception.
    */
   TriaActiveIterator(const TriaIterator<Accessor> &);
 
@@ -794,10 +790,9 @@ public:
    * index of the object pointed to. The last parameter is of a type declared
    * by the accessor class used by the current iterator.
    *
-   * @pre This constructor will throw an exception if not one of the
-   *   following two conditions are satisfied: (i) the object
-   *   represented by the argument is past-the-end; or (ii) the
-   *   argument represents an active object.
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   an active object. All other cases will result in an exception.
    */
   TriaActiveIterator(
     const Triangulation<Accessor::dimension, Accessor::space_dimension> *parent,
@@ -835,10 +830,9 @@ public:
    * constructor works also for parameters of type
    * <tt>TriaIterator<OtherAccessor></tt>.
    *
-   * @pre This constructor will throw an exception if not one of the
-   *   following two conditions are satisfied: (i) the object
-   *   represented by the argument is past-the-end; or (ii) the
-   *   argument represents an active object.
+   * @pre The argument passed to this constructor must either be
+   *   (i) a past-the-end iterator; or (ii) it must point to
+   *   an active object. All other cases will result in an exception.
    */
   template <typename OtherAccessor>
   TriaActiveIterator(const TriaRawIterator<OtherAccessor> &i);
