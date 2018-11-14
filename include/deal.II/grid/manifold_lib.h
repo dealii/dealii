@@ -461,6 +461,83 @@ private:
   double tolerance;
 };
 
+/**
+ * Elliptical manifold description derived from ChartManifold.
+ * More informations on the elliptical coordinate system can be found
+ * at <a
+ * href="https://en.wikipedia.org/wiki/Elliptic_coordinate_system">Wikipedia
+ * </a>.
+ *
+ * The constructor of this class will throw an exception if both dim and
+ * spacedim are different from two.
+ *
+ * This manifold can be used to produce hyper_shells with elliptical curvature.
+ * As an example, the test elliptical_manifold_01 produces the following
+ * triangulation:
+ * @image html elliptical_hyper_shell.png
+ *
+ * @ingroup manifold
+ *
+ * @author Stefano Dominici, 2018
+ */
+template <int dim, int spacedim = dim>
+class EllipticalManifold : public ChartManifold<dim, spacedim, spacedim>
+{
+public:
+  /**
+   * Constructor that takes the center of the manifold system, the direction of
+   * the major axis, and the eccentricity parameter.
+   * The default major axis is the <tt>x</tt>-axis. The manifold is rotated in
+   * order to align the major axis to the direction specified in input.
+   * @param center Center of the manifold.
+   * @param major_axis_direction Direction of the major axis of the
+   * manifold.
+   * @param c_parameter Parameter controlling the eccentricity of the
+   * manifold.
+   *
+   */
+  EllipticalManifold(const Point<spacedim> &    center,
+                     const Tensor<1, spacedim> &major_axis_direction,
+                     const double               c_parameter);
+  virtual ~EllipticalManifold() = default;
+
+  virtual std::unique_ptr<Manifold<dim, spacedim>>
+  clone() const override;
+
+  virtual Point<spacedim>
+  pull_back(const Point<spacedim> &space_point) const override;
+
+  virtual Point<spacedim>
+  push_forward(const Point<spacedim> &chart_point) const override;
+
+  virtual DerivativeForm<1, spacedim, spacedim>
+  push_forward_gradient(const Point<spacedim> &chart_point) const override;
+
+
+protected:
+  /**
+   * The direction vector of the major axis.
+   */
+  Tensor<1, spacedim> direction;
+  /**
+   * The center of the manifold.
+   */
+  const Point<spacedim> center;
+  /**
+   * The parameter controlling the eccentricity of the manifold.
+   */
+  const double c_parameter;
+
+private:
+  /**
+   * Return the periodicity of the coordinate variables of the manifold.
+   *
+   * For $dim=2$ and $spacedim=2$, first coordinate is non-periodic, while
+   * second coordinate has a periodicity of $2\pi$.
+   */
+  static Tensor<1, spacedim>
+  get_periodicity();
+};
 
 
 /**
