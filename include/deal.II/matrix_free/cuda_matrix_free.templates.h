@@ -724,11 +724,14 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
+  template <typename VectorType>
   void
-  MatrixFree<dim, Number>::copy_constrained_values(
-    const CUDAVector<Number> &src,
-    CUDAVector<Number> &      dst) const
+  MatrixFree<dim, Number>::copy_constrained_values(const VectorType &src,
+                                                   VectorType &      dst) const
   {
+    static_assert(
+      std::is_same<Number, typename VectorType::value_type>::value,
+      "VectorType::value_type and Number should be of the same type.");
     internal::copy_constrained_dofs<Number>
       <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
                                                       n_constrained_dofs,
@@ -739,10 +742,14 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
+  template <typename VectorType>
   void
-  MatrixFree<dim, Number>::set_constrained_values(Number              val,
-                                                  CUDAVector<Number> &dst) const
+  MatrixFree<dim, Number>::set_constrained_values(Number      val,
+                                                  VectorType &dst) const
   {
+    static_assert(
+      std::is_same<Number, typename VectorType::value_type>::value,
+      "VectorType::value_type and Number should be of the same type.");
     internal::set_constrained_dofs<Number>
       <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
                                                       n_constrained_dofs,
@@ -762,11 +769,11 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  template <typename functor>
+  template <typename functor, typename VectorType>
   void
-  MatrixFree<dim, Number>::cell_loop(const functor &           func,
-                                     const CUDAVector<Number> &src,
-                                     CUDAVector<Number> &      dst) const
+  MatrixFree<dim, Number>::cell_loop(const functor &   func,
+                                     const VectorType &src,
+                                     VectorType &      dst) const
   {
     for (unsigned int i = 0; i < n_colors; ++i)
       internal::apply_kernel_shmem<dim, Number, functor>

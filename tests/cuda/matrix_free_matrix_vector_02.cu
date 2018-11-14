@@ -45,5 +45,9 @@ test()
                                            constraints);
   constraints.close();
 
-  do_test<dim, fe_degree, double, fe_degree + 1>(dof, constraints);
+  do_test<dim,
+          fe_degree,
+          double,
+          LinearAlgebra::CUDAWrappers::Vector<double>,
+          fe_degree + 1>(dof, constraints);
 }

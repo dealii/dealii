@@ -79,10 +79,6 @@ namespace CUDAWrappers
     // TODO this should really be a CUDAWrappers::Point
     using point_type = Tensor<1, dim, Number>;
 
-    // Use Number2 so we don't hide the template parameter Number
-    template <typename Number2>
-    using CUDAVector = ::dealii::LinearAlgebra::CUDAWrappers::Vector<Number2>;
-
     /**
      * Parallelization scheme used: parallel_in_elem (parallelism at the level
      * of degrees of freedom) or parallel_over_elem (parallelism at the level of
@@ -183,18 +179,19 @@ namespace CUDAWrappers
      * This method runs the loop over all cells and apply the local operation on
      * each element in parallel. @p func is a functor which is appplied on each color.
      */
-    template <typename functor>
+    template <typename functor, typename VectorType>
     void
-    cell_loop(const functor &           func,
-              const CUDAVector<Number> &src,
-              CUDAVector<Number> &      dst) const;
+    cell_loop(const functor &   func,
+              const VectorType &src,
+              VectorType &      dst) const;
 
+    template <typename VectorType>
     void
-    copy_constrained_values(const CUDAVector<Number> &src,
-                            CUDAVector<Number> &      dst) const;
+    copy_constrained_values(const VectorType &src, VectorType &dst) const;
 
+    template <typename VectorType>
     void
-    set_constrained_values(const Number val, CUDAVector<Number> &dst) const;
+    set_constrained_values(const Number val, VectorType &dst) const;
 
     /**
      * Free all the memory allocated.
