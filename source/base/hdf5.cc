@@ -17,6 +17,7 @@
 
 #ifdef DEAL_II_WITH_HDF5
 
+#  include <deal.II/base/array_view.h>
 #  include <deal.II/base/hdf5.h>
 
 #  include <deal.II/lac/full_matrix.h>
@@ -167,80 +168,6 @@ namespace HDF5
     get_container_size(const FullMatrix<number> &data)
     {
       return static_cast<unsigned int>(data.m() * data.n());
-    }
-
-
-
-    // This function returns the pointer to the raw data of a container
-    template <typename number>
-    void *
-    get_container_pointer(std::vector<number> &data)
-    {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong
-      return data.data();
-    }
-
-
-
-    template <typename number>
-    void *
-    get_container_pointer(Vector<number> &data)
-    {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong.
-      // Use the first element of FullMatrix to get the pointer to the raw data
-      return &data[0];
-    }
-
-
-
-    template <typename number>
-    void *
-    get_container_pointer(FullMatrix<number> &data)
-    {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong.
-      // Use the first element of FullMatrix to get the pointer to the raw data
-      return &data[0][0];
-    }
-
-
-
-    // This function returns the pointer to the raw data of a container
-    // The returned pointer is const, which means that it can be used only to
-    // read the data
-    template <typename number>
-    const void *
-    get_container_const_pointer(const std::vector<number> &data)
-    {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong
-      return data.data();
-    }
-
-
-
-    template <typename number>
-    const void *
-    get_container_const_pointer(const Vector<number> &data)
-    {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong.
-      // Use the first element of FullMatrix to get the pointer to the raw data
-      return &*data.begin();
-    }
-
-
-
-    template <typename number>
-    const void *
-    get_container_const_pointer(const FullMatrix<number> &data)
-    {
-      // It is very important to pass the variable "data" by reference otherwise
-      // the pointer will be wrong.
-      // Use the first element of FullMatrix to get the pointer to the raw data
-      return &data[0][0];
     }
 
 
@@ -707,7 +634,7 @@ namespace HDF5
                   H5S_ALL,
                   H5S_ALL,
                   plist,
-                  internal::get_container_pointer(data));
+                  make_array_view(data).data());
     Assert(ret >= 0, ExcInternalError());
 
     if (mpi)
@@ -774,7 +701,7 @@ namespace HDF5
                   memory_dataspace,
                   *dataspace,
                   plist,
-                  internal::get_container_pointer(data));
+                  make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
     if (mpi)
@@ -843,7 +770,7 @@ namespace HDF5
                   memory_dataspace,
                   *dataspace,
                   plist,
-                  internal::get_container_pointer(data));
+                  make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
     if (mpi)
@@ -915,7 +842,7 @@ namespace HDF5
                   memory_dataspace,
                   *dataspace,
                   plist,
-                  internal::get_container_pointer(data));
+                  make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
     if (mpi)
@@ -1029,7 +956,7 @@ namespace HDF5
                    H5S_ALL,
                    H5S_ALL,
                    plist,
-                   internal::get_container_const_pointer(data));
+                   make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
@@ -1093,7 +1020,7 @@ namespace HDF5
                    memory_dataspace,
                    *dataspace,
                    plist,
-                   internal::get_container_const_pointer(data));
+                   make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
@@ -1163,7 +1090,7 @@ namespace HDF5
                    memory_dataspace,
                    *dataspace,
                    plist,
-                   internal::get_container_const_pointer(data));
+                   make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
@@ -1232,7 +1159,7 @@ namespace HDF5
                    memory_dataspace,
                    *dataspace,
                    plist,
-                   internal::get_container_const_pointer(data));
+                   make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     if (mpi)
