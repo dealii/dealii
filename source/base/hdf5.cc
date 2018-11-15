@@ -1413,7 +1413,7 @@ namespace HDF5
 
 
   Group
-  Group::open_group(const std::string &name)
+  Group::open_group(const std::string &name) const
   {
     return Group(name, *this, mpi, GroupAccessMode::open);
   }
@@ -1421,7 +1421,7 @@ namespace HDF5
 
 
   Group
-  Group::create_group(const std::string &name)
+  Group::create_group(const std::string &name) const
   {
     return Group(name, *this, mpi, GroupAccessMode::create);
   }
@@ -1429,7 +1429,7 @@ namespace HDF5
 
 
   DataSet
-  Group::open_dataset(const std::string &name)
+  Group::open_dataset(const std::string &name) const
   {
     return DataSet(name, *hdf5_reference, mpi);
   }

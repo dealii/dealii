@@ -967,19 +967,19 @@ namespace HDF5
      * Opens a sub-group of the current Group or File.
      */
     Group
-    open_group(const std::string &name);
+    open_group(const std::string &name) const;
 
     /**
      * Creates a sub-group in the current Group or File.
      */
     Group
-    create_group(const std::string &name);
+    create_group(const std::string &name) const;
 
     /**
      * Opens a dataset.
      */
     DataSet
-    open_dataset(const std::string &name);
+    open_dataset(const std::string &name) const;
 
     /**
      * Creates a dataset. @p number can be `float`, `double`,
