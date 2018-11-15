@@ -46,7 +46,7 @@ main()
 
   const double old_wall_time = t.wall_time();
   AssertThrow(old_wall_time > 0., ExcInternalError());
-  const double old_cpu_time = t.wall_time();
+  const double old_cpu_time = t.cpu_time();
   AssertThrow(old_cpu_time > 0., ExcInternalError());
 
   burn(50);
