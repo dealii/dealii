@@ -74,7 +74,7 @@ test_timer(Timer &t)
 
   const double old_wall_time = t.wall_time();
   AssertThrow(old_wall_time > 0., ExcInternalError());
-  const double old_cpu_time = t.wall_time();
+  const double old_cpu_time = t.cpu_time();
   AssertThrow(old_cpu_time > 0., ExcInternalError());
   assert_min_max_avg_invalid(t.get_data());
   assert_min_max_avg_invalid(t.get_total_data());
