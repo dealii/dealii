@@ -45,18 +45,6 @@ namespace Utilities
 
     Handle::~Handle()
     {
-      dealii::GrowingVectorMemory<
-        LinearAlgebra::CUDAWrappers::Vector<float>>::release_unused_memory();
-      dealii::GrowingVectorMemory<
-        LinearAlgebra::CUDAWrappers::Vector<double>>::release_unused_memory();
-
-      dealii::GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<float, dealii::MemorySpace::CUDA>>::
-        release_unused_memory();
-      dealii::GrowingVectorMemory<
-        LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::CUDA>>::
-        release_unused_memory();
-
       cusolverStatus_t cusolver_error_code =
         cusolverDnDestroy(cusolver_dn_handle);
       AssertCusolver(cusolver_error_code);
