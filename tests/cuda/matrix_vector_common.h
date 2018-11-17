@@ -34,6 +34,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -53,7 +54,11 @@ test();
 
 
 
-template <int dim, int fe_degree, typename Number, int n_q_points_1d>
+template <int dim,
+          int fe_degree,
+          typename Number,
+          typename VectorType,
+          int n_q_points_1d>
 void
 do_test(const DoFHandler<dim> &          dof,
         const AffineConstraints<double> &constraints)
@@ -70,12 +75,12 @@ do_test(const DoFHandler<dim> &          dof,
   const QGauss<1> quad(n_q_points_1d);
   mf_data.reinit(mapping, dof, constraints, quad, additional_data);
 
-  const unsigned int                                    n_dofs = dof.n_dofs();
-  MatrixFreeTest<dim, fe_degree, Number, n_q_points_1d> mf(mf_data);
-  Vector<Number>                              in_host(n_dofs), out_host(n_dofs);
-  LinearAlgebra::ReadWriteVector<Number>      in(n_dofs), out(n_dofs);
-  LinearAlgebra::CUDAWrappers::Vector<Number> in_device(n_dofs);
-  LinearAlgebra::CUDAWrappers::Vector<Number> out_device(n_dofs);
+  const unsigned int n_dofs = dof.n_dofs();
+  MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d> mf(mf_data);
+  Vector<Number>                         in_host(n_dofs), out_host(n_dofs);
+  LinearAlgebra::ReadWriteVector<Number> in(n_dofs), out(n_dofs);
+  VectorType                             in_device(n_dofs);
+  VectorType                             out_device(n_dofs);
 
   for (unsigned int i = 0; i < n_dofs; ++i)
     {

@@ -19,6 +19,7 @@
 // general, with and without hanging nodes).
 
 #include <deal.II/lac/cuda_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/matrix_free/cuda_fe_evaluation.h>
 #include <deal.II/matrix_free/cuda_matrix_free.h>
@@ -94,7 +95,8 @@ operator()(const unsigned int                                          cell,
 template <int dim,
           int fe_degree,
           typename Number,
-          int n_q_points_1d = fe_degree + 1>
+          typename VectorType = LinearAlgebra::CUDAWrappers::Vector<Number>,
+          int n_q_points_1d   = fe_degree + 1>
 class MatrixFreeTest
 {
 public:
@@ -102,8 +104,7 @@ public:
     : data(data_in){};
 
   void
-  vmult(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
-        const LinearAlgebra::CUDAWrappers::Vector<Number> &src);
+  vmult(VectorType &dst, const VectorType &src);
 
 private:
   const CUDAWrappers::MatrixFree<dim, Number> &data;
@@ -111,11 +112,15 @@ private:
 
 
 
-template <int dim, int fe_degree, typename Number, int n_q_points_1d>
+template <int dim,
+          int fe_degree,
+          typename Number,
+          typename VectorType,
+          int n_q_points_1d>
 void
-MatrixFreeTest<dim, fe_degree, Number, n_q_points_1d>::vmult(
-  LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
-  const LinearAlgebra::CUDAWrappers::Vector<Number> &src)
+MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::vmult(
+  VectorType &      dst,
+  const VectorType &src)
 {
   dst = static_cast<Number>(0.);
   HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d> helmholtz_operator;
