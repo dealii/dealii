@@ -278,7 +278,7 @@ namespace Utilities
     AssertIndexRange(bits_per_dim * dim, 65);
     Assert(bits_per_dim > 0, ExcMessage("bits_per_dim should be positive"));
 
-    const Integer mask = (1 << bits_per_dim) - 1;
+    const Integer mask = (Integer(1) << bits_per_dim) - 1;
 
     Integer res = 0;
     for (unsigned int i = 0; i < dim; ++i)
