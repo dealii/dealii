@@ -1303,11 +1303,19 @@ namespace FETools
       // running, there are no thread-safety issues here. since this is
       // compiled for all dimensions at once, need to create objects for
       // each dimension and then separate between them further down
-      static std::array<
+      std::array<
         std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
                    4>,
-        4>
-        fe_name_map = fill_default_map();
+        4> &
+      get_fe_name_map()
+      {
+        static std::array<
+          std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
+                     4>,
+          4>
+          fe_name_map = fill_default_map();
+        return fe_name_map;
+      }
     } // namespace FEToolsAddFENameHelper
 
     namespace FEToolsGetInterpolationMatrixHelper
@@ -2413,13 +2421,15 @@ namespace FETools
       internal::FEToolsAddFENameHelper::fe_name_map_lock);
 
     Assert(
-      internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim].find(name) ==
-        internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim].end(),
+      internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].find(
+        name) ==
+        internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
+          .end(),
       ExcMessage("Cannot change existing element in finite element name list"));
 
     // Insert the normalized name into
     // the map
-    internal::FEToolsAddFENameHelper::fe_name_map[dim][spacedim][name] =
+    internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim][name] =
       std::unique_ptr<const Subscriptor>(factory);
   }
 
@@ -2669,7 +2679,7 @@ namespace FETools
       get_fe_by_name(std::string &name)
       {
         return get_fe_by_name_ext<dim, spacedim>(
-          name, FEToolsAddFENameHelper::fe_name_map[dim][spacedim]);
+          name, FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]);
       }
     } // namespace FEToolsGetFEHelper
   }   // namespace internal
