@@ -223,7 +223,7 @@ LogStream::attach(std::ostream &                o,
   file = &o;
   o.setf(flags);
   if (print_job_id)
-    o << dealjobid();
+    o << JobIdentifier::get_dealjobid()();
 }
 
 

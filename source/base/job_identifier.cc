@@ -24,7 +24,13 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-JobIdentifier dealjobid;
+const JobIdentifier &
+JobIdentifier::get_dealjobid()
+{
+  static JobIdentifier dealjobid;
+  return dealjobid;
+}
+
 
 
 JobIdentifier::JobIdentifier()
