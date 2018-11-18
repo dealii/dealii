@@ -43,7 +43,12 @@ namespace deal_II_exceptions
 {
   namespace internals
   {
-    std::string additional_assert_output;
+    std::string &
+    get_additional_assert_output()
+    {
+      static std::string additional_assert_output;
+      return additional_assert_output;
+    }
 
     bool show_stacktrace = true;
 
@@ -51,9 +56,9 @@ namespace deal_II_exceptions
   } // namespace internals
 
   void
-  set_additional_assert_output(const char *const p)
+  set_additional_assert_output(const std::string &p)
   {
-    internals::additional_assert_output = p;
+    internals::get_additional_assert_output() = p;
   }
 
   void
@@ -324,12 +329,13 @@ ExceptionBase::generate_message() const
       print_info(converter);
       print_stack_trace(converter);
 
-      if (!deal_II_exceptions::internals::additional_assert_output.empty())
+      if (!deal_II_exceptions::internals::get_additional_assert_output()
+             .empty())
         {
           converter
             << "--------------------------------------------------------"
             << std::endl
-            << deal_II_exceptions::internals::additional_assert_output
+            << deal_II_exceptions::internals::get_additional_assert_output()
             << std::endl;
         }
 
