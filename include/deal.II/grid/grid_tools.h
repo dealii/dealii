@@ -331,6 +331,17 @@ namespace GridTools
    * or it is a pointer to the function. In either case, argument and return
    * value have to be of type <tt>Point@<spacedim@></tt>.
    *
+   * @note The transformations that make sense to use with this function
+   *   should have a Jacobian with a positive determinant. For example,
+   *   rotation, shearing, stretching, or scaling all satisfy this (though
+   *   there is no requirement that the transformation used actually is
+   *   linear, as all of these examples are). On the other hand, reflections
+   *   or inversions have a negative determinant of the Jacobian. The
+   *   current function has no way of asserting a positive determinant
+   *   of the Jacobian, but if you happen to use such a transformation,
+   *   the result will be a triangulation in which cells have a negative
+   *   volume.
+   *
    * @note If you are using a parallel::distributed::Triangulation you will
    * have hanging nodes in your local Triangulation even if your "global" mesh
    * has no hanging nodes. This will cause issues with wrong positioning of
