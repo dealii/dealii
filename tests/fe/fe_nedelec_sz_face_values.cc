@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,7 +13,6 @@
 //
 // ---------------------------------------------------------------------
 //
-// By Alexander Grayver
 //
 // Fix bug with FEFaceValues initialization when used with FE_NedelecSZ
 
