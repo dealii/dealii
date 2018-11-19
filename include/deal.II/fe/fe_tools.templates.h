@@ -1303,7 +1303,7 @@ namespace FETools
       // running, there are no thread-safety issues here. since this is
       // compiled for all dimensions at once, need to create objects for
       // each dimension and then separate between them further down
-      std::array<
+      inline std::array<
         std::array<std::map<std::string, std::unique_ptr<const Subscriptor>>,
                    4>,
         4> &
