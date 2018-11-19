@@ -436,7 +436,7 @@ private:
   };
 
   /**
-   * Array of allocated vectors.
+   * Return an array of allocated vectors.
    */
   static Pool &
   get_pool();
