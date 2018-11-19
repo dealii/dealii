@@ -568,13 +568,14 @@ namespace Step30
                     // situation of our cell and the neighbor we want to treat
                     // only one half, so that each face is considered only
                     // once. Thus we have the additional condition, that the
-                    // cell with the lower index does the work. In the rare
-                    // case that both cells have the same index, the cell with
-                    // lower level is selected.
-                    if (!cell->neighbor_is_coarser(face_no) &&
-                        (neighbor->index() > cell->index() ||
-                         (neighbor->level() < cell->level() &&
-                          neighbor->index() == cell->index())))
+                    // cell with the higher level does the work. In case that
+                    // both cells have the same level, the cell with lower index
+                    // is selected.
+                    if (dim > 1 && cell->neighbor_is_coarser(face_no))
+                      continue;
+                    if (neighbor->level() < cell->level() ||
+                        (neighbor->index() > cell->index() &&
+                         neighbor->level() == cell->level()))
                       {
                         // Here we know, that the neighbor is not coarser so we
                         // can use the usual @p neighbor_of_neighbor
