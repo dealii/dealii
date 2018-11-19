@@ -361,9 +361,42 @@ public:
   read(const std::string &in, Format format = Default);
 
   /**
-   * Read grid data from an vtk file. Numerical data is ignored.
+   * Read grid data from a unstructured vtk file. The vtk file may contain
+   * the following VTK cell types: VTK_HEXAHEDRON, VTK_QUAD, and VTK_LINE.
+   *
+   * Depending on the template dimension, only some of the above are accepted.
+   *
+   * In particular, in three dimensions, this function expects the file to
+   * contain
+   *
+   * - VTK_HEXAHEDRON cell types
+   * - VTK_QUAD cell types, to specify optional boundary or interior quad faces
+   * - VTK_LINE cell types, to specify optional boundary or interior edges
+   *
+   * In two dimensions:
+   *
+   * - VTK_QUAD cell types
+   * - VTK_LINE cell types, to specify optional boundary or interior edges
+   *
+   * In one dimension
+   *
+   * - VTK_LINE cell types
+   *
+   * The input file may specify boundary ids, material ids, and manifold ids
+   * using the CELL_DATA section of the
+   * [VTK file format](http://www.vtk.org/VTK/img/file-formats.pdf).
+   *
+   * This function interprets two types of CELL_DATA contained in the input
+   * file: `SCALARS MaterialID`, used to specify the material_id of the cells,
+   * or the boundary_id of the faces and edges, and `SCALARS ManifoldID`, that
+   * can be used to specify the manifold id of any Triangulation object (cell,
+   * face, or edge).
+   *
+   * The companion GridOut::write_vtk function can be used to write VTK files
+   * compatible with this method.
    *
    * @author Mayank Sabharwal, Andreas Putz, 2013
+   * @author Luca Heltai, 2018
    */
   void
   read_vtk(std::istream &in);

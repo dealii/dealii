@@ -113,7 +113,6 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_vtk(std::istream &in)
 {
-  Assert((dim == 2) || (dim == 3), ExcNotImplemented());
   std::string line;
 
   // verify that the first, third and fourth lines match
@@ -157,8 +156,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
       unsigned int n_vertices;
       in >> n_vertices;
 
-      in.ignore(256,
-                '\n'); // ignoring the number beside the total no. of points.
+      in >> keyword; // float, double, int, char, etc.
 
       for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
         {
@@ -177,30 +175,15 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 ExcMessage(
                   "While reading VTK file, failed to find POINTS section"));
 
-
-  //////////////////ignoring space between points and cells
-  /// sections////////////////////
-  std::string checkline;
-  int         no;
-  in.ignore(256,
-            '\n'); // this move pointer to the next line ignoring unwanted no.
-  no = in.tellg();
-  getline(in, checkline);
-  if (checkline.compare("") != 0)
-    {
-      in.seekg(no);
-    }
-
   in >> keyword;
 
-  ///////////////////Processing the CELLS section that contains cells(cells) and
-  /// bound_quads(subcelldata)///////////////////////
+  unsigned int n_geometric_objects = 0;
+  unsigned int n_ints;
 
   if (keyword == "CELLS")
     {
-      unsigned int n_geometric_objects;
       in >> n_geometric_objects;
-      in.ignore(256, '\n');
+      in >> n_ints; // Ignore this, since we don't need it.
 
       if (dim == 3)
         {
@@ -227,6 +210,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
               else if (type == 4)
                 {
+                  // we assume that the file contains first all cells,
+                  // then all faces, and finally all lines
+                  AssertThrow(subcelldata.boundary_lines.size() == 0,
+                              ExcNotImplemented());
+
                   subcelldata.boundary_quads.emplace_back();
 
                   for (unsigned int j = 0; j < type;
@@ -234,6 +222,16 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     in >> subcelldata.boundary_quads.back().vertices[j];
 
                   subcelldata.boundary_quads.back().material_id = 0;
+                }
+              else if (type == 2)
+                {
+                  subcelldata.boundary_lines.emplace_back();
+
+                  for (unsigned int j = 0; j < type;
+                       j++) // loop to feed the data to the boundary
+                    in >> subcelldata.boundary_lines.back().vertices[j];
+
+                  subcelldata.boundary_lines.back().material_id = 0;
                 }
 
               else
@@ -285,7 +283,26 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 AssertThrow(
                   false,
                   ExcMessage(
-                    "While reading VTK file, unknown file type encountered"));
+                    "While reading VTK file, unknown cell type encountered"));
+            }
+        }
+      else if (dim == 1)
+        {
+          for (unsigned int count = 0; count < n_geometric_objects; count++)
+            {
+              unsigned int type;
+              in >> type;
+
+              AssertThrow(
+                type == 2,
+                ExcMessage(
+                  "While reading VTK file, unknown cell type encountered"));
+              cells.emplace_back();
+
+              for (unsigned int j = 0; j < type; j++) // loop to feed data
+                in >> cells.back().vertices[j];
+
+              cells.back().material_id = 0;
             }
         }
       else
@@ -298,101 +315,161 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
       in >> keyword;
 
-      if (keyword ==
-          "CELL_TYPES") // Entering the cell_types section and ignoring data.
-        {
-          in.ignore(256, '\n');
+      AssertThrow(
+        keyword == "CELL_TYPES",
+        ExcMessage(std::string(
+          "While reading VTK file, missing CELL_TYPES section. Found <" +
+          keyword + "> instead.")));
 
-          while (!in.fail() && !in.eof())
-            {
-              in >> keyword;
-              if (keyword != "12" && keyword != "9")
-                {
-                  break;
-                }
-            }
-        }
+      in >> n_ints;
+      AssertThrow(
+        n_ints == n_geometric_objects,
+        ExcMessage("The VTK reader found a CELL_DATA statement "
+                   "that lists a total of " +
+                   Utilities::int_to_string(n_ints) +
+                   " cell data objects, but this needs to "
+                   "equal the number of cells (which is " +
+                   Utilities::int_to_string(cells.size()) +
+                   ") plus the number of quads (" +
+                   Utilities::int_to_string(subcelldata.boundary_quads.size()) +
+                   " in 3d or the number of lines (" +
+                   Utilities::int_to_string(subcelldata.boundary_lines.size()) +
+                   ") in 2d."));
 
-      ////////////////////////Processing the CELL_DATA
-      /// section/////////////////////////////
+      int tmp_int;
+      for (unsigned int i = 0; i < n_ints; ++i)
+        in >> tmp_int;
 
-      if (keyword == "CELL_DATA")
-        {
-          unsigned int n_ids;
-          in >> n_ids;
+      // Ignore everything up to CELL_DATA
+      while (in >> keyword)
+        if (keyword == "CELL_DATA")
+          {
+            unsigned int n_ids;
+            in >> n_ids;
 
-          AssertThrow(
-            n_ids == cells.size() +
-                       (dim == 3 ?
-                          subcelldata.boundary_quads.size() :
-                          (dim == 2 ? subcelldata.boundary_lines.size() : 0)),
-            ExcMessage(
-              "The VTK reader found a CELL_DATA statement "
-              "that lists a total of " +
-              Utilities::int_to_string(n_ids) +
-              " cell data objects, but this needs to "
-              "equal the number of cells (which is " +
-              Utilities::int_to_string(cells.size()) +
-              ") plus the number of quads (" +
-              Utilities::int_to_string(subcelldata.boundary_quads.size()) +
-              " in 3d or the number of lines (" +
-              Utilities::int_to_string(subcelldata.boundary_lines.size()) +
-              ") in 2d."));
+            AssertThrow(n_ids == n_geometric_objects,
+                        ExcMessage("The VTK reader found a CELL_DATA statement "
+                                   "that lists a total of " +
+                                   Utilities::int_to_string(n_ids) +
+                                   " cell data objects, but this needs to "
+                                   "equal the number of cells (which is " +
+                                   Utilities::int_to_string(cells.size()) +
+                                   ") plus the number of quads (" +
+                                   Utilities::int_to_string(
+                                     subcelldata.boundary_quads.size()) +
+                                   " in 3d or the number of lines (" +
+                                   Utilities::int_to_string(
+                                     subcelldata.boundary_lines.size()) +
+                                   ") in 2d."));
 
+            const std::vector<std::string> data_sets{"MaterialID",
+                                                     "ManifoldID"};
 
-          std::string linenew;
-          std::string textnew[2];
-          textnew[0] = "SCALARS MaterialID double";
-          textnew[1] = "LOOKUP_TABLE default";
+            for (unsigned int i = 0; i < data_sets.size(); ++i)
+              {
+                // Ignore everything until we get to a SCALARS data set
+                while (in >> keyword)
+                  if (keyword == "SCALARS")
+                    {
+                      // Now see if we know about this type of data set,
+                      // if not, just ignore everything till the next SCALARS
+                      // keyword
+                      std::string set = "";
+                      in >> keyword;
+                      for (auto set_cmp : data_sets)
+                        if (keyword == set_cmp)
+                          {
+                            set = keyword;
+                            break;
+                          }
+                      if (set == "")
+                        // keep ignoring everything until the next SCALARS
+                        // keyword
+                        continue;
 
-          in.ignore(256, '\n');
+                      // Now we got somewhere. Proceed from here.
+                      // Ignore everything till the end of the line.
+                      // SCALARS MaterialID 1
+                      // (the last number is optional)
+                      in.ignore(256, '\n');
 
-          for (unsigned int i = 0; i < 2; i++)
-            {
-              getline(in, linenew);
-              if (i == 0)
-                if (linenew.size() > textnew[0].size())
-                  linenew.resize(textnew[0].size());
+                      in >> keyword;
+                      AssertThrow(
+                        keyword == "LOOKUP_TABLE",
+                        ExcMessage(
+                          "While reading VTK file, missing keyword LOOKUP_TABLE"));
 
-              AssertThrow(linenew.compare(textnew[i]) == 0,
-                          ExcMessage(
-                            std::string(
-                              "While reading VTK file, failed to find <") +
-                            textnew[i] + "> section"));
-            }
+                      in >> keyword;
+                      AssertThrow(
+                        keyword == "default",
+                        ExcMessage(
+                          "While reading VTK file, missing keyword default"));
 
-          // read material ids first for all cells, then for all
-          // faces. the assumption that cells come before all faces
-          // has been verified above via an assertion, so the order
-          // used in the following blocks makes sense
-          for (unsigned int i = 0; i < cells.size(); i++)
-            {
-              double id;
-              in >> id;
-              cells[i].material_id = id;
-            }
+                      // read material or manifold ids first for all cells,
+                      // then for all faces, and finally for all lines. the
+                      // assumption that cells come before all faces and
+                      // lines has been verified above via an assertion, so
+                      // the order used in the following blocks makes sense
+                      for (unsigned int i = 0; i < cells.size(); i++)
+                        {
+                          double id;
+                          in >> id;
+                          if (set == "MaterialID")
+                            cells[i].material_id = id;
+                          else if (set == "ManifoldID")
+                            cells[i].manifold_id = id;
+                          else
+                            Assert(false, ExcInternalError());
+                        }
 
-          if (dim == 3)
-            {
-              for (unsigned int i = 0; i < subcelldata.boundary_quads.size();
-                   i++)
-                {
-                  double id;
-                  in >> id;
-                  subcelldata.boundary_quads[i].material_id = id;
-                }
-            }
-          else if (dim == 2)
-            {
-              for (unsigned int i = 0; i < subcelldata.boundary_lines.size();
-                   i++)
-                {
-                  double id;
-                  in >> id;
-                  subcelldata.boundary_lines[i].material_id = id;
-                }
-            }
-        }
+                      if (dim == 3)
+                        {
+                          for (unsigned int i = 0;
+                               i < subcelldata.boundary_quads.size();
+                               i++)
+                            {
+                              double id;
+                              in >> id;
+                              if (set == "MaterialID")
+                                subcelldata.boundary_quads[i].material_id = id;
+                              else if (set == "ManifoldID")
+                                subcelldata.boundary_quads[i].manifold_id = id;
+                              else
+                                Assert(false, ExcInternalError());
+                            }
+                          for (unsigned int i = 0;
+                               i < subcelldata.boundary_lines.size();
+                               i++)
+                            {
+                              double id;
+                              in >> id;
+                              if (set == "MaterialID")
+                                subcelldata.boundary_lines[i].material_id = id;
+                              else if (set == "ManifoldID")
+                                subcelldata.boundary_lines[i].manifold_id = id;
+                              else
+                                Assert(false, ExcInternalError());
+                            }
+                        }
+                      else if (dim == 2)
+                        {
+                          for (unsigned int i = 0;
+                               i < subcelldata.boundary_lines.size();
+                               i++)
+                            {
+                              double id;
+                              in >> id;
+                              if (set == "MaterialID")
+                                subcelldata.boundary_lines[i].material_id = id;
+                              else if (set == "ManifoldID")
+                                subcelldata.boundary_lines[i].manifold_id = id;
+                              else
+                                Assert(false, ExcInternalError());
+                            }
+                        }
+                    }
+              }
+          }
 
       Assert(subcelldata.check_consistency(dim), ExcInternalError());
 
@@ -412,7 +489,6 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 ExcMessage(
                   "While reading VTK file, failed to find CELLS section"));
 }
-
 
 
 template <int dim, int spacedim>

@@ -2921,6 +2921,8 @@ namespace
       }
   }
 
+
+
   std::vector<std::string>
   triangulation_patch_data_names()
   {
@@ -2931,6 +2933,72 @@ namespace
     v[3] = "subdomain";
     v[4] = "level_subdomain";
     return v;
+  }
+
+
+  /**
+   * Return all lines of a face in three dimension that have a non-standard
+   * boundary indicator (!=0), or a non-flat manifold indicator.
+   */
+  std::vector<typename Triangulation<3, 3>::active_line_iterator>
+  relevant_co_faces(const Triangulation<3, 3> &tria)
+  {
+    std::vector<typename Triangulation<3, 3>::active_line_iterator> res;
+
+    std::vector<bool> flags;
+    tria.save_user_flags_line(flags);
+    const_cast<Triangulation<3, 3> &>(tria).clear_user_flags_line();
+
+    for (auto face = tria.begin_active_face(); face != tria.end_face(); ++face)
+      for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_face; ++l)
+        {
+          auto line = face->line(l);
+          if (line->user_flag_set() || line->has_children())
+            continue;
+          else
+            line->set_user_flag();
+          if (line->manifold_id() != numbers::flat_manifold_id ||
+              (line->boundary_id() != 0 &&
+               line->boundary_id() != numbers::invalid_boundary_id))
+            res.push_back(line);
+        }
+    const_cast<Triangulation<3, 3> &>(tria).load_user_flags_line(flags);
+    return res;
+  }
+
+
+  /**
+   * Same as above, for 1 and 2 dimensional grids. Does nothing.
+   */
+  template <int dim, int spacedim>
+  std::vector<typename Triangulation<dim, spacedim>::active_line_iterator>
+  relevant_co_faces(const Triangulation<dim, spacedim> &)
+  {
+    return {};
+  }
+
+
+
+  /**
+   * Return all faces of a triangulation that have a non-standard
+   * boundary indicator (!=0), or a non-flat manifold indicator.
+   */
+  template <int dim, int spacedim>
+  std::vector<typename Triangulation<dim, spacedim>::active_face_iterator>
+  relevant_faces(const Triangulation<dim, spacedim> &tria)
+  {
+    std::vector<typename Triangulation<dim, spacedim>::active_face_iterator>
+      res;
+    if (dim == 1)
+      return res;
+    for (auto face = tria.begin_active_face(); face != tria.end_face(); ++face)
+      {
+        if (face->manifold_id() != numbers::flat_manifold_id ||
+            (face->boundary_id() != 0 &&
+             face->boundary_id() != numbers::invalid_boundary_id))
+          res.push_back(face);
+      }
+    return res;
   }
 } // namespace
 
@@ -2943,23 +3011,144 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
 {
   AssertThrow(out, ExcIO());
 
-  // convert the cells of the triangulation into a set of patches
-  // and then have them output. since there is no data attached to
-  // the geometry, we also do not have to provide any names, identifying
-  // information, etc.
-  std::vector<DataOutBase::Patch<dim, spacedim>> patches;
-  patches.reserve(tria.n_active_cells());
-  generate_triangulation_patches(patches, tria.begin_active(), tria.end());
-  DataOutBase::write_vtk(
-    patches,
-    triangulation_patch_data_names(),
-    std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>(),
-    vtk_flags,
-    out);
+  // get the positions of the vertices
+  const std::vector<Point<spacedim>> &vertices = tria.get_vertices();
+
+  const auto n_vertices = vertices.size();
+
+  out << "# vtk DataFile Version 3.0\n"
+      << "Triangulation generated with deal.II\n"
+      << "ASCII\n"
+      << "DATASET UNSTRUCTURED_GRID\n"
+      << "POINTS " << n_vertices << " double\n";
+
+  // actually write the vertices.
+  for (auto v : vertices)
+    {
+      out << v;
+      for (unsigned int d = spacedim + 1; d <= 3; ++d)
+        out << " 0"; // fill with zeroes
+      out << '\n';
+    }
+
+  const auto faces    = relevant_faces(tria);
+  const auto co_faces = relevant_co_faces(tria);
+
+  // Write cells preamble
+  const int n_cells = tria.n_active_cells() + faces.size() + co_faces.size();
+
+  // VTK now expects a number telling the total storage requirement to read all
+  // cell connectivity information. The connectivity information is read cell by
+  // cell, first specifying how many vertices are required to describe the cell,
+  // and then specifying the index of every vertex. This means that for every
+  // deal.II object type, we always need n_vertices + 1 integer per cell.
+  // Compute the total number here.
+  const int cells_size =
+    tria.n_active_cells() * (GeometryInfo<dim>::vertices_per_cell + 1) +
+    faces.size() * (GeometryInfo<dim>::vertices_per_face + 1) +
+    co_faces.size() * (3); // only in 3d, otherwise it is always zero.
+
+
+  out << "\nCELLS " << n_cells << ' ' << cells_size << '\n';
+  /*
+   * VTK cells:
+   *
+   * 1 VTK_VERTEX
+   * 3 VTK_LINE
+   * 9 VTK_QUAD
+   * 12 VTK_HEXAHEDRON
+   * ...
+   */
+  const int cell_type    = (dim == 1 ? 3 : dim == 2 ? 9 : 12);
+  const int face_type    = (dim == 1 ? 1 : dim == 2 ? 3 : 9);
+  const int co_face_type = (dim == 1 ? -1 : dim == 2 ? -1 : 3);
+
+  // write cells.
+  for (auto cell : tria.active_cell_iterators())
+    {
+      out << GeometryInfo<dim>::vertices_per_cell;
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        {
+          out << ' ' << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[i]);
+        }
+      out << '\n';
+    }
+  for (auto face : faces)
+    {
+      out << GeometryInfo<dim>::vertices_per_face;
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
+        {
+          out << ' '
+              << face->vertex_index(
+                   GeometryInfo < (dim > 1) ? dim - 1 : dim > ::ucd_to_deal[i]);
+        }
+      out << '\n';
+    }
+  for (auto co_face : co_faces)
+    {
+      out << 2;
+      for (unsigned int i = 0; i < 2; ++i)
+        out << ' ' << co_face->vertex_index(i);
+      out << '\n';
+    }
+
+  // write cell types
+  out << "\nCELL_TYPES " << n_cells << '\n';
+  for (unsigned int i = 0; i < tria.n_active_cells(); ++i)
+    {
+      out << cell_type << ' ';
+    }
+  out << '\n';
+  for (unsigned int i = 0; i < faces.size(); ++i)
+    {
+      out << face_type << ' ';
+    }
+  out << '\n';
+  for (unsigned int i = 0; i < co_faces.size(); ++i)
+    {
+      out << co_face_type << ' ';
+    }
+  out << "\n\nCELL_DATA " << n_cells << '\n'
+      << "SCALARS MaterialID int 1\n"
+      << "LOOKUP_TABLE default\n";
+
+  // Now material id and boundary id
+  for (auto cell : tria.active_cell_iterators())
+    {
+      out << static_cast<int>(cell->material_id()) << ' ';
+    }
+  out << '\n';
+  for (auto face : faces)
+    {
+      out << static_cast<int>(face->boundary_id()) << ' ';
+    }
+  out << '\n';
+  for (auto co_face : co_faces)
+    {
+      out << static_cast<int>(co_face->boundary_id()) << ' ';
+    }
+
+  out << "\n\nSCALARS ManifoldID int 1\n"
+      << "LOOKUP_TABLE default\n";
+
+  // Now material id and boundary id
+  for (auto cell : tria.active_cell_iterators())
+    {
+      out << static_cast<int>(cell->manifold_id()) << ' ';
+    }
+  out << '\n';
+  for (auto face : faces)
+    {
+      out << static_cast<int>(face->manifold_id()) << ' ';
+    }
+  out << '\n';
+  for (auto co_face : co_faces)
+    {
+      out << static_cast<int>(co_face->manifold_id()) << ' ';
+    }
+  out << '\n';
+
+  out.flush();
 
   AssertThrow(out, ExcIO());
 }
