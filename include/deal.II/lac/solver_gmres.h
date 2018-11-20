@@ -456,9 +456,6 @@ private:
  * <tt>2*SolverFGMRES::AdditionalData::max_basis_size+1</tt> auxiliary
  * vectors.
  *
- * Caveat: Documentation of this class is not up to date. There are also a few
- * parameters of GMRES we would like to introduce here.
- *
  * @author Guido Kanschat, 2003
  */
 template <class VectorType = Vector<double>>
@@ -473,13 +470,24 @@ public:
     /**
      * Constructor. By default, set the maximum basis size to 30.
      */
-    explicit AdditionalData(const unsigned int max_basis_size   = 30,
-                            const bool /*use_default_residual*/ = true)
+    explicit AdditionalData(const unsigned int max_basis_size = 30)
       : max_basis_size(max_basis_size)
     {}
 
     /**
-     * Maximum number of tmp vectors.
+     * @deprecated: use the other constructor as the second argument is
+     unused.
+     */
+    DEAL_II_DEPRECATED
+    AdditionalData(const unsigned int max_basis_size,
+                   const bool         use_default_residual)
+      : max_basis_size(max_basis_size)
+    {
+      (void)use_default_residual;
+    }
+
+    /**
+     * Maximum basis size.
      */
     unsigned int max_basis_size;
   };

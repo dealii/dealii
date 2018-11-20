@@ -3002,7 +3002,7 @@ namespace Step32
             solver_control,
             mem,
             SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::AdditionalData(
-              30, true));
+              30));
           solver.solve(stokes_matrix,
                        distributed_stokes_solution,
                        stokes_rhs,
@@ -3028,7 +3028,7 @@ namespace Step32
             solver_control_refined,
             mem,
             SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::AdditionalData(
-              50, true));
+              50));
           solver.solve(stokes_matrix,
                        distributed_stokes_solution,
                        stokes_rhs,

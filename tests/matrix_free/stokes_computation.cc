@@ -1368,7 +1368,7 @@ namespace StokesClass
         SolverFGMRES<block_vector_t> solver(
           solver_control_cheap,
           mem,
-          SolverFGMRES<block_vector_t>::AdditionalData(50, true));
+          SolverFGMRES<block_vector_t>::AdditionalData(50));
 
         solver.solve(stokes_matrix,
                      distributed_stokes_solution,
