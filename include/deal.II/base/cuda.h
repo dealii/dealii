@@ -36,13 +36,14 @@ namespace Utilities
   namespace CUDA
   {
     /**
-     * This structure creates, stores, and destroys the handles of the different
-     * CUDA libraries used inside deal.II.
+     * Various CUDA APIs need an object to store internal data. This structure
+     * creates, initializes, stores, and destroys these so-called handles for
+     * the respective CUDA libraries used inside deal.II.
      */
     struct Handle
     {
       /**
-       * Constructor. Create the handles for the different libraries.
+       * Constructor. Initialize the handles for the different libraries.
        */
       Handle();
 
@@ -52,17 +53,25 @@ namespace Utilities
       Handle(Handle const &) = delete;
 
       /**
-       * Destructor. Destroy the handles and free all the memory allocated by
-       * GrowingVectorMemory.
+       * Destructor. Destroy the handles.
        */
       ~Handle();
 
+      /**
+       * Pointer to an opaque cuSolverDN context.
+       * The handle must be passed to every cuSolverDN library function.
+       */
       cusolverDnHandle_t cusolver_dn_handle;
 
+      /**
+       * Pointer to an opaque cuSolverSP context.
+       * The handle must be passed to every cuSolverSP library function.
+       */
       cusolverSpHandle_t cusolver_sp_handle;
 
       /**
-       * Handle to the cuSPARSE library.
+       * Pointer to an opaque cuSPARSE context.
+       * The handle must be passed to every cuSPARSE library function.
        */
       cusparseHandle_t cusparse_handle;
     };
