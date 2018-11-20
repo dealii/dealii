@@ -436,9 +436,10 @@ private:
   };
 
   /**
-   * Array of allocated vectors.
+   * Return an array of allocated vectors.
    */
-  static Pool pool;
+  static Pool &
+  get_pool();
 
   /**
    * Overall number of allocations. Only used for bookkeeping and to generate

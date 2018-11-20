@@ -598,14 +598,9 @@ struct MPILogInitAll
 // cards for different processes even if only one node is used. The choice below
 // is based on the MPI proccess id.
 // MPI needs to be initialized before using this function.
-//
-// Also initialize a dummy handle that makes sure that unused memory is released
-// before the device shuts down.
 void
 init_cuda(const bool use_mpi = false)
 {
-  static Utilities::CUDA::Handle cuda_handle;
-
 #  ifndef DEAL_II_WITH_MPI
   Assert(use_mpi == false, ExcInternalError());
 #  endif
