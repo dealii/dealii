@@ -58,9 +58,11 @@ namespace CUDAWrappers
        */
       template <typename CellIterator>
       void
-      setup_constraints(std::vector<types::global_dof_index> &dof_indices,
-                        const CellIterator &                  cell,
-                        unsigned int &                        mask) const;
+      setup_constraints(
+        std::vector<types::global_dof_index> &                    dof_indices,
+        const CellIterator &                                      cell,
+        const std::unique_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        unsigned int &                                            mask) const;
 
     private:
       /**
@@ -272,9 +274,10 @@ namespace CUDAWrappers
     template <typename CellIterator>
     void
     HangingNodes<dim>::setup_constraints(
-      std::vector<types::global_dof_index> &dof_indices,
-      const CellIterator &                  cell,
-      unsigned int &                        mask) const
+      std::vector<types::global_dof_index> &                    dof_indices,
+      const CellIterator &                                      cell,
+      const std::unique_ptr<const Utilities::MPI::Partitioner> &partitioner,
+      unsigned int &                                            mask) const
     {
       mask                         = 0;
       const unsigned int n_dofs_1d = fe_degree + 1;
@@ -311,6 +314,11 @@ namespace CUDAWrappers
 
                   // Get indices to read
                   neighbor->face(neighbor_face)->get_dof_indices(neighbor_dofs);
+                  // If the vector is distributed, we need to transform the
+                  // global indices to local ones.
+                  if (partitioner)
+                    for (auto &index : neighbor_dofs)
+                      index = partitioner->global_to_local(index);
 
                   if (dim == 2)
                     {
@@ -554,6 +562,11 @@ namespace CUDAWrappers
                           neighbor_dofs.resize(n_dofs_1d * n_dofs_1d *
                                                n_dofs_1d);
                           neighbor_cell->get_dof_indices(neighbor_dofs);
+                          // If the vector is distributed, we need to transform
+                          // the global indices to local ones.
+                          if (partitioner)
+                            for (auto &index : neighbor_dofs)
+                              index = partitioner->global_to_local(index);
 
                           for (unsigned int i = 0; i < n_dofs_1d; ++i)
                             {

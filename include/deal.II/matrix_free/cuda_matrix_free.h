@@ -21,6 +21,7 @@
 
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 
+#  include <deal.II/base/mpi.h>
 #  include <deal.II/base/quadrature.h>
 #  include <deal.II/base/tensor.h>
 
@@ -32,6 +33,7 @@
 
 #  include <deal.II/lac/affine_constraints.h>
 #  include <deal.II/lac/cuda_vector.h>
+#  include <deal.II/lac/la_parallel_vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -142,6 +144,9 @@ namespace CUDAWrappers
      */
     MatrixFree();
 
+    /**
+     * Return the length of the padding.
+     */
     unsigned int
     get_padding_length() const;
 
@@ -151,7 +156,35 @@ namespace CUDAWrappers
      * degrees of freedom, the DoFHandler and the mapping describe the
      * transformation from unit to real cell, and the finite element
      * underlying the DoFHandler together with the quadrature formula
-     * describe the local operations.
+     * describe the local operations. This function supports distributed
+     * computation (MPI).
+     */
+    void
+    reinit(const Mapping<dim> &             mapping,
+           const DoFHandler<dim> &          dof_handler,
+           const AffineConstraints<Number> &constraints,
+           const Quadrature<1> &            quad,
+           const MPI_Comm &                 comm,
+           const AdditionalData             additional_data = AdditionalData());
+
+    /**
+     * Initializes the data structures. Same as above but using a Q1 mapping.
+     */
+    void
+    reinit(const DoFHandler<dim> &          dof_handler,
+           const AffineConstraints<Number> &constraints,
+           const Quadrature<1> &            quad,
+           const MPI_Comm &                 comm,
+           const AdditionalData             AdditionalData = AdditionalData());
+
+    /**
+     * Extracts the information needed to perform loops over cells. The
+     * DoFHandler and AffineConstraints objects describe the layout of
+     * degrees of freedom, the DoFHandler and the mapping describe the
+     * transformation from unit to real cell, and the finite element
+     * underlying the DoFHandler together with the quadrature formula
+     * describe the local operations. This function does not support distributed
+     * computation.
      */
     void
     reinit(const Mapping<dim> &             mapping,
@@ -185,10 +218,19 @@ namespace CUDAWrappers
               const VectorType &src,
               VectorType &      dst) const;
 
+    /**
+     * Copy the values of the constrained entries from @p src to @p dst. This is
+     * used to impose zero Dirichlet boundary condition.
+     */
     template <typename VectorType>
     void
     copy_constrained_values(const VectorType &src, VectorType &dst) const;
 
+    /**
+     * Set the entries in @p dst corresponding to constrained values to @p val.
+     * The main purpose of this function is to set the constrained entries of
+     * the source vector used in cell_loop() to zero.
+     */
     template <typename VectorType>
     void
     set_constrained_values(const Number val, VectorType &dst) const;
@@ -206,6 +248,107 @@ namespace CUDAWrappers
     memory_consumption() const;
 
   private:
+    /**
+     * Initializes the data structures.
+     */
+    void
+    reinit(const Mapping<dim> &             mapping,
+           const DoFHandler<dim> &          dof_handler,
+           const AffineConstraints<Number> &constraints,
+           const Quadrature<1> &            quad,
+           std::shared_ptr<const MPI_Comm>  comm,
+           const AdditionalData             additional_data);
+
+    /**
+     * Helper function. Loop over all the cells and apply the functor on each
+     * element in parallel. This function is used when MPI is not used.
+     */
+    template <typename functor, typename VectorType>
+    void
+    serial_cell_loop(const functor &   func,
+                     const VectorType &src,
+                     VectorType &      dst) const;
+
+    /**
+     * Helper function. Loop over all the cells and apply the functor on each
+     * element in parallel. This function is used when MPI is used.
+     */
+    template <typename functor>
+    void
+    distributed_cell_loop(
+      const functor &                                                      func,
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
+
+    /**
+     * This function should never be called. Calling it results in an internal
+     * error. This function exists only because cell_loop needs
+     * distributed_cell_loop() to exist for LinearAlgebra::CUDAWrappers::Vector.
+     */
+    template <typename functor>
+    void
+    distributed_cell_loop(
+      const functor &                                    func,
+      const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
+      LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
+
+    /**
+     * Helper function. Copy the values of the constrained entries of @p src to
+     * @p dst. This function is used when MPI is not used.
+     */
+    template <typename VectorType>
+    void
+    serial_copy_constrained_values(const VectorType &src,
+                                   VectorType &      dst) const;
+
+    /**
+     * Helper function. Copy the values of the constrained entries of @p src to
+     * @p dst. This function is used when MPI is used.
+     */
+    void
+    distributed_copy_constrained_values(
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
+
+    /**
+     * This function should never be called. Calling it results in an internal
+     * error. This function exists only because copy_constrained_values needs
+     * distributed_copy_constrained_values() to exist for
+     * LinearAlgebra::CUDAWrappers::Vector.
+     */
+    void
+    distributed_copy_constrained_values(
+      const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
+      LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
+
+    /**
+     * Helper function. Set the constrained entries of @p dst to @p val. This
+     * function is used when MPI is not used.
+     */
+    template <typename VectorType>
+    void
+    serial_set_constrained_values(const Number val, VectorType &dst) const;
+
+    /**
+     * Helper function. Set the constrained entries of @p dst to @p val. This
+     * function is used when MPI is used.
+     */
+    void
+    distributed_set_constrained_values(
+      const Number                                                   val,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
+
+    /**
+     * This function should never be called. Calling it results in an internal
+     * error. This function exists only because set_constrained_values needs
+     * distributed_set_constrained_values() to exist for
+     * LinearAlgebra::CUDAWrappers::Vector.
+     */
+    void
+    distributed_set_constrained_values(
+      const Number                                 val,
+      LinearAlgebra::CUDAWrappers::Vector<Number> &dst) const;
+
     /**
      * Parallelization scheme used, parallelization over degrees of freedom or
      * over cells.
@@ -284,7 +427,13 @@ namespace CUDAWrappers
      */
     std::vector<dim3> block_dim;
 
-    // Parallelization parameter
+    /**
+     * Unique pointer to a Partitioner for distributed Vectors used in
+     * cell_loop. When MPI is not used the pointer is null.
+     */
+    std::unique_ptr<const Utilities::MPI::Partitioner> partitioner;
+
+    // Parallelization parameters
     unsigned int cells_per_block;
     dim3         constraint_grid_dim;
     dim3         constraint_block_dim;
