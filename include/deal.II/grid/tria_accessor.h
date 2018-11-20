@@ -360,10 +360,14 @@ protected:
   operator=(const TriaAccessorBase &);
 
   /**
-   * Ordering of accessors. If #structure_dimension is less than #dimension,
-   * we simply compare the index of such an object. If #structure_dimension
-   * equals #dimension, we compare the level() first, and the index() only if
-   * levels are equal.
+   * Comparison operator for accessors. This operator is used when comparing
+   * iterators into objects of a triangulation, for example when putting
+   * them into a `std::map`.
+   *
+   * If #structure_dimension is less than #dimension, we simply compare the
+   * index of such an object because faces and edges do not have levels. If
+   * #structure_dimension equals #dimension, we compare the level first, and
+   * the index only if levels are equal.
    */
   bool
   operator<(const TriaAccessorBase &other) const;
@@ -488,7 +492,7 @@ public:
   state() const;
 
   /**
-   * Return a pointer to the triangulation which the object pointed to by this
+   * Return a reference to the triangulation which the object pointed to by this
    * class belongs to.
    */
   const Triangulation<dim, spacedim> &
@@ -1795,6 +1799,13 @@ public:
   index() const;
 
   /**
+   * Return a reference to the triangulation which the object pointed to by this
+   * class belongs to.
+   */
+  const Triangulation<dim, spacedim> &
+  get_triangulation() const;
+
+  /**
    * @name Advancement of iterators
    */
   /**
@@ -2059,6 +2070,17 @@ protected:
   copy_from(const TriaAccessor &);
 
   /**
+   * Comparison operator for accessors. This operator is used when comparing
+   * iterators into objects of a triangulation, for example when putting
+   * them into a `std::map`.
+   *
+   * This operator simply compares the global index of the vertex the
+   * current object points to.
+   */
+  bool
+  operator<(const TriaAccessor &other) const;
+
+  /**
    * Pointer to the triangulation we operate on.
    */
   const Triangulation<dim, spacedim> *tria;
@@ -2213,6 +2235,13 @@ public:
   index() const;
 
   /**
+   * Return a reference to the triangulation which the object pointed to by this
+   * class belongs to.
+   */
+  const Triangulation<1, spacedim> &
+  get_triangulation() const;
+
+  /**
    * @name Advancement of iterators
    */
   /**
@@ -2242,6 +2271,17 @@ public:
    */
   bool
   operator!=(const TriaAccessor &) const;
+
+  /**
+   * Comparison operator for accessors. This operator is used when comparing
+   * iterators into objects of a triangulation, for example when putting
+   * them into a `std::map`.
+   *
+   * This operator simply compares the global index of the vertex the
+   * current object points to.
+   */
+  bool
+  operator<(const TriaAccessor &other) const;
 
   /**
    * @}

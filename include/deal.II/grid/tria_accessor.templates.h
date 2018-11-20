@@ -2298,6 +2298,18 @@ TriaAccessor<0, dim, spacedim>::copy_from(const TriaAccessor &t)
 
 
 template <int dim, int spacedim>
+inline bool
+TriaAccessor<0, dim, spacedim>::
+operator<(const TriaAccessor<0, dim, spacedim> &other) const
+{
+  Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+
+  return (global_vertex_index < other.global_vertex_index);
+}
+
+
+
+template <int dim, int spacedim>
 inline IteratorState::IteratorStates
 TriaAccessor<0, dim, spacedim>::state() const
 {
@@ -2323,6 +2335,15 @@ inline int
 TriaAccessor<0, dim, spacedim>::index() const
 {
   return global_vertex_index;
+}
+
+
+
+template <int dim, int spacedim>
+inline const Triangulation<dim, spacedim> &
+TriaAccessor<0, dim, spacedim>::get_triangulation() const
+{
+  return *tria;
 }
 
 
@@ -2673,6 +2694,18 @@ TriaAccessor<0, 1, spacedim>::copy_from(const TriaAccessor &t)
 
 
 template <int spacedim>
+inline bool
+TriaAccessor<0, 1, spacedim>::
+operator<(const TriaAccessor<0, 1, spacedim> &other) const
+{
+  Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+
+  return (global_vertex_index < other.global_vertex_index);
+}
+
+
+
+template <int spacedim>
 inline IteratorState::IteratorStates
 TriaAccessor<0, 1, spacedim>::state()
 {
@@ -2694,6 +2727,15 @@ inline int
 TriaAccessor<0, 1, spacedim>::index() const
 {
   return global_vertex_index;
+}
+
+
+
+template <int spacedim>
+inline const Triangulation<1, spacedim> &
+TriaAccessor<0, 1, spacedim>::get_triangulation() const
+{
+  return *tria;
 }
 
 
