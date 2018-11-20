@@ -1,0 +1,11 @@
+prefix=@CONFIG_PATH_PC@
+includedir=${prefix}/@DEAL_II_INCLUDE_RELDIR@
+libdir=${prefix}/@DEAL_II_LIBRARY_RELDIR@
+
+Name: deal.II debug variant
+Description: A C++ software library supporting the creation of finite element codes and an open community of users and developers.
+Version: @DEAL_II_VERSION@
+URL: https://dealii.org/
+
+Cflags: @DEAL_II_CXX_FLAGS@ @DEAL_II_CXX_FLAGS_DEBUG@ @CONFIG_INCLUDE_DIRS_PC@
+Libs: @DEAL_II_LINKER_FLAGS@ @DEAL_II_LINKER_FLAGS_DEBUG@ @CONFIG_LIBRARIES_DEBUG_PC@ @CONFIG_RPATH_DEBUG_PC@
