@@ -488,7 +488,7 @@ public:
   state() const;
 
   /**
-   * Return a pointer to the triangulation which the object pointed to by this
+   * Return a reference to the triangulation which the object pointed to by this
    * class belongs to.
    */
   const Triangulation<dim, spacedim> &
@@ -1795,6 +1795,13 @@ public:
   index() const;
 
   /**
+   * Return a reference to the triangulation which the object pointed to by this
+   * class belongs to.
+   */
+  const Triangulation<dim, spacedim> &
+  get_triangulation() const;
+
+  /**
    * @name Advancement of iterators
    */
   /**
@@ -2211,6 +2218,13 @@ public:
    */
   int
   index() const;
+
+  /**
+   * Return a reference to the triangulation which the object pointed to by this
+   * class belongs to.
+   */
+  const Triangulation<1, spacedim> &
+  get_triangulation() const;
 
   /**
    * @name Advancement of iterators

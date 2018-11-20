@@ -2328,6 +2328,15 @@ TriaAccessor<0, dim, spacedim>::index() const
 
 
 template <int dim, int spacedim>
+inline const Triangulation<dim, spacedim> &
+TriaAccessor<0, dim, spacedim>::get_triangulation() const
+{
+  return *tria;
+}
+
+
+
+template <int dim, int spacedim>
 inline void
 TriaAccessor<0, dim, spacedim>::operator++()
 {
@@ -2694,6 +2703,15 @@ inline int
 TriaAccessor<0, 1, spacedim>::index() const
 {
   return global_vertex_index;
+}
+
+
+
+template <int spacedim>
+inline const Triangulation<1, spacedim> &
+TriaAccessor<0, 1, spacedim>::get_triangulation() const
+{
+  return *tria;
 }
 
 
