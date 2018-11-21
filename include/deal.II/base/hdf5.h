@@ -354,10 +354,22 @@ namespace HDF5
     void
     set_attribute(const std::string &attr_name, const T value);
 
-
-    const std::string name;
+    /**
+     * Returns the #name of the object. In the case of File, #name corresponds
+     * to the file name. In the case of Group and DataSet, #name corresponds to
+     * the name of the object in the HDF5 file.
+     */
+    std::string
+    get_name() const;
 
   protected:
+    /**
+     * Name of the HDF5Oject. In the case of File, @p name corresponds to the
+     * file name. In the case of Group and DataSet @p name corresponds to the
+     * name of the object in the HDF5 file.
+     */
+    const std::string name;
+
     /**
      * HDF5 identifier for the objects File, Group and DataSet. The
      * `std::shared_ptr<>` pointer allows the object to be copied. For example

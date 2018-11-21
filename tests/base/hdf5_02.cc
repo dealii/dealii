@@ -92,6 +92,7 @@ test()
 
     // Read attributes attached to a group
     auto test_group = data_file.open_group("test_group");
+    deallog << "group_name: " << test_group.get_name() << std::endl;
 
 #ifdef DEAL_II_WITH_COMPLEX_VALUES
     auto group_complex_float =

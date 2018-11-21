@@ -513,6 +513,14 @@ namespace HDF5
 
 
 
+  std::string
+  HDF5Object::get_name() const
+  {
+    return name;
+  }
+
+
+
   DataSet::DataSet(const std::string &name,
                    const hid_t &      parent_group_id,
                    const bool         mpi)
