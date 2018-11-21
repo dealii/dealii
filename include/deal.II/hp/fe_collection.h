@@ -228,6 +228,12 @@ namespace hp
     n_blocks() const;
 
     /**
+     * Return the maximal degree over all elements of this collection.
+     */
+    unsigned int
+    max_degree() const;
+
+    /**
      * Return the maximal number of degrees of freedom per vertex over all
      * elements of this collection.
      */
@@ -902,6 +908,22 @@ namespace hp
   {
     AssertIndexRange(index, finite_elements.size());
     return *finite_elements[index];
+  }
+
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  FECollection<dim, spacedim>::max_degree() const
+  {
+    Assert(finite_elements.size() > 0, ExcNoFiniteElements());
+
+    unsigned int max = 0;
+    for (unsigned int i = 0; i < finite_elements.size(); ++i)
+      if (finite_elements[i]->degree > max)
+        max = finite_elements[i]->degree;
+
+    return max;
   }
 
 
