@@ -857,7 +857,7 @@ namespace HDF5
      * This function sets the boolean query_io_mode.
      */
     void
-    set_query_io_mode(bool query_io_mode);
+    set_query_io_mode(const bool query_io_mode);
 
     /**
      * This function returns the dimensions of the dataset. The vector

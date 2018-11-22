@@ -193,7 +193,7 @@ namespace HDF5
       std::is_same<Container,
                    std::vector<typename Container::value_type>>::value,
       Container>::type
-    initialize_container(std::vector<hsize_t> dimensions)
+    initialize_container(const std::vector<hsize_t> dimensions)
     {
       return Container(std::accumulate(
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
@@ -205,7 +205,7 @@ namespace HDF5
     typename std::enable_if<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
       Container>::type
-    initialize_container(std::vector<hsize_t> dimensions)
+    initialize_container(const std::vector<hsize_t> dimensions)
     {
       return Container(std::accumulate(
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
@@ -218,7 +218,7 @@ namespace HDF5
       std::is_same<Container,
                    FullMatrix<typename Container::value_type>>::value,
       Container>::type
-    initialize_container(std::vector<hsize_t> dimensions)
+    initialize_container(const std::vector<hsize_t> dimensions)
     {
       // If the rank is higher than 2, then remove single-dimensional entries
       // from the shape defined by dimensions. This is equivalent to the squeeze
@@ -228,7 +228,7 @@ namespace HDF5
 
       if (dimensions.size() > 2)
         {
-          for (auto &&dimension : dimensions)
+          for (const auto &dimension : dimensions)
             {
               if (dimension > 1)
                 squeezed_dimensions.push_back(dimension);
@@ -247,7 +247,7 @@ namespace HDF5
 
     // Convert a HDF5 no_collective_cause code to a human readable string
     std::string
-    no_collective_cause_to_string(uint32_t no_collective_cause)
+    no_collective_cause_to_string(const uint32_t no_collective_cause)
     {
       std::string message;
 
@@ -1349,7 +1349,7 @@ namespace HDF5
 
 
   void
-  DataSet::set_query_io_mode(bool new_query_io_mode)
+  DataSet::set_query_io_mode(const bool new_query_io_mode)
   {
     query_io_mode = new_query_io_mode;
   }
