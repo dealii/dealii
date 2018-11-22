@@ -3073,16 +3073,16 @@ public:
 
   /**
    * Return the total number of used faces, active or not.  In 2D, the result
-   * equals n_lines(), while in 3D it equals n_quads(). Since there are no
-   * face objects in 1d, the function returns zero in 1d.
+   * equals n_lines(), in 3D it equals n_quads(), while in 1D it equals
+   * the number of vertices.
    */
   unsigned int
   n_faces() const;
 
   /**
-   * Return the total number of active faces, active or not.  In 2D, the
-   * result equals n_active_lines(), while in 3D it equals n_active_quads().
-   * Since there are no face objects in 1d, the function returns zero in 1d.
+   * Return the total number of active faces.  In 2D, the result equals
+   * n_active_lines(), in 3D it equals n_active_quads(), while in 1D it equals
+   * the number of used vertices.
    */
   unsigned int
   n_active_faces() const;
@@ -3295,7 +3295,8 @@ public:
 
   /**
    * Return the total number of faces, used or not. In 2d, the result equals
-   * n_raw_lines(), while in 3d it equals n_raw_quads().
+   * n_raw_lines(), in 3d it equals n_raw_quads(), while in 1D it equals
+   * the number of vertices.
    *
    * @note This function really exports internal information about the
    * triangulation. It shouldn't be used in applications. The function is only
