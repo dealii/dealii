@@ -486,7 +486,7 @@ namespace Step30
           {
             typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 
-            // Case a)
+            // Case (a): The face is at the boundary.
             if (face->at_boundary())
               {
                 fe_v_face.reinit(cell, face_no);
@@ -499,10 +499,27 @@ namespace Step30
                        ExcInternalError());
                 typename DoFHandler<dim>::cell_iterator neighbor =
                   cell->neighbor(face_no);
-                // Case b), we decide that there are finer cells as neighbors
-                // by asking the face, whether it has children. if so, then
-                // there must also be finer cells which are children or
-                // farther offspring of our neighbor.
+
+                // Case (b): This is an internal face and the neighbor
+                // is refined (which we can test by asking whether the
+                // face of the current cell has children). In this
+                // case, we will need to integrate over the
+                // "sub-faces", i.e., the children of the face of the
+                // current cell.
+                //
+                // (There is a slightly confusing corner case: If we
+                // are in 1d -- where admittedly the current program
+                // and its demonstration of anisotropic refinement is
+                // not particularly relevant -- then the faces between
+                // cells are always the same: they are just
+                // vertices. In other words, in 1d, we do not want to
+                // treat faces between cells of different level
+                // differently. The condition `face->has_children()`
+                // we check here ensures this: in 1d, this function
+                // always returns `false`, and consequently in 1d we
+                // will not ever go into this `if` branch. But we will
+                // have to come back to this corner case below in case
+                // (c).)
                 if (face->has_children())
                   {
                     // We need to know, which of the neighbors faces points in
@@ -561,21 +578,38 @@ namespace Step30
                   }
                 else
                   {
-                    // Case c). We simply ask, whether the neighbor is
-                    // coarser. If not, then it is neither coarser nor finer,
-                    // since any finer neighbor would have been treated above
-                    // with case b). Of all the cases with the same refinement
-                    // situation of our cell and the neighbor we want to treat
-                    // only one half, so that each face is considered only
-                    // once. Thus we have the additional condition, that the
-                    // cell with the higher level does the work. In case that
-                    // both cells have the same level, the cell with lower index
-                    // is selected.
+                    // Case (c). We get here if this is an internal
+                    // face and if the neighbor is not further refined
+                    // (or, as mentioned above, we are in 1d in which
+                    // case we get here for every internal face). We
+                    // then need to decide whether we want to
+                    // integrate over the current face. If the
+                    // neighbor is in fact coarser, then we ignore the
+                    // face and instead handle it when we visit the
+                    // neighboring cell and look at the current face
+                    // (except in 1d, where as mentioned above this is
+                    // not happening):
                     if (dim > 1 && cell->neighbor_is_coarser(face_no))
                       continue;
-                    if (neighbor->level() < cell->level() ||
-                        (neighbor->index() > cell->index() &&
-                         neighbor->level() == cell->level()))
+
+                    // On the other hand, if the neighbor is more
+                    // refined, then we have already handled the face
+                    // in case (b) above (except in 1d). So for 2d and
+                    // 3d, we just have to decide whether we want to
+                    // handle a face between cells at the same level
+                    // from the current side or from the neighboring
+                    // side.  We do this by introducing a tie-breaker:
+                    // We'll just take the cell with the smaller index
+                    // (within the current refinement level). In 1d,
+                    // we take either the coarser cell, or if they are
+                    // on the same level, the one with the smaller
+                    // index within that level. This leads to a
+                    // complicated condition that, hopefully, makes
+                    // sense given the description above:
+                    if (((dim > 1) && (cell->index() < neighbor->index())) ||
+                        ((dim == 1) && ((cell->level() < neighbor->level()) ||
+                                        ((cell->level() == neighbor->level()) &&
+                                         (cell->index() < neighbor->index())))))
                       {
                         // Here we know, that the neighbor is not coarser so we
                         // can use the usual @p neighbor_of_neighbor
@@ -615,8 +649,9 @@ namespace Step30
                             }
                       }
 
-                    // We do not need to consider case d), as those faces are
-                    // treated 'from the other side within case b).
+                    // We do not need to consider a case (d), as those
+                    // faces are treated 'from the other side within
+                    // case (b).
                   }
               }
           }
