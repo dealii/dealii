@@ -433,7 +433,10 @@ namespace Utilities
         dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
 
       MPI_Op op;
-      int    ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
+      int    ierr =
+        MPI_Op_create(reinterpret_cast<MPI_User_function *>(&max_reduce),
+                      true,
+                      &op);
       AssertThrowMPI(ierr);
 
       MinMaxAvg in;

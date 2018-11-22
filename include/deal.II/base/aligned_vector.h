@@ -407,8 +407,8 @@ namespace internal
       // never arrive here because they are non-trivial).
 
       if (std::is_trivial<T>::value == true)
-        std::memcpy((void *)(destination_ + begin),
-                    (void *)(source_ + begin),
+        std::memcpy(static_cast<void *>(destination_ + begin),
+                    static_cast<const void *>(source_ + begin),
                     (end - begin) * sizeof(T));
       else
         for (std::size_t i = begin; i < end; ++i)
@@ -474,8 +474,8 @@ namespace internal
       // never arrive here because they are non-trivial).
 
       if (std::is_trivial<T>::value == true)
-        std::memcpy((void *)(destination_ + begin),
-                    (void *)(source_ + begin),
+        std::memcpy(static_cast<void *>(destination_ + begin),
+                    static_cast<void *>(source_ + begin),
                     (end - begin) * sizeof(T));
       else
         for (std::size_t i = begin; i < end; ++i)
@@ -536,7 +536,9 @@ namespace internal
           // cast element to (void*) to silence compiler warning for virtual
           // classes (they will never arrive here because they are
           // non-trivial).
-          if (std::memcmp(zero, (void *)&element, sizeof(T)) == 0)
+          if (std::memcmp(zero,
+                          static_cast<const void *>(&element),
+                          sizeof(T)) == 0)
             trivial_element = true;
         }
       if (size < minimum_parallel_grain_size)
@@ -557,7 +559,7 @@ namespace internal
       // classes (they will never arrive here because they are
       // non-trivial).
       if (std::is_trivial<T>::value == true && trivial_element)
-        std::memset((void *)(destination_ + begin),
+        std::memset(static_cast<void *>(destination_ + begin),
                     0,
                     (end - begin) * sizeof(T));
       else
@@ -640,7 +642,7 @@ namespace internal
       // classes (they will never arrive here because they are
       // non-trivial).
       if (std::is_trivial<T>::value == true)
-        std::memset((void *)(destination_ + begin),
+        std::memset(static_cast<void *>(destination_ + begin),
                     0,
                     (end - begin) * sizeof(T));
       else
@@ -861,7 +863,7 @@ AlignedVector<T>::reserve(const size_type size_alloc)
       // allocate and align along 64-byte boundaries (this is enough for all
       // levels of vectorization currently supported by deal.II)
       T *new_data;
-      Utilities::System::posix_memalign((void **)&new_data,
+      Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_data),
                                         64,
                                         size_actual_allocate);
 

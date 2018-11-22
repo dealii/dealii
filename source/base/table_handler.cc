@@ -438,7 +438,8 @@ TableHandler::write_text(std::ostream &out, const TextOutputFormat format) const
             {
               const std::string &key = sel_columns[j];
               column_widths[j] =
-                std::max(column_widths[j], (unsigned int)key.length());
+                std::max(column_widths[j],
+                         static_cast<unsigned int>(key.length()));
               out << std::setw(column_widths[j]);
               out << key << " | ";
             }

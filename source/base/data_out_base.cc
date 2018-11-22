@@ -109,7 +109,7 @@ namespace
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
       if (value_in > 63)
         return '=';
-      return encoding[(int)value_in];
+      return encoding[static_cast<int>(value_in)];
     }
 
     int
@@ -266,9 +266,9 @@ namespace
         uLongf compressed_data_length = compressBound(data.size() * sizeof(T));
         char * compressed_data        = new char[compressed_data_length];
         int    err =
-          compress2((Bytef *)compressed_data,
+          compress2(reinterpret_cast<Bytef *>(compressed_data),
                     &compressed_data_length,
-                    (const Bytef *)data.data(),
+                    reinterpret_cast<const Bytef *>(data.data()),
                     data.size() * sizeof(T),
                     get_zlib_compression_level(flags.compression_level));
         (void)err;
@@ -276,11 +276,12 @@ namespace
 
         // now encode the compression header
         const uint32_t compression_header[4] = {
-          1,                                   /* number of blocks */
-          (uint32_t)(data.size() * sizeof(T)), /* size of block */
-          (uint32_t)(data.size() * sizeof(T)), /* size of last block */
-          (uint32_t)
-            compressed_data_length}; /* list of compressed sizes of blocks */
+          1,                                              /* number of blocks */
+          static_cast<uint32_t>(data.size() * sizeof(T)), /* size of block */
+          static_cast<uint32_t>(data.size() *
+                                sizeof(T)), /* size of last block */
+          static_cast<uint32_t>(
+            compressed_data_length)}; /* list of compressed sizes of blocks */
 
         char *encoded_header =
           encode_block(reinterpret_cast<const char *>(&compression_header[0]),
@@ -6391,25 +6392,25 @@ namespace DataOutBase
                              0,
                              n_subdivisions);
 
-                x_min = std::min(x_min, (double)projected_points[0][0]);
-                x_min = std::min(x_min, (double)projected_points[1][0]);
-                x_min = std::min(x_min, (double)projected_points[2][0]);
-                x_min = std::min(x_min, (double)projected_points[3][0]);
+                x_min = std::min(x_min, projected_points[0][0]);
+                x_min = std::min(x_min, projected_points[1][0]);
+                x_min = std::min(x_min, projected_points[2][0]);
+                x_min = std::min(x_min, projected_points[3][0]);
 
-                x_max = std::max(x_max, (double)projected_points[0][0]);
-                x_max = std::max(x_max, (double)projected_points[1][0]);
-                x_max = std::max(x_max, (double)projected_points[2][0]);
-                x_max = std::max(x_max, (double)projected_points[3][0]);
+                x_max = std::max(x_max, projected_points[0][0]);
+                x_max = std::max(x_max, projected_points[1][0]);
+                x_max = std::max(x_max, projected_points[2][0]);
+                x_max = std::max(x_max, projected_points[3][0]);
 
-                y_min = std::min(y_min, (double)projected_points[0][1]);
-                y_min = std::min(y_min, (double)projected_points[1][1]);
-                y_min = std::min(y_min, (double)projected_points[2][1]);
-                y_min = std::min(y_min, (double)projected_points[3][1]);
+                y_min = std::min(y_min, projected_points[0][1]);
+                y_min = std::min(y_min, projected_points[1][1]);
+                y_min = std::min(y_min, projected_points[2][1]);
+                y_min = std::min(y_min, projected_points[3][1]);
 
-                y_max = std::max(y_max, (double)projected_points[0][1]);
-                y_max = std::max(y_max, (double)projected_points[1][1]);
-                y_max = std::max(y_max, (double)projected_points[2][1]);
-                y_max = std::max(y_max, (double)projected_points[3][1]);
+                y_max = std::max(y_max, projected_points[0][1]);
+                y_max = std::max(y_max, projected_points[1][1]);
+                y_max = std::max(y_max, projected_points[2][1]);
+                y_max = std::max(y_max, projected_points[3][1]);
 
                 Assert((flags.height_vector < patch->data.n_rows()) ||
                          patch->data.n_rows() == 0,
@@ -6417,32 +6418,32 @@ namespace DataOutBase
                                      0,
                                      patch->data.n_rows()));
 
-                z_min = std::min(z_min,
-                                 (double)patch->data(flags.height_vector,
+                z_min = std::min<double>(z_min,
+                                         patch->data(flags.height_vector,
                                                      i1 * d1 + i2 * d2));
-                z_min = std::min(z_min,
-                                 (double)patch->data(flags.height_vector,
+                z_min = std::min<double>(z_min,
+                                         patch->data(flags.height_vector,
                                                      (i1 + 1) * d1 + i2 * d2));
-                z_min = std::min(z_min,
-                                 (double)patch->data(flags.height_vector,
+                z_min = std::min<double>(z_min,
+                                         patch->data(flags.height_vector,
                                                      i1 * d1 + (i2 + 1) * d2));
                 z_min =
-                  std::min(z_min,
-                           (double)patch->data(flags.height_vector,
+                  std::min<double>(z_min,
+                                   patch->data(flags.height_vector,
                                                (i1 + 1) * d1 + (i2 + 1) * d2));
 
-                z_max = std::max(z_max,
-                                 (double)patch->data(flags.height_vector,
+                z_max = std::max<double>(z_max,
+                                         patch->data(flags.height_vector,
                                                      i1 * d1 + i2 * d2));
-                z_max = std::max(z_max,
-                                 (double)patch->data(flags.height_vector,
+                z_max = std::max<double>(z_max,
+                                         patch->data(flags.height_vector,
                                                      (i1 + 1) * d1 + i2 * d2));
-                z_max = std::max(z_max,
-                                 (double)patch->data(flags.height_vector,
+                z_max = std::max<double>(z_max,
+                                         patch->data(flags.height_vector,
                                                      i1 * d1 + (i2 + 1) * d2));
                 z_max =
-                  std::max(z_max,
-                           (double)patch->data(flags.height_vector,
+                  std::max<double>(z_max,
+                                   patch->data(flags.height_vector,
                                                (i1 + 1) * d1 + (i2 + 1) * d2));
               }
           }
@@ -6678,55 +6679,71 @@ namespace DataOutBase
 
                 x_min_perspective =
                   std::min(x_min_perspective,
-                           (double)projection_decompositions[0][0]);
+                           static_cast<double>(
+                             projection_decompositions[0][0]));
                 x_min_perspective =
                   std::min(x_min_perspective,
-                           (double)projection_decompositions[1][0]);
+                           static_cast<double>(
+                             projection_decompositions[1][0]));
                 x_min_perspective =
                   std::min(x_min_perspective,
-                           (double)projection_decompositions[2][0]);
+                           static_cast<double>(
+                             projection_decompositions[2][0]));
                 x_min_perspective =
                   std::min(x_min_perspective,
-                           (double)projection_decompositions[3][0]);
+                           static_cast<double>(
+                             projection_decompositions[3][0]));
 
                 x_max_perspective =
                   std::max(x_max_perspective,
-                           (double)projection_decompositions[0][0]);
+                           static_cast<double>(
+                             projection_decompositions[0][0]));
                 x_max_perspective =
                   std::max(x_max_perspective,
-                           (double)projection_decompositions[1][0]);
+                           static_cast<double>(
+                             projection_decompositions[1][0]));
                 x_max_perspective =
                   std::max(x_max_perspective,
-                           (double)projection_decompositions[2][0]);
+                           static_cast<double>(
+                             projection_decompositions[2][0]));
                 x_max_perspective =
                   std::max(x_max_perspective,
-                           (double)projection_decompositions[3][0]);
+                           static_cast<double>(
+                             projection_decompositions[3][0]));
 
                 y_min_perspective =
                   std::min(y_min_perspective,
-                           (double)projection_decompositions[0][1]);
+                           static_cast<double>(
+                             projection_decompositions[0][1]));
                 y_min_perspective =
                   std::min(y_min_perspective,
-                           (double)projection_decompositions[1][1]);
+                           static_cast<double>(
+                             projection_decompositions[1][1]));
                 y_min_perspective =
                   std::min(y_min_perspective,
-                           (double)projection_decompositions[2][1]);
+                           static_cast<double>(
+                             projection_decompositions[2][1]));
                 y_min_perspective =
                   std::min(y_min_perspective,
-                           (double)projection_decompositions[3][1]);
+                           static_cast<double>(
+                             projection_decompositions[3][1]));
 
                 y_max_perspective =
                   std::max(y_max_perspective,
-                           (double)projection_decompositions[0][1]);
+                           static_cast<double>(
+                             projection_decompositions[0][1]));
                 y_max_perspective =
                   std::max(y_max_perspective,
-                           (double)projection_decompositions[1][1]);
+                           static_cast<double>(
+                             projection_decompositions[1][1]));
                 y_max_perspective =
                   std::max(y_max_perspective,
-                           (double)projection_decompositions[2][1]);
+                           static_cast<double>(
+                             projection_decompositions[2][1]));
                 y_max_perspective =
                   std::max(y_max_perspective,
-                           (double)projection_decompositions[3][1]);
+                           static_cast<double>(
+                             projection_decompositions[3][1]));
               }
           }
       }
@@ -7283,9 +7300,10 @@ namespace DataOutBase
               out << "; font-weight:bold";
 
             out << "\">"
-                << (float)(((int)((z_min + index * (z_dimension / 4.)) *
-                                  10000)) /
-                           10000.);
+                << static_cast<float>(
+                     (static_cast<int>((z_min + index * (z_dimension / 4.)) *
+                                       10000)) /
+                     10000.);
 
             if (index == 4)
               out << " max";
