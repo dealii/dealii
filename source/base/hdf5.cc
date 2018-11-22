@@ -67,7 +67,7 @@ namespace HDF5
         }
       else if (std::is_same<number, std::complex<float>>::value)
         {
-          t_type  = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+          t_type  = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
             // Relase the HDF5 resource
             H5Tclose(*pointer);
             delete pointer;
@@ -83,7 +83,7 @@ namespace HDF5
         }
       else if (std::is_same<number, std::complex<double>>::value)
         {
-          t_type  = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+          t_type  = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
             // Relase the HDF5 resource
             H5Tclose(*pointer);
             delete pointer;
@@ -530,12 +530,12 @@ namespace HDF5
     , local_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
     , global_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
   {
-    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Relase the HDF5 resource
       H5Dclose(*pointer);
       delete pointer;
     });
-    dataspace      = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+    dataspace      = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Relase the HDF5 resource
       H5Sclose(*pointer);
       delete pointer;
@@ -582,12 +582,12 @@ namespace HDF5
     , local_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
     , global_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
   {
-    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Relase the HDF5 resource
       H5Dclose(*pointer);
       delete pointer;
     });
-    dataspace      = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+    dataspace      = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Relase the HDF5 resource
       H5Sclose(*pointer);
       delete pointer;
@@ -1386,7 +1386,7 @@ namespace HDF5
                const GroupAccessMode mode)
     : HDF5Object(name, mpi)
   {
-    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Relase the HDF5 resource
       H5Gclose(*pointer);
       delete pointer;
@@ -1487,7 +1487,7 @@ namespace HDF5
              const MPI_Comm       mpi_communicator)
     : Group(name, mpi)
   {
-    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](auto pointer) {
+    hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Relase the HDF5 resource
       H5Fclose(*pointer);
       delete pointer;
