@@ -118,7 +118,8 @@ namespace HDF5
     std::vector<hsize_t>
     get_container_dimensions(const std::vector<number> &data)
     {
-      return std::vector<hsize_t>{data.size()};
+      std::vector<hsize_t> dimensions = {data.size()};
+      return dimensions;
     }
 
 
@@ -127,7 +128,8 @@ namespace HDF5
     std::vector<hsize_t>
     get_container_dimensions(const Vector<number> &data)
     {
-      return std::vector<hsize_t>{data.size()};
+      std::vector<hsize_t> dimensions = {data.size()};
+      return dimensions;
     }
 
 
@@ -136,7 +138,8 @@ namespace HDF5
     std::vector<hsize_t>
     get_container_dimensions(const FullMatrix<number> &data)
     {
-      return std::vector<hsize_t>{data.m(), data.n()};
+      std::vector<hsize_t> dimensions = {data.m(), data.n()};
+      return dimensions;
     }
 
 
