@@ -1051,7 +1051,7 @@ namespace Utilities
     unsigned int
     get_this_mpi_process(const Epetra_Comm &mpi_communicator)
     {
-      return (unsigned int)mpi_communicator.MyPID();
+      return static_cast<unsigned int>(mpi_communicator.MyPID());
     }
 
 

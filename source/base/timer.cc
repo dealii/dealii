@@ -553,10 +553,11 @@ TimerOutput::print_summary() const
   // get the maximum width among all sections
   unsigned int max_width = 0;
   for (const auto &i : sections)
-    max_width = std::max(max_width, (unsigned int)i.first.length());
+    max_width =
+      std::max(max_width, static_cast<unsigned int>(i.first.length()));
 
   // 32 is the default width until | character
-  max_width                     = std::max(max_width + 1, (unsigned int)32);
+  max_width = std::max(max_width + 1, static_cast<unsigned int>(32));
   const std::string extra_dash  = std::string(max_width - 32, '-');
   const std::string extra_space = std::string(max_width - 32, ' ');
 

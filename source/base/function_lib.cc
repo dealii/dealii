@@ -2647,8 +2647,7 @@ namespace Functions
         else if (p[d] >= interval_endpoints[d].second - delta_x)
           ix[d] = n_subintervals[d] - 1;
         else
-          ix[d] =
-            (unsigned int)((p[d] - interval_endpoints[d].first) / delta_x);
+          ix[d] = (p[d] - interval_endpoints[d].first) / delta_x;
       }
 
     // now compute the relative point within the interval/rectangle/box
