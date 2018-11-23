@@ -1568,9 +1568,9 @@ namespace Patterns
 
     namespace internal
     {
-      const std::array<std::string, 4> default_list_separator{
+      constexpr std::array<const char *, 4> default_list_separator{
         {",", ";", "|", "%"}};
-      const std::array<std::string, 4> default_map_separator{
+      constexpr std::array<const char *, 4> default_map_separator{
         {":", "=", "@", "#"}};
 
       // specialize a type for all of the STL containers and maps

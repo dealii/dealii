@@ -35,26 +35,6 @@ namespace GridGenerator
 {
   namespace
   {
-    // Corner points of the cube [-1,1]^3
-    const Point<3> hexahedron[8] = {Point<3>(-1, -1, -1),
-                                    Point<3>(+1, -1, -1),
-                                    Point<3>(-1, +1, -1),
-                                    Point<3>(+1, +1, -1),
-                                    Point<3>(-1, -1, +1),
-                                    Point<3>(+1, -1, +1),
-                                    Point<3>(-1, +1, +1),
-                                    Point<3>(+1, +1, +1)};
-
-    // Octahedron inscribed in the cube
-    // [-1,1]^3
-    const Point<3> octahedron[6] = {Point<3>(-1, 0, 0),
-                                    Point<3>(1, 0, 0),
-                                    Point<3>(0, -1, 0),
-                                    Point<3>(0, 1, 0),
-                                    Point<3>(0, 0, -1),
-                                    Point<3>(0, 0, 1)};
-
-
     /**
      * Perform the action specified by the @p colorize flag of the
      * hyper_rectangle() function of this class.
@@ -3919,6 +3899,16 @@ namespace GridGenerator
     std::vector<Point<3>>    vertices;
     std::vector<CellData<3>> cells;
 
+    // Corner points of the cube [-1,1]^3
+    static const std::array<Point<3>, 8> hexahedron = {{{-1, -1, -1}, //
+                                                        {+1, -1, -1}, //
+                                                        {-1, +1, -1}, //
+                                                        {+1, +1, -1}, //
+                                                        {-1, -1, +1}, //
+                                                        {+1, -1, +1}, //
+                                                        {-1, +1, +1}, //
+                                                        {+1, +1, +1}}};
+
     // Start with the shell bounded by
     // two nested cubes
     if (n == 6)
@@ -3952,8 +3942,17 @@ namespace GridGenerator
     // A more regular subdivision can
     // be obtained by two nested
     // rhombic dodecahedra
+
     else if (n == 12)
       {
+        // Octahedron inscribed in the cube [-1,1]^3
+        static const std::array<Point<3>, 6> octahedron = {{{-1, 0, 0}, //
+                                                            {1, 0, 0},  //
+                                                            {0, -1, 0}, //
+                                                            {0, 1, 0},  //
+                                                            {0, 0, -1}, //
+                                                            {0, 0, 1}}};
+
         for (unsigned int i = 0; i < 8; ++i)
           vertices.push_back(p + hexahedron[i] * irad);
         for (unsigned int i = 0; i < 6; ++i)

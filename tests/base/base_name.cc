@@ -22,9 +22,10 @@ main()
 {
   initlog();
 
-  deallog << dealjobid.base_name("mypath/test.cc") << std::endl;
-  ;
-  deallog << dealjobid.base_name("/foo.bar/mypath/test.cc") << std::endl;
+  deallog << JobIdentifier::get_dealjobid().base_name("mypath/test.cc")
+          << std::endl;
+  deallog << JobIdentifier::get_dealjobid().base_name("/foo.bar/mypath/test.cc")
+          << std::endl;
 
   return 0;
 }

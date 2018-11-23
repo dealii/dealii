@@ -52,11 +52,16 @@
 #include <map>
 #include <string>
 
-// a map from the keys in the expansion lists to the list itself. For
+// Returns a map from the keys in the expansion lists to the list itself. For
 // instance, the example above will lead to the entry
-//      expansion_lists[REAL_SCALARS] = (double, float)
+//      get_expansion_lists()[REAL_SCALARS] = (double, float)
 // in this map, among others
-std::map<std::string, std::list<std::string>> expansion_lists;
+std::map<std::string, std::list<std::string>> &
+get_expansion_lists()
+{
+  static std::map<std::string, std::list<std::string>> expansion_lists;
+  return expansion_lists;
+}
 
 
 
@@ -281,7 +286,7 @@ substitute_tokens(const std::string &text,
 
 // read and parse the expansion lists like
 //   REAL_SCALARS    := { double; float}
-// as specified at the top of the file and store them in the global
+// as specified at the top of the file and store them in the static
 // expansion_lists variable
 void
 read_expansion_lists(const std::string &filename)
@@ -338,7 +343,7 @@ read_expansion_lists(const std::string &filename)
       // happen if, for example, we have "Vector<double>; TRILINOS_VECTOR;"
       // and if TRILINOS_VECTOR is an empty expansion after running
       // ./configure)
-      expansion_lists[name] =
+      get_expansion_lists()[name] =
         delete_empty_entries(split_string_list(expansion, ';'));
     }
 }
@@ -361,7 +366,7 @@ substitute(const std::string &                                   text,
       const std::string name    = substitutions.front().first,
                         pattern = substitutions.front().second;
 
-      if (expansion_lists.find(pattern) == expansion_lists.end())
+      if (get_expansion_lists().find(pattern) == get_expansion_lists().end())
         {
           std::cerr << "could not find pattern '" << pattern << "'"
                     << std::endl;
@@ -373,8 +378,8 @@ substitute(const std::string &                                   text,
         rest_of_substitutions(++substitutions.begin(), substitutions.end());
 
       for (std::list<std::string>::const_iterator expansion =
-             expansion_lists[pattern].begin();
-           expansion != expansion_lists[pattern].end();
+             get_expansion_lists()[pattern].begin();
+           expansion != get_expansion_lists()[pattern].end();
            ++expansion)
         {
           std::string new_text = substitute_tokens(text, name, *expansion);
@@ -388,7 +393,7 @@ substitute(const std::string &                                   text,
       const std::string name    = substitutions.front().first,
                         pattern = substitutions.front().second;
 
-      if (expansion_lists.find(pattern) == expansion_lists.end())
+      if (get_expansion_lists().find(pattern) == get_expansion_lists().end())
         {
           std::cerr << "could not find pattern '" << pattern << "'"
                     << std::endl;
@@ -396,8 +401,8 @@ substitute(const std::string &                                   text,
         }
 
       for (std::list<std::string>::const_iterator expansion =
-             expansion_lists[pattern].begin();
-           expansion != expansion_lists[pattern].end();
+             get_expansion_lists()[pattern].begin();
+           expansion != get_expansion_lists()[pattern].end();
            ++expansion)
         {
           // surround each block in the for loop with an if-def hack
