@@ -671,7 +671,8 @@ namespace DoFRenumbering
            ExcDoFHandlerNotInitialized());
 
     std::vector<types::global_dof_index> renumbering(
-      dof_handler.n_dofs(level), numbers::invalid_dof_index);
+      dof_handler.locally_owned_mg_dofs(level).n_elements(),
+      numbers::invalid_dof_index);
 
     typename DoFHandlerType::level_cell_iterator start =
       dof_handler.begin(level);
@@ -806,10 +807,23 @@ namespace DoFRenumbering
         local_dof_indices.resize(dofs_per_cell);
         cell->get_active_or_mg_dof_indices(local_dof_indices);
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          if (start->get_dof_handler().locally_owned_dofs().is_element(
-                local_dof_indices[i]))
-            component_to_dof_map[component_list[fe_index][i]].push_back(
-              local_dof_indices[i]);
+          {
+            if (is_level_operation)
+              {
+                if (start->get_dof_handler()
+                      .locally_owned_mg_dofs(start->level())
+                      .is_element(local_dof_indices[i]))
+                  component_to_dof_map[component_list[fe_index][i]].push_back(
+                    local_dof_indices[i]);
+              }
+            else
+              {
+                if (start->get_dof_handler().locally_owned_dofs().is_element(
+                      local_dof_indices[i]))
+                  component_to_dof_map[component_list[fe_index][i]].push_back(
+                    local_dof_indices[i]);
+              }
+          }
       }
 
     // now we've got all indices sorted
@@ -927,13 +941,28 @@ namespace DoFRenumbering
              dof_index != end_of_component;
              ++dof_index)
           {
-            Assert(
-              start->get_dof_handler().locally_owned_dofs().index_within_set(
-                *dof_index) < new_indices.size(),
-              ExcInternalError());
-            new_indices[start->get_dof_handler()
-                          .locally_owned_dofs()
-                          .index_within_set(*dof_index)] = next_free_index++;
+            if (is_level_operation)
+              {
+                Assert(start->get_dof_handler()
+                           .locally_owned_mg_dofs(start->level())
+                           .index_within_set(*dof_index) < new_indices.size(),
+                       ExcInternalError());
+                new_indices[start->get_dof_handler()
+                              .locally_owned_mg_dofs(start->level())
+                              .index_within_set(*dof_index)] =
+                  next_free_index++;
+              }
+            else
+              {
+                Assert(start->get_dof_handler()
+                           .locally_owned_dofs()
+                           .index_within_set(*dof_index) < new_indices.size(),
+                       ExcInternalError());
+                new_indices[start->get_dof_handler()
+                              .locally_owned_dofs()
+                              .index_within_set(*dof_index)] =
+                  next_free_index++;
+              }
           }
       }
 
@@ -1021,7 +1050,8 @@ namespace DoFRenumbering
            ExcDoFHandlerNotInitialized());
 
     std::vector<types::global_dof_index> renumbering(
-      dof_handler.n_dofs(level), numbers::invalid_dof_index);
+      dof_handler.locally_owned_mg_dofs(level).n_elements(),
+      numbers::invalid_dof_index);
 
     typename DoFHandler<dim, spacedim>::level_cell_iterator start =
       dof_handler.begin(level);
@@ -1121,10 +1151,23 @@ namespace DoFRenumbering
         local_dof_indices.resize(dofs_per_cell);
         cell->get_active_or_mg_dof_indices(local_dof_indices);
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          if (start->get_dof_handler().locally_owned_dofs().is_element(
-                local_dof_indices[i]))
-            block_to_dof_map[block_list[fe_index][i]].push_back(
-              local_dof_indices[i]);
+          {
+            if (is_level_operation)
+              {
+                if (start->get_dof_handler()
+                      .locally_owned_mg_dofs(start->level())
+                      .is_element(local_dof_indices[i]))
+                  block_to_dof_map[block_list[fe_index][i]].push_back(
+                    local_dof_indices[i]);
+              }
+            else
+              {
+                if (start->get_dof_handler().locally_owned_dofs().is_element(
+                      local_dof_indices[i]))
+                  block_to_dof_map[block_list[fe_index][i]].push_back(
+                    local_dof_indices[i]);
+              }
+          }
       }
 
     // now we've got all indices sorted
@@ -1229,13 +1272,28 @@ namespace DoFRenumbering
              dof_index != end_of_component;
              ++dof_index)
           {
-            Assert(
-              start->get_dof_handler().locally_owned_dofs().index_within_set(
-                *dof_index) < new_indices.size(),
-              ExcInternalError());
-            new_indices[start->get_dof_handler()
-                          .locally_owned_dofs()
-                          .index_within_set(*dof_index)] = next_free_index++;
+            if (is_level_operation)
+              {
+                Assert(start->get_dof_handler()
+                           .locally_owned_mg_dofs(start->level())
+                           .index_within_set(*dof_index) < new_indices.size(),
+                       ExcInternalError());
+                new_indices[start->get_dof_handler()
+                              .locally_owned_mg_dofs(start->level())
+                              .index_within_set(*dof_index)] =
+                  next_free_index++;
+              }
+            else
+              {
+                Assert(start->get_dof_handler()
+                           .locally_owned_dofs()
+                           .index_within_set(*dof_index) < new_indices.size(),
+                       ExcInternalError());
+                new_indices[start->get_dof_handler()
+                              .locally_owned_dofs()
+                              .index_within_set(*dof_index)] =
+                  next_free_index++;
+              }
           }
       }
 
