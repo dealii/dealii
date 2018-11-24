@@ -3074,7 +3074,7 @@ public:
   /**
    * Return the total number of used faces, active or not.  In 2D, the result
    * equals n_lines(), in 3D it equals n_quads(), while in 1D it equals
-   * the number of vertices.
+   * the number of used vertices.
    */
   unsigned int
   n_faces() const;

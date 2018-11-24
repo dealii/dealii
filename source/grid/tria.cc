@@ -12520,7 +12520,7 @@ Triangulation<dim, spacedim>::n_faces() const
   switch (dim)
     {
       case 1:
-        return n_vertices();
+        return n_used_vertices();
       case 2:
         return n_lines();
       case 3:
