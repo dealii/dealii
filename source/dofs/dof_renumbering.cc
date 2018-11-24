@@ -716,7 +716,7 @@ namespace DoFRenumbering
     // Get a reference to the set of dofs. Note that we assume that all cells
     // are assumed to be on the same level, otherwise the operation doesn't make
     // much sense (we will assert this below).
-    const IndexSet &dofset =
+    const IndexSet &locally_owned_dofs =
       is_level_operation ?
         start->get_dof_handler().locally_owned_mg_dofs(start->level()) :
         start->get_dof_handler().locally_owned_dofs();
@@ -823,7 +823,7 @@ namespace DoFRenumbering
         cell->get_active_or_mg_dof_indices(local_dof_indices);
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          if (dofset.is_element(local_dof_indices[i]))
+          if (locally_owned_dofs.is_element(local_dof_indices[i]))
             component_to_dof_map[component_list[fe_index][i]].push_back(
               local_dof_indices[i]);
       }
@@ -943,9 +943,10 @@ namespace DoFRenumbering
              dof_index != end_of_component;
              ++dof_index)
           {
-            Assert(dofset.index_within_set(*dof_index) < new_indices.size(),
+            Assert(locally_owned_dofs.index_within_set(*dof_index) <
+                     new_indices.size(),
                    ExcInternalError());
-            new_indices[dofset.index_within_set(*dof_index)] =
+            new_indices[locally_owned_dofs.index_within_set(*dof_index)] =
               next_free_index++;
           }
       }
@@ -1083,7 +1084,7 @@ namespace DoFRenumbering
     // Get a reference to the set of dofs. Note that we assume that all cells
     // are assumed to be on the same level, otherwise the operation doesn't make
     // much sense (we will assert this below).
-    const IndexSet &dofset =
+    const IndexSet &locally_owned_dofs =
       is_level_operation ?
         start->get_dof_handler().locally_owned_mg_dofs(start->level()) :
         start->get_dof_handler().locally_owned_dofs();
@@ -1150,7 +1151,7 @@ namespace DoFRenumbering
         cell->get_active_or_mg_dof_indices(local_dof_indices);
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          if (dofset.is_element(local_dof_indices[i]))
+          if (locally_owned_dofs.is_element(local_dof_indices[i]))
             block_to_dof_map[block_list[fe_index][i]].push_back(
               local_dof_indices[i]);
       }
@@ -1257,9 +1258,10 @@ namespace DoFRenumbering
              dof_index != end_of_component;
              ++dof_index)
           {
-            Assert(dofset.index_within_set(*dof_index) < new_indices.size(),
+            Assert(locally_owned_dofs.index_within_set(*dof_index) <
+                     new_indices.size(),
                    ExcInternalError());
-            new_indices[dofset.index_within_set(*dof_index)] =
+            new_indices[locally_owned_dofs.index_within_set(*dof_index)] =
               next_free_index++;
           }
       }
