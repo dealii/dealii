@@ -349,7 +349,8 @@ namespace internal
     {
       // convert the active_fe_index into a signed type, flip all
       // bits, and get the unsigned representation back
-      return ~(static_cast<signed_active_fe_index_type>(active_fe_index));
+      return static_cast<active_fe_index_type>(
+        ~(static_cast<signed_active_fe_index_type>(active_fe_index)));
     }
 
 
