@@ -338,7 +338,7 @@ namespace internal
     inline bool
     DoFLevel::is_compressed_entry(const active_fe_index_type active_fe_index)
     {
-      return ((signed_active_fe_index_type)active_fe_index < 0);
+      return (static_cast<signed_active_fe_index_type>(active_fe_index) < 0);
     }
 
 
@@ -349,8 +349,7 @@ namespace internal
     {
       // convert the active_fe_index into a signed type, flip all
       // bits, and get the unsigned representation back
-      return (active_fe_index_type) ~(
-        signed_active_fe_index_type)active_fe_index;
+      return ~(static_cast<signed_active_fe_index_type>(active_fe_index));
     }
 
 
@@ -366,7 +365,7 @@ namespace internal
 
       // make sure we are on an object for which DoFs have been
       // allocated at all
-      Assert(dof_offsets[obj_index] != (offset_type)(-1),
+      Assert(dof_offsets[obj_index] != static_cast<offset_type>(-1),
              ExcMessage("You are trying to access degree of freedom "
                         "information for an object on which no such "
                         "information is available"));
@@ -400,7 +399,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert(dof_offsets[obj_index] != (offset_type)(-1),
+      Assert(dof_offsets[obj_index] != static_cast<offset_type>(-1),
              ExcMessage("You are trying to access degree of freedom "
                         "information for an object on which no such "
                         "information is available"));

@@ -42,12 +42,12 @@ namespace internal
       unsigned int new_size = 0;
       for (unsigned int cell = 0; cell < dof_offsets.size();)
         // see if this cell is active on the current level
-        if (dof_offsets[cell] != (offset_type)(-1))
+        if (dof_offsets[cell] != static_cast<offset_type>(-1))
           {
             // find the next cell active on this level
             unsigned int next_cell = cell + 1;
             while ((next_cell < dof_offsets.size()) &&
-                   (dof_offsets[next_cell] == (offset_type)(-1)))
+                   (dof_offsets[next_cell] == static_cast<offset_type>(-1)))
               ++next_cell;
 
             const unsigned int next_offset =
@@ -87,15 +87,15 @@ namespace internal
       std::vector<types::global_dof_index> new_dof_indices;
       new_dof_indices.reserve(new_size);
       std::vector<offset_type> new_dof_offsets(dof_offsets.size(),
-                                               (offset_type)(-1));
+                                               static_cast<offset_type>(-1));
       for (unsigned int cell = 0; cell < dof_offsets.size();)
         // see if this cell is active on the current level
-        if (dof_offsets[cell] != (offset_type)(-1))
+        if (dof_offsets[cell] != static_cast<offset_type>(-1))
           {
             // find the next cell active on this level
             unsigned int next_cell = cell + 1;
             while ((next_cell < dof_offsets.size()) &&
-                   (dof_offsets[next_cell] == (offset_type)(-1)))
+                   (dof_offsets[next_cell] == static_cast<offset_type>(-1)))
               ++next_cell;
 
             const unsigned int next_offset =
@@ -169,7 +169,7 @@ namespace internal
       // dof_indices array after uncompression.
       unsigned int new_size = 0;
       for (unsigned int cell = 0; cell < dof_offsets.size(); ++cell)
-        if (dof_offsets[cell] != (offset_type)(-1))
+        if (dof_offsets[cell] != static_cast<offset_type>(-1))
           {
             // we know now that the slot for this cell is used. extract the
             // active_fe_index for it and see how many entries we need
@@ -181,15 +181,15 @@ namespace internal
       std::vector<types::global_dof_index> new_dof_indices;
       new_dof_indices.reserve(new_size);
       std::vector<offset_type> new_dof_offsets(dof_offsets.size(),
-                                               (offset_type)(-1));
+                                               static_cast<offset_type>(-1));
       for (unsigned int cell = 0; cell < dof_offsets.size();)
         // see if this cell is active on the current level
-        if (dof_offsets[cell] != (offset_type)(-1))
+        if (dof_offsets[cell] != static_cast<offset_type>(-1))
           {
             // find the next cell active on this level
             unsigned int next_cell = cell + 1;
             while ((next_cell < dof_offsets.size()) &&
-                   (dof_offsets[next_cell] == (offset_type)(-1)))
+                   (dof_offsets[next_cell] == static_cast<offset_type>(-1)))
               ++next_cell;
 
             const unsigned int next_offset =
