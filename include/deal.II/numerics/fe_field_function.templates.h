@@ -282,7 +282,7 @@ namespace Functions
         // Number of quadrature points on this cell
         unsigned int nq = qpoints[i].size();
         // Construct a quadrature formula
-        std::vector<double> ww(nq, 1. / ((double)nq));
+        std::vector<double> ww(nq, 1. / nq);
 
         quadrature_collection.push_back(Quadrature<dim>(qpoints[i], ww));
       }
@@ -352,7 +352,7 @@ namespace Functions
         // Number of quadrature points on this cell
         unsigned int nq = qpoints[i].size();
         // Construct a quadrature formula
-        std::vector<double> ww(nq, 1. / ((double)nq));
+        std::vector<double> ww(nq, 1. / nq);
 
         quadrature_collection.push_back(Quadrature<dim>(qpoints[i], ww));
       }
@@ -428,7 +428,7 @@ namespace Functions
         // Number of quadrature points on this cell
         unsigned int nq = qpoints[i].size();
         // Construct a quadrature formula
-        std::vector<double> ww(nq, 1. / ((double)nq));
+        std::vector<double> ww(nq, 1. / nq);
 
         quadrature_collection.push_back(Quadrature<dim>(qpoints[i], ww));
       }
