@@ -20,6 +20,8 @@
 // correctly (at the point when this test was written, renumbering that
 // changes the set of owned dofs is not implemented).
 
+#include <deal.II/base/std_cxx14/memory.h>
+
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_accessor.h>
@@ -85,8 +87,8 @@ check()
  tr.execute_coarsening_and_refinement();
   */
 
-  auto fe_scalar = std::make_unique<dealii::FE_Q<dim>>(1);
-  auto fe        = std::make_unique<dealii::FESystem<dim>>(*fe_scalar, 1);
+  auto fe_scalar = std_cxx14::make_unique<dealii::FE_Q<dim>>(1);
+  auto fe        = std_cxx14::make_unique<dealii::FESystem<dim>>(*fe_scalar, 1);
 
   dealii::DoFHandler<dim> dofhandler(tria);
   dofhandler.distribute_dofs(*fe);
