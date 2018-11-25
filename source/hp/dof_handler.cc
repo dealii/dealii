@@ -260,11 +260,11 @@ namespace internal
               dof_handler.levels[level]->dof_offsets =
                 std::vector<DoFLevel::offset_type>(
                   dof_handler.tria->n_raw_cells(level),
-                  (DoFLevel::offset_type)(-1));
+                  static_cast<DoFLevel::offset_type>(-1));
               dof_handler.levels[level]->cell_cache_offsets =
                 std::vector<DoFLevel::offset_type>(
                   dof_handler.tria->n_raw_cells(level),
-                  (DoFLevel::offset_type)(-1));
+                  static_cast<DoFLevel::offset_type>(-1));
 
               types::global_dof_index next_free_dof = 0;
               types::global_dof_index cache_size    = 0;
@@ -323,7 +323,7 @@ namespace internal
               Assert(static_cast<unsigned int>(std::count(
                        dof_handler.levels[level]->dof_offsets.begin(),
                        dof_handler.levels[level]->dof_offsets.end(),
-                       (DoFLevel::offset_type)(-1))) ==
+                       static_cast<DoFLevel::offset_type>(-1))) ==
                        dof_handler.tria->n_raw_cells(level) -
                          n_active_non_artificial_cells,
                      ExcInternalError());
@@ -964,7 +964,7 @@ namespace internal
               // up, and because every vector entry has exactly one processor
               // that owns it, the sum is correct
               std::vector<unsigned int> active_fe_indices(tr->n_active_cells(),
-                                                          (unsigned int)0);
+                                                          0u);
               for (const auto &cell : dof_handler.active_cell_iterators())
                 if (cell->is_locally_owned())
                   active_fe_indices[cell->active_cell_index()] =
