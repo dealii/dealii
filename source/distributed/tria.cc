@@ -3594,16 +3594,13 @@ namespace parallel
           types::subdomain_id                                  ghost_owner = 0;
           typename dealii::internal::p4est::types<dim>::topidx ghost_tree  = 0;
 
-          for (unsigned int g_idx = 0;
-               g_idx < parallel_ghost->ghosts.elem_count;
+          for (int g_idx = 0; static_cast<unsigned int>(g_idx) <
+                              parallel_ghost->ghosts.elem_count;
                ++g_idx)
             {
-              while (
-                g_idx >=
-                (unsigned int)parallel_ghost->proc_offsets[ghost_owner + 1])
+              while (g_idx >= parallel_ghost->proc_offsets[ghost_owner + 1])
                 ++ghost_owner;
-              while (g_idx >=
-                     (unsigned int)parallel_ghost->tree_offsets[ghost_tree + 1])
+              while (g_idx >= parallel_ghost->tree_offsets[ghost_tree + 1])
                 ++ghost_tree;
 
               quadr = static_cast<
