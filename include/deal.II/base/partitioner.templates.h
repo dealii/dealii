@@ -98,41 +98,97 @@ namespace Utilities
         }
 
       Number *temp_array_ptr = temporary_storage.data();
-      for (unsigned int i = 0; i < n_import_targets; i++)
-        {
-          // copy the data to be sent to the import_data field
-          std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-            my_imports = import_indices_data.begin() +
-                         import_indices_chunks_by_rank_data[i],
-            end_my_imports = import_indices_data.begin() +
-                             import_indices_chunks_by_rank_data[i + 1];
-          unsigned int index = 0;
-          for (; my_imports != end_my_imports; ++my_imports)
-            {
-              const unsigned int chunk_size =
-                my_imports->second - my_imports->first;
 #    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
       defined(DEAL_II_WITH_CUDA_AWARE_MPI)
-              if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+      // When using CUDAs-aware MPI, the set of local indices that are ghosts
+      // indices on other processors is expanded in arrays. This is for
+      // performance reasons as this can significantly decrease the number of
+      // kernel launched. The indices are expanded the first time the function
+      // is called.
+      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+        {
+          if (import_indices_plain_dev.size() == 0)
+            {
+              import_indices_plain_dev.reserve(n_import_targets);
+              for (unsigned int i = 0; i < n_import_targets; i++)
                 {
-                  const cudaError_t cuda_error_code =
-                    cudaMemcpy(temp_array_ptr + index,
-                               locally_owned_array.data() + my_imports->first,
-                               chunk_size * sizeof(Number),
-                               cudaMemcpyDeviceToDevice);
-                  AssertCuda(cuda_error_code);
-                }
-              else
-#    endif
-                {
-                  std::memcpy(temp_array_ptr + index,
-                              locally_owned_array.data() + my_imports->first,
-                              chunk_size * sizeof(Number));
-                }
-              index += chunk_size;
-            }
+                  // Expand the indices on the host
+                  std::vector<std::pair<unsigned int, unsigned int>>::
+                    const_iterator my_imports =
+                                     import_indices_data.begin() +
+                                     import_indices_chunks_by_rank_data[i],
+                                   end_my_imports =
+                                     import_indices_data.begin() +
+                                     import_indices_chunks_by_rank_data[i + 1];
+                  std::vector<unsigned int> import_indices_plain_host;
+                  for (; my_imports != end_my_imports; ++my_imports)
+                    {
+                      const unsigned int chunk_size =
+                        my_imports->second - my_imports->first;
+                      for (unsigned int j = 0; j < chunk_size; ++j)
+                        import_indices_plain_host.push_back(my_imports->first +
+                                                            j);
+                    }
 
-          AssertDimension(index, import_targets_data[i].second);
+                  // Move the indices to the device
+                  import_indices_plain_dev.emplace_back(std::make_pair(
+                    std::unique_ptr<unsigned int[], void (*)(unsigned int *)>(
+                      nullptr,
+                      Utilities::CUDA::delete_device_data<unsigned int>),
+                    import_indices_plain_host.size()));
+
+                  import_indices_plain_dev[i].first.reset(
+                    Utilities::CUDA::allocate_device_data<unsigned int>(
+                      import_indices_plain_dev[i].second));
+                  Utilities::CUDA::copy_to_dev(
+                    import_indices_plain_host,
+                    import_indices_plain_dev[i].first.get());
+                }
+            }
+        }
+#    endif
+
+      for (unsigned int i = 0; i < n_import_targets; i++)
+        {
+#    if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+      defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+          if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
+            {
+              const int n_blocks =
+                1 + (import_indices_plain_dev[i].second - 1) /
+                      (::dealii::CUDAWrappers::chunk_size *
+                       ::dealii::CUDAWrappers::block_size);
+              ::dealii::LinearAlgebra::CUDAWrappers::kernel::
+                gather<<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
+                  temp_array_ptr,
+                  locally_owned_array.data(),
+                  import_indices_plain_dev[i].first.get(),
+                  import_indices_plain_dev[i].second);
+            }
+          else
+#    endif
+            {
+              // copy the data to be sent to the import_data field
+              std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
+                my_imports = import_indices_data.begin() +
+                             import_indices_chunks_by_rank_data[i],
+                end_my_imports = import_indices_data.begin() +
+                                 import_indices_chunks_by_rank_data[i + 1];
+              unsigned int index = 0;
+              for (; my_imports != end_my_imports; ++my_imports)
+                {
+                  const unsigned int chunk_size =
+                    my_imports->second - my_imports->first;
+                  {
+                    std::memcpy(temp_array_ptr + index,
+                                locally_owned_array.data() + my_imports->first,
+                                chunk_size * sizeof(Number));
+                  }
+                  index += chunk_size;
+                }
+
+              AssertDimension(index, import_targets_data[i].second);
+            }
 
           // start the send operations
           const int ierr =
@@ -702,7 +758,7 @@ namespace Utilities
 
   } // end of namespace MPI
 
-} // end of namespace Utilities
+} // namespace Utilities
 
 
 DEAL_II_NAMESPACE_CLOSE

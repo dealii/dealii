@@ -615,6 +615,20 @@ namespace Utilities
       std::vector<std::pair<unsigned int, unsigned int>> import_indices_data;
 
       /**
+       * The set of (local) indices that we are importing during compress(),
+       * i.e., others' ghosts that belong to the local range. The data stored is
+       * the same than in import_indices_data but the data is expanded in plain
+       * arrays. This variable is only used when using CUDA-aware MPI.
+       */
+      // The variable is mutable to enable lazy initialization in
+      // export_to_ghosted_array_start(). This way partitioner does not have to
+      // be templated on the MemorySpaceType.
+      mutable std::vector<
+        std::pair<std::unique_ptr<unsigned int[], void (*)(unsigned int *)>,
+                  unsigned int>>
+        import_indices_plain_dev;
+
+      /**
        * A variable caching the number of ghost indices. It would be expensive
        * to compute it by iterating over the import indices and accumulate them.
        */
