@@ -461,6 +461,21 @@ namespace LinearAlgebra
 
 
       /**
+       * Set each element @v val to @p v using @p indices as permutation, i.e.,
+       * <tt>val[i] = v[indices[i]]</tt>.
+       *
+       * @ingroup CUDAWrappers
+       */
+      template <typename Number>
+      __global__ void
+      gather(Number *         val,
+             const Number *   v,
+             const size_type *indices,
+             const size_type  N);
+
+
+
+      /**
        * Add each element @v val to @p v using @p indices as permutation, i.e.,
        * <tt>val[indices[i]] += v[i]</tt>.
        *

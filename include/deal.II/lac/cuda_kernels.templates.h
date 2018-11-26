@@ -554,6 +554,25 @@ namespace LinearAlgebra
 
       template <typename Number>
       __global__ void
+      gather(Number *         val,
+             const Number *   v,
+             const size_type *indices,
+             const size_type  N)
+      {
+        const size_type idx_base =
+          threadIdx.x + blockIdx.x * (blockDim.x * chunk_size);
+        for (unsigned int i = 0; i < chunk_size; ++i)
+          {
+            const size_type idx = idx_base + i * block_size;
+            if (idx < N)
+              val[idx] = v[indices[idx]];
+          }
+      }
+
+
+
+      template <typename Number>
+      __global__ void
       add_permutated(Number *         val,
                      const Number *   v,
                      const size_type *indices,
