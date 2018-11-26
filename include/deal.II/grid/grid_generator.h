@@ -1579,13 +1579,12 @@ namespace GridGenerator
    * @return A map that for each cell of the surface mesh (key) returns an
    * iterator to the corresponding face of a cell of the volume mesh (value).
    * The keys include both active and non-active cells of the surface mesh.
-   * For dim=2 (i.e., where volume cells are quadrilaterals and surface cells
-   * are lines), the order of vertices of surface cells and the corresponding
-   * volume faces match. For dim=3 (i.e., where volume cells are hexahedra and
-   * surface cells are quadrilaterals), the order of vertices may not match in
-   * order to ensure that each surface cell has a right-handed coordinate
-   * system when viewed from one of the two sides of the surface connecting
-   * the cells of the surface mesh.
+   * The order of vertices of surface cells and the corresponding
+   * volume faces may not match in order to ensure that each surface cell is
+   * associated with an outward facing normal.
+   * As a consequence, if you want to match quantities on the faces of the
+   * domain cells and on the cells of the surface mesh, you may have to
+   * translate between vertex locations or quadrature points.
    *
    * @note The algorithm outlined above assumes that all faces on higher
    * refinement levels always have exactly the same boundary indicator as
