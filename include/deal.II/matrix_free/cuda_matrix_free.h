@@ -252,12 +252,12 @@ namespace CUDAWrappers
      * Initializes the data structures.
      */
     void
-    reinit(const Mapping<dim> &             mapping,
-           const DoFHandler<dim> &          dof_handler,
-           const AffineConstraints<Number> &constraints,
-           const Quadrature<1> &            quad,
-           std::shared_ptr<const MPI_Comm>  comm,
-           const AdditionalData             additional_data);
+    internal_reinit(const Mapping<dim> &             mapping,
+                    const DoFHandler<dim> &          dof_handler,
+                    const AffineConstraints<Number> &constraints,
+                    const Quadrature<1> &            quad,
+                    std::shared_ptr<const MPI_Comm>  comm,
+                    const AdditionalData             additional_data);
 
     /**
      * Helper function. Loop over all the cells and apply the functor on each

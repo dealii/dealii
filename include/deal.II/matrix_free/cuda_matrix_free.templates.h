@@ -520,12 +520,12 @@ namespace CUDAWrappers
                                   const MPI_Comm &                 comm,
                                   const AdditionalData additional_data)
   {
-    reinit(mapping,
-           dof_handler,
-           constraints,
-           quad,
-           std::make_shared<const MPI_Comm>(comm),
-           additional_data);
+    internal_reinit(mapping,
+                    dof_handler,
+                    constraints,
+                    quad,
+                    std::make_shared<const MPI_Comm>(comm),
+                    additional_data);
   }
 
 
@@ -538,12 +538,12 @@ namespace CUDAWrappers
                                   const MPI_Comm &                 comm,
                                   const AdditionalData additional_data)
   {
-    reinit(StaticMappingQ1<dim>::mapping,
-           dof_handler,
-           constraints,
-           quad,
-           std::make_shared<const MPI_Comm>(comm),
-           additional_data);
+    internal_reinit(StaticMappingQ1<dim>::mapping,
+                    dof_handler,
+                    constraints,
+                    quad,
+                    std::make_shared<const MPI_Comm>(comm),
+                    additional_data);
   }
 
 
@@ -556,7 +556,8 @@ namespace CUDAWrappers
                                   const Quadrature<1> &            quad,
                                   const AdditionalData additional_data)
   {
-    reinit(mapping, dof_handler, constraints, quad, nullptr, additional_data);
+    internal_reinit(
+      mapping, dof_handler, constraints, quad, nullptr, additional_data);
   }
 
 
@@ -568,12 +569,12 @@ namespace CUDAWrappers
                                   const Quadrature<1> &            quad,
                                   const AdditionalData additional_data)
   {
-    reinit(StaticMappingQ1<dim>::mapping,
-           dof_handler,
-           constraints,
-           quad,
-           nullptr,
-           additional_data);
+    internal_reinit(StaticMappingQ1<dim>::mapping,
+                    dof_handler,
+                    constraints,
+                    quad,
+                    nullptr,
+                    additional_data);
   }
 
 
@@ -753,12 +754,13 @@ namespace CUDAWrappers
 
   template <int dim, typename Number>
   void
-  MatrixFree<dim, Number>::reinit(const Mapping<dim> &             mapping,
-                                  const DoFHandler<dim> &          dof_handler,
-                                  const AffineConstraints<Number> &constraints,
-                                  const Quadrature<1> &            quad,
-                                  std::shared_ptr<const MPI_Comm>  comm,
-                                  const AdditionalData additional_data)
+  MatrixFree<dim, Number>::internal_reinit(
+    const Mapping<dim> &             mapping,
+    const DoFHandler<dim> &          dof_handler,
+    const AffineConstraints<Number> &constraints,
+    const Quadrature<1> &            quad,
+    std::shared_ptr<const MPI_Comm>  comm,
+    const AdditionalData             additional_data)
   {
     if (typeid(Number) == typeid(double))
       cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
