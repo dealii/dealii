@@ -888,9 +888,9 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
           if (cell->refine_flag_set())
             previous_cells += (GeometryInfo<dim>::max_children_per_cell - 1);
           else if (cell->coarsen_flag_set())
-            previous_cells -=
-              (double)(GeometryInfo<dim>::max_children_per_cell - 1) /
-              GeometryInfo<dim>::max_children_per_cell;
+            previous_cells -= static_cast<double>(
+                                GeometryInfo<dim>::max_children_per_cell - 1) /
+                              GeometryInfo<dim>::max_children_per_cell;
 
         // @p{previous_cells} now gives the
         // number of cells which would result
@@ -915,9 +915,9 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
           if (cell->refine_flag_set())
             estimated_cells += (GeometryInfo<dim>::max_children_per_cell - 1);
           else if (cell->coarsen_flag_set())
-            estimated_cells -=
-              (double)(GeometryInfo<dim>::max_children_per_cell - 1) /
-              GeometryInfo<dim>::max_children_per_cell;
+            estimated_cells -= static_cast<double>(
+                                 GeometryInfo<dim>::max_children_per_cell - 1) /
+                               GeometryInfo<dim>::max_children_per_cell;
 
         // calculate the allowed delta in
         // cell numbers; be more lenient

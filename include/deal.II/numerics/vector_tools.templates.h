@@ -3531,7 +3531,7 @@ namespace VectorTools
         boundary_functions,
         rhs,
         dof_to_boundary_mapping,
-        (const Function<spacedim, number> *)nullptr,
+        static_cast<const Function<spacedim, number> *>(nullptr),
         component_mapping);
 
       // For certain weird elements,
