@@ -1052,7 +1052,8 @@ namespace internal
           if (dofs_per_cell * block_size > 10000)
             block_size /= 4;
 
-          block_size = 1 << (unsigned int)(std::log2(block_size + 1));
+          block_size =
+            1 << static_cast<unsigned int>(std::log2(block_size + 1));
         }
       if (block_size > n_active_cells)
         block_size = std::max(1U, n_active_cells);

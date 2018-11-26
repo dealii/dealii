@@ -2968,9 +2968,10 @@ inline FEEvaluationBase<dim, n_components_, Number, is_face>::FEEvaluationBase(
                   mapping_data->descriptor[active_quad_index].n_q_points);
   Assert(
     dof_info->start_components.back() == 1 ||
-      (int)n_components_ <=
-        (int)dof_info->start_components
-            [dof_info->component_to_base_index[first_selected_component] + 1] -
+      static_cast<int>(n_components_) <=
+        static_cast<int>(
+          dof_info->start_components
+            [dof_info->component_to_base_index[first_selected_component] + 1]) -
           first_selected_component,
     ExcMessage(
       "You tried to construct a vector-valued evaluator with " +
