@@ -564,7 +564,7 @@ namespace HDF5
     free(dims);
 
     size = 1;
-    for (auto &&dimension : dimensions)
+    for (const auto &dimension : dimensions)
       {
         size *= dimension;
       }
@@ -609,7 +609,7 @@ namespace HDF5
     Assert(*hdf5_reference >= 0, ExcMessage("Error at H5Dcreate2"));
 
     size = 1;
-    for (auto &&dimension : dimensions)
+    for (const auto &dimension : dimensions)
       {
         size *= dimension;
       }
