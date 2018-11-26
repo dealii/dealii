@@ -121,7 +121,7 @@ namespace Utilities
       /**
        * Return row of this process in the process grid.
        *
-       * It's negative for in-active processes.
+       * It's negative for inactive processes.
        */
       int
       get_this_process_row() const;
@@ -129,7 +129,7 @@ namespace Utilities
       /**
        * Return column of this process in the process grid.
        *
-       * It's negative for in-active processes.
+       * It's negative for inactive processes.
        */
       int
       get_this_process_column() const;
@@ -233,11 +233,13 @@ namespace Utilities
     }
 
 
+
     inline int
     ProcessGrid::get_this_process_row() const
     {
       return this_process_row;
     }
+
 
 
     inline int
