@@ -149,7 +149,7 @@ test()
 
   coupling.Tvmult(Mprojected_squares, space_square);
 
-  SolverControl                     cn(100, 1e-12);
+  SolverControl                     cn(100, 1e-12, false, false);
   TrilinosWrappers::SolverCG        solver(cn);
   TrilinosWrappers::PreconditionILU prec;
   prec.initialize(mass_matrix);
