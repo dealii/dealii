@@ -97,19 +97,16 @@ namespace CUDAWrappers
     /**
      * Allocate an array to the device and copy @p array_host to the device.
      */
-    template <typename Number1, typename Number2>
+    template <typename Number1>
     void
-    alloc_and_copy(Number1 **            array_device,
-                   std::vector<Number2> &array_host,
-                   const unsigned int    n)
+    alloc_and_copy(Number1 **array_device,
+                   const ArrayView<const Number1, MemorySpace::Host> array_host,
+                   const unsigned int                                n)
     {
       cudaError_t error_code = cudaMalloc(array_device, n * sizeof(Number1));
       AssertCuda(error_code);
+      AssertDimension(array_host.size(), n);
 
-      // TODO This is very dangerous because we are doing a memcopy but with
-      // different data types. However this is very useful to move Point to the
-      // device where they are stored as Tensor. Thus, we need Point on the
-      // device in order to make this function safer.
       error_code = cudaMemcpy(*array_device,
                               array_host.data(),
                               n * sizeof(Number1),
@@ -156,7 +153,7 @@ namespace CUDAWrappers
       MatrixFree<dim, Number> *data;
       // Host data
       std::vector<types::global_dof_index> local_to_global_host;
-      std::vector<Point<dim>>              q_points_host;
+      std::vector<Point<dim, Number>>      q_points_host;
       std::vector<Number>                  JxW_host;
       std::vector<Number>                  inv_jacobian_host;
       std::vector<unsigned int>            constraint_mask_host;
@@ -352,9 +349,11 @@ namespace CUDAWrappers
           MatrixFree<dim, Number>::parallel_over_elem)
         transpose_in_place(local_to_global_host, n_cells, padding_length);
 
-      alloc_and_copy(&data->local_to_global[color],
-                     local_to_global_host,
-                     n_cells * padding_length);
+      alloc_and_copy(
+        &data->local_to_global[color],
+        ArrayView<const types::global_dof_index>(local_to_global_host.data(),
+                                                 local_to_global_host.size()),
+        n_cells * padding_length);
 
       // Quadrature points
       if (update_flags & update_quadrature_points)
@@ -364,7 +363,8 @@ namespace CUDAWrappers
             transpose_in_place(q_points_host, n_cells, padding_length);
 
           alloc_and_copy(&data->q_points[color],
-                         q_points_host,
+                         ArrayView<const Tensor<1, dim, Number>>(
+                           q_points_host.data(), q_points_host.size()),
                          n_cells * padding_length);
         }
 
@@ -375,7 +375,10 @@ namespace CUDAWrappers
               MatrixFree<dim, Number>::parallel_over_elem)
             transpose_in_place(JxW_host, n_cells, padding_length);
 
-          alloc_and_copy(&data->JxW[color], JxW_host, n_cells * padding_length);
+          alloc_and_copy(&data->JxW[color],
+                         ArrayView<const Number>(JxW_host.data(),
+                                                 JxW_host.size()),
+                         n_cells * padding_length);
         }
 
       // Inverse jacobians
@@ -399,13 +402,16 @@ namespace CUDAWrappers
                                padding_length);
 
           alloc_and_copy(&data->inv_jacobian[color],
-                         inv_jacobian_host,
+                         ArrayView<const Number>(inv_jacobian_host.data(),
+                                                 inv_jacobian_host.size()),
                          n_cells * dim * dim * padding_length);
         }
 
-      alloc_and_copy(&data->constraint_mask[color],
-                     constraint_mask_host,
-                     n_cells);
+      alloc_and_copy(
+        &data->constraint_mask[color],
+        ArrayView<const types::global_dof_index>(constraint_mask_host.data(),
+                                                 constraint_mask_host.size()),
+        n_cells);
     }
 
 
