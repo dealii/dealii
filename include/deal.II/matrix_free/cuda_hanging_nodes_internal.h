@@ -61,7 +61,7 @@ namespace CUDAWrappers
       setup_constraints(
         std::vector<types::global_dof_index> &                    dof_indices,
         const CellIterator &                                      cell,
-        const std::unique_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
         unsigned int &                                            mask) const;
 
     private:
@@ -276,7 +276,7 @@ namespace CUDAWrappers
     HangingNodes<dim>::setup_constraints(
       std::vector<types::global_dof_index> &                    dof_indices,
       const CellIterator &                                      cell,
-      const std::unique_ptr<const Utilities::MPI::Partitioner> &partitioner,
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
       unsigned int &                                            mask) const
     {
       mask                         = 0;
