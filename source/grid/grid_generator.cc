@@ -4297,175 +4297,60 @@ namespace GridGenerator
     const double                  duplicated_vertex_tolerance,
     const bool                    copy_manifold_ids)
   {
-    for (const auto triangulation : triangulations)
-      {
-        (void)triangulation;
-        Assert(triangulation->n_levels() == 1,
-               ExcMessage("The input triangulations must be non-empty "
-                          "and must not be refined."));
-      }
-
-    // get the union of the set of vertices
-    unsigned int n_vertices = 0;
-    for (const auto triangulation : triangulations)
-      n_vertices += triangulation->n_vertices();
-
     std::vector<Point<spacedim>> vertices;
-    vertices.reserve(n_vertices);
-    for (const auto triangulation : triangulations)
-      vertices.insert(vertices.end(),
-                      triangulation->get_vertices().begin(),
-                      triangulation->get_vertices().end());
+    std::vector<CellData<dim>>   cells;
+    SubCellData                  subcell_data;
 
-    // now form the union of the set of cells
-    std::vector<CellData<dim>> cells;
-    unsigned int               n_cells = 0;
-    for (const auto triangulation : triangulations)
-      n_cells += triangulation->n_cells();
-
-    cells.reserve(n_cells);
     unsigned int n_accumulated_vertices = 0;
     for (const auto triangulation : triangulations)
       {
-        for (const auto &cell : triangulation->cell_iterators())
+        Assert(triangulation->n_levels() == 1,
+               ExcMessage("The input triangulations must be non-empty "
+                          "and must not be refined."));
+
+        std::vector<Point<spacedim>> tria_vertices;
+        std::vector<CellData<dim>>   tria_cells;
+        SubCellData                  tria_subcell_data;
+        std::tie(tria_vertices, tria_cells, tria_subcell_data) =
+          GridTools::get_coarse_mesh_description(*triangulation);
+
+        vertices.insert(vertices.end(),
+                        tria_vertices.begin(),
+                        tria_vertices.end());
+        for (CellData<dim> &cell_data : tria_cells)
           {
-            CellData<dim> this_cell;
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
-              this_cell.vertices[v] =
-                cell->vertex_index(v) + n_accumulated_vertices;
-            this_cell.material_id = cell->material_id();
-            this_cell.manifold_id = cell->manifold_id();
-            cells.push_back(std::move(this_cell));
+            for (unsigned int &vertex_n : cell_data.vertices)
+              vertex_n += n_accumulated_vertices;
+            cells.push_back(cell_data);
           }
+
+        // Skip copying lines with no manifold information.
+        if (copy_manifold_ids)
+          {
+            for (CellData<1> &line_data : tria_subcell_data.boundary_lines)
+              {
+                if (line_data.manifold_id == numbers::flat_manifold_id)
+                  continue;
+                for (unsigned int &vertex_n : line_data.vertices)
+                  vertex_n += n_accumulated_vertices;
+                line_data.boundary_id =
+                  numbers::internal_face_boundary_id; // default
+                subcell_data.boundary_lines.push_back(line_data);
+              }
+
+            for (CellData<2> &quad_data : tria_subcell_data.boundary_quads)
+              {
+                if (quad_data.manifold_id == numbers::flat_manifold_id)
+                  continue;
+                for (unsigned int &vertex_n : quad_data.vertices)
+                  vertex_n += n_accumulated_vertices;
+                quad_data.boundary_id =
+                  numbers::internal_face_boundary_id; // default
+                subcell_data.boundary_quads.push_back(quad_data);
+              }
+          }
+
         n_accumulated_vertices += triangulation->n_vertices();
-      }
-
-    // Now for the SubCellData
-    SubCellData subcell_data;
-    if (copy_manifold_ids)
-      {
-        switch (dim)
-          {
-            case 1:
-              break;
-
-            case 2:
-              {
-                unsigned int n_boundary_lines = 0;
-                for (const auto triangulation : triangulations)
-                  n_boundary_lines += triangulation->n_lines();
-
-                subcell_data.boundary_lines.reserve(n_boundary_lines);
-
-                auto copy_line_manifold_ids =
-                  [&](const Triangulation<dim, spacedim> &tria,
-                      const unsigned int                  offset) {
-                    for (typename Triangulation<dim, spacedim>::line_iterator
-                           line = tria.begin_face();
-                         line != tria.end_face();
-                         ++line)
-                      if (line->manifold_id() != numbers::flat_manifold_id)
-                        {
-                          CellData<1> boundary_line;
-
-                          boundary_line.vertices[0] =
-                            line->vertex_index(0) + offset;
-                          boundary_line.vertices[1] =
-                            line->vertex_index(1) + offset;
-
-                          boundary_line.manifold_id = line->manifold_id();
-                          boundary_line.boundary_id =
-                            numbers::internal_face_boundary_id; // default
-
-                          subcell_data.boundary_lines.push_back(
-                            boundary_line); // trivially-copyable
-                        }
-                  };
-
-                unsigned int n_accumulated_vertices = 0;
-                for (const auto triangulation : triangulations)
-                  {
-                    copy_line_manifold_ids(*triangulation,
-                                           n_accumulated_vertices);
-                    n_accumulated_vertices += triangulation->n_vertices();
-                  }
-                break;
-              }
-
-            case 3:
-              {
-                unsigned int n_boundary_quads = 0;
-                for (const auto triangulation : triangulations)
-                  n_boundary_quads += triangulation->n_quads();
-
-                subcell_data.boundary_quads.reserve(n_boundary_quads);
-                // we can't do better here than to loop over all the lines
-                // bounding a face. For regular meshes an (interior) line in
-                // 3D is part of four cells. So this should be an appropriate
-                // guess.
-                subcell_data.boundary_lines.reserve(4 * n_boundary_quads);
-
-                auto copy_face_and_line_manifold_ids =
-                  [&](const Triangulation<dim, spacedim> &tria,
-                      const unsigned int                  offset) {
-                    for (typename Triangulation<dim, spacedim>::face_iterator
-                           face = tria.begin_face();
-                         face != tria.end_face();
-                         ++face)
-                      if (face->manifold_id() != numbers::flat_manifold_id)
-                        {
-                          CellData<2> boundary_quad;
-
-                          boundary_quad.vertices[0] =
-                            face->vertex_index(0) + offset;
-                          boundary_quad.vertices[1] =
-                            face->vertex_index(1) + offset;
-                          boundary_quad.vertices[2] =
-                            face->vertex_index(2) + offset;
-                          boundary_quad.vertices[3] =
-                            face->vertex_index(3) + offset;
-
-                          boundary_quad.manifold_id = face->manifold_id();
-                          boundary_quad.boundary_id =
-                            numbers::internal_face_boundary_id; // default
-
-                          subcell_data.boundary_quads.push_back(
-                            boundary_quad); // trivially-copyable
-                        }
-                    for (const auto &cell : tria.cell_iterators())
-                      for (unsigned int l = 0; l < 12; ++l)
-                        if (cell->line(l)->manifold_id() !=
-                            numbers::flat_manifold_id)
-                          {
-                            CellData<1> boundary_line;
-
-                            boundary_line.vertices[0] =
-                              cell->line(l)->vertex_index(0) + offset;
-                            boundary_line.vertices[1] =
-                              cell->line(l)->vertex_index(1) + offset;
-
-                            boundary_line.manifold_id =
-                              cell->line(l)->manifold_id();
-                            boundary_line.boundary_id =
-                              numbers::internal_face_boundary_id; // default
-
-                            subcell_data.boundary_lines.push_back(
-                              boundary_line); // trivially_copyable
-                          }
-                  };
-                unsigned int n_accumulated_vertices = 0;
-                for (const auto triangulation : triangulations)
-                  {
-                    copy_face_and_line_manifold_ids(*triangulation,
-                                                    n_accumulated_vertices);
-                    n_accumulated_vertices += triangulation->n_vertices();
-                  }
-                break;
-              }
-            default:
-              Assert(false, ExcNotImplemented());
-          }
       }
 
     // throw out duplicated vertices

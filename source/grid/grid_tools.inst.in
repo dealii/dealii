@@ -169,6 +169,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       compute_bounding_box(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
+      template std::tuple<std::vector<Point<deal_II_space_dimension>>,
+                          std::vector<CellData<deal_II_dimension>>,
+                          SubCellData>
+      get_coarse_mesh_description(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria);
+
       template void
       delete_unused_vertices(std::vector<Point<deal_II_space_dimension>> &,
                              std::vector<CellData<deal_II_dimension>> &,

@@ -263,6 +263,19 @@ namespace GridTools
     const Iterator &                                      object,
     const Point<Iterator::AccessorType::space_dimension> &trial_point);
 
+  /**
+   * Return the arrays that define the coarse mesh of a Triangulation. This
+   * function is the inverse of Triangulation::create_triangulation().
+   *
+   * This function is useful in cases where one needs to deconstruct a
+   * Triangulation or manipulate the numbering of the vertices in some way: an
+   * example is GridGenerator::merge_triangulations().
+   */
+  template <int dim, int spacedim>
+  std::
+    tuple<std::vector<Point<spacedim>>, std::vector<CellData<dim>>, SubCellData>
+    get_coarse_mesh_description(const Triangulation<dim, spacedim> &tria);
+
   /*@}*/
   /**
    * @name Functions supporting the creation of meshes
