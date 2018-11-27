@@ -713,6 +713,14 @@ namespace DoFRenumbering
         return 0;
       }
 
+    // Get a reference to the set of dofs. Note that we assume that all cells
+    // are assumed to be on the same level, otherwise the operation doesn't make
+    // much sense (we will assert this below).
+    const IndexSet &locally_owned_dofs =
+      is_level_operation ?
+        start->get_dof_handler().locally_owned_mg_dofs(start->level()) :
+        start->get_dof_handler().locally_owned_dofs();
+
     // Copy last argument into a
     // writable vector.
     std::vector<unsigned int> component_order(component_order_arg);
@@ -798,6 +806,13 @@ namespace DoFRenumbering
             if (!cell->is_locally_owned())
               continue;
           }
+
+        if (is_level_operation)
+          Assert(
+            cell->level() == start->level(),
+            ExcMessage(
+              "Multigrid renumbering in compute_component_wise() needs to be applied to a single level!"));
+
         // on each cell: get dof indices
         // and insert them into the global
         // list using their component
@@ -806,24 +821,11 @@ namespace DoFRenumbering
           fe_collection[fe_index].dofs_per_cell;
         local_dof_indices.resize(dofs_per_cell);
         cell->get_active_or_mg_dof_indices(local_dof_indices);
+
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            if (is_level_operation)
-              {
-                if (start->get_dof_handler()
-                      .locally_owned_mg_dofs(start->level())
-                      .is_element(local_dof_indices[i]))
-                  component_to_dof_map[component_list[fe_index][i]].push_back(
-                    local_dof_indices[i]);
-              }
-            else
-              {
-                if (start->get_dof_handler().locally_owned_dofs().is_element(
-                      local_dof_indices[i]))
-                  component_to_dof_map[component_list[fe_index][i]].push_back(
-                    local_dof_indices[i]);
-              }
-          }
+          if (locally_owned_dofs.is_element(local_dof_indices[i]))
+            component_to_dof_map[component_list[fe_index][i]].push_back(
+              local_dof_indices[i]);
       }
 
     // now we've got all indices sorted
@@ -941,28 +943,11 @@ namespace DoFRenumbering
              dof_index != end_of_component;
              ++dof_index)
           {
-            if (is_level_operation)
-              {
-                Assert(start->get_dof_handler()
-                           .locally_owned_mg_dofs(start->level())
-                           .index_within_set(*dof_index) < new_indices.size(),
-                       ExcInternalError());
-                new_indices[start->get_dof_handler()
-                              .locally_owned_mg_dofs(start->level())
-                              .index_within_set(*dof_index)] =
-                  next_free_index++;
-              }
-            else
-              {
-                Assert(start->get_dof_handler()
-                           .locally_owned_dofs()
-                           .index_within_set(*dof_index) < new_indices.size(),
-                       ExcInternalError());
-                new_indices[start->get_dof_handler()
-                              .locally_owned_dofs()
-                              .index_within_set(*dof_index)] =
-                  next_free_index++;
-              }
+            Assert(locally_owned_dofs.index_within_set(*dof_index) <
+                     new_indices.size(),
+                   ExcInternalError());
+            new_indices[locally_owned_dofs.index_within_set(*dof_index)] =
+              next_free_index++;
           }
       }
 
@@ -1096,6 +1081,14 @@ namespace DoFRenumbering
         return 0;
       }
 
+    // Get a reference to the set of dofs. Note that we assume that all cells
+    // are assumed to be on the same level, otherwise the operation doesn't make
+    // much sense (we will assert this below).
+    const IndexSet &locally_owned_dofs =
+      is_level_operation ?
+        start->get_dof_handler().locally_owned_mg_dofs(start->level()) :
+        start->get_dof_handler().locally_owned_dofs();
+
     // vector to hold the dof indices on
     // the cell we visit at a time
     std::vector<types::global_dof_index> local_dof_indices;
@@ -1142,6 +1135,12 @@ namespace DoFRenumbering
               continue;
           }
 
+        if (is_level_operation)
+          Assert(
+            cell->level() == start->level(),
+            ExcMessage(
+              "Multigrid renumbering in compute_block_wise() needs to be applied to a single level!"));
+
         // on each cell: get dof indices
         // and insert them into the global
         // list using their component
@@ -1150,24 +1149,11 @@ namespace DoFRenumbering
           fe_collection[fe_index].dofs_per_cell;
         local_dof_indices.resize(dofs_per_cell);
         cell->get_active_or_mg_dof_indices(local_dof_indices);
+
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            if (is_level_operation)
-              {
-                if (start->get_dof_handler()
-                      .locally_owned_mg_dofs(start->level())
-                      .is_element(local_dof_indices[i]))
-                  block_to_dof_map[block_list[fe_index][i]].push_back(
-                    local_dof_indices[i]);
-              }
-            else
-              {
-                if (start->get_dof_handler().locally_owned_dofs().is_element(
-                      local_dof_indices[i]))
-                  block_to_dof_map[block_list[fe_index][i]].push_back(
-                    local_dof_indices[i]);
-              }
-          }
+          if (locally_owned_dofs.is_element(local_dof_indices[i]))
+            block_to_dof_map[block_list[fe_index][i]].push_back(
+              local_dof_indices[i]);
       }
 
     // now we've got all indices sorted
@@ -1272,28 +1258,11 @@ namespace DoFRenumbering
              dof_index != end_of_component;
              ++dof_index)
           {
-            if (is_level_operation)
-              {
-                Assert(start->get_dof_handler()
-                           .locally_owned_mg_dofs(start->level())
-                           .index_within_set(*dof_index) < new_indices.size(),
-                       ExcInternalError());
-                new_indices[start->get_dof_handler()
-                              .locally_owned_mg_dofs(start->level())
-                              .index_within_set(*dof_index)] =
-                  next_free_index++;
-              }
-            else
-              {
-                Assert(start->get_dof_handler()
-                           .locally_owned_dofs()
-                           .index_within_set(*dof_index) < new_indices.size(),
-                       ExcInternalError());
-                new_indices[start->get_dof_handler()
-                              .locally_owned_dofs()
-                              .index_within_set(*dof_index)] =
-                  next_free_index++;
-              }
+            Assert(locally_owned_dofs.index_within_set(*dof_index) <
+                     new_indices.size(),
+                   ExcInternalError());
+            new_indices[locally_owned_dofs.index_within_set(*dof_index)] =
+              next_free_index++;
           }
       }
 
