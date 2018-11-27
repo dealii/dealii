@@ -556,12 +556,10 @@ namespace HDF5
     Assert(*dataspace >= 0, ExcMessage("Error at H5Dget_space"));
     rank_ret = H5Sget_simple_extent_ndims(*dataspace);
     Assert(rank_ret >= 0, ExcInternalError());
-    rank          = rank_ret;
-    hsize_t *dims = (hsize_t *)malloc(rank * sizeof(hsize_t));
-    rank_ret      = H5Sget_simple_extent_dims(*dataspace, dims, NULL);
+    rank = rank_ret;
+    dimensions.resize(rank);
+    rank_ret = H5Sget_simple_extent_dims(*dataspace, dimensions.data(), NULL);
     AssertDimension(rank_ret, static_cast<int>(rank));
-    dimensions.assign(dims, dims + rank);
-    free(dims);
 
     size = 1;
     for (const auto &dimension : dimensions)
