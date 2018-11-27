@@ -86,7 +86,7 @@ namespace CUDAWrappers
      * Constructor.
      */
     __device__
-    FEEvaluation(int                      cell_id,
+    FEEvaluation(const unsigned int       cell_id,
                  const data_type *        data,
                  SharedData<dim, Number> *shdata);
 
@@ -191,7 +191,7 @@ namespace CUDAWrappers
             typename Number>
   __device__
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(int                      cell_id,
+    FEEvaluation(const unsigned int       cell_id,
                  const data_type *        data,
                  SharedData<dim, Number> *shdata)
     : n_cells(data->n_cells)
