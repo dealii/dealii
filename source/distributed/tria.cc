@@ -3598,12 +3598,11 @@ namespace parallel
                g_idx < parallel_ghost->ghosts.elem_count;
                ++g_idx)
             {
-              while (
-                g_idx >=
-                (unsigned int)parallel_ghost->proc_offsets[ghost_owner + 1])
+              while (g_idx >= static_cast<unsigned int>(
+                                parallel_ghost->proc_offsets[ghost_owner + 1]))
                 ++ghost_owner;
-              while (g_idx >=
-                     (unsigned int)parallel_ghost->tree_offsets[ghost_tree + 1])
+              while (g_idx >= static_cast<unsigned int>(
+                                parallel_ghost->tree_offsets[ghost_tree + 1]))
                 ++ghost_tree;
 
               quadr = static_cast<
