@@ -428,10 +428,10 @@ namespace CUDAWrappers
     std::vector<dim3> block_dim;
 
     /**
-     * Unique pointer to a Partitioner for distributed Vectors used in
+     * Shared pointer to a Partitioner for distributed Vectors used in
      * cell_loop. When MPI is not used the pointer is null.
      */
-    std::unique_ptr<const Utilities::MPI::Partitioner> partitioner;
+    std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
     // Parallelization parameters
     unsigned int cells_per_block;

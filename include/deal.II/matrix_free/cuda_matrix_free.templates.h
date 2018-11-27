@@ -23,7 +23,6 @@
 
 #  include <deal.II/base/cuda_size.h>
 #  include <deal.II/base/graph_coloring.h>
-#  include <deal.II/base/std_cxx14/memory.h>
 
 #  include <deal.II/dofs/dof_tools.h>
 
@@ -147,7 +146,7 @@ namespace CUDAWrappers
       get_cell_data(
         const CellFilter &                                        cell,
         const unsigned int                                        cell_id,
-        const std::unique_ptr<const Utilities::MPI::Partitioner> &partitioner);
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       void
       alloc_and_copy_arrays(const unsigned int cell);
@@ -287,7 +286,7 @@ namespace CUDAWrappers
     ReinitHelper<dim, Number>::get_cell_data(
       const CellFilter &                                        cell,
       const unsigned int                                        cell_id,
-      const std::unique_ptr<const Utilities::MPI::Partitioner> &partitioner)
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
     {
       cell->get_dof_indices(local_dof_indices);
       // When using MPI, we need to transform the local_dof_indices, which
@@ -843,7 +842,7 @@ namespace CUDAWrappers
       {
         DoFTools::extract_locally_relevant_dofs(dof_handler,
                                                 locally_relevant_dofs);
-        partitioner = std_cxx14::make_unique<Utilities::MPI::Partitioner>(
+        partitioner = std::make_shared<Utilities::MPI::Partitioner>(
           dof_handler.locally_owned_dofs(), locally_relevant_dofs, *comm);
       }
     for (unsigned int i = 0; i < n_colors; ++i)
