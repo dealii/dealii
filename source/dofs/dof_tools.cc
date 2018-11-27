@@ -129,7 +129,7 @@ namespace DoFTools
                                     const ComponentMask &component_mask)
     {
       std::vector<unsigned char> local_component_association(
-        fe.dofs_per_cell, (unsigned char)(-1));
+        fe.dofs_per_cell, static_cast<unsigned char>(-1));
 
       // compute the component each local dof belongs to.
       // if the shape function is primitive, then this
@@ -170,7 +170,7 @@ namespace DoFTools
 
       Assert(std::find(local_component_association.begin(),
                        local_component_association.end(),
-                       (unsigned char)(-1)) ==
+                       static_cast<unsigned char>(-1)) ==
                local_component_association.end(),
              ExcInternalError());
 
@@ -280,13 +280,13 @@ namespace DoFTools
                               DoFHandlerType::space_dimension> &fe =
             fe_collection[f];
           local_block_association[f].resize(fe.dofs_per_cell,
-                                            (unsigned char)(-1));
+                                            static_cast<unsigned char>(-1));
           for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
             local_block_association[f][i] = fe.system_to_block_index(i).first;
 
           Assert(std::find(local_block_association[f].begin(),
                            local_block_association[f].end(),
-                           (unsigned char)(-1)) ==
+                           static_cast<unsigned char>(-1)) ==
                    local_block_association[f].end(),
                  ExcInternalError());
         }
@@ -2649,7 +2649,8 @@ namespace DoFTools
               if (cell->at_boundary(face))
                 vertex_boundary[vg] = true;
               else if ((!level_boundary_patches) &&
-                       (cell->neighbor(face)->level() != (int)level))
+                       (cell->neighbor(face)->level() !=
+                        static_cast<int>(level)))
                 vertex_boundary[vg] = true;
             }
         }

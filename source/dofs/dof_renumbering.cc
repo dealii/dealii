@@ -1722,14 +1722,11 @@ namespace DoFRenumbering
 
     unsigned int global_index = 0;
 
-    typename std::vector<
-      typename DoFHandlerType::level_cell_iterator>::const_iterator cell;
-
-    for (cell = cells.begin(); cell != cells.end(); ++cell)
+    for (const auto &cell : cells)
       {
-        Assert((*cell)->level() == (int)level, ExcInternalError());
+        Assert(cell->level() == static_cast<int>(level), ExcInternalError());
 
-        (*cell)->get_active_or_mg_dof_indices(cell_dofs);
+        cell->get_active_or_mg_dof_indices(cell_dofs);
         std::sort(cell_dofs.begin(), cell_dofs.end());
 
         for (unsigned int i = 0; i < n_cell_dofs; ++i)
