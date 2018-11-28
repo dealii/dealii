@@ -376,7 +376,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // keyword
                       std::string set = "";
                       in >> keyword;
-                      for (auto set_cmp : data_sets)
+                      for (const auto &set_cmp : data_sets)
                         if (keyword == set_cmp)
                           {
                             set = keyword;

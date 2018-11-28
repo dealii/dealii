@@ -2960,7 +2960,7 @@ namespace
           if (line->manifold_id() != numbers::flat_manifold_id ||
               (line->boundary_id() != 0 &&
                line->boundary_id() != numbers::invalid_boundary_id))
-            res.push_back(line);
+            res.emplace_back(line);
         }
     const_cast<Triangulation<3, 3> &>(tria).load_user_flags_line(flags);
     return res;
