@@ -247,6 +247,67 @@ namespace HDF5
     }
 
 
+    // This helper function sets the property list of the read and write
+    // operations of DataSet. A property list has to be created for the MPI
+    // driver. For the serial driver the default H5P_DEFAULT can be used. In
+    // addition H5Pset_dxpl_mpio is used to set the MPI mode to collective.
+    void
+    set_plist(hid_t &plist, const bool mpi)
+    {
+      herr_t ret;
+
+      if (mpi)
+        {
+          plist = H5Pcreate(H5P_DATASET_XFER);
+          Assert(plist >= 0, ExcInternalError());
+          ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+          Assert(ret >= 0, ExcInternalError());
+        }
+      else
+        {
+          plist = H5P_DEFAULT;
+        }
+
+      // This avoids the unused warning
+      (void)ret;
+    }
+
+
+    // This helper function release the property list handler of the read and
+    // write operations of DataSet. For the serial there is no need to release
+    // the property list handler because H5P_DEFAULT has been used. If
+    // query_io_mode is True then H5Pget_mpio_actual_io_mode and
+    // H5Pget_mpio_no_collective_cause are used to check if the operation has
+    // been collective.
+    void
+    release_plist(hid_t &                    plist,
+                  H5D_mpio_actual_io_mode_t &io_mode,
+                  uint32_t &                 local_no_collective_cause,
+                  uint32_t &                 global_no_collective_cause,
+                  const bool                 mpi,
+                  const bool                 query_io_mode)
+    {
+      herr_t ret;
+
+      if (mpi)
+        {
+          if (query_io_mode)
+            {
+              ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
+              Assert(ret >= 0, ExcInternalError());
+              ret =
+                H5Pget_mpio_no_collective_cause(plist,
+                                                &local_no_collective_cause,
+                                                &global_no_collective_cause);
+              Assert(ret >= 0, ExcInternalError());
+            }
+          ret = H5Pclose(plist);
+          Assert(ret >= 0, ExcInternalError());
+        }
+
+      (void)ret;
+    }
+
 
     // Convert a HDF5 no_collective_cause code to a human readable string
     std::string
@@ -626,17 +687,7 @@ namespace HDF5
 
     Container data = internal::initialize_container<Container>(dimensions);
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcInternalError());
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcInternalError());
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
 
     ret = H5Dread(*hdf5_reference,
                   *t_type,
@@ -646,20 +697,13 @@ namespace HDF5
                   make_array_view(data).data());
     Assert(ret >= 0, ExcInternalError());
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcInternalError());
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0, ExcInternalError());
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcInternalError());
-      }
+
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
 
     (void)ret;
     return data;
@@ -693,17 +737,7 @@ namespace HDF5
                              coordinates.data());
     Assert(ret >= 0, ExcMessage("Error at H5Sselect_elements"));
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
 
     ret = H5Dread(*hdf5_reference,
                   *t_type,
@@ -713,21 +747,12 @@ namespace HDF5
                   make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0,
-                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
 
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
@@ -762,17 +787,7 @@ namespace HDF5
       *dataspace, H5S_SELECT_SET, offset.data(), NULL, count.data(), NULL);
     Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
 
     ret = H5Dread(*hdf5_reference,
                   *t_type,
@@ -782,21 +797,12 @@ namespace HDF5
                   make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0,
-                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
 
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
@@ -834,17 +840,7 @@ namespace HDF5
                               block.data());
     Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
 
     ret = H5Dread(*hdf5_reference,
                   *t_type,
@@ -854,21 +850,12 @@ namespace HDF5
                   make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0,
-                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
 
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
@@ -895,17 +882,7 @@ namespace HDF5
     ret = H5Sselect_none(*dataspace);
     Assert(ret >= 0, ExcMessage("H5Sselect_none"));
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
 
     // The pointer of data can safely be NULL, see the discussion at the HDF5
     // forum:
@@ -914,21 +891,12 @@ namespace HDF5
       *hdf5_reference, *t_type, memory_dataspace, *dataspace, plist, NULL);
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0,
-                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
 
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
@@ -948,17 +916,7 @@ namespace HDF5
     hid_t  plist;
     herr_t ret;
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
 
     ret = H5Dwrite(*hdf5_reference,
                    *t_type,
@@ -968,20 +926,12 @@ namespace HDF5
                    make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcInternalError());
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0, ExcInternalError());
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
 
     (void)ret;
   }
@@ -1012,17 +962,7 @@ namespace HDF5
                              coordinates.data());
     Assert(ret >= 0, ExcMessage("Error at H5Sselect_elements"));
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
 
     ret = H5Dwrite(*hdf5_reference,
                    *t_type,
@@ -1032,21 +972,13 @@ namespace HDF5
                    make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0,
-                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
+
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5SClose"));
 
@@ -1083,17 +1015,8 @@ namespace HDF5
       *dataspace, H5S_SELECT_SET, offset.data(), NULL, count.data(), NULL);
     Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
+
     ret = H5Dwrite(*hdf5_reference,
                    *t_type,
                    memory_dataspace,
@@ -1102,21 +1025,13 @@ namespace HDF5
                    make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0,
-                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
+
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
 
@@ -1152,17 +1067,8 @@ namespace HDF5
                               block.data());
     Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
-        ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-        Assert(ret >= 0, ExcMessage("Error at H5Pset_dxpl_mpio"));
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
+
     ret = H5Dwrite(*hdf5_reference,
                    *t_type,
                    memory_dataspace,
@@ -1171,21 +1077,13 @@ namespace HDF5
                    make_array_view(data).data());
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcMessage("Error at H5Pget_mpio_actual_io_mode"));
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0,
-                   ExcMessage("Error at H5Pget_mpio_no_collective_cause"));
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
+
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
 
@@ -1210,15 +1108,7 @@ namespace HDF5
     ret = H5Sselect_none(*dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5PSselect_none"));
 
-    if (mpi)
-      {
-        plist = H5Pcreate(H5P_DATASET_XFER);
-        H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
-      }
-    else
-      {
-        plist = H5P_DEFAULT;
-      }
+    internal::set_plist(plist, mpi);
 
     // The pointer of data can safely be NULL, see the discussion at the HDF5
     // forum:
@@ -1227,20 +1117,13 @@ namespace HDF5
       *hdf5_reference, *t_type, memory_dataspace, *dataspace, plist, NULL);
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
-    if (mpi)
-      {
-        if (query_io_mode)
-          {
-            ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
-            Assert(ret >= 0, ExcInternalError());
-            ret = H5Pget_mpio_no_collective_cause(plist,
-                                                  &local_no_collective_cause,
-                                                  &global_no_collective_cause);
-            Assert(ret >= 0, ExcInternalError());
-          }
-        ret = H5Pclose(plist);
-        Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
-      }
+    internal::release_plist(plist,
+                            io_mode,
+                            local_no_collective_cause,
+                            global_no_collective_cause,
+                            mpi,
+                            query_io_mode);
+
     ret = H5Sclose(memory_dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
 
