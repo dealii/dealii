@@ -875,7 +875,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
       out << "object \"material\" class array type int rank 0 items " << n_cells
           << " data follows" << '\n';
       for (cell = tria.begin_active(); cell != endc; ++cell)
-        out << ' ' << (unsigned int)cell->material_id();
+        out << ' ' << cell->material_id();
       out << '\n' << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
 
       out << "object \"level\" class array type int rank 0 items " << n_cells
@@ -944,10 +944,17 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
           << " data follows" << '\n';
       for (cell = tria.begin_active(); cell != endc; ++cell)
         {
-          // Little trick to get -1
-          // for the interior
+          // Little trick to get -1 for the interior
           for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-            out << ' ' << (int)(signed char)cell->face(f)->boundary_id();
+            {
+              const types::boundary_id boundary_id =
+                cell->face(f)->boundary_id();
+              out << ' '
+                  << (boundary_id == static_cast<types::boundary_id>(-1) ?
+                        -1 :
+                        static_cast<std::make_signed<types::boundary_id>::type>(
+                          boundary_id));
+            }
           out << '\n';
         }
       out << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
@@ -1451,8 +1458,8 @@ GridOut::write_xfig(const Triangulation<2> &tria,
             cell->vertex(GeometryInfo<dim>::ucd_to_deal[k % nv]);
           for (unsigned int d = 0; d < static_cast<unsigned int>(dim); ++d)
             {
-              int val = (int)(1200 * xfig_flags.scaling(d) *
-                              (p(d) - xfig_flags.offset(d)));
+              int val =
+                1200 * xfig_flags.scaling(d) * (p(d) - xfig_flags.offset(d));
               out << '\t' << ((d == 0) ? val : -val);
             }
           out << std::endl;
@@ -1471,8 +1478,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
                 out << "2 1 "
                     // with line style and thickness
                     << xfig_flags.boundary_style << ' '
-                    << xfig_flags.boundary_thickness << ' '
-                    << (1 + (unsigned int)bi);
+                    << xfig_flags.boundary_thickness << ' ' << 1 + bi;
                 // Fill color
                 out << " -1 ";
                 // Depth 100 less than cells
@@ -1496,8 +1502,8 @@ GridOut::write_xfig(const Triangulation<2> &tria,
                     for (unsigned int d = 0; d < static_cast<unsigned int>(dim);
                          ++d)
                       {
-                        int val = (int)(1200 * xfig_flags.scaling(d) *
-                                        (p(d) - xfig_flags.offset(d)));
+                        int val = 1200 * xfig_flags.scaling(d) *
+                                  (p(d) - xfig_flags.offset(d));
                         out << '\t' << ((d == 0) ? val : -val);
                       }
                     out << std::endl;
@@ -1609,9 +1615,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   // bounding box of the given triangulation and check
   // the cells for material id, level number, subdomain id
   // (, and level subdomain id).
-  for (Triangulation<2, 2>::cell_iterator cell = tria.begin();
-       cell != tria.end();
-       ++cell)
+  for (const auto &cell : tria.cell_iterators())
     {
       for (unsigned int vertex_index = 0; vertex_index < 4; vertex_index++)
         {
@@ -1626,13 +1630,13 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
             y_max = cell->vertex(vertex_index)[1];
         }
 
-      if ((unsigned int)cell->level() < min_level)
+      if (static_cast<unsigned int>(cell->level()) < min_level)
         min_level = cell->level();
-      if ((unsigned int)cell->level() > max_level)
+      if (static_cast<unsigned int>(cell->level()) > max_level)
         max_level = cell->level();
 
-      materials[(unsigned int)cell->material_id()] = 1;
-      levels[(unsigned int)cell->level()]          = 1;
+      materials[cell->material_id()] = 1;
+      levels[cell->level()]          = 1;
       if (cell->active())
         subdomains[cell->subdomain_id() + 2] = 1;
       level_subdomains[cell->level_subdomain_id() + 2] = 1;
@@ -1795,7 +1799,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   if (svg_flags.convert_level_number_to_height)
     {
       point[2] = svg_flags.level_height_factor *
-                 ((float)tria.begin()->level() / (float)n_levels) *
+                 (static_cast<float>(tria.begin()->level()) /
+                  static_cast<float>(n_levels)) *
                  std::max(x_dimension, y_dimension);
     }
 
@@ -1818,9 +1823,10 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
       if (svg_flags.convert_level_number_to_height)
         {
-          point[2] = svg_flags.level_height_factor *
-                     ((float)cell->level() / (float)n_levels) *
-                     std::max(x_dimension, y_dimension);
+          point[2] =
+            svg_flags.level_height_factor *
+            (static_cast<float>(cell->level()) / static_cast<float>(n_levels)) *
+            std::max(x_dimension, y_dimension);
         }
 
       projection_decomposition = GridOut::svg_project_point(point,
@@ -1896,7 +1902,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       if (y_min_perspective > projection_decomposition[1])
         y_min_perspective = projection_decomposition[1];
 
-      if ((unsigned int)cell->level() == min_level)
+      if (static_cast<unsigned int>(cell->level()) == min_level)
         min_level_min_vertex_distance = cell->minimum_vertex_distance();
     }
 
@@ -2139,10 +2145,10 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
               switch (svg_flags.coloring)
                 {
                   case GridOutFlags::Svg::material_id:
-                    out << (unsigned int)cell->material_id();
+                    out << cell->material_id();
                     break;
                   case GridOutFlags::Svg::level_number:
-                    out << (unsigned int)cell->level();
+                    out << static_cast<unsigned int>(cell->level());
                     break;
                   case GridOutFlags::Svg::subdomain_id:
                     if (cell->active())
@@ -2169,7 +2175,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           if (svg_flags.convert_level_number_to_height)
             {
               point[2] = svg_flags.level_height_factor *
-                         ((float)cell->level() / (float)n_levels) *
+                         (static_cast<float>(cell->level()) /
+                          static_cast<float>(n_levels)) *
                          std::max(x_dimension, y_dimension);
             }
 
@@ -2307,7 +2314,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
               if (svg_flags.convert_level_number_to_height)
                 {
                   point[2] = svg_flags.level_height_factor *
-                             ((float)cell->level() / (float)n_levels) *
+                             (static_cast<float>(cell->level()) /
+                              static_cast<float>(n_levels)) *
                              std::max(x_dimension, y_dimension);
                 }
 
@@ -2326,11 +2334,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                                            camera_focus);
 
               const unsigned int font_size_this_cell =
-                static_cast<unsigned int>(.5 +
-                                          cell_label_font_size *
-                                            std::pow(.5,
-                                                     (float)cell->level() - 4. +
-                                                       3.5 * distance_factor));
+                .5 + cell_label_font_size *
+                       std::pow(.5, cell->level() - 4. + 3.5 * distance_factor);
 
               out << "  <text"
                   << " x=\""
@@ -2366,7 +2371,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                   if (svg_flags.label_level_number ||
                       svg_flags.label_cell_index)
                     out << ',';
-                  out << (int)cell->material_id();
+                  out << static_cast<int>(cell->material_id());
                 }
 
               if (svg_flags.label_subdomain_id)
@@ -2408,7 +2413,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                       if (svg_flags.convert_level_number_to_height)
                         {
                           point[2] = svg_flags.level_height_factor *
-                                     ((float)cell->level() / (float)n_levels) *
+                                     (static_cast<float>(cell->level()) /
+                                      static_cast<float>(n_levels)) *
                                      std::max(x_dimension, y_dimension);
                         }
 
@@ -2445,7 +2451,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                       if (svg_flags.convert_level_number_to_height)
                         {
                           point[2] = svg_flags.level_height_factor *
-                                     ((float)cell->level() / (float)n_levels) *
+                                     (static_cast<float>(cell->level()) /
+                                      static_cast<float>(n_levels)) *
                                      std::max(x_dimension, y_dimension);
                         }
 
@@ -3235,12 +3242,10 @@ GridOut::write_mesh_per_processor_as_vtu(
           patch.vertices[vertex] = cell->vertex(vertex);
           patch.data(0, vertex)  = cell->level();
           if (!cell->has_children())
-            patch.data(1, vertex) =
-              (double)static_cast<int>(cell->subdomain_id());
+            patch.data(1, vertex) = static_cast<int>(cell->subdomain_id());
           else
             patch.data(1, vertex) = -1.0;
-          patch.data(2, vertex) =
-            (double)static_cast<int>(cell->level_subdomain_id());
+          patch.data(2, vertex) = static_cast<int>(cell->level_subdomain_id());
           patch.data(3, vertex) = tria.locally_owned_subdomain();
         }
 

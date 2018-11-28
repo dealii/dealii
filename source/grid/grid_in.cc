@@ -2961,7 +2961,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
                   cells[valid_cell].vertices[f] =
                     mFaces[i].mIndices[f] + v_offset;
                 }
-              cells[valid_cell].material_id = (types::material_id)m;
+              cells[valid_cell].material_id = m;
               ++valid_cell;
             }
           else
