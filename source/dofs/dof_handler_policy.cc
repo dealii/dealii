@@ -4119,9 +4119,10 @@ namespace internal
                   displacements[i] = shift;
                   shift += rcounts[i];
                 }
-              Assert(((int)new_numbers_copy.size()) ==
-                       rcounts[Utilities::MPI::this_mpi_process(
-                         tr->get_communicator())],
+              Assert(new_numbers_copy.size() ==
+                       static_cast<unsigned int>(
+                         rcounts[Utilities::MPI::this_mpi_process(
+                           tr->get_communicator())]),
                      ExcInternalError());
               ierr = MPI_Allgatherv(new_numbers_copy.data(),
                                     new_numbers_copy.size(),

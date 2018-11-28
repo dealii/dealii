@@ -2245,7 +2245,7 @@ namespace DoFTools
       // matrix, we assume that for a 0* rotation we would have to build the
       // identity matrix
 
-      Assert(matrix.m() == (int)spacedim, ExcInternalError())
+      Assert(matrix.m() == spacedim, ExcInternalError())
 
         Quadrature<dim - 1>
           quadrature(fe.get_unit_face_support_points());
@@ -2351,7 +2351,7 @@ namespace DoFTools
            ExcMessage("The supplied (rotation or interpolation) matrix must "
                       "be a square matrix"));
 
-    Assert(first_vector_components.empty() || matrix.m() == (int)spacedim,
+    Assert(first_vector_components.empty() || matrix.m() == spacedim,
            ExcMessage("first_vector_components is nonempty, so matrix must "
                       "be a rotation matrix exactly of size spacedim"));
 
@@ -2362,15 +2362,15 @@ namespace DoFTools
         const unsigned int n_dofs_per_face =
           face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
 
-        Assert(
-          matrix.m() == 0 ||
-            (first_vector_components.empty() &&
-             matrix.m() == n_dofs_per_face) ||
-            (!first_vector_components.empty() && matrix.m() == (int)spacedim),
-          ExcMessage("The matrix must have either size 0 or spacedim "
-                     "(if first_vector_components is nonempty) "
-                     "or the size must be equal to the # of DoFs on the face "
-                     "(if first_vector_components is empty)."));
+        Assert(matrix.m() == 0 ||
+                 (first_vector_components.empty() &&
+                  matrix.m() == n_dofs_per_face) ||
+                 (!first_vector_components.empty() && matrix.m() == spacedim),
+               ExcMessage(
+                 "The matrix must have either size 0 or spacedim "
+                 "(if first_vector_components is nonempty) "
+                 "or the size must be equal to the # of DoFs on the face "
+                 "(if first_vector_components is empty)."));
       }
 
     if (!face_2->has_children())
@@ -2379,15 +2379,15 @@ namespace DoFTools
         const unsigned int n_dofs_per_face =
           face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
 
-        Assert(
-          matrix.m() == 0 ||
-            (first_vector_components.empty() &&
-             matrix.m() == n_dofs_per_face) ||
-            (!first_vector_components.empty() && matrix.m() == (int)spacedim),
-          ExcMessage("The matrix must have either size 0 or spacedim "
-                     "(if first_vector_components is nonempty) "
-                     "or the size must be equal to the # of DoFs on the face "
-                     "(if first_vector_components is empty)."));
+        Assert(matrix.m() == 0 ||
+                 (first_vector_components.empty() &&
+                  matrix.m() == n_dofs_per_face) ||
+                 (!first_vector_components.empty() && matrix.m() == spacedim),
+               ExcMessage(
+                 "The matrix must have either size 0 or spacedim "
+                 "(if first_vector_components is nonempty) "
+                 "or the size must be equal to the # of DoFs on the face "
+                 "(if first_vector_components is empty)."));
       }
 #endif
 
