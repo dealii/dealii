@@ -238,7 +238,7 @@ namespace SUNDIALS
     (void)status;
     AssertKINSOL(status);
 
-    status = KINSetUserData(kinsol_mem, (void *)this);
+    status = KINSetUserData(kinsol_mem, static_cast<void *>(this));
     AssertKINSOL(status);
 
     status = KINSetNumMaxIters(kinsol_mem, data.maximum_non_linear_iterations);
@@ -253,7 +253,7 @@ namespace SUNDIALS
     status = KINSetMaxSetupCalls(kinsol_mem, data.maximum_setup_calls);
     AssertKINSOL(status);
 
-    status = KINSetNoInitSetup(kinsol_mem, (int)data.no_init_setup);
+    status = KINSetNoInitSetup(kinsol_mem, data.no_init_setup);
     AssertKINSOL(status);
 
     status = KINSetMaxNewtonStep(kinsol_mem, data.maximum_newton_step);
@@ -275,7 +275,7 @@ namespace SUNDIALS
 
     if (solve_jacobian_system)
       {
-        KINMem KIN_mem      = (KINMem)kinsol_mem;
+        auto KIN_mem        = static_cast<KINMem>(kinsol_mem);
         KIN_mem->kin_lsolve = t_kinsol_solve_jacobian<VectorType>;
         if (setup_jacobian)
           {
@@ -306,7 +306,7 @@ namespace SUNDIALS
       Assert(iteration_function, ExcFunctionNotProvided("iteration_function"));
 
     // call to KINSol
-    status = KINSol(kinsol_mem, solution, (int)data.strategy, u_scale, f_scale);
+    status = KINSol(kinsol_mem, solution, data.strategy, u_scale, f_scale);
     AssertKINSOL(status);
 
     copy(initial_guess_and_solution, solution);
@@ -337,7 +337,7 @@ namespace SUNDIALS
 #  endif
     KINFree(&kinsol_mem);
 
-    return (unsigned int)nniters;
+    return static_cast<unsigned int>(nniters);
   }
 
   template <typename VectorType>
