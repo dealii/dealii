@@ -687,8 +687,28 @@ namespace internal
 
                   if (add_to_ghost)
                     {
-                      ghost_cells.insert(std::pair<unsigned int, unsigned int>(
-                        neighbor->level(), neighbor->index()));
+                      if (use_active_cells && neighbor->has_children())
+                        for (unsigned int s = 0;
+                             s < dcell->face(f)->n_children();
+                             ++s)
+                          {
+                            typename dealii::Triangulation<dim>::cell_iterator
+                              neighbor_child =
+                                dcell->at_boundary(f) ?
+                                  dcell->periodic_neighbor_child_on_subface(f,
+                                                                            s) :
+                                  dcell->neighbor_child_on_subface(f, s);
+                            if (neighbor_child->subdomain_id() !=
+                                dcell->subdomain_id())
+                              ghost_cells.insert(
+                                std::pair<unsigned int, unsigned int>(
+                                  neighbor_child->level(),
+                                  neighbor_child->index()));
+                          }
+                      else
+                        ghost_cells.insert(
+                          std::pair<unsigned int, unsigned int>(
+                            neighbor->level(), neighbor->index()));
                       at_processor_boundary[i] = true;
                     }
                 }
@@ -842,11 +862,15 @@ namespace internal
                                           cell));
                                       }
                                     else
-                                      Assert(face_is_owned[dcell->face(f)
-                                                             ->index()] ==
-                                               FaceCategory::
-                                                 locally_active_done_elsewhere,
-                                             ExcInternalError());
+                                      Assert(
+                                        face_is_owned[dcell->face(f)
+                                                        ->index()] ==
+                                            FaceCategory::
+                                              locally_active_done_elsewhere ||
+                                          face_is_owned[dcell->face(f)
+                                                          ->index()] ==
+                                            FaceCategory::ghosted,
+                                        ExcInternalError());
                                   }
                                 else
                                   {
