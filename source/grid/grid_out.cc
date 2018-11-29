@@ -1454,8 +1454,8 @@ GridOut::write_xfig(const Triangulation<2> &tria,
             cell->vertex(GeometryInfo<dim>::ucd_to_deal[k % nv]);
           for (unsigned int d = 0; d < static_cast<unsigned int>(dim); ++d)
             {
-              int val =
-                1200 * xfig_flags.scaling(d) * (p(d) - xfig_flags.offset(d));
+              int val = static_cast<int>(1200 * xfig_flags.scaling(d) *
+                                         (p(d) - xfig_flags.offset(d)));
               out << '\t' << ((d == 0) ? val : -val);
             }
           out << std::endl;
@@ -1498,8 +1498,9 @@ GridOut::write_xfig(const Triangulation<2> &tria,
                     for (unsigned int d = 0; d < static_cast<unsigned int>(dim);
                          ++d)
                       {
-                        int val = 1200 * xfig_flags.scaling(d) *
-                                  (p(d) - xfig_flags.offset(d));
+                        int val =
+                          static_cast<int>(1200 * xfig_flags.scaling(d) *
+                                           (p(d) - xfig_flags.offset(d)));
                         out << '\t' << ((d == 0) ? val : -val);
                       }
                     out << std::endl;
@@ -3264,14 +3265,14 @@ GridOut::write_mesh_per_processor_as_vtu(
           patch.vertices[vertex] = cell->vertex(vertex);
           patch.data(0, vertex)  = cell->level();
           if (!cell->has_children())
-            patch.data(1, vertex) =
+            patch.data(1, vertex) = static_cast<double>(
               static_cast<std::make_signed<types::subdomain_id>::type>(
-                cell->subdomain_id());
+                cell->subdomain_id()));
           else
             patch.data(1, vertex) = -1.0;
-          patch.data(2, vertex) =
+          patch.data(2, vertex) = static_cast<double>(
             static_cast<std::make_signed<types::subdomain_id>::type>(
-              cell->level_subdomain_id());
+              cell->level_subdomain_id()));
           patch.data(3, vertex) = tria.locally_owned_subdomain();
         }
 

@@ -2812,7 +2812,7 @@ namespace GridTools
       if (cell->active())
         {
           while (current_cell_idx >=
-                 std::floor(static_cast<long>(n_active_cells) *
+                 std::floor(static_cast<uint_least64_t>(n_active_cells) *
                             (current_proc_idx + 1) / n_partitions))
             ++current_proc_idx;
           cell->set_subdomain_id(current_proc_idx);
