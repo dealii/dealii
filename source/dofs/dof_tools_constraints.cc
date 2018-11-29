@@ -2035,11 +2035,19 @@ namespace DoFTools
             cell_to_rotated_face_index[fe.face_to_cell_index(
               target, 0, face_orientation, face_flip, face_rotation)];
 
-          const bool face_2_constrained =
-            affine_constraints.is_constrained(dofs_2[i]);
-          const auto dof_left  = face_2_constrained ? dofs_1[j] : dofs_2[i];
-          const auto dof_right = face_2_constrained ? dofs_2[i] : dofs_1[j];
-          factor               = face_2_constrained ? 1. / factor : factor;
+          auto dof_left  = dofs_1[j];
+          auto dof_right = dofs_2[i];
+
+          // If dof_left is already constrained, or dof_left < dof_right we
+          // flip the order to ensure that dofs are constrained in a stable
+          // manner on different MPI processes.
+          if (affine_constraints.is_constrained(dof_left) ||
+              (dof_left < dof_right &&
+               !affine_constraints.is_constrained(dof_right)))
+            {
+              std::swap(dof_left, dof_right);
+              factor = 1. / factor;
+            }
 
           // Next, we try to enter the constraint
           //   dof_left = factor * dof_right;
@@ -2196,7 +2204,6 @@ namespace DoFTools
         }
       return transformation;
     }
-
   } /*namespace*/
 
 
