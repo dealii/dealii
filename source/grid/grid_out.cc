@@ -947,13 +947,9 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
           // Little trick to get -1 for the interior
           for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
             {
-              const types::boundary_id boundary_id =
-                cell->face(f)->boundary_id();
               out << ' '
-                  << (boundary_id == static_cast<types::boundary_id>(-1) ?
-                        -1 :
-                        static_cast<std::make_signed<types::boundary_id>::type>(
-                          boundary_id));
+                  << static_cast<std::make_signed<types::boundary_id>::type>(
+                       cell->face(f)->boundary_id());
             }
           out << '\n';
         }
