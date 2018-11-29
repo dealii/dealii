@@ -31,8 +31,6 @@
 #include <deal.II/dofs/dof_iterator_selector.h>
 #include <deal.II/dofs/number_cache.h>
 
-#include <deal.II/grid/cell_id.h>
-
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/hp/dof_level.h>
 #include <deal.II/hp/fe_collection.h>
@@ -126,7 +124,13 @@ namespace hp
    *   the parent.
    * - When coarsening cells, the (now active) parent cell will be assigned
    *   an active FE index that is determined from its (no longer active)
-   *   children, following the FiniteElementDomination logic.
+   *   children, following the FiniteElementDomination logic: We choose the
+   *   least dominant among all elements that dominate all of those used on the
+   *   children. See FECollection::find_least_dominating_fe_in_collection() for
+   *   further information on this topic.
+   *
+   * @note Finite elements need to be assigned to each cell by calling
+   * distribute_dofs() first to make this functionality available.
    *
    *
    * <h3>Active FE indices and parallel meshes</h3>
@@ -1106,16 +1110,16 @@ namespace hp
     std::vector<unsigned int> vertex_dof_offsets;
 
     /**
-     * Container to temporarily store the CellID and active FE index of
+     * Container to temporarily store the iterator and active FE index of
      * cells that will be refined.
      */
-    std::vector<std::pair<CellId, unsigned int>> refined_cells_fe_index;
+    std::map<const cell_iterator, const unsigned int> refined_cells_fe_index;
 
     /**
-     * Container to temporarily store the CellID and active FE index of
-     * cells that will be coarsened.
+     * Container to temporarily store the iterator and active FE index of
+     * parent cells that will remain after coarsening.
      */
-    std::vector<std::pair<CellId, unsigned int>> coarsened_cells_fe_index;
+    std::map<const cell_iterator, const unsigned int> coarsened_cells_fe_index;
 
     /**
      * A list of connections with which this object connects to the

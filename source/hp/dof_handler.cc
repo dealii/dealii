@@ -1731,6 +1731,8 @@ namespace hp
   void
   DoFHandler<dim, spacedim>::pre_refinement_fe_index_update()
   {
+    // Finite elements need to be assigned to each cell by calling
+    // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
         Assert(refined_cells_fe_index.empty(), ExcInternalError());
@@ -1745,29 +1747,25 @@ namespace hp
             &(*tria)));
 
         std::vector<types::subdomain_id> saved_subdomain_ids;
-        if (shared_tria != nullptr)
-          if (shared_tria->with_artificial_cells())
-            {
-              saved_subdomain_ids.resize(shared_tria->n_active_cells());
+        if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+          {
+            saved_subdomain_ids.resize(shared_tria->n_active_cells());
 
-              typename parallel::shared::Triangulation<dim, spacedim>::
-                active_cell_iterator cell = shared_tria->begin_active(),
-                                     endc = shared_tria->end();
+            const std::vector<types::subdomain_id> &true_subdomain_ids =
+              shared_tria->get_true_subdomain_ids_of_cells();
 
-              const std::vector<types::subdomain_id> &true_subdomain_ids =
-                shared_tria->get_true_subdomain_ids_of_cells();
+            for (auto &cell : active_cell_iterators())
+              {
+                const unsigned int index   = cell->active_cell_index();
+                saved_subdomain_ids[index] = cell->subdomain_id();
+                cell->set_subdomain_id(true_subdomain_ids[index]);
+              }
 
-              for (unsigned int index = 0; cell != endc; ++cell, ++index)
-                {
-                  saved_subdomain_ids[index] = cell->subdomain_id();
-                  cell->set_subdomain_id(true_subdomain_ids[index]);
-                }
-
-              // Make sure every processor knows the active_fe_indices
-              // on both its own cells and all ghost cells.
-              dealii::internal::hp::DoFHandlerImplementation::Implementation::
-                communicate_active_fe_indices(*this);
-            }
+            // Make sure every processor knows the active_fe_indices
+            // on both its own cells and all ghost cells.
+            dealii::internal::hp::DoFHandlerImplementation::Implementation::
+              communicate_active_fe_indices(*this);
+          }
 
         // Store active_fe_index information for all cells that will be
         // affected by refinement/coarsening.
@@ -1777,28 +1775,24 @@ namespace hp
               {
                 // Store the active_fe_index of each cell that will be refined
                 // to and distribute it later on its children.
-                refined_cells_fe_index.push_back(
-                  {cell->id(), cell->active_fe_index()});
+                refined_cells_fe_index.insert({cell, cell->active_fe_index()});
               }
             else if (cell->coarsen_flag_set())
               {
                 // From all cells that will be coarsened, determine their parent
                 // and calculate its proper active_fe_index, so that it can be
                 // set after refinement.
+                // But first, check if that particular cell has a parent at all.
+                Assert(cell->level() > 0, ExcInternalError());
                 const auto &parent = cell->parent();
                 // Check if the active_fe_index for the current cell has been
                 // determined already.
-                if (std::find_if(
-                      coarsened_cells_fe_index.cbegin(),
-                      coarsened_cells_fe_index.cend(),
-                      [&parent](
-                        const std::pair<CellId, unsigned int> &element) {
-                        return element.first == parent->id();
-                      }) == coarsened_cells_fe_index.cend())
+                if (coarsened_cells_fe_index.find(parent) ==
+                    coarsened_cells_fe_index.end())
                   {
                     std::set<unsigned int> fe_indices_children;
                     for (unsigned int child_index = 0;
-                         child_index < GeometryInfo<dim>::max_children_per_cell;
+                         child_index < parent->n_children();
                          ++child_index)
                       fe_indices_children.insert(
                         parent->child(child_index)->active_fe_index());
@@ -1814,22 +1808,20 @@ namespace hp
                         "that dominates all children of a cell you are trying "
                         "to coarsen!"));
 
-                    coarsened_cells_fe_index.push_back(
-                      {parent->id(), fe_index});
+                    coarsened_cells_fe_index.insert({parent, fe_index});
                   }
               }
           }
 
         // Finally, restore current subdomain_ids.
-        if (shared_tria != nullptr)
-          if (shared_tria->with_artificial_cells())
+        if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+          for (auto &cell : active_cell_iterators())
             {
-              typename parallel::shared::Triangulation<dim, spacedim>::
-                active_cell_iterator cell = shared_tria->begin_active(),
-                                     endc = shared_tria->end();
-
-              for (unsigned int index = 0; cell != endc; ++cell, ++index)
-                cell->set_subdomain_id(saved_subdomain_ids[index]);
+              if (cell->is_artificial())
+                cell->set_subdomain_id(numbers::invalid_subdomain_id);
+              else
+                cell->set_subdomain_id(
+                  saved_subdomain_ids[cell->active_cell_index()]);
             }
       }
   }
@@ -1839,21 +1831,21 @@ namespace hp
   void
   DoFHandler<dim, spacedim>::post_refinement_fe_index_update()
   {
+    // Finite elements need to be assigned to each cell by calling
+    // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
         // Distribute active_fe_indices from all refined cells on their
         // respective children.
-        for (auto &pair : refined_cells_fe_index)
+        for (const auto &pair : refined_cells_fe_index)
           {
-            typename hp::DoFHandler<dim, spacedim>::cell_iterator parent(
-              *(pair.first.to_cell(*tria)), this);
+            const cell_iterator parent(*(pair.first), this);
 
             for (unsigned int child_index = 0;
-                 child_index < GeometryInfo<dim>::max_children_per_cell;
+                 child_index < parent->n_children();
                  ++child_index)
               {
-                typename hp::DoFHandler<dim, spacedim>::cell_iterator child =
-                  parent->child(child_index);
+                const cell_iterator child = parent->child(child_index);
 
                 if (child->is_locally_owned())
                   {
@@ -1865,10 +1857,9 @@ namespace hp
 
         // Set active_fe_indices on coarsened cells that have been determined
         // before the actual coarsening happened.
-        for (auto &pair : coarsened_cells_fe_index)
+        for (const auto &pair : coarsened_cells_fe_index)
           {
-            typename hp::DoFHandler<dim, spacedim>::cell_iterator cell(
-              *(pair.first.to_cell(*tria)), this);
+            const cell_iterator cell(*(pair.first), this);
 
             if (cell->is_locally_owned())
               {
