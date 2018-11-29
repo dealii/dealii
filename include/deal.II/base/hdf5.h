@@ -710,6 +710,31 @@ namespace HDF5
     write_none();
 
     /**
+     * This function returns the boolean query_io_mode.
+     *
+     * In cases where maximum performance has to be achieved, it is important to
+     * make sure that all MPI read/write operations are collective. The HDF5
+     * library provides API routines that can be used after the read/write I/O
+     * operations to query the I/O mode. If query_io_mode is set to true, then
+     * after every read/write operation the deal.II's HDF5 interface calls the
+     * routines
+     * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
+     * and
+     * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
+     * The results are stored in io_mode, local_no_collective_cause and
+     * global_no_collective_cause. We suggest to query the I/O mode only in
+     * Debug mode because it requires calling additional HDF5 routines.
+     */
+    bool
+    get_query_io_mode() const;
+
+    /**
+     * This function sets the boolean query_io_mode.
+     */
+    void
+    set_query_io_mode(const bool new_query_io_mode);
+
+    /**
      * This function returns the I/O mode that was used on the last
      * parallel I/O call. See <a
      * href="https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode">H5Pget_mpio_actual_io_mode</a>.
@@ -744,7 +769,6 @@ namespace HDF5
      */
     H5D_mpio_actual_io_mode_t
     get_io_mode_as_hdf5_type();
-
 
     /**
      * This function returns the local causes that broke collective I/O on the
@@ -833,31 +857,6 @@ namespace HDF5
      */
     uint32_t
     get_global_no_collective_cause_as_hdf5_type();
-
-    /**
-     * This function returns the boolean query_io_mode.
-     *
-     * In cases where maximum performance has to be achieved, it is important to
-     * make sure that all MPI read/write operations are collective. The HDF5
-     * library provides API routines that can be used after the read/write I/O
-     * operations to query the I/O mode. If query_io_mode is set to true, then
-     * after every read/write operation the deal.II's HDF5 interface calls the
-     * routines
-     * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
-     * and
-     * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
-     * The results are stored in io_mode, local_no_collective_cause and
-     * global_no_collective_cause. We suggest to query the I/O mode only in
-     * Debug mode because it requires calling additional HDF5 routines.
-     */
-    bool
-    get_query_io_mode() const;
-
-    /**
-     * This function sets the boolean query_io_mode.
-     */
-    void
-    set_query_io_mode(const bool query_io_mode);
 
     /**
      * This function returns the dimensions of the dataset. The vector

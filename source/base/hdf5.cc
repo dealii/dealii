@@ -1132,6 +1132,22 @@ namespace HDF5
 
 
 
+  void
+  DataSet::set_query_io_mode(const bool new_query_io_mode)
+  {
+    query_io_mode = new_query_io_mode;
+  }
+
+
+
+  std::vector<hsize_t>
+  DataSet::get_dimensions() const
+  {
+    return dimensions;
+  }
+
+
+
   std::string
   DataSet::get_io_mode()
   {
@@ -1228,22 +1244,6 @@ namespace HDF5
   DataSet::get_query_io_mode() const
   {
     return query_io_mode;
-  }
-
-
-
-  void
-  DataSet::set_query_io_mode(const bool new_query_io_mode)
-  {
-    query_io_mode = new_query_io_mode;
-  }
-
-
-
-  std::vector<hsize_t>
-  DataSet::get_dimensions() const
-  {
-    return dimensions;
   }
 
 
