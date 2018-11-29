@@ -29,18 +29,18 @@
 DEAL_II_NAMESPACE_OPEN
 
 // It is necessary to turn clang-format off in order to maintain the Doxygen
-// links because the they are longer than 80 characters
+// links because they are longer than 80 characters
 // clang-format off
 /**
  * Namespace containing the HDF5 interface.
  *
  * The [Hierarchical Data Format (HDF)](https://www.hdfgroup.org/) is a cross
- * platform and high I/O performance format designed to store large amounts of
+ * platform and a high I/O performance format designed to store large amounts of
  * data. It supports serial and MPI I/O access. This set of classes provides an
  * interface to the [HDF5 library](https://www.hdfgroup.org/downloads/hdf5/).
  *
  * # Groups, Datasets and attributes
- * The HDF5 file is organized in
+ * An HDF5 file is organized in
  * [groups](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Groups/HDF5_Groups.htm)
  * and
  * [datasets](https://bitbucket.hdfgroup.org/pages/HDFFV/hdf5doc/master/browse/html/UG/HDF5_Users_Guide-Responsive%20HTML5/HDF5_Users_Guide/Datasets/HDF5_Datasets.htm).
@@ -52,11 +52,11 @@ DEAL_II_NAMESPACE_OPEN
  * is a small meta data. The methods HDF5Object::get_attribute() and
  * HDF5Object::set_attribute() can be used to get and set attributes.
  *
- * An example is below
+ * An example is shown below
  * @code
  * HDF5::File data_file(filename, HDF5::File::Mode::create);
  * double double_attribute = 2.2;
- * data_file.set_attribute("double_attribute", double attribute);
+ * data_file.set_attribute("double_attribute", double_attribute);
  * auto group = data_file.create_group("group");
  * group.set_attribute("simulation_type", std::string("elastic_equation"));
  * auto dataset = group.create_dataset<double>("dataset_name", dimensions);
@@ -68,7 +68,7 @@ DEAL_II_NAMESPACE_OPEN
  * An HDF5 file can be opened/created with serial (one single process) or
  * MPI support (several processes access the same HDF5 file).
  * File::File(const std::string &, const FileAccessMode)
- * opens/creates a HDF5 file for serial operations.
+ * opens/creates an HDF5 file for serial operations.
  * File::File(const std::string &, const FileAccessMode, const MPI_Comm)
  * creates or opens an HDF5 file in parallel using MPI. The HDF5 calls that
  * modify the structure of the file are always collective, whereas writing
@@ -158,7 +158,7 @@ DEAL_II_NAMESPACE_OPEN
  *   }
  * @endcode
  *
- * ## Query the I/O mode that HDF5 used on the last parallel I/O call
+ * ## Query the I/O mode that HDF5 used in the last parallel I/O call
  * The default access mode in the deal.II's HDF5 C++ interface  is collective
  * which is typically faster since it allows MPI to do more optimizations. In
  * some cases, such as when there is type conversion, the HDF5 library can
@@ -168,21 +168,20 @@ DEAL_II_NAMESPACE_OPEN
  * In cases where maximum performance is a requirement, it is important to
  * make sure that all MPI read/write operations are collective. The HDF5 library
  * provides API routines that can be used after the read/write I/O operations to
- * query the I/O mode. If DataSet::query_io_mode() is set to True, then after
+ * query the I/O mode. If DataSet::query_io_mode is True, then after
  * every read/write operation the deal.II's HDF5 interface calls the routines
  * [H5Pget_mpio_actual_io_mode()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioActualIoMode)
  * and
  * [H5Pget_mpio_no_collective_cause()](https://support.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-GetMpioNoCollectiveCause).
- * The results are stored in DataSet::io_mode(),
- * DataSet::local_no_collective_cause() and
- * DataSet::get_global_no_collective_cause(). We suggest to query the I/O mode
+ * The results are stored in DataSet::io_mode, DataSet::local_no_collective_cause
+ * and DataSet::get_global_no_collective_cause. We suggest to query the I/O mode
  * only in Debug mode because it requires calling additional HDF5 routines.
  *
  * The following code can be used to query the I/O method.
  * @code
  * auto dataset = group.create_dataset<double>("name", dimensions);
  * #ifdef DEBUG
- * dataset.query_io_mode(true);
+ * dataset.set_query_io_mode(true);
  * #endif
  *
  * if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
@@ -194,7 +193,7 @@ DEAL_II_NAMESPACE_OPEN
  *     dataset.write_none<double>();
  *   }
  *
- * if(dataset.query_io_mode()){
+ * if(dataset.get_query_io_mode()){
  *   pcout << "IO mode: " << dataset.io_mode() << std::endl;
  *   pcout << "Local no collective cause: "
  *         << dataset.local_no_collective_cause() << std::endl;
@@ -210,7 +209,7 @@ DEAL_II_NAMESPACE_OPEN
  * Local no collective cause: H5D_MPIO_COLLECTIVE
  * Global no collective cause: H5D_MPIO_COLLECTIVE
  * @endcode
- * See DataSet::io_mode(), DataSet::local_no_collective_cause() and
+ * See DataSet::get_io_mode(), DataSet::get_local_no_collective_cause() and
  * DataSet::get_global_no_collective_cause() for all the possible return
  * codes.
  *
@@ -256,7 +255,7 @@ DEAL_II_NAMESPACE_OPEN
  * stored as HDF5 compound datatypes compatible with
  * [h5py](https://www.h5py.org/) and [numpy](http://www.numpy.org/).
  *
- * This python script writes the parameters for a deal.II simulation:
+ * The following python script writes the parameters for a deal.II simulation:
  * ~~~~~~~~~~~~~{.py}
  * h5_file = h5py.File('simulation.hdf5','w')
  * data = h5_file.create_group('data')
@@ -413,7 +412,7 @@ namespace HDF5
 
   public:
     /**
-     * Reads data of the dataset.
+     * Reads all the data of the dataset.
      *
      * Datatype conversion takes place at the time of the read operation and is
      * automatic. See the <a
@@ -743,9 +742,9 @@ namespace HDF5
      * Value                          | Meaning
      * ------------------------------ | -------
      * H5D_MPIO_NO_COLLECTIVE         | No collective I/O was performed. Collective I/O was not requested or collective I/O isn't possible on this dataset.
-     * H5D_MPIO_CHUNK_INDEPENDENT     | HDF5 performed one the chunk collective optimization schemes and each chunk was accessed independently.
-     * H5D_MPIO_CHUNK_COLLECTIVE      | HDF5 performed one the chunk collective optimization schemes and each chunk was accessed collectively.
-     * H5D_MPIO_CHUNK_MIXED           | HDF5 performed one the chunk collective optimization schemes and some chunks were accessed independently, some collectively.
+     * H5D_MPIO_CHUNK_INDEPENDENT     | HDF5 performed chunk collective optimization schemes and each chunk was accessed independently.
+     * H5D_MPIO_CHUNK_COLLECTIVE      | HDF5 performed chunk collective optimization and each chunk was accessed collectively.
+     * H5D_MPIO_CHUNK_MIXED           | HDF5 performed chunk collective optimization and some chunks were accessed independently, some collectively.
      * H5D_MPIO_CONTIGUOUS_COLLECTIVE | Collective I/O was performed on a contiguous dataset.
      */
     std::string
@@ -762,9 +761,9 @@ namespace HDF5
      * Value                          | Meaning
      * ------------------------------ | -------
      * H5D_MPIO_NO_COLLECTIVE         | No collective I/O was performed. Collective I/O was not requested or collective I/O isn't possible on this dataset.
-     * H5D_MPIO_CHUNK_INDEPENDENT     | HDF5 performed one the chunk collective optimization schemes and each chunk was accessed independently.
-     * H5D_MPIO_CHUNK_COLLECTIVE      | HDF5 performed one the chunk collective optimization schemes and each chunk was accessed collectively.
-     * H5D_MPIO_CHUNK_MIXED           | HDF5 performed one the chunk collective optimization schemes and some chunks were accessed independently, some collectively.
+     * H5D_MPIO_CHUNK_INDEPENDENT     | HDF5 performed chunk collective optimization and each chunk was accessed independently.
+     * H5D_MPIO_CHUNK_COLLECTIVE      | HDF5 performed chunk collective optimization and each chunk was accessed collectively.
+     * H5D_MPIO_CHUNK_MIXED           | HDF5 performed chunk collective optimization and some chunks were accessed independently, some collectively.
      * H5D_MPIO_CONTIGUOUS_COLLECTIVE | Collective I/O was performed on a contiguous dataset.
      */
     H5D_mpio_actual_io_mode_t
@@ -1054,8 +1053,8 @@ namespace HDF5
     };
 
     /**
-     * Creates or opens a HDF5 file for serial operations. This call does not
-     * require MPI support. It creates or opens a HDF5 file depending on the
+     * Creates or opens an HDF5 file for serial operations. This call does not
+     * require MPI support. It creates or opens an HDF5 file depending on the
      * value of @p mode.
      */
     File(const std::string &name, const FileAccessMode mode);
