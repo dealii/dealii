@@ -356,7 +356,7 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
 
     for (unsigned int i = 0; i < constraint_points.size(); ++i)
       {
-        const double interval = (double)(q_deg * 2);
+        const double interval = static_cast<double>(q_deg * 2);
         bool         mirror[dim - 1];
         Point<dim>   constraint_point;
 
