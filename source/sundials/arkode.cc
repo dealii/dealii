@@ -132,12 +132,15 @@ namespace SUNDIALS
       copy(*src_ypred, ypred);
       copy(*src_fpred, fpred);
 
-      int err = solver.setup_jacobian(convfail,
+      // avoid reinterpret_cast
+      bool jcurPtr_tmp = false;
+      int  err         = solver.setup_jacobian(convfail,
                                       arkode_mem->ark_tn,
                                       arkode_mem->ark_gamma,
                                       *src_ypred,
                                       *src_fpred,
-                                      (bool &)*jcurPtr);
+                                      jcurPtr_tmp);
+      *jcurPtr         = jcurPtr_tmp ? SUNTRUE : SUNFALSE;
 
       return err;
     }
@@ -424,7 +427,7 @@ namespace SUNDIALS
     status = ARKodeSetInitStep(arkode_mem, current_time_step);
     AssertARKode(status);
 
-    status = ARKodeSetUserData(arkode_mem, (void *)this);
+    status = ARKodeSetUserData(arkode_mem, this);
     AssertARKode(status);
 
     status = ARKodeSetStopTime(arkode_mem, data.final_time);
@@ -435,7 +438,7 @@ namespace SUNDIALS
     AssertARKode(status);
 
     // Initialize solver
-    ARKodeMem ARKode_mem = (ARKodeMem)arkode_mem;
+    auto ARKode_mem = static_cast<ARKodeMem>(arkode_mem);
 
     if (solve_jacobian_system)
       {
