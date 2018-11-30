@@ -104,9 +104,9 @@ namespace CUDAWrappers
     namespace internal
     {
       // TODO: use a template parameter instead of a macro
-#  define MAX_ELEM_DEGREE 10
-      __constant__ double
-        constraint_weights[(MAX_ELEM_DEGREE + 1) * (MAX_ELEM_DEGREE + 1)];
+#  define DEAL_II_MAX_ELEM_DEGREE 10
+      __constant__ double constraint_weights[(DEAL_II_MAX_ELEM_DEGREE + 1) *
+                                             (DEAL_II_MAX_ELEM_DEGREE + 1)];
 
       // Here is the system for how we store constraint types in a binary mask.
       // This is not a complete contradiction-free system, i.e., there are

@@ -331,7 +331,7 @@ namespace Particles
     const int             ierr = MPI_Scan(&particles_to_add_locally,
                               &local_start_index,
                               1,
-                              PARTICLE_INDEX_MPI_TYPE,
+                              DEAL_II_PARTICLE_INDEX_MPI_TYPE,
                               MPI_SUM,
                               triangulation->get_communicator());
     AssertThrowMPI(ierr);
