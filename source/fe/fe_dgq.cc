@@ -861,7 +861,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
 
   // Check whether the support points are equidistant.
   for (unsigned int j = 0; j <= this->degree; j++)
-    if (std::abs(points[j] - (double)j / this->degree) > 1e-15)
+    if (std::abs(points[j] - static_cast<double>(j) / this->degree) > 1e-15)
       {
         equidistant = false;
         break;

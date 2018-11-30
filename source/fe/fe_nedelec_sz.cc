@@ -256,7 +256,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // component given: Note some i,j combinations will be
                   // incorrect, but only on invalid edges.
                   data->sigma_imj_grads[i][j][sigma_imj_component[i][j]] =
-                    2.0 * (double)sigma_imj_sign[i][j];
+                    2.0 * sigma_imj_sign[i][j];
                 }
             }
 
@@ -643,7 +643,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
                   // component given: Note some i,j combinations will be
                   // incorrect, but only on invalid edges.
                   data->sigma_imj_grads[i][j][sigma_imj_component[i][j]] =
-                    2.0 * (double)sigma_imj_sign[i][j];
+                    2.0 * sigma_imj_sign[i][j];
                 }
             }
           // Now compute the edge parameterisations for a single element
@@ -753,10 +753,10 @@ FE_NedelecSZ<dim, spacedim>::get_data(
             {
               data->edge_lambda_gradgrads_3d[m][edge_lambda_directions[m][0]]
                                             [edge_lambda_directions[m][1]] =
-                (double)edge_lambda_sign[m] * 1.0;
+                edge_lambda_sign[m];
               data->edge_lambda_gradgrads_3d[m][edge_lambda_directions[m][1]]
                                             [edge_lambda_directions[m][0]] =
-                (double)edge_lambda_sign[m] * 1.0;
+                edge_lambda_sign[m];
             }
           // Precomputation for higher order shape functions,
           // and the face parameterisation.

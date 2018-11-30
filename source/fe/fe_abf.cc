@@ -584,8 +584,7 @@ FE_ABF<dim>::convert_generalized_support_point_values_to_dof_values(
   // Face integral of ABF terms
   for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
     {
-      double n_orient =
-        (double)GeometryInfo<dim>::unit_normal_orientation[face];
+      const double n_orient = GeometryInfo<dim>::unit_normal_orientation[face];
       for (unsigned int fp = 0; fp < n_face_points; ++fp)
         {
           // TODO: Check what the face_orientation, face_flip and face_rotation

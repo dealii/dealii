@@ -2475,7 +2475,7 @@ FE_Nedelec<dim>::get_face_interpolation_matrix(
 
       for (unsigned int i = 0; i < q; ++i)
         {
-          for (int j = 1; j < (int)GeometryInfo<dim>::lines_per_face; ++j)
+          for (unsigned int j = 1; j < GeometryInfo<dim>::lines_per_face; ++j)
             interpolation_matrix(j * p + i, j * q + i) = 1.0;
 
           for (unsigned int j = 0; j < q - 1; ++j)
@@ -3609,8 +3609,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                                                n_edge_points]
                                             [face_coordinates[face][1]];
 
-                      for (int i = 2;
-                           i < (int)GeometryInfo<dim>::lines_per_face;
+                      for (unsigned int i = 2;
+                           i < GeometryInfo<dim>::lines_per_face;
                            ++i)
                         for (unsigned int j = 0; j <= deg; ++j)
                           tmp -=

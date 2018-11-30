@@ -301,7 +301,8 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
 
   // Check whether the support points are equidistant.
   for (unsigned int j = 0; j < n_points; j++)
-    if (std::fabs(points[j] - (double)j / (this->degree - 1)) > 1e-15)
+    if (std::fabs(points[j] - static_cast<double>(j) / (this->degree - 1)) >
+        1e-15)
       {
         type = false;
         break;

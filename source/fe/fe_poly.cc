@@ -43,10 +43,8 @@ FE_Poly<TensorProductPolynomials<1>, 1, 2>::fill_fe_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, 2>
     &output_data) const
 {
-  // convert data object to internal
-  // data for this class. fails with
-  // an exception if that is not
-  // possible
+  // convert data object to internal data for this class. fails with an
+  // exception if that is not possible
   Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
@@ -113,8 +111,8 @@ FE_Poly<TensorProductPolynomials<2>, 2, 3>::fill_fe_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 3>
     &output_data) const
 {
-  // assert that the following dynamics
-  // cast is really well-defined.
+  // convert data object to internal data for this class. fails with an
+  // exception if that is not possible
   Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
@@ -180,11 +178,8 @@ FE_Poly<PolynomialSpace<1>, 1, 2>::fill_fe_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, 2>
     &output_data) const
 {
-  // convert data object to internal
-  // data for this class. fails with
-  // an exception if that is not
-  // possible
-
+  // convert data object to internal data for this class. fails with an
+  // exception if that is not possible
   Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
@@ -250,6 +245,8 @@ FE_Poly<PolynomialSpace<2>, 2, 3>::fill_fe_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 3>
     &output_data) const
 {
+  // convert data object to internal data for this class. fails with an
+  // exception if that is not possible
   Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
