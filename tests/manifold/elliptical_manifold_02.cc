@@ -30,6 +30,8 @@
 
 #define TOLERANCE 1e-12
 
+
+
 // Helper functions
 template <int dim, int spacedim>
 Point<spacedim>
@@ -46,6 +48,9 @@ test_push(const Tensor<1, spacedim> &axis,
   deallog << chart_point << std::endl;
   return chart_point;
 }
+
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 test_pull(const Tensor<1, spacedim> &axis,
@@ -61,6 +66,8 @@ test_pull(const Tensor<1, spacedim> &axis,
   deallog << chart_point << std::endl;
   return space_point;
 }
+
+
 
 // Function that tests pull_back() and push_forward().
 void
@@ -79,6 +86,8 @@ local_test(const Tensor<1, 2> &axis,
       deallog << "FAILED" << std::endl;
     }
 }
+
+
 
 void
 test()
@@ -102,6 +111,8 @@ test()
     local_test(axis, c_parameter, Point<2>(4.0, 2.0));
   }
 }
+
+
 
 int
 main()

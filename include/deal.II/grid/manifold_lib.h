@@ -499,17 +499,25 @@ public:
   EllipticalManifold(const Point<spacedim> &    center,
                      const Tensor<1, spacedim> &major_axis_direction,
                      const double               c_parameter);
-  virtual ~EllipticalManifold() = default;
 
   virtual std::unique_ptr<Manifold<dim, spacedim>>
   clone() const override;
 
+  /**
+   * @copydoc ChartManifold::pull_back()
+   */
   virtual Point<spacedim>
   pull_back(const Point<spacedim> &space_point) const override;
 
+  /**
+   * @copydoc ChartManifold::push_forward()
+   */
   virtual Point<spacedim>
   push_forward(const Point<spacedim> &chart_point) const override;
 
+  /**
+   * @copydoc ChartManifold::push_forward_gradient()
+   */
   virtual DerivativeForm<1, spacedim, spacedim>
   push_forward_gradient(const Point<spacedim> &chart_point) const override;
 
@@ -530,10 +538,10 @@ protected:
 
 private:
   /**
-   * Return the periodicity of the coordinate variables of the manifold.
+   * @copydoc ChartManifold::get_periodicity()
    *
-   * For $dim=2$ and $spacedim=2$, first coordinate is non-periodic, while
-   * second coordinate has a periodicity of $2\pi$.
+   * For $\text{dim}=2$ and $\text{spacedim}=2$, the first coordinate is
+   * non-periodic, while the second coordinate has a periodicity of $2\pi$.
    */
   static Tensor<1, spacedim>
   get_periodicity();

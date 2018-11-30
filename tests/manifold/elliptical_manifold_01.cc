@@ -41,6 +41,35 @@
 // hyper_shell made of 8 elements.
 namespace
 {
+  /* The following system of equations
+  // /
+  // |x = ellPar*cosh(u)*cos(v)
+  // |y = ellPar*sinh(u)*sin(v)
+  // \
+  // allows to transform a point (u,v) in the chart space to a
+  // point (x,y) in the cartesian space.
+  //
+  // Setting v=0, the system of equations becomes
+  // /
+  // |x = x_0 = ellPar*cosh(u)
+  // |y = 0
+  // \
+  // which represents the crossing point of an ellipsis, non-rotated and
+  // centered at the origin of the cartesian system, with its major axis.
+  //
+  // For the sake of completeness, by setting v=pi/2, one finds y_0 =
+  // ellPar*sinh(u) as the crossing point on the minor axis.
+  //
+  // This function takes in input a point pt={x_0,v}
+  // and transforms it into (x,y) in accordance with the first system of
+  // equations above.
+  //
+  // On a final note, the condition x_0 >= ellPar has to be satisfied. This is
+  // required because min(cosh(u)) = 1 is obtained for u = 0, and imposing v = 0
+  // the minimum value that x can assume is x = ellPar.
+  // For the sake of completeness, it's worth to notice that there would be no
+  // restrictions on the input if we passed y_0, instead of x_0, as pt[0].
+  */
   Point<2>
   chart_to_cartesian(const Point<2> &pt, const double ellPar)
   {
@@ -51,6 +80,9 @@ namespace
     c[1]            = ellPar * sh * std::sin(pt[1]);
     return c;
   }
+
+
+
   std::vector<Point<2>>
   generate_shell_points(const Point<2> &center,
                         const double    radius0,
@@ -78,6 +110,21 @@ namespace
       }
     return points;
   }
+
+
+
+  // Generate an hyper_shell over an EllipticalManifold having an abitrary
+  // center, and the major axis oriented in the direction of the x-axis.
+  //
+  // inner_radius and outer_radius parameters correspond to the
+  // distances from the center of the manifold of the
+  // crossing points of two concentric ellipsis with their major axis.
+  //
+  // Input parameters must respect the following constrains:
+  // c_parameter < inner_radius < outer_radius.
+  //
+  // To understand the constrain on the c_parameter refer to the
+  // documentation of function chart_to_cartesian() whithin this namespace.
   void build_simple_hyper_shell(Triangulation<2, 2> &grid,
                                 const Point<2> &     center,
                                 const double         inner_radius,
@@ -107,7 +154,13 @@ namespace
     grid.set_manifold(0, EllipticalManifold<2, 2>(center, axis, c_param));
     grid.set_all_manifold_ids(0);
   }
+
+
+
 } // namespace
+
+
+
 // Helper function
 // Generate a simple hyper_shell over an elliptical manifold centered at the
 // origin. Major axis is the x-axis.
@@ -133,6 +186,8 @@ test(unsigned int ref = 1)
   GridOut gridout;
   gridout.write_msh(tria, deallog.get_file_stream());
 }
+
+
 
 int
 main()

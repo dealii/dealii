@@ -1148,6 +1148,7 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
 }
 
 
+
 // ============================================================
 // EllipticalManifold
 // ============================================================
@@ -1174,6 +1175,8 @@ EllipticalManifold<dim, spacedim>::EllipticalManifold(
   direction /= direction_norm;
 }
 
+
+
 template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 EllipticalManifold<dim, spacedim>::clone() const
@@ -1183,16 +1186,20 @@ EllipticalManifold<dim, spacedim>::clone() const
                                                              c_parameter);
 }
 
+
+
 template <int dim, int spacedim>
 Tensor<1, spacedim>
 EllipticalManifold<dim, spacedim>::get_periodicity()
 {
   Tensor<1, spacedim> periodicity;
   // The second elliptical coordinate is periodic, while the first is not.
-  // Enforce periodicity on last variable.
+  // Enforce periodicity on the last variable.
   periodicity[spacedim - 1] = 2.0 * numbers::PI;
   return periodicity;
 }
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -1201,6 +1208,9 @@ EllipticalManifold<dim, spacedim>::push_forward(const Point<spacedim> &) const
   Assert(false, ExcNotImplemented());
   return Point<spacedim>();
 }
+
+
+
 template <>
 Point<2>
 EllipticalManifold<2, 2>::push_forward(const Point<2> &chart_point) const
@@ -1218,6 +1228,9 @@ EllipticalManifold<2, 2>::push_forward(const Point<2> &chart_point) const
                    direction[1] * x + direction[0] * y);
   return p + center;
 }
+
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 EllipticalManifold<dim, spacedim>::pull_back(const Point<spacedim> &) const
@@ -1225,6 +1238,9 @@ EllipticalManifold<dim, spacedim>::pull_back(const Point<spacedim> &) const
   Assert(false, ExcNotImplemented());
   return Point<spacedim>();
 }
+
+
+
 template <>
 Point<2>
 EllipticalManifold<2, 2>::pull_back(const Point<2> &space_point) const
@@ -1235,11 +1251,12 @@ EllipticalManifold<2, 2>::pull_back(const Point<2> &space_point) const
   const double y0 = space_point[1] - center[1];
   const double x  = direction[0] * x0 + direction[1] * y0;
   const double y  = -direction[1] * x0 + direction[0] * y0;
-  // From here we try to find solutions to equation
-  // x^2/(1-q)-y^2/q = c^2 for q, and q = -sinh^2(pt[0]),
-  // and to equation
-  // x^2/(1-p)-y^2/p = c^2 for p, and p = sin^2(pt[1]).
-  // Note that p and q are solutions to the same quadratic equation.
+  // From here we try to find solutions of two equations:
+  // x^2/(1-q)-y^2/q = c^2 for q, given q = -sinh^2(pt[0]),
+  // and
+  // x^2/(1-p)-y^2/p = c^2 for p, given p = sin^2(pt[1]).
+  // Note that, in the end, p and q are solutions to the same quadratic
+  // equation.
   const double x2 = x * x;
   const double y2 = y * y;
   //
@@ -1252,49 +1269,55 @@ EllipticalManifold<2, 2>::pull_back(const Point<2> &space_point) const
     p = 0.0;
   if (p > 1.0)
     p = 1.0;
-  const double q     = (-b - srdelta) / (2.0 * c2);
-  const bool   x_pos = std::signbit(x) == 0;
-  const bool   y_pos = std::signbit(y) == 0;
-  const double eta0  = std::asin(std::sqrt(p));
+  const double q             = (-b - srdelta) / (2.0 * c2);
+  const bool   x_is_positive = !std::signbit(x);
+  const bool   y_is_positive = !std::signbit(y);
+  const double eta0          = std::asin(std::sqrt(p));
   // Given q = -sinh^2(pt[0]),
   // pt[0] is calculated by straight inversion since q <= 0 for any
   // pt[0].
   Point<2> pt(std::log(std::sqrt(-q) + std::sqrt(1.0 - q)), eta0);
   // Unfolding pt[1] according to the quadrant.
-  if (x_pos && !y_pos)
+  if (x_is_positive && !y_is_positive)
     pt[1] = 2.0 * numbers::PI - eta0;
-  else if (!x_pos && y_pos)
+  else if (!x_is_positive && y_is_positive)
     pt[1] = numbers::PI - eta0;
-  else if (!x_pos && !y_pos)
+  else if (!x_is_positive && !y_is_positive)
     pt[1] = numbers::PI + eta0;
   return pt;
 }
 
+
+
 template <int dim, int spacedim>
 DerivativeForm<1, spacedim, spacedim>
 EllipticalManifold<dim, spacedim>::push_forward_gradient(
-  const Point<spacedim> &chart_point) const
+  const Point<spacedim> &) const
 {
-  DerivativeForm<1, spacedim, spacedim> dX;
-  const double                          ch = std::cosh(chart_point[0]);
-  const double                          sh = std::sinh(chart_point[0]);
-  const double                          cs = std::cos(chart_point[1]);
-  const double                          sn = std::sin(chart_point[1]);
-  switch (spacedim)
-    {
-      case 2:
-        {
-          dX[0][0] = c_parameter * sh * cs;
-          dX[0][1] = -c_parameter * ch * sn;
-          dX[1][0] = c_parameter * ch * sn;
-          dX[1][1] = c_parameter * sh * cs;
-        }
-        break;
-      default:
-        Assert(false, ExcNotImplemented());
-    }
+  Assert(false, ExcNotImplemented());
+  return DerivativeForm<1, spacedim, spacedim>();
+}
+
+
+
+template <>
+DerivativeForm<1, 2, 2>
+EllipticalManifold<2, 2>::push_forward_gradient(
+  const Point<2> &chart_point) const
+{
+  const double            ch = std::cosh(chart_point[0]);
+  const double            sh = std::sinh(chart_point[0]);
+  const double            cs = std::cos(chart_point[1]);
+  const double            sn = std::sin(chart_point[1]);
+  DerivativeForm<1, 2, 2> dX;
+  dX[0][0] = c_parameter * sh * cs;
+  dX[0][1] = -c_parameter * ch * sn;
+  dX[1][0] = c_parameter * ch * sn;
+  dX[1][1] = c_parameter * sh * cs;
   return dX;
 }
+
+
 
 // ============================================================
 // FunctionManifold
