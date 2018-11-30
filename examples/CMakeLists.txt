@@ -28,6 +28,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     #
     # Glob Includes:
     #
+    PATTERN "*.cu"
     PATTERN "*.cc"
     PATTERN "*.prm"
     PATTERN "*.inp"
@@ -51,7 +52,9 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     #
     # Set up all executables:
     #
-    FILE(GLOB _steps ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.cc)
+    FILE(GLOB _steps 
+      ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.cc
+      ${CMAKE_CURRENT_SOURCE_DIR}/step-*/*.cu)
     FOREACH(_step ${_steps})
       GET_FILENAME_COMPONENT(_name ${_step} NAME_WE)
       GET_FILENAME_COMPONENT(_directory ${_step} DIRECTORY)
