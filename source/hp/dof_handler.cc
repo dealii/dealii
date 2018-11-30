@@ -1839,7 +1839,7 @@ namespace hp
         // respective children.
         for (const auto &pair : refined_cells_fe_index)
           {
-            const cell_iterator parent(*(pair.first), this);
+            const cell_iterator &parent = pair.first;
 
             for (unsigned int child_index = 0;
                  child_index < parent->n_children();
@@ -1859,7 +1859,7 @@ namespace hp
         // before the actual coarsening happened.
         for (const auto &pair : coarsened_cells_fe_index)
           {
-            const cell_iterator cell(*(pair.first), this);
+            const cell_iterator &cell = pair.first;
 
             if (cell->is_locally_owned())
               {
