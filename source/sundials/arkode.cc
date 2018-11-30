@@ -140,7 +140,11 @@ namespace SUNDIALS
                                       *src_ypred,
                                       *src_fpred,
                                       jcurPtr_tmp);
-      *jcurPtr         = jcurPtr_tmp ? SUNTRUE : SUNFALSE;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(2, 0, 0)
+      *jcurPtr = jcurPtr_tmp ? SUNTRUE : SUNFALSE;
+#  else
+      *jcurPtr = jcurPtr_tmp ? TRUE : FALSE;
+#  endif
 
       return err;
     }
