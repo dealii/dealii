@@ -2812,8 +2812,8 @@ namespace GridTools
       if (cell->active())
         {
           while (current_cell_idx >=
-                 std::floor((long)n_active_cells * (current_proc_idx + 1) /
-                            n_partitions))
+                 std::floor(static_cast<uint_least64_t>(n_active_cells) *
+                            (current_proc_idx + 1) / n_partitions))
             ++current_proc_idx;
           cell->set_subdomain_id(current_proc_idx);
           ++current_cell_idx;
@@ -3674,12 +3674,12 @@ namespace GridTools
           if (cell->face(f)->at_boundary())
             for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_face; ++e)
               {
-                const auto bid = cell->face(f)->line(e)->boundary_id();
-                const auto ind = std::find(src_boundary_ids.begin(),
-                                           src_boundary_ids.end(),
-                                           bid) -
-                                 src_boundary_ids.begin();
-                if ((unsigned int)ind < src_boundary_ids.size())
+                const auto         bid = cell->face(f)->line(e)->boundary_id();
+                const unsigned int ind = std::find(src_boundary_ids.begin(),
+                                                   src_boundary_ids.end(),
+                                                   bid) -
+                                         src_boundary_ids.begin();
+                if (ind < src_boundary_ids.size())
                   cell->face(f)->line(e)->set_manifold_id(
                     dst_manifold_ids[ind]);
               }
@@ -3692,12 +3692,12 @@ namespace GridTools
       for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
-            const auto bid = cell->face(f)->boundary_id();
-            const auto ind =
+            const auto         bid = cell->face(f)->boundary_id();
+            const unsigned int ind =
               std::find(src_boundary_ids.begin(), src_boundary_ids.end(), bid) -
               src_boundary_ids.begin();
 
-            if ((unsigned int)ind < src_boundary_ids.size())
+            if (ind < src_boundary_ids.size())
               {
                 // assign the manifold id
                 cell->face(f)->set_manifold_id(dst_manifold_ids[ind]);
@@ -3710,11 +3710,11 @@ namespace GridTools
                    ++e)
                 {
                   const auto bid = cell->face(f)->line(e)->boundary_id();
-                  const auto ind = std::find(src_boundary_ids.begin(),
-                                             src_boundary_ids.end(),
-                                             bid) -
-                                   src_boundary_ids.begin();
-                  if ((unsigned int)ind < src_boundary_ids.size())
+                  const unsigned int ind = std::find(src_boundary_ids.begin(),
+                                                     src_boundary_ids.end(),
+                                                     bid) -
+                                           src_boundary_ids.begin();
+                  if (ind < src_boundary_ids.size())
                     cell->face(f)->line(e)->set_boundary_id(
                       reset_boundary_ids[ind]);
                 }

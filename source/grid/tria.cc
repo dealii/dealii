@@ -1195,7 +1195,8 @@ namespace internal
       types::boundary_id,
       << "The input data for creating a triangulation contained "
       << "information about a line with indices " << arg1 << " and " << arg2
-      << " that is described to have boundary indicator " << (int)arg3
+      << " that is described to have boundary indicator "
+      << static_cast<int>(arg3)
       << ". However, this is an internal line not located on the "
       << "boundary. You cannot assign a boundary indicator to it." << std::endl
       << std::endl
@@ -1228,7 +1229,8 @@ namespace internal
       << "The input data for creating a triangulation contained "
       << "information about a quad with indices " << arg1 << ", " << arg2
       << ", " << arg3 << ", and " << arg4
-      << " that is described to have boundary indicator " << (int)arg5
+      << " that is described to have boundary indicator "
+      << static_cast<int>(arg5)
       << ". However, this is an internal quad not located on the "
       << "boundary. You cannot assign a boundary indicator to it." << std::endl
       << std::endl
@@ -1493,9 +1495,10 @@ namespace internal
         // access any of these numbers, we can do this in the
         // background
         Threads::Task<void> update_lines = Threads::new_task(
-          (void (*)(const Triangulation<dim, spacedim> &,
-                    const unsigned int,
-                    internal::TriangulationImplementation::NumberCache<1> &))(
+          static_cast<
+            void (*)(const Triangulation<dim, spacedim> &,
+                     const unsigned int,
+                     internal::TriangulationImplementation::NumberCache<1> &)>(
             &compute_number_cache<dim, spacedim>),
           triangulation,
           level_objects,
@@ -1599,9 +1602,10 @@ namespace internal
         // don't access any of these numbers, we can do this in the
         // background
         Threads::Task<void> update_quads_and_lines = Threads::new_task(
-          (void (*)(const Triangulation<dim, spacedim> &,
-                    const unsigned int,
-                    internal::TriangulationImplementation::NumberCache<2> &))(
+          static_cast<
+            void (*)(const Triangulation<dim, spacedim> &,
+                     const unsigned int,
+                     internal::TriangulationImplementation::NumberCache<2> &)>(
             &compute_number_cache<dim, spacedim>),
           triangulation,
           level_objects,

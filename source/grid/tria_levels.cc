@@ -73,7 +73,7 @@ namespace internal
           else
             direction_flags.clear();
 
-          parents.reserve((int)(total_cells + 1) / 2);
+          parents.reserve((total_cells + 1) / 2);
           parents.insert(parents.end(),
                          (total_cells + 1) / 2 - parents.size(),
                          -1);
@@ -165,7 +165,7 @@ namespace internal
           else
             direction_flags.clear();
 
-          parents.reserve((int)(total_cells + 1) / 2);
+          parents.reserve((total_cells + 1) / 2);
           parents.insert(parents.end(),
                          (total_cells + 1) / 2 - parents.size(),
                          -1);
