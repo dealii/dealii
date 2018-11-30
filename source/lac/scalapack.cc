@@ -725,18 +725,12 @@ ScaLAPACKMatrix<NumberType>::copy_to(
     return;
 
   // range checking for matrix A
-  Assert(offset_A.first < (unsigned int)(n_rows - submatrix_size.first + 1),
-         ExcIndexRange(offset_A.first, 0, n_rows - submatrix_size.first + 1));
-  Assert(
-    offset_A.second < (unsigned int)(n_columns - submatrix_size.second + 1),
-    ExcIndexRange(offset_A.second, 0, n_columns - submatrix_size.second + 1));
+  AssertIndexRange(offset_A.first, n_rows - submatrix_size.first + 1);
+  AssertIndexRange(offset_A.second, n_columns - submatrix_size.second + 1);
 
   // range checking for matrix B
-  Assert(offset_B.first < (unsigned int)(B.n_rows - submatrix_size.first + 1),
-         ExcIndexRange(offset_B.first, 0, B.n_rows - submatrix_size.first + 1));
-  Assert(
-    offset_B.second < (unsigned int)(B.n_columns - submatrix_size.second + 1),
-    ExcIndexRange(offset_B.second, 0, B.n_columns - submatrix_size.second + 1));
+  AssertIndexRange(offset_B.first, B.n_rows - submatrix_size.first + 1);
+  AssertIndexRange(offset_B.second, B.n_columns - submatrix_size.second + 1);
 
   // Currently, copying of matrices will only be supported if A and B share the
   // same MPI communicator
@@ -1431,17 +1425,15 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_index(
   const bool                                   compute_eigenvectors)
 {
   // check validity of index limits
-  Assert(index_limits.first < (unsigned int)n_rows,
-         ExcIndexRange(index_limits.first, 0, n_rows));
-  Assert(index_limits.second < (unsigned int)n_rows,
-         ExcIndexRange(index_limits.second, 0, n_rows));
+  AssertIndexRange(index_limits.first, n_rows);
+  AssertIndexRange(index_limits.second, n_rows);
 
   std::pair<unsigned int, unsigned int> idx =
     std::make_pair(std::min(index_limits.first, index_limits.second),
                    std::max(index_limits.first, index_limits.second));
 
   // compute all eigenvalues/eigenvectors
-  if (idx.first == 0 && idx.second == (unsigned int)n_rows - 1)
+  if (idx.first == 0 && idx.second == static_cast<unsigned int>(n_rows - 1))
     return eigenpairs_symmetric(compute_eigenvectors);
   else
     return eigenpairs_symmetric(compute_eigenvectors, idx);
@@ -1723,7 +1715,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
         this->values.swap(eigenvectors->values);
 
       // adapt the size of ev to fit m upon return
-      while ((int)ev.size() > m)
+      while (ev.size() > static_cast<size_type>(m))
         ev.pop_back();
     }
   /*
@@ -1974,7 +1966,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
         this->values.swap(eigenvectors->values);
 
       // Adapt the size of ev to fit m upon return.
-      while ((int)ev.size() > m)
+      while (ev.size() > static_cast<size_type>(m))
         ev.pop_back();
     }
   /*
@@ -2549,28 +2541,28 @@ namespace internal
       LAPACKSupport::State val;
       state_enum_id = H5Tcreate(H5T_ENUM, sizeof(LAPACKSupport::State));
       val           = LAPACKSupport::State::cholesky;
-      herr_t status = H5Tenum_insert(state_enum_id, "cholesky", (int *)&val);
+      herr_t status = H5Tenum_insert(state_enum_id, "cholesky", &val);
       AssertThrow(status >= 0, ExcInternalError());
       val    = LAPACKSupport::State::eigenvalues;
-      status = H5Tenum_insert(state_enum_id, "eigenvalues", (int *)&val);
+      status = H5Tenum_insert(state_enum_id, "eigenvalues", &val);
       AssertThrow(status >= 0, ExcInternalError());
       val    = LAPACKSupport::State::inverse_matrix;
-      status = H5Tenum_insert(state_enum_id, "inverse_matrix", (int *)&val);
+      status = H5Tenum_insert(state_enum_id, "inverse_matrix", &val);
       AssertThrow(status >= 0, ExcInternalError());
       val    = LAPACKSupport::State::inverse_svd;
-      status = H5Tenum_insert(state_enum_id, "inverse_svd", (int *)&val);
+      status = H5Tenum_insert(state_enum_id, "inverse_svd", &val);
       AssertThrow(status >= 0, ExcInternalError());
       val    = LAPACKSupport::State::lu;
-      status = H5Tenum_insert(state_enum_id, "lu", (int *)&val);
+      status = H5Tenum_insert(state_enum_id, "lu", &val);
       AssertThrow(status >= 0, ExcInternalError());
       val    = LAPACKSupport::State::matrix;
-      status = H5Tenum_insert(state_enum_id, "matrix", (int *)&val);
+      status = H5Tenum_insert(state_enum_id, "matrix", &val);
       AssertThrow(status >= 0, ExcInternalError());
       val    = LAPACKSupport::State::svd;
-      status = H5Tenum_insert(state_enum_id, "svd", (int *)&val);
+      status = H5Tenum_insert(state_enum_id, "svd", &val);
       AssertThrow(status >= 0, ExcInternalError());
       val    = LAPACKSupport::State::unusable;
-      status = H5Tenum_insert(state_enum_id, "unusable", (int *)&val);
+      status = H5Tenum_insert(state_enum_id, "unusable", &val);
       AssertThrow(status >= 0, ExcInternalError());
     }
 
@@ -2580,25 +2572,22 @@ namespace internal
       // create HDF5 enum type for LAPACKSupport::Property
       property_enum_id = H5Tcreate(H5T_ENUM, sizeof(LAPACKSupport::Property));
       LAPACKSupport::Property prop = LAPACKSupport::Property::diagonal;
-      herr_t                  status =
-        H5Tenum_insert(property_enum_id, "diagonal", (int *)&prop);
+      herr_t status = H5Tenum_insert(property_enum_id, "diagonal", &prop);
       AssertThrow(status >= 0, ExcInternalError());
       prop   = LAPACKSupport::Property::general;
-      status = H5Tenum_insert(property_enum_id, "general", (int *)&prop);
+      status = H5Tenum_insert(property_enum_id, "general", &prop);
       AssertThrow(status >= 0, ExcInternalError());
       prop   = LAPACKSupport::Property::hessenberg;
-      status = H5Tenum_insert(property_enum_id, "hessenberg", (int *)&prop);
+      status = H5Tenum_insert(property_enum_id, "hessenberg", &prop);
       AssertThrow(status >= 0, ExcInternalError());
-      prop = LAPACKSupport::Property::lower_triangular;
-      status =
-        H5Tenum_insert(property_enum_id, "lower_triangular", (int *)&prop);
+      prop   = LAPACKSupport::Property::lower_triangular;
+      status = H5Tenum_insert(property_enum_id, "lower_triangular", &prop);
       AssertThrow(status >= 0, ExcInternalError());
       prop   = LAPACKSupport::Property::symmetric;
-      status = H5Tenum_insert(property_enum_id, "symmetric", (int *)&prop);
+      status = H5Tenum_insert(property_enum_id, "symmetric", &prop);
       AssertThrow(status >= 0, ExcInternalError());
-      prop = LAPACKSupport::Property::upper_triangular;
-      status =
-        H5Tenum_insert(property_enum_id, "upper_triangular", (int *)&prop);
+      prop   = LAPACKSupport::Property::upper_triangular;
+      status = H5Tenum_insert(property_enum_id, "upper_triangular", &prop);
       AssertThrow(status >= 0, ExcInternalError());
     }
   } // namespace
@@ -2628,12 +2617,8 @@ ScaLAPACKMatrix<NumberType>::save(
       chunks_size_.first  = n_rows;
       chunks_size_.second = 1;
     }
-  Assert((chunks_size_.first <= (unsigned int)n_rows) &&
-           (chunks_size_.first > 0),
-         ExcIndexRange(chunks_size_.first, 1, n_rows + 1));
-  Assert((chunks_size_.second <= (unsigned int)n_columns) &&
-           (chunks_size_.second > 0),
-         ExcIndexRange(chunks_size_.second, 1, n_columns + 1));
+  AssertIndexRange(chunks_size_.first + 1, n_rows);
+  AssertIndexRange(chunks_size_.second + 1, n_columns);
 
 #    ifdef H5_HAVE_PARALLEL
   // implementation for configurations equipped with a parallel file system
@@ -3122,11 +3107,11 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
       hsize_t dims[2];
       H5Sget_simple_extent_dims(dataspace_id, dims, nullptr);
       AssertThrow(
-        (int)dims[0] == n_columns,
+        static_cast<int>(dims[0]) == n_columns,
         ExcMessage(
           "The number of columns of the matrix does not match the content of the archive"));
       AssertThrow(
-        (int)dims[1] == n_rows,
+        static_cast<int>(dims[1]) == n_rows,
         ExcMessage(
           "The number of rows of the matrix does not match the content of the archive"));
 
@@ -3167,10 +3152,10 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
       // get every dimension
       hsize_t dims_state[1];
       H5Sget_simple_extent_dims(dataspace_state, dims_state, nullptr);
-      AssertThrow((int)dims_state[0] == 1, ExcIO());
+      AssertThrow(static_cast<int>(dims_state[0]) == 1, ExcIO());
       hsize_t dims_property[1];
       H5Sget_simple_extent_dims(dataspace_property, dims_property, nullptr);
-      AssertThrow((int)dims_property[0] == 1, ExcIO());
+      AssertThrow(static_cast<int>(dims_property[0]) == 1, ExcIO());
 
       // read data
       status = H5Dread(dataset_state_id,
@@ -3318,11 +3303,11 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
   status = H5Sget_simple_extent_dims(dataspace_id, dims, nullptr);
   AssertThrow(status >= 0, ExcIO());
   AssertThrow(
-    (int)dims[0] == n_columns,
+    static_cast<int>(dims[0]) == n_columns,
     ExcMessage(
       "The number of columns of the matrix does not match the content of the archive"));
   AssertThrow(
-    (int)dims[1] == n_rows,
+    static_cast<int>(dims[1]) == n_rows,
     ExcMessage(
       "The number of rows of the matrix does not match the content of the archive"));
 
@@ -3400,10 +3385,10 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
   // get every dimension
   hsize_t dims_state[1];
   H5Sget_simple_extent_dims(dataspace_state, dims_state, nullptr);
-  AssertThrow((int)dims_state[0] == 1, ExcIO());
+  AssertThrow(static_cast<int>(dims_state[0]) == 1, ExcIO());
   hsize_t dims_property[1];
   H5Sget_simple_extent_dims(dataspace_property, dims_property, nullptr);
-  AssertThrow((int)dims_property[0] == 1, ExcIO());
+  AssertThrow(static_cast<int>(dims_property[0]) == 1, ExcIO());
 
   // read data
   status = H5Dread(

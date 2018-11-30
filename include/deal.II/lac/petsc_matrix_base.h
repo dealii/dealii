@@ -1327,7 +1327,7 @@ namespace PETScWrappers
                 n_columns++;
               }
           }
-        Assert(n_columns <= (int)n_cols, ExcInternalError());
+        AssertIndexRange(n_columns, n_cols + 1);
 
         col_index_ptr = column_indices.data();
         col_value_ptr = column_values.data();
@@ -1471,7 +1471,7 @@ namespace PETScWrappers
                 n_columns++;
               }
           }
-        Assert(n_columns <= (int)n_cols, ExcInternalError());
+        AssertIndexRange(n_columns, n_cols + 1);
 
         col_index_ptr = column_indices.data();
         col_value_ptr = column_values.data();

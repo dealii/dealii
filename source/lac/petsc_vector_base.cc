@@ -75,8 +75,7 @@ namespace PETScWrappers
               const size_type ghostidx =
                 vector.ghost_indices.index_within_set(index);
 
-              Assert(ghostidx + end - begin < (size_type)lsize,
-                     ExcInternalError());
+              AssertIndexRange(ghostidx + end - begin, lsize);
               value = *(ptr + ghostidx + end - begin);
             }
 

@@ -98,7 +98,7 @@ DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
       Assert(pos1 <= entries.size(), ExcInternalError());
       entries.insert(it, my_it, end);
       it = entries.begin() + pos1;
-      Assert(entries.size() >= (size_type)(it - entries.begin()),
+      Assert(entries.size() >= static_cast<size_type>(it - entries.begin()),
              ExcInternalError());
 
       // now merge the two lists.
