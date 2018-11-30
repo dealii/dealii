@@ -1365,8 +1365,14 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  * @author Guido Kanschat 2007
  */
-#define AssertDimension(dim1, dim2) \
-  Assert((dim1) == (dim2), dealii::ExcDimensionMismatch((dim1), (dim2)))
+#define AssertDimension(dim1, dim2)                                            \
+  Assert(static_cast<typename ::dealii::internal::argument_type<void(          \
+             typename std::common_type<decltype(dim1),                         \
+                                       decltype(dim2)>::type)>::type>(dim1) == \
+           static_cast<typename ::dealii::internal::argument_type<void(        \
+             typename std::common_type<decltype(dim1),                         \
+                                       decltype(dim2)>::type)>::type>(dim2),   \
+         dealii::ExcDimensionMismatch((dim1), (dim2)))
 
 
 /**

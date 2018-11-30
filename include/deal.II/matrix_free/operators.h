@@ -1275,8 +1275,7 @@ namespace MatrixFreeOperators
       {
         if (data_->n_macro_cells() > 0)
           {
-            AssertDimension(static_cast<int>(level),
-                            data_->get_cell_iterator(0, 0, j)->level());
+            AssertDimension(level, data_->get_cell_iterator(0, 0, j)->level());
           }
 
         // setup edge_constrained indices

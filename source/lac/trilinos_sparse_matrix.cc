@@ -492,13 +492,9 @@ namespace TrilinosWrappers
       if (input_row_map.Comm().MyPID() == 0)
         {
           AssertDimension(sparsity_pattern.n_rows(),
-                          static_cast<size_type>(
-                            TrilinosWrappers::n_global_elements(
-                              input_row_map)));
+                          TrilinosWrappers::n_global_elements(input_row_map));
           AssertDimension(sparsity_pattern.n_cols(),
-                          static_cast<size_type>(
-                            TrilinosWrappers::n_global_elements(
-                              input_col_map)));
+                          TrilinosWrappers::n_global_elements(input_col_map));
         }
 
       column_space_map = std_cxx14::make_unique<Epetra_Map>(input_col_map);
@@ -584,8 +580,7 @@ namespace TrilinosWrappers
 
       // check whether we got the number of columns right.
       AssertDimension(sparsity_pattern.n_cols(),
-                      static_cast<size_type>(
-                        TrilinosWrappers::n_global_cols(*graph)));
+                      TrilinosWrappers::n_global_cols(*graph));
       (void)n_global_cols;
 
       // And now finally generate the matrix.
@@ -634,11 +629,9 @@ namespace TrilinosWrappers
       nonlocal_matrix_exporter.reset();
 
       AssertDimension(sparsity_pattern.n_rows(),
-                      static_cast<size_type>(
-                        TrilinosWrappers::n_global_elements(input_row_map)));
+                      TrilinosWrappers::n_global_elements(input_row_map));
       AssertDimension(sparsity_pattern.n_cols(),
-                      static_cast<size_type>(
-                        TrilinosWrappers::n_global_elements(input_col_map)));
+                      TrilinosWrappers::n_global_elements(input_col_map));
 
       column_space_map = std_cxx14::make_unique<Epetra_Map>(input_col_map);
 
@@ -786,8 +779,7 @@ namespace TrilinosWrappers
       graph->OptimizeStorage();
 
       AssertDimension(sparsity_pattern.n_cols(),
-                      static_cast<size_type>(
-                        TrilinosWrappers::n_global_cols(*graph)));
+                      TrilinosWrappers::n_global_cols(*graph));
 
       matrix = std_cxx14::make_unique<Epetra_FECrsMatrix>(Copy, *graph, false);
     }
@@ -1867,7 +1859,7 @@ namespace TrilinosWrappers
           indices.size(),
           n_indices,
           indices.data());
-        AssertDimension(static_cast<unsigned int>(n_indices), indices.size());
+        AssertDimension(n_indices, indices.size());
 
         for (TrilinosWrappers::types::int_type i = 0; i < n_indices; ++i)
           std::cout << indices[i] << " ";
@@ -2100,11 +2092,9 @@ namespace TrilinosWrappers
                                                                     src,
                                                                     dst);
     const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
-    AssertDimension(dst_local_size,
-                    static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
+    AssertDimension(dst_local_size, matrix->RangeMap().NumMyPoints());
     const size_type src_local_size = internal::end(src) - internal::begin(src);
-    AssertDimension(src_local_size,
-                    static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
+    AssertDimension(src_local_size, matrix->DomainMap().NumMyPoints());
 
     Epetra_MultiVector tril_dst(
       View, matrix->RangeMap(), internal::begin(dst), dst_local_size, 1);
@@ -2133,11 +2123,9 @@ namespace TrilinosWrappers
                                                                     dst,
                                                                     src);
     const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
-    AssertDimension(dst_local_size,
-                    static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
+    AssertDimension(dst_local_size, matrix->DomainMap().NumMyPoints());
     const size_type src_local_size = internal::end(src) - internal::begin(src);
-    AssertDimension(src_local_size,
-                    static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
+    AssertDimension(src_local_size, matrix->RangeMap().NumMyPoints());
 
     Epetra_MultiVector tril_dst(
       View, matrix->DomainMap(), internal::begin(dst), dst_local_size, 1);
@@ -3097,13 +3085,9 @@ namespace TrilinosWrappers
 
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            first_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            second_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -3141,13 +3125,9 @@ namespace TrilinosWrappers
 
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            first_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            second_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -3182,13 +3162,9 @@ namespace TrilinosWrappers
 
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            first_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            second_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -3226,13 +3202,9 @@ namespace TrilinosWrappers
 
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            first_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            second_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -3288,13 +3260,9 @@ namespace TrilinosWrappers
 
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            first_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            second_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -3330,13 +3298,9 @@ namespace TrilinosWrappers
 
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            first_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            second_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -3368,13 +3332,9 @@ namespace TrilinosWrappers
 
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            first_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            second_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -3410,13 +3370,9 @@ namespace TrilinosWrappers
 
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            first_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
           const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
-          AssertDimension(i_local_size,
-                          static_cast<size_type>(
-                            second_op_init_map.NumMyPoints()));
+          AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           (void)second_op_init_map;
           Intermediate tril_int(View,
                                 first_op_init_map,
