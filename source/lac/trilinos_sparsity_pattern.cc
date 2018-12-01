@@ -335,8 +335,7 @@ namespace TrilinosWrappers
       nonlocal_graph.reset();
       graph.reset();
       AssertDimension(n_entries_per_row.size(),
-                      static_cast<size_type>(
-                        TrilinosWrappers::n_global_elements(row_map)));
+                      TrilinosWrappers::n_global_elements(row_map));
 
       column_space_map = std_cxx14::make_unique<Epetra_Map>(col_map);
       std::vector<int> local_entries_per_row(
@@ -376,11 +375,9 @@ namespace TrilinosWrappers
       graph.reset();
 
       AssertDimension(sp.n_rows(),
-                      static_cast<size_type>(
-                        TrilinosWrappers::n_global_elements(row_map)));
+                      TrilinosWrappers::n_global_elements(row_map));
       AssertDimension(sp.n_cols(),
-                      static_cast<size_type>(
-                        TrilinosWrappers::n_global_elements(col_map)));
+                      TrilinosWrappers::n_global_elements(col_map));
 
       column_space_map = std_cxx14::make_unique<Epetra_Map>(col_map);
 
@@ -405,8 +402,7 @@ namespace TrilinosWrappers
         graph = std_cxx14::make_unique<Epetra_FECrsGraph>(
           Copy, row_map, col_map, n_entries_per_row.data(), false);
 
-      AssertDimension(sp.n_rows(),
-                      static_cast<size_type>(n_global_rows(*graph)));
+      AssertDimension(sp.n_rows(), n_global_rows(*graph));
 
       std::vector<TrilinosWrappers::types::int_type> row_indices;
 

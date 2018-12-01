@@ -2015,9 +2015,9 @@ namespace TrilinosWrappers
   PreconditionBase::vmult(dealii::Vector<double> &      dst,
                           const dealii::Vector<double> &src) const
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(dst.size()),
+    AssertDimension(dst.size(),
                     preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(src.size()),
+    AssertDimension(src.size(),
                     preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),
@@ -2035,9 +2035,9 @@ namespace TrilinosWrappers
   PreconditionBase::Tvmult(dealii::Vector<double> &      dst,
                            const dealii::Vector<double> &src) const
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(dst.size()),
+    AssertDimension(dst.size(),
                     preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(src.size()),
+    AssertDimension(src.size(),
                     preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),
@@ -2059,11 +2059,9 @@ namespace TrilinosWrappers
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      dst.local_size()),
+    AssertDimension(dst.local_size(),
                     preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      src.local_size()),
+    AssertDimension(src.local_size(),
                     preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),
@@ -2081,11 +2079,9 @@ namespace TrilinosWrappers
     LinearAlgebra::distributed::Vector<double> &      dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      dst.local_size()),
+    AssertDimension(dst.local_size(),
                     preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      src.local_size()),
+    AssertDimension(src.local_size(),
                     preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst(View,
                            preconditioner->OperatorDomainMap(),

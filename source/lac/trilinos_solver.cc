@@ -229,12 +229,8 @@ namespace TrilinosWrappers
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      x.local_size()),
-                    A.domain_partitioner().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      b.local_size()),
-                    A.range_partitioner().NumMyElements());
+    AssertDimension(x.local_size(), A.domain_partitioner().NumMyElements());
+    AssertDimension(b.local_size(), A.range_partitioner().NumMyElements());
 
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
     Epetra_Vector ep_b(View,
@@ -257,12 +253,8 @@ namespace TrilinosWrappers
                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
                     const PreconditionBase &preconditioner)
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      x.local_size()),
-                    A.OperatorDomainMap().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      b.local_size()),
-                    A.OperatorRangeMap().NumMyElements());
+    AssertDimension(x.local_size(), A.OperatorDomainMap().NumMyElements());
+    AssertDimension(b.local_size(), A.OperatorRangeMap().NumMyElements());
 
     Epetra_Vector ep_x(View, A.OperatorDomainMap(), x.begin());
     Epetra_Vector ep_b(View,
@@ -913,12 +905,8 @@ namespace TrilinosWrappers
     dealii::LinearAlgebra::distributed::Vector<double> &      x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      x.local_size()),
-                    A.domain_partitioner().NumMyElements());
-    AssertDimension(static_cast<TrilinosWrappers::types::int_type>(
-                      b.local_size()),
-                    A.range_partitioner().NumMyElements());
+    AssertDimension(x.local_size(), A.domain_partitioner().NumMyElements());
+    AssertDimension(b.local_size(), A.range_partitioner().NumMyElements());
     Epetra_Vector ep_x(View, A.domain_partitioner(), x.begin());
     Epetra_Vector ep_b(View,
                        A.range_partitioner(),
