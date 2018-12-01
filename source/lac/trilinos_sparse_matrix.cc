@@ -143,7 +143,7 @@ namespace TrilinosWrappers
         }
 
       int ierr = matrix->trilinos_matrix().ExtractGlobalRowCopy(
-        static_cast<TrilinosWrappers::types::int_type>(this->a_row),
+        this->a_row,
         colnums,
         ncols,
         &((*value_cache)[0]),
@@ -1859,14 +1859,12 @@ namespace TrilinosWrappers
             &nonlocal_matrix->Graph() :
             &matrix->Graph();
 
-        indices.resize(graph->NumGlobalIndices(
-          static_cast<TrilinosWrappers::types::int_type>(row)));
+        indices.resize(graph->NumGlobalIndices(row));
         int n_indices = 0;
-        graph->ExtractGlobalRowCopy(
-          static_cast<TrilinosWrappers::types::int_type>(row),
-          indices.size(),
-          n_indices,
-          indices.data());
+        graph->ExtractGlobalRowCopy(row,
+                                    indices.size(),
+                                    n_indices,
+                                    indices.data());
         AssertDimension(n_indices, indices.size());
 
         for (TrilinosWrappers::types::int_type i = 0; i < n_indices; ++i)
