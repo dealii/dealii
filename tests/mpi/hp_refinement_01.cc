@@ -40,7 +40,11 @@ void
 test()
 {
   // ------ setup ------
-  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    ::Triangulation<dim>::none,
+    false,
+    parallel::shared::Triangulation<dim>::partition_zoltan);
 
   GridGenerator::subdivided_hyper_cube(tria, 2);
   tria.refine_global(1);
