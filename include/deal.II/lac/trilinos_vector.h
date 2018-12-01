@@ -1613,7 +1613,8 @@ namespace TrilinosWrappers
             {
               const int ierr = vector->ReplaceGlobalValues(
                 1,
-                (const TrilinosWrappers::types::int_type *)(&row),
+                reinterpret_cast<const TrilinosWrappers::types::int_type *>(
+                  &row),
                 &values[i]);
               AssertThrow(ierr == 0, ExcTrilinosError(ierr));
               compressed = false;
@@ -1688,7 +1689,8 @@ namespace TrilinosWrappers
             {
               const int ierr = vector->SumIntoGlobalValues(
                 1,
-                (const TrilinosWrappers::types::int_type *)(&row),
+                reinterpret_cast<const TrilinosWrappers::types::int_type *>(
+                  &row),
                 &values[i]);
               AssertThrow(ierr == 0, ExcTrilinosError(ierr));
               compressed = false;
@@ -1717,11 +1719,9 @@ namespace TrilinosWrappers
     Vector::size() const
     {
 #    ifndef DEAL_II_WITH_64BIT_INDICES
-      return (size_type)(vector->Map().MaxAllGID() + 1 -
-                         vector->Map().MinAllGID());
+      return vector->Map().MaxAllGID() + 1 - vector->Map().MinAllGID();
 #    else
-      return (size_type)(vector->Map().MaxAllGID64() + 1 -
-                         vector->Map().MinAllGID64());
+      return vector->Map().MaxAllGID64() + 1 - vector->Map().MinAllGID64();
 #    endif
     }
 
@@ -1730,7 +1730,7 @@ namespace TrilinosWrappers
     inline Vector::size_type
     Vector::local_size() const
     {
-      return (size_type)vector->Map().NumMyElements();
+      return vector->Map().NumMyElements();
     }
 
 
