@@ -743,7 +743,7 @@ PArpackSolver<VectorType>::internal_reinit(const IndexSet &locally_owned_dofs)
   nloc = locally_owned_dofs.n_elements();
   ncv  = additional_data.number_of_arnoldi_vectors;
 
-  Assert((int)local_indices.size() == nloc, ExcInternalError());
+  AssertDimension(local_indices.size(), nloc);
 
   // vectors
   ldv = nloc;
@@ -1016,9 +1016,11 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
       const int shift_x = ipntr[0] - 1;
       const int shift_y = ipntr[1] - 1;
       Assert(shift_x >= 0, dealii::ExcInternalError());
-      Assert(shift_x + nloc <= (int)workd.size(), dealii::ExcInternalError());
+      Assert(shift_x + nloc <= static_cast<int>(workd.size()),
+             dealii::ExcInternalError());
       Assert(shift_y >= 0, dealii::ExcInternalError());
-      Assert(shift_y + nloc <= (int)workd.size(), dealii::ExcInternalError());
+      Assert(shift_y + nloc <= static_cast<int>(workd.size()),
+             dealii::ExcInternalError());
 
       src = 0.;
 
@@ -1058,7 +1060,7 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
         {
           const int shift_b_x = ipntr[2] - 1;
           Assert(shift_b_x >= 0, dealii::ExcInternalError());
-          Assert(shift_b_x + nloc <= (int)workd.size(),
+          Assert(shift_b_x + nloc <= static_cast<int>(workd.size()),
                  dealii::ExcInternalError());
 
           // B*X
@@ -1176,7 +1178,7 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
   for (int i = 0; i < nev; ++i)
     {
       (*eigenvectors[i]) = 0.0;
-      Assert(i * nloc + nloc <= (int)v.size(), dealii::ExcInternalError());
+      AssertIndexRange(i * nloc + nloc, v.size() + 1);
 
       eigenvectors[i]->add(nloc, local_indices.data(), &v[i * nloc]);
       eigenvectors[i]->compress(VectorOperation::add);
@@ -1187,7 +1189,7 @@ PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
       std::complex<double>(eigenvalues_real[i], eigenvalues_im[i]);
 
   // Throw an error if the solver did not converge.
-  AssertThrow(iparam[4] >= (int)n_eigenvalues,
+  AssertThrow(iparam[4] >= static_cast<int>(n_eigenvalues),
               PArpackExcConvergedEigenvectors(n_eigenvalues, iparam[4]));
 
   // both PDNAUPD and PDSAUPD compute eigenpairs of inv[A - sigma*M]*M
