@@ -130,6 +130,15 @@ namespace GridTools
     get_used_vertices_rtree() const;
 
     /**
+     * Returned the cached RTree object of the cell bounging boxes, constructed
+     * using the active cell iterators of the stored triangulation.
+     */
+    const RTree<
+      std::pair<BoundingBox<spacedim>,
+                typename Triangulation<dim, spacedim>::active_cell_iterator>> &
+    get_cell_bounding_boxes_rtree() const;
+
+    /**
      * Return a reference to the stored triangulation.
      */
     const Triangulation<dim, spacedim> &
@@ -199,6 +208,15 @@ namespace GridTools
      * Store an RTree object, containing the used vertices of the triangulation.
      */
     mutable RTree<std::pair<Point<spacedim>, unsigned int>> used_vertices_rtree;
+
+    /**
+     * Store an RTree object, containing the bounding boxes of the cells of the
+     * triangulation.
+     */
+    mutable RTree<
+      std::pair<BoundingBox<spacedim>,
+                typename Triangulation<dim, spacedim>::active_cell_iterator>>
+      cell_bounding_boxes_rtree;
 
     /**
      * Storage for the status of the triangulation signal.

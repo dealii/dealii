@@ -69,6 +69,11 @@ namespace GridTools
     update_used_vertices_rtree = 0x010,
 
     /**
+     * Update an RTree of the cell bounding boxes.
+     */
+    update_cell_bounding_boxes_rtree = 0x020,
+
+    /**
      * Update all objects.
      */
     update_all = 0xFFF,

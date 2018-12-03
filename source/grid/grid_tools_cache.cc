@@ -114,6 +114,26 @@ namespace GridTools
 
 
 
+  template <int dim, int spacedim>
+  const RTree<
+    std::pair<BoundingBox<spacedim>,
+              typename Triangulation<dim, spacedim>::active_cell_iterator>> &
+  Cache<dim, spacedim>::get_cell_bounding_boxes_rtree() const
+  {
+    if (update_flags & update_cell_bounding_boxes_rtree)
+      {
+        std::vector<std::pair<
+          BoundingBox<spacedim>,
+          typename Triangulation<dim, spacedim>::active_cell_iterator>>
+                     boxes(tria->n_active_cells());
+        unsigned int i = 0;
+        for (auto cell : tria->active_cell_iterators())
+          boxes[i++] = std::make_pair(cell->bounding_box(), cell);
+        cell_bounding_boxes_rtree = pack_rtree(boxes);
+      }
+    return cell_bounding_boxes_rtree;
+  }
+
 #ifdef DEAL_II_WITH_NANOFLANN
   template <int dim, int spacedim>
   const KDTree<spacedim> &

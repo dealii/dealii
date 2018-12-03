@@ -1,0 +1,67 @@
+
+DEAL::Testing dim = 1, spacedim = 1
+DEAL::Nearest cell to 0.840188:  2.3
+DEAL::Nearest cell to 0.394383:  2.1
+DEAL::Nearest cell to 0.783099:  2.3
+DEAL::Nearest cell to 0.798440:  2.3
+DEAL::Nearest cell to 0.911647:  2.3
+DEAL::Nearest cell to 0.197551:  2.0
+DEAL::Nearest cell to 0.335223:  2.1
+DEAL::Nearest cell to 0.768230:  2.3
+DEAL::Nearest cell to 0.277775:  2.1
+DEAL::Nearest cell to 0.553970:  2.2
+DEAL::Testing dim = 1, spacedim = 2
+DEAL::Nearest cell to 0.477397 0.628871:  2.1
+DEAL::Nearest cell to 0.364784 0.513401:  2.1
+DEAL::Nearest cell to 0.952230 0.916195:  2.3
+DEAL::Nearest cell to 0.635712 0.717297:  2.2
+DEAL::Nearest cell to 0.141603 0.606969:  2.0
+DEAL::Nearest cell to 0.0163006 0.242887:  2.0
+DEAL::Nearest cell to 0.137232 0.804177:  2.0
+DEAL::Nearest cell to 0.156679 0.400944:  2.0
+DEAL::Nearest cell to 0.129790 0.108809:  2.0
+DEAL::Nearest cell to 0.998925 0.218257:  2.3
+DEAL::Testing dim = 1, spacedim = 3
+DEAL::Nearest cell to 0.512932 0.839112 0.612640:  2.2
+DEAL::Nearest cell to 0.296032 0.637552 0.524287:  2.1
+DEAL::Nearest cell to 0.493583 0.972775 0.292517:  2.1
+DEAL::Nearest cell to 0.771358 0.526745 0.769914:  2.3
+DEAL::Nearest cell to 0.400229 0.891529 0.283315:  2.1
+DEAL::Nearest cell to 0.352458 0.807725 0.919026:  2.1
+DEAL::Nearest cell to 0.0697553 0.949327 0.525995:  2.0
+DEAL::Nearest cell to 0.0860558 0.192214 0.663227:  2.0
+DEAL::Nearest cell to 0.890233 0.348893 0.0641713:  2.3
+DEAL::Nearest cell to 0.0200230 0.457702 0.0630958:  2.0
+DEAL::Testing dim = 2, spacedim = 2
+DEAL::Nearest cell to 0.238280 0.970634:  2.10
+DEAL::Nearest cell to 0.902208 0.850920:  2.15
+DEAL::Nearest cell to 0.266666 0.539760:  2.9
+DEAL::Nearest cell to 0.375207 0.760249:  2.11
+DEAL::Nearest cell to 0.512535 0.667724:  2.12
+DEAL::Nearest cell to 0.531606 0.0392803:  2.4
+DEAL::Nearest cell to 0.437638 0.931835:  2.11
+DEAL::Nearest cell to 0.930810 0.720952:  2.13
+DEAL::Nearest cell to 0.284293 0.738534:  2.9
+DEAL::Nearest cell to 0.639979 0.354049:  2.6
+DEAL::Testing dim = 2, spacedim = 3
+DEAL::Nearest cell to 0.687861 0.165974 0.440105:  2.4
+DEAL::Nearest cell to 0.880075 0.829201 0.330337:  2.15
+DEAL::Nearest cell to 0.228968 0.893372 0.350360:  2.10
+DEAL::Nearest cell to 0.686670 0.956468 0.588640:  2.14
+DEAL::Nearest cell to 0.657304 0.858676 0.439560:  2.14
+DEAL::Nearest cell to 0.923970 0.398437 0.814767:  2.7
+DEAL::Nearest cell to 0.684219 0.910972 0.482491:  2.14
+DEAL::Nearest cell to 0.215825 0.950252 0.920128:  2.10
+DEAL::Nearest cell to 0.147660 0.881062 0.641081:  2.10
+DEAL::Nearest cell to 0.431953 0.619596 0.281059:  2.9
+DEAL::Testing dim = 3, spacedim = 3
+DEAL::Nearest cell to 0.786002 0.307458 0.447034:  2.15
+DEAL::Nearest cell to 0.226107 0.187533 0.276235:  2.4
+DEAL::Nearest cell to 0.556444 0.416501 0.169607:  2.10
+DEAL::Nearest cell to 0.906804 0.103171 0.126075:  2.9
+DEAL::Nearest cell to 0.495444 0.760475 0.984752:  2.55
+DEAL::Nearest cell to 0.935004 0.684445 0.383188:  2.29
+DEAL::Nearest cell to 0.749771 0.368664 0.294160:  2.14
+DEAL::Nearest cell to 0.232262 0.584489 0.244413:  2.16
+DEAL::Nearest cell to 0.152390 0.732149 0.125475:  2.16
+DEAL::Nearest cell to 0.793470 0.164102 0.745071:  2.41
