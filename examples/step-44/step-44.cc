@@ -3052,9 +3052,9 @@ namespace Step44
           std::cout << " SLV " << std::flush;
           if (parameters.type_lin == "CG")
             {
-              const int solver_its =
-                static_cast<int>(tangent_matrix.block(u_dof, u_dof).m() *
-                                 parameters.max_iterations_lin);
+              const auto solver_its = static_cast<unsigned int>(
+                tangent_matrix.block(u_dof, u_dof).m() *
+                parameters.max_iterations_lin);
               const double tol_sol =
                 parameters.tol_lin * system_rhs.block(u_dof).l2_norm();
 
