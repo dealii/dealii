@@ -30,10 +30,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-using namespace dealii;
-
-
 /**
  * A namespace that provides an interface to the
  * <a href="https://trilinos.org/docs/dev/packages/rol/doc/html/index.html">

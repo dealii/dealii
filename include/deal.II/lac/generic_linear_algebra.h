@@ -65,8 +65,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace LinearAlgebraPETSc
 {
-  using namespace dealii;
-
   using SolverCG    = PETScWrappers::SolverCG;
   using SolverGMRES = PETScWrappers::SolverGMRES;
 
@@ -151,8 +149,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace LinearAlgebraTrilinos
 {
-  using namespace dealii;
-
   using SolverCG    = TrilinosWrappers::SolverCG;
   using SolverGMRES = TrilinosWrappers::SolverGMRES;
 
