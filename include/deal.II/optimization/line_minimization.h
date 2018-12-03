@@ -33,9 +33,8 @@
 #include <fstream>
 #include <string>
 
-DEAL_II_NAMESPACE_OPEN
 
-using namespace dealii;
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace for various algorithms related to minimization a over line.
