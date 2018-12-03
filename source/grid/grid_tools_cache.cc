@@ -95,6 +95,25 @@ namespace GridTools
 
 
 
+  template <int dim, int spacedim>
+  const RTree<std::pair<Point<spacedim>, unsigned int>> &
+  Cache<dim, spacedim>::get_used_vertices_rtree() const
+  {
+    if (update_flags & update_used_vertices_rtree)
+      {
+        const auto &used_vertices = get_used_vertices();
+        std::vector<std::pair<Point<spacedim>, unsigned int>> vertices(
+          used_vertices.size());
+        unsigned int i = 0;
+        for (auto it : used_vertices)
+          vertices[i++] = std::make_pair(it.second, it.first);
+        used_vertices_rtree = pack_rtree(vertices);
+      }
+    return used_vertices_rtree;
+  }
+
+
+
 #ifdef DEAL_II_WITH_NANOFLANN
   template <int dim, int spacedim>
   const KDTree<spacedim> &

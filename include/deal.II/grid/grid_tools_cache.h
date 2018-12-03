@@ -31,6 +31,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/numerics/kdtree.h>
+#include <deal.II/numerics/rtree.h>
 
 #include <boost/signals2.hpp>
 
@@ -122,6 +123,13 @@ namespace GridTools
     get_used_vertices() const;
 
     /**
+     * Returned the cached RTree object for the vertices, constructed using the
+     * used vertices of the triangulation.
+     */
+    const RTree<std::pair<Point<spacedim>, unsigned int>> &
+    get_used_vertices_rtree() const;
+
+    /**
      * Return a reference to the stored triangulation.
      */
     const Triangulation<dim, spacedim> &
@@ -186,6 +194,11 @@ namespace GridTools
      * GridTools::extract_used_vertices().
      */
     mutable std::map<unsigned int, Point<spacedim>> used_vertices;
+
+    /**
+     * Store an RTree object, containing the used vertices of the triangulation.
+     */
+    mutable RTree<std::pair<Point<spacedim>, unsigned int>> used_vertices_rtree;
 
     /**
      * Storage for the status of the triangulation signal.
