@@ -514,7 +514,7 @@ namespace internal
                     // compress out very small values
                     for (unsigned int d = 0; d < dim; ++d)
                       for (unsigned int e = 0; e < dim; ++e)
-                        if (std::fabs(jac_0[d][e]))
+                        if (std::fabs(jac_0[d][e]) != 0.)
                           cell_data.const_jac[d][e][j] = jac_0[d][e];
                     continue;
                   }

@@ -412,7 +412,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // the order used in the following blocks makes sense
                       for (unsigned int i = 0; i < cells.size(); i++)
                         {
-                          double id;
+                          types::manifold_id id;
                           in >> id;
                           if (set == "MaterialID")
                             cells[i].material_id = id;
@@ -428,7 +428,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                i < subcelldata.boundary_quads.size();
                                i++)
                             {
-                              double id;
+                              types::manifold_id id;
                               in >> id;
                               if (set == "MaterialID")
                                 subcelldata.boundary_quads[i].material_id = id;
@@ -441,7 +441,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                i < subcelldata.boundary_lines.size();
                                i++)
                             {
-                              double id;
+                              types::manifold_id id;
                               in >> id;
                               if (set == "MaterialID")
                                 subcelldata.boundary_lines[i].material_id = id;
@@ -457,7 +457,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                i < subcelldata.boundary_lines.size();
                                i++)
                             {
-                              double id;
+                              types::manifold_id id;
                               in >> id;
                               if (set == "MaterialID")
                                 subcelldata.boundary_lines[i].material_id = id;
@@ -1437,7 +1437,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       in >> version >> file_type >> data_size;
 
       Assert((version >= 2.0) && (version <= 4.0), ExcNotImplemented());
-      gmsh_file_format = version;
+      gmsh_file_format = static_cast<unsigned int>(version);
       Assert(file_type == 0, ExcNotImplemented());
       Assert(data_size == sizeof(double), ExcNotImplemented());
 

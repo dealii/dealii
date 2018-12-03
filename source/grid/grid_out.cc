@@ -2330,9 +2330,10 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                                            camera_horizontal,
                                            camera_focus);
 
-              const unsigned int font_size_this_cell =
-                .5 + cell_label_font_size *
-                       std::pow(.5, cell->level() - 4. + 3.5 * distance_factor);
+              const auto font_size_this_cell = static_cast<unsigned int>(
+                .5 +
+                cell_label_font_size *
+                  std::pow(.5, cell->level() - 4. + 3.5 * distance_factor));
 
               out << "  <text"
                   << " x=\""

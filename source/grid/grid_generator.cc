@@ -2004,7 +2004,7 @@ namespace GridGenerator
                         const double         h) -> void {
       // use std::round instead of std::ceil to improve aspect ratio
       // in case padding is only slightly larger than h.
-      const unsigned int rounded = std::round(padding / h);
+      const auto rounded = static_cast<unsigned int>(std::round(padding / h));
       // in case padding is much smaller than h, make sure we
       // have at least 1 element
       const unsigned int num = (padding > 0. && rounded == 0) ? 1 : rounded;

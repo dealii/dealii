@@ -1194,7 +1194,7 @@ namespace VectorTools
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
-      ReductionControl control(6. * rhs.size(), 0., 1e-12, false, false);
+      ReductionControl control(6 * rhs.size(), 0., 1e-12, false, false);
       SolverCG<LinearAlgebra::distributed::Vector<Number>> cg(control);
       PreconditionJacobi<MatrixType>                       preconditioner;
       preconditioner.initialize(mass_matrix, 1.);
@@ -1554,7 +1554,7 @@ namespace VectorTools
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
-      ReductionControl control(5. * rhs.size(), 0., 1e-12, false, false);
+      ReductionControl control(5 * rhs.size(), 0., 1e-12, false, false);
       SolverCG<LinearAlgebra::distributed::Vector<Number>>    cg(control);
       typename PreconditionJacobi<MatrixType>::AdditionalData data(0.8);
       PreconditionJacobi<MatrixType>                          preconditioner;
@@ -1647,7 +1647,7 @@ namespace VectorTools
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
-      ReductionControl control(5. * rhs.size(), 0., 1e-12, false, false);
+      ReductionControl control(5 * rhs.size(), 0., 1e-12, false, false);
       SolverCG<LinearAlgebra::distributed::Vector<Number>>    cg(control);
       typename PreconditionJacobi<MatrixType>::AdditionalData data(0.8);
       PreconditionJacobi<MatrixType>                          preconditioner;
@@ -3341,7 +3341,7 @@ namespace VectorTools
       // steps may not be sufficient, since roundoff errors may accumulate for
       // badly conditioned matrices. This behavior can be observed, e.g. for
       // FE_Q_Hierarchical for degree higher than three.
-      ReductionControl control(5. * rhs.size(), 0., 1.e-12, false, false);
+      ReductionControl control(5 * rhs.size(), 0., 1.e-12, false, false);
       GrowingVectorMemory<Vector<number>> memory;
       SolverCG<Vector<number>>            cg(control, memory);
 
