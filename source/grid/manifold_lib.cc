@@ -1156,18 +1156,20 @@ template <int dim, int spacedim>
 EllipticalManifold<dim, spacedim>::EllipticalManifold(
   const Point<spacedim> &    center,
   const Tensor<1, spacedim> &major_axis_direction,
-  const double               c_parameter)
+  const double               eccentricity)
   : ChartManifold<dim, spacedim, spacedim>(
       EllipticalManifold<dim, spacedim>::get_periodicity())
   , direction(major_axis_direction)
   , center(center)
-  , c_parameter(c_parameter)
+  , cosh_u(1.0 / eccentricity)
+  , sinh_u(std::sqrt(cosh_u * cosh_u - 1.0))
 {
-  // throws an exception if dim!=2 || spacedim!=2.
+  // Throws an exception if dim!=2 || spacedim!=2.
   Assert(dim == 2 && spacedim == 2, ExcNotImplemented());
-  Assert(this->c_parameter > 0.0,
+  // Throws an exception if eccentricity is not in range.
+  Assert(std::signbit(cosh_u * cosh_u - 1.0) == false,
          ExcMessage(
-           "Invalid ellipsis parameter 'c': It must satisfy c > 0.0."));
+           "Invalid eccentricity: It must satisfy 0 < eccentricity < 1."));
   const double direction_norm = direction.norm();
   Assert(direction_norm != 0.0,
          ExcMessage(
@@ -1181,9 +1183,9 @@ template <int dim, int spacedim>
 std::unique_ptr<Manifold<dim, spacedim>>
 EllipticalManifold<dim, spacedim>::clone() const
 {
-  return std::make_unique<EllipticalManifold<dim, spacedim>>(center,
-                                                             direction,
-                                                             c_parameter);
+  const double eccentricity = 1.0 / cosh_u;
+  return std_cxx14::make_unique<EllipticalManifold<dim, spacedim>>(
+    center, direction, eccentricity);
 }
 
 
@@ -1215,14 +1217,12 @@ template <>
 Point<2>
 EllipticalManifold<2, 2>::push_forward(const Point<2> &chart_point) const
 {
-  const double ch = std::cosh(chart_point[0]);
-  const double sh = std::sinh(chart_point[0]);
   const double cs = std::cos(chart_point[1]);
   const double sn = std::sin(chart_point[1]);
   // Coordinates in the reference frame (i.e. major axis direction is
   // x-axis)
-  const double x = c_parameter * ch * cs;
-  const double y = c_parameter * sh * sn;
+  const double x = chart_point[0] * cosh_u * cs;
+  const double y = chart_point[0] * sinh_u * sn;
   // Rotate them according to the major axis direction
   const Point<2> p(direction[0] * x - direction[1] * y,
                    direction[1] * x + direction[0] * y);
@@ -1246,45 +1246,29 @@ Point<2>
 EllipticalManifold<2, 2>::pull_back(const Point<2> &space_point) const
 {
   // Moving space_point in the reference coordinate system.
-  const double c2 = c_parameter * c_parameter;
   const double x0 = space_point[0] - center[0];
   const double y0 = space_point[1] - center[1];
   const double x  = direction[0] * x0 + direction[1] * y0;
   const double y  = -direction[1] * x0 + direction[0] * y0;
-  // From here we try to find solutions of two equations:
-  // x^2/(1-q)-y^2/q = c^2 for q, given q = -sinh^2(pt[0]),
-  // and
-  // x^2/(1-p)-y^2/p = c^2 for p, given p = sin^2(pt[1]).
-  // Note that, in the end, p and q are solutions to the same quadratic
-  // equation.
-  const double x2 = x * x;
-  const double y2 = y * y;
-  //
-  const double b       = x2 + y2 - c2;
-  const double srdelta = std::sqrt(b * b + 4.0 * c2 * y2);
-  double       p       = (-b + srdelta) / (2.0 * c2);
-  // Since p=sin^2(pt[1]) is bounded in [0,1],
-  // guard against numerical overflows.
-  if (p < 0.0)
-    p = 0.0;
-  if (p > 1.0)
-    p = 1.0;
-  const double q             = (-b - srdelta) / (2.0 * c2);
-  const bool   x_is_positive = !std::signbit(x);
-  const bool   y_is_positive = !std::signbit(y);
-  const double eta0          = std::asin(std::sqrt(p));
-  // Given q = -sinh^2(pt[0]),
-  // pt[0] is calculated by straight inversion since q <= 0 for any
-  // pt[0].
-  Point<2> pt(std::log(std::sqrt(-q) + std::sqrt(1.0 - q)), eta0);
-  // Unfolding pt[1] according to the quadrant.
-  if (x_is_positive && !y_is_positive)
-    pt[1] = 2.0 * numbers::PI - eta0;
-  else if (!x_is_positive && y_is_positive)
-    pt[1] = numbers::PI - eta0;
-  else if (!x_is_positive && !y_is_positive)
-    pt[1] = numbers::PI + eta0;
-  return pt;
+  const double pt0 =
+    std::sqrt((x * x) / (cosh_u * cosh_u) + (y * y) / (sinh_u * sinh_u));
+  // If the radius is exactly zero, the point coincides with the origin.
+  if (pt0 == 0.0)
+    {
+      return center;
+    }
+  double cos_eta = x / (pt0 * cosh_u);
+  if (cos_eta < -1.0)
+    {
+      cos_eta = -1.0;
+    }
+  if (cos_eta > 1.0)
+    {
+      cos_eta = 1.0;
+    }
+  const double eta = std::acos(cos_eta);
+  const double pt1 = (std::signbit(y) ? 2.0 * numbers::PI - eta : eta);
+  return Point<2>(pt0, pt1);
 }
 
 
@@ -1305,15 +1289,13 @@ DerivativeForm<1, 2, 2>
 EllipticalManifold<2, 2>::push_forward_gradient(
   const Point<2> &chart_point) const
 {
-  const double            ch = std::cosh(chart_point[0]);
-  const double            sh = std::sinh(chart_point[0]);
   const double            cs = std::cos(chart_point[1]);
   const double            sn = std::sin(chart_point[1]);
   DerivativeForm<1, 2, 2> dX;
-  dX[0][0] = c_parameter * sh * cs;
-  dX[0][1] = -c_parameter * ch * sn;
-  dX[1][0] = c_parameter * ch * sn;
-  dX[1][1] = c_parameter * sh * cs;
+  dX[0][0] = cosh_u * cs;
+  dX[0][1] = -chart_point[0] * cosh_u * sn;
+  dX[1][0] = sinh_u * sn;
+  dX[1][1] = chart_point[1] * sinh_u * cs;
   return dX;
 }
 
