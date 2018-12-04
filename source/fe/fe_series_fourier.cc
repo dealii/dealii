@@ -182,11 +182,12 @@ namespace FESeries
 
 
   template <int dim, int spacedim>
+  template <typename Number>
   void
   Fourier<dim, spacedim>::calculate(
-    const Vector<double> &            local_dof_values,
-    const unsigned int                cell_active_fe_index,
-    Table<dim, std::complex<double>> &fourier_coefficients)
+    const Vector<Number> &       local_dof_values,
+    const unsigned int           cell_active_fe_index,
+    Table<dim, CoefficientType> &fourier_coefficients)
   {
     ensure_existence(*fe_collection,
                      *q_collection,
@@ -194,12 +195,12 @@ namespace FESeries
                      cell_active_fe_index,
                      fourier_transform_matrices);
 
-    const FullMatrix<std::complex<double>> &matrix =
+    const FullMatrix<CoefficientType> &matrix =
       fourier_transform_matrices[cell_active_fe_index];
 
     std::fill(unrolled_coefficients.begin(),
               unrolled_coefficients.end(),
-              std::complex<double>(0.));
+              CoefficientType(0.));
 
     Assert(unrolled_coefficients.size() == matrix.m(), ExcInternalError());
 

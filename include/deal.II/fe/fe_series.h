@@ -91,6 +91,8 @@ namespace FESeries
   class Fourier : public Subscriptor
   {
   public:
+    using CoefficientType = typename std::complex<double>;
+
     /**
      * A non-default constructor. The @p size_in_each_direction defines the number
      * of modes in each direction, @p fe_collection is the hp::FECollection
@@ -107,10 +109,11 @@ namespace FESeries
      * @p local_dof_values corresponding to FiniteElement with
      * @p cell_active_fe_index .
      */
+    template <typename Number>
     void
-    calculate(const dealii::Vector<double> &    local_dof_values,
-              const unsigned int                cell_active_fe_index,
-              Table<dim, std::complex<double>> &fourier_coefficients);
+    calculate(const dealii::Vector<Number> &local_dof_values,
+              const unsigned int            cell_active_fe_index,
+              Table<dim, CoefficientType> & fourier_coefficients);
 
   private:
     /**
@@ -131,12 +134,12 @@ namespace FESeries
     /**
      * Transformation matrices for each FiniteElement.
      */
-    std::vector<FullMatrix<std::complex<double>>> fourier_transform_matrices;
+    std::vector<FullMatrix<CoefficientType>> fourier_transform_matrices;
 
     /**
      * Auxiliary vector to store unrolled coefficients.
      */
-    std::vector<std::complex<double>> unrolled_coefficients;
+    std::vector<CoefficientType> unrolled_coefficients;
   };
 
   /**
@@ -186,6 +189,8 @@ namespace FESeries
   class Legendre : public Subscriptor
   {
   public:
+    using CoefficientType = double;
+
     /**
      * A non-default constructor. The @p size_in_each_direction defines the number
      * of coefficients in each direction, @p fe_collection is the hp::FECollection
@@ -202,10 +207,11 @@ namespace FESeries
      * @p local_dof_values corresponding to FiniteElement with
      * @p cell_active_fe_index .
      */
+    template <typename Number>
     void
-    calculate(const dealii::Vector<double> &local_dof_values,
+    calculate(const dealii::Vector<Number> &local_dof_values,
               const unsigned int            cell_active_fe_index,
-              Table<dim, double> &          legendre_coefficients);
+              Table<dim, CoefficientType> & legendre_coefficients);
 
   private:
     /**
@@ -226,12 +232,12 @@ namespace FESeries
     /**
      * Transformation matrices for each FiniteElement.
      */
-    std::vector<FullMatrix<double>> legendre_transform_matrices;
+    std::vector<FullMatrix<CoefficientType>> legendre_transform_matrices;
 
     /**
      * Auxiliary vector to store unrolled coefficients.
      */
-    std::vector<double> unrolled_coefficients;
+    std::vector<CoefficientType> unrolled_coefficients;
   };
 
 
@@ -249,12 +255,12 @@ namespace FESeries
    * in this case: mean, L1_norm, L2_norm, Linfty_norm. The mean norm can only
    * be applied to real valued coefficients.
    */
-  template <int dim, typename T>
+  template <int dim, typename CoefficientType>
   std::pair<std::vector<unsigned int>, std::vector<double>>
-  process_coefficients(const Table<dim, T> &          coefficients,
+  process_coefficients(const Table<dim, CoefficientType> &coefficients,
                        const std::function<std::pair<bool, unsigned int>(
-                         const TableIndices<dim> &)> &predicate,
-                       const VectorTools::NormType    norm);
+                         const TableIndices<dim> &)> &    predicate,
+                       const VectorTools::NormType        norm);
 
 
 
@@ -278,32 +284,34 @@ namespace internal
 {
   namespace FESeriesImplementation
   {
-    template <int dim, typename T>
+    template <int dim, typename CoefficientType>
     void
-    fill_map_index(const Table<dim, T> &                   coefficients,
-                   const TableIndices<dim> &               ind,
-                   const std::function<std::pair<bool, unsigned int>(
-                     const TableIndices<dim> &)> &         predicate,
-                   std::map<unsigned int, std::vector<T>> &pred_to_values)
+    fill_map_index(
+      const Table<dim, CoefficientType> &coefficients,
+      const TableIndices<dim> &          ind,
+      const std::function<
+        std::pair<bool, unsigned int>(const TableIndices<dim> &)> &predicate,
+      std::map<unsigned int, std::vector<CoefficientType>> &pred_to_values)
     {
       const std::pair<bool, unsigned int> pred_pair = predicate(ind);
       // don't add a value if predicate is false
       if (pred_pair.first == false)
         return;
 
-      const unsigned int pred_value  = pred_pair.second;
-      const T &          coeff_value = coefficients(ind);
+      const unsigned int     pred_value  = pred_pair.second;
+      const CoefficientType &coeff_value = coefficients(ind);
       // If pred_value is not in the pred_to_values map, the element will be
       // created. Otherwise a reference to the existing element is returned.
       pred_to_values[pred_value].push_back(coeff_value);
     }
 
-    template <typename T>
+    template <typename CoefficientType>
     void
-    fill_map(const Table<1, T> &                     coefficients,
-             const std::function<std::pair<bool, unsigned int>(
-               const TableIndices<1> &)> &           predicate,
-             std::map<unsigned int, std::vector<T>> &pred_to_values)
+    fill_map(
+      const Table<1, CoefficientType> &coefficients,
+      const std::function<
+        std::pair<bool, unsigned int>(const TableIndices<1> &)> &predicate,
+      std::map<unsigned int, std::vector<CoefficientType>> &     pred_to_values)
     {
       for (unsigned int i = 0; i < coefficients.size(0); i++)
         {
@@ -312,12 +320,13 @@ namespace internal
         }
     }
 
-    template <typename T>
+    template <typename CoefficientType>
     void
-    fill_map(const Table<2, T> &                     coefficients,
-             const std::function<std::pair<bool, unsigned int>(
-               const TableIndices<2> &)> &           predicate,
-             std::map<unsigned int, std::vector<T>> &pred_to_values)
+    fill_map(
+      const Table<2, CoefficientType> &coefficients,
+      const std::function<
+        std::pair<bool, unsigned int>(const TableIndices<2> &)> &predicate,
+      std::map<unsigned int, std::vector<CoefficientType>> &     pred_to_values)
     {
       for (unsigned int i = 0; i < coefficients.size(0); i++)
         for (unsigned int j = 0; j < coefficients.size(1); j++)
@@ -327,12 +336,13 @@ namespace internal
           }
     }
 
-    template <typename T>
+    template <typename CoefficientType>
     void
-    fill_map(const Table<3, T> &                     coefficients,
-             const std::function<std::pair<bool, unsigned int>(
-               const TableIndices<3> &)> &           predicate,
-             std::map<unsigned int, std::vector<T>> &pred_to_values)
+    fill_map(
+      const Table<3, CoefficientType> &coefficients,
+      const std::function<
+        std::pair<bool, unsigned int>(const TableIndices<3> &)> &predicate,
+      std::map<unsigned int, std::vector<CoefficientType>> &     pred_to_values)
     {
       for (unsigned int i = 0; i < coefficients.size(0); i++)
         for (unsigned int j = 0; j < coefficients.size(1); j++)
@@ -344,16 +354,16 @@ namespace internal
     }
 
 
-    template <typename T>
+    template <typename Number>
     double
-    complex_mean_value(const T &value)
+    complex_mean_value(const Number &value)
     {
       return value;
     }
 
-    template <typename T>
+    template <typename Number>
     double
-    complex_mean_value(const std::complex<T> &value)
+    complex_mean_value(const std::complex<Number> &value)
     {
       AssertThrow(false,
                   ExcMessage(
@@ -365,10 +375,10 @@ namespace internal
 } // namespace internal
 
 
-template <int dim, typename T>
+template <int dim, typename CoefficientType>
 std::pair<std::vector<unsigned int>, std::vector<double>>
 FESeries::process_coefficients(
-  const Table<dim, T> &coefficients,
+  const Table<dim, CoefficientType> &coefficients,
   const std::function<std::pair<bool, unsigned int>(const TableIndices<dim> &)>
     &                         predicate,
   const VectorTools::NormType norm)
@@ -379,19 +389,17 @@ FESeries::process_coefficients(
   // first, parse all table elements into a map of predicate values and
   // coefficients. We could have stored (predicate values ->TableIndicies) map,
   // but its processing would have been much harder later on.
-  std::map<unsigned int, std::vector<T>> pred_to_values;
+  std::map<unsigned int, std::vector<CoefficientType>> pred_to_values;
   internal::FESeriesImplementation::fill_map(coefficients,
                                              predicate,
                                              pred_to_values);
 
   // now go through the map and populate the @p norm_values based on @p norm:
-  for (typename std::map<unsigned int, std::vector<T>>::const_iterator it =
-         pred_to_values.begin();
-       it != pred_to_values.end();
-       ++it)
+  for (const auto &pred_to_value : pred_to_values)
     {
-      predicate_values.push_back(it->first);
-      Vector<T> values(it->second.begin(), it->second.end());
+      predicate_values.push_back(pred_to_value.first);
+      Vector<CoefficientType> values(pred_to_value.second.cbegin(),
+                                     pred_to_value.second.cend());
 
       switch (norm)
         {

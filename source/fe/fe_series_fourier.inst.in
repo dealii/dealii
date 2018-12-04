@@ -22,3 +22,17 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                                      deal_II_space_dimension>;
 #endif
   }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
+     SCALAR : REAL_SCALARS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template void
+    FESeries::Fourier<deal_II_dimension, deal_II_space_dimension>::calculate(
+      const Vector<SCALAR> &,
+      const unsigned int,
+      Table<deal_II_dimension,
+            FESeries::Fourier<deal_II_dimension,
+                              deal_II_space_dimension>::CoefficientType> &);
+#endif
+  }
