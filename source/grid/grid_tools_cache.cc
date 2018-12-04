@@ -105,7 +105,7 @@ namespace GridTools
         std::vector<std::pair<Point<spacedim>, unsigned int>> vertices(
           used_vertices.size());
         unsigned int i = 0;
-        for (auto it : used_vertices)
+        for (const auto &it : used_vertices)
           vertices[i++] = std::make_pair(it.second, it.first);
         used_vertices_rtree = pack_rtree(vertices);
       }

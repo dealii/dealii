@@ -152,8 +152,8 @@ struct traversal
         }
     }
 
-    inline bool is_visited(turn_type const& turn, turn_operation_type const& op,
-                           signed_size_type turn_index, int op_index) const
+    inline bool is_visited(turn_type const&, turn_operation_type const& op,
+                           signed_size_type, int) const
     {
         return op.visited.visited();
     }

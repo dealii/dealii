@@ -39,7 +39,7 @@ test(const unsigned int ref = 2, const unsigned int n_points = 10)
   Triangulation<dim, spacedim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(ref);
-  GridTools::Cache cache(tria);
+  GridTools::Cache<dim, spacedim> cache(tria);
 
   const auto &v_tree = cache.get_used_vertices_rtree();
 

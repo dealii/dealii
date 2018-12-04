@@ -123,14 +123,14 @@ namespace GridTools
     get_used_vertices() const;
 
     /**
-     * Returned the cached RTree object for the vertices, constructed using the
+     * Return the cached RTree object for the vertices, constructed using the
      * used vertices of the triangulation.
      */
     const RTree<std::pair<Point<spacedim>, unsigned int>> &
     get_used_vertices_rtree() const;
 
     /**
-     * Returned the cached RTree object of the cell bounging boxes, constructed
+     * Return the cached RTree object of the cell bounging boxes, constructed
      * using the active cell iterators of the stored triangulation.
      */
     const RTree<
