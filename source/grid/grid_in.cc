@@ -412,12 +412,14 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // the order used in the following blocks makes sense
                       for (unsigned int i = 0; i < cells.size(); i++)
                         {
-                          types::manifold_id id;
+                          double id;
                           in >> id;
                           if (set == "MaterialID")
-                            cells[i].material_id = id;
+                            cells[i].material_id =
+                              static_cast<types::material_id>(id);
                           else if (set == "ManifoldID")
-                            cells[i].manifold_id = id;
+                            cells[i].manifold_id =
+                              static_cast<types::manifold_id>(id);
                           else
                             Assert(false, ExcInternalError());
                         }
@@ -428,12 +430,14 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                i < subcelldata.boundary_quads.size();
                                i++)
                             {
-                              types::manifold_id id;
+                              double id;
                               in >> id;
                               if (set == "MaterialID")
-                                subcelldata.boundary_quads[i].material_id = id;
+                                subcelldata.boundary_quads[i].material_id =
+                                  static_cast<types::material_id>(id);
                               else if (set == "ManifoldID")
-                                subcelldata.boundary_quads[i].manifold_id = id;
+                                subcelldata.boundary_quads[i].manifold_id =
+                                  static_cast<types::manifold_id>(id);
                               else
                                 Assert(false, ExcInternalError());
                             }
@@ -441,12 +445,14 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                i < subcelldata.boundary_lines.size();
                                i++)
                             {
-                              types::manifold_id id;
+                              double id;
                               in >> id;
                               if (set == "MaterialID")
-                                subcelldata.boundary_lines[i].material_id = id;
+                                subcelldata.boundary_lines[i].material_id =
+                                  static_cast<types::material_id>(id);
                               else if (set == "ManifoldID")
-                                subcelldata.boundary_lines[i].manifold_id = id;
+                                subcelldata.boundary_lines[i].manifold_id =
+                                  static_cast<types::manifold_id>(id);
                               else
                                 Assert(false, ExcInternalError());
                             }
@@ -457,12 +463,14 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                i < subcelldata.boundary_lines.size();
                                i++)
                             {
-                              types::manifold_id id;
+                              double id;
                               in >> id;
                               if (set == "MaterialID")
-                                subcelldata.boundary_lines[i].material_id = id;
+                                subcelldata.boundary_lines[i].material_id =
+                                  static_cast<types::material_id>(id);
                               else if (set == "ManifoldID")
-                                subcelldata.boundary_lines[i].manifold_id = id;
+                                subcelldata.boundary_lines[i].manifold_id =
+                                  static_cast<types::manifold_id>(id);
                               else
                                 Assert(false, ExcInternalError());
                             }
