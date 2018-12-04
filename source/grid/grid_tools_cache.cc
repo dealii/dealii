@@ -95,6 +95,45 @@ namespace GridTools
 
 
 
+  template <int dim, int spacedim>
+  const RTree<std::pair<Point<spacedim>, unsigned int>> &
+  Cache<dim, spacedim>::get_used_vertices_rtree() const
+  {
+    if (update_flags & update_used_vertices_rtree)
+      {
+        const auto &used_vertices = get_used_vertices();
+        std::vector<std::pair<Point<spacedim>, unsigned int>> vertices(
+          used_vertices.size());
+        unsigned int i = 0;
+        for (const auto &it : used_vertices)
+          vertices[i++] = std::make_pair(it.second, it.first);
+        used_vertices_rtree = pack_rtree(vertices);
+      }
+    return used_vertices_rtree;
+  }
+
+
+
+  template <int dim, int spacedim>
+  const RTree<
+    std::pair<BoundingBox<spacedim>,
+              typename Triangulation<dim, spacedim>::active_cell_iterator>> &
+  Cache<dim, spacedim>::get_cell_bounding_boxes_rtree() const
+  {
+    if (update_flags & update_cell_bounding_boxes_rtree)
+      {
+        std::vector<std::pair<
+          BoundingBox<spacedim>,
+          typename Triangulation<dim, spacedim>::active_cell_iterator>>
+                     boxes(tria->n_active_cells());
+        unsigned int i = 0;
+        for (auto cell : tria->active_cell_iterators())
+          boxes[i++] = std::make_pair(cell->bounding_box(), cell);
+        cell_bounding_boxes_rtree = pack_rtree(boxes);
+      }
+    return cell_bounding_boxes_rtree;
+  }
+
 #ifdef DEAL_II_WITH_NANOFLANN
   template <int dim, int spacedim>
   const KDTree<spacedim> &

@@ -1,0 +1,67 @@
+
+DEAL::Testing dim = 1, spacedim = 1
+DEAL::Nearest vertex to 0.840188: v[4] = 0.750000
+DEAL::Nearest vertex to 0.394383: v[2] = 0.500000
+DEAL::Nearest vertex to 0.783099: v[4] = 0.750000
+DEAL::Nearest vertex to 0.798440: v[4] = 0.750000
+DEAL::Nearest vertex to 0.911647: v[1] = 1.00000
+DEAL::Nearest vertex to 0.197551: v[3] = 0.250000
+DEAL::Nearest vertex to 0.335223: v[3] = 0.250000
+DEAL::Nearest vertex to 0.768230: v[4] = 0.750000
+DEAL::Nearest vertex to 0.277775: v[3] = 0.250000
+DEAL::Nearest vertex to 0.553970: v[2] = 0.500000
+DEAL::Testing dim = 1, spacedim = 2
+DEAL::Nearest vertex to 0.477397 0.628871: v[2] = 0.500000 0.00000
+DEAL::Nearest vertex to 0.364784 0.513401: v[3] = 0.250000 0.00000
+DEAL::Nearest vertex to 0.952230 0.916195: v[1] = 1.00000 0.00000
+DEAL::Nearest vertex to 0.635712 0.717297: v[4] = 0.750000 0.00000
+DEAL::Nearest vertex to 0.141603 0.606969: v[3] = 0.250000 0.00000
+DEAL::Nearest vertex to 0.0163006 0.242887: v[0] = 0.00000 0.00000
+DEAL::Nearest vertex to 0.137232 0.804177: v[3] = 0.250000 0.00000
+DEAL::Nearest vertex to 0.156679 0.400944: v[3] = 0.250000 0.00000
+DEAL::Nearest vertex to 0.129790 0.108809: v[3] = 0.250000 0.00000
+DEAL::Nearest vertex to 0.998925 0.218257: v[1] = 1.00000 0.00000
+DEAL::Testing dim = 1, spacedim = 3
+DEAL::Nearest vertex to 0.512932 0.839112 0.612640: v[2] = 0.500000 0.00000 0.00000
+DEAL::Nearest vertex to 0.296032 0.637552 0.524287: v[3] = 0.250000 0.00000 0.00000
+DEAL::Nearest vertex to 0.493583 0.972775 0.292517: v[2] = 0.500000 0.00000 0.00000
+DEAL::Nearest vertex to 0.771358 0.526745 0.769914: v[4] = 0.750000 0.00000 0.00000
+DEAL::Nearest vertex to 0.400229 0.891529 0.283315: v[2] = 0.500000 0.00000 0.00000
+DEAL::Nearest vertex to 0.352458 0.807725 0.919026: v[3] = 0.250000 0.00000 0.00000
+DEAL::Nearest vertex to 0.0697553 0.949327 0.525995: v[0] = 0.00000 0.00000 0.00000
+DEAL::Nearest vertex to 0.0860558 0.192214 0.663227: v[0] = 0.00000 0.00000 0.00000
+DEAL::Nearest vertex to 0.890233 0.348893 0.0641713: v[1] = 1.00000 0.00000 0.00000
+DEAL::Nearest vertex to 0.0200230 0.457702 0.0630958: v[0] = 0.00000 0.00000 0.00000
+DEAL::Testing dim = 2, spacedim = 2
+DEAL::Nearest vertex to 0.238280 0.970634: v[15] = 0.250000 1.00000
+DEAL::Nearest vertex to 0.902208 0.850920: v[14] = 1.00000 0.750000
+DEAL::Nearest vertex to 0.266666 0.539760: v[19] = 0.250000 0.500000
+DEAL::Nearest vertex to 0.375207 0.760249: v[18] = 0.500000 0.750000
+DEAL::Nearest vertex to 0.512535 0.667724: v[18] = 0.500000 0.750000
+DEAL::Nearest vertex to 0.531606 0.0392803: v[4] = 0.500000 0.00000
+DEAL::Nearest vertex to 0.437638 0.931835: v[7] = 0.500000 1.00000
+DEAL::Nearest vertex to 0.930810 0.720952: v[14] = 1.00000 0.750000
+DEAL::Nearest vertex to 0.284293 0.738534: v[23] = 0.250000 0.750000
+DEAL::Nearest vertex to 0.639979 0.354049: v[22] = 0.750000 0.250000
+DEAL::Testing dim = 2, spacedim = 3
+DEAL::Nearest vertex to 0.687861 0.165974 0.440105: v[22] = 0.750000 0.250000 0.00000
+DEAL::Nearest vertex to 0.880075 0.829201 0.330337: v[14] = 1.00000 0.750000 0.00000
+DEAL::Nearest vertex to 0.228968 0.893372 0.350360: v[15] = 0.250000 1.00000 0.00000
+DEAL::Nearest vertex to 0.686670 0.956468 0.588640: v[16] = 0.750000 1.00000 0.00000
+DEAL::Nearest vertex to 0.657304 0.858676 0.439560: v[24] = 0.750000 0.750000 0.00000
+DEAL::Nearest vertex to 0.923970 0.398437 0.814767: v[6] = 1.00000 0.500000 0.00000
+DEAL::Nearest vertex to 0.684219 0.910972 0.482491: v[16] = 0.750000 1.00000 0.00000
+DEAL::Nearest vertex to 0.215825 0.950252 0.920128: v[15] = 0.250000 1.00000 0.00000
+DEAL::Nearest vertex to 0.147660 0.881062 0.641081: v[15] = 0.250000 1.00000 0.00000
+DEAL::Nearest vertex to 0.431953 0.619596 0.281059: v[8] = 0.500000 0.500000 0.00000
+DEAL::Testing dim = 3, spacedim = 3
+DEAL::Nearest vertex to 0.786002 0.307458 0.447034: v[107] = 0.750000 0.250000 0.500000
+DEAL::Nearest vertex to 0.226107 0.187533 0.276235: v[117] = 0.250000 0.250000 0.250000
+DEAL::Nearest vertex to 0.556444 0.416501 0.169607: v[76] = 0.500000 0.500000 0.250000
+DEAL::Nearest vertex to 0.906804 0.103171 0.126075: v[35] = 1.00000 0.00000 0.250000
+DEAL::Nearest vertex to 0.495444 0.760475 0.984752: v[72] = 0.500000 0.750000 1.00000
+DEAL::Nearest vertex to 0.935004 0.684445 0.383188: v[66] = 1.00000 0.750000 0.500000
+DEAL::Nearest vertex to 0.749771 0.368664 0.294160: v[118] = 0.750000 0.250000 0.250000
+DEAL::Nearest vertex to 0.232262 0.584489 0.244413: v[112] = 0.250000 0.500000 0.250000
+DEAL::Nearest vertex to 0.152390 0.732149 0.125475: v[119] = 0.250000 0.750000 0.250000
+DEAL::Nearest vertex to 0.793470 0.164102 0.745071: v[122] = 0.750000 0.250000 0.750000
