@@ -1683,7 +1683,8 @@ namespace GridTools
       &                                                  vertex_to_cells,
     const std::vector<std::vector<Tensor<1, spacedim>>> &vertex_to_cell_centers,
     const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint,
-    const std::vector<bool> &marked_vertices)
+    const std::vector<bool> &                              marked_vertices,
+    const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree)
   {
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
@@ -1714,8 +1715,33 @@ namespace GridTools
           }
         else
           {
-            closest_vertex_index =
-              GridTools::find_closest_vertex(mesh, p, marked_vertices);
+            if (!used_vertices_rtree.empty())
+              {
+                // If we have an rtree at our disposal, use it.
+                using ValueType = std::pair<Point<spacedim>, unsigned int>;
+                std::function<bool(const ValueType &)> marked;
+                if (marked_vertices.size() == mesh.n_vertices())
+                  marked = [&marked_vertices](const ValueType &value) -> bool {
+                    return marked_vertices[value.second];
+                  };
+                else
+                  marked = [](const ValueType &) -> bool { return true; };
+
+                std::vector<std::pair<Point<spacedim>, unsigned int>> res;
+                used_vertices_rtree.query(
+                  boost::geometry::index::nearest(p, 1) &&
+                    boost::geometry::index::satisfies(marked),
+                  std::back_inserter(res));
+
+                // We should have one and only one result
+                AssertDimension(res.size(), 1);
+                closest_vertex_index = res[0].second;
+              }
+            else
+              {
+                closest_vertex_index =
+                  GridTools::find_closest_vertex(mesh, p, marked_vertices);
+              }
             vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
           }
 
@@ -4963,6 +4989,7 @@ namespace GridTools
     const auto &vertex_to_cells = cache.get_vertex_to_cell_map();
     const auto &vertex_to_cell_centers =
       cache.get_vertex_to_cell_centers_directions();
+    const auto &used_vertices_rtree = cache.get_used_vertices_rtree();
 
     return find_active_cell_around_point(mapping,
                                          mesh,
@@ -4970,7 +4997,8 @@ namespace GridTools
                                          vertex_to_cells,
                                          vertex_to_cell_centers,
                                          cell_hint,
-                                         marked_vertices);
+                                         marked_vertices,
+                                         used_vertices_rtree);
   }
 
   template <int spacedim>

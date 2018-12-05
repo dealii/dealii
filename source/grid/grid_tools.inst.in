@@ -36,7 +36,8 @@ for (X : TRIANGULATIONS; deal_II_dimension : DIMENSIONS;
         const dealii::internal::ActiveCellIterator<deal_II_dimension,
                                                    deal_II_space_dimension,
                                                    X>::type &,
-        const std::vector<bool> &);
+        const std::vector<bool> &,
+        const RTree<std::pair<Point<deal_II_space_dimension>, unsigned int>> &);
 
       template std::vector<BoundingBox<deal_II_space_dimension>>
       compute_mesh_predicate_bounding_box<X>(
