@@ -2221,10 +2221,10 @@ namespace boost { namespace numeric { namespace ublas {
                         index1 = it1_.index1 ();
                 }
                 size_type index2 = (*this) ().size1 ();
-                if (it2_ != it2_end_)
+                if (it2_ != it2_end_) {
                     if (it2_.index1 () <= i_)
                         ++ it2_;
-                    if (it2_ != it2_end_) {
+                    if (it2_ != it2_end_)
                         index2 = it2_.index1 ();
                 }
                 i_ = (std::min) (index1, index2);

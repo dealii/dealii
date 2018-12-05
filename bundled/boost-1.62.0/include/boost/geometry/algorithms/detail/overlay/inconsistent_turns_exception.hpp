@@ -25,7 +25,7 @@ public:
     virtual ~inconsistent_turns_exception() throw()
     {}
 
-    virtual char const* what() const throw()
+    virtual char const* what() const throw() override
     {
         return "Boost.Geometry Inconsistent Turns exception";
     }
