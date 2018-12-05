@@ -24,6 +24,15 @@
 #include "../tests.h"
 #include "create_matrix.h"
 
+template <typename T>
+std::string
+to_string(const T &t)
+{
+  std::ostringstream s;
+  s << t;
+  return s.str();
+}
+
 template <typename NumberType>
 void
 test(const unsigned int n = 3, const unsigned int k = 6)
@@ -36,12 +45,12 @@ test(const unsigned int n = 3, const unsigned int k = 6)
   for (unsigned int i = 0; i < A.m(); ++i)
     for (unsigned int j = 0; j < A.n(); ++j)
       {
-        const auto &at = At(j, i);
-        const auto &a  = A(i, j);
+        const auto at = At(j, i);
+        const auto a  = numbers::NumberTraits<NumberType>::conjugate(A(i, j));
         AssertThrow(at == a,
-                    ExcMessage(std::to_string(a) + "!=" + std::to_string(at) +
-                               " for (" + std::to_string(i) + "," +
-                               std::to_string(j) + ")"));
+                    ExcMessage(to_string(a) + "!=" + to_string(at) + " for (" +
+                               std::to_string(i) + "," + std::to_string(j) +
+                               ")"));
       }
 
   deallog << "OK" << std::endl;
@@ -54,4 +63,8 @@ main()
   test<double>(11, 27);
   test<double>(15, 4);
   test<double>(10, 10);
+
+  test<std::complex<double>>(11, 27);
+  test<std::complex<double>>(15, 4);
+  test<std::complex<double>>(10, 10);
 }
