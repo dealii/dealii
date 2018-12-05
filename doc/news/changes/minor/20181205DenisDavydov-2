@@ -1,0 +1,3 @@
+New: Add LAPACKFullMatrix::transpose() to perform out-of-place transposition.
+<br>
+(Denis Davydov, 2018/12/05)

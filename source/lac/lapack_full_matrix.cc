@@ -1033,6 +1033,25 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &      C,
 
 template <typename number>
 void
+LAPACKFullMatrix<number>::transpose(LAPACKFullMatrix<number> &B) const
+{
+  const LAPACKFullMatrix<number> &A = *this;
+  AssertDimension(A.m(), B.n());
+  AssertDimension(A.n(), B.m());
+  const types::blas_int m = B.m();
+  const types::blas_int n = B.n();
+#ifdef DEAL_II_LAPACK_WITH_MKL
+  mkl_omatcopy('C', 'T', n, m, 1., &A.values[0], n, &B.values[0], m);
+#else
+  for (types::blas_int i = 0; i < m; ++i)
+    for (types::blas_int j = 0; j < n; ++j)
+      B(i, j) = A(j, i);
+#endif
+}
+
+
+template <typename number>
+void
 LAPACKFullMatrix<number>::scale_rows(const Vector<number> &V)
 {
   LAPACKFullMatrix<number> &A = *this;

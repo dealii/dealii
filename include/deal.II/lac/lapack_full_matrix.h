@@ -528,6 +528,16 @@ public:
           const bool                      adding = false) const;
 
   /**
+   * Performs out-place transposition.
+   * Matrix @p B should be appropriately sized.
+   *
+   * @note If deal.II is configured with Intel-MKL, `mkl_?omatcopy` will be used,
+   * otherwise transposition is done element by element.
+   */
+  void
+  transpose(LAPACKFullMatrix<number> &B) const;
+
+  /**
    * Scale rows of this matrix by @p V . This is equivalent to premultiplication
    * with a diagonal matrix $\mathbf A\leftarrow {\rm diag}(\mathbf V)\mathbf
    * A$.
