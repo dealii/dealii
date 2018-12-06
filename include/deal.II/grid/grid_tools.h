@@ -36,6 +36,8 @@
 
 #  include <deal.II/lac/sparsity_tools.h>
 
+#  include <deal.II/numerics/rtree.h>
+
 #  include <boost/archive/binary_iarchive.hpp>
 #  include <boost/archive/binary_oarchive.hpp>
 #  include <boost/optional.hpp>
@@ -1125,8 +1127,10 @@ namespace GridTools
    * A version of the previous function that exploits an already existing
    * map between vertices and cells, constructed using the function
    * GridTools::vertex_to_cell_map, a map of vertex_to_cell_centers, obtained
-   * through GridTools::vertex_to_cell_centers_directions, and a guess
-   * `cell_hint`.
+   * through GridTools::vertex_to_cell_centers_directions, a guess
+   * `cell_hint`, and optionally an RTree constructed from the used
+   * vertices of the Triangulation. All of these structures can be queried
+   * from a GridTools::Cache object.
    *
    * @author Luca Heltai, Rene Gassmoeller, 2017
    */
@@ -1148,7 +1152,9 @@ namespace GridTools
     const std::vector<std::vector<Tensor<1, spacedim>>> &vertex_to_cell_centers,
     const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint =
       typename MeshType<dim, spacedim>::active_cell_iterator(),
-    const std::vector<bool> &marked_vertices = {});
+    const std::vector<bool> &                              marked_vertices = {},
+    const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree =
+      {});
 
   /**
    * A version of the previous function where we use that mapping on a given
