@@ -377,7 +377,7 @@ namespace Differentiation
       Assert(is_registered_tape(tape_index),
              ExcMessage("Tape number not registered"));
 
-      TapedDrivers<ad_type, scalar_type>::print_tape_stats(tape_index, stream);
+      this->taped_driver.print_tape_stats(tape_index, stream);
     }
 
 
@@ -829,8 +829,8 @@ namespace Differentiation
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
-          return TapedDrivers<ad_type, scalar_type>::value(
-            this->active_tape_index(), this->independent_variable_values);
+          return this->taped_driver.value(this->active_tape_index(),
+                                          this->independent_variable_values);
         }
       else
         {
@@ -840,8 +840,7 @@ namespace Differentiation
                    this->n_independent_variables(),
                  ExcInternalError());
 
-          return TapelessDrivers<ad_type, scalar_type>::value(
-            this->dependent_variables);
+          return this->tapeless_driver.value(this->dependent_variables);
         }
     }
 
@@ -891,10 +890,9 @@ namespace Differentiation
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
-          TapedDrivers<ad_type, scalar_type>::gradient(
-            this->active_tape_index(),
-            this->independent_variable_values,
-            gradient);
+          this->taped_driver.gradient(this->active_tape_index(),
+                                      this->independent_variable_values,
+                                      gradient);
         }
       else
         {
@@ -904,8 +902,9 @@ namespace Differentiation
                    this->n_independent_variables(),
                  ExcInternalError());
 
-          TapelessDrivers<ad_type, scalar_type>::gradient(
-            this->independent_variables, this->dependent_variables, gradient);
+          this->tapeless_driver.gradient(this->independent_variables,
+                                         this->dependent_variables,
+                                         gradient);
         }
     }
 
@@ -961,10 +960,9 @@ namespace Differentiation
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
-          TapedDrivers<ad_type, scalar_type>::hessian(
-            this->active_tape_index(),
-            this->independent_variable_values,
-            hessian);
+          this->taped_driver.hessian(this->active_tape_index(),
+                                     this->independent_variable_values,
+                                     hessian);
         }
       else
         {
@@ -973,8 +971,10 @@ namespace Differentiation
           Assert(this->independent_variables.size() ==
                    this->n_independent_variables(),
                  ExcInternalError());
-          TapelessDrivers<ad_type, scalar_type>::hessian(
-            this->independent_variables, this->dependent_variables, hessian);
+
+          this->tapeless_driver.hessian(this->independent_variables,
+                                        this->dependent_variables,
+                                        hessian);
         }
     }
 
@@ -1048,18 +1048,16 @@ namespace Differentiation
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
-          TapedDrivers<ad_type, scalar_type>::values(
-            this->active_tape_index(),
-            this->n_dependent_variables(),
-            this->independent_variable_values,
-            values);
+          this->taped_driver.values(this->active_tape_index(),
+                                    this->n_dependent_variables(),
+                                    this->independent_variable_values,
+                                    values);
         }
       else
         {
           Assert(ADNumberTraits<ad_type>::is_tapeless == true,
                  ExcInternalError());
-          TapelessDrivers<ad_type, scalar_type>::values(
-            this->dependent_variables, values);
+          this->tapeless_driver.values(this->dependent_variables, values);
         }
     }
 
@@ -1106,11 +1104,10 @@ namespace Differentiation
                  ExcDimensionMismatch(this->independent_variable_values.size(),
                                       this->n_independent_variables()));
 
-          TapedDrivers<ad_type, scalar_type>::jacobian(
-            this->active_tape_index(),
-            this->n_dependent_variables(),
-            this->independent_variable_values,
-            jacobian);
+          this->taped_driver.jacobian(this->active_tape_index(),
+                                      this->n_dependent_variables(),
+                                      this->independent_variable_values,
+                                      jacobian);
         }
       else
         {
@@ -1119,8 +1116,10 @@ namespace Differentiation
           Assert(this->independent_variables.size() ==
                    this->n_independent_variables(),
                  ExcInternalError());
-          TapelessDrivers<ad_type, scalar_type>::jacobian(
-            this->independent_variables, this->dependent_variables, jacobian);
+
+          this->tapeless_driver.jacobian(this->independent_variables,
+                                         this->dependent_variables,
+                                         jacobian);
         }
     }
 

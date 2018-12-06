@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2017 by the deal.II authors
+## Copyright (C) 2017 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,12 +16,15 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
+  ad_drivers.cc
   ad_helpers.cc
   adolc_number_types.cc
   sacado_number_types.cc
   )
 
 SET(_inst
+  ad_drivers.inst1.in
+  ad_drivers.inst2.in
   ad_helpers.inst1.in
   ad_helpers.inst2.in
   adolc_number_types.inst.in

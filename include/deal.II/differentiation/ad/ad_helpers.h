@@ -328,6 +328,9 @@ namespace Differentiation
        * image space.
        * @param[in] clear_registered_tapes A flag that indicates the that
        * list of @p registered_tapes must be cleared.
+       * If set to <tt>true</tt> then the data structure that tracks which
+       * tapes have been recorded is cleared as well. It is then expected that
+       * any preexisting tapes be re-recorded.
        *
        * @note This also resets the active tape number to an invalid number, and
        * deactivates the recording mode for taped variables.
