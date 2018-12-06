@@ -752,7 +752,8 @@ namespace Differentiation
       this->finalize_sensitive_independent_variables();
       Assert(this->independent_variables.size() ==
                this->n_independent_variables(),
-             ExcInternalError());
+             ExcDimensionMismatch(this->independent_variables.size(),
+                                  this->n_independent_variables()));
 
       return this->independent_variables;
     }
@@ -876,7 +877,8 @@ namespace Differentiation
                  ExcInternalError());
           Assert(this->independent_variables.size() ==
                    this->n_independent_variables(),
-                 ExcInternalError());
+                 ExcDimensionMismatch(this->independent_variables.size(),
+                                      this->n_independent_variables()));
 
           return this->tapeless_driver.value(this->dependent_variables);
         }
@@ -938,7 +940,8 @@ namespace Differentiation
                  ExcInternalError());
           Assert(this->independent_variables.size() ==
                    this->n_independent_variables(),
-                 ExcInternalError());
+                 ExcDimensionMismatch(this->independent_variables.size(),
+                                      this->n_independent_variables()));
 
           this->tapeless_driver.gradient(this->independent_variables,
                                          this->dependent_variables,
@@ -1008,7 +1011,8 @@ namespace Differentiation
                  ExcInternalError());
           Assert(this->independent_variables.size() ==
                    this->n_independent_variables(),
-                 ExcInternalError());
+                 ExcDimensionMismatch(this->independent_variables.size(),
+                                      this->n_independent_variables()));
 
           this->tapeless_driver.hessian(this->independent_variables,
                                         this->dependent_variables,
@@ -1153,7 +1157,8 @@ namespace Differentiation
                  ExcInternalError());
           Assert(this->independent_variables.size() ==
                    this->n_independent_variables(),
-                 ExcInternalError());
+                 ExcDimensionMismatch(this->independent_variables.size(),
+                                      this->n_independent_variables()));
 
           this->tapeless_driver.jacobian(this->independent_variables,
                                          this->dependent_variables,
