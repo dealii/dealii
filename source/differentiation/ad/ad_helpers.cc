@@ -476,6 +476,44 @@ namespace Differentiation
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    bool
+    ADHelperBase<ADNumberTypeCode, ScalarType>::recorded_tape_requires_retaping(
+      const typename Types<ad_type>::tape_index tape_index) const
+    {
+      if (ADNumberTraits<ad_type>::is_tapeless == true)
+        return false;
+
+      return taped_driver.requires_retaping(tape_index);
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    bool
+    ADHelperBase<ADNumberTypeCode, ScalarType>::active_tape_requires_retaping()
+      const
+    {
+      if (ADNumberTraits<ad_type>::is_tapeless == true)
+        return false;
+
+      return taped_driver.last_action_requires_retaping();
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
+    void
+    ADHelperBase<ADNumberTypeCode, ScalarType>::clear_active_tape()
+    {
+      if (ADNumberTraits<ad_type>::is_tapeless == true)
+        return;
+
+      taped_driver.remove_tape(taped_driver.active_tape_index());
+    }
+
+
+
+    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
     ADHelperBase<ADNumberTypeCode, ScalarType>::activate_tape(
       const typename Types<ad_type>::tape_index tape_index,

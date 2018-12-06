@@ -478,6 +478,50 @@ namespace Differentiation
       activate_recorded_tape(
         const typename Types<ad_type>::tape_index tape_index);
 
+      /**
+       * Return a flag that, when <code>true</code>, indicates that the
+       * retaping of the dependent function is necessary for a reliable
+       * computation to be performed on a tape with the given @p tape_index.
+       * This may be necessary a sign comparison within branched operations
+       * yields different results to those computed at the original tape
+       * evaluation point.
+       *
+       * For the output of this function to be meaningful, it must be called
+       * after the activate_recorded_tape() is called and the new evaluation
+       * point for the tape (i.e. values of the independent variables) have
+       * been set and subsequently used (i.e. in the determination of the values
+       * or derivatives of the dependent variables).
+       */
+      bool
+      recorded_tape_requires_retaping(
+        const typename Types<ad_type>::tape_index tape_index) const;
+
+      /**
+       * Return a flag that, when <code>true</code>, indicates that the
+       * retaping of the dependent function is necessary for a reliable
+       * computation to be performed on the avtive tape. This may be necessary a
+       * sign comparison within branched operations yields different results to
+       * those computed at the original tape evaluation point.
+       *
+       * For the output of this function to be meaningful, it must be called
+       * after the activate_recorded_tape() is called and the new evaluation
+       * point for the tape (i.e. values of the independent variables) have
+       * been set and subsequently used (i.e. in the determination of the values
+       * or derivatives of the dependent variables).
+       */
+      bool
+      active_tape_requires_retaping() const;
+
+      /**
+       * Clears and removes the currently active tape.
+       *
+       * This is typically only necessary when branch switching is detected on
+       * the original tape at evaluation point. This state can be checked using
+       * the active_tape_requires_retaping() function.
+       */
+      void
+      clear_active_tape();
+
       //@}
 
     protected:
