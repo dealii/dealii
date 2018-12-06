@@ -565,7 +565,8 @@ Vector<Number>::l2_norm() const
     norm2, 0, vec_size, norm_square, thread_loop_partitioner);
   if (numbers::is_finite(norm_square) &&
       norm_square >= std::numeric_limits<real_type>::min())
-    return std::sqrt(norm_square);
+    return static_cast<typename Vector<Number>::real_type>(
+      std::sqrt(norm_square));
   else
     {
       real_type scale = 0.;
@@ -578,7 +579,7 @@ Vector<Number>::l2_norm() const
                 numbers::NumberTraits<Number>::abs(values[i]);
               if (scale < abs_x)
                 {
-                  sum   = 1. + sum * (scale / abs_x) * (scale / abs_x);
+                  sum   = 1 + sum * (scale / abs_x) * (scale / abs_x);
                   scale = abs_x;
                 }
               else
@@ -586,7 +587,8 @@ Vector<Number>::l2_norm() const
             }
         }
       AssertIsFinite(scale * std::sqrt(sum));
-      return scale * std::sqrt(sum);
+      return static_cast<typename Vector<Number>::real_type>(scale *
+                                                             std::sqrt(sum));
     }
 }
 

@@ -1397,7 +1397,7 @@ ScaLAPACKMatrix<NumberType>::invert()
 
               AssertThrow(info == 0,
                           LAPACKSupport::ExcErrorCode("pgetri", info));
-              lwork  = work[0];
+              lwork  = static_cast<int>(work[0]);
               liwork = iwork[0];
               work.resize(lwork);
               iwork.resize(liwork);
@@ -1655,7 +1655,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                  &info);
           AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyevx", info));
         }
-      lwork = work[0];
+      lwork = static_cast<int>(work[0]);
       work.resize(lwork);
 
       if (all_eigenpairs)
@@ -1929,7 +1929,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
 
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyevr", info));
 
-      lwork = work[0];
+      lwork = static_cast<int>(work[0]);
       work.resize(lwork);
       liwork = iwork[0];
       iwork.resize(liwork);
@@ -2091,7 +2091,7 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
              &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgesvd", info));
 
-      lwork = work[0];
+      lwork = static_cast<int>(work[0]);
       work.resize(lwork);
 
       pgesvd(&jobu,
@@ -2197,7 +2197,7 @@ ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
             &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgels", info));
 
-      lwork = work[0];
+      lwork = static_cast<int>(work[0]);
       work.resize(lwork);
 
       pgels(&trans,
@@ -2346,7 +2346,7 @@ ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(
              &liwork,
              &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pdpocon", info));
-      lwork = std::ceil(work[0]);
+      lwork = static_cast<int>(std::ceil(work[0]));
       work.resize(lwork);
 
       // now the actual run:
@@ -2846,7 +2846,8 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
    * the minimum value for NB yields that only ceil(400/32)=13 processes will be
    * writing the matrix to disk.
    */
-  const int NB = std::max((int)std::ceil((double)n_columns / n_mpi_processes),
+  const int NB = std::max(static_cast<int>(std::ceil(
+                            static_cast<double>(n_columns) / n_mpi_processes)),
                           column_block_size);
 
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
@@ -3268,8 +3269,10 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
 
   const int MB = n_rows;
   // for the choice of NB see explanation in save_parallel()
-  const int NB = std::max((int)std::ceil((double)n_columns / n_mpi_processes),
+  const int NB = std::max(static_cast<int>(std::ceil(
+                            static_cast<double>(n_columns) / n_mpi_processes)),
                           column_block_size);
+
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
 
   // get pointer to data held by the process

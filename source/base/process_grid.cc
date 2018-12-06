@@ -65,7 +65,7 @@ namespace
     // Np = Pc * Pc / ratio
     // for quadratic matrices the ratio equals 1
     const double ratio = double(n) / m;
-    int          Pc    = std::floor(std::sqrt(ratio * Np));
+    int          Pc    = static_cast<int>(std::sqrt(ratio * Np));
 
     // one could rounds up Pc to the number which has zero remainder from the
     // division of Np while ( Np % Pc != 0 )

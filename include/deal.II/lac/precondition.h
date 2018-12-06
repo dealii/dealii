@@ -2206,8 +2206,10 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
       const_cast<
         PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(
         this)
-        ->data.degree = 1 + std::log(1. / eps + std::sqrt(1. / eps / eps - 1)) /
-                              std::log(1. / sigma);
+        ->data.degree =
+        1 + static_cast<unsigned int>(
+              std::log(1. / eps + std::sqrt(1. / eps / eps - 1)) /
+              std::log(1. / sigma));
     }
 
   const_cast<
