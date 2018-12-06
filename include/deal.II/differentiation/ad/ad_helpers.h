@@ -949,7 +949,7 @@ namespace Differentiation
        * Depending on the selected @p ADNumberTypeCode, this may or may not
        * correspond with the @p ScalarType prescribed as a template argument.
        *
-       * @note If the keep flag has been set when
+       * @note If the @p keep_independent_values flag has been set when
        * ADHelperBase::start_recording_operations() is called then the tape is
        * immediately usable after creation, and the values of the independent
        * variables set by register_dof_values() are those at which the function
@@ -969,7 +969,7 @@ namespace Differentiation
        * which to extract the local degree of freedom values. This would
        * typically obtained by calling <code>cell->get_dof_indices()</code>.
        *
-       * @note If the keep flag has been set when
+       * @note If the @p keep_independent_values flag has been set when
        * ADHelperBase::start_recording_operations() is called then the tape is
        * immediately usable after creation, and the values of the independent
        * variables set by register_dof_values() are those at which the function
