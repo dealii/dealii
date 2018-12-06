@@ -15,6 +15,7 @@
 
 #include <deal.II/base/numbers.h>
 
+#include <deal.II/lac/blas_extension_templates.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/lapack_full_matrix.h>
@@ -1042,7 +1043,7 @@ LAPACKFullMatrix<number>::transpose(LAPACKFullMatrix<number> &B) const
   const types::blas_int n = B.n();
 #ifdef DEAL_II_LAPACK_WITH_MKL
   const number one = 1.;
-  mkl_omatcopy('C', 'C', n, m, one, &A.values[0], n, &B.values[0], m);
+  omatcopy('C', 'C', n, m, one, &A.values[0], n, &B.values[0], m);
 #else
   for (types::blas_int i = 0; i < m; ++i)
     for (types::blas_int j = 0; j < n; ++j)
