@@ -1604,18 +1604,14 @@ namespace TrilinosWrappers
 
       for (size_type i = 0; i < n_elements; ++i)
         {
-          const size_type                         row       = indices[i];
-          const TrilinosWrappers::types::int_type local_row = vector->Map().LID(
-            static_cast<TrilinosWrappers::types::int_type>(row));
+          const TrilinosWrappers::types::int_type row = indices[i];
+          const TrilinosWrappers::types::int_type local_row =
+            vector->Map().LID(row);
           if (local_row != -1)
             (*vector)[0][local_row] = values[i];
           else
             {
-              const int ierr = vector->ReplaceGlobalValues(
-                1,
-                reinterpret_cast<const TrilinosWrappers::types::int_type *>(
-                  &row),
-                &values[i]);
+              const int ierr = vector->ReplaceGlobalValues(1, &row, &values[i]);
               AssertThrow(ierr == 0, ExcTrilinosError(ierr));
               compressed = false;
             }

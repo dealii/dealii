@@ -1535,6 +1535,7 @@ namespace TrilinosWrappers
 
     TrilinosWrappers::types::int_type *col_index_ptr;
     TrilinosScalar *                   col_value_ptr;
+    TrilinosWrappers::types::int_type  trilinos_row = row;
     TrilinosWrappers::types::int_type  n_columns;
 
     boost::container::small_vector<TrilinosScalar, 200> local_value_array(
@@ -1619,26 +1620,22 @@ namespace TrilinosWrappers
 
         if (matrix->Filled() == false)
           {
-            ierr = matrix->InsertGlobalValues(
-              1,
-              reinterpret_cast<TrilinosWrappers::types::int_type *>(
-                const_cast<size_type *>(&row)),
-              n_columns,
-              col_index_ptr,
-              &col_value_ptr,
-              Epetra_FECrsMatrix::ROW_MAJOR);
+            ierr = matrix->InsertGlobalValues(1,
+                                              &trilinos_row,
+                                              n_columns,
+                                              col_index_ptr,
+                                              &col_value_ptr,
+                                              Epetra_FECrsMatrix::ROW_MAJOR);
             if (ierr > 0)
               ierr = 0;
           }
         else
-          ierr = matrix->ReplaceGlobalValues(
-            1,
-            reinterpret_cast<TrilinosWrappers::types::int_type *>(
-              const_cast<size_type *>(&row)),
-            n_columns,
-            col_index_ptr,
-            &col_value_ptr,
-            Epetra_FECrsMatrix::ROW_MAJOR);
+          ierr = matrix->ReplaceGlobalValues(1,
+                                             &trilinos_row,
+                                             n_columns,
+                                             col_index_ptr,
+                                             &col_value_ptr,
+                                             Epetra_FECrsMatrix::ROW_MAJOR);
         // use the FECrsMatrix facilities for set even in the case when we
         // have explicitly set the off-processor rows because that only works
         // properly when adding elements, not when setting them (since we want
@@ -1734,6 +1731,7 @@ namespace TrilinosWrappers
 
     TrilinosWrappers::types::int_type *col_index_ptr;
     TrilinosScalar *                   col_value_ptr;
+    TrilinosWrappers::types::int_type  trilinos_row = row;
     TrilinosWrappers::types::int_type  n_columns;
 
     boost::container::small_vector<TrilinosScalar, 100> local_value_array(
@@ -1823,14 +1821,12 @@ namespace TrilinosWrappers
         // a time).
         compressed = false;
 
-        ierr = matrix->SumIntoGlobalValues(
-          1,
-          reinterpret_cast<TrilinosWrappers::types::int_type *>(
-            const_cast<size_type *>(&row)),
-          n_columns,
-          col_index_ptr,
-          &col_value_ptr,
-          Epetra_FECrsMatrix::ROW_MAJOR);
+        ierr = matrix->SumIntoGlobalValues(1,
+                                           &trilinos_row,
+                                           n_columns,
+                                           col_index_ptr,
+                                           &col_value_ptr,
+                                           Epetra_FECrsMatrix::ROW_MAJOR);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 

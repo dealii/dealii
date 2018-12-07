@@ -453,11 +453,11 @@ namespace TrilinosWrappers
                     ++p;
                 }
             }
-            graph->InsertGlobalIndices(
-              1,
-              reinterpret_cast<TrilinosWrappers::types::int_type *>(&row),
-              row_length,
-              row_indices.data());
+            const TrilinosWrappers::types::int_type trilinos_row = row;
+            graph->InsertGlobalIndices(1,
+                                       &trilinos_row,
+                                       row_length,
+                                       row_indices.data());
           }
 
       // TODO A dynamic_cast fails here, this is suspicious.
@@ -802,15 +802,12 @@ namespace TrilinosWrappers
                  nonlocal_graph->IndicesAreGlobal() == true,
                ExcInternalError());
 
-        // TODO A dynamic_cast fails here, this is suspicious.
-        const auto &range_map =
-          static_cast<const Epetra_Map &>(graph->RangeMap());
-        nonlocal_graph->FillComplete(*column_space_map, range_map);
+        nonlocal_graph->FillComplete(*column_space_map, graph->RangeMap());
         nonlocal_graph->OptimizeStorage();
         Epetra_Export exporter(nonlocal_graph->RowMap(), graph->RowMap());
         ierr = graph->Export(*nonlocal_graph, exporter, Add);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-        ierr = graph->FillComplete(*column_space_map, range_map);
+        ierr = graph->FillComplete(*column_space_map, graph->RangeMap());
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
     else
