@@ -56,7 +56,6 @@ ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wall")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wextra")
-ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wpointer-arith")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wsign-compare")
@@ -96,6 +95,10 @@ IF(NOT DEAL_II_WITH_CXX17)
 ENDIF()
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Enable warnings for conversion from real types to integer types.
+  # The warning is too noisy in gcc and therefore only enabled for clang.
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
+
   #
   # Silence Clang warnings about unused compiler parameters (works around a
   # regression in the clang driver frontend of certain versions):
