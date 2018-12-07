@@ -54,7 +54,7 @@ cell_weight(
     (cell->center()[0] < 1) && (cell->center()[1] < 1) &&
         (dim == 3 ? (cell->center()[2] < 1) : true) ?
       // one cell has more weight than all others together
-      std::pow(16, dim) * 1000 :
+      Utilities::pow(16, dim) * 1000 :
       0);
 }
 

@@ -216,7 +216,8 @@ namespace Advection
   AdvectionProblem<dim>::assemble_rhs(Vector<double> &solution,
                                       Vector<double> &residual)
   {
-    const unsigned int n_gauss_points = std::ceil(((2.0 * fe.degree) + 1) / 2);
+    const auto n_gauss_points =
+      static_cast<unsigned int>(std::ceil(((2.0 * fe.degree) + 1) / 2));
 
     MeshWorker::IntegrationInfoBox<dim> info_box;
 
@@ -437,8 +438,8 @@ namespace Advection
     deallog << "\tNumber of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
 
-    const double delta_t = 0.005;
-    const double n_dt    = 10;
+    const double       delta_t = 0.005;
+    const unsigned int n_dt    = 10;
 
     double inv_cell_vol = 1.0 / std::pow(0.01, dim);
 

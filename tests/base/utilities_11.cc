@@ -25,18 +25,18 @@
 void
 test()
 {
-  unsigned long long int i = std::pow(2, 33);
+  const auto i = static_cast<unsigned long long int>(std::pow(2, 33));
   Assert(Utilities::to_string(i) == "8589934592", ExcInternalError());
   Assert(Utilities::to_string(i, 11) == "08589934592", ExcInternalError());
 
-  unsigned long long j = std::pow(2, 31);
+  const auto j = static_cast<unsigned long long int>(std::pow(2, 31));
   Assert(Utilities::to_string(j) == "2147483648", ExcInternalError());
 
-  int k = -std::pow(2, 30);
+  const int k = static_cast<int>(-std::pow(2, 30));
   Assert(Utilities::to_string(k) == "-1073741824", ExcInternalError());
   Assert(Utilities::to_string(k, 12) == "-01073741824", ExcInternalError());
 
-  long long int l = -std::pow(2, 35);
+  const auto l = static_cast<long long int>(-std::pow(2, 35));
   Assert(Utilities::to_string(l) == "-34359738368", ExcInternalError());
   Assert(Utilities::to_string(l, 13) == "-034359738368", ExcInternalError());
 
