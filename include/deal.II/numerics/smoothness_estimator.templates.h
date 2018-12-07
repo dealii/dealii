@@ -53,16 +53,19 @@ namespace SmoothnessEstimator
 
 
     /**
-     * Calculates predicates of @p ind in the form
-     * \f$
-     *    v = \sum\limits_{d=0}^{dim} ind[d]^2
-     * \f$.
-     *
-     * We flag the predicate whether it fulfills the criterion
-     * \f$
-     *    0 < v < max_degree^2
-     * \f$
-     * using @p max_degree.
+     * we will need to take the maximum
+     * absolute value of fourier coefficients which correspond to $k$-vector
+     * $|{\bf k}|= const$. To filter the coefficients Table we
+     * will use the FESeries::process_coefficients() which requires a predicate
+     * to be specified. The predicate should operate on TableIndices and return
+     * a pair of <code>bool</code> and <code>unsigned int</code>. The latter
+     * is the value of the map from TableIndicies to unsigned int.  It is
+     * used to define subsets of coefficients from which we search for the one
+     * with highest absolute value, i.e. $l^\infty$-norm. The <code>bool</code>
+     * parameter defines which indices should be used in processing. In the
+     * current case we are interested in coefficients which correspond to
+     * $0 < i*i+j*j < N*N$ and $0 < i*i+j*j+k*k < N*N$ in 2D and 3D,
+     * respectively.
      */
     template <int dim>
     std::pair<bool, unsigned int>
@@ -79,30 +82,217 @@ namespace SmoothnessEstimator
   } // namespace
 
 
-
-  template <typename FESeriesType, typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  estimate_by_coeff_decay(
-    FESeriesType &                         fe_series,
-    const DoFHandlerType &                 dof_handler,
+  legendre_coefficient_decay(
+    FESeries::Legendre<dim, spacedim> &    fe_legendre,
+    const hp::DoFHandler<dim, spacedim> &  dof_handler,
     const std::vector<const VectorType *> &all_solutions,
     const std::vector<Vector<float> *> &   all_smoothness_indicators,
-    const VectorTools::NormType            regression_strategy)
+    const std::function<void(std::vector<bool> &flags)> coefficients_predicate,
+    const double smallest_abs_coefficient)
   {
+    Assert(smallest_abs_coefficient >= 0.,
+           ExcMessage("smallest_abs_coefficient should be non-negative."));
+
+    using number = typename VectorType::value_type;
+    using number_coeff =
+      typename FESeries::Legendre<dim, spacedim>::CoefficientType;
+
     AssertDimension(all_solutions.size(), all_smoothness_indicators.size());
 
     for (auto &smoothness_indicator : all_smoothness_indicators)
       smoothness_indicator->reinit(
         dof_handler.get_triangulation().n_active_cells());
 
-    const unsigned int dim = DoFHandlerType::dimension;
+    Table<dim, number_coeff> expansion_coefficients;
+    resize(expansion_coefficients, fe_legendre.get_size_in_each_direction());
+
+    Vector<number> local_dof_values;
+
+    // auxiliary vector to do linear regression
+    std::vector<number_coeff> x;
+    std::vector<number_coeff> y;
+
+    x.reserve(dof_handler.get_fe_collection().max_degree());
+    y.reserve(dof_handler.get_fe_collection().max_degree());
+
+    // precalculate predicates for each degree:
+    std::vector<std::vector<bool>> predicates(
+      dof_handler.get_fe_collection().max_degree());
+    for (unsigned int p = 1; p <= dof_handler.get_fe_collection().max_degree();
+         ++p)
+      {
+        auto &pred = predicates[p - 1];
+        // we have p+1 coefficients for degree p
+        pred.resize(p + 1);
+        coefficients_predicate(pred);
+      }
+
+    for (auto &cell : dof_handler.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          local_dof_values.reinit(cell->get_fe().dofs_per_cell);
+
+          const unsigned int pe = cell->get_fe().degree;
+
+          Assert(pe > 0, ExcInternalError());
+          const auto &pred = predicates[pe - 1];
+
+          // since we use coefficients with indices [1,pe] in each direction,
+          // the number of coefficients we need to calculate is at least N=pe+1
+          AssertIndexRange(pe, fe_legendre.get_size_in_each_direction());
+
+          auto solution_it              = all_solutions.cbegin();
+          auto smoothness_indicators_it = all_smoothness_indicators.begin();
+          for (; solution_it != all_solutions.cend();
+               ++solution_it, ++smoothness_indicators_it)
+            {
+              cell->get_dof_values(*(*solution_it), local_dof_values);
+              fe_legendre.calculate(local_dof_values,
+                                    cell->active_fe_index(),
+                                    expansion_coefficients);
+
+              // choose the smallest decay of coefficients in each direction,
+              // i.e. the maximum decay slope k_v
+              number_coeff k_v = -std::numeric_limits<number_coeff>::max();
+              for (unsigned int d = 0; d < dim; d++)
+                {
+                  x.resize(0);
+                  y.resize(0);
+
+                  // will use all non-zero coefficients allowed by the predicate
+                  // function
+                  Assert(pred.size() == pe + 1, ExcInternalError());
+                  for (unsigned int i = 0; i <= pe; i++)
+                    if (pred[i])
+                      {
+                        TableIndices<dim> ind;
+                        ind[d] = i;
+                        const number_coeff coeff_abs =
+                          std::abs(expansion_coefficients(ind));
+
+                        if (coeff_abs > smallest_abs_coefficient)
+                          {
+                            y.push_back(std::log(coeff_abs));
+                            x.push_back(i);
+                          }
+                      }
+
+                  // in case we don't have enough non-zero coefficient to fit,
+                  // skip this direction
+                  if (x.size() < 2)
+                    continue;
+
+                  const std::pair<number_coeff, number_coeff> fit =
+                    FESeries::linear_regression(x, y);
+
+                  // decay corresponds to negative slope
+                  // take the lesser negative slope along each direction
+                  k_v = std::max(k_v, fit.first);
+                }
+
+              (*(*smoothness_indicators_it))(cell->active_cell_index()) =
+                std::exp(k_v);
+            }
+        }
+  }
+
+
+
+  template <int dim, int spacedim, typename VectorType>
+  void
+  legendre_coefficient_decay(
+    FESeries::Legendre<dim, spacedim> &                 fe_legendre,
+    const hp::DoFHandler<dim, spacedim> &               dof_handler,
+    const VectorType &                                  solution,
+    Vector<float> &                                     smoothness_indicators,
+    const std::function<void(std::vector<bool> &flags)> coefficients_predicate,
+    const double smallest_abs_coefficient)
+  {
+    const std::vector<const VectorType *> all_solutions(1, &solution);
+    const std::vector<Vector<float> *>    all_smoothness_indicators(
+      1, &smoothness_indicators);
+
+    legendre_coefficient_decay(fe_legendre,
+                               dof_handler,
+                               all_solutions,
+                               all_smoothness_indicators,
+                               coefficients_predicate,
+                               smallest_abs_coefficient);
+  }
+
+
+
+  template <int dim, int spacedim, typename VectorType>
+  void
+  legendre_coefficient_decay(
+    const hp::DoFHandler<dim, spacedim> &               dof_handler,
+    const VectorType &                                  solution,
+    Vector<float> &                                     smoothness_indicators,
+    const std::function<void(std::vector<bool> &flags)> coefficients_predicate,
+    const double smallest_abs_coefficient)
+  {
     const unsigned int max_degree =
       dof_handler.get_fe_collection().max_degree();
 
-    Table<dim, typename FESeriesType::CoefficientType> expansion_coefficients;
+    // We initialize a FESeries::Legendre expansion object object which will be
+    // used to calculate the expansion coefficients. In addition to the
+    // hp::FECollection, we need to provide quadrature rules hp::QCollection for
+    // integration on the reference cell.
+    // We will need to assemble the expansion matrices for each of the finite
+    // elements we deal with, i.e. the matrices F_k,j. We have to do that for
+    // each of the finite elements in use. To that end we need a quadrature
+    // rule. As a default, we use the same quadrature formula for each finite
+    // element, namely one that is obtained by iterating a 2-point Gauss formula
+    // as many times as the maximal polynomial degree.
+    QGauss<1>      base_quadrature(2);
+    QIterated<dim> quadrature(base_quadrature, max_degree);
+
+    hp::QCollection<dim> expansion_q_collection;
+    for (unsigned int i = 0; i < dof_handler.get_fe_collection().size(); ++i)
+      expansion_q_collection.push_back(quadrature);
+
+    FESeries::Legendre<dim, spacedim> legendre(max_degree + 1,
+                                               dof_handler.get_fe_collection(),
+                                               expansion_q_collection);
+
+    legendre_coefficient_decay(legendre,
+                               dof_handler,
+                               solution,
+                               smoothness_indicators,
+                               coefficients_predicate,
+                               smallest_abs_coefficient);
+  }
+
+
+
+  template <int dim, int spacedim, typename VectorType>
+  void
+  fourier_coefficient_decay(
+    FESeries::Fourier<dim, spacedim> &     fe_series,
+    const hp::DoFHandler<dim, spacedim> &  dof_handler,
+    const std::vector<const VectorType *> &all_solutions,
+    const std::vector<Vector<float> *> &   all_smoothness_indicators,
+    const VectorTools::NormType            regression_strategy)
+  {
+    using number = typename VectorType::value_type;
+    using number_coeff =
+      typename FESeries::Fourier<dim, spacedim>::CoefficientType;
+
+    AssertDimension(all_solutions.size(), all_smoothness_indicators.size());
+
+    for (auto &smoothness_indicator : all_smoothness_indicators)
+      smoothness_indicator->reinit(
+        dof_handler.get_triangulation().n_active_cells());
+
+    const unsigned int max_degree =
+      dof_handler.get_fe_collection().max_degree();
+
+    Table<dim, number_coeff> expansion_coefficients;
     resize(expansion_coefficients, max_degree);
 
-    Vector<typename VectorType::value_type>                   local_dof_values;
+    Vector<number>                                            local_dof_values;
     std::vector<double>                                       ln_k;
     std::pair<std::vector<unsigned int>, std::vector<double>> res;
     for (auto &cell : dof_handler.active_cell_iterators())
@@ -155,12 +345,11 @@ namespace SmoothnessEstimator
                 }
 
               // Second, calculate ln(U_k).
-              for (double &residual_element : res.second)
+              for (auto &residual_element : res.second)
                 residual_element = std::log(residual_element);
 
               // Last, do the linear regression.
-              std::pair<double, double> fit =
-                FESeries::linear_regression(ln_k, res.second);
+              const auto fit = FESeries::linear_regression(ln_k, res.second);
 
               // Compute the Sobolev index s=mu-dim/2 and store it in the vector
               // of estimated values for each cell.
@@ -172,36 +361,35 @@ namespace SmoothnessEstimator
 
 
 
-  template <typename FESeriesType, typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  estimate_by_coeff_decay(FESeriesType &              fe_series,
-                          const DoFHandlerType &      dof_handler,
-                          const VectorType &          solution,
-                          Vector<float> &             smoothness_indicators,
-                          const VectorTools::NormType regression_strategy)
+  fourier_coefficient_decay(FESeries::Fourier<dim, spacedim> &   fe_series,
+                            const hp::DoFHandler<dim, spacedim> &dof_handler,
+                            const VectorType &                   solution,
+                            Vector<float> &             smoothness_indicators,
+                            const VectorTools::NormType regression_strategy)
   {
     const std::vector<const VectorType *> all_solutions(1, &solution);
     const std::vector<Vector<float> *>    all_smoothness_indicators(
       1, &smoothness_indicators);
 
-    estimate_by_coeff_decay(fe_series,
-                            dof_handler,
-                            all_solutions,
-                            all_smoothness_indicators,
-                            regression_strategy);
+    fourier_coefficient_decay(fe_series,
+                              dof_handler,
+                              all_solutions,
+                              all_smoothness_indicators,
+                              regression_strategy);
   }
 
 
 
-  template <typename FESeriesType, typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  estimate_by_coeff_decay(
-    const DoFHandlerType &                 dof_handler,
+  fourier_coefficient_decay(
+    const hp::DoFHandler<dim, spacedim> &  dof_handler,
     const std::vector<const VectorType *> &all_solutions,
     const std::vector<Vector<float> *> &   all_smoothness_indicators,
     const VectorTools::NormType            regression_strategy)
   {
-    const unsigned int dim = DoFHandlerType::dimension;
     const unsigned int max_degree =
       dof_handler.get_fe_collection().max_degree();
 
@@ -225,34 +413,34 @@ namespace SmoothnessEstimator
     // The FESeries::Fourier class' constructor first parameter $N$ defines the
     // number of coefficients in 1D with the total number of coefficients being
     // $N^{dim}$.
-    FESeriesType fe_series(max_degree,
-                           dof_handler.get_fe_collection(),
-                           expansion_q_collection);
+    FESeries::Fourier<dim, spacedim> fe_series(max_degree,
+                                               dof_handler.get_fe_collection(),
+                                               expansion_q_collection);
 
-    estimate_by_coeff_decay(fe_series,
-                            dof_handler,
-                            all_solutions,
-                            all_smoothness_indicators,
-                            regression_strategy);
+    fourier_coefficient_decay(fe_series,
+                              dof_handler,
+                              all_solutions,
+                              all_smoothness_indicators,
+                              regression_strategy);
   }
 
 
 
-  template <typename FESeriesType, typename DoFHandlerType, typename VectorType>
+  template <int dim, int spacedim, typename VectorType>
   void
-  estimate_by_coeff_decay(const DoFHandlerType &      dof_handler,
-                          const VectorType &          solution,
-                          Vector<float> &             smoothness_indicators,
-                          const VectorTools::NormType regression_strategy)
+  fourier_coefficient_decay(const hp::DoFHandler<dim, spacedim> &dof_handler,
+                            const VectorType &                   solution,
+                            Vector<float> &             smoothness_indicators,
+                            const VectorTools::NormType regression_strategy)
   {
     const std::vector<const VectorType *> all_solutions(1, &solution);
     const std::vector<Vector<float> *>    all_smoothness_indicators(
       1, &smoothness_indicators);
 
-    estimate_by_coeff_decay<FESeriesType>(dof_handler,
-                                          all_solutions,
-                                          all_smoothness_indicators,
-                                          regression_strategy);
+    fourier_coefficient_decay(dof_handler,
+                              all_solutions,
+                              all_smoothness_indicators,
+                              regression_strategy);
   }
 } // namespace SmoothnessEstimator
 

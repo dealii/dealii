@@ -15,41 +15,69 @@
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
-     VEC : REAL_VECTOR_TYPES;
-     DH : DOFHANDLER_TEMPLATES;
-     EXP : SERIES_EXPANSION_TEMPLATES)
+     VEC : REAL_VECTOR_TYPES)
   {
 #if deal_II_dimension != 1 && deal_II_dimension <= deal_II_space_dimension
-    template void SmoothnessEstimator::estimate_by_coeff_decay<
-      EXP<deal_II_dimension, deal_II_space_dimension>,
-      DH<deal_II_dimension, deal_II_space_dimension>,
-      VEC>(EXP<deal_II_dimension, deal_II_space_dimension> &,
-           const DH<deal_II_dimension, deal_II_space_dimension> &,
+    template void SmoothnessEstimator::legendre_coefficient_decay<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      VEC>(FESeries::Legendre<deal_II_dimension, deal_II_space_dimension> &,
+           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+           const std::vector<const VEC *> &,
+           const std::vector<Vector<float> *> &,
+           const std::function<void(std::vector<bool> & flags)>,
+           const double);
+
+    template void SmoothnessEstimator::legendre_coefficient_decay<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      VEC>(FESeries::Legendre<deal_II_dimension, deal_II_space_dimension> &,
+           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+           const VEC &,
+           Vector<float> &,
+           const std::function<void(std::vector<bool> & flags)>,
+           const double);
+
+    template void SmoothnessEstimator::legendre_coefficient_decay<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      VEC>(const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+           const VEC &,
+           Vector<float> &,
+           const std::function<void(std::vector<bool> & flags)>,
+           const double);
+
+    template void SmoothnessEstimator::fourier_coefficient_decay<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      VEC>(FESeries::Fourier<deal_II_dimension, deal_II_space_dimension> &,
+           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
            const std::vector<const VEC *> &,
            const std::vector<Vector<float> *> &,
            const VectorTools::NormType);
-    template void SmoothnessEstimator::estimate_by_coeff_decay<
-      EXP<deal_II_dimension, deal_II_space_dimension>,
-      DH<deal_II_dimension, deal_II_space_dimension>,
-      VEC>(EXP<deal_II_dimension, deal_II_space_dimension> &,
-           const DH<deal_II_dimension, deal_II_space_dimension> &,
+    template void SmoothnessEstimator::fourier_coefficient_decay<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      VEC>(FESeries::Fourier<deal_II_dimension, deal_II_space_dimension> &,
+           const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
            const VEC &,
            Vector<float> &,
            const VectorTools::NormType);
 
-    template void SmoothnessEstimator::estimate_by_coeff_decay<
-      EXP<deal_II_dimension, deal_II_space_dimension>,
-      DH<deal_II_dimension, deal_II_space_dimension>,
-      VEC>(const DH<deal_II_dimension, deal_II_space_dimension> &,
+    template void SmoothnessEstimator::fourier_coefficient_decay<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      VEC>(const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
            const std::vector<const VEC *> &,
            const std::vector<Vector<float> *> &,
            const VectorTools::NormType);
-    template void SmoothnessEstimator::estimate_by_coeff_decay<
-      EXP<deal_II_dimension, deal_II_space_dimension>,
-      DH<deal_II_dimension, deal_II_space_dimension>,
-      VEC>(const DH<deal_II_dimension, deal_II_space_dimension> &,
+    template void SmoothnessEstimator::fourier_coefficient_decay<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      VEC>(const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
            const VEC &,
            Vector<float> &,
            const VectorTools::NormType);
+
 #endif
   }

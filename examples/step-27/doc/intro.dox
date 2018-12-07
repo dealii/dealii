@@ -511,7 +511,7 @@ $\hat u(\hat{\bf x})$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
 
 These steps outlined above are applicable on many different scenarios, which
 motivated the introduction of a generic function
-SmoothnessEstimator::estimate_by_coeff_decay() in deal.II, that combines all
+SmoothnessEstimator::estimate_by_coefficient_decay() in deal.II, that combines all
 the tasks described in this section in one simple function call.
 
 <h4>Compensating for anisotropy</h4>

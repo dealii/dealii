@@ -270,8 +270,9 @@ namespace Step27
       estimated_error_per_cell);
 
     Vector<float> smoothness_indicators;
-    SmoothnessEstimator::estimate_by_coeff_decay<FESeries::Fourier<dim>>(
-      dof_handler, solution, smoothness_indicators);
+    SmoothnessEstimator::fourier_coefficient_decay(dof_handler,
+                                                   solution,
+                                                   smoothness_indicators);
 
     // Output to VTK
     if (false)

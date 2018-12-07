@@ -254,6 +254,12 @@ namespace FESeries
               Table<dim, CoefficientType> & legendre_coefficients);
 
     /**
+     * Return number of coefficients in each coordinate direction.
+     */
+    unsigned int
+    get_size_in_each_direction() const;
+
+    /**
      * Calculate all transformation matrices to transfer the finite element
      * solution to the series expansion representation.
      *

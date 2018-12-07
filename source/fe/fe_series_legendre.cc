@@ -231,6 +231,15 @@ namespace FESeries
 
 
   template <int dim, int spacedim>
+  unsigned int
+  Legendre<dim, spacedim>::get_size_in_each_direction() const
+  {
+    return N;
+  }
+
+
+
+  template <int dim, int spacedim>
   template <typename Number>
   void
   Legendre<dim, spacedim>::calculate(
@@ -238,6 +247,9 @@ namespace FESeries
     const unsigned int            cell_active_fe_index,
     Table<dim, CoefficientType> & legendre_coefficients)
   {
+    for (unsigned int d = 0; d < dim; ++d)
+      AssertDimension(legendre_coefficients.size(d), N);
+
     ensure_existence(*fe_collection,
                      *q_collection,
                      N,

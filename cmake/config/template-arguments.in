@@ -258,11 +258,6 @@ AFFINE_CONSTRAINTS_SP_BLOCK := { BlockSparsityPattern;
                                  @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@;
                                }
 
-// Series expansion templates
-SERIES_EXPANSION_TEMPLATES := { FESeries::Fourier;
-                                FESeries::Legendre;
-                              }
-
 // all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }
 

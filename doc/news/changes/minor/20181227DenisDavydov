@@ -1,0 +1,6 @@
+New: Add FESeries::Legendre::get_size_in_each_direction() to retrieve
+the number of coefficients in each direction. Also add an Assert in
+FESeries::Legendre::calculate() to check the dimension of the table to store
+coefficients.
+<br>
+(Denis Davydov, 2018/12/27)

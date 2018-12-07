@@ -349,8 +349,9 @@ namespace Step27
     // Estimating the smoothness is performed with the method of decaing
     // expansion coefficients as outlined in the introduction.
     Vector<float> smoothness_indicators;
-    SmoothnessEstimator::estimate_by_coeff_decay<FESeries::Fourier<dim>>(
-      dof_handler, solution, smoothness_indicators);
+    SmoothnessEstimator::fourier_coefficient_decay(dof_handler,
+                                                   solution,
+                                                   smoothness_indicators);
 
     // Next we want to generate graphical output. In addition to the two
     // estimated quantities derived above, we would also like to output the
