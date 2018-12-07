@@ -31,11 +31,21 @@
 #ifdef DEAL_II_WITH_UMFPACK
 #  include <umfpack.h>
 #endif
-#ifndef SuiteSparse_long
-#  define SuiteSparse_long long int
-#endif
 
 DEAL_II_NAMESPACE_OPEN
+
+namespace types
+{
+  /**
+   * Index type for UMFPACK. SuiteSparse_long has to be used here for the
+   * Windows 64 build.
+   */
+#ifdef SuiteSparse_long
+  using suitesparse_index = SuiteSparse_long;
+#else
+  using suitesparse_index = long int;
+#endif
+} // namespace types
 
 /**
  * This class provides an interface to the sparse direct solver UMFPACK, which
@@ -353,13 +363,11 @@ private:
   sort_arrays(const BlockSparseMatrix<number> &);
 
   /**
-   * The arrays in which we store the data for the solver. SuiteSparse_long
-   * has to be used here for Windows 64 build, if we used only long int,
-   * compilation would fail.
+   * The arrays in which we store the data for the solver.
    */
-  std::vector<SuiteSparse_long> Ap;
-  std::vector<SuiteSparse_long> Ai;
-  std::vector<double>           Ax;
+  std::vector<types::suitesparse_index> Ap;
+  std::vector<types::suitesparse_index> Ai;
+  std::vector<double>                   Ax;
 
   /**
    * Control and work arrays for the solver routines.

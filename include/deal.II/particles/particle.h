@@ -47,7 +47,7 @@ namespace types
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
-#    define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#    define DEAL_II_PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
 #  endif
 #else
   /**
@@ -68,7 +68,7 @@ namespace types
    * An identifier that denotes the MPI type associated with
    * types::global_dof_index.
    */
-#    define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
+#    define DEAL_II_PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
 #  endif
 #endif
 } // namespace types
