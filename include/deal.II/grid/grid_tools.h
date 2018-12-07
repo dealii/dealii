@@ -1154,7 +1154,7 @@ namespace GridTools
       typename MeshType<dim, spacedim>::active_cell_iterator(),
     const std::vector<bool> &                              marked_vertices = {},
     const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree =
-      {});
+      RTree<std::pair<Point<spacedim>, unsigned int>>{});
 
   /**
    * A version of the previous function where we use that mapping on a given
