@@ -219,7 +219,8 @@ namespace LinearAlgebra
     else
       {
         Number *new_values;
-        Utilities::System::posix_memalign((void **)&new_values,
+        Utilities::System::posix_memalign(reinterpret_cast<void **>(
+                                            &new_values),
                                           64,
                                           sizeof(Number) * new_alloc_size);
         values.reset(new_values);

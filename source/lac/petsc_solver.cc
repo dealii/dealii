@@ -419,9 +419,9 @@ namespace PETScWrappers
     // and do some equally nasty stuff that at
     // least doesn't yield warnings...
     int (*fun_ptr)(KSP, int);
-    ierr = PetscObjectQueryFunction((PetscObject)(ksp),
+    ierr = PetscObjectQueryFunction(reinterpret_cast<PetscObject>(ksp),
                                     "KSPGMRESSetRestart_C",
-                                    (void (**)()) & fun_ptr);
+                                    reinterpret_cast<void (**)()>(&fun_ptr));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     ierr = (*fun_ptr)(ksp, additional_data.restart_parameter);

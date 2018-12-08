@@ -1124,7 +1124,7 @@ namespace PETScWrappers
   VectorBase::get_mpi_communicator() const
   {
     static MPI_Comm comm;
-    PetscObjectGetComm((PetscObject)vector, &comm);
+    PetscObjectGetComm(reinterpret_cast<PetscObject>(vector), &comm);
     return comm;
   }
 
@@ -1199,8 +1199,7 @@ namespace PETScWrappers
                 const unsigned int ghostidx =
                   ghost_indices.index_within_set(index);
 
-                Assert(ghostidx + end - begin < (unsigned int)lsize,
-                       ExcInternalError());
+                AssertIndexRange(ghostidx + end - begin, lsize);
                 *(values_begin + i) = *(ptr + ghostidx + end - begin);
               }
           }

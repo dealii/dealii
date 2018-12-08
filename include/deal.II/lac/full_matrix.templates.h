@@ -588,7 +588,8 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
       {
         number2 add_value = adding ? dst(i, j) : 0.;
         for (size_type k = 0; k < l; k++)
-          add_value += (number2)(*this)(i, k) * (number2)(src(k, j));
+          add_value += static_cast<number2>((*this)(i, k)) *
+                       static_cast<number2>((src(k, j)));
         dst(i, j) = add_value;
       }
 }
@@ -671,7 +672,8 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
         {
           number2 add_value = 0.;
           for (size_type k = 0; k < l; ++k)
-            add_value += (number2)(*this)(k, i) * (number2)(*this)(k, j);
+            add_value += static_cast<number2>((*this)(k, i)) *
+                         static_cast<number2>((*this)(k, j));
           if (adding)
             {
               dst(i, j) += add_value;
@@ -692,7 +694,8 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
         {
           number2 add_value = adding ? dst(i, j) : 0.;
           for (size_type k = 0; k < l; k++)
-            add_value += (number2)(*this)(k, i) * (number2)(src(k, j));
+            add_value += static_cast<number2>((*this)(k, i)) *
+                         static_cast<number2>((src(k, j)));
           dst(i, j) = add_value;
         }
 }
@@ -774,7 +777,8 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
         {
           number2 add_value = 0.;
           for (size_type k = 0; k < l; ++k)
-            add_value += (number2)(*this)(i, k) * (number2)(*this)(j, k);
+            add_value += static_cast<number2>((*this)(i, k)) *
+                         static_cast<number2>((*this)(j, k));
           if (adding)
             {
               dst(i, j) += add_value;
@@ -792,7 +796,8 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
         {
           number2 add_value = adding ? dst(i, j) : 0.;
           for (size_type k = 0; k < l; k++)
-            add_value += (number2)(*this)(i, k) * (number2)(src(j, k));
+            add_value += static_cast<number2>((*this)(i, k)) *
+                         static_cast<number2>(src(j, k));
           dst(i, j) = add_value;
         }
 }
@@ -877,7 +882,8 @@ FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
       {
         number2 add_value = adding ? dst(i, j) : 0.;
         for (size_type k = 0; k < l; k++)
-          add_value += (number2)(*this)(k, i) * (number2)(src(j, k));
+          add_value += static_cast<number2>((*this)(k, i)) *
+                       static_cast<number2>(src(j, k));
         dst(i, j) = add_value;
       }
 }

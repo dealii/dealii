@@ -96,7 +96,8 @@ public:
    * derived from BlockVectorBase<T>).
    */
   static const bool value =
-    (sizeof(check_for_block_vector((VectorType *)nullptr)) == sizeof(yes_type));
+    (sizeof(check_for_block_vector(static_cast<VectorType *>(nullptr))) ==
+     sizeof(yes_type));
 };
 
 

@@ -137,7 +137,9 @@ namespace LinearAlgebra
 
               Number *new_val;
               Utilities::System::posix_memalign(
-                (void **)&new_val, 64, sizeof(Number) * new_alloc_size);
+                reinterpret_cast<void **>(&new_val),
+                64,
+                sizeof(Number) * new_alloc_size);
               data.values.reset(new_val);
 
               allocated_size = new_alloc_size;
@@ -1678,10 +1680,10 @@ namespace LinearAlgebra
     {
       Number local_result = mean_value_local();
       if (partitioner->n_mpi_processes() > 1)
-        return Utilities::MPI::sum(local_result *
-                                     (real_type)partitioner->local_size(),
+        return Utilities::MPI::sum(local_result * static_cast<real_type>(
+                                                    partitioner->local_size()),
                                    partitioner->get_mpi_communicator()) /
-               (real_type)partitioner->size();
+               static_cast<real_type>(partitioner->size());
       else
         return local_result;
     }
