@@ -83,7 +83,7 @@ test()
   for (const auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
       data.cell_vectorization_category[cell->active_cell_index()] =
-        cell->center()[1] * 10.;
+        static_cast<unsigned int>(cell->center()[1] * 10.);
 
   data.cell_vectorization_categories_strict = false;
   mf_data.reinit(dof, constraints, QGauss<1>(2), data);

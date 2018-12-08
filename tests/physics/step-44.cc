@@ -1910,8 +1910,9 @@ namespace Step44
           pcout << " SLV " << std::flush;
           if (parameters.type_lin == "CG")
             {
-              const int solver_its = tangent_matrix.block(u_dof, u_dof).m() *
-                                     parameters.max_iterations_lin;
+              const auto solver_its = static_cast<unsigned int>(
+                tangent_matrix.block(u_dof, u_dof).m() *
+                parameters.max_iterations_lin);
               const double tol_sol =
                 parameters.tol_lin * system_rhs.block(u_dof).l2_norm();
               SolverControl solver_control(solver_its, tol_sol, false, false);
@@ -1992,8 +1993,8 @@ namespace Step44
             preconditioner_K_Jp_inv.use_matrix(
               tangent_matrix.block(J_dof, p_dof));
             ReductionControl solver_control_K_Jp_inv(
-              tangent_matrix.block(J_dof, p_dof).m() *
-                parameters.max_iterations_lin,
+              static_cast<unsigned int>(tangent_matrix.block(J_dof, p_dof).m() *
+                                        parameters.max_iterations_lin),
               1.0e-30,
               parameters.tol_lin);
             SolverSelector<Vector<double>> solver_K_Jp_inv;
@@ -2011,8 +2012,8 @@ namespace Step44
             preconditioner_K_con_inv.use_matrix(
               tangent_matrix.block(u_dof, u_dof));
             ReductionControl solver_control_K_con_inv(
-              tangent_matrix.block(u_dof, u_dof).m() *
-                parameters.max_iterations_lin,
+              static_cast<unsigned int>(tangent_matrix.block(u_dof, u_dof).m() *
+                                        parameters.max_iterations_lin),
               1.0e-30,
               parameters.tol_lin);
             SolverSelector<Vector<double>> solver_K_con_inv;

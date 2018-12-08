@@ -131,7 +131,7 @@ test()
         if (cell->center()[0] < 0.5 && cell->center()[1] < 0.5)
           cell->set_refine_flag();
       if (dim == 3)
-        if (cell->center()[0] < 0.5 && cell->center()[1] &&
+        if (cell->center()[0] < 0.5 && cell->center()[1] < 0.5 &&
             cell->center()[2] < 0.5)
           cell->set_refine_flag();
     }
@@ -153,7 +153,7 @@ test()
           cell->set_refine_flag();
       if (dim == 3)
         if (cell->is_locally_owned() && cell->center()[0] < 0.5 &&
-            cell->center()[1] && cell->center()[2] < 0.5)
+            cell->center()[1] < 0.5 && cell->center()[2] < 0.5)
           cell->set_refine_flag();
     }
   distributed_tria.execute_coarsening_and_refinement();

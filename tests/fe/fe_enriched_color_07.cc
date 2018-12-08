@@ -611,14 +611,14 @@ public:
                              const double &     sigma,
                              const std::string &rhs_expr,
                              const std::string &boundary_expr,
-                             const double &     refinement = 11);
+                             const unsigned int refinement = 11);
   EstimateEnrichmentFunction(const Point<1> &   center,
                              const double &     left_bound,
                              const double &     right_bound,
                              const double &     sigma,
                              const std::string &rhs_expr,
                              const std::string &boundary_expr,
-                             const double &     refinement = 11);
+                             const unsigned int refinement = 11);
   ~EstimateEnrichmentFunction();
   void
   run();
@@ -669,7 +669,7 @@ EstimateEnrichmentFunction::EstimateEnrichmentFunction(
   const double &     sigma,
   const std::string &rhs_expr,
   const std::string &boundary_expr,
-  const double &     refinement)
+  const unsigned int refinement)
   : center(center)
   , domain_size(domain_size)
   , sigma(sigma)
@@ -692,7 +692,7 @@ EstimateEnrichmentFunction::EstimateEnrichmentFunction(
   const double &     sigma,
   const std::string &rhs_expr,
   const std::string &boundary_expr,
-  const double &     refinement)
+  const unsigned int refinement)
   : center(center)
   , left_bound(left_bound)
   , right_bound(right_bound)

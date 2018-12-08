@@ -1500,7 +1500,8 @@ namespace Patterns
           return std_cxx14::make_unique<Patterns::Bool>();
         else if (std::is_integral<T>::value)
           return std_cxx14::make_unique<Patterns::Integer>(
-            std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+            static_cast<int>(std::numeric_limits<T>::min()),
+            static_cast<int>(std::numeric_limits<T>::max()));
         else if (std::is_floating_point<T>::value)
           return std_cxx14::make_unique<Patterns::Double>(
             -std::numeric_limits<T>::max(), std::numeric_limits<T>::max());

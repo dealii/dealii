@@ -78,7 +78,7 @@ test()
       hp::FECollection<dim> fe_collection;
 
       // prepare FECollection with arbitrary number of entries
-      const unsigned int max_degree = 1 + std::pow(2, dim);
+      const unsigned int max_degree = 1 + Utilities::pow(2, dim);
       for (unsigned int i = 0; i < max_degree; ++i)
         fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
@@ -133,7 +133,7 @@ test()
     hp::FECollection<dim> fe_collection;
 
     // prepare FECollection with arbitrary number of entries
-    const unsigned int max_degree = 1 + std::pow(2, dim);
+    const unsigned int max_degree = 1 + Utilities::pow(2, dim);
     for (unsigned int i = 0; i < max_degree; ++i)
       fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
