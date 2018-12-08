@@ -893,8 +893,7 @@ namespace Differentiation
       double,
       typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
                               NumberTypes::adolc_taped>::type>::
-      is_registered_tape(
-        const typename Types<ADNumberType>::tape_index tape_index) const
+      is_registered_tape(const typename Types<ADNumberType>::tape_index) const
     {
       AssertThrow(false, ExcRequiresADOLC());
       return false;
@@ -943,6 +942,8 @@ namespace Differentiation
       AssertThrow(false, ExcRequiresADOLC());
     }
 
+
+    template <typename ADNumberType>
     std::vector<typename Types<ADNumberType>::tape_index>
     TapedDrivers<
       ADNumberType,
@@ -1028,8 +1029,7 @@ namespace Differentiation
                  double,
                  typename std::enable_if<
                    ADNumberTraits<ADNumberType>::type_code ==
-                   NumberTypes::adolc_taped>::type>::print(std::ostream &stream)
-      const
+                   NumberTypes::adolc_taped>::type>::print(std::ostream &) const
     {
       AssertThrow(false, ExcRequiresADOLC());
     }
@@ -1050,7 +1050,7 @@ namespace Differentiation
 
 
     template <typename ADNumberType>
-    TapedDrivers<
+    typename TapedDrivers<
       ADNumberType,
       double,
       typename std::enable_if<ADNumberTraits<ADNumberType>::type_code ==
@@ -1082,6 +1082,8 @@ namespace Differentiation
       AssertThrow(false, ExcRequiresADOLC());
     }
 
+
+    template <typename ADNumberType>
     void
     TapedDrivers<
       ADNumberType,
