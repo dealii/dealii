@@ -77,6 +77,37 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
         )
       SET(${var} FALSE)
     ENDIF()
+
+    #
+    # See if we use Intel-MKL by compiling a small program
+    #
+    SET(CMAKE_REQUIRED_INCLUDES
+      ${LAPACK_INCLUDE_DIRS}
+      )
+    CHECK_CXX_SOURCE_COMPILES("
+    #include <mkl.h>
+    #include <vector>
+    int main(){
+      const int m = 5;
+      const int n = 2;
+      std::vector<double> A(m*n,0.);
+      std::vector<double> B(m*n,0.);
+      mkl_domatcopy('C', 'T', m, n, 1., A.data(), n, B.data(), m);
+      return 0;
+    }"
+    MKL_SYMBOL_CHECK)
+    IF(MKL_SYMBOL_CHECK)
+      MESSAGE(STATUS
+      "Use Intel MKL for BLAS/LAPACK."
+      )
+      SET(DEAL_II_LAPACK_WITH_MKL ON)
+    ELSE()
+      MESSAGE(STATUS
+      "Use other than Intel MKL implementation of BLAS/LAPACK (consult CMakeFiles/CMakeError.log for further information)."
+      )
+      SET(DEAL_II_LAPACK_WITH_MKL OFF)
+    ENDIF()
+
   ENDIF()
 ENDMACRO()
 
