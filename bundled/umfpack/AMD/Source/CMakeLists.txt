@@ -15,6 +15,8 @@
 
 INCLUDE_DIRECTORIES(${UMFPACK_BUNDLED_INCLUDE_DIRS})
 
+STRIP_FLAG(DEAL_II_CXX_FLAGS "-Wfloat-conversion")
+
 SET(src_amd
   amd_1.cc
   amd_2.cc
