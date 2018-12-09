@@ -2617,8 +2617,8 @@ ScaLAPACKMatrix<NumberType>::save(
       chunks_size_.first  = n_rows;
       chunks_size_.second = 1;
     }
-  AssertIndexRange(chunks_size_.first + 1, n_rows);
-  AssertIndexRange(chunks_size_.second + 1, n_columns);
+  AssertIndexRange(chunks_size_.first - 1, n_rows);
+  AssertIndexRange(chunks_size_.second - 1, n_columns);
 
 #    ifdef H5_HAVE_PARALLEL
   // implementation for configurations equipped with a parallel file system
