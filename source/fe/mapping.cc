@@ -35,6 +35,7 @@ Mapping<dim, spacedim>::get_vertices(
 }
 
 
+
 template <int dim, int spacedim>
 Point<dim - 1>
 Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
@@ -49,26 +50,29 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
 
   Point<dim> unit_cell_pt = transform_real_to_unit_cell(cell, p);
 
-  Point<dim - 1> unit_face_pt;
+  const unsigned int unit_normal_direction =
+    GeometryInfo<dim>::unit_normal_direction[face_no];
 
   if (dim == 2)
     {
-      if (GeometryInfo<dim>::unit_normal_direction[face_no] == 0)
-        unit_face_pt = Point<dim - 1>(unit_cell_pt(1));
-      else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 1)
-        unit_face_pt = Point<dim - 1>(unit_cell_pt(0));
+      if (unit_normal_direction == 0)
+        return Point<dim - 1>{unit_cell_pt(1)};
+      else if (unit_normal_direction == 1)
+        return Point<dim - 1>{unit_cell_pt(0)};
     }
   else if (dim == 3)
     {
-      if (GeometryInfo<dim>::unit_normal_direction[face_no] == 0)
-        unit_face_pt = Point<dim - 1>(unit_cell_pt(1), unit_cell_pt(2));
-      else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 1)
-        unit_face_pt = Point<dim - 1>(unit_cell_pt(0), unit_cell_pt(2));
-      else if (GeometryInfo<dim>::unit_normal_direction[face_no] == 2)
-        unit_face_pt = Point<dim - 1>(unit_cell_pt(0), unit_cell_pt(1));
+      if (unit_normal_direction == 0)
+        return Point<dim - 1>{unit_cell_pt(1), unit_cell_pt(2)};
+      else if (unit_normal_direction == 1)
+        return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(2)};
+      else if (unit_normal_direction == 2)
+        return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(1)};
     }
 
-  return unit_face_pt;
+  // We should never get here
+  Assert(false, ExcInternalError());
+  return {};
 }
 
 /* ---------------------------- InternalDataBase --------------------------- */
