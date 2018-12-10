@@ -461,6 +461,106 @@ private:
   double tolerance;
 };
 
+/**
+ * Elliptical manifold description derived from ChartManifold.
+ * More informations on the elliptical coordinate system can be found
+ * at <a
+ * href="https://en.wikipedia.org/wiki/Elliptic_coordinate_system">Wikipedia
+ * </a>.
+ *
+ * This is based on the definition of elliptic coordinates $(u,v)$
+ * @f[
+ *  \left\lbrace\begin{align*}
+ *  x &=  x_0 + c \cosh(u) \cos(v) \\
+ *  y &=  y_0 + c \sinh(u) \sin(v)
+ *  \end{align*}\right.
+ * @f]
+ * in which $(x_0,y_0)$ are coordinates of the center of the cartesian system.
+ *
+ * The current implementation uses coordinates $(c,v)$, instead of $(u,v)$, and
+ * fixes $u$ according to a given eccentricity. Therefore, this choice
+ * of coordinates generates an elliptical manifold characterized by a constant
+ * eccentricity: $e=\frac{1}{\cosh(u)}$, with $e\in\left]0,1\right[$.
+ *
+ * The constructor of this class will throw an exception if both dim and
+ * spacedim are different from two.
+ *
+ * This manifold can be used to produce hyper_shells with elliptical curvature.
+ * As an example, the test <B>elliptical_manifold_01</B> produces the following
+ * triangulation:
+ * @image html elliptical_hyper_shell.png
+ *
+ * @ingroup manifold
+ *
+ * @author Stefano Dominici, 2018
+ */
+template <int dim, int spacedim = dim>
+class EllipticalManifold : public ChartManifold<dim, spacedim, spacedim>
+{
+public:
+  /**
+   * Constructor that takes the center of the manifold system, the direction of
+   * the major axis, and the manifold eccentricity.
+   * The default major axis is the <tt>x</tt>-axis. The manifold is rotated in
+   * order to align the major axis to the direction specified in input.
+   * @param center Center of the manifold.
+   * @param major_axis_direction Direction of the major axis of the
+   * manifold.
+   * @param eccentricity Eccentricity of the
+   * manifold $e\in\left]0,1\right[$.
+   *
+   */
+  EllipticalManifold(const Point<spacedim> &    center,
+                     const Tensor<1, spacedim> &major_axis_direction,
+                     const double               eccentricity);
+
+  virtual std::unique_ptr<Manifold<dim, spacedim>>
+  clone() const override;
+
+  /**
+   * @copydoc ChartManifold::pull_back()
+   */
+  virtual Point<spacedim>
+  pull_back(const Point<spacedim> &space_point) const override;
+
+  /**
+   * @copydoc ChartManifold::push_forward()
+   */
+  virtual Point<spacedim>
+  push_forward(const Point<spacedim> &chart_point) const override;
+
+  /**
+   * @copydoc ChartManifold::push_forward_gradient()
+   */
+  virtual DerivativeForm<1, spacedim, spacedim>
+  push_forward_gradient(const Point<spacedim> &chart_point) const override;
+
+
+protected:
+  /**
+   * The direction vector of the major axis.
+   */
+  Tensor<1, spacedim> direction;
+  /**
+   * The center of the manifold.
+   */
+  const Point<spacedim> center;
+  /**
+   * Parameters deriving from the eccentricity of the manifold.
+   */
+  const double cosh_u;
+  const double sinh_u;
+
+private:
+  /**
+   * @copydoc ChartManifold::get_periodicity()
+   *
+   * For $\text{dim}=2$ and $\text{spacedim}=2$, the first coordinate is
+   * non-periodic, while the second coordinate has a periodicity of $2\pi$.
+   */
+  static Tensor<1, spacedim>
+  get_periodicity();
+};
 
 
 /**

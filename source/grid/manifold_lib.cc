@@ -1150,6 +1150,158 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
 
 
 // ============================================================
+// EllipticalManifold
+// ============================================================
+template <int dim, int spacedim>
+EllipticalManifold<dim, spacedim>::EllipticalManifold(
+  const Point<spacedim> &    center,
+  const Tensor<1, spacedim> &major_axis_direction,
+  const double               eccentricity)
+  : ChartManifold<dim, spacedim, spacedim>(
+      EllipticalManifold<dim, spacedim>::get_periodicity())
+  , direction(major_axis_direction)
+  , center(center)
+  , cosh_u(1.0 / eccentricity)
+  , sinh_u(std::sqrt(cosh_u * cosh_u - 1.0))
+{
+  // Throws an exception if dim!=2 || spacedim!=2.
+  Assert(dim == 2 && spacedim == 2, ExcNotImplemented());
+  // Throws an exception if eccentricity is not in range.
+  Assert(std::signbit(cosh_u * cosh_u - 1.0) == false,
+         ExcMessage(
+           "Invalid eccentricity: It must satisfy 0 < eccentricity < 1."));
+  const double direction_norm = direction.norm();
+  Assert(direction_norm != 0.0,
+         ExcMessage(
+           "Invalid major axis direction vector: Null vector not allowed."));
+  direction /= direction_norm;
+}
+
+
+
+template <int dim, int spacedim>
+std::unique_ptr<Manifold<dim, spacedim>>
+EllipticalManifold<dim, spacedim>::clone() const
+{
+  const double eccentricity = 1.0 / cosh_u;
+  return std_cxx14::make_unique<EllipticalManifold<dim, spacedim>>(
+    center, direction, eccentricity);
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<1, spacedim>
+EllipticalManifold<dim, spacedim>::get_periodicity()
+{
+  Tensor<1, spacedim> periodicity;
+  // The second elliptical coordinate is periodic, while the first is not.
+  // Enforce periodicity on the last variable.
+  periodicity[spacedim - 1] = 2.0 * numbers::PI;
+  return periodicity;
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+EllipticalManifold<dim, spacedim>::push_forward(const Point<spacedim> &) const
+{
+  Assert(false, ExcNotImplemented());
+  return Point<spacedim>();
+}
+
+
+
+template <>
+Point<2>
+EllipticalManifold<2, 2>::push_forward(const Point<2> &chart_point) const
+{
+  const double cs = std::cos(chart_point[1]);
+  const double sn = std::sin(chart_point[1]);
+  // Coordinates in the reference frame (i.e. major axis direction is
+  // x-axis)
+  const double x = chart_point[0] * cosh_u * cs;
+  const double y = chart_point[0] * sinh_u * sn;
+  // Rotate them according to the major axis direction
+  const Point<2> p(direction[0] * x - direction[1] * y,
+                   direction[1] * x + direction[0] * y);
+  return p + center;
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+EllipticalManifold<dim, spacedim>::pull_back(const Point<spacedim> &) const
+{
+  Assert(false, ExcNotImplemented());
+  return Point<spacedim>();
+}
+
+
+
+template <>
+Point<2>
+EllipticalManifold<2, 2>::pull_back(const Point<2> &space_point) const
+{
+  // Moving space_point in the reference coordinate system.
+  const double x0 = space_point[0] - center[0];
+  const double y0 = space_point[1] - center[1];
+  const double x  = direction[0] * x0 + direction[1] * y0;
+  const double y  = -direction[1] * x0 + direction[0] * y0;
+  const double pt0 =
+    std::sqrt((x * x) / (cosh_u * cosh_u) + (y * y) / (sinh_u * sinh_u));
+  // If the radius is exactly zero, the point coincides with the origin.
+  if (pt0 == 0.0)
+    {
+      return center;
+    }
+  double cos_eta = x / (pt0 * cosh_u);
+  if (cos_eta < -1.0)
+    {
+      cos_eta = -1.0;
+    }
+  if (cos_eta > 1.0)
+    {
+      cos_eta = 1.0;
+    }
+  const double eta = std::acos(cos_eta);
+  const double pt1 = (std::signbit(y) ? 2.0 * numbers::PI - eta : eta);
+  return Point<2>(pt0, pt1);
+}
+
+
+
+template <int dim, int spacedim>
+DerivativeForm<1, spacedim, spacedim>
+EllipticalManifold<dim, spacedim>::push_forward_gradient(
+  const Point<spacedim> &) const
+{
+  Assert(false, ExcNotImplemented());
+  return DerivativeForm<1, spacedim, spacedim>();
+}
+
+
+
+template <>
+DerivativeForm<1, 2, 2>
+EllipticalManifold<2, 2>::push_forward_gradient(
+  const Point<2> &chart_point) const
+{
+  const double            cs = std::cos(chart_point[1]);
+  const double            sn = std::sin(chart_point[1]);
+  DerivativeForm<1, 2, 2> dX;
+  dX[0][0] = cosh_u * cs;
+  dX[0][1] = -chart_point[0] * cosh_u * sn;
+  dX[1][0] = sinh_u * sn;
+  dX[1][1] = chart_point[1] * sinh_u * cs;
+  return dX;
+}
+
+
+
+// ============================================================
 // FunctionManifold
 // ============================================================
 template <int dim, int spacedim, int chartdim>
