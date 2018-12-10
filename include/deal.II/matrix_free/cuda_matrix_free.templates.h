@@ -474,7 +474,7 @@ namespace CUDAWrappers
 
     template <int dim, typename Number, typename functor>
     __global__ void
-    apply_kernel_shmem(const functor &                              func,
+    apply_kernel_shmem(functor                                      func,
                        const typename MatrixFree<dim, Number>::Data gpu_data,
                        const Number *                               src,
                        Number *                                     dst)
@@ -503,6 +503,29 @@ namespace CUDAWrappers
 
       if (cell < gpu_data.n_cells)
         func(cell, &gpu_data, &shared_data, src, dst);
+    }
+
+
+
+    template <int dim, typename Number, typename Functor>
+    __global__ void
+    evaluate_coeff(Functor                                      func,
+                   const typename MatrixFree<dim, Number>::Data gpu_data)
+    {
+      constexpr unsigned int cells_per_block =
+        cells_per_block_shmem(dim, Functor::n_dofs_1d - 1);
+
+      constexpr unsigned int n_dofs_per_block =
+        cells_per_block * Functor::n_local_dofs;
+      constexpr unsigned int n_q_points_per_block =
+        cells_per_block * Functor::n_q_points;
+
+      const unsigned int local_cell = threadIdx.x / Functor::n_dofs_1d;
+      const unsigned int cell =
+        local_cell + cells_per_block * (blockIdx.x + gridDim.x * blockIdx.y);
+
+      if (cell < gpu_data.n_cells)
+        func(cell, &gpu_data);
     }
   } // namespace internal
 
@@ -728,6 +751,18 @@ namespace CUDAWrappers
       distributed_cell_loop(func, src, dst);
     else
       serial_cell_loop(func, src, dst);
+  }
+
+
+
+  template <int dim, typename Number>
+  template <typename Functor>
+  void
+  MatrixFree<dim, Number>::evaluate_coefficients(Functor func) const
+  {
+    for (unsigned int i = 0; i < n_colors; ++i)
+      internal::evaluate_coeff<dim, Number, Functor>
+        <<<grid_dim[i], block_dim[i]>>>(func, get_data(i));
   }
 
 

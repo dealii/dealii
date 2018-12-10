@@ -210,13 +210,32 @@ namespace CUDAWrappers
 
     /**
      * This method runs the loop over all cells and apply the local operation on
-     * each element in parallel. @p func is a functor which is appplied on each color.
+     * each element in parallel. @p func is a functor which is applied on each color.
      */
     template <typename functor, typename VectorType>
     void
     cell_loop(const functor &   func,
               const VectorType &src,
               VectorType &      dst) const;
+
+    /**
+     * This method runs the loop over all cells and apply the local operation on
+     * each element in parallel. This function is very similar to cell_loop()
+     * but it uses a simpler functor.
+     *
+     * @p func needs to define
+     * \code
+     *  __device__ void operator()(
+     *    const unsigned int                                          cell,
+     *    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data);
+     * static const unsigned int n_dofs_1d;
+     * static const unsigned int n_local_dofs;
+     * static const unsigned int n_q_points;
+     * \endcode
+     */
+    template <typename Functor>
+    void
+    evaluate_coefficients(Functor func) const;
 
     /**
      * Copy the values of the constrained entries from @p src to @p dst. This is
@@ -481,6 +500,63 @@ namespace CUDAWrappers
                      fe_degree==2 ? 2 :
                      1) : 1;
     /* clang-format on */
+  }
+
+
+
+  /**
+   * Compute the quadrature point index in the local cell of a given thread.
+   *
+   * @relates MatrixFree
+   */
+  template <int dim>
+  __device__ inline unsigned int
+  q_point_id_in_cell(const unsigned int n_q_points_1d)
+  {
+    return (dim == 1 ?
+              threadIdx.x % n_q_points_1d :
+              dim == 2 ?
+              threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
+              threadIdx.x % n_q_points_1d +
+                  n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
+  }
+
+
+
+  /**
+   * Return the quadrature point index local of a given thread. The index is
+   * only unique for a given MPI process.
+   *
+   * @relates MatrixFree
+   */
+  template <int dim, typename Number>
+  __device__ inline unsigned int
+  local_q_point_id(
+    const unsigned int                                          cell,
+    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
+    const unsigned int                                          n_q_points_1d,
+    const unsigned int                                          n_q_points)
+  {
+    return (data->row_start / data->padding_length + cell) * n_q_points +
+           q_point_id_in_cell<dim>(n_q_points_1d);
+  }
+
+
+
+  /**
+   * Return the quadrature point associated with a given thread.
+   *
+   * @relates MatrixFree
+   */
+  template <int dim, typename Number>
+  __device__ inline typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
+  get_quadrature_point(
+    const unsigned int                                          cell,
+    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
+    const unsigned int                                          n_q_points_1d)
+  {
+    return *(data->q_points + data->padding_length * cell +
+             q_point_id_in_cell<dim>(n_q_points_1d));
   }
 } // namespace CUDAWrappers
 
