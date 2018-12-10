@@ -26,14 +26,37 @@
 
 #include "../tests.h"
 
+__device__ unsigned int
+compute_thread_id()
+{
+  const unsigned int thread_num_in_block =
+    threadIdx.x + blockDim.x * threadIdx.y +
+    blockDim.x * blockDim.y * threadIdx.z;
+  const unsigned int n_threads_per_block = blockDim.x * blockDim.y * blockDim.z;
+  const unsigned int blocks_num_in_grid =
+    blockIdx.x + gridDim.x * blockIdx.y + gridDim.x * gridDim.y * blockIdx.z;
+
+  return thread_num_in_block + blocks_num_in_grid * n_threads_per_block;
+}
+
+
+
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperatorQuad
 {
 public:
+  __device__
+  HelmholtzOperatorQuad(Number coef)
+    : coef(coef)
+  {}
+
   __device__ void operator()(
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
       *                fe_eval,
     const unsigned int q_point) const;
+
+private:
+  Number coef;
 };
 
 
@@ -44,7 +67,7 @@ __device__ void HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>::
   CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> *fe_eval,
   const unsigned int                                                    q) const
 {
-  fe_eval->submit_value(Number(10) * fe_eval->get_value(q), q);
+  fe_eval->submit_value(coef * fe_eval->get_value(q), q);
   fe_eval->submit_gradient(fe_eval->get_gradient(q), q);
 }
 
@@ -54,6 +77,10 @@ template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperator
 {
 public:
+  HelmholtzOperator(Number *coefficient)
+    : coef(coefficient)
+  {}
+
   __device__ void
   operator()(
     const unsigned int                                          cell,
@@ -67,6 +94,8 @@ public:
     dealii::Utilities::pow(fe_degree + 1, dim);
   static const unsigned int n_q_points =
     dealii::Utilities::pow(n_q_points_1d, dim);
+
+  Number *coef;
 };
 
 
@@ -80,14 +109,64 @@ operator()(const unsigned int                                          cell,
            const Number *                         src,
            Number *                               dst) const
 {
+  const unsigned int pos = CUDAWrappers::local_q_point_id<dim, Number>(
+    cell, gpu_data, n_dofs_1d, n_q_points);
+
   CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
     cell, gpu_data, shared_data);
   fe_eval.read_dof_values(src);
   fe_eval.evaluate(true, true);
   fe_eval.apply_quad_point_operations(
-    HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>());
+    HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>(coef[pos]));
   fe_eval.integrate(true, true);
   fe_eval.distribute_local_to_global(dst);
+}
+
+
+
+template <int dim, int fe_degree, typename Number, int n_q_points_1d>
+class VaryingCoefficientFunctor
+{
+public:
+  VaryingCoefficientFunctor(Number *coefficient)
+    : coef(coefficient)
+  {}
+
+  __device__ void
+  operator()(
+    const unsigned int                                          cell,
+    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data);
+
+  static const unsigned int n_dofs_1d = fe_degree + 1;
+  static const unsigned int n_local_dofs =
+    dealii::Utilities::pow(fe_degree + 1, dim);
+  static const unsigned int n_q_points =
+    dealii::Utilities::pow(n_q_points_1d, dim);
+
+private:
+  Number *coef;
+};
+
+
+
+template <int dim, int fe_degree, typename Number, int n_q_points_1d>
+__device__ void
+VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d>::
+operator()(const unsigned int                                          cell,
+           const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data)
+{
+  const unsigned int pos = CUDAWrappers::local_q_point_id<dim, Number>(
+    cell, gpu_data, n_dofs_1d, n_q_points);
+  const auto q_point =
+    CUDAWrappers::get_quadrature_point<dim, Number>(cell, gpu_data, n_dofs_1d);
+
+  Number p_square = 0.;
+  for (unsigned int i = 0; i < dim; ++i)
+    {
+      Number coord = q_point[i];
+      p_square += coord * coord;
+    }
+  coef[pos] = 10. / (0.05 + 2. * p_square);
 }
 
 
@@ -100,15 +179,41 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+  MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in,
+                 const unsigned int                           size,
+                 const bool constant_coeff = true);
 
   void
   vmult(VectorType &dst, const VectorType &src);
 
 private:
   const CUDAWrappers::MatrixFree<dim, Number> &data;
+  LinearAlgebra::CUDAWrappers::Vector<Number>  coef;
 };
+
+template <int dim,
+          int fe_degree,
+          typename Number,
+          typename VectorType,
+          int n_q_points_1d>
+MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::
+  MatrixFreeTest(const CUDAWrappers::MatrixFree<dim, Number> &data_in,
+                 const unsigned int                           size,
+                 const bool                                   constant_coeff)
+  : data(data_in)
+{
+  coef.reinit(size);
+  if (constant_coeff)
+    {
+      coef.add(10.);
+    }
+  else
+    {
+      VaryingCoefficientFunctor<dim, fe_degree, Number, n_q_points_1d> functor(
+        coef.get_values());
+      data.evaluate_coefficients(functor);
+    }
+}
 
 
 
@@ -123,7 +228,8 @@ MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::vmult(
   const VectorType &src)
 {
   dst = static_cast<Number>(0.);
-  HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d> helmholtz_operator;
+  HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d> helmholtz_operator(
+    coef.get_values());
   data.cell_loop(helmholtz_operator, src, dst);
   data.copy_constrained_values(src, dst);
 }

@@ -111,11 +111,13 @@ test()
   mf_data.reinit(
     mapping, dof, constraints, quad, MPI_COMM_WORLD, additional_data);
 
+  const unsigned int coef_size =
+    tria.n_locally_owned_active_cells() * std::pow(fe_degree + 1, dim);
   MatrixFreeTest<dim,
                  fe_degree,
                  Number,
                  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
-                                                                mf(mf_data);
+                                                                mf(mf_data, coef_size);
   LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev(
     owned_set, MPI_COMM_WORLD);
   LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev(
