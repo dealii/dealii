@@ -82,7 +82,6 @@ for (deal_II_dimension : DIMENSIONS)
       const std::vector<hp::QCollection<1>> &,
       const AdditionalData &);
 
-#ifndef DEAL_II_MSVC
     template void
     internal::MatrixFreeFunctions::ShapeInfo<double>::reinit<deal_II_dimension>(
       const Quadrature<1> &,
@@ -106,7 +105,6 @@ for (deal_II_dimension : DIMENSIONS)
         const Quadrature<1> &,
         const FiniteElement<deal_II_dimension, deal_II_dimension> &,
         const unsigned int);
-#endif
   }
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)

@@ -228,6 +228,7 @@ BOOST_BGL_DECLARE_NAMED_PARAMS
   };
 
   struct param_not_found {};
+  static param_not_found g_param_not_found;
 
   template <typename Tag, typename Args>
   struct get_param_type: 
@@ -237,7 +238,7 @@ BOOST_BGL_DECLARE_NAMED_PARAMS
   inline
   const typename lookup_named_param_def<Tag, Args, param_not_found>::type&
   get_param(const Args& p, Tag) {
-    return lookup_named_param_def<Tag, Args, param_not_found>::get(p, param_not_found());
+    return lookup_named_param_def<Tag, Args, param_not_found>::get(p, g_param_not_found);
   }
 
   template <class P, class Default> 
