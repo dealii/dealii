@@ -38,8 +38,11 @@
 #  include <sundials/sundials_config.h>
 #  if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
 #    include <kinsol/kinsol_direct.h>
+#    include <kinsol/kinsol_spils.h>
 #    include <sunlinsol/sunlinsol_dense.h>
 #    include <sunmatrix/sunmatrix_dense.h>
+#    include <sunlinsol/sunlinsol_spgmr.h>
+#    include <sunlinsol/sunlinsol_spfgmr.h>
 #  else
 #    include <kinsol/kinsol_dense.h>
 #  endif
@@ -148,6 +151,39 @@ namespace SUNDIALS
 
       return err;
     }
+
+    template <class VectorType>
+    int
+    t_kinsol_jacobian_vmult(N_Vector v,  /* vector that must be multiplied by the jacobian */
+                            N_Vector Jv, /* where to store the result of the vmult */
+                            N_Vector u,  /* current value of the dependent variable vector */
+                            booleantype* new_u, /* u has changed since last call to this function */
+                            void* user_data)
+    {
+      KINSOL<VectorType> &solver =
+              *static_cast<KINSOL<VectorType> *>(user_data);
+      GrowingVectorMemory<VectorType> mem;
+
+      typename VectorMemory<VectorType>::Pointer src_v(mem);
+      solver.reinit_vector(*src_v);
+
+      typename VectorMemory<VectorType>::Pointer src_u(mem);
+      solver.reinit_vector(*src_u);
+
+      typename VectorMemory<VectorType>::Pointer dst_jv(mem);
+      solver.reinit_vector(*dst_jv);
+
+      copy(*src_v, v);
+      copy(*src_u, u);
+
+
+      solver.jacobian_vmult(*src_v,*src_u,*dst_jv);
+
+      copy(Jv,*dst_jv);
+      *new_u = SUNFALSE;
+      return 0;
+    }
+
   } // namespace
 
   template <typename VectorType>
@@ -287,13 +323,34 @@ namespace SUNDIALS
       }
     else
       {
-#  if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
-        J      = SUNDenseMatrix(system_size, system_size);
-        LS     = SUNDenseLinearSolver(u_scale, J);
-        status = KINDlsSetLinearSolver(kinsol_mem, LS, J);
-#  else
-        status = KINDense(kinsol_mem, system_size);
-#  endif
+        if(data.linear_solver == KINSOL::AdditionalData::LinearSolver::dense) {
+
+#       if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
+          J = SUNDenseMatrix(system_size, system_size);
+          LS = SUNDenseLinearSolver(u_scale, J);
+          status = KINDlsSetLinearSolver(kinsol_mem, LS, J);
+#       else
+          status = KINDense(kinsol_mem, system_size);
+#       endif
+        }
+        else if(data.linear_solver == KINSOL::AdditionalData::LinearSolver::gmres){
+#       if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
+          LS = SUNSPGMR(u_scale,PREC_NONE,-1);
+          status = KINSpilsSetLinearSolver(kinsol_mem,LS);
+          AssertKINSOL(status);
+          status = KINSpilsSetJacTimesVecFn(kinsol_mem,t_kinsol_jacobian_vmult<VectorType>);
+#       else
+          AssertThrow(false,ExcNotImplemented());
+#       endif
+        }
+        else if(data.linear_solver == KINSOL::AdditionalData::LinearSolver::fgmres){
+#       if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
+          LS = SUNSPFGMR(u_scale,PREC_NONE,-1);
+          status = KINSpilsSetLinearSolver(kinsol_mem,LS);
+#       else
+          AssertThrow(false,ExcNotImplemented());
+#       endif
+        }
         AssertKINSOL(status);
       }
 
@@ -347,6 +404,10 @@ namespace SUNDIALS
     reinit_vector = [](VectorType &) {
       AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
+    jacobian_vmult = [](const VectorType&, const VectorType&, VectorType&){
+      AssertThrow(false,ExcFunctionNotProvided("jacobian_vmult"));
+    };
+
   }
 
   template class KINSOL<Vector<double>>;

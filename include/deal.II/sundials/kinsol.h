@@ -228,6 +228,11 @@ namespace SUNDIALS
         picard = KIN_PICARD,
       };
 
+      enum LinearSolver{
+        dense,
+        gmres,
+        fgmres
+      };
       /**
        * Initialization parameters for KINSOL.
        *
@@ -267,7 +272,8 @@ namespace SUNDIALS
         const double            maximum_newton_step           = 0.0,
         const double            dq_relative_error             = 0.0,
         const unsigned int      maximum_beta_failures         = 0,
-        const unsigned int      anderson_subspace_size        = 0)
+        const unsigned int      anderson_subspace_size        = 0,
+        const LinearSolver     &linear_solver                 = dense)
         : strategy(strategy)
         , maximum_non_linear_iterations(maximum_non_linear_iterations)
         , function_tolerance(function_tolerance)
@@ -278,6 +284,7 @@ namespace SUNDIALS
         , dq_relative_error(dq_relative_error)
         , maximum_beta_failures(maximum_beta_failures)
         , anderson_subspace_size(anderson_subspace_size)
+        , linear_solver(linear_solver)
       {}
 
       /**
@@ -364,6 +371,22 @@ namespace SUNDIALS
         prm.enter_subsection("Fixed point and Picard parameters");
         prm.add_parameter("Anderson acceleration subspace size",
                           anderson_subspace_size);
+        static std::string linear_solver_str("dense");
+        prm.add_parameter("Internal linear solver",
+                          linear_solver_str,
+                          "Choose among dense|gmres|fgmres",
+                          Patterns::Selection(
+                                  "dense|gmres|fgmres"));
+        prm.add_action("Internal linear solver", [&](const std::string &value) {
+          if (value == "dense")
+            linear_solver = dense;
+          else if (value == "gmres")
+            linear_solver = gmres;
+          else if (value == "fgmres")
+            linear_solver = fgmres;
+          else
+          Assert(false, ExcInternalError());
+        });
         prm.leave_subsection();
       }
 
@@ -445,6 +468,11 @@ namespace SUNDIALS
        * If you set this to 0, no acceleration is used.
        */
       unsigned int anderson_subspace_size;
+
+      /**
+       * Type of interal solver used by Kinsol
+       */
+      LinearSolver linear_solver;
     };
 
     /**
@@ -610,6 +638,13 @@ namespace SUNDIALS
      * implemented.
      */
     std::function<VectorType &()> get_function_scaling;
+
+    /**
+     * A function object that the user my supply to compute jacobian vmult
+     */
+    std::function<void(const VectorType &src,
+                      const VectorType &u,
+                      VectorType &out)> jacobian_vmult;
 
     /**
      * Handle KINSOL exceptions.
