@@ -509,8 +509,8 @@ namespace Step42
     template <int dim>
     double BitmapFile<dim>::get_value(const double x, const double y) const
     {
-      const int ix = std::min(std::max((int)(x / hx), 0), nx - 2);
-      const int iy = std::min(std::max((int)(y / hy), 0), ny - 2);
+      const int ix = std::min(std::max(static_cast<int>(x / hx), 0), nx - 2);
+      const int iy = std::min(std::max(static_cast<int>(y / hy), 0), ny - 2);
 
       const double xi  = std::min(std::max((x - ix * hx) / hx, 1.), 0.);
       const double eta = std::min(std::max((y - iy * hy) / hy, 1.), 0.);
