@@ -118,8 +118,8 @@ CHECK_CXX_COMPILER_BUG(
 #
 CHECK_CXX_SOURCE_COMPILES(
   "
-  bool f() {}
-  int main(){ if (__builtin_expect(f(),false)) ; }
+  bool f() { return true; }
+  int main(){ if (__builtin_expect(f(),false)) {} }
   "
   DEAL_II_HAVE_BUILTIN_EXPECT)
 
