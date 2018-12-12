@@ -4,9 +4,11 @@ from sympy.physics.vector import ReferenceFrame, gradient, divergence
 from sympy.vector import CoordSysCartesian
 
 R = ReferenceFrame('R')
-x = R[0]; y = R[1]
+x = R[0]
+y = R[1]
 
-a=-0.5; b=1.5
+a=-0.5
+b=1.5
 visc=1e-1
 lambda_=(1/(2*visc)-sqrt(1/(4*visc**2)+4*pi**2))
 print(" visc=%f" % visc)
