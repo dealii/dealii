@@ -642,11 +642,22 @@ namespace SUNDIALS
     std::function<VectorType &()> get_function_scaling;
 
     /**
-     * A function object that the user my supply to compute jacobian vmult
+     * A function object that the user may supply to compute jacobian vmult
      */
     std::function<void(const VectorType &src,
-                      const VectorType &u,
-                      VectorType &out)> jacobian_vmult;
+                       const VectorType &u,
+                       VectorType &out)> jacobian_vmult;
+
+    /**
+     * A function object the user may supply to solve $Px=z$ where $P$ is the preconditioner matrix
+     */
+    std::function<void(const VectorType &z, VectorType& x)> solve_preconditioner;
+
+    /**
+     * If the user cannot or does not need to assemble a preconditioner matrix, he/she can provide this function
+     */
+    std::function<void(const VectorType &u, const VectorType& f,
+                       const VectorType& z, VectorType& x)> solve_preconditioner_matrix_free;
 
     /**
      * Handle KINSOL exceptions.

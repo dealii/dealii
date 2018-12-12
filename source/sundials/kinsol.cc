@@ -154,9 +154,9 @@ namespace SUNDIALS
 
     template <class VectorType>
     int
-    t_kinsol_jacobian_vmult(N_Vector v,  /* vector that must be multiplied by the jacobian */
-                            N_Vector Jv, /* where to store the result of the vmult */
-                            N_Vector u,  /* current value of the dependent variable vector */
+    t_kinsol_jacobian_vmult(N_Vector v,         /* vector that must be multiplied by the jacobian */
+                            N_Vector Jv,        /* where to store the result of the vmult */
+                            N_Vector u,         /* current value of the dependent variable vector */
                             booleantype* new_u, /* u has changed since last call to this function */
                             void* user_data)
     {
@@ -184,6 +184,62 @@ namespace SUNDIALS
       return 0;
     }
 
+    template <class VectorType>
+    int
+    t_kinsol_solve_preconditioner(N_Vector u,      /* current unscaled value of the iterate            */
+                                  N_Vector uscale, /* diagonal elements of the scaling matrix for u    */
+                                  N_Vector fval,   /* F(u)                                             */
+                                  N_Vector fscale, /* diagonal elements of the scaling matrix for fval */
+                                  N_Vector v,      /* on input v=rhs, on output v = solution           */
+                                  void* user_data){
+      KINSOL<VectorType> &solver =
+              *static_cast<KINSOL<VectorType> *>(user_data);
+      GrowingVectorMemory<VectorType> mem;
+
+      typename VectorMemory<VectorType>::Pointer dst_v(mem);
+      solver.reinit_vector(*dst_v);
+
+      typename VectorMemory<VectorType>::Pointer src_v(mem);
+      solver.reinit_vector(*src_v);
+
+
+      copy(*src_v,v);
+
+      if(solver.solve_preconditioner_matrix_free){
+        typename VectorMemory<VectorType>::Pointer src_u(mem);
+        solver.reinit_vector(*src_u);
+
+        typename VectorMemory<VectorType>::Pointer src_f(mem);
+        solver.reinit_vector(*src_f);
+
+        copy(*src_u, u);
+        copy(*src_f, fval);
+
+        // if the user provided scaling vectors, we apply them
+        // otherwise uscale and fscale are vectors of 1
+        if(solver.get_solution_scaling){
+          typename VectorMemory<VectorType>::Pointer scale(mem);
+          solver.reinit_vector(*scale);
+          copy(*scale,uscale);
+          for(auto i=0llu; i<scale->size(); ++i)
+            (*src_u)[i] *= (*scale)[i];
+        }
+
+        if(solver.get_function_scaling){
+          typename VectorMemory<VectorType>::Pointer scale(mem);
+          solver.reinit_vector(*scale);
+          copy(*scale,fscale);
+          for(auto i=0llu; i<scale->size(); ++i)
+            (*src_f)[i] *= (*scale)[i];
+        }
+        solver.solve_preconditioner_matrix_free(*src_u,*src_f,*src_v,*dst_v);
+      }
+      else
+        solver.solve_preconditioner(*src_v,*dst_v);
+
+      copy(v,*dst_v);
+      return 0;
+    }
   } // namespace
 
   template <typename VectorType>
@@ -332,26 +388,54 @@ namespace SUNDIALS
 #       else
           status = KINDense(kinsol_mem, system_size);
 #       endif
+          AssertKINSOL(status);
+
         }
-        else if(data.linear_solver == KINSOL::AdditionalData::LinearSolver::gmres){
-#       if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
-          LS = SUNSPGMR(u_scale,PREC_NONE,-1);
+        else {
+#         if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
+          switch(data.linear_solver){
+
+            case KINSOL::AdditionalData::LinearSolver::gmres:
+              if (solve_preconditioner || solve_preconditioner_matrix_free) {
+                // KINSOL wants a RIGHT preconditioner
+                // as per documentation, other type of preconditioning
+                // (i.e., left, both) are not well supported
+                LS = SUNSPGMR(u_scale, PREC_RIGHT, -1);
+                AssertKINSOL(status);
+              }
+              else
+                LS = SUNSPGMR(u_scale,PREC_NONE,-1);
+              break;
+
+
+            case KINSOL::AdditionalData::LinearSolver::fgmres:
+              if (solve_preconditioner || solve_preconditioner_matrix_free) {
+                // KINSOL Flexible GMRES works only with a right preconditioner
+                LS = SUNSPFGMR(u_scale, PREC_RIGHT, -1);
+              }
+              else
+                LS = SUNSPFGMR(u_scale,PREC_NONE,-1);
+              break;
+
+            default:
+              AssertThrow(false,ExcNotImplemented());
+              break;
+
+          }
+
           status = KINSpilsSetLinearSolver(kinsol_mem,LS);
           AssertKINSOL(status);
           status = KINSpilsSetJacTimesVecFn(kinsol_mem,t_kinsol_jacobian_vmult<VectorType>);
+          AssertKINSOL(status);
+          if (solve_preconditioner || solve_preconditioner_matrix_free) {
+            status = KINSpilsSetPreconditioner(kinsol_mem, NULL, t_kinsol_solve_preconditioner<VectorType>);
+            AssertKINSOL(status);
+          }
+
 #       else
-          AssertThrow(false,ExcNotImplemented());
+          AssertThrow(false, ExcNotImplemented());
 #       endif
         }
-        else if(data.linear_solver == KINSOL::AdditionalData::LinearSolver::fgmres){
-#       if DEAL_II_SUNDIALS_VERSION_GTE(3, 0, 0)
-          LS = SUNSPFGMR(u_scale,PREC_NONE,-1);
-          status = KINSpilsSetLinearSolver(kinsol_mem,LS);
-#       else
-          AssertThrow(false,ExcNotImplemented());
-#       endif
-        }
-        AssertKINSOL(status);
       }
 
     if (data.strategy == AdditionalData::newton ||
