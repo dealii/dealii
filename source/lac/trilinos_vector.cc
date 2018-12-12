@@ -827,8 +827,7 @@ namespace TrilinosWrappers
       if (size() != local_size())
         {
           auto global_id = [&](const size_type index) {
-            return gid(vector->Map(),
-                       static_cast<TrilinosWrappers::types::int_type>(index));
+            return gid(vector->Map(), index);
           };
           out << "size:" << size() << " local_size:" << local_size() << " :"
               << std::endl;

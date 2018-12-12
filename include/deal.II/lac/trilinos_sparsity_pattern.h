@@ -1504,12 +1504,17 @@ namespace TrilinosWrappers
            ExcNotImplemented());
 
     TrilinosWrappers::types::int_type *col_index_ptr =
-      (TrilinosWrappers::types::int_type *)(&*begin);
-    const int n_cols = static_cast<int>(end - begin);
+      reinterpret_cast<TrilinosWrappers::types::int_type *>(
+        const_cast<typename std::decay<decltype(*begin)>::type *>(&*begin));
+    // Check at least for the first index that the conversion actually works
+    AssertDimension(*col_index_ptr, *begin);
+    TrilinosWrappers::types::int_type trilinos_row_index = row;
+    const int                         n_cols = static_cast<int>(end - begin);
 
     int ierr;
     if (row_is_stored_locally(row))
-      ierr = graph->InsertGlobalIndices(row, n_cols, col_index_ptr);
+      ierr =
+        graph->InsertGlobalIndices(trilinos_row_index, n_cols, col_index_ptr);
     else if (nonlocal_graph.get() != nullptr)
       {
         // this is the case when we have explicitly set the off-processor rows
@@ -1520,11 +1525,15 @@ namespace TrilinosWrappers
                ExcMessage("Attempted to write into off-processor matrix row "
                           "that has not be specified as being writable upon "
                           "initialization"));
-        ierr = nonlocal_graph->InsertGlobalIndices(row, n_cols, col_index_ptr);
+        ierr = nonlocal_graph->InsertGlobalIndices(trilinos_row_index,
+                                                   n_cols,
+                                                   col_index_ptr);
       }
     else
-      ierr = graph->InsertGlobalIndices(
-        1, (TrilinosWrappers::types::int_type *)&row, n_cols, col_index_ptr);
+      ierr = graph->InsertGlobalIndices(1,
+                                        &trilinos_row_index,
+                                        n_cols,
+                                        col_index_ptr);
 
     AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
   }

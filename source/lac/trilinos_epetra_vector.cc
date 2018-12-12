@@ -575,7 +575,7 @@ namespace LinearAlgebra
             (unsigned int *)vector->Map().MyGlobalElements();
 #    else
           size_type *vector_indices =
-            (size_type *)vector->Map().MyGlobalElements64();
+            reinterpret_cast<size_type *>(vector->Map().MyGlobalElements64());
 #    endif
           is.add_indices(vector_indices, vector_indices + n_indices);
         }

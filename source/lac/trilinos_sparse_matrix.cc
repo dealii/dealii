@@ -143,7 +143,7 @@ namespace TrilinosWrappers
         }
 
       int ierr = matrix->trilinos_matrix().ExtractGlobalRowCopy(
-        (TrilinosWrappers::types::int_type)this->a_row,
+        this->a_row,
         colnums,
         ncols,
         &((*value_cache)[0]),
@@ -205,8 +205,9 @@ namespace TrilinosWrappers
     : column_space_map(new Epetra_Map(input_map))
     , matrix(new Epetra_FECrsMatrix(Copy,
                                     *column_space_map,
-                                    (int *)const_cast<unsigned int *>(
-                                      &(n_entries_per_row[0])),
+                                    reinterpret_cast<int *>(
+                                      const_cast<unsigned int *>(
+                                        &(n_entries_per_row[0]))),
                                     false))
     , last_action(Zero)
     , compressed(false)
@@ -235,8 +236,9 @@ namespace TrilinosWrappers
     : column_space_map(new Epetra_Map(input_col_map))
     , matrix(new Epetra_FECrsMatrix(Copy,
                                     input_row_map,
-                                    (int *)const_cast<unsigned int *>(
-                                      &(n_entries_per_row[0])),
+                                    reinterpret_cast<int *>(
+                                      const_cast<unsigned int *>(
+                                        &(n_entries_per_row[0]))),
                                     false))
     , last_action(Zero)
     , compressed(false)
@@ -288,7 +290,8 @@ namespace TrilinosWrappers
                    0,
                    Utilities::Trilinos::comm_self()),
         *column_space_map,
-        (int *)const_cast<unsigned int *>(&(n_entries_per_row[0])),
+        reinterpret_cast<int *>(
+          const_cast<unsigned int *>(&(n_entries_per_row[0]))),
         false))
     , last_action(Zero)
     , compressed(false)
@@ -318,8 +321,9 @@ namespace TrilinosWrappers
         parallel_partitioning.make_trilinos_map(communicator, false)))
     , matrix(new Epetra_FECrsMatrix(Copy,
                                     *column_space_map,
-                                    (int *)const_cast<unsigned int *>(
-                                      &(n_entries_per_row[0])),
+                                    reinterpret_cast<int *>(
+                                      const_cast<unsigned int *>(
+                                        &(n_entries_per_row[0]))),
                                     false))
     , last_action(Zero)
     , compressed(false)
@@ -353,7 +357,8 @@ namespace TrilinosWrappers
     , matrix(new Epetra_FECrsMatrix(
         Copy,
         row_parallel_partitioning.make_trilinos_map(communicator, false),
-        (int *)const_cast<unsigned int *>(&(n_entries_per_row[0])),
+        reinterpret_cast<int *>(
+          const_cast<unsigned int *>(&(n_entries_per_row[0]))),
         false))
     , last_action(Zero)
     , compressed(false)
@@ -1243,7 +1248,7 @@ namespace TrilinosWrappers
 
         int *diag_find =
           std::find(col_indices, col_indices + num_entries, local_row);
-        int diag_index = (int)(diag_find - col_indices);
+        int diag_index = static_cast<int>(diag_find - col_indices);
 
         for (TrilinosWrappers::types::int_type j = 0; j < num_entries; ++j)
           if (diag_index != j || new_diag_value == 0)
@@ -1325,7 +1330,7 @@ namespace TrilinosWrappers
         int *el_find =
           std::find(col_indices, col_indices + nnz_present, trilinos_j);
 
-        int local_col_index = (int)(el_find - col_indices);
+        int local_col_index = static_cast<int>(el_find - col_indices);
 
         // This is actually the only
         // difference to the el(i,j)
@@ -1401,7 +1406,7 @@ namespace TrilinosWrappers
         int *el_find =
           std::find(col_indices, col_indices + nnz_present, trilinos_j);
 
-        int local_col_index = (int)(el_find - col_indices);
+        int local_col_index = static_cast<int>(el_find - col_indices);
 
 
         // This is actually the only
@@ -1530,6 +1535,7 @@ namespace TrilinosWrappers
 
     TrilinosWrappers::types::int_type *col_index_ptr;
     TrilinosScalar *                   col_value_ptr;
+    TrilinosWrappers::types::int_type  trilinos_row = row;
     TrilinosWrappers::types::int_type  n_columns;
 
     boost::container::small_vector<TrilinosScalar, 200> local_value_array(
@@ -1542,7 +1548,8 @@ namespace TrilinosWrappers
     // we will not modify const data)
     if (elide_zero_values == false)
       {
-        col_index_ptr = (TrilinosWrappers::types::int_type *)col_indices;
+        col_index_ptr = reinterpret_cast<TrilinosWrappers::types::int_type *>(
+          const_cast<size_type *>(col_indices));
         col_value_ptr = const_cast<TrilinosScalar *>(values);
         n_columns     = n_cols;
       }
@@ -1566,8 +1573,7 @@ namespace TrilinosWrappers
               }
           }
 
-        Assert(n_columns <= (TrilinosWrappers::types::int_type)n_cols,
-               ExcInternalError());
+        AssertIndexRange(n_columns, n_cols + 1);
       }
 
 
@@ -1585,7 +1591,7 @@ namespace TrilinosWrappers
         if (matrix->Filled() == false)
           {
             ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
-              static_cast<TrilinosWrappers::types::int_type>(row),
+              row,
               static_cast<int>(n_columns),
               const_cast<double *>(col_value_ptr),
               col_index_ptr);
@@ -1614,24 +1620,22 @@ namespace TrilinosWrappers
 
         if (matrix->Filled() == false)
           {
-            ierr = matrix->InsertGlobalValues(
-              1,
-              (TrilinosWrappers::types::int_type *)&row,
-              n_columns,
-              col_index_ptr,
-              &col_value_ptr,
-              Epetra_FECrsMatrix::ROW_MAJOR);
+            ierr = matrix->InsertGlobalValues(1,
+                                              &trilinos_row,
+                                              n_columns,
+                                              col_index_ptr,
+                                              &col_value_ptr,
+                                              Epetra_FECrsMatrix::ROW_MAJOR);
             if (ierr > 0)
               ierr = 0;
           }
         else
-          ierr = matrix->ReplaceGlobalValues(
-            1,
-            (TrilinosWrappers::types::int_type *)&row,
-            n_columns,
-            col_index_ptr,
-            &col_value_ptr,
-            Epetra_FECrsMatrix::ROW_MAJOR);
+          ierr = matrix->ReplaceGlobalValues(1,
+                                             &trilinos_row,
+                                             n_columns,
+                                             col_index_ptr,
+                                             &col_value_ptr,
+                                             Epetra_FECrsMatrix::ROW_MAJOR);
         // use the FECrsMatrix facilities for set even in the case when we
         // have explicitly set the off-processor rows because that only works
         // properly when adding elements, not when setting them (since we want
@@ -1727,6 +1731,7 @@ namespace TrilinosWrappers
 
     TrilinosWrappers::types::int_type *col_index_ptr;
     TrilinosScalar *                   col_value_ptr;
+    TrilinosWrappers::types::int_type  trilinos_row = row;
     TrilinosWrappers::types::int_type  n_columns;
 
     boost::container::small_vector<TrilinosScalar, 100> local_value_array(
@@ -1739,7 +1744,8 @@ namespace TrilinosWrappers
     // we will not modify const data)
     if (elide_zero_values == false)
       {
-        col_index_ptr = (TrilinosWrappers::types::int_type *)col_indices;
+        col_index_ptr = reinterpret_cast<TrilinosWrappers::types::int_type *>(
+          const_cast<size_type *>(col_indices));
         col_value_ptr = const_cast<TrilinosScalar *>(values);
         n_columns     = n_cols;
 #  ifdef DEBUG
@@ -1768,8 +1774,7 @@ namespace TrilinosWrappers
               }
           }
 
-        Assert(n_columns <= (TrilinosWrappers::types::int_type)n_cols,
-               ExcInternalError());
+        AssertIndexRange(n_columns, n_cols + 1);
       }
     // Exit early if there is nothing to do
     if (n_columns == 0)
@@ -1816,13 +1821,12 @@ namespace TrilinosWrappers
         // a time).
         compressed = false;
 
-        ierr =
-          matrix->SumIntoGlobalValues(1,
-                                      (TrilinosWrappers::types::int_type *)&row,
-                                      n_columns,
-                                      col_index_ptr,
-                                      &col_value_ptr,
-                                      Epetra_FECrsMatrix::ROW_MAJOR);
+        ierr = matrix->SumIntoGlobalValues(1,
+                                           &trilinos_row,
+                                           n_columns,
+                                           col_index_ptr,
+                                           &col_value_ptr,
+                                           Epetra_FECrsMatrix::ROW_MAJOR);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
 
@@ -1851,14 +1855,12 @@ namespace TrilinosWrappers
             &nonlocal_matrix->Graph() :
             &matrix->Graph();
 
-        indices.resize(graph->NumGlobalIndices(
-          static_cast<TrilinosWrappers::types::int_type>(row)));
+        indices.resize(graph->NumGlobalIndices(row));
         int n_indices = 0;
-        graph->ExtractGlobalRowCopy(
-          static_cast<TrilinosWrappers::types::int_type>(row),
-          indices.size(),
-          n_indices,
-          indices.data());
+        graph->ExtractGlobalRowCopy(row,
+                                    indices.size(),
+                                    n_indices,
+                                    indices.data());
         AssertDimension(n_indices, indices.size());
 
         for (TrilinosWrappers::types::int_type i = 0; i < n_indices; ++i)
