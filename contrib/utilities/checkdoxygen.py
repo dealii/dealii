@@ -23,8 +23,8 @@ for l in lines:
     elif "@}" in l:
              count = count -1
              if (count < 0):
-                 sys.exit("Error in file '%s' in line %d"%(args[0],lineno));
+                 sys.exit("Error in file '%s' in line %d"%(args[0],lineno))
     lineno = lineno + 1
 
 if (count != 0):
-    sys.exit("Error: missing closing braces in file '%s'"%(args[0]));
+    sys.exit("Error: missing closing braces in file '%s'"%(args[0]))

@@ -30,7 +30,7 @@ class TestPointWrapper(unittest.TestCase):
         self.assertEqual(p1.y, 2.)
         p2 = Point([0., 2.])
         self.assertEqual(p1.distance(p2), 1.)
-        self.assertEqual(p2.norm(), 2.) 
+        self.assertEqual(p2.norm(), 2.)
         self.assertEqual(p2.norm_square(), 4.)
         self.assertEqual(p1 != p2, True)
         self.assertEqual(p1 == p2, False)
@@ -41,25 +41,25 @@ class TestPointWrapper(unittest.TestCase):
         p3 = p1 - p2
         self.assertEqual(p3.x, p1.x - p2.x)
         self.assertEqual(p3.y, p1.y - p2.y)
-        p3 = -p2;
+        p3 = -p2
         self.assertEqual(p3.x, -p2.x)
         self.assertEqual(p3.y, -p2.y)
-        p3 = p2 / 2.; 
+        p3 = p2 / 2.
         self.assertEqual(p3.x, p2.x / 2.)
         self.assertEqual(p3.y, p2.y / 2.)
-        p3 = p2 * 2.;
+        p3 = p2 * 2.
         self.assertEqual(p3.x, p2.x * 2.)
         self.assertEqual(p3.y, p2.y * 2.)
-        p2 += p1 
+        p2 += p1
         self.assertEqual(p2.x, 1.)
         self.assertEqual(p2.y, 4.)
-        p2 -= p1 
+        p2 -= p1
         self.assertEqual(p2.x, 0.)
         self.assertEqual(p2.y, 2.)
-        p2 /= 2.; 
+        p2 /= 2.
         self.assertEqual(p2.x, 0.)
         self.assertEqual(p2.y, 1.)
-        p2 *= 2.;
+        p2 *= 2.
         self.assertEqual(p2.x, 0.)
         self.assertEqual(p2.y, 2.)
 
@@ -90,15 +90,15 @@ class TestPointWrapper(unittest.TestCase):
         self.assertEqual(p3.x, p1.x - p2.x)
         self.assertEqual(p3.y, p1.y - p2.y)
         self.assertEqual(p3.z, p1.z - p2.z)
-        p3 = -p2;
+        p3 = -p2
         self.assertEqual(p3.x, -p2.x)
         self.assertEqual(p3.y, -p2.y)
         self.assertEqual(p3.z, -p2.z)
-        p3 = p2 / 2.; 
+        p3 = p2 / 2.
         self.assertEqual(p3.x, p2.x / 2.)
         self.assertEqual(p3.y, p2.y / 2.)
         self.assertEqual(p3.z, p2.z / 2.)
-        p3 = p2 * 2.;
+        p3 = p2 * 2.
         self.assertEqual(p3.x, p2.x * 2.)
         self.assertEqual(p3.y, p2.y * 2.)
         self.assertEqual(p3.z, p2.z * 2.)
