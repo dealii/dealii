@@ -462,7 +462,7 @@ namespace TrilinosWrappers
 
       // TODO A dynamic_cast fails here, this is suspicious.
       const auto &range_map =
-        static_cast<const Epetra_Map &>(graph->RangeMap());
+        static_cast<const Epetra_Map &>(graph->RangeMap()); // NOLINT
       int ierr = graph->GlobalAssemble(*column_space_map, range_map, true);
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
@@ -814,7 +814,7 @@ namespace TrilinosWrappers
       {
         // TODO A dynamic_cast fails here, this is suspicious.
         const auto &range_map =
-          static_cast<const Epetra_Map &>(graph->RangeMap());
+          static_cast<const Epetra_Map &>(graph->RangeMap()); // NOLINT
         ierr = graph->GlobalAssemble(*column_space_map, range_map, true);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
@@ -1035,7 +1035,7 @@ namespace TrilinosWrappers
   {
     // TODO A dynamic_cast fails here, this is suspicious.
     const auto &domain_map =
-      static_cast<const Epetra_Map &>(graph->DomainMap());
+      static_cast<const Epetra_Map &>(graph->DomainMap()); // NOLINT
     return domain_map;
   }
 
@@ -1045,7 +1045,8 @@ namespace TrilinosWrappers
   SparsityPattern::range_partitioner() const
   {
     // TODO A dynamic_cast fails here, this is suspicious.
-    const auto &range_map = static_cast<const Epetra_Map &>(graph->RangeMap());
+    const auto &range_map =
+      static_cast<const Epetra_Map &>(graph->RangeMap()); // NOLINT
     return range_map;
   }
 
@@ -1055,7 +1056,8 @@ namespace TrilinosWrappers
   SparsityPattern::row_partitioner() const
   {
     // TODO A dynamic_cast fails here, this is suspicious.
-    const auto &row_map = static_cast<const Epetra_Map &>(graph->RowMap());
+    const auto &row_map =
+      static_cast<const Epetra_Map &>(graph->RowMap()); // NOLINT
     return row_map;
   }
 
@@ -1065,7 +1067,8 @@ namespace TrilinosWrappers
   SparsityPattern::col_partitioner() const
   {
     // TODO A dynamic_cast fails here, this is suspicious.
-    const auto &col_map = static_cast<const Epetra_Map &>(graph->ColMap());
+    const auto &col_map =
+      static_cast<const Epetra_Map &>(graph->ColMap()); // NOLINT
     return col_map;
   }
 
