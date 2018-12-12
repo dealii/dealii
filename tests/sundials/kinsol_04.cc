@@ -46,15 +46,15 @@ main(int argc, char **argv)
 
   if (false)
     {
-      std::ofstream ofile(SOURCE_DIR "/kinsol_02.prm");
+      std::ofstream ofile(SOURCE_DIR "/kinsol_04.prm");
       prm.print_parameters(ofile, ParameterHandler::ShortText);
     }
 
-  std::ifstream ifile(SOURCE_DIR "/kinsol_02.prm");
+  std::ifstream ifile(SOURCE_DIR "/kinsol_04.prm");
   prm.parse_input(ifile);
 
   // Size of the problem
-  unsigned int N = 10;
+  unsigned int N = 1000;
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 
@@ -69,11 +69,28 @@ main(int argc, char **argv)
   kinsol.jacobian_vmult =
     [](const VectorType &rhs, const VectorType &u, VectorType &out) {
       for (auto i = 0u; i < u.size(); ++i)
-        out[i] = 2 * u[i] * rhs[i];
+        out[i] = 2. * u[i] * rhs[i];
     };
 
+
+  VectorType preconditioner(N);
+
+  kinsol.setup_preconditioner = [&preconditioner](const VectorType &u,
+                                                  const VectorType & /*f*/) {
+    preconditioner = u;
+    preconditioner *= 2.;
+  };
+
+  kinsol.solve_preconditioner = [&preconditioner](const VectorType &rhs,
+                                                  VectorType &      out) {
+    for (auto i = 0u; i < rhs.size(); ++i)
+      {
+        out[i] = rhs[i] / preconditioner[i];
+      }
+  };
+
   VectorType v(N);
-  v          = 1.0;
+  v          = N / 2;
   auto niter = kinsol.solve(v);
   deallog << v << std::endl;
   deallog << "Converged in " << niter << " iterations." << std::endl;

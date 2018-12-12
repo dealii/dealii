@@ -228,7 +228,8 @@ namespace SUNDIALS
         picard = KIN_PICARD,
       };
 
-      enum LinearSolver{
+      enum LinearSolver
+      {
         dense,
         gmres,
         fgmres
@@ -273,7 +274,8 @@ namespace SUNDIALS
         const double            dq_relative_error             = 0.0,
         const unsigned int      maximum_beta_failures         = 0,
         const unsigned int      anderson_subspace_size        = 0,
-        const LinearSolver     &linear_solver                 = dense)
+        const LinearSolver      linear_solver                 = dense,
+        const unsigned int      verbosity                     = 0)
         : strategy(strategy)
         , maximum_non_linear_iterations(maximum_non_linear_iterations)
         , function_tolerance(function_tolerance)
@@ -285,6 +287,7 @@ namespace SUNDIALS
         , maximum_beta_failures(maximum_beta_failures)
         , anderson_subspace_size(anderson_subspace_size)
         , linear_solver(linear_solver)
+        , verbosity(verbosity)
       {}
 
       /**
@@ -351,6 +354,10 @@ namespace SUNDIALS
         prm.add_parameter("Function norm stopping tolerance",
                           function_tolerance);
         prm.add_parameter("Scaled step stopping tolerance", step_tolerance);
+        prm.add_parameter("Verbosity",
+                          verbosity,
+                          "Allowed values [0,3]",
+                          Patterns::Integer(0, 3));
 
         prm.enter_subsection("Newton parameters");
         prm.add_parameter("No initial matrix setup", no_init_setup);
@@ -377,8 +384,7 @@ namespace SUNDIALS
         prm.add_parameter("Internal linear solver",
                           linear_solver_str,
                           "Choose among dense|gmres|fgmres",
-                          Patterns::Selection(
-                                  "dense|gmres|fgmres"));
+                          Patterns::Selection("dense|gmres|fgmres"));
         prm.add_action("Internal linear solver", [&](const std::string &value) {
           if (value == "dense")
             linear_solver = dense;
@@ -387,7 +393,7 @@ namespace SUNDIALS
           else if (value == "fgmres")
             linear_solver = fgmres;
           else
-          Assert(false, ExcInternalError());
+            Assert(false, ExcInternalError());
         });
         prm.leave_subsection();
       }
@@ -475,6 +481,11 @@ namespace SUNDIALS
        * Type of interal solver used by Kinsol
        */
       LinearSolver linear_solver;
+
+      /**
+       * Level of verbosity [0,3]
+       */
+      unsigned int verbosity;
     };
 
     /**
@@ -644,20 +655,41 @@ namespace SUNDIALS
     /**
      * A function object that the user may supply to compute jacobian vmult
      */
-    std::function<void(const VectorType &src,
-                       const VectorType &u,
-                       VectorType &out)> jacobian_vmult;
+    std::function<
+      void(const VectorType &src, const VectorType &u, VectorType &out)>
+      jacobian_vmult;
 
     /**
-     * A function object the user may supply to solve $Px=z$ where $P$ is the preconditioner matrix
+     * A function object the user may supply to solve $Px=z$ where $P$ is the
+     * preconditioner matrix. This function is called after the
+     * setup_preconditioner has been called. However, Kinsol tries to minimize
+     * the number of calls to setup_preconditioner.
+     *
+     * Eventually, the user might want to provide just one function to solve the
+     * preconditioner system without the split of setup-solve. In this case, the
+     * user should provide only solve_preconditioner_setup_free.
      */
-    std::function<void(const VectorType &z, VectorType& x)> solve_preconditioner;
+    std::function<void(const VectorType &z, VectorType &x)>
+      solve_preconditioner;
 
     /**
-     * If the user cannot or does not need to assemble a preconditioner matrix, he/she can provide this function
+     * This function is called to assemble the preconditioner. This function is
+     * not called before every call to solve_preconditioner, but just the right
+     * amount of time to let the nonliner solver converge.
      */
-    std::function<void(const VectorType &u, const VectorType& f,
-                       const VectorType& z, VectorType& x)> solve_preconditioner_matrix_free;
+    std::function<void(const VectorType &u, const VectorType &f)>
+      setup_preconditioner;
+
+    /**
+     * If the user doesn't want or cannot split the solution of the precondioner
+     * system into the two steps setup-solve, he/she can simply provide this
+     * function. Note that the matrix-free case fits this situation.
+     */
+    std::function<void(const VectorType &u,
+                       const VectorType &f,
+                       const VectorType &z,
+                       VectorType &      x)>
+      solve_preconditioner_setup_free;
 
     /**
      * Handle KINSOL exceptions.

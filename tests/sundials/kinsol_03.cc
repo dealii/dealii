@@ -66,24 +66,24 @@ main(int argc, char **argv)
     return 0;
   };
 
-  kinsol.jacobian_vmult=[](const VectorType& rhs,
-			   const VectorType& u,
-			   VectorType& out){
-    for(auto i=0u; i<u.size(); ++i)
-      out[i] = 2.*u[i]*rhs[i];
-  };			    
+  kinsol.jacobian_vmult =
+    [](const VectorType &rhs, const VectorType &u, VectorType &out) {
+      for (auto i = 0u; i < u.size(); ++i)
+        out[i] = 2. * u[i] * rhs[i];
+    };
 
-  kinsol.solve_preconditioner_matrix_free = [](const VectorType& u,
- 					       const VectorType& /*f*/,
- 					       const VectorType& rhs,
- 					       VectorType& out){
-  for (auto i=0u; i < u.size(); ++i){
-    out[i] = rhs[i]/(2.*u[i]);
-  }
- };
-  
+  kinsol.solve_preconditioner_setup_free = [](const VectorType &u,
+                                              const VectorType & /*f*/,
+                                              const VectorType &rhs,
+                                              VectorType &      out) {
+    for (auto i = 0u; i < u.size(); ++i)
+      {
+        out[i] = rhs[i] / (2. * u[i]);
+      }
+  };
+
   VectorType v(N);
-  v          = 1.0;
+  v          = N / 2;
   auto niter = kinsol.solve(v);
   deallog << v << std::endl;
   deallog << "Converged in " << niter << " iterations." << std::endl;

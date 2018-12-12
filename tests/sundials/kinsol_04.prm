@@ -7,7 +7,7 @@ subsection Fixed point and Picard parameters
   set Anderson acceleration subspace size = 0
 end
 subsection Linear solver parameter
-  set Internal linear solver = gmres
+  set Internal linear solver = fgmres
 end
 subsection Linesearch parameters
   set Maximum number of beta-condition failures = 0
