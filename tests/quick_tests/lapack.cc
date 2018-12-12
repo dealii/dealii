@@ -112,7 +112,7 @@ main()
   for (unsigned int i = 0; i < A.m(); ++i)
     {
       std::complex<double> lambda = LA.eigenvalue(i);
-      deallog << "Eigenvalues " << (int)(lambda.real() + .0001) << '\t'
-              << (int)(lambda.imag() + .0001) << std::endl;
+      deallog << "Eigenvalues " << static_cast<int>(lambda.real() + .0001)
+              << '\t' << static_cast<int>(lambda.imag() + .0001) << std::endl;
     }
 }
