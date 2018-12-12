@@ -3,8 +3,10 @@ set Maximum number of nonlinear iterations = 200
 set Scaled step stopping tolerance         = 0
 set Solution strategy                      = linesearch
 subsection Fixed point and Picard parameters
-  set Anderson acceleration subspace size = 5
-  set Internal linear solver              = gmres
+  set Anderson acceleration subspace size = 0
+end
+subsection Linear solver parameter
+  set Internal linear solver = gmres
 end
 subsection Linesearch parameters
   set Maximum number of beta-condition failures = 0

@@ -371,6 +371,8 @@ namespace SUNDIALS
         prm.enter_subsection("Fixed point and Picard parameters");
         prm.add_parameter("Anderson acceleration subspace size",
                           anderson_subspace_size);
+        prm.leave_subsection();
+        prm.enter_subsection("Linear solver parameter");
         static std::string linear_solver_str("dense");
         prm.add_parameter("Internal linear solver",
                           linear_solver_str,
