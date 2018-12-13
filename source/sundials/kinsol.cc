@@ -459,7 +459,6 @@ namespace SUNDIALS
                       // as per documentation, other type of preconditioning
                       // (i.e., left, both) are not well supported
                       LS = SUNSPGMR(u_scale, PREC_RIGHT, -1);
-                      AssertKINSOL(status);
                     }
                   else
                     LS = SUNSPGMR(u_scale, PREC_NONE, -1);

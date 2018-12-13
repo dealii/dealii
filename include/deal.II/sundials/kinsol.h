@@ -264,18 +264,18 @@ namespace SUNDIALS
        */
       AdditionalData(
         // Global parameters
-        const SolutionStrategy &strategy                      = linesearch,
-        const unsigned int      maximum_non_linear_iterations = 200,
-        const double            function_tolerance            = 0.0,
-        const double            step_tolerance                = 0.0,
-        const bool              no_init_setup                 = false,
-        const unsigned int      maximum_setup_calls           = 0,
-        const double            maximum_newton_step           = 0.0,
-        const double            dq_relative_error             = 0.0,
-        const unsigned int      maximum_beta_failures         = 0,
-        const unsigned int      anderson_subspace_size        = 0,
-        const LinearSolver      linear_solver                 = dense,
-        const unsigned int      verbosity                     = 0)
+        const SolutionStrategy strategy                      = linesearch,
+        const unsigned int     maximum_non_linear_iterations = 200,
+        const double           function_tolerance            = 0.0,
+        const double           step_tolerance                = 0.0,
+        const bool             no_init_setup                 = false,
+        const unsigned int     maximum_setup_calls           = 0,
+        const double           maximum_newton_step           = 0.0,
+        const double           dq_relative_error             = 0.0,
+        const unsigned int     maximum_beta_failures         = 0,
+        const unsigned int     anderson_subspace_size        = 0,
+        const LinearSolver     linear_solver                 = dense,
+        const unsigned int     verbosity                     = 0)
         : strategy(strategy)
         , maximum_non_linear_iterations(maximum_non_linear_iterations)
         , function_tolerance(function_tolerance)
@@ -653,16 +653,21 @@ namespace SUNDIALS
     std::function<VectorType &()> get_function_scaling;
 
     /**
-     * A function object that the user may supply to compute jacobian vmult
+     * A function object that the user has to supply to use the internal
+     * iterative solvers of KINSOL (e.g., gmres, fgmres). This function computes
+     * matrix-vector product Jacobian times @param [in] src and stores the
+     * result in @param out.
+     * @param u is the value of the dependent variable vector, which is needed
+     * to compute the Jacobian.
      */
     std::function<
-      void(const VectorType &src, const VectorType &u, VectorType &out)>
+      void(const VectorType &u, const VectorType &src, VectorType &out)>
       jacobian_vmult;
 
     /**
      * A function object the user may supply to solve $Px=z$ where $P$ is the
      * preconditioner matrix. This function is called after the
-     * setup_preconditioner has been called. However, Kinsol tries to minimize
+     * setup_preconditioner has been called. However, KINSOL tries to minimize
      * the number of calls to setup_preconditioner.
      *
      * Eventually, the user might want to provide just one function to solve the
@@ -676,6 +681,8 @@ namespace SUNDIALS
      * This function is called to assemble the preconditioner. This function is
      * not called before every call to solve_preconditioner, but just the right
      * amount of time to let the nonliner solver converge.
+     * @param u is the current (scaled) value of the iterate
+     * @param f is the current (scaled) residual
      */
     std::function<void(const VectorType &u, const VectorType &f)>
       setup_preconditioner;
@@ -684,6 +691,13 @@ namespace SUNDIALS
      * If the user doesn't want or cannot split the solution of the precondioner
      * system into the two steps setup-solve, he/she can simply provide this
      * function. Note that the matrix-free case fits this situation.
+     *
+     * @param [in] u is the current (scaled) value of the iterate
+     * @param [in] f is the current (scaled) residual
+     * @param [in] z is the right hand side for the system we have to solve
+     * $Px=z$
+     * @param [out] x is where to store the solution
+     *
      */
     std::function<void(const VectorType &u,
                        const VectorType &f,
