@@ -475,7 +475,10 @@ namespace SUNDIALS
                   break;
 
                 default:
-                  AssertThrow(false, ExcNotImplemented());
+                  AssertThrow(
+                    false,
+                    ExcMessage(
+                      "Supported since version 3.0 of Sundials. Please upgrade your library."));
                   break;
               }
 
