@@ -93,8 +93,8 @@ test(Utilities::CUDA::Handle &cuda_handle)
   CUDAWrappers::SparseMatrix<double> A_dev(cuda_handle, A);
   check_matrix(A, A_dev);
 
-  AssertThrow(A.m() == A_dev.m(), ExcInternalError());
-  AssertThrow(A.n() == A_dev.n(), ExcInternalError());
+  AssertDimension(A.m(), A_dev.m());
+  AssertDimension(A.n(), A_dev.n());
 
   // Multiply by a constant
   A *= 2.;

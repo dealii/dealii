@@ -1350,6 +1350,7 @@ namespace Step44
               tangent_matrix.block(0, 0).frobenius_norm();
 
             (void)tang_mtrx_norm_new;
+            (void)tang_mtrx_norm_old;
             if (ss != 0.0)
               Assert(tang_mtrx_norm_new != tang_mtrx_norm_old,
                      ExcInternalError());
