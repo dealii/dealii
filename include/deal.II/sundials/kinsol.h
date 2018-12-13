@@ -661,7 +661,7 @@ namespace SUNDIALS
      * to compute the Jacobian.
      */
     std::function<
-      void(const VectorType &u, const VectorType &src, VectorType &out)>
+      void(const VectorType &src, const VectorType &u, VectorType &out)>
       jacobian_vmult;
 
     /**
