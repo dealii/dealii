@@ -47,12 +47,14 @@ ARGS="-D DEAL_II_WITH_MUPARSER=OFF -D DEAL_II_WITH_MPI=ON -D CMAKE_EXPORT_COMPIL
 
 # disable performance-inefficient-string-concatenation because we don't care about "a"+to_string(5)+...
 CHECKS="-*,
-        mpi-*,
-        performance-*,
-        -performance-inefficient-string-concatenation,
+        cppcoreguidelines-pro-type-static-cast-downcast,
+        google-readability-casting,
         modernize-use-emplace,
         modernize-deprecated-headers,
-        modernize-use-using"
+        modernize-use-using,
+        mpi-*,
+        performance-*,
+        -performance-inefficient-string-concatenation"
 
 CHECKS="$(echo "${CHECKS}" | tr -d '[:space:]')"
 echo "$CHECKS"

@@ -927,12 +927,12 @@ namespace Step60
       TimerOutput::Scope timer_section(monitor, "Assemble system");
 
       // Embedding stiffness matrix $K$, and the right hand side $G$.
-      MatrixTools::create_laplace_matrix(*space_dh,
-                                         QGauss<spacedim>(2 * space_fe->degree +
-                                                          1),
-                                         stiffness_matrix,
-                                         (const Function<spacedim> *)nullptr,
-                                         constraints);
+      MatrixTools::create_laplace_matrix(
+        *space_dh,
+        QGauss<spacedim>(2 * space_fe->degree + 1),
+        stiffness_matrix,
+        static_cast<const Function<spacedim> *>(nullptr),
+        constraints);
 
       VectorTools::create_right_hand_side(*embedded_mapping,
                                           *embedded_dh,

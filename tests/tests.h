@@ -222,7 +222,7 @@ namespace Testing
     r[k % 32] = nonoverflow_add(r[(k + 32 - 31) % 32], r[(k + 32 - 3) % 32]);
     int ret   = r[k % 32];
     k         = (k + 1) % 32;
-    return (unsigned int)ret >> 1;
+    return static_cast<unsigned int>(ret) >> 1;
   }
 
   // reseed our random number generator
@@ -315,7 +315,7 @@ checksum(const IT &begin, const IT &end)
 
   while (it != end)
     {
-      a = (a + (unsigned char)*it) % 65521;
+      a = (a + static_cast<unsigned char>(*it)) % 65521;
       b = (a + b) % 65521;
       ++it;
     }
