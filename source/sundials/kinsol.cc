@@ -177,7 +177,6 @@ namespace SUNDIALS
       copy(*src_v, v);
       copy(*src_u, u);
 
-
       solver.jacobian_vmult(*src_v, *src_u, *dst_jv);
 
       copy(Jv, *dst_jv);
@@ -249,7 +248,6 @@ namespace SUNDIALS
 
       typename VectorMemory<VectorType>::Pointer src_v(mem);
       solver.reinit_vector(*src_v);
-
 
       copy(*src_v, v);
 
