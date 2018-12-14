@@ -19,6 +19,7 @@
 // general, with and without hanging nodes). It also tests the multithreading
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -52,6 +53,20 @@ template <int dim, int fe_degree>
 void
 test();
 
+template <int dim>
+double
+ConstantCoefficient(const Point<dim> & /*p*/)
+{
+  return 10.;
+}
+
+
+template <int dim>
+double
+VaryingCoefficient(const Point<dim> &p)
+{
+  return 10. / (0.05 + 2. * p.square());
+}
 
 
 template <int dim,
@@ -61,7 +76,9 @@ template <int dim,
           int n_q_points_1d>
 void
 do_test(const DoFHandler<dim> &          dof,
-        const AffineConstraints<double> &constraints)
+        const AffineConstraints<double> &constraints,
+        const unsigned int               n_locally_owned_cells,
+        const bool                       constant_coefficient = true)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
@@ -76,7 +93,10 @@ do_test(const DoFHandler<dim> &          dof,
   mf_data.reinit(mapping, dof, constraints, quad, additional_data);
 
   const unsigned int n_dofs = dof.n_dofs();
-  MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d> mf(mf_data);
+  MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d> mf(
+    mf_data,
+    n_locally_owned_cells * std::pow(n_q_points_1d, dim),
+    constant_coefficient);
   Vector<Number>                         in_host(n_dofs), out_host(n_dofs);
   LinearAlgebra::ReadWriteVector<Number> in(n_dofs), out(n_dofs);
   VectorType                             in_device(n_dofs);
@@ -110,7 +130,7 @@ do_test(const DoFHandler<dim> &          dof,
                             dof.get_fe(),
                             quadrature_formula,
                             update_values | update_gradients |
-                              update_JxW_values);
+                              update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -126,15 +146,22 @@ do_test(const DoFHandler<dim> &          dof,
         fe_values.reinit(cell);
 
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          for (unsigned int i = 0; i < dofs_per_cell; ++i)
-            {
-              for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                cell_matrix(i, j) += ((fe_values.shape_grad(i, q_point) *
-                                         fe_values.shape_grad(j, q_point) +
-                                       10. * fe_values.shape_value(i, q_point) *
-                                         fe_values.shape_value(j, q_point)) *
-                                      fe_values.JxW(q_point));
-            }
+          {
+            const auto coef =
+              constant_coefficient ?
+                ConstantCoefficient<dim>(fe_values.quadrature_point(q_point)) :
+                VaryingCoefficient<dim>(fe_values.quadrature_point(q_point));
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              {
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                  cell_matrix(i, j) +=
+                    ((fe_values.shape_grad(i, q_point) *
+                        fe_values.shape_grad(j, q_point) +
+                      coef * fe_values.shape_value(i, q_point) *
+                        fe_values.shape_value(j, q_point)) *
+                     fe_values.JxW(q_point));
+              }
+          }
 
         cell->get_dof_indices(local_dof_indices);
         constraints.distribute_local_to_global(cell_matrix,
@@ -169,7 +196,7 @@ main()
   {
     deallog.push("2d");
     test<2, 1>();
-    //  test<2, 2>();
+    // test<2, 2>();
     test<2, 3>();
     deallog.pop();
     deallog.push("3d");

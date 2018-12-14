@@ -15,12 +15,7 @@
 
 
 
-// this tests the correctness of MPI-parallel matrix free matrix-vector
-// products by comparing the result with a Trilinos sparse matrix assembled in
-// the usual way. The mesh is distributed among processors (hypercube) and has
-// both hanging nodes (by randomly refining some cells, so the mesh is going
-// to be different when run with different numbers of processors) and
-// Dirichlet boundary conditions
+// Same test as matrix_free_matrix_vector_10 but using varying coefficient
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
@@ -47,6 +42,13 @@
 #include "../tests.h"
 #include "matrix_vector_mf.h"
 
+
+template <int dim>
+double
+VaryingCoefficient(const Point<dim> &p)
+{
+  return 10. / (0.05 + 2. * p.square());
+}
 
 
 template <int dim, int fe_degree>
@@ -121,7 +123,7 @@ test()
                  fe_degree,
                  Number,
                  LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>>
-                                                                mf(mf_data, coef_size);
+                                                                mf(mf_data, coef_size, false);
   LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> in_dev(
     owned_set, MPI_COMM_WORLD);
   LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> out_dev(
@@ -145,7 +147,7 @@ test()
   out_host.import(rw_out, VectorOperation::insert);
 
   // assemble trilinos sparse matrix with
-  // (\nabla v, \nabla u) + (v, 10 * u) for
+  // (\nabla v, \nabla u) + (v, coef * u) for
   // reference
   LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> in_host(
     owned_set, MPI_COMM_WORLD);
@@ -170,7 +172,7 @@ test()
     FEValues<dim> fe_values(dof.get_fe(),
                             quadrature_formula,
                             update_values | update_gradients |
-                              update_JxW_values);
+                              update_quadrature_points | update_JxW_values);
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -187,16 +189,20 @@ test()
           fe_values.reinit(cell);
 
           for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              {
-                for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                  cell_matrix(i, j) +=
-                    ((fe_values.shape_grad(i, q_point) *
-                        fe_values.shape_grad(j, q_point) +
-                      10. * fe_values.shape_value(i, q_point) *
-                        fe_values.shape_value(j, q_point)) *
-                     fe_values.JxW(q_point));
-              }
+            {
+              const auto coef =
+                VaryingCoefficient<dim>(fe_values.quadrature_point(q_point));
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                {
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                    cell_matrix(i, j) +=
+                      ((fe_values.shape_grad(i, q_point) *
+                          fe_values.shape_grad(j, q_point) +
+                        coef * fe_values.shape_value(i, q_point) *
+                          fe_values.shape_value(j, q_point)) *
+                       fe_values.JxW(q_point));
+                }
+            }
 
           cell->get_dof_indices(local_dof_indices);
           constraints.distribute_local_to_global(cell_matrix,

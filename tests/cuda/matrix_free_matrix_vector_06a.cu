@@ -74,5 +74,5 @@ test()
           fe_degree,
           double,
           LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>,
-          fe_degree + 1>(dof, constraints);
+          fe_degree + 1>(dof, constraints, tria.n_active_cells());
 }

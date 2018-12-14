@@ -160,12 +160,21 @@ namespace CUDAWrappers
     __device__ void
     submit_gradient(const gradient_type &grad_in, const unsigned int q_point);
 
+    // clang-format off
     /**
-     * Apply the function @p func on every quadrature point.
+     * Apply the functor @p func on every quadrature point.
+     *
+     * @p func needs to define
+     * \code
+     * __device__ void operator()(
+     *   CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> *fe_eval,
+     *   const unsigned int                                                               q_point) const;
+     * \endcode
      */
-    template <typename functor>
+    // clang-format on
+    template <typename Functor>
     __device__ void
-    apply_quad_point_operations(const functor &func);
+    apply_quad_point_operations(const Functor &func);
 
   private:
     types::global_dof_index *local_to_global;
@@ -427,10 +436,10 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  template <typename functor>
+  template <typename Functor>
   __device__ void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    apply_quad_point_operations(const functor &func)
+    apply_quad_point_operations(const Functor &func)
   {
     const unsigned int q_point =
       (dim == 1 ?
