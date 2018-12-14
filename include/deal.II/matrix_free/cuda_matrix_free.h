@@ -208,13 +208,28 @@ namespace CUDAWrappers
     Data
     get_data(unsigned int color) const;
 
+    // clang-format off
     /**
      * This method runs the loop over all cells and apply the local operation on
      * each element in parallel. @p func is a functor which is applied on each color.
+     *
+     * @p func needs to define
+     * \code
+     * __device__ void operator()(
+     *   const unsigned int                                          cell,
+     *   const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
+     *   CUDAWrappers::SharedData<dim, Number> *                     shared_data,
+     *   const Number *                                              src,
+     *   Number *                                                    dst) const;
+     *   static const unsigned int n_dofs_1d;
+     *   static const unsigned int n_local_dofs;
+     *   static const unsigned int n_q_points;
+     * \endcode
      */
-    template <typename functor, typename VectorType>
+    // clang-format on
+    template <typename Functor, typename VectorType>
     void
-    cell_loop(const functor &   func,
+    cell_loop(const Functor &   func,
               const VectorType &src,
               VectorType &      dst) const;
 
@@ -282,9 +297,9 @@ namespace CUDAWrappers
      * Helper function. Loop over all the cells and apply the functor on each
      * element in parallel. This function is used when MPI is not used.
      */
-    template <typename functor, typename VectorType>
+    template <typename Functor, typename VectorType>
     void
-    serial_cell_loop(const functor &   func,
+    serial_cell_loop(const Functor &   func,
                      const VectorType &src,
                      VectorType &      dst) const;
 
@@ -292,10 +307,10 @@ namespace CUDAWrappers
      * Helper function. Loop over all the cells and apply the functor on each
      * element in parallel. This function is used when MPI is used.
      */
-    template <typename functor>
+    template <typename Functor>
     void
     distributed_cell_loop(
-      const functor &                                                      func,
+      const Functor &                                                      func,
       const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
       LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
 
@@ -304,10 +319,10 @@ namespace CUDAWrappers
      * error. This function exists only because cell_loop needs
      * distributed_cell_loop() to exist for LinearAlgebra::CUDAWrappers::Vector.
      */
-    template <typename functor>
+    template <typename Functor>
     void
     distributed_cell_loop(
-      const functor &                                    func,
+      const Functor &                                    func,
       const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
       LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
 

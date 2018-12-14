@@ -472,34 +472,34 @@ namespace CUDAWrappers
 
 
 
-    template <int dim, typename Number, typename functor>
+    template <int dim, typename Number, typename Functor>
     __global__ void
-    apply_kernel_shmem(functor                                      func,
+    apply_kernel_shmem(Functor                                      func,
                        const typename MatrixFree<dim, Number>::Data gpu_data,
                        const Number *                               src,
                        Number *                                     dst)
     {
       constexpr unsigned int cells_per_block =
-        cells_per_block_shmem(dim, functor::n_dofs_1d - 1);
+        cells_per_block_shmem(dim, Functor::n_dofs_1d - 1);
 
       constexpr unsigned int n_dofs_per_block =
-        cells_per_block * functor::n_local_dofs;
+        cells_per_block * Functor::n_local_dofs;
       constexpr unsigned int n_q_points_per_block =
-        cells_per_block * functor::n_q_points;
+        cells_per_block * Functor::n_q_points;
       // TODO make use of dynamically allocated shared memory
       __shared__ Number values[n_dofs_per_block];
       __shared__ Number gradients[dim][n_q_points_per_block];
 
-      const unsigned int local_cell = threadIdx.x / functor::n_dofs_1d;
+      const unsigned int local_cell = threadIdx.x / Functor::n_dofs_1d;
       const unsigned int cell =
         local_cell + cells_per_block * (blockIdx.x + gridDim.x * blockIdx.y);
 
       Number *gq[dim];
       for (int d = 0; d < dim; ++d)
-        gq[d] = &gradients[d][local_cell * functor::n_q_points];
+        gq[d] = &gradients[d][local_cell * Functor::n_q_points];
 
       SharedData<dim, Number> shared_data(
-        &values[local_cell * functor::n_local_dofs], gq);
+        &values[local_cell * Functor::n_local_dofs], gq);
 
       if (cell < gpu_data.n_cells)
         func(cell, &gpu_data, &shared_data, src, dst);
@@ -741,9 +741,9 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  template <typename functor, typename VectorType>
+  template <typename Functor, typename VectorType>
   void
-  MatrixFree<dim, Number>::cell_loop(const functor &   func,
+  MatrixFree<dim, Number>::cell_loop(const Functor &   func,
                                      const VectorType &src,
                                      VectorType &      dst) const
   {
@@ -971,15 +971,15 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  template <typename functor, typename VectorType>
+  template <typename Functor, typename VectorType>
   void
-  MatrixFree<dim, Number>::serial_cell_loop(const functor &   func,
+  MatrixFree<dim, Number>::serial_cell_loop(const Functor &   func,
                                             const VectorType &src,
                                             VectorType &      dst) const
   {
     // Execute the loop on the cells
     for (unsigned int i = 0; i < n_colors; ++i)
-      internal::apply_kernel_shmem<dim, Number, functor>
+      internal::apply_kernel_shmem<dim, Number, Functor>
         <<<grid_dim[i], block_dim[i]>>>(func,
                                         get_data(i),
                                         src.get_values(),
@@ -989,10 +989,10 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  template <typename functor>
+  template <typename Functor>
   void
   MatrixFree<dim, Number>::distributed_cell_loop(
-    const functor &                                                      func,
+    const Functor &                                                      func,
     const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
     LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
   {
@@ -1005,7 +1005,7 @@ namespace CUDAWrappers
 
     // Execute the loop on the cells
     for (unsigned int i = 0; i < n_colors; ++i)
-      internal::apply_kernel_shmem<dim, Number, functor>
+      internal::apply_kernel_shmem<dim, Number, Functor>
         <<<grid_dim[i], block_dim[i]>>>(func,
                                         get_data(i),
                                         ghosted_src.get_values(),
@@ -1019,10 +1019,10 @@ namespace CUDAWrappers
 
 
   template <int dim, typename Number>
-  template <typename functor>
+  template <typename Functor>
   void
   MatrixFree<dim, Number>::distributed_cell_loop(
-    const functor &,
+    const Functor &,
     const LinearAlgebra::CUDAWrappers::Vector<Number> &,
     LinearAlgebra::CUDAWrappers::Vector<Number> &) const
   {
