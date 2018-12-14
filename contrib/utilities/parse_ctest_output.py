@@ -70,19 +70,22 @@ def parse_revision(dirname):
 
     for test in testing.findall("Test"):
         fail=False
-        if test.attrib['Status']=="failed": fail=True
+        if test.attrib['Status']=="failed":
+            fail=True
         name = test.find('Name').text
         group = name.split('/')[0]
         status = 4
         if fail:
             text = test.find('Results').find('Measurement').find('Value').text
-            if text == None: text=""
+            if text == None:
+                text=""
             failtext = text.encode('utf-8')
             failtextlines = failtext.replace('"','').split('\n')
             failstatustxt = failtextlines[0].split(' ')[-1]
             for i in range(0,len(failtextlines)):
                 failtextlines[i] = failtextlines[i][0:80]
-                if failtextlines[i].startswith('FAILED: '): failtextlines[i]='FAILED: ...'
+                if failtextlines[i].startswith('FAILED: '):
+                    failtextlines[i]='FAILED: ...'
             failtext = '\n'.join(failtextlines[4:min(25,len(failtext))])
             statuslist=['CONFIGURE','BUILD','RUN','DIFF']
             if failstatustxt in statuslist:
