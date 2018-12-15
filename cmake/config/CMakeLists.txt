@@ -247,6 +247,28 @@ ENDFOREACH()
 #
 
 #
+# We need to gather some variables for the regex below to work.
+#
+
+SET(_library_prefixes "")
+IF (CMAKE_SHARED_LIBRARY_PREFIX)
+  LIST(APPEND _library_prefixes ${CMAKE_SHARED_LIBRARY_PREFIX})
+ENDIF()
+IF (CMAKE_STATIC_LIBRARY_PREFIX)
+  LIST(APPEND _library_prefixes ${CMAKE_STATIC_LIBRARY_PREFIX})
+ENDIF()
+STRING(REPLACE ";" "|" _library_prefixes "${_library_prefixes}")
+
+SET(_library_suffixes "")
+IF (CMAKE_SHARED_LIBRARY_SUFFIX)
+  LIST(APPEND _library_suffixes ${CMAKE_SHARED_LIBRARY_SUFFIX})
+ENDIF()
+IF (CMAKE_STATIC_LIBRARY_SUFFIX)
+  LIST(APPEND _library_suffixes ${CMAKE_STATIC_LIBRARY_SUFFIX})
+ENDIF()
+STRING(REPLACE ";" "|" _library_suffixes "${_library_suffixes}")
+
+#
 # Build up the link line from our list of libraries:
 #
 
@@ -283,14 +305,12 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
       ENDIF()
 
       # Recover short name:
-      STRING(REGEX REPLACE
-        "^(${CMAKE_STATIC_LIBRARY_PREFIX}|${CMAKE_SHARED_LIBRARY_PREFIX})"
-        "" _name "${_name}"
-        )
-      STRING(REGEX REPLACE
-        "(${CMAKE_STATIC_LIBRARY_SUFFIX}|${CMAKE_SHARED_LIBRARY_SUFFIX})$"
-        "" _name "${_name}"
-        )
+      IF(_library_prefixes)
+        STRING(REGEX REPLACE "^(${_library_prefixes})" "" _name "${_name}")
+      ENDIF()
+      IF(_library_suffixes)
+        STRING(REGEX REPLACE "(${_library_suffixes})$" "" _name "${_name}")
+      ENDIF()
       SET(_library_string "${_library_string}-l${_name}")
     ENDIF()
 
