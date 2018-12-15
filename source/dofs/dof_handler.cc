@@ -847,7 +847,6 @@ DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
   , faces(nullptr)
   , mg_faces(nullptr)
 {
-  // decide whether we need a sequential or a parallel distributed policy
   if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
         &tria) != nullptr)
     policy =
@@ -856,15 +855,21 @@ DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
         *this);
   else if (dynamic_cast<
              const parallel::distributed::Triangulation<dim, spacedim> *>(
-             &tria) == nullptr)
-    policy =
-      std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
-                               Sequential<DoFHandler<dim, spacedim>>>(*this);
-  else
+             &tria) != nullptr)
     policy =
       std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
                                ParallelDistributed<DoFHandler<dim, spacedim>>>(
         *this);
+  else if (dynamic_cast<
+             const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+             &tria) != nullptr)
+    policy = std_cxx14::make_unique<
+      internal::DoFHandlerImplementation::Policy::ParallelFullyDistributed<
+        DoFHandler<dim, spacedim>>>(*this);
+  else
+    policy =
+      std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
+                               Sequential<DoFHandler<dim, spacedim>>>(*this);
 }
 
 
@@ -913,6 +918,12 @@ DoFHandler<dim, spacedim>::initialize(const Triangulation<dim, spacedim> &t,
       std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
                                ParallelDistributed<DoFHandler<dim, spacedim>>>(
         *this);
+  else if (dynamic_cast<
+             const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+             &t) != nullptr)
+    policy = std_cxx14::make_unique<
+      internal::DoFHandlerImplementation::Policy::ParallelFullyDistributed<
+        DoFHandler<dim, spacedim>>>(*this);
   else
     policy =
       std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
@@ -1252,6 +1263,9 @@ DoFHandler<dim, spacedim>::distribute_dofs(
   // triangulation. it doesn't work
   // correctly yet if it is parallel
   if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+        &*tria) == nullptr &&
+      dynamic_cast<
+        const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
         &*tria) == nullptr)
     block_info_object.initialize(*this, false, true);
 }
@@ -1294,6 +1308,9 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
   // triangulation. it doesn't work
   // correctly yet if it is parallel
   if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
+        &*tria) == nullptr &&
+      dynamic_cast<
+        const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
         &*tria) == nullptr)
     block_info_object.initialize(*this, true, false);
 }
@@ -1354,7 +1371,10 @@ DoFHandler<dim, spacedim>::renumber_dofs(
     }
   else if (dynamic_cast<
              const parallel::distributed::Triangulation<dim, spacedim> *>(
-             &*tria) != nullptr)
+             &*tria) != nullptr &&
+           dynamic_cast<
+             const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
+             &*tria) == nullptr)
     {
       AssertDimension(new_numbers.size(), n_locally_owned_dofs());
     }

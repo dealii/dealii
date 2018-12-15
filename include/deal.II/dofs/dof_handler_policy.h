@@ -253,6 +253,51 @@ namespace internal
          */
         SmartPointer<DoFHandlerType> dof_handler;
       };
+
+      /**
+       * This class implements the policy for operations when we use a
+       * parallel::distributed::Triangulation object.
+       */
+      template <class DoFHandlerType>
+      class ParallelFullyDistributed
+        : public PolicyBase<DoFHandlerType::dimension,
+                            DoFHandlerType::space_dimension>
+      {
+      public:
+        /**
+         * Constructor.
+         * @param dof_handler The DoFHandler object upon which this
+         *   policy class is supposed to work.
+         */
+        ParallelFullyDistributed(DoFHandlerType &dof_handler);
+
+        // documentation is inherited
+        virtual NumberCache
+        distribute_dofs() const override;
+
+        // documentation is inherited
+        virtual std::vector<NumberCache>
+        distribute_mg_dofs() const override;
+
+        // documentation is inherited
+        virtual NumberCache
+        renumber_dofs(const std::vector<types::global_dof_index> &new_numbers)
+          const override;
+
+        // documentation is inherited
+        virtual NumberCache
+        renumber_mg_dofs(const unsigned int level,
+                         const std::vector<types::global_dof_index>
+                           &new_numbers) const override;
+
+      private:
+        /**
+         * The DoFHandler object on which this policy object works.
+         */
+        SmartPointer<DoFHandlerType> dof_handler;
+      };
+
+
     } // namespace Policy
   }   // namespace DoFHandlerImplementation
 } // namespace internal

@@ -63,6 +63,10 @@
 #include <tuple>
 #include <unordered_map>
 
+#ifdef DEAL_II_WITH_METIS
+#  include <metis.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -3017,6 +3021,413 @@ namespace GridTools
           }
       }
   }
+
+
+
+  class Graph
+  {
+  public:
+    std::vector<int> xadj;
+    std::vector<int> adjncy;
+    std::vector<int> weights;
+    int              elements;
+    std::vector<int> parts;
+
+    void
+    print(std::ostream &out);
+  };
+
+  class PartitioningAlgorithm
+  {
+  public:
+    virtual void
+    mesh_to_dual(std::vector<int> &eptr_in,
+                 std::vector<int> &eind_in,
+                 int               ncommon_in,
+                 Graph &           graph_out);
+
+    virtual void
+    partition(Graph &graph, int n_partitions, bool is_prepartitioned = false);
+  };
+
+  class MetisPartitioningAlgorithm : public PartitioningAlgorithm
+  {
+  public:
+    void
+    mesh_to_dual(std::vector<int> &eptr_in,
+                 std::vector<int> &eind_in,
+                 int               ncommon_in,
+                 Graph &           graph_out) override;
+
+    void
+    partition(Graph &graph,
+              int    n_partitions,
+              bool   is_prepartitioned = false) override;
+  };
+
+  void
+  Graph::print(std::ostream &out)
+  {
+    std::cout << std::endl;
+    std::cout << "Graph:" << std::endl;
+    for (auto i : xadj)
+      out << i << " ";
+    out << std::endl;
+
+    for (auto i : adjncy)
+      out << i << " ";
+    out << std::endl;
+
+    for (auto i : weights)
+      out << i << " ";
+    out << std::endl;
+
+    out << elements << std::endl;
+
+    for (auto i : parts)
+      out << i << " ";
+    out << std::endl << std::endl;
+  }
+
+  void
+  PartitioningAlgorithm::mesh_to_dual(std::vector<int> & /*eptr_in*/,
+                                      std::vector<int> & /*eind_in*/,
+                                      int /*ncommon_in*/,
+                                      Graph & /*graph_out*/)
+  {}
+
+  void
+  PartitioningAlgorithm::partition(Graph & /*graph*/,
+                                   int /*n_partitions*/,
+                                   bool /*is_prepartitioned*/)
+  {}
+
+  void
+  MetisPartitioningAlgorithm::mesh_to_dual(std::vector<int> &eptr_in,
+                                           std::vector<int> &eind_in,
+                                           int               ncommon_in,
+                                           Graph &           graph_out)
+  {
+#ifdef DEAL_II_WITH_METIS
+    // extract relevant quantities
+    const unsigned int n_elements = eptr_in.size() - 1;
+    const unsigned int n_nodes =
+      *std::max_element(eind_in.begin(), eind_in.end()) + 1;
+
+    // convert data type
+    idx_t              numflag = 0;
+    idx_t              ne      = n_elements;
+    idx_t              nn      = n_nodes;
+    idx_t              ncommon = ncommon_in;
+    std::vector<idx_t> eptr    = eptr_in;
+    std::vector<idx_t> eind    = eind_in;
+    ;
+
+    // perform actual conversion from mesh to dual graph
+    idx_t *xadj;
+    idx_t *adjncy;
+    AssertThrow(
+      METIS_MeshToDual(
+        &ne, &nn, &eptr[0], &eind[0], &ncommon, &numflag, &xadj, &adjncy) ==
+        METIS_OK,
+      ExcMessage("There has been problem during METIS_MeshToDual."));
+
+    // convert result to the right format
+    auto &xadj_out = graph_out.xadj;
+    xadj_out.resize(n_elements + 1);
+    for (unsigned int i = 0; i < n_elements + 1; i++)
+      xadj_out[i] = xadj[i];
+
+    const unsigned int n_links    = xadj[ne];
+    auto &             adjncy_out = graph_out.adjncy;
+    adjncy_out.resize(n_links);
+    for (unsigned int i = 0; i < n_links; i++)
+      adjncy_out[i] = adjncy[i];
+
+    graph_out.parts.resize(n_elements);
+    graph_out.elements = n_elements;
+
+    // delete temporal variables
+    AssertThrow(METIS_Free(xadj) == METIS_OK,
+                ExcMessage("There has been problem during METIS_Free."));
+    AssertThrow(METIS_Free(adjncy) == METIS_OK,
+                ExcMessage("There has been problem during METIS_Free."));
+#else
+    AssertThrow(false,
+                ExcMessage("deal.II hase not been compiled with Metis."));
+    (void)eptr_in;
+    (void)eind_in;
+    (void)ncommon_in;
+    (void)graph_out;
+#endif
+  }
+
+  void
+  MetisPartitioningAlgorithm::partition(Graph &graph,
+                                        int    n_partitions,
+                                        bool   is_prepartitioned)
+  {
+#ifdef DEAL_II_WITH_METIS
+    idx_t ne   = graph.elements;
+    idx_t ncon = 1;
+    idx_t edgecut;
+    idx_t nparts = n_partitions;
+
+    std::vector<idx_t> xadj   = graph.xadj;
+    std::vector<idx_t> adjncy = graph.adjncy;
+    std::vector<idx_t> parts(graph.elements);
+
+    int status = METIS_OK;
+
+    if (n_partitions == 1)
+      {
+        for (unsigned int i = 0; i < parts.size(); i++)
+          parts[i] = 0;
+      }
+    else if (is_prepartitioned)
+      {
+        std::vector<idx_t> adjwgt(adjncy.size());
+
+        // check if edge is connecting
+        for (unsigned int i = 0; i < xadj.size() - 1; i++)
+          for (int j = graph.xadj[i]; j < graph.xadj[i + 1]; j++)
+            if (graph.parts[i] == graph.parts[graph.adjncy[j]])
+              adjwgt[j] = 10;
+            else
+              adjwgt[j] = 1;
+
+        status = METIS_PartGraphRecursive(&ne,
+                                          &ncon,
+                                          &xadj[0],
+                                          &adjncy[0],
+                                          NULL,
+                                          NULL,
+                                          &adjwgt[0],
+                                          &nparts,
+                                          NULL,
+                                          NULL,
+                                          NULL,
+                                          &edgecut,
+                                          &parts[0]);
+      }
+    else
+      {
+        idx_t options[METIS_NOPTIONS];
+        METIS_SetDefaultOptions(options);
+        //          options[METIS_OPTION_MINCONN] = 1;
+        //          options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL;
+        //          options[METIS_OPTION_NCUTS] = 10;
+        //          options[METIS_OPTION_UFACTOR] = 1;
+        //          options[METIS_OPTION_DBGLVL] = 1;
+        status = METIS_PartGraphRecursive(&ne,
+                                          &ncon,
+                                          &xadj[0],
+                                          &adjncy[0],
+                                          NULL,
+                                          NULL,
+                                          NULL,
+                                          &nparts,
+                                          NULL,
+                                          NULL,
+                                          options,
+                                          &edgecut,
+                                          &parts[0]);
+      }
+
+    AssertThrow(status == METIS_OK,
+                ExcMessage("Partitioning with Metis was not successful."));
+
+    graph.parts = parts;
+#else
+    AssertThrow(false,
+                ExcMessage("deal.II hase not been compiled with Metis."));
+    (void)graph;
+    (void)n_partitions;
+#endif
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  shared_partition_triangulation(dealii::Triangulation<dim, spacedim> &tria,
+                                 AdditionalData additional_data)
+  {
+    const unsigned int size_all    = additional_data.size_all;
+    const unsigned int size_groups = additional_data.size_groups;
+    const unsigned int size_node   = additional_data.size_node;
+
+    // retrieve number of refinements from triangulation and send number
+    // of refinements
+    std::vector<int> eind, eptr;
+    eptr.push_back(0);
+
+    // Step 2: extract mesh from triangulation
+    std::map<unsigned int, unsigned int> periodic_map;
+    for (auto cell : tria.active_cell_iterators())
+      {
+        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; i++)
+          {
+            if (cell->has_periodic_neighbor(i))
+              {
+                auto face_t = cell->face(i);
+                auto face_n = cell->periodic_neighbor(i)->face(
+                  cell->periodic_neighbor_face_no(i));
+                for (unsigned int j = 0;
+                     j < GeometryInfo<dim>::vertices_per_face;
+                     j++)
+                  {
+                    auto         v_t  = face_t->vertex_index(j);
+                    auto         v_n  = face_n->vertex_index(j);
+                    unsigned int temp = std::min(v_t, v_n);
+                    {
+                      auto it = periodic_map.find(v_t);
+                      if (it != periodic_map.end())
+                        temp = std::min(temp, it->second);
+                    }
+                    {
+                      auto it = periodic_map.find(v_n);
+                      if (it != periodic_map.end())
+                        temp = std::min(temp, it->second);
+                    }
+                    periodic_map[v_t] = temp;
+                    periodic_map[v_n] = temp;
+                  }
+              }
+          }
+      }
+
+    for (auto p : periodic_map)
+      {
+        if (p.first == p.second)
+          continue;
+        auto pp = periodic_map.find(p.second);
+        if (pp->first == pp->second)
+          continue;
+        AssertThrow(false, ExcMessage("Map has to be compressed!"));
+      }
+
+    std::map<unsigned int, unsigned int> temp_map;
+    for (auto cell : tria.active_cell_iterators())
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; i++)
+        {
+          auto pp = periodic_map.find(cell->vertex_index(i));
+          if (pp != periodic_map.end() && (pp->first != pp->second))
+            continue;
+          temp_map[cell->vertex_index(i)] = -1;
+        }
+
+    int c = 0;
+    for (auto &m : temp_map)
+      m.second = c++;
+
+    for (auto cell : tria.active_cell_iterators())
+      {
+        for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; i++)
+          {
+            if (temp_map.find(cell->vertex_index(i)) != temp_map.end())
+              eind.push_back(temp_map[cell->vertex_index(i)]);
+            else
+              {
+                eind.push_back(temp_map[periodic_map[cell->vertex_index(i)]]);
+              }
+          }
+        eptr.push_back(GeometryInfo<dim>::vertices_per_cell + eptr.back());
+      }
+
+    Graph graph_vertex;
+
+    // select a partitioner
+    std::shared_ptr<PartitioningAlgorithm> partitioner;
+
+    if (additional_data.partition_type == PartitioningType::metis)
+      partitioner.reset(new MetisPartitioningAlgorithm());
+    else
+      AssertThrow(false, ExcMessage("No partitioner has been selected."));
+
+    // Step 3: create dual graph with connectivity on vertices
+    partitioner->mesh_to_dual(eptr, eind, 1, graph_vertex);
+
+    auto compress = [](const Graph &graph_in) {
+      Graph graph_out;
+
+      auto n_parts =
+        *std::max_element(graph_in.parts.begin(), graph_in.parts.end()) + 1;
+      std::vector<std::map<unsigned int, unsigned int>> temp(n_parts);
+
+      for (unsigned int i = 0; i < graph_in.xadj.size() - 1; i++)
+        {
+          for (int j = graph_in.xadj[i]; j < graph_in.xadj[i + 1]; j++)
+            temp[graph_in.parts[i]][graph_in.parts[graph_in.adjncy[j]]] = 0;
+        }
+
+      for (unsigned int i = 0; i < graph_in.xadj.size() - 1; i++)
+        {
+          for (int j = graph_in.xadj[i]; j < graph_in.xadj[i + 1]; j++)
+            if (graph_in.weights.size() == 0)
+              temp[graph_in.parts[i]][graph_in.parts[graph_in.adjncy[j]]]++;
+            else
+              temp[graph_in.parts[i]][graph_in.parts[graph_in.adjncy[j]]] +=
+                graph_in.weights[j];
+        }
+
+      graph_out.elements = n_parts;
+
+      graph_out.xadj.push_back(0);
+
+      for (auto &t : temp)
+        {
+          graph_out.xadj.push_back(graph_out.xadj.back() + t.size());
+          for (auto &tt : t)
+            {
+              graph_out.adjncy.push_back(tt.first);
+              graph_out.weights.push_back(tt.second);
+            }
+        }
+
+      return graph_out;
+    };
+
+    // Step 4a: perform partitioning on finest level
+    // create dual graph with connectivity on faces
+    Graph graph_face;
+    partitioner->mesh_to_dual(eptr,
+                              eind,
+                              GeometryInfo<dim>::vertices_per_face,
+                              graph_face);
+    partitioner->partition(graph_face, size_all, false);
+
+    auto g1 = compress(graph_face);
+    partitioner->partition(g1, size_groups, false);
+
+    auto g2 = compress(g1);
+    partitioner->partition(g2, size_node, false);
+
+    // re-numerate ranks
+    std::map<std::pair<unsigned int, unsigned int>, std::set<unsigned int>>
+      sets;
+    for (unsigned int i = 0; i < g1.parts.size(); i++)
+      sets[{g2.parts[g1.parts[i]], g1.parts[i]}] = std::set<unsigned int>();
+
+    for (unsigned int i = 0; i < g1.parts.size(); i++)
+      sets[{g2.parts[g1.parts[i]], g1.parts[i]}].insert(i);
+
+    unsigned int     k = 0;
+    std::vector<int> re_order(g1.parts.size());
+    for (auto &set : sets)
+      for (auto s : set.second)
+        re_order[s] = k++;
+
+    for (unsigned int i = 0; i < graph_face.parts.size(); i++)
+      graph_face.parts[i] = re_order[graph_face.parts[i]];
+
+    // save partitioning
+    graph_vertex.parts = graph_face.parts;
+
+    auto ptr = graph_vertex.parts.begin();
+    for (auto cell : tria.active_cell_iterators())
+      cell->set_subdomain_id(*ptr++);
+  }
+
 
 
   template <int dim, int spacedim>

@@ -22,6 +22,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/timer.h>
 
 #include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/tria_base.h>
@@ -64,8 +65,10 @@ namespace internal
     {
       template <typename>
       class ParallelDistributed;
-    }
-  } // namespace DoFHandlerImplementation
+      template <typename>
+      class ParallelFullyDistributed;
+    } // namespace Policy
+  }   // namespace DoFHandlerImplementation
 } // namespace internal
 
 namespace FETools
@@ -1388,7 +1391,6 @@ namespace parallel
   } // namespace distributed
 } // namespace parallel
 
-
 #else // DEAL_II_WITH_P4EST
 
 namespace parallel
@@ -1421,6 +1423,162 @@ namespace parallel
 
 
 #endif
+
+struct Part_
+{
+  Part_()
+  {}
+
+  Part_(CellId::binary_type index,
+        unsigned int        subdomain_id,
+        unsigned int        level_subdomain_id)
+    : index(index)
+    , subdomain_id(subdomain_id)
+    , level_subdomain_id(level_subdomain_id){};
+
+  CellId::binary_type index;
+  unsigned int        subdomain_id;
+  unsigned int        level_subdomain_id;
+};
+
+class Part
+{
+public:
+  std::vector<Part_> cells;
+};
+
+namespace parallel
+{
+  namespace fullydistributed
+  {
+    template <int dim, int spacedim>
+    struct ConstructionData
+    {
+      // information describing the local part of the coarse grid
+      std::vector<CellData<dim>>      cells;
+      std::vector<Point<spacedim>>    vertices;
+      std::vector<types::boundary_id> boundary_ids;
+
+      // information
+      std::map<int, int> coarse_lid_to_gid;
+
+      // information describing how to constuct the levels
+      std::vector<Part> parts;
+    };
+
+    template <int dim, int spacedim = dim>
+    class Triangulation : public dealii::parallel::Triangulation<dim, spacedim>
+    {
+    public:
+      typedef typename dealii::Triangulation<dim, spacedim>::cell_iterator
+        cell_iterator;
+
+      typedef
+        typename dealii::Triangulation<dim, spacedim>::active_cell_iterator
+          active_cell_iterator;
+
+      typedef
+        typename dealii::Triangulation<dim, spacedim>::CellStatus CellStatus;
+
+      void
+      reinit(ConstructionData<dim, spacedim> &construction_data);
+
+      virtual void
+      create_triangulation(const std::vector<Point<spacedim>> &vertices,
+                           const std::vector<CellData<dim>> &  cells,
+                           const SubCellData &subcelldata) override;
+
+
+      enum Settings
+      {
+        /**
+         * Default settings, other options are disabled.
+         */
+        default_setting = 0x0,
+        /**
+         * This flags needs to be set to use the geometric multigrid
+         * functionality. This option requires additional computation and
+         * communication. Note: geometric multigrid is still a work in
+         * progress.
+         */
+        construct_multigrid_hierarchy = 0x1
+      };
+
+
+      Triangulation(MPI_Comm mpi_communicator,
+                    Settings settings_ = default_setting);
+
+      Triangulation(MPI_Comm mpi_communicator,
+                    MPI_Comm mpi_communicator_coarse,
+                    Settings settings_ = default_setting);
+
+      virtual ~Triangulation();
+
+      virtual void
+      clear() override;
+
+      void
+      copy_local_forest_to_triangulation();
+
+      virtual void
+      execute_coarsening_and_refinement() override;
+
+      virtual bool
+      prepare_coarsening_and_refinement() override;
+
+      virtual bool
+      has_hanging_nodes() const override;
+
+      virtual std::size_t
+      memory_consumption() const override;
+
+      virtual std::size_t
+      memory_consumption_p4est() const;
+
+      virtual void
+      add_periodicity(
+        const std::vector<GridTools::PeriodicFacePair<cell_iterator>> &)
+        override;
+
+      virtual void
+      update_number_cache() override;
+
+      virtual std::map<unsigned int, std::set<dealii::types::subdomain_id>>
+      compute_vertices_with_ghost_neighbors() const override;
+
+      bool
+      do_construct_multigrid_hierarchy() const;
+
+      MPI_Comm
+      get_coarse_communicator() const;
+
+      const std::map<int, int> &
+      get_coarse_lid_to_gid() const;
+
+      const std::map<int, int> &
+      get_coarse_gid_to_lid() const;
+
+    private:
+      /**
+       * store the Settings.
+       */
+      Settings settings;
+
+      template <typename>
+      friend class dealii::internal::DoFHandlerImplementation::Policy::
+        ParallelFullyDistributed;
+
+      template <int, int, class>
+      friend class dealii::FETools::internal::ExtrapolateImplementation;
+
+      std::map<int, int> coarse_gid_to_lid;
+      std::map<int, int> coarse_lid_to_gid;
+
+      MPI_Comm mpi_communicator_coarse;
+    };
+
+  } // namespace fullydistributed
+} // namespace parallel
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -251,6 +251,10 @@ namespace parallel
         this->number_cache.level_ghost_owners.insert(
           cell->level_subdomain_id());
 
+        //    for(auto i : this->number_cache.level_ghost_owners)
+        //        std::cout << i << " ";
+        //    std::cout << std::endl;
+
 #  ifdef DEBUG
     // Check that level_ghost_owners is symmetric by sending a message to
     // everyone

@@ -294,6 +294,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         Triangulation<deal_II_dimension, deal_II_space_dimension> &);
 
       template void
+      shared_partition_triangulation(
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        AdditionalData additional_data);
+
+      template void
       get_subdomain_association(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<types::subdomain_id> &);

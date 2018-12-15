@@ -2063,8 +2063,8 @@ namespace GridTools
     Assert(0 <= direction && direction < space_dim,
            ExcIndexRange(direction, 0, space_dim));
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+    // Assert(pairs1.size() == pairs2.size(),
+    //        ExcMessage("Unmatched faces on periodic boundaries"));
 
     unsigned int n_matches = 0;
 
@@ -2101,8 +2101,8 @@ namespace GridTools
       }
 
     // Assure that all faces are matched
-    AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
-                ExcMessage("Unmatched faces on periodic boundaries"));
+    // AssertThrow(n_matches == pairs1.size() && pairs2.size() == 0,
+    //            ExcMessage("Unmatched faces on periodic boundaries"));
   }
 
 
@@ -2237,13 +2237,14 @@ namespace GridTools
           }
       }
 
-    Assert(pairs1.size() == pairs2.size(),
-           ExcMessage("Unmatched faces on periodic boundaries"));
+    // Assert(pairs1.size() == pairs2.size(),
+    //       ExcMessage("Unmatched faces on periodic boundaries"));
 
-    Assert(pairs1.size() > 0,
-           ExcMessage("No new periodic face pairs have been found. "
-                      "Are you sure that you've selected the correct boundary "
-                      "id's and that the coarsest level mesh is colorized?"));
+    // Assert(pairs1.size() > 0,
+    //       ExcMessage("No new periodic face pairs have been found. "
+    //                  "Are you sure that you've selected the correct boundary
+    //                  " "id's and that the coarsest level mesh is
+    //                  colorized?"));
 
     // and call match_periodic_face_pairs that does the actual matching:
     match_periodic_face_pairs(

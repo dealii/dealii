@@ -950,8 +950,9 @@ namespace
     Assert(face_1->at_boundary() && face_2->at_boundary(),
            ExcMessage("Periodic faces must be on the boundary"));
 
+    if (std::abs(cell_1->level() - cell_2->level()) > 1)
+      return;
     Assert(std::abs(cell_1->level() - cell_2->level()) < 2, ExcInternalError());
-
     // insert periodic face pair for both cells
     using CellFace =
       std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
@@ -967,6 +968,35 @@ namespace
     // Only one periodic neighbor is allowed
     Assert(periodic_face_map.count(cell_face_1) == 0, ExcInternalError());
     periodic_face_map.insert(periodic_faces);
+
+    if (dim == 1)
+      {
+        if (cell_1->has_children())
+          {
+            if (cell_2->has_children())
+              {
+                update_periodic_face_map_recursively<dim, spacedim>(
+                  cell_1->child(n_face_1),
+                  cell_2->child(n_face_2),
+                  n_face_1,
+                  n_face_2,
+                  orientation,
+                  periodic_face_map);
+              }
+            else // only face_1 has children
+              {
+                update_periodic_face_map_recursively<dim, spacedim>(
+                  cell_1->child(n_face_1),
+                  cell_2,
+                  n_face_1,
+                  n_face_2,
+                  orientation,
+                  periodic_face_map);
+              }
+          }
+
+        return;
+      }
 
     // A lookup table on how to go through the child cells depending on the
     // orientation:
@@ -1825,9 +1855,10 @@ namespace internal
           // nodes (for example a
           // ring of cells -- no end
           // points at all)
-          AssertThrow(((spacedim == 1) && (boundary_nodes == 2)) ||
-                        (spacedim > 1),
-                      ExcMessage("The Triangulation has too many end points"));
+          // AssertThrow(((spacedim == 1) && (boundary_nodes == 2)) ||
+          //              (spacedim > 1),
+          //            ExcMessage("The Triangulation has too many end
+          //            points"));
         }
 
 
