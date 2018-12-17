@@ -546,90 +546,47 @@ namespace DoFTools
     } // namespace
 
 
-    template <typename number>
-    void
-    make_hp_hanging_node_constraints(const dealii::DoFHandler<1> &,
-                                     AffineConstraints<number> &)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
 
-
-    template <typename number>
-    void
-    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1> &,
-                                           AffineConstraints<number> &,
-                                           std::integral_constant<int, 1>)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    template <typename number>
+    template <typename number, int spacedim>
     void
     make_hp_hanging_node_constraints(
-      const dealii::hp::DoFHandler<1> & /*dof_handler*/,
+      const dealii::hp::DoFHandler<1, spacedim> & /*dof_handler*/,
       AffineConstraints<number> & /*constraints*/)
     {
-      // we may have to compute constraints for vertices. gotta think about that
-      // a bit more
-
-      // TODO[WB]: think about what to do here...
+      // nothing to do for dof handlers in 1d
     }
 
 
-    template <typename number>
+    template <typename number, int spacedim>
     void
     make_oldstyle_hanging_node_constraints(
-      const dealii::hp::DoFHandler<1> & /*dof_handler*/,
+      const dealii::hp::DoFHandler<1, spacedim> & /*dof_handler*/,
       AffineConstraints<number> & /*constraints*/,
       std::integral_constant<int, 1>)
     {
-      // we may have to compute constraints for vertices. gotta think about that
-      // a bit more
-
-      // TODO[WB]: think about what to do here...
+      // nothing to do for dof handlers in 1d
     }
 
 
-    template <typename number>
+    template <typename number, int spacedim>
     void
-    make_hp_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
-                                     AffineConstraints<number> &)
+    make_hp_hanging_node_constraints(
+      const dealii::DoFHandler<1, spacedim> & /*dof_handler*/,
+      AffineConstraints<number> & /*constraints*/)
     {
-      // nothing to do for regular dof handlers in 1d
+      // nothing to do for dof handlers in 1d
     }
 
 
-    template <typename number>
+    template <typename number, int spacedim>
     void
-    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
-                                           AffineConstraints<number> &,
-                                           std::integral_constant<int, 1>)
+    make_oldstyle_hanging_node_constraints(
+      const dealii::DoFHandler<1, spacedim> & /*dof_handler*/,
+      AffineConstraints<number> & /*constraints*/,
+      std::integral_constant<int, 1>)
     {
-      // nothing to do for regular dof handlers in 1d
+      // nothing to do for dof handlers in 1d
     }
-
-
-    template <typename number>
-    void
-    make_hp_hanging_node_constraints(const dealii::DoFHandler<1, 3> &,
-                                     AffineConstraints<number> &)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
-    template <typename number>
-    void
-    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1, 3> &,
-                                           AffineConstraints<number> &,
-                                           std::integral_constant<int, 1>)
-    {
-      // nothing to do for regular dof handlers in 1d
-    }
-
-
 
     template <typename DoFHandlerType, typename number>
     void
