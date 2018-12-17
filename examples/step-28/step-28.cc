@@ -517,7 +517,7 @@ namespace Step28
       const EnergyGroup<dim> &                       g_prime,
       const typename DoFHandler<dim>::cell_iterator &cell_g,
       const typename DoFHandler<dim>::cell_iterator &cell_g_prime,
-      const FullMatrix<double>                       prolongation_matrix);
+      const FullMatrix<double> &                     prolongation_matrix);
   };
 
 
@@ -849,7 +849,7 @@ namespace Step28
     const EnergyGroup<dim> &                       g_prime,
     const typename DoFHandler<dim>::cell_iterator &cell_g,
     const typename DoFHandler<dim>::cell_iterator &cell_g_prime,
-    const FullMatrix<double>                       prolongation_matrix)
+    const FullMatrix<double> &                     prolongation_matrix)
   {
     // The first case is that both cells are no further refined. In that case,
     // we can assemble the relevant terms (see the introduction). This
