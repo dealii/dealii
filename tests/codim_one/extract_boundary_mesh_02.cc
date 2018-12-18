@@ -62,13 +62,10 @@ test_vertices_orientation(
       for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
         deallog << "  " << face->vertex(k) << std::endl;
 
-      for (unsigned int k = 0; k < GeometryInfo<s_dim>::vertices_per_cell; ++k)
-        {
-          Point<spacedim> diff(face->vertex(k));
-          diff -= cell->vertex(k);
-          AssertThrow(diff.square() < 1.e-15 * face->vertex(k).square(),
-                      ExcInternalError());
-        }
+      Point<spacedim> diff(face->center());
+      diff -= cell->center();
+      AssertThrow(diff.square() < 1.e-15 * face->center().square(),
+                  ExcInternalError());
     }
 }
 

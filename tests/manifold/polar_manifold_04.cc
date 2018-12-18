@@ -48,7 +48,8 @@ test(unsigned int ref = 1)
 
   for (cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
-      if (cell->center().distance(Point<spacedim>()) < 1e-10)
+      if ((fabs(cell->center()[0]) < 1e-10) &&
+          (fabs(cell->center()[1]) < 1e-10))
         cell->set_all_manifold_ids(0);
     }
 
