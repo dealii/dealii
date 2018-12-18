@@ -1,0 +1,175 @@
+
+DEAL:0:2d::cells before: 16
+DEAL:0:2d::cellid=0_1:0 vector_size=0 vector_sum=0 refining
+DEAL:0:2d::cellid=0_1:1 vector_size=1 vector_sum=0
+DEAL:0:2d::cellid=0_1:2 vector_size=2 vector_sum=1
+DEAL:0:2d::cellid=0_1:3 vector_size=3 vector_sum=3
+DEAL:0:2d::cellid=1_1:0 vector_size=4 vector_sum=6
+DEAL:0:2d::cellid=1_1:1 vector_size=5 vector_sum=10
+DEAL:0:2d::cellid=1_1:2 vector_size=6 vector_sum=15
+DEAL:0:2d::cellid=1_1:3 vector_size=7 vector_sum=21
+DEAL:0:2d::cells after: 16
+DEAL:0:2d::cellid=0_1:1 vector_size=1 vector_sum=0
+DEAL:0:2d::cellid=0_1:2 vector_size=2 vector_sum=1
+DEAL:0:2d::cellid=0_1:3 vector_size=3 vector_sum=3
+DEAL:0:2d::cellid=0_2:00 vector_size=0 vector_sum=0
+DEAL:0:2d::cellid=0_2:01 vector_size=0 vector_sum=0
+DEAL:0:2d::cellid=0_2:02 vector_size=0 vector_sum=0
+DEAL:0:2d::cellid=0_2:03 vector_size=0 vector_sum=0
+DEAL:0:2d::OK
+DEAL:0:3d::cells before: 64
+DEAL:0:3d::cellid=0_1:0 vector_size=0 vector_sum=0 refining
+DEAL:0:3d::cellid=0_1:1 vector_size=1 vector_sum=0
+DEAL:0:3d::cellid=0_1:2 vector_size=2 vector_sum=1
+DEAL:0:3d::cellid=0_1:3 vector_size=3 vector_sum=3
+DEAL:0:3d::cellid=0_1:4 vector_size=4 vector_sum=6
+DEAL:0:3d::cellid=0_1:5 vector_size=5 vector_sum=10
+DEAL:0:3d::cellid=0_1:6 vector_size=6 vector_sum=15
+DEAL:0:3d::cellid=0_1:7 vector_size=7 vector_sum=21
+DEAL:0:3d::cellid=1_1:0 vector_size=8 vector_sum=28
+DEAL:0:3d::cellid=1_1:1 vector_size=9 vector_sum=36
+DEAL:0:3d::cellid=1_1:2 vector_size=10 vector_sum=45
+DEAL:0:3d::cellid=1_1:3 vector_size=11 vector_sum=55
+DEAL:0:3d::cellid=1_1:4 vector_size=12 vector_sum=66
+DEAL:0:3d::cellid=1_1:5 vector_size=13 vector_sum=78
+DEAL:0:3d::cellid=1_1:6 vector_size=14 vector_sum=91
+DEAL:0:3d::cellid=1_1:7 vector_size=15 vector_sum=105
+DEAL:0:3d::cellid=2_1:0 vector_size=16 vector_sum=120
+DEAL:0:3d::cellid=2_1:1 vector_size=17 vector_sum=136
+DEAL:0:3d::cellid=2_1:2 vector_size=18 vector_sum=153
+DEAL:0:3d::cellid=2_1:3 vector_size=19 vector_sum=171
+DEAL:0:3d::cellid=2_1:4 vector_size=20 vector_sum=190
+DEAL:0:3d::cellid=2_1:5 vector_size=21 vector_sum=210
+DEAL:0:3d::cellid=2_1:6 vector_size=22 vector_sum=231
+DEAL:0:3d::cellid=2_1:7 vector_size=23 vector_sum=253
+DEAL:0:3d::cellid=3_1:0 vector_size=24 vector_sum=276
+DEAL:0:3d::cellid=3_1:1 vector_size=25 vector_sum=300
+DEAL:0:3d::cellid=3_1:2 vector_size=26 vector_sum=325
+DEAL:0:3d::cellid=3_1:3 vector_size=27 vector_sum=351
+DEAL:0:3d::cellid=3_1:4 vector_size=28 vector_sum=378
+DEAL:0:3d::cellid=3_1:5 vector_size=29 vector_sum=406
+DEAL:0:3d::cellid=3_1:6 vector_size=30 vector_sum=435
+DEAL:0:3d::cellid=3_1:7 vector_size=31 vector_sum=465
+DEAL:0:3d::cells after: 64
+DEAL:0:3d::cellid=0_1:1 vector_size=1 vector_sum=0
+DEAL:0:3d::cellid=0_1:2 vector_size=2 vector_sum=1
+DEAL:0:3d::cellid=0_1:3 vector_size=3 vector_sum=3
+DEAL:0:3d::cellid=0_1:4 vector_size=4 vector_sum=6
+DEAL:0:3d::cellid=0_1:5 vector_size=5 vector_sum=10
+DEAL:0:3d::cellid=0_1:6 vector_size=6 vector_sum=15
+DEAL:0:3d::cellid=0_1:7 vector_size=7 vector_sum=21
+DEAL:0:3d::cellid=1_1:0 vector_size=8 vector_sum=28
+DEAL:0:3d::cellid=1_1:1 vector_size=9 vector_sum=36
+DEAL:0:3d::cellid=1_1:2 vector_size=10 vector_sum=45
+DEAL:0:3d::cellid=1_1:3 vector_size=11 vector_sum=55
+DEAL:0:3d::cellid=1_1:4 vector_size=12 vector_sum=66
+DEAL:0:3d::cellid=1_1:5 vector_size=13 vector_sum=78
+DEAL:0:3d::cellid=1_1:6 vector_size=14 vector_sum=91
+DEAL:0:3d::cellid=1_1:7 vector_size=15 vector_sum=105
+DEAL:0:3d::cellid=2_1:0 vector_size=16 vector_sum=120
+DEAL:0:3d::cellid=2_1:1 vector_size=17 vector_sum=136
+DEAL:0:3d::cellid=2_1:2 vector_size=18 vector_sum=153
+DEAL:0:3d::cellid=2_1:3 vector_size=19 vector_sum=171
+DEAL:0:3d::cellid=2_1:4 vector_size=20 vector_sum=190
+DEAL:0:3d::cellid=2_1:5 vector_size=21 vector_sum=210
+DEAL:0:3d::cellid=2_1:6 vector_size=22 vector_sum=231
+DEAL:0:3d::cellid=2_1:7 vector_size=23 vector_sum=253
+DEAL:0:3d::cellid=0_2:00 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:01 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:02 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:03 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:04 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:05 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:06 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:07 vector_size=0 vector_sum=0
+DEAL:0:3d::OK
+
+DEAL:1:2d::cells before: 16
+DEAL:1:2d::cellid=2_1:0 vector_size=0 vector_sum=0
+DEAL:1:2d::cellid=2_1:1 vector_size=1 vector_sum=0
+DEAL:1:2d::cellid=2_1:2 vector_size=2 vector_sum=1
+DEAL:1:2d::cellid=2_1:3 vector_size=3 vector_sum=3
+DEAL:1:2d::cellid=3_1:0 vector_size=4 vector_sum=6 coarsening
+DEAL:1:2d::cellid=3_1:1 vector_size=5 vector_sum=10 coarsening
+DEAL:1:2d::cellid=3_1:2 vector_size=6 vector_sum=15 coarsening
+DEAL:1:2d::cellid=3_1:3 vector_size=7 vector_sum=21 coarsening
+DEAL:1:2d::cells after: 16
+DEAL:1:2d::cellid=3_0: vector_size=4 vector_sum=6
+DEAL:1:2d::cellid=1_1:0 vector_size=4 vector_sum=6
+DEAL:1:2d::cellid=1_1:1 vector_size=5 vector_sum=10
+DEAL:1:2d::cellid=1_1:2 vector_size=6 vector_sum=15
+DEAL:1:2d::cellid=1_1:3 vector_size=7 vector_sum=21
+DEAL:1:2d::cellid=2_1:0 vector_size=0 vector_sum=0
+DEAL:1:2d::cellid=2_1:1 vector_size=1 vector_sum=0
+DEAL:1:2d::cellid=2_1:2 vector_size=2 vector_sum=1
+DEAL:1:2d::cellid=2_1:3 vector_size=3 vector_sum=3
+DEAL:1:2d::OK
+DEAL:1:3d::cells before: 64
+DEAL:1:3d::cellid=4_1:0 vector_size=0 vector_sum=0
+DEAL:1:3d::cellid=4_1:1 vector_size=1 vector_sum=0
+DEAL:1:3d::cellid=4_1:2 vector_size=2 vector_sum=1
+DEAL:1:3d::cellid=4_1:3 vector_size=3 vector_sum=3
+DEAL:1:3d::cellid=4_1:4 vector_size=4 vector_sum=6
+DEAL:1:3d::cellid=4_1:5 vector_size=5 vector_sum=10
+DEAL:1:3d::cellid=4_1:6 vector_size=6 vector_sum=15
+DEAL:1:3d::cellid=4_1:7 vector_size=7 vector_sum=21
+DEAL:1:3d::cellid=5_1:0 vector_size=8 vector_sum=28
+DEAL:1:3d::cellid=5_1:1 vector_size=9 vector_sum=36
+DEAL:1:3d::cellid=5_1:2 vector_size=10 vector_sum=45
+DEAL:1:3d::cellid=5_1:3 vector_size=11 vector_sum=55
+DEAL:1:3d::cellid=5_1:4 vector_size=12 vector_sum=66
+DEAL:1:3d::cellid=5_1:5 vector_size=13 vector_sum=78
+DEAL:1:3d::cellid=5_1:6 vector_size=14 vector_sum=91
+DEAL:1:3d::cellid=5_1:7 vector_size=15 vector_sum=105
+DEAL:1:3d::cellid=6_1:0 vector_size=16 vector_sum=120
+DEAL:1:3d::cellid=6_1:1 vector_size=17 vector_sum=136
+DEAL:1:3d::cellid=6_1:2 vector_size=18 vector_sum=153
+DEAL:1:3d::cellid=6_1:3 vector_size=19 vector_sum=171
+DEAL:1:3d::cellid=6_1:4 vector_size=20 vector_sum=190
+DEAL:1:3d::cellid=6_1:5 vector_size=21 vector_sum=210
+DEAL:1:3d::cellid=6_1:6 vector_size=22 vector_sum=231
+DEAL:1:3d::cellid=6_1:7 vector_size=23 vector_sum=253
+DEAL:1:3d::cellid=7_1:0 vector_size=24 vector_sum=276 coarsening
+DEAL:1:3d::cellid=7_1:1 vector_size=25 vector_sum=300 coarsening
+DEAL:1:3d::cellid=7_1:2 vector_size=26 vector_sum=325 coarsening
+DEAL:1:3d::cellid=7_1:3 vector_size=27 vector_sum=351 coarsening
+DEAL:1:3d::cellid=7_1:4 vector_size=28 vector_sum=378 coarsening
+DEAL:1:3d::cellid=7_1:5 vector_size=29 vector_sum=406 coarsening
+DEAL:1:3d::cellid=7_1:6 vector_size=30 vector_sum=435 coarsening
+DEAL:1:3d::cellid=7_1:7 vector_size=31 vector_sum=465 coarsening
+DEAL:1:3d::cells after: 64
+DEAL:1:3d::cellid=7_0: vector_size=24 vector_sum=276
+DEAL:1:3d::cellid=3_1:0 vector_size=24 vector_sum=276
+DEAL:1:3d::cellid=3_1:1 vector_size=25 vector_sum=300
+DEAL:1:3d::cellid=3_1:2 vector_size=26 vector_sum=325
+DEAL:1:3d::cellid=3_1:3 vector_size=27 vector_sum=351
+DEAL:1:3d::cellid=3_1:4 vector_size=28 vector_sum=378
+DEAL:1:3d::cellid=3_1:5 vector_size=29 vector_sum=406
+DEAL:1:3d::cellid=3_1:6 vector_size=30 vector_sum=435
+DEAL:1:3d::cellid=3_1:7 vector_size=31 vector_sum=465
+DEAL:1:3d::cellid=4_1:0 vector_size=0 vector_sum=0
+DEAL:1:3d::cellid=4_1:1 vector_size=1 vector_sum=0
+DEAL:1:3d::cellid=4_1:2 vector_size=2 vector_sum=1
+DEAL:1:3d::cellid=4_1:3 vector_size=3 vector_sum=3
+DEAL:1:3d::cellid=4_1:4 vector_size=4 vector_sum=6
+DEAL:1:3d::cellid=4_1:5 vector_size=5 vector_sum=10
+DEAL:1:3d::cellid=4_1:6 vector_size=6 vector_sum=15
+DEAL:1:3d::cellid=4_1:7 vector_size=7 vector_sum=21
+DEAL:1:3d::cellid=5_1:0 vector_size=8 vector_sum=28
+DEAL:1:3d::cellid=5_1:1 vector_size=9 vector_sum=36
+DEAL:1:3d::cellid=5_1:2 vector_size=10 vector_sum=45
+DEAL:1:3d::cellid=5_1:3 vector_size=11 vector_sum=55
+DEAL:1:3d::cellid=5_1:4 vector_size=12 vector_sum=66
+DEAL:1:3d::cellid=5_1:5 vector_size=13 vector_sum=78
+DEAL:1:3d::cellid=5_1:6 vector_size=14 vector_sum=91
+DEAL:1:3d::cellid=5_1:7 vector_size=15 vector_sum=105
+DEAL:1:3d::cellid=6_1:0 vector_size=16 vector_sum=120
+DEAL:1:3d::cellid=6_1:1 vector_size=17 vector_sum=136
+DEAL:1:3d::cellid=6_1:2 vector_size=18 vector_sum=153
+DEAL:1:3d::cellid=6_1:3 vector_size=19 vector_sum=171
+DEAL:1:3d::cellid=6_1:4 vector_size=20 vector_sum=190
+DEAL:1:3d::cellid=6_1:5 vector_size=21 vector_sum=210
+DEAL:1:3d::cellid=6_1:6 vector_size=22 vector_sum=231
+DEAL:1:3d::cellid=6_1:7 vector_size=23 vector_sum=253
+DEAL:1:3d::OK
+
