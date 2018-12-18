@@ -30,7 +30,6 @@
 // This test works on a parallel::distributed::Triangulation.
 
 
-#include <deal.II/distributed/active_fe_indices_transfer.h>
 #include <deal.II/distributed/cell_weights.h>
 #include <deal.II/distributed/tria.h>
 
@@ -66,9 +65,6 @@ test()
   dh.distribute_dofs(fe_collection);
 
 
-  parallel::distributed::ActiveFEIndicesTransfer<dim> feidx_transfer(dh);
-  feidx_transfer.prepare_for_transfer();
-
   parallel::CellWeights<dim> cell_weights(dh);
   cell_weights.register_ndofs_weighting(100000);
 
@@ -85,7 +81,6 @@ test()
 
 
   tria.repartition();
-  feidx_transfer.unpack();
   dh.distribute_dofs(fe_collection);
 
 

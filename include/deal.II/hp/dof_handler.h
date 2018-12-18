@@ -26,6 +26,8 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/template_constraints.h>
 
+#include <deal.II/distributed/cell_data_transfer.templates.h>
+
 #include <deal.II/dofs/deprecated_function_map.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_iterator_selector.h>
@@ -36,6 +38,7 @@
 #include <deal.II/hp/fe_collection.h>
 
 #include <map>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -159,12 +162,23 @@ namespace hp
    * @ref GlossArtificialCell "the glossary entry on artificial cells"
    * for more information.
    *
-   * Using a parallel::distributed::Triangulation with an hp::DoFHandler
-   * requires additional attention during coarsening and refinement, since
-   * no information on active FE indices will be automatically transferred.
-   * This has to be done manually using the
-   * parallel::distributed::ActiveFEIndicesTransfer class. Consult its
-   * documentation for more information.
+   * During refinement and coarsening, information about the @p active_fe_index
+   * of each cell will be automatically transferred.
+   *
+   * However, using a parallel::distributed::Triangulation with an
+   * hp::DoFHandler requires additional attention during serialization, since no
+   * information on active FE indices will be automatically transferred. This
+   * has to be done manually using the
+   * prepare_for_serialization_of_active_fe_indices() and
+   * deserialize_active_fe_indices() functions. The former has to be called
+   * before parallel::distributed::Triangulation::save() is invoked, and the
+   * latter needs to be run after parallel::distributed::Triangulation::load().
+   * If further data will be attached to the triangulation via the
+   * parallel::distributed::CellDataTransfer,
+   * parallel::distributed::SolutionTransfer, or Particles::ParticleHandler
+   * classes, all corresponding preparation and deserialization function calls
+   * need to happen in the same order. Consult the documentation of
+   * parallel::distributed::SolutionTransfer for more information.
    *
    *
    * @ingroup dofs
@@ -885,6 +899,43 @@ namespace hp
     memory_consumption() const;
 
     /**
+     * Whenever serialization with a parallel::distributed::Triangulation as the
+     * underlying triangulation is considered, we also need to consider storing
+     * the active_fe_indices on all active cells as well.
+     *
+     * This function registers that these indices are to be stored whenever the
+     * parallel::distributed::Triangulation::save() function is called on the
+     * underlying triangulation.
+     *
+     * @note Currently only implemented for triangulations of type
+     *   parallel::distributed::Triangulation. An assertion will be triggered if
+     *   a different type is registered.
+     *
+     * @see The documentation of parallel::distributed::SolutionTransfer has further
+     *   information on serialization.
+     */
+    void
+    prepare_for_serialization_of_active_fe_indices();
+
+    /**
+     * Whenever serialization with a parallel::distributed::Triangulation as the
+     * underlying triangulation is considered, we also need to consider storing
+     * the active_fe_indices on all active cells as well.
+     *
+     * This function deserializes and distributes the previously stored
+     * active_fe_indices on all active cells.
+     *
+     * @note Currently only implemented for triangulations of type
+     *   parallel::distributed::Triangulation. An assertion will be triggered if
+     *   a different type is registered.
+     *
+     * @see The documentation of parallel::distributed::SolutionTransfer has further
+     *   information on serialization.
+     */
+    void
+    deserialize_active_fe_indices();
+
+    /**
      * Write the data of this object to a stream for the purpose of
      * serialization.
      */
@@ -1039,17 +1090,70 @@ namespace hp
     post_refinement_action();
 
     /**
-     * Functions that will be triggered through signals whenever the
-     * triangulation is modified, with the restriction that it is not
-     * a parallel::distributed::Triangulation.
+     * A function that will be triggered through a triangulation
+     * signal just before the associated Triangulation is modified.
      *
-     * Here they are used to administrate the active_fe_indices during the
-     * spatial refinement.
+     * The function that stores the active_fe_indices of all cells that will
+     * be refined or coarsened before the refinement happens, so that
+     * they can be set again after refinement.
      */
     void
-    pre_refinement_fe_index_update();
+    pre_active_fe_index_transfer();
+
+    /**
+     * A function that will be triggered through a triangulation
+     * signal just before the associated parallel::shared::Triangulation is
+     * modified.
+     *
+     * The function that stores the active_fe_indices of all cells that will
+     * be refined or coarsened before the refinement happens, so that
+     * they can be set again after refinement.
+     */
     void
-    post_refinement_fe_index_update();
+    pre_shared_active_fe_index_transfer();
+
+    /**
+     * A function that will be triggered through a triangulation
+     * signal just before the associated parallel::distributed::Triangulation is
+     * modified.
+     *
+     * The function that stores all active_fe_indices on locally owned cells for
+     * distribution over all participating processors.
+     */
+    void
+    pre_distributed_active_fe_index_transfer();
+
+    /**
+     * A function that will be triggered through a triangulation
+     * signal just after the associated Triangulation is modified.
+     *
+     * The function that restores the active_fe_indices of all cells that
+     * were refined or coarsened.
+     */
+    void
+    post_active_fe_index_transfer();
+
+    /**
+     * A function that will be triggered through a triangulation
+     * signal just after the associated parallel::shared::Triangulation is
+     * modified.
+     *
+     * The function that restores the active_fe_indices of all cells that
+     * were refined or coarsened.
+     */
+    void
+    post_shared_active_fe_index_transfer();
+
+    /**
+     * A function that will be triggered through a triangulation
+     * signal just after the associated parallel::distributed::Triangulation is
+     * modified.
+     *
+     * The function that restores all active_fe_indices on locally owned cells
+     * that have been communicated.
+     */
+    void
+    post_distributed_active_fe_index_transfer();
 
     /**
      * Space to store the DoF numbers for the different levels. Analogous to
@@ -1119,6 +1223,23 @@ namespace hp
      * parent cells that will remain after coarsening.
      */
     std::map<const cell_iterator, const unsigned int> coarsened_cells_fe_index;
+
+    /**
+     * Container to temporarily store the active_fe_index of every locally
+     * owned cell for transfer across parallel::distributed::Triangulation
+     * objects.
+     */
+    std::vector<unsigned int> active_fe_indices;
+
+    /**
+     * Helper object to transfer all active_fe_indices on
+     * parallel::distributed::Triangulation objects during refinement/coarsening
+     * and serialization.
+     */
+    std::unique_ptr<
+      parallel::distributed::
+        CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>
+      cell_data_transfer;
 
     /**
      * A list of connections with which this object connects to the

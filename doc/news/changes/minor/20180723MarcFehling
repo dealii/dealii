@@ -1,6 +1,0 @@
-New: Class parallel::distributed::ActiveFEIndicesTransfer
-has been introduced to transfer the active_fe_index of each
-cell across meshes in case of refinement/serialization, if a
-hp::DoFHandler has been used with a parallel::distributed::Triangulation.
-<br>
-(Marc Fehling, 2018/07/23)

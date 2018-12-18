@@ -19,7 +19,6 @@
 // This tests is based on mpi/feindices_transfer.cc
 
 
-#include <deal.II/distributed/active_fe_indices_transfer.h>
 #include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
@@ -101,16 +100,12 @@ test()
 
 
   // ----- transfer -----
-  parallel::distributed::ActiveFEIndicesTransfer<dim> feidx_transfer(dh);
   parallel::distributed::
     SolutionTransfer<dim, TrilinosWrappers::MPI::Vector, hp::DoFHandler<dim>>
       soltrans(dh);
 
-  feidx_transfer.prepare_for_transfer();
   soltrans.prepare_for_coarsening_and_refinement(old_solution);
   tria.execute_coarsening_and_refinement();
-
-  feidx_transfer.unpack();
 
   dh.distribute_dofs(fe_collection);
   locally_owned_dofs = dh.locally_owned_dofs();

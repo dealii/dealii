@@ -18,7 +18,6 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_unity_include_src
   grid_refinement.cc
   cell_weights.cc
-  active_fe_indices_transfer.cc
   cell_data_transfer.cc
   solution_transfer.cc
   tria.cc
@@ -42,7 +41,6 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
 SET(_inst
   grid_refinement.inst.in
   cell_weights.inst.in
-  active_fe_indices_transfer.inst.in
   cell_data_transfer.inst.in
   solution_transfer.inst.in
   tria.inst.in
