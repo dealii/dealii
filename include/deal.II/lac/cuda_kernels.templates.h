@@ -552,18 +552,18 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number>
+      template <typename Number, typename IndexType>
       __global__ void
       gather(Number *         val,
              const Number *   v,
-             const size_type *indices,
-             const size_type  N)
+             const IndexType *indices,
+             const IndexType  N)
       {
-        const size_type idx_base =
+        const IndexType idx_base =
           threadIdx.x + blockIdx.x * (blockDim.x * chunk_size);
         for (unsigned int i = 0; i < chunk_size; ++i)
           {
-            const size_type idx = idx_base + i * block_size;
+            const IndexType idx = idx_base + i * block_size;
             if (idx < N)
               val[idx] = v[indices[idx]];
           }

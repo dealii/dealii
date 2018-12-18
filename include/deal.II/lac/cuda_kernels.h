@@ -466,12 +466,12 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
-      template <typename Number>
+      template <typename Number, typename IndexType>
       __global__ void
       gather(Number *         val,
              const Number *   v,
-             const size_type *indices,
-             const size_type  N);
+             const IndexType *indices,
+             const IndexType  N);
 
 
 

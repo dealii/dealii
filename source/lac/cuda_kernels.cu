@@ -115,6 +115,11 @@ namespace LinearAlgebra
                             const size_type *indices,
                             const size_type  N);
       template __global__ void
+      gather(float *          val,
+             const float *    v,
+             const size_type *indices,
+             const size_type  N);
+      template __global__ void
       add_permutated<float>(float *          val,
                             const float *    v,
                             const size_type *indices,
@@ -209,6 +214,11 @@ namespace LinearAlgebra
                              const double *   v,
                              const size_type *indices,
                              const size_type  N);
+      template __global__ void
+      gather(double *         val,
+             const double *   v,
+             const size_type *indices,
+             const size_type  N);
       template __global__ void
       add_permutated<double>(double *         val,
                              const double *   v,
