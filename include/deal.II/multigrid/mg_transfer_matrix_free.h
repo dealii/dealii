@@ -653,6 +653,8 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
               }
             dst[level].collect_sizes();
           }
+        else
+          dst[level] = 0;
       }
   }
 
