@@ -2137,7 +2137,8 @@ namespace TrilinosWrappers
     inline const Epetra_Map &
     Vector::vector_partitioner() const
     {
-      return static_cast<const Epetra_Map &>(vector->Map());
+      // TODO A dynamic_cast fails here. This is suspicious.
+      return static_cast<const Epetra_Map &>(vector->Map()); // NOLINT
     }
 
 
