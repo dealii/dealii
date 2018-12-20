@@ -406,11 +406,10 @@ namespace CUDAWrappers
                          n_cells * dim * dim * padding_length);
         }
 
-      alloc_and_copy(
-        &data->constraint_mask[color],
-        ArrayView<const types::global_dof_index>(constraint_mask_host.data(),
-                                                 constraint_mask_host.size()),
-        n_cells);
+      alloc_and_copy(&data->constraint_mask[color],
+                     ArrayView<const unsigned int>(constraint_mask_host.data(),
+                                                   constraint_mask_host.size()),
+                     n_cells);
     }
 
 
