@@ -308,7 +308,7 @@ namespace LinearAlgebra
     // the argument's lifetime needs to be longer then. If we do this, we need
     // to think about whether the view should be read/write.
 
-    stored_elements = IndexSet(trilinos_vec.vector_partitioner());
+    stored_elements = IndexSet(trilinos_vec.trilinos_partitioner());
 
     resize_val(stored_elements.n_elements());
 

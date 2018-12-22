@@ -60,7 +60,7 @@ test()
   tril_vector_ghosted.print(deallog.get_file_stream());
 
 
-  IndexSet readwrite_is(tril_vector_ghosted.vector_partitioner());
+  IndexSet readwrite_is(tril_vector_ghosted.trilinos_partitioner());
   deallog << "ghosted IS: ";
   readwrite_is.print(deallog);
 

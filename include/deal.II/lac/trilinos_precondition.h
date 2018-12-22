@@ -1976,9 +1976,11 @@ namespace TrilinosWrappers
   inline void
   PreconditionBase::vmult(MPI::Vector &dst, const MPI::Vector &src) const
   {
-    Assert(dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
+    Assert(dst.trilinos_partitioner().SameAs(
+             preconditioner->OperatorRangeMap()),
            ExcNonMatchingMaps("dst"));
-    Assert(src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
+    Assert(src.trilinos_partitioner().SameAs(
+             preconditioner->OperatorDomainMap()),
            ExcNonMatchingMaps("src"));
 
     const int ierr = preconditioner->ApplyInverse(src.trilinos_vector(),
@@ -1989,9 +1991,11 @@ namespace TrilinosWrappers
   inline void
   PreconditionBase::Tvmult(MPI::Vector &dst, const MPI::Vector &src) const
   {
-    Assert(dst.vector_partitioner().SameAs(preconditioner->OperatorRangeMap()),
+    Assert(dst.trilinos_partitioner().SameAs(
+             preconditioner->OperatorRangeMap()),
            ExcNonMatchingMaps("dst"));
-    Assert(src.vector_partitioner().SameAs(preconditioner->OperatorDomainMap()),
+    Assert(src.trilinos_partitioner().SameAs(
+             preconditioner->OperatorDomainMap()),
            ExcNonMatchingMaps("src"));
 
     preconditioner->SetUseTranspose(true);
