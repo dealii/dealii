@@ -1,0 +1,6 @@
+Replaced: TrilinosWrappers::MPI::Vector::vector_partitioner() has been
+deprecated in favor of TrilinosWrappers::MPI::Vector::trilinos_partitioner().
+The latter one returns an Epetra_BlockMap instead of an Epetra_Map avoiding an
+invalid downcast.
+<br>
+(Daniel Arndt, 2018/12/22)
