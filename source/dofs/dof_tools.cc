@@ -1385,7 +1385,7 @@ namespace DoFTools
          &dof_handler.get_triangulation()) == nullptr ?
          [&dof_handler]() {
            unsigned int max_subdomain_id = 0;
-           for (auto cell : dof_handler.active_cell_iterators())
+           for (const auto &cell : dof_handler.active_cell_iterators())
              max_subdomain_id =
                std::max(max_subdomain_id, cell->subdomain_id());
            return max_subdomain_id + 1;

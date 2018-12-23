@@ -1213,6 +1213,8 @@ namespace Utilities
          const std::vector<char>::const_iterator &cend,
          const bool                               allow_compression)
   {
+    T object;
+
     // the data is never compressed when we can't use zlib.
     (void)allow_compression;
 
@@ -1234,14 +1236,11 @@ namespace Utilities
 #endif
       {
         Assert(std::distance(cbegin, cend) == sizeof(T), ExcInternalError());
-        T object;
         std::memcpy(&object, &*cbegin, sizeof(T));
-        return object;
       }
     else
       {
         std::string decompressed_buffer;
-        T           object;
 
         // first decompress the buffer
 #ifdef DEAL_II_WITH_ZLIB
@@ -1264,8 +1263,9 @@ namespace Utilities
         boost::archive::binary_iarchive archive(in);
 
         archive >> object;
-        return object;
       }
+
+    return object;
   }
 
 
