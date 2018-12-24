@@ -1194,6 +1194,10 @@ namespace Utilities
 
         return (dest_buffer.size() - previous_size);
       }
+
+    // We should never get here
+    Assert(false, ExcInternalError());
+    return 0;
   }
 
 
