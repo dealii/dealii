@@ -1135,6 +1135,8 @@ namespace Utilities
        std::vector<char> &dest_buffer,
        const bool         allow_compression)
   {
+    size_t pack_size;
+
     // the data is never compressed when we can't use zlib.
     (void)allow_compression;
 
@@ -1160,7 +1162,7 @@ namespace Utilities
 
         std::memcpy(dest_buffer.data() + previous_size, &object, sizeof(T));
 
-        return sizeof(T);
+        pack_size = sizeof(T);
       }
     else
       {
@@ -1192,8 +1194,10 @@ namespace Utilities
             std::move(s.begin(), s.end(), std::back_inserter(dest_buffer));
           }
 
-        return (dest_buffer.size() - previous_size);
+        pack_size = dest_buffer.size() - previous_size;
       }
+
+    return pack_size;
   }
 
 
