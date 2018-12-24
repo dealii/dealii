@@ -180,6 +180,16 @@ namespace LinearAlgebra
                   const MPI_Comm               communicator);
 
       /**
+       * Destructor.
+       *
+       * @note We need to explicitly provide a destructor, otherwise the
+       *   linker may think it is unused and discards it, although required
+       *   in a different section. The Intel compiler is prone to this
+       *   behavior.
+       */
+      virtual ~BlockVector() override = default;
+
+      /**
        * Copy operator: fill all components of the vector with the given
        * scalar value.
        */
