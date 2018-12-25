@@ -615,10 +615,16 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
                      &(mg_dof[0]->get_triangulation())) == tria),
                   ExcMessage("The DoFHandler use different Triangulations!"));
 
+    MGLevelObject<bool> do_reinit;
+    do_reinit.resize(min_level, max_level);
     for (unsigned int level = min_level; level <= max_level; ++level)
       {
-        dst[level].reinit(n_blocks);
-        bool collect_size = false;
+        do_reinit[level] = false;
+        if (dst[level].n_blocks() != n_blocks)
+          {
+            do_reinit[level] = true;
+            continue; // level
+          }
         for (unsigned int b = 0; b < n_blocks; ++b)
           {
             LinearAlgebra::distributed::Vector<Number> &v = dst[level].block(b);
@@ -626,16 +632,29 @@ MGTransferBlockMatrixFree<dim, Number>::copy_to_mg(
                 v.local_size() !=
                   mg_dof[b]->locally_owned_mg_dofs(level).n_elements())
               {
+                do_reinit[level] = true;
+                break; // b
+              }
+          }
+      }
+
+    for (unsigned int level = min_level; level <= max_level; ++level)
+      {
+        if (do_reinit[level])
+          {
+            dst[level].reinit(n_blocks);
+            for (unsigned int b = 0; b < n_blocks; ++b)
+              {
+                LinearAlgebra::distributed::Vector<Number> &v =
+                  dst[level].block(b);
                 v.reinit(mg_dof[b]->locally_owned_mg_dofs(level),
                          tria != nullptr ? tria->get_communicator() :
                                            MPI_COMM_SELF);
-                collect_size = true;
               }
-            else
-              v = 0.;
+            dst[level].collect_sizes();
           }
-        if (collect_size)
-          dst[level].collect_sizes();
+        else
+          dst[level] = 0;
       }
   }
 
