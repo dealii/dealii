@@ -38,14 +38,15 @@ DEAL_II_NAMESPACE_OPEN
 
 #  ifdef DEAL_II_WITH_64BIT_INDICES
 
-IndexSet::IndexSet(const Epetra_Map &map)
+IndexSet::IndexSet(const Epetra_BlockMap &map)
   : is_compressed(true)
   , index_space_size(1 + map.MaxAllGID64())
   , largest_range(numbers::invalid_unsigned_int)
 {
   Assert(map.MinAllGID64() == 0,
-         ExcMessage("The Epetra_Map does not contain the global index 0, which "
-                    "means some entries are not present on any processor."));
+         ExcMessage(
+           "The Epetra_BlockMap does not contain the global index 0, "
+           "which means some entries are not present on any processor."));
 
   // For a contiguous map, we do not need to go through the whole data...
   if (map.LinearMap())
@@ -64,14 +65,15 @@ IndexSet::IndexSet(const Epetra_Map &map)
 
 // this is the standard 32-bit implementation
 
-IndexSet::IndexSet(const Epetra_Map &map)
+IndexSet::IndexSet(const Epetra_BlockMap &map)
   : is_compressed(true)
   , index_space_size(1 + map.MaxAllGID())
   , largest_range(numbers::invalid_unsigned_int)
 {
   Assert(map.MinAllGID() == 0,
-         ExcMessage("The Epetra_Map does not contain the global index 0, which "
-                    "means some entries are not present on any processor."));
+         ExcMessage(
+           "The Epetra_BlockMap does not contain the global index 0, "
+           "which means some entries are not present on any processor."));
 
   // For a contiguous map, we do not need to go through the whole data...
   if (map.LinearMap())

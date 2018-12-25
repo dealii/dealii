@@ -137,9 +137,9 @@ public:
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
-   * Constructor from a trilinos Epetra_Map.
+   * Constructor from a Trilinos Epetra_BlockMap.
    */
-  explicit IndexSet(const Epetra_Map &map);
+  explicit IndexSet(const Epetra_BlockMap &map);
 #endif
 
   /**

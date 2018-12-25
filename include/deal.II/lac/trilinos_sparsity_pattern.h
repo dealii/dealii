@@ -1551,7 +1551,7 @@ namespace TrilinosWrappers
   inline IndexSet
   SparsityPattern::locally_owned_domain_indices() const
   {
-    return IndexSet(static_cast<const Epetra_Map &>(graph->DomainMap()));
+    return IndexSet(graph->DomainMap());
   }
 
 
@@ -1559,7 +1559,7 @@ namespace TrilinosWrappers
   inline IndexSet
   SparsityPattern::locally_owned_range_indices() const
   {
-    return IndexSet(static_cast<const Epetra_Map &>(graph->RangeMap()));
+    return IndexSet(graph->RangeMap());
   }
 
 #    endif // DOXYGEN
