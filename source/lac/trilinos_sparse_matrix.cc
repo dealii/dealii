@@ -2068,10 +2068,10 @@ namespace TrilinosWrappers
                                 const TrilinosWrappers::MPI::Vector &in,
                                 const TrilinosWrappers::MPI::Vector &out)
       {
-        Assert(in.vector_partitioner().SameAs(m.DomainMap()) == true,
+        Assert(in.trilinos_partitioner().SameAs(m.DomainMap()) == true,
                ExcMessage(
                  "Column map of matrix does not fit with vector map!"));
-        Assert(out.vector_partitioner().SameAs(m.RangeMap()) == true,
+        Assert(out.trilinos_partitioner().SameAs(m.RangeMap()) == true,
                ExcMessage("Row map of matrix does not fit with vector map!"));
         (void)m;
         (void)in;

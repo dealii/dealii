@@ -1201,9 +1201,19 @@ namespace TrilinosWrappers
       /**
        * Return a const reference to the underlying Trilinos Epetra_Map that
        * sets the parallel partitioning of the vector.
+       *
+       * @deprecated Use trilinos_partitioner() instead.
        */
+      DEAL_II_DEPRECATED
       const Epetra_Map &
       vector_partitioner() const;
+
+      /**
+       * Return a const reference to the underlying Trilinos Epetra_BlockMap
+       * that sets the parallel partitioning of the vector.
+       */
+      const Epetra_BlockMap &
+      trilinos_partitioner() const;
 
       /**
        * Print to a stream. @p precision denotes the desired precision with
@@ -2139,6 +2149,14 @@ namespace TrilinosWrappers
     {
       // TODO A dynamic_cast fails here. This is suspicious.
       return static_cast<const Epetra_Map &>(vector->Map()); // NOLINT
+    }
+
+
+
+    inline const Epetra_BlockMap &
+    Vector::trilinos_partitioner() const
+    {
+      return vector->Map();
     }
 
 
