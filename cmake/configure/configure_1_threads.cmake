@@ -146,6 +146,11 @@ MACRO(FEATURE_THREADS_FIND_EXTERNAL var)
   # versions:
   #
   IF(TBB_VERSION VERSION_LESS "4.2")
+    # Clear the previously determined version numbers to avoid confusion
+    SET(TBB_VERSION "bundled")
+    SET(TBB_VERSION_MAJOR "")
+    SET(TBB_VERSION_MINOR "")
+
     MESSAGE(STATUS
       "The externally provided TBB library is older than version 4.2.0, which "
       "cannot be used with deal.II."
