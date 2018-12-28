@@ -529,10 +529,9 @@ namespace hp
      *
      * Range-based for loops are useful in that they require much less code
      * than traditional loops (see <a
-     * href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-
-     * based_for_loop">here</a> for a discussion of how they work). An example
-     * is that without range-based for loops, one often writes code such as
-     * the following:
+     * href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">here</a>
+     * for a discussion of how they work). An example is that without
+     * range-based for loops, one often writes code such as the following:
      * @code
      *   DoFHandler<dim> dof_handler;
      *   ...
