@@ -2538,7 +2538,7 @@ private:
  * quadrature points and face integrations. The design of the class is similar
  * to FEEvaluation and most of the interfaces are shared with that class, in
  * particular most access functions that come from the common base classes
- * FEEvaluationAccess and FEEvaluatioBase. Furthermore, the relation of this
+ * FEEvaluationAccess and FEEvaluationBase. Furthermore, the relation of this
  * class to FEEvaluation is similar to the relation between FEValues and
  * FEFaceValues.
  *
