@@ -1335,10 +1335,8 @@ namespace GridTools
                       const Point<spacedim> &        p,
                       const std::vector<bool> &      marked_vertices)
   {
-    // first get the underlying
-    // triangulation from the
-    // mesh and determine vertices
-    // and used vertices
+    // first get the underlying triangulation from the mesh and determine
+    // vertices and used vertices
     const Triangulation<dim, spacedim> &tria = mesh.get_triangulation();
 
     const std::vector<Point<spacedim>> &vertices = tria.get_vertices();
@@ -1348,13 +1346,10 @@ namespace GridTools
            ExcDimensionMismatch(tria.get_vertices().size(),
                                 marked_vertices.size()));
 
-    // If p is an element of marked_vertices,
-    // and q is that of used_Vertices,
-    // the vector marked_vertices does NOT
-    // contain unused vertices if p implies q.
-    // I.e., if p is true q must be true
-    // (if p is false, q could be false or true).
-    // p implies q logic is encapsulated in ~p|q.
+    // marked_vertices is expected to be a subset of used_vertices. Thus,
+    // comparing the range marked_vertices.begin() to marked_vertices.end() with
+    // the range used_vertices.begin() to used_vertices.end() the element in the
+    // second range must be valid if the element in the first range is valid.
     Assert(
       marked_vertices.size() == 0 ||
         std::equal(marked_vertices.begin(),
@@ -1365,23 +1360,18 @@ namespace GridTools
         "marked_vertices should be a subset of used vertices in the triangulation "
         "but marked_vertices contains one or more vertices that are not used vertices!"));
 
-    // In addition, if a vector bools
-    // is specified (marked_vertices)
-    // marking all the vertices which
-    // could be the potentially closest
-    // vertex to the point, use it instead
-    // of used vertices
+    // If marked_indices is empty, consider all used_vertices for finding the
+    // closest vertex to the point. Otherwise, marked_indices is used.
     const std::vector<bool> &used = (marked_vertices.size() == 0) ?
                                       tria.get_used_vertices() :
                                       marked_vertices;
 
-    // At the beginning, the first
-    // used vertex is the closest one
+    // At the beginning, the first used vertex is considered to be the closest
+    // one.
     std::vector<bool>::const_iterator first =
       std::find(used.begin(), used.end(), true);
 
-    // Assert that at least one vertex
-    // is actually used
+    // Assert that at least one vertex is actually used
     Assert(first != used.end(), ExcInternalError());
 
     unsigned int best_vertex = std::distance(used.begin(), first);
@@ -1416,10 +1406,8 @@ namespace GridTools
     if (mapping.preserves_vertex_locations() == true)
       return find_closest_vertex(mesh, p, marked_vertices);
 
-    // first get the underlying
-    // triangulation from the
-    // mesh and determine vertices
-    // and used vertices
+    // first get the underlying triangulation from the mesh and determine
+    // vertices and used vertices
     const Triangulation<dim, spacedim> &tria = mesh.get_triangulation();
 
     auto vertices = extract_used_vertices(tria, mapping);
@@ -1429,13 +1417,11 @@ namespace GridTools
            ExcDimensionMismatch(tria.get_vertices().size(),
                                 marked_vertices.size()));
 
-    // If p is an element of marked_vertices,
-    // and q is that of used_Vertices,
-    // the vector marked_vertices does NOT
-    // contain unused vertices if p implies q.
-    // I.e., if p is true q must be true
-    // (if p is false, q could be false or true).
-    // p implies q logic is encapsulated in ~p|q.
+    // marked_vertices is expected to be a subset of used_vertices. Thus,
+    // comparing the range marked_vertices.begin() to marked_vertices.end()
+    // with the range used_vertices.begin() to used_vertices.end() the element
+    // in the second range must be valid if the element in the first range is
+    // valid.
     Assert(
       marked_vertices.size() == 0 ||
         std::equal(marked_vertices.begin(),
@@ -1447,12 +1433,12 @@ namespace GridTools
         "but marked_vertices contains one or more vertices that are not used vertices!"));
 
     // Remove from the map unwanted elements.
-    if (marked_vertices.size())
+    if (marked_vertices.size() != 0)
       for (auto it = vertices.begin(); it != vertices.end();)
         {
           if (marked_vertices[it->first] == false)
             {
-              vertices.erase(it++);
+              it = vertices.erase(it);
             }
           else
             {
