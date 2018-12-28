@@ -851,7 +851,7 @@ make_array_view(const std::vector<ElementType> &vector)
  * object.
  * @param[in] starting_index The index of the first element of the vector that
  * will be part of this view.
- * @param[in] size_of_view
+ * @param[in] size_of_view Number of elements in the new ArrayView.
  *
  * @pre <code>starting_index + size_of_view <= vector.size()</code>
  *
@@ -885,7 +885,7 @@ make_array_view(std::vector<ElementType> &vector,
  * object.
  * @param[in] starting_index The index of the first element of the vector that
  * will be part of this view.
- * @param[in] size_of_view
+ * @param[in] size_of_view Number of elements in the new ArrayView.
  *
  * @pre <code>starting_index + size_of_view <= vector.size()</code>
  *

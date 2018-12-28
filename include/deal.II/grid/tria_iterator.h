@@ -208,8 +208,8 @@ class TriaActiveIterator;
  * iterator is invalid anyway, regardless of the state of the triangulation
  * pointer and the state of the element pointed to.
  *
- * Past-the-end iterators may also be used to compare an iterator with the <i
- * >before-the-start</i> value, when running backwards. There is no
+ * Past-the-end iterators may also be used to compare an iterator with the
+ * <i>before-the-start</i> value, when running backwards. There is no
  * distinction between the iterators pointing past the two ends of a vector.
  *
  * By defining only one value to be past-the-end and making all other values
