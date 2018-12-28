@@ -515,14 +515,21 @@ namespace VectorTools
 
       for (const auto i : interpolation.locally_owned_elements())
         {
-          const auto value =
-            ::dealii::internal::ElementAccess<VectorType>::get(interpolation,
-                                                               i);
           const auto weight =
             ::dealii::internal::ElementAccess<VectorType>::get(weights, i);
-          ::dealii::internal::ElementAccess<VectorType>::set(value / weight,
-                                                             i,
-                                                             vec);
+
+          // See if we touched this DoF at all. If so, set the average
+          // of the value we computed in the output vector. Otherwise,
+          // don't touch the value at all.
+          if (weight != number(0))
+            {
+              const auto value =
+                ::dealii::internal::ElementAccess<VectorType>::get(
+                  interpolation, i);
+              ::dealii::internal::ElementAccess<VectorType>::set(value / weight,
+                                                                 i,
+                                                                 vec);
+            }
         }
       vec.compress(VectorOperation::insert);
     }
