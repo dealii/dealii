@@ -310,6 +310,11 @@ CHECK_CXX_SOURCE_COMPILES(
             [[deprecated]] void test();
           };
 
+          enum color
+          {
+            red [[deprecated]]
+          };
+
           template <int dim>
           struct foo {};
           using bar [[deprecated]] = foo<2>;
@@ -328,6 +333,11 @@ CHECK_CXX_SOURCE_COMPILES(
           {
             __attribute__((deprecated)) bob(int i);
             __attribute__((deprecated)) void test();
+          };
+
+          enum color
+          {
+            red __attribute__((deprecated))
           };
 
           template <int dim>
