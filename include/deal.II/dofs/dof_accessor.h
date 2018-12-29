@@ -1838,7 +1838,7 @@ public:
    * Retrieve the global indices of the degrees of freedom on this cell in the
    * level vector associated to the level of the cell.
    */
-  void
+  DEAL_II_DEPRECATED void
   get_mg_dof_indices(std::vector<types::global_dof_index> &dof_indices) const;
 
   /**

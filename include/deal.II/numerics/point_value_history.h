@@ -480,6 +480,7 @@ public:
    * get_support_locations replaces it and reflects the fact that the points
    * returned are actually the support points.
    */
+  DEAL_II_DEPRECATED
   void
   get_points(std::vector<std::vector<Point<dim>>> &locations);
 

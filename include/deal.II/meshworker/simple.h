@@ -86,7 +86,7 @@ namespace MeshWorker
        * In spite of using local block structure, all blocks will be entered
        * into the same global matrix, disregarding any global block structure.
        */
-
+      DEAL_II_DEPRECATED
       void
       initialize_local_blocks(const BlockIndices &);
 
