@@ -1,0 +1,8 @@
+
+DEAL:BFGS::Starting value 63.201
+DEAL:BFGS::Convergence step 127 value 8.1397e-06
+DEAL::Limited memory BFGS solution:
+DEAL::-4.4833e-09 0.050000 0.10000 0.15000 0.20000 0.25000 0.30000 0.35000 0.40000 0.45000 0.50000 0.55000 0.60000 0.65000 0.70000 0.75000 0.80000 0.85000 0.90000 0.95000 1.0000
+DEAL::Function value: 1.3096e-13
+DEAL::Linf error in solution: 1.6564e-07
+DEAL::function calls: 133

@@ -1,0 +1,3 @@
+New: Add SolverBFGS to minimize a function using the limited memory BFGS approach.
+<br>
+(Denis Davydov, 2018/12/26)
