@@ -176,6 +176,26 @@ public:
   rank1_update(const number a, const Vector<number> &v);
 
   /**
+   * Apply <a href="https://en.wikipedia.org/wiki/Givens_rotation">Givens
+   * rotation</a>
+   * @p csr (a triplet of cosine, sine and radius, see
+   * Utilities::LinearAlgebra::givens_rotation() for the definition of the
+   * rotation matrix $\mathbf G$)
+   * to this matrix in the plane spanned by the @p i'th and @p k'th unit vectors.
+   * If @p left is <code>true</code>, the rotation is applied from left
+   * $\mathbf A \leftarrow \mathbf G \mathbf A$
+   * and only rows @p i and @p k are affected.
+   * Otherwise, transpose of the rotation matrix is applied from right
+   * $\mathbf A \leftarrow \mathbf A \mathbf G^T$
+   * and only columns @p i and @p k are affected.
+   */
+  void
+  apply_givens_rotation(const std::array<number, 3> &csr,
+                        const size_type              i,
+                        const size_type              k,
+                        const bool                   left = true);
+
+  /**
    * Assignment from different matrix classes, performing the usual conversion
    * to the transposed format expected by LAPACK. This assignment operator
    * uses iterators of the typename MatrixType. Therefore, sparse matrices are

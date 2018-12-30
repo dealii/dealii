@@ -299,6 +299,18 @@ public:
   grow_or_shrink(const size_type N);
 
   /**
+   * Apply <a href="https://en.wikipedia.org/wiki/Givens_rotation">Givens
+   * rotation</a>
+   * @p csr (a triplet of cosine, sine and radius, see
+   * Utilities::LinearAlgebra::givens_rotation())
+   * to the vector in the plane spanned by the @p i'th and @p k'th unit vectors.
+   */
+  void
+  apply_givens_rotation(const std::array<Number, 3> &csr,
+                        const size_type              i,
+                        const size_type              k);
+
+  /**
    * Change the dimension to that of the vector @p V. The same applies as for
    * the other @p reinit function.
    *
