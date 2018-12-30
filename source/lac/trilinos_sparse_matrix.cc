@@ -1246,15 +1246,15 @@ namespace TrilinosWrappers
 
         Assert(ierr == 0, ExcTrilinosError(ierr));
 
-        int *diag_find =
-          std::find(col_indices, col_indices + num_entries, local_row);
-        int diag_index = static_cast<int>(diag_find - col_indices);
+        const std::ptrdiff_t diag_index =
+          std::find(col_indices, col_indices + num_entries, local_row) -
+          col_indices;
 
         for (TrilinosWrappers::types::int_type j = 0; j < num_entries; ++j)
           if (diag_index != j || new_diag_value == 0)
             values[j] = 0.;
 
-        if (diag_find && std::fabs(values[diag_index]) == 0.0 &&
+        if (diag_index != num_entries && std::fabs(values[diag_index]) == 0.0 &&
             new_diag_value != 0.0)
           values[diag_index] = new_diag_value;
       }
@@ -1326,11 +1326,9 @@ namespace TrilinosWrappers
         // Search the index where we
         // look for the value, and then
         // finally get it.
-
-        int *el_find =
-          std::find(col_indices, col_indices + nnz_present, trilinos_j);
-
-        int local_col_index = static_cast<int>(el_find - col_indices);
+        const std::ptrdiff_t local_col_index =
+          std::find(col_indices, col_indices + nnz_present, trilinos_j) -
+          col_indices;
 
         // This is actually the only
         // difference to the el(i,j)
@@ -1403,11 +1401,9 @@ namespace TrilinosWrappers
         // Search the index where we
         // look for the value, and then
         // finally get it.
-        int *el_find =
-          std::find(col_indices, col_indices + nnz_present, trilinos_j);
-
-        int local_col_index = static_cast<int>(el_find - col_indices);
-
+        const std::ptrdiff_t local_col_index =
+          std::find(col_indices, col_indices + nnz_present, trilinos_j) -
+          col_indices;
 
         // This is actually the only
         // difference to the () function
