@@ -1529,10 +1529,10 @@ namespace TrilinosWrappers
 
     last_action = Insert;
 
-    TrilinosWrappers::types::int_type *col_index_ptr;
-    TrilinosScalar *                   col_value_ptr;
-    TrilinosWrappers::types::int_type  trilinos_row = row;
-    TrilinosWrappers::types::int_type  n_columns;
+    const TrilinosWrappers::types::int_type *col_index_ptr;
+    const TrilinosScalar *                   col_value_ptr;
+    const TrilinosWrappers::types::int_type  trilinos_row = row;
+    TrilinosWrappers::types::int_type        n_columns;
 
     boost::container::small_vector<TrilinosScalar, 200> local_value_array(
       n_cols);
@@ -1544,9 +1544,10 @@ namespace TrilinosWrappers
     // we will not modify const data)
     if (elide_zero_values == false)
       {
-        col_index_ptr = reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          const_cast<size_type *>(col_indices));
-        col_value_ptr = const_cast<TrilinosScalar *>(values);
+        col_index_ptr =
+          reinterpret_cast<const TrilinosWrappers::types::int_type *>(
+            col_indices);
+        col_value_ptr = values;
         n_columns     = n_cols;
       }
     else
@@ -1563,8 +1564,8 @@ namespace TrilinosWrappers
             AssertIsFinite(value);
             if (value != 0)
               {
-                col_index_ptr[n_columns] = col_indices[j];
-                col_value_ptr[n_columns] = value;
+                local_index_array[n_columns] = col_indices[j];
+                local_value_array[n_columns] = value;
                 n_columns++;
               }
           }
@@ -1587,10 +1588,7 @@ namespace TrilinosWrappers
         if (matrix->Filled() == false)
           {
             ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
-              row,
-              static_cast<int>(n_columns),
-              const_cast<double *>(col_value_ptr),
-              col_index_ptr);
+              row, static_cast<int>(n_columns), col_value_ptr, col_index_ptr);
 
             // When inserting elements, we do not want to create exceptions in
             // the case when inserting non-local data (since that's what we
@@ -1725,10 +1723,10 @@ namespace TrilinosWrappers
 
     last_action = Add;
 
-    TrilinosWrappers::types::int_type *col_index_ptr;
-    TrilinosScalar *                   col_value_ptr;
-    TrilinosWrappers::types::int_type  trilinos_row = row;
-    TrilinosWrappers::types::int_type  n_columns;
+    const TrilinosWrappers::types::int_type *col_index_ptr;
+    const TrilinosScalar *                   col_value_ptr;
+    const TrilinosWrappers::types::int_type  trilinos_row = row;
+    TrilinosWrappers::types::int_type        n_columns;
 
     boost::container::small_vector<TrilinosScalar, 100> local_value_array(
       n_cols);
@@ -1740,9 +1738,10 @@ namespace TrilinosWrappers
     // we will not modify const data)
     if (elide_zero_values == false)
       {
-        col_index_ptr = reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          const_cast<size_type *>(col_indices));
-        col_value_ptr = const_cast<TrilinosScalar *>(values);
+        col_index_ptr =
+          reinterpret_cast<const TrilinosWrappers::types::int_type *>(
+            col_indices);
+        col_value_ptr = values;
         n_columns     = n_cols;
 #  ifdef DEBUG
         for (size_type j = 0; j < n_cols; ++j)
@@ -1764,9 +1763,9 @@ namespace TrilinosWrappers
             AssertIsFinite(value);
             if (value != 0)
               {
-                col_index_ptr[n_columns] = col_indices[j];
-                col_value_ptr[n_columns] = value;
-                n_columns++;
+                local_index_array[n_columns] = col_indices[j];
+                local_value_array[n_columns] = value;
+                ++n_columns;
               }
           }
 
