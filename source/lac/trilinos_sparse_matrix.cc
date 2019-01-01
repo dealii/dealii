@@ -1246,15 +1246,15 @@ namespace TrilinosWrappers
 
         Assert(ierr == 0, ExcTrilinosError(ierr));
 
-        int *diag_find =
-          std::find(col_indices, col_indices + num_entries, local_row);
-        int diag_index = static_cast<int>(diag_find - col_indices);
+        const std::ptrdiff_t diag_index =
+          std::find(col_indices, col_indices + num_entries, local_row) -
+          col_indices;
 
         for (TrilinosWrappers::types::int_type j = 0; j < num_entries; ++j)
           if (diag_index != j || new_diag_value == 0)
             values[j] = 0.;
 
-        if (diag_find && std::fabs(values[diag_index]) == 0.0 &&
+        if (diag_index != num_entries && std::fabs(values[diag_index]) == 0.0 &&
             new_diag_value != 0.0)
           values[diag_index] = new_diag_value;
       }
@@ -1326,11 +1326,9 @@ namespace TrilinosWrappers
         // Search the index where we
         // look for the value, and then
         // finally get it.
-
-        int *el_find =
-          std::find(col_indices, col_indices + nnz_present, trilinos_j);
-
-        int local_col_index = static_cast<int>(el_find - col_indices);
+        const std::ptrdiff_t local_col_index =
+          std::find(col_indices, col_indices + nnz_present, trilinos_j) -
+          col_indices;
 
         // This is actually the only
         // difference to the el(i,j)
@@ -1403,11 +1401,9 @@ namespace TrilinosWrappers
         // Search the index where we
         // look for the value, and then
         // finally get it.
-        int *el_find =
-          std::find(col_indices, col_indices + nnz_present, trilinos_j);
-
-        int local_col_index = static_cast<int>(el_find - col_indices);
-
+        const std::ptrdiff_t local_col_index =
+          std::find(col_indices, col_indices + nnz_present, trilinos_j) -
+          col_indices;
 
         // This is actually the only
         // difference to the () function
@@ -1533,10 +1529,10 @@ namespace TrilinosWrappers
 
     last_action = Insert;
 
-    TrilinosWrappers::types::int_type *col_index_ptr;
-    TrilinosScalar *                   col_value_ptr;
-    TrilinosWrappers::types::int_type  trilinos_row = row;
-    TrilinosWrappers::types::int_type  n_columns;
+    const TrilinosWrappers::types::int_type *col_index_ptr;
+    const TrilinosScalar *                   col_value_ptr;
+    const TrilinosWrappers::types::int_type  trilinos_row = row;
+    TrilinosWrappers::types::int_type        n_columns;
 
     boost::container::small_vector<TrilinosScalar, 200> local_value_array(
       n_cols);
@@ -1548,9 +1544,10 @@ namespace TrilinosWrappers
     // we will not modify const data)
     if (elide_zero_values == false)
       {
-        col_index_ptr = reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          const_cast<size_type *>(col_indices));
-        col_value_ptr = const_cast<TrilinosScalar *>(values);
+        col_index_ptr =
+          reinterpret_cast<const TrilinosWrappers::types::int_type *>(
+            col_indices);
+        col_value_ptr = values;
         n_columns     = n_cols;
       }
     else
@@ -1567,8 +1564,8 @@ namespace TrilinosWrappers
             AssertIsFinite(value);
             if (value != 0)
               {
-                col_index_ptr[n_columns] = col_indices[j];
-                col_value_ptr[n_columns] = value;
+                local_index_array[n_columns] = col_indices[j];
+                local_value_array[n_columns] = value;
                 n_columns++;
               }
           }
@@ -1591,10 +1588,7 @@ namespace TrilinosWrappers
         if (matrix->Filled() == false)
           {
             ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
-              row,
-              static_cast<int>(n_columns),
-              const_cast<double *>(col_value_ptr),
-              col_index_ptr);
+              row, static_cast<int>(n_columns), col_value_ptr, col_index_ptr);
 
             // When inserting elements, we do not want to create exceptions in
             // the case when inserting non-local data (since that's what we
@@ -1729,10 +1723,10 @@ namespace TrilinosWrappers
 
     last_action = Add;
 
-    TrilinosWrappers::types::int_type *col_index_ptr;
-    TrilinosScalar *                   col_value_ptr;
-    TrilinosWrappers::types::int_type  trilinos_row = row;
-    TrilinosWrappers::types::int_type  n_columns;
+    const TrilinosWrappers::types::int_type *col_index_ptr;
+    const TrilinosScalar *                   col_value_ptr;
+    const TrilinosWrappers::types::int_type  trilinos_row = row;
+    TrilinosWrappers::types::int_type        n_columns;
 
     boost::container::small_vector<TrilinosScalar, 100> local_value_array(
       n_cols);
@@ -1744,9 +1738,10 @@ namespace TrilinosWrappers
     // we will not modify const data)
     if (elide_zero_values == false)
       {
-        col_index_ptr = reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          const_cast<size_type *>(col_indices));
-        col_value_ptr = const_cast<TrilinosScalar *>(values);
+        col_index_ptr =
+          reinterpret_cast<const TrilinosWrappers::types::int_type *>(
+            col_indices);
+        col_value_ptr = values;
         n_columns     = n_cols;
 #  ifdef DEBUG
         for (size_type j = 0; j < n_cols; ++j)
@@ -1768,9 +1763,9 @@ namespace TrilinosWrappers
             AssertIsFinite(value);
             if (value != 0)
               {
-                col_index_ptr[n_columns] = col_indices[j];
-                col_value_ptr[n_columns] = value;
-                n_columns++;
+                local_index_array[n_columns] = col_indices[j];
+                local_value_array[n_columns] = value;
+                ++n_columns;
               }
           }
 

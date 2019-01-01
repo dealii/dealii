@@ -874,11 +874,9 @@ namespace TrilinosWrappers
                    ExcDimensionMismatch(nnz_present, nnz_extracted));
 
             // Search the index
-            TrilinosWrappers::types::int_type *el_find =
-              std::find(col_indices, col_indices + nnz_present, trilinos_j);
-
-            const TrilinosWrappers::types::int_type local_col_index =
-              el_find - col_indices;
+            const std::ptrdiff_t local_col_index =
+              std::find(col_indices, col_indices + nnz_present, trilinos_j) -
+              col_indices;
 
             if (local_col_index == nnz_present)
               return false;
@@ -903,11 +901,9 @@ namespace TrilinosWrappers
                    ExcDimensionMismatch(nnz_present, nnz_extracted));
 
             // Search the index
-            int *el_find = std::find(col_indices,
-                                     col_indices + nnz_present,
-                                     static_cast<int>(trilinos_j));
-
-            const int local_col_index = static_cast<int>(el_find - col_indices);
+            const std::ptrdiff_t local_col_index =
+              std::find(col_indices, col_indices + nnz_present, trilinos_j) -
+              col_indices;
 
             if (local_col_index == nnz_present)
               return false;
