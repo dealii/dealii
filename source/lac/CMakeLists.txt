@@ -53,7 +53,6 @@ SET(_unity_include_src
   tridiagonal_matrix.cc
   vector.cc
   vector_memory.cc
-  vector_view.cc
   )
 
 SET(_separate_src
@@ -81,7 +80,6 @@ SET(_inst
   vector.inst.in
   vector_memory.inst.in
   vector_memory_release.inst.in
-  vector_view.inst.in
   )
 
 

@@ -70,9 +70,6 @@ class LAPACKFullMatrix;
 template <typename>
 class BlockVector;
 
-template <typename>
-class VectorView;
-
 namespace parallel
 {
   namespace internal
@@ -1025,11 +1022,6 @@ protected:
    */
   template <typename Number2>
   friend class LAPACKFullMatrix;
-
-  /**
-   * VectorView will access the pointer.
-   */
-  friend class VectorView<Number>;
 
 private:
   /**
