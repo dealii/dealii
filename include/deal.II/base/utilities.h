@@ -1138,6 +1138,8 @@ namespace Utilities
     // the data is never compressed when we can't use zlib.
     (void)allow_compression;
 
+    size_t size = 0;
+
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
     // serialization machinery
@@ -1160,7 +1162,7 @@ namespace Utilities
 
         std::memcpy(dest_buffer.data() + previous_size, &object, sizeof(T));
 
-        return sizeof(T);
+        size = sizeof(T);
       }
     else
       {
@@ -1192,12 +1194,10 @@ namespace Utilities
             std::move(s.begin(), s.end(), std::back_inserter(dest_buffer));
           }
 
-        return (dest_buffer.size() - previous_size);
+        size = dest_buffer.size() - previous_size;
       }
 
-    // We should never get here
-    Assert(false, ExcInternalError());
-    return 0;
+    return size;
   }
 
 
