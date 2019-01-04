@@ -602,9 +602,9 @@ namespace internal
 
     // Type T is constructible from F.
     template <typename F>
-    static T
-    value(const F &f,
-          typename std::enable_if<
+    static DEAL_II_CUDA_HOST_DEV T
+                                 value(const F &f,
+                                       typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
                           typename std::decay<F>::type>::value &&
             std::is_constructible<T, F>::value>::type * = nullptr)
