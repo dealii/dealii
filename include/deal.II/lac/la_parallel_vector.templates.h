@@ -911,7 +911,7 @@ namespace LinearAlgebra
             {
               Number *new_val;
               Utilities::System::posix_memalign(
-                (void **)&new_val,
+                reinterpret_cast<void **>(&new_val),
                 64,
                 sizeof(Number) * partitioner->n_import_indices());
               import_data.values.reset(new_val);
@@ -926,7 +926,7 @@ namespace LinearAlgebra
       // uses a view of the array and thus we need the data on the host to
       // outlive the scope of the function.
       Number *new_val;
-      Utilities::System::posix_memalign((void **)&new_val,
+      Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_val),
                                         64,
                                         sizeof(Number) * allocated_size);
 
@@ -1071,7 +1071,7 @@ namespace LinearAlgebra
             {
               Number *new_val;
               Utilities::System::posix_memalign(
-                (void **)&new_val,
+                reinterpret_cast<void **>(&new_val),
                 64,
                 sizeof(Number) * partitioner->n_import_indices());
               import_data.values.reset(new_val);
@@ -1086,7 +1086,7 @@ namespace LinearAlgebra
       // uses a view of the array and thus we need the data on the host to
       // outlive the scope of the function.
       Number *new_val;
-      Utilities::System::posix_memalign((void **)&new_val,
+      Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_val),
                                         64,
                                         sizeof(Number) * allocated_size);
 

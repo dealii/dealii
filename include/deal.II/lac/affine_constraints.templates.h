@@ -166,7 +166,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
   for (const auto &kv : received)
     {
       // for each incoming line:
-      for (auto &lineit : kv.second)
+      for (const auto &lineit : kv.second)
         {
           const ConstraintLine reference = get_line(lineit.index);
 
