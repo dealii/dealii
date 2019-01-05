@@ -365,10 +365,8 @@ namespace internal
                                     vector_partitioner->local_range().first);
       const std::size_t  n_ghosts = ghost_dofs.size();
 #ifdef DEBUG
-      for (std::vector<unsigned int>::iterator dof = dof_indices.begin();
-           dof != dof_indices.end();
-           ++dof)
-        AssertIndexRange(*dof, n_owned + n_ghosts);
+      for (const auto dof_index : dof_indices)
+        AssertIndexRange(dof_index, n_owned + n_ghosts);
 #endif
 
       const unsigned int        n_components = start_components.back();
@@ -631,8 +629,8 @@ namespace internal
         (vector_partitioner->local_range().second -
          vector_partitioner->local_range().first) +
         vector_partitioner->ghost_indices().n_elements();
-      for (std::size_t i = 0; i < dof_indices.size(); ++i)
-        AssertIndexRange(dof_indices[i], index_range);
+      for (const auto dof_index : dof_indices)
+        AssertIndexRange(dof_index, index_range);
 
       // sanity check 2: for the constraint indicators, the first index should
       // be smaller than the number of indices in the row, and the second
@@ -1201,9 +1199,9 @@ namespace internal
                   }
           }
       // ensure that all indices are touched at least during the last round
-      for (auto &i : touched_by)
-        if (i == numbers::invalid_unsigned_int)
-          i = task_info.cell_partition_data.back() - 1;
+      for (auto &index : touched_by)
+        if (index == numbers::invalid_unsigned_int)
+          index = task_info.cell_partition_data.back() - 1;
 
       vector_zero_range_list_index.resize(
         1 + task_info
@@ -1221,7 +1219,7 @@ namespace internal
           auto it = chunk_must_zero_vector.find(chunk);
           if (it != chunk_must_zero_vector.end())
             {
-              for (unsigned int i : it->second)
+              for (const auto i : it->second)
                 vector_zero_range_list.push_back(i);
               vector_zero_range_list_index[chunk + 1] =
                 vector_zero_range_list.size();
@@ -1519,13 +1517,13 @@ namespace internal
         }
 
       AssertIndexRange(counter, local_size + 1);
-      for (std::size_t i = 0; i < renumbering.size(); ++i)
-        if (renumbering[i] == numbers::invalid_dof_index)
-          renumbering[i] = counter++;
+      for (types::global_dof_index &dof_index : renumbering)
+        if (dof_index == numbers::invalid_dof_index)
+          dof_index = counter++;
 
       // transform indices to global index space
-      for (std::size_t i = 0; i < renumbering.size(); ++i)
-        renumbering[i] = vector_partitioner->local_to_global(renumbering[i]);
+      for (types::global_dof_index &dof_index : renumbering)
+        dof_index = vector_partitioner->local_to_global(dof_index);
 
       AssertDimension(counter, renumbering.size());
     }

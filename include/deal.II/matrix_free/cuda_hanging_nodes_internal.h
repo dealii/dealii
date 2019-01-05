@@ -224,7 +224,7 @@ namespace CUDAWrappers
         line_to_inactive_cells(n_raw_lines);
 
       // First add active and inactive cells to their lines:
-      for (auto cell : dof_handler.cell_iterators())
+      for (const auto &cell : dof_handler.cell_iterators())
         {
           for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell;
                ++line)
@@ -261,7 +261,7 @@ namespace CUDAWrappers
                     child->line(neighbor_line)->index();
 
                   // Now add all active cells
-                  for (auto cl : line_to_cells[line_idx])
+                  for (const auto cl : line_to_cells[line_idx])
                     line_to_cells[child_line_idx].push_back(cl);
                 }
             }
@@ -514,7 +514,7 @@ namespace CUDAWrappers
                 {
                   // For each cell which share that edge
                   const unsigned int line = cell->line(local_line)->index();
-                  for (auto edge_neighbor : line_to_cells[line])
+                  for (const auto edge_neighbor : line_to_cells[line])
                     {
                       // If one of them is coarser than us
                       const cell_iterator neighbor_cell = edge_neighbor.first;

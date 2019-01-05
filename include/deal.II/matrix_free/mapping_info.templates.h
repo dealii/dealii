@@ -1133,7 +1133,7 @@ namespace internal
           // other tasks can already start copying the non-constant data)
           if (my_q == 0)
             {
-              for (auto &it : data_cells_local[0].second.data)
+              for (const auto &it : data_cells_local[0].second.data)
                 {
                   Tensor<2, dim, VectorizedArray<Number>> jac;
                   for (unsigned int d = 0; d < dim; ++d)
@@ -1809,7 +1809,7 @@ namespace internal
             {
               const Number jac_size =
                 ExtractCellHelper::get_jacobian_size(tria);
-              for (auto &it : data_faces_local[0].second.data)
+              for (const auto &it : data_faces_local[0].second.data)
                 {
                   // JxW values; invert previously applied scaling
                   for (unsigned int v = 0;

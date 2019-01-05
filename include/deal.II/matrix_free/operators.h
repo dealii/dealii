@@ -1288,10 +1288,10 @@ namespace MatrixFreeOperators
         edge_constrained_values[j].resize(interface_indices.size());
         const IndexSet &locally_owned =
           data->get_dof_handler(selected_rows[j]).locally_owned_mg_dofs(level);
-        for (unsigned int i = 0; i < interface_indices.size(); ++i)
-          if (locally_owned.is_element(interface_indices[i]))
+        for (const auto interface_index : interface_indices)
+          if (locally_owned.is_element(interface_index))
             edge_constrained_indices[j].push_back(
-              locally_owned.index_within_set(interface_indices[i]));
+              locally_owned.index_within_set(interface_index));
         have_interface_matrices |=
           Utilities::MPI::max(
             static_cast<unsigned int>(edge_constrained_indices[j].size()),
@@ -1309,8 +1309,8 @@ namespace MatrixFreeOperators
       {
         const std::vector<unsigned int> &constrained_dofs =
           data->get_constrained_dofs(selected_rows[j]);
-        for (unsigned int i = 0; i < constrained_dofs.size(); ++i)
-          BlockHelper::subblock(dst, j).local_element(constrained_dofs[i]) = 1.;
+        for (const auto constrained_dof : constrained_dofs)
+          BlockHelper::subblock(dst, j).local_element(constrained_dof) = 1.;
         for (unsigned int i = 0; i < edge_constrained_indices[j].size(); ++i)
           BlockHelper::subblock(dst, j).local_element(
             edge_constrained_indices[j][i]) = 1.;
@@ -1442,9 +1442,9 @@ namespace MatrixFreeOperators
       {
         const std::vector<unsigned int> &constrained_dofs =
           data->get_constrained_dofs(selected_rows[j]);
-        for (unsigned int i = 0; i < constrained_dofs.size(); ++i)
-          BlockHelper::subblock(dst, j).local_element(constrained_dofs[i]) +=
-            BlockHelper::subblock(src, j).local_element(constrained_dofs[i]);
+        for (const auto constrained_dof : constrained_dofs)
+          BlockHelper::subblock(dst, j).local_element(constrained_dof) +=
+            BlockHelper::subblock(src, j).local_element(constrained_dof);
       }
 
     // reset edge constrained values, multiply by unit matrix and add into
