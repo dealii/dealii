@@ -642,11 +642,12 @@ namespace FETools
         {
           // The base element establishing a component does not make sense in
           // this case. Set up to something meaningless:
-          for (unsigned int i = 0; i < component_to_base_table.size(); i++)
-            component_to_base_table[i] =
-              std::make_pair(std::make_pair(numbers::invalid_unsigned_int,
-                                            numbers::invalid_unsigned_int),
-                             numbers::invalid_unsigned_int);
+          std::fill(
+            component_to_base_table.begin(),
+            component_to_base_table.end(),
+            std::make_pair(std::make_pair(numbers::invalid_unsigned_int,
+                                          numbers::invalid_unsigned_int),
+                           numbers::invalid_unsigned_int));
         }
 
 
@@ -1403,16 +1404,16 @@ namespace FETools
 
     comp_start.resize(element.n_base_elements());
 
-    unsigned int k = 0;
+    unsigned int index = 0;
     for (unsigned int i = 0; i < comp_start.size(); ++i)
       {
         comp_start[i].resize(element.element_multiplicity(i));
         const unsigned int increment = element.base_element(i).dofs_per_cell;
 
-        for (unsigned int j = 0; j < comp_start[i].size(); ++j)
+        for (unsigned int &first_index_of_component : comp_start[i])
           {
-            comp_start[i][j] = k;
-            k += increment;
+            first_index_of_component = index;
+            index += increment;
           }
       }
 

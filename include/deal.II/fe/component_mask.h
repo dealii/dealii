@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 
+#include <algorithm>
 #include <iosfwd>
 #include <vector>
 
@@ -319,11 +320,9 @@ ComponentMask::n_selected_components(const unsigned int n) const
   else
     {
       AssertDimension(real_n, component_mask.size());
-      unsigned int c = 0;
-      for (unsigned int i = 0; i < component_mask.size(); ++i)
-        if (component_mask[i] == true)
-          ++c;
-      return c;
+      return std::count_if(component_mask.begin(),
+                           component_mask.end(),
+                           [](const bool selected) { return selected; });
     }
 }
 
