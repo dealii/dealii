@@ -96,8 +96,7 @@ namespace Step30
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int i = 0; i < values.size(); ++i)
-      values[i] = 0;
+    std::fill(values.begin(), values.end(), 0.);
   }
 
 
