@@ -100,19 +100,9 @@ namespace NonMatching
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
 
-    // Now we run on ech cell, get a quadrature formula
-    typename DoFHandler<dim1, spacedim>::active_cell_iterator
-      cell = immersed_dh.begin_active(),
-      endc = immersed_dh.end();
-
     // Dof indices
     std::vector<types::global_dof_index> dofs(immersed_fe.dofs_per_cell);
     std::vector<types::global_dof_index> odofs(space_fe.dofs_per_cell);
-
-    FEValues<dim1, spacedim> fe_v(immersed_mapping,
-                                  immersed_fe,
-                                  quad,
-                                  update_quadrature_points);
 
     // Take care of components
     const ComponentMask space_c =
@@ -127,6 +117,7 @@ namespace NonMatching
     AssertDimension(space_c.size(), space_fe.n_components());
     AssertDimension(immersed_c.size(), immersed_fe.n_components());
 
+    // Global to local indices
     std::vector<unsigned int> space_gtl(space_fe.n_components(),
                                         numbers::invalid_unsigned_int);
     std::vector<unsigned int> immersed_gtl(immersed_fe.n_components(),
@@ -140,6 +131,30 @@ namespace NonMatching
       if (immersed_c[i])
         immersed_gtl[i] = j++;
 
+    const unsigned int n_q_points = quad.size();
+    const unsigned int n_active_c =
+      immersed_dh.get_triangulation().n_active_cells();
+    std::vector<Point<spacedim>> all_points(n_active_c * n_q_points);
+    {
+      FEValues<dim1, spacedim> fe_v(immersed_mapping,
+                                    immersed_fe,
+                                    quad,
+                                    update_quadrature_points);
+      unsigned int             c = 0;
+      for (const auto &cell : immersed_dh.active_cell_iterators())
+        {
+          // Reinitialize the cell and the fe_values
+          fe_v.reinit(cell);
+          const std::vector<Point<spacedim>> &x_points =
+            fe_v.get_quadrature_points();
+
+          // Copy the points to the vector
+          std::copy(x_points.begin(),
+                    x_points.end(),
+                    all_points.begin() + c * n_q_points);
+          ++c;
+        }
+    }
     // [TODO]: when the add_entries_local_to_global below will implement
     // the version with the dof_mask, this should be uncommented.
     //
@@ -160,23 +175,49 @@ namespace NonMatching
     //        }
     //  }
 
-    for (; cell != endc; ++cell)
+
+    // Get a list of outer cells, qpoints and maps.
+    const auto  cpm = GridTools::compute_point_locations(cache, all_points);
+    const auto &all_cells = std::get<0>(cpm);
+    const auto &maps      = std::get<2>(cpm);
+
+    std::vector<
+      std::set<typename Triangulation<dim0, spacedim>::active_cell_iterator>>
+      cell_sets(n_active_c);
+
+    for (unsigned int i = 0; i < maps.size(); ++i)
       {
-        // Reinitialize the cell and the fe_values
-        fe_v.reinit(cell);
+        // Quadrature points should be reasonably clustered:
+        // the following index keeps track of the last id
+        // where the current cell was inserted
+        unsigned int last_id = std::numeric_limits<unsigned int>::max();
+        for (const unsigned int idx : maps[i])
+          {
+            // Find in which cell the point lies
+            unsigned int cell_id = idx / n_q_points;
+            if (last_id != cell_id)
+              {
+                cell_sets[cell_id].insert(all_cells[i]);
+                last_id = cell_id;
+              }
+          }
+      }
+
+    // Now we run on each cell of the immersed
+    // and build the sparsity
+    unsigned int i = 0;
+    for (const auto &cell : immersed_dh.active_cell_iterators())
+      {
+        // Reinitialize the cell
         cell->get_dof_indices(dofs);
 
-        const std::vector<Point<spacedim>> &Xpoints =
-          fe_v.get_quadrature_points();
+        // List of outer cells
+        const auto &cells = cell_sets[i];
 
-        // Get a list of outer cells, qpoints and maps.
-        const auto  cpm   = GridTools::compute_point_locations(cache, Xpoints);
-        const auto &cells = std::get<0>(cpm);
-
-        for (unsigned int c = 0; c < cells.size(); ++c)
+        for (const auto &cell_c : cells)
           {
             // Get the ones in the current outer cell
-            typename DoFHandler<dim0, spacedim>::cell_iterator ocell(*cells[c],
+            typename DoFHandler<dim0, spacedim>::cell_iterator ocell(*cell_c,
                                                                      &space_dh);
             // Make sure we act only on locally_owned cells
             if (ocell->is_locally_owned())
@@ -189,6 +230,7 @@ namespace NonMatching
                   odofs, dofs, sparsity); //, true, dof_mask);
               }
           }
+        ++i;
       }
   }
 
