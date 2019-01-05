@@ -285,8 +285,8 @@ namespace GraphColoring
               // linked to current_vertex is already using the color j, this
               // color cannot be used anymore.
               bool unused_color(true);
-              for (unsigned int k = 0; k < graph[current_vertex].size(); ++k)
-                if (colors_used[j].count(graph[current_vertex][k]) == 1)
+              for (const auto adjacent_vertex : graph[current_vertex])
+                if (colors_used[j].count(adjacent_vertex) == 1)
                   {
                     unused_color = false;
                     break;
