@@ -1372,8 +1372,8 @@ DoFHandler<dim, spacedim>::renumber_dofs(
         Assert(*p == i, ExcNewNumbersNotConsecutive(i));
     }
   else
-    for (types::global_dof_index i = 0; i < new_numbers.size(); ++i)
-      Assert(new_numbers[i] < n_dofs(),
+    for (const auto new_number : new_numbers)
+      Assert(new_number < n_dofs(),
              ExcMessage(
                "New DoF index is not less than the total number of dofs."));
 #endif
@@ -1411,8 +1411,8 @@ DoFHandler<dim, spacedim>::renumber_dofs(
         Assert(*p == i, ExcNewNumbersNotConsecutive(i));
     }
   else
-    for (types::global_dof_index i = 0; i < new_numbers.size(); ++i)
-      Assert(new_numbers[i] < n_dofs(level),
+    for (const auto new_number : new_numbers)
+      Assert(new_number < n_dofs(level),
              ExcMessage(
                "New DoF index is not less than the total number of dofs."));
 #endif

@@ -1212,10 +1212,13 @@ namespace DoFTools
                             subface->get_dof_indices(slave_dofs,
                                                      subface_fe_index);
 
-                            for (unsigned int i = 0; i < slave_dofs.size(); ++i)
-                              Assert(slave_dofs[i] !=
-                                       numbers::invalid_dof_index,
-                                     ExcInternalError());
+                            for (const types::global_dof_index slave_dof :
+                                 slave_dofs)
+                              {
+                                (void)slave_dof;
+                                Assert(slave_dof != numbers::invalid_dof_index,
+                                       ExcInternalError());
+                              }
 
                             // Now create the element constraint for this
                             // subface.
@@ -3507,14 +3510,14 @@ namespace DoFTools
 
                   // enter those dofs into the list that match the component
                   // signature.
-                  for (unsigned int i = 0; i < face_dofs.size(); ++i)
+                  for (const types::global_dof_index face_dof : face_dofs)
                     {
                       // Find out if a dof has a contribution in this component,
                       // and if so, add it to the list
                       const std::vector<types::global_dof_index>::iterator
                         it_index_on_cell = std::find(cell_dofs.begin(),
                                                      cell_dofs.end(),
-                                                     face_dofs[i]);
+                                                     face_dof);
                       Assert(it_index_on_cell != cell_dofs.end(),
                              ExcInvalidIterator());
                       const unsigned int index_on_cell =
@@ -3530,7 +3533,7 @@ namespace DoFTools
                           }
 
                       if (nonzero)
-                        zero_boundary_constraints.add_line(face_dofs[i]);
+                        zero_boundary_constraints.add_line(face_dof);
                     }
                 }
             }

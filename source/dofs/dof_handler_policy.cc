@@ -676,7 +676,7 @@ namespace internal
                           DoFIdentities &identities =
                             *vertex_dof_identities[most_dominating_fe_index]
                                                   [other_fe_index];
-                          for (unsigned int i = 0; i < identities.size(); ++i)
+                          for (const auto &identity : identities)
                             {
                               const types::global_dof_index master_dof_index =
                                 dealii::internal::DoFAccessorImplementation::
@@ -684,14 +684,14 @@ namespace internal
                                     dof_handler,
                                     vertex_index,
                                     most_dominating_fe_index,
-                                    identities[i].first);
+                                    identity.first);
                               const types::global_dof_index slave_dof_index =
                                 dealii::internal::DoFAccessorImplementation::
                                   Implementation::get_vertex_dof_index(
                                     dof_handler,
                                     vertex_index,
                                     other_fe_index,
-                                    identities[i].second);
+                                    identity.second);
 
                               // on subdomain boundaries, we will
                               // encounter invalid DoFs on ghost cells,
@@ -1036,16 +1036,15 @@ namespace internal
                                 DoFIdentities &identities =
                                   *line_dof_identities[most_dominating_fe_index]
                                                       [other_fe_index];
-                                for (unsigned int i = 0; i < identities.size();
-                                     ++i)
+                                for (const auto &identity : identities)
                                   {
                                     const types::global_dof_index
                                       master_dof_index = line->dof_index(
-                                        identities[i].first,
+                                        identity.first,
                                         most_dominating_fe_index);
                                     const types::global_dof_index
                                       slave_dof_index =
-                                        line->dof_index(identities[i].second,
+                                        line->dof_index(identity.second,
                                                         other_fe_index);
 
                                     // on subdomain boundaries, we will
@@ -1197,13 +1196,13 @@ namespace internal
                             DoFIdentities &identities =
                               *quad_dof_identities[most_dominating_fe_index]
                                                   [other_fe_index];
-                            for (unsigned int i = 0; i < identities.size(); ++i)
+                            for (const auto &identity : identities)
                               {
                                 const types::global_dof_index master_dof_index =
-                                  quad->dof_index(identities[i].first,
+                                  quad->dof_index(identity.first,
                                                   most_dominating_fe_index);
                                 const types::global_dof_index slave_dof_index =
-                                  quad->dof_index(identities[i].second,
+                                  quad->dof_index(identity.second,
                                                   other_fe_index);
 
                                 // we only store an identity if we are about to
@@ -1363,12 +1362,13 @@ namespace internal
                     new_dof_indices[p.first] = new_dof_indices[p.second];
                 }
 
-          for (unsigned int i = 0; i < new_dof_indices.size(); ++i)
+          for (const types::global_dof_index new_dof_index : new_dof_indices)
             {
-              Assert(new_dof_indices[i] != enumeration_dof_index,
+              (void)new_dof_index;
+              Assert(new_dof_index != enumeration_dof_index,
                      ExcInternalError());
-              Assert(new_dof_indices[i] < next_free_dof ||
-                       new_dof_indices[i] == numbers::invalid_dof_index,
+              Assert(new_dof_index < next_free_dof ||
+                       new_dof_index == numbers::invalid_dof_index,
                      ExcInternalError());
             }
 
@@ -1516,8 +1516,7 @@ namespace internal
                               DoFIdentities &identities =
                                 *vertex_dof_identities[most_dominating_fe_index]
                                                       [other_fe_index];
-                              for (unsigned int i = 0; i < identities.size();
-                                   ++i)
+                              for (const auto &identity : identities)
                                 {
                                   const types::global_dof_index
                                     master_dof_index = dealii::internal::
@@ -1526,7 +1525,7 @@ namespace internal
                                           dof_handler,
                                           vertex_index,
                                           most_dominating_fe_index,
-                                          identities[i].first);
+                                          identity.first);
                                   const types::global_dof_index
                                     slave_dof_index = dealii::internal::
                                       DoFAccessorImplementation::
@@ -1534,7 +1533,7 @@ namespace internal
                                           dof_handler,
                                           vertex_index,
                                           other_fe_index,
-                                          identities[i].second);
+                                          identity.second);
 
                                   // check if we are on an interface between
                                   // a locally owned and a ghost cell on which
@@ -1558,7 +1557,7 @@ namespace internal
                                           dof_handler,
                                           vertex_index,
                                           other_fe_index,
-                                          identities[i].second,
+                                          identity.second,
                                           master_dof_index);
                                 }
                             }
@@ -1796,16 +1795,15 @@ namespace internal
                                 DoFIdentities &identities =
                                   *line_dof_identities[most_dominating_fe_index]
                                                       [other_fe_index];
-                                for (unsigned int i = 0; i < identities.size();
-                                     ++i)
+                                for (const auto &identity : identities)
                                   {
                                     const types::global_dof_index
                                       master_dof_index = line->dof_index(
-                                        identities[i].first,
+                                        identity.first,
                                         most_dominating_fe_index);
                                     const types::global_dof_index
                                       slave_dof_index =
-                                        line->dof_index(identities[i].second,
+                                        line->dof_index(identity.second,
                                                         other_fe_index);
 
                                     // check if we are on an interface between
@@ -1824,7 +1822,7 @@ namespace internal
                                          numbers::invalid_dof_index) &&
                                         (master_dof_index !=
                                          numbers::invalid_dof_index))
-                                      line->set_dof_index(identities[i].second,
+                                      line->set_dof_index(identity.second,
                                                           master_dof_index,
                                                           other_fe_index);
                                   }
@@ -1940,13 +1938,13 @@ namespace internal
                             DoFIdentities &identities =
                               *quad_dof_identities[most_dominating_fe_index]
                                                   [other_fe_index];
-                            for (unsigned int i = 0; i < identities.size(); ++i)
+                            for (const auto &identity : identities)
                               {
                                 const types::global_dof_index master_dof_index =
-                                  quad->dof_index(identities[i].first,
+                                  quad->dof_index(identity.first,
                                                   most_dominating_fe_index);
                                 const types::global_dof_index slave_dof_index =
-                                  quad->dof_index(identities[i].second,
+                                  quad->dof_index(identity.second,
                                                   other_fe_index);
 
                                 // check if we are on an interface between
@@ -1964,7 +1962,7 @@ namespace internal
                                      numbers::invalid_dof_index) &&
                                     (master_dof_index !=
                                      numbers::invalid_dof_index))
-                                  quad->set_dof_index(identities[i].second,
+                                  quad->set_dof_index(identity.second,
                                                       master_dof_index,
                                                       other_fe_index);
                               }
@@ -2092,7 +2090,7 @@ namespace internal
         {
           std::vector<types::global_dof_index> local_dof_indices;
 
-          for (auto cell : dof_handler.active_cell_iterators())
+          for (const auto &cell : dof_handler.active_cell_iterators())
             if (cell->is_ghost() && (cell->subdomain_id() < subdomain_id))
               {
                 // we found a neighboring ghost cell whose subdomain
@@ -2103,7 +2101,7 @@ namespace internal
                 // the interface)
                 local_dof_indices.resize(cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices(local_dof_indices);
-                for (auto &local_dof_index : local_dof_indices)
+                for (const auto &local_dof_index : local_dof_indices)
                   if (local_dof_index != numbers::invalid_dof_index)
                     renumbering[local_dof_index] = numbers::invalid_dof_index;
               }
@@ -4552,12 +4550,9 @@ namespace internal
           using cellmap_t =
             std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>;
           cellmap_t neighbor_cell_list;
-          for (std::set<dealii::types::subdomain_id>::iterator it =
-                 level_ghost_owners.begin();
-               it != level_ghost_owners.end();
-               ++it)
+          for (const auto level_ghost_owner : level_ghost_owners)
             neighbor_cell_list.insert(
-              std::make_pair(*it, CellDataTransferBuffer<dim>()));
+              std::make_pair(level_ghost_owner, CellDataTransferBuffer<dim>()));
 
           for (typename DoFHandlerType::level_cell_iterator cell =
                  dof_handler.begin(0);
@@ -5185,7 +5180,7 @@ namespace internal
           // mark all cells that either have to send data (locally
           // owned cells that are adjacent to ghost neighbors in some
           // way) or receive data (all ghost cells) via the user flags
-          for (auto cell : dof_handler->active_cell_iterators())
+          for (const auto &cell : dof_handler->active_cell_iterators())
             if (cell->is_locally_owned())
               {
                 for (unsigned int v = 0;
@@ -5236,7 +5231,7 @@ namespace internal
           // at this point, we must have taken care of the data transfer
           // on all cells we had previously marked. verify this
 #  ifdef DEBUG
-          for (auto cell : dof_handler->active_cell_iterators())
+          for (const auto &cell : dof_handler->active_cell_iterators())
             Assert(cell->user_flag_set() == false, ExcInternalError());
 #  endif
 
@@ -5248,7 +5243,7 @@ namespace internal
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          for (auto cell : dof_handler->active_cell_iterators())
+          for (const auto &cell : dof_handler->active_cell_iterators())
             if (!cell->is_artificial())
               {
                 local_dof_indices.resize(cell->get_fe().dofs_per_cell);
@@ -5373,12 +5368,9 @@ namespace internal
             // TODO: make this code simpler with the new constructors of
             // NumberCache make indices consecutive
             level_number_cache.n_locally_owned_dofs = 0;
-            for (std::vector<dealii::types::global_dof_index>::iterator it =
-                   renumbering.begin();
-                 it != renumbering.end();
-                 ++it)
-              if (*it != numbers::invalid_dof_index)
-                *it = level_number_cache.n_locally_owned_dofs++;
+            for (types::global_dof_index &index : renumbering)
+              if (index != numbers::invalid_dof_index)
+                index = level_number_cache.n_locally_owned_dofs++;
 
             //* 3. communicate local dofcount and shift ids to make
             // them unique
@@ -5400,12 +5392,9 @@ namespace internal
               level_number_cache.n_locally_owned_dofs_per_processor.begin() +
                 triangulation->locally_owned_subdomain(),
               static_cast<dealii::types::global_dof_index>(0));
-            for (std::vector<dealii::types::global_dof_index>::iterator it =
-                   renumbering.begin();
-                 it != renumbering.end();
-                 ++it)
-              if (*it != numbers::invalid_dof_index)
-                (*it) += shift;
+            for (types::global_dof_index &index : renumbering)
+              if (index != numbers::invalid_dof_index)
+                index += shift;
 
             // now re-enumerate all dofs to this shifted and condensed
             // numbering form.  we renumber some dofs as invalid, so
@@ -5669,7 +5658,7 @@ namespace internal
           triangulation->clear_user_flags();
 
           // mark all own cells for transfer
-          for (auto cell : dof_handler->active_cell_iterators())
+          for (const auto &cell : dof_handler->active_cell_iterators())
             if (!cell->is_artificial())
               cell->set_user_flag();
 
