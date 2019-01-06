@@ -1266,8 +1266,8 @@ namespace TrilinosWrappers
   SparseMatrix::clear_rows(const std::vector<size_type> &rows,
                            const TrilinosScalar          new_diag_value)
   {
-    for (size_type row = 0; row < rows.size(); ++row)
-      clear_row(rows[row], new_diag_value);
+    for (const auto row : rows)
+      clear_row(row, new_diag_value);
   }
 
 

@@ -342,9 +342,9 @@ DynamicSparsityPattern::max_entries_per_row() const
     return 0;
 
   size_type m = 0;
-  for (size_type i = 0; i < lines.size(); ++i)
+  for (const auto &line : lines)
     {
-      m = std::max(m, static_cast<size_type>(lines[i].entries.size()));
+      m = std::max(m, static_cast<size_type>(line.entries.size()));
     }
 
   return m;
@@ -484,11 +484,8 @@ DynamicSparsityPattern::print(std::ostream &out) const
     {
       out << '[' << (rowset.size() == 0 ? row : rowset.nth_index_in_set(row));
 
-      for (std::vector<size_type>::const_iterator j =
-             lines[row].entries.begin();
-           j != lines[row].entries.end();
-           ++j)
-        out << ',' << *j;
+      for (const auto entry : lines[row].entries)
+        out << ',' << entry;
 
       out << ']' << std::endl;
     }
@@ -506,16 +503,13 @@ DynamicSparsityPattern::print_gnuplot(std::ostream &out) const
       const size_type rowindex =
         rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<size_type>::const_iterator j =
-             lines[row].entries.begin();
-           j != lines[row].entries.end();
-           ++j)
+      for (const auto entry : lines[row].entries)
         // while matrix entries are usually
         // written (i,j), with i vertical and
         // j horizontal, gnuplot output is
         // x-y, that is we have to exchange
         // the order of output
-        out << *j << " " << -static_cast<signed int>(rowindex) << std::endl;
+        out << entry << " " << -static_cast<signed int>(rowindex) << std::endl;
     }
 
 
@@ -533,13 +527,10 @@ DynamicSparsityPattern::bandwidth() const
       const size_type rowindex =
         rowset.size() == 0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<size_type>::const_iterator j =
-             lines[row].entries.begin();
-           j != lines[row].entries.end();
-           ++j)
-        if (static_cast<size_type>(std::abs(static_cast<int>(rowindex - *j))) >
-            b)
-          b = std::abs(static_cast<signed int>(rowindex - *j));
+      for (const auto entry : lines[row].entries)
+        if (static_cast<size_type>(
+              std::abs(static_cast<int>(rowindex - entry))) > b)
+          b = std::abs(static_cast<signed int>(rowindex - entry));
     }
 
   return b;
@@ -554,9 +545,9 @@ DynamicSparsityPattern::n_nonzero_elements() const
     return 0;
 
   size_type n = 0;
-  for (size_type i = 0; i < lines.size(); ++i)
+  for (const auto &line : lines)
     {
-      n += lines[i].entries.size();
+      n += line.entries.size();
     }
 
   return n;
@@ -570,8 +561,8 @@ DynamicSparsityPattern::memory_consumption() const
                   MemoryConsumption::memory_consumption(rowset) -
                   sizeof(rowset);
 
-  for (size_type i = 0; i < lines.size(); ++i)
-    mem += MemoryConsumption::memory_consumption(lines[i]);
+  for (const auto &line : lines)
+    mem += MemoryConsumption::memory_consumption(line);
 
   return mem;
 }

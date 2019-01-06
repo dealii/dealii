@@ -278,8 +278,7 @@ ScaLAPACKMatrix<NumberType>::reinit(
       // set process-local variables to something telling:
       n_local_rows    = -1;
       n_local_columns = -1;
-      for (unsigned int i = 0; i < 9; ++i)
-        descriptor[i] = -1;
+      std::fill(std::begin(descriptor), std::end(descriptor), -1);
     }
 }
 
