@@ -100,11 +100,11 @@ FE_ABF<dim>::FE_ABF(const unsigned int deg)
   this->interface_constraints.reinit((1 << (dim - 1)) * this->dofs_per_face,
                                      this->dofs_per_face);
   unsigned int target_row = 0;
-  for (unsigned int d = 0; d < face_embeddings.size(); ++d)
-    for (unsigned int i = 0; i < face_embeddings[d].m(); ++i)
+  for (const auto &face_embedding : face_embeddings)
+    for (unsigned int i = 0; i < face_embedding.m(); ++i)
       {
-        for (unsigned int j = 0; j < face_embeddings[d].n(); ++j)
-          this->interface_constraints(target_row, j) = face_embeddings[d](i, j);
+        for (unsigned int j = 0; j < face_embedding.n(); ++j)
+          this->interface_constraints(target_row, j) = face_embedding(i, j);
         ++target_row;
       }
 }

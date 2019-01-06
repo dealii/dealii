@@ -2162,10 +2162,9 @@ FESystem<dim, spacedim>::hp_object_dof_identities(
                 Assert(false, ExcNotImplemented());
             }
 
-          for (unsigned int i = 0; i < base_identities.size(); ++i)
-            identities.emplace_back(base_identities[i].first + dof_offset,
-                                    base_identities[i].second +
-                                      dof_offset_other);
+          for (const auto &base_identity : base_identities)
+            identities.emplace_back(base_identity.first + dof_offset,
+                                    base_identity.second + dof_offset_other);
 
           // record the dofs treated above as already taken care of
           dof_offset += base.template n_dofs_per_object<structdim>();
@@ -2407,10 +2406,9 @@ FESystem<dim, spacedim>::get_constant_modes() const
                              k) = base_table.first(c, ind.second);
         }
       for (unsigned int r = 0; r < element_multiplicity; ++r)
-        for (unsigned int c = 0; c < base_table.second.size(); ++c)
+        for (const unsigned int c : base_table.second)
           components.push_back(
-            comp + r * this->base_elements[i].first->n_components() +
-            base_table.second[c]);
+            comp + r * this->base_elements[i].first->n_components() + c);
     }
   AssertDimension(components.size(), constant_modes.n_rows());
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(constant_modes,
