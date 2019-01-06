@@ -285,25 +285,112 @@ namespace NonMatching
                                   update_JxW_values | update_quadrature_points |
                                     update_values);
 
-    // Now we run on ech cell, get a quadrature formula
+    const unsigned int n_q_points = quad.size();
+    const unsigned int n_active_c =
+      immersed_dh.get_triangulation().n_active_cells();
+    std::vector<Point<spacedim>> all_points(n_active_c * n_q_points);
+
+    // Collecting all points
+    {
+      unsigned int c = 0;
+      for (const auto &cell : immersed_dh.active_cell_iterators())
+        {
+          // Reinitialize the cell and the fe_values
+          fe_v.reinit(cell);
+          const std::vector<Point<spacedim>> &x_points =
+            fe_v.get_quadrature_points();
+
+          // Copy the points to the vector
+          std::copy(x_points.begin(),
+                    x_points.end(),
+                    all_points.begin() + c * n_q_points);
+          ++c;
+        }
+    }
+
+    // Get a list of outer cells, qpoints and maps.
+    const auto  cpm = GridTools::compute_point_locations(cache, all_points);
+    const auto &all_cells   = std::get<0>(cpm);
+    const auto &all_qpoints = std::get<1>(cpm);
+    const auto &all_maps    = std::get<2>(cpm);
+
+    std::vector<
+      std::vector<typename Triangulation<dim0, spacedim>::active_cell_iterator>>
+                                                       cell_container(n_active_c);
+    std::vector<std::vector<std::vector<Point<dim0>>>> qpoints_container(
+      n_active_c);
+    std::vector<std::vector<std::vector<unsigned int>>> maps_container(
+      n_active_c);
+
+    // Cycle over all cells of underling mesh found
+    // call it omesh, elaborating the output
+    for (unsigned int o = 0; o < all_cells.size(); ++o)
+      {
+        for (unsigned int j = 0; j < all_maps[o].size(); ++j)
+          {
+            // Find the index of the "owner" cell and qpoint
+            // with regard to the immersed mesh
+            const unsigned int cell_id = all_maps[o][j] / n_q_points;
+            const unsigned int n_pt    = all_maps[o][j] % n_q_points;
+
+            // If there are no cells, we just add our data
+            if (cell_container[cell_id].empty())
+              {
+                cell_container[cell_id].emplace_back(all_cells[o]);
+                qpoints_container[cell_id].emplace_back(
+                  std::vector<Point<dim0>>{all_qpoints[o][j]});
+                maps_container[cell_id].emplace_back(
+                  std::vector<unsigned int>{n_pt});
+              }
+            // If there are already cells, we begin by looking
+            // at the last inserted cell, which is more likely:
+            else if (cell_container[cell_id].back() == all_cells[o])
+              {
+                qpoints_container[cell_id].back().emplace_back(
+                  all_qpoints[o][j]);
+                maps_container[cell_id].back().emplace_back(n_pt);
+              }
+            else
+              {
+                // We don't need to check the last element
+                const auto cell_p = std::find(cell_container[cell_id].begin(),
+                                              cell_container[cell_id].end() - 1,
+                                              all_cells[o]);
+
+                if (cell_p == cell_container[cell_id].end() - 1)
+                  {
+                    cell_container[cell_id].emplace_back(all_cells[o]);
+                    qpoints_container[cell_id].emplace_back(
+                      std::vector<Point<dim0>>{all_qpoints[o][j]});
+                    maps_container[cell_id].emplace_back(
+                      std::vector<unsigned int>{n_pt});
+                  }
+                else
+                  {
+                    const unsigned int pos =
+                      cell_p - cell_container[cell_id].begin();
+                    qpoints_container[cell_id][pos].emplace_back(
+                      all_qpoints[o][j]);
+                    maps_container[cell_id][pos].emplace_back(n_pt);
+                  }
+              }
+          }
+      }
+
     typename DoFHandler<dim1, spacedim>::active_cell_iterator
       cell = immersed_dh.begin_active(),
       endc = immersed_dh.end();
 
-    for (; cell != endc; ++cell)
+    for (unsigned int j = 0; cell != endc; ++cell, ++j)
       {
         // Reinitialize the cell and the fe_values
         fe_v.reinit(cell);
         cell->get_dof_indices(dofs);
 
-        const std::vector<Point<spacedim>> &Xpoints =
-          fe_v.get_quadrature_points();
-
         // Get a list of outer cells, qpoints and maps.
-        const auto  cpm   = GridTools::compute_point_locations(cache, Xpoints);
-        const auto &cells = std::get<0>(cpm);
-        const auto &qpoints = std::get<1>(cpm);
-        const auto &maps    = std::get<2>(cpm);
+        const auto &cells   = cell_container[j];
+        const auto &qpoints = qpoints_container[j];
+        const auto &maps    = maps_container[j];
 
         for (unsigned int c = 0; c < cells.size(); ++c)
           {
