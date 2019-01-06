@@ -1756,14 +1756,11 @@ namespace MatrixCreator
               // for this purpose we seek the diagonal of the matrix, where
               // there must be an element belonging to the boundary. we take the
               // maximum diagonal entry.
-              types::global_dof_index max_element =
-                static_cast<types::global_dof_index>(0);
-              for (std::vector<types::global_dof_index>::const_iterator i =
-                     dof_to_boundary_mapping.begin();
-                   i != dof_to_boundary_mapping.end();
-                   ++i)
-                if ((*i != numbers::invalid_dof_index) && (*i > max_element))
-                  max_element = *i;
+              types::global_dof_index max_element = 0;
+              for (const auto index : dof_to_boundary_mapping)
+                if ((index != numbers::invalid_dof_index) &&
+                    (index > max_element))
+                  max_element = index;
               Assert(max_element == matrix.n() - 1, ExcInternalError());
 
               double max_diag_entry = 0;

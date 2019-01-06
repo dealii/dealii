@@ -1559,7 +1559,8 @@ TimeDependent::do_loop(InitFunctionObject      init_function,
 
 
   // wake up the first few time levels
-  for (int step = -timestepping_data.look_ahead; step < 0; ++step)
+  for (int step = -static_cast<int>(timestepping_data.look_ahead); step < 0;
+       ++step)
     for (int look_ahead = 0;
          look_ahead <= static_cast<int>(timestepping_data.look_ahead);
          ++look_ahead)
