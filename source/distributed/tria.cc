@@ -1355,15 +1355,13 @@ namespace parallel
       // following loops will be skipped.
       std::vector<unsigned int> local_sizes_fixed(
         1 + n_callbacks_fixed + (variable_size_data_stored ? 1 : 0));
-      for (auto data_cell_fixed_it = packed_fixed_size_data.cbegin();
-           data_cell_fixed_it != packed_fixed_size_data.cend();
-           ++data_cell_fixed_it)
+      for (const auto &data_cell : packed_fixed_size_data)
         {
-          if (data_cell_fixed_it->size() == local_sizes_fixed.size())
+          if (data_cell.size() == local_sizes_fixed.size())
             {
               auto sizes_fixed_it = local_sizes_fixed.begin();
-              auto data_fixed_it  = data_cell_fixed_it->cbegin();
-              for (; data_fixed_it != data_cell_fixed_it->cend();
+              auto data_fixed_it  = data_cell.cbegin();
+              for (; data_fixed_it != data_cell.cend();
                    ++data_fixed_it, ++sizes_fixed_it)
                 {
                   *sizes_fixed_it = data_fixed_it->size();
@@ -1404,16 +1402,12 @@ namespace parallel
       if (variable_size_data_stored)
         {
           src_sizes_variable.reserve(packed_variable_size_data.size());
-          for (auto data_cell_variable_it = packed_variable_size_data.cbegin();
-               data_cell_variable_it != packed_variable_size_data.cend();
-               ++data_cell_variable_it)
+          for (const auto &data_cell : packed_variable_size_data)
             {
               int variable_data_size_on_cell = 0;
 
-              for (auto data_variable_it = data_cell_variable_it->cbegin();
-                   data_variable_it != data_cell_variable_it->cend();
-                   ++data_variable_it)
-                variable_data_size_on_cell += data_variable_it->size();
+              for (const auto &data : data_cell)
+                variable_data_size_on_cell += data.size();
 
               src_sizes_variable.push_back(variable_data_size_on_cell);
             }
@@ -1431,24 +1425,20 @@ namespace parallel
 
       // Move every piece of packed fixed size data into the consecutive buffer.
       src_data_fixed.reserve(expected_size_fixed);
-      for (auto data_cell_fixed_it = packed_fixed_size_data.begin();
-           data_cell_fixed_it != packed_fixed_size_data.end();
-           ++data_cell_fixed_it)
+      for (const auto &data_cell_fixed : packed_fixed_size_data)
         {
           // Move every fraction of packed data into the buffer
           // reserved for this particular cell.
-          for (auto data_fixed_it = data_cell_fixed_it->begin();
-               data_fixed_it != data_cell_fixed_it->end();
-               ++data_fixed_it)
-            std::move(data_fixed_it->begin(),
-                      data_fixed_it->end(),
+          for (const auto &data_fixed : data_cell_fixed)
+            std::move(data_fixed.begin(),
+                      data_fixed.end(),
                       std::back_inserter(src_data_fixed));
 
           // If we only packed the CellStatus information
           // (i.e. encountered a cell flagged CELL_INVALID),
           // fill the remaining space with invalid entries.
           // We can skip this if there is nothing else to pack.
-          if ((data_cell_fixed_it->size() == 1) &&
+          if ((data_cell_fixed.size() == 1) &&
               (sizes_fixed_cumulative.size() > 1))
             {
               const std::size_t bytes_skipped =
@@ -1465,17 +1455,13 @@ namespace parallel
       if (variable_size_data_stored)
         {
           src_data_variable.reserve(expected_size_variable);
-          for (auto data_cell_variable_it = packed_variable_size_data.begin();
-               data_cell_variable_it != packed_variable_size_data.end();
-               ++data_cell_variable_it)
+          for (const auto &data_cell : packed_variable_size_data)
             {
               // Move every fraction of packed data into the buffer
               // reserved for this particular cell.
-              for (auto data_variable_it = data_cell_variable_it->begin();
-                   data_variable_it != data_cell_variable_it->end();
-                   ++data_variable_it)
-                std::move(data_variable_it->begin(),
-                          data_variable_it->end(),
+              for (const auto &data : data_cell)
+                std::move(data.begin(),
+                          data.end(),
                           std::back_inserter(src_data_variable));
             }
         }
@@ -2497,13 +2483,8 @@ namespace parallel
                       }
 
                   if (vertex_indices.size() > 0)
-                    for (std::set<dealii::types::subdomain_id>::iterator it =
-                           send_to.begin();
-                         it != send_to.end();
-                         ++it)
+                    for (const auto subdomain : send_to)
                       {
-                        const dealii::types::subdomain_id subdomain = *it;
-
                         // get an iterator to what needs to be sent to that
                         // subdomain (if already exists), or create such an
                         // object

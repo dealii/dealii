@@ -370,13 +370,13 @@ namespace parallel
 
     std::vector<bool> vertex_of_own_cell(this->n_vertices(), false);
 
-    for (auto cell : this->active_cell_iterators())
+    for (const auto &cell : this->active_cell_iterators())
       if (cell->is_locally_owned())
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
           vertex_of_own_cell[cell->vertex_index(v)] = true;
 
     std::map<unsigned int, std::set<dealii::types::subdomain_id>> result;
-    for (auto cell : this->active_cell_iterators())
+    for (const auto &cell : this->active_cell_iterators())
       if (cell->is_ghost())
         {
           const types::subdomain_id owner = cell->subdomain_id();
