@@ -1,0 +1,64 @@
+DEAL::-----------------------------------
+DEAL::1d, p=1, max_p=3, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::0.000831516
+DEAL::estimated regularity:
+DEAL::0.988446
+DEAL::-----------------------------------
+DEAL::2d, p=1, max_p=3, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::0.000415758
+DEAL::estimated regularity:
+DEAL::1.09966
+DEAL::-----------------------------------
+DEAL::3d, p=1, max_p=3, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::0.000207879
+DEAL::estimated regularity:
+DEAL::0.890459
+DEAL::-----------------------------------
+DEAL::1d, p=2, max_p=3, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::0.000637547
+DEAL::estimated regularity:
+DEAL::1.04031
+DEAL::-----------------------------------
+DEAL::2d, p=2, max_p=3, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::0.000212516
+DEAL::estimated regularity:
+DEAL::0.854283
+DEAL::-----------------------------------
+DEAL::3d, p=2, max_p=3, n_modes=3
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::7.08386e-05
+DEAL::estimated regularity:
+DEAL::0.504717
+DEAL::-----------------------------------
+DEAL::1d, p=3, max_p=3, n_modes=4
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::0.000375709
+DEAL::estimated regularity:
+DEAL::0.972651
+DEAL::-----------------------------------
+DEAL::2d, p=3, max_p=3, n_modes=4
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::9.39272e-05
+DEAL::estimated regularity:
+DEAL::0.522683
+DEAL::-----------------------------------
+DEAL::3d, p=3, max_p=3, n_modes=4
+DEAL::-----------------------------------
+DEAL::Linf norm in exact and calculate Fourier coefficients:
+DEAL::2.34818e-05
+DEAL::estimated regularity:
+DEAL::0.417735
+DEAL::Ok

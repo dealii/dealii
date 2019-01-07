@@ -1,0 +1,4 @@
+New: Member function hp::FECollection::max_degree() that returns the
+maximal polynomial degree of all finite elements in the collection.
+<br>
+(Marc Fehling, 2019/10/30)

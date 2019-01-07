@@ -29,6 +29,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_series.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
@@ -38,6 +39,8 @@
 
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/q_collection.h>
+#include <deal.II/hp/refinement.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -101,7 +104,9 @@ namespace Step27
     Vector<double> solution;
     Vector<double> system_rhs;
 
-    const unsigned int max_degree;
+    const unsigned int     max_degree;
+    hp::QCollection<dim>   fourier_q_collection;
+    FESeries::Fourier<dim> fourier;
   };
 
 
@@ -142,6 +147,17 @@ namespace Step27
         quadrature_collection.push_back(QGauss<dim>(degree + 1));
         face_quadrature_collection.push_back(QGauss<dim - 1>(degree + 1));
       }
+
+    QGauss<1>      base_quadrature(2);
+    QIterated<dim> quadrature(base_quadrature, max_degree);
+    for (unsigned int i = 0; i < fe_collection.size(); ++i)
+      fourier_q_collection.push_back(quadrature);
+
+    const std::vector<unsigned int> n_coefficients_per_direction(
+      fe_collection.size(), max_degree);
+    fourier.initialize(n_coefficients_per_direction,
+                       fe_collection,
+                       fourier_q_collection);
   }
 
 
@@ -269,10 +285,26 @@ namespace Step27
       solution,
       estimated_error_per_cell);
 
+    GridRefinement::refine_and_coarsen_fixed_number(triangulation,
+                                                    estimated_error_per_cell,
+                                                    0.3,
+                                                    0.03);
+
     Vector<float> smoothness_indicators;
-    SmoothnessEstimator::fourier_coefficient_decay(dof_handler,
-                                                   solution,
-                                                   smoothness_indicators);
+    SmoothnessEstimator::Fourier::coefficient_decay(
+      fourier,
+      dof_handler,
+      solution,
+      smoothness_indicators,
+      /*regression_strategy=*/VectorTools::Linfty_norm,
+      /*smallest_abs_coefficient=*/1e-10,
+      /*only_flagged_cells=*/true);
+
+    hp::Refinement::p_adaptivity_from_relative_threshold(dof_handler,
+                                                         smoothness_indicators,
+                                                         0.5,
+                                                         0);
+    hp::Refinement::choose_p_over_h(dof_handler);
 
     // Output to VTK
     if (false)
@@ -302,50 +334,7 @@ namespace Step27
         data_out.write_vtk(output);
       }
 
-    {
-      GridRefinement::refine_and_coarsen_fixed_number(triangulation,
-                                                      estimated_error_per_cell,
-                                                      0.3,
-                                                      0.03);
-
-      float max_smoothness = *std::min_element(smoothness_indicators.begin(),
-                                               smoothness_indicators.end()),
-            min_smoothness = *std::max_element(smoothness_indicators.begin(),
-                                               smoothness_indicators.end());
-      {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
-        for (; cell != endc; ++cell)
-          if (cell->refine_flag_set())
-            {
-              max_smoothness =
-                std::max(max_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
-              min_smoothness =
-                std::min(min_smoothness,
-                         smoothness_indicators(cell->active_cell_index()));
-            }
-      }
-      const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
-
-      {
-        typename hp::DoFHandler<dim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
-        for (; cell != endc; ++cell)
-          if (cell->refine_flag_set() &&
-              (smoothness_indicators(cell->active_cell_index()) >
-               threshold_smoothness) &&
-              (cell->active_fe_index() + 1 < fe_collection.size()))
-            {
-              cell->clear_refine_flag();
-              cell->set_active_fe_index(cell->active_fe_index() + 1);
-            }
-      }
-
-      triangulation.execute_coarsening_and_refinement();
-    }
+    triangulation.execute_coarsening_and_refinement();
   }
 
 

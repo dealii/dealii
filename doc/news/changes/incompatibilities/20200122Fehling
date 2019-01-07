@@ -1,0 +1,5 @@
+Changed: FESeries::Fourier and FESeries::Legendre now require to use an
+individual number of coefficients per direction for each finite element
+registered in the provided FECollection.
+<br>
+(Marc Fehling, 2020/01/22)

@@ -367,7 +367,7 @@ and see how fast they decay. If they decay as
 then consequently the function we had here was in $H^{\mu-d/2}$.
 
 
-<h4>What has to be done</h4>
+<h4>What we have to do</h4>
 
 So what do we have to do to estimate the local smoothness of $u({\bf x})$ on
 a cell $K$? Clearly, the first step is to compute the Fourier coefficients
@@ -403,9 +403,9 @@ cell. In other words, we can write it as a matrix-vector product
 @f]
 with the matrix
 @f[
-   {\cal F}_{{\bf k},j}
-   =
-   \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
+        {\cal F}_{{\bf k},j}
+        =
+        \int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
 @f]
 This matrix is easily computed for a given number of shape functions
 $\varphi_j$ and Fourier modes $N$. Consequently, finding the
@@ -509,10 +509,6 @@ $\beta$, the formula above gives us a mean to calculate the value of
 the exponent $\mu$ that we can then use to determine that
 $\hat u(\hat{\bf x})$ is in $H^s(\hat K)$ with $s=\mu-\frac d2$.
 
-These steps outlined above are applicable on many different scenarios, which
-motivated the introduction of a generic function
-SmoothnessEstimator::estimate_by_coefficient_decay() in deal.II, that combines all
-the tasks described in this section in one simple function call.
 
 <h4>Compensating for anisotropy</h4>
 

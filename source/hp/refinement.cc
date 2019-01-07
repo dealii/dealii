@@ -137,13 +137,9 @@ namespace hp
              dealii::GridRefinement::ExcInvalidParameterValue());
 
       // We first have to determine the maximal and minimal values of the
-      // criteria of all flagged cells. We start with the minimal and maximal
-      // values of all cells, a range within which the minimal and maximal
-      // values on cells flagged for refinement must surely lie.
-      Number max_criterion_refine =
-               *std::min_element(criteria.begin(), criteria.end()),
-             min_criterion_refine =
-               *std::max_element(criteria.begin(), criteria.end());
+      // criteria of all flagged cells.
+      Number max_criterion_refine  = std::numeric_limits<Number>::lowest(),
+             min_criterion_refine  = std::numeric_limits<Number>::max();
       Number max_criterion_coarsen = max_criterion_refine,
              min_criterion_coarsen = min_criterion_refine;
 

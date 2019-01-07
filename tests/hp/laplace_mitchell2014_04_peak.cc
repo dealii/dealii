@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2020 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,8 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-// test SmoothnessEstimator::legendre_coefficient_decay() on
-// problem 4 (peak) in Mitchel 2014.
+
+
+// test SmoothnessEstimator::Legendre::coefficient_decay_per_direction()
+// on problem 4 (peak) in Mitchell 2014.
+
 
 #include "laplace.h"
 
@@ -103,12 +106,14 @@ private:
   estimate_error();
   void
   mark_h_cells();
-
-  std::pair<unsigned int, unsigned int>
-  substitute_h_for_p(
-    std::vector<typename Triangulation<dim>::active_cell_iterator> &p_cells);
+  void
+  substitute_h_for_p();
 
   hp::QCollection<dim - 1> quadrature_face;
+
+  std::vector<unsigned int> n_coefficients_per_direction;
+  hp::QCollection<dim>      expansion_q_collection;
+  FESeries::Legendre<dim>   legendre;
 };
 
 template <int dim>
@@ -135,45 +140,42 @@ Problem4<dim>::Problem4(const Function<dim> &force_function,
       const QIterated<dim> q_iterated(q_trapez, p + 3);
       Laplace<dim>::quadrature_infty.push_back(QSorted<dim>(q_iterated));
     }
+
+  // after the FECollection has been generated, create a corresponding legendre
+  // series expansion object
+  n_coefficients_per_direction =
+    SmoothnessEstimator::Legendre::default_number_of_coefficients_per_direction(
+      Laplace<dim>::fe);
+  expansion_q_collection =
+    SmoothnessEstimator::Legendre::default_quadrature_collection(
+      Laplace<dim>::fe);
+  legendre.initialize(n_coefficients_per_direction,
+                      Laplace<dim>::fe,
+                      expansion_q_collection);
 }
 
 
 
 template <int dim>
-std::pair<unsigned int, unsigned int>
-Problem4<dim>::substitute_h_for_p(
-  std::vector<typename Triangulation<dim>::active_cell_iterator> &p_cells)
+void
+Problem4<dim>::substitute_h_for_p()
 {
   Vector<float> smoothness_indicators(
     Laplace<dim>::triangulation.n_active_cells());
-  SmoothnessEstimator::legendre_coefficient_decay(Laplace<dim>::dof_handler,
-                                                  Laplace<dim>::solution,
-                                                  smoothness_indicators);
+  SmoothnessEstimator::Legendre::coefficient_decay_per_direction(
+    legendre,
+    Laplace<dim>::dof_handler,
+    Laplace<dim>::solution,
+    smoothness_indicators);
 
-  unsigned int num_p_cells = 0;
-  unsigned int num_h_cells = 0;
-  for (auto &cell : Laplace<dim>::dof_handler.active_cell_iterators())
-    if (cell->refine_flag_set())
-      {
-        typename Triangulation<dim>::active_cell_iterator tria_cell(
-          &(Laplace<dim>::triangulation), cell->level(), cell->index());
-
-        const unsigned int cur_fe_index = cell->active_fe_index();
-        const bool p_ref = smoothness_indicators(cell->index()) < exp(-1.);
-
-        if (cur_fe_index < Laplace<dim>::fe.size() - 1 && p_ref)
-          {
-            ++num_p_cells;
-            cell->clear_refine_flag();
-            p_cells.push_back(tria_cell);
-          }
-        else
-          {
-            ++num_h_cells;
-          }
-      }
-
-  return std::make_pair(num_h_cells, num_p_cells);
+  hp::Refinement::p_adaptivity_from_absolute_threshold(
+    Laplace<dim>::dof_handler,
+    smoothness_indicators,
+    static_cast<float>(1.),
+    static_cast<float>(0.),
+    std::greater<float>(),
+    std::less<float>());
+  hp::Refinement::choose_p_over_h(Laplace<dim>::dof_handler);
 }
 
 

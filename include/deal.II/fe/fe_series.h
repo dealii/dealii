@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_fe_series_H
-#define dealii_fe_series_H
+#ifndef dealii_fe_series_h
+#define dealii_fe_series_h
 
 
 
@@ -94,15 +94,49 @@ namespace FESeries
     using CoefficientType = typename std::complex<double>;
 
     /**
-     * A non-default constructor. The @p size_in_each_direction defines the number
-     * of modes in each direction, @p fe_collection is the hp::FECollection
+     * Default constructor.
+     *
+     * Leaves all members in an empty or uninitialized state. Please call
+     * initialize() once you have all data structures ready.
+     */
+    Fourier() = default;
+
+    /**
+     * Constructor that initializes all required data structures.
+     *
+     * The @p n_coefficients_per_direction defines the number of coefficients in
+     * each direction, @p fe_collection is the hp::FECollection for which
+     * expansion will be used and @p q_collection is the hp::QCollection used to
+     * integrate the expansion for each FiniteElement in @p fe_collection.
+     */
+    Fourier(const std::vector<unsigned int> &      n_coefficients_per_direction,
+            const hp::FECollection<dim, spacedim> &fe_collection,
+            const hp::QCollection<dim> &           q_collection);
+
+    /**
+     * A non-default constructor. The @p n_coefficients_per_direction defines the
+     * number of modes in each direction, @p fe_collection is the hp::FECollection
      * for which expansion will be used and @p q_collection is the hp::QCollection
      * used to integrate the expansion for each FiniteElement
      * in @p fe_collection.
+     *
+     * @deprecated Use a different constructor instead.
      */
-    Fourier(const unsigned int                     size_in_each_direction,
+    DEAL_II_DEPRECATED
+    Fourier(const unsigned int                     n_coefficients_per_direction,
             const hp::FECollection<dim, spacedim> &fe_collection,
             const hp::QCollection<dim> &           q_collection);
+
+    /**
+     * Initialize and overwrite all mandatory data structures for the
+     * calculation calculation of transformation matrices.
+     *
+     * All previously calculated transformation matrices will be cleared.
+     */
+    void
+    initialize(const std::vector<unsigned int> &n_coefficients_per_direction,
+               const hp::FECollection<dim, spacedim> &fe_collection,
+               const hp::QCollection<dim> &           q_collection);
 
     /**
      * Calculate @p fourier_coefficients of the cell vector field given by
@@ -114,6 +148,13 @@ namespace FESeries
     calculate(const dealii::Vector<Number> &local_dof_values,
               const unsigned int            cell_active_fe_index,
               Table<dim, CoefficientType> & fourier_coefficients);
+
+    /**
+     * Return the number of coefficients in each coordinate direction for the
+     * finite element associated with @p index in the provided hp::FECollection.
+     */
+    unsigned int
+    get_n_coefficients_per_direction(const unsigned int index) const;
 
     /**
      * Calculate all transformation matrices to transfer the finite element
@@ -157,6 +198,12 @@ namespace FESeries
 
   private:
     /**
+     * Number of coefficients in each direction for each finite element in the
+     * registered hp::FECollection.
+     */
+    std::vector<unsigned int> n_coefficients_per_direction;
+
+    /**
      * hp::FECollection for which transformation matrices will be calculated.
      */
     SmartPointer<const hp::FECollection<dim, spacedim>> fe_collection;
@@ -181,6 +228,8 @@ namespace FESeries
      */
     std::vector<CoefficientType> unrolled_coefficients;
   };
+
+
 
   /**
    * A class to calculate expansion of a scalar FE field into series of Legendre
@@ -232,15 +281,48 @@ namespace FESeries
     using CoefficientType = double;
 
     /**
+     * Default constructor.
+     *
+     * Leaves all members in an empty or uninitialized state. Please call
+     * initialize() once you have all data structures ready.
+     */
+    Legendre() = default;
+
+    /**
+     * Constructor that initializes all required data structures.
+     *
+     * The @p n_coefficients_per_direction defines the number of coefficients in
+     * each direction, @p fe_collection is the hp::FECollection for which
+     * expansion will be used and @p q_collection is the hp::QCollection used to
+     * integrate the expansion for each FiniteElement in @p fe_collection.
+     */
+    Legendre(const std::vector<unsigned int> &n_coefficients_per_direction,
+             const hp::FECollection<dim, spacedim> &fe_collection,
+             const hp::QCollection<dim> &           q_collection);
+
+    /**
      * A non-default constructor. The @p size_in_each_direction defines the number
      * of coefficients in each direction, @p fe_collection is the hp::FECollection
      * for which expansion will be used and @p q_collection is the hp::QCollection
-     * used to integrate the expansion for each FiniteElement
-     * in @p fe_collection.
+     * used to integrate the expansion for each FiniteElement in @p fe_collection.
+     *
+     * @deprecated Use a different constructor instead.
      */
-    Legendre(const unsigned int                     size_in_each_direction,
+    DEAL_II_DEPRECATED
+    Legendre(const unsigned int n_coefficients_per_direction,
              const hp::FECollection<dim, spacedim> &fe_collection,
              const hp::QCollection<dim> &           q_collection);
+
+    /**
+     * Initialize and overwrite all mandatory data structures for the
+     * calculation of transformation matrices.
+     *
+     * All previously calculated transformation matrices will be cleared.
+     */
+    void
+    initialize(const std::vector<unsigned int> &n_coefficients_per_direction,
+               const hp::FECollection<dim, spacedim> &fe_collection,
+               const hp::QCollection<dim> &           q_collection);
 
     /**
      * Calculate @p legendre_coefficients of the cell vector field given by
@@ -254,10 +336,11 @@ namespace FESeries
               Table<dim, CoefficientType> & legendre_coefficients);
 
     /**
-     * Return number of coefficients in each coordinate direction.
+     * Return the number of coefficients in each coordinate direction for the
+     * finite element associated with @p index in the provided hp::FECollection.
      */
     unsigned int
-    get_size_in_each_direction() const;
+    get_n_coefficients_per_direction(const unsigned int index) const;
 
     /**
      * Calculate all transformation matrices to transfer the finite element
@@ -301,9 +384,10 @@ namespace FESeries
 
   private:
     /**
-     * Number of coefficients in each direction
+     * Number of coefficients in each direction for each finite element in the
+     * registered hp::FECollection.
      */
-    const unsigned int N;
+    std::vector<unsigned int> n_coefficients_per_direction;
 
     /**
      * hp::FECollection for which transformation matrices will be calculated.
@@ -327,6 +411,7 @@ namespace FESeries
   };
 
 
+
   /**
    * Calculate the @p norm of subsets of @p coefficients defined by
    * @p predicate being constant. Return the pair of vectors of predicate values
@@ -337,18 +422,20 @@ namespace FESeries
    * used in calculation, whereas the latter is the unrolled value of indices
    * according to which the subsets of coefficients will be formed.
    *
-   * @note Only the following values of @p norm are implemented and make sense
-   * in this case: mean, L1_norm, L2_norm, Linfty_norm. The mean norm can only
-   * be applied to real valued coefficients.
+   * Only those coefficients will be considered which are larger than
+   * @p smallest_abs_coefficient.
+   *
+   * @note Only the following values of @p norm_type are implemented and make
+   * sense in this case: mean, L1_norm, L2_norm, Linfty_norm. The mean norm ca
+   * only be applied to real valued coefficients.
    */
   template <int dim, typename CoefficientType>
   std::pair<std::vector<unsigned int>, std::vector<double>>
   process_coefficients(const Table<dim, CoefficientType> &coefficients,
                        const std::function<std::pair<bool, unsigned int>(
                          const TableIndices<dim> &)> &    predicate,
-                       const VectorTools::NormType        norm);
-
-
+                       const VectorTools::NormType        norm_type,
+                       const double smallest_abs_coefficient = 1e-10);
 
   /**
    * Linear regression least-square fit of $y = k \, x + b$.
@@ -361,6 +448,8 @@ namespace FESeries
 } // namespace FESeries
 
 /*@}*/
+
+
 
 #ifndef DOXYGEN
 
@@ -391,6 +480,8 @@ namespace internal
       pred_to_values[pred_value].push_back(coeff_value);
     }
 
+
+
     template <typename CoefficientType>
     void
     fill_map(
@@ -405,6 +496,8 @@ namespace internal
           fill_map_index(coefficients, ind, predicate, pred_to_values);
         }
     }
+
+
 
     template <typename CoefficientType>
     void
@@ -421,6 +514,8 @@ namespace internal
             fill_map_index(coefficients, ind, predicate, pred_to_values);
           }
     }
+
+
 
     template <typename CoefficientType>
     void
@@ -440,12 +535,15 @@ namespace internal
     }
 
 
+
     template <typename Number>
     double
     complex_mean_value(const Number &value)
     {
       return value;
     }
+
+
 
     template <typename Number>
     double
@@ -461,14 +559,19 @@ namespace internal
 } // namespace internal
 
 
+
 template <int dim, typename CoefficientType>
 std::pair<std::vector<unsigned int>, std::vector<double>>
 FESeries::process_coefficients(
   const Table<dim, CoefficientType> &coefficients,
   const std::function<std::pair<bool, unsigned int>(const TableIndices<dim> &)>
     &                         predicate,
-  const VectorTools::NormType norm)
+  const VectorTools::NormType norm_type,
+  const double                smallest_abs_coefficient)
 {
+  Assert(smallest_abs_coefficient >= 0.,
+         ExcMessage("smallest_abs_coefficient should be non-negative."));
+
   std::vector<unsigned int> predicate_values;
   std::vector<double>       norm_values;
 
@@ -483,37 +586,43 @@ FESeries::process_coefficients(
   // now go through the map and populate the @p norm_values based on @p norm:
   for (const auto &pred_to_value : pred_to_values)
     {
-      predicate_values.push_back(pred_to_value.first);
       Vector<CoefficientType> values(pred_to_value.second.cbegin(),
                                      pred_to_value.second.cend());
 
-      switch (norm)
+      double norm_value = 0;
+      switch (norm_type)
         {
           case VectorTools::L2_norm:
             {
-              norm_values.push_back(values.l2_norm());
+              norm_value = values.l2_norm();
               break;
             }
           case VectorTools::L1_norm:
             {
-              norm_values.push_back(values.l1_norm());
+              norm_value = values.l1_norm();
               break;
             }
           case VectorTools::Linfty_norm:
             {
-              norm_values.push_back(values.linfty_norm());
+              norm_value = values.linfty_norm();
               break;
             }
           case VectorTools::mean:
             {
-              norm_values.push_back(
-                internal::FESeriesImplementation::complex_mean_value(
-                  values.mean_value()));
+              norm_value = internal::FESeriesImplementation::complex_mean_value(
+                values.mean_value());
               break;
             }
           default:
             AssertThrow(false, ExcNotImplemented());
             break;
+        }
+
+      // will use all non-zero coefficients
+      if (std::abs(norm_value) > smallest_abs_coefficient)
+        {
+          predicate_values.push_back(pred_to_value.first);
+          norm_values.push_back(norm_value);
         }
     }
 
@@ -532,12 +641,11 @@ FESeries::Fourier<dim, spacedim>::save_transformation_matrices(
   // Store information about those resources which have been used to generate
   // the transformation matrices.
   // mode vector
-  unsigned int size = k_vectors.n_elements();
-  ar &         size;
+  ar &n_coefficients_per_direction;
 
   // finite element collection
-  size = fe_collection->size();
-  ar &size;
+  unsigned int size = fe_collection->size();
+  ar &         size;
   for (unsigned int i = 0; i < size; ++i)
     ar &(*fe_collection)[i].get_name();
 
@@ -563,12 +671,16 @@ FESeries::Fourier<dim, spacedim>::load_transformation_matrices(
   // Check whether the currently registered resources are compatible with
   // the transformation matrices to load.
   // mode vector
-  unsigned int size;
-  ar &         size;
-  AssertDimension(size, k_vectors.n_elements());
+  std::vector<unsigned int> compare_coefficients;
+  ar &                      compare_coefficients;
+  Assert(compare_coefficients == n_coefficients_per_direction,
+         ExcMessage("A different number of coefficients vector has been used "
+                    "to generate the transformation matrices you are about "
+                    "to load!"));
 
   // finite element collection
-  ar &size;
+  unsigned int size;
+  ar &         size;
   AssertDimension(size, fe_collection->size());
   std::string name;
   for (unsigned int i = 0; i < size; ++i)
@@ -607,12 +719,11 @@ FESeries::Legendre<dim, spacedim>::save_transformation_matrices(
   // Store information about those resources which have been used to generate
   // the transformation matrices.
   // mode vector
-  unsigned int size = N;
-  ar &         size;
+  ar &n_coefficients_per_direction;
 
   // finite element collection
-  size = fe_collection->size();
-  ar &size;
+  unsigned int size = fe_collection->size();
+  ar &         size;
   for (unsigned int i = 0; i < size; ++i)
     ar &(*fe_collection)[i].get_name();
 
@@ -638,12 +749,16 @@ FESeries::Legendre<dim, spacedim>::load_transformation_matrices(
   // Check whether the currently registered resources are compatible with
   // the transformation matrices to load.
   // mode vector
-  unsigned int size;
-  ar &         size;
-  AssertDimension(size, N);
+  std::vector<unsigned int> compare_coefficients;
+  ar &                      compare_coefficients;
+  Assert(compare_coefficients == n_coefficients_per_direction,
+         ExcMessage("A different number of coefficients vector has been used "
+                    "to generate the transformation matrices you are about "
+                    "to load!"));
 
   // finite element collection
-  ar &size;
+  unsigned int size;
+  ar &         size;
   AssertDimension(size, fe_collection->size());
   std::string name;
   for (unsigned int i = 0; i < size; ++i)
@@ -675,4 +790,4 @@ FESeries::Legendre<dim, spacedim>::load_transformation_matrices(
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii_fe_series_H
+#endif // dealii_fe_series_h

@@ -228,7 +228,8 @@ namespace hp
     n_blocks() const;
 
     /**
-     * Return the maximal degree over all elements of this collection.
+     * Return the maximum of values returned by FiniteElement::get_degree()
+     * over all elements of this collection.
      */
     unsigned int
     max_degree() const;

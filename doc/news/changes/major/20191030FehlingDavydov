@@ -1,0 +1,4 @@
+New: Namespace SmoothnessEstimator providing smoothness estimation strategies
+for hp-adaptive FEM based on Fourier and Legendre series expansions.
+<br>
+(Marc Fehling, Denis Davydov, 2019/10/30)
