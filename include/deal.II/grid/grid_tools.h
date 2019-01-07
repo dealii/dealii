@@ -2696,24 +2696,32 @@ namespace GridTools
   /**
    * In this collective operation each process provides a vector
    * of bounding boxes and a communicator.
-   * All these vectors are gathered in each process
-   * and organized in a search tree which is then returned.
+   * All these vectors are gathered on each of the processes,
+   * organized in a search tree which, and then returned.
    *
-   * The idea is that the vector of bounding boxes describes
-   * a relevant property which could be of use to other processes,
-   * e.g. for a distributed triangulation, the bounding
-   * boxes could describe the portion of the mesh which is
-   * locally owned by the current process.
+   * The idea is that the vector of bounding boxes describes a
+   * relevant property of the computations on each process
+   * individually, which could also be of use to other processes. An
+   * example would be if the input vector of bounding boxes
+   * corresponded to a covering of the locally owned partition of a
+   * mesh (see @ref GlossLocallyOwnedCell) of a
+   * parallel::distributed::Triangulation object. While these may
+   * overlap the bounding boxes of other processes, finding which
+   * process owns the cell that encloses a given point is vastly
+   * easier if the process trying to figure this out has a list of
+   * bounding boxes for each of the other processes at hand.
    *
-   * The search tree is an r-tree with packing algorithm,
-   * which is provided by boost library.
+   * The returned search tree object is an r-tree with packing
+   * algorithm, which is provided by boost library. See
+   * https://www.boost.org/doc/libs/1_67_0/libs/geometry/doc/html/geometry/spatial_indexes/introduction.html
+   * for more information.
    *
    * In the returned tree, each node contains a pair of elements:
    * the first being a bounding box,
    * the second being the rank of the process whose local description
    * contains the bounding box.
    *
-   * Note: this function is a collective operation.
+   * @note This function is a collective operation.
    *
    * @author Giovanni Alzetta, 2018.
    */
