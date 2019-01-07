@@ -22,6 +22,8 @@
 #  include <deal.II/base/bounding_box.h>
 #  include <deal.II/base/geometry_info.h>
 
+#  include <deal.II/boost_adaptors/bounding_box.h>
+
 #  include <deal.II/dofs/dof_handler.h>
 
 #  include <deal.II/fe/mapping.h>
@@ -40,6 +42,7 @@
 
 #  include <boost/archive/binary_iarchive.hpp>
 #  include <boost/archive/binary_oarchive.hpp>
+#  include <boost/geometry/index/detail/serialization.hpp>
 #  include <boost/optional.hpp>
 #  include <boost/serialization/array.hpp>
 #  include <boost/serialization/vector.hpp>
@@ -2688,6 +2691,36 @@ namespace GridTools
   std::vector<std::vector<BoundingBox<spacedim>>>
   exchange_local_bounding_boxes(
     const std::vector<BoundingBox<spacedim>> &local_bboxes,
+    MPI_Comm                                  mpi_communicator);
+
+  /**
+   * In this collective operation each process provides a vector
+   * of bounding boxes and a communicator.
+   * All these vectors are gathered in each process
+   * and organized in a search tree which is then returned.
+   *
+   * The idea is that the vector of bounding boxes describes
+   * a relevant property which could be of use to other processes,
+   * e.g. for a distributed triangulation, the bounding
+   * boxes could describe the portion of the mesh which is
+   * locally owned by the current process.
+   *
+   * The search tree is an r-tree with packing algorithm,
+   * which is provided by boost library.
+   *
+   * In the returned tree, each node contains a pair of elements:
+   * the first being a bounding box,
+   * the second being the rank of the process whose local description
+   * contains the bounding box.
+   *
+   * Note: this function is a collective operation.
+   *
+   * @author Giovanni Alzetta, 2018.
+   */
+  template <int spacedim>
+  RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
+  build_global_description_tree(
+    const std::vector<BoundingBox<spacedim>> &local_description,
     MPI_Comm                                  mpi_communicator);
 
   /**

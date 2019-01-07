@@ -1,0 +1,6 @@
+New: Function GridTools::build_global_description_tree which exchanges a given
+vector of bounding boxes on all processes and uses the result to build an Rtree
+with packing algorithm.
+<br>
+(Giovanni Alzetta, 2018/12/17)
+

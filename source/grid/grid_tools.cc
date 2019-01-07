@@ -5081,6 +5081,65 @@ namespace GridTools
 #endif // DEAL_II_WITH_MPI
   }
 
+  template <int spacedim>
+  RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
+  build_global_description_tree(
+    const std::vector<BoundingBox<spacedim>> &local_description,
+    MPI_Comm                                  mpi_communicator)
+  {
+#ifndef DEAL_II_WITH_MPI
+    (void)local_description;
+    (void)mpi_communicator;
+    Assert(false,
+           ExcMessage(
+             "GridTools::build_global_description_tree() requires MPI."));
+    return RTree<std::pair<BoundingBox<spacedim>, unsigned int>>{};
+#else
+    // Exchanging local bounding boxes
+    std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes;
+    global_bboxes =
+      Utilities::MPI::all_gather(mpi_communicator, local_description);
+
+    // Preparing to flatten the vector
+    unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
+    unsigned int tot_bboxes = 0;
+    // The i element of the following vector contains the index of the first
+    // local bounding box from the process of rank i
+    std::vector<unsigned int> bboxes_position(n_procs);
+
+    for (const auto &process_bboxes : global_bboxes)
+      tot_bboxes += process_bboxes.size();
+
+    // Now flattening the vector
+    std::vector<std::pair<BoundingBox<spacedim>, unsigned int>>
+      flat_global_bboxes;
+    flat_global_bboxes.reserve(tot_bboxes);
+    unsigned int process_index = 0;
+    for (const auto &process_bboxes : global_bboxes)
+      {
+        // Initializing a vector containing bounding boxes and rank of a process
+        std::vector<std::pair<BoundingBox<spacedim>, unsigned int>>
+          boxes_and_indices(process_bboxes.size());
+        // Adding to each box the rank of the process owning it
+        for (unsigned int i = 0; i < process_bboxes.size(); ++i)
+          boxes_and_indices[i] =
+            std::make_pair(process_bboxes[i], process_index);
+
+        flat_global_bboxes.insert(flat_global_bboxes.end(),
+                                  boxes_and_indices.begin(),
+                                  boxes_and_indices.end());
+        ++process_index;
+      }
+
+    // Building a tree out of the bounding boxes
+    // We avoid using the insert method so that boost uses the packing algorithm
+    RTree<std::pair<BoundingBox<spacedim>, unsigned int>> r_tree(
+      flat_global_bboxes.begin(), flat_global_bboxes.end());
+    return r_tree;
+#endif // DEAL_II_WITH_MPI
+  }
+
+
 
 } /* namespace GridTools */
 
