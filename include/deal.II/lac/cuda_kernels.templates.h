@@ -44,9 +44,9 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number, typename Binop>
+      template <typename Number, template <typename> class Binop>
       __global__ void
-      vector_bin_op(Number *v1, Number *v2, const size_type N)
+      vector_bin_op(Number *v1, const Number *v2, const size_type N)
       {
         const size_type idx_base =
           threadIdx.x + blockIdx.x * (blockDim.x * chunk_size);
@@ -54,7 +54,7 @@ namespace LinearAlgebra
           {
             const size_type idx = idx_base + i * block_size;
             if (idx < N)
-              v1[idx] = Binop::operation(v1[idx], v2[idx]);
+              v1[idx] = Binop<Number>::operation(v1[idx], v2[idx]);
           }
       }
 
@@ -547,6 +547,25 @@ namespace LinearAlgebra
             const size_type idx = idx_base + i * block_size;
             if (idx < N)
               val[indices[idx]] = v[idx];
+          }
+      }
+
+
+
+      template <typename Number, typename IndexType>
+      __global__ void
+      gather(Number *         val,
+             const Number *   v,
+             const IndexType *indices,
+             const IndexType  N)
+      {
+        const IndexType idx_base =
+          threadIdx.x + blockIdx.x * (blockDim.x * chunk_size);
+        for (unsigned int i = 0; i < chunk_size; ++i)
+          {
+            const IndexType idx = idx_base + i * block_size;
+            if (idx < N)
+              val[idx] = v[indices[idx]];
           }
       }
 

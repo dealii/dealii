@@ -26,6 +26,8 @@
 
 #  include <deal.II/lac/cuda_atomic.h>
 
+#  include <assert.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
@@ -57,13 +59,25 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
+      template <typename Number>
       struct Binop_Addition
       {
-        template <typename Number>
         __device__ static inline Number
         operation(const Number a, const Number b)
         {
           return a + b;
+        }
+      };
+
+      template <typename Number>
+      struct Binop_Addition<std::complex<Number>>
+      {
+        __device__ static inline std::complex<Number>
+        operation(const std::complex<Number> a, const std::complex<Number>)
+        {
+          printf("This function is not implemented for std::complex<Number>!");
+          assert(false);
+          return a;
         }
       };
 
@@ -74,13 +88,83 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
+      template <typename Number>
       struct Binop_Subtraction
       {
-        template <typename Number>
         __device__ static inline Number
         operation(const Number a, const Number b)
         {
           return a - b;
+        }
+      };
+
+      template <typename Number>
+      struct Binop_Subtraction<std::complex<Number>>
+      {
+        __device__ static inline std::complex<Number>
+        operation(const std::complex<Number> a, const std::complex<Number> b)
+        {
+          printf("This function is not implemented for std::complex<Number>!");
+          assert(false);
+          return a;
+        }
+      };
+
+
+
+      /**
+       * Functor defining the maximum of two Numbers.
+       *
+       * @ingroup CUDAWrappers
+       */
+      template <typename Number>
+      struct Binop_Max
+      {
+        __device__ static inline Number
+        operation(const Number a, const Number b)
+        {
+          return a > b ? a : b;
+        }
+      };
+
+      template <typename Number>
+      struct Binop_Max<std::complex<Number>>
+      {
+        __device__ static inline std::complex<Number>
+        operation(const std::complex<Number> a, const std::complex<Number>)
+        {
+          printf("This function is not implemented for std::complex<Number>!");
+          assert(false);
+          return a;
+        }
+      };
+
+
+
+      /**
+       * Functor defining the maximum of two Numbers.
+       *
+       * @ingroup CUDAWrappers
+       */
+      template <typename Number>
+      struct Binop_Min
+      {
+        __device__ static inline Number
+        operation(const Number a, const Number b)
+        {
+          return a > b ? b : a;
+        }
+      };
+
+      template <typename Number>
+      struct Binop_Min<std::complex<Number>>
+      {
+        __device__ static inline std::complex<Number>
+        operation(const std::complex<Number> a, const std::complex<Number>)
+        {
+          printf("This function is not implemented for std::complex<Number>!");
+          assert(false);
+          return a;
         }
       };
 
@@ -91,15 +175,15 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
-      template <typename Number, typename Binop>
+      template <typename Number, template <typename> class Binop>
       __global__ void
-      vector_bin_op(Number *v1, Number *v2, const size_type N);
+      vector_bin_op(Number *v1, const Number *v2, const size_type N);
 
 
 
       /**
-       * Structure implementing the functions used to add elements when using a
-       * reduction.
+       * Structure implementing the functions used to add elements when
+       * using a reduction.
        *
        * @ingroup CUDAWrappers
        */
@@ -122,8 +206,8 @@ namespace LinearAlgebra
 
 
       /**
-       * Structure implementing the functions used to compute the L1 norm when
-       * using a reduction.
+       * Structure implementing the functions used to compute the L1 norm
+       * when using a reduction.
        *
        * @ingroup CUDAWrappers
        */
@@ -181,8 +265,8 @@ namespace LinearAlgebra
 
 
       /**
-       * Structure implementing the functions used to compute the dot product
-       * norm when using a double vector reduction.
+       * Structure implementing the functions used to compute the dot
+       * product norm when using a double vector reduction.
        *
        * @ingroup CUDAWrappers
        */
@@ -262,8 +346,8 @@ namespace LinearAlgebra
 
 
       /**
-       * Scaling and simple addition of a multiple of a vector, i.e. <tt>val =
-       * = s*val + a*V_val</tt>
+       * Scaling and simple addition of a multiple of a vector, i.e. <tt>val
+       * = = s*val + a*V_val</tt>
        *
        * @ingroup CUDAWrappers
        */
@@ -296,8 +380,8 @@ namespace LinearAlgebra
 
 
       /**
-       * Scale each element of this vector by the corresponding element in the
-       * argument.
+       * Scale each element of this vector by the corresponding element in
+       * the argument.
        *
        * @ingroup CUDAWrappers
        */
@@ -373,6 +457,21 @@ namespace LinearAlgebra
                      const Number *   v,
                      const size_type *indices,
                      const size_type  N);
+
+
+
+      /**
+       * Set each element @v val to @p v using @p indices as permutation, i.e.,
+       * <tt>val[i] = v[indices[i]]</tt>.
+       *
+       * @ingroup CUDAWrappers
+       */
+      template <typename Number, typename IndexType>
+      __global__ void
+      gather(Number *         val,
+             const Number *   v,
+             const IndexType *indices,
+             const IndexType  N);
 
 
 

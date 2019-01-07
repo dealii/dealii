@@ -18,30 +18,33 @@
 for (SCALAR : MPI_SCALARS)
   {
 #ifdef DEAL_II_WITH_MPI
-    template void Utilities::MPI::Partitioner::export_to_ghosted_array_start<
-      SCALAR,
-      MemorySpace::Host>(const unsigned int,
-                         const ArrayView<const SCALAR, MemorySpace::Host> &,
-                         const ArrayView<SCALAR, MemorySpace::Host> &,
-                         const ArrayView<SCALAR, MemorySpace::Host> &,
-                         std::vector<MPI_Request> &) const;
+    template void Utilities::MPI::Partitioner::
+      export_to_ghosted_array_start<SCALAR, dealii::MemorySpace::CUDA>(
+        const unsigned int,
+        const ArrayView<const SCALAR, MemorySpace::CUDA> &,
+        const ArrayView<SCALAR, MemorySpace::CUDA> &,
+        const ArrayView<SCALAR, MemorySpace::CUDA> &,
+        std::vector<MPI_Request> &) const;
+
     template void Utilities::MPI::Partitioner::export_to_ghosted_array_finish<
       SCALAR,
-      MemorySpace::Host>(const ArrayView<SCALAR, MemorySpace::Host> &,
+      MemorySpace::CUDA>(const ArrayView<SCALAR, MemorySpace::CUDA> &,
                          std::vector<MPI_Request> &) const;
+
     template void Utilities::MPI::Partitioner::import_from_ghosted_array_start<
       SCALAR,
-      MemorySpace::Host>(const VectorOperation::values,
+      MemorySpace::CUDA>(const VectorOperation::values,
                          const unsigned int,
-                         const ArrayView<SCALAR, MemorySpace::Host> &,
-                         const ArrayView<SCALAR, MemorySpace::Host> &,
+                         const ArrayView<SCALAR, MemorySpace::CUDA> &,
+                         const ArrayView<SCALAR, MemorySpace::CUDA> &,
                          std::vector<MPI_Request> &) const;
+
     template void Utilities::MPI::Partitioner::import_from_ghosted_array_finish<
       SCALAR,
-      MemorySpace::Host>(const VectorOperation::values,
-                         const ArrayView<const SCALAR, MemorySpace::Host> &,
-                         const ArrayView<SCALAR, MemorySpace::Host> &,
-                         const ArrayView<SCALAR, MemorySpace::Host> &,
+      MemorySpace::CUDA>(const VectorOperation::values,
+                         const ArrayView<const SCALAR, MemorySpace::CUDA> &,
+                         const ArrayView<SCALAR, MemorySpace::CUDA> &,
+                         const ArrayView<SCALAR, MemorySpace::CUDA> &,
                          std::vector<MPI_Request> &) const;
 #endif
   }

@@ -40,6 +40,7 @@
 #cmakedefine DEAL_II_WITH_ASSIMP
 #cmakedefine DEAL_II_WITH_COMPLEX_VALUES
 #cmakedefine DEAL_II_WITH_CUDA
+#cmakedefine DEAL_II_WITH_CUDA_AWARE_MPI
 #cmakedefine DEAL_II_WITH_CXX14
 #cmakedefine DEAL_II_WITH_CXX17
 #cmakedefine DEAL_II_WITH_GSL

@@ -81,19 +81,19 @@ namespace LinearAlgebra
 
 
       // Resize the underlying array on the host or on the device
-      template <typename Number, typename MemorySpace>
+      template <typename Number, typename MemorySpaceType>
       struct la_parallel_vector_templates_functions
       {
-        static_assert(
-          std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
-            std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
-          "MemorySpace should be Host or CUDA");
+        static_assert(std::is_same<MemorySpaceType, MemorySpace::Host>::value ||
+                        std::is_same<MemorySpaceType, MemorySpace::CUDA>::value,
+                      "MemorySpace should be Host or CUDA");
 
         static void
-        resize_val(const types::global_dof_index /*new_alloc_size*/,
-                   types::global_dof_index & /*allocated_size*/,
-                   ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-                     & /*data*/)
+        resize_val(
+          const types::global_dof_index /*new_alloc_size*/,
+          types::global_dof_index & /*allocated_size*/,
+          ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpaceType>
+            & /*data*/)
         {}
 
         static void
@@ -103,14 +103,14 @@ namespace LinearAlgebra
           const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner> &
           /*communication_pattern*/,
           const IndexSet & /*locally_owned_elem*/,
-          ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpaceType>
             & /*data*/)
         {}
 
         template <typename RealType>
         static void
         linfty_norm_local(
-          const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+          const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpaceType>
             & /*data*/,
           const unsigned int /*size*/,
           RealType & /*max*/)
@@ -375,9 +375,9 @@ namespace LinearAlgebra
     } // namespace internal
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::clear_mpi_requests()
+    Vector<Number, MemorySpaceType>::clear_mpi_requests()
     {
 #ifdef DEAL_II_WITH_MPI
       for (size_type j = 0; j < compress_requests.size(); j++)
@@ -397,12 +397,13 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::resize_val(const size_type new_alloc_size)
+    Vector<Number, MemorySpaceType>::resize_val(const size_type new_alloc_size)
     {
-      internal::la_parallel_vector_templates_functions<Number, MemorySpace>::
-        resize_val(new_alloc_size, allocated_size, data);
+      internal::la_parallel_vector_templates_functions<
+        Number,
+        MemorySpaceType>::resize_val(new_alloc_size, allocated_size, data);
 
       thread_loop_partitioner =
         std::make_shared<::dealii::parallel::internal::TBBPartitioner>();
@@ -410,10 +411,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::reinit(const size_type size,
-                                        const bool      omit_zeroing_entries)
+    Vector<Number, MemorySpaceType>::reinit(const size_type size,
+                                            const bool omit_zeroing_entries)
     {
       clear_mpi_requests();
 
@@ -421,7 +422,8 @@ namespace LinearAlgebra
       resize_val(size);
 
       // delete previous content in import data
-      import_data.reset();
+      import_data.values.reset();
+      import_data.values_dev.reset();
 
       // set partitioner to serial version
       partitioner = std::make_shared<Utilities::MPI::Partitioner>(size);
@@ -435,11 +437,12 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     template <typename Number2>
     void
-    Vector<Number, MemorySpace>::reinit(const Vector<Number2, MemorySpace> &v,
-                                        const bool omit_zeroing_entries)
+    Vector<Number, MemorySpaceType>::reinit(
+      const Vector<Number2, MemorySpaceType> &v,
+      const bool                              omit_zeroing_entries)
     {
       clear_mpi_requests();
       Assert(v.partitioner.get() != nullptr, ExcNotInitialized());
@@ -465,18 +468,20 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-      import_data.reset();
+      import_data.values.reset();
+      import_data.values_dev.reset();
 
       thread_loop_partitioner = v.thread_loop_partitioner;
     }
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::reinit(const IndexSet &locally_owned_indices,
-                                        const IndexSet &ghost_indices,
-                                        const MPI_Comm  communicator)
+    Vector<Number, MemorySpaceType>::reinit(
+      const IndexSet &locally_owned_indices,
+      const IndexSet &ghost_indices,
+      const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
       std::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner(
@@ -488,10 +493,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::reinit(const IndexSet &locally_owned_indices,
-                                        const MPI_Comm  communicator)
+    Vector<Number, MemorySpaceType>::reinit(
+      const IndexSet &locally_owned_indices,
+      const MPI_Comm  communicator)
     {
       // set up parallel partitioner with index sets and communicator
       std::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner(
@@ -501,9 +507,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::reinit(
+    Vector<Number, MemorySpaceType>::reinit(
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_in)
     {
       clear_mpi_requests();
@@ -522,15 +528,16 @@ namespace LinearAlgebra
       // is only used as temporary storage for compress() and
       // update_ghost_values, and we might have vectors where we never
       // call these methods and hence do not need to have the storage.
-      import_data.reset();
+      import_data.values.reset();
+      import_data.values_dev.reset();
 
       vector_is_ghosted = false;
     }
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace>::Vector()
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType>::Vector()
       : partitioner(new Utilities::MPI::Partitioner())
       , allocated_size(0)
     {
@@ -539,8 +546,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace>::Vector(const Vector<Number, MemorySpace> &v)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType>::Vector(
+      const Vector<Number, MemorySpaceType> &v)
       : Subscriptor()
       , allocated_size(0)
       , vector_is_ghosted(false)
@@ -553,17 +561,17 @@ namespace LinearAlgebra
       if (this_size > 0)
         {
           dealii::internal::VectorOperations::
-            functions<Number, Number, MemorySpace>::copy(
+            functions<Number, Number, MemorySpaceType>::copy(
               thread_loop_partitioner, partitioner->local_size(), v.data, data);
         }
     }
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace>::Vector(const IndexSet &local_range,
-                                        const IndexSet &ghost_indices,
-                                        const MPI_Comm  communicator)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
+                                            const IndexSet &ghost_indices,
+                                            const MPI_Comm  communicator)
       : allocated_size(0)
       , vector_is_ghosted(false)
     {
@@ -572,9 +580,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace>::Vector(const IndexSet &local_range,
-                                        const MPI_Comm  communicator)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType>::Vector(const IndexSet &local_range,
+                                            const MPI_Comm  communicator)
       : allocated_size(0)
       , vector_is_ghosted(false)
     {
@@ -583,8 +591,8 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace>::Vector(const size_type size)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType>::Vector(const size_type size)
       : allocated_size(0)
       , vector_is_ghosted(false)
     {
@@ -593,8 +601,8 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace>::Vector(
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType>::Vector(
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
       : allocated_size(0)
       , vector_is_ghosted(false)
@@ -604,8 +612,8 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    inline Vector<Number, MemorySpace>::~Vector()
+    template <typename Number, typename MemorySpaceType>
+    inline Vector<Number, MemorySpaceType>::~Vector()
     {
       try
         {
@@ -617,9 +625,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    inline Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::operator=(const Vector<Number, MemorySpace> &c)
+    template <typename Number, typename MemorySpaceType>
+    inline Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::
+    operator=(const Vector<Number, MemorySpaceType> &c)
     {
 #ifdef _MSC_VER
       return this->operator=<Number>(c);
@@ -630,11 +639,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     template <typename Number2>
-    inline Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::
-    operator=(const Vector<Number2, MemorySpace> &c)
+    inline Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::
+    operator=(const Vector<Number2, MemorySpaceType> &c)
     {
       Assert(c.partitioner.get() != nullptr, ExcNotInitialized());
 
@@ -686,7 +695,7 @@ namespace LinearAlgebra
       if (this_size > 0)
         {
           dealii::internal::VectorOperations::
-            functions<Number, Number2, MemorySpace>::copy(
+            functions<Number, Number2, MemorySpaceType>::copy(
               thread_loop_partitioner, this_size, c.data, data);
         }
 
@@ -699,17 +708,17 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     template <typename Number2>
     void
-    Vector<Number, MemorySpace>::copy_locally_owned_data_from(
-      const Vector<Number2, MemorySpace> &src)
+    Vector<Number, MemorySpaceType>::copy_locally_owned_data_from(
+      const Vector<Number2, MemorySpaceType> &src)
     {
       AssertDimension(partitioner->local_size(), src.partitioner->local_size());
       if (partitioner->local_size() > 0)
         {
           dealii::internal::VectorOperations::
-            functions<Number, Number2, MemorySpace>::copy(
+            functions<Number, Number2, MemorySpaceType>::copy(
               thread_loop_partitioner,
               partitioner->local_size(),
               src.data,
@@ -751,9 +760,9 @@ namespace LinearAlgebra
       }
     } // namespace petsc_helpers
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::
     operator=(const PETScWrappers::MPI::Vector &petsc_vec)
     {
       // TODO: We would like to use the same compact infrastructure as for the
@@ -794,9 +803,9 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::
     operator=(const TrilinosWrappers::MPI::Vector &trilinos_vec)
     {
 #  ifdef DEAL_II_WITH_MPI
@@ -819,9 +828,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::compress(
+    Vector<Number, MemorySpaceType>::compress(
       ::dealii::VectorOperation::values operation)
     {
       compress_start(0, operation);
@@ -830,9 +839,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::update_ghost_values() const
+    Vector<Number, MemorySpaceType>::update_ghost_values() const
     {
       update_ghost_values_start();
       update_ghost_values_finish();
@@ -840,9 +849,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::zero_out_ghosts() const
+    Vector<Number, MemorySpaceType>::zero_out_ghosts() const
     {
       if (data.values != nullptr)
         std::fill_n(data.values.get() + partitioner->local_size(),
@@ -864,9 +873,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::compress_start(
+    Vector<Number, MemorySpaceType>::compress_start(
       const unsigned int                counter,
       ::dealii::VectorOperation::values operation)
     {
@@ -880,46 +889,86 @@ namespace LinearAlgebra
       std::lock_guard<std::mutex> lock(mutex);
 
       // allocate import_data in case it is not set up yet
-      if (import_data == nullptr && partitioner->n_import_indices() > 0)
-        import_data =
-          std_cxx14::make_unique<Number[]>(partitioner->n_import_indices());
+      if (partitioner->n_import_indices() > 0)
+        {
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+    defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+          Assert(
+            (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value),
+            ExcMessage(
+              "Using MemorySpace::CUDA only allowed if the code is compiled with a CUDA compiler!"));
+          if (import_data.values_dev == nullptr)
+            import_data.values_dev.reset(
+              Utilities::CUDA::allocate_device_data<Number>(
+                partitioner->n_import_indices()));
+#  else
+#    ifdef DEAL_II_WITH_CUDA_AWARE_MPI
+          static_assert(
+            std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
+            "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
+#    endif
+          if (import_data.values == nullptr)
+            {
+              Number *new_val;
+              Utilities::System::posix_memalign(
+                (void **)&new_val,
+                64,
+                sizeof(Number) * partitioner->n_import_indices());
+              import_data.values.reset(new_val);
+            }
+#  endif
+        }
 
-#  ifdef DEAL_II_COMPILER_CUDA_AWARE
-      // TODO: for now move the data to the host and then move it back to the
+#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
+    !defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+      // Move the data to the host and then move it back to the
       // the device. We use values to store the elements because the function
       // uses a view of the array and thus we need the data on the host to
       // outlive the scope of the function.
-      if (std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value)
-        {
-          Number *new_val;
-          Utilities::System::posix_memalign((void **)&new_val,
-                                            64,
-                                            sizeof(Number) * allocated_size);
-          data.values.reset(new_val);
+      Number *new_val;
+      Utilities::System::posix_memalign((void **)&new_val,
+                                        64,
+                                        sizeof(Number) * allocated_size);
 
-          cudaError_t cuda_error_code =
-            cudaMemcpy(data.values.get(),
-                       data.values_dev.get(),
-                       allocated_size * sizeof(Number),
-                       cudaMemcpyDeviceToHost);
-          AssertCuda(cuda_error_code);
-        }
+      data.values.reset(new_val);
+
+      cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
+                                               data.values_dev.get(),
+                                               allocated_size * sizeof(Number),
+                                               cudaMemcpyDeviceToHost);
+      AssertCuda(cuda_error_code);
 #  endif
+
+#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+        defined(DEAL_II_WITH_CUDA_AWARE_MPI))
       partitioner->import_from_ghosted_array_start(
         operation,
         counter,
-        ArrayView<Number>(data.values.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
-        ArrayView<Number>(import_data.get(), partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::Host>(data.values.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
+        ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
+                                             partitioner->n_import_indices()),
         compress_requests);
+#  else
+      partitioner->import_from_ghosted_array_start(
+        operation,
+        counter,
+        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
+        ArrayView<Number, MemorySpace::CUDA>(import_data.values_dev.get(),
+                                             partitioner->n_import_indices()),
+        compress_requests);
+#  endif
 #endif
     }
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::compress_finish(
+    Vector<Number, MemorySpaceType>::compress_finish(
       ::dealii::VectorOperation::values operation)
     {
 #ifdef DEAL_II_WITH_MPI
@@ -931,22 +980,42 @@ namespace LinearAlgebra
 
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
-
-      Assert(partitioner->n_import_indices() == 0 || import_data != nullptr,
+#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+        defined(DEAL_II_WITH_CUDA_AWARE_MPI))
+      Assert(partitioner->n_import_indices() == 0 ||
+               import_data.values != nullptr,
              ExcNotInitialized());
-      partitioner->import_from_ghosted_array_finish(
+      partitioner->import_from_ghosted_array_finish<Number, MemorySpace::Host>(
         operation,
-        ArrayView<const Number>(import_data.get(),
-                                partitioner->n_import_indices()),
-        ArrayView<Number>(data.values.get(), partitioner->local_size()),
-        ArrayView<Number>(data.values.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
+        ArrayView<const Number, MemorySpace::Host>(
+          import_data.values.get(), partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::Host>(data.values.get(),
+                                             partitioner->local_size()),
+        ArrayView<Number, MemorySpace::Host>(data.values.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
         compress_requests);
+#  else
+      Assert(partitioner->n_import_indices() == 0 ||
+               import_data.values_dev != nullptr,
+             ExcNotInitialized());
+      partitioner->import_from_ghosted_array_finish<Number, MemorySpace::CUDA>(
+        operation,
+        ArrayView<const Number, MemorySpace::CUDA>(
+          import_data.values_dev.get(), partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get(),
+                                             partitioner->local_size()),
+        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
+        compress_requests);
+#  endif
 
-#  ifdef DEAL_II_COMPILER_CUDA_AWARE
-      // TODO For now, the communication is done on the host, so we need to
+#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
+    !defined  DEAL_II_WITH_CUDA_AWARE_MPI
+      // The communication is done on the host, so we need to
       // move the data back to the device.
-      if (std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value)
+      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
         {
           cudaError_t cuda_error_code =
             cudaMemcpy(data.values_dev.get(),
@@ -965,9 +1034,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::update_ghost_values_start(
+    Vector<Number, MemorySpaceType>::update_ghost_values_start(
       const unsigned int counter) const
     {
 #ifdef DEAL_II_WITH_MPI
@@ -980,40 +1049,80 @@ namespace LinearAlgebra
       std::lock_guard<std::mutex> lock(mutex);
 
       // allocate import_data in case it is not set up yet
-      if (import_data == nullptr && partitioner->n_import_indices() > 0)
-        import_data =
-          std_cxx14::make_unique<Number[]>(partitioner->n_import_indices());
+      if (partitioner->n_import_indices() > 0)
+        {
+#  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+    defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+          Assert(
+            (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value),
+            ExcMessage(
+              "Using MemorySpace::CUDA only allowed if the code is compiled with a CUDA compiler!"));
+          if (import_data.values_dev == nullptr)
+            import_data.values_dev.reset(
+              Utilities::CUDA::allocate_device_data<Number>(
+                partitioner->n_import_indices()));
+#  else
+#    ifdef DEAL_II_WITH_CUDA_AWARE_MPI
+          static_assert(
+            std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
+            "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
+#    endif
+          if (import_data.values == nullptr)
+            {
+              Number *new_val;
+              Utilities::System::posix_memalign(
+                (void **)&new_val,
+                64,
+                sizeof(Number) * partitioner->n_import_indices());
+              import_data.values.reset(new_val);
+            }
+#  endif
+        }
 
-#  ifdef DEAL_II_COMPILER_CUDA_AWARE
-      // TODO: for now move the data to the host and then move it back to the
+#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
+    !defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+      // Move the data to the host and then move it back to the
       // the device. We use values to store the elements because the function
       // uses a view of the array and thus we need the data on the host to
       // outlive the scope of the function.
-      if (std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value)
-        {
-          Number *new_val;
-          Utilities::System::posix_memalign((void **)&new_val,
-                                            64,
-                                            sizeof(Number) * allocated_size);
+      Number *new_val;
+      Utilities::System::posix_memalign((void **)&new_val,
+                                        64,
+                                        sizeof(Number) * allocated_size);
 
-          data.values.reset(new_val);
+      data.values.reset(new_val);
 
-          cudaError_t cuda_error_code =
-            cudaMemcpy(data.values.get(),
-                       data.values_dev.get(),
-                       allocated_size * sizeof(Number),
-                       cudaMemcpyDeviceToHost);
-          AssertCuda(cuda_error_code);
-        }
+      cudaError_t cuda_error_code = cudaMemcpy(data.values.get(),
+                                               data.values_dev.get(),
+                                               allocated_size * sizeof(Number),
+                                               cudaMemcpyDeviceToHost);
+      AssertCuda(cuda_error_code);
 #  endif
 
-      partitioner->export_to_ghosted_array_start(
+#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+        defined(DEAL_II_WITH_CUDA_AWARE_MPI))
+      partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
         counter,
-        ArrayView<const Number>(data.values.get(), partitioner->local_size()),
-        ArrayView<Number>(import_data.get(), partitioner->n_import_indices()),
-        ArrayView<Number>(data.values.get() + partitioner->local_size(),
-                          partitioner->n_ghost_indices()),
+        ArrayView<const Number, MemorySpace::Host>(data.values.get(),
+                                                   partitioner->local_size()),
+        ArrayView<Number, MemorySpace::Host>(import_data.values.get(),
+                                             partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::Host>(data.values.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
         update_ghost_values_requests);
+#  else
+      partitioner->export_to_ghosted_array_start<Number, MemorySpace::CUDA>(
+        counter,
+        ArrayView<const Number, MemorySpace::CUDA>(data.values_dev.get(),
+                                                   partitioner->local_size()),
+        ArrayView<Number, MemorySpace::CUDA>(import_data.values_dev.get(),
+                                             partitioner->n_import_indices()),
+        ArrayView<Number, MemorySpace::CUDA>(data.values_dev.get() +
+                                               partitioner->local_size(),
+                                             partitioner->n_ghost_indices()),
+        update_ghost_values_requests);
+#  endif
 
 #else
       (void)counter;
@@ -1022,9 +1131,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::update_ghost_values_finish() const
+    Vector<Number, MemorySpaceType>::update_ghost_values_finish() const
     {
 #ifdef DEAL_II_WITH_MPI
       // wait for both sends and receives to complete, even though only
@@ -1037,15 +1146,27 @@ namespace LinearAlgebra
           // make this function thread safe
           std::lock_guard<std::mutex> lock(mutex);
 
+#  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+        defined(DEAL_II_WITH_CUDA_AWARE_MPI))
           partitioner->export_to_ghosted_array_finish(
-            ArrayView<Number>(data.values.get() + partitioner->local_size(),
-                              partitioner->n_ghost_indices()),
+            ArrayView<Number, MemorySpace::Host>(
+              data.values.get() + partitioner->local_size(),
+              partitioner->n_ghost_indices()),
             update_ghost_values_requests);
+#  else
+          partitioner->export_to_ghosted_array_finish(
+            ArrayView<Number, MemorySpace::CUDA>(
+              data.values_dev.get() + partitioner->local_size(),
+              partitioner->n_ghost_indices()),
+            update_ghost_values_requests);
+#  endif
         }
-#  ifdef DEAL_II_COMPILER_CUDA_AWARE
-      // TODO For now, the communication is done on the host, so we need to
+
+#  if defined DEAL_II_COMPILER_CUDA_AWARE && \
+    !defined  DEAL_II_WITH_CUDA_AWARE_MPI
+      // The communication is done on the host, so we need to
       // move the data back to the device.
-      if (std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value)
+      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
         {
           cudaError_t cuda_error_code =
             cudaMemcpy(data.values_dev.get() + partitioner->local_size(),
@@ -1057,15 +1178,16 @@ namespace LinearAlgebra
           data.values.reset();
         }
 #  endif
+
 #endif
       vector_is_ghosted = true;
     }
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::import(
+    Vector<Number, MemorySpaceType>::import(
       const ReadWriteVector<Number> &                 V,
       VectorOperation::values                         operation,
       std::shared_ptr<const CommunicationPatternBase> communication_pattern)
@@ -1092,7 +1214,7 @@ namespace LinearAlgebra
                       ExcMessage("The communication pattern is not of type "
                                  "Utilities::MPI::Partitioner."));
         }
-      Vector<Number> tmp_vector(comm_pattern);
+      Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(comm_pattern);
 
       data.copy_to(tmp_vector.begin(), local_size());
 
@@ -1146,9 +1268,9 @@ namespace LinearAlgebra
       data.copy_from(tmp_vector.begin(), local_size());
     }
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::swap(Vector<Number, MemorySpace> &v)
+    Vector<Number, MemorySpaceType>::swap(Vector<Number, MemorySpaceType> &v)
     {
 #ifdef DEAL_II_WITH_MPI
 
@@ -1198,18 +1320,16 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::operator=(const Number s)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::operator=(const Number s)
     {
       const size_type this_size = local_size();
       if (this_size > 0)
         {
           dealii::internal::VectorOperations::
-            functions<Number, Number, MemorySpace>::set(thread_loop_partitioner,
-                                                        this_size,
-                                                        s,
-                                                        data);
+            functions<Number, Number, MemorySpaceType>::set(
+              thread_loop_partitioner, this_size, s, data);
         }
 
       // if we call Vector::operator=0, we want to zero out all the entries
@@ -1222,13 +1342,13 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::reinit(const VectorSpaceVector<Number> &V,
-                                        const bool omit_zeroing_entries)
+    Vector<Number, MemorySpaceType>::reinit(const VectorSpaceVector<Number> &V,
+                                            const bool omit_zeroing_entries)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert(dynamic_cast<const VectorType *>(&V) != nullptr,
              ExcVectorTypeNotCompatible());
       const VectorType &down_V = dynamic_cast<const VectorType &>(V);
@@ -1238,12 +1358,13 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::operator+=(const VectorSpaceVector<Number> &vv)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::
+    operator+=(const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1251,7 +1372,7 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::add_vector(
+        functions<Number, Number, MemorySpaceType>::add_vector(
           thread_loop_partitioner, partitioner->local_size(), v.data, data);
 
       if (vector_is_ghosted)
@@ -1262,12 +1383,13 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::operator-=(const VectorSpaceVector<Number> &vv)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::
+    operator-=(const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1275,7 +1397,7 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::subtract_vector(
+        functions<Number, Number, MemorySpaceType>::subtract_vector(
           thread_loop_partitioner, partitioner->local_size(), v.data, data);
 
       if (vector_is_ghosted)
@@ -1286,14 +1408,14 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::add(const Number a)
+    Vector<Number, MemorySpaceType>::add(const Number a)
     {
       AssertIsFinite(a);
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::add_factor(
+        functions<Number, Number, MemorySpaceType>::add_factor(
           thread_loop_partitioner, partitioner->local_size(), a, data);
 
       if (vector_is_ghosted)
@@ -1302,13 +1424,14 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::add_local(const Number                     a,
-                                           const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::add_local(
+      const Number                     a,
+      const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1321,16 +1444,16 @@ namespace LinearAlgebra
         return;
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::add_av(
+        functions<Number, Number, MemorySpaceType>::add_av(
           thread_loop_partitioner, partitioner->local_size(), a, v.data, data);
     }
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::add(const Number                     a,
-                                     const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::add(const Number                     a,
+                                         const VectorSpaceVector<Number> &vv)
     {
       add_local(a, vv);
 
@@ -1340,15 +1463,15 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::add(const Number                     a,
-                                     const VectorSpaceVector<Number> &vv,
-                                     const Number                     b,
-                                     const VectorSpaceVector<Number> &ww)
+    Vector<Number, MemorySpaceType>::add(const Number                     a,
+                                         const VectorSpaceVector<Number> &vv,
+                                         const Number                     b,
+                                         const VectorSpaceVector<Number> &ww)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1363,7 +1486,7 @@ namespace LinearAlgebra
       AssertDimension(local_size(), w.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::add_avpbw(
+        functions<Number, Number, MemorySpaceType>::add_avpbw(
           thread_loop_partitioner,
           partitioner->local_size(),
           a,
@@ -1378,10 +1501,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::add(const std::vector<size_type> &indices,
-                                     const std::vector<Number> &   values)
+    Vector<Number, MemorySpaceType>::add(const std::vector<size_type> &indices,
+                                         const std::vector<Number> &   values)
     {
       for (std::size_t i = 0; i < indices.size(); ++i)
         {
@@ -1391,16 +1514,17 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::sadd(const Number                       x,
-                                      const Vector<Number, MemorySpace> &v)
+    Vector<Number, MemorySpaceType>::sadd(
+      const Number                           x,
+      const Vector<Number, MemorySpaceType> &v)
     {
       AssertIsFinite(x);
       AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::sadd_xv(
+        functions<Number, Number, MemorySpaceType>::sadd_xv(
           thread_loop_partitioner, partitioner->local_size(), x, v.data, data);
 
       if (vector_is_ghosted)
@@ -1409,14 +1533,15 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::sadd_local(const Number                     x,
-                                            const Number                     a,
-                                            const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::sadd_local(
+      const Number                     x,
+      const Number                     a,
+      const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1426,7 +1551,7 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::sadd_xav(
+        functions<Number, Number, MemorySpaceType>::sadd_xav(
           thread_loop_partitioner,
           partitioner->local_size(),
           x,
@@ -1437,11 +1562,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::sadd(const Number                     x,
-                                      const Number                     a,
-                                      const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::sadd(const Number                     x,
+                                          const Number                     a,
+                                          const VectorSpaceVector<Number> &vv)
     {
       sadd_local(x, a, vv);
 
@@ -1451,13 +1576,14 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::sadd(const Number                       x,
-                                      const Number                       a,
-                                      const Vector<Number, MemorySpace> &v,
-                                      const Number                       b,
-                                      const Vector<Number, MemorySpace> &w)
+    Vector<Number, MemorySpaceType>::sadd(
+      const Number                           x,
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v,
+      const Number                           b,
+      const Vector<Number, MemorySpaceType> &w)
     {
       AssertIsFinite(x);
       AssertIsFinite(a);
@@ -1467,7 +1593,7 @@ namespace LinearAlgebra
       AssertDimension(local_size(), w.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::sadd_xavbw(
+        functions<Number, Number, MemorySpaceType>::sadd_xavbw(
           thread_loop_partitioner,
           partitioner->local_size(),
           x,
@@ -1483,14 +1609,14 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::operator*=(const Number factor)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::operator*=(const Number factor)
     {
       AssertIsFinite(factor);
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::multiply_factor(
+        functions<Number, Number, MemorySpaceType>::multiply_factor(
           thread_loop_partitioner, partitioner->local_size(), factor, data);
 
       if (vector_is_ghosted)
@@ -1501,9 +1627,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    Vector<Number, MemorySpace> &
-    Vector<Number, MemorySpace>::operator/=(const Number factor)
+    template <typename Number, typename MemorySpaceType>
+    Vector<Number, MemorySpaceType> &
+    Vector<Number, MemorySpaceType>::operator/=(const Number factor)
     {
       operator*=(static_cast<Number>(1.) / factor);
       return *this;
@@ -1511,12 +1637,12 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::scale(const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::scale(const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1524,10 +1650,8 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::scale(thread_loop_partitioner,
-                                                      local_size(),
-                                                      v.data,
-                                                      data);
+        functions<Number, Number, MemorySpaceType>::scale(
+          thread_loop_partitioner, local_size(), v.data, data);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1535,13 +1659,13 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::equ(const Number                     a,
-                                     const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::equ(const Number                     a,
+                                         const VectorSpaceVector<Number> &vv)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1550,7 +1674,7 @@ namespace LinearAlgebra
       AssertDimension(local_size(), v.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::equ_au(
+        functions<Number, Number, MemorySpaceType>::equ_au(
           thread_loop_partitioner, partitioner->local_size(), a, v.data, data);
 
 
@@ -1560,12 +1684,13 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::equ(const Number                       a,
-                                     const Vector<Number, MemorySpace> &v,
-                                     const Number                       b,
-                                     const Vector<Number, MemorySpace> &w)
+    Vector<Number, MemorySpaceType>::equ(
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v,
+      const Number                           b,
+      const Vector<Number, MemorySpaceType> &w)
     {
       AssertIsFinite(a);
       AssertIsFinite(b);
@@ -1574,7 +1699,7 @@ namespace LinearAlgebra
       AssertDimension(local_size(), w.local_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::equ_aubv(
+        functions<Number, Number, MemorySpaceType>::equ_aubv(
           thread_loop_partitioner,
           partitioner->local_size(),
           a,
@@ -1589,20 +1714,20 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     bool
-    Vector<Number, MemorySpace>::all_zero() const
+    Vector<Number, MemorySpaceType>::all_zero() const
     {
       return (linfty_norm() == 0) ? true : false;
     }
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     template <typename Number2>
     Number
-    Vector<Number, MemorySpace>::inner_product_local(
-      const Vector<Number2, MemorySpace> &v) const
+    Vector<Number, MemorySpaceType>::inner_product_local(
+      const Vector<Number2, MemorySpaceType> &v) const
     {
       if (PointerComparison::equal(this, &v))
         return norm_sqr_local();
@@ -1610,20 +1735,18 @@ namespace LinearAlgebra
       AssertDimension(partitioner->local_size(), v.partitioner->local_size());
 
       return dealii::internal::VectorOperations::
-        functions<Number, Number2, MemorySpace>::dot(thread_loop_partitioner,
-                                                     partitioner->local_size(),
-                                                     v.data,
-                                                     data);
+        functions<Number, Number2, MemorySpaceType>::dot(
+          thread_loop_partitioner, partitioner->local_size(), v.data, data);
     }
 
 
 
-    template <typename Number, typename MemorySpace>
-    Number Vector<Number, MemorySpace>::
+    template <typename Number, typename MemorySpaceType>
+    Number Vector<Number, MemorySpaceType>::
            operator*(const VectorSpaceVector<Number> &vv) const
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1638,15 +1761,15 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::norm_sqr_local() const
+    template <typename Number, typename MemorySpaceType>
+    typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::norm_sqr_local() const
     {
       real_type sum;
 
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::norm_2(
+        functions<Number, Number, MemorySpaceType>::norm_2(
           thread_loop_partitioner, partitioner->local_size(), sum, data);
 
       AssertIsFinite(sum);
@@ -1656,9 +1779,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     Number
-    Vector<Number, MemorySpace>::mean_value_local() const
+    Vector<Number, MemorySpaceType>::mean_value_local() const
     {
       Assert(size() != 0, ExcEmptyObject());
 
@@ -1666,7 +1789,7 @@ namespace LinearAlgebra
         return Number();
 
       Number sum = ::dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::mean_value(
+        functions<Number, Number, MemorySpaceType>::mean_value(
           thread_loop_partitioner, partitioner->local_size(), data);
 
       return sum / real_type(partitioner->local_size());
@@ -1674,9 +1797,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     Number
-    Vector<Number, MemorySpace>::mean_value() const
+    Vector<Number, MemorySpaceType>::mean_value() const
     {
       Number local_result = mean_value_local();
       if (partitioner->n_mpi_processes() > 1)
@@ -1690,14 +1813,14 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::l1_norm_local() const
+    template <typename Number, typename MemorySpaceType>
+    typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::l1_norm_local() const
     {
       real_type sum;
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::norm_1(
+        functions<Number, Number, MemorySpaceType>::norm_1(
           thread_loop_partitioner, partitioner->local_size(), sum, data);
 
       return sum;
@@ -1705,9 +1828,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::l1_norm() const
+    template <typename Number, typename MemorySpaceType>
+    typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::l1_norm() const
     {
       real_type local_result = l1_norm_local();
       if (partitioner->n_mpi_processes() > 1)
@@ -1719,9 +1842,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::norm_sqr() const
+    template <typename Number, typename MemorySpaceType>
+    typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::norm_sqr() const
     {
       real_type local_result = norm_sqr_local();
       if (partitioner->n_mpi_processes() > 1)
@@ -1733,23 +1856,23 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::l2_norm() const
+    template <typename Number, typename MemorySpaceType>
+    typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::l2_norm() const
     {
       return std::sqrt(norm_sqr());
     }
 
 
 
-    template <typename Number, typename MemorySpace>
-    typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::lp_norm_local(const real_type p) const
+    template <typename Number, typename MemorySpaceType>
+    typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::lp_norm_local(const real_type p) const
     {
       real_type sum = 0.;
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::norm_p(
+        functions<Number, Number, MemorySpaceType>::norm_p(
           thread_loop_partitioner, partitioner->local_size(), sum, p, data);
 
       return std::pow(sum, 1. / p);
@@ -1757,9 +1880,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::lp_norm(const real_type p) const
+    template <typename Number, typename MemorySpaceType>
+    typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::lp_norm(const real_type p) const
     {
       const real_type local_result = lp_norm_local(p);
       if (partitioner->n_mpi_processes() > 1)
@@ -1773,24 +1896,25 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::linfty_norm_local() const
+    template <typename Number, typename MemorySpaceType>
+    typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::linfty_norm_local() const
     {
       real_type max = 0.;
 
       const size_type local_size = partitioner->local_size();
-      internal::la_parallel_vector_templates_functions<Number, MemorySpace>::
-        linfty_norm_local(data, local_size, max);
+      internal::la_parallel_vector_templates_functions<
+        Number,
+        MemorySpaceType>::linfty_norm_local(data, local_size, max);
 
       return max;
     }
 
 
 
-    template <typename Number, typename MemorySpace>
-    inline typename Vector<Number, MemorySpace>::real_type
-    Vector<Number, MemorySpace>::linfty_norm() const
+    template <typename Number, typename MemorySpaceType>
+    inline typename Vector<Number, MemorySpaceType>::real_type
+    Vector<Number, MemorySpaceType>::linfty_norm() const
     {
       const real_type local_result = linfty_norm_local();
       if (partitioner->n_mpi_processes() > 1)
@@ -1802,19 +1926,19 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     Number
-    Vector<Number, MemorySpace>::add_and_dot_local(
-      const Number                       a,
-      const Vector<Number, MemorySpace> &v,
-      const Vector<Number, MemorySpace> &w)
+    Vector<Number, MemorySpaceType>::add_and_dot_local(
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v,
+      const Vector<Number, MemorySpaceType> &w)
     {
       const size_type vec_size = partitioner->local_size();
       AssertDimension(vec_size, v.local_size());
       AssertDimension(vec_size, w.local_size());
 
       Number sum = dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpace>::add_and_dot(
+        functions<Number, Number, MemorySpaceType>::add_and_dot(
           thread_loop_partitioner, vec_size, a, v.data, w.data, data);
 
       AssertIsFinite(sum);
@@ -1824,15 +1948,15 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     Number
-    Vector<Number, MemorySpace>::add_and_dot(
+    Vector<Number, MemorySpaceType>::add_and_dot(
       const Number                     a,
       const VectorSpaceVector<Number> &vv,
       const VectorSpaceVector<Number> &ww)
     {
       // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpace>;
+      using VectorType = Vector<Number, MemorySpaceType>;
       Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
              ExcVectorTypeNotCompatible());
       const VectorType &v = dynamic_cast<const VectorType &>(vv);
@@ -1850,9 +1974,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     inline bool
-    Vector<Number, MemorySpace>::partitioners_are_compatible(
+    Vector<Number, MemorySpaceType>::partitioners_are_compatible(
       const Utilities::MPI::Partitioner &part) const
     {
       return partitioner->is_compatible(part);
@@ -1860,9 +1984,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     inline bool
-    Vector<Number, MemorySpace>::partitioners_are_globally_compatible(
+    Vector<Number, MemorySpaceType>::partitioners_are_globally_compatible(
       const Utilities::MPI::Partitioner &part) const
     {
       return partitioner->is_globally_compatible(part);
@@ -1870,9 +1994,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     std::size_t
-    Vector<Number, MemorySpace>::memory_consumption() const
+    Vector<Number, MemorySpaceType>::memory_consumption() const
     {
       std::size_t memory = sizeof(*this);
       memory += sizeof(Number) * static_cast<std::size_t>(allocated_size);
@@ -1883,7 +2007,7 @@ namespace LinearAlgebra
       if (partitioner.use_count() > 0)
         memory +=
           partitioner->memory_consumption() / partitioner.use_count() + 1;
-      if (import_data != nullptr)
+      if (import_data.values != nullptr || import_data.values_dev != nullptr)
         memory += (static_cast<std::size_t>(partitioner->n_import_indices()) *
                    sizeof(Number));
       return memory;
@@ -1891,12 +2015,12 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
+    template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpace>::print(std::ostream &     out,
-                                       const unsigned int precision,
-                                       const bool         scientific,
-                                       const bool         across) const
+    Vector<Number, MemorySpaceType>::print(std::ostream &     out,
+                                           const unsigned int precision,
+                                           const bool         scientific,
+                                           const bool         across) const
     {
       Assert(partitioner.get() != nullptr, ExcInternalError());
       AssertThrow(out, ExcIO());
@@ -1976,8 +2100,8 @@ namespace LinearAlgebra
       out.precision(old_precision);
     }
 
-  } // namespace distributed
-} // namespace LinearAlgebra
+  } // end of namespace distributed
+} // end of namespace LinearAlgebra
 
 
 DEAL_II_NAMESPACE_CLOSE

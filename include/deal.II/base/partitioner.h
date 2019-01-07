@@ -21,6 +21,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
@@ -419,14 +420,14 @@ namespace Utilities
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::update_ghost_values().
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       export_to_ghosted_array_start(
-        const unsigned int             communication_channel,
-        const ArrayView<const Number> &locally_owned_array,
-        const ArrayView<Number> &      temporary_storage,
-        const ArrayView<Number> &      ghost_array,
-        std::vector<MPI_Request> &     requests) const;
+        const unsigned int                              communication_channel,
+        const ArrayView<const Number, MemorySpaceType> &locally_owned_array,
+        const ArrayView<Number, MemorySpaceType> &      temporary_storage,
+        const ArrayView<Number, MemorySpaceType> &      ghost_array,
+        std::vector<MPI_Request> &                      requests) const;
 
       /**
        * Finish the exports of the data in a locally owned array to the range
@@ -445,10 +446,11 @@ namespace Utilities
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::update_ghost_values().
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
-      export_to_ghosted_array_finish(const ArrayView<Number> & ghost_array,
-                                     std::vector<MPI_Request> &requests) const;
+      export_to_ghosted_array_finish(
+        const ArrayView<Number, MemorySpaceType> &ghost_array,
+        std::vector<MPI_Request> &                requests) const;
 
       /**
        * Start importing the data on an array indexed by the ghost indices of
@@ -486,14 +488,14 @@ namespace Utilities
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::compress().
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       import_from_ghosted_array_start(
-        const VectorOperation::values vector_operation,
-        const unsigned int            communication_channel,
-        const ArrayView<Number> &     ghost_array,
-        const ArrayView<Number> &     temporary_storage,
-        std::vector<MPI_Request> &    requests) const;
+        const VectorOperation::values             vector_operation,
+        const unsigned int                        communication_channel,
+        const ArrayView<Number, MemorySpaceType> &ghost_array,
+        const ArrayView<Number, MemorySpaceType> &temporary_storage,
+        std::vector<MPI_Request> &                requests) const;
 
       /**
        * Finish importing the data from an array indexed by the ghost
@@ -529,14 +531,14 @@ namespace Utilities
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::compress().
        */
-      template <typename Number>
+      template <typename Number, typename MemorySpaceType = MemorySpace::Host>
       void
       import_from_ghosted_array_finish(
-        const VectorOperation::values  vector_operation,
-        const ArrayView<const Number> &temporary_storage,
-        const ArrayView<Number> &      locally_owned_storage,
-        const ArrayView<Number> &      ghost_array,
-        std::vector<MPI_Request> &     requests) const;
+        const VectorOperation::values                   vector_operation,
+        const ArrayView<const Number, MemorySpaceType> &temporary_storage,
+        const ArrayView<Number, MemorySpaceType> &      locally_owned_storage,
+        const ArrayView<Number, MemorySpaceType> &      ghost_array,
+        std::vector<MPI_Request> &                      requests) const;
 #endif
 
       /**
@@ -611,6 +613,20 @@ namespace Utilities
        * some indices may be duplicates.
        */
       std::vector<std::pair<unsigned int, unsigned int>> import_indices_data;
+
+      /**
+       * The set of (local) indices that we are importing during compress(),
+       * i.e., others' ghosts that belong to the local range. The data stored is
+       * the same than in import_indices_data but the data is expanded in plain
+       * arrays. This variable is only used when using CUDA-aware MPI.
+       */
+      // The variable is mutable to enable lazy initialization in
+      // export_to_ghosted_array_start(). This way partitioner does not have to
+      // be templated on the MemorySpaceType.
+      mutable std::vector<
+        std::pair<std::unique_ptr<unsigned int[], void (*)(unsigned int *)>,
+                  unsigned int>>
+        import_indices_plain_dev;
 
       /**
        * A variable caching the number of ghost indices. It would be expensive

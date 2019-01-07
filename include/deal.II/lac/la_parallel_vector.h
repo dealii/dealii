@@ -1330,7 +1330,8 @@ namespace LinearAlgebra
        * in @p compress() or sent from this processor in
        * @p update_ghost_values.
        */
-      mutable std::unique_ptr<Number[]> import_data;
+      mutable ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
+        import_data;
 
       /**
        * Stores whether the vector currently allows for reading ghost elements
