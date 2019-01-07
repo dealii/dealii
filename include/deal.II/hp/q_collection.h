@@ -157,7 +157,7 @@ namespace hp
     // this collection. Inlining the definition of q_pointers causes internal
     // compiler errors on GCC 7.1.1 so we define it separately:
     const auto q_pointers = {&quadrature_objects...};
-    for (auto p : q_pointers)
+    for (const auto p : q_pointers)
       push_back(*p);
   }
 
