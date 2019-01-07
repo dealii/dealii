@@ -3581,9 +3581,9 @@ namespace GridTools
     // archive the cellids in an efficient binary format
     const std::size_t n_cells = cell_ids.size();
     ar &              n_cells;
-    for (auto &it : cell_ids)
+    for (const auto &id : cell_ids)
       {
-        CellId::binary_type binary_cell_id = it.template to_binary<dim>();
+        CellId::binary_type binary_cell_id = id.template to_binary<dim>();
         ar &                binary_cell_id;
       }
 
@@ -3649,7 +3649,7 @@ namespace GridTools
       vertices_with_ghost_neighbors =
         tria->compute_vertices_with_ghost_neighbors();
 
-    for (auto cell : tria->active_cell_iterators())
+    for (const auto &cell : tria->active_cell_iterators())
       if (cell->is_locally_owned())
         {
           std::set<dealii::types::subdomain_id> send_to;
@@ -3686,10 +3686,8 @@ namespace GridTools
                 {
                   const CellId cellid = cell->id();
 
-                  for (auto it : send_to)
+                  for (const auto subdomain : send_to)
                     {
-                      const dealii::types::subdomain_id subdomain = it;
-
                       // find the data buffer for proc "subdomain" if it exists
                       // or create an empty one otherwise
                       typename DestinationToBufferMap::iterator p =

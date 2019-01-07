@@ -1228,7 +1228,7 @@ namespace GridGenerator
    * auto min_line_length = [](const Triangulation<dim> &tria) -> double
    * {
    *   double length = std::numeric_limits<double>::max();
-   *   for (const auto cell : tria.active_cell_iterators())
+   *   for (const auto &cell : tria.active_cell_iterators())
    *     for (unsigned int n = 0; n < GeometryInfo<dim>::lines_per_cell; ++n)
    *       length = std::min(length, (cell->line(n)->vertex(0) -
    *                                  cell->line(n)->vertex(1)).norm());
