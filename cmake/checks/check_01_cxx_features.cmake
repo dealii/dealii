@@ -569,38 +569,61 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
 # but a compiler extension in earlier language versions: check both
 # possibilities here.
 #
-IF(DEAL_II_WITH_CXX17)
+# first try the attribute [[fallthrough]]
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wextra ${DEAL_II_CXX_VERSION_FLAG}")
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  int main()
+  {
+    int i = 42;
+    int j = 10;
+    switch(i)
+      {
+      case 1:
+        ++j;
+        [[fallthrough]];
+      case 2:
+        ++j;
+        [[fallthrough]];
+      default:
+        break;
+      }
+   }
+   "
+   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
+   )
+
+# see if the current compiler configuration supports the GCC extension
+# __attribute__((fallthrough)) syntax instead
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  int main()
+  {
+    int i = 42;
+    int j = 10;
+    switch(i)
+      {
+      case 1:
+        ++j;
+        __attribute__((fallthrough));
+      case 2:
+        ++j;
+        __attribute__((fallthrough));
+      default:
+        break;
+      }
+  }
+  "
+  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
+  )
+
+RESET_CMAKE_REQUIRED()
+IF(DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH)
   SET(DEAL_II_FALLTHROUGH "[[fallthrough]]")
+ELSEIF(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
+  SET(DEAL_II_FALLTHROUGH "__attribute__((fallthrough))")
 ELSE()
-  # see if the current compiler configuration supports the GCC extension
-  # __attribute__((fallthrough)) syntax instead
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wextra ${DEAL_II_CXX_VERSION_FLAG}")
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    int main()
-    {
-      int i = 42;
-      int j = 10;
-      switch(i)
-        {
-        case 1:
-          ++j;
-          __attribute__((fallthrough));
-        case 2:
-          ++j;
-          __attribute__((fallthrough));
-        default:
-          break;
-        }
-    }
-    "
-    DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
-  RESET_CMAKE_REQUIRED()
-  IF(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
-    SET(DEAL_II_FALLTHROUGH "__attribute__((fallthrough))")
-  ELSE()
-    SET(DEAL_II_FALLTHROUGH " ")
-  ENDIF()
+  SET(DEAL_II_FALLTHROUGH " ")
 ENDIF()
 
 ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
