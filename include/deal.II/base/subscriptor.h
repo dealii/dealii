@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <atomic>
+#include <cstring>
 #include <map>
 #include <mutex>
 #include <string>
@@ -104,11 +105,23 @@ public:
 
   /**
    * Subscribes a user of the object by storing the pointer @p validity. The
-   * subscriber may be identified by text supplied as @p identifier.
+   * subscriber may be identified by text supplied as @p identifier. The latter
+   * variable must not be a temporary and its type must decay to
+   * const char *. In particular, calling this function with a rvalue reference
+   * is not allowed.
+   */
+  template <typename ConstCharStar = const char *>
+  typename std::enable_if<
+    std::is_same<ConstCharStar, const char *>::value>::type
+  subscribe(std::atomic<bool> *const validity,
+            ConstCharStar            identifier = nullptr) const;
+
+  /**
+   * Calling subscribe() with a rvalue reference as identifier is not allowed.
    */
   void
   subscribe(std::atomic<bool> *const validity,
-            const char *             identifier = nullptr) const;
+            const char *&&           identifier) const = delete;
 
   /**
    * Unsubscribes a user from the object.
@@ -192,16 +205,6 @@ public:
 
 private:
   /**
-   * The data type used in #counter_map.
-   */
-  using map_value_type = std::map<const char *, unsigned int>::value_type;
-
-  /**
-   * The iterator type used in #counter_map.
-   */
-  using map_iterator = std::map<const char *, unsigned int>::iterator;
-
-  /**
    * Store the number of objects which subscribed to this object. Initially,
    * this number is zero, and upon destruction it shall be zero again (i.e.
    * all objects which subscribed should have unsubscribed again).
@@ -219,11 +222,34 @@ private:
    */
   mutable std::atomic<unsigned int> counter;
 
+  /*
+   * Functor struct used for key comparison in #counter_map.
+   * Not the memory location but the actual C-string content is compared.
+   */
+  struct MapCompare
+  {
+    bool
+    operator()(const char *lhs, const char *rhs) const
+    {
+      return std::strcmp(lhs, rhs) > 0;
+    }
+  };
+
   /**
    * In this map, we count subscriptions for each different identification
    * string supplied to subscribe().
    */
-  mutable std::map<const char *, unsigned int> counter_map;
+  mutable std::map<const char *, unsigned int, MapCompare> counter_map;
+
+  /**
+   * The data type used in #counter_map.
+   */
+  using map_value_type = decltype(counter_map)::value_type;
+
+  /**
+   * The iterator type used in #counter_map.
+   */
+  using map_iterator = decltype(counter_map)::iterator;
 
   /**
    * In this vector, we store pointers to the validity bool in the SmartPointer
