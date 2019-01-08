@@ -54,8 +54,8 @@ template <typename Range  = BlockVector<double>,
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_operator(const BlockMatrixType &matrix);
 
-template <size_t m,
-          size_t n,
+template <std::size_t m,
+          std::size_t n,
           typename Range  = BlockVector<double>,
           typename Domain = Range,
           typename BlockPayload =
@@ -68,7 +68,7 @@ block_operator(
                               n>,
                    m> &);
 
-template <size_t m,
+template <std::size_t m,
           typename Range  = BlockVector<double>,
           typename Domain = Range,
           typename BlockPayload =
@@ -80,7 +80,7 @@ block_diagonal_operator(
                                   typename BlockPayload::BlockType>,
                    m> &);
 
-template <size_t m,
+template <std::size_t m,
           typename Range  = BlockVector<double>,
           typename Domain = Range,
           typename BlockPayload =
@@ -264,7 +264,7 @@ public:
    * LinearOperator. This constructor calls the corresponding block_operator()
    * specialization.
    */
-  template <size_t m, size_t n>
+  template <std::size_t m, std::size_t n>
   BlockLinearOperator(const std::array<std::array<BlockType, n>, m> &ops)
   {
     *this = block_operator<m, n, Range, Domain, BlockPayload>(ops);
@@ -275,7 +275,7 @@ public:
    * @p ops of LinearOperator. This constructor calls the corresponding
    * block_operator() specialization.
    */
-  template <size_t m>
+  template <std::size_t m>
   BlockLinearOperator(const std::array<BlockType, m> &ops)
   {
     *this = block_diagonal_operator<m, Range, Domain, BlockPayload>(ops);
@@ -304,7 +304,7 @@ public:
    * This assignment operator calls the corresponding block_operator()
    * specialization.
    */
-  template <size_t m, size_t n>
+  template <std::size_t m, std::size_t n>
   BlockLinearOperator<Range, Domain, BlockPayload> &
   operator=(const std::array<std::array<BlockType, n>, m> &ops)
   {
@@ -317,7 +317,7 @@ public:
    * that creates a block-diagonal BlockLinearOperator. This assignment
    * operator calls the corresponding block_operator() specialization.
    */
-  template <size_t m>
+  template <std::size_t m>
   BlockLinearOperator<Range, Domain, BlockPayload> &
   operator=(const std::array<BlockType, m> &ops)
   {
@@ -679,8 +679,8 @@ block_operator(const BlockMatrixType &block_matrix)
  *
  * @ingroup LAOperators
  */
-template <size_t m,
-          size_t n,
+template <std::size_t m,
+          std::size_t n,
           typename Range,
           typename Domain,
           typename BlockPayload>
@@ -793,7 +793,7 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
  *
  * @ingroup LAOperators
  */
-template <size_t m, typename Range, typename Domain, typename BlockPayload>
+template <std::size_t m, typename Range, typename Domain, typename BlockPayload>
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(
   const std::array<LinearOperator<typename Range::BlockType,
@@ -842,7 +842,7 @@ block_diagonal_operator(
  *
  * @ingroup LAOperators
  */
-template <size_t m, typename Range, typename Domain, typename BlockPayload>
+template <std::size_t m, typename Range, typename Domain, typename BlockPayload>
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(
   const LinearOperator<typename Range::BlockType,

@@ -64,10 +64,10 @@ namespace SUNDIALS
     void
     copy(TrilinosWrappers::MPI::Vector &dst, const N_Vector &src)
     {
-      const IndexSet is = dst.locally_owned_elements();
-      const size_t   N  = is.n_elements();
+      const IndexSet    is = dst.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(src));
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
         }
@@ -77,10 +77,10 @@ namespace SUNDIALS
     void
     copy(N_Vector &dst, const TrilinosWrappers::MPI::Vector &src)
     {
-      const IndexSet is = src.locally_owned_elements();
-      const size_t   N  = is.n_elements();
+      const IndexSet    is = src.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(dst));
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
         }
@@ -89,10 +89,10 @@ namespace SUNDIALS
     void
     copy(TrilinosWrappers::MPI::BlockVector &dst, const N_Vector &src)
     {
-      const IndexSet is = dst.locally_owned_elements();
-      const size_t   N  = is.n_elements();
+      const IndexSet    is = dst.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(src));
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
         }
@@ -102,10 +102,10 @@ namespace SUNDIALS
     void
     copy(N_Vector &dst, const TrilinosWrappers::MPI::BlockVector &src)
     {
-      IndexSet     is = src.locally_owned_elements();
-      const size_t N  = is.n_elements();
+      IndexSet          is = src.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(dst));
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
         }
@@ -119,10 +119,10 @@ namespace SUNDIALS
     void
     copy(PETScWrappers::MPI::Vector &dst, const N_Vector &src)
     {
-      const IndexSet is = dst.locally_owned_elements();
-      const size_t   N  = is.n_elements();
+      const IndexSet    is = dst.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(src));
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
         }
@@ -132,10 +132,10 @@ namespace SUNDIALS
     void
     copy(N_Vector &dst, const PETScWrappers::MPI::Vector &src)
     {
-      const IndexSet is = src.locally_owned_elements();
-      const size_t   N  = is.n_elements();
+      const IndexSet    is = src.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(dst));
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
         }
@@ -144,10 +144,10 @@ namespace SUNDIALS
     void
     copy(PETScWrappers::MPI::BlockVector &dst, const N_Vector &src)
     {
-      const IndexSet is = dst.locally_owned_elements();
-      const size_t   N  = is.n_elements();
+      const IndexSet    is = dst.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(src));
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           dst[is.nth_index_in_set(i)] = NV_Ith_P(src, i);
         }
@@ -157,10 +157,10 @@ namespace SUNDIALS
     void
     copy(N_Vector &dst, const PETScWrappers::MPI::BlockVector &src)
     {
-      const IndexSet is = src.locally_owned_elements();
-      const size_t   N  = is.n_elements();
+      const IndexSet    is = src.locally_owned_elements();
+      const std::size_t N  = is.n_elements();
       AssertDimension(N, N_Vector_length(dst));
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           NV_Ith_P(dst, i) = src[is.nth_index_in_set(i)];
         }
@@ -174,9 +174,9 @@ namespace SUNDIALS
     void
     copy(BlockVector<double> &dst, const N_Vector &src)
     {
-      const size_t N = dst.size();
+      const std::size_t N = dst.size();
       AssertDimension(N_Vector_length(src), N);
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           dst[i] = NV_Ith_S(src, i);
         }
@@ -185,9 +185,9 @@ namespace SUNDIALS
     void
     copy(N_Vector &dst, const BlockVector<double> &src)
     {
-      const size_t N = src.size();
+      const std::size_t N = src.size();
       AssertDimension(N_Vector_length(dst), N);
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           NV_Ith_S(dst, i) = src[i];
         }
@@ -196,9 +196,9 @@ namespace SUNDIALS
     void
     copy(Vector<double> &dst, const N_Vector &src)
     {
-      const size_t N = dst.size();
+      const std::size_t N = dst.size();
       AssertDimension(N_Vector_length(src), N);
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           dst[i] = NV_Ith_S(src, i);
         }
@@ -207,9 +207,9 @@ namespace SUNDIALS
     void
     copy(N_Vector &dst, const Vector<double> &src)
     {
-      const size_t N = src.size();
+      const std::size_t N = src.size();
       AssertDimension(N_Vector_length(dst), N);
-      for (size_t i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
         {
           NV_Ith_S(dst, i) = src[i];
         }

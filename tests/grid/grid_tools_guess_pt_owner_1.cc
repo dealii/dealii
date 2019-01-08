@@ -102,7 +102,7 @@ test_point_owner(unsigned int n_procs)
   points.clear();
 
   unsigned int n_points = 2 * tot_bbox;
-  for (size_t i = 0; i < n_points; ++i)
+  for (std::size_t i = 0; i < n_points; ++i)
     {
       Point<spacedim> p;
       p[0] = tot_bbox * double(Testing::rand()) / RAND_MAX;

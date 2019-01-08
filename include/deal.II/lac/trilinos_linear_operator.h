@@ -168,7 +168,10 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    */
-  template <size_t m, size_t n, typename Range, typename Domain = Range>
+  template <std::size_t m,
+            std::size_t n,
+            typename Range,
+            typename Domain = Range>
   inline BlockLinearOperator<
     Range,
     Domain,
@@ -246,7 +249,7 @@ namespace TrilinosWrappers
    *
    * @ingroup TrilinosWrappers
    */
-  template <size_t m, typename Range, typename Domain = Range>
+  template <std::size_t m, typename Range, typename Domain = Range>
   inline BlockLinearOperator<
     Range,
     Domain,

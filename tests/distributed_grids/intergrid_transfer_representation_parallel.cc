@@ -97,7 +97,7 @@ test(unsigned n_refinements)
   // For this test case, all weights are one and their sum
   // should be equal to number of degrees of freedom
   unsigned local_sum = 0.;
-  for (size_t i = 0; i < transfer_representation.size(); ++i)
+  for (std::size_t i = 0; i < transfer_representation.size(); ++i)
     {
       TransferRep::value_type m = transfer_representation[i];
       for (TransferRep::value_type::const_iterator it = m.begin();

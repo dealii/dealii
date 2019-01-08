@@ -933,7 +933,7 @@ namespace Utilities
 
 
     void
-    posix_memalign(void **memptr, size_t alignment, size_t size)
+    posix_memalign(void **memptr, std::size_t alignment, std::size_t size)
     {
 #ifndef DEAL_II_MSVC
       const int ierr = ::posix_memalign(memptr, alignment, size);

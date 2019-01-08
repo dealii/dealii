@@ -50,7 +50,7 @@ namespace boost
        * Access to the D-th coordinate of the lower left  corner of a
        * dealii::BoundingBox.
        */
-      template <int dim, class Number, size_t D>
+      template <int dim, class Number, std::size_t D>
       struct indexed_access<dealii::BoundingBox<dim, Number>, min_corner, D>
       {
         /**
@@ -78,7 +78,7 @@ namespace boost
        * Access to the D-th coordinate of the upper right corner of a
        * dealii::BoundingBox.
        */
-      template <int dim, class Number, size_t D>
+      template <int dim, class Number, std::size_t D>
       struct indexed_access<dealii::BoundingBox<dim, Number>, max_corner, D>
       {
         /**

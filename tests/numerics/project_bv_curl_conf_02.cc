@@ -108,7 +108,7 @@ test(unsigned order)
           const std::vector<std::pair<types::global_dof_index, double>> &c2 =
             *constraints_fe.get_constraint_entries(lines.nth_index_in_set(i));
 
-          for (size_t j = 0; j < c1.size(); ++j)
+          for (std::size_t j = 0; j < c1.size(); ++j)
             if ((c1[j].first != c2[j].first) ||
                 (fabs(c1[j].second - c2[j].second) > 1e-14))
               {

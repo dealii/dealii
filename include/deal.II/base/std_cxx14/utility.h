@@ -57,7 +57,7 @@ namespace std_cxx14
   } // namespace internal
   // --------------------------------------------------------------
 
-  template <size_t N>
+  template <std::size_t N>
   struct make_index_sequence : internal::merge_and_renumber<
                                  typename make_index_sequence<N / 2>::type,
                                  typename make_index_sequence<N - N / 2>::type>

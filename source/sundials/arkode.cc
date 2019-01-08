@@ -286,8 +286,8 @@ namespace SUNDIALS
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
-        const IndexSet is                = solution.locally_owned_elements();
-        const size_t   local_system_size = is.n_elements();
+        const IndexSet    is                = solution.locally_owned_elements();
+        const std::size_t local_system_size = is.n_elements();
 
         yy = N_VNew_Parallel(communicator, local_system_size, system_size);
 
@@ -385,8 +385,8 @@ namespace SUNDIALS
 #  ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
-        const IndexSet is                = solution.locally_owned_elements();
-        const size_t   local_system_size = is.n_elements();
+        const IndexSet    is                = solution.locally_owned_elements();
+        const std::size_t local_system_size = is.n_elements();
 
         yy = N_VNew_Parallel(communicator, local_system_size, system_size);
 

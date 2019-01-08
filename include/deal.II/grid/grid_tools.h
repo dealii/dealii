@@ -3571,8 +3571,8 @@ namespace GridTools
     Assert(cell_ids.size() == data.size(),
            ExcDimensionMismatch(cell_ids.size(), data.size()));
     // archive the cellids in an efficient binary format
-    const size_t n_cells = cell_ids.size();
-    ar &         n_cells;
+    const std::size_t n_cells = cell_ids.size();
+    ar &              n_cells;
     for (auto &it : cell_ids)
       {
         CellId::binary_type binary_cell_id = it.template to_binary<dim>();
@@ -3590,8 +3590,8 @@ namespace GridTools
   CellDataTransferBuffer<dim, T>::load(Archive &ar,
                                        const unsigned int /*version*/)
   {
-    size_t n_cells;
-    ar &   n_cells;
+    std::size_t n_cells;
+    ar &        n_cells;
     cell_ids.clear();
     cell_ids.reserve(n_cells);
     for (unsigned int c = 0; c < n_cells; ++c)
