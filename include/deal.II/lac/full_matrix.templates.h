@@ -409,7 +409,7 @@ FullMatrix<number>::add_col(const size_type i,
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
-  for (size_t l = 0; l < m(); ++l)
+  for (std::size_t l = 0; l < m(); ++l)
     (*this)(l, i) += s * (*this)(l, j) + t * (*this)(l, k);
 }
 
@@ -1751,7 +1751,7 @@ FullMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
   Assert(dst.size() == n(), ExcDimensionMismatch(dst.size(), n()));
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
-  const size_t      n       = src.size();
+  const std::size_t n       = src.size();
   somenumber *      dst_ptr = dst.begin();
   const somenumber *src_ptr = src.begin();
 

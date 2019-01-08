@@ -2878,7 +2878,8 @@ namespace DoFTools
         copy_data.global_parameter_representation.resize(n_interesting_dofs);
 
         bool is_called_in_parallel = false;
-        for (size_t i = 0; i < copy_data.global_parameter_representation.size();
+        for (std::size_t i = 0;
+             i < copy_data.global_parameter_representation.size();
              ++i)
           {
 #ifdef DEAL_II_WITH_MPI
@@ -2936,7 +2937,8 @@ namespace DoFTools
                         copy_data);
 
 #ifdef DEAL_II_WITH_MPI
-        for (size_t i = 0; i < copy_data.global_parameter_representation.size();
+        for (std::size_t i = 0;
+             i < copy_data.global_parameter_representation.size();
              ++i)
           copy_data.global_parameter_representation[i].update_ghost_values();
 #endif

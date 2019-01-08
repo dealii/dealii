@@ -65,7 +65,7 @@ namespace boost
       /**
        * Getter function for D-th coordinate of a dealii Point.
        */
-      template <size_t D, int dim, class Number>
+      template <std::size_t D, int dim, class Number>
       struct access<dealii::Point<dim, Number>, D>
       {
         static inline double

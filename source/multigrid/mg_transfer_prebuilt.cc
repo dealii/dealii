@@ -289,7 +289,7 @@ MGTransferPrebuilt<VectorType>::build_matrices(
             n_locally_owned_mg_dofs_per_processor(
               locally_owned_mg_dofs_per_processor.size(), 0);
 
-          for (size_t index = 0;
+          for (std::size_t index = 0;
                index < n_locally_owned_mg_dofs_per_processor.size();
                ++index)
             {

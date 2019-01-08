@@ -54,7 +54,7 @@ test(unsigned int n_ref, unsigned int n_points)
   std::vector<Point<spacedim>> points;
 
   deallog << "Points in study: " << n_points << std::endl;
-  for (size_t i = 0; i < n_points; ++i)
+  for (std::size_t i = 0; i < n_points; ++i)
     points.push_back(random_point<spacedim>());
 
   auto v_to_c   = GridTools::vertex_to_cell_map(tria);

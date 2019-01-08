@@ -61,9 +61,9 @@ MultithreadInfo::get_n_cpus()
 unsigned int
 MultithreadInfo::get_n_cpus()
 {
-  int    mib[2];
-  int    n_cpus;
-  size_t len;
+  int         mib[2];
+  int         n_cpus;
+  std::size_t len;
 
   mib[0] = CTL_HW;
   mib[1] = HW_NCPU;

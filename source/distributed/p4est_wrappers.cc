@@ -397,7 +397,7 @@ namespace internal
       types<2>::locidx        min_quadrants,
       int                     min_level,
       int                     fill_uniform,
-      size_t                  data_size,
+      std::size_t             data_size,
       p4est_init_t            init_fn,
       void *                  user_pointer) = p4est_new_ext;
 
@@ -444,8 +444,8 @@ namespace internal
       types<2>::connectivity *connectivity) = p4est_connectivity_is_valid;
 
     types<2>::connectivity *(&functions<2>::connectivity_load)(
-      const char *filename,
-      size_t *    length) = p4est_connectivity_load;
+      const char * filename,
+      std::size_t *length) = p4est_connectivity_load;
 
     unsigned int (&functions<2>::checksum)(types<2>::forest *p4est) =
       p4est_checksum;
@@ -463,14 +463,14 @@ namespace internal
       p4est_ghost_destroy;
 
     void (&functions<2>::reset_data)(types<2>::forest *p4est,
-                                     size_t            data_size,
+                                     std::size_t       data_size,
                                      p4est_init_t      init_fn,
                                      void *user_pointer) = p4est_reset_data;
 
-    size_t (&functions<2>::forest_memory_used)(types<2>::forest *p4est) =
+    std::size_t (&functions<2>::forest_memory_used)(types<2>::forest *p4est) =
       p4est_memory_used;
 
-    size_t (&functions<2>::connectivity_memory_used)(
+    std::size_t (&functions<2>::connectivity_memory_used)(
       types<2>::connectivity *p4est) = p4est_connectivity_memory_used;
 
     template <int dim, int spacedim>
@@ -533,7 +533,7 @@ namespace internal
                                          int                     tag,
                                          void *                  dest_data,
                                          const void *            src_data,
-                                         size_t                  data_size) =
+                                         std::size_t             data_size) =
       p4est_transfer_fixed;
 
     types<2>::transfer_context *(&functions<2>::transfer_fixed_begin)(
@@ -543,7 +543,7 @@ namespace internal
       int                     tag,
       void *                  dest_data,
       const void *            src_data,
-      size_t                  data_size) = p4est_transfer_fixed_begin;
+      std::size_t             data_size) = p4est_transfer_fixed_begin;
 
     void (&functions<2>::transfer_fixed_end)(types<2>::transfer_context *tc) =
       p4est_transfer_fixed_end;
@@ -636,7 +636,7 @@ namespace internal
       types<3>::locidx        min_quadrants,
       int                     min_level,
       int                     fill_uniform,
-      size_t                  data_size,
+      std::size_t             data_size,
       p8est_init_t            init_fn,
       void *                  user_pointer) = p8est_new_ext;
 
@@ -683,8 +683,8 @@ namespace internal
       types<3>::connectivity *connectivity) = p8est_connectivity_is_valid;
 
     types<3>::connectivity *(&functions<3>::connectivity_load)(
-      const char *filename,
-      size_t *    length) = p8est_connectivity_load;
+      const char * filename,
+      std::size_t *length) = p8est_connectivity_load;
 
     unsigned int (&functions<3>::checksum)(types<3>::forest *p8est) =
       p8est_checksum;
@@ -702,14 +702,14 @@ namespace internal
       p8est_ghost_destroy;
 
     void (&functions<3>::reset_data)(types<3>::forest *p4est,
-                                     size_t            data_size,
+                                     std::size_t       data_size,
                                      p8est_init_t      init_fn,
                                      void *user_pointer) = p8est_reset_data;
 
-    size_t (&functions<3>::forest_memory_used)(types<3>::forest *p4est) =
+    std::size_t (&functions<3>::forest_memory_used)(types<3>::forest *p4est) =
       p8est_memory_used;
 
-    size_t (&functions<3>::connectivity_memory_used)(
+    std::size_t (&functions<3>::connectivity_memory_used)(
       types<3>::connectivity *p4est) = p8est_connectivity_memory_used;
 
     constexpr unsigned int functions<3>::max_level;
@@ -720,7 +720,7 @@ namespace internal
                                          int                     tag,
                                          void *                  dest_data,
                                          const void *            src_data,
-                                         size_t                  data_size) =
+                                         std::size_t             data_size) =
       p8est_transfer_fixed;
 
     types<3>::transfer_context *(&functions<3>::transfer_fixed_begin)(
@@ -730,7 +730,7 @@ namespace internal
       int                     tag,
       void *                  dest_data,
       const void *            src_data,
-      size_t                  data_size) = p8est_transfer_fixed_begin;
+      std::size_t             data_size) = p8est_transfer_fixed_begin;
 
     void (&functions<3>::transfer_fixed_end)(types<3>::transfer_context *tc) =
       p8est_transfer_fixed_end;

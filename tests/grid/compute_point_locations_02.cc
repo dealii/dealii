@@ -58,7 +58,7 @@ test_compute_pt_loc(unsigned int n_points)
   // Creating the random points
   std::vector<Point<dim>> points;
 
-  for (size_t i = 0; i < n_points; ++i)
+  for (std::size_t i = 0; i < n_points; ++i)
     {
       Point<dim> p;
       for (unsigned int d = 0; d < dim; ++d)
@@ -72,7 +72,7 @@ test_compute_pt_loc(unsigned int n_points)
   auto my_pair = GridTools::find_active_cell_around_point(cache, points[0]);
   auto cell_qpoint_map =
     GridTools::compute_point_locations(cache, points, my_pair.first);
-  size_t n_cells = std::get<0>(cell_qpoint_map).size();
+  std::size_t n_cells = std::get<0>(cell_qpoint_map).size();
 
   deallog << "Points found in " << n_cells << " cells" << std::endl;
 

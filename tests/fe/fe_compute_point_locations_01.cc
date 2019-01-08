@@ -57,7 +57,7 @@ test_compute_pt_loc(unsigned int n_points)
   // Creating the random points
   std::vector<Point<dim>> points;
 
-  for (size_t i = 0; i < n_points; ++i)
+  for (std::size_t i = 0; i < n_points; ++i)
     points.push_back(random_point<dim>());
 
   std::vector<typename DoFHandler<dim>::active_cell_iterator> cells;
@@ -68,7 +68,7 @@ test_compute_pt_loc(unsigned int n_points)
   Vector<double>                  dummy;
   Functions::FEFieldFunction<dim> fe_function(
     dof_handler, dummy, StaticMappingQ1<dim, dim>::mapping);
-  size_t n_cells =
+  std::size_t n_cells =
     fe_function.compute_point_locations(points, cells, qpoints, maps);
 
   deallog << "Points found in " << n_cells << " cells" << std::endl;

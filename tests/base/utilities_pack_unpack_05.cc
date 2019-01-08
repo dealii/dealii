@@ -36,7 +36,7 @@ check(const double (&array)[N], const Point<dim>(&point))
 
   // PACK BUFFER
   // add first object to buffer and store buffer size for later separation
-  const size_t buffer_separator = Utilities::pack(array, buffer);
+  const std::size_t buffer_separator = Utilities::pack(array, buffer);
   // add second object to buffer
   Utilities::pack(point, buffer);
 

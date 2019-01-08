@@ -855,7 +855,7 @@ namespace Utilities
      * leaving this task to the calling site.
      */
     void
-    posix_memalign(void **memptr, size_t alignment, size_t size);
+    posix_memalign(void **memptr, std::size_t alignment, std::size_t size);
   } // namespace System
 
 
@@ -1138,7 +1138,7 @@ namespace Utilities
     // the data is never compressed when we can't use zlib.
     (void)allow_compression;
 
-    size_t size = 0;
+    std::size_t size = 0;
 
     // see if the object is small and copyable via memcpy. if so, use
     // this fast path. otherwise, we have to go through the BOOST
@@ -1157,7 +1157,7 @@ namespace Utilities
 #  endif
 #endif
       {
-        const size_t previous_size = dest_buffer.size();
+        const std::size_t previous_size = dest_buffer.size();
         dest_buffer.resize(previous_size + sizeof(T));
 
         std::memcpy(dest_buffer.data() + previous_size, &object, sizeof(T));
@@ -1168,7 +1168,7 @@ namespace Utilities
       {
         // use buffer as the target of a compressing
         // stream into which we serialize the current object
-        const size_t previous_size = dest_buffer.size();
+        const std::size_t previous_size = dest_buffer.size();
 #ifdef DEAL_II_WITH_ZLIB
         if (allow_compression)
           {

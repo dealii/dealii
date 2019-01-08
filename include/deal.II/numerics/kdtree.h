@@ -126,16 +126,16 @@ public:
      * Return the L2 distance between points
      */
     coord_t
-    kdtree_distance(const coord_t *p1,
-                    const size_t   idx_p2,
-                    const size_t   size) const;
+    kdtree_distance(const coord_t *   p1,
+                    const std::size_t idx_p2,
+                    const std::size_t size) const;
 
 
     /**
      * Return the d-th component of the idx-th point in the class.
      */
     coord_t
-    kdtree_get_pt(const size_t idx, const int d) const;
+    kdtree_get_pt(const std::size_t idx, const int d) const;
 
 
     /**
@@ -289,7 +289,8 @@ KDTree<dim>::PointCloudAdaptor::kdtree_get_point_count() const
 
 template <int dim>
 inline double
-KDTree<dim>::PointCloudAdaptor::kdtree_get_pt(const size_t idx, int d) const
+KDTree<dim>::PointCloudAdaptor::kdtree_get_pt(const std::size_t idx,
+                                              int               d) const
 {
   AssertIndexRange(d, dim);
   return points[idx][d];
@@ -309,13 +310,13 @@ KDTree<dim>::PointCloudAdaptor::kdtree_get_bbox(BBOX &) const
 
 template <int dim>
 inline double
-KDTree<dim>::PointCloudAdaptor::kdtree_distance(const double *p1,
-                                                const size_t  idx_p2,
-                                                const size_t  size) const
+KDTree<dim>::PointCloudAdaptor::kdtree_distance(const double *    p1,
+                                                const std::size_t idx_p2,
+                                                const std::size_t size) const
 {
   AssertDimension(size, dim);
   double res = 0.0;
-  for (size_t d = 0; d < size; ++d)
+  for (std::size_t d = 0; d < size; ++d)
     res += (p1[d] - points[idx_p2][d]) * (p1[d] - points[idx_p2][d]);
   return std::sqrt(res);
 }
