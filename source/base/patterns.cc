@@ -59,7 +59,7 @@ namespace Patterns
             {
               std::string u;
               u.reserve(input.size());
-              for (auto c : input)
+              for (const auto c : input)
                 {
                   switch (c)
                     {
@@ -866,7 +866,7 @@ namespace Patterns
         (split_list.size() > max_elements))
       return false;
 
-    for (auto &key_value_pair : split_list)
+    for (const auto &key_value_pair : split_list)
       {
         std::vector<std::string> pair =
           Utilities::split_string_list(key_value_pair, key_value_separator);

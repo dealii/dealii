@@ -189,11 +189,11 @@ namespace Utilities
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
-      for (unsigned int i = 0; i < destinations.size(); ++i)
+      for (const unsigned int destination : destinations)
         {
-          Assert(destinations[i] < n_procs,
-                 ExcIndexRange(destinations[i], 0, n_procs));
-          Assert(destinations[i] != myid,
+          (void)destination;
+          Assert(destination < n_procs, ExcIndexRange(destination, 0, n_procs));
+          Assert(destination != myid,
                  ExcMessage(
                    "There is no point in communicating with ourselves."));
         }
@@ -302,11 +302,11 @@ namespace Utilities
     {
       const unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
 
-      for (unsigned int i = 0; i < destinations.size(); ++i)
+      for (const unsigned int destination : destinations)
         {
-          Assert(destinations[i] < n_procs,
-                 ExcIndexRange(destinations[i], 0, n_procs));
-          Assert(destinations[i] != Utilities::MPI::this_mpi_process(mpi_comm),
+          (void)destination;
+          Assert(destination < n_procs, ExcIndexRange(destination, 0, n_procs));
+          Assert(destination != Utilities::MPI::this_mpi_process(mpi_comm),
                  ExcMessage(
                    "There is no point in communicating with ourselves."));
         }

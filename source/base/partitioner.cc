@@ -413,10 +413,10 @@ namespace Utilities
 #  ifdef DEBUG
           const types::global_dof_index n_local_dofs =
             local_range_data.second - local_range_data.first;
-          for (unsigned int i = 0; i < import_indices_data.size(); ++i)
+          for (const auto &range : import_indices_data)
             {
-              AssertIndexRange(import_indices_data[i].first, n_local_dofs);
-              AssertIndexRange(import_indices_data[i].second - 1, n_local_dofs);
+              AssertIndexRange(range.first, n_local_dofs);
+              AssertIndexRange(range.second - 1, n_local_dofs);
             }
 #  endif
         }
@@ -449,21 +449,19 @@ namespace Utilities
           // first translate tight ghost indices into indices within the large
           // set:
           std::vector<unsigned int> expanded_numbering;
-          for (IndexSet::ElementIterator it = ghost_indices_data.begin();
-               it != ghost_indices_data.end();
-               ++it)
+          for (dealii::IndexSet::size_type index : ghost_indices_data)
             {
-              Assert(larger_ghost_index_set.is_element(*it),
+              Assert(larger_ghost_index_set.is_element(index),
                      ExcMessage("The given larger ghost index set must contain"
                                 "all indices in the actual index set."));
               Assert(
-                larger_ghost_index_set.index_within_set(*it) <
+                larger_ghost_index_set.index_within_set(index) <
                   static_cast<types::global_dof_index>(
                     std::numeric_limits<unsigned int>::max()),
                 ExcMessage(
                   "Index overflow: This class supports at most 2^32-1 ghost elements"));
               expanded_numbering.push_back(
-                larger_ghost_index_set.index_within_set(*it));
+                larger_ghost_index_set.index_within_set(index));
             }
 
           // now rework expanded_numbering into ranges and store in:

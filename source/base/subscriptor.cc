@@ -52,7 +52,7 @@ Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
   : counter(0)
   , object_info(subscriptor.object_info)
 {
-  for (auto validity_ptr : subscriptor.validity_pointers)
+  for (const auto validity_ptr : subscriptor.validity_pointers)
     *validity_ptr = false;
 }
 
@@ -60,7 +60,7 @@ Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
 
 Subscriptor::~Subscriptor()
 {
-  for (auto validity_ptr : validity_pointers)
+  for (const auto validity_ptr : validity_pointers)
     *validity_ptr = false;
   object_info = nullptr;
 }
@@ -94,12 +94,11 @@ Subscriptor::check_no_subscribers() const noexcept
       if (std::uncaught_exception() == false)
         {
           std::string infostring;
-          for (map_iterator it = counter_map.begin(); it != counter_map.end();
-               ++it)
+          for (const auto &map_entry : counter_map)
             {
-              if (it->second > 0)
-                infostring +=
-                  std::string("\n  from Subscriber ") + std::string(it->first);
+              if (map_entry.second > 0)
+                infostring += std::string("\n  from Subscriber ") +
+                              std::string(map_entry.first);
             }
 
           if (infostring == "")
@@ -145,7 +144,7 @@ Subscriptor::operator=(const Subscriptor &s)
 Subscriptor &
 Subscriptor::operator=(Subscriptor &&s) noexcept
 {
-  for (auto validity_ptr : s.validity_pointers)
+  for (const auto validity_ptr : s.validity_pointers)
     *validity_ptr = false;
   object_info = s.object_info;
   return *this;

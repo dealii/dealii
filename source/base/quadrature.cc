@@ -868,20 +868,20 @@ QProjector<3>::project_to_all_faces(const SubQuadrature &quadrature)
   // mutations of a face (mutation==0
   // corresponds to a face with standard
   // orientation, no flip and no rotation)
-  for (unsigned int mutation = 0; mutation < 8; ++mutation)
+  for (const auto &mutation : q)
     {
       // project to each face and append
       // results
       for (unsigned int face = 0; face < n_faces; ++face)
         {
-          project_to_face(q[mutation], face, help);
+          project_to_face(mutation, face, help);
           std::copy(help.begin(), help.end(), std::back_inserter(q_points));
         }
 
       // next copy over weights
       for (unsigned int face = 0; face < n_faces; ++face)
-        std::copy(q[mutation].get_weights().begin(),
-                  q[mutation].get_weights().end(),
+        std::copy(mutation.get_weights().begin(),
+                  mutation.get_weights().end(),
                   std::back_inserter(weights));
     }
 
@@ -1012,7 +1012,7 @@ QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
   // mutations of a face (mutation==0
   // corresponds to a face with standard
   // orientation, no flip and no rotation)
-  for (unsigned int mutation = 0; mutation < 8; ++mutation)
+  for (const auto &mutation : q)
     {
       // project to each face and copy
       // results
@@ -1025,7 +1025,7 @@ QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
                            RefinementCase<dim - 1>(ref_case));
                ++subface)
             {
-              project_to_subface(q[mutation],
+              project_to_subface(mutation,
                                  face,
                                  subface,
                                  help,
@@ -1042,8 +1042,8 @@ QProjector<3>::project_to_all_subfaces(const SubQuadrature &quadrature)
                subface < GeometryInfo<dim - 1>::n_children(
                            RefinementCase<dim - 1>(ref_case));
                ++subface)
-            std::copy(q[mutation].get_weights().begin(),
-                      q[mutation].get_weights().end(),
+            std::copy(mutation.get_weights().begin(),
+                      mutation.get_weights().end(),
                       std::back_inserter(weights));
     }
 
