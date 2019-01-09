@@ -5240,27 +5240,64 @@ namespace GridGenerator
     //    preserve the order of cells passed in using the CellData argument;
     //    also, that it will not reorder the vertices.
 
-    std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
-             typename MeshType<dim, spacedim>::face_iterator>
-      surface_to_volume_mapping;
+    // dimension of the boundary mesh
+    const unsigned int boundary_dim = dim - 1;
 
-    const unsigned int boundary_dim = dim - 1; // dimension of the boundary mesh
+    // temporary map for level==0
+    // iterator to face is stored along with face number
+    // (this is required by the algorithm to adjust the normals of the
+    // cells of the boundary mesh)
+    std::vector<
+      std::pair<typename MeshType<dim, spacedim>::face_iterator, unsigned int>>
+      temporary_mapping_level0;
 
-    // First create surface mesh and mapping
-    // from only level(0) cells of volume_mesh
-    std::vector<typename MeshType<dim, spacedim>::face_iterator>
-      mapping; // temporary map for level==0
-
-
+    // vector indicating whether a vertex of the volume mesh has
+    // already been visited (necessary to avoid duplicate vertices in
+    // boundary mesh)
     std::vector<bool> touched(volume_mesh.get_triangulation().n_vertices(),
                               false);
+
+    // data structures required for creation of boundary mesh
     std::vector<CellData<boundary_dim>> cells;
     SubCellData                         subcell_data;
     std::vector<Point<spacedim>>        vertices;
 
-    std::map<unsigned int, unsigned int>
-      map_vert_index; // volume vertex indices to surf ones
+    // volume vertex indices to surf ones
+    std::map<unsigned int, unsigned int> map_vert_index;
 
+    // define swapping of vertices to get proper normal orientation of boundary
+    // mesh;
+    // the entry (i,j) of swap_matrix stores the index of the vertex of
+    // the boundary cell corresponding to the j-th vertex on the i-th face
+    // of the underlying volume cell
+    // if e.g. face 3 of a volume cell is considered and vertices 1 and 2 of the
+    // corresponding boundary cell are swapped to get
+    // proper normal orientation, swap_matrix[3]=( 0, 2, 1, 3 )
+    Table<2, unsigned int> swap_matrix(
+      GeometryInfo<spacedim>::faces_per_cell,
+      GeometryInfo<dim - 1>::vertices_per_cell);
+    for (unsigned int i1 = 0; i1 < GeometryInfo<spacedim>::faces_per_cell; i1++)
+      {
+        for (unsigned int i2 = 0; i2 < GeometryInfo<dim - 1>::vertices_per_cell;
+             i2++)
+          swap_matrix[i1][i2] = i2;
+      }
+    // vertex swapping such that normals on the surface mesh point out of the
+    // underlying volume
+    if (dim == 3)
+      {
+        std::swap(swap_matrix[0][1], swap_matrix[0][2]);
+        std::swap(swap_matrix[2][1], swap_matrix[2][2]);
+        std::swap(swap_matrix[4][1], swap_matrix[4][2]);
+      }
+    else if (dim == 2)
+      {
+        std::swap(swap_matrix[1][0], swap_matrix[1][1]);
+        std::swap(swap_matrix[2][0], swap_matrix[2][1]);
+      }
+
+    // Create boundary mesh and mapping
+    // from only level(0) cells of volume_mesh
     for (typename MeshType<dim, spacedim>::cell_iterator cell =
            volume_mesh.begin(0);
          cell != volume_mesh.end(0);
@@ -5289,26 +5326,14 @@ namespace GridGenerator
                       touched[v_index]        = true;
                     }
 
-                  c_data.vertices[j] = map_vert_index[v_index];
-                  c_data.material_id =
-                    static_cast<types::material_id>(face->boundary_id());
-                  c_data.manifold_id = face->manifold_id();
+                  c_data.vertices[swap_matrix[i][j]] = map_vert_index[v_index];
                 }
+              c_data.material_id =
+                static_cast<types::material_id>(face->boundary_id());
+              c_data.manifold_id = face->manifold_id();
 
-              // if we start from a 3d mesh, then we have copied the
-              // vertex information in the same order in which they
-              // appear in the face; however, this means that we
-              // impart a coordinate system that is right-handed when
-              // looked at *from the outside* of the cell if the
-              // current face has index 0, 2, 4 within a 3d cell, but
-              // right-handed when looked at *from the inside* for the
-              // other faces. we fix this by flipping opposite
-              // vertices if we are on a face 1, 3, 5
-              if (dim == 3)
-                if (i % 2 == 1)
-                  std::swap(c_data.vertices[1], c_data.vertices[2]);
 
-              // in 3d, we also need to make sure we copy the manifold
+              // in 3d, we need to make sure we copy the manifold
               // indicators from the edges of the volume mesh to the
               // edges of the surface mesh
               //
@@ -5341,7 +5366,8 @@ namespace GridGenerator
                             break;
                           }
                       if (edge_found == true)
-                        continue; // try next edge of current face
+                        // try next edge of current face
+                        continue;
                     }
 
                     CellData<1> edge;
@@ -5355,9 +5381,8 @@ namespace GridGenerator
                     subcell_data.boundary_lines.push_back(edge);
                   }
 
-
               cells.push_back(c_data);
-              mapping.push_back(face);
+              temporary_mapping_level0.push_back(std::make_pair(face, i));
             }
         }
 
@@ -5367,47 +5392,118 @@ namespace GridGenerator
       surface_mesh.get_triangulation())
       .create_triangulation(vertices, cells, subcell_data);
 
-    // Make the actual mapping
-    for (typename MeshType<dim - 1, spacedim>::active_cell_iterator cell =
-           surface_mesh.begin(0);
-         cell != surface_mesh.end(0);
-         ++cell)
-      surface_to_volume_mapping[cell] = mapping.at(cell->index());
+    // in 2d: set default boundary ids for "boundary vertices"
+    if (dim == 2)
+      {
+        for (const auto &cell : surface_mesh.active_cell_iterators())
+          for (unsigned int vertex = 0; vertex < 2; vertex++)
+            if (cell->face(vertex)->at_boundary())
+              cell->face(vertex)->set_boundary_id(0);
+      }
 
+    // Make mapping for level 0
+
+    // temporary map between cells on the boundary and corresponding faces of
+    // domain mesh (each face is characterized by an iterator to the face and
+    // the face number within the underlying cell)
+    std::vector<std::pair<
+      const typename MeshType<dim - 1, spacedim>::cell_iterator,
+      std::pair<typename MeshType<dim, spacedim>::face_iterator, unsigned int>>>
+      temporary_map_boundary_cell_face;
+    for (const auto &cell : surface_mesh.active_cell_iterators())
+      temporary_map_boundary_cell_face.push_back(
+        std::make_pair(cell, temporary_mapping_level0.at(cell->index())));
+
+
+    // refine the boundary mesh according to the refinement of the underlying
+    // volume mesh,
+    // algorithm:
+    //   (1) check which cells on refinement level i need to be refined
+    //   (2) do refinement (yields cells on level i+1)
+    //   (3) repeat for the next level (i+1->i) until refinement is completed
+
+    // stores the index into temporary_map_boundary_cell_face at which
+    // presently deepest refinement level of boundary mesh begins
+    unsigned int index_cells_deepest_level = 0;
     do
       {
         bool changed = false;
 
-        for (typename MeshType<dim - 1, spacedim>::active_cell_iterator cell =
-               surface_mesh.begin_active();
-             cell != surface_mesh.end();
-             ++cell)
-          if (surface_to_volume_mapping[cell]->has_children() == true)
-            {
-              cell->set_refine_flag();
-              changed = true;
-            }
+        // vector storing cells which have been marked for
+        // refinement
+        std::vector<unsigned int> cells_refined;
 
+        // loop over cells of presently deepest level of boundary triangulation
+        for (unsigned int cell_n = index_cells_deepest_level;
+             cell_n < temporary_map_boundary_cell_face.size();
+             cell_n++)
+          {
+            // mark boundary cell for refinement if underlying volume face has
+            // children
+            if (temporary_map_boundary_cell_face[cell_n]
+                  .second.first->has_children())
+              {
+                // algorithm only works for
+                // isotropic refinement!
+                Assert(temporary_map_boundary_cell_face[cell_n]
+                           .second.first->refinement_case() ==
+                         RefinementCase<dim - 1>::isotropic_refinement,
+                       ExcNotImplemented());
+                temporary_map_boundary_cell_face[cell_n]
+                  .first->set_refine_flag();
+                cells_refined.push_back(cell_n);
+                changed = true;
+              }
+          }
+
+        // if cells have been marked for refinement (i.e., presently deepest
+        // level is not the deepest level of the volume mesh)
         if (changed)
           {
+            // do actual refinement
             const_cast<Triangulation<dim - 1, spacedim> &>(
               surface_mesh.get_triangulation())
               .execute_coarsening_and_refinement();
 
-            for (typename MeshType<dim - 1, spacedim>::cell_iterator
-                   surface_cell = surface_mesh.begin();
-                 surface_cell != surface_mesh.end();
-                 ++surface_cell)
-              for (unsigned int c = 0; c < surface_cell->n_children(); c++)
-                if (surface_to_volume_mapping.find(surface_cell->child(c)) ==
-                    surface_to_volume_mapping.end())
-                  surface_to_volume_mapping[surface_cell->child(c)] =
-                    surface_to_volume_mapping[surface_cell]->child(c);
+            // add new level of cells to temporary_map_boundary_cell_face
+            index_cells_deepest_level = temporary_map_boundary_cell_face.size();
+            for (const auto &refined_cell_n : cells_refined)
+              {
+                const typename MeshType<dim - 1, spacedim>::cell_iterator
+                  refined_cell =
+                    temporary_map_boundary_cell_face[refined_cell_n].first;
+                const typename MeshType<dim,
+                                        spacedim>::face_iterator refined_face =
+                  temporary_map_boundary_cell_face[refined_cell_n].second.first;
+                const unsigned int refined_face_number =
+                  temporary_map_boundary_cell_face[refined_cell_n]
+                    .second.second;
+                for (unsigned int child_n = 0;
+                     child_n < refined_cell->n_children();
+                     ++child_n)
+                  // at this point, the swapping of vertices done earlier must
+                  // be taken into account to get the right association between
+                  // volume faces and boundary cells!
+                  temporary_map_boundary_cell_face.push_back(
+                    std::make_pair(refined_cell->child(
+                                     swap_matrix[refined_face_number][child_n]),
+                                   std::make_pair(refined_face->child(child_n),
+                                                  refined_face_number)));
+              }
           }
+        // we are at the deepest level of refinement of the volume mesh
         else
           break;
       }
     while (true);
+
+    // generate the final mapping from the temporary mapping
+    std::map<typename MeshType<dim - 1, spacedim>::cell_iterator,
+             typename MeshType<dim, spacedim>::face_iterator>
+      surface_to_volume_mapping;
+    for (unsigned int i = 0; i < temporary_map_boundary_cell_face.size(); i++)
+      surface_to_volume_mapping[temporary_map_boundary_cell_face[i].first] =
+        temporary_map_boundary_cell_face[i].second.first;
 
     return surface_to_volume_mapping;
   }

@@ -2,6 +2,6 @@
 DEAL::3 active cells
 DEAL::4 degrees of freedom
 DEAL::2 boundary degrees of freedom
-DEAL::0 1.00000
+DEAL::1 1.00000
 DEAL::3 1.00000
 DEAL::0 boundary degrees of freedom
