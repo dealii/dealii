@@ -612,8 +612,8 @@ MGTransferBlockMatrixFree<dim, Number>::MGTransferBlockMatrixFree(
   const std::vector<MGConstrainedDoFs> &mg_c)
   : same_for_all(false)
 {
-  for (unsigned int i = 0; i < mg_c.size(); ++i)
-    matrix_free_transfer_vector.emplace_back(mg_c[i]);
+  for (const auto &constrained_block_dofs : mg_c)
+    matrix_free_transfer_vector.emplace_back(constrained_block_dofs);
 }
 
 

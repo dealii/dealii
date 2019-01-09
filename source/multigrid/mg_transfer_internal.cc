@@ -193,20 +193,16 @@ namespace internal
 
           // * find owners of the level dofs and insert into send_data
           // accordingly
-          for (typename std::vector<DoFPair>::iterator dofpair =
-                 send_data_temp.begin();
-               dofpair != send_data_temp.end();
-               ++dofpair)
+          for (const auto &dofpair : send_data_temp)
             {
               std::set<types::subdomain_id>::iterator it;
               for (it = neighbors.begin(); it != neighbors.end(); ++it)
                 {
                   if (mg_dof
-                        .locally_owned_mg_dofs_per_processor(
-                          dofpair->level)[*it]
-                        .is_element(dofpair->level_dof_index))
+                        .locally_owned_mg_dofs_per_processor(dofpair.level)[*it]
+                        .is_element(dofpair.level_dof_index))
                     {
-                      send_data[*it].push_back(*dofpair);
+                      send_data[*it].push_back(dofpair);
                       break;
                     }
                 }
@@ -219,12 +215,9 @@ namespace internal
           // * send
           std::vector<MPI_Request> requests;
           {
-            for (std::set<types::subdomain_id>::iterator it = neighbors.begin();
-                 it != neighbors.end();
-                 ++it)
+            for (const auto dest : neighbors)
               {
                 requests.push_back(MPI_Request());
-                unsigned int          dest = *it;
                 std::vector<DoFPair> &data = send_data[dest];
                 // If there is nothing to send, we still need to send a message,
                 // because the receiving end will be waitng. In that case we
@@ -299,11 +292,10 @@ namespace internal
                                 &status);
                 AssertThrowMPI(ierr);
 
-                for (unsigned int i = 0; i < receive_buffer.size(); ++i)
+                for (const auto &dof_pair : receive_buffer)
                   {
-                    copy_indices_level_mine[receive_buffer[i].level]
-                      .emplace_back(receive_buffer[i].global_dof_index,
-                                    receive_buffer[i].level_dof_index);
+                    copy_indices_level_mine[dof_pair.level].emplace_back(
+                      dof_pair.global_dof_index, dof_pair.level_dof_index);
                   }
               }
           }
@@ -332,20 +324,12 @@ namespace internal
       // mode.
       std::less<std::pair<types::global_dof_index, types::global_dof_index>>
         compare;
-      for (unsigned int level = 0; level < copy_indices.size(); ++level)
-        std::sort(copy_indices[level].begin(),
-                  copy_indices[level].end(),
-                  compare);
-      for (unsigned int level = 0; level < copy_indices_level_mine.size();
-           ++level)
-        std::sort(copy_indices_level_mine[level].begin(),
-                  copy_indices_level_mine[level].end(),
-                  compare);
-      for (unsigned int level = 0; level < copy_indices_global_mine.size();
-           ++level)
-        std::sort(copy_indices_global_mine[level].begin(),
-                  copy_indices_global_mine[level].end(),
-                  compare);
+      for (auto &level_indices : copy_indices)
+        std::sort(level_indices.begin(), level_indices.end(), compare);
+      for (auto &level_indices : copy_indices_level_mine)
+        std::sort(level_indices.begin(), level_indices.end(), compare);
+      for (auto &level_indices : copy_indices_global_mine)
+        std::sort(level_indices.begin(), level_indices.end(), compare);
     }
 
 
@@ -376,11 +360,10 @@ namespace internal
           // partitioner that we are going to use for the vector
           const auto &part = ghosted_level_vector.get_partitioner();
           ghosted_dofs.add_indices(part->ghost_indices());
-          for (unsigned int i = 0; i < copy_indices_global_mine.size(); ++i)
-            copy_indices_global_mine[i].second =
-              locally_owned.n_elements() +
-              ghosted_dofs.index_within_set(
-                part->local_to_global(copy_indices_global_mine[i].second));
+          for (auto &indices : copy_indices_global_mine)
+            indices.second = locally_owned.n_elements() +
+                             ghosted_dofs.index_within_set(
+                               part->local_to_global(indices.second));
         }
       ghosted_level_vector.reinit(locally_owned, ghosted_dofs, communicator);
     }
@@ -701,9 +684,9 @@ namespace internal
 
                   const IndexSet &owned_level_dofs =
                     mg_dof.locally_owned_mg_dofs(level);
-                  for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
-                    if (!owned_level_dofs.is_element(local_dof_indices[i]))
-                      ghosted_level_dofs.push_back(local_dof_indices[i]);
+                  for (const auto local_dof_index : local_dof_indices)
+                    if (!owned_level_dofs.is_element(local_dof_index))
+                      ghosted_level_dofs.push_back(local_dof_index);
 
                   add_child_indices<dim>(c,
                                          fe->dofs_per_cell -
@@ -772,9 +755,9 @@ namespace internal
 
                   const IndexSet &owned_level_dofs_l0 =
                     mg_dof.locally_owned_mg_dofs(0);
-                  for (unsigned int i = 0; i < local_dof_indices.size(); ++i)
-                    if (!owned_level_dofs_l0.is_element(local_dof_indices[i]))
-                      ghosted_level_dofs_l0.push_back(local_dof_indices[i]);
+                  for (const auto local_dof_index : local_dof_indices)
+                    if (!owned_level_dofs_l0.is_element(local_dof_index))
+                      ghosted_level_dofs_l0.push_back(local_dof_index);
 
                   const std::size_t start_index =
                     global_level_dof_indices_l0.size();
