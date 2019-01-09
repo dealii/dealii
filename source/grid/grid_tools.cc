@@ -5090,12 +5090,14 @@ namespace GridTools
     MPI_Comm                                  mpi_communicator)
   {
 #ifndef DEAL_II_WITH_MPI
-    (void)local_description;
     (void)mpi_communicator;
-    Assert(false,
-           ExcMessage(
-             "GridTools::build_global_description_tree() requires MPI."));
-    return RTree<std::pair<BoundingBox<spacedim>, unsigned int>>{};
+    // Building a tree with the only boxes available without MPI
+    std::vector<std::pair<BoundingBox<spacedim>, unsigned int>> boxes_index(
+      local_description.size());
+    // Adding to each box the rank of the process owning it
+    for (unsigned int i = 0; i < local_description.size(); ++i)
+      boxes_index[i] = std::make_pair(local_description[i], 0u);
+    return pack_rtree(boxes_index);
 #else
     // Exchanging local bounding boxes
     const std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes =
