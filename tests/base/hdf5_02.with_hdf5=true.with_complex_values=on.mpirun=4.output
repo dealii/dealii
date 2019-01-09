@@ -1,0 +1,9 @@
+
+DEAL::root_total calculated:-3.10361e+08
+DEAL::root_total read:-3.10361e+08
+DEAL::group_name: test_group
+DEAL::group_complex_total calculated:(1.53171e+09,2.85468e+07)
+DEAL::group_complex_total read:(1.53171e+09,2.85468e+07)
+DEAL::group_string read:test_string_attribute
+DEAL::dataset_double read:20.2000
+DEAL::dataset_string read:test_dataset_attribute
