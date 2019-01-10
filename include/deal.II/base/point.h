@@ -22,6 +22,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/tensor.h>
 
+#include <boost/geometry.hpp>
+
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -142,6 +144,15 @@ public:
    * arguments (if dim<3).
    */
   Point(const Number x, const Number y, const Number z);
+
+  /**
+   * Convert a boost::geometry::point to a dealii::Point.
+   */
+  template <int dummy_dim = dim>
+  Point(const boost::geometry::model::
+          point<Number, dim, boost::geometry::cs::cartesian> &boost_pt,
+        typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0),
+                                int>::type = 0);
 
   /**
    * Return a unit vector in coordinate direction <tt>i</tt>, i.e., a vector
@@ -356,6 +367,28 @@ inline Point<dim, Number>::Point(const Number x, const Number y, const Number z)
   this->values[y_index]          = y;
   this->values[z_index]          = z;
 }
+
+
+
+template <int dim, typename Number>
+template <int dummy_dim>
+inline Point<dim, Number>::Point(
+  const boost::geometry::model::
+    point<Number, dim, boost::geometry::cs::cartesian> &boost_pt,
+  typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0), int>::type)
+{
+  Assert(dim <= 3, ExcNotImplemented());
+  this->values[0]                = boost::geometry::get<0>(boost_pt);
+  constexpr unsigned int y_index = (dim < 2) ? 0 : 1;
+  constexpr unsigned int z_index = (dim < 3) ? 0 : 2;
+
+  if (dim >= 2)
+    this->values[y_index] = boost::geometry::get<y_index>(boost_pt);
+
+  if (dim >= 3)
+    this->values[z_index] = boost::geometry::get<z_index>(boost_pt);
+}
+
 
 
 template <int dim, typename Number>
