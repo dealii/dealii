@@ -547,15 +547,11 @@ namespace Particles
     const std::set<types::subdomain_id> ghost_owners =
       triangulation->ghost_owners();
 
-    for (auto ghost_domain_id = ghost_owners.begin();
-         ghost_domain_id != ghost_owners.end();
-         ++ghost_domain_id)
-      moved_particles[*ghost_domain_id].reserve(
+    for (const auto ghost_owner : ghost_owners)
+      moved_particles[ghost_owner].reserve(
         static_cast<vector_size>(particles_out_of_cell.size() * 0.25));
-    for (auto ghost_domain_id = ghost_owners.begin();
-         ghost_domain_id != ghost_owners.end();
-         ++ghost_domain_id)
-      moved_cells[*ghost_domain_id].reserve(
+    for (const auto ghost_owner : ghost_owners)
+      moved_cells[ghost_owner].reserve(
         static_cast<vector_size>(particles_out_of_cell.size() * 0.25));
 
     {
@@ -726,20 +722,15 @@ namespace Particles
 
     const std::set<types::subdomain_id> ghost_owners =
       triangulation->ghost_owners();
-    for (auto ghost_domain_id = ghost_owners.begin();
-         ghost_domain_id != ghost_owners.end();
-         ++ghost_domain_id)
-      ghost_particles_by_domain[*ghost_domain_id].reserve(
+    for (const auto ghost_owner : ghost_owners)
+      ghost_particles_by_domain[ghost_owner].reserve(
         static_cast<typename std::vector<particle_iterator>::size_type>(
           particles.size() * 0.25));
 
     std::vector<std::set<unsigned int>> vertex_to_neighbor_subdomain(
       triangulation->n_vertices());
 
-    typename Triangulation<dim, spacedim>::active_cell_iterator
-      cell = triangulation->begin_active(),
-      endc = triangulation->end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation->active_cell_iterators())
       {
         if (cell->is_ghost())
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
@@ -748,8 +739,7 @@ namespace Particles
               cell->subdomain_id());
       }
 
-    cell = triangulation->begin_active();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation->active_cell_iterators())
       {
         if (!cell->is_ghost())
           {
@@ -767,16 +757,13 @@ namespace Particles
                 const particle_iterator_range particle_range =
                   particles_in_cell(cell);
 
-                for (std::set<types::subdomain_id>::const_iterator domain =
-                       cell_to_neighbor_subdomain.begin();
-                     domain != cell_to_neighbor_subdomain.end();
-                     ++domain)
+                for (const auto domain : cell_to_neighbor_subdomain)
                   {
                     for (typename particle_iterator_range::iterator particle =
                            particle_range.begin();
                          particle != particle_range.end();
                          ++particle)
-                      ghost_particles_by_domain[*domain].push_back(particle);
+                      ghost_particles_by_domain[domain].push_back(particle);
                   }
               }
           }
@@ -1223,10 +1210,8 @@ namespace Particles
       {
         case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
           {
-            typename std::multimap<internal::LevelInd,
-                                   Particle<dim, spacedim>>::iterator
-              position_hint = particles.end();
-            for (auto &particle : loaded_particles_on_cell)
+            auto position_hint = particles.end();
+            for (const auto &particle : loaded_particles_on_cell)
               {
                 // Use std::multimap::emplace_hint to speed up insertion of
                 // particles. This is a C++11 function, but not all compilers

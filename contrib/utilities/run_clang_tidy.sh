@@ -68,4 +68,4 @@ CC=clang CXX=clang++ cmake "$ARGS" "$SRC" || (echo "cmake failed!"; false) || ex
 
 cmake --build . --target expand_all_instantiations || (echo "make expand_all_instantiations failed!"; false) || exit 3
 
-run-clang-tidy.py -p . -checks="$CHECKS" -quiet -header-filter="$SRC/include/*"
+run-clang-tidy.py -p . -checks="$CHECKS" -quiet -header-filter="$SRC/include/*" -fix
