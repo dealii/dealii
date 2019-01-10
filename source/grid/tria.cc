@@ -11959,9 +11959,6 @@ typename Triangulation<dim, spacedim>::cell_iterator
 Triangulation<dim, spacedim>::last() const
 {
   const unsigned int level = levels.size() - 1;
-
-  Assert(level < n_global_levels() || level < levels.size(),
-         ExcInvalidLevel(level));
   if (levels[level]->cells.cells.size() == 0)
     return end(level);
 
