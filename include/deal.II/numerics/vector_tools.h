@@ -798,12 +798,35 @@ namespace VectorTools
     VectorType &                                              u2);
 
   /**
-   * Compute the projection of @p function to the finite element space.
+   * Compute the projection of @p function to the finite element space. In other
+   * words, given a function $f(\mathbf x)$, the current function computes a
+   * finite element function $f_h(\mathbf x)=\sum_j F_j \varphi_j(\mathbf x)$
+   * characterized by the (output) vector of nodal values $F$ that satisfies
+   * the equation
+   * @f{align*}{
+   *   (\varphi_i, f_h)_\Omega = (\varphi_i,f)_\Omega
+   * @f}
+   * for all test functions $\varphi_i$. This requires solving a linear system
+   * involving the mass matrix since the equation above is equivalent to
+   * the linear system
+   * @f{align*}{
+   *   \sum_j (\varphi_i, \varphi_j)_\Omega F_j = (\varphi_i,f)_\Omega
+   * @f}
+   * which can also be written as $MF = \Phi$ with
+   * $M_{ij} = (\varphi_i, \varphi_j)_\Omega$ and
+   * $\Phi_i = (\varphi_i,f)_\Omega$.
    *
-   * By default, projection to the boundary and enforcement of zero boundary
-   * values are disabled. The ordering of arguments to this function is such
-   * that you need not give a second quadrature formula if you don't want to
-   * project to the boundary first, but that you must if you want to do so.
+   * By default, no boundary values for $f_h$ are needed nor
+   * imposed, but there are optional parameters to this function that allow
+   * imposing either zero boundary values or, in a first step, to project
+   * the boundary values of $f$ onto the finite element space on the boundary
+   * of the mesh in a similar way to above, and then using these values as the
+   * imposed boundary values for $f_h$. The ordering of arguments to this
+   * function is such that you need not give a second quadrature formula (of
+   * type `Quadrature<dim-1>` and used for the computation of the matrix and
+   * right hand side for the projection of boundary values) if you
+   * don't want to project to the boundary first, but that you must if you want
+   * to do so.
    *
    * A MatrixFree implementation is used if the following conditions are met:
    * - @p enforce_zero_boundary is false,
@@ -814,16 +837,22 @@ namespace VectorTools
    * - dim==spacedim
    *
    * In this case, this function performs numerical quadrature using the given
-   * quadrature formula for integration of the provided function while a
+   * quadrature formula for integration of the right hand side $\Phi_i$ while a
    * QGauss(fe_degree+2) object is used for the mass operator. You should
-   * therefore make sure that the given quadrature formula is sufficient for
-   * creating the right-hand side.
+   * therefore make sure that the given quadrature formula is sufficiently
+   * accurate for creating the right-hand side.
    *
    * Otherwise, only serial Triangulations are supported and the mass matrix
-   * is assembled exactly using MatrixTools::create_mass_matrix and the same
-   * quadrature rule as for the right-hand side.
+   * is assembled using MatrixTools::create_mass_matrix. The given
+   * quadrature rule is then used for both the matrix and the right-hand side.
    * You should therefore make sure that the given quadrature formula is also
-   * sufficient for creating the mass matrix.
+   * sufficient for creating the mass matrix. In particular, the degree of the
+   * quadrature formula must be sufficiently high to ensure that the mass
+   * matrix is invertible. For example, if you are using a FE_Q(k) element,
+   * then the integrand of the matrix entries $M_{ij}$ is of polynomial
+   * degree $2k$ in each variable, and you need a Gauss quadrature formula
+   * with $k+1$ points in each coordinate direction to ensure that $M$
+   * is invertible.
    *
    * See the general documentation of this namespace for further information.
    *
