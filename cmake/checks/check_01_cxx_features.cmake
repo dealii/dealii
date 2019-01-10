@@ -569,8 +569,11 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
 # but a compiler extension in earlier language versions: check both
 # possibilities here.
 #
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wno-unused-command-line-argument")
+#
 # first try the attribute [[fallthrough]]
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wextra ${DEAL_II_CXX_VERSION_FLAG}")
+#
 CHECK_CXX_SOURCE_COMPILES(
   "
   int main()
@@ -593,8 +596,10 @@ CHECK_CXX_SOURCE_COMPILES(
    DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
    )
 
+#
 # see if the current compiler configuration supports the GCC extension
 # __attribute__((fallthrough)) syntax instead
+#
 CHECK_CXX_SOURCE_COMPILES(
   "
   int main()
