@@ -3394,10 +3394,14 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException1(ExcInvalidLevel,
+  DeclException2(ExcInvalidLevel,
                  int,
-                 << "The given level " << arg1
-                 << " is not in the valid range!");
+                 int,
+                 << "You are requesting information from refinement level "
+                 << arg1
+                 << " of a triangulation, but this triangulation only has "
+                 << arg2 << " refinement levels. The given level " << arg1
+                 << " must be *less* than " << arg2 << ".");
   /**
    * The function raising this exception can only operate on an empty
    * Triangulation, i.e., a Triangulation without grid cells.
