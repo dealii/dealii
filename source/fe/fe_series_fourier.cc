@@ -54,8 +54,8 @@ namespace
         for (unsigned int k = 0; k < N; ++k)
           {
             k_vectors(i, j, k)[0] = 2. * numbers::PI * i;
-            k_vectors(i, j, k)[0] = 2. * numbers::PI * j;
-            k_vectors(i, j, k)[0] = 2. * numbers::PI * k;
+            k_vectors(i, j, k)[1] = 2. * numbers::PI * j;
+            k_vectors(i, j, k)[2] = 2. * numbers::PI * k;
           }
   }
 
