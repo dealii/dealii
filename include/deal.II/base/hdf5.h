@@ -318,7 +318,7 @@ namespace HDF5
      * Constructor. @p string_name is the name of the HDF5 Object. If @p mpi is
      * True then MPI I/O is used.
      */
-    HDF5Object(const std::string name, const bool mpi);
+    HDF5Object(const std::string &name, const bool mpi);
 
   public:
     /**
@@ -404,11 +404,11 @@ namespace HDF5
      * Create dataset. This is an internal constructor. The function
      * Group::create_dataset() should be used to create a dataset.
      */
-    DataSet(const std::string &         name,
-            const hid_t &               parent_group_id,
-            const std::vector<hsize_t> &dimensions,
-            std::shared_ptr<hid_t>      t_type,
-            const bool                  mpi);
+    DataSet(const std::string &           name,
+            const hid_t &                 parent_group_id,
+            const std::vector<hsize_t> &  dimensions,
+            const std::shared_ptr<hid_t> &t_type,
+            const bool                    mpi);
 
   public:
     /**
