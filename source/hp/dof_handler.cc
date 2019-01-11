@@ -980,7 +980,7 @@ namespace internal
               // non-locally_owned cells. so we have to work around the
               // issue a little bit by accessing the underlying data
               // structures directly
-              for (auto cell : dof_handler.active_cell_iterators())
+              for (const auto &cell : dof_handler.active_cell_iterators())
                 if (cell->is_ghost())
                   dof_handler.levels[cell->level()]->set_active_fe_index(
                     cell->index(),
@@ -1579,8 +1579,8 @@ namespace hp
           Assert(*p == i, ExcNewNumbersNotConsecutive(i));
       }
     else
-      for (types::global_dof_index i = 0; i < new_numbers.size(); ++i)
-        Assert(new_numbers[i] < n_dofs(),
+      for (const auto new_number : new_numbers)
+        Assert(new_number < n_dofs(),
                ExcMessage(
                  "New DoF index is not less than the total number of dofs."));
 #endif
@@ -1754,7 +1754,7 @@ namespace hp
             const std::vector<types::subdomain_id> &true_subdomain_ids =
               shared_tria->get_true_subdomain_ids_of_cells();
 
-            for (auto &cell : active_cell_iterators())
+            for (const auto &cell : active_cell_iterators())
               {
                 const unsigned int index   = cell->active_cell_index();
                 saved_subdomain_ids[index] = cell->subdomain_id();
@@ -1815,7 +1815,7 @@ namespace hp
 
         // Finally, restore current subdomain_ids.
         if (shared_tria != nullptr && shared_tria->with_artificial_cells())
-          for (auto &cell : active_cell_iterators())
+          for (const auto &cell : active_cell_iterators())
             {
               if (cell->is_artificial())
                 cell->set_subdomain_id(numbers::invalid_subdomain_id);

@@ -256,10 +256,9 @@ namespace internal
     void
     DoFLevel::normalize_active_fe_indices()
     {
-      for (unsigned int i = 0; i < active_fe_indices.size(); ++i)
-        if (is_compressed_entry(active_fe_indices[i]))
-          active_fe_indices[i] =
-            get_toggled_compression_state(active_fe_indices[i]);
+      for (auto &active_fe_index : active_fe_indices)
+        if (is_compressed_entry(active_fe_index))
+          active_fe_index = get_toggled_compression_state(active_fe_index);
     }
 
 
