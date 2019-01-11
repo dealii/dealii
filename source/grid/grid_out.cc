@@ -1580,17 +1580,17 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
   min_level = max_level = tria.begin()->level();
 
-  // auxiliary array for the materials being used (material ids 255 max.)
-  std::array<unsigned int, 256> materials{};
+  // auxiliary set for the materials being used
+  std::set<unsigned int> materials;
 
-  // auxiliary array for the levels being used (level number 255 max.)
-  std::array<unsigned int, 256> levels{};
+  // auxiliary set for the levels being used
+  std::set<unsigned int> levels;
 
-  // auxiliary array for the subdomains being used (subdomain id 255 max.)
-  std::array<unsigned int, 256> subdomains{};
+  // auxiliary set for the subdomains being used
+  std::set<unsigned int> subdomains;
 
-  // auxiliary array for the level subdomains being used
-  std::array<int, 256> level_subdomains{};
+  // auxiliary set for the level subdomains being used
+  std::set<int> level_subdomains;
 
   // We use an active cell iterator to determine the
   // bounding box of the given triangulation and check
@@ -1616,41 +1616,27 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       if (static_cast<unsigned int>(cell->level()) > max_level)
         max_level = cell->level();
 
-      materials[cell->material_id()] = 1;
-      levels[cell->level()]          = 1;
+      materials.insert(cell->material_id());
+      levels.insert(cell->level());
       if (cell->active())
-        subdomains[cell->subdomain_id() + 2] = 1;
-      level_subdomains[cell->level_subdomain_id() + 2] = 1;
+        subdomains.insert(cell->subdomain_id() + 2);
+      level_subdomains.insert(cell->level_subdomain_id() + 2);
     }
 
   x_dimension = x_max - x_min;
   y_dimension = y_max - y_min;
 
   // count the materials being used
-  const unsigned int n_materials =
-    std::count_if(materials.begin(),
-                  materials.end(),
-                  [](const unsigned int material) { return material != 0; });
+  const unsigned int n_materials = materials.size();
 
   // count the levels being used
-  const unsigned int n_levels =
-    std::count_if(levels.begin(), levels.end(), [](const unsigned int level) {
-      return level != 0;
-    });
+  const unsigned int n_levels = levels.size();
 
   // count the subdomains being used
-  const unsigned int n_subdomains =
-    std::count_if(subdomains.begin(),
-                  subdomains.end(),
-                  [](const unsigned int subdomain) { return subdomain != 0; });
+  const unsigned int n_subdomains = subdomains.size();
 
   // count the level subdomains being used
-  const unsigned int n_level_subdomains =
-    std::count_if(level_subdomains.begin(),
-                  level_subdomains.end(),
-                  [](const int level_subdomain) {
-                    return level_subdomain != 0;
-                  });
+  const unsigned int n_level_subdomains = level_subdomains.size();
 
   switch (svg_flags.coloring)
     {
@@ -1967,7 +1953,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   // polygon styles with respect to the chosen cell coloring
   if (svg_flags.coloring)
     {
-      unsigned int labeling_index = 0;
+      unsigned int labeling_index      = 0;
+      auto         materials_it        = materials.begin();
+      auto         levels_it           = levels.begin();
+      auto         subdomains_it       = subdomains.begin();
+      auto         level_subdomains_it = level_subdomains.begin();
 
       for (unsigned int index = 0; index < n; index++)
         {
@@ -2015,20 +2005,16 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           switch (svg_flags.coloring)
             {
               case GridOutFlags::Svg::material_id:
-                while (!materials[labeling_index])
-                  labeling_index++;
+                labeling_index = *materials_it++;
                 break;
               case GridOutFlags::Svg::level_number:
-                while (!levels[labeling_index])
-                  labeling_index++;
+                labeling_index = *levels_it++;
                 break;
               case GridOutFlags::Svg::subdomain_id:
-                while (!subdomains[labeling_index])
-                  labeling_index++;
+                labeling_index = *subdomains_it++;
                 break;
               case GridOutFlags::Svg::level_subdomain_id:
-                while (!level_subdomains[labeling_index])
-                  labeling_index++;
+                labeling_index = *level_subdomains_it++;
                 break;
               default:
                 break;
@@ -2654,27 +2640,27 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       unsigned int element_width =
         static_cast<unsigned int>(.5 + (height / 100.) * 2.5);
 
-      int labeling_index = 0;
+      int  labeling_index      = 0;
+      auto materials_it        = materials.begin();
+      auto levels_it           = levels.begin();
+      auto subdomains_it       = subdomains.begin();
+      auto level_subdomains_it = level_subdomains.begin();
 
       for (unsigned int index = 0; index < n; index++)
         {
           switch (svg_flags.coloring)
             {
               case GridOutFlags::Svg::material_id:
-                while (!materials[labeling_index])
-                  labeling_index++;
+                labeling_index = *materials_it++;
                 break;
               case GridOutFlags::Svg::level_number:
-                while (!levels[labeling_index])
-                  labeling_index++;
+                labeling_index = *levels_it++;
                 break;
               case GridOutFlags::Svg::subdomain_id:
-                while (!subdomains[labeling_index])
-                  labeling_index++;
+                labeling_index = *subdomains_it++;
                 break;
               case GridOutFlags::Svg::level_subdomain_id:
-                while (!level_subdomains[labeling_index])
-                  labeling_index++;
+                labeling_index = *level_subdomains_it++;
                 break;
               default:
                 break;
