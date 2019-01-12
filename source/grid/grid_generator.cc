@@ -2088,7 +2088,7 @@ namespace GridGenerator
     static constexpr double tol =
       std::numeric_limits<double>::epsilon() * 10000;
     if (colorize)
-      for (auto &cell : tria.active_cell_iterators())
+      for (const auto &cell : tria.active_cell_iterators())
         for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
              ++face_n)
           {
@@ -2257,7 +2257,7 @@ namespace GridGenerator
     // The bulk cells are not quite squares, so we need to move the left
     // and right sides of cylinder_tria inwards so that it fits in
     // bulk_tria:
-    for (auto &cell : cylinder_tria.active_cell_iterators())
+    for (const auto &cell : cylinder_tria.active_cell_iterators())
       for (unsigned int vertex_n = 0;
            vertex_n < GeometryInfo<2>::vertices_per_cell;
            ++vertex_n)
@@ -2269,7 +2269,7 @@ namespace GridGenerator
         }
 
     // Assign interior manifold ids to be the TFI id.
-    for (auto &cell : cylinder_tria.active_cell_iterators())
+    for (const auto &cell : cylinder_tria.active_cell_iterators())
       {
         cell->set_manifold_id(tfi_manifold_id);
         for (unsigned int face_n = 0; face_n < GeometryInfo<2>::faces_per_cell;
@@ -2317,7 +2317,7 @@ namespace GridGenerator
 
     // Ensure that all manifold ids on a polar cell really are set to the
     // polar manifold id:
-    for (auto &cell : tria.active_cell_iterators())
+    for (const auto &cell : tria.active_cell_iterators())
       if (cell->manifold_id() == polar_manifold_id)
         cell->set_all_manifold_ids(polar_manifold_id);
 
@@ -2360,7 +2360,7 @@ namespace GridGenerator
     tria.set_manifold(tfi_manifold_id, inner_manifold);
 
     if (colorize)
-      for (auto &face : tria.active_face_iterators())
+      for (const auto &face : tria.active_face_iterators())
         if (face->at_boundary())
           {
             const Point<2> center = face->center();
@@ -2418,7 +2418,7 @@ namespace GridGenerator
     // 3, the bottom boundary id is 4 and the top is 5: both are walls, so set
     // them to 3
     if (colorize)
-      for (auto &face : tria.active_face_iterators())
+      for (const auto &face : tria.active_face_iterators())
         if (face->boundary_id() == 4 || face->boundary_id() == 5)
           face->set_boundary_id(3);
   }
@@ -2633,9 +2633,9 @@ namespace GridGenerator
     coords[3] = right + thickness;
 
     unsigned int k = 0;
-    for (unsigned int i0 = 0; i0 < 4; ++i0)
-      for (unsigned int i1 = 0; i1 < 4; ++i1)
-        vertices[k++] = Point<2>(coords[i1], coords[i0]);
+    for (const double y : coords)
+      for (const double x : coords)
+        vertices[k++] = Point<2>(x, y);
 
     const types::material_id materials[9] = {5, 4, 6, 1, 0, 2, 9, 8, 10};
 
@@ -3318,10 +3318,10 @@ namespace GridGenerator
     coords[3] = right + thickness;
 
     unsigned int k = 0;
-    for (unsigned int z = 0; z < 4; ++z)
-      for (unsigned int y = 0; y < 4; ++y)
-        for (unsigned int x = 0; x < 4; ++x)
-          vertices[k++] = Point<3>(coords[x], coords[y], coords[z]);
+    for (const double z : coords)
+      for (const double y : coords)
+        for (const double x : coords)
+          vertices[k++] = Point<3>(x, y, z);
 
     const types::material_id materials[27] = {21, 20, 22, 17, 16, 18, 25,
                                               24, 26, 5,  4,  6,  1,  0,
@@ -3388,7 +3388,7 @@ namespace GridGenerator
 
     // Set boundary ids at -half_length to 1 and at half_length to 2. Set the
     // manifold id on hull faces (i.e., faces not on either end) to 0.
-    for (auto face : triangulation.active_face_iterators())
+    for (const auto &face : triangulation.active_face_iterators())
       if (face->at_boundary())
         {
           if (std::abs(face->center()[0] - -half_length) < 1e-8 * half_length)
@@ -3596,11 +3596,11 @@ namespace GridGenerator
       Point<3>(d, half_length, d),
     };
     // Turn cylinder such that y->x
-    for (unsigned int i = 0; i < 24; ++i)
+    for (auto &vertex : vertices)
       {
-        const double h = vertices[i](1);
-        vertices[i](1) = -vertices[i](0);
-        vertices[i](0) = h;
+        const double h = vertex(1);
+        vertex(1)      = -vertex(0);
+        vertex(0)      = h;
       }
 
     int cell_vertices[10][8] = {{0, 1, 8, 9, 2, 3, 10, 11},
@@ -4741,10 +4741,8 @@ namespace GridGenerator
         quads.push_back(quad);
 
         quad.boundary_id = top_boundary_id;
-        for (unsigned int vertex_n = 0;
-             vertex_n < GeometryInfo<3>::vertices_per_face;
-             ++vertex_n)
-          quad.vertices[vertex_n] += (n_slices - 1) * input.n_vertices();
+        for (unsigned int &vertex : quad.vertices)
+          vertex += (n_slices - 1) * input.n_vertices();
         if (copy_manifold_ids)
           quad.manifold_id = cell->manifold_id();
         quads.push_back(quad);
@@ -4763,7 +4761,7 @@ namespace GridGenerator
     for (auto manifold_id_it = priorities.rbegin();
          manifold_id_it != priorities.rend();
          ++manifold_id_it)
-      for (auto &face : result.active_face_iterators())
+      for (const auto &face : result.active_face_iterators())
         if (face->manifold_id() == *manifold_id_it)
           for (unsigned int line_n = 0;
                line_n < GeometryInfo<3>::lines_per_face;
@@ -5347,20 +5345,18 @@ namespace GridGenerator
                     // orientation. if so, skip it.
                     {
                       bool edge_found = false;
-                      for (unsigned int i = 0;
-                           i < subcell_data.boundary_lines.size();
-                           ++i)
-                        if (((subcell_data.boundary_lines[i].vertices[0] ==
+                      for (auto &boundary_line : subcell_data.boundary_lines)
+                        if (((boundary_line.vertices[0] ==
                               map_vert_index[face->line(e)->vertex_index(0)]) &&
-                             (subcell_data.boundary_lines[i].vertices[1] ==
+                             (boundary_line.vertices[1] ==
                               map_vert_index[face->line(e)->vertex_index(
                                 1)])) ||
-                            ((subcell_data.boundary_lines[i].vertices[0] ==
+                            ((boundary_line.vertices[0] ==
                               map_vert_index[face->line(e)->vertex_index(1)]) &&
-                             (subcell_data.boundary_lines[i].vertices[1] ==
+                             (boundary_line.vertices[1] ==
                               map_vert_index[face->line(e)->vertex_index(0)])))
                           {
-                            subcell_data.boundary_lines[i].boundary_id =
+                            boundary_line.boundary_id =
                               numbers::internal_face_boundary_id;
                             edge_found = true;
                             break;

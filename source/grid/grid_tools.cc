@@ -655,7 +655,8 @@ namespace GridTools
         cells[c].vertices[v] = new_vertex_numbers[cells[c].vertices[v]];
 
     // same for boundary data
-    for (unsigned int c = 0; c < subcelldata.boundary_lines.size(); ++c)
+    for (unsigned int c = 0; c < subcelldata.boundary_lines.size(); // NOLINT
+         ++c)
       for (unsigned int v = 0; v < GeometryInfo<1>::vertices_per_cell; ++v)
         {
           Assert(subcelldata.boundary_lines[c].vertices[v] <
@@ -674,7 +675,8 @@ namespace GridTools
             new_vertex_numbers[subcelldata.boundary_lines[c].vertices[v]];
         }
 
-    for (unsigned int c = 0; c < subcelldata.boundary_quads.size(); ++c)
+    for (unsigned int c = 0; c < subcelldata.boundary_quads.size(); // NOLINT
+         ++c)
       for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_cell; ++v)
         {
           Assert(subcelldata.boundary_quads[c].vertices[v] <
@@ -3643,7 +3645,7 @@ namespace GridTools
     const auto                      src_boundary_ids = tria.get_boundary_ids();
     std::vector<types::manifold_id> dst_manifold_ids(src_boundary_ids.size());
     auto                            m_it = dst_manifold_ids.begin();
-    for (auto b : src_boundary_ids)
+    for (const auto b : src_boundary_ids)
       {
         *m_it = static_cast<types::manifold_id>(b);
         ++m_it;
@@ -3886,7 +3888,7 @@ namespace GridTools
       {
         has_cells_with_more_than_dim_faces_on_boundary = false;
 
-        for (auto cell : tria.active_cell_iterators())
+        for (const auto &cell : tria.active_cell_iterators())
           {
             unsigned int boundary_face_counter = 0;
             for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
@@ -3916,7 +3918,7 @@ namespace GridTools
       {
         while (refinement_cycles > 0)
           {
-            for (auto cell : tria.active_cell_iterators())
+            for (const auto &cell : tria.active_cell_iterators())
               cell->set_coarsen_flag();
             tria.execute_coarsening_and_refinement();
             refinement_cycles--;
@@ -3936,7 +3938,7 @@ namespace GridTools
     const unsigned int v0 = 0, v1 = 1, v2 = (dim > 1 ? 2 : 0),
                        v3 = (dim > 1 ? 3 : 0);
 
-    for (auto cell : tria.active_cell_iterators())
+    for (const auto &cell : tria.active_cell_iterators())
       {
         double       angle_fraction   = 0;
         unsigned int vertex_at_corner = numbers::invalid_unsigned_int;
@@ -4085,7 +4087,7 @@ namespace GridTools
       {
         while (refinement_cycles > 0)
           {
-            for (auto cell : tria.active_cell_iterators())
+            for (const auto &cell : tria.active_cell_iterators())
               cell->set_coarsen_flag();
             tria.execute_coarsening_and_refinement();
             refinement_cycles--;
@@ -4094,7 +4096,7 @@ namespace GridTools
       }
 
     // add the cells that were not marked as skipped
-    for (auto cell : tria.active_cell_iterators())
+    for (const auto &cell : tria.active_cell_iterators())
       {
         if (cells_to_remove[cell->active_cell_index()] == false)
           {
@@ -4161,7 +4163,7 @@ namespace GridTools
     std::map<types::manifold_id, std::unique_ptr<Manifold<dim, spacedim>>>
       manifolds;
     // Set manifolds in new Triangulation
-    for (auto manifold_id : manifold_ids)
+    for (const auto manifold_id : manifold_ids)
       if (manifold_id != numbers::flat_manifold_id)
         manifolds[manifold_id] = tria.get_manifold(manifold_id).clone();
 
@@ -4170,7 +4172,7 @@ namespace GridTools
     tria.create_triangulation(vertices, cells_to_add, subcelldata_to_add);
 
     // Restore manifolds
-    for (auto manifold_id : manifold_ids)
+    for (const auto manifold_id : manifold_ids)
       if (manifold_id != numbers::flat_manifold_id)
         tria.set_manifold(manifold_id, *manifolds[manifold_id]);
   }
@@ -4535,7 +4537,7 @@ namespace GridTools
 
         // Alayzing the output discarding artificial cell
         // and storing in the proper container locally owned and ghost cells
-        for (auto const &cell_tuples : cpt_loc_pts)
+        for (const auto &cell_tuples : cpt_loc_pts)
           {
             auto &cell_loc    = cell_tuples.first;
             auto &q_loc       = std::get<0>(cell_tuples.second);
@@ -4621,7 +4623,7 @@ namespace GridTools
 
         // rank and points is a pair: first rank, then a pair of vectors
         // (points, indices)
-        for (auto const &rank_and_points : map_pts)
+        for (const auto &rank_and_points : map_pts)
           {
             // Rewriting the contents of the map in human readable format
             const auto &received_process = rank_and_points.first;
@@ -4849,11 +4851,11 @@ namespace GridTools
                                 point_idx))
           // The point wasn't found in ghost or locally owned cells: adding it
           // to the map
-          for (unsigned int i = 0; i < probable_owners_rks.size(); ++i)
-            if (probable_owners_rks[i] != my_rank)
+          for (const unsigned int probable_owners_rk : probable_owners_rks)
+            if (probable_owners_rk != my_rank)
               {
                 // add to the data for process probable_owners_rks[i]
-                auto &current_pts = other_check_pts[probable_owners_rks[i]];
+                auto &current_pts = other_check_pts[probable_owners_rk];
                 // The point local_points[point_idx]
                 current_pts.first.emplace_back(local_points[point_idx]);
                 // and its index in the current process

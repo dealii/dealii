@@ -1331,9 +1331,7 @@ GridOut::write_xfig(const Triangulation<2> &tria,
   const int dim      = 2;
   const int spacedim = 2;
 
-  const unsigned int nv  = GeometryInfo<dim>::vertices_per_cell;
-  const unsigned int nf  = GeometryInfo<dim>::faces_per_cell;
-  const unsigned int nvf = GeometryInfo<dim>::vertices_per_face;
+  const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
 
   // The following text was copied
   // from an existing XFig file.
@@ -1463,10 +1461,9 @@ GridOut::write_xfig(const Triangulation<2> &tria,
       // Now write boundary edges
       static const unsigned int face_reorder[4] = {2, 1, 3, 0};
       if (xfig_flags.draw_boundary)
-        for (unsigned int f = 0; f < nf; ++f)
+        for (const unsigned int f : face_reorder)
           {
-            Triangulation<dim, spacedim>::face_iterator face =
-              cell->face(face_reorder[f]);
+            Triangulation<dim, spacedim>::face_iterator face = cell->face(f);
             const types::boundary_id bi = face->boundary_id();
             if (bi != numbers::internal_face_boundary_id)
               {
@@ -1485,14 +1482,16 @@ GridOut::write_xfig(const Triangulation<2> &tria,
                     // some style parameters
                     << " 0 0 -1 0 0 "
                     // number of points
-                    << nvf << std::endl;
+                    << GeometryInfo<dim>::vertices_per_face << std::endl;
 
                 // For each point, write scaled
                 // and shifted coordinates
                 // multiplied by 1200
                 // (dots/inch)
 
-                for (unsigned int k = 0; k < nvf; ++k)
+                for (unsigned int k = 0;
+                     k < GeometryInfo<dim>::vertices_per_face;
+                     ++k)
                   {
                     const Point<dim> &p = face->vertex(k % nv);
                     for (unsigned int d = 0; d < static_cast<unsigned int>(dim);
@@ -1530,11 +1529,6 @@ GridOut::write_svg(const Triangulation<dim, spacedim> &,
 void
 GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 {
-  unsigned int n_materials        = 0;
-  unsigned int n_levels           = 0;
-  unsigned int n_subdomains       = 0;
-  unsigned int n_level_subdomains = 0;
-
   unsigned int n = 0;
 
   unsigned int min_level, max_level;
@@ -1586,27 +1580,17 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
   min_level = max_level = tria.begin()->level();
 
-  // auxiliary array for the materials being used (material ids 255 max.)
-  unsigned int materials[256];
-  for (unsigned int material_index = 0; material_index < 256; material_index++)
-    materials[material_index] = 0;
+  // auxiliary set for the materials being used
+  std::set<unsigned int> materials;
 
-  // auxiliary array for the levels being used (level number 255 max.)
-  unsigned int levels[256];
-  for (unsigned int level_index = 0; level_index < 256; level_index++)
-    levels[level_index] = 0;
+  // auxiliary set for the levels being used
+  std::set<unsigned int> levels;
 
-  // auxiliary array for the subdomains being used (subdomain id 255 max.)
-  unsigned int subdomains[256];
-  for (unsigned int subdomain_index = 0; subdomain_index < 256;
-       subdomain_index++)
-    subdomains[subdomain_index] = 0;
+  // auxiliary set for the subdomains being used
+  std::set<unsigned int> subdomains;
 
-  // auxiliary array for the level subdomains being used
-  int level_subdomains[256];
-  for (int level_subdomain_index = 0; level_subdomain_index < 256;
-       level_subdomain_index++)
-    level_subdomains[level_subdomain_index] = 0;
+  // auxiliary set for the level subdomains being used
+  std::set<int> level_subdomains;
 
   // We use an active cell iterator to determine the
   // bounding box of the given triangulation and check
@@ -1632,45 +1616,27 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       if (static_cast<unsigned int>(cell->level()) > max_level)
         max_level = cell->level();
 
-      materials[cell->material_id()] = 1;
-      levels[cell->level()]          = 1;
+      materials.insert(cell->material_id());
+      levels.insert(cell->level());
       if (cell->active())
-        subdomains[cell->subdomain_id() + 2] = 1;
-      level_subdomains[cell->level_subdomain_id() + 2] = 1;
+        subdomains.insert(cell->subdomain_id() + 2);
+      level_subdomains.insert(cell->level_subdomain_id() + 2);
     }
 
   x_dimension = x_max - x_min;
   y_dimension = y_max - y_min;
 
   // count the materials being used
-  for (unsigned int material_index = 0; material_index < 256; material_index++)
-    {
-      if (materials[material_index])
-        n_materials++;
-    }
+  const unsigned int n_materials = materials.size();
 
   // count the levels being used
-  for (unsigned int level_index = 0; level_index < 256; level_index++)
-    {
-      if (levels[level_index])
-        n_levels++;
-    }
+  const unsigned int n_levels = levels.size();
 
   // count the subdomains being used
-  for (unsigned int subdomain_index = 0; subdomain_index < 256;
-       subdomain_index++)
-    {
-      if (subdomains[subdomain_index])
-        n_subdomains++;
-    }
+  const unsigned int n_subdomains = subdomains.size();
 
   // count the level subdomains being used
-  for (int level_subdomain_index = 0; level_subdomain_index < 256;
-       level_subdomain_index++)
-    {
-      if (level_subdomains[level_subdomain_index])
-        n_level_subdomains++;
-    }
+  const unsigned int n_level_subdomains = level_subdomains.size();
 
   switch (svg_flags.coloring)
     {
@@ -1987,7 +1953,11 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
   // polygon styles with respect to the chosen cell coloring
   if (svg_flags.coloring)
     {
-      unsigned int labeling_index = 0;
+      unsigned int labeling_index      = 0;
+      auto         materials_it        = materials.begin();
+      auto         levels_it           = levels.begin();
+      auto         subdomains_it       = subdomains.begin();
+      auto         level_subdomains_it = level_subdomains.begin();
 
       for (unsigned int index = 0; index < n; index++)
         {
@@ -2035,20 +2005,16 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
           switch (svg_flags.coloring)
             {
               case GridOutFlags::Svg::material_id:
-                while (!materials[labeling_index])
-                  labeling_index++;
+                labeling_index = *materials_it++;
                 break;
               case GridOutFlags::Svg::level_number:
-                while (!levels[labeling_index])
-                  labeling_index++;
+                labeling_index = *levels_it++;
                 break;
               case GridOutFlags::Svg::subdomain_id:
-                while (!subdomains[labeling_index])
-                  labeling_index++;
+                labeling_index = *subdomains_it++;
                 break;
               case GridOutFlags::Svg::level_subdomain_id:
-                while (!level_subdomains[labeling_index])
-                  labeling_index++;
+                labeling_index = *level_subdomains_it++;
                 break;
               default:
                 break;
@@ -2674,27 +2640,27 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
       unsigned int element_width =
         static_cast<unsigned int>(.5 + (height / 100.) * 2.5);
 
-      int labeling_index = 0;
+      int  labeling_index      = 0;
+      auto materials_it        = materials.begin();
+      auto levels_it           = levels.begin();
+      auto subdomains_it       = subdomains.begin();
+      auto level_subdomains_it = level_subdomains.begin();
 
       for (unsigned int index = 0; index < n; index++)
         {
           switch (svg_flags.coloring)
             {
               case GridOutFlags::Svg::material_id:
-                while (!materials[labeling_index])
-                  labeling_index++;
+                labeling_index = *materials_it++;
                 break;
               case GridOutFlags::Svg::level_number:
-                while (!levels[labeling_index])
-                  labeling_index++;
+                labeling_index = *levels_it++;
                 break;
               case GridOutFlags::Svg::subdomain_id:
-                while (!subdomains[labeling_index])
-                  labeling_index++;
+                labeling_index = *subdomains_it++;
                 break;
               case GridOutFlags::Svg::level_subdomain_id:
-                while (!level_subdomains[labeling_index])
-                  labeling_index++;
+                labeling_index = *level_subdomains_it++;
                 break;
               default:
                 break;
@@ -3042,7 +3008,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
       << "POINTS " << n_vertices << " double\n";
 
   // actually write the vertices.
-  for (auto v : vertices)
+  for (const auto &v : vertices)
     {
       out << v;
       for (unsigned int d = spacedim + 1; d <= 3; ++d)
@@ -3083,7 +3049,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
   const int co_face_type = (dim == 1 ? -1 : dim == 2 ? -1 : 3);
 
   // write cells.
-  for (auto cell : tria.active_cell_iterators())
+  for (const auto &cell : tria.active_cell_iterators())
     {
       out << GeometryInfo<dim>::vertices_per_cell;
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -3092,7 +3058,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
         }
       out << '\n';
     }
-  for (auto face : faces)
+  for (const auto &face : faces)
     {
       out << GeometryInfo<dim>::vertices_per_face;
       for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
@@ -3103,7 +3069,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
         }
       out << '\n';
     }
-  for (auto co_face : co_faces)
+  for (const auto &co_face : co_faces)
     {
       out << 2;
       for (unsigned int i = 0; i < 2; ++i)
@@ -3132,21 +3098,21 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
       << "LOOKUP_TABLE default\n";
 
   // Now material id and boundary id
-  for (auto cell : tria.active_cell_iterators())
+  for (const auto &cell : tria.active_cell_iterators())
     {
       out << static_cast<std::make_signed<types::material_id>::type>(
                cell->material_id())
           << ' ';
     }
   out << '\n';
-  for (auto face : faces)
+  for (const auto &face : faces)
     {
       out << static_cast<std::make_signed<types::boundary_id>::type>(
                face->boundary_id())
           << ' ';
     }
   out << '\n';
-  for (auto co_face : co_faces)
+  for (const auto &co_face : co_faces)
     {
       out << static_cast<std::make_signed<types::boundary_id>::type>(
                co_face->boundary_id())
@@ -3157,21 +3123,21 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
       << "LOOKUP_TABLE default\n";
 
   // Now material id and boundary id
-  for (auto cell : tria.active_cell_iterators())
+  for (const auto &cell : tria.active_cell_iterators())
     {
       out << static_cast<std::make_signed<types::boundary_id>::type>(
                cell->manifold_id())
           << ' ';
     }
   out << '\n';
-  for (auto face : faces)
+  for (const auto &face : faces)
     {
       out << static_cast<std::make_signed<types::boundary_id>::type>(
                face->manifold_id())
           << ' ';
     }
   out << '\n';
-  for (auto co_face : co_faces)
+  for (const auto &co_face : co_faces)
     {
       out << static_cast<std::make_signed<types::boundary_id>::type>(
                co_face->manifold_id())

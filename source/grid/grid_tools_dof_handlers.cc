@@ -704,7 +704,7 @@ namespace GridTools
 
         const double original_distance_to_unit_cell =
           GeometryInfo<dim>::distance_to_unit_cell(unit_point);
-        for (auto cell : cells_to_add)
+        for (const auto &cell : cells_to_add)
           {
             if (cell != my_cell)
               try
