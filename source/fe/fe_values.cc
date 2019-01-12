@@ -184,17 +184,6 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  Scalar<dim, spacedim> &
-  Scalar<dim, spacedim>::operator=(const Scalar<dim, spacedim> &)
-  {
-    // we shouldn't be copying these objects
-    Assert(false, ExcInternalError());
-    return *this;
-  }
-
-
-
-  template <int dim, int spacedim>
   Vector<dim, spacedim>::Vector(const FEValuesBase<dim, spacedim> &fe_values,
                                 const unsigned int first_vector_component)
     : fe_values(&fe_values)
@@ -272,17 +261,6 @@ namespace FEValuesViews
     : fe_values(nullptr)
     , first_vector_component(numbers::invalid_unsigned_int)
   {}
-
-
-
-  template <int dim, int spacedim>
-  Vector<dim, spacedim> &
-  Vector<dim, spacedim>::operator=(const Vector<dim, spacedim> &)
-  {
-    // we shouldn't be copying these objects
-    Assert(false, ExcInternalError());
-    return *this;
-  }
 
 
 
@@ -377,18 +355,6 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-  SymmetricTensor<2, dim, spacedim> &
-  SymmetricTensor<2, dim, spacedim>::
-  operator=(const SymmetricTensor<2, dim, spacedim> &)
-  {
-    // we shouldn't be copying these objects
-    Assert(false, ExcInternalError());
-    return *this;
-  }
-
-
-
-  template <int dim, int spacedim>
   Tensor<2, dim, spacedim>::Tensor(const FEValuesBase<dim, spacedim> &fe_values,
                                    const unsigned int first_tensor_component)
     : fe_values(&fe_values)
@@ -465,17 +431,6 @@ namespace FEValuesViews
     : fe_values(nullptr)
     , first_tensor_component(numbers::invalid_unsigned_int)
   {}
-
-
-
-  template <int dim, int spacedim>
-  Tensor<2, dim, spacedim> &
-  Tensor<2, dim, spacedim>::operator=(const Tensor<2, dim, spacedim> &)
-  {
-    // we shouldn't be copying these objects
-    Assert(false, ExcInternalError());
-    return *this;
-  }
 
 
 

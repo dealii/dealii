@@ -261,10 +261,10 @@ namespace FEValuesViews
 
     /**
      * Copy operator. This is not a lightweight object so we don't allow
-     * copying and generate an exception if this function is called.
+     * copying and generate a compile-time error if this function is called.
      */
     Scalar &
-    operator=(const Scalar<dim, spacedim> &);
+    operator=(const Scalar<dim, spacedim> &) = delete;
 
     /**
      * Return the value of the vector component selected by this view, for the
@@ -767,10 +767,10 @@ namespace FEValuesViews
 
     /**
      * Copy operator. This is not a lightweight object so we don't allow
-     * copying and generate an exception if this function is called.
+     * copying and generate a compile-time error if this function is called.
      */
     Vector &
-    operator=(const Vector<dim, spacedim> &);
+    operator=(const Vector<dim, spacedim> &) = delete;
 
     /**
      * Return the value of the vector components selected by this view, for
@@ -1363,10 +1363,10 @@ namespace FEValuesViews
 
     /**
      * Copy operator. This is not a lightweight object so we don't allow
-     * copying and generate an exception if this function is called.
+     * copying and generate a compile-time error if this function is called.
      */
     SymmetricTensor &
-    operator=(const SymmetricTensor<2, dim, spacedim> &);
+    operator=(const SymmetricTensor<2, dim, spacedim> &) = delete;
 
     /**
      * Return the value of the vector components selected by this view, for
@@ -1659,10 +1659,10 @@ namespace FEValuesViews
 
     /**
      * Copy operator. This is not a lightweight object so we don't allow
-     * copying and generate an exception if this function is called.
+     * copying and generate a compile-time error if this function is called.
      */
     Tensor &
-    operator=(const Tensor<2, dim, spacedim> &);
+    operator=(const Tensor<2, dim, spacedim> &) = delete;
 
     /**
      * Return the value of the vector components selected by this view, for
@@ -2045,6 +2045,11 @@ public:
                const Mapping<dim, spacedim> &      mapping,
                const FiniteElement<dim, spacedim> &fe);
 
+  /**
+   * The copy operator is deleted since objects of this class are not copyable.
+   */
+  FEValuesBase &
+  operator=(const FEValuesBase &) = delete;
 
   /**
    * Destructor.
@@ -3391,13 +3396,6 @@ private:
    * it private, and also do not implement it.
    */
   FEValuesBase(const FEValuesBase &);
-
-  /**
-   * Copy operator. Since objects of this class are not copyable, we make it
-   * private, and also do not implement it.
-   */
-  FEValuesBase &
-  operator=(const FEValuesBase &);
 
   /**
    * A cache for all possible FEValuesViews objects.
