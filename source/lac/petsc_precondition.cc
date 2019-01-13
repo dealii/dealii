@@ -625,7 +625,7 @@ namespace PETScWrappers
             false,
             ExcMessage(
               "ParaSails parameter symmetric can only be equal to 0, 1, 2!"));
-      };
+      }
 
     set_option_value("-pc_hypre_parasails_sym", ssStream.str());
 

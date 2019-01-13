@@ -88,7 +88,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::reinit(
         SparsityPatternBase *sp = sub_objects[i][j];
         sub_objects[i][j]       = nullptr;
         delete sp;
-      };
+      }
   sub_objects.reinit(0, 0);
 
   // then set new sizes
@@ -201,7 +201,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::max_entries_per_row() const
 
       if (this_row > max_entries)
         max_entries = this_row;
-    };
+    }
   return max_entries;
 }
 

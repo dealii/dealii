@@ -1537,7 +1537,7 @@ namespace DoFRenumbering
         {
           new_indices[i] = next_selected;
           ++next_selected;
-        };
+        }
     Assert(next_unselected == n_selected_dofs, ExcInternalError());
     Assert(next_selected == n_dofs, ExcInternalError());
   }
@@ -1579,7 +1579,7 @@ namespace DoFRenumbering
         {
           new_indices[i] = next_selected;
           ++next_selected;
-        };
+        }
     Assert(next_unselected == n_selected_dofs, ExcInternalError());
     Assert(next_selected == n_dofs, ExcInternalError());
   }

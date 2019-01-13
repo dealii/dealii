@@ -452,9 +452,9 @@ MGTransferComponentBase::build_matrices(const DoFHandler<dim, spacedim> &,
                         if ((icomp == jcomp) && mg_component_mask[icomp])
                           prolongation_sparsities[level]->add(
                             dof_indices_child[i], dof_indices_parent[j]);
-                      };
-              };
-          };
+                      }
+              }
+          }
       prolongation_sparsities[level]->compress();
 
       prolongation_matrices[level]->reinit(*prolongation_sparsities[level]);

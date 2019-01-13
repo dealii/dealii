@@ -273,7 +273,7 @@ namespace DerivativeApproximation
                 fe_values.get_fe().n_components()));
           fe_values.get_function_gradients(solution, values);
           return ProjectedDerivative(values[0][component]);
-        };
+        }
     }
 
 
@@ -476,8 +476,8 @@ namespace DerivativeApproximation
               EE[0]              = am + R * std::cos(theta);
               EE[1] = am + R * std::cos(theta + 2. / 3. * numbers::PI);
               EE[2] = am + R * std::cos(theta + 4. / 3. * numbers::PI);
-            };
-        };
+            }
+        }
 
       return std::max(std::fabs(EE[0]),
                       std::max(std::fabs(EE[1]), std::fabs(EE[2])));
@@ -518,7 +518,7 @@ namespace DerivativeApproximation
           {
             const double s = (d[i][j] + d[j][i]) / 2;
             d[i][j] = d[j][i] = s;
-          };
+          }
     }
 
 
@@ -610,7 +610,7 @@ namespace DerivativeApproximation
                 fe_values.get_fe().n_components()));
           fe_values.get_function_hessians(solution, values);
           return ProjectedDerivative(values[0][component]);
-        };
+        }
     }
 
 
@@ -884,7 +884,7 @@ namespace DerivativeApproximation
           projected_finite_difference /= distance;
 
           projected_derivative += outer_product(y, projected_finite_difference);
-        };
+        }
 
       // can we determine an
       // approximation of the

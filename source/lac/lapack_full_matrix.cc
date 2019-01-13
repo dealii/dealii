@@ -2339,7 +2339,7 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream &     out,
         else
           out << std::setw(width) << zero_string << ' ';
       out << std::endl;
-    };
+    }
 
   AssertThrow(out, ExcIO());
   // reset output format

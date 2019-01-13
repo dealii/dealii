@@ -129,7 +129,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::declare_data_vector(
            ++data_set)
         for (unsigned int i = 0; i < data_set->names.size(); ++i)
           Assert(*name != data_set->names[i], ExcNameAlreadyUsed(*name));
-    };
+    }
 
   switch (vector_type)
     {
@@ -142,7 +142,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::declare_data_vector(
         cell_data.emplace_back();
         cell_data.back().names = names;
         break;
-    };
+    }
 }
 
 
@@ -217,7 +217,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
             data_vector->data.reinit(vec.size());
             std::copy(vec.begin(), vec.end(), data_vector->data.begin());
             return;
-          };
+          }
 
       // ok. not found. there is a
       // slight chance that
@@ -242,9 +242,9 @@ DataOutStack<dim, spacedim, DoFHandlerType>::add_data_vector(
             data_vector->data.reinit(vec.size());
             std::copy(vec.begin(), vec.end(), data_vector->data.begin());
             return;
-          };
+          }
       Assert(false, ExcVectorNotDeclared(names[0]));
-    };
+    }
 
   // we have either return or Assert
   // statements above, so shouldn't
@@ -383,7 +383,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::build_patches(
 
           default:
             Assert(false, ExcNotImplemented());
-        };
+        }
 
 
       // now fill in the data values.

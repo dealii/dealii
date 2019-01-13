@@ -155,7 +155,7 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
               my_patches[angle].vertices[3] = r2 * angle_directions[angle + 1];
 
               break;
-            };
+            }
 
           case 2:
             {
@@ -181,14 +181,14 @@ DataOutRotation<dim, DoFHandlerType>::build_one_patch(
                     .vertices[vertex +
                               GeometryInfo<dimension>::vertices_per_cell][0] =
                     v(1);
-                };
+                }
 
               break;
-            };
+            }
 
           default:
             Assert(false, ExcNotImplemented());
-        };
+        }
 
       // then fill in data
       if (data.n_datasets > 0)

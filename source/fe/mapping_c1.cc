@@ -152,7 +152,7 @@ MappingC1<2>::MappingC1Generic::add_line_support_points(
               real_point *= h;
               real_point += line->vertex(0);
               a.push_back(real_point);
-            };
+            }
         }
       else
         // not at boundary, so just use scaled Gauss-Lobatto points (i.e., use

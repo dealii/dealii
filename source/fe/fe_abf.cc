@@ -518,12 +518,12 @@ FE_ABF<dim>::has_support_on_face(const unsigned int shape_index,
 
               default:
                 return true;
-            };
-        };
+            }
+        }
 
       default: // other rt_order
         return true;
-    };
+    }
 
   return true;
 }

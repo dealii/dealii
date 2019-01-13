@@ -262,7 +262,7 @@ PolynomialSpace<dim>::compute(
       {
         v(d, i).resize(v_size, 0.);
         polynomials[i].value(p(d), v(d, i));
-      };
+      }
 
   if (update_values)
     {

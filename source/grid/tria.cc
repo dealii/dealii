@@ -52,7 +52,7 @@ SubCellData::check_consistency(const unsigned int dim) const
         return ((boundary_lines.size() == 0) && (boundary_quads.size() == 0));
       case 2:
         return (boundary_quads.size() == 0);
-    };
+    }
   return true;
 }
 

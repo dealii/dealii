@@ -870,7 +870,7 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
                                this->dofs_per_face);
       default:
         Assert(false, ExcNotImplemented());
-    };
+    }
   return TableIndices<2>(numbers::invalid_unsigned_int,
                          numbers::invalid_unsigned_int);
 }

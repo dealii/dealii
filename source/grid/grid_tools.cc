@@ -121,7 +121,7 @@ namespace GridTools
           if ((*pi == true) && (*pj == true) &&
               ((vertices[i] - vertices[j]).norm_square() > max_distance_sqr))
             max_distance_sqr = (vertices[i] - vertices[j]).norm_square();
-      };
+      }
 
     return std::sqrt(max_distance_sqr);
   }

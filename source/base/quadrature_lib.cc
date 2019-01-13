@@ -181,7 +181,7 @@ QTrapez<1>::QTrapez()
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i]           = wts[i];
-    };
+    }
 }
 
 
@@ -197,7 +197,7 @@ QSimpson<1>::QSimpson()
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i]           = wts[i];
-    };
+    }
 }
 
 
@@ -214,7 +214,7 @@ QMilne<1>::QMilne()
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i]           = wts[i];
-    };
+    }
 }
 
 
@@ -237,7 +237,7 @@ QWeddle<1>::QWeddle()
     {
       this->quadrature_points[i] = Point<1>(xpts[i]);
       this->weights[i]           = wts[i];
-    };
+    }
 }
 
 

@@ -875,7 +875,7 @@ FE_Q_Hierarchical<dim>::initialize_generalized_support_points()
                 p(2) = .5;
             }
           this->generalized_support_points[index_map_inverse[k++]] = p;
-        };
+        }
 }
 
 
@@ -1924,7 +1924,7 @@ FE_Q_Hierarchical<dim>::initialize_generalized_face_support_points()
                 p(2) = .5;
             }
           this->generalized_face_support_points[face_renumber[k++]] = p;
-        };
+        }
 }
 
 
