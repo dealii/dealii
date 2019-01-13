@@ -26,21 +26,6 @@
 
 #include "../tests.h"
 
-__device__ unsigned int
-compute_thread_id()
-{
-  const unsigned int thread_num_in_block =
-    threadIdx.x + blockDim.x * threadIdx.y +
-    blockDim.x * blockDim.y * threadIdx.z;
-  const unsigned int n_threads_per_block = blockDim.x * blockDim.y * blockDim.z;
-  const unsigned int blocks_num_in_grid =
-    blockIdx.x + gridDim.x * blockIdx.y + gridDim.x * gridDim.y * blockIdx.z;
-
-  return thread_num_in_block + blocks_num_in_grid * n_threads_per_block;
-}
-
-
-
 template <int dim, int fe_degree, typename Number, int n_q_points_1d>
 class HelmholtzOperatorQuad
 {
