@@ -35,6 +35,16 @@ template class VectorMemory<LinearAlgebra::CUDAWrappers::Vector<float>>;
 template class VectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>;
 template class GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<float>>;
 template class GrowingVectorMemory<LinearAlgebra::CUDAWrappers::Vector<double>>;
+#  ifdef DEAL_II_WITH_MPI
+template class VectorMemory<
+  LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>;
+template class VectorMemory<
+  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>;
+template class GrowingVectorMemory<
+  LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>;
+template class GrowingVectorMemory<
+  LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>;
+#  endif
 #endif
 
 namespace internal
@@ -51,6 +61,14 @@ namespace internal
         float>>::release_unused_memory();
       dealii::GrowingVectorMemory<dealii::LinearAlgebra::CUDAWrappers::Vector<
         double>>::release_unused_memory();
+#  ifdef DEAL_II_WITH_MPI
+      dealii::GrowingVectorMemory<
+        dealii::LinearAlgebra::distributed::Vector<float, MemorySpace::CUDA>>::
+        release_unused_memory();
+      dealii::GrowingVectorMemory<
+        dealii::LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>>::
+        release_unused_memory();
+#  endif
 #endif
     }
   } // namespace GrowingVectorMemoryImplementation
