@@ -41,7 +41,7 @@ namespace Particles
      * point to the first element in which the data should be written. This
      * function is meant for serializing all particle properties and
      * afterwards de-serializing the properties by calling the appropriate
-     * constructor Particle(void *&data, PropertyPool *property_pool = NULL);
+     * constructor Particle(void *&data, PropertyPool *property_pool = nullptr);
      *
      * @param [in,out] data The memory location to write particle data
      * into. This pointer points to the begin of the memory, in which the

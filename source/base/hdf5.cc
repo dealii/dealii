@@ -619,7 +619,8 @@ namespace HDF5
     Assert(rank_ret >= 0, ExcInternalError());
     rank = rank_ret;
     dimensions.resize(rank);
-    rank_ret = H5Sget_simple_extent_dims(*dataspace, dimensions.data(), NULL);
+    rank_ret =
+      H5Sget_simple_extent_dims(*dataspace, dimensions.data(), nullptr);
     AssertDimension(rank_ret, static_cast<int>(rank));
 
     size = 1;
@@ -655,7 +656,7 @@ namespace HDF5
       delete pointer;
     });
 
-    *dataspace = H5Screate_simple(rank, dimensions.data(), NULL);
+    *dataspace = H5Screate_simple(rank, dimensions.data(), nullptr);
     Assert(*dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
 
     *hdf5_reference = H5Dcreate2(parent_group_id,
@@ -729,7 +730,7 @@ namespace HDF5
 
     Container data = internal::initialize_container<Container>(data_dimensions);
 
-    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
+    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), nullptr);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
     ret = H5Sselect_elements(*dataspace,
                              H5S_SELECT_SET,
@@ -781,10 +782,14 @@ namespace HDF5
     Container data = internal::initialize_container<Container>(data_dimensions);
 
     memory_dataspace =
-      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
+      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), nullptr);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
-    ret = H5Sselect_hyperslab(
-      *dataspace, H5S_SELECT_SET, offset.data(), NULL, count.data(), NULL);
+    ret = H5Sselect_hyperslab(*dataspace,
+                              H5S_SELECT_SET,
+                              offset.data(),
+                              nullptr,
+                              count.data(),
+                              nullptr);
     Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
 
     internal::set_plist(plist, mpi);
@@ -830,7 +835,7 @@ namespace HDF5
     Container data = internal::initialize_container<Container>(data_dimensions);
 
     memory_dataspace =
-      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
+      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), nullptr);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
     ret = H5Sselect_hyperslab(*dataspace,
                               H5S_SELECT_SET,
@@ -877,18 +882,18 @@ namespace HDF5
     hid_t  plist;
     herr_t ret;
 
-    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
+    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), nullptr);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
     ret = H5Sselect_none(*dataspace);
     Assert(ret >= 0, ExcMessage("H5Sselect_none"));
 
     internal::set_plist(plist, mpi);
 
-    // The pointer of data can safely be NULL, see the discussion at the HDF5
+    // The pointer of data can safely be nullptr, see the discussion at the HDF5
     // forum:
     // https://forum.hdfgroup.org/t/parallel-i-o-does-not-support-filters-yet/884/17
     ret = H5Dread(
-      *hdf5_reference, *t_type, memory_dataspace, *dataspace, plist, NULL);
+      *hdf5_reference, *t_type, memory_dataspace, *dataspace, plist, nullptr);
     Assert(ret >= 0, ExcMessage("Error at H5Dread"));
 
     internal::release_plist(plist,
@@ -954,7 +959,7 @@ namespace HDF5
     herr_t ret;
 
 
-    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
+    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), nullptr);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
     ret = H5Sselect_elements(*dataspace,
                              H5S_SELECT_SET,
@@ -1009,10 +1014,14 @@ namespace HDF5
     herr_t ret;
 
     memory_dataspace =
-      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
+      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), nullptr);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
-    ret = H5Sselect_hyperslab(
-      *dataspace, H5S_SELECT_SET, offset.data(), NULL, count.data(), NULL);
+    ret = H5Sselect_hyperslab(*dataspace,
+                              H5S_SELECT_SET,
+                              offset.data(),
+                              nullptr,
+                              count.data(),
+                              nullptr);
     Assert(ret >= 0, ExcMessage("Error at H5Sselect_hyperslab"));
 
     internal::set_plist(plist, mpi);
@@ -1057,7 +1066,7 @@ namespace HDF5
     herr_t ret;
 
     memory_dataspace =
-      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), NULL);
+      H5Screate_simple(data_dimensions.size(), data_dimensions.data(), nullptr);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
     ret = H5Sselect_hyperslab(*dataspace,
                               H5S_SELECT_SET,
@@ -1103,18 +1112,18 @@ namespace HDF5
     hid_t  plist;
     herr_t ret;
 
-    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), NULL);
+    memory_dataspace = H5Screate_simple(1, data_dimensions.data(), nullptr);
     Assert(memory_dataspace >= 0, ExcMessage("Error at H5Screate_simple"));
     ret = H5Sselect_none(*dataspace);
     Assert(ret >= 0, ExcMessage("Error at H5PSselect_none"));
 
     internal::set_plist(plist, mpi);
 
-    // The pointer of data can safely be NULL, see the discussion at the HDF5
+    // The pointer of data can safely be nullptr, see the discussion at the HDF5
     // forum:
     // https://forum.hdfgroup.org/t/parallel-i-o-does-not-support-filters-yet/884/17
     ret = H5Dwrite(
-      *hdf5_reference, *t_type, memory_dataspace, *dataspace, plist, NULL);
+      *hdf5_reference, *t_type, memory_dataspace, *dataspace, plist, nullptr);
     Assert(ret >= 0, ExcMessage("Error at H5Dwrite"));
 
     internal::release_plist(plist,

@@ -164,7 +164,7 @@ Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
     object_info = &typeid(*this);
   ++counter;
 
-  const char *const name = (id != 0) ? id : unknown_subscriber;
+  const char *const name = (id != nullptr) ? id : unknown_subscriber;
 
   map_iterator it = counter_map.find(name);
   if (it == counter_map.end())

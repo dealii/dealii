@@ -4901,7 +4901,7 @@ namespace DataOutBase
     // later
     char *file_name = (char *)flags.tecplot_binary_file_name;
 
-    if (file_name == NULL)
+    if (file_name == nullptr)
       {
         // At least in debug mode we should tell users why they don't get
         // tecplot binary output
@@ -5164,12 +5164,13 @@ namespace DataOutBase
       // As we don't do anything else with tec_var_names following const_cast is
       // ok
       char *var_names = const_cast<char *>(tec_var_names.c_str());
-      ierr = TECINI(NULL, var_names, file_name, dot, &tec_debug, &is_double);
+      ierr = TECINI(nullptr, var_names, file_name, dot, &tec_debug, &is_double);
 
       Assert(ierr == 0, ExcErrorOpeningTecplotFile(file_name));
 
       char FEBLOCK[] = {'F', 'E', 'B', 'L', 'O', 'C', 'K', 0};
-      ierr = TECZNE(NULL, &num_nodes, &num_cells, &cell_type, FEBLOCK, NULL);
+      ierr =
+        TECZNE(nullptr, &num_nodes, &num_cells, &cell_type, FEBLOCK, nullptr);
 
       Assert(ierr == 0, ExcTecplotAPIError());
 

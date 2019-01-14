@@ -1910,7 +1910,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_values(
     &data) const
 {
   // Convert to the correct internal data class for this FE class.
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != 0,
+  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
@@ -2034,7 +2034,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   // data for this class. fails with
   // an exception if that is not
   // possible
-  Assert(dynamic_cast<const InternalData *>(&fe_internal) != 0,
+  Assert(dynamic_cast<const InternalData *>(&fe_internal) != nullptr,
          ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &>(fe_internal);
 
