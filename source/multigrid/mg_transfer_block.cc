@@ -364,9 +364,9 @@ MGTransferBlockBase::build_matrices(const DoFHandler<dim, spacedim> &,
                         if ((icomp == jcomp) && selected[icomp])
                           prolongation_sparsities[level]->add(
                             dof_indices_child[i], dof_indices_parent[j]);
-                      };
-              };
-          };
+                      }
+              }
+          }
       prolongation_sparsities[level]->compress();
 
       prolongation_matrices[level]->reinit(*prolongation_sparsities[level]);

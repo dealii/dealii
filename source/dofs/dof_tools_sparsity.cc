@@ -347,7 +347,7 @@ namespace DoFTools
           if ((index != numbers::invalid_dof_index) && (index > max_element))
             max_element = index;
         AssertDimension(max_element, sparsity.n_rows() - 1);
-      };
+      }
 #endif
 
     std::vector<types::global_dof_index> dofs_on_this_face;
@@ -423,7 +423,7 @@ namespace DoFTools
               sparsity.add_entries(boundary_dof_boundary_indices[i],
                                    boundary_dof_boundary_indices.begin(),
                                    boundary_dof_boundary_indices.end());
-          };
+          }
         return;
       }
 
@@ -448,7 +448,7 @@ namespace DoFTools
           if ((index != numbers::invalid_dof_index) && (index > max_element))
             max_element = index;
         AssertDimension(max_element, sparsity.n_rows() - 1);
-      };
+      }
 #endif
 
     std::vector<types::global_dof_index> dofs_on_this_face;

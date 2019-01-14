@@ -1444,7 +1444,7 @@ FESystem<dim, spacedim>::build_interface_constraints()
                 // should be of size zero)
                 Assert(false, ExcInternalError());
                 break;
-              };
+              }
 
             case 2:
               {
@@ -1495,9 +1495,9 @@ FESystem<dim, spacedim>::build_interface_constraints()
                       base_element(m_index.first.first).dofs_per_line *
                         sub_line +
                       tmp2;
-                  };
+                  }
                 break;
-              };
+              }
 
             case 3:
               {
@@ -1580,14 +1580,14 @@ FESystem<dim, spacedim>::build_interface_constraints()
                       base_element(m_index.first.first).dofs_per_quad *
                         sub_quad +
                       tmp2;
-                  };
+                  }
 
                 break;
-              };
+              }
 
             default:
               Assert(false, ExcNotImplemented());
-          };
+          }
 
         // now that we gathered all information: use it to build the
         // matrix. note that if n and m belong to different base elements or
@@ -1596,7 +1596,7 @@ FESystem<dim, spacedim>::build_interface_constraints()
           this->interface_constraints(m, n) =
             (base_element(n_index.first.first)
                .constraints()(m_index.second, n_index.second));
-      };
+      }
 }
 
 

@@ -554,7 +554,7 @@ namespace Patterns
           return true;
 
         tmp.erase(0, tmp.find('|') + 1);
-      };
+      }
 
     // remove whitespace at the end
     while ((tmp.length() != 0) && (std::isspace(*(tmp.end() - 1))))
@@ -1274,7 +1274,7 @@ namespace Patterns
           name.erase(name.length() - 1, 1);
 
         split_names.push_back(name);
-      };
+      }
 
 
     // check the different possibilities
@@ -1296,10 +1296,10 @@ namespace Patterns
                 // need it anymore.
                 string_found = true;
                 break;
-              };
+              }
 
             tmp.erase(0, tmp.find('|') + 1);
-          };
+          }
         // check last choice, not finished by |
         if (!string_found)
           if (*test_string == tmp)
@@ -1307,7 +1307,7 @@ namespace Patterns
 
         if (!string_found)
           return false;
-      };
+      }
 
     return true;
   }

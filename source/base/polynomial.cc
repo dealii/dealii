@@ -210,7 +210,7 @@ namespace Polynomials
       {
         values[0] = value(x);
         return;
-      };
+      }
 
     // if there are derivatives needed, then do it properly by the full Horner
     // scheme
@@ -1124,8 +1124,8 @@ namespace Polynomials
             // coefficients array
             recursive_coefficients[k] =
               std_cxx14::make_unique<const std::vector<double>>(std::move(ck));
-          };
-      };
+          }
+      }
   }
 
 

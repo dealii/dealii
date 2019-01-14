@@ -89,10 +89,10 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
               max_value =
                 std::max(max_value,
                          *std::max_element(values[i].begin(), values[i].end()));
-            };
+            }
 
           break;
-        };
+        }
 
       case logarithmic:
         {
@@ -159,7 +159,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
                                       min_value + (n + 1) * delta);
 
           break;
-        };
+        }
 
       case logarithmic:
         {
@@ -172,11 +172,11 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
                                                (n + 1) * delta));
 
           break;
-        };
+        }
 
       default:
         Assert(false, ExcInternalError());
-    };
+    }
 
   // fill the other lists of intervals
   for (unsigned int i = 1; i < values.size(); ++i)
@@ -200,8 +200,8 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
             {
               ++intervals[i][n].content;
               break;
-            };
-      };
+            }
+      }
 }
 
 
@@ -270,7 +270,7 @@ Histogram::write_gnuplot(std::ostream &out) const
               << intervals[i][n].content << std::endl;
 
         out << std::endl;
-      };
+      }
 
   AssertThrow(out, ExcIO());
 }
@@ -297,7 +297,7 @@ Histogram::parse_interval_spacing(const std::string &name)
       AssertThrow(false, ExcInvalidName(name));
 
       return linear;
-    };
+    }
 }
 
 

@@ -82,7 +82,7 @@ namespace internal
           neighbors.insert(neighbors.end(),
                            total_cells * (2 * dimension) - neighbors.size(),
                            std::make_pair(-1, -1));
-        };
+        }
     }
 
 
@@ -174,7 +174,7 @@ namespace internal
           neighbors.insert(neighbors.end(),
                            total_cells * (2 * dimension) - neighbors.size(),
                            std::make_pair(-1, -1));
-        };
+        }
     }
 
 

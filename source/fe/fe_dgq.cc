@@ -759,7 +759,7 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
           // second on face 1:
           return (((shape_index == 0) && (face_index == 0)) ||
                   ((shape_index == this->degree) && (face_index == 1)));
-        };
+        }
 
       case 2:
         {
@@ -772,7 +772,7 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
           if (face_index == 3 && shape_index >= this->dofs_per_cell - n)
             return true;
           return false;
-        };
+        }
 
       case 3:
         {
@@ -797,7 +797,7 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
           if (face_index == 5 && shape_index >= this->dofs_per_cell - n2)
             return true;
           return false;
-        };
+        }
 
       default:
         Assert(false, ExcNotImplemented());

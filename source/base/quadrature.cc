@@ -135,7 +135,7 @@ Quadrature<dim>::Quadrature(const SubQuadrature &q1, const Quadrature<1> &q2)
         weights[present_index] = q1.weight(i1) * q2.weight(i2);
 
         ++present_index;
-      };
+      }
 
 #ifdef DEBUG
   if (size() > 0)
@@ -527,7 +527,7 @@ QProjector<2>::project_to_face(const Quadrature<1> &  quadrature,
           break;
         default:
           Assert(false, ExcInternalError());
-      };
+      }
 }
 
 
@@ -573,7 +573,7 @@ QProjector<3>::project_to_face(const Quadrature<2> &  quadrature,
 
         default:
           Assert(false, ExcInternalError());
-      };
+      }
 }
 
 
@@ -624,7 +624,7 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                 break;
               default:
                 Assert(false, ExcInternalError());
-            };
+            }
           break;
         case 1:
           switch (subface_no)
@@ -637,7 +637,7 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                 break;
               default:
                 Assert(false, ExcInternalError());
-            };
+            }
           break;
         case 2:
           switch (subface_no)
@@ -650,7 +650,7 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                 break;
               default:
                 Assert(false, ExcInternalError());
-            };
+            }
           break;
         case 3:
           switch (subface_no)
@@ -663,12 +663,12 @@ QProjector<2>::project_to_subface(const Quadrature<1> &  quadrature,
                 break;
               default:
                 Assert(false, ExcInternalError());
-            };
+            }
           break;
 
         default:
           Assert(false, ExcInternalError());
-      };
+      }
 }
 
 
@@ -916,7 +916,7 @@ QProjector<1>::project_to_all_subfaces(const Quadrature<0> &quadrature)
       {
         project_to_subface(quadrature, face, subface, help);
         std::copy(help.begin(), help.end(), std::back_inserter(q_points));
-      };
+      }
 
   // next copy over weights
   std::vector<double> weights;
@@ -960,7 +960,7 @@ QProjector<2>::project_to_all_subfaces(const SubQuadrature &quadrature)
       {
         project_to_subface(quadrature, face, subface, help);
         std::copy(help.begin(), help.end(), std::back_inserter(q_points));
-      };
+      }
 
   // next copy over weights
   std::vector<double> weights;
@@ -1580,7 +1580,7 @@ namespace internal
 //          dst.weights[next_point]
 //            = base_quadrature.weight(q_point) / n_copies;
 //          ++next_point;
-//        };
+//        }
 //     }
 //   else
 //                                   // skip doubly available points
@@ -1602,7 +1602,7 @@ namespace internal
 //        {
 //          double_point_weight += base_quadrature.weight(i);
 //          ++n_end_points;
-//        };
+//        }
 //                                     // scale the weight correctly
 //       double_point_weight /= n_copies;
 
@@ -1639,8 +1639,8 @@ namespace internal
 //                                        n_copies;
 
 //          ++next_point;
-//        };
-//     };
+//        }
+//     }
 
 // #if DEBUG
 //   double sum_of_weights = 0;
@@ -1691,7 +1691,7 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
               base_quadrature.weight(q_point) / n_copies;
 
             ++next_point;
-          };
+          }
     }
   else
     // skip doubly available points
@@ -1713,7 +1713,7 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
           {
             double_point_weight += base_quadrature.weight(i);
             ++n_end_points;
-          };
+          }
       // scale the weight correctly
       double_point_weight /= n_copies;
 
@@ -1751,8 +1751,8 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
                 base_quadrature.weight(q_point) / n_copies;
 
             ++next_point;
-          };
-    };
+          }
+    }
 
 #if DEBUG
   double sum_of_weights = 0;

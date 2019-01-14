@@ -900,7 +900,7 @@ namespace internal
               default:
                 Assert(false, ExcNotImplemented());
                 max_couplings = 0;
-            };
+            }
           return std::min(max_couplings, dof_handler.n_dofs());
         }
 

@@ -203,7 +203,7 @@ SparsityPattern::SparsityPattern(const SparsityPattern &original,
       // row given to this constructor
       Assert(next_free_slot <= &colnums[rowstart[row + 1]],
              ExcNotEnoughSpace(0, rowstart[row + 1] - rowstart[row]));
-    };
+    }
 }
 
 
@@ -435,7 +435,7 @@ SparsityPattern::compress()
                                    &new_colnums[next_row_start]) ==
                 &new_colnums[next_row_start]),
              ExcInternalError());
-    };
+    }
 
   // assert that we have used all allocated space, no more and no less
   Assert(next_free_entry == nonzero_elements, ExcInternalError());
@@ -628,7 +628,7 @@ SparsityPattern::empty() const
       Assert(max_vec_len == 0, ExcInternalError());
 
       return true;
-    };
+    }
   return false;
 }
 
@@ -709,8 +709,8 @@ SparsityPattern::add(const size_type i, const size_type j)
         {
           colnums[k] = j;
           return;
-        };
-    };
+        }
+    }
 
   // if we came thus far, something went wrong: there was not enough space in
   // this line
@@ -858,7 +858,7 @@ SparsityPattern::symmetrize()
         // would not harm, only take time to check up)
         if (colnums[k] != row)
           add(colnums[k], row);
-      };
+      }
 }
 
 

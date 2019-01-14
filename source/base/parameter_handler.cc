@@ -1966,7 +1966,7 @@ ParameterHandler::print_parameters_section(
 
                 default:
                   Assert(false, ExcNotImplemented());
-              };
+              }
 
             // then the contents of the subsection
             enter_subsection(demangle(p->first));
@@ -2018,7 +2018,7 @@ ParameterHandler::print_parameters_section(
                 overall_indent_level -= 1;
                 out << std::setw(overall_indent_level * 2) << ""
                     << "end" << std::endl;
-              };
+              }
 
           break;
         }
@@ -2340,7 +2340,7 @@ MultipleParameterLoop::loop(MultipleParameterLoop::UserClass &uc)
       uc.create_new(run_no + 1);
       fill_entry_values(run_no);
       uc.run(*this);
-    };
+    }
 }
 
 
@@ -2536,7 +2536,7 @@ MultipleParameterLoop::Entry::split_different_values()
       different_values.push_back(
         prefix + std::string(multiple, 0, multiple.find('|')) + postfix);
       multiple.erase(0, multiple.find('|') + 1);
-    };
+    }
   // make up the last selection ("while" broke
   // because there was no '|' any more
   different_values.push_back(prefix + multiple + postfix);

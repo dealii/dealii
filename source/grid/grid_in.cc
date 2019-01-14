@@ -788,7 +788,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
       // vertices_indices[i] is automatically
       // created upon first usage
       vertex_indices[vertex_number] = vertex;
-    };
+    }
 
   // set up array of cells
   std::vector<CellData<dim>> cells;
@@ -906,7 +906,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                 // no such vertex index
                 AssertThrow(false, ExcInvalidVertexIndex(cell, vertex));
                 vertex = numbers::invalid_unsigned_int;
-              };
+              }
         }
       else if ((cell_type == "quad") && (dim == 3))
         // boundary info
@@ -960,12 +960,12 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                 // no such vertex index
                 Assert(false, ExcInvalidVertexIndex(cell, vertex));
                 vertex = numbers::invalid_unsigned_int;
-              };
+              }
         }
       else
         // cannot read this
         AssertThrow(false, ExcUnknownIdentifier(cell_type));
-    };
+    }
 
 
   // check that no forbidden arrays are used
@@ -1132,7 +1132,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
         in >> vertices[vertex][d];
       // read Ref phi_i, whatever that may be
       in >> dummy;
-    };
+    }
   AssertThrow(in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
@@ -1151,7 +1151,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       in >> dummy >> dummy;
       // read Ref phi_i, whatever that may be
       in >> dummy;
-    };
+    }
   AssertThrow(in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
@@ -1172,7 +1172,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
       in >> dummy >> dummy;
       // read Ref phi_i, whatever that may be
       in >> dummy;
-    };
+    }
   AssertThrow(in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
@@ -1202,11 +1202,11 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
                       ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
 
           --cells.back().vertices[i];
-        };
+        }
 
       // read and discard Ref phi_i
       in >> dummy;
-    };
+    }
   AssertThrow(in, ExcInvalidDBMeshFormat());
 
   skip_empty_lines(in);
@@ -1290,7 +1290,7 @@ GridIn<2>::read_xda(std::istream &in)
 
       for (unsigned int &vertex : cells[cell].vertices)
         in >> vertex;
-    };
+    }
 
 
 
@@ -1306,7 +1306,7 @@ GridIn<2>::read_xda(std::istream &in)
       // store vertex
       for (unsigned int d = 0; d < 2; ++d)
         vertices[vertex](d) = x[d];
-    };
+    }
   AssertThrow(in, ExcIO());
 
   // do some clean-up on vertices...
@@ -1368,7 +1368,7 @@ GridIn<3>::read_xda(std::istream &in)
 
       for (unsigned int i = 0; i < 8; i++)
         cells[cell].vertices[i] = xda_ordered_nodes[xda_to_dealII_map[i]];
-    };
+    }
 
 
 
@@ -1384,7 +1384,7 @@ GridIn<3>::read_xda(std::istream &in)
       // store vertex
       for (unsigned int d = 0; d < 3; ++d)
         vertices[vertex](d) = x[d];
-    };
+    }
   AssertThrow(in, ExcIO());
 
   // do some clean-up on vertices...
@@ -1775,7 +1775,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
                                   ExcInvalidVertexIndex(cell_per_entity,
                                                         vertex));
                       vertex = numbers::invalid_unsigned_int;
-                    };
+                    }
               }
             else if ((cell_type == 3) && (dim == 3))
               // boundary info
@@ -3099,7 +3099,7 @@ GridIn<2>::debug_output_grid(const std::vector<CellData<2>> &cells,
             min_y = p(1);
           if (p(1) > max_y)
             max_y = p(1);
-        };
+        }
 
       out << "# cell " << i << std::endl;
       Point<2> center;
@@ -3123,7 +3123,7 @@ GridIn<2>::debug_output_grid(const std::vector<CellData<2>> &cells,
             << vertices[cells[i].vertices[f]](0) << ','
             << vertices[cells[i].vertices[f]](1) << std::endl;
       out << std::endl;
-    };
+    }
 
 
   out << std::endl
@@ -3203,7 +3203,7 @@ GridIn<3>::debug_output_grid(const std::vector<CellData<3>> &cells,
           << vertices[cell.vertices[7]] << std::endl
           << std::endl
           << std::endl;
-    };
+    }
 }
 
 

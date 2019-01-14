@@ -1833,7 +1833,7 @@ CellAccessor<2>::point_inside(const Point<2> &p) const
       // outside
       if ((-face[1] * to_p[0] + face[0] * to_p[1]) < 0)
         return false;
-    };
+    }
 
   // if we arrived here, then the
   // point is inside for all four
@@ -2179,7 +2179,7 @@ CellAccessor<dim, spacedim>::set_neighbor(
       this->tria->levels[this->present_level]
         ->neighbors[this->present_index * GeometryInfo<dim>::faces_per_cell + i]
         .second = -1;
-    };
+    }
 }
 
 

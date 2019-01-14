@@ -213,7 +213,7 @@ namespace Threads
       {
         std::abort();
         return 1;
-      };
+      }
 #  endif
   }
 
@@ -254,7 +254,7 @@ namespace Threads
           }
         else
           return_values[i].second = end;
-      };
+      }
     return return_values;
   }
 } // namespace Threads

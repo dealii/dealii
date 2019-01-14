@@ -458,7 +458,7 @@ namespace PETScWrappers
           sum1 += *ptr++;
           sum2 += *ptr++;
           sum3 += *ptr++;
-        };
+        }
       // add up remaining elements
       while (ptr != start_ptr + size())
         sum0 += *ptr++;
