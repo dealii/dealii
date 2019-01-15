@@ -321,7 +321,7 @@ namespace PETScWrappers
 
     // then restore the matrix and return the number of columns in this row as
     // queried previously. Starting with PETSc 3.4, MatRestoreRow actually
-    // resets the last three arguments to zero/NULL, to avoid abuse of pointers
+    // resets the last three arguments to nullptr, to avoid abuse of pointers
     // now dangling. as a consequence, we need to save the size of the array
     // and return the saved value.
     const PetscInt ncols_saved = ncols;

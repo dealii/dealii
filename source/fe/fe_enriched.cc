@@ -727,7 +727,8 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
             continue;
 
           Assert(enrichments[base_no - 1][m](cell) != nullptr,
-                 ExcMessage("The pointer to the enrichment function is NULL"));
+                 ExcMessage(
+                   "The pointer to the enrichment function is not set"));
 
           Assert(enrichments[base_no - 1][m](cell)->n_components == 1,
                  ExcMessage(

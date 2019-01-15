@@ -478,7 +478,7 @@ namespace HDF5
      *
      * When reading a hyperslab, HDF5 also allows to provide "stride" and
      * "block" parameters (see the [HDF5 documentation](https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab)).
-     * These are not used by the current function and set to `NULL`. However
+     * These are not used by the current function and set to `nullptr`. However
      * these parameters can be used with the function
      * read_hyperslab(const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &, const std::vector<hsize_t> &)
      *
@@ -628,7 +628,7 @@ namespace HDF5
      *
      * When writing a hyperslab, HDF5 also allows to provide "stride" and
      * "block" parameters (see the [HDF5 documentation](https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-SelectHyperslab)).
-     * These are not used by the current function and set to `NULL`. However
+     * These are not used by the current function and set to `nullptr`. However
      * these parameters can be used with the function
      * write_hyperslab(const Container &data, const std::vector<hsize_t> &data_dimensions, const std::vector<hsize_t> &offset, const std::vector<hsize_t> &stride, const std::vector<hsize_t> &count, const std::vector<hsize_t> &block).
      *

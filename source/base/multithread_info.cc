@@ -68,7 +68,7 @@ MultithreadInfo::get_n_cpus()
   mib[0] = CTL_HW;
   mib[1] = HW_NCPU;
   len    = sizeof(n_cpus);
-  sysctl(mib, 2, &n_cpus, &len, NULL, 0);
+  sysctl(mib, 2, &n_cpus, &len, nullptr, 0);
 
   return n_cpus;
 }

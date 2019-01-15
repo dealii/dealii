@@ -120,7 +120,7 @@ ExceptionBase::ExceptionBase(const ExceptionBase &exc)
 
 ExceptionBase::~ExceptionBase() noexcept
 {
-  free(stacktrace); // free(NULL) is allowed
+  free(stacktrace); // free(nullptr) is allowed
   stacktrace = nullptr;
 }
 
@@ -161,7 +161,7 @@ ExceptionBase::what() const noexcept
       // backtrace_symbols.
 
       // first delete old stacktrace if necessary
-      free(stacktrace); // free(NULL) is allowed
+      free(stacktrace); // free(nullptr) is allowed
       stacktrace = backtrace_symbols(raw_stacktrace, n_stacktrace_frames);
 #endif
 

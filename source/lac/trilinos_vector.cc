@@ -433,8 +433,9 @@ namespace TrilinosWrappers
       // somewhere. This can happen when a vector lives in GrowingVectorMemory
       // data structures. Thus, the following code is commented out.
       //
-      // if (my_comm != NULL && v_comm != NULL && my_comm->DataPtr() !=
-      // v_comm->DataPtr())
+      // if (my_comm != nullptr &&
+      //     v_comm != nullptr &&
+      //     my_comm->DataPtr() != v_comm->DataPtr())
       //  {
       //    int communicators_same = 0;
       //    const int ierr = MPI_Comm_compare (my_comm->GetMpiComm(),

@@ -3285,7 +3285,7 @@ inline unsigned int
 FEEvaluationBase<dim, n_components_, Number, is_face>::
   get_mapping_data_index_offset() const
 {
-  if (matrix_info == 0)
+  if (matrix_info == nullptr)
     return 0;
   else
     {
