@@ -15,13 +15,15 @@
 
 
 // check that the inner product is exactly the same down to roundoff for
-// various vectors. Due to vectorization and its requirements for alignment,
-// we also test that the result does not depend on the alignment of any of the
-// vectors by choosing among several start locations of a vector relative to a
-// data array allocated as usual.
+// various vectors.
+//
+// It was previously possible to create an unaligned view (a VectorView
+// object) into a Vector: an original goal of this test was to verify that
+// unaligned dot products were identical to aligned ones, but since Vector now
+// uses AlignedVector to store its data it is no longer possible to test this.
 
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_view.h>
+#include <deal.II/lac/vector.templates.h>
 
 #include "../tests.h"
 
@@ -46,8 +48,10 @@ check_norms()
       for (unsigned int shift1 = 0; shift1 < 8; ++shift1)
         for (unsigned int shift2 = 0; shift2 < 8; ++shift2)
           {
-            VectorView<number> v1(size, larger1.begin() + shift1);
-            VectorView<number> v2(size, larger2.begin() + shift2);
+            Vector<number> v1(larger1.begin() + shift1,
+                              larger1.begin() + shift1 + size);
+            Vector<number> v2(larger2.begin() + shift2,
+                              larger2.begin() + shift2 + size);
             for (unsigned int i = 0; i < size; ++i)
               {
                 v1(i) = in1(i);
