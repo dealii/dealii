@@ -240,7 +240,7 @@ namespace PETScWrappers
     ierr = MatShellSetOperation(
       matrix,
       MATOP_MULT,
-      reinterpret_cast<void (*)(void)>(
+      reinterpret_cast<void (*)()>(
         &dealii::PETScWrappers::MatrixFree::matrix_free_mult));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
