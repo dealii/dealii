@@ -43,7 +43,7 @@ echo "SRC-DIR=$SRC"
 # disable muparser (to avoid warnings with bundled one)
 # enable MPI (to get MPI warnings)
 # export compile commands (so that run-clang-tidy.py works)
-ARGS="-D DEAL_II_WITH_MUPARSER=OFF -D DEAL_II_WITH_MPI=ON -D CMAKE_EXPORT_COMPILE_COMMANDS=ON @$"
+ARGS="-D DEAL_II_WITH_MUPARSER=OFF -D DEAL_II_WITH_MPI=ON -D CMAKE_EXPORT_COMPILE_COMMANDS=ON $@"
 
 # disable performance-inefficient-string-concatenation because we don't care about "a"+to_string(5)+...
 CHECKS="-*,
@@ -64,7 +64,7 @@ if ! [ -x "$(command -v run-clang-tidy.py)" ] || ! [ -x "$(command -v clang++)" 
     exit 2
 fi
 
-CC=clang CXX=clang++ cmake "$ARGS" "$SRC" || (echo "cmake failed!"; false) || exit 2
+CC=clang CXX=clang++ cmake $ARGS "$SRC" || (echo "cmake failed!"; false) || exit 2
 
 cmake --build . --target expand_all_instantiations || (echo "make expand_all_instantiations failed!"; false) || exit 3
 
