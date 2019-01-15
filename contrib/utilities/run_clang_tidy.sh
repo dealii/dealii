@@ -40,10 +40,11 @@ if test ! -d "$SRC/source" -o ! -d "$SRC/include" -o ! -d "$SRC/examples" -o ! -
 fi
 echo "SRC-DIR=$SRC"
 
+# do not allow bundled packages, otherwise we get too many warnings from TBB/UMFPACK/etc.
 # disable muparser (to avoid warnings with bundled one)
 # enable MPI (to get MPI warnings)
 # export compile commands (so that run-clang-tidy.py works)
-ARGS="-D DEAL_II_WITH_MUPARSER=OFF -D DEAL_II_WITH_MPI=ON -D CMAKE_EXPORT_COMPILE_COMMANDS=ON $@"
+ARGS="-D DEAL_II_ALLOW_BUNDLED=OFF -D DEAL_II_WITH_MUPARSER=OFF -D DEAL_II_WITH_MPI=ON -D CMAKE_EXPORT_COMPILE_COMMANDS=ON $@"
 
 # disable performance-inefficient-string-concatenation because we don't care about "a"+to_string(5)+...
 CHECKS="-*,
