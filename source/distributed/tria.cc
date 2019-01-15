@@ -3835,12 +3835,12 @@ namespace parallel
             }
         }
 
+      this->prepare_coarsening_and_refinement();
+
       // signal that refinement is going to happen
       this->signals.pre_distributed_refinement();
 
       // now do the work we're supposed to do when we are in charge
-      this->prepare_coarsening_and_refinement();
-
       // make sure all flags are cleared on cells we don't own, since nothing
       // good can come of that if they are still around
       for (typename Triangulation<dim, spacedim>::active_cell_iterator cell =
