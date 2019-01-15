@@ -82,9 +82,6 @@ namespace Step54
       const std::string &  output_filename,
       const ProjectionType surface_projection_kind = NormalProjection);
 
-
-    ~TriangulationOnCAD();
-
     void run();
 
   private:
@@ -122,10 +119,6 @@ namespace Step54
     , output_filename(output_filename)
     , surface_projection_kind(surface_projection_kind)
   {}
-
-  TriangulationOnCAD::~TriangulationOnCAD()
-  {}
-
 
 
   // @sect4{TriangulationOnCAD::read_domain}

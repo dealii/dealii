@@ -2690,11 +2690,6 @@ public:
                    const unsigned int             first_selected_component = 0);
 
   /**
-   * Destructor.
-   */
-  ~FEFaceEvaluation();
-
-  /**
    * Initializes the operation pointer to the current face. This method is the
    * default choice for face integration as the data stored in MappingInfo is
    * stored according to this numbering. Unlike the reinit functions taking a
@@ -7144,17 +7139,6 @@ inline FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
   , dofs_per_component(this->data->dofs_per_component_on_cell)
   , dofs_per_cell(this->data->dofs_per_component_on_cell * n_components_)
   , n_q_points(this->data->n_q_points_face)
-{}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number>
-inline FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-  ~FEFaceEvaluation()
 {}
 
 

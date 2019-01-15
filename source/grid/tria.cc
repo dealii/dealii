@@ -15027,17 +15027,6 @@ Triangulation<dim, spacedim>::memory_consumption() const
 }
 
 
-
-template <int dim, int spacedim>
-Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList() noexcept
-{
-  // don't do anything here. the compiler will automatically convert
-  // any exceptions created by the destructors of the member variables
-  // into abort() in order to satisfy the throw()/noexcept
-  // specification
-}
-
-
 // explicit instantiations
 #include "tria.inst"
 

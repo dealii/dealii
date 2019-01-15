@@ -453,8 +453,7 @@ namespace Step44
       , delta_t(delta_t)
     {}
 
-    virtual ~Time()
-    {}
+    virtual ~Time() = default;
 
     double current() const
     {
@@ -529,9 +528,6 @@ namespace Step44
     {
       Assert(kappa > 0, ExcInternalError());
     }
-
-    ~Material_Compressible_Neo_Hook_Three_Field()
-    {}
 
     // We update the material model with various deformation dependent data
     // based on $F$ and the pressure $\widetilde{p}$ and dilatation
@@ -693,8 +689,7 @@ namespace Step44
       , Jc(SymmetricTensor<4, dim>())
     {}
 
-    virtual ~PointHistory()
-    {}
+    virtual ~PointHistory() = default;
 
     // The first function is used to create a material object and to
     // initialize all tensors correctly: The second one updates the stored

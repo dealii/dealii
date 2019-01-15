@@ -110,7 +110,7 @@ public:
   /**
    * Destructor
    */
-  ~SolverSelector() override;
+  virtual ~SolverSelector() override = default;
 
   /**
    * Solver procedure. Calls the @p solve function of the @p solver whose @p
@@ -252,12 +252,6 @@ SolverSelector<VectorType>::SolverSelector(const std::string &name,
                                            SolverControl &    solver_control)
   : solver_name(name)
   , control(&solver_control)
-{}
-
-
-
-template <typename VectorType>
-SolverSelector<VectorType>::~SolverSelector()
 {}
 
 
