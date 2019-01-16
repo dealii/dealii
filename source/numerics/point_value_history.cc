@@ -1157,10 +1157,9 @@ PointValueHistory<dim>::write_gnuplot(
                 {
                   AssertThrow(names.size() == n_stored,
                               ExcDimensionMismatch(names.size(), n_stored));
-                  for (unsigned int component = 0; component < names.size();
-                       component++)
+                  for (const auto &name : names)
                     {
-                      to_gnuplot << "<" << names[component] << "> ";
+                      to_gnuplot << "<" << name << "> ";
                     }
                 }
               else
@@ -1432,10 +1431,9 @@ PointValueHistory<dim>::status(std::ostream &out)
       // add names, if available
       if (component_names->second.size() > 0)
         {
-          for (unsigned int name = 0; name < component_names->second.size();
-               name++)
+          for (const auto &name : component_names->second)
             {
-              out << "<" << component_names->second[name] << "> ";
+              out << "<" << name << "> ";
             }
           out << "\n";
         }

@@ -386,7 +386,7 @@ namespace VectorTools
       // Now loop over all locally owned, active cells.
       //
 
-      for (auto cell : dof_handler.active_cell_iterators())
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
           // If this cell is not locally owned, do nothing.
           if (!cell->is_locally_owned())
@@ -938,8 +938,8 @@ namespace VectorTools
 
           std::map<types::boundary_id, const Function<spacedim, number> *>
             boundary_functions;
-          for (unsigned int i = 0; i < used_boundary_ids.size(); ++i)
-            boundary_functions[used_boundary_ids[i]] = &function;
+          for (const auto used_boundary_id : used_boundary_ids)
+            boundary_functions[used_boundary_id] = &function;
           project_boundary_values(
             mapping, dof, boundary_functions, q_boundary, boundary_values);
         }
@@ -957,15 +957,14 @@ namespace VectorTools
       const AffineConstraints<number> &          constraints,
       std::map<types::global_dof_index, number> &boundary_values)
     {
-      for (typename std::map<types::global_dof_index, number>::iterator it =
-             boundary_values.begin();
-           it != boundary_values.end();
-           ++it)
-        if (constraints.is_constrained(it->first))
+      for (const auto &boundary_value : boundary_values)
+        if (constraints.is_constrained(boundary_value.first))
           // TODO: This looks wrong -- shouldn't it be ==0 in the first
           // condition and && ?
-          if (!(constraints.get_constraint_entries(it->first)->size() > 0 ||
-                (constraints.get_inhomogeneity(it->first) == it->second)))
+          if (!(constraints.get_constraint_entries(boundary_value.first)
+                    ->size() > 0 ||
+                (constraints.get_inhomogeneity(boundary_value.first) ==
+                 boundary_value.second)))
             return false;
 
       return true;
@@ -6940,9 +6939,8 @@ namespace VectorTools
   {
     ZeroFunction<dim>                                        zero_function(dim);
     std::map<types::boundary_id, const Function<spacedim> *> function_map;
-    std::set<types::boundary_id>::const_iterator it = boundary_ids.begin();
-    for (; it != boundary_ids.end(); ++it)
-      function_map[*it] = &zero_function;
+    for (const types::boundary_id boundary_id : boundary_ids)
+      function_map[boundary_id] = &zero_function;
     compute_nonzero_normal_flux_constraints(dof_handler,
                                             first_vector_component,
                                             boundary_ids,
@@ -7550,9 +7548,8 @@ namespace VectorTools
   {
     ZeroFunction<dim>                                        zero_function(dim);
     std::map<types::boundary_id, const Function<spacedim> *> function_map;
-    std::set<types::boundary_id>::const_iterator it = boundary_ids.begin();
-    for (; it != boundary_ids.end(); ++it)
-      function_map[*it] = &zero_function;
+    for (const types::boundary_id boundary_id : boundary_ids)
+      function_map[boundary_id] = &zero_function;
     compute_nonzero_tangential_flux_constraints(dof_handler,
                                                 first_vector_component,
                                                 boundary_ids,
@@ -7692,16 +7689,12 @@ namespace VectorTools
     // iterate over the list of all vector components we found and see if we
     // can find constrained ones
     unsigned int n_total_constraints_found = 0;
-    for (typename std::set<std::array<types::global_dof_index, dim>,
-                           internal::PointComparator<dim>>::const_iterator it =
-           vector_dofs.begin();
-         it != vector_dofs.end();
-         ++it)
+    for (const auto &dofs : vector_dofs)
       {
         unsigned int n_constraints = 0;
         bool         is_constrained[dim];
         for (unsigned int d = 0; d < dim; ++d)
-          if (no_normal_flux_constraints.is_constrained((*it)[d]))
+          if (no_normal_flux_constraints.is_constrained(dofs[d]))
             {
               is_constrained[d] = true;
               ++n_constraints;
@@ -7718,11 +7711,11 @@ namespace VectorTools
             // function.).
             if (n_constraints > 1)
               {
-                const Vector<double> b_value = dof_vector_to_b_values[*it];
+                const Vector<double> b_value = dof_vector_to_b_values[dofs];
                 for (unsigned int d = 0; d < dim; ++d)
                   {
-                    constraints.add_line((*it)[d]);
-                    constraints.set_inhomogeneity((*it)[d], b_value(d));
+                    constraints.add_line(dofs[d]);
+                    constraints.set_inhomogeneity(dofs[d], b_value(d));
                   }
                 continue;
               }
@@ -7742,31 +7735,31 @@ namespace VectorTools
             AssertIndexRange(constrained_index, dim);
             const std::vector<std::pair<types::global_dof_index, double>>
               *constrained = no_normal_flux_constraints.get_constraint_entries(
-                (*it)[constrained_index]);
+                dofs[constrained_index]);
             // find components to which this index is constrained to
             Assert(constrained != nullptr, ExcInternalError());
             Assert(constrained->size() < dim, ExcInternalError());
-            for (unsigned int c = 0; c < constrained->size(); ++c)
+            for (const auto &entry : *constrained)
               {
                 int index = -1;
                 for (unsigned int d = 0; d < dim; ++d)
-                  if ((*constrained)[c].first == (*it)[d])
+                  if (entry.first == dofs[d])
                     index = d;
                 Assert(index != -1, ExcInternalError());
-                normal[index] = (*constrained)[c].second;
+                normal[index] = entry.second;
               }
-            Vector<double> boundary_value = dof_vector_to_b_values[*it];
+            Vector<double> boundary_value = dof_vector_to_b_values[dofs];
             for (unsigned int d = 0; d < dim; ++d)
               {
                 if (is_constrained[d])
                   continue;
-                const unsigned int new_index = (*it)[d];
+                const unsigned int new_index = dofs[d];
                 if (!constraints.is_constrained(new_index))
                   {
                     constraints.add_line(new_index);
                     if (std::abs(normal[d]) > 1e-13)
                       constraints.add_entry(new_index,
-                                            (*it)[constrained_index],
+                                            dofs[constrained_index],
                                             -normal[d]);
                     constraints.set_inhomogeneity(new_index, boundary_value[d]);
                   }

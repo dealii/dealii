@@ -214,12 +214,11 @@ namespace
     for (unsigned int l = 0; l < mg_dof.get_triangulation().n_global_levels();
          ++l)
       {
-        for (unsigned int i = 0; i < my_copy_indices_level_mine[l].size(); ++i)
-          accessed_indices.push_back(my_copy_indices_level_mine[l][i].first);
+        for (const auto &indices : my_copy_indices_level_mine[l])
+          accessed_indices.push_back(indices.first);
         std::vector<types::global_dof_index> accessed_level_indices;
-        for (unsigned int i = 0; i < my_copy_indices_global_mine[l].size(); ++i)
-          accessed_level_indices.push_back(
-            my_copy_indices_global_mine[l][i].second);
+        for (const auto &indices : my_copy_indices_global_mine[l])
+          accessed_level_indices.push_back(indices.second);
         std::sort(accessed_level_indices.begin(), accessed_level_indices.end());
         level_index_set[l].set_size(mg_dof.locally_owned_mg_dofs(l).size());
         level_index_set[l].add_indices(accessed_level_indices.begin(),

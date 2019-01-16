@@ -233,11 +233,9 @@ Histogram::write_gnuplot(std::ostream &out) const
   // one data set is available
   if (intervals.size() == 1)
     {
-      for (unsigned int n = 0; n < intervals[0].size(); ++n)
-        out << intervals[0][n].left_point << ' ' << intervals[0][n].content
-            << std::endl
-            << intervals[0][n].right_point << ' ' << intervals[0][n].content
-            << std::endl;
+      for (const auto &interval : intervals[0])
+        out << interval.left_point << ' ' << interval.content << std::endl
+            << interval.right_point << ' ' << interval.content << std::endl;
     }
   else
     // otherwise create a whole 3d plot

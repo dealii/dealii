@@ -218,8 +218,8 @@ TimeDependent::start_sweep(const unsigned int s)
       timesteps[step]->set_sweep_no(sweep_no);
     }
 
-  for (unsigned int step = 0; step < timesteps.size(); ++step)
-    timesteps[step]->start_sweep();
+  for (const auto &timestep : timesteps)
+    timestep->start_sweep();
 }
 
 
@@ -255,8 +255,8 @@ TimeDependent::memory_consumption() const
      MemoryConsumption::memory_consumption(sweep_no) +
      sizeof(timestepping_data_primal) + sizeof(timestepping_data_dual) +
      sizeof(timestepping_data_postprocess));
-  for (unsigned int i = 0; i < timesteps.size(); ++i)
-    mem += MemoryConsumption::memory_consumption(*timesteps[i]);
+  for (const auto &timestep : timesteps)
+    mem += MemoryConsumption::memory_consumption(*timestep);
 
   return mem;
 }
