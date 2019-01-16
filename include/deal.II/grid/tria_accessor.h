@@ -310,6 +310,18 @@ public:
    */
   static const unsigned int structure_dimension = structdim;
 
+  /**
+   * Copy operator. These operators are usually used in a context like
+   * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
+   * object pointed to
+   * by @p b to the object pointed to by @p a. However, the result of
+   * dereferencing an iterator is not an object but an accessor; consequently,
+   * this operation is not useful for iterators on triangulations.
+   * Consequently, this operator is declared as deleted and can not be used.
+   */
+  void
+  operator=(const TriaAccessorBase *) = delete;
+
 protected:
   /**
    * Declare the data type that this accessor class expects to get passed from
@@ -330,18 +342,6 @@ protected:
    * Copy constructor. Creates an object with exactly the same data.
    */
   TriaAccessorBase(const TriaAccessorBase &);
-
-  /**
-   * Copy operator. These operators are usually used in a context like
-   * <tt>iterator a,b; *a=*b;</tt>. Presumably, the intent here is to copy the
-   * object pointed to
-   * by @p b to the object pointed to by @p a. However, the result of
-   * dereferencing an iterator is not an object but an accessor; consequently,
-   * this operation is not useful for iterators on triangulations.
-   * Consequently, this operator is declared as deleted and can not be used.
-   */
-  void
-  operator=(const TriaAccessorBase *) = delete;
 
   /**
    * Copy operator. Since this is only called from iterators, do not return

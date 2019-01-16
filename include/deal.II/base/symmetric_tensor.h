@@ -443,11 +443,6 @@ namespace internal
       Accessor(tensor_type &tensor, const TableIndices<rank> &previous_indices);
 
       /**
-       * Default constructor. Not needed, so deleted.
-       */
-      Accessor() = delete;
-
-      /**
        * Copy constructor.
        */
       Accessor(const Accessor &) = default;

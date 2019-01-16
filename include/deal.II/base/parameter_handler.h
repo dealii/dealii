@@ -843,18 +843,6 @@ class MultipleParameterLoop;
  */
 class ParameterHandler : public Subscriptor
 {
-private:
-  /**
-   * Inhibit automatic CopyConstructor.
-   */
-  ParameterHandler(const ParameterHandler &) = delete;
-
-  /**
-   * Inhibit automatic assignment operator.
-   */
-  ParameterHandler &
-  operator=(const ParameterHandler &) = delete;
-
 public:
   /**
    * List of possible output formats used for
@@ -911,6 +899,17 @@ public:
    * spectacular.
    */
   virtual ~ParameterHandler() override = default;
+
+  /**
+   * Inhibit automatic CopyConstructor.
+   */
+  ParameterHandler(const ParameterHandler &) = delete;
+
+  /**
+   * Inhibit automatic assignment operator.
+   */
+  ParameterHandler &
+  operator=(const ParameterHandler &) = delete;
 
   /**
    * Parse each line from a stream until the stream returns the <tt>eof</tt>

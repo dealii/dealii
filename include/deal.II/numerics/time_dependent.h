@@ -694,6 +694,19 @@ public:
   virtual ~TimeStepBase() override = default;
 
   /**
+   * The copy constructor is deleted to avoid shallow copies with unexpected
+   * behavior.
+   */
+  TimeStepBase(const TimeStepBase &) = delete;
+
+  /**
+   * The copy assignment operator is dleetd to avoid shallow copies winth
+   * unexpected behavior.
+   */
+  TimeStepBase &
+  operator=(const TimeStepBase &) = delete;
+
+  /**
    * Reconstruct all the data that is needed for this time level to work. This
    * function serves to reget all the variables and data structures to work
    * again after they have been send to sleep some time before, or at the
@@ -925,24 +938,6 @@ private:
    */
   void
   set_sweep_no(const unsigned int sweep_no);
-
-
-  /**
-   * Copy constructor. I can see no reason why someone might want to use it,
-   * so I don't provide it. Since this class has pointer members, making it
-   * private prevents the compiler to provide it's own, incorrect one if
-   * anyone chose to copy such an object.
-   */
-  TimeStepBase(const TimeStepBase &) = delete;
-
-  /**
-   * Copy operator. I can see no reason why someone might want to use it, so I
-   * don't provide it. Since this class has pointer members, making it private
-   * prevents the compiler to provide it's own, incorrect one if anyone chose
-   * to copy such an object.
-   */
-  TimeStepBase &
-  operator=(const TimeStepBase &) = delete;
 
   // make the manager object a friend
   friend class TimeDependent;

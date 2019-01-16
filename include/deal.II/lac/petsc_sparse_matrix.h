@@ -146,6 +146,17 @@ namespace PETScWrappers
     operator=(const double d);
 
     /**
+     * The copy constructor is deleted.
+     */
+    SparseMatrix(const SparseMatrix &) = delete;
+
+    /**
+     * The copy assignment operator is deleted.
+     */
+    SparseMatrix &
+    operator=(const SparseMatrix &) = delete;
+
+    /**
      * Throw away the present matrix and generate one that has the same
      * properties as if it were created by the constructor of this class with
      * the same argument list as the present function.
@@ -241,16 +252,6 @@ namespace PETScWrappers
            const MPI::Vector & V = MPI::Vector()) const;
 
   private:
-    /**
-     * Purposefully not implemented
-     */
-    SparseMatrix(const SparseMatrix &) = delete;
-    /**
-     * Purposefully not implemented
-     */
-    SparseMatrix &
-    operator=(const SparseMatrix &) = delete;
-
     /**
      * Do the actual work for the respective reinit() function and the
      * matching constructor, i.e. create a matrix. Getting rid of the previous

@@ -178,11 +178,6 @@ namespace internal
        */
       Accessor(const TableType &table, const iterator data);
 
-      /**
-       * Default constructor. Not needed, and invisible, so deleted.
-       */
-      Accessor() = delete;
-
     public:
       /**
        * Copy constructor. This constructor is public so that one can pass
@@ -283,11 +278,6 @@ namespace internal
        */
       Accessor(const TableType &table, const iterator data);
 
-      /**
-       * Default constructor. Not needed, so deleted.
-       */
-      Accessor() = delete;
-
     public:
       /**
        * Copy constructor. This constructor is public so that one can pass
@@ -297,7 +287,6 @@ namespace internal
        * the table it points to. Don't do this.
        */
       Accessor(const Accessor &a);
-
 
       /**
        * Index operator. Performs a range check.

@@ -2046,10 +2046,17 @@ public:
                const FiniteElement<dim, spacedim> &fe);
 
   /**
-   * The copy operator is deleted since objects of this class are not copyable.
+   * The copy assignment is deleted since objects of this class are not
+   * copyable.
    */
   FEValuesBase &
   operator=(const FEValuesBase &) = delete;
+
+  /**
+   * The copy constructor is deleted since objects of this class are not
+   * copyable.
+   */
+  FEValuesBase(const FEValuesBase &) = delete;
 
   /**
    * Destructor.
@@ -3391,12 +3398,6 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell);
 
 private:
-  /**
-   * Copy constructor. Since objects of this class are not copyable, we make
-   * it private, and also do not implement it.
-   */
-  FEValuesBase(const FEValuesBase &);
-
   /**
    * A cache for all possible FEValuesViews objects.
    */

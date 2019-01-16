@@ -270,6 +270,13 @@ namespace PETScWrappers
     explicit VectorBase(const Vec &v);
 
     /**
+     * The copy assignment operator is deleted to avoid accidental usage with
+     * unexpected behavior.
+     */
+    VectorBase &
+    operator=(const VectorBase &) = delete;
+
+    /**
      * Destructor
      */
     virtual ~VectorBase() override;
@@ -806,15 +813,6 @@ namespace PETScWrappers
                          const size_type *  indices,
                          const PetscScalar *values,
                          const bool         add_values);
-
-  private:
-    /**
-     * Assignment operator. This is currently not implemented, so it is
-     * deliberately left as private (and undefined) to prevent accidental
-     * usage.
-     */
-    VectorBase &
-    operator=(const VectorBase &) = delete;
   };
 
 

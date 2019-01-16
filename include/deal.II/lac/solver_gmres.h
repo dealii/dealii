@@ -239,6 +239,11 @@ public:
   SolverGMRES(SolverControl &cn, const AdditionalData &data = AdditionalData());
 
   /**
+   * The copy constructor is deleted.
+   */
+  SolverGMRES(const SolverGMRES<VectorType> &) = delete;
+
+  /**
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename PreconditionerType>
@@ -431,13 +436,6 @@ protected:
    * Auxiliary matrix for inverting @p H
    */
   FullMatrix<double> H1;
-
-
-private:
-  /**
-   * No copy constructor.
-   */
-  SolverGMRES(const SolverGMRES<VectorType> &);
 };
 
 /**
