@@ -51,6 +51,7 @@ SET(_scripts
   ${CMAKE_CURRENT_SOURCE_DIR}/run_test.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_closest_tag.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_latest_tag.sh
+  ${CMAKE_CURRENT_SOURCE_DIR}/../contrib/utilities/indent.py
   )
 FILE(COPY ${_scripts}
   DESTINATION ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/scripts
