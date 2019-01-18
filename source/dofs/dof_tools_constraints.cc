@@ -1825,28 +1825,29 @@ namespace DoFTools
 
       Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
 
-      // if face_2 does have children, then we need to iterate over them
+      // If face_2 does have children, then we need to iterate over these
+      // children and set periodic constraints in the inverse direction:
+
       if (face_2->has_children())
         {
           Assert(face_2->n_children() ==
                    GeometryInfo<dim>::max_children_per_face,
                  ExcNotImplemented());
+
           const unsigned int dofs_per_face =
             face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
           FullMatrix<double> child_transformation(dofs_per_face, dofs_per_face);
-          FullMatrix<double> subface_interpolation(dofs_per_face,
-                                                   dofs_per_face);
+          FullMatrix<double> subface_interp(dofs_per_face, dofs_per_face);
+
           for (unsigned int c = 0; c < face_2->n_children(); ++c)
             {
               // get the interpolation matrix recursively from the one that
               // interpolated from face_1 to face_2 by multiplying from the left
               // with the one that interpolates from face_2 to its child
-              face_1->get_fe(face_1->nth_active_fe_index(0))
-                .get_subface_interpolation_matrix(
-                  face_1->get_fe(face_1->nth_active_fe_index(0)),
-                  c,
-                  subface_interpolation);
-              subface_interpolation.mmult(child_transformation, transformation);
+              const auto &fe = face_1->get_fe(face_1->nth_active_fe_index(0));
+              fe.get_subface_interpolation_matrix(fe, c, subface_interp);
+              subface_interp.mmult(child_transformation, transformation);
+
               set_periodicity_constraints(face_1,
                                           face_2->child(c),
                                           child_transformation,
@@ -1856,362 +1857,362 @@ namespace DoFTools
                                           face_flip,
                                           face_rotation);
             }
+          return;
         }
-      else
-        // both faces are active. we need to match the corresponding DoFs of
-        // both faces
+
+      //
+      // If we reached this point then both faces are active. Now all
+      // that is left is to match the corresponding DoFs of both faces.
+      //
+
+      const unsigned int face_1_index = face_1->nth_active_fe_index(0);
+      const unsigned int face_2_index = face_2->nth_active_fe_index(0);
+      Assert(face_1->get_fe(face_1_index) == face_2->get_fe(face_2_index),
+             ExcMessage(
+               "Matching periodic cells need to use the same finite element"));
+
+      const FiniteElement<dim, spacedim> &fe = face_1->get_fe(face_1_index);
+
+      Assert(component_mask.represents_n_components(fe.n_components()),
+             ExcMessage(
+               "The number of components in the mask has to be either "
+               "zero or equal to the number of components in the finite "
+               "element."));
+
+      const unsigned int dofs_per_face = fe.dofs_per_face;
+
+      std::vector<types::global_dof_index> dofs_1(dofs_per_face);
+      std::vector<types::global_dof_index> dofs_2(dofs_per_face);
+
+      face_1->get_dof_indices(dofs_1, face_1_index);
+      face_2->get_dof_indices(dofs_2, face_2_index);
+
+      // If either of the two faces has an invalid dof index, stop. This is
+      // so that there is no attempt to match artificial cells of parallel
+      // distributed triangulations.
+      //
+      // While it seems like we ought to be able to avoid even calling
+      // set_periodicity_constraints for artificial faces, this situation
+      // can arise when a face that is being made periodic is only
+      // partially touched by the local subdomain.
+      // make_periodicity_constraints will be called recursively even for
+      // the section of the face that is not touched by the local
+      // subdomain.
+      //
+      // Until there is a better way to determine if the cells that
+      // neighbor a face are artificial, we simply test to see if the face
+      // does not have a valid dof initialization.
+
+      for (unsigned int i = 0; i < dofs_per_face; i++)
+        if (dofs_1[i] == numbers::invalid_dof_index ||
+            dofs_2[i] == numbers::invalid_dof_index)
+          {
+            return;
+          }
+
+      // Well, this is a hack:
+      //
+      // There is no
+      //   face_to_face_index(face_index,
+      //                      face_orientation,
+      //                      face_flip,
+      //                      face_rotation)
+      // function in FiniteElementData, so we have to use
+      //   face_to_cell_index(face_index, face
+      //                      face_orientation,
+      //                      face_flip,
+      //                      face_rotation)
+      // But this will give us an index on a cell - something we cannot work
+      // with directly. But luckily we can match them back :-]
+
+      std::map<unsigned int, unsigned int> cell_to_rotated_face_index;
+
+      // Build up a cell to face index for face_2:
+      for (unsigned int i = 0; i < dofs_per_face; ++i)
         {
-          const unsigned int face_1_index = face_1->nth_active_fe_index(0);
-          const unsigned int face_2_index = face_2->nth_active_fe_index(0);
-          Assert(
-            face_1->get_fe(face_1_index) == face_2->get_fe(face_2_index),
-            ExcMessage(
-              "Matching periodic cells need to use the same finite element"));
+          const unsigned int cell_index =
+            fe.face_to_cell_index(i,
+                                  0, /* It doesn't really matter, just
+                                      * assume we're on the first face...
+                                      */
+                                  true,
+                                  false,
+                                  false // default orientation
+            );
+          cell_to_rotated_face_index[cell_index] = i;
+        }
 
-          const FiniteElement<dim, spacedim> &fe = face_1->get_fe(face_1_index);
+      //
+      // Loop over all dofs on face 2 and constrain them against all
+      // matching dofs on face 1:
+      //
 
-          Assert(component_mask.represents_n_components(fe.n_components()),
-                 ExcMessage(
-                   "The number of components in the mask has to be either "
-                   "zero or equal to the number of components in the finite "
-                   "element."));
+      for (unsigned int i = 0; i < dofs_per_face; ++i)
+        {
+          // Obey the component mask
+          if ((component_mask.n_selected_components(fe.n_components()) !=
+               fe.n_components()) &&
+              !component_mask[fe.face_system_to_component_index(i).first])
+            continue;
 
-          const unsigned int dofs_per_face = fe.dofs_per_face;
-
-          std::vector<types::global_dof_index> dofs_1(dofs_per_face);
-          std::vector<types::global_dof_index> dofs_2(dofs_per_face);
-
-          face_1->get_dof_indices(dofs_1, face_1_index);
-          face_2->get_dof_indices(dofs_2, face_2_index);
-
-          for (unsigned int i = 0; i < dofs_per_face; i++)
-            {
-              if (dofs_1[i] == numbers::invalid_dof_index ||
-                  dofs_2[i] == numbers::invalid_dof_index)
-                {
-                  /* If either of these faces have no indices, stop.  This is so
-                   * that there is no attempt to match artificial cells of
-                   * parallel distributed triangulations.
-                   *
-                   * While it seems like we ought to be able to avoid even
-                   * calling set_periodicity_constraints for artificial faces,
-                   * this situation can arise when a face that is being made
-                   * periodic is only partially touched by the local subdomain.
-                   * make_periodicity_constraints will be called recursively
-                   * even for the section of the face that is not touched by the
-                   * local subdomain.
-                   *
-                   * Until there is a better way to determine if the cells that
-                   * neighbor a face are artificial, we simply test to see if
-                   * the face does not have a valid dof initialization.
-                   */
-                  return;
-                }
-            }
-
-          // Well, this is a hack:
+          // As mentioned in the comment above, we need to be careful about
+          // treating identity constraints differently. consequently, find
+          // out whether this dof 'i' will be identity constrained
           //
-          // There is no
-          //   face_to_face_index(face_index,
-          //                      face_orientation,
-          //                      face_flip,
-          //                      face_rotation)
-          // function in FiniteElementData, so we have to use
-          //   face_to_cell_index(face_index, face
-          //                      face_orientation,
-          //                      face_flip,
-          //                      face_rotation)
-          // But this will give us an index on a cell - something we cannot work
-          // with directly. But luckily we can match them back :-]
+          // To check whether this is the case, first see whether there
+          // are any weights other than 0 and 1, then in a first stage
+          // make sure that if so there is only one weight equal to 1,
+          //
+          // afterwards do the same for constraints of type dof1=-dof2.
 
-          std::map<unsigned int, unsigned int> cell_to_rotated_face_index;
+          // FIXME: Refactor into one go.
 
-          // Build up a cell to face index for face_2:
-          for (unsigned int i = 0; i < dofs_per_face; ++i)
-            {
-              const unsigned int cell_index =
-                fe.face_to_cell_index(i,
-                                      0, /* It doesn't really matter, just
-                                          * assume we're on the first face...
-                                          */
-                                      true,
-                                      false,
-                                      false // default orientation
-                );
-              cell_to_rotated_face_index[cell_index] = i;
-            }
-
-          // loop over all dofs on face 2 and constrain them against the ones on
-          // face 1
-          for (unsigned int i = 0; i < dofs_per_face; ++i)
-            if ((component_mask.n_selected_components(fe.n_components()) ==
-                 fe.n_components()) ||
-                component_mask[fe.face_system_to_component_index(i).first])
+          bool         is_identity_constrained = true;
+          const double eps                     = 1.e-13;
+          for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
+            if (std::abs(transformation(i, jj)) > eps &&
+                std::abs(transformation(i, jj) - 1.) > eps)
               {
-                // as mentioned in the comment above this function, we need to
-                // be careful about treating identity constraints differently.
-                // consequently, find out whether this dof 'i' will be identity
-                // constrained
-                //
-                // to check whether this is the case, first see whether there
-                // are any weights other than 0 and 1, then in a first stage
-                // make sure that if so there is only one weight equal to 1
-                //
-                // afterwards do the same for constraints of type dof1=-dof2
-                bool         is_identity_constrained = true;
-                const double eps                     = 1.e-13;
-                for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-                  if (std::abs(transformation(i, jj)) > eps &&
-                      std::abs(transformation(i, jj) - 1.) > eps)
-                    {
-                      is_identity_constrained = false;
-                      break;
-                    }
-                unsigned int identity_constraint_target =
-                  numbers::invalid_unsigned_int;
-                if (is_identity_constrained == true)
-                  {
-                    bool one_identity_found = false;
-                    for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-                      if (std::abs(transformation(i, jj) - 1.) < eps)
-                        {
-                          if (one_identity_found == false)
-                            {
-                              one_identity_found         = true;
-                              identity_constraint_target = jj;
-                            }
-                          else
-                            {
-                              is_identity_constrained = false;
-                              identity_constraint_target =
-                                numbers::invalid_unsigned_int;
-                              break;
-                            }
-                        }
-                  }
+                is_identity_constrained = false;
+                break;
+              }
 
-                bool         is_inverse_constrained = !is_identity_constrained;
-                unsigned int inverse_constraint_target =
-                  numbers::invalid_unsigned_int;
-                if (is_inverse_constrained)
-                  for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-                    if (std::abs(transformation(i, jj)) > eps &&
-                        std::abs(transformation(i, jj) + 1.) > eps)
+          unsigned int identity_constraint_target =
+            numbers::invalid_unsigned_int;
+          if (is_identity_constrained == true)
+            {
+              bool one_identity_found = false;
+              for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
+                if (std::abs(transformation(i, jj) - 1.) < eps)
+                  {
+                    if (one_identity_found == false)
                       {
-                        is_inverse_constrained = false;
+                        one_identity_found         = true;
+                        identity_constraint_target = jj;
+                      }
+                    else
+                      {
+                        is_identity_constrained = false;
+                        identity_constraint_target =
+                          numbers::invalid_unsigned_int;
                         break;
                       }
-                if (is_inverse_constrained)
-                  {
-                    bool one_identity_found = false;
-                    for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-                      if (std::abs(transformation(i, jj) + 1) < eps)
-                        {
-                          if (one_identity_found == false)
-                            {
-                              one_identity_found        = true;
-                              inverse_constraint_target = jj;
-                            }
-                          else
-                            {
-                              is_inverse_constrained = false;
-                              inverse_constraint_target =
-                                numbers::invalid_unsigned_int;
-                              break;
-                            }
-                        }
                   }
+            }
 
-                const unsigned int target = is_identity_constrained ?
-                                              identity_constraint_target :
-                                              inverse_constraint_target;
-
-                // find out whether this dof also exists on face 1 if this is
-                // true and the constraint is no identity constraint to itself,
-                // set it to zero
-                bool constraint_set = false;
-                for (unsigned int j = 0; j < dofs_per_face; ++j)
+          bool         is_inverse_constrained = !is_identity_constrained;
+          unsigned int inverse_constraint_target =
+            numbers::invalid_unsigned_int;
+          if (is_inverse_constrained)
+            for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
+              if (std::abs(transformation(i, jj)) > eps &&
+                  std::abs(transformation(i, jj) + 1.) > eps)
+                {
+                  is_inverse_constrained = false;
+                  break;
+                }
+          if (is_inverse_constrained)
+            {
+              bool one_identity_found = false;
+              for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
+                if (std::abs(transformation(i, jj) + 1) < eps)
                   {
-                    if (dofs_2[i] == dofs_1[j])
-                      if (!(is_identity_constrained && target == i))
-                        {
-                          affine_constraints.add_line(dofs_2[i]);
-                          constraint_set = true;
-                        }
-                  }
-
-                if (!constraint_set)
-                  {
-                    // now treat constraints, either as an equality constraint
-                    // or as a sequence of constraints
-                    if (is_identity_constrained || is_inverse_constrained)
+                    if (one_identity_found == false)
                       {
-                        // Query the correct face_index on face_1 respecting the
-                        // given orientation:
-                        const unsigned int j =
-                          cell_to_rotated_face_index[fe.face_to_cell_index(
-                            target,
-                            0, /* It doesn't really matter, just assume
-                                * we're on the first face...
-                                */
-                            face_orientation,
-                            face_flip,
-                            face_rotation)];
+                        one_identity_found        = true;
+                        inverse_constraint_target = jj;
+                      }
+                    else
+                      {
+                        is_inverse_constrained = false;
+                        inverse_constraint_target =
+                          numbers::invalid_unsigned_int;
+                        break;
+                      }
+                  }
+            }
 
-                        if (affine_constraints.is_constrained(dofs_2[i]))
+          const unsigned int target = is_identity_constrained ?
+                                        identity_constraint_target :
+                                        inverse_constraint_target;
+
+          // Fix up a rare corner case:
+          //
+          // Find out whether the current dof (living on face 2) also
+          // exists on face 1. If this is the case then both faces share
+          // the same dof and we are in one of two situations:
+          //  - We are about to enter an identity constraint of the dof to
+          //    itself. In this case simply do nothing.
+          //  - Otherwise, we force the dof to zero.
+          {
+            bool continue_with_next_dof = false;
+            for (unsigned int j = 0; j < dofs_per_face; ++j)
+              if (dofs_2[i] == dofs_1[j])
+                {
+                  if (!(is_identity_constrained && target == i))
+                    affine_constraints.add_line(dofs_2[i]);
+                  continue_with_next_dof = true;
+                }
+
+            if (continue_with_next_dof)
+              continue;
+          }
+
+          // Next, we work on all constraints that are not identity
+          // constraints, i.e., constraints that involve an interpolation
+          // step that constrains the current dof (on face 2) to more than
+          // one dof on face 1.
+
+          if (!is_identity_constrained && !is_inverse_constrained)
+            {
+              // The current dof is already constrained. There is nothing
+              // left to do.
+              if (affine_constraints.is_constrained(dofs_2[i]))
+                continue;
+
+              // Enter the constraint piece by piece:
+              affine_constraints.add_line(dofs_2[i]);
+
+              for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
+                {
+                  // Query the correct face_index on face_1 respecting
+                  // the given orientation:
+                  const unsigned int j =
+                    cell_to_rotated_face_index[fe.face_to_cell_index(
+                      jj, 0, face_orientation, face_flip, face_rotation)];
+
+                  if (std::abs(transformation(i, jj)) > eps)
+                    affine_constraints.add_entry(dofs_2[i],
+                                                 dofs_1[j],
+                                                 transformation(i, jj));
+                }
+
+              // Continue with next dof.
+              continue;
+            }
+
+          //
+          // We are left with an equality constraint.
+          //
+
+          // Query the correct face_index on face_1 respecting the
+          // given orientation:
+          const unsigned int j =
+            cell_to_rotated_face_index[fe.face_to_cell_index(
+              target, 0, face_orientation, face_flip, face_rotation)];
+
+          if (affine_constraints.is_constrained(dofs_2[i]))
+            {
+              // If the two aren't already identity constrained (whichever
+              // way around) or already identical (in case of rotated
+              // periodicity constraints), then enter the constraint.
+              // Otherwise, there is nothing for us to do.
+              bool enter_constraint = false;
+              // see if this would add an identity constraint
+              // cycle
+              if (!affine_constraints.is_constrained(dofs_1[j]))
+                {
+                  types::global_dof_index new_dof = dofs_2[i];
+                  while (new_dof != dofs_1[j])
+                    if (affine_constraints.is_constrained(new_dof))
+                      {
+                        const std::vector<
+                          std::pair<types::global_dof_index, double>>
+                          *constraint_entries =
+                            affine_constraints.get_constraint_entries(new_dof);
+                        if (constraint_entries->size() == 1)
+                          new_dof = (*constraint_entries)[0].first;
+                        else
                           {
-                            // if the two aren't already identity constrained
-                            // (whichever way around) or already identical (in
-                            // case of rotated periodicity constraints), then
-                            // enter the constraint. otherwise there is nothing
-                            // for us still to do
-                            bool enter_constraint = false;
-                            // see if this would add an identity constraint
-                            // cycle
-                            if (!affine_constraints.is_constrained(dofs_1[j]))
-                              {
-                                types::global_dof_index new_dof = dofs_2[i];
-                                while (new_dof != dofs_1[j])
-                                  if (affine_constraints.is_constrained(
-                                        new_dof))
-                                    {
-                                      const std::vector<
-                                        std::pair<types::global_dof_index,
-                                                  double>> *constraint_entries =
-                                        affine_constraints
-                                          .get_constraint_entries(new_dof);
-                                      if (constraint_entries->size() == 1)
-                                        new_dof =
-                                          (*constraint_entries)[0].first;
-                                      else
-                                        {
-                                          enter_constraint = true;
-                                          break;
-                                        }
-                                    }
-                                  else
-                                    {
-                                      enter_constraint = true;
-                                      break;
-                                    }
-                              }
+                            enter_constraint = true;
+                            break;
+                          }
+                      }
+                    else
+                      {
+                        enter_constraint = true;
+                        break;
+                      }
+                }
 
-                            if (enter_constraint)
+              if (enter_constraint)
+                {
+                  affine_constraints.add_line(dofs_1[j]);
+                  affine_constraints.add_entry(
+                    dofs_1[j], dofs_2[i], is_identity_constrained ? 1.0 : -1.0);
+                }
+            }
+          else
+            {
+              // if the two aren't already identity constrained
+              // (whichever way around) or already identical (in
+              // case of rotated periodicity constraints), then
+              // enter the constraint. Otherwise there is nothing
+              // for us to do
+              bool enter_constraint = false;
+              if (!affine_constraints.is_constrained(dofs_1[j]))
+                {
+                  if (dofs_2[i] != dofs_1[j])
+                    enter_constraint = true;
+                }
+              else // dofs_1[j] is constrained, is it identity or
+                   // inverse constrained?
+                {
+                  const std::vector<std::pair<types::global_dof_index, double>>
+                    *constraint_entries =
+                      affine_constraints.get_constraint_entries(dofs_1[j]);
+                  if (constraint_entries->size() == 1 &&
+                      (*constraint_entries)[0].first == dofs_2[i])
+                    {
+                      if ((is_identity_constrained &&
+                           std::abs((*constraint_entries)[0].second - 1) >
+                             eps) ||
+                          (is_inverse_constrained &&
+                           std::abs((*constraint_entries)[0].second + 1) > eps))
+                        {
+                          // this pair of constraints means that
+                          // both dofs have to be constrained to
+                          // 0.
+                          affine_constraints.add_line(dofs_2[i]);
+                        }
+                    }
+                  else
+                    {
+                      // see if this would add an identity
+                      // constraint cycle
+                      types::global_dof_index new_dof = dofs_1[j];
+                      while (new_dof != dofs_2[i])
+                        if (affine_constraints.is_constrained(new_dof))
+                          {
+                            const std::vector<
+                              std::pair<types::global_dof_index, double>>
+                              *constraint_entries =
+                                affine_constraints.get_constraint_entries(
+                                  new_dof);
+                            if (constraint_entries->size() == 1)
+                              new_dof = (*constraint_entries)[0].first;
+                            else
                               {
-                                affine_constraints.add_line(dofs_1[j]);
-                                affine_constraints.add_entry(
-                                  dofs_1[j],
-                                  dofs_2[i],
-                                  is_identity_constrained ? 1.0 : -1.0);
+                                enter_constraint = true;
+                                break;
                               }
                           }
                         else
                           {
-                            // if the two aren't already identity constrained
-                            // (whichever way around) or already identical (in
-                            // case of rotated periodicity constraints), then
-                            // enter the constraint. otherwise there is nothing
-                            // for us still to do
-                            bool enter_constraint = false;
-                            if (!affine_constraints.is_constrained(dofs_1[j]))
-                              {
-                                if (dofs_2[i] != dofs_1[j])
-                                  enter_constraint = true;
-                              }
-                            else // dofs_1[j] is constrained, is it identity or
-                                 // inverse constrained?
-                              {
-                                const std::vector<
-                                  std::pair<types::global_dof_index, double>>
-                                  *constraint_entries =
-                                    affine_constraints.get_constraint_entries(
-                                      dofs_1[j]);
-                                if (constraint_entries->size() == 1 &&
-                                    (*constraint_entries)[0].first == dofs_2[i])
-                                  {
-                                    if ((is_identity_constrained &&
-                                         std::abs(
-                                           (*constraint_entries)[0].second -
-                                           1) > eps) ||
-                                        (is_inverse_constrained &&
-                                         std::abs(
-                                           (*constraint_entries)[0].second +
-                                           1) > eps))
-                                      {
-                                        // this pair of constraints means that
-                                        // both dofs have to be constrained to
-                                        // 0.
-                                        affine_constraints.add_line(dofs_2[i]);
-                                      }
-                                  }
-                                else
-                                  {
-                                    // see if this would add an identity
-                                    // constraint cycle
-                                    types::global_dof_index new_dof = dofs_1[j];
-                                    while (new_dof != dofs_2[i])
-                                      if (affine_constraints.is_constrained(
-                                            new_dof))
-                                        {
-                                          const std::vector<std::pair<
-                                            types::global_dof_index,
-                                            double>> *constraint_entries =
-                                            affine_constraints
-                                              .get_constraint_entries(new_dof);
-                                          if (constraint_entries->size() == 1)
-                                            new_dof =
-                                              (*constraint_entries)[0].first;
-                                          else
-                                            {
-                                              enter_constraint = true;
-                                              break;
-                                            }
-                                        }
-                                      else
-                                        {
-                                          enter_constraint = true;
-                                          break;
-                                        }
-                                  }
-                              }
-
-                            if (enter_constraint)
-                              {
-                                affine_constraints.add_line(dofs_2[i]);
-                                affine_constraints.add_entry(
-                                  dofs_2[i],
-                                  dofs_1[j],
-                                  is_identity_constrained ? 1.0 : -1.0);
-                              }
+                            enter_constraint = true;
+                            break;
                           }
-                      }
-                    else if (!affine_constraints.is_constrained(dofs_2[i]))
-                      {
-                        // this is just a regular constraint. enter it piece by
-                        // piece
-                        affine_constraints.add_line(dofs_2[i]);
-                        for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-                          {
-                            // Query the correct face_index on face_1 respecting
-                            // the given orientation:
-                            const unsigned int j =
-                              cell_to_rotated_face_index[fe.face_to_cell_index(
-                                jj,
-                                0,
-                                face_orientation,
-                                face_flip,
-                                face_rotation)];
+                    }
+                }
 
-                            // And finally constrain the two DoFs respecting
-                            // component_mask:
-                            if (transformation(i, jj) != 0)
-                              affine_constraints.add_entry(
-                                dofs_2[i], dofs_1[j], transformation(i, jj));
-                          }
-                      }
-                  }
-              }
-        }
+              if (enter_constraint)
+                {
+                  affine_constraints.add_line(dofs_2[i]);
+                  affine_constraints.add_entry(
+                    dofs_2[i], dofs_1[j], is_identity_constrained ? 1.0 : -1.0);
+                }
+            }
+        } /* for dofs_per_face */
     }
 
 
