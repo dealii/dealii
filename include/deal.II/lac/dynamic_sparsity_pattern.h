@@ -78,6 +78,13 @@ namespace DynamicSparsityPatternIterators
     Accessor(const DynamicSparsityPattern *sparsity_pattern);
 
     /**
+     * Default constructor creating a dummy accessor. This constructor is here
+     * only to be able to store accessors in STL containers such as
+     * `std::vector`.
+     */
+    Accessor();
+
+    /**
      * Row number of the element represented by this object.
      */
     size_type
@@ -112,6 +119,12 @@ namespace DynamicSparsityPatternIterators
     operator<(const Accessor &) const;
 
   protected:
+    DeclExceptionMsg(DummyAccessor,
+                     "The instance of this class was initialized"
+                     " without DynamicSparsityPattern object, which"
+                     " means that it is a dummy accessor that can"
+                     " not do any operations.");
+
     /**
      * The sparsity pattern we operate on accessed.
      */
@@ -191,6 +204,13 @@ namespace DynamicSparsityPatternIterators
      * @p sp.
      */
     Iterator(const DynamicSparsityPattern *sp);
+
+    /**
+     * Default constructor creating an invalid iterator. This constructor is
+     * here only to be able to store iterators in STL containers such as
+     * `std::vector`.
+     */
+    Iterator();
 
     /**
      * Prefix increment.
@@ -736,9 +756,18 @@ namespace DynamicSparsityPatternIterators
 
 
 
+  inline Accessor::Accessor()
+    : sparsity_pattern(nullptr)
+    , current_row(numbers::invalid_size_type)
+    , current_entry()
+    , end_of_row()
+  {}
+
+
   inline size_type
   Accessor::row() const
   {
+    Assert(sparsity_pattern != nullptr, DummyAccessor());
     Assert(current_row < sparsity_pattern->n_rows(), ExcInternalError());
 
     return current_row;
@@ -748,6 +777,7 @@ namespace DynamicSparsityPatternIterators
   inline size_type
   Accessor::column() const
   {
+    Assert(sparsity_pattern != nullptr, DummyAccessor());
     Assert(current_row < sparsity_pattern->n_rows(), ExcInternalError());
 
     return *current_entry;
@@ -757,6 +787,7 @@ namespace DynamicSparsityPatternIterators
   inline size_type
   Accessor::index() const
   {
+    Assert(sparsity_pattern != nullptr, DummyAccessor());
     Assert(current_row < sparsity_pattern->n_rows(), ExcInternalError());
 
     return (current_entry -
@@ -772,6 +803,8 @@ namespace DynamicSparsityPatternIterators
   inline bool
   Accessor::operator==(const Accessor &other) const
   {
+    Assert(sparsity_pattern != nullptr, DummyAccessor());
+    Assert(other.sparsity_pattern != nullptr, DummyAccessor());
     // compare the sparsity pattern the iterator points into, the
     // current row, and the location within this row. ignore the
     // latter if the row is past-the-end because in that case the
@@ -787,6 +820,8 @@ namespace DynamicSparsityPatternIterators
   inline bool
   Accessor::operator<(const Accessor &other) const
   {
+    Assert(sparsity_pattern != nullptr, DummyAccessor());
+    Assert(other.sparsity_pattern != nullptr, DummyAccessor());
     Assert(sparsity_pattern == other.sparsity_pattern, ExcInternalError());
 
     // if *this is past-the-end, then it is less than no one
@@ -811,6 +846,7 @@ namespace DynamicSparsityPatternIterators
   inline void
   Accessor::advance()
   {
+    Assert(sparsity_pattern != nullptr, DummyAccessor());
     Assert(current_row < sparsity_pattern->n_rows(), ExcInternalError());
 
     // move to the next element in this row
@@ -846,6 +882,12 @@ namespace DynamicSparsityPatternIterators
 
   inline Iterator::Iterator(const DynamicSparsityPattern *sparsity_pattern)
     : accessor(sparsity_pattern)
+  {}
+
+
+
+  inline Iterator::Iterator()
+    : accessor()
   {}
 
 
