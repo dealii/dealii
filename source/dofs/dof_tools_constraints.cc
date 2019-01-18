@@ -1991,35 +1991,9 @@ namespace DoFTools
                 if (no_entries > 1)
                   {
                     is_identity_constrained = false;
-                    target                  = numbers::invalid_unsigned_int;
                     break;
                   }
               }
-          }
-
-          // Fix up a rare corner case:
-          //
-          // Find out whether the current dof (living on face 2) also
-          // exists on face 1. If this is the case then both faces share
-          // the same dof and we are in one of two situations:
-          //  - We are about to enter an identity constraint of the dof to
-          //    itself. In this case simply do nothing.
-          //  - Otherwise, we force the dof to zero.
-          {
-            bool continue_with_next_dof = false;
-            for (unsigned int j = 0; j < dofs_per_face; ++j)
-              if (dofs_2[i] == dofs_1[j])
-                {
-                  // Force dof to 0 if we do not have an identity
-                  // constraint of the dof to itself.
-                  if (!(is_identity_constrained && target == i))
-                    affine_constraints.add_line(dofs_2[i]);
-
-                  continue_with_next_dof = true;
-                }
-
-            if (continue_with_next_dof)
-              continue;
           }
 
           // Next, we work on all constraints that are not identity
@@ -2039,8 +2013,8 @@ namespace DoFTools
 
               for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
                 {
-                  // Query the correct face_index on face_1 respecting
-                  // the given orientation:
+                  // Get the correct dof index on face_1 respecting the
+                  // given orientation:
                   const unsigned int j =
                     cell_to_rotated_face_index[fe.face_to_cell_index(
                       jj, 0, face_orientation, face_flip, face_rotation)];
@@ -2055,124 +2029,77 @@ namespace DoFTools
               continue;
             }
 
-          //
-          // We are left with an equality constraint.
-          //
+          // We are left with an "identity constraint".
 
-          // Query the correct face_index on face_1 respecting the
-          // given orientation:
+          // Get the correct dof index on face_1 respecting the given
+          // orientation:
           const unsigned int j =
             cell_to_rotated_face_index[fe.face_to_cell_index(
               target, 0, face_orientation, face_flip, face_rotation)];
 
-          if (affine_constraints.is_constrained(dofs_2[i]))
+          const bool face_2_constrained =
+            affine_constraints.is_constrained(dofs_2[i]);
+          const auto dof_left  = face_2_constrained ? dofs_1[j] : dofs_2[i];
+          const auto dof_right = face_2_constrained ? dofs_2[i] : dofs_1[j];
+          factor               = face_2_constrained ? 1. / factor : factor;
+
+          // If both degrees of freedom are constrained, there is nothing we
+          // can do. Simply continue with the next dof.
+          if (affine_constraints.is_constrained(dof_left) &&
+              affine_constraints.is_constrained(dof_right))
+            continue;
+
+          // We have to be careful that adding the current identity
+          // constraint does not create a constraint cycle. Thus, check for
+          // a dependency cycle:
+
+          bool   constraints_are_cyclic = true;
+          double cycle_factor           = factor;
+
+          for (auto test_dof = dof_right; test_dof != dof_left;)
             {
-              // If the two aren't already identity constrained (whichever
-              // way around) or already identical (in case of rotated
-              // periodicity constraints), then enter the constraint.
-              // Otherwise, there is nothing for us to do.
-              bool enter_constraint = false;
-              // see if this would add an identity constraint
-              // cycle
-              if (!affine_constraints.is_constrained(dofs_1[j]))
+              if (!affine_constraints.is_constrained(test_dof))
                 {
-                  types::global_dof_index new_dof = dofs_2[i];
-                  while (new_dof != dofs_1[j])
-                    if (affine_constraints.is_constrained(new_dof))
-                      {
-                        const std::vector<
-                          std::pair<types::global_dof_index, double>>
-                          *constraint_entries =
-                            affine_constraints.get_constraint_entries(new_dof);
-                        if (constraint_entries->size() == 1)
-                          new_dof = (*constraint_entries)[0].first;
-                        else
-                          {
-                            enter_constraint = true;
-                            break;
-                          }
-                      }
-                    else
-                      {
-                        enter_constraint = true;
-                        break;
-                      }
+                  constraints_are_cyclic = false;
+                  break;
                 }
 
-              if (enter_constraint)
+              const auto &constraint_entries =
+                *affine_constraints.get_constraint_entries(test_dof);
+              if (constraint_entries.size() == 1)
                 {
-                  affine_constraints.add_line(dofs_1[j]);
-                  affine_constraints.add_entry(dofs_1[j], dofs_2[i], factor);
+                  test_dof = constraint_entries[0].first;
+                  cycle_factor *= constraint_entries[0].second;
                 }
+              else
+                {
+                  constraints_are_cyclic = false;
+                  break;
+                }
+            }
+
+          // In case of a dependency cycle we, either
+          //  - do nothing if cycle_factor == 1. In this case all degrees
+          //    of freedom are already periodically constrained,
+          //  - otherwise, force all dofs to zero (by setting dof_left to
+          //    zero). The reasoning behind this is the fact that
+          //    cycle_factor != 1 occurs in situations such as
+          //    x1 == x2 and x2 == -1. * x1. This system is only solved by
+          //    x_1 = x_2 = 0.
+
+          if (constraints_are_cyclic)
+            {
+              if (std::abs(cycle_factor - 1.) > eps)
+                affine_constraints.add_line(dof_left);
             }
           else
             {
-              // if the two aren't already identity constrained
-              // (whichever way around) or already identical (in
-              // case of rotated periodicity constraints), then
-              // enter the constraint. Otherwise there is nothing
-              // for us to do
-              bool enter_constraint = false;
-              if (!affine_constraints.is_constrained(dofs_1[j]))
-                {
-                  if (dofs_2[i] != dofs_1[j])
-                    enter_constraint = true;
-                }
-              else // dofs_1[j] is constrained, is it identity or
-                   // inverse constrained?
-                {
-                  const std::vector<std::pair<types::global_dof_index, double>>
-                    *constraint_entries =
-                      affine_constraints.get_constraint_entries(dofs_1[j]);
-                  if (constraint_entries->size() == 1 &&
-                      (*constraint_entries)[0].first == dofs_2[i])
-                    {
-                      if (std::abs(std::abs((*constraint_entries)[0].second) -
-                                   1) > eps)
-                        {
-                          // this pair of constraints means that
-                          // both dofs have to be constrained to
-                          // 0.
-                          affine_constraints.add_line(dofs_2[i]);
-                        }
-                    }
-                  else
-                    {
-                      // see if this would add an identity
-                      // constraint cycle
-                      types::global_dof_index new_dof = dofs_1[j];
-                      while (new_dof != dofs_2[i])
-                        if (affine_constraints.is_constrained(new_dof))
-                          {
-                            const std::vector<
-                              std::pair<types::global_dof_index, double>>
-                              *constraint_entries =
-                                affine_constraints.get_constraint_entries(
-                                  new_dof);
-                            if (constraint_entries->size() == 1)
-                              new_dof = (*constraint_entries)[0].first;
-                            else
-                              {
-                                enter_constraint = true;
-                                break;
-                              }
-                          }
-                        else
-                          {
-                            enter_constraint = true;
-                            break;
-                          }
-                    }
-                }
-
-              if (enter_constraint)
-                {
-                  affine_constraints.add_line(dofs_2[i]);
-                  affine_constraints.add_entry(dofs_2[i], dofs_1[j], factor);
-                }
+              affine_constraints.add_line(dof_left);
+              affine_constraints.add_entry(dof_left, dof_right, factor);
             }
         } /* for dofs_per_face */
     }
+
 
 
     // Internally used in make_periodicity_constraints.
