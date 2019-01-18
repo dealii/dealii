@@ -135,9 +135,8 @@ namespace MatrixTools
             }
         solution.set(indices, solution_values);
 
-        // now also set appropriate values for
-        // the rhs
-        for (double &solution_value : solution_values)
+        // now also set appropriate values for the rhs
+        for (auto &solution_value : solution_values)
           solution_value *= average_nonzero_diagonal_entry;
 
         right_hand_side.set(indices, solution_values);

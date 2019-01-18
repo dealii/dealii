@@ -104,6 +104,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::declare_data_vector(
   const std::vector<std::string> &names,
   const VectorType                vector_type)
 {
+#ifdef DEBUG
   // make sure this function is
   // not called after some parameter
   // values have already been
@@ -114,7 +115,6 @@ DataOutStack<dim, spacedim, DoFHandlerType>::declare_data_vector(
   // used twice
   for (const auto &name : names)
     {
-      (void)name;
       for (const auto &data_set : dof_data)
         for (const auto &data_set_name : data_set.names)
           Assert(name != data_set_name, ExcNameAlreadyUsed(name));
@@ -123,6 +123,7 @@ DataOutStack<dim, spacedim, DoFHandlerType>::declare_data_vector(
         for (const auto &data_set_name : data_set.names)
           Assert(name != data_set_name, ExcNameAlreadyUsed(name));
     }
+#endif
 
   switch (vector_type)
     {
