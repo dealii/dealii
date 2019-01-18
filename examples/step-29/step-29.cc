@@ -100,7 +100,8 @@ namespace Step29
   {
   public:
     DirichletBoundaryValues()
-      : Function<dim>(2){};
+      : Function<dim>(2)
+    {}
 
     virtual void vector_value(const Point<dim> &p,
                               Vector<double> &  values) const override;
