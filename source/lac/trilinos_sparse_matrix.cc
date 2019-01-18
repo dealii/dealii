@@ -606,7 +606,8 @@ namespace TrilinosWrappers
     public:
       Epetra_CrsGraphMod(const Epetra_Map &row_map,
                          const int *       n_entries_per_row)
-        : Epetra_CrsGraph(Copy, row_map, n_entries_per_row, true){};
+        : Epetra_CrsGraph(Copy, row_map, n_entries_per_row, true)
+      {}
 
       void
       SetIndicesAreGlobal()
