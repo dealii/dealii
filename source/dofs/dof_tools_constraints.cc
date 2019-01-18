@@ -1799,11 +1799,13 @@ namespace DoFTools
      *
      * @precondition: face_1 is supposed to be active
      *
-     * @note As bug #82 ((http://code.google.com/p/dealii/issues/detail?id=82) and
-     * the corresponding testcase bits/periodicity_05 demonstrate, we can
-     * occasionally get into trouble if we already have the constraint x1=x2 and
-     * want to insert x2=x1. we avoid this by skipping an identity constraint if
-     * the opposite constraint already exists
+     * @note We have to be careful not to accidentally create constraint
+     * cycles when adding periodic constraints: For example, as the
+     * corresponding testcase bits/periodicity_05 demonstrates, we can
+     * occasionally get into trouble if we already have the constraint
+     * x1 == x2 and want to insert x2 == x1. We avoid this by skipping
+     * such "identity constraints" if the opposite constraint already
+     * exists.
      */
     template <typename FaceIterator>
     void
@@ -1955,86 +1957,45 @@ namespace DoFTools
               !component_mask[fe.face_system_to_component_index(i).first])
             continue;
 
-          // As mentioned in the comment above, we need to be careful about
-          // treating identity constraints differently. consequently, find
-          // out whether this dof 'i' will be identity constrained
+          // We have to be careful to treat so called "identity
+          // constraints" special. These are constraints of the form
+          // x1 == factor * x_2. In this case, if the constraint
+          // x2 == 1./factor * x1 already exists we are in trouble.
           //
-          // To check whether this is the case, first see whether there
-          // are any weights other than 0 and 1, then in a first stage
-          // make sure that if so there is only one weight equal to 1,
-          //
-          // afterwards do the same for constraints of type dof1=-dof2.
+          // Consequently, we have to check that we have indeed such an
+          // "identity constraint". We do this by looping over all entries
+          // of the row of the transformation matrix and check whether we
+          // find exactly one nonzero entry. If this is the case, set
+          // "is_identity_constrained" to true and record the corresponding
+          // index and factor.
 
-          // FIXME: Refactor into one go.
+          bool         is_identity_constrained = false;
+          unsigned int target                  = numbers::invalid_unsigned_int;
+          double       factor                  = 1.;
 
-          bool         is_identity_constrained = true;
-          const double eps                     = 1.e-13;
-          for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-            if (std::abs(transformation(i, jj)) > eps &&
-                std::abs(transformation(i, jj) - 1.) > eps)
-              {
-                is_identity_constrained = false;
-                break;
-              }
-
-          unsigned int identity_constraint_target =
-            numbers::invalid_unsigned_int;
-          if (is_identity_constrained == true)
-            {
-              bool one_identity_found = false;
-              for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-                if (std::abs(transformation(i, jj) - 1.) < eps)
-                  {
-                    if (one_identity_found == false)
-                      {
-                        one_identity_found         = true;
-                        identity_constraint_target = jj;
-                      }
-                    else
-                      {
-                        is_identity_constrained = false;
-                        identity_constraint_target =
-                          numbers::invalid_unsigned_int;
-                        break;
-                      }
-                  }
-            }
-
-          bool         is_inverse_constrained = !is_identity_constrained;
-          unsigned int inverse_constraint_target =
-            numbers::invalid_unsigned_int;
-          if (is_inverse_constrained)
+          const double eps = 1.e-13;
+          {
+            unsigned int no_entries = 0;
             for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-              if (std::abs(transformation(i, jj)) > eps &&
-                  std::abs(transformation(i, jj) + 1.) > eps)
-                {
-                  is_inverse_constrained = false;
-                  break;
-                }
-          if (is_inverse_constrained)
-            {
-              bool one_identity_found = false;
-              for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-                if (std::abs(transformation(i, jj) + 1) < eps)
-                  {
-                    if (one_identity_found == false)
-                      {
-                        one_identity_found        = true;
-                        inverse_constraint_target = jj;
-                      }
-                    else
-                      {
-                        is_inverse_constrained = false;
-                        inverse_constraint_target =
-                          numbers::invalid_unsigned_int;
-                        break;
-                      }
-                  }
-            }
+              {
+                const auto entry = transformation(i, jj);
 
-          const unsigned int target = is_identity_constrained ?
-                                        identity_constraint_target :
-                                        inverse_constraint_target;
+                if (std::abs(entry) > eps)
+                  {
+                    no_entries++;
+                    is_identity_constrained = true;
+                    target                  = jj;
+                    factor                  = entry;
+                  }
+
+                if (no_entries > 1)
+                  {
+                    is_identity_constrained = false;
+                    target                  = numbers::invalid_unsigned_int;
+                    break;
+                  }
+              }
+          }
 
           // Fix up a rare corner case:
           //
@@ -2049,8 +2010,11 @@ namespace DoFTools
             for (unsigned int j = 0; j < dofs_per_face; ++j)
               if (dofs_2[i] == dofs_1[j])
                 {
+                  // Force dof to 0 if we do not have an identity
+                  // constraint of the dof to itself.
                   if (!(is_identity_constrained && target == i))
                     affine_constraints.add_line(dofs_2[i]);
+
                   continue_with_next_dof = true;
                 }
 
@@ -2063,7 +2027,7 @@ namespace DoFTools
           // step that constrains the current dof (on face 2) to more than
           // one dof on face 1.
 
-          if (!is_identity_constrained && !is_inverse_constrained)
+          if (!is_identity_constrained)
             {
               // The current dof is already constrained. There is nothing
               // left to do.
@@ -2138,8 +2102,7 @@ namespace DoFTools
               if (enter_constraint)
                 {
                   affine_constraints.add_line(dofs_1[j]);
-                  affine_constraints.add_entry(
-                    dofs_1[j], dofs_2[i], is_identity_constrained ? 1.0 : -1.0);
+                  affine_constraints.add_entry(dofs_1[j], dofs_2[i], factor);
                 }
             }
           else
@@ -2164,11 +2127,8 @@ namespace DoFTools
                   if (constraint_entries->size() == 1 &&
                       (*constraint_entries)[0].first == dofs_2[i])
                     {
-                      if ((is_identity_constrained &&
-                           std::abs((*constraint_entries)[0].second - 1) >
-                             eps) ||
-                          (is_inverse_constrained &&
-                           std::abs((*constraint_entries)[0].second + 1) > eps))
+                      if (std::abs(std::abs((*constraint_entries)[0].second) -
+                                   1) > eps)
                         {
                           // this pair of constraints means that
                           // both dofs have to be constrained to
@@ -2208,8 +2168,7 @@ namespace DoFTools
               if (enter_constraint)
                 {
                   affine_constraints.add_line(dofs_2[i]);
-                  affine_constraints.add_entry(
-                    dofs_2[i], dofs_1[j], is_identity_constrained ? 1.0 : -1.0);
+                  affine_constraints.add_entry(dofs_2[i], dofs_1[j], factor);
                 }
             }
         } /* for dofs_per_face */
