@@ -556,6 +556,18 @@ public:
   //@{
 
   /**
+   * Return a pointer to the underlying data buffer.
+   */
+  pointer
+  data();
+
+  /**
+   * Return a const pointer to the underlying data buffer.
+   */
+  const_pointer
+  data() const;
+
+  /**
    * Make the @p Vector class a bit like the <tt>vector<></tt> class of the
    * C++ standard library by returning iterators to the start and end of the
    * elements of this vector.
@@ -1104,6 +1116,24 @@ inline bool
 Vector<Number>::in_local_range(const size_type) const
 {
   return true;
+}
+
+
+
+template <typename Number>
+inline typename Vector<Number>::pointer
+Vector<Number>::data()
+{
+  return values.get();
+}
+
+
+
+template <typename Number>
+inline typename Vector<Number>::const_pointer
+Vector<Number>::data() const
+{
+  return values.get();
 }
 
 
