@@ -572,7 +572,7 @@ namespace LinearAlgebra
           const size_type n_indices = vector->Map().NumMyElements();
 #    ifndef DEAL_II_WITH_64BIT_INDICES
           unsigned int *vector_indices =
-            (unsigned int *)vector->Map().MyGlobalElements();
+            reinterpret_cast<unsigned int *>(vector->Map().MyGlobalElements());
 #    else
           size_type *vector_indices =
             reinterpret_cast<size_type *>(vector->Map().MyGlobalElements64());

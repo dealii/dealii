@@ -174,10 +174,10 @@ namespace internal
 #  ifdef DEBUG
       // safety check
       if (use_active_cells)
-        for (unsigned int i = 0; i < cell_levels.size(); ++i)
+        for (const auto &cell_level : cell_levels)
           {
             typename dealii::Triangulation<dim>::cell_iterator dcell(
-              &triangulation, cell_levels[i].first, cell_levels[i].second);
+              &triangulation, cell_level.first, cell_level.second);
             Assert(dcell->active(), ExcInternalError());
           }
 #  endif
@@ -273,19 +273,16 @@ namespace internal
           // sort the cell ids related to each neighboring processor. This
           // algorithm is symmetric so every processor combination should
           // arrive here and no deadlock should be possible
-          for (std::map<types::subdomain_id, FaceIdentifier>::iterator it =
-                 inner_faces_at_proc_boundary.begin();
-               it != inner_faces_at_proc_boundary.end();
-               ++it)
+          for (auto &inner_face : inner_faces_at_proc_boundary)
             {
-              Assert(it->first != my_domain,
+              Assert(inner_face.first != my_domain,
                      ExcInternalError("Should not send info to myself"));
-              std::sort(it->second.shared_faces.begin(),
-                        it->second.shared_faces.end());
-              it->second.shared_faces.erase(
-                std::unique(it->second.shared_faces.begin(),
-                            it->second.shared_faces.end()),
-                it->second.shared_faces.end());
+              std::sort(inner_face.second.shared_faces.begin(),
+                        inner_face.second.shared_faces.end());
+              inner_face.second.shared_faces.erase(
+                std::unique(inner_face.second.shared_faces.begin(),
+                            inner_face.second.shared_faces.end()),
+                inner_face.second.shared_faces.end());
 
               // safety check: both involved processors should see the same list
               // because the pattern of ghosting is symmetric. We test this by
@@ -298,46 +295,46 @@ namespace internal
                 comm = ptria->get_communicator();
 
               MPI_Status   status;
-              unsigned int mysize    = it->second.shared_faces.size();
+              unsigned int mysize    = inner_face.second.shared_faces.size();
               unsigned int othersize = numbers::invalid_unsigned_int;
               MPI_Sendrecv(&mysize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
+                           inner_face.first,
                            600 + my_domain,
                            &othersize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
-                           600 + it->first,
+                           inner_face.first,
+                           600 + inner_face.first,
                            comm,
                            &status);
               AssertDimension(mysize, othersize);
-              mysize = it->second.n_hanging_faces_smaller_subdomain;
+              mysize = inner_face.second.n_hanging_faces_smaller_subdomain;
               MPI_Sendrecv(&mysize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
+                           inner_face.first,
                            700 + my_domain,
                            &othersize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
-                           700 + it->first,
+                           inner_face.first,
+                           700 + inner_face.first,
                            comm,
                            &status);
               AssertDimension(mysize, othersize);
-              mysize = it->second.n_hanging_faces_larger_subdomain;
+              mysize = inner_face.second.n_hanging_faces_larger_subdomain;
               MPI_Sendrecv(&mysize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
+                           inner_face.first,
                            800 + my_domain,
                            &othersize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
-                           800 + it->first,
+                           inner_face.first,
+                           800 + inner_face.first,
                            comm,
                            &status);
               AssertDimension(mysize, othersize);
@@ -359,11 +356,11 @@ namespace internal
               // contained in `shared_faces`, whereas we need a copy that we
               // sort differently for the other way around.
               std::vector<std::tuple<CellId, CellId, unsigned int>> other_range(
-                it->second.shared_faces.size());
+                inner_face.second.shared_faces.size());
               for (unsigned int i = 0; i < other_range.size(); ++i)
                 other_range[i] =
-                  std::make_tuple(it->second.shared_faces[i].second,
-                                  it->second.shared_faces[i].first,
+                  std::make_tuple(inner_face.second.shared_faces[i].second,
+                                  inner_face.second.shared_faces[i].first,
                                   i);
               std::sort(other_range.begin(), other_range.end());
 
@@ -375,15 +372,16 @@ namespace internal
               // be made in an arbitrary way.
               unsigned int      n_faces_lower_proc = 0, n_faces_higher_proc = 0;
               std::vector<char> assignment(other_range.size(), 0);
-              if (it->second.shared_faces.size() > 0)
+              if (inner_face.second.shared_faces.size() > 0)
                 {
                   // identify faces that go to the processor with the higher
                   // rank
                   unsigned int count = 0;
-                  for (unsigned int i = 1; i < it->second.shared_faces.size();
+                  for (unsigned int i = 1;
+                       i < inner_face.second.shared_faces.size();
                        ++i)
-                    if (it->second.shared_faces[i].first ==
-                        it->second.shared_faces[i - 1 - count].first)
+                    if (inner_face.second.shared_faces[i].first ==
+                        inner_face.second.shared_faces[i - 1 - count].first)
                       ++count;
                     else
                       {
@@ -413,11 +411,11 @@ namespace internal
                           {
                             for (unsigned int k = 0; k <= count; ++k)
                               {
-                                Assert(it->second
+                                Assert(inner_face.second
                                            .shared_faces[std::get<2>(
                                              other_range[i - 1])]
                                            .second ==
-                                         it->second
+                                         inner_face.second
                                            .shared_faces[std::get<2>(
                                              other_range[i - 1 - k])]
                                            .second,
@@ -444,13 +442,13 @@ namespace internal
               // faces that always get assigned to one side, and the faces we
               // have already assigned due to the criterion above
               n_faces_lower_proc +=
-                it->second.n_hanging_faces_smaller_subdomain;
+                inner_face.second.n_hanging_faces_smaller_subdomain;
               n_faces_higher_proc +=
-                it->second.n_hanging_faces_larger_subdomain;
+                inner_face.second.n_hanging_faces_larger_subdomain;
               const unsigned int n_total_faces_at_proc_boundary =
-                (it->second.shared_faces.size() +
-                 it->second.n_hanging_faces_smaller_subdomain +
-                 it->second.n_hanging_faces_larger_subdomain);
+                (inner_face.second.shared_faces.size() +
+                 inner_face.second.n_hanging_faces_smaller_subdomain +
+                 inner_face.second.n_hanging_faces_larger_subdomain);
               unsigned int split_index = n_total_faces_at_proc_boundary / 2;
               if (split_index < n_faces_lower_proc)
                 split_index = 0;
@@ -466,39 +464,39 @@ namespace internal
               MPI_Sendrecv(&split_index,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
+                           inner_face.first,
                            900 + my_domain,
                            &othersize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
-                           900 + it->first,
+                           inner_face.first,
+                           900 + inner_face.first,
                            comm,
                            &status);
               AssertDimension(split_index, othersize);
               MPI_Sendrecv(&n_faces_lower_proc,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
+                           inner_face.first,
                            1000 + my_domain,
                            &othersize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
-                           1000 + it->first,
+                           inner_face.first,
+                           1000 + inner_face.first,
                            comm,
                            &status);
               AssertDimension(n_faces_lower_proc, othersize);
               MPI_Sendrecv(&n_faces_higher_proc,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
+                           inner_face.first,
                            1100 + my_domain,
                            &othersize,
                            1,
                            MPI_UNSIGNED,
-                           it->first,
-                           1100 + it->first,
+                           inner_face.first,
+                           1100 + inner_face.first,
                            comm,
                            &status);
               AssertDimension(n_faces_higher_proc, othersize);
@@ -509,11 +507,13 @@ namespace internal
                 owned_faces_higher;
               for (unsigned int i = 0; i < assignment.size(); ++i)
                 if (assignment[i] < 0)
-                  owned_faces_lower.push_back(it->second.shared_faces[i]);
+                  owned_faces_lower.push_back(
+                    inner_face.second.shared_faces[i]);
                 else if (assignment[i] > 0)
-                  owned_faces_higher.push_back(it->second.shared_faces[i]);
+                  owned_faces_higher.push_back(
+                    inner_face.second.shared_faces[i]);
               AssertIndexRange(split_index,
-                               it->second.shared_faces.size() + 1 -
+                               inner_face.second.shared_faces.size() + 1 -
                                  owned_faces_lower.size() -
                                  owned_faces_higher.size());
 
@@ -521,13 +521,15 @@ namespace internal
               for (; i < assignment.size() && c < split_index; ++i)
                 if (assignment[i] == 0)
                   {
-                    owned_faces_lower.push_back(it->second.shared_faces[i]);
+                    owned_faces_lower.push_back(
+                      inner_face.second.shared_faces[i]);
                     ++c;
                   }
               for (; i < assignment.size(); ++i)
                 if (assignment[i] == 0)
                   {
-                    owned_faces_higher.push_back(it->second.shared_faces[i]);
+                    owned_faces_higher.push_back(
+                      inner_face.second.shared_faces[i]);
                   }
 
 #  ifdef DEBUG
@@ -541,20 +543,20 @@ namespace internal
                                  owned_faces_higher.end());
               std::sort(check_faces.begin(), check_faces.end());
               AssertDimension(check_faces.size(),
-                              it->second.shared_faces.size());
+                              inner_face.second.shared_faces.size());
               for (unsigned int i = 0; i < check_faces.size(); ++i)
-                Assert(check_faces[i] == it->second.shared_faces[i],
+                Assert(check_faces[i] == inner_face.second.shared_faces[i],
                        ExcInternalError());
 #  endif
 
               // now only set half of the faces as the ones to keep
-              if (my_domain < it->first)
-                it->second.shared_faces.swap(owned_faces_lower);
+              if (my_domain < inner_face.first)
+                inner_face.second.shared_faces.swap(owned_faces_lower);
               else
-                it->second.shared_faces.swap(owned_faces_higher);
+                inner_face.second.shared_faces.swap(owned_faces_higher);
 
-              std::sort(it->second.shared_faces.begin(),
-                        it->second.shared_faces.end());
+              std::sort(inner_face.second.shared_faces.begin(),
+                        inner_face.second.shared_faces.end());
             }
         }
 
@@ -717,11 +719,8 @@ namespace internal
 
       // step 2: append the ghost cells at the end of the locally owned
       // cells
-      for (std::set<std::pair<unsigned int, unsigned int>>::iterator it =
-             ghost_cells.begin();
-           it != ghost_cells.end();
-           ++it)
-        cell_levels.push_back(*it);
+      for (const auto &ghost_cell : ghost_cells)
+        cell_levels.push_back(ghost_cell);
 
       // step 3: clean up the cells close to the boundary
       std::sort(cells_close_to_boundary.begin(), cells_close_to_boundary.end());
@@ -1108,13 +1107,13 @@ namespace internal
           // to the face type
           for (unsigned int face = face_start; face < face_end; ++face)
             {
-              for (unsigned int type = 0; type < faces_type.size(); ++type)
+              for (auto &face_type : faces_type)
                 {
                   // Compare current face with first face of type type
-                  if (compare_faces_for_vectorization(
-                        faces_in[face], faces_in[faces_type[type][0]]))
+                  if (compare_faces_for_vectorization(faces_in[face],
+                                                      faces_in[face_type[0]]))
                     {
-                      faces_type[type].push_back(face);
+                      face_type.push_back(face);
                       goto face_found;
                     }
                 }
@@ -1127,17 +1126,16 @@ namespace internal
           std::set<FaceToCellTopology<vectorization_width>,
                    FaceComparator<vectorization_width>>
             new_faces;
-          for (unsigned int type = 0; type < faces_type.size(); ++type)
+          for (const auto &face_type : faces_type)
             {
               macro_face.interior_face_no =
-                faces_in[faces_type[type][0]].interior_face_no;
+                faces_in[face_type[0]].interior_face_no;
               macro_face.exterior_face_no =
-                faces_in[faces_type[type][0]].exterior_face_no;
-              macro_face.subface_index =
-                faces_in[faces_type[type][0]].subface_index;
+                faces_in[face_type[0]].exterior_face_no;
+              macro_face.subface_index = faces_in[face_type[0]].subface_index;
               macro_face.face_orientation =
-                faces_in[faces_type[type][0]].face_orientation;
-              unsigned int               no_faces = faces_type[type].size();
+                faces_in[face_type[0]].face_orientation;
+              unsigned int               no_faces = face_type.size();
               std::vector<unsigned char> touched(no_faces, 0);
 
               // do two passes through the data. The first is to identify
@@ -1146,7 +1144,7 @@ namespace internal
               // all the rest
               unsigned int n_vectorized = 0;
               for (unsigned int f = 0; f < no_faces; ++f)
-                if (faces_in[faces_type[type][f]].cells_interior[0] %
+                if (faces_in[face_type[f]].cells_interior[0] %
                       vectorization_width ==
                     0)
                   {
@@ -1155,23 +1153,20 @@ namespace internal
                       is_contiguous = false;
                     else
                       for (unsigned int v = 1; v < vectorization_width; ++v)
-                        if (faces_in[faces_type[type][f + v]]
-                              .cells_interior[0] !=
-                            faces_in[faces_type[type][f]].cells_interior[0] + v)
+                        if (faces_in[face_type[f + v]].cells_interior[0] !=
+                            faces_in[face_type[f]].cells_interior[0] + v)
                           is_contiguous = false;
                     if (is_contiguous)
                       {
                         AssertIndexRange(f,
-                                         faces_type[type].size() -
+                                         face_type.size() -
                                            vectorization_width + 1);
                         for (unsigned int v = 0; v < vectorization_width; ++v)
                           {
                             macro_face.cells_interior[v] =
-                              faces_in[faces_type[type][f + v]]
-                                .cells_interior[0];
+                              faces_in[face_type[f + v]].cells_interior[0];
                             macro_face.cells_exterior[v] =
-                              faces_in[faces_type[type][f + v]]
-                                .cells_exterior[0];
+                              faces_in[face_type[f + v]].cells_exterior[0];
                             touched[f + v] = 1;
                           }
                         new_faces.insert(macro_face);
@@ -1186,12 +1181,12 @@ namespace internal
                 if (touched[f] == 0)
                   untouched.push_back(f);
               unsigned int v = 0;
-              for (auto f : untouched)
+              for (const auto f : untouched)
                 {
                   macro_face.cells_interior[v] =
-                    faces_in[faces_type[type][f]].cells_interior[0];
+                    faces_in[face_type[f]].cells_interior[0];
                   macro_face.cells_exterior[v] =
-                    faces_in[faces_type[type][f]].cells_exterior[0];
+                    faces_in[face_type[f]].cells_exterior[0];
                   ++v;
                   if (v == vectorization_width)
                     {
@@ -1220,8 +1215,7 @@ namespace internal
                       // postpone to the next partition
                       std::vector<unsigned int> untreated(v);
                       for (unsigned int f = 0; f < v; ++f)
-                        untreated[f] =
-                          faces_type[type][*(untouched.end() - 1 - f)];
+                        untreated[f] = face_type[*(untouched.end() - 1 - f)];
                       new_faces_type.push_back(untreated);
                     }
                 }
@@ -1238,8 +1232,8 @@ namespace internal
 
 #  ifdef DEBUG
       // final safety checks
-      for (unsigned int i = 0; i < faces_type.size(); ++i)
-        AssertDimension(faces_type[i].size(), 0U);
+      for (const auto &face_type : faces_type)
+        AssertDimension(face_type.size(), 0U);
 
       AssertDimension(faces_out.size(), face_partition_data.back());
       unsigned int nfaces = 0;
@@ -1252,9 +1246,9 @@ namespace internal
       AssertDimension(nfaces, faces_in.size());
 
       std::vector<std::pair<unsigned int, unsigned int>> in_faces, out_faces;
-      for (unsigned int i = 0; i < faces_in.size(); ++i)
-        in_faces.emplace_back(faces_in[i].cells_interior[0],
-                              faces_in[i].cells_exterior[0]);
+      for (const auto &face_in : faces_in)
+        in_faces.emplace_back(face_in.cells_interior[0],
+                              face_in.cells_exterior[0]);
       for (unsigned int i = face_partition_data[0];
            i < face_partition_data.back();
            ++i)

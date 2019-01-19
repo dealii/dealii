@@ -329,9 +329,9 @@ struct FE_Q_Base<PolynomialType, xdim, xspacedim>::Implementation
         for (unsigned int child = 0;
              child < GeometryInfo<dim - 1>::max_children_per_cell;
              ++child)
-          for (unsigned int i = 0; i < inner_points.size(); ++i)
+          for (const auto &inner_point : inner_points)
             constraint_points.push_back(
-              GeometryInfo<dim - 1>::child_to_cell_coordinates(inner_points[i],
+              GeometryInfo<dim - 1>::child_to_cell_coordinates(inner_point,
                                                                child));
       }
 

@@ -350,40 +350,27 @@ MatrixOut::build_patches(const Matrix &     matrix,
   for (size_type i = 0; i < gridpoints_y; ++i)
     for (size_type j = 0; j < gridpoints_x; ++j, ++index)
       {
-        // within each patch, order
-        // the points in such a way
-        // that if some graphical
-        // output program (such as
-        // gnuplot) plots the
-        // quadrilaterals as two
-        // triangles, then the
-        // diagonal of the
-        // quadrilateral which cuts
-        // it into the two printed
-        // triangles is parallel to
-        // the diagonal of the
-        // matrix, rather than
-        // perpendicular to it. this
-        // has the advantage that,
-        // for example, the unit
-        // matrix is plotted as a
-        // straight rim, rather than
-        // as a series of bumps and
-        // valleys along the diagonal
+        // within each patch, order the points in such a way that if some
+        // graphical output program (such as gnuplot) plots the quadrilaterals
+        // as two triangles, then the diagonal of the quadrilateral which cuts
+        // it into the two printed triangles is parallel to the diagonal of the
+        // matrix, rather than perpendicular to it. this has the advantage that,
+        // for example, the unit matrix is plotted as a straight rim, rather
+        // than as a series of bumps and valleys along the diagonal
         patches[index].vertices[0](0) = j;
-        patches[index].vertices[0](1) = static_cast<signed int>(-i);
+        patches[index].vertices[0](1) = -static_cast<signed int>(i);
         patches[index].vertices[1](0) = j;
-        patches[index].vertices[1](1) = static_cast<signed int>(-i - 1);
+        patches[index].vertices[1](1) = -static_cast<signed int>(i + 1);
         patches[index].vertices[2](0) = j + 1;
-        patches[index].vertices[2](1) = static_cast<signed int>(-i);
+        patches[index].vertices[2](1) = -static_cast<signed int>(i);
         patches[index].vertices[3](0) = j + 1;
-        patches[index].vertices[3](1) = static_cast<signed int>(-i - 1);
+        patches[index].vertices[3](1) = -static_cast<signed int>(i + 1);
         // next scale all the patch
         // coordinates by the block
         // size, to get original
         // coordinates
-        for (unsigned int v = 0; v < 4; ++v)
-          patches[index].vertices[v] *= options.block_size;
+        for (auto &vertex : patches[index].vertices)
+          vertex *= options.block_size;
 
         patches[index].n_subdivisions = 1;
 

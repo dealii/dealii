@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 
+#include <algorithm>
 #include <iosfwd>
 #include <vector>
 
@@ -289,11 +290,9 @@ BlockMask::n_selected_blocks(const unsigned int n) const
   else
     {
       AssertDimension(real_n, block_mask.size());
-      unsigned int c = 0;
-      for (unsigned int i = 0; i < block_mask.size(); ++i)
-        if (block_mask[i] == true)
-          ++c;
-      return c;
+      return std::count_if(block_mask.begin(),
+                           block_mask.end(),
+                           [](const bool selected) { return selected; });
     }
 }
 

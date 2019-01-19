@@ -1038,8 +1038,8 @@ MatrixFree<dim, Number>::initialize_indices(
                             .dofs_per_cell);
                         cell->neighbor_or_periodic_neighbor(f)
                           ->get_mg_dof_indices(dof_indices);
-                        for (unsigned int i = 0; i < dof_indices.size(); ++i)
-                          dof_info[no].ghost_dofs.push_back(dof_indices[i]);
+                        for (const auto dof_index : dof_indices)
+                          dof_info[no].ghost_dofs.push_back(dof_index);
                       }
           }
         dof_info[no].assign_ghosts(cells_with_ghosts);
@@ -1138,9 +1138,8 @@ MatrixFree<dim, Number>::initialize_indices(
               counter = 0;
               for (unsigned int j = 0; j < dof_info[0].max_fe_index; j++)
                 {
-                  for (unsigned int jj = 0; jj < renumbering_fe_index[j].size();
-                       jj++)
-                    renumbering[counter++] = renumbering_fe_index[j][jj];
+                  for (const auto jj : renumbering_fe_index[j])
+                    renumbering[counter++] = jj;
                   irregular_cells[renumbering_fe_index[j].size() /
                                     vectorization_length +
                                   n_macro_cells_before] =
@@ -1164,9 +1163,8 @@ MatrixFree<dim, Number>::initialize_indices(
               counter = start_nonboundary * vectorization_length;
               for (unsigned int j = 0; j < dof_info[0].max_fe_index; j++)
                 {
-                  for (unsigned int jj = 0; jj < renumbering_fe_index[j].size();
-                       jj++)
-                    renumbering[counter++] = renumbering_fe_index[j][jj];
+                  for (const auto jj : renumbering_fe_index[j])
+                    renumbering[counter++] = jj;
                   irregular_cells[renumbering_fe_index[j].size() /
                                     vectorization_length +
                                   n_macro_cells_before] =
@@ -1302,12 +1300,12 @@ MatrixFree<dim, Number>::initialize_indices(
   constraint_pool_data.reserve(length);
   constraint_pool_row_index.reserve(constraint_values.constraints.size() + 1);
   constraint_pool_row_index.resize(1, 0);
-  for (unsigned int i = 0; i < constraints.size(); ++i)
+  for (const auto &constraint : constraints)
     {
-      Assert(constraints[i] != nullptr, ExcInternalError());
+      Assert(constraint != nullptr, ExcInternalError());
       constraint_pool_data.insert(constraint_pool_data.end(),
-                                  constraints[i]->begin(),
-                                  constraints[i]->end());
+                                  constraint->begin(),
+                                  constraint->end());
       constraint_pool_row_index.push_back(constraint_pool_data.size());
     }
 
@@ -1337,8 +1335,9 @@ MatrixFree<dim, Number>::initialize_indices(
             task_info.face_partition_data.size())
         hard_vectorization_boundary[task_info.partition_row_index[2]] = true;
       else
-        for (unsigned int i = 0; i < hard_vectorization_boundary.size(); ++i)
-          hard_vectorization_boundary[i] = true;
+        std::fill(hard_vectorization_boundary.begin(),
+                  hard_vectorization_boundary.end(),
+                  true);
 
       internal::MatrixFreeFunctions::collect_faces_vectorization(
         face_setup.inner_faces,

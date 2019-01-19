@@ -1072,14 +1072,14 @@ namespace ColorEnriched
         dof_handler.get_triangulation().n_vertices(), false);
 
       // Mark vertices that belong to cells in subdomain 1
-      for (auto cell : dof_handler.active_cell_iterators())
+      for (const auto &cell : dof_handler.active_cell_iterators())
         if (predicate_1(cell)) // True ==> part of subdomain 1
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
                ++v)
             vertices_subdomain_1[cell->vertex_index(v)] = true;
 
       // Find if cells in subdomain 2 and subdomain 1 share vertices.
-      for (auto cell : dof_handler.active_cell_iterators())
+      for (const auto &cell : dof_handler.active_cell_iterators())
         if (predicate_2(cell)) // True ==> part of subdomain 2
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
                ++v)
@@ -1173,7 +1173,7 @@ namespace ColorEnriched
        * of predicates active in the given cell.
        */
       unsigned int map_index = 0;
-      for (auto cell : dof_handler.active_cell_iterators())
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
           // set default FE index ==> no enrichment and no active predicates
           cell->set_active_fe_index(0);
@@ -1289,7 +1289,7 @@ namespace ColorEnriched
        */
 
       // loop through faces
-      for (auto cell : dof_handler.active_cell_iterators())
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
           const unsigned int           fe_index = cell->active_fe_index();
           const std::set<unsigned int> fe_set   = fe_sets.at(fe_index);
@@ -1413,8 +1413,7 @@ namespace ColorEnriched
       // loop through color sets and create FE_enriched element for each
       // of them provided before calling this function, we have color
       // enrichment function associated with each color.
-      for (unsigned int color_set_id = 0; color_set_id < fe_sets.size();
-           ++color_set_id)
+      for (const auto &fe_set : fe_sets)
         {
           std::vector<const FiniteElement<dim, spacedim> *> vec_fe_enriched(
             n_colors, &fe_nothing);
@@ -1422,12 +1421,12 @@ namespace ColorEnriched
             const typename Triangulation<dim, spacedim>::cell_iterator &)>>>
             functions(n_colors, {dummy_function});
 
-          for (const auto it : fe_sets[color_set_id])
+          for (const unsigned int color_id : fe_set)
             {
-              // Given a color id ( = it), corresponding color enrichment
+              // Given a color id, corresponding color enrichment
               // function is at index id-1 because color_enrichments are
               // indexed from zero and colors are indexed from 1.
-              const unsigned int ind = it - 1;
+              const unsigned int ind = color_id - 1;
 
               AssertIndexRange(ind, vec_fe_enriched.size());
               AssertIndexRange(ind, functions.size());

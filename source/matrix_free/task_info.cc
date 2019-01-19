@@ -811,11 +811,10 @@ namespace internal
             ((n_active_cells - n_boundary_cells) / 2 / vectorization_length) *
             vectorization_length;
           unsigned int count = 0;
-          for (unsigned int i = 0; i < cells_close_to_boundary.size(); ++i)
-            if (cell_marked[cells_close_to_boundary[i]] == 0)
+          for (const unsigned int cell : cells_close_to_boundary)
+            if (cell_marked[cell] == 0)
               {
-                cell_marked[cells_close_to_boundary[i]] =
-                  count < n_second_slot ? 1 : 3;
+                cell_marked[cell] = count < n_second_slot ? 1 : 3;
                 ++count;
               }
 
@@ -836,8 +835,11 @@ namespace internal
       else
         std::fill(cell_marked.begin(), cell_marked.end(), 1);
 
-      for (unsigned int i = 0; i < cell_marked.size(); ++i)
-        Assert(cell_marked[i] != 0, ExcInternalError());
+      for (const unsigned char marker : cell_marked)
+        {
+          (void)marker;
+          Assert(marker != 0, ExcInternalError());
+        }
 
       unsigned int              n_categories = 1;
       std::vector<unsigned int> tight_category_map;
@@ -856,7 +858,7 @@ namespace internal
           std::vector<unsigned int> used_categories_vector(
             used_categories.size());
           n_categories = 0;
-          for (auto &it : used_categories)
+          for (const auto &it : used_categories)
             used_categories_vector[n_categories++] = it;
           for (unsigned int i = 0; i < n_active_cells + n_ghost_cells; ++i)
             {
@@ -879,8 +881,8 @@ namespace internal
         {
           n_categories = 2;
           tight_category_map.resize(n_active_cells + n_ghost_cells, 1);
-          for (unsigned int i = 0; i < cells_close_to_boundary.size(); ++i)
-            tight_category_map[cells_close_to_boundary[i]] = 0;
+          for (const unsigned int cell : cells_close_to_boundary)
+            tight_category_map[cell] = 0;
         }
 
       cell_partition_data.clear();
@@ -921,9 +923,8 @@ namespace internal
           // step 3: append cells according to categories
           for (unsigned int j = 0; j < n_categories; ++j)
             {
-              for (unsigned int jj = 0; jj < renumbering_category[j].size();
-                   jj++)
-                renumbering[counter++] = renumbering_category[j][jj];
+              for (const unsigned int cell : renumbering_category[j])
+                renumbering[counter++] = cell;
               unsigned int remainder =
                 renumbering_category[j].size() % vectorization_length;
               if (remainder)
@@ -1544,8 +1545,9 @@ namespace internal
       irregular_cells.resize(n_active_cells + n_ghost_slots);
 
       unsigned int max_fe_index = 0;
-      for (unsigned int i = 0; i < cell_active_fe_index.size(); ++i)
-        max_fe_index = std::max(cell_active_fe_index[i], max_fe_index);
+      for (const unsigned int fe_index : cell_active_fe_index)
+        max_fe_index = std::max(fe_index, max_fe_index);
+
       Assert(!hp_bool || cell_active_fe_index.size() == n_active_cells,
              ExcInternalError());
 
@@ -1604,30 +1606,26 @@ namespace internal
                 else
                   {
                     partition_counter = 0;
-                    for (unsigned int j = 0; j < neighbor_list.size(); ++j)
+                    for (const unsigned int neighbor : neighbor_list)
                       {
-                        Assert(cell_partition[neighbor_list[j]] == part,
+                        Assert(cell_partition[neighbor] == part,
                                ExcInternalError());
-                        Assert(cell_partition_l2[neighbor_list[j]] ==
-                                 partition_l2 - 1,
+                        Assert(cell_partition_l2[neighbor] == partition_l2 - 1,
                                ExcInternalError());
-                        DynamicSparsityPattern::iterator neighbor =
-                                                           connectivity.begin(
-                                                             neighbor_list[j]),
-                                                         end = connectivity.end(
-                                                           neighbor_list[j]);
-                        for (; neighbor != end; ++neighbor)
+                        auto       neighbor_it = connectivity.begin(neighbor);
+                        const auto end_it      = connectivity.end(neighbor);
+                        for (; neighbor_it != end_it; ++neighbor_it)
                           {
-                            if (cell_partition[neighbor->column()] == part &&
-                                cell_partition_l2[neighbor->column()] ==
+                            if (cell_partition[neighbor_it->column()] == part &&
+                                cell_partition_l2[neighbor_it->column()] ==
                                   numbers::invalid_unsigned_int)
                               {
-                                cell_partition_l2[neighbor->column()] =
+                                cell_partition_l2[neighbor_it->column()] =
                                   partition_l2;
                                 neighbor_neighbor_list.push_back(
-                                  neighbor->column());
+                                  neighbor_it->column());
                                 partition_partition_list[counter++] =
-                                  neighbor->column();
+                                  neighbor_it->column();
                                 partition_counter++;
                               }
                           }
@@ -1789,11 +1787,9 @@ namespace internal
                           cell = counter - partition_counter;
                           for (unsigned int j = 0; j < max_fe_index + 1; j++)
                             {
-                              for (unsigned int jj = 0;
-                                   jj < renumbering_fe_index[j].size();
-                                   jj++)
-                                renumbering[cell++] =
-                                  renumbering_fe_index[j][jj];
+                              for (const unsigned int jj :
+                                   renumbering_fe_index[j])
+                                renumbering[cell++] = jj;
                               if (renumbering_fe_index[j].size() %
                                     vectorization_length !=
                                   0)
@@ -2058,15 +2054,12 @@ namespace internal
 
               // Loop through the list of cells in previous partition and put
               // all their neighbors in current partition
-              for (unsigned int j = 0; j < neighbor_list.size(); ++j)
+              for (const unsigned int cell : neighbor_list)
                 {
-                  Assert(cell_partition[neighbor_list[j]] == partition - 1,
+                  Assert(cell_partition[cell] == partition - 1,
                          ExcInternalError());
-                  DynamicSparsityPattern::iterator neighbor =
-                                                     connectivity.begin(
-                                                       neighbor_list[j]),
-                                                   end = connectivity.end(
-                                                     neighbor_list[j]);
+                  auto       neighbor = connectivity.begin(cell);
+                  const auto end      = connectivity.end(cell);
                   for (; neighbor != end; ++neighbor)
                     {
                       if (cell_partition[neighbor->column()] ==
