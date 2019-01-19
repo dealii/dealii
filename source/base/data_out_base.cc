@@ -412,7 +412,7 @@ namespace DataOutBase
       // function.
 
       // we have to take care, however, whether the points are appended to the
-      // end of the patch->data table
+      // end of the patch.data table
       const unsigned int n_data_sets = patches[0].points_are_available ?
                                          (patches[0].data.n_rows() - spacedim) :
                                          patches[0].data.n_rows();
@@ -421,31 +421,28 @@ namespace DataOutBase
 
       // loop over all patches
       unsigned int next_value = 0;
-      for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-             patches.begin();
-           patch != patches.end();
-           ++patch)
+      for (const auto &patch : patches)
         {
-          const unsigned int n_subdivisions = patch->n_subdivisions;
+          const unsigned int n_subdivisions = patch.n_subdivisions;
           (void)n_subdivisions;
 
-          Assert((patch->data.n_rows() == n_data_sets &&
-                  !patch->points_are_available) ||
-                   (patch->data.n_rows() == n_data_sets + spacedim &&
-                    patch->points_are_available),
-                 ExcDimensionMismatch(patch->points_are_available ?
+          Assert((patch.data.n_rows() == n_data_sets &&
+                  !patch.points_are_available) ||
+                   (patch.data.n_rows() == n_data_sets + spacedim &&
+                    patch.points_are_available),
+                 ExcDimensionMismatch(patch.points_are_available ?
                                         (n_data_sets + spacedim) :
                                         n_data_sets,
-                                      patch->data.n_rows()));
+                                      patch.data.n_rows()));
           Assert((n_data_sets == 0) ||
-                   (patch->data.n_cols() ==
+                   (patch.data.n_cols() ==
                     Utilities::fixed_power<dim>(n_subdivisions + 1)),
-                 ExcInvalidDatasetSize(patch->data.n_cols(),
+                 ExcInvalidDatasetSize(patch.data.n_cols(),
                                        n_subdivisions + 1));
 
-          for (unsigned int i = 0; i < patch->data.n_cols(); ++i, ++next_value)
+          for (unsigned int i = 0; i < patch.data.n_cols(); ++i, ++next_value)
             for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-              data_vectors[data_set][next_value] = patch->data(data_set, i);
+              data_vectors[data_set][next_value] = patch.data(data_set, i);
         }
 
       for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -515,12 +512,11 @@ namespace DataOutBase
   {
     node_data.resize(existing_points.size() * node_dim);
 
-    for (Map3DPoint::const_iterator it = existing_points.begin();
-         it != existing_points.end();
-         ++it)
+    for (const auto &existing_point : existing_points)
       {
         for (unsigned int d = 0; d < node_dim; ++d)
-          node_data[node_dim * it->second + d] = it->first(d);
+          node_data[node_dim * existing_point.second + d] =
+            existing_point.first(d);
       }
   }
 
@@ -532,12 +528,10 @@ namespace DataOutBase
   {
     cell_data.resize(filtered_cells.size());
 
-    for (std::map<unsigned int, unsigned int>::const_iterator it =
-           filtered_cells.begin();
-         it != filtered_cells.end();
-         ++it)
+    for (const auto &filtered_cell : filtered_cells)
       {
-        cell_data[it->first] = it->second + local_node_offset;
+        cell_data[filtered_cell.first] =
+          filtered_cell.second + local_node_offset;
       }
   }
 
@@ -713,20 +707,17 @@ namespace
   //----------------------------------------------------------------------//
   // For a given patch, compute the node interpolating the corner nodes linearly
   // at the point (xstep, ystep, zstep)*1./n_subdivisions. If the points are
-  // saved in the patch->data member, return the saved point instead
-
-  // TODO: Make this function return its value, rather than using a reference as
-  // first argument; take a reference for 'patch', not a pointer
+  // saved in the patch.data member, return the saved point instead
   template <int dim, int spacedim>
-  inline void
-  compute_node(Point<spacedim> &                        node,
-               const DataOutBase::Patch<dim, spacedim> *patch,
+  inline Point<spacedim>
+  compute_node(const DataOutBase::Patch<dim, spacedim> &patch,
                const unsigned int                       xstep,
                const unsigned int                       ystep,
                const unsigned int                       zstep,
                const unsigned int                       n_subdivisions)
   {
-    if (patch->points_are_available)
+    Point<spacedim> node;
+    if (patch.points_are_available)
       {
         unsigned int point_no = 0;
         switch (dim)
@@ -754,12 +745,12 @@ namespace
               Assert(false, ExcNotImplemented());
           }
         for (unsigned int d = 0; d < spacedim; ++d)
-          node[d] = patch->data(patch->data.size(0) - spacedim + d, point_no);
+          node[d] = patch.data(patch.data.size(0) - spacedim + d, point_no);
       }
     else
       {
         if (dim == 0)
-          node = patch->vertices[0];
+          node = patch.vertices[0];
         else
           {
             // perform a dim-linear interpolation
@@ -767,29 +758,30 @@ namespace
                          xfrac    = xstep * stepsize;
 
             node =
-              (patch->vertices[1] * xfrac) + (patch->vertices[0] * (1 - xfrac));
+              (patch.vertices[1] * xfrac) + (patch.vertices[0] * (1 - xfrac));
             if (dim > 1)
               {
                 const double yfrac = ystep * stepsize;
                 node *= 1 - yfrac;
-                node += ((patch->vertices[3] * xfrac) +
-                         (patch->vertices[2] * (1 - xfrac))) *
+                node += ((patch.vertices[3] * xfrac) +
+                         (patch.vertices[2] * (1 - xfrac))) *
                         yfrac;
                 if (dim > 2)
                   {
                     const double zfrac = zstep * stepsize;
                     node *= (1 - zfrac);
-                    node += (((patch->vertices[5] * xfrac) +
-                              (patch->vertices[4] * (1 - xfrac))) *
+                    node += (((patch.vertices[5] * xfrac) +
+                              (patch.vertices[4] * (1 - xfrac))) *
                                (1 - yfrac) +
-                             ((patch->vertices[7] * xfrac) +
-                              (patch->vertices[6] * (1 - xfrac))) *
+                             ((patch.vertices[7] * xfrac) +
+                              (patch.vertices[6] * (1 - xfrac))) *
                                yfrac) *
                             zfrac;
                   }
               }
           }
       }
+    return node;
   }
 
   /**
@@ -937,13 +929,10 @@ namespace
   {
     n_nodes = 0;
     n_cells = 0;
-    for (typename std::vector<DataOutBase::Patch<dim, spacedim>>::const_iterator
-           patch = patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        n_nodes += Utilities::fixed_power<dim>(patch->n_subdivisions + 1);
-        n_cells += Utilities::fixed_power<dim>(patch->n_subdivisions);
+        n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
+        n_cells += Utilities::fixed_power<dim>(patch.n_subdivisions);
       }
   }
 
@@ -2538,15 +2527,10 @@ namespace DataOutBase
   {
     Assert(dim <= 3, ExcNotImplemented());
     unsigned int count = 0;
-    // We only need this point below, but it does not harm to declare it here.
-    Point<spacedim> node;
 
-    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
         // Length of loops in all dimensions. If a dimension is not used, a loop
         // of length one will do the job.
@@ -2557,10 +2541,8 @@ namespace DataOutBase
         for (unsigned int i3 = 0; i3 < n3; ++i3)
           for (unsigned int i2 = 0; i2 < n2; ++i2)
             for (unsigned int i1 = 0; i1 < n1; ++i1)
-              {
-                compute_node(node, &*patch, i1, i2, i3, n_subdivisions);
-                out.write_point(count++, node);
-              }
+              out.write_point(count++,
+                              compute_node(patch, i1, i2, i3, n_subdivisions));
       }
     out.flush_points();
   }
@@ -2572,12 +2554,9 @@ namespace DataOutBase
     Assert(dim <= 3, ExcNotImplemented());
     unsigned int count                 = 0;
     unsigned int first_vertex_of_patch = 0;
-    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
         // Length of loops in all dimensons
         const unsigned int n1 = (dim > 0) ? n_subdivisions : 1;
@@ -2617,12 +2596,9 @@ namespace DataOutBase
     // Array to hold cell order in each dimension
     std::array<unsigned, dim> cell_order;
 
-    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
 
         cell_order.fill(n_subdivisions);
@@ -2668,24 +2644,21 @@ namespace DataOutBase
     Assert(dim <= 3, ExcNotImplemented());
     unsigned int count = 0;
 
-    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
         // Length of loops in all dimensions
-        Assert((patch->data.n_rows() == n_data_sets &&
-                !patch->points_are_available) ||
-                 (patch->data.n_rows() == n_data_sets + spacedim &&
-                  patch->points_are_available),
-               ExcDimensionMismatch(patch->points_are_available ?
+        Assert((patch.data.n_rows() == n_data_sets &&
+                !patch.points_are_available) ||
+                 (patch.data.n_rows() == n_data_sets + spacedim &&
+                  patch.points_are_available),
+               ExcDimensionMismatch(patch.points_are_available ?
                                       (n_data_sets + spacedim) :
                                       n_data_sets,
-                                    patch->data.n_rows()));
-        Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
-               ExcInvalidDatasetSize(patch->data.n_cols(), n));
+                                    patch.data.n_rows()));
+        Assert(patch.data.n_cols() == Utilities::fixed_power<dim>(n),
+               ExcInvalidDatasetSize(patch.data.n_cols(), n));
 
         std::vector<float>  floats(n_data_sets);
         std::vector<double> doubles(n_data_sets);
@@ -2697,14 +2670,14 @@ namespace DataOutBase
             {
               for (unsigned int data_set = 0; data_set < n_data_sets;
                    ++data_set)
-                doubles[data_set] = patch->data(data_set, i);
+                doubles[data_set] = patch.data(data_set, i);
               out.write_dataset(count, doubles);
             }
           else
             {
               for (unsigned int data_set = 0; data_set < n_data_sets;
                    ++data_set)
-                floats[data_set] = patch->data(data_set, i);
+                floats[data_set] = patch.data(data_set, i);
               out.write_dataset(count, floats);
             }
       }
@@ -3241,12 +3214,9 @@ namespace DataOutBase
             << GeometryInfo<dim>::faces_per_cell << " items " << n_cells
             << " data follows";
 
-        for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-               patches.begin();
-             patch != patches.end();
-             ++patch)
+        for (const auto &patch : patches)
           {
-            const unsigned int n               = patch->n_subdivisions;
+            const unsigned int n               = patch.n_subdivisions;
             const unsigned int n1              = (dim > 0) ? n : 1;
             const unsigned int n2              = (dim > 1) ? n : 1;
             const unsigned int n3              = (dim > 2) ? n : 1;
@@ -3256,7 +3226,7 @@ namespace DataOutBase
             unsigned int       dz              = n * n;
 
             const unsigned int patch_start =
-              patch->patch_index * cells_per_patch;
+              patch.patch_index * cells_per_patch;
 
             for (unsigned int i3 = 0; i3 < n3; ++i3)
               for (unsigned int i2 = 0; i2 < n2; ++i2)
@@ -3276,9 +3246,9 @@ namespace DataOutBase
                     // Direction -x Last cell in row of other patch
                     if (i1 == 0)
                       {
-                        const unsigned int nn = patch->neighbors[0];
+                        const unsigned int nn = patch.neighbors[0];
                         out << '\t';
-                        if (nn != patch->no_neighbor)
+                        if (nn != patch.no_neighbor)
                           out
                             << (nn * cells_per_patch + ny + nz + dx * (n - 1));
                         else
@@ -3291,9 +3261,9 @@ namespace DataOutBase
                     // Direction +x First cell in row of other patch
                     if (i1 == n - 1)
                       {
-                        const unsigned int nn = patch->neighbors[1];
+                        const unsigned int nn = patch.neighbors[1];
                         out << '\t';
-                        if (nn != patch->no_neighbor)
+                        if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + ny + nz);
                         else
                           out << "-1";
@@ -3307,9 +3277,9 @@ namespace DataOutBase
                     // Direction -y
                     if (i2 == 0)
                       {
-                        const unsigned int nn = patch->neighbors[2];
+                        const unsigned int nn = patch.neighbors[2];
                         out << '\t';
-                        if (nn != patch->no_neighbor)
+                        if (nn != patch.no_neighbor)
                           out
                             << (nn * cells_per_patch + nx + nz + dy * (n - 1));
                         else
@@ -3322,9 +3292,9 @@ namespace DataOutBase
                     // Direction +y
                     if (i2 == n - 1)
                       {
-                        const unsigned int nn = patch->neighbors[3];
+                        const unsigned int nn = patch.neighbors[3];
                         out << '\t';
-                        if (nn != patch->no_neighbor)
+                        if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + nx + nz);
                         else
                           out << "-1";
@@ -3339,9 +3309,9 @@ namespace DataOutBase
                     // Direction -z
                     if (i3 == 0)
                       {
-                        const unsigned int nn = patch->neighbors[4];
+                        const unsigned int nn = patch.neighbors[4];
                         out << '\t';
-                        if (nn != patch->no_neighbor)
+                        if (nn != patch.no_neighbor)
                           out
                             << (nn * cells_per_patch + nx + ny + dz * (n - 1));
                         else
@@ -3354,9 +3324,9 @@ namespace DataOutBase
                     // Direction +z
                     if (i3 == n - 1)
                       {
-                        const unsigned int nn = patch->neighbors[5];
+                        const unsigned int nn = patch.neighbors[5];
                         out << '\t';
-                        if (nn != patch->no_neighbor)
+                        if (nn != patch.no_neighbor)
                           out << (nn * cells_per_patch + nx + ny);
                         else
                           out << "-1";
@@ -3503,19 +3473,16 @@ namespace DataOutBase
           out << '<' << flags.space_dimension_labels.at(spacedim_n) << "> ";
         }
 
-      for (unsigned int i = 0; i < data_names.size(); ++i)
-        out << '<' << data_names[i] << "> ";
+      for (const auto &data_name : data_names)
+        out << '<' << data_name << "> ";
       out << '\n';
     }
 
 
     // loop over all patches
-    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
         // Length of loops in all dimensions
         const unsigned int n1 = (dim > 0) ? n : 1;
@@ -3525,19 +3492,18 @@ namespace DataOutBase
         unsigned int       d2 = n;
         unsigned int       d3 = n * n;
 
-        Assert((patch->data.n_rows() == n_data_sets &&
-                !patch->points_are_available) ||
-                 (patch->data.n_rows() == n_data_sets + spacedim &&
-                  patch->points_are_available),
-               ExcDimensionMismatch(patch->points_are_available ?
+        Assert((patch.data.n_rows() == n_data_sets &&
+                !patch.points_are_available) ||
+                 (patch.data.n_rows() == n_data_sets + spacedim &&
+                  patch.points_are_available),
+               ExcDimensionMismatch(patch.points_are_available ?
                                       (n_data_sets + spacedim) :
                                       n_data_sets,
-                                    patch->data.n_rows()));
-        Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
-               ExcInvalidDatasetSize(patch->data.n_cols(), n_subdivisions + 1));
+                                    patch.data.n_rows()));
+        Assert(patch.data.n_cols() == Utilities::fixed_power<dim>(n),
+               ExcInvalidDatasetSize(patch.data.n_cols(), n_subdivisions + 1));
 
         Point<spacedim> this_point;
-        Point<spacedim> node;
         if (dim < 3)
           {
             for (unsigned int i2 = 0; i2 < n2; ++i2)
@@ -3545,12 +3511,12 @@ namespace DataOutBase
                 for (unsigned int i1 = 0; i1 < n1; ++i1)
                   {
                     // compute coordinates for this patch point
-                    compute_node(node, &*patch, i1, i2, 0, n_subdivisions);
-                    out << node << ' ';
+                    out << compute_node(patch, i1, i2, 0, n_subdivisions)
+                        << ' ';
 
                     for (unsigned int data_set = 0; data_set < n_data_sets;
                          ++data_set)
-                      out << patch->data(data_set, i1 * d1 + i2 * d2) << ' ';
+                      out << patch.data(data_set, i1 * d1 + i2 * d2) << ' ';
                     out << '\n';
                   }
                 // end of row in patch
@@ -3571,8 +3537,8 @@ namespace DataOutBase
                 for (unsigned int i1 = 0; i1 < n1; ++i1)
                   {
                     // compute coordinates for this patch point
-                    compute_node(
-                      this_point, &*patch, i1, i2, i3, n_subdivisions);
+                    this_point =
+                      compute_node(patch, i1, i2, i3, n_subdivisions);
                     // line into positive x-direction if possible
                     if (i1 < n_subdivisions)
                       {
@@ -3581,20 +3547,19 @@ namespace DataOutBase
                         for (unsigned int data_set = 0; data_set < n_data_sets;
                              ++data_set)
                           out << ' '
-                              << patch->data(data_set,
-                                             i1 * d1 + i2 * d2 + i3 * d3);
+                              << patch.data(data_set,
+                                            i1 * d1 + i2 * d2 + i3 * d3);
                         out << '\n';
 
                         // write point there and its data
-                        compute_node(
-                          node, &*patch, i1 + 1, i2, i3, n_subdivisions);
-                        out << node;
+                        out << compute_node(
+                          patch, i1 + 1, i2, i3, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
                              ++data_set)
                           out << ' '
-                              << patch->data(data_set,
-                                             (i1 + 1) * d1 + i2 * d2 + i3 * d3);
+                              << patch.data(data_set,
+                                            (i1 + 1) * d1 + i2 * d2 + i3 * d3);
                         out << '\n';
 
                         // end of line
@@ -3609,20 +3574,19 @@ namespace DataOutBase
                         for (unsigned int data_set = 0; data_set < n_data_sets;
                              ++data_set)
                           out << ' '
-                              << patch->data(data_set,
-                                             i1 * d1 + i2 * d2 + i3 * d3);
+                              << patch.data(data_set,
+                                            i1 * d1 + i2 * d2 + i3 * d3);
                         out << '\n';
 
                         // write point there and its data
-                        compute_node(
-                          node, &*patch, i1, i2 + 1, i3, n_subdivisions);
-                        out << node;
+                        out << compute_node(
+                          patch, i1, i2 + 1, i3, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
                              ++data_set)
                           out << ' '
-                              << patch->data(data_set,
-                                             i1 * d1 + (i2 + 1) * d2 + i3 * d3);
+                              << patch.data(data_set,
+                                            i1 * d1 + (i2 + 1) * d2 + i3 * d3);
                         out << '\n';
 
                         // end of line
@@ -3637,20 +3601,19 @@ namespace DataOutBase
                         for (unsigned int data_set = 0; data_set < n_data_sets;
                              ++data_set)
                           out << ' '
-                              << patch->data(data_set,
-                                             i1 * d1 + i2 * d2 + i3 * d3);
+                              << patch.data(data_set,
+                                            i1 * d1 + i2 * d2 + i3 * d3);
                         out << '\n';
 
                         // write point there and its data
-                        compute_node(
-                          node, &*patch, i1, i2, i3 + 1, n_subdivisions);
-                        out << node;
+                        out << compute_node(
+                          patch, i1, i2, i3 + 1, n_subdivisions);
 
                         for (unsigned int data_set = 0; data_set < n_data_sets;
                              ++data_set)
                           out << ' '
-                              << patch->data(data_set,
-                                             i1 * d1 + i2 * d2 + (i3 + 1) * d3);
+                              << patch.data(data_set,
+                                            i1 * d1 + i2 * d2 + (i3 + 1) * d3);
                         out << '\n';
                         // end of line
                         out << '\n' << '\n';
@@ -3773,33 +3736,30 @@ namespace DataOutBase
     double hmin = patches[0].data(0, 0);
     double hmax = patches[0].data(0, 0);
 
-    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
 
-        Assert((patch->data.n_rows() == n_data_sets &&
-                !patch->points_are_available) ||
-                 (patch->data.n_rows() == n_data_sets + spacedim &&
-                  patch->points_are_available),
-               ExcDimensionMismatch(patch->points_are_available ?
+        Assert((patch.data.n_rows() == n_data_sets &&
+                !patch.points_are_available) ||
+                 (patch.data.n_rows() == n_data_sets + spacedim &&
+                  patch.points_are_available),
+               ExcDimensionMismatch(patch.points_are_available ?
                                       (n_data_sets + spacedim) :
                                       n_data_sets,
-                                    patch->data.n_rows()));
-        Assert(patch->data.n_cols() ==
+                                    patch.data.n_rows()));
+        Assert(patch.data.n_cols() ==
                  Utilities::fixed_power<dim>(n_subdivisions + 1),
-               ExcInvalidDatasetSize(patch->data.n_cols(), n_subdivisions + 1));
+               ExcInvalidDatasetSize(patch.data.n_cols(), n_subdivisions + 1));
 
         for (unsigned int i = 0; i < n_subdivisions + 1; ++i)
           for (unsigned int j = 0; j < n_subdivisions + 1; ++j)
             {
               const int dl = i * (n_subdivisions + 1) + j;
-              if (patch->data(0, dl) < hmin)
-                hmin = patch->data(0, dl);
-              if (patch->data(0, dl) > hmax)
-                hmax = patch->data(0, dl);
+              if (patch.data(0, dl) < hmin)
+                hmin = patch.data(0, dl);
+              if (patch.data(0, dl) > hmax)
+                hmax = patch.data(0, dl);
             }
       }
 
@@ -3829,26 +3789,23 @@ namespace DataOutBase
       }
 
     // loop over all patches
-    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
         const unsigned int d1             = 1;
         const unsigned int d2             = n;
 
-        Assert((patch->data.n_rows() == n_data_sets &&
-                !patch->points_are_available) ||
-                 (patch->data.n_rows() == n_data_sets + spacedim &&
-                  patch->points_are_available),
-               ExcDimensionMismatch(patch->points_are_available ?
+        Assert((patch.data.n_rows() == n_data_sets &&
+                !patch.points_are_available) ||
+                 (patch.data.n_rows() == n_data_sets + spacedim &&
+                  patch.points_are_available),
+               ExcDimensionMismatch(patch.points_are_available ?
                                       (n_data_sets + spacedim) :
                                       n_data_sets,
-                                    patch->data.n_rows()));
-        Assert(patch->data.n_cols() == Utilities::fixed_power<dim>(n),
-               ExcInvalidDatasetSize(patch->data.n_cols(), n_subdivisions + 1));
+                                    patch.data.n_rows()));
+        Assert(patch.data.n_cols() == Utilities::fixed_power<dim>(n),
+               ExcInvalidDatasetSize(patch.data.n_cols(), n_subdivisions + 1));
 
 
         std::vector<Point<spacedim>> ver(n * n);
@@ -3857,8 +3814,8 @@ namespace DataOutBase
           for (unsigned int i1 = 0; i1 < n; ++i1)
             {
               // compute coordinates for this patch point, storing in ver
-              compute_node(
-                ver[i1 * d1 + i2 * d2], &*patch, i1, i2, 0, n_subdivisions);
+              ver[i1 * d1 + i2 * d2] =
+                compute_node(patch, i1, i2, 0, n_subdivisions);
             }
 
 
@@ -3887,15 +3844,15 @@ namespace DataOutBase
 
                       h1(0) =
                         ver[ir * d1 + j * d2](0) - ver[il * d1 + j * d2](0);
-                      h1(1) = patch->data(0, ir * d1 + j * d2) -
-                              patch->data(0, il * d1 + j * d2);
+                      h1(1) = patch.data(0, ir * d1 + j * d2) -
+                              patch.data(0, il * d1 + j * d2);
                       h1(2) =
                         ver[ir * d1 + j * d2](1) - ver[il * d1 + j * d2](1);
 
                       h2(0) =
                         ver[i * d1 + jr * d2](0) - ver[i * d1 + jl * d2](0);
-                      h2(1) = patch->data(0, i * d1 + jr * d2) -
-                              patch->data(0, i * d1 + jl * d2);
+                      h2(1) = patch.data(0, i * d1 + jr * d2) -
+                              patch.data(0, i * d1 + jl * d2);
                       h2(2) =
                         ver[i * d1 + jr * d2](1) - ver[i * d1 + jl * d2](1);
 
@@ -3929,16 +3886,16 @@ namespace DataOutBase
 
                       // down/right triangle
                       out << "smooth_triangle {" << '\n'
-                          << "\t<" << ver[dl](0) << "," << patch->data(0, dl)
+                          << "\t<" << ver[dl](0) << "," << patch.data(0, dl)
                           << "," << ver[dl](1) << ">, <" << nrml[dl](0) << ", "
                           << nrml[dl](1) << ", " << nrml[dl](2) << ">," << '\n';
                       out << " \t<" << ver[dl + d1](0) << ","
-                          << patch->data(0, dl + d1) << "," << ver[dl + d1](1)
+                          << patch.data(0, dl + d1) << "," << ver[dl + d1](1)
                           << ">, <" << nrml[dl + d1](0) << ", "
                           << nrml[dl + d1](1) << ", " << nrml[dl + d1](2)
                           << ">," << '\n';
                       out << "\t<" << ver[dl + d1 + d2](0) << ","
-                          << patch->data(0, dl + d1 + d2) << ","
+                          << patch.data(0, dl + d1 + d2) << ","
                           << ver[dl + d1 + d2](1) << ">, <"
                           << nrml[dl + d1 + d2](0) << ", "
                           << nrml[dl + d1 + d2](1) << ", "
@@ -3946,17 +3903,17 @@ namespace DataOutBase
 
                       // upper/left triangle
                       out << "smooth_triangle {" << '\n'
-                          << "\t<" << ver[dl](0) << "," << patch->data(0, dl)
+                          << "\t<" << ver[dl](0) << "," << patch.data(0, dl)
                           << "," << ver[dl](1) << ">, <" << nrml[dl](0) << ", "
                           << nrml[dl](1) << ", " << nrml[dl](2) << ">," << '\n';
                       out << "\t<" << ver[dl + d1 + d2](0) << ","
-                          << patch->data(0, dl + d1 + d2) << ","
+                          << patch.data(0, dl + d1 + d2) << ","
                           << ver[dl + d1 + d2](1) << ">, <"
                           << nrml[dl + d1 + d2](0) << ", "
                           << nrml[dl + d1 + d2](1) << ", "
                           << nrml[dl + d1 + d2](2) << ">," << '\n';
                       out << "\t<" << ver[dl + d2](0) << ","
-                          << patch->data(0, dl + d2) << "," << ver[dl + d2](1)
+                          << patch.data(0, dl + d2) << "," << ver[dl + d2](1)
                           << ">, <" << nrml[dl + d2](0) << ", "
                           << nrml[dl + d2](1) << ", " << nrml[dl + d2](2)
                           << ">}" << '\n';
@@ -3965,24 +3922,24 @@ namespace DataOutBase
                     {
                       // writing standard triangles down/right triangle
                       out << "triangle {" << '\n'
-                          << "\t<" << ver[dl](0) << "," << patch->data(0, dl)
+                          << "\t<" << ver[dl](0) << "," << patch.data(0, dl)
                           << "," << ver[dl](1) << ">," << '\n';
                       out << "\t<" << ver[dl + d1](0) << ","
-                          << patch->data(0, dl + d1) << "," << ver[dl + d1](1)
+                          << patch.data(0, dl + d1) << "," << ver[dl + d1](1)
                           << ">," << '\n';
                       out << "\t<" << ver[dl + d1 + d2](0) << ","
-                          << patch->data(0, dl + d1 + d2) << ","
+                          << patch.data(0, dl + d1 + d2) << ","
                           << ver[dl + d1 + d2](1) << ">}" << '\n';
 
                       // upper/left triangle
                       out << "triangle {" << '\n'
-                          << "\t<" << ver[dl](0) << "," << patch->data(0, dl)
+                          << "\t<" << ver[dl](0) << "," << patch.data(0, dl)
                           << "," << ver[dl](1) << ">," << '\n';
                       out << "\t<" << ver[dl + d1 + d2](0) << ","
-                          << patch->data(0, dl + d1 + d2) << ","
+                          << patch.data(0, dl + d1 + d2) << ","
                           << ver[dl + d1 + d2](1) << ">," << '\n';
                       out << "\t<" << ver[dl + d2](0) << ","
-                          << patch->data(0, dl + d2) << "," << ver[dl + d2](1)
+                          << patch.data(0, dl + d2) << "," << ver[dl + d2](1)
                           << ">}" << '\n';
                     }
                 }
@@ -4000,7 +3957,7 @@ namespace DataOutBase
                 << "  v_steps 0" << '\n';
             for (int i = 0; i < 16; ++i)
               {
-                out << "\t<" << ver[i](0) << "," << patch->data(0, i) << ","
+                out << "\t<" << ver[i](0) << "," << patch.data(0, i) << ","
                     << ver[i](1) << ">";
                 if (i != 15)
                   out << ",";
@@ -4119,9 +4076,8 @@ namespace DataOutBase
 
     // two variables in which we will store the minimum and maximum values of
     // the field to be used for colorization
-    //
-    // preset them by 0 to calm down the compiler; they are initialized later
-    double min_color_value = 0, max_color_value = 0;
+    float min_color_value = std::numeric_limits<float>::max();
+    float max_color_value = std::numeric_limits<float>::min();
 
     // Array for z-coordinates of points. The elevation determined by a function
     // if spacedim=2 or the z-cooridate of the grid point if spacedim=3
@@ -4129,12 +4085,9 @@ namespace DataOutBase
 
     // compute the cells for output and enter them into the set above note that
     // since dim==2, we have exactly four vertices per patch and per cell
-    for (typename std::vector<Patch<2, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
         const unsigned int d1             = 1;
         const unsigned int d2             = n;
@@ -4143,38 +4096,38 @@ namespace DataOutBase
           for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
             {
               Point<spacedim> points[4];
-              compute_node(points[0], &*patch, i1, i2, 0, n_subdivisions);
-              compute_node(points[1], &*patch, i1 + 1, i2, 0, n_subdivisions);
-              compute_node(points[2], &*patch, i1, i2 + 1, 0, n_subdivisions);
-              compute_node(
-                points[3], &*patch, i1 + 1, i2 + 1, 0, n_subdivisions);
+              points[0] = compute_node(patch, i1, i2, 0, n_subdivisions);
+              points[1] = compute_node(patch, i1 + 1, i2, 0, n_subdivisions);
+              points[2] = compute_node(patch, i1, i2 + 1, 0, n_subdivisions);
+              points[3] =
+                compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions);
 
               switch (spacedim)
                 {
                   case 2:
-                    Assert((flags.height_vector < patch->data.n_rows()) ||
-                             patch->data.n_rows() == 0,
+                    Assert((flags.height_vector < patch.data.n_rows()) ||
+                             patch.data.n_rows() == 0,
                            ExcIndexRange(flags.height_vector,
                                          0,
-                                         patch->data.n_rows()));
+                                         patch.data.n_rows()));
                     heights[0] =
-                      patch->data.n_rows() != 0 ?
-                        patch->data(flags.height_vector, i1 * d1 + i2 * d2) *
+                      patch.data.n_rows() != 0 ?
+                        patch.data(flags.height_vector, i1 * d1 + i2 * d2) *
                           flags.z_scaling :
                         0;
-                    heights[1] = patch->data.n_rows() != 0 ?
-                                   patch->data(flags.height_vector,
-                                               (i1 + 1) * d1 + i2 * d2) *
+                    heights[1] = patch.data.n_rows() != 0 ?
+                                   patch.data(flags.height_vector,
+                                              (i1 + 1) * d1 + i2 * d2) *
                                      flags.z_scaling :
                                    0;
-                    heights[2] = patch->data.n_rows() != 0 ?
-                                   patch->data(flags.height_vector,
-                                               i1 * d1 + (i2 + 1) * d2) *
+                    heights[2] = patch.data.n_rows() != 0 ?
+                                   patch.data(flags.height_vector,
+                                              i1 * d1 + (i2 + 1) * d2) *
                                      flags.z_scaling :
                                    0;
-                    heights[3] = patch->data.n_rows() != 0 ?
-                                   patch->data(flags.height_vector,
-                                               (i1 + 1) * d1 + (i2 + 1) * d2) *
+                    heights[3] = patch.data.n_rows() != 0 ?
+                                   patch.data(flags.height_vector,
+                                              (i1 + 1) * d1 + (i2 + 1) * d2) *
                                      flags.z_scaling :
                                    0;
 
@@ -4248,27 +4201,27 @@ namespace DataOutBase
 
               if (flags.draw_cells && flags.shade_cells)
                 {
-                  Assert((flags.color_vector < patch->data.n_rows()) ||
-                           patch->data.n_rows() == 0,
+                  Assert((flags.color_vector < patch.data.n_rows()) ||
+                           patch.data.n_rows() == 0,
                          ExcIndexRange(flags.color_vector,
                                        0,
-                                       patch->data.n_rows()));
+                                       patch.data.n_rows()));
                   const double color_values[4] = {
-                    patch->data.n_rows() != 0 ?
-                      patch->data(flags.color_vector, i1 * d1 + i2 * d2) :
+                    patch.data.n_rows() != 0 ?
+                      patch.data(flags.color_vector, i1 * d1 + i2 * d2) :
                       1,
 
-                    patch->data.n_rows() != 0 ?
-                      patch->data(flags.color_vector, (i1 + 1) * d1 + i2 * d2) :
+                    patch.data.n_rows() != 0 ?
+                      patch.data(flags.color_vector, (i1 + 1) * d1 + i2 * d2) :
                       1,
 
-                    patch->data.n_rows() != 0 ?
-                      patch->data(flags.color_vector, i1 * d1 + (i2 + 1) * d2) :
+                    patch.data.n_rows() != 0 ?
+                      patch.data(flags.color_vector, i1 * d1 + (i2 + 1) * d2) :
                       1,
 
-                    patch->data.n_rows() != 0 ?
-                      patch->data(flags.color_vector,
-                                  (i1 + 1) * d1 + (i2 + 1) * d2) :
+                    patch.data.n_rows() != 0 ?
+                      patch.data(flags.color_vector,
+                                 (i1 + 1) * d1 + (i2 + 1) * d2) :
                       1};
 
                   // set color value to average of the value at the vertices
@@ -4277,19 +4230,10 @@ namespace DataOutBase
                                          4;
 
                   // update bounds of color field
-                  if (patch == patches.begin())
-                    min_color_value = max_color_value = eps_cell.color_value;
-                  else
-                    {
-                      min_color_value =
-                        (min_color_value < eps_cell.color_value ?
-                           min_color_value :
-                           eps_cell.color_value);
-                      max_color_value =
-                        (max_color_value > eps_cell.color_value ?
-                           max_color_value :
-                           eps_cell.color_value);
-                    }
+                  min_color_value =
+                    std::min(min_color_value, eps_cell.color_value);
+                  max_color_value =
+                    std::max(max_color_value, eps_cell.color_value);
                 }
 
               // finally add this cell
@@ -4304,15 +4248,13 @@ namespace DataOutBase
     double y_min = cells.begin()->vertices[0](1);
     double y_max = y_min;
 
-    for (typename std::multiset<EpsCell2d>::const_iterator cell = cells.begin();
-         cell != cells.end();
-         ++cell)
-      for (unsigned int vertex = 0; vertex < 4; ++vertex)
+    for (const auto &cell : cells)
+      for (const auto &vertex : cell.vertices)
         {
-          x_min = std::min(x_min, cell->vertices[vertex](0));
-          x_max = std::max(x_max, cell->vertices[vertex](0));
-          y_min = std::min(y_min, cell->vertices[vertex](1));
-          y_max = std::max(y_max, cell->vertices[vertex](1));
+          x_min = std::min(x_min, vertex(0));
+          x_max = std::max(x_max, vertex(0));
+          y_min = std::min(y_min, vertex(1));
+          y_max = std::max(y_max, vertex(1));
         }
 
     // scale in x-direction such that in the output 0 <= x <= 300. don't scale
@@ -4367,16 +4309,14 @@ namespace DataOutBase
 
     // now we've got all the information we need. write the cells. note: due to
     // the ordering, we traverse the list of cells back-to-front
-    for (typename std::multiset<EpsCell2d>::const_iterator cell = cells.begin();
-         cell != cells.end();
-         ++cell)
+    for (const auto &cell : cells)
       {
         if (flags.draw_cells)
           {
             if (flags.shade_cells)
               {
                 const EpsFlags::RgbValues rgb_values =
-                  (*flags.color_function)(cell->color_value,
+                  (*flags.color_function)(cell.color_value,
                                           min_color_value,
                                           max_color_value);
 
@@ -4390,18 +4330,18 @@ namespace DataOutBase
             else
               out << "1 sg ";
 
-            out << (cell->vertices[0] - offset) * scale << " m "
-                << (cell->vertices[1] - offset) * scale << " l "
-                << (cell->vertices[3] - offset) * scale << " l "
-                << (cell->vertices[2] - offset) * scale << " lf" << '\n';
+            out << (cell.vertices[0] - offset) * scale << " m "
+                << (cell.vertices[1] - offset) * scale << " l "
+                << (cell.vertices[3] - offset) * scale << " l "
+                << (cell.vertices[2] - offset) * scale << " lf" << '\n';
           }
 
         if (flags.draw_mesh)
           out << "0 sg " // draw lines in black
-              << (cell->vertices[0] - offset) * scale << " m "
-              << (cell->vertices[1] - offset) * scale << " l "
-              << (cell->vertices[3] - offset) * scale << " l "
-              << (cell->vertices[2] - offset) * scale << " lx" << '\n';
+              << (cell.vertices[0] - offset) * scale << " m "
+              << (cell.vertices[1] - offset) * scale << " l "
+              << (cell.vertices[3] - offset) * scale << " l "
+              << (cell.vertices[2] - offset) * scale << " lx" << '\n';
       }
     out << "showpage" << '\n';
 
@@ -4996,12 +4936,9 @@ namespace DataOutBase
       {
         unsigned int entry = 0;
 
-        for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-               patches.begin();
-             patch != patches.end();
-             ++patch)
+        for (const auto &patch : patches)
           {
-            const unsigned int n_subdivisions = patch->n_subdivisions;
+            const unsigned int n_subdivisions = patch.n_subdivisions;
 
             switch (dim)
               {
@@ -5014,11 +4951,11 @@ namespace DataOutBase
                                        y_frac = j * 1. / n_subdivisions;
 
                           tm.nd((d - 1), entry) = static_cast<float>(
-                            (((patch->vertices[1](d - 1) * x_frac) +
-                              (patch->vertices[0](d - 1) * (1 - x_frac))) *
+                            (((patch.vertices[1](d - 1) * x_frac) +
+                              (patch.vertices[0](d - 1) * (1 - x_frac))) *
                                (1 - y_frac) +
-                             ((patch->vertices[3](d - 1) * x_frac) +
-                              (patch->vertices[2](d - 1) * (1 - x_frac))) *
+                             ((patch.vertices[3](d - 1) * x_frac) +
+                              (patch.vertices[2](d - 1) * (1 - x_frac))) *
                                y_frac));
                           entry++;
                         }
@@ -5037,18 +4974,18 @@ namespace DataOutBase
 
                             // compute coordinates for this patch point
                             tm.nd((d - 1), entry) = static_cast<float>(
-                              ((((patch->vertices[1](d - 1) * x_frac) +
-                                 (patch->vertices[0](d - 1) * (1 - x_frac))) *
+                              ((((patch.vertices[1](d - 1) * x_frac) +
+                                 (patch.vertices[0](d - 1) * (1 - x_frac))) *
                                   (1 - y_frac) +
-                                ((patch->vertices[3](d - 1) * x_frac) +
-                                 (patch->vertices[2](d - 1) * (1 - x_frac))) *
+                                ((patch.vertices[3](d - 1) * x_frac) +
+                                 (patch.vertices[2](d - 1) * (1 - x_frac))) *
                                   y_frac) *
                                  (1 - z_frac) +
-                               (((patch->vertices[5](d - 1) * x_frac) +
-                                 (patch->vertices[4](d - 1) * (1 - x_frac))) *
+                               (((patch.vertices[5](d - 1) * x_frac) +
+                                 (patch.vertices[4](d - 1) * (1 - x_frac))) *
                                   (1 - y_frac) +
-                                ((patch->vertices[7](d - 1) * x_frac) +
-                                 (patch->vertices[6](d - 1) * (1 - x_frac))) *
+                                ((patch.vertices[7](d - 1) * x_frac) +
+                                 (patch.vertices[6](d - 1) * (1 - x_frac))) *
                                   y_frac) *
                                  z_frac));
                             entry++;
@@ -5082,12 +5019,9 @@ namespace DataOutBase
     unsigned int first_vertex_of_patch = 0;
     unsigned int elem                  = 0;
 
-    for (typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-           patches.begin();
-         patch != patches.end();
-         ++patch)
+    for (const auto &patch : patches)
       {
-        const unsigned int n_subdivisions = patch->n_subdivisions;
+        const unsigned int n_subdivisions = patch.n_subdivisions;
         const unsigned int n              = n_subdivisions + 1;
         const unsigned int d1             = 1;
         const unsigned int d2             = n;
@@ -5384,30 +5318,26 @@ namespace DataOutBase
     // when writing, first write out all vector data, then handle the scalar
     // data sets that have been left over
     std::vector<bool> data_set_written(n_data_sets, false);
-    for (unsigned int n_th_vector = 0;
-         n_th_vector < nonscalar_data_ranges.size();
-         ++n_th_vector)
+    for (const auto &nonscalar_data_range : nonscalar_data_ranges)
       {
-        AssertThrow(
-          std::get<1>(nonscalar_data_ranges[n_th_vector]) >=
-            std::get<0>(nonscalar_data_ranges[n_th_vector]),
-          ExcLowerRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
-                        std::get<0>(nonscalar_data_ranges[n_th_vector])));
-        AssertThrow(
-          std::get<1>(nonscalar_data_ranges[n_th_vector]) < n_data_sets,
-          ExcIndexRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
-                        0,
-                        n_data_sets));
-        AssertThrow(std::get<1>(nonscalar_data_ranges[n_th_vector]) + 1 -
-                        std::get<0>(nonscalar_data_ranges[n_th_vector]) <=
+        AssertThrow(std::get<1>(nonscalar_data_range) >=
+                      std::get<0>(nonscalar_data_range),
+                    ExcLowerRange(std::get<1>(nonscalar_data_range),
+                                  std::get<0>(nonscalar_data_range)));
+        AssertThrow(std::get<1>(nonscalar_data_range) < n_data_sets,
+                    ExcIndexRange(std::get<1>(nonscalar_data_range),
+                                  0,
+                                  n_data_sets));
+        AssertThrow(std::get<1>(nonscalar_data_range) + 1 -
+                        std::get<0>(nonscalar_data_range) <=
                       3,
                     ExcMessage(
                       "Can't declare a vector with more than 3 components "
                       "in VTK"));
 
         // mark these components as already written:
-        for (unsigned int i = std::get<0>(nonscalar_data_ranges[n_th_vector]);
-             i <= std::get<1>(nonscalar_data_ranges[n_th_vector]);
+        for (unsigned int i = std::get<0>(nonscalar_data_range);
+             i <= std::get<1>(nonscalar_data_range);
              ++i)
           data_set_written[i] = true;
 
@@ -5415,16 +5345,15 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "VECTORS ";
 
-        if (std::get<2>(nonscalar_data_ranges[n_th_vector]) != "")
-          out << std::get<2>(nonscalar_data_ranges[n_th_vector]);
+        if (std::get<2>(nonscalar_data_range) != "")
+          out << std::get<2>(nonscalar_data_range);
         else
           {
-            for (unsigned int i =
-                   std::get<0>(nonscalar_data_ranges[n_th_vector]);
-                 i < std::get<1>(nonscalar_data_ranges[n_th_vector]);
+            for (unsigned int i = std::get<0>(nonscalar_data_range);
+                 i < std::get<1>(nonscalar_data_range);
                  ++i)
               out << data_names[i] << "__";
-            out << data_names[std::get<1>(nonscalar_data_ranges[n_th_vector])];
+            out << data_names[std::get<1>(nonscalar_data_range)];
           }
 
         out << " double" << '\n';
@@ -5432,35 +5361,26 @@ namespace DataOutBase
         // now write data. pad all vectors to have three components
         for (unsigned int n = 0; n < n_nodes; ++n)
           {
-            switch (std::get<1>(nonscalar_data_ranges[n_th_vector]) -
-                    std::get<0>(nonscalar_data_ranges[n_th_vector]))
+            switch (std::get<1>(nonscalar_data_range) -
+                    std::get<0>(nonscalar_data_range))
               {
                 case 0:
-                  out << data_vectors(
-                           std::get<0>(nonscalar_data_ranges[n_th_vector]), n)
+                  out << data_vectors(std::get<0>(nonscalar_data_range), n)
                       << " 0 0" << '\n';
                   break;
 
                 case 1:
-                  out << data_vectors(
-                           std::get<0>(nonscalar_data_ranges[n_th_vector]), n)
+                  out << data_vectors(std::get<0>(nonscalar_data_range), n)
                       << ' '
-                      << data_vectors(
-                           std::get<0>(nonscalar_data_ranges[n_th_vector]) + 1,
-                           n)
+                      << data_vectors(std::get<0>(nonscalar_data_range) + 1, n)
                       << " 0" << '\n';
                   break;
                 case 2:
-                  out << data_vectors(
-                           std::get<0>(nonscalar_data_ranges[n_th_vector]), n)
+                  out << data_vectors(std::get<0>(nonscalar_data_range), n)
                       << ' '
-                      << data_vectors(
-                           std::get<0>(nonscalar_data_ranges[n_th_vector]) + 1,
-                           n)
+                      << data_vectors(std::get<0>(nonscalar_data_range) + 1, n)
                       << ' '
-                      << data_vectors(
-                           std::get<0>(nonscalar_data_ranges[n_th_vector]) + 2,
-                           n)
+                      << data_vectors(std::get<0>(nonscalar_data_range) + 2, n)
                       << '\n';
                   break;
 
@@ -5648,14 +5568,11 @@ namespace DataOutBase
             << "</Cells>\n"
             << "  <PointData Scalars=\"scalars\">\n";
         std::vector<bool> data_set_written(data_names.size(), false);
-        for (unsigned int n_th_vector = 0;
-             n_th_vector < nonscalar_data_ranges.size();
-             ++n_th_vector)
+        for (const auto &nonscalar_data_range : nonscalar_data_ranges)
           {
             // mark these components as already written:
-            for (unsigned int i =
-                   std::get<0>(nonscalar_data_ranges[n_th_vector]);
-                 i <= std::get<1>(nonscalar_data_ranges[n_th_vector]);
+            for (unsigned int i = std::get<0>(nonscalar_data_range);
+                 i <= std::get<1>(nonscalar_data_range);
                  ++i)
               data_set_written[i] = true;
 
@@ -5663,17 +5580,15 @@ namespace DataOutBase
             // underscores unless a vector name has been specified
             out << "    <DataArray type=\"Float32\" Name=\"";
 
-            if (std::get<2>(nonscalar_data_ranges[n_th_vector]) != "")
-              out << std::get<2>(nonscalar_data_ranges[n_th_vector]);
+            if (std::get<2>(nonscalar_data_range) != "")
+              out << std::get<2>(nonscalar_data_range);
             else
               {
-                for (unsigned int i =
-                       std::get<0>(nonscalar_data_ranges[n_th_vector]);
-                     i < std::get<1>(nonscalar_data_ranges[n_th_vector]);
+                for (unsigned int i = std::get<0>(nonscalar_data_range);
+                     i < std::get<1>(nonscalar_data_range);
                      ++i)
                   out << data_names[i] << "__";
-                out << data_names[std::get<1>(
-                  nonscalar_data_ranges[n_th_vector])];
+                out << data_names[std::get<1>(nonscalar_data_range)];
               }
 
             out << "\" NumberOfComponents=\"3\"></DataArray>\n";
@@ -5860,12 +5775,12 @@ namespace DataOutBase
     // when writing, first write out all vector data, then handle the scalar
     // data sets that have been left over
     std::vector<bool> data_set_written(n_data_sets, false);
-    for (auto range : nonscalar_data_ranges)
+    for (const auto &range : nonscalar_data_ranges)
       {
-        const auto first_component = std::get<0>(range);
-        const auto last_component  = std::get<1>(range);
-        const auto name            = std::get<2>(range);
-        const bool is_tensor =
+        const auto  first_component = std::get<0>(range);
+        const auto  last_component  = std::get<1>(range);
+        const auto &name            = std::get<2>(range);
+        const bool  is_tensor =
           (std::get<3>(range) ==
            DataComponentInterpretation::component_is_part_of_tensor);
         const unsigned int n_components = (is_tensor ? 9 : 3);
@@ -6073,30 +5988,26 @@ namespace DataOutBase
 
     // We need to output in the same order as the write_vtu function does:
     std::vector<bool> data_set_written(n_data_sets, false);
-    for (unsigned int n_th_vector = 0;
-         n_th_vector < nonscalar_data_ranges.size();
-         ++n_th_vector)
+    for (const auto &nonscalar_data_range : nonscalar_data_ranges)
       {
-        AssertThrow(
-          std::get<1>(nonscalar_data_ranges[n_th_vector]) >=
-            std::get<0>(nonscalar_data_ranges[n_th_vector]),
-          ExcLowerRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
-                        std::get<0>(nonscalar_data_ranges[n_th_vector])));
-        AssertThrow(
-          std::get<1>(nonscalar_data_ranges[n_th_vector]) < n_data_sets,
-          ExcIndexRange(std::get<1>(nonscalar_data_ranges[n_th_vector]),
-                        0,
-                        n_data_sets));
-        AssertThrow(std::get<1>(nonscalar_data_ranges[n_th_vector]) + 1 -
-                        std::get<0>(nonscalar_data_ranges[n_th_vector]) <=
+        AssertThrow(std::get<1>(nonscalar_data_range) >=
+                      std::get<0>(nonscalar_data_range),
+                    ExcLowerRange(std::get<1>(nonscalar_data_range),
+                                  std::get<0>(nonscalar_data_range)));
+        AssertThrow(std::get<1>(nonscalar_data_range) < n_data_sets,
+                    ExcIndexRange(std::get<1>(nonscalar_data_range),
+                                  0,
+                                  n_data_sets));
+        AssertThrow(std::get<1>(nonscalar_data_range) + 1 -
+                        std::get<0>(nonscalar_data_range) <=
                       3,
                     ExcMessage(
                       "Can't declare a vector with more than 3 components "
                       "in VTK"));
 
         // mark these components as already written:
-        for (unsigned int i = std::get<0>(nonscalar_data_ranges[n_th_vector]);
-             i <= std::get<1>(nonscalar_data_ranges[n_th_vector]);
+        for (unsigned int i = std::get<0>(nonscalar_data_range);
+             i <= std::get<1>(nonscalar_data_range);
              ++i)
           data_set_written[i] = true;
 
@@ -6104,16 +6015,15 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "    <PDataArray type=\"Float32\" Name=\"";
 
-        if (std::get<2>(nonscalar_data_ranges[n_th_vector]) != "")
-          out << std::get<2>(nonscalar_data_ranges[n_th_vector]);
+        if (std::get<2>(nonscalar_data_range) != "")
+          out << std::get<2>(nonscalar_data_range);
         else
           {
-            for (unsigned int i =
-                   std::get<0>(nonscalar_data_ranges[n_th_vector]);
-                 i < std::get<1>(nonscalar_data_ranges[n_th_vector]);
+            for (unsigned int i = std::get<0>(nonscalar_data_range);
+                 i < std::get<1>(nonscalar_data_range);
                  ++i)
               out << data_names[i] << "__";
-            out << data_names[std::get<1>(nonscalar_data_ranges[n_th_vector])];
+            out << data_names[std::get<1>(nonscalar_data_range)];
           }
 
         out << "\" NumberOfComponents=\"3\" format=\"ascii\"/>\n";
@@ -6132,8 +6042,8 @@ namespace DataOutBase
     out << "      <PDataArray type=\"Float32\" NumberOfComponents=\"3\"/>\n";
     out << "    </PPoints>\n";
 
-    for (unsigned int i = 0; i < piece_names.size(); ++i)
-      out << "    <Piece Source=\"" << piece_names[i] << "\"/>\n";
+    for (const auto &piece_name : piece_names)
+      out << "    <Piece Source=\"" << piece_name << "\"/>\n";
 
     out << "  </PUnstructuredGrid>\n";
     out << "</VTKFile>\n";
@@ -6167,9 +6077,9 @@ namespace DataOutBase
     std::streamsize ss = out.precision();
     out.precision(12);
 
-    for (unsigned int i = 0; i < times_and_names.size(); ++i)
-      out << "    <DataSet timestep=\"" << times_and_names[i].first
-          << "\" group=\"\" part=\"0\" file=\"" << times_and_names[i].second
+    for (const auto &time_and_name : times_and_names)
+      out << "    <DataSet timestep=\"" << time_and_name.first
+          << "\" group=\"\" part=\"0\" file=\"" << time_and_name.second
           << "\"/>\n";
 
     out << "  </Collection>\n";
@@ -6188,8 +6098,8 @@ namespace DataOutBase
                      const std::vector<std::string> &piece_names)
   {
     out << "!NBLOCKS " << piece_names.size() << '\n';
-    for (unsigned int i = 0; i < piece_names.size(); ++i)
-      out << piece_names[i] << '\n';
+    for (const auto &piece_name : piece_names)
+      out << piece_name << '\n';
 
     out << std::flush;
   }
@@ -6329,7 +6239,6 @@ namespace DataOutBase
     const SvgFlags &flags,
     std::ostream &  out)
   {
-    const int          dim    = 2;
     const unsigned int height = flags.height;
     unsigned int       width  = flags.width;
 
@@ -6342,56 +6251,52 @@ namespace DataOutBase
     // determine the bounding box in the model space
     double x_dimension, y_dimension, z_dimension;
 
-    typename std::vector<Patch<dim, spacedim>>::const_iterator patch =
-      patches.begin();
+    const auto &first_patch = patches[0];
 
-    unsigned int       n_subdivisions = patch->n_subdivisions;
+    unsigned int       n_subdivisions = first_patch.n_subdivisions;
     unsigned int       n              = n_subdivisions + 1;
     const unsigned int d1             = 1;
     const unsigned int d2             = n;
 
-    Point<spacedim> projected_point;
-    Point<spacedim> projected_points[4];
+    Point<spacedim>                projected_point;
+    std::array<Point<spacedim>, 4> projected_points;
 
-    Point<2> projection_decomposition;
-    Point<2> projection_decompositions[4];
+    Point<2>                projection_decomposition;
+    std::array<Point<2>, 4> projection_decompositions;
 
-    compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);
+    projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
 
-    Assert((flags.height_vector < patch->data.n_rows()) ||
-             patch->data.n_rows() == 0,
-           ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
+    Assert((flags.height_vector < first_patch.data.n_rows()) ||
+             first_patch.data.n_rows() == 0,
+           ExcIndexRange(flags.height_vector, 0, first_patch.data.n_rows()));
 
     double x_min = projected_point[0];
     double x_max = x_min;
     double y_min = projected_point[1];
     double y_max = y_min;
-    double z_min =
-      patch->data.n_rows() != 0 ? patch->data(flags.height_vector, 0) : 0;
+    double z_min = first_patch.data.n_rows() != 0 ?
+                     first_patch.data(flags.height_vector, 0) :
+                     0;
     double z_max = z_min;
 
     // iterate over the patches
-    for (; patch != patches.end(); ++patch)
+    for (const auto &patch : patches)
       {
-        n_subdivisions = patch->n_subdivisions;
+        n_subdivisions = patch.n_subdivisions;
         n              = n_subdivisions + 1;
 
         for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
           {
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
-                compute_node(
-                  projected_points[0], &*patch, i1, i2, 0, n_subdivisions);
-                compute_node(
-                  projected_points[1], &*patch, i1 + 1, i2, 0, n_subdivisions);
-                compute_node(
-                  projected_points[2], &*patch, i1, i2 + 1, 0, n_subdivisions);
-                compute_node(projected_points[3],
-                             &*patch,
-                             i1 + 1,
-                             i2 + 1,
-                             0,
-                             n_subdivisions);
+                projected_points[0] =
+                  compute_node(patch, i1, i2, 0, n_subdivisions);
+                projected_points[1] =
+                  compute_node(patch, i1 + 1, i2, 0, n_subdivisions);
+                projected_points[2] =
+                  compute_node(patch, i1, i2 + 1, 0, n_subdivisions);
+                projected_points[3] =
+                  compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions);
 
                 x_min = std::min(x_min, projected_points[0][0]);
                 x_min = std::min(x_min, projected_points[1][0]);
@@ -6413,39 +6318,39 @@ namespace DataOutBase
                 y_max = std::max(y_max, projected_points[2][1]);
                 y_max = std::max(y_max, projected_points[3][1]);
 
-                Assert((flags.height_vector < patch->data.n_rows()) ||
-                         patch->data.n_rows() == 0,
+                Assert((flags.height_vector < patch.data.n_rows()) ||
+                         patch.data.n_rows() == 0,
                        ExcIndexRange(flags.height_vector,
                                      0,
-                                     patch->data.n_rows()));
+                                     patch.data.n_rows()));
 
                 z_min = std::min<double>(z_min,
-                                         patch->data(flags.height_vector,
-                                                     i1 * d1 + i2 * d2));
+                                         patch.data(flags.height_vector,
+                                                    i1 * d1 + i2 * d2));
                 z_min = std::min<double>(z_min,
-                                         patch->data(flags.height_vector,
-                                                     (i1 + 1) * d1 + i2 * d2));
+                                         patch.data(flags.height_vector,
+                                                    (i1 + 1) * d1 + i2 * d2));
                 z_min = std::min<double>(z_min,
-                                         patch->data(flags.height_vector,
-                                                     i1 * d1 + (i2 + 1) * d2));
+                                         patch.data(flags.height_vector,
+                                                    i1 * d1 + (i2 + 1) * d2));
                 z_min =
                   std::min<double>(z_min,
-                                   patch->data(flags.height_vector,
-                                               (i1 + 1) * d1 + (i2 + 1) * d2));
+                                   patch.data(flags.height_vector,
+                                              (i1 + 1) * d1 + (i2 + 1) * d2));
 
                 z_max = std::max<double>(z_max,
-                                         patch->data(flags.height_vector,
-                                                     i1 * d1 + i2 * d2));
+                                         patch.data(flags.height_vector,
+                                                    i1 * d1 + i2 * d2));
                 z_max = std::max<double>(z_max,
-                                         patch->data(flags.height_vector,
-                                                     (i1 + 1) * d1 + i2 * d2));
+                                         patch.data(flags.height_vector,
+                                                    (i1 + 1) * d1 + i2 * d2));
                 z_max = std::max<double>(z_max,
-                                         patch->data(flags.height_vector,
-                                                     i1 * d1 + (i2 + 1) * d2));
+                                         patch.data(flags.height_vector,
+                                                    i1 * d1 + (i2 + 1) * d2));
                 z_max =
                   std::max<double>(z_max,
-                                   patch->data(flags.height_vector,
-                                               (i1 + 1) * d1 + (i2 + 1) * d2));
+                                   patch.data(flags.height_vector,
+                                              (i1 + 1) * d1 + (i2 + 1) * d2));
               }
           }
       }
@@ -6561,23 +6466,22 @@ namespace DataOutBase
     double x_max_perspective, y_max_perspective;
     double x_dimension_perspective, y_dimension_perspective;
 
-    patch = patches.begin();
-
-    n_subdivisions = patch->n_subdivisions;
+    n_subdivisions = first_patch.n_subdivisions;
     n              = n_subdivisions + 1;
 
     Point<3> point;
 
-    compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);
+    projected_point = compute_node(first_patch, 0, 0, 0, n_subdivisions);
 
-    Assert((flags.height_vector < patch->data.n_rows()) ||
-             patch->data.n_rows() == 0,
-           ExcIndexRange(flags.height_vector, 0, patch->data.n_rows()));
+    Assert((flags.height_vector < first_patch.data.n_rows()) ||
+             first_patch.data.n_rows() == 0,
+           ExcIndexRange(flags.height_vector, 0, first_patch.data.n_rows()));
 
     point[0] = projected_point[0];
     point[1] = projected_point[1];
-    point[2] =
-      patch->data.n_rows() != 0 ? patch->data(flags.height_vector, 0) : 0;
+    point[2] = first_patch.data.n_rows() != 0 ?
+                 first_patch.data(flags.height_vector, 0) :
+                 0;
 
     projection_decomposition = svg_project_point(point,
                                                  camera_position,
@@ -6591,92 +6495,68 @@ namespace DataOutBase
     y_max_perspective = projection_decomposition[1];
 
     // iterate over the patches
-    for (; patch != patches.end(); ++patch)
+    for (const auto &patch : patches)
       {
-        n_subdivisions = patch->n_subdivisions;
+        n_subdivisions = patch.n_subdivisions;
         for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
           {
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
-                Point<spacedim> projected_vertices[4];
-                Point<3>        vertices[4];
+                const std::array<Point<spacedim>, 4> projected_vertices{
+                  compute_node(patch, i1, i2, 0, n_subdivisions),
+                  compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
+                  compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
+                  compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)};
 
-                compute_node(
-                  projected_vertices[0], &*patch, i1, i2, 0, n_subdivisions);
-                compute_node(projected_vertices[1],
-                             &*patch,
-                             i1 + 1,
-                             i2,
-                             0,
-                             n_subdivisions);
-                compute_node(projected_vertices[2],
-                             &*patch,
-                             i1,
-                             i2 + 1,
-                             0,
-                             n_subdivisions);
-                compute_node(projected_vertices[3],
-                             &*patch,
-                             i1 + 1,
-                             i2 + 1,
-                             0,
-                             n_subdivisions);
-
-                Assert((flags.height_vector < patch->data.n_rows()) ||
-                         patch->data.n_rows() == 0,
+                Assert((flags.height_vector < patch.data.n_rows()) ||
+                         patch.data.n_rows() == 0,
                        ExcIndexRange(flags.height_vector,
                                      0,
-                                     patch->data.n_rows()));
+                                     patch.data.n_rows()));
 
-                vertices[0][0] = projected_vertices[0][0];
-                vertices[0][1] = projected_vertices[0][1];
-                vertices[0][2] = patch->data.n_rows() != 0 ?
-                                   patch->data(0, i1 * d1 + i2 * d2) :
-                                   0;
+                const std::array<Point<3>, 4> vertices = {
+                  Point<3>{projected_vertices[0][0],
+                           projected_vertices[0][1],
+                           patch.data.n_rows() != 0 ?
+                             patch.data(0, i1 * d1 + i2 * d2) :
+                             0},
+                  Point<3>{projected_vertices[1][0],
+                           projected_vertices[1][1],
+                           patch.data.n_rows() != 0 ?
+                             patch.data(0, (i1 + 1) * d1 + i2 * d2) :
+                             0},
+                  Point<3>{projected_vertices[2][0],
+                           projected_vertices[2][1],
+                           patch.data.n_rows() != 0 ?
+                             patch.data(0, i1 * d1 + (i2 + 1) * d2) :
+                             0},
+                  Point<3>{projected_vertices[3][0],
+                           projected_vertices[3][1],
+                           patch.data.n_rows() != 0 ?
+                             patch.data(0, (i1 + 1) * d1 + (i2 + 1) * d2) :
+                             0}};
 
-                vertices[1][0] = projected_vertices[1][0];
-                vertices[1][1] = projected_vertices[1][1];
-                vertices[1][2] = patch->data.n_rows() != 0 ?
-                                   patch->data(0, (i1 + 1) * d1 + i2 * d2) :
-                                   0;
-
-                vertices[2][0] = projected_vertices[2][0];
-                vertices[2][1] = projected_vertices[2][1];
-                vertices[2][2] = patch->data.n_rows() != 0 ?
-                                   patch->data(0, i1 * d1 + (i2 + 1) * d2) :
-                                   0;
-
-                vertices[3][0] = projected_vertices[3][0];
-                vertices[3][1] = projected_vertices[3][1];
-                vertices[3][2] =
-                  patch->data.n_rows() != 0 ?
-                    patch->data(0, (i1 + 1) * d1 + (i2 + 1) * d2) :
-                    0;
-
-                projection_decompositions[0] =
+                projection_decompositions = {
                   svg_project_point(vertices[0],
                                     camera_position,
                                     camera_direction,
                                     camera_horizontal,
-                                    camera_focus);
-                projection_decompositions[1] =
+                                    camera_focus),
                   svg_project_point(vertices[1],
                                     camera_position,
                                     camera_direction,
                                     camera_horizontal,
-                                    camera_focus);
-                projection_decompositions[2] =
+                                    camera_focus),
                   svg_project_point(vertices[2],
                                     camera_position,
                                     camera_direction,
                                     camera_horizontal,
-                                    camera_focus);
-                projection_decompositions[3] =
+                                    camera_focus),
                   svg_project_point(vertices[3],
                                     camera_position,
                                     camera_direction,
                                     camera_horizontal,
-                                    camera_focus);
+                                    camera_focus)};
 
                 x_min_perspective =
                   std::min(x_min_perspective,
@@ -6755,69 +6635,51 @@ namespace DataOutBase
     std::multiset<SvgCell> cells;
 
     // iterate over the patches
-    for (patch = patches.begin(); patch != patches.end(); ++patch)
+    for (const auto &patch : patches)
       {
-        n_subdivisions = patch->n_subdivisions;
+        n_subdivisions = patch.n_subdivisions;
 
         for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
           {
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
-                Point<spacedim> projected_vertices[4];
-                SvgCell         cell;
+                const std::array<Point<spacedim>, 4> projected_vertices = {
+                  compute_node(patch, i1, i2, 0, n_subdivisions),
+                  compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
+                  compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
+                  compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)};
 
-                compute_node(
-                  projected_vertices[0], &*patch, i1, i2, 0, n_subdivisions);
-                compute_node(projected_vertices[1],
-                             &*patch,
-                             i1 + 1,
-                             i2,
-                             0,
-                             n_subdivisions);
-                compute_node(projected_vertices[2],
-                             &*patch,
-                             i1,
-                             i2 + 1,
-                             0,
-                             n_subdivisions);
-                compute_node(projected_vertices[3],
-                             &*patch,
-                             i1 + 1,
-                             i2 + 1,
-                             0,
-                             n_subdivisions);
-
-                Assert((flags.height_vector < patch->data.n_rows()) ||
-                         patch->data.n_rows() == 0,
+                Assert((flags.height_vector < patch.data.n_rows()) ||
+                         patch.data.n_rows() == 0,
                        ExcIndexRange(flags.height_vector,
                                      0,
-                                     patch->data.n_rows()));
+                                     patch.data.n_rows()));
+
+                SvgCell cell;
 
                 cell.vertices[0][0] = projected_vertices[0][0];
                 cell.vertices[0][1] = projected_vertices[0][1];
-                cell.vertices[0][2] = patch->data.n_rows() != 0 ?
-                                        patch->data(0, i1 * d1 + i2 * d2) :
+                cell.vertices[0][2] = patch.data.n_rows() != 0 ?
+                                        patch.data(0, i1 * d1 + i2 * d2) :
                                         0;
 
                 cell.vertices[1][0] = projected_vertices[1][0];
                 cell.vertices[1][1] = projected_vertices[1][1];
-                cell.vertices[1][2] =
-                  patch->data.n_rows() != 0 ?
-                    patch->data(0, (i1 + 1) * d1 + i2 * d2) :
-                    0;
+                cell.vertices[1][2] = patch.data.n_rows() != 0 ?
+                                        patch.data(0, (i1 + 1) * d1 + i2 * d2) :
+                                        0;
 
                 cell.vertices[2][0] = projected_vertices[2][0];
                 cell.vertices[2][1] = projected_vertices[2][1];
-                cell.vertices[2][2] =
-                  patch->data.n_rows() != 0 ?
-                    patch->data(0, i1 * d1 + (i2 + 1) * d2) :
-                    0;
+                cell.vertices[2][2] = patch.data.n_rows() != 0 ?
+                                        patch.data(0, i1 * d1 + (i2 + 1) * d2) :
+                                        0;
 
                 cell.vertices[3][0] = projected_vertices[3][0];
                 cell.vertices[3][1] = projected_vertices[3][1];
                 cell.vertices[3][2] =
-                  patch->data.n_rows() != 0 ?
-                    patch->data(0, (i1 + 1) * d1 + (i2 + 1) * d2) :
+                  patch.data.n_rows() != 0 ?
+                    patch.data(0, (i1 + 1) * d1 + (i2 + 1) * d2) :
                     0;
 
                 cell.projected_vertices[0] =
@@ -6882,9 +6744,7 @@ namespace DataOutBase
     unsigned int triangle_counter = 0;
 
     // write the cells in the correct order
-    for (typename std::multiset<SvgCell>::const_iterator cell = cells.begin();
-         cell != cells.end();
-         ++cell)
+    for (const auto &cell : cells)
       {
         Point<3> points3d_triangle[3];
 
@@ -6894,24 +6754,24 @@ namespace DataOutBase
             switch (triangle_index)
               {
                 case 0:
-                  points3d_triangle[0] = cell->vertices[0],
-                  points3d_triangle[1] = cell->vertices[1],
-                  points3d_triangle[2] = cell->center;
+                  points3d_triangle[0] = cell.vertices[0],
+                  points3d_triangle[1] = cell.vertices[1],
+                  points3d_triangle[2] = cell.center;
                   break;
                 case 1:
-                  points3d_triangle[0] = cell->vertices[1],
-                  points3d_triangle[1] = cell->vertices[3],
-                  points3d_triangle[2] = cell->center;
+                  points3d_triangle[0] = cell.vertices[1],
+                  points3d_triangle[1] = cell.vertices[3],
+                  points3d_triangle[2] = cell.center;
                   break;
                 case 2:
-                  points3d_triangle[0] = cell->vertices[3],
-                  points3d_triangle[1] = cell->vertices[2],
-                  points3d_triangle[2] = cell->center;
+                  points3d_triangle[0] = cell.vertices[3],
+                  points3d_triangle[1] = cell.vertices[2],
+                  points3d_triangle[2] = cell.center;
                   break;
                 case 3:
-                  points3d_triangle[0] = cell->vertices[2],
-                  points3d_triangle[1] = cell->vertices[0],
-                  points3d_triangle[2] = cell->center;
+                  points3d_triangle[0] = cell.vertices[2],
+                  points3d_triangle[1] = cell.vertices[0],
+                  points3d_triangle[2] = cell.center;
                   break;
                 default:
                   break;
@@ -7067,34 +6927,34 @@ namespace DataOutBase
 
             // draw current triangle
             double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-            double x3 = cell->projected_center[0];
-            double y3 = cell->projected_center[1];
+            double x3 = cell.projected_center[0];
+            double y3 = cell.projected_center[1];
 
             switch (triangle_index)
               {
                 case 0:
-                  x1 = cell->projected_vertices[0][0],
-                  y1 = cell->projected_vertices[0][1],
-                  x2 = cell->projected_vertices[1][0],
-                  y2 = cell->projected_vertices[1][1];
+                  x1 = cell.projected_vertices[0][0],
+                  y1 = cell.projected_vertices[0][1],
+                  x2 = cell.projected_vertices[1][0],
+                  y2 = cell.projected_vertices[1][1];
                   break;
                 case 1:
-                  x1 = cell->projected_vertices[1][0],
-                  y1 = cell->projected_vertices[1][1],
-                  x2 = cell->projected_vertices[3][0],
-                  y2 = cell->projected_vertices[3][1];
+                  x1 = cell.projected_vertices[1][0],
+                  y1 = cell.projected_vertices[1][1],
+                  x2 = cell.projected_vertices[3][0],
+                  y2 = cell.projected_vertices[3][1];
                   break;
                 case 2:
-                  x1 = cell->projected_vertices[3][0],
-                  y1 = cell->projected_vertices[3][1],
-                  x2 = cell->projected_vertices[2][0],
-                  y2 = cell->projected_vertices[2][1];
+                  x1 = cell.projected_vertices[3][0],
+                  y1 = cell.projected_vertices[3][1],
+                  x2 = cell.projected_vertices[2][0],
+                  y2 = cell.projected_vertices[2][1];
                   break;
                 case 3:
-                  x1 = cell->projected_vertices[2][0],
-                  y1 = cell->projected_vertices[2][1],
-                  x2 = cell->projected_vertices[0][0],
-                  y2 = cell->projected_vertices[0][1];
+                  x1 = cell.projected_vertices[2][0],
+                  y1 = cell.projected_vertices[2][1],
+                  x2 = cell.projected_vertices[0][0],
+                  y2 = cell.projected_vertices[0][1];
                   break;
                 default:
                   break;
@@ -7387,18 +7247,18 @@ namespace DataOutBase
         << '\n';
 
     out << data_names.size() << '\n';
-    for (unsigned int i = 0; i < data_names.size(); ++i)
-      out << data_names[i] << '\n';
+    for (const auto &data_name : data_names)
+      out << data_name << '\n';
 
     out << patches.size() << '\n';
     for (unsigned int i = 0; i < patches.size(); ++i)
       out << patches[i] << '\n';
 
     out << nonscalar_data_ranges.size() << '\n';
-    for (unsigned int i = 0; i < nonscalar_data_ranges.size(); ++i)
-      out << std::get<0>(nonscalar_data_ranges[i]) << ' '
-          << std::get<1>(nonscalar_data_ranges[i]) << '\n'
-          << std::get<2>(nonscalar_data_ranges[i]) << '\n';
+    for (const auto &nonscalar_data_range : nonscalar_data_ranges)
+      out << std::get<0>(nonscalar_data_range) << ' '
+          << std::get<1>(nonscalar_data_range) << '\n'
+          << std::get<2>(nonscalar_data_range) << '\n';
 
     out << '\n';
     // make sure everything now gets to disk
@@ -8691,10 +8551,9 @@ DataOutInterface<dim, spacedim>::validate_dataset_names() const
     const unsigned int             n_data_sets = data_names.size();
     std::vector<bool>              data_set_written(n_data_sets, false);
 
-    for (unsigned int n_th_vector = 0; n_th_vector < ranges.size();
-         ++n_th_vector)
+    for (const auto &range : ranges)
       {
-        const std::string &name = std::get<2>(ranges[n_th_vector]);
+        const std::string &name = std::get<2>(range);
         if (name != "")
           {
             Assert(all_names.find(name) == all_names.end(),
@@ -8703,8 +8562,7 @@ DataOutInterface<dim, spacedim>::validate_dataset_names() const
                      "but '" +
                      name + "' is used more than once."));
             all_names.insert(name);
-            for (unsigned int i = std::get<0>(ranges[n_th_vector]);
-                 i <= std::get<1>(ranges[n_th_vector]);
+            for (unsigned int i = std::get<0>(range); i <= std::get<1>(range);
                  ++i)
               data_set_written[i] = true;
           }
@@ -9071,20 +8929,18 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
       ss << indent(indent_level + 1) << "</Topology>\n";
     }
 
-  for (std::map<std::string, unsigned int>::const_iterator it =
-         attribute_dims.begin();
-       it != attribute_dims.end();
-       ++it)
+  for (const auto &attribute_dim : attribute_dims)
     {
-      ss << indent(indent_level + 1) << "<Attribute Name=\"" << it->first
-         << "\" AttributeType=\"" << (it->second > 1 ? "Vector" : "Scalar")
+      ss << indent(indent_level + 1) << "<Attribute Name=\""
+         << attribute_dim.first << "\" AttributeType=\""
+         << (attribute_dim.second > 1 ? "Vector" : "Scalar")
          << "\" Center=\"Node\">\n";
       // Vectors must have 3 elements even for 2D models
       ss << indent(indent_level + 2) << "<DataItem Dimensions=\"" << num_nodes
-         << " " << (it->second > 1 ? 3 : 1)
+         << " " << (attribute_dim.second > 1 ? 3 : 1)
          << "\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">\n";
-      ss << indent(indent_level + 3) << h5_sol_filename << ":/" << it->first
-         << "\n";
+      ss << indent(indent_level + 3) << h5_sol_filename << ":/"
+         << attribute_dim.first << "\n";
       ss << indent(indent_level + 2) << "</DataItem>\n";
       ss << indent(indent_level + 1) << "</Attribute>\n";
     }

@@ -1754,10 +1754,8 @@ IndexSet::n_elements() const
 
 #ifdef DEBUG
   size_type s = 0;
-  for (std::vector<Range>::iterator range = ranges.begin();
-       range != ranges.end();
-       ++range)
-    s += (range->end - range->begin);
+  for (const auto &range : ranges)
+    s += (range.end - range.begin);
   Assert(s == v, ExcInternalError());
 #endif
 
@@ -1916,9 +1914,8 @@ IndexSet::fill_binary_vector(Vector &vector) const
 
   // then write ones into the elements whose indices are contained in the
   // index set
-  for (std::vector<Range>::iterator it = ranges.begin(); it != ranges.end();
-       ++it)
-    for (size_type i = it->begin; i < it->end; ++i)
+  for (const auto &range : ranges)
+    for (size_type i = range.begin; i < range.end; ++i)
       vector[i] = 1;
 }
 

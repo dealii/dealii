@@ -173,26 +173,26 @@ ParameterAcceptor::parse_parameters(ParameterHandler &)
 void
 ParameterAcceptor::parse_all_parameters(ParameterHandler &prm)
 {
-  for (unsigned int i = 0; i < class_list.size(); ++i)
-    if (class_list[i] != nullptr)
+  for (const auto &instance : class_list)
+    if (instance != nullptr)
       {
-        class_list[i]->enter_my_subsection(prm);
-        class_list[i]->parse_parameters(prm);
-        class_list[i]->parse_parameters_call_back();
-        class_list[i]->leave_my_subsection(prm);
+        instance->enter_my_subsection(prm);
+        instance->parse_parameters(prm);
+        instance->parse_parameters_call_back();
+        instance->leave_my_subsection(prm);
       }
 }
 
 void
 ParameterAcceptor::declare_all_parameters(ParameterHandler &prm)
 {
-  for (unsigned int i = 0; i < class_list.size(); ++i)
-    if (class_list[i] != nullptr)
+  for (const auto &instance : class_list)
+    if (instance != nullptr)
       {
-        class_list[i]->enter_my_subsection(prm);
-        class_list[i]->declare_parameters(prm);
-        class_list[i]->declare_parameters_call_back();
-        class_list[i]->leave_my_subsection(prm);
+        instance->enter_my_subsection(prm);
+        instance->declare_parameters(prm);
+        instance->declare_parameters_call_back();
+        instance->leave_my_subsection(prm);
       }
 }
 

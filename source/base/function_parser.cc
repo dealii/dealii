@@ -367,11 +367,9 @@ FunctionParser<dim>::init_muparser() const
                                           "erfc",
                                           "rand",
                                           "rand_seed"};
-          for (unsigned int f = 0;
-               f < sizeof(function_names) / sizeof(function_names[0]);
-               ++f)
+          for (const auto &function_name_c_string : function_names)
             {
-              const std::string  function_name        = function_names[f];
+              const std::string  function_name        = function_name_c_string;
               const unsigned int function_name_length = function_name.size();
 
               std::string::size_type pos = 0;

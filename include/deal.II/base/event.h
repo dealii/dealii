@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -177,11 +178,7 @@ namespace Algorithms
   {
     if (all_true)
       return true;
-    for (std::vector<bool>::const_iterator i = flags.begin(); i != flags.end();
-         ++i)
-      if (*i)
-        return true;
-    return false;
+    return std::find(flags.begin(), flags.end(), true) != flags.end();
   }
 
 
@@ -209,13 +206,7 @@ namespace Algorithms
         // Test all flags separately
         // and return false if one is
         // not set
-        for (std::vector<bool>::const_iterator i = flags.begin();
-             i != flags.end();
-             ++i)
-          if (!*i)
-            return false;
-        // All flags are set
-        return true;
+        return std::find(flags.begin(), flags.end(), false) == flags.end();
       }
 
     // Finally, compare each flag
@@ -256,9 +247,7 @@ namespace Algorithms
     all_true = false;
     if (event.all_true)
       {
-        for (std::vector<bool>::iterator i = flags.begin(); i != flags.end();
-             ++i)
-          *i = false;
+        std::fill(flags.begin(), flags.end(), false);
         return *this;
       }
 

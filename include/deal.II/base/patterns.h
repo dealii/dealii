@@ -1436,7 +1436,7 @@ namespace Patterns
     static_assert(sizeof...(ps) > 0,
                   "The number of PatternTypes must be greater than zero!");
     auto pattern_pointers = {(static_cast<const PatternBase *>(&ps))...};
-    for (auto p : pattern_pointers)
+    for (const auto p : pattern_pointers)
       patterns.push_back(p->clone());
   }
 
@@ -1787,8 +1787,8 @@ namespace Patterns
         std::vector<std::string> vec(t.size());
 
         unsigned int i = 0;
-        for (const auto &ti : t)
-          vec[i++] = Convert<typename T::value_type>::to_string(ti, base_p);
+        for (const auto entry : t)
+          vec[i++] = Convert<typename T::value_type>::to_string(entry, base_p);
 
         std::string s;
         if (vec.size() > 0)

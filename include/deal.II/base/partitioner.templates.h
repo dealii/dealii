@@ -238,7 +238,7 @@ namespace Utilities
           unsigned int offset =
             n_ghost_indices_in_larger_set - n_ghost_indices();
           // must copy ghost data into extended ghost array
-          for (const auto ghost_range : ghost_indices_subset_data)
+          for (const auto &ghost_range : ghost_indices_subset_data)
             {
               if (offset > ghost_range.first)
                 {

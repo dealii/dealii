@@ -87,10 +87,7 @@ ExceptionBase::ExceptionBase()
   , what_str("")
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-  for (unsigned int i = 0;
-       i < sizeof(raw_stacktrace) / sizeof(raw_stacktrace[0]);
-       ++i)
-    raw_stacktrace[i] = nullptr;
+  std::fill(std::begin(raw_stacktrace), std::end(raw_stacktrace), nullptr);
 #endif
 }
 
@@ -109,10 +106,7 @@ ExceptionBase::ExceptionBase(const ExceptionBase &exc)
                  // by what()
 {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
-  for (unsigned int i = 0;
-       i < sizeof(raw_stacktrace) / sizeof(raw_stacktrace[0]);
-       ++i)
-    raw_stacktrace[i] = nullptr;
+  std::fill(std::begin(raw_stacktrace), std::end(raw_stacktrace), nullptr);
 #endif
 }
 

@@ -124,8 +124,8 @@ namespace Polynomials
   {
     std::vector<Polynomial<double>> p_base =
       LagrangeEquidistant::generate_complete_basis(base_degree);
-    for (unsigned int i = 0; i < p_base.size(); ++i)
-      p_base[i].scale(n_subdivisions);
+    for (auto &polynomial : p_base)
+      polynomial.scale(n_subdivisions);
 
     std::vector<PiecewisePolynomial<double>> p;
     p.reserve(n_subdivisions * base_degree + 1);
