@@ -268,6 +268,18 @@ public:
   const_reference operator[](const size_type index) const;
 
   /**
+   * Return a pointer to the underlying data buffer.
+   */
+  pointer
+  data();
+
+  /**
+   * Return a const pointer to the underlying data buffer.
+   */
+  const_pointer
+  data() const;
+
+  /**
    * Return a read and write pointer to the beginning of the data array.
    */
   iterator
@@ -1032,6 +1044,24 @@ inline typename AlignedVector<T>::const_reference AlignedVector<T>::
 {
   AssertIndexRange(index, size());
   return data_begin[index];
+}
+
+
+
+template <typename T>
+inline typename AlignedVector<T>::pointer
+AlignedVector<T>::data()
+{
+  return data_begin;
+}
+
+
+
+template <typename T>
+inline typename AlignedVector<T>::const_pointer
+AlignedVector<T>::data() const
+{
+  return data_begin;
 }
 
 
