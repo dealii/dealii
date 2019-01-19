@@ -6503,10 +6503,10 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 const std::array<Point<spacedim>, 4> projected_vertices{
-                  compute_node(patch, i1, i2, 0, n_subdivisions),
-                  compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
-                  compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
-                  compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)};
+                  {compute_node(patch, i1, i2, 0, n_subdivisions),
+                   compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
+                   compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
+                   compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
 
                 Assert((flags.height_vector < patch.data.n_rows()) ||
                          patch.data.n_rows() == 0,
@@ -6515,48 +6515,48 @@ namespace DataOutBase
                                      patch.data.n_rows()));
 
                 const std::array<Point<3>, 4> vertices = {
-                  Point<3>{projected_vertices[0][0],
-                           projected_vertices[0][1],
-                           patch.data.n_rows() != 0 ?
-                             patch.data(0, i1 * d1 + i2 * d2) :
-                             0},
-                  Point<3>{projected_vertices[1][0],
-                           projected_vertices[1][1],
-                           patch.data.n_rows() != 0 ?
-                             patch.data(0, (i1 + 1) * d1 + i2 * d2) :
-                             0},
-                  Point<3>{projected_vertices[2][0],
-                           projected_vertices[2][1],
-                           patch.data.n_rows() != 0 ?
-                             patch.data(0, i1 * d1 + (i2 + 1) * d2) :
-                             0},
-                  Point<3>{projected_vertices[3][0],
-                           projected_vertices[3][1],
-                           patch.data.n_rows() != 0 ?
-                             patch.data(0, (i1 + 1) * d1 + (i2 + 1) * d2) :
-                             0}};
+                  {Point<3>{projected_vertices[0][0],
+                            projected_vertices[0][1],
+                            patch.data.n_rows() != 0 ?
+                              patch.data(0, i1 * d1 + i2 * d2) :
+                              0},
+                   Point<3>{projected_vertices[1][0],
+                            projected_vertices[1][1],
+                            patch.data.n_rows() != 0 ?
+                              patch.data(0, (i1 + 1) * d1 + i2 * d2) :
+                              0},
+                   Point<3>{projected_vertices[2][0],
+                            projected_vertices[2][1],
+                            patch.data.n_rows() != 0 ?
+                              patch.data(0, i1 * d1 + (i2 + 1) * d2) :
+                              0},
+                   Point<3>{projected_vertices[3][0],
+                            projected_vertices[3][1],
+                            patch.data.n_rows() != 0 ?
+                              patch.data(0, (i1 + 1) * d1 + (i2 + 1) * d2) :
+                              0}}};
 
                 projection_decompositions = {
-                  svg_project_point(vertices[0],
-                                    camera_position,
-                                    camera_direction,
-                                    camera_horizontal,
-                                    camera_focus),
-                  svg_project_point(vertices[1],
-                                    camera_position,
-                                    camera_direction,
-                                    camera_horizontal,
-                                    camera_focus),
-                  svg_project_point(vertices[2],
-                                    camera_position,
-                                    camera_direction,
-                                    camera_horizontal,
-                                    camera_focus),
-                  svg_project_point(vertices[3],
-                                    camera_position,
-                                    camera_direction,
-                                    camera_horizontal,
-                                    camera_focus)};
+                  {svg_project_point(vertices[0],
+                                     camera_position,
+                                     camera_direction,
+                                     camera_horizontal,
+                                     camera_focus),
+                   svg_project_point(vertices[1],
+                                     camera_position,
+                                     camera_direction,
+                                     camera_horizontal,
+                                     camera_focus),
+                   svg_project_point(vertices[2],
+                                     camera_position,
+                                     camera_direction,
+                                     camera_horizontal,
+                                     camera_focus),
+                   svg_project_point(vertices[3],
+                                     camera_position,
+                                     camera_direction,
+                                     camera_horizontal,
+                                     camera_focus)}};
 
                 x_min_perspective =
                   std::min(x_min_perspective,
@@ -6644,10 +6644,10 @@ namespace DataOutBase
             for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
               {
                 const std::array<Point<spacedim>, 4> projected_vertices = {
-                  compute_node(patch, i1, i2, 0, n_subdivisions),
-                  compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
-                  compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
-                  compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)};
+                  {compute_node(patch, i1, i2, 0, n_subdivisions),
+                   compute_node(patch, i1 + 1, i2, 0, n_subdivisions),
+                   compute_node(patch, i1, i2 + 1, 0, n_subdivisions),
+                   compute_node(patch, i1 + 1, i2 + 1, 0, n_subdivisions)}};
 
                 Assert((flags.height_vector < patch.data.n_rows()) ||
                          patch.data.n_rows() == 0,
