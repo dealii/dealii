@@ -160,7 +160,8 @@ namespace internal
 
       // Initialize the transformation matrix as the
       // identity tensor
-      Q = dealii::unit_symmetric_tensor<dim, Number>();
+      Q = static_cast<Tensor<2, dim, Number>>(
+        dealii::unit_symmetric_tensor<dim, Number>());
 
       // Make the first row and column to be of the
       // desired form
