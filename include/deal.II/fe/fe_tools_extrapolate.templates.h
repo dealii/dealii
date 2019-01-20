@@ -1158,7 +1158,7 @@ namespace FETools
           destinations.push_back(it->receiver);
 
           it->pack_data(*buffer);
-          const int ierr = MPI_Isend(&(*buffer)[0],
+          const int ierr = MPI_Isend(buffer->data(),
                                      buffer->size(),
                                      MPI_BYTE,
                                      it->receiver,

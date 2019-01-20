@@ -95,15 +95,15 @@ MatrixFree<dim, Number>::create_cell_subrange_hp_by_index(
       AssertIndexRange(range.second, fe_indices.size() + 1);
 #endif
       std::pair<unsigned int, unsigned int> return_range;
-      return_range.first = std::lower_bound(&fe_indices[0] + range.first,
-                                            &fe_indices[0] + range.second,
+      return_range.first = std::lower_bound(fe_indices.begin() + range.first,
+                                            fe_indices.begin() + range.second,
                                             fe_index) -
-                           &fe_indices[0];
+                           fe_indices.begin();
       return_range.second =
-        std::lower_bound(&fe_indices[0] + return_range.first,
-                         &fe_indices[0] + range.second,
+        std::lower_bound(fe_indices.begin() + return_range.first,
+                         fe_indices.begin() + range.second,
                          fe_index + 1) -
-        &fe_indices[0];
+        fe_indices.begin();
       Assert(return_range.first >= range.first &&
                return_range.second <= range.second,
              ExcInternalError());

@@ -209,7 +209,7 @@ namespace Utilities
       // results over all processes
       unsigned int n_recv_from;
       const int    ierr = MPI_Reduce_scatter_block(
-        &dest_vector[0], &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
+        dest_vector.data(), &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
 
       AssertThrowMPI(ierr);
 
@@ -222,7 +222,7 @@ namespace Utilities
                   el,
                   32766,
                   mpi_comm,
-                  &send_requests[&el - &destinations[0]]);
+                  send_requests.data() + (&el - destinations.data()));
 
       // if no one to receive from, return an empty vector
       if (n_recv_from == 0)
@@ -322,7 +322,7 @@ namespace Utilities
       unsigned int n_recv_from = 0;
 
       const int ierr = MPI_Reduce_scatter_block(
-        &dest_vector[0], &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
+        dest_vector.data(), &n_recv_from, 1, MPI_UNSIGNED, MPI_SUM, mpi_comm);
 
       AssertThrowMPI(ierr);
 
@@ -334,14 +334,14 @@ namespace Utilities
       std::vector<unsigned int> buffer(dest_vector.size());
       unsigned int              n_recv_from = 0;
 
-      MPI_Reduce(&dest_vector[0],
-                 &buffer[0],
+      MPI_Reduce(dest_vector.data(),
+                 buffer.data(),
                  dest_vector.size(),
                  MPI_UNSIGNED,
                  MPI_SUM,
                  0,
                  mpi_comm);
-      MPI_Scatter(&buffer[0],
+      MPI_Scatter(buffer.data(),
                   1,
                   MPI_UNSIGNED,
                   &n_recv_from,

@@ -298,7 +298,7 @@ namespace CUDAWrappers
     // Copy the elements to the gpu
     val_dev.reset(Utilities::CUDA::allocate_device_data<Number>(nnz));
     cudaError_t error_code = cudaMemcpy(val_dev.get(),
-                                        &val[0],
+                                        val.data(),
                                         nnz * sizeof(Number),
                                         cudaMemcpyHostToDevice);
     AssertCuda(error_code);
@@ -307,7 +307,7 @@ namespace CUDAWrappers
     column_index_dev.reset(Utilities::CUDA::allocate_device_data<int>(nnz));
     AssertCuda(error_code);
     error_code = cudaMemcpy(column_index_dev.get(),
-                            &column_index[0],
+                            column_index.data(),
                             nnz * sizeof(int),
                             cudaMemcpyHostToDevice);
     AssertCuda(error_code);
@@ -316,7 +316,7 @@ namespace CUDAWrappers
     row_ptr_dev.reset(Utilities::CUDA::allocate_device_data<int>(row_ptr_size));
     AssertCuda(error_code);
     error_code = cudaMemcpy(row_ptr_dev.get(),
-                            &row_ptr[0],
+                            row_ptr.data(),
                             row_ptr_size * sizeof(int),
                             cudaMemcpyHostToDevice);
     AssertCuda(error_code);

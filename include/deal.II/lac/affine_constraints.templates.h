@@ -3662,10 +3662,10 @@ AffineConstraints<number>::distribute_local_to_global(
       // calculate all the data that will be written into the matrix row.
       if (use_dealii_matrix == false)
         {
-          size_type *col_ptr = &cols[0];
+          size_type *col_ptr = cols.data();
           // cast is uncritical here and only used to avoid compiler
           // warnings. We never access a non-double array
-          number *val_ptr = &vals[0];
+          number *val_ptr = vals.data();
           internals::resolve_matrix_row(global_rows,
                                         global_rows,
                                         i,
@@ -3674,9 +3674,10 @@ AffineConstraints<number>::distribute_local_to_global(
                                         local_matrix,
                                         col_ptr,
                                         val_ptr);
-          const size_type n_values = col_ptr - &cols[0];
+          const size_type n_values = col_ptr - cols.data();
           if (n_values > 0)
-            global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
+            global_matrix.add(
+              row, n_values, cols.data(), vals.data(), false, true);
         }
       else
         internals::resolve_matrix_row(
@@ -3816,8 +3817,8 @@ AffineConstraints<number>::distribute_local_to_global(
                               end_block   = block_starts[block_col + 1];
               if (use_dealii_matrix == false)
                 {
-                  size_type *col_ptr = &cols[0];
-                  number *   val_ptr = &vals[0];
+                  size_type *col_ptr = cols.data();
+                  number *   val_ptr = vals.data();
                   internals::resolve_matrix_row(global_rows,
                                                 global_rows,
                                                 i,
@@ -3826,10 +3827,11 @@ AffineConstraints<number>::distribute_local_to_global(
                                                 local_matrix,
                                                 col_ptr,
                                                 val_ptr);
-                  const size_type n_values = col_ptr - &cols[0];
+                  const size_type n_values = col_ptr - cols.data();
                   if (n_values > 0)
                     global_matrix.block(block, block_col)
-                      .add(row, n_values, &cols[0], &vals[0], false, true);
+                      .add(
+                        row, n_values, cols.data(), vals.data(), false, true);
                 }
               else
                 {
@@ -3928,8 +3930,8 @@ AffineConstraints<number>::distribute_local_to_global(
       const size_type row = global_rows.global_row(i);
 
       // calculate all the data that will be written into the matrix row.
-      size_type *col_ptr = &cols[0];
-      number *   val_ptr = &vals[0];
+      size_type *col_ptr = cols.data();
+      number *   val_ptr = vals.data();
       internals::resolve_matrix_row(global_rows,
                                     global_cols,
                                     i,
@@ -3938,9 +3940,9 @@ AffineConstraints<number>::distribute_local_to_global(
                                     local_matrix,
                                     col_ptr,
                                     val_ptr);
-      const size_type n_values = col_ptr - &cols[0];
+      const size_type n_values = col_ptr - cols.data();
       if (n_values > 0)
-        global_matrix.add(row, n_values, &cols[0], &vals[0], false, true);
+        global_matrix.add(row, n_values, cols.data(), vals.data(), false, true);
     }
 }
 

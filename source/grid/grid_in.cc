@@ -2103,9 +2103,9 @@ GridIn<2>::read_netcdf(const std::string &filename)
               ExcIO());
   std::vector<std::vector<double>> point_values(
     3, std::vector<double>(n_vertices));
-  points_xc->get(&*point_values[0].begin(), n_vertices);
-  points_yc->get(&*point_values[1].begin(), n_vertices);
-  points_zc->get(&*point_values[2].begin(), n_vertices);
+  points_xc->get(point_values[0].data(), n_vertices);
+  points_yc->get(point_values[1].data(), n_vertices);
+  points_zc->get(point_values[2].data(), n_vertices);
 
   // and fill the vertices
   std::vector<Point<spacedim>> vertices(n_vertices);
@@ -2265,9 +2265,9 @@ GridIn<3>::read_netcdf(const std::string &filename)
               ExcIO());
   std::vector<std::vector<double>> point_values(
     3, std::vector<double>(n_vertices));
-  points_xc->get(&*point_values[0].begin(), n_vertices);
-  points_yc->get(&*point_values[1].begin(), n_vertices);
-  points_zc->get(&*point_values[2].begin(), n_vertices);
+  points_xc->get(point_values[0].data(), n_vertices);
+  points_yc->get(point_values[1].data(), n_vertices);
+  points_zc->get(point_values[2].data(), n_vertices);
 
   // and fill the vertices
   std::vector<Point<spacedim>> vertices(n_vertices);

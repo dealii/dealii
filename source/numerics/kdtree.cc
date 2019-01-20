@@ -48,7 +48,7 @@ KDTree<dim>::get_points_within_ball(const Point<dim> &center,
   params.sorted = sorted;
 
   std::vector<std::pair<unsigned int, double>> matches;
-  kdtree->radiusSearch(&center[0], radius, matches, params);
+  kdtree->radiusSearch(center.begin_raw(), radius, matches, params);
 
   return matches;
 }
@@ -67,7 +67,10 @@ KDTree<dim>::get_closest_points(const Point<dim> & target,
   std::vector<unsigned int> indices(n_points);
   std::vector<double>       distances(n_points);
 
-  kdtree->knnSearch(&target[0], n_points, &indices[0], &distances[0]);
+  kdtree->knnSearch(target.begin_raw(),
+                    n_points,
+                    indices.data(),
+                    distances.data());
 
   // convert it to the format we want to return
   std::vector<std::pair<unsigned int, double>> matches(n_points);

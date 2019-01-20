@@ -556,7 +556,7 @@ namespace DataOutBase
   const double *
   DataOutFilter::get_data_set(const unsigned int set_num) const
   {
-    return &data_sets[set_num][0];
+    return data_sets[set_num].data();
   }
 
 
@@ -5110,11 +5110,11 @@ namespace DataOutBase
 
       int total = (vars_per_node * num_nodes);
 
-      ierr = TECDAT(&total, &tm.nodalData[0], &is_double);
+      ierr = TECDAT(&total, tm.nodalData.data(), &is_double);
 
       Assert(ierr == 0, ExcTecplotAPIError());
 
-      ierr = TECNOD(&tm.connData[0]);
+      ierr = TECNOD(tm.connData.data());
 
       Assert(ierr == 0, ExcTecplotAPIError());
 

@@ -319,9 +319,9 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       // makes use of the fact that the matrix stores its data in a
       // contiguous array.
-      sum(ArrayView<const Number>(&local.val[0], local.n_nonzero_elements()),
+      sum(ArrayView<const Number>(local.val.get(), local.n_nonzero_elements()),
           mpi_communicator,
-          ArrayView<Number>(&global.val[0], global.n_nonzero_elements()));
+          ArrayView<Number>(global.val.get(), global.n_nonzero_elements()));
 #else
       (void)mpi_communicator;
       if (!PointerComparison::equal(&local, &global))

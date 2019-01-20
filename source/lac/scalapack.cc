@@ -457,7 +457,7 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
     {
       const int   ii = 1;
       NumberType *loc_vals_A =
-        this->values.size() > 0 ? &(this->values[0]) : nullptr;
+        this->values.size() > 0 ? this->values.data() : nullptr;
       const NumberType *loc_vals_B =
         mpi_process_is_active_B ? &(B(0, 0)) : nullptr;
 
@@ -628,7 +628,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
     {
       const int         ii = 1;
       const NumberType *loc_vals_A =
-        this->values.size() > 0 ? &(this->values[0]) : nullptr;
+        this->values.size() > 0 ? this->values.data() : nullptr;
       NumberType *loc_vals_B = mpi_process_is_active_B ? &(B(0, 0)) : nullptr;
 
       pgemr2d(&n_rows,
@@ -801,7 +801,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(
   if (in_context_A)
     {
       if (this->values.size() != 0)
-        loc_vals_A = &this->values[0];
+        loc_vals_A = this->values.data();
 
       for (unsigned int i = 0; i < desc_A.size(); ++i)
         desc_A[i] = this->descriptor[i];
@@ -812,7 +812,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(
   if (in_context_B)
     {
       if (B.values.size() != 0)
-        loc_vals_B = &B.values[0];
+        loc_vals_B = B.values.data();
 
       for (unsigned int i = 0; i < desc_B.size(); ++i)
         desc_B[i] = B.descriptor[i];
@@ -922,7 +922,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
           AssertThrow(this->values.size() > 0,
                       dealii::ExcMessage(
                         "source: process is active but local matrix empty"));
-          loc_vals_source = &this->values[0];
+          loc_vals_source = this->values.data();
         }
       if (dest.grid->mpi_process_is_active && (dest.values.size() > 0))
         {
@@ -930,7 +930,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
             dest.values.size() > 0,
             dealii::ExcMessage(
               "destination: process is active but local matrix empty"));
-          loc_vals_dest = &dest.values[0];
+          loc_vals_dest = dest.values.data();
         }
       pgemr2d(&n_rows,
               &n_columns,
@@ -1012,8 +1012,9 @@ ScaLAPACKMatrix<NumberType>::add(const ScaLAPACKMatrix<NumberType> &B,
     {
       char        trans_b = transpose_B ? 'T' : 'N';
       NumberType *A_loc =
-        (this->values.size() > 0) ? &this->values[0] : nullptr;
-      const NumberType *B_loc = (B.values.size() > 0) ? &B.values[0] : nullptr;
+        (this->values.size() > 0) ? this->values.data() : nullptr;
+      const NumberType *B_loc =
+        (B.values.size() > 0) ? B.values.data() : nullptr;
 
       pgeadd(&trans_b,
              &n_rows,
@@ -1138,10 +1139,10 @@ ScaLAPACKMatrix<NumberType>::mult(const NumberType                   b,
       char trans_b = transpose_B ? 'T' : 'N';
 
       const NumberType *A_loc =
-        (this->values.size() > 0) ? (&(this->values[0])) : nullptr;
+        (this->values.size() > 0) ? this->values.data() : nullptr;
       const NumberType *B_loc =
-        (B.values.size() > 0) ? (&(B.values[0])) : nullptr;
-      NumberType *C_loc = (C.values.size() > 0) ? (&(C.values[0])) : nullptr;
+        (B.values.size() > 0) ? B.values.data() : nullptr;
+      NumberType *C_loc = (C.values.size() > 0) ? C.values.data() : nullptr;
       int         m     = C.n_rows;
       int         n     = C.n_columns;
       int         k     = transpose_A ? this->n_rows : this->n_columns;
@@ -1242,7 +1243,7 @@ ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
   if (grid->mpi_process_is_active)
     {
       int         info  = 0;
-      NumberType *A_loc = &this->values[0];
+      NumberType *A_loc = this->values.data();
       // pdpotrf_(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
       ppotrf(&uplo,
              &n_columns,
@@ -1271,7 +1272,7 @@ ScaLAPACKMatrix<NumberType>::compute_lu_factorization()
   if (grid->mpi_process_is_active)
     {
       int         info  = 0;
-      NumberType *A_loc = &this->values[0];
+      NumberType *A_loc = this->values.data();
 
       const int iarow = indxg2p_(&submatrix_row,
                                  &row_block_size,
@@ -1325,7 +1326,7 @@ ScaLAPACKMatrix<NumberType>::invert()
             property == LAPACKSupport::upper_triangular ? 'U' : 'L';
           const char  diag  = 'N';
           int         info  = 0;
-          NumberType *A_loc = &this->values[0];
+          NumberType *A_loc = this->values.data();
           ptrtri(&uploTriangular,
                  &diag,
                  &n_columns,
@@ -1355,7 +1356,7 @@ ScaLAPACKMatrix<NumberType>::invert()
       if (grid->mpi_process_is_active)
         {
           int         info  = 0;
-          NumberType *A_loc = &this->values[0];
+          NumberType *A_loc = this->values.data();
 
           if (is_symmetric)
             {
@@ -1575,7 +1576,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
           il = std::min(eigenvalue_idx.first, eigenvalue_idx.second) + 1;
           iu = std::max(eigenvalue_idx.first, eigenvalue_idx.second) + 1;
         }
-      NumberType *A_loc = &this->values[0];
+      NumberType *A_loc = this->values.data();
       /*
        * by setting lwork to -1 a workspace query for optimal length of work is
        * performed
@@ -1583,7 +1584,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
       int         lwork  = -1;
       int         liwork = -1;
       NumberType *eigenvectors_loc =
-        (compute_eigenvectors ? &eigenvectors->values[0] : nullptr);
+        (compute_eigenvectors ? eigenvectors->values.data() : nullptr);
       work.resize(1);
       iwork.resize(1);
 
@@ -1596,12 +1597,12 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                 &submatrix_row,
                 &submatrix_column,
                 descriptor,
-                &ev[0],
+                ev.data(),
                 eigenvectors_loc,
                 &eigenvectors->submatrix_row,
                 &eigenvectors->submatrix_column,
                 eigenvectors->descriptor,
-                &work[0],
+                work.data(),
                 &lwork,
                 &info);
           AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyev", info));
@@ -1630,19 +1631,19 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                  &abstol,
                  &m,
                  &nz,
-                 &ev[0],
+                 ev.data(),
                  &orfac,
                  eigenvectors_loc,
                  &eigenvectors->submatrix_row,
                  &eigenvectors->submatrix_column,
                  eigenvectors->descriptor,
-                 &work[0],
+                 work.data(),
                  &lwork,
-                 &iwork[0],
+                 iwork.data(),
                  &liwork,
-                 &ifail[0],
-                 &iclustr[0],
-                 &gap[0],
+                 ifail.data(),
+                 iclustr.data(),
+                 gap.data(),
                  &info);
           AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyevx", info));
         }
@@ -1658,12 +1659,12 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                 &submatrix_row,
                 &submatrix_column,
                 descriptor,
-                &ev[0],
+                ev.data(),
                 eigenvectors_loc,
                 &eigenvectors->submatrix_row,
                 &eigenvectors->submatrix_column,
                 eigenvectors->descriptor,
-                &work[0],
+                work.data(),
                 &lwork,
                 &info);
 
@@ -1690,19 +1691,19 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
                  &abstol,
                  &m,
                  &nz,
-                 &ev[0],
+                 ev.data(),
                  &orfac,
                  eigenvectors_loc,
                  &eigenvectors->submatrix_row,
                  &eigenvectors->submatrix_column,
                  eigenvectors->descriptor,
-                 &work[0],
+                 work.data(),
                  &lwork,
-                 &iwork[0],
+                 iwork.data(),
                  &liwork,
-                 &ifail[0],
-                 &iclustr[0],
-                 &gap[0],
+                 ifail.data(),
+                 iclustr.data(),
+                 gap.data(),
                  &info);
 
           AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("psyevx", info));
@@ -1880,7 +1881,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
           il = std::min(eigenvalue_idx.first, eigenvalue_idx.second) + 1;
           iu = std::max(eigenvalue_idx.first, eigenvalue_idx.second) + 1;
         }
-      NumberType *A_loc = &this->values[0];
+      NumberType *A_loc = this->values.data();
 
       /*
        * By setting lwork to -1 a workspace query for optimal length of work is
@@ -1889,7 +1890,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
       int         lwork  = -1;
       int         liwork = -1;
       NumberType *eigenvectors_loc =
-        (compute_eigenvectors ? &eigenvectors->values[0] : nullptr);
+        (compute_eigenvectors ? eigenvectors->values.data() : nullptr);
       work.resize(1);
       iwork.resize(1);
 
@@ -2049,9 +2050,9 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
     {
       char        jobu   = left_singluar_vectors ? 'V' : 'N';
       char        jobvt  = right_singluar_vectors ? 'V' : 'N';
-      NumberType *A_loc  = &this->values[0];
-      NumberType *U_loc  = left_singluar_vectors ? &(U->values[0]) : nullptr;
-      NumberType *VT_loc = right_singluar_vectors ? &(VT->values[0]) : nullptr;
+      NumberType *A_loc  = this->values.data();
+      NumberType *U_loc  = left_singluar_vectors ? U->values.data() : nullptr;
+      NumberType *VT_loc = right_singluar_vectors ? VT->values.data() : nullptr;
       int         info   = 0;
       /*
        * by setting lwork to -1 a workspace query for optimal length of work is
@@ -2077,7 +2078,7 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
              &VT->submatrix_row,
              &VT->submatrix_column,
              VT->descriptor,
-             &work[0],
+             work.data(),
              &lwork,
              &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgesvd", info));
@@ -2102,7 +2103,7 @@ ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
              &VT->submatrix_row,
              &VT->submatrix_column,
              VT->descriptor,
-             &work[0],
+             work.data(),
              &lwork,
              &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgesvd", info));
@@ -2161,8 +2162,8 @@ ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
   if (grid->mpi_process_is_active)
     {
       char        trans = transpose ? 'T' : 'N';
-      NumberType *A_loc = &this->values[0];
-      NumberType *B_loc = &B.values[0];
+      NumberType *A_loc = this->values.data();
+      NumberType *B_loc = B.values.data();
       int         info  = 0;
       /*
        * by setting lwork to -1 a workspace query for optimal length of work is
@@ -2183,7 +2184,7 @@ ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
             &B.submatrix_row,
             &B.submatrix_column,
             B.descriptor,
-            &work[0],
+            work.data(),
             &lwork,
             &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgels", info));
@@ -2203,7 +2204,7 @@ ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
             &B.submatrix_row,
             &B.submatrix_column,
             B.descriptor,
-            &work[0],
+            work.data(),
             &lwork,
             &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pgels", info));
@@ -2317,7 +2318,7 @@ ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(
       iwork.resize(liwork);
 
       int               info  = 0;
-      const NumberType *A_loc = &this->values[0];
+      const NumberType *A_loc = this->values.data();
 
       // by setting lwork to -1 a workspace query for optimal length of work is
       // performed
@@ -2331,9 +2332,9 @@ ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(
              descriptor,
              &a_norm,
              &rcond,
-             &work[0],
+             work.data(),
              &lwork,
-             &iwork[0],
+             iwork.data(),
              &liwork,
              &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pdpocon", info));
@@ -2349,9 +2350,9 @@ ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(
              descriptor,
              &a_norm,
              &rcond,
-             &work[0],
+             work.data(),
              &lwork,
-             &iwork[0],
+             iwork.data(),
              &liwork,
              &info);
       AssertThrow(info == 0, LAPACKSupport::ExcErrorCode("pdpocon", info));
@@ -2696,7 +2697,7 @@ ScaLAPACKMatrix<NumberType>::save_serial(
       hid_t dataspace_id = H5Screate_simple(2, dims, nullptr);
 
       // create the dataset within the file using chunk creation properties
-      hid_t type_id    = hdf5_type_id(&tmp.values[0]);
+      hid_t type_id    = hdf5_type_id(tmp.values.data());
       hid_t dataset_id = H5Dcreate2(file_id,
                                     "/matrix",
                                     type_id,
@@ -2707,7 +2708,7 @@ ScaLAPACKMatrix<NumberType>::save_serial(
 
       // write the dataset
       status = H5Dwrite(
-        dataset_id, type_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, &tmp.values[0]);
+        dataset_id, type_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, tmp.values.data());
       AssertThrow(status >= 0, ExcIO());
 
       // create HDF5 enum type for LAPACKSupport::State and
@@ -2842,7 +2843,7 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
   copy_to(tmp);
 
   // get pointer to data held by the process
-  NumberType *data = (tmp.values.size() > 0) ? &tmp.values[0] : nullptr;
+  NumberType *data = (tmp.values.size() > 0) ? tmp.values.data() : nullptr;
 
   herr_t status;
   // dataset dimensions
@@ -3095,7 +3096,7 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
       // Selection
       hid_t       datatype   = H5Dget_type(dataset_id);
       H5T_class_t t_class_in = H5Tget_class(datatype);
-      H5T_class_t t_class    = H5Tget_class(hdf5_type_id(&tmp.values[0]));
+      H5T_class_t t_class    = H5Tget_class(hdf5_type_id(tmp.values.data()));
       AssertThrow(
         t_class_in == t_class,
         ExcMessage(
@@ -3120,11 +3121,11 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
 
       // read data
       status = H5Dread(dataset_id,
-                       hdf5_type_id(&tmp.values[0]),
+                       hdf5_type_id(tmp.values.data()),
                        H5S_ALL,
                        H5S_ALL,
                        H5P_DEFAULT,
-                       &tmp.values[0]);
+                       tmp.values.data());
       AssertThrow(status >= 0, ExcIO());
 
       // create HDF5 enum type for LAPACKSupport::State and
@@ -3264,7 +3265,7 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
   ScaLAPACKMatrix<NumberType> tmp(n_rows, n_columns, column_grid, MB, NB);
 
   // get pointer to data held by the process
-  NumberType *data = (tmp.values.size() > 0) ? &tmp.values[0] : nullptr;
+  NumberType *data = (tmp.values.size() > 0) ? tmp.values.data() : nullptr;
 
   herr_t status;
 

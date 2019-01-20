@@ -1737,7 +1737,7 @@ namespace internal
               Assert(data.n_shape_functions > 0, ExcInternalError());
 
               const Tensor<1, spacedim> *supp_pts =
-                &data.mapping_support_points[0];
+                data.mapping_support_points.data();
 
               for (unsigned int point = 0; point < n_q_points; ++point)
                 {

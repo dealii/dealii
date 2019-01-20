@@ -578,7 +578,7 @@ ChunkSparseMatrix<number>::add(const number                         factor,
   // add everything, including padding elements
   const size_type     chunk_size = cols->get_chunk_size();
   number *            val_ptr    = val.get();
-  const somenumber *  matrix_ptr = &matrix.val[0];
+  const somenumber *  matrix_ptr = matrix.val.get();
   const number *const end_ptr =
     val.get() +
     cols->sparsity_pattern.n_nonzero_elements() * chunk_size * chunk_size;

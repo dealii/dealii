@@ -301,7 +301,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute(
       for (unsigned d = 0; d < dim; ++d)
         polynomials[i].value(p(d),
                              n_values_and_derivatives,
-                             &values_1d[i][d][0]);
+                             values_1d[i][d].data());
 
   unsigned int indices[3];
   unsigned int ind = 0;

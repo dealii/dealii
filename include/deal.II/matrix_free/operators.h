@@ -998,8 +998,9 @@ namespace MatrixFreeOperators
 
     const unsigned int shift_coefficient =
       inverse_coefficients.size() > dofs_per_component ? dofs_per_component : 0;
-    const VectorizedArray<Number> *inv_coefficient = &inverse_coefficients[0];
-    VectorizedArray<Number>        temp_data_field[dofs_per_component];
+    const VectorizedArray<Number> *inv_coefficient =
+      inverse_coefficients.data();
+    VectorizedArray<Number> temp_data_field[dofs_per_component];
     for (unsigned int d = 0; d < n_actual_components; ++d)
       {
         const VectorizedArray<Number> *in  = in_array + d * dofs_per_component;

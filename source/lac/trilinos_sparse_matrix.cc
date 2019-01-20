@@ -146,9 +146,9 @@ namespace TrilinosWrappers
         this->a_row,
         colnums,
         ncols,
-        &((*value_cache)[0]),
+        value_cache->data(),
         reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          &((*colnum_cache)[0])));
+          colnum_cache->data()));
       value_cache->resize(ncols);
       colnum_cache->resize(ncols);
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
@@ -207,7 +207,7 @@ namespace TrilinosWrappers
                                     *column_space_map,
                                     reinterpret_cast<int *>(
                                       const_cast<unsigned int *>(
-                                        &(n_entries_per_row[0]))),
+                                        n_entries_per_row.data())),
                                     false))
     , last_action(Zero)
     , compressed(false)
@@ -238,7 +238,7 @@ namespace TrilinosWrappers
                                     input_row_map,
                                     reinterpret_cast<int *>(
                                       const_cast<unsigned int *>(
-                                        &(n_entries_per_row[0]))),
+                                        n_entries_per_row.data())),
                                     false))
     , last_action(Zero)
     , compressed(false)
@@ -291,7 +291,7 @@ namespace TrilinosWrappers
                    Utilities::Trilinos::comm_self()),
         *column_space_map,
         reinterpret_cast<int *>(
-          const_cast<unsigned int *>(&(n_entries_per_row[0]))),
+          const_cast<unsigned int *>(n_entries_per_row.data())),
         false))
     , last_action(Zero)
     , compressed(false)
@@ -323,7 +323,7 @@ namespace TrilinosWrappers
                                     *column_space_map,
                                     reinterpret_cast<int *>(
                                       const_cast<unsigned int *>(
-                                        &(n_entries_per_row[0]))),
+                                        n_entries_per_row.data())),
                                     false))
     , last_action(Zero)
     , compressed(false)
@@ -358,7 +358,7 @@ namespace TrilinosWrappers
         Copy,
         row_parallel_partitioning.make_trilinos_map(communicator, false),
         reinterpret_cast<int *>(
-          const_cast<unsigned int *>(&(n_entries_per_row[0]))),
+          const_cast<unsigned int *>(n_entries_per_row.data())),
         false))
     , last_action(Zero)
     , compressed(false)

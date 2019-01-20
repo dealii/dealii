@@ -994,7 +994,7 @@ namespace SparsityTools
       unsigned int idx = 0;
       for (const auto &sparsity_line : send_data)
         {
-          const int ierr = MPI_Isend(&(sparsity_line.second[0]),
+          const int ierr = MPI_Isend(sparsity_line.second.data(),
                                      sparsity_line.second.size(),
                                      DEAL_II_DOF_INDEX_MPI_TYPE,
                                      sparsity_line.first,
@@ -1138,7 +1138,7 @@ namespace SparsityTools
       unsigned int idx = 0;
       for (const auto &sparsity_line : send_data)
         {
-          const int ierr = MPI_Isend(&(sparsity_line.second[0]),
+          const int ierr = MPI_Isend(sparsity_line.second.data(),
                                      sparsity_line.second.size(),
                                      DEAL_II_DOF_INDEX_MPI_TYPE,
                                      sparsity_line.first,

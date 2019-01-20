@@ -267,7 +267,7 @@ namespace PETScWrappers
 
       const PetscInt *ptr =
         (ghostindices.size() > 0 ?
-           reinterpret_cast<const PetscInt *>(&(ghostindices[0])) :
+           reinterpret_cast<const PetscInt *>(ghostindices.data()) :
            nullptr);
 
       PetscErrorCode ierr = VecCreateGhost(communicator,
