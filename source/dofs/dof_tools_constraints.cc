@@ -1839,7 +1839,8 @@ namespace DoFTools
           const unsigned int dofs_per_face =
             face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
           FullMatrix<double> child_transformation(dofs_per_face, dofs_per_face);
-          FullMatrix<double> subface_interp(dofs_per_face, dofs_per_face);
+          FullMatrix<double> subface_interpolation(dofs_per_face,
+                                                   dofs_per_face);
 
           for (unsigned int c = 0; c < face_2->n_children(); ++c)
             {
@@ -1847,8 +1848,8 @@ namespace DoFTools
               // interpolated from face_1 to face_2 by multiplying from the left
               // with the one that interpolates from face_2 to its child
               const auto &fe = face_1->get_fe(face_1->nth_active_fe_index(0));
-              fe.get_subface_interpolation_matrix(fe, c, subface_interp);
-              subface_interp.mmult(child_transformation, transformation);
+              fe.get_subface_interpolation_matrix(fe, c, subface_interpolation);
+              subface_interpolation.mmult(child_transformation, transformation);
 
               set_periodicity_constraints(face_1,
                                           face_2->child(c),
@@ -1973,28 +1974,25 @@ namespace DoFTools
           unsigned int target                  = numbers::invalid_unsigned_int;
           double       factor                  = 1.;
 
-          const double eps = 1.e-13;
-          {
-            unsigned int no_entries = 0;
-            for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-              {
-                const auto entry = transformation(i, jj);
-
-                if (std::abs(entry) > eps)
-                  {
-                    no_entries++;
-                    is_identity_constrained = true;
-                    target                  = jj;
-                    factor                  = entry;
-                  }
-
-                if (no_entries > 1)
-                  {
-                    is_identity_constrained = false;
-                    break;
-                  }
-              }
-          }
+          constexpr double eps = 1.e-13;
+          for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
+            {
+              const auto entry = transformation(i, jj);
+              if (std::abs(entry) > eps)
+                {
+                  if (is_identity_constrained)
+                    {
+                      // We did encounter more than one nonzero entry, so
+                      // the dof is not identity constrained. Set the
+                      // boolean to false and break out of the for loop.
+                      is_identity_constrained = false;
+                      break;
+                    }
+                  is_identity_constrained = true;
+                  target                  = jj;
+                  factor                  = entry;
+                }
+            }
 
           // Next, we work on all constraints that are not identity
           // constraints, i.e., constraints that involve an interpolation
@@ -2042,6 +2040,9 @@ namespace DoFTools
           const auto dof_left  = face_2_constrained ? dofs_1[j] : dofs_2[i];
           const auto dof_right = face_2_constrained ? dofs_2[i] : dofs_1[j];
           factor               = face_2_constrained ? 1. / factor : factor;
+
+          // Next, we try to enter the constraint
+          //   dof_left = factor * dof_right;
 
           // If both degrees of freedom are constrained, there is nothing we
           // can do. Simply continue with the next dof.
