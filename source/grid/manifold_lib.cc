@@ -2187,7 +2187,8 @@ TransfiniteInterpolationManifold<dim, spacedim>::
             cell->real_to_unit_cell_affine_approximation(points[i]);
           current_distance += GeometryInfo<dim>::distance_to_unit_cell(point);
         }
-      distances_and_cells.emplace_back(current_distance, cell->index());
+      distances_and_cells.push_back(
+        std::make_pair(current_distance, cell->index()));
     }
   // no coarse cell could be found -> transformation failed
   AssertThrow(distances_and_cells.size() > 0,
