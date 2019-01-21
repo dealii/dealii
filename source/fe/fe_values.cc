@@ -3680,9 +3680,9 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-  std::vector<typename InputVector::value_type> &                values) const
+  const InputVector &                             fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  std::vector<typename InputVector::value_type> & values) const
 {
   using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_values,
@@ -3732,9 +3732,9 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-  std::vector<Vector<typename InputVector::value_type>> &        values) const
+  const InputVector &                                    fe_function,
+  const ArrayView<const types::global_dof_index> &       indices,
+  std::vector<Vector<typename InputVector::value_type>> &values) const
 {
   using Number = typename InputVector::value_type;
   // Size of indices must be a multiple of dofs_per_cell such that an integer
@@ -3763,10 +3763,9 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-  VectorSlice<std::vector<std::vector<typename InputVector::value_type>>>
-       values,
+  const InputVector &                                      fe_function,
+  const ArrayView<const types::global_dof_index> &         indices,
+  ArrayView<std::vector<typename InputVector::value_type>> values,
   bool quadrature_points_fastest) const
 {
   using Number = typename InputVector::value_type;
@@ -3823,8 +3822,8 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+  const InputVector &                             fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
   std::vector<Tensor<1, spacedim, typename InputVector::value_type>> &gradients)
   const
 {
@@ -3877,10 +3876,9 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-  VectorSlice<std::vector<
-    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>>
+  const InputVector &                             fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  ArrayView<std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
        gradients,
   bool quadrature_points_fastest) const
 {
@@ -3937,8 +3935,8 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+  const InputVector &                             fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
   std::vector<Tensor<2, spacedim, typename InputVector::value_type>> &hessians)
   const
 {
@@ -3993,10 +3991,9 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-  VectorSlice<std::vector<
-    std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>>
+  const InputVector &                             fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  ArrayView<std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
        hessians,
   bool quadrature_points_fastest) const
 {
@@ -4050,9 +4047,9 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-  std::vector<typename InputVector::value_type> &laplacians) const
+  const InputVector &                             fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  std::vector<typename InputVector::value_type> & laplacians) const
 {
   using Number = typename InputVector::value_type;
   Assert(this->update_flags & update_hessians,
@@ -4101,8 +4098,8 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+  const InputVector &                                    fe_function,
+  const ArrayView<const types::global_dof_index> &       indices,
   std::vector<Vector<typename InputVector::value_type>> &laplacians) const
 {
   using Number = typename InputVector::value_type;
@@ -4132,9 +4129,9 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-  std::vector<std::vector<typename InputVector::value_type>> &   laplacians,
+  const InputVector &                                         fe_function,
+  const ArrayView<const types::global_dof_index> &            indices,
+  std::vector<std::vector<typename InputVector::value_type>> &laplacians,
   bool quadrature_points_fastest) const
 {
   using Number = typename InputVector::value_type;
@@ -4189,8 +4186,8 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+  const InputVector &                             fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
   std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
     &third_derivatives) const
 {
@@ -4246,10 +4243,9 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const InputVector &                                            fe_function,
-  const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-  VectorSlice<std::vector<
-    std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>>
+  const InputVector &                             fe_function,
+  const ArrayView<const types::global_dof_index> &indices,
+  ArrayView<std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
        third_derivatives,
   bool quadrature_points_fastest) const
 {

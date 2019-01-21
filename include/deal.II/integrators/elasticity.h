@@ -83,11 +83,10 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     inline void
-    cell_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fe,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      double factor = 1.)
+    cell_residual(Vector<number> &                                    result,
+                  const FEValuesBase<dim> &                           fe,
+                  const ArrayView<const std::vector<Tensor<1, dim>>> &input,
+                  double factor = 1.)
     {
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
@@ -260,14 +259,13 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    nitsche_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fe,
-      const VectorSlice<const std::vector<std::vector<double>>> &        input,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Dinput,
-      const VectorSlice<const std::vector<std::vector<double>>> &        data,
-      double penalty,
-      double factor = 1.)
+    nitsche_residual(Vector<number> &                                    result,
+                     const FEValuesBase<dim> &                           fe,
+                     const ArrayView<const std::vector<double>> &        input,
+                     const ArrayView<const std::vector<Tensor<1, dim>>> &Dinput,
+                     const ArrayView<const std::vector<double>> &        data,
+                     double penalty,
+                     double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
@@ -314,13 +312,13 @@ namespace LocalIntegrators
     template <int dim, typename number>
     inline void
     nitsche_tangential_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fe,
-      const VectorSlice<const std::vector<std::vector<double>>> &        input,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Dinput,
-      const VectorSlice<const std::vector<std::vector<double>>> &        data,
-      double penalty,
-      double factor = 1.)
+      Vector<number> &                                    result,
+      const FEValuesBase<dim> &                           fe,
+      const ArrayView<const std::vector<double>> &        input,
+      const ArrayView<const std::vector<Tensor<1, dim>>> &Dinput,
+      const ArrayView<const std::vector<double>> &        data,
+      double                                              penalty,
+      double                                              factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
@@ -395,12 +393,12 @@ namespace LocalIntegrators
     template <int dim, typename number>
     void
     nitsche_residual_homogeneous(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fe,
-      const VectorSlice<const std::vector<std::vector<double>>> &        input,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Dinput,
-      double penalty,
-      double factor = 1.)
+      Vector<number> &                                    result,
+      const FEValuesBase<dim> &                           fe,
+      const ArrayView<const std::vector<double>> &        input,
+      const ArrayView<const std::vector<Tensor<1, dim>>> &Dinput,
+      double                                              penalty,
+      double                                              factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
@@ -550,20 +548,17 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    ip_residual(
-      Vector<number> &                                           result1,
-      Vector<number> &                                           result2,
-      const FEValuesBase<dim> &                                  fe1,
-      const FEValuesBase<dim> &                                  fe2,
-      const VectorSlice<const std::vector<std::vector<double>>> &input1,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>>
-        &                                                        Dinput1,
-      const VectorSlice<const std::vector<std::vector<double>>> &input2,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>>
-        &    Dinput2,
-      double pen,
-      double int_factor = 1.,
-      double ext_factor = -1.)
+    ip_residual(Vector<number> &                                    result1,
+                Vector<number> &                                    result2,
+                const FEValuesBase<dim> &                           fe1,
+                const FEValuesBase<dim> &                           fe2,
+                const ArrayView<const std::vector<double>> &        input1,
+                const ArrayView<const std::vector<Tensor<1, dim>>> &Dinput1,
+                const ArrayView<const std::vector<double>> &        input2,
+                const ArrayView<const std::vector<Tensor<1, dim>>> &Dinput2,
+                double                                              pen,
+                double int_factor = 1.,
+                double ext_factor = -1.)
     {
       const unsigned int n1 = fe1.dofs_per_cell;
 

@@ -128,11 +128,10 @@ ChunkSparsityPattern::reinit(const size_type m,
 
 
 void
-ChunkSparsityPattern::reinit(
-  const size_type                                  m,
-  const size_type                                  n,
-  const VectorSlice<const std::vector<size_type>> &row_lengths,
-  const size_type                                  chunk_size)
+ChunkSparsityPattern::reinit(const size_type                   m,
+                             const size_type                   n,
+                             const ArrayView<const size_type> &row_lengths,
+                             const size_type                   chunk_size)
 {
   Assert(row_lengths.size() == m, ExcInvalidNumber(m));
   Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));

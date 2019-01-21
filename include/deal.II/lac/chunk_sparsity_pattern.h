@@ -391,13 +391,13 @@ public:
          const size_type               chunk_size);
 
   /**
-   * Same as above, but with a VectorSlice argument instead.
+   * Same as above, but with an ArrayView argument instead.
    */
   void
-  reinit(const size_type                                  m,
-         const size_type                                  n,
-         const VectorSlice<const std::vector<size_type>> &row_lengths,
-         const size_type                                  chunk_size);
+  reinit(const size_type                   m,
+         const size_type                   n,
+         const ArrayView<const size_type> &row_lengths,
+         const size_type                   chunk_size);
 
   /**
    * This function compresses the sparsity structure that this object

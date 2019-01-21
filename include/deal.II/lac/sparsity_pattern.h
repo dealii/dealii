@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/linear_index_iterator.h>
 #include <deal.II/base/std_cxx14/memory.h>
@@ -51,8 +52,6 @@ template <typename number>
 class SparseLUDecomposition;
 template <typename number>
 class SparseILU;
-template <typename VectorType>
-class VectorSlice;
 
 namespace ChunkSparsityPatternIterators
 {
@@ -510,12 +509,12 @@ public:
 
 
   /**
-   * Same as above, but with a VectorSlice argument instead.
+   * Same as above, but with an ArrayView argument instead.
    */
   void
-  reinit(const size_type                                     m,
-         const size_type                                     n,
-         const VectorSlice<const std::vector<unsigned int>> &row_lengths);
+  reinit(const size_type                      m,
+         const size_type                      n,
+         const ArrayView<const unsigned int> &row_lengths);
 
   /**
    * This function compresses the sparsity structure that this object

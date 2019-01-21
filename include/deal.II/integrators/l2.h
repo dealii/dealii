@@ -176,10 +176,10 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    L2(Vector<number> &                                           result,
-       const FEValuesBase<dim> &                                  fe,
-       const VectorSlice<const std::vector<std::vector<double>>> &input,
-       const double                                               factor = 1.)
+    L2(Vector<number> &                            result,
+       const FEValuesBase<dim> &                   fe,
+       const ArrayView<const std::vector<double>> &input,
+       const double                                factor = 1.)
     {
       const unsigned int n_dofs       = fe.dofs_per_cell;
       const unsigned int n_components = input.size();

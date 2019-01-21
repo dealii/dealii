@@ -98,11 +98,10 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    cell_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fetest,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      const double factor = 1.)
+    cell_residual(Vector<number> &                                    result,
+                  const FEValuesBase<dim> &                           fetest,
+                  const ArrayView<const std::vector<Tensor<1, dim>>> &input,
+                  const double factor = 1.)
     {
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
@@ -135,11 +134,10 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    cell_residual(
-      Vector<number> &                                           result,
-      const FEValuesBase<dim> &                                  fetest,
-      const VectorSlice<const std::vector<std::vector<double>>> &input,
-      const double                                               factor = 1.)
+    cell_residual(Vector<number> &                            result,
+                  const FEValuesBase<dim> &                   fetest,
+                  const ArrayView<const std::vector<double>> &input,
+                  const double                                factor = 1.)
     {
       AssertDimension(fetest.get_fe().n_components(), 1);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
@@ -317,12 +315,11 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    u_dot_n_residual(
-      Vector<number> &                                           result,
-      const FEValuesBase<dim> &                                  fe,
-      const FEValuesBase<dim> &                                  fetest,
-      const VectorSlice<const std::vector<std::vector<double>>> &data,
-      double                                                     factor = 1.)
+    u_dot_n_residual(Vector<number> &                            result,
+                     const FEValuesBase<dim> &                   fe,
+                     const FEValuesBase<dim> &                   fetest,
+                     const ArrayView<const std::vector<double>> &data,
+                     double                                      factor = 1.)
     {
       const unsigned int t_dofs = fetest.dofs_per_cell;
 
@@ -461,19 +458,17 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     DEAL_II_DEPRECATED void
-    grad_div_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fetest,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      const double factor = 1.);
+    grad_div_residual(Vector<number> &         result,
+                      const FEValuesBase<dim> &fetest,
+                      const ArrayView<const std::vector<Tensor<1, dim>>> &input,
+                      const double factor = 1.);
 
     template <int dim, typename number>
     void
-    grad_div_residual(
-      Vector<number> &                                                   result,
-      const FEValuesBase<dim> &                                          fetest,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      const double                                                       factor)
+    grad_div_residual(Vector<number> &         result,
+                      const FEValuesBase<dim> &fetest,
+                      const ArrayView<const std::vector<Tensor<1, dim>>> &input,
+                      const double factor)
     {
       GradDiv::cell_residual(result, fetest, input, factor);
     }
@@ -550,8 +545,8 @@ namespace LocalIntegrators
      */
     template <int dim>
     double
-    norm(const FEValuesBase<dim> &                                          fe,
-         const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Du)
+    norm(const FEValuesBase<dim> &                           fe,
+         const ArrayView<const std::vector<Tensor<1, dim>>> &Du)
     {
       AssertDimension(fe.get_fe().n_components(), dim);
       AssertVectorVectorDimension(Du, dim, fe.n_quadrature_points);

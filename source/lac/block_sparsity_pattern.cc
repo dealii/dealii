@@ -356,8 +356,12 @@ BlockSparsityPattern::reinit(
                              row_lengths[j][0]);
         else
           {
-            VectorSlice<const std::vector<unsigned int>> block_rows(
-              row_lengths[j], start, length);
+            Assert(row_lengths[j].begin() + start + length <=
+                     row_lengths[j].end(),
+                   ExcInternalError());
+            ArrayView<const unsigned int> block_rows(row_lengths[j].data() +
+                                                       start,
+                                                     length);
             block(i, j).reinit(rows.block_size(i),
                                cols.block_size(j),
                                block_rows);
