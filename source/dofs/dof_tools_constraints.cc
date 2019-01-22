@@ -1779,41 +1779,36 @@ namespace DoFTools
   }
 
 
+  //
+  // Implementation of make_periodicity_constraints:
+  //
 
   namespace
   {
     /**
      * @internal
      *
-     * Internally used in make_periodicity_constraints.
+     * Internally used in collect_periodicity_constraints.
      *
-     * enter constraints for periodicity into the given AffineConstraints
-     * object. this function is called when at least one of the two face
-     * iterators corresponds to an active object without further children
+     * Collect constraints for periodicity into the given Container object.
+     * This function is called when at least one of the two face iterators
+     * corresponds to an active object without further children
      *
-     * @param transformation A matrix that maps degrees of freedom from one face
-     * to another. If the DoFs on the two faces are supposed to match exactly,
-     * then the matrix so provided will be the identity matrix. if face 2 is
-     * once refined from face 1, then the matrix needs to be the interpolation
-     * matrix from a face to this particular child
+     * @param transformation A matrix that maps degrees of freedom from one
+     * face to another. If the DoFs on the two faces are supposed to match
+     * exactly, then the matrix so provided will be the identity matrix. if
+     * face 2 is once refined from face 1, then the matrix needs to be the
+     * interpolation matrix from a face to this particular child
      *
      * @precondition: face_1 is supposed to be active
-     *
-     * @note We have to be careful not to accidentally create constraint
-     * cycles when adding periodic constraints: For example, as the
-     * corresponding testcase bits/periodicity_05 demonstrates, we can
-     * occasionally get into trouble if we already have the constraint
-     * x1 == x2 and want to insert x2 == x1. We avoid this by skipping
-     * such "identity constraints" if the opposite constraint already
-     * exists.
      */
-    template <typename FaceIterator>
+    template <typename FaceIterator, typename Container, typename Matrix>
     void
-    set_periodicity_constraints(
+    collect_periodicity_constraints(
       const FaceIterator &                         face_1,
       const typename identity<FaceIterator>::type &face_2,
-      const FullMatrix<double> &                   transformation,
-      AffineConstraints<double> &                  affine_constraints,
+      const Matrix &                               transformation,
+      Container &                                  constraints,
       const ComponentMask &                        component_mask,
       const bool                                   face_orientation,
       const bool                                   face_flip,
@@ -1851,14 +1846,14 @@ namespace DoFTools
               fe.get_subface_interpolation_matrix(fe, c, subface_interpolation);
               subface_interpolation.mmult(child_transformation, transformation);
 
-              set_periodicity_constraints(face_1,
-                                          face_2->child(c),
-                                          child_transformation,
-                                          affine_constraints,
-                                          component_mask,
-                                          face_orientation,
-                                          face_flip,
-                                          face_rotation);
+              collect_periodicity_constraints(face_1,
+                                              face_2->child(c),
+                                              child_transformation,
+                                              constraints,
+                                              component_mask,
+                                              face_orientation,
+                                              face_flip,
+                                              face_rotation);
             }
           return;
         }
@@ -1953,161 +1948,45 @@ namespace DoFTools
       for (unsigned int i = 0; i < dofs_per_face; ++i)
         {
           // Obey the component mask
+
           if ((component_mask.n_selected_components(fe.n_components()) !=
                fe.n_components()) &&
               !component_mask[fe.face_system_to_component_index(i).first])
             continue;
 
-          // We have to be careful to treat so called "identity
-          // constraints" special. These are constraints of the form
-          // x1 == factor * x_2. In this case, if the constraint
-          // x2 == 1./factor * x1 already exists we are in trouble.
-          //
-          // Consequently, we have to check that we have indeed such an
-          // "identity constraint". We do this by looping over all entries
-          // of the row of the transformation matrix and check whether we
-          // find exactly one nonzero entry. If this is the case, set
-          // "is_identity_constrained" to true and record the corresponding
-          // index and factor.
-
-          bool         is_identity_constrained = false;
-          unsigned int target                  = numbers::invalid_unsigned_int;
-          double       factor                  = 1.;
-
           constexpr double eps = 1.e-13;
+
+          // Create a ConstraintLine for the current dof...
+          typename Container::value_type line;
+          line.index = dofs_2[i];
+
           for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-            {
-              const auto entry = transformation(i, jj);
-              if (std::abs(entry) > eps)
-                {
-                  if (is_identity_constrained)
-                    {
-                      // We did encounter more than one nonzero entry, so
-                      // the dof is not identity constrained. Set the
-                      // boolean to false and break out of the for loop.
-                      is_identity_constrained = false;
-                      break;
-                    }
-                  is_identity_constrained = true;
-                  target                  = jj;
-                  factor                  = entry;
-                }
-            }
+            if (std::abs(transformation(i, jj)) > eps)
+              {
+                const unsigned int j =
+                  cell_to_rotated_face_index[fe.face_to_cell_index(
+                    jj, 0, face_orientation, face_flip, face_rotation)];
 
-          // Next, we work on all constraints that are not identity
-          // constraints, i.e., constraints that involve an interpolation
-          // step that constrains the current dof (on face 2) to more than
-          // one dof on face 1.
+                line.entries.emplace_back(
+                  std::make_pair(dofs_1[j], transformation(i, jj)));
+              }
 
-          if (!is_identity_constrained)
-            {
-              // The current dof is already constrained. There is nothing
-              // left to do.
-              if (affine_constraints.is_constrained(dofs_2[i]))
-                continue;
-
-              // Enter the constraint piece by piece:
-              affine_constraints.add_line(dofs_2[i]);
-
-              for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
-                {
-                  // Get the correct dof index on face_1 respecting the
-                  // given orientation:
-                  const unsigned int j =
-                    cell_to_rotated_face_index[fe.face_to_cell_index(
-                      jj, 0, face_orientation, face_flip, face_rotation)];
-
-                  if (std::abs(transformation(i, jj)) > eps)
-                    affine_constraints.add_entry(dofs_2[i],
-                                                 dofs_1[j],
-                                                 transformation(i, jj));
-                }
-
-              // Continue with next dof.
-              continue;
-            }
-
-          // We are left with an "identity constraint".
-
-          // Get the correct dof index on face_1 respecting the given
-          // orientation:
-          const unsigned int j =
-            cell_to_rotated_face_index[fe.face_to_cell_index(
-              target, 0, face_orientation, face_flip, face_rotation)];
-
-          const bool face_2_constrained =
-            affine_constraints.is_constrained(dofs_2[i]);
-          const auto dof_left  = face_2_constrained ? dofs_1[j] : dofs_2[i];
-          const auto dof_right = face_2_constrained ? dofs_2[i] : dofs_1[j];
-          factor               = face_2_constrained ? 1. / factor : factor;
-
-          // Next, we try to enter the constraint
-          //   dof_left = factor * dof_right;
-
-          // If both degrees of freedom are constrained, there is nothing we
-          // can do. Simply continue with the next dof.
-          if (affine_constraints.is_constrained(dof_left) &&
-              affine_constraints.is_constrained(dof_right))
-            continue;
-
-          // We have to be careful that adding the current identity
-          // constraint does not create a constraint cycle. Thus, check for
-          // a dependency cycle:
-
-          bool   constraints_are_cyclic = true;
-          double cycle_factor           = factor;
-
-          for (auto test_dof = dof_right; test_dof != dof_left;)
-            {
-              if (!affine_constraints.is_constrained(test_dof))
-                {
-                  constraints_are_cyclic = false;
-                  break;
-                }
-
-              const auto &constraint_entries =
-                *affine_constraints.get_constraint_entries(test_dof);
-              if (constraint_entries.size() == 1)
-                {
-                  test_dof = constraint_entries[0].first;
-                  cycle_factor *= constraint_entries[0].second;
-                }
-              else
-                {
-                  constraints_are_cyclic = false;
-                  break;
-                }
-            }
-
-          // In case of a dependency cycle we, either
-          //  - do nothing if cycle_factor == 1. In this case all degrees
-          //    of freedom are already periodically constrained,
-          //  - otherwise, force all dofs to zero (by setting dof_left to
-          //    zero). The reasoning behind this is the fact that
-          //    cycle_factor != 1 occurs in situations such as
-          //    x1 == x2 and x2 == -1. * x1. This system is only solved by
-          //    x_1 = x_2 = 0.
-
-          if (constraints_are_cyclic)
-            {
-              if (std::abs(cycle_factor - 1.) > eps)
-                affine_constraints.add_line(dof_left);
-            }
-          else
-            {
-              affine_constraints.add_line(dof_left);
-              affine_constraints.add_entry(dof_left, dof_right, factor);
-            }
+          // ... and add it to the set:
+          constraints.emplace_back(std::move(line));
         } /* for dofs_per_face */
     }
 
 
 
-    // Internally used in make_periodicity_constraints.
-    //
-    // Build up a (possibly rotated) interpolation matrix that is used in
-    // set_periodicity_constraints with the help of user supplied matrix and
-    // first_vector_components.
+    /**
+     * @internal
+     *
+     * Internally used in collect_periodicity_constraints.
+     *
+     * Build up a (possibly rotated) interpolation matrix that is used in
+     * set_periodicity_constraints with the help of user supplied matrix and
+     * first_vector_components.
+     */
     template <int dim, int spacedim>
     FullMatrix<double>
     compute_transformation(
@@ -2197,11 +2076,328 @@ namespace DoFTools
       return transformation;
     }
 
+
+
+    /**
+     * @internal
+     *
+     * Internally used in make_periodicity_constraints.
+     *
+     * This function recursively iterates over pairs of subfaces until it
+     * encounters an active face and the recursion stops. Then, the actual
+     * work is handed over to the collect_periodicity_constraints variant
+     * above.
+     */
+    template <typename FaceIterator, typename Container, typename Matrix>
+    void
+    collect_periodicity_constraints(
+      const FaceIterator &                         face_1,
+      const typename identity<FaceIterator>::type &face_2,
+      Container &                                  constraints,
+      const ComponentMask &                        component_mask,
+      const bool                                   face_orientation,
+      const bool                                   face_flip,
+      const bool                                   face_rotation,
+      const Matrix &                               matrix,
+      const std::vector<unsigned int> &            first_vector_components)
+    {
+      static const int dim      = FaceIterator::AccessorType::dimension;
+      static const int spacedim = FaceIterator::AccessorType::space_dimension;
+
+      // A lookup table on how to go through the child faces depending on the
+      // orientation:
+
+      static const int lookup_table_2d[2][2] = {
+        //          flip:
+        {0, 1}, //  false
+        {1, 0}, //  true
+      };
+
+      static const int lookup_table_3d[2][2][2][4] = {
+        //                    orientation flip  rotation
+        {
+          {
+            {0, 2, 1, 3}, //  false       false false
+            {2, 3, 0, 1}, //  false       false true
+          },
+          {
+            {3, 1, 2, 0}, //  false       true  false
+            {1, 0, 3, 2}, //  false       true  true
+          },
+        },
+        {
+          {
+            {0, 1, 2, 3}, //  true        false false
+            {1, 3, 0, 2}, //  true        false true
+          },
+          {
+            {3, 2, 1, 0}, //  true        true  false
+            {2, 0, 3, 1}, //  true        true  true
+          },
+        },
+      };
+
+      if (face_1->has_children() && face_2->has_children())
+        {
+          // In the case that both faces have children, we loop over all
+          // children and apply collect_periodicty_constrains recursively:
+
+          Assert(face_1->n_children() ==
+                     GeometryInfo<dim>::max_children_per_face &&
+                   face_2->n_children() ==
+                     GeometryInfo<dim>::max_children_per_face,
+                 ExcNotImplemented());
+
+          for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face;
+               ++i)
+            {
+              // Lookup the index for the second face
+              unsigned int j;
+              switch (dim)
+                {
+                  case 2:
+                    j = lookup_table_2d[face_flip][i];
+                    break;
+                  case 3:
+                    j = lookup_table_3d[face_orientation][face_flip]
+                                       [face_rotation][i];
+                    break;
+                  default:
+                    AssertThrow(false, ExcNotImplemented());
+                }
+
+              collect_periodicity_constraints(face_1->child(i),
+                                              face_2->child(j),
+                                              constraints,
+                                              component_mask,
+                                              face_orientation,
+                                              face_flip,
+                                              face_rotation,
+                                              matrix,
+                                              first_vector_components);
+            }
+        }
+      else
+        {
+          // Otherwise at least one of the two faces is active and we need to do
+          // some work and enter the constraints!
+
+          // The finite element that matters is the one on the active face:
+          const FiniteElement<dim, spacedim> &fe =
+            face_1->has_children() ?
+              face_2->get_fe(face_2->nth_active_fe_index(0)) :
+              face_1->get_fe(face_1->nth_active_fe_index(0));
+
+          const unsigned int n_dofs_per_face = fe.dofs_per_face;
+
+          // Sometimes we just have nothing to do (for all finite elements, or
+          // systems which accidentally don't have any dofs on the boundary).
+          if (n_dofs_per_face == 0)
+            return;
+
+          const FullMatrix<double> transformation =
+            compute_transformation(fe, matrix, first_vector_components);
+
+          if (!face_2->has_children())
+            {
+              // Performance hack: We do not need to compute an inverse if the
+              // matrix is the identity matrix.
+              if (first_vector_components.empty() && matrix.m() == 0)
+                {
+                  collect_periodicity_constraints(face_2,
+                                                  face_1,
+                                                  transformation,
+                                                  constraints,
+                                                  component_mask,
+                                                  face_orientation,
+                                                  face_flip,
+                                                  face_rotation);
+                }
+              else
+                {
+                  FullMatrix<double> inverse(transformation.m());
+                  inverse.invert(transformation);
+
+                  collect_periodicity_constraints(face_2,
+                                                  face_1,
+                                                  inverse,
+                                                  constraints,
+                                                  component_mask,
+                                                  face_orientation,
+                                                  face_flip,
+                                                  face_rotation);
+                }
+            }
+          else
+            {
+              Assert(!face_1->has_children(), ExcInternalError());
+
+              // Important note: In 3D we have to take care of the fact
+              // that face_rotation gives the relative rotation of face_1
+              // to face_2, i.e. we have to invert the rotation when
+              // constraining face_2 to face_1. Therefore face_flip has to
+              // be toggled if face_rotation is true: In case of inverted
+              // orientation, nothing has to be done.
+              collect_periodicity_constraints(face_1,
+                                              face_2,
+                                              transformation,
+                                              constraints,
+                                              component_mask,
+                                              face_orientation,
+                                              face_orientation ?
+                                                face_rotation ^ face_flip :
+                                                face_flip,
+                                              face_rotation);
+            }
+        }
+    }
+
+
+
+    /**
+     * @internal
+     *
+     * Internally used in make_periodicity_constraints.
+     *
+     * Enter periodicity constraints that were previously collected by
+     * collect_periodicity_constraints into the given AffineConstraints
+     * object.
+     *
+     * @note We have to be careful not to accidentally create constraint
+     * cycles when adding periodic constraints: For example, as the
+     * corresponding testcase bits/periodicity_05 demonstrates, we can
+     * occasionally get into trouble if we already have the constraint
+     * x1 == x2 and want to insert x2 == x1. We avoid this by skipping
+     * such "identity constraints" if the opposite constraint already
+     * exists.
+     */
+    template <typename Container>
+    void
+    set_periodicity_constraints(const Container &          constraints,
+                                AffineConstraints<double> &affine_constraints)
+    {
+      for (const auto &line : constraints)
+        {
+          // We have to be careful to treat so called "identity
+          // constraints" special. These are constraints of the form
+          // x1 == factor * x2.
+          //
+          // In this case, we will try enter the constraint
+          // "x2 == 1./factor * x1" instead of "x1 == factor * x2"
+          // if x1 is already constrained. This is necessary in order to
+          // cover a number of corner cases in which otherwise periodic
+          // constraints would be forgotten.
+          //
+          // This also forces us to check for constraint cycles in this
+          // case.
+
+          Assert(line.entries.size() >= 1, ExcInternalError());
+
+          // First, we work on all constraints that are not identity
+          // constraints, i.e., constraints that involve an interpolation
+          // step that constrains the current dof to more than one dof:
+
+          if (line.entries.size() != 1)
+            {
+              // The current dof is already constrained. There is nothing
+              // left to do.
+              if (affine_constraints.is_constrained(line.index))
+                continue;
+
+              affine_constraints.add_line(line.index);
+              affine_constraints.add_entries(line.index, line.entries);
+
+              // Continue with next dof.
+              continue;
+            }
+
+          //
+          // We are left with an "identity constraint" of the form:
+          //   dof_left = factor * dof_right:
+          //
+
+          auto dof_left  = line.index;
+          auto dof_right = line.entries[0].first;
+          auto factor    = line.entries[0].second;
+
+          // If both degrees of freedom are constrained, there is nothing
+          // left to do. Simply continue with the next dof.
+
+          if (affine_constraints.is_constrained(dof_left) &&
+              affine_constraints.is_constrained(dof_right))
+            continue;
+
+          // If dof_left is already constrained, flip the order.
+
+          if (affine_constraints.is_constrained(dof_left))
+            {
+              // We enter dof_right = 1. / factor * dof_left instead:
+              std::swap(dof_left, dof_right);
+              factor = 1. / factor;
+            }
+
+          // We have to be careful that adding the current identity
+          // constraint does not create a constraint cycle. Thus, check for
+          // a dependency cycle:
+
+          bool   constraints_are_cyclic = true;
+          double cycle_factor           = factor;
+
+          for (auto test_dof = dof_right; test_dof != dof_left;)
+            {
+              if (!affine_constraints.is_constrained(test_dof))
+                {
+                  constraints_are_cyclic = false;
+                  break;
+                }
+
+              const auto &constraint_entries =
+                *affine_constraints.get_constraint_entries(test_dof);
+              if (constraint_entries.size() == 1)
+                {
+                  test_dof = constraint_entries[0].first;
+                  cycle_factor *= constraint_entries[0].second;
+                }
+              else
+                {
+                  constraints_are_cyclic = false;
+                  break;
+                }
+            }
+
+          // In case of a dependency cycle we, either
+          //  - do nothing if cycle_factor == 1. In this case all degrees
+          //    of freedom are already periodically constrained,
+          //  - otherwise, force all dofs to zero (by setting dof_left to
+          //    zero). The reasoning behind this is the fact that
+          //    cycle_factor != 1 occurs in situations such as
+          //    x1 == x2 and x2 == -1. * x1. This system is only solved by
+          //    x_1 = x_2 = 0.
+
+          if (constraints_are_cyclic)
+            {
+              constexpr double eps = 1.e-13;
+
+              if (std::abs(cycle_factor - 1.) > eps)
+                affine_constraints.add_line(dof_left);
+            }
+          else
+            {
+              Assert(!affine_constraints.is_constrained(dof_left),
+                     ExcInternalError());
+
+              affine_constraints.add_line(dof_left);
+              affine_constraints.add_entry(dof_left, dof_right, factor);
+            }
+        } /* for dofs_per_face */
+    }
   } /*namespace*/
 
 
-  // Low level interface:
 
+  //
+  // Low level interface:
+  //
 
   template <typename FaceIterator>
   void
@@ -2216,6 +2412,10 @@ namespace DoFTools
     const FullMatrix<double> &                   matrix,
     const std::vector<unsigned int> &            first_vector_components)
   {
+    // Every call to on of the high-level make_periodicity_constraints
+    // variants will end up here, so check all preconditions at this point:
+
+#ifdef DEBUG
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
@@ -2246,7 +2446,6 @@ namespace DoFTools
            ExcMessage("first_vector_components is nonempty, so matrix must "
                       "be a rotation matrix exactly of size spacedim"));
 
-#ifdef DEBUG
     if (!face_1->has_children())
       {
         Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
@@ -2282,155 +2481,28 @@ namespace DoFTools
       }
 #endif
 
-    // A lookup table on how to go through the child faces depending on the
-    // orientation:
+    std::vector<typename AffineConstraints<double>::ConstraintLine> constraints;
 
-    static const int lookup_table_2d[2][2] = {
-      //          flip:
-      {0, 1}, //  false
-      {1, 0}, //  true
-    };
+    // First, we collect all periodicity constraints recursively:
+    collect_periodicity_constraints(face_1,
+                                    face_2,
+                                    constraints,
+                                    component_mask,
+                                    face_orientation,
+                                    face_flip,
+                                    face_rotation,
+                                    matrix,
+                                    first_vector_components);
 
-    static const int lookup_table_3d[2][2][2][4] = {
-      //                    orientation flip  rotation
-      {
-        {
-          {0, 2, 1, 3}, //  false       false false
-          {2, 3, 0, 1}, //  false       false true
-        },
-        {
-          {3, 1, 2, 0}, //  false       true  false
-          {1, 0, 3, 2}, //  false       true  true
-        },
-      },
-      {
-        {
-          {0, 1, 2, 3}, //  true        false false
-          {1, 3, 0, 2}, //  true        false true
-        },
-        {
-          {3, 2, 1, 0}, //  true        true  false
-          {2, 0, 3, 1}, //  true        true  true
-        },
-      },
-    };
-
-    if (face_1->has_children() && face_2->has_children())
-      {
-        // In the case that both faces have children, we loop over all children
-        // and apply make_periodicty_constrains recursively:
-
-        Assert(face_1->n_children() ==
-                   GeometryInfo<dim>::max_children_per_face &&
-                 face_2->n_children() ==
-                   GeometryInfo<dim>::max_children_per_face,
-               ExcNotImplemented());
-
-        for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face;
-             ++i)
-          {
-            // Lookup the index for the second face
-            unsigned int j;
-            switch (dim)
-              {
-                case 2:
-                  j = lookup_table_2d[face_flip][i];
-                  break;
-                case 3:
-                  j = lookup_table_3d[face_orientation][face_flip]
-                                     [face_rotation][i];
-                  break;
-                default:
-                  AssertThrow(false, ExcNotImplemented());
-              }
-
-            make_periodicity_constraints(face_1->child(i),
-                                         face_2->child(j),
-                                         affine_constraints,
-                                         component_mask,
-                                         face_orientation,
-                                         face_flip,
-                                         face_rotation,
-                                         matrix,
-                                         first_vector_components);
-          }
-      }
-    else
-      {
-        // Otherwise at least one of the two faces is active and we need to do
-        // some work and enter the constraints!
-
-        // The finite element that matters is the one on the active face:
-        const FiniteElement<dim, spacedim> &fe =
-          face_1->has_children() ?
-            face_2->get_fe(face_2->nth_active_fe_index(0)) :
-            face_1->get_fe(face_1->nth_active_fe_index(0));
-
-        const unsigned int n_dofs_per_face = fe.dofs_per_face;
-
-        // Sometimes we just have nothing to do (for all finite elements, or
-        // systems which accidentally don't have any dofs on the boundary).
-        if (n_dofs_per_face == 0)
-          return;
-
-        const FullMatrix<double> transformation =
-          compute_transformation(fe, matrix, first_vector_components);
-
-        if (!face_2->has_children())
-          {
-            // Performance hack: We do not need to compute an inverse if the
-            // matrix is the identity matrix.
-            if (first_vector_components.empty() && matrix.m() == 0)
-              {
-                set_periodicity_constraints(face_2,
-                                            face_1,
-                                            transformation,
-                                            affine_constraints,
-                                            component_mask,
-                                            face_orientation,
-                                            face_flip,
-                                            face_rotation);
-              }
-            else
-              {
-                FullMatrix<double> inverse(transformation.m());
-                inverse.invert(transformation);
-
-                set_periodicity_constraints(face_2,
-                                            face_1,
-                                            inverse,
-                                            affine_constraints,
-                                            component_mask,
-                                            face_orientation,
-                                            face_flip,
-                                            face_rotation);
-              }
-          }
-        else
-          {
-            Assert(!face_1->has_children(), ExcInternalError());
-
-            // Important note:
-            // In 3D we have to take care of the fact that face_rotation gives
-            // the relative rotation of face_1 to face_2, i.e. we have to invert
-            // the rotation when constraining face_2 to face_1. Therefore
-            // face_flip has to be toggled if face_rotation is true: In case of
-            // inverted orientation, nothing has to be done.
-            set_periodicity_constraints(face_1,
-                                        face_2,
-                                        transformation,
-                                        affine_constraints,
-                                        component_mask,
-                                        face_orientation,
-                                        face_orientation ?
-                                          face_rotation ^ face_flip :
-                                          face_flip,
-                                        face_rotation);
-          }
-      }
+    // Then, we enter all constraints into the AffineConstraints object:
+    set_periodicity_constraints(constraints, affine_constraints);
   }
 
 
+
+  //
+  // High level interface variants:
+  //
 
   template <typename DoFHandlerType>
   void
@@ -2467,8 +2539,6 @@ namespace DoFTools
       }
   }
 
-
-  // High level interface variants:
 
 
   template <typename DoFHandlerType>
