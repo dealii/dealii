@@ -279,9 +279,30 @@ namespace Differentiation
        * Return a flag that, when <code>true</code>, indicates that the retaping
        * of the dependent function for the chosen @p tape_index is necessary for
        * a reliable computation to be performed.
-       * This may be necessary a sign comparison within branched operations
+       * This may be necessary if a sign comparison within branched operations
        * yields different results to those computed at the original tape
        * evaluation point.
+       *
+       * This issue, known as "branch switching", can be clarified by means of
+       * a trivial example:
+       * @code
+       * ADNumberType func (ADNumberType x, ADNumberType y, ADNumberType z)
+       * {
+       *   if (x < y)
+       *     return y;
+       *   else
+       *     return x*z;
+       * }
+       * @endcode
+       * During taping, the conditional statement may be either <tt>true</tt> or
+       * <tt>false</tt>, and the result (with its sensitivities) returned by
+       * this function. For some other evaluation of the tape (i.e. for some
+       * different
+       * inputs @p x and @p y, the other branch of the conditional check may be
+       * chosen. The result of following this code path has not been recorded on
+       * the tape, and therefore cannot be evaluated. In such a case, it is
+       * therefore necessary to re-record the tape at the new evaluation point
+       * in order to resolve the new code branch.
        *
        * @note The chosen tape index must be greater than
        * Numbers<ADNumberType>::invalid_tape_index and less than
@@ -295,9 +316,30 @@ namespace Differentiation
        * Return a flag that, when <code>true</code>, indicates that the retaping
        * of the dependent function is necessary for a reliable computation to be
        * performed on the active tape.
-       * This may be necessary a sign comparison within branched operations
+       * This may be necessary if a sign comparison within branched operations
        * yields different results to those computed at the original tape
        * evaluation point.
+       *
+       * This issue, known as "branch switching", can be clarified by means of
+       * a trivial example:
+       * @code
+       * ADNumberType func (ADNumberType x, ADNumberType y, ADNumberType z)
+       * {
+       *   if (x < y)
+       *     return y;
+       *   else
+       *     return x*z;
+       * }
+       * @endcode
+       * During taping, the conditional statement may be either <tt>true</tt> or
+       * <tt>false</tt>, and the result (with its sensitivities) returned by
+       * this function. For some other evaluation of the tape (i.e. for some
+       * different
+       * inputs @p x and @p y, the other branch of the conditional check may be
+       * chosen. The result of following this code path has not been recorded on
+       * the tape, and therefore cannot be evaluated. In such a case, it is
+       * therefore necessary to re-record the tape at the new evaluation point
+       * in order to resolve the new code branch.
        */
       bool
       last_action_requires_retaping() const;
@@ -869,6 +911,8 @@ namespace Differentiation
        *
        * When the @p status variable takes a negative value, retaping of the dependent
        * function is necessary for a reliable computation to be performed.
+       * This status can be queried through the requires_retaping() and
+       * last_action_requires_retaping() functions.
        */
       mutable std::map<typename Types<ADNumberType>::tape_index, int> status;
 
