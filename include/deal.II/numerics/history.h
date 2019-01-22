@@ -58,7 +58,7 @@ public:
   /**
    * Constructor.
    *
-   * @parameter max_elements maximum number of elements to be stored in the
+   * @param max_elements maximum number of elements to be stored in the
    * history.
    */
   FiniteSizeHistory(const std::size_t max_elements = 0);

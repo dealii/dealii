@@ -1040,7 +1040,7 @@ namespace ColorEnriched
    * <table>
    * <tr>
    * <th>Active FE index</th>
-   * <th>FiniteElement name</code> </th>
+   * <th>FiniteElement name</th>
    * </tr>
    * <tr>
    * <td>0</td>
