@@ -101,6 +101,9 @@ ENDFOREACH()
 MESSAGE(STATUS "translated this into")
 MESSAGE(STATUS "found ${_inst_in_dirs}")
 
+# make sure doxygen sees the extra.sty stylefile:
+SET(_extra_packages "${CMAKE_CURRENT_SOURCE_DIR}/extra")
+
 # Generate the input files for doxygen using template .in files in which
 # we have to substitute some CMake variables
 CONFIGURE_FILE(
