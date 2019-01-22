@@ -1596,6 +1596,7 @@ namespace deal_II_exceptions
   AssertDimension(VEC.size(), DIM1);                 \
   for (const auto &subvector : VEC)                  \
     {                                                \
+      (void)subvector;                               \
       AssertDimension(subvector.size(), DIM2);       \
     }
 
