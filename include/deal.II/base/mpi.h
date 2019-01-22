@@ -822,7 +822,7 @@ namespace Utilities
 
       // Exchanging the size of each buffer
       MPI_Allgather(
-        &n_local_data, 1, MPI_INT, &(size_all_data[0]), 1, MPI_INT, comm);
+        &n_local_data, 1, MPI_INT, size_all_data.data(), 1, MPI_INT, comm);
 
       // Now computing the displacement, relative to recvbuf,
       // at which to store the incoming buffer

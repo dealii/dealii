@@ -60,7 +60,7 @@ namespace TrilinosWrappers
             colnum_cache->size(),
             ncols,
             reinterpret_cast<TrilinosWrappers::types::int_type *>(
-              const_cast<size_type *>(&(*colnum_cache)[0])));
+              const_cast<size_type *>(colnum_cache->data())));
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           AssertThrow(static_cast<std::vector<size_type>::size_type>(ncols) ==
                         colnum_cache->size(),

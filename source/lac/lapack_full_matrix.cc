@@ -82,7 +82,7 @@ namespace internal
       geev(&vl,
            &vr,
            &n_rows,
-           &matrix[0],
+           matrix.data(),
            &n_rows,
            real_part_eigenvalues.data(),
            imag_part_eigenvalues.data(),
@@ -134,7 +134,7 @@ namespace internal
       geev(&vl,
            &vr,
            &n_rows,
-           &matrix[0],
+           matrix.data(),
            &n_rows,
            eigenvalues.data(),
            left_eigenvectors.data(),
@@ -178,12 +178,12 @@ namespace internal
       gesdd(&job,
             &n_rows,
             &n_cols,
-            &matrix[0],
+            matrix.data(),
             &n_rows,
             singular_values.data(),
-            &left_vectors[0],
+            left_vectors.data(),
             &n_rows,
-            &right_vectors[0],
+            right_vectors.data(),
             &n_cols,
             real_work.data(),
             &work_flag,
@@ -224,12 +224,12 @@ namespace internal
       gesdd(&job,
             &n_rows,
             &n_cols,
-            &matrix[0],
+            matrix.data(),
             &n_rows,
             singular_values.data(),
-            &left_vectors[0],
+            left_vectors.data(),
             &n_rows,
-            &right_vectors[0],
+            right_vectors.data(),
             &n_cols,
             work.data(),
             &work_flag,
@@ -436,7 +436,7 @@ LAPACKFullMatrix<number>::operator*=(const number factor)
   types::blas_int       info  = 0;
   // kl and ku will not be referenced for type = G (dense matrices).
   const types::blas_int kl     = 0;
-  number *              values = &this->values[0];
+  number *              values = this->values.data();
 
   lascl(&type, &kl, &kl, &cfrom, &factor, &m, &n, values, &lda, &info);
 
@@ -466,7 +466,7 @@ LAPACKFullMatrix<number>::operator/=(const number factor)
   types::blas_int       info = 0;
   // kl and ku will not be referenced for type = G (dense matrices).
   const types::blas_int kl     = 0;
-  number *              values = &this->values[0];
+  number *              values = this->values.data();
 
   lascl(&type, &kl, &kl, &factor, &cto, &m, &n, values, &lda, &info);
 
@@ -496,8 +496,8 @@ LAPACKFullMatrix<number>::add(const number a, const LAPACKFullMatrix<number> &A)
   // ==> use BLAS 1 for adding vectors
   const types::blas_int n        = this->m() * this->n();
   const types::blas_int inc      = 1;
-  number *              values   = &this->values[0];
-  const number *        values_A = &A.values[0];
+  number *              values   = this->values.data();
+  const number *        values_A = A.values.data();
 
   axpy(&n, &a, values_A, &inc, values, &inc);
 }
@@ -677,7 +677,8 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
       const types::blas_int lda  = N;
       const types::blas_int incx = 1;
 
-      trmv(&uplo, &trans, &diag, &N, &this->values[0], &lda, &w[0], &incx);
+      trmv(
+        &uplo, &trans, &diag, &N, this->values.data(), &lda, w.data(), &incx);
 
       return;
     }
@@ -694,12 +695,12 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
                &mm,
                &nn,
                &alpha,
-               &this->values[0],
+               this->values.data(),
                &mm,
-               v.values.get(),
+               v.data(),
                &one,
                &beta,
-               w.values.get(),
+               w.data(),
                &one);
           break;
         }
@@ -714,9 +715,9 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
                &nn,
                &nn,
                &alpha,
-               &svd_vt->values[0],
+               svd_vt->values.data(),
                &nn,
-               v.values.get(),
+               v.data(),
                &one,
                &null,
                work.data(),
@@ -729,12 +730,12 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
                &mm,
                &mm,
                &alpha,
-               &svd_u->values[0],
+               svd_u->values.data(),
                &mm,
                work.data(),
                &one,
                &beta,
-               w.values.get(),
+               w.data(),
                &one);
           break;
         }
@@ -749,9 +750,9 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
                &mm,
                &mm,
                &alpha,
-               &svd_u->values[0],
+               svd_u->values.data(),
                &mm,
-               v.values.get(),
+               v.data(),
                &one,
                &null,
                work.data(),
@@ -764,12 +765,12 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
                &nn,
                &nn,
                &alpha,
-               &svd_vt->values[0],
+               svd_vt->values.data(),
                &nn,
                work.data(),
                &one,
                &beta,
-               w.values.get(),
+               w.data(),
                &one);
           break;
         }
@@ -811,7 +812,8 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
       const types::blas_int lda  = N;
       const types::blas_int incx = 1;
 
-      trmv(&uplo, &trans, &diag, &N, &this->values[0], &lda, &w[0], &incx);
+      trmv(
+        &uplo, &trans, &diag, &N, this->values.data(), &lda, w.data(), &incx);
 
       return;
     }
@@ -829,12 +831,12 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
                &mm,
                &nn,
                &alpha,
-               &this->values[0],
+               this->values.data(),
                &mm,
-               v.values.get(),
+               v.data(),
                &one,
                &beta,
-               w.values.get(),
+               w.data(),
                &one);
           break;
         }
@@ -850,9 +852,9 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
                &mm,
                &mm,
                &alpha,
-               &svd_u->values[0],
+               svd_u->values.data(),
                &mm,
-               v.values.get(),
+               v.data(),
                &one,
                &null,
                work.data(),
@@ -865,12 +867,12 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
                &nn,
                &nn,
                &alpha,
-               &svd_vt->values[0],
+               svd_vt->values.data(),
                &nn,
                work.data(),
                &one,
                &beta,
-               w.values.get(),
+               w.data(),
                &one);
           break;
         }
@@ -886,9 +888,9 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
                &nn,
                &nn,
                &alpha,
-               &svd_vt->values[0],
+               svd_vt->values.data(),
                &nn,
-               v.values.get(),
+               v.data(),
                &one,
                &null,
                work.data(),
@@ -901,12 +903,12 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
                &mm,
                &mm,
                &alpha,
-               &svd_u->values[0],
+               svd_u->values.data(),
                &mm,
                work.data(),
                &one,
                &beta,
-               w.values.get(),
+               w.data(),
                &one);
           break;
         }
@@ -958,12 +960,12 @@ LAPACKFullMatrix<number>::mmult(LAPACKFullMatrix<number> &      C,
        &nn,
        &kk,
        &alpha,
-       &this->values[0],
+       this->values.data(),
        &mm,
-       &B.values[0],
+       B.values.data(),
        &kk,
        &beta,
-       &C.values[0],
+       C.values.data(),
        &mm);
 }
 
@@ -993,9 +995,9 @@ LAPACKFullMatrix<number>::mmult(FullMatrix<number> &            C,
        &mm,
        &kk,
        &alpha,
-       &B.values[0],
+       B.values.data(),
        &kk,
-       &this->values[0],
+       this->values.data(),
        &mm,
        &beta,
        &C(0, 0),
@@ -1055,12 +1057,12 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &      C,
        &nn,
        &kk,
        &alpha,
-       &this->values[0],
+       this->values.data(),
        &kk,
-       &work[0],
+       work.data(),
        &kk,
        &beta,
-       &C.values[0],
+       C.values.data(),
        &mm);
 }
 
@@ -1077,7 +1079,7 @@ LAPACKFullMatrix<number>::transpose(LAPACKFullMatrix<number> &B) const
   const types::blas_int n = B.n();
 #ifdef DEAL_II_LAPACK_WITH_MKL
   const number one = 1.;
-  omatcopy('C', 'C', n, m, one, &A.values[0], n, &B.values[0], m);
+  omatcopy('C', 'C', n, m, one, A.values.data(), n, B.values.data(), m);
 #else
   for (types::blas_int i = 0; i < m; ++i)
     for (types::blas_int j = 0; j < n; ++j)
@@ -1128,10 +1130,10 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &      C,
            &nn,
            &kk,
            &alpha,
-           &this->values[0],
+           this->values.data(),
            &kk,
            &beta,
-           &C.values[0],
+           C.values.data(),
            &nn);
 
       // fill-in lower triangular part
@@ -1149,12 +1151,12 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &      C,
            &nn,
            &kk,
            &alpha,
-           &this->values[0],
+           this->values.data(),
            &kk,
-           &B.values[0],
+           B.values.data(),
            &kk,
            &beta,
-           &C.values[0],
+           C.values.data(),
            &mm);
     }
 }
@@ -1185,9 +1187,9 @@ LAPACKFullMatrix<number>::Tmmult(FullMatrix<number> &            C,
        &mm,
        &kk,
        &alpha,
-       &B.values[0],
+       B.values.data(),
        &kk,
-       &this->values[0],
+       this->values.data(),
        &kk,
        &beta,
        &C(0, 0),
@@ -1220,10 +1222,10 @@ LAPACKFullMatrix<number>::mTmult(LAPACKFullMatrix<number> &      C,
            &nn,
            &kk,
            &alpha,
-           &this->values[0],
+           this->values.data(),
            &nn,
            &beta,
-           &C.values[0],
+           C.values.data(),
            &nn);
 
       // fill-in lower triangular part
@@ -1241,12 +1243,12 @@ LAPACKFullMatrix<number>::mTmult(LAPACKFullMatrix<number> &      C,
            &nn,
            &kk,
            &alpha,
-           &this->values[0],
+           this->values.data(),
            &mm,
-           &B.values[0],
+           B.values.data(),
            &nn,
            &beta,
-           &C.values[0],
+           C.values.data(),
            &mm);
     }
 }
@@ -1278,9 +1280,9 @@ LAPACKFullMatrix<number>::mTmult(FullMatrix<number> &            C,
        &mm,
        &kk,
        &alpha,
-       &B.values[0],
+       B.values.data(),
        &nn,
-       &this->values[0],
+       this->values.data(),
        &mm,
        &beta,
        &C(0, 0),
@@ -1312,12 +1314,12 @@ LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number> &      C,
        &nn,
        &kk,
        &alpha,
-       &this->values[0],
+       this->values.data(),
        &kk,
-       &B.values[0],
+       B.values.data(),
        &nn,
        &beta,
-       &C.values[0],
+       C.values.data(),
        &mm);
 }
 
@@ -1347,9 +1349,9 @@ LAPACKFullMatrix<number>::TmTmult(FullMatrix<number> &            C,
        &mm,
        &kk,
        &alpha,
-       &B.values[0],
+       B.values.data(),
        &nn,
-       &this->values[0],
+       this->values.data(),
        &kk,
        &beta,
        &C(0, 0),
@@ -1366,7 +1368,7 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
 
   const types::blas_int mm     = this->m();
   const types::blas_int nn     = this->n();
-  number *const         values = &this->values[0];
+  number *const         values = this->values.data();
   ipiv.resize(mm);
   types::blas_int info = 0;
   getrf(&mm, &nn, values, &mm, ipiv.data(), &info);
@@ -1432,7 +1434,7 @@ LAPACKFullMatrix<number>::norm(const char type) const
 
   const types::blas_int N      = this->n();
   const types::blas_int M      = this->m();
-  const number *const   values = &this->values[0];
+  const number *const   values = this->values.data();
   if (property == symmetric)
     {
       const types::blas_int lda = std::max<types::blas_int>(1, N);
@@ -1484,7 +1486,7 @@ LAPACKFullMatrix<number>::compute_cholesky_factorization()
   (void)mm;
   Assert(mm == nn, ExcDimensionMismatch(mm, nn));
 
-  number *const         values = &this->values[0];
+  number *const         values = this->values.data();
   types::blas_int       info   = 0;
   const types::blas_int lda    = std::max<types::blas_int>(1, nn);
   potrf(&LAPACKSupport::L, &nn, values, &lda, &info);
@@ -1507,7 +1509,7 @@ LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
   number rcond = 0.;
 
   const types::blas_int N      = this->m();
-  const number *        values = &this->values[0];
+  const number *        values = this->values.data();
   types::blas_int       info   = 0;
   const types::blas_int lda    = std::max<types::blas_int>(1, N);
   work.resize(3 * N);
@@ -1541,7 +1543,7 @@ LAPACKFullMatrix<number>::reciprocal_condition_number() const
   number rcond = 0.;
 
   const types::blas_int N      = this->m();
-  const number *const   values = &this->values[0];
+  const number *const   values = this->values.data();
   types::blas_int       info   = 0;
   const types::blas_int lda    = std::max<types::blas_int>(1, N);
   work.resize(3 * N);
@@ -1698,7 +1700,7 @@ LAPACKFullMatrix<number>::invert()
   const types::blas_int nn = this->n();
   Assert(nn == mm, ExcNotQuadratic());
 
-  number *const   values = &this->values[0];
+  number *const   values = this->values.data();
   types::blas_int info   = 0;
 
   if (property != symmetric)
@@ -1740,7 +1742,7 @@ LAPACKFullMatrix<number>::solve(Vector<number> &v, const bool transposed) const
   AssertDimension(this->m(), v.size());
   const char *          trans  = transposed ? &T : &N;
   const types::blas_int nn     = this->n();
-  const number *const   values = &this->values[0];
+  const number *const   values = this->values.data();
   const types::blas_int n_rhs  = 1;
   types::blas_int       info   = 0;
 
@@ -1786,19 +1788,32 @@ LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
   AssertDimension(this->m(), B.m());
   const char *          trans  = transposed ? &T : &N;
   const types::blas_int nn     = this->n();
-  const number *const   values = &this->values[0];
+  const number *const   values = this->values.data();
   const types::blas_int n_rhs  = B.n();
   types::blas_int       info   = 0;
 
   if (state == lu)
     {
-      getrs(
-        trans, &nn, &n_rhs, values, &nn, ipiv.data(), &B.values[0], &nn, &info);
+      getrs(trans,
+            &nn,
+            &n_rhs,
+            values,
+            &nn,
+            ipiv.data(),
+            B.values.data(),
+            &nn,
+            &info);
     }
   else if (state == cholesky)
     {
-      potrs(
-        &LAPACKSupport::L, &nn, &n_rhs, values, &nn, &B.values[0], &nn, &info);
+      potrs(&LAPACKSupport::L,
+            &nn,
+            &n_rhs,
+            values,
+            &nn,
+            B.values.data(),
+            &nn,
+            &info);
     }
   else if (property == upper_triangular || property == lower_triangular)
     {
@@ -1814,7 +1829,7 @@ LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
             &n_rhs,
             values,
             &lda,
-            &B.values[0],
+            B.values.data(),
             &ldb,
             &info);
     }
@@ -1977,8 +1992,8 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
   wr.resize(nn);
   LAPACKFullMatrix<number> matrix_eigenvectors(nn, nn);
 
-  number *const values_A            = &this->values[0];
-  number *const values_eigenvectors = &matrix_eigenvectors.values[0];
+  number *const values_A            = this->values.data();
+  number *const values_eigenvectors = matrix_eigenvectors.values.data();
 
   types::blas_int              info(0), lwork(-1), n_eigenpairs(0);
   const char *const            jobz(&V);
@@ -2092,9 +2107,9 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   wr.resize(nn);
   LAPACKFullMatrix<number> matrix_eigenvectors(nn, nn);
 
-  number *const values_A            = &this->values[0];
-  number *const values_B            = &B.values[0];
-  number *const values_eigenvectors = &matrix_eigenvectors.values[0];
+  number *const values_A            = this->values.data();
+  number *const values_B            = B.values.data();
+  number *const values_eigenvectors = matrix_eigenvectors.values.data();
 
   types::blas_int              info(0), lwork(-1), n_eigenpairs(0);
   const char *const            jobz(&V);
@@ -2216,8 +2231,8 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   wi.resize(nn); // This is set purely for consistency reasons with the
   // eigenvalues() function.
 
-  number *const values_A = &this->values[0];
-  number *const values_B = &B.values[0];
+  number *const values_A = this->values.data();
+  number *const values_B = B.values.data();
 
   types::blas_int   info  = 0;
   types::blas_int   lwork = -1;

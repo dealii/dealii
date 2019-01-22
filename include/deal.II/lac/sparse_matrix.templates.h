@@ -438,9 +438,9 @@ SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
         row,
         matrix.row_length(row),
         ncols,
-        &(value_cache[0]),
+        value_cache.data(),
         reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          &(colnum_cache[0])));
+          colnum_cache.data()));
       (void)ierr;
       Assert(ierr == 0, ExcTrilinosError(ierr));
 
@@ -1407,7 +1407,7 @@ SparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
   const size_type    n            = src.size();
   somenumber *       dst_ptr      = dst.begin();
   const somenumber * src_ptr      = src.begin();
-  const std::size_t *rowstart_ptr = &cols->rowstart[0];
+  const std::size_t *rowstart_ptr = cols->rowstart.get();
 
   // optimize the following loop for
   // the case that the relaxation
@@ -1452,7 +1452,7 @@ SparseMatrix<number>::precondition_SSOR(
   internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   const size_type    n            = src.size();
-  const std::size_t *rowstart_ptr = &cols->rowstart[0];
+  const std::size_t *rowstart_ptr = cols->rowstart.get();
   somenumber *       dst_ptr      = &dst(0);
 
   // case when we have stored the position
@@ -1482,7 +1482,7 @@ SparseMatrix<number>::precondition_SSOR(
           *dst_ptr /= val[*rowstart_ptr];
         }
 
-      rowstart_ptr = &cols->rowstart[0];
+      rowstart_ptr = cols->rowstart.get();
       dst_ptr      = &dst(0);
       for (; rowstart_ptr != &cols->rowstart[n]; ++rowstart_ptr, ++dst_ptr)
         *dst_ptr *=
@@ -1521,10 +1521,10 @@ SparseMatrix<number>::precondition_SSOR(
       // line denotes the diagonal element,
       // which we need not check.
       const size_type first_right_of_diagonal_index =
-        (Utilities::lower_bound(&cols->colnums[*rowstart_ptr + 1],
-                                &cols->colnums[*(rowstart_ptr + 1)],
+        (Utilities::lower_bound(cols->colnums.get() + *rowstart_ptr + 1,
+                                cols->colnums.get() + *(rowstart_ptr + 1),
                                 row) -
-         &cols->colnums[0]);
+         cols->colnums.get());
 
       number s = 0;
       for (size_type j = (*rowstart_ptr) + 1; j < first_right_of_diagonal_index;
@@ -1537,7 +1537,7 @@ SparseMatrix<number>::precondition_SSOR(
       *dst_ptr /= val[*rowstart_ptr];
     };
 
-  rowstart_ptr = &cols->rowstart[0];
+  rowstart_ptr = cols->rowstart.get();
   dst_ptr      = &dst(0);
   for (size_type row = 0; row < n; ++row, ++rowstart_ptr, ++dst_ptr)
     *dst_ptr *= somenumber((number(2.) - om)) * somenumber(val[*rowstart_ptr]);
@@ -1552,7 +1552,7 @@ SparseMatrix<number>::precondition_SSOR(
         (Utilities::lower_bound(&cols->colnums[*rowstart_ptr + 1],
                                 &cols->colnums[end_row],
                                 static_cast<size_type>(row)) -
-         &cols->colnums[0]);
+         cols->colnums.get());
       number s = 0;
       for (size_type j = first_right_of_diagonal_index; j < end_row; ++j)
         s += val[j] * number(dst(cols->colnums[j]));

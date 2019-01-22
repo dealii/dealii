@@ -1064,7 +1064,7 @@ namespace Differentiation
         ::gradient(active_tape_index,
                    independent_variables.size(),
                    const_cast<scalar_type *>(independent_variables.data()),
-                   &gradient[0]);
+                   gradient.data());
       }
 
       static void
@@ -1086,7 +1086,7 @@ namespace Differentiation
           independent_variables.size();
         std::vector<scalar_type *> H(n_independent_variables);
         for (unsigned int i = 0; i < n_independent_variables; ++i)
-          H[i] = &(hessian[i][0]);
+          H[i] = &hessian[i][0];
 
         ::hessian(active_tape_index,
                   n_independent_variables,
@@ -1119,7 +1119,7 @@ namespace Differentiation
                    n_dependent_variables,
                    independent_variables.size(),
                    const_cast<scalar_type *>(independent_variables.data()),
-                   &values[0]);
+                   values.data());
       }
 
       static void
@@ -1141,7 +1141,7 @@ namespace Differentiation
 
         std::vector<scalar_type *> J(n_dependent_variables);
         for (unsigned int i = 0; i < n_dependent_variables; ++i)
-          J[i] = &(jacobian[i][0]);
+          J[i] = &jacobian[i][0];
 
         ::jacobian(active_tape_index,
                    n_dependent_variables,

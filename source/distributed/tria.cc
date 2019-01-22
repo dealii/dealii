@@ -4242,7 +4242,7 @@ namespace parallel
           // that the packet has been
           // received
           it->second.pack_data(*buffer);
-          const int ierr = MPI_Isend(&(*buffer)[0],
+          const int ierr = MPI_Isend(buffer->data(),
                                      buffer->size(),
                                      MPI_BYTE,
                                      it->first,

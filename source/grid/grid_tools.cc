@@ -2364,7 +2364,7 @@ namespace GridTools
           }
 
         // Send the message
-        ierr = MPI_Isend(&vertices_send_buffers[i][0],
+        ierr = MPI_Isend(vertices_send_buffers[i].data(),
                          buffer_size,
                          DEAL_II_VERTEX_INDEX_MPI_TYPE,
                          destination,
@@ -2389,7 +2389,7 @@ namespace GridTools
         vertices_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        ierr = MPI_Recv(&vertices_recv_buffers[i][0],
+        ierr = MPI_Recv(vertices_recv_buffers[i].data(),
                         buffer_size,
                         DEAL_II_VERTEX_INDEX_MPI_TYPE,
                         source,
@@ -2430,7 +2430,7 @@ namespace GridTools
           }
 
         // Send the message
-        ierr = MPI_Isend(&cellids_send_buffers[i][0],
+        ierr = MPI_Isend(cellids_send_buffers[i].data(),
                          buffer_size,
                          MPI_CHAR,
                          destination,
@@ -2453,7 +2453,7 @@ namespace GridTools
         cellids_recv_buffers[i].resize(buffer_size);
 
         // Receive the message
-        ierr = MPI_Recv(&cellids_recv_buffers[i][0],
+        ierr = MPI_Recv(cellids_recv_buffers[i].data(),
                         buffer_size,
                         MPI_CHAR,
                         source,
@@ -5029,7 +5029,7 @@ namespace GridTools
     int ierr = MPI_Allgather(&n_local_data,
                              1,
                              MPI_INT,
-                             &(size_all_data[0]),
+                             size_all_data.data(),
                              1,
                              MPI_INT,
                              mpi_communicator);
@@ -5046,12 +5046,12 @@ namespace GridTools
     // Allocating a vector to contain all the received data
     std::vector<double> data_array(rdispls.back() + size_all_data.back());
 
-    ierr = MPI_Allgatherv(&(loc_data_array[0]),
+    ierr = MPI_Allgatherv(loc_data_array.data(),
                           n_local_data,
                           MPI_DOUBLE,
-                          &(data_array[0]),
-                          &(size_all_data[0]),
-                          &(rdispls[0]),
+                          data_array.data(),
+                          size_all_data.data(),
+                          rdispls.data(),
                           MPI_DOUBLE,
                           mpi_communicator);
     AssertThrowMPI(ierr);

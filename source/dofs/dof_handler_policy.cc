@@ -4655,7 +4655,7 @@ namespace internal
 
               // send reply
               reply_buffers[idx] = cell_data_transfer_buffer.pack_data();
-              ierr               = MPI_Isend(&(reply_buffers[idx])[0],
+              ierr               = MPI_Isend(reply_buffers[idx].data(),
                                reply_buffers[idx].size(),
                                MPI_BYTE,
                                status.MPI_SOURCE,
@@ -5381,7 +5381,7 @@ namespace internal
               &level_number_cache.n_locally_owned_dofs,
               1,
               DEAL_II_DOF_INDEX_MPI_TYPE,
-              &level_number_cache.n_locally_owned_dofs_per_processor[0],
+              level_number_cache.n_locally_owned_dofs_per_processor.data(),
               1,
               DEAL_II_DOF_INDEX_MPI_TYPE,
               triangulation->get_communicator());

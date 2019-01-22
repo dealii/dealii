@@ -494,7 +494,7 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::vmult(
          mass_matrix[0].n_rows());
   Number *      t   = tmp_array.begin();
   const Number *src = src_view.begin();
-  Number *      dst = &(dst_view[0]);
+  Number *      dst = dst_view.data();
 
   if (dim == 1)
     {
@@ -561,7 +561,7 @@ TensorProductMatrixSymmetricSumBase<dim, Number, size>::apply_inverse(
          mass_matrix[0].n_rows());
   Number *      t   = tmp_array.begin();
   const Number *src = src_view.data();
-  Number *      dst = &(dst_view[0]);
+  Number *      dst = dst_view.data();
 
   // NOTE: dof_to_quad has to be interpreted as 'dof to eigenvalue index'
   //       --> apply<.,true,.> (S,src,dst) calculates dst = S^T * src,

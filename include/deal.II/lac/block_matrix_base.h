@@ -1809,8 +1809,8 @@ BlockMatrixBase<MatrixType>::set(const size_type  row,
       block(row_index.first, block_col)
         .set(row_index.second,
              temporary_data.counter_within_block[block_col],
-             &temporary_data.column_indices[block_col][0],
-             &temporary_data.column_values[block_col][0],
+             temporary_data.column_indices[block_col].data(),
+             temporary_data.column_values[block_col].data(),
              false);
     }
 }
@@ -2065,8 +2065,8 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
       block(row_index.first, block_col)
         .add(row_index.second,
              temporary_data.counter_within_block[block_col],
-             &temporary_data.column_indices[block_col][0],
-             &temporary_data.column_values[block_col][0],
+             temporary_data.column_indices[block_col].data(),
+             temporary_data.column_values[block_col].data(),
              false,
              col_indices_are_sorted);
     }

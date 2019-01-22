@@ -121,8 +121,8 @@ FullMatrix<number>::all_zero() const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
-  const number *      p = &this->values[0];
-  const number *const e = &this->values[0] + this->n_elements();
+  const number *      p = this->values.data();
+  const number *const e = this->values.data() + this->n_elements();
   while (p != e)
     if (*p++ != number(0.0))
       return false;
@@ -183,7 +183,7 @@ FullMatrix<number>::vmult(Vector<number2> &      dst,
 
   Assert(&src != &dst, ExcSourceEqualsDestination());
 
-  const number *e = &this->values[0];
+  const number *e = this->values.data();
   // get access to the data in order to
   // avoid copying it when using the ()
   // operator
@@ -214,7 +214,7 @@ FullMatrix<number>::Tvmult(Vector<number2> &      dst,
 
   Assert(&src != &dst, ExcSourceEqualsDestination());
 
-  const number *  e       = &this->values[0];
+  const number *  e       = this->values.data();
   number2 *       dst_ptr = &dst(0);
   const size_type size_m = m(), size_n = n();
 
@@ -567,7 +567,7 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
              &alpha,
              &src(0, 0),
              &m,
-             &this->values[0],
+             this->values.data(),
              &k,
              &beta,
              &dst(0, 0),
@@ -652,7 +652,7 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
              &alpha,
              &src(0, 0),
              &m,
-             &this->values[0],
+             this->values.data(),
              &n,
              &beta,
              &dst(0, 0),
@@ -757,7 +757,7 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
              &alpha,
              &src(0, 0),
              &k,
-             &this->values[0],
+             this->values.data(),
              &k,
              &beta,
              &dst(0, 0),
@@ -859,7 +859,7 @@ FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
              &alpha,
              &src(0, 0),
              &k,
-             &this->values[0],
+             this->values.data(),
              &n,
              &beta,
              &dst(0, 0),
@@ -957,7 +957,7 @@ FullMatrix<number>::matrix_norm_square(const Vector<number2> &v) const
 
   number2         sum     = 0.;
   const size_type n_rows  = m();
-  const number *  val_ptr = &this->values[0];
+  const number *  val_ptr = this->values.data();
 
   for (size_type row = 0; row < n_rows; ++row)
     {
@@ -988,7 +988,7 @@ FullMatrix<number>::matrix_scalar_product(const Vector<number2> &u,
   number2         sum     = 0.;
   const size_type n_rows  = m();
   const size_type n_cols  = n();
-  const number *  val_ptr = &this->values[0];
+  const number *  val_ptr = this->values.data();
 
   for (size_type row = 0; row < n_rows; ++row)
     {
@@ -1859,7 +1859,7 @@ FullMatrix<number>::gauss_jordan()
 
         // Use the LAPACK function getrf for
         // calculating the LU factorization.
-        getrf(&nn, &nn, &this->values[0], &nn, ipiv.data(), &info);
+        getrf(&nn, &nn, this->values.data(), &nn, ipiv.data(), &info);
 
         Assert(info >= 0, ExcInternalError());
         Assert(info == 0, LACExceptions::ExcSingular());
@@ -1870,8 +1870,13 @@ FullMatrix<number>::gauss_jordan()
         // Use the LAPACK function getri for
         // calculating the actual inverse using
         // the LU factorization.
-        getri(
-          &nn, &this->values[0], &nn, ipiv.data(), inv_work.data(), &nn, &info);
+        getri(&nn,
+              this->values.data(),
+              &nn,
+              ipiv.data(),
+              inv_work.data(),
+              &nn,
+              &info);
 
         Assert(info >= 0, ExcInternalError());
         Assert(info == 0, LACExceptions::ExcSingular());

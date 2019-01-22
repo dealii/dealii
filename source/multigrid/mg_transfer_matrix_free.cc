@@ -500,7 +500,7 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
                                [(cell / vec_size) * three_to_dim],
             n_components,
             fe_degree,
-            &evaluation_data[0]);
+            evaluation_data.data());
           for (unsigned int c = 0; c < n_components; ++c)
             internal::FEEvaluationImplBasisChange<internal::evaluate_general,
                                                   dim,

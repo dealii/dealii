@@ -2218,7 +2218,7 @@ CellAccessor<dim, spacedim>::id() const
   Assert(ptr.level() == 0, ExcInternalError());
   const unsigned int coarse_index = ptr.index();
 
-  return CellId(coarse_index, n_child_indices, &(id[0]));
+  return CellId(coarse_index, n_child_indices, id.data());
 }
 
 
