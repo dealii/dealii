@@ -476,17 +476,13 @@ namespace Differentiation
     {
       // We've chosen to use unsigned shorts for the tape
       // index type (a safety precaution) so we need to
-      // perform a conversion betwwen ADOL-C's native tape
+      // perform a conversion between ADOL-C's native tape
       // index type and that chosen by us.
       std::vector<short> registered_tape_indices_s;
       cachedTraceTags(registered_tape_indices_s);
 
-      std::vector<typename Types<ADNumberType>::tape_index>
-        registered_tape_indices(registered_tape_indices_s.size());
-      std::copy(registered_tape_indices_s.begin(),
-                registered_tape_indices_s.end(),
-                registered_tape_indices.begin());
-      return registered_tape_indices;
+      return std::vector<typename Types<ADNumberType>::tape_index>(
+        registered_tape_indices_s.begin(), registered_tape_indices_s.end());
     }
 
 
@@ -537,8 +533,10 @@ namespace Differentiation
 
       // See ADOL-C manual section 1.7 and comments in last paragraph of
       // section 3.1
-      Assert(status_tape < 4 && status_tape >= -2,
-             ExcIndexRange(status_tape, -2, 4));
+      Assert(
+        status_tape < 4 && status_tape >= -2,
+        ExcMessage(
+          "The tape status is not within the range specified within the ADOL-C documentation."));
       return (status_tape < 0);
     }
 
