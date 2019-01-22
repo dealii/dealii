@@ -37,6 +37,8 @@ s/\$projectname// unless (m/<title>/);
 # Finally, define some extra commands for MathJax in every file. These are in an
 # undisplayed div so that the \newcommand text does not pop up and then
 # disappear while MathJax works.
+#
+# Note: If you add an entry here, also put it into ./doc/doxygen/extra.sty
 if (eof)
 {
     print '<!--Extra macros for MathJax:-->', "\n";
