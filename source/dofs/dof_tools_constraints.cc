@@ -2396,7 +2396,7 @@ namespace DoFTools
 
 
   //
-  // Low level interface:
+  // Low level interfaces:
   //
 
   template <typename FaceIterator>
@@ -2414,7 +2414,6 @@ namespace DoFTools
   {
     // Every call to on of the high-level make_periodicity_constraints
     // variants will end up here, so check all preconditions at this point:
-
 #ifdef DEBUG
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -2500,46 +2499,125 @@ namespace DoFTools
 
 
 
-  //
-  // High level interface variants:
-  //
-
   template <typename DoFHandlerType>
   void
   make_periodicity_constraints(
     const std::vector<
       GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>
       &                              periodic_faces,
-    AffineConstraints<double> &      constraints,
+    AffineConstraints<double> &      affine_constraints,
     const ComponentMask &            component_mask,
     const std::vector<unsigned int> &first_vector_components)
   {
-    // Loop over all periodic faces...
+    // First, loop over all periodic faces and collect all periodicity
+    // constraints recursively:
+
+    std::vector<typename AffineConstraints<double>::ConstraintLine> constraints;
+
     for (const auto &pair : periodic_faces)
       {
         const auto &face_1 = pair.cell[0]->face(pair.face_idx[0]);
         const auto &face_2 = pair.cell[1]->face(pair.face_idx[1]);
 
+        // Every call to one of the high-level make_periodicity_constraints
+        // variants will end up here, so check all preconditions for every
+        // periodic face pair at this point:
+#ifdef DEBUG
+        static const int dim      = DoFHandlerType::dimension;
+        static const int spacedim = DoFHandlerType::space_dimension;
+
+        const auto face_orientation = pair.orientation[0];
+        const auto face_flip        = pair.orientation[1];
+        const auto face_rotation    = pair.orientation[2];
+
+        const auto &matrix = pair.matrix;
+
+        Assert((dim != 1) || (face_orientation == true && face_flip == false &&
+                              face_rotation == false),
+               ExcMessage("The supplied orientation "
+                          "(face_orientation, face_flip, face_rotation) "
+                          "is invalid for 1D"));
+
+        Assert((dim != 2) ||
+                 (face_orientation == true && face_rotation == false),
+               ExcMessage("The supplied orientation "
+                          "(face_orientation, face_flip, face_rotation) "
+                          "is invalid for 2D"));
+
+        Assert(face_1 != face_2,
+               ExcMessage("face_1 and face_2 are equal! Cannot constrain DoFs "
+                          "on the very same face"));
+
         Assert(face_1->at_boundary() && face_2->at_boundary(),
-               ExcInternalError());
+               ExcMessage("Faces for periodicity constraints must be on the "
+                          "boundary"));
 
-        Assert(face_1 != face_2, ExcInternalError());
+        Assert(matrix.m() == matrix.n(),
+               ExcMessage(
+                 "The supplied (rotation or interpolation) matrix must "
+                 "be a square matrix"));
 
-        // ... and apply the low level make_periodicity_constraints function to
-        // every matching pair:
-        make_periodicity_constraints(face_1,
-                                     face_2,
-                                     constraints,
-                                     component_mask,
-                                     pair.orientation[0],
-                                     pair.orientation[1],
-                                     pair.orientation[2],
-                                     pair.matrix,
-                                     first_vector_components);
+        Assert(first_vector_components.empty() || matrix.m() == spacedim,
+               ExcMessage("first_vector_components is nonempty, so matrix must "
+                          "be a rotation matrix exactly of size spacedim"));
+
+        if (!face_1->has_children())
+          {
+            Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
+            const unsigned int n_dofs_per_face =
+              face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+
+            Assert(matrix.m() == 0 ||
+                     (first_vector_components.empty() &&
+                      matrix.m() == n_dofs_per_face) ||
+                     (!first_vector_components.empty() &&
+                      matrix.m() == spacedim),
+                   ExcMessage(
+                     "The matrix must have either size 0 or spacedim "
+                     "(if first_vector_components is nonempty) "
+                     "or the size must be equal to the # of DoFs on the face "
+                     "(if first_vector_components is empty)."));
+          }
+
+        if (!face_2->has_children())
+          {
+            Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
+            const unsigned int n_dofs_per_face =
+              face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
+
+            Assert(matrix.m() == 0 ||
+                     (first_vector_components.empty() &&
+                      matrix.m() == n_dofs_per_face) ||
+                     (!first_vector_components.empty() &&
+                      matrix.m() == spacedim),
+                   ExcMessage(
+                     "The matrix must have either size 0 or spacedim "
+                     "(if first_vector_components is nonempty) "
+                     "or the size must be equal to the # of DoFs on the face "
+                     "(if first_vector_components is empty)."));
+          }
+#endif
+
+        collect_periodicity_constraints(face_1,
+                                        face_2,
+                                        constraints,
+                                        component_mask,
+                                        pair.orientation[0],
+                                        pair.orientation[1],
+                                        pair.orientation[2],
+                                        pair.matrix,
+                                        first_vector_components);
       }
+
+    // Then, we enter all constraints into the AffineConstraints object:
+    set_periodicity_constraints(constraints, affine_constraints);
   }
 
 
+
+  //
+  // High level interface variants:
+  //
 
   template <typename DoFHandlerType>
   void
