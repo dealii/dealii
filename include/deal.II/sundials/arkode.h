@@ -141,7 +141,7 @@ namespace SUNDIALS
    * \f[
    *  G(z_i) \dealcoloneq M z_i − h_n A^I_{i,i} f_I (t^I_{n,i}, z_i) − a_i = 0
    * \f]
-   * must be solved for each stage $z_i , i = 1, \ldot, s$, where
+   * must be solved for each stage $z_i , i = 1, \ldots, s$, where
    * we have the data
    * \f[
    *  a_i \dealcoloneq
