@@ -1417,7 +1417,7 @@ namespace Differentiation
      *     // must refer to one of these types. See the example for the
      *     // ADHelperEnergyFunctional for details on how to extend
      *     // support to taped AD numbers.
-     *     using ADHelper = AD::ADHelperEnergyFunctional<...>;
+     *     using ADHelper = AD::ADHelperResidualLinearization<...>;
      *     using ADNumberType = typename ADHelper::ad_type;
      *
      *     // Create and initialize an instance of the helper class.
