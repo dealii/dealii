@@ -1592,11 +1592,11 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  * @author Guido Kanschat 2010
  */
-#define AssertVectorVectorDimension(vec, dim1, dim2) \
-  AssertDimension((vec).size(), (dim1));             \
-  for (unsigned int i = 0; i < dim1; ++i)            \
+#define AssertVectorVectorDimension(VEC, DIM1, DIM2) \
+  AssertDimension(VEC.size(), DIM1);                 \
+  for (const auto &subvector : VEC)                  \
     {                                                \
-      AssertDimension((vec)[i].size(), (dim2));      \
+      AssertDimension(subvector.size(), DIM2);       \
     }
 
 namespace internal
