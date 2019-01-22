@@ -98,11 +98,11 @@ namespace SUNDIALS
    *   \end{cases}
    * \f]
    *
-   * where $y,\dot y$ are vectors in $\R^n$, $t$ is often the time (but can
-   * also be a parametric quantity), and
-   * $F:\R\times\R^n\times\R^n\rightarrow\R^n$. Such problem is solved
-   * using Newton iteration augmented with a line search global
-   * strategy. The integration method used in IDA is the variable-order,
+   * where $y,\dot y$ are vectors in $\mathbb{R}^n$, $t$ is often the time (but
+   * can also be a parametric quantity), and
+   * $F:\mathbb{R}\times\mathbb{R}^n\times \mathbb{R}^n\rightarrow\mathbb{R}^n$.
+   * Such problem is solved using Newton iteration augmented with a line search
+   * global strategy. The integration method used in IDA is the variable-order,
    * variable-coefficient BDF (Backward Differentiation Formula), in
    * fixed-leading-coefficient. The method order ranges from 1 to 5, with
    * the BDF of order $q$ given by the multistep formula
