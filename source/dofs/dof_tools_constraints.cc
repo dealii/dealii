@@ -2284,9 +2284,9 @@ namespace DoFTools
           //
           // In this case, we will try enter the constraint
           // "x2 == 1./factor * x1" instead of "x1 == factor * x2"
-          // if x1 is already constrained. This is necessary in order to
-          // cover a number of corner cases in which otherwise periodic
-          // constraints would be forgotten.
+          // depending on the order of x1 and x2. This is necessary in
+          // order to cover a number of corner cases in which otherwise
+          // periodic constraints would be forgotten.
           //
           // This also forces us to check for constraint cycles in this
           // case.
@@ -2327,9 +2327,13 @@ namespace DoFTools
               affine_constraints.is_constrained(dof_right))
             continue;
 
-          // If dof_left is already constrained, flip the order.
+          // If dof_left is already constrained, or dof_left < dof_right we
+          // flip the order to ensure that dofs are constrained in a stable
+          // manner on different MPI processes.
 
-          if (affine_constraints.is_constrained(dof_left))
+          if (affine_constraints.is_constrained(dof_left) ||
+              (dof_left < dof_right &&
+               !affine_constraints.is_constrained(dof_right)))
             {
               // We enter dof_right = 1. / factor * dof_left instead:
               std::swap(dof_left, dof_right);
@@ -2493,6 +2497,8 @@ namespace DoFTools
                                     matrix,
                                     first_vector_components);
 
+    std::sort(constraints.begin(), constraints.end());
+
     // Then, we enter all constraints into the AffineConstraints object:
     set_periodicity_constraints(constraints, affine_constraints);
   }
@@ -2608,6 +2614,8 @@ namespace DoFTools
                                         pair.matrix,
                                         first_vector_components);
       }
+
+    std::sort(constraints.begin(), constraints.end());
 
     // Then, we enter all constraints into the AffineConstraints object:
     set_periodicity_constraints(constraints, affine_constraints);
