@@ -59,7 +59,7 @@ namespace LineMinimization
 
   /**
    * Given $x\_low$ and $x\_hi$ together with values of function
-   * $f(x\_low)$ and $f(x\_hi)$) and its gradients ($g(x\_low)*g(x\_hi) < 0$) at
+   * $f(x\_low)$ and $f(x\_hi)$ and its gradients ($g(x\_low)*g(x\_hi) < 0$) at
    * those points, return the local minimizer of the cubic interpolation
    * function (that is, the location where the cubic interpolation function
    * attains its minimum value).
@@ -242,9 +242,9 @@ namespace LineMinimization
    *
    *     // However, the corresponding gradient given in eq 5.14 is wrong. The
    *     // suggested result
-   *     // <code>const double g = -(residual_0*residual_trial);</code>
+   *     // const double g = -(residual_0*residual_trial);
    *     // should actually be
-   *     // $g = G(V + alpha*delta)*[ K(V + alpha*delta)*delta$.
+   *     // g = G(V + alpha*delta)*[ K(V + alpha*delta)*delta.
    *     Vector<double> tmp;
    *     tmp.reinit(newton_update);
    *     tangent_matrix.vmult(tmp, newton_update);

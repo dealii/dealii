@@ -738,6 +738,7 @@ public:
    *
    * @param radial_quadrature Base quadrature to use in the radial direction
    * @param angular_quadrature Base quadrature to use in the angular direction
+   * @param beta Exponent used in the transformation
    */
   QDuffy(const Quadrature<1> &radial_quadrature,
          const Quadrature<1> &angular_quadrature,
@@ -748,6 +749,7 @@ public:
    * both the radial and angular quadratures.
    *
    * @param n Order of QGauss quadrature
+   * @param beta Exponent used in the transformation
    */
   QDuffy(const unsigned int n, const double beta);
 };

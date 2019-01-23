@@ -446,7 +446,7 @@ namespace LinearAlgebra
 
 
       /**
-       * Set each element @v val to @p v using @p indices as permutation, i.e.,
+       * Set each element in @p val to @p v using @p indices as permutation, i.e.,
        * <tt>val[indices[i]] = v[i]</tt>.
        *
        * @ingroup CUDAWrappers
@@ -461,7 +461,7 @@ namespace LinearAlgebra
 
 
       /**
-       * Set each element @v val to @p v using @p indices as permutation, i.e.,
+       * Set each element in @p val to @p v using @p indices as permutation, i.e.,
        * <tt>val[i] = v[indices[i]]</tt>.
        *
        * @ingroup CUDAWrappers
@@ -476,7 +476,7 @@ namespace LinearAlgebra
 
 
       /**
-       * Add each element @v val to @p v using @p indices as permutation, i.e.,
+       * Add each element in @p val to @p v using @p indices as permutation, i.e.,
        * <tt>val[indices[i]] += v[i]</tt>.
        *
        * @ingroup CUDAWrappers
