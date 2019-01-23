@@ -116,14 +116,14 @@ test(const unsigned numRefinementLevels = 2)
   pcout << "number of elements: " << triangulation.n_global_active_cells()
         << std::endl;
 
-  // create dofHandler
+  // create dof_handler
   FESystem<dim>   FE(FE_Q<dim>(QGaussLobatto<1>(2)), 1);
-  DoFHandler<dim> dofHandler(triangulation);
-  dofHandler.distribute_dofs(FE);
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(FE);
 
   // write mesh for visualization
   DataOut<dim> data_out;
-  data_out.attach_dof_handler(dofHandler);
+  data_out.attach_dof_handler(dof_handler);
   Vector<float> subdomain(triangulation.n_active_cells());
   for (unsigned int i = 0; i < subdomain.size(); ++i)
     subdomain(i) = triangulation.locally_owned_subdomain();
@@ -133,17 +133,17 @@ test(const unsigned numRefinementLevels = 2)
                                  mpi_communicator);
 
   IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dofHandler, locally_relevant_dofs);
+  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   IndexSet locally_active_dofs;
-  DoFTools::extract_locally_active_dofs(dofHandler, locally_active_dofs);
+  DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
 
   const std::vector<IndexSet> &locally_owned_dofs =
-    dofHandler.locally_owned_dofs_per_processor();
+    dof_handler.locally_owned_dofs_per_processor();
 
   std::map<types::global_dof_index, Point<dim>> supportPoints;
   DoFTools::map_dofs_to_support_points(MappingQ1<dim>(),
-                                       dofHandler,
+                                       dof_handler,
                                        supportPoints);
 
   /// creating combined hanging node and periodic constraint matrix
@@ -155,7 +155,7 @@ test(const unsigned numRefinementLevels = 2)
     GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
     periodicity_vectorDof;
   for (int d = 0; d < dim; ++d)
-    GridTools::collect_periodic_faces(dofHandler,
+    GridTools::collect_periodic_faces(dof_handler,
                                       /*b_id1*/ 2 * d + 1,
                                       /*b_id2*/ 2 * d + 2,
                                       /*direction*/ d,
@@ -173,7 +173,7 @@ test(const unsigned numRefinementLevels = 2)
   pcout << "Periodicity constraints are consistent in parallel: " << consistent
         << std::endl;
 
-  DoFTools::make_hanging_node_constraints(dofHandler, constraints);
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   const bool hanging_consistent =
     constraints.is_consistent_in_parallel(locally_owned_dofs,

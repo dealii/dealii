@@ -141,17 +141,17 @@ test(const unsigned numRefinementLevels = 2)
     }
 
   if (this_mpi_process == 0)
-    std::cout << "number of elements: " << triangulation.n_global_active_cells()
-              << std::endl;
+    deallog << "number of elements: " << triangulation.n_global_active_cells()
+            << '\n';
 
-  // create dofHandler
+  // create dof_handler
   FESystem<dim>   FE(FE_Q<dim>(QGaussLobatto<1>(2)), 1);
-  DoFHandler<dim> dofHandler(triangulation);
-  dofHandler.distribute_dofs(FE);
+  DoFHandler<dim> dof_handler(triangulation);
+  dof_handler.distribute_dofs(FE);
 
   // write mesh for visualization
   DataOut<dim> data_out;
-  data_out.attach_dof_handler(dofHandler);
+  data_out.attach_dof_handler(dof_handler);
   Vector<float> subdomain(triangulation.n_active_cells());
   for (unsigned int i = 0; i < subdomain.size(); ++i)
     subdomain(i) = triangulation.locally_owned_subdomain();
@@ -161,23 +161,23 @@ test(const unsigned numRefinementLevels = 2)
                                  mpi_communicator);
 
   IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dofHandler, locally_relevant_dofs);
+  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   std::map<types::global_dof_index, Point<dim>> supportPoints;
   DoFTools::map_dofs_to_support_points(MappingQ1<dim>(),
-                                       dofHandler,
+                                       dof_handler,
                                        supportPoints);
 
   /// creating combined hanging node and periodic constraint matrix
   AffineConstraints<double> constraints;
   constraints.clear();
   constraints.reinit(locally_relevant_dofs);
-  DoFTools::make_hanging_node_constraints(dofHandler, constraints);
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   std::vector<
     GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
     periodicity_vectorDof;
   for (int d = 0; d < dim; ++d)
-    GridTools::collect_periodic_faces(dofHandler,
+    GridTools::collect_periodic_faces(dof_handler,
                                       /*b_id1*/ 2 * d + 1,
                                       /*b_id2*/ 2 * d + 2,
                                       /*direction*/ d,
@@ -187,30 +187,21 @@ test(const unsigned numRefinementLevels = 2)
                                                           constraints);
   constraints.close();
 
-  for (unsigned int i = 0; i < n_mpi_processes; ++i)
+  deallog << "=== Process " << this_mpi_process << std::endl
+          << "Constraints:" << std::endl;
+  constraints.print(deallog.get_file_stream());
+  deallog << "Owned DoFs:" << std::endl;
+  dof_handler.locally_owned_dofs().print(deallog);
+  deallog << "Ghost DoFs:" << std::endl;
+  locally_relevant_dofs.print(deallog);
+  // we have issues with constraints for u_52 = ....
+  const unsigned int i = 52;
+  if (locally_relevant_dofs.is_element(i) && constraints.is_constrained(i))
     {
-      if (this_mpi_process == i)
-        {
-          std::cout << "=== Process " << i << std::endl
-                    << "Constraints:" << std::endl;
-          constraints.print(std::cout);
-          std::cout << "Owned DoFs:" << std::endl;
-          dofHandler.locally_owned_dofs().print(std::cout);
-          std::cout << "Ghost DoFs:" << std::endl;
-          locally_relevant_dofs.print(std::cout);
-          std::cout << "Coordinates:" << std::endl;
-          // we have issues with constraints for u_52 = ....
-          const unsigned int i = 52;
-          if (locally_relevant_dofs.is_element(i) &&
-              constraints.is_constrained(i))
-            {
-              std::cout << i << "@" << supportPoints[i] << std::endl;
-              for (auto c : *constraints.get_constraint_entries(i))
-                std::cout << c.first << "@" << supportPoints[c.first]
-                          << std::endl;
-            }
-        }
-      MPI_Barrier(mpi_communicator);
+      deallog << "Coordinates:" << std::endl;
+      deallog << i << "@" << supportPoints[i] << std::endl;
+      for (auto c : *constraints.get_constraint_entries(i))
+        deallog << c.first << "@" << supportPoints[c.first] << std::endl;
     }
 }
 
@@ -218,5 +209,6 @@ int
 main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  MPILogInitAll                    mpi_log;
   test<3>();
 }
