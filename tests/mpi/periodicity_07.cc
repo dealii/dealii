@@ -150,15 +150,6 @@ test(const unsigned numRefinementLevels = 2)
   AffineConstraints<double> constraints;
   constraints.clear();
   constraints.reinit(locally_relevant_dofs);
-  DoFTools::make_hanging_node_constraints(dofHandler, constraints);
-
-  const bool hanging_consistent =
-    constraints.is_consistent_in_parallel(locally_owned_dofs,
-                                          locally_active_dofs,
-                                          mpi_communicator);
-
-  pcout << "Hanging nodes constraints are consistent in parallel: "
-        << hanging_consistent << std::endl;
 
   std::vector<
     GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
@@ -172,7 +163,6 @@ test(const unsigned numRefinementLevels = 2)
 
   DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vectorDof,
                                                           constraints);
-  constraints.close();
 
   const bool consistent =
     constraints.is_consistent_in_parallel(locally_owned_dofs,
@@ -180,45 +170,20 @@ test(const unsigned numRefinementLevels = 2)
                                           mpi_communicator,
                                           /*verbose*/ true);
 
-  pcout << "Total constraints are consistent in parallel: " << consistent
+  pcout << "Periodicity constraints are consistent in parallel: " << consistent
         << std::endl;
 
-  /* verbose output of is_consistent_in_parallel() gives:
+  DoFTools::make_hanging_node_constraints(dofHandler, constraints);
 
-  Proc 10 got line 370 from 11 wrong values!
-  Proc 10 got line 374 from 11 wrong values!
-  Proc 10 got line 378 from 11 wrong values!
-  3 inconsistent lines discovered!
+  const bool hanging_consistent =
+    constraints.is_consistent_in_parallel(locally_owned_dofs,
+                                          locally_active_dofs,
+                                          mpi_communicator);
 
-  */
+  pcout << "Hanging nodes constraints are consistent in parallel: "
+        << hanging_consistent << std::endl;
 
-  const std::vector<unsigned int> wrong_lines = {{370, 374, 378}};
-
-  for (unsigned int i = 0; i < n_mpi_processes; ++i)
-    {
-      if (this_mpi_process == i)
-        {
-          std::cout << "=== Process " << i << std::endl;
-          // constraints.print(std::cout);
-          // std::cout << "Owned DoFs:" << std::endl;
-          // dofHandler.locally_owned_dofs().print(std::cout);
-          // std::cout << "Ghost DoFs:" << std::endl;
-          // locally_relevant_dofs.print(std::cout);
-
-          for (auto ind : wrong_lines)
-            if (locally_relevant_dofs.is_element(ind) &&
-                constraints.is_constrained(ind))
-              {
-                std::cout << "Constraints for " << ind << " @ "
-                          << supportPoints[ind] << ":" << std::endl;
-                for (auto c : *constraints.get_constraint_entries(ind))
-                  std::cout << "    " << c.first << " @ "
-                            << supportPoints[c.first] << " :  " << c.second
-                            << std::endl;
-              }
-        }
-      MPI_Barrier(mpi_communicator);
-    }
+  constraints.close();
 }
 
 int
