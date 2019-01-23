@@ -2449,18 +2449,12 @@ namespace DoFTools
     const ComponentMask &            component_mask,
     const std::vector<unsigned int> &first_vector_components)
   {
-    using FaceVector = std::vector<
-      GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator>>;
-    typename FaceVector::const_iterator it, end_periodic;
-    it           = periodic_faces.begin();
-    end_periodic = periodic_faces.end();
-
     // Loop over all periodic faces...
-    for (; it != end_periodic; ++it)
+    for (auto &pair : periodic_faces)
       {
         using FaceIterator        = typename DoFHandlerType::face_iterator;
-        const FaceIterator face_1 = it->cell[0]->face(it->face_idx[0]);
-        const FaceIterator face_2 = it->cell[1]->face(it->face_idx[1]);
+        const FaceIterator face_1 = pair.cell[0]->face(pair.face_idx[0]);
+        const FaceIterator face_2 = pair.cell[1]->face(pair.face_idx[1]);
 
         Assert(face_1->at_boundary() && face_2->at_boundary(),
                ExcInternalError());
@@ -2473,10 +2467,10 @@ namespace DoFTools
                                      face_2,
                                      constraints,
                                      component_mask,
-                                     it->orientation[0],
-                                     it->orientation[1],
-                                     it->orientation[2],
-                                     it->matrix,
+                                     pair.orientation[0],
+                                     pair.orientation[1],
+                                     pair.orientation[2],
+                                     pair.matrix,
                                      first_vector_components);
       }
   }
