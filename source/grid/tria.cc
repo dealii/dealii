@@ -12004,7 +12004,24 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::raw_cell_iterator
 Triangulation<dim, spacedim>::end_raw(const unsigned int level) const
 {
-  Assert(level < n_global_levels(), ExcInvalidLevel(level));
+  // This function may be called on parallel triangulations on levels
+  // that exist globally, but not on the local portion of the
+  // triangulation. In that case, just return the end iterator.
+  //
+  // We need to use levels.size() instead of n_levels() because the
+  // latter function uses the cache, but we need to be able to call
+  // this function at a time when the cache is not currently up to
+  // date.
+  if (level >= levels.size())
+    {
+      Assert(level < n_global_levels(),
+             ExcInvalidLevel(level, n_global_levels()));
+      return end();
+    }
+
+  // Query whether the given level is valid for the local portion of the
+  // triangulation.
+  Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
   if (level < levels.size() - 1)
     return begin_raw(level + 1);
   else
@@ -12016,11 +12033,28 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::cell_iterator
 Triangulation<dim, spacedim>::end(const unsigned int level) const
 {
+  // This function may be called on parallel triangulations on levels
+  // that exist globally, but not on the local portion of the
+  // triangulation. In that case, just retrn the end iterator.
+  //
+  // We need to use levels.size() instead of n_levels() because the
+  // latter function uses the cache, but we need to be able to call
+  // this function at a time when the cache is not currently up to
+  // date.
+  if (level >= levels.size())
+    {
+      Assert(level < n_global_levels(),
+             ExcInvalidLevel(level, n_global_levels()));
+      return end();
+    }
+
+  // Query whether the given level is valid for the local portion of the
+  // triangulation.
+  Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
   if (level < levels.size() - 1)
     return begin(level + 1);
-  Assert(level < n_global_levels() || level < levels.size(),
-         ExcInvalidLevel(level));
-  return end();
+  else
+    return end();
 }
 
 
@@ -12028,8 +12062,24 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::active_cell_iterator
 Triangulation<dim, spacedim>::end_active(const unsigned int level) const
 {
-  Assert(level < n_global_levels() || level < levels.size(),
-         ExcInvalidLevel(level));
+  // This function may be called on parallel triangulations on levels
+  // that exist globally, but not on the local portion of the
+  // triangulation. In that case, just return the end iterator.
+  //
+  // We need to use levels.size() instead of n_levels() because the
+  // latter function uses the cache, but we need to be able to call
+  // this function at a time when the cache is not currently up to
+  // date.
+  if (level >= levels.size())
+    {
+      Assert(level < n_global_levels(),
+             ExcInvalidLevel(level, n_global_levels()));
+      return end();
+    }
+
+  // Query whether the given level is valid for the local portion of the
+  // triangulation.
+  Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
   return (level >= levels.size() - 1 ? active_cell_iterator(end()) :
                                        begin_active(level + 1));
 }
@@ -12202,11 +12252,27 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::raw_line_iterator
 Triangulation<dim, spacedim>::begin_raw_line(const unsigned int level) const
 {
+  // This function may be called on parallel triangulations on levels
+  // that exist globally, but not on the local portion of the
+  // triangulation. In that case, just return the end iterator.
+  //
+  // We need to use levels.size() instead of n_levels() because the
+  // latter function uses the cache, but we need to be able to call
+  // this function at a time when the cache is not currently up to
+  // date.
+  if (level >= levels.size())
+    {
+      Assert(level < n_global_levels(),
+             ExcInvalidLevel(level, n_global_levels()));
+      return end_line();
+    }
+
   switch (dim)
     {
       case 1:
-        Assert(level < n_global_levels() || level < levels.size(),
-               ExcInvalidLevel(level));
+        // Query whether the given level is valid for the local portion of the
+        // triangulation.
+        Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
 
         if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
           return end_line();
@@ -12272,6 +12338,21 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::raw_quad_iterator
 Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
 {
+  // This function may be called on parallel triangulations on levels
+  // that exist globally, but not on the local portion of the
+  // triangulation. In that case, just return the end iterator.
+  //
+  // We need to use levels.size() instead of n_levels() because the
+  // latter function uses the cache, but we need to be able to call
+  // this function at a time when the cache is not currently up to
+  // date.
+  if (level >= levels.size())
+    {
+      Assert(level < n_global_levels(),
+             ExcInvalidLevel(level, n_global_levels()));
+      return end_quad();
+    }
+
   switch (dim)
     {
       case 1:
@@ -12279,8 +12360,9 @@ Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
         return raw_hex_iterator();
       case 2:
         {
-          Assert(level < n_global_levels() || level < levels.size(),
-                 ExcInvalidLevel(level));
+          // Query whether the given level is valid for the local portion of the
+          // triangulation.
+          Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
 
           if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
             return end_quad();
@@ -12355,6 +12437,21 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::raw_hex_iterator
 Triangulation<dim, spacedim>::begin_raw_hex(const unsigned int level) const
 {
+  // This function may be called on parallel triangulations on levels
+  // that exist globally, but not on the local portion of the
+  // triangulation. In that case, just return the end iterator.
+  //
+  // We need to use levels.size() instead of n_levels() because the
+  // latter function uses the cache, but we need to be able to call
+  // this function at a time when the cache is not currently up to
+  // date.
+  if (level >= levels.size())
+    {
+      Assert(level < n_global_levels(),
+             ExcInvalidLevel(level, n_global_levels()));
+      return end_hex();
+    }
+
   switch (dim)
     {
       case 1:
@@ -12363,8 +12460,9 @@ Triangulation<dim, spacedim>::begin_raw_hex(const unsigned int level) const
         return raw_hex_iterator();
       case 3:
         {
-          Assert(level < n_global_levels() || level < levels.size(),
-                 ExcInvalidLevel(level));
+          // Query whether the given level is valid for the local portion of the
+          // triangulation.
+          Assert(level < levels.size(), ExcInvalidLevel(level, levels.size()));
 
           if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
             return end_hex();
