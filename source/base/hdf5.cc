@@ -196,7 +196,7 @@ namespace HDF5
       std::is_same<Container,
                    std::vector<typename Container::value_type>>::value,
       Container>::type
-    initialize_container(const std::vector<hsize_t> dimensions)
+    initialize_container(const std::vector<hsize_t> &dimensions)
     {
       return Container(std::accumulate(
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
@@ -208,7 +208,7 @@ namespace HDF5
     typename std::enable_if<
       std::is_same<Container, Vector<typename Container::value_type>>::value,
       Container>::type
-    initialize_container(const std::vector<hsize_t> dimensions)
+    initialize_container(const std::vector<hsize_t> &dimensions)
     {
       return Container(std::accumulate(
         dimensions.begin(), dimensions.end(), 1, std::multiplies<int>()));
@@ -371,7 +371,7 @@ namespace HDF5
 
 
 
-  HDF5Object::HDF5Object(const std::string name, const bool mpi)
+  HDF5Object::HDF5Object(const std::string &name, const bool mpi)
     : name(name)
     , mpi(mpi)
   {}
@@ -387,16 +387,15 @@ namespace HDF5
     hid_t                        attr;
     herr_t                       ret;
 
-
     attr = H5Aopen(*hdf5_reference, attr_name.data(), H5P_DEFAULT);
     Assert(attr >= 0, ExcMessage("Error at H5Aopen"));
+    (void)ret;
     ret = H5Aread(attr, *t_type, &value);
     Assert(ret >= 0, ExcMessage("Error at H5Aread"));
+    (void)ret;
     ret = H5Aclose(attr);
     Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
 
-    // This avoids the unused warning
-    (void)ret;
     return value;
   }
 
@@ -414,14 +413,13 @@ namespace HDF5
     attr = H5Aopen(*hdf5_reference, attr_name.data(), H5P_DEFAULT);
     Assert(attr >= 0, ExcMessage("Error at H5Aopen"));
     ret = H5Aread(attr, H5T_NATIVE_INT, &int_value);
+    (void)ret;
     Assert(ret >= 0, ExcMessage("Error at H5Aread"));
     ret = H5Aclose(attr);
-    Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
-    // The int can be casted to a bool
-    bool bool_value = (bool)int_value;
-
     (void)ret;
-    return bool_value;
+    Assert(ret >= 0, ExcMessage("Error at H5Aclose"));
+
+    return (int_value != 0);
   }
 
 
@@ -536,10 +534,6 @@ namespace HDF5
     hid_t  t_type;
     herr_t ret;
 
-    // Reserve space for the string and the null terminator
-    char *c_string_value = (char *)malloc(sizeof(char) * (value.size() + 1));
-    strcpy(c_string_value, value.data());
-
     /* Create a datatype to refer to. */
     t_type = H5Tcopy(H5T_C_S1);
     Assert(t_type >= 0, ExcInternalError());
@@ -562,11 +556,14 @@ namespace HDF5
 
     /*
      * Write scalar attribute.
+     * In most of the cases H5Awrite and H5Dwrite take a pointer to the data.
+     * But in the particular case of a variable length string, H5Awrite takes
+     * the address of the pointer of the string.
      */
-    ret = H5Awrite(attr, t_type, &c_string_value);
+    const char *c_string_value = value.c_str();
+    ret                        = H5Awrite(attr, t_type, &c_string_value);
     Assert(ret >= 0, ExcInternalError());
 
-    free(c_string_value);
     ret = H5Sclose(aid);
     Assert(ret >= 0, ExcMessage("Error at H5Sclose"));
     ret = H5Aclose(attr);
@@ -632,11 +629,11 @@ namespace HDF5
 
 
 
-  DataSet::DataSet(const std::string &         name,
-                   const hid_t &               parent_group_id,
-                   const std::vector<hsize_t> &dimensions,
-                   std::shared_ptr<hid_t>      t_type,
-                   const bool                  mpi)
+  DataSet::DataSet(const std::string &           name,
+                   const hid_t &                 parent_group_id,
+                   const std::vector<hsize_t> &  dimensions,
+                   const std::shared_ptr<hid_t> &t_type,
+                   const bool                    mpi)
     : HDF5Object(name, mpi)
     , rank(dimensions.size())
     , dimensions(dimensions)
@@ -1007,7 +1004,7 @@ namespace HDF5
       internal::get_hdf5_datatype<typename Container::value_type>();
     // In this particular overload of write_hyperslab the data_dimensions are
     // the same as count
-    const std::vector<hsize_t> data_dimensions = count;
+    const std::vector<hsize_t> &data_dimensions = count;
 
     hid_t  memory_dataspace;
     hid_t  plist;
