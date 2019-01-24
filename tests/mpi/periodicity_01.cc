@@ -167,6 +167,16 @@ namespace Step40
                                              constraints);
     constraints.close();
 
+    const std::vector<IndexSet> &locally_owned_dofs =
+      dof_handler.locally_owned_dofs_per_processor();
+    IndexSet locally_active_dofs;
+    DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+    AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,
+                                                      locally_active_dofs,
+                                                      mpi_communicator,
+                                                      /*verbose*/ true),
+                ExcInternalError());
+
     DynamicSparsityPattern csp(dof_handler.n_dofs(),
                                dof_handler.n_dofs(),
                                locally_relevant_dofs);

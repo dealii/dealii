@@ -205,6 +205,16 @@ check(const unsigned int orientation, bool reverse)
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   constraints.print(deallog.get_file_stream());
 
+  const std::vector<IndexSet> &locally_owned_dofs_vector =
+    dof_handler.locally_owned_dofs_per_processor();
+  IndexSet locally_active_dofs;
+  DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+  AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs_vector,
+                                                    locally_active_dofs,
+                                                    MPI_COMM_WORLD,
+                                                    /*verbose*/ true),
+              ExcInternalError());
+
   unsigned int n_local_constraints = 0;
 
   std::map<types::global_dof_index, Point<dim>> support_points;
