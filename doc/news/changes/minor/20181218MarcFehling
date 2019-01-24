@@ -1,0 +1,4 @@
+New: Class parallel::distributed::CellDataTransfer has been introduced to transfer 
+cell by cell data across distributed meshes in case of refinement/serialization.
+<br>
+(Marc Fehling, 2018/12/18)

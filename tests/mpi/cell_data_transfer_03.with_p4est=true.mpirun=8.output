@@ -1,0 +1,223 @@
+
+DEAL:0:2d::cells before: 16
+DEAL:0:2d::cellid=0_1:0 vector_size=0 vector_sum=0 refining
+DEAL:0:2d::cellid=0_1:1 vector_size=1 vector_sum=0
+DEAL:0:2d::cellid=0_1:2 vector_size=2 vector_sum=1
+DEAL:0:2d::cellid=0_1:3 vector_size=3 vector_sum=3
+DEAL:0:2d::cells after: 16
+DEAL:0:2d::cellid=0_2:00 vector_size=0 vector_sum=0
+DEAL:0:2d::cellid=0_2:01 vector_size=0 vector_sum=0
+DEAL:0:2d::cellid=0_2:02 vector_size=0 vector_sum=0
+DEAL:0:2d::cellid=0_2:03 vector_size=0 vector_sum=0
+DEAL:0:2d::OK
+DEAL:0:3d::cells before: 64
+DEAL:0:3d::cellid=0_1:0 vector_size=0 vector_sum=0 refining
+DEAL:0:3d::cellid=0_1:1 vector_size=1 vector_sum=0
+DEAL:0:3d::cellid=0_1:2 vector_size=2 vector_sum=1
+DEAL:0:3d::cellid=0_1:3 vector_size=3 vector_sum=3
+DEAL:0:3d::cellid=0_1:4 vector_size=4 vector_sum=6
+DEAL:0:3d::cellid=0_1:5 vector_size=5 vector_sum=10
+DEAL:0:3d::cellid=0_1:6 vector_size=6 vector_sum=15
+DEAL:0:3d::cellid=0_1:7 vector_size=7 vector_sum=21
+DEAL:0:3d::cells after: 64
+DEAL:0:3d::cellid=0_2:00 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:01 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:02 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:03 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:04 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:05 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:06 vector_size=0 vector_sum=0
+DEAL:0:3d::cellid=0_2:07 vector_size=0 vector_sum=0
+DEAL:0:3d::OK
+
+DEAL:1:2d::cells before: 16
+DEAL:1:2d::cells after: 16
+DEAL:1:2d::OK
+DEAL:1:3d::cells before: 64
+DEAL:1:3d::cellid=1_1:0 vector_size=0 vector_sum=0
+DEAL:1:3d::cellid=1_1:1 vector_size=1 vector_sum=0
+DEAL:1:3d::cellid=1_1:2 vector_size=2 vector_sum=1
+DEAL:1:3d::cellid=1_1:3 vector_size=3 vector_sum=3
+DEAL:1:3d::cellid=1_1:4 vector_size=4 vector_sum=6
+DEAL:1:3d::cellid=1_1:5 vector_size=5 vector_sum=10
+DEAL:1:3d::cellid=1_1:6 vector_size=6 vector_sum=15
+DEAL:1:3d::cellid=1_1:7 vector_size=7 vector_sum=21
+DEAL:1:3d::cells after: 64
+DEAL:1:3d::cellid=0_1:1 vector_size=1 vector_sum=0
+DEAL:1:3d::cellid=0_1:2 vector_size=2 vector_sum=1
+DEAL:1:3d::cellid=0_1:3 vector_size=3 vector_sum=3
+DEAL:1:3d::cellid=0_1:4 vector_size=4 vector_sum=6
+DEAL:1:3d::cellid=0_1:5 vector_size=5 vector_sum=10
+DEAL:1:3d::cellid=0_1:6 vector_size=6 vector_sum=15
+DEAL:1:3d::cellid=0_1:7 vector_size=7 vector_sum=21
+DEAL:1:3d::OK
+
+
+DEAL:2:2d::cells before: 16
+DEAL:2:2d::cellid=1_1:0 vector_size=0 vector_sum=0
+DEAL:2:2d::cellid=1_1:1 vector_size=1 vector_sum=0
+DEAL:2:2d::cellid=1_1:2 vector_size=2 vector_sum=1
+DEAL:2:2d::cellid=1_1:3 vector_size=3 vector_sum=3
+DEAL:2:2d::cells after: 16
+DEAL:2:2d::cellid=0_1:1 vector_size=1 vector_sum=0
+DEAL:2:2d::cellid=0_1:2 vector_size=2 vector_sum=1
+DEAL:2:2d::OK
+DEAL:2:3d::cells before: 64
+DEAL:2:3d::cellid=2_1:0 vector_size=0 vector_sum=0
+DEAL:2:3d::cellid=2_1:1 vector_size=1 vector_sum=0
+DEAL:2:3d::cellid=2_1:2 vector_size=2 vector_sum=1
+DEAL:2:3d::cellid=2_1:3 vector_size=3 vector_sum=3
+DEAL:2:3d::cellid=2_1:4 vector_size=4 vector_sum=6
+DEAL:2:3d::cellid=2_1:5 vector_size=5 vector_sum=10
+DEAL:2:3d::cellid=2_1:6 vector_size=6 vector_sum=15
+DEAL:2:3d::cellid=2_1:7 vector_size=7 vector_sum=21
+DEAL:2:3d::cells after: 64
+DEAL:2:3d::cellid=1_1:0 vector_size=0 vector_sum=0
+DEAL:2:3d::cellid=1_1:1 vector_size=1 vector_sum=0
+DEAL:2:3d::cellid=1_1:2 vector_size=2 vector_sum=1
+DEAL:2:3d::cellid=1_1:3 vector_size=3 vector_sum=3
+DEAL:2:3d::cellid=1_1:4 vector_size=4 vector_sum=6
+DEAL:2:3d::cellid=1_1:5 vector_size=5 vector_sum=10
+DEAL:2:3d::cellid=1_1:6 vector_size=6 vector_sum=15
+DEAL:2:3d::cellid=1_1:7 vector_size=7 vector_sum=21
+DEAL:2:3d::OK
+
+
+DEAL:3:2d::cells before: 16
+DEAL:3:2d::cells after: 16
+DEAL:3:2d::cellid=0_1:3 vector_size=3 vector_sum=3
+DEAL:3:2d::OK
+DEAL:3:3d::cells before: 64
+DEAL:3:3d::cellid=3_1:0 vector_size=0 vector_sum=0
+DEAL:3:3d::cellid=3_1:1 vector_size=1 vector_sum=0
+DEAL:3:3d::cellid=3_1:2 vector_size=2 vector_sum=1
+DEAL:3:3d::cellid=3_1:3 vector_size=3 vector_sum=3
+DEAL:3:3d::cellid=3_1:4 vector_size=4 vector_sum=6
+DEAL:3:3d::cellid=3_1:5 vector_size=5 vector_sum=10
+DEAL:3:3d::cellid=3_1:6 vector_size=6 vector_sum=15
+DEAL:3:3d::cellid=3_1:7 vector_size=7 vector_sum=21
+DEAL:3:3d::cells after: 64
+DEAL:3:3d::cellid=2_1:0 vector_size=0 vector_sum=0
+DEAL:3:3d::cellid=2_1:1 vector_size=1 vector_sum=0
+DEAL:3:3d::cellid=2_1:2 vector_size=2 vector_sum=1
+DEAL:3:3d::cellid=2_1:3 vector_size=3 vector_sum=3
+DEAL:3:3d::cellid=2_1:4 vector_size=4 vector_sum=6
+DEAL:3:3d::cellid=2_1:5 vector_size=5 vector_sum=10
+DEAL:3:3d::cellid=2_1:6 vector_size=6 vector_sum=15
+DEAL:3:3d::cellid=2_1:7 vector_size=7 vector_sum=21
+DEAL:3:3d::OK
+
+
+DEAL:4:2d::cells before: 16
+DEAL:4:2d::cellid=2_1:0 vector_size=0 vector_sum=0
+DEAL:4:2d::cellid=2_1:1 vector_size=1 vector_sum=0
+DEAL:4:2d::cellid=2_1:2 vector_size=2 vector_sum=1
+DEAL:4:2d::cellid=2_1:3 vector_size=3 vector_sum=3
+DEAL:4:2d::cells after: 16
+DEAL:4:2d::cellid=1_1:0 vector_size=0 vector_sum=0
+DEAL:4:2d::cellid=1_1:1 vector_size=1 vector_sum=0
+DEAL:4:2d::cellid=1_1:2 vector_size=2 vector_sum=1
+DEAL:4:2d::cellid=1_1:3 vector_size=3 vector_sum=3
+DEAL:4:2d::OK
+DEAL:4:3d::cells before: 64
+DEAL:4:3d::cellid=4_1:0 vector_size=0 vector_sum=0
+DEAL:4:3d::cellid=4_1:1 vector_size=1 vector_sum=0
+DEAL:4:3d::cellid=4_1:2 vector_size=2 vector_sum=1
+DEAL:4:3d::cellid=4_1:3 vector_size=3 vector_sum=3
+DEAL:4:3d::cellid=4_1:4 vector_size=4 vector_sum=6
+DEAL:4:3d::cellid=4_1:5 vector_size=5 vector_sum=10
+DEAL:4:3d::cellid=4_1:6 vector_size=6 vector_sum=15
+DEAL:4:3d::cellid=4_1:7 vector_size=7 vector_sum=21
+DEAL:4:3d::cells after: 64
+DEAL:4:3d::cellid=3_1:0 vector_size=0 vector_sum=0
+DEAL:4:3d::cellid=3_1:1 vector_size=1 vector_sum=0
+DEAL:4:3d::cellid=3_1:2 vector_size=2 vector_sum=1
+DEAL:4:3d::cellid=3_1:3 vector_size=3 vector_sum=3
+DEAL:4:3d::cellid=3_1:4 vector_size=4 vector_sum=6
+DEAL:4:3d::cellid=3_1:5 vector_size=5 vector_sum=10
+DEAL:4:3d::cellid=3_1:6 vector_size=6 vector_sum=15
+DEAL:4:3d::cellid=3_1:7 vector_size=7 vector_sum=21
+DEAL:4:3d::OK
+
+
+DEAL:5:2d::cells before: 16
+DEAL:5:2d::cells after: 16
+DEAL:5:2d::OK
+DEAL:5:3d::cells before: 64
+DEAL:5:3d::cellid=5_1:0 vector_size=0 vector_sum=0
+DEAL:5:3d::cellid=5_1:1 vector_size=1 vector_sum=0
+DEAL:5:3d::cellid=5_1:2 vector_size=2 vector_sum=1
+DEAL:5:3d::cellid=5_1:3 vector_size=3 vector_sum=3
+DEAL:5:3d::cellid=5_1:4 vector_size=4 vector_sum=6
+DEAL:5:3d::cellid=5_1:5 vector_size=5 vector_sum=10
+DEAL:5:3d::cellid=5_1:6 vector_size=6 vector_sum=15
+DEAL:5:3d::cellid=5_1:7 vector_size=7 vector_sum=21
+DEAL:5:3d::cells after: 64
+DEAL:5:3d::cellid=4_1:0 vector_size=0 vector_sum=0
+DEAL:5:3d::cellid=4_1:1 vector_size=1 vector_sum=0
+DEAL:5:3d::cellid=4_1:2 vector_size=2 vector_sum=1
+DEAL:5:3d::cellid=4_1:3 vector_size=3 vector_sum=3
+DEAL:5:3d::cellid=4_1:4 vector_size=4 vector_sum=6
+DEAL:5:3d::cellid=4_1:5 vector_size=5 vector_sum=10
+DEAL:5:3d::cellid=4_1:6 vector_size=6 vector_sum=15
+DEAL:5:3d::cellid=4_1:7 vector_size=7 vector_sum=21
+DEAL:5:3d::OK
+
+
+DEAL:6:2d::cells before: 16
+DEAL:6:2d::cellid=3_1:0 vector_size=0 vector_sum=0 coarsening
+DEAL:6:2d::cellid=3_1:1 vector_size=1 vector_sum=0 coarsening
+DEAL:6:2d::cellid=3_1:2 vector_size=2 vector_sum=1 coarsening
+DEAL:6:2d::cellid=3_1:3 vector_size=3 vector_sum=3 coarsening
+DEAL:6:2d::cells after: 16
+DEAL:6:2d::cellid=2_1:0 vector_size=0 vector_sum=0
+DEAL:6:2d::cellid=2_1:1 vector_size=1 vector_sum=0
+DEAL:6:2d::cellid=2_1:2 vector_size=2 vector_sum=1
+DEAL:6:2d::cellid=2_1:3 vector_size=3 vector_sum=3
+DEAL:6:2d::OK
+DEAL:6:3d::cells before: 64
+DEAL:6:3d::cellid=6_1:0 vector_size=0 vector_sum=0
+DEAL:6:3d::cellid=6_1:1 vector_size=1 vector_sum=0
+DEAL:6:3d::cellid=6_1:2 vector_size=2 vector_sum=1
+DEAL:6:3d::cellid=6_1:3 vector_size=3 vector_sum=3
+DEAL:6:3d::cellid=6_1:4 vector_size=4 vector_sum=6
+DEAL:6:3d::cellid=6_1:5 vector_size=5 vector_sum=10
+DEAL:6:3d::cellid=6_1:6 vector_size=6 vector_sum=15
+DEAL:6:3d::cellid=6_1:7 vector_size=7 vector_sum=21
+DEAL:6:3d::cells after: 64
+DEAL:6:3d::cellid=5_1:0 vector_size=0 vector_sum=0
+DEAL:6:3d::cellid=5_1:1 vector_size=1 vector_sum=0
+DEAL:6:3d::cellid=5_1:2 vector_size=2 vector_sum=1
+DEAL:6:3d::cellid=5_1:3 vector_size=3 vector_sum=3
+DEAL:6:3d::cellid=5_1:4 vector_size=4 vector_sum=6
+DEAL:6:3d::cellid=5_1:5 vector_size=5 vector_sum=10
+DEAL:6:3d::cellid=5_1:6 vector_size=6 vector_sum=15
+DEAL:6:3d::cellid=5_1:7 vector_size=7 vector_sum=21
+DEAL:6:3d::OK
+
+
+DEAL:7:2d::cells before: 16
+DEAL:7:2d::cells after: 16
+DEAL:7:2d::cellid=3_0: vector_size=0 vector_sum=0
+DEAL:7:2d::OK
+DEAL:7:3d::cells before: 64
+DEAL:7:3d::cellid=7_1:0 vector_size=0 vector_sum=0 coarsening
+DEAL:7:3d::cellid=7_1:1 vector_size=1 vector_sum=0 coarsening
+DEAL:7:3d::cellid=7_1:2 vector_size=2 vector_sum=1 coarsening
+DEAL:7:3d::cellid=7_1:3 vector_size=3 vector_sum=3 coarsening
+DEAL:7:3d::cellid=7_1:4 vector_size=4 vector_sum=6 coarsening
+DEAL:7:3d::cellid=7_1:5 vector_size=5 vector_sum=10 coarsening
+DEAL:7:3d::cellid=7_1:6 vector_size=6 vector_sum=15 coarsening
+DEAL:7:3d::cellid=7_1:7 vector_size=7 vector_sum=21 coarsening
+DEAL:7:3d::cells after: 64
+DEAL:7:3d::cellid=7_0: vector_size=0 vector_sum=0
+DEAL:7:3d::cellid=6_1:0 vector_size=0 vector_sum=0
+DEAL:7:3d::cellid=6_1:1 vector_size=1 vector_sum=0
+DEAL:7:3d::cellid=6_1:2 vector_size=2 vector_sum=1
+DEAL:7:3d::cellid=6_1:3 vector_size=3 vector_sum=3
+DEAL:7:3d::cellid=6_1:4 vector_size=4 vector_sum=6
+DEAL:7:3d::cellid=6_1:5 vector_size=5 vector_sum=10
+DEAL:7:3d::cellid=6_1:6 vector_size=6 vector_sum=15
+DEAL:7:3d::cellid=6_1:7 vector_size=7 vector_sum=21
+DEAL:7:3d::OK
+
