@@ -566,7 +566,7 @@ namespace TrilinosWrappers
   {
     // Introduce the preconditioner, if the identity preconditioner is used,
     // the precondioner is set to none, ...
-    if (preconditioner.preconditioner.use_count() != 0)
+    if (preconditioner.preconditioner.strong_count() != 0)
       {
         const int ierr = solver.SetPrecOperator(
           const_cast<Epetra_Operator *>(preconditioner.preconditioner.get()));

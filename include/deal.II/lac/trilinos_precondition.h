@@ -232,7 +232,7 @@ namespace TrilinosWrappers
      * This is a pointer to the preconditioner object that is used when
      * applying the preconditioner.
      */
-    std::shared_ptr<Epetra_Operator> preconditioner;
+    Teuchos::RCP<Epetra_Operator> preconditioner;
 
     /**
      * Internal communication pattern in case the matrix needs to be copied
