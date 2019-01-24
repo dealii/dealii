@@ -992,9 +992,9 @@ public:
   memory_consumption() const;
   //@}
 
-protected:
+private:
   /**
-   * Dimension. Actual number of components contained in the vector.  Get this
+   * Dimension. Actual number of components contained in the vector. Get this
    * number by calling <tt>size()</tt>.
    */
   size_type vec_size;
