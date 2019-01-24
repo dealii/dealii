@@ -137,7 +137,6 @@ public:
    */
   using real_type = typename numbers::NumberTraits<Number>::real_type;
 
-public:
   /**
    * @name Basic object handling
    */
