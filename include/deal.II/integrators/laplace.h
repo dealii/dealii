@@ -121,11 +121,10 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    cell_residual(
-      Vector<double> &                                                   result,
-      const FEValuesBase<dim> &                                          fe,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &input,
-      double factor = 1.)
+    cell_residual(Vector<double> &                                    result,
+                  const FEValuesBase<dim> &                           fe,
+                  const ArrayView<const std::vector<Tensor<1, dim>>> &input,
+                  double factor = 1.)
     {
       const unsigned int nq     = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
@@ -323,14 +322,13 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    nitsche_residual(
-      Vector<double> &                                                   result,
-      const FEValuesBase<dim> &                                          fe,
-      const VectorSlice<const std::vector<std::vector<double>>> &        input,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>> &Dinput,
-      const VectorSlice<const std::vector<std::vector<double>>> &        data,
-      double penalty,
-      double factor = 1.)
+    nitsche_residual(Vector<double> &                                    result,
+                     const FEValuesBase<dim> &                           fe,
+                     const ArrayView<const std::vector<double>> &        input,
+                     const ArrayView<const std::vector<Tensor<1, dim>>> &Dinput,
+                     const ArrayView<const std::vector<double>> &        data,
+                     double penalty,
+                     double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_comp = fe.get_fe().n_components();
@@ -639,20 +637,17 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    ip_residual(
-      Vector<double> &                                           result1,
-      Vector<double> &                                           result2,
-      const FEValuesBase<dim> &                                  fe1,
-      const FEValuesBase<dim> &                                  fe2,
-      const VectorSlice<const std::vector<std::vector<double>>> &input1,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>>
-        &                                                        Dinput1,
-      const VectorSlice<const std::vector<std::vector<double>>> &input2,
-      const VectorSlice<const std::vector<std::vector<Tensor<1, dim>>>>
-        &    Dinput2,
-      double pen,
-      double int_factor = 1.,
-      double ext_factor = -1.)
+    ip_residual(Vector<double> &                                    result1,
+                Vector<double> &                                    result2,
+                const FEValuesBase<dim> &                           fe1,
+                const FEValuesBase<dim> &                           fe2,
+                const ArrayView<const std::vector<double>> &        input1,
+                const ArrayView<const std::vector<Tensor<1, dim>>> &Dinput1,
+                const ArrayView<const std::vector<double>> &        input2,
+                const ArrayView<const std::vector<Tensor<1, dim>>> &Dinput2,
+                double                                              pen,
+                double int_factor = 1.,
+                double ext_factor = -1.)
     {
       const unsigned int n_comp = fe1.get_fe().n_components();
       const unsigned int n1     = fe1.dofs_per_cell;

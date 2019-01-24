@@ -2336,9 +2336,9 @@ public:
   template <class InputVector>
   void
   get_function_values(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-    std::vector<typename InputVector::value_type> &values) const;
+    const InputVector &                             fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
+    std::vector<typename InputVector::value_type> & values) const;
 
   /**
    * Generate vector function values from an arbitrary vector.
@@ -2364,8 +2364,8 @@ public:
   template <class InputVector>
   void
   get_function_values(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+    const InputVector &                                    fe_function,
+    const ArrayView<const types::global_dof_index> &       indices,
     std::vector<Vector<typename InputVector::value_type>> &values) const;
 
 
@@ -2402,10 +2402,9 @@ public:
   template <class InputVector>
   void
   get_function_values(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-    VectorSlice<std::vector<std::vector<typename InputVector::value_type>>>
-               values,
+    const InputVector &                                      fe_function,
+    const ArrayView<const types::global_dof_index> &         indices,
+    ArrayView<std::vector<typename InputVector::value_type>> values,
     const bool quadrature_points_fastest) const;
 
   //@}
@@ -2490,8 +2489,8 @@ public:
   template <class InputVector>
   void
   get_function_gradients(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+    const InputVector &                             fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
     std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
       &gradients) const;
 
@@ -2504,10 +2503,10 @@ public:
   template <class InputVector>
   void
   get_function_gradients(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-    VectorSlice<std::vector<
-      std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>>
+    const InputVector &                             fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
+    ArrayView<
+      std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
          gradients,
     bool quadrature_points_fastest = false) const;
 
@@ -2595,8 +2594,8 @@ public:
   template <class InputVector>
   void
   get_function_hessians(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+    const InputVector &                             fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
     std::vector<Tensor<2, spacedim, typename InputVector::value_type>>
       &hessians) const;
 
@@ -2609,10 +2608,10 @@ public:
   template <class InputVector>
   void
   get_function_hessians(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-    VectorSlice<std::vector<
-      std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>>
+    const InputVector &                             fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
+    ArrayView<
+      std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
          hessians,
     bool quadrature_points_fastest = false) const;
 
@@ -2698,9 +2697,9 @@ public:
   template <class InputVector>
   void
   get_function_laplacians(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-    std::vector<typename InputVector::value_type> &laplacians) const;
+    const InputVector &                             fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
+    std::vector<typename InputVector::value_type> & laplacians) const;
 
   /**
    * Access to the second derivatives of a function with more flexibility. See
@@ -2711,8 +2710,8 @@ public:
   template <class InputVector>
   void
   get_function_laplacians(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+    const InputVector &                                    fe_function,
+    const ArrayView<const types::global_dof_index> &       indices,
     std::vector<Vector<typename InputVector::value_type>> &laplacians) const;
 
   /**
@@ -2724,9 +2723,9 @@ public:
   template <class InputVector>
   void
   get_function_laplacians(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-    std::vector<std::vector<typename InputVector::value_type>> &   laplacians,
+    const InputVector &                                         fe_function,
+    const ArrayView<const types::global_dof_index> &            indices,
+    std::vector<std::vector<typename InputVector::value_type>> &laplacians,
     bool quadrature_points_fastest = false) const;
 
   //@}
@@ -2814,8 +2813,8 @@ public:
   template <class InputVector>
   void
   get_function_third_derivatives(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
+    const InputVector &                             fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
     std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
       &third_derivatives) const;
 
@@ -2828,10 +2827,10 @@ public:
   template <class InputVector>
   void
   get_function_third_derivatives(
-    const InputVector &                                            fe_function,
-    const VectorSlice<const std::vector<types::global_dof_index>> &indices,
-    VectorSlice<std::vector<
-      std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>>
+    const InputVector &                             fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
+    ArrayView<
+      std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
          third_derivatives,
     bool quadrature_points_fastest = false) const;
   //@}

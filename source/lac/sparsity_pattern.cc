@@ -240,10 +240,9 @@ SparsityPattern::reinit(const size_type    m,
 
 
 void
-SparsityPattern::reinit(
-  const size_type                                     m,
-  const size_type                                     n,
-  const VectorSlice<const std::vector<unsigned int>> &row_lengths)
+SparsityPattern::reinit(const size_type                      m,
+                        const size_type                      n,
+                        const ArrayView<const unsigned int> &row_lengths)
 {
   AssertDimension(row_lengths.size(), m);
 
