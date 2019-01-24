@@ -991,9 +991,9 @@ public:
   memory_consumption() const;
   //@}
 
-protected:
+private:
   /**
-   * Dimension. Actual number of components contained in the vector.  Get this
+   * Dimension. Actual number of components contained in the vector. Get this
    * number by calling <tt>size()</tt>.
    */
   size_type vec_size;
@@ -1023,6 +1023,14 @@ protected:
     thread_loop_partitioner;
 
   /**
+   * Allocate and align @p values along 64-byte boundaries. The size of the
+   * allocated memory is determined by @p max_vec_size . Copy first
+   * @p copy_n_el from the old values.
+   */
+  void
+  allocate(const size_type copy_n_el = 0);
+
+  /**
    * Make all other vector types friends.
    */
   template <typename Number2>
@@ -1033,15 +1041,6 @@ protected:
    */
   template <typename Number2>
   friend class LAPACKFullMatrix;
-
-private:
-  /**
-   * Allocate and align @p values along 64-byte boundaries. The size of the
-   * allocated memory is determined by @p max_vec_size . Copy first
-   * @p copy_n_el from the old values.
-   */
-  void
-  allocate(const size_type copy_n_el = 0);
 };
 
 /*@}*/
