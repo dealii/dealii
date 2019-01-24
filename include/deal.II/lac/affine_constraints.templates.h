@@ -185,7 +185,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
               ++inconsistent;
               if (verbose)
                 std::cout << "Proc " << myid << " got line " << lineit.index
-                          << " from " << kv.first << " wrong values!"
+                          << " from " << kv.first << " with wrong values!"
                           << std::endl;
             }
         }
