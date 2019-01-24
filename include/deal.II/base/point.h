@@ -281,7 +281,7 @@ public:
 // At least clang-3.7 requires us to have a user-defined constructor
 // and we can't use 'Point<dim,Number>::Point () = default' here.
 template <int dim, typename Number>
-inline Point<dim, Number>::Point()
+inline Point<dim, Number>::Point() // NOLINT
 {}
 
 

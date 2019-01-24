@@ -680,12 +680,6 @@ public:
    */
   class InternalDataBase
   {
-  private:
-    /**
-     * Copy construction is forbidden.
-     */
-    InternalDataBase(const InternalDataBase &) = delete;
-
   public:
     /**
      * Constructor. Sets update_flags to @p update_default and @p first_cell
@@ -697,6 +691,11 @@ public:
      * Destructor. Made virtual to allow polymorphism.
      */
     virtual ~InternalDataBase() = default;
+
+    /**
+     * Copy construction is forbidden.
+     */
+    InternalDataBase(const InternalDataBase &) = delete;
 
     /**
      * A set of update flags specifying the kind of information that an

@@ -296,10 +296,10 @@ public:
   operator>(const DerivedIterator &) const;
 
 protected:
-  /**
+  /*
    * The inheriting class should have a default constructor.
    */
-  LinearIndexIterator() = default;
+  LinearIndexIterator() = default; // NOLINT
 
   /**
    * Constructor that copies an accessor.

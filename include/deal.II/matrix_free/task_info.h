@@ -44,8 +44,7 @@ namespace internal
   struct MFWorkerInterface
   {
   public:
-    virtual ~MFWorkerInterface()
-    {}
+    virtual ~MFWorkerInterface() = default;
 
     /// Starts the communication for the update ghost values operation
     virtual void

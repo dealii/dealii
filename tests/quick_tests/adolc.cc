@@ -30,7 +30,7 @@
 using namespace dealii;
 
 int
-main(void)
+main()
 {
   const double       tol = 1e-12;
   const unsigned int n   = 10;
