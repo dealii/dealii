@@ -183,6 +183,73 @@ namespace internal
 
 
 
+    void
+    DoFInfo::get_dof_indices_on_cell_batch(std::vector<unsigned int> &my_rows,
+                                           const unsigned int         cell,
+                                           const bool apply_constraints) const
+    {
+      const unsigned int n_fe_components = start_components.back();
+      const unsigned int fe_index =
+        dofs_per_cell.size() == 1 ? 0 : cell_active_fe_index[cell];
+      const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
+
+      const unsigned int n_vectorization  = vectorization_length;
+      constexpr auto     dof_access_index = dof_access_cell;
+      AssertIndexRange(cell,
+                       n_vectorization_lanes_filled[dof_access_index].size());
+      const unsigned int n_vectorization_actual =
+        n_vectorization_lanes_filled[dof_access_index][cell];
+
+      // we might have constraints, so the final number
+      // of indices is not known a priori.
+      // conservatively reserve the maximum without constraints
+      my_rows.reserve(n_vectorization * dofs_this_cell);
+      my_rows.resize(0);
+      unsigned int total_size = 0;
+      for (unsigned int v = 0; v < n_vectorization_actual; ++v)
+        {
+          const unsigned int ib =
+            (cell * n_vectorization + v) * n_fe_components;
+          const unsigned int ie =
+            (cell * n_vectorization + v + 1) * n_fe_components;
+
+          // figure out constraints by comparing constraint_indicator row
+          // shift for this cell within the block as compared to the next
+          // one
+          const bool has_constraints =
+            row_starts[ib].second != row_starts[ib + n_fe_components].second;
+
+          auto do_copy = [&](const unsigned int *begin,
+                             const unsigned int *end) {
+            const unsigned int shift = total_size;
+            total_size += (end - begin);
+            my_rows.resize(total_size);
+            std::copy(begin, end, my_rows.begin() + shift);
+          };
+
+          if (!has_constraints || apply_constraints)
+            {
+              const unsigned int *begin =
+                dof_indices.data() + row_starts[ib].first;
+              const unsigned int *end =
+                dof_indices.data() + row_starts[ie].first;
+              do_copy(begin, end);
+            }
+          else
+            {
+              Assert(row_starts_plain_indices[cell * n_vectorization + v] !=
+                       numbers::invalid_unsigned_int,
+                     ExcNotInitialized());
+              const unsigned int *begin =
+                plain_dof_indices.data() +
+                row_starts_plain_indices[cell * n_vectorization + v];
+              const unsigned int *end = begin + dofs_this_cell;
+              do_copy(begin, end);
+            }
+        }
+    }
+
+
     template <typename number>
     void
     DoFInfo ::read_dof_indices(
