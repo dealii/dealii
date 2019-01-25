@@ -245,21 +245,6 @@ void second_grid()
   grid_out.write_eps(triangulation, out);
 
   std::cout << "Grid written to grid-2.eps" << std::endl;
-
-  // At this point, all objects created in this function will be destroyed in
-  // reverse order. Unfortunately, we defined the manifold object after the
-  // triangulation, which still has a pointer to it and the library will
-  // produce an error if the manifold object is destroyed before the
-  // triangulation. We therefore have to release it, which can be done as
-  // follows. Note that this sets the manifold object used for part "0" of the
-  // domain back to a default object, over which the triangulation has full
-  // control.
-  triangulation.reset_manifold(0);
-  // An alternative to doing so, and one that is frequently more convenient,
-  // would have been to declare the manifold object before the triangulation
-  // object. In that case, the triangulation would have let lose of the
-  // manifold object upon its destruction, and everything would have been
-  // fine.
 }
 
 
