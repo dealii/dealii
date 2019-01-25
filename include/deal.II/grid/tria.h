@@ -2706,6 +2706,20 @@ public:
 
   /**
    * Iterator to the first used cell on level @p level.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   cell_iterator
   begin(const unsigned int level = 0) const;
@@ -2725,6 +2739,20 @@ public:
    *  @endcode
    * have zero iterations, as may be expected if there are no active cells on
    * this level.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   active_cell_iterator
   begin_active(const unsigned int level = 0) const;
@@ -2739,6 +2767,20 @@ public:
   /**
    * Return an iterator which is the first iterator not on level. If @p level
    * is the last level, then this returns <tt>end()</tt>.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   cell_iterator
   end(const unsigned int level) const;
@@ -2747,6 +2789,20 @@ public:
    * Return an active iterator which is the first active iterator not on the
    * given level. If @p level is the last level, then this returns
    * <tt>end()</tt>.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   active_cell_iterator
   end_active(const unsigned int level) const;
@@ -3577,12 +3633,40 @@ private:
 
   /**
    * Iterator to the first used line on level @p level.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   line_iterator
   begin_line(const unsigned int level = 0) const;
 
   /**
    * Iterator to the first active line on level @p level.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   active_line_iterator
   begin_active_line(const unsigned int level = 0) const;
@@ -3607,18 +3691,60 @@ private:
    * Iterator to the first quad, used or not, on the given level. If a level
    * has no quads, a past-the-end iterator is returned.  If quads are no
    * cells, i.e. for $dim>2$ no level argument must be given.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   raw_quad_iterator
   begin_raw_quad(const unsigned int level = 0) const;
 
   /**
    * Iterator to the first used quad on level @p level.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   quad_iterator
   begin_quad(const unsigned int level = 0) const;
 
   /**
    * Iterator to the first active quad on level @p level.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   active_quad_iterator
   begin_active_quad(const unsigned int level = 0) const;
@@ -3641,19 +3767,61 @@ private:
 
   /**
    * Iterator to the first hex, used or not, on level @p level. If a level has
-   * no hexs, a past-the-end iterator is returned.
+   * no hexes, a past-the-end iterator is returned.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   raw_hex_iterator
   begin_raw_hex(const unsigned int level = 0) const;
 
   /**
    * Iterator to the first used hex on level @p level.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   hex_iterator
   begin_hex(const unsigned int level = 0) const;
 
   /**
    * Iterator to the first active hex on level @p level.
+   *
+   * @note The given @p level argument needs to correspond to a level of the
+   *   triangulation, i.e., should be less than the value returned by
+   *   n_levels(). On the other hand, for parallel computations using
+   *   a parallel::distributed::Triangulation object, it is often convenient
+   *   to write loops over the cells of all levels of the global mesh, even
+   *   if the <i>local</i> portion of the triangulation does not actually
+   *   have cells at one of the higher levels. In those cases, the
+   *   @p level argument is accepted if it is less than what the
+   *   n_global_levels() function returns. If the given @p level is
+   *   between the values returned by n_levels() and n_global_levels(),
+   *   then no cells exist in the local portion of the triangulation
+   *   at this level, and the function simply returns what end() would
+   *   return.
    */
   active_hex_iterator
   begin_active_hex(const unsigned int level = 0) const;
