@@ -224,10 +224,8 @@ namespace TrilinosWrappers
   PreconditionAMG::initialize(const Epetra_RowMatrix &      matrix,
                               const Teuchos::ParameterList &ml_parameters)
   {
-    preconditioner.reset();
-    preconditioner =
-      std::make_shared<ML_Epetra::MultiLevelPreconditioner>(matrix,
-                                                            ml_parameters);
+    preconditioner.reset(
+      new ML_Epetra::MultiLevelPreconditioner(matrix, ml_parameters));
   }
 
 

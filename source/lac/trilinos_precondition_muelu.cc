@@ -26,6 +26,7 @@
 
 #    include <Epetra_MultiVector.h>
 #    include <MueLu.hpp>
+#    include <MueLu_CreateEpetraPreconditioner.hpp>
 #    include <MueLu_EpetraOperator.hpp>
 #    include <MueLu_MLParameterListInterpreter.hpp>
 #    include <Teuchos_ParameterList.hpp>
@@ -205,38 +206,10 @@ namespace TrilinosWrappers
   PreconditionAMGMueLu::initialize(const Epetra_CrsMatrix &matrix,
                                    Teuchos::ParameterList &muelu_parameters)
   {
-    // We cannot use MueLu::CreateEpetraOperator directly because, we cannot
-    // transfer ownership of MueLu::EpetraOperator from Teuchos::RCP to
-    // std::shared_ptr.
-
-    // For now, just use serial node, i.e. no multithreaing or GPU.
-    using node = KokkosClassic::DefaultNode::DefaultNodeType;
-    preconditioner.reset();
-
-    // Cast matrix into a MueLu::Matrix. The constness needs to be cast away.
-    // MueLu uses Teuchos::RCP which are Trilinos version of std::shared_ptr.
-    Teuchos::RCP<Epetra_CrsMatrix> rcp_matrix =
-      Teuchos::rcpFromRef(*(const_cast<Epetra_CrsMatrix *>(&matrix)));
-    Teuchos::RCP<Xpetra::CrsMatrix<double, int, int, node>> muelu_crs_matrix =
-      Teuchos::rcp(new Xpetra::EpetraCrsMatrix(rcp_matrix));
-    Teuchos::RCP<Xpetra::Matrix<double, int, int, node>> muelu_matrix =
-      Teuchos::rcp(
-        new Xpetra::CrsMatrixWrap<double, int, int, node>(muelu_crs_matrix));
-
-    // Create the multigrid hierarchy using ML parameters.
-    Teuchos::RCP<MueLu::HierarchyManager<double, int, int, node>>
-      hierarchy_factory;
-    hierarchy_factory = Teuchos::rcp(
-      new MueLu::MLParameterListInterpreter<double, int, int, node>(
-        muelu_parameters));
-    Teuchos::RCP<MueLu::Hierarchy<double, int, int, node>> hierarchy =
-      hierarchy_factory->CreateHierarchy();
-    hierarchy->GetLevel(0)->Set("A", muelu_matrix);
-    hierarchy_factory->SetupHierarchy(*hierarchy);
-
-    // MueLu::EpetraOperator is just a wrapper around a "standard"
-    // Epetra_Operator.
-    preconditioner = std::make_shared<MueLu::EpetraOperator>(hierarchy);
+    const auto teuchos_wrapped_matrix =
+      Teuchos::rcp(const_cast<Epetra_CrsMatrix *>(&matrix), false);
+    preconditioner = MueLu::CreateEpetraPreconditioner(teuchos_wrapped_matrix,
+                                                       muelu_parameters);
   }
 
 

@@ -77,7 +77,7 @@ namespace TrilinosWrappers
   Epetra_Operator &
   PreconditionBase::trilinos_operator() const
   {
-    AssertThrow(preconditioner,
+    AssertThrow(!preconditioner.is_null(),
                 ExcMessage("Trying to dereference a null pointer."));
     return (*preconditioner);
   }
@@ -679,9 +679,8 @@ namespace TrilinosWrappers
   PreconditionChebyshev::initialize(const SparseMatrix &  matrix,
                                     const AdditionalData &additional_data)
   {
-    preconditioner.reset();
     preconditioner =
-      std::make_shared<Ifpack_Chebyshev>(&matrix.trilinos_matrix());
+      Teuchos::rcp(new Ifpack_Chebyshev(&matrix.trilinos_matrix()));
 
     Ifpack_Chebyshev *ifpack =
       dynamic_cast<Ifpack_Chebyshev *>(preconditioner.get());
