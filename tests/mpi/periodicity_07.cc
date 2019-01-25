@@ -150,6 +150,7 @@ test(const unsigned numRefinementLevels = 2)
   AffineConstraints<double> constraints;
   constraints.clear();
   constraints.reinit(locally_relevant_dofs);
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   std::vector<
     GridTools::PeriodicFacePair<typename DoFHandler<dim>::cell_iterator>>
@@ -163,6 +164,7 @@ test(const unsigned numRefinementLevels = 2)
 
   DoFTools::make_periodicity_constraints<DoFHandler<dim>>(periodicity_vectorDof,
                                                           constraints);
+  constraints.close();
 
   const bool consistent =
     constraints.is_consistent_in_parallel(locally_owned_dofs,
@@ -170,20 +172,8 @@ test(const unsigned numRefinementLevels = 2)
                                           mpi_communicator,
                                           /*verbose*/ true);
 
-  pcout << "Periodicity constraints are consistent in parallel: " << consistent
+  pcout << "Total constraints are consistent in parallel: " << consistent
         << std::endl;
-
-  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-
-  const bool hanging_consistent =
-    constraints.is_consistent_in_parallel(locally_owned_dofs,
-                                          locally_active_dofs,
-                                          mpi_communicator);
-
-  pcout << "Hanging nodes constraints are consistent in parallel: "
-        << hanging_consistent << std::endl;
-
-  constraints.close();
 }
 
 int
