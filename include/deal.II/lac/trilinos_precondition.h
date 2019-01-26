@@ -1783,7 +1783,7 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    ~PreconditionAMGMueLu() override;
+    virtual ~PreconditionAMGMueLu() override = default;
 
     /**
      * Let Trilinos compute a multilevel hierarchy for the solution of a

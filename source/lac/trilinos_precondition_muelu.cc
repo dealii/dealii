@@ -55,19 +55,16 @@ namespace TrilinosWrappers
 
   PreconditionAMGMueLu::PreconditionAMGMueLu()
   {
+    // clang-tidy wants to default the constructor if we disable the check
+    // in case we compile without 64-bit indices
 #    ifdef DEAL_II_WITH_64BIT_INDICES
-    AssertThrow(false,
+    constexpr bool enabled = false;
+#    else
+    constexpr bool enabled = true;
+#    endif
+    AssertThrow(enabled,
                 ExcMessage(
                   "PreconditionAMGMueLu does not support 64bit-indices!"));
-#    endif
-  }
-
-
-
-  PreconditionAMGMueLu::~PreconditionAMGMueLu()
-  {
-    preconditioner.reset();
-    trilinos_matrix.reset();
   }
 
 
