@@ -1455,69 +1455,68 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       // if the next block is of kind $Entities, parse it
       if (line == "$Entities")
         {
-          unsigned long numPoints, numCurves, numSurfaces, numVolumes,
-            numPhysicals;
-          int    tag, physicalTag;
-          double boxMinX, boxMinY, boxMinZ, boxMaxX, boxMaxY, boxMaxZ;
+          unsigned long n_points, n_curves, n_surfaces, n_volumes, n_physicals;
+          int           tag, physical_tag;
+          double        box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+            box_max_z;
 
-          in >> numPoints >> numCurves >> numSurfaces >> numVolumes;
-          for (unsigned int i = 0; i < numPoints; ++i)
+          // we only care for physical_tag to fill tag_maps
+          in >> n_points >> n_curves >> n_surfaces >> n_volumes;
+          for (unsigned int i = 0; i < n_points; ++i)
             {
               // parse point ids
-              in >> tag >> boxMinX >> boxMinY >> boxMinZ >> boxMaxX >>
-                boxMaxY >> boxMaxZ >> numPhysicals;
-              AssertThrow(numPhysicals < 2,
+              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                box_max_y >> box_max_z >> n_physicals;
+              AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
-              for (unsigned int j = 0; j < numPhysicals; ++j)
-                in >> physicalTag;
-              tag_maps[0][tag] = (numPhysicals == 0) ? 0 : physicalTag;
+              for (unsigned int j = 0; j < n_physicals; ++j)
+                in >> physical_tag;
+              tag_maps[0][tag] = (n_physicals == 0) ? 0 : physical_tag;
             }
-          for (unsigned int i = 0; i < numCurves; ++i)
+          for (unsigned int i = 0; i < n_curves; ++i)
             {
               // parse curve ids
-              in >> tag >> boxMinX >> boxMinY >> boxMinZ >> boxMaxX >>
-                boxMaxY >> boxMaxZ >> numPhysicals;
-              AssertThrow(numPhysicals < 2,
+              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                box_max_y >> box_max_z >> n_physicals;
+              AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
-              for (unsigned int j = 0; j < numPhysicals; ++j)
-                in >> physicalTag;
-              tag_maps[1][tag] = (numPhysicals == 0) ? 0 : physicalTag;
-              in >> numPoints;
-              for (unsigned int j = 0; j < numPoints; ++j)
+              for (unsigned int j = 0; j < n_physicals; ++j)
+                in >> physical_tag;
+              tag_maps[1][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              in >> n_points;
+              for (unsigned int j = 0; j < n_points; ++j)
                 in >> tag;
             }
 
-          for (unsigned int i = 0; i < numSurfaces; ++i)
+          for (unsigned int i = 0; i < n_surfaces; ++i)
             {
               // parse surface ids
-              in >> tag >> boxMinX >> boxMinY >> boxMinZ >> boxMaxX >>
-                boxMaxY >> boxMaxZ >> numPhysicals;
-              AssertThrow(numPhysicals < 2,
+              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                box_max_y >> box_max_z >> n_physicals;
+              AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
-              for (unsigned int j = 0; j < numPhysicals; ++j)
-                in >> physicalTag;
-              tag_maps[2][tag] = (numPhysicals == 0) ? 0 : physicalTag;
-              in >> numCurves;
-              for (unsigned int j = 0; j < numCurves; ++j)
+              for (unsigned int j = 0; j < n_physicals; ++j)
+                in >> physical_tag;
+              tag_maps[2][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              in >> n_curves;
+              for (unsigned int j = 0; j < n_curves; ++j)
                 in >> tag;
             }
-          for (unsigned int i = 0; i < numVolumes; ++i)
+          for (unsigned int i = 0; i < n_volumes; ++i)
             {
               // parse volume ids
-              in >> tag >> boxMinX >> boxMinY >> boxMinZ >> boxMaxX >>
-                boxMaxY >> boxMaxZ >> numPhysicals;
-              AssertThrow(numPhysicals < 2,
+              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                box_max_y >> box_max_z >> n_physicals;
+              AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
-              for (unsigned int j = 0; j < numPhysicals; ++j)
-                in >> physicalTag;
-              tag_maps[3][tag] = (numPhysicals == 0) ? 0 : physicalTag;
-              in >> numSurfaces;
-              for (unsigned int j = 0; j < numSurfaces; ++j)
+              for (unsigned int j = 0; j < n_physicals; ++j)
+                in >> physical_tag;
+              tag_maps[3][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              in >> n_surfaces;
+              for (unsigned int j = 0; j < n_surfaces; ++j)
                 in >> tag;
             }
-          std::cout << line << std::endl;
           in >> line;
-          std::cout << line << std::endl;
           AssertThrow(line == "$EndEntities", ExcInvalidGMSHInput(line));
           in >> line;
         }
