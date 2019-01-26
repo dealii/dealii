@@ -18,21 +18,11 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  if DEAL_II_TRILINOS_VERSION_GTE(11, 14, 0)
-
 #    include <deal.II/lac/sparse_matrix.h>
-#    include <deal.II/lac/trilinos_index_access.h>
 #    include <deal.II/lac/trilinos_sparse_matrix.h>
-#    include <deal.II/lac/vector.h>
 
-#    include <Epetra_MultiVector.h>
-#    include <MueLu.hpp>
 #    include <MueLu_CreateEpetraPreconditioner.hpp>
-#    include <MueLu_EpetraOperator.hpp>
-#    include <MueLu_MLParameterListInterpreter.hpp>
-#    include <Teuchos_ParameterList.hpp>
-#    include <Teuchos_RCP.hpp>
 #    include <ml_MultiLevelPreconditioner.h>
-#    include <ml_include.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -97,6 +87,8 @@ namespace TrilinosWrappers
   {
     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
+
+    parameter_list.set("parameterlist: syntax", "ml");
 
     if (additional_data.elliptic == true)
       ML_Epetra::SetDefaults("SA", parameter_list);
