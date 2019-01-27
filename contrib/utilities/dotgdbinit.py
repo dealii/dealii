@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------
 #
-# Copyright (C) 2015 - 2017 by the deal.II authors
+# Copyright (C) 2015 - 2018 by the deal.II authors
 #
 # This file is part of the deal.II library.
 #
@@ -25,7 +25,7 @@
 # slightly older versions of GDB (the Python interface was added in 7.0,
 # released in 2009).
 #
-# Authors: Wolfgang Bangerth, 2015, David Wells, 2015 - 2017
+# Authors: Wolfgang Bangerth, 2015, David Wells, 2015 - 2018
 #
 set print pretty 1
 
@@ -50,6 +50,31 @@ def build_output_string(keys, accessor):
             ",\n".join(["  {} = {}".format(key, accessor[key])
                         for key in keys]) +
             "\n}")
+
+
+class AlignedVectorPrinter(object):
+    """Print a deal.II AlignedVector instance."""
+    def __init__(self, typename, val):
+        self.typename = typename
+        self.val = val
+        self.length = int(self.val['data_end'] - self.val['data_begin'])
+
+    def children(self):
+        # The first entry (see the "Pretty Printing API" documentation of GDB)
+        # in the tuple should be a name for the child, which should be nothing
+        # (the array elements don't have individual names) here.
+        return (("", (self.val['data_begin'] + count).dereference())
+                for count in range(self.length))
+
+    def to_string(self):
+        return "AlignedVector<{}>({})".format(self.val.type.template_argument(0),
+                                              self.length)
+
+    @staticmethod
+    def display_hint():
+        """Provide a hint to GDB that this is an array-like container
+        (so print values in sequence)."""
+        return "array"
 
 
 class PointPrinter(object):
@@ -94,23 +119,17 @@ class VectorPrinter(object):
     def __init__(self, typename, val):
         self.typename = typename
         self.val = val
+        a_vec = self.val['values']
+        self.length = int(a_vec['data_end'] - a_vec['data_begin'])
 
     def children(self):
-        # The first entry (see the "Pretty Printing API" documentation of GDB)
-        # in the tuple should be a name for the child, which should be nothing
-        # (an empty string) here.
-        return (("", (self.val['values'] + count).dereference())
-                for count in range(int(self.val['vec_size'])))
+        return (("values", self.val['values']),
+                ("thread_loop_partitioner",
+                 self.val['thread_loop_partitioner']))
 
     def to_string(self):
-        return "{}[{}]".format(self.val.type.template_argument(0),
-                               self.val['vec_size'])
-
-    @staticmethod
-    def display_hint():
-        """Provide a hint to GDB that this is an array-like container
-        (so print values in sequence)."""
-        return "array"
+        return "Vector<{}>({})".format(self.val.type.template_argument(0),
+                                       self.length)
 
 
 class QuadraturePrinter(object):
@@ -184,6 +203,7 @@ dealii_printer = Printer("deal.II")
 def register_dealii_printers():
     """Register deal.II pretty-printers with gdb."""
     printers = {
+        AlignedVectorPrinter: ['AlignedVector'],
         PointPrinter: ['Point'],
         TensorPrinter: ['Tensor'],
         VectorPrinter: ['Vector'],
