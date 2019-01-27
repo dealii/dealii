@@ -404,9 +404,10 @@ namespace Utilities
   constexpr unsigned int
   pow(const unsigned int base, const int iexp)
   {
-#ifdef DEAL_II_WITH_CXX14
-#  ifdef DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR
-#    if defined(DEAL_II_HAVE_BUILTIN_EXPECT) && defined(__INTEL_COMPILER)
+#if defined(DEBUG) && defined(DEAL_II_WITH_CXX14) && \
+  defined(DEAL_II_HAVE_CXX14_CONSTEXPR_CAN_CALL_NONCONSTEXPR)
+    // Up to __builtin_expect this is the same code as in the 'Assert' macro.
+    // The call to __builtin_expect turns out to be problematic.
     if (!(iexp >= 0))
       ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
         ::dealii::deal_II_exceptions::internals::abort_or_throw_on_exception,
@@ -416,10 +417,6 @@ namespace Utilities
         "iexp>=0",
         "ExcMessage(\"The exponent must not be negative!\")",
         ExcMessage("The exponent must not be negative!"));
-#    else
-    Assert(iexp >= 0, ExcMessage("The exponent must not be negative!"));
-#    endif
-#  endif
 #endif
     // The "exponentiation by squaring" algorithm used below has to be
     // compressed to one statement due to C++11's restrictions on constexpr
