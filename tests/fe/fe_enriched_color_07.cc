@@ -1424,7 +1424,9 @@ LaplaceProblem<dim>::setup_system()
 {
   pcout << "...start setup system" << std::endl;
 
-  GridTools::partition_triangulation(n_mpi_processes, triangulation);
+  GridTools::partition_triangulation(n_mpi_processes,
+                                     triangulation,
+                                     SparsityTools::Partitioner::zoltan);
 
   dof_handler.distribute_dofs(*fe_collection);
 
