@@ -1460,29 +1460,37 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           double        box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
             box_max_z;
 
-          // we only care for physical_tag to fill tag_maps
+          // we only care for 'physical_tag' to fill tag_maps
           in >> n_points >> n_curves >> n_surfaces >> n_volumes;
           for (unsigned int i = 0; i < n_points; ++i)
             {
               // parse point ids
+              // we only care for 'tag' as key for tag_maps[0]
               in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
                 box_max_y >> box_max_z >> n_physicals;
+              // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
+              // if there is no physical tag, use 0 as default
               tag_maps[0][tag] = (n_physicals == 0) ? 0 : physical_tag;
             }
           for (unsigned int i = 0; i < n_curves; ++i)
             {
               // parse curve ids
+              // we only care for 'tag' as key for tag_maps[1]
               in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
                 box_max_y >> box_max_z >> n_physicals;
+              // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
+              // if there is no physical tag, use 0 as default
               tag_maps[1][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              // we don't care about the points associated to a curve, but have
+              // to parse them anyway because their format is unstructured
               in >> n_points;
               for (unsigned int j = 0; j < n_points; ++j)
                 in >> tag;
@@ -1491,13 +1499,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           for (unsigned int i = 0; i < n_surfaces; ++i)
             {
               // parse surface ids
+              // we only care for 'tag' as key for tag_maps[2]
               in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
                 box_max_y >> box_max_z >> n_physicals;
+              // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
+              // if there is no physical tag, use 0 as default
               tag_maps[2][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              // we don't care about the curves associated to a surface, but
+              // have to parse them anyway because their format is unstructured
               in >> n_curves;
               for (unsigned int j = 0; j < n_curves; ++j)
                 in >> tag;
@@ -1505,13 +1518,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           for (unsigned int i = 0; i < n_volumes; ++i)
             {
               // parse volume ids
+              // we only care for 'tag' as key for tag_maps[3]
               in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
                 box_max_y >> box_max_z >> n_physicals;
+              // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
+              // if there is no physical tag, use 0 as default
               tag_maps[3][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              // we don't care about the surfaces associated to a volume, but
+              // have to parse them anyway because their format is unstructured
               in >> n_surfaces;
               for (unsigned int j = 0; j < n_surfaces; ++j)
                 in >> tag;
