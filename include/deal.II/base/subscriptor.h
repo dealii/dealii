@@ -290,6 +290,37 @@ private:
 
 //---------------------------------------------------------------------------
 
+inline Subscriptor::Subscriptor()
+  : counter(0)
+  , object_info(nullptr)
+{}
+
+
+
+inline Subscriptor::Subscriptor(const Subscriptor &)
+  : counter(0)
+  , object_info(nullptr)
+{}
+
+
+
+inline Subscriptor &
+Subscriptor::operator=(const Subscriptor &s)
+{
+  object_info = s.object_info;
+  return *this;
+}
+
+
+
+inline unsigned int
+Subscriptor::n_subscriptions() const
+{
+  return counter;
+}
+
+
+
 template <class Archive>
 inline void
 Subscriptor::serialize(Archive &, const unsigned int)
