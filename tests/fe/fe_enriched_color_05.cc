@@ -254,8 +254,10 @@ main(int argc, char **argv)
     }
 
 #ifdef DATA_OUT_FE_ENRICHED
-  GridTools::partition_triangulation(
-    Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD), triangulation);
+  GridTools::partition_triangulation(Utilities::MPI::n_mpi_processes(
+                                       MPI_COMM_WORLD),
+                                     triangulation,
+                                     SparsityTools::Partitioner::zoltan);
   dof_handler.distribute_dofs(*fe_collection);
 
   plot_shape_function<dim>(dof_handler, 5);
