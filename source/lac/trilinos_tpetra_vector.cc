@@ -672,8 +672,10 @@ namespace LinearAlgebra
 
     template class Vector<float>;
     template class Vector<double>;
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
     template class Vector<std::complex<float>>;
     template class Vector<std::complex<double>>;
+#endif
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
