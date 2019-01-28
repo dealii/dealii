@@ -174,9 +174,11 @@ class VectorizedArray
 {
 public:
   /**
-   * This gives the number of vectors collected in this class.
+   * This gives the number of elements collected in this class. In the general
+   * case, there is only one element. Specializations use SIMD intrinsics and
+   * can work on multiple elements at the same time.
    */
-  static const unsigned int n_array_elements = 1;
+  static const unsigned int n_array_elements;
 
   // POD means that there should be no user-defined constructors, destructors
   // and copy functions (the standard is somewhat relaxed in C++2011, though).
@@ -448,6 +450,10 @@ private:
   friend VectorizedArray<Number2>
   std::min(const VectorizedArray<Number2> &, const VectorizedArray<Number2> &);
 };
+
+// We need to have a separate declaration for static const members
+template <typename Number>
+const unsigned int VectorizedArray<Number>::n_array_elements = 1;
 
 
 
