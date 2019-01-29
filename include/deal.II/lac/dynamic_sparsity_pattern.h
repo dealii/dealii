@@ -210,7 +210,7 @@ namespace DynamicSparsityPatternIterators
      * here only to be able to store iterators in STL containers such as
      * `std::vector`.
      */
-    Iterator();
+    Iterator() = default;
 
     /**
      * Prefix increment.
@@ -882,12 +882,6 @@ namespace DynamicSparsityPatternIterators
 
   inline Iterator::Iterator(const DynamicSparsityPattern *sparsity_pattern)
     : accessor(sparsity_pattern)
-  {}
-
-
-
-  inline Iterator::Iterator()
-    : accessor()
   {}
 
 

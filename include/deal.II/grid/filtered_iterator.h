@@ -568,11 +568,6 @@ public:
   FilteredIterator(const FilteredIterator &fi);
 
   /**
-   * Destructor.
-   */
-  ~FilteredIterator();
-
-  /**
    * Assignment operator. Copy the iterator value of the argument, but as
    * discussed in the class documentation, the predicate of the argument is
    * not copied. The iterator value underlying the argument has to satisfy the
@@ -963,14 +958,6 @@ inline FilteredIterator<BaseIterator>::FilteredIterator(
   BaseIterator(*static_cast<const BaseIterator *>(&fi))
   , predicate(fi.predicate->clone())
 {}
-
-
-
-template <typename BaseIterator>
-inline FilteredIterator<BaseIterator>::~FilteredIterator()
-{
-  predicate.reset();
-}
 
 
 

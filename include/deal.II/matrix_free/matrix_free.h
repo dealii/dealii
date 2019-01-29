@@ -2666,7 +2666,7 @@ namespace internal
             3);
     }
 
-    ~VectorDataExchange()
+    ~VectorDataExchange() // NOLINT
     {
 #  ifdef DEAL_II_WITH_MPI
       for (unsigned int i = 0; i < tmp_data.size(); ++i)
