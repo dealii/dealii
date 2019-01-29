@@ -1404,10 +1404,13 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   Assert(tria != nullptr, ExcNoTriangulationSelected());
   AssertThrow(in, ExcIO());
 
-  unsigned int                      n_vertices;
-  unsigned int                      n_cells;
-  unsigned int                      dummy;
-  std::string                       line;
+  unsigned int n_vertices;
+  unsigned int n_cells;
+  unsigned int dummy;
+  std::string  line;
+  // This array stores maps from the 'entities' to the 'physical tags' for
+  // points, curves, surfaces and volumes. We use this information later to
+  // assign boundary ids.
   std::array<std::map<int, int>, 4> tag_maps;
 
   in >> line;
@@ -1455,22 +1458,24 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
       // if the next block is of kind $Entities, parse it
       if (line == "$Entities")
         {
-          unsigned long n_points, n_curves, n_surfaces, n_volumes, n_physicals;
-          int           tag, physical_tag;
-          double        box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
-            box_max_z;
+          unsigned long n_points, n_curves, n_surfaces, n_volumes;
 
-          // we only care for 'physical_tag' to fill tag_maps
           in >> n_points >> n_curves >> n_surfaces >> n_volumes;
           for (unsigned int i = 0; i < n_points; ++i)
             {
               // parse point ids
+              int          tag;
+              unsigned int n_physicals;
+              double box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+                box_max_z;
+
               // we only care for 'tag' as key for tag_maps[0]
               in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
                 box_max_y >> box_max_z >> n_physicals;
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
+              int physical_tag;
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
               // if there is no physical tag, use 0 as default
@@ -1479,12 +1484,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           for (unsigned int i = 0; i < n_curves; ++i)
             {
               // parse curve ids
+              int          tag;
+              unsigned int n_physicals;
+              double box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+                box_max_z;
+
               // we only care for 'tag' as key for tag_maps[1]
               in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
                 box_max_y >> box_max_z >> n_physicals;
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
+              int physical_tag;
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
               // if there is no physical tag, use 0 as default
@@ -1499,12 +1510,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           for (unsigned int i = 0; i < n_surfaces; ++i)
             {
               // parse surface ids
+              int          tag;
+              unsigned int n_physicals;
+              double box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+                box_max_z;
+
               // we only care for 'tag' as key for tag_maps[2]
               in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
                 box_max_y >> box_max_z >> n_physicals;
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
+              int physical_tag;
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
               // if there is no physical tag, use 0 as default
@@ -1518,12 +1535,18 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           for (unsigned int i = 0; i < n_volumes; ++i)
             {
               // parse volume ids
+              int          tag;
+              unsigned int n_physicals;
+              double box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+                box_max_z;
+
               // we only care for 'tag' as key for tag_maps[3]
               in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
                 box_max_y >> box_max_z >> n_physicals;
               // if there is a physical tag, we will use it as boundary id below
               AssertThrow(n_physicals < 2,
                           ExcMessage("More than one tag is not supported!"));
+              int physical_tag;
               for (unsigned int j = 0; j < n_physicals; ++j)
                 in >> physical_tag;
               // if there is no physical tag, use 0 as default
