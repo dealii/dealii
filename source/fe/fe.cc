@@ -446,7 +446,7 @@ FiniteElement<dim, spacedim>::component_mask(const BlockMask &block_mask) const
   // if we get a block mask that represents all blocks, then
   // do the same for the returned component mask
   if (block_mask.represents_the_all_selected_mask())
-    return ComponentMask();
+    return {};
 
   AssertDimension(block_mask.size(), this->n_blocks());
 
@@ -502,7 +502,7 @@ FiniteElement<dim, spacedim>::block_mask(
   // if we get a component mask that represents all component, then
   // do the same for the returned block mask
   if (component_mask.represents_the_all_selected_mask())
-    return BlockMask();
+    return {};
 
   AssertDimension(component_mask.size(), this->n_components());
 
@@ -859,20 +859,18 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
   switch (dim)
     {
       case 1:
-        return TableIndices<2>(0U, 0U);
+        return {0U, 0U};
       case 2:
-        return TableIndices<2>(this->dofs_per_vertex + 2 * this->dofs_per_line,
-                               this->dofs_per_face);
+        return {this->dofs_per_vertex + 2 * this->dofs_per_line,
+                this->dofs_per_face};
       case 3:
-        return TableIndices<2>(5 * this->dofs_per_vertex +
-                                 12 * this->dofs_per_line +
-                                 4 * this->dofs_per_quad,
-                               this->dofs_per_face);
+        return {5 * this->dofs_per_vertex + 12 * this->dofs_per_line +
+                  4 * this->dofs_per_quad,
+                this->dofs_per_face};
       default:
         Assert(false, ExcNotImplemented());
     }
-  return TableIndices<2>(numbers::invalid_unsigned_int,
-                         numbers::invalid_unsigned_int);
+  return {numbers::invalid_unsigned_int, numbers::invalid_unsigned_int};
 }
 
 

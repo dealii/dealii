@@ -4363,8 +4363,7 @@ namespace FEValuesViews
       Assert(n < 1, ExcIndexRange(n, 0, 1));
       (void)n;
 
-      const double array[1] = {t[0]};
-      return dealii::SymmetricTensor<2, 1>(array);
+      return {{t[0]}};
     }
 
 
@@ -4376,18 +4375,16 @@ namespace FEValuesViews
         {
           case 0:
             {
-              const double array[3] = {t[0], 0, t[1] / 2};
-              return dealii::SymmetricTensor<2, 2>(array);
+              return {{t[0], 0, t[1] / 2}};
             }
           case 1:
             {
-              const double array[3] = {0, t[1], t[0] / 2};
-              return dealii::SymmetricTensor<2, 2>(array);
+              return {{0, t[1], t[0] / 2}};
             }
           default:
             {
               Assert(false, ExcIndexRange(n, 0, 2));
-              return dealii::SymmetricTensor<2, 2>();
+              return {};
             }
         }
     }
@@ -4401,23 +4398,20 @@ namespace FEValuesViews
         {
           case 0:
             {
-              const double array[6] = {t[0], 0, 0, t[1] / 2, t[2] / 2, 0};
-              return dealii::SymmetricTensor<2, 3>(array);
+              return {{t[0], 0, 0, t[1] / 2, t[2] / 2, 0}};
             }
           case 1:
             {
-              const double array[6] = {0, t[1], 0, t[0] / 2, 0, t[2] / 2};
-              return dealii::SymmetricTensor<2, 3>(array);
+              return {{0, t[1], 0, t[0] / 2, 0, t[2] / 2}};
             }
           case 2:
             {
-              const double array[6] = {0, 0, t[2], 0, t[0] / 2, t[1] / 2};
-              return dealii::SymmetricTensor<2, 3>(array);
+              return {{0, 0, t[2], 0, t[0] / 2, t[1] / 2}};
             }
           default:
             {
               Assert(false, ExcIndexRange(n, 0, 3));
-              return dealii::SymmetricTensor<2, 3>();
+              return {};
             }
         }
     }

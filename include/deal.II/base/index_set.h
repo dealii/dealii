@@ -1030,9 +1030,7 @@ inline IndexSet::ElementIterator
 IndexSet::IntervalAccessor::begin() const
 {
   Assert(is_valid(), ExcMessage("invalid iterator"));
-  return IndexSet::ElementIterator(index_set,
-                                   range_idx,
-                                   index_set->ranges[range_idx].begin);
+  return {index_set, range_idx, index_set->ranges[range_idx].begin};
 }
 
 
@@ -1044,9 +1042,7 @@ IndexSet::IntervalAccessor::end() const
 
   // point to first index in next interval unless we are the last interval.
   if (range_idx < index_set->ranges.size() - 1)
-    return IndexSet::ElementIterator(index_set,
-                                     range_idx + 1,
-                                     index_set->ranges[range_idx + 1].begin);
+    return {index_set, range_idx + 1, index_set->ranges[range_idx + 1].begin};
   else
     return index_set->end();
 }
@@ -1479,7 +1475,7 @@ IndexSet::begin() const
 {
   compress();
   if (ranges.size() > 0)
-    return IndexSet::ElementIterator(this, 0, ranges[0].begin);
+    return {this, 0, ranges[0].begin};
   else
     return end();
 }
@@ -1530,9 +1526,9 @@ IndexSet::at(const size_type global_index) const
   // [a,b[ and we will return an iterator pointing directly at global_index
   // (else branch).
   if (global_index < p->begin)
-    return IndexSet::ElementIterator(this, p - ranges.begin(), p->begin);
+    return {this, static_cast<size_type>(p - ranges.begin()), p->begin};
   else
-    return IndexSet::ElementIterator(this, p - ranges.begin(), global_index);
+    return {this, static_cast<size_type>(p - ranges.begin()), global_index};
 }
 
 

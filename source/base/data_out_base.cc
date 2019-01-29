@@ -7630,7 +7630,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
     }
   else
     {
-      return XDMFEntry();
+      return {};
     }
 }
 

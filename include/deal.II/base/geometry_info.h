@@ -2519,7 +2519,7 @@ GeometryInfo<2>::unit_cell_vertex(const unsigned int vertex)
   Assert(vertex < vertices_per_cell,
          ExcIndexRange(vertex, 0, vertices_per_cell));
 
-  return Point<2>(vertex % 2, vertex / 2);
+  return {static_cast<double>(vertex % 2), static_cast<double>(vertex / 2)};
 }
 
 
@@ -2531,7 +2531,9 @@ GeometryInfo<3>::unit_cell_vertex(const unsigned int vertex)
   Assert(vertex < vertices_per_cell,
          ExcIndexRange(vertex, 0, vertices_per_cell));
 
-  return Point<3>(vertex % 2, vertex / 2 % 2, vertex / 4);
+  return {static_cast<double>(vertex % 2),
+          static_cast<double>(vertex / 2 % 2),
+          static_cast<double>(vertex / 4)};
 }
 
 

@@ -2745,7 +2745,7 @@ namespace TrilinosWrappers
     Accessor<false>::value() const
     {
       Assert(a_row < matrix->m(), ExcBeyondEndOfMatrix());
-      return Reference(*this);
+      return {*this};
     }
 
 

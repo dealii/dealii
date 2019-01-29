@@ -277,10 +277,9 @@ namespace Step53
     const double R_bar = R / std::sqrt(1 - (ellipticity * ellipticity *
                                             std::sin(theta) * std::sin(theta)));
 
-    return Point<3>((R_bar + d) * std::cos(phi) * std::cos(theta),
-                    (R_bar + d) * std::sin(phi) * std::cos(theta),
-                    ((1 - ellipticity * ellipticity) * R_bar + d) *
-                      std::sin(theta));
+    return {(R_bar + d) * std::cos(phi) * std::cos(theta),
+            (R_bar + d) * std::sin(phi) * std::cos(theta),
+            ((1 - ellipticity * ellipticity) * R_bar + d) * std::sin(theta)};
   }
 
   Point<3> AfricaGeometry::pull_back_wgs84(const Point<3> &x) const

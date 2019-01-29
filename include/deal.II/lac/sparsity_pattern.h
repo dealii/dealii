@@ -1254,7 +1254,7 @@ inline SparsityPattern::iterator
 SparsityPattern::begin() const
 {
   if (n_rows() > 0)
-    return iterator(this, rowstart[0]);
+    return {this, rowstart[0]};
   else
     return end();
 }
@@ -1265,9 +1265,9 @@ inline SparsityPattern::iterator
 SparsityPattern::end() const
 {
   if (n_rows() > 0)
-    return iterator(this, rowstart[rows]);
+    return {this, rowstart[rows]};
   else
-    return iterator(nullptr, 0);
+    return {nullptr, 0};
 }
 
 
@@ -1277,7 +1277,7 @@ SparsityPattern::begin(const size_type r) const
 {
   Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
 
-  return iterator(this, rowstart[r]);
+  return {this, rowstart[r]};
 }
 
 
@@ -1287,7 +1287,7 @@ SparsityPattern::end(const size_type r) const
 {
   Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
 
-  return iterator(this, rowstart[r + 1]);
+  return {this, rowstart[r + 1]};
 }
 
 

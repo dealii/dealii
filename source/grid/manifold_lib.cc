@@ -1268,7 +1268,7 @@ EllipticalManifold<2, 2>::pull_back(const Point<2> &space_point) const
     }
   const double eta = std::acos(cos_eta);
   const double pt1 = (std::signbit(y) ? 2.0 * numbers::PI - eta : eta);
-  return Point<2>(pt0, pt1);
+  return {pt0, pt1};
 }
 
 
@@ -1279,7 +1279,7 @@ EllipticalManifold<dim, spacedim>::push_forward_gradient(
   const Point<spacedim> &) const
 {
   Assert(false, ExcNotImplemented());
-  return DerivativeForm<1, spacedim, spacedim>();
+  return {};
 }
 
 
@@ -1481,7 +1481,7 @@ TorusManifold<dim>::pull_back(const Point<3> &p) const
   double w     = std::sqrt(std::pow(y - std::sin(phi) * R, 2.0) +
                        std::pow(x - std::cos(phi) * R, 2.0) + z * z) /
              r;
-  return Point<3>(phi, theta, w);
+  return {phi, theta, w};
 }
 
 
@@ -1494,9 +1494,9 @@ TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
   double theta = chart_point(1);
   double w     = chart_point(2);
 
-  return Point<3>(std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi),
-                  r * w * std::sin(theta),
-                  std::sin(phi) * R + r * w * std::cos(theta) * std::sin(phi));
+  return {std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi),
+          r * w * std::sin(theta),
+          std::sin(phi) * R + r * w * std::cos(theta) * std::sin(phi)};
 }
 
 

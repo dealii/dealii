@@ -518,16 +518,12 @@ namespace HDF5
   template <>
   void
   HDF5Object::set_attribute(const std::string &attr_name,
-                            const std::string  value)
+                            const std::string  value) // NOLINT
   {
     // Writes a UTF8 variable string
     //
     // code inspired from
     // https://support.hdfgroup.org/ftp/HDF5/examples/misc-examples/vlstratt.c
-    //
-    // In the case of a variable length string, H5Awrite needs the address of a
-    // (char *). For this reason the std::string value has been copied to a C
-    // string.
 
     hid_t  attr;
     hid_t  aid;
@@ -1313,7 +1309,7 @@ namespace HDF5
   Group
   Group::open_group(const std::string &name) const
   {
-    return Group(name, *this, mpi, GroupAccessMode::open);
+    return {name, *this, mpi, GroupAccessMode::open};
   }
 
 
@@ -1321,7 +1317,7 @@ namespace HDF5
   Group
   Group::create_group(const std::string &name) const
   {
-    return Group(name, *this, mpi, GroupAccessMode::create);
+    return {name, *this, mpi, GroupAccessMode::create};
   }
 
 
@@ -1329,7 +1325,7 @@ namespace HDF5
   DataSet
   Group::open_dataset(const std::string &name) const
   {
-    return DataSet(name, *hdf5_reference, mpi);
+    return {name, *hdf5_reference, mpi};
   }
 
 
@@ -1340,7 +1336,7 @@ namespace HDF5
                         const std::vector<hsize_t> &dimensions) const
   {
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    return DataSet(name, *hdf5_reference, dimensions, t_type, mpi);
+    return {name, *hdf5_reference, dimensions, t_type, mpi};
   }
 
 

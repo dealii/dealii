@@ -2152,8 +2152,7 @@ namespace Step33
 
             direct.solve(system_matrix, newton_update, right_hand_side);
 
-            return std::pair<unsigned int, double>(solver_control.last_step(),
-                                                   solver_control.last_value());
+            return {solver_control.last_step(), solver_control.last_value()};
           }
 
         // Likewise, if we are to use an iterative solver, we use Aztec's GMRES
@@ -2215,13 +2214,12 @@ namespace Step33
             solver.Iterate(parameters.max_iterations,
                            parameters.linear_residual);
 
-            return std::pair<unsigned int, double>(solver.NumIters(),
-                                                   solver.TrueResidual());
+            return {solver.NumIters(), solver.TrueResidual()};
           }
       }
 
     Assert(false, ExcNotImplemented());
-    return std::pair<unsigned int, double>(0, 0);
+    return {0, 0};
   }
 
 
