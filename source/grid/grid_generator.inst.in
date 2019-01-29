@@ -106,6 +106,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           &cells_to_remove,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &result);
 
+      template void
+      general_cell(Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+                   const std::vector<Point<deal_II_space_dimension>> &,
+                   const bool);
 #endif
     \}
   }
@@ -152,11 +156,6 @@ for (deal_II_dimension : DIMENSIONS)
                                  const Point<deal_II_dimension> &,
                                  const Point<deal_II_dimension> &,
                                  const bool);
-
-      template void
-      general_cell(Triangulation<deal_II_dimension> &,
-                   const std::vector<Point<deal_II_dimension>> &,
-                   const bool);
 
       template void
       simplex<deal_II_dimension>(

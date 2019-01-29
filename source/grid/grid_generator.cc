@@ -749,11 +749,11 @@ namespace GridGenerator
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  general_cell(Triangulation<dim> &           tria,
-               const std::vector<Point<dim>> &vertices,
-               const bool                     colorize)
+  general_cell(Triangulation<dim, spacedim> &      tria,
+               const std::vector<Point<spacedim>> &vertices,
+               const bool                          colorize)
   {
     Assert(vertices.size() == dealii::GeometryInfo<dim>::vertices_per_cell,
            ExcMessage("Wrong number of vertices."));
@@ -761,7 +761,7 @@ namespace GridGenerator
     // First create a hyper_rectangle and then deform it.
     hyper_cube(tria, 0, 1, colorize);
 
-    typename Triangulation<dim>::active_cell_iterator cell =
+    typename Triangulation<dim, spacedim>::active_cell_iterator cell =
       tria.begin_active();
     for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
       cell->vertex(i) = vertices[i];
