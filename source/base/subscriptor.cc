@@ -31,23 +31,6 @@ static const char *unknown_subscriber = "unknown subscriber";
 std::mutex Subscriptor::mutex;
 
 
-Subscriptor::Subscriptor()
-  : counter(0)
-  , object_info(nullptr)
-{
-  // this has to go somewhere to avoid an extra warning.
-  (void)unknown_subscriber;
-}
-
-
-
-Subscriptor::Subscriptor(const Subscriptor &)
-  : counter(0)
-  , object_info(nullptr)
-{}
-
-
-
 Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
   : counter(0)
   , object_info(subscriptor.object_info)
@@ -133,15 +116,6 @@ Subscriptor::check_no_subscribers() const noexcept
 
 
 Subscriptor &
-Subscriptor::operator=(const Subscriptor &s)
-{
-  object_info = s.object_info;
-  return *this;
-}
-
-
-
-Subscriptor &
 Subscriptor::operator=(Subscriptor &&s) noexcept
 {
   for (const auto validity_ptr : s.validity_pointers)
@@ -220,14 +194,6 @@ Subscriptor::unsubscribe(std::atomic<bool> *const validity,
   validity_pointers.erase(validity_ptr_it);
   --counter;
   --it->second;
-}
-
-
-
-unsigned int
-Subscriptor::n_subscriptions() const
-{
-  return counter;
 }
 
 
