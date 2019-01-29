@@ -518,16 +518,12 @@ namespace HDF5
   template <>
   void
   HDF5Object::set_attribute(const std::string &attr_name,
-                            const std::string  value)
+                            const std::string  value) // NOLINT
   {
     // Writes a UTF8 variable string
     //
     // code inspired from
     // https://support.hdfgroup.org/ftp/HDF5/examples/misc-examples/vlstratt.c
-    //
-    // In the case of a variable length string, H5Awrite needs the address of a
-    // (char *). For this reason the std::string value has been copied to a C
-    // string.
 
     hid_t  attr;
     hid_t  aid;
