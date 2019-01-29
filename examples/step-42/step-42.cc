@@ -897,7 +897,7 @@ namespace Step42
   // indicator one.
   Point<3> rotate_half_sphere(const Point<3> &in)
   {
-    return Point<3>(in(2), in(1), -in(0));
+    return {in(2), in(1), -in(0)};
   }
 
   template <int dim>

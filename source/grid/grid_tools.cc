@@ -815,8 +815,8 @@ namespace GridTools
       Point<2>
       operator()(const Point<2> &p) const
       {
-        return Point<2>(std::cos(angle) * p(0) - std::sin(angle) * p(1),
-                        std::sin(angle) * p(0) + std::cos(angle) * p(1));
+        return {std::cos(angle) * p(0) - std::sin(angle) * p(1),
+                std::sin(angle) * p(0) + std::cos(angle) * p(1)};
       }
 
     private:
@@ -836,17 +836,17 @@ namespace GridTools
       operator()(const Point<3> &p) const
       {
         if (axis == 0)
-          return Point<3>(p(0),
-                          std::cos(angle) * p(1) - std::sin(angle) * p(2),
-                          std::sin(angle) * p(1) + std::cos(angle) * p(2));
+          return {p(0),
+                  std::cos(angle) * p(1) - std::sin(angle) * p(2),
+                  std::sin(angle) * p(1) + std::cos(angle) * p(2)};
         else if (axis == 1)
-          return Point<3>(std::cos(angle) * p(0) + std::sin(angle) * p(2),
-                          p(1),
-                          -std::sin(angle) * p(0) + std::cos(angle) * p(2));
+          return {std::cos(angle) * p(0) + std::sin(angle) * p(2),
+                  p(1),
+                  -std::sin(angle) * p(0) + std::cos(angle) * p(2)};
         else
-          return Point<3>(std::cos(angle) * p(0) - std::sin(angle) * p(1),
-                          std::sin(angle) * p(0) + std::cos(angle) * p(1),
-                          p(2));
+          return {std::cos(angle) * p(0) - std::sin(angle) * p(1),
+                  std::sin(angle) * p(0) + std::cos(angle) * p(1),
+                  p(2)};
       }
 
     private:

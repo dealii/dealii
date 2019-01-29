@@ -404,7 +404,7 @@ namespace OpenCASCADE
     double u = proj_params.X();
     double v = proj_params.Y();
 
-    return Point<2>(u, v);
+    return {u, v};
   }
 
   template <int dim, int spacedim>

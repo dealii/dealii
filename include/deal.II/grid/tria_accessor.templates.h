@@ -2586,7 +2586,7 @@ template <int dim, int spacedim>
 inline RefinementCase<0>
 TriaAccessor<0, dim, spacedim>::refinement_case()
 {
-  return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
+  return {RefinementPossibilities<0>::no_refinement};
 }
 
 
@@ -2998,7 +2998,7 @@ template <int spacedim>
 inline RefinementCase<0>
 TriaAccessor<0, 1, spacedim>::refinement_case()
 {
-  return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
+  return {RefinementPossibilities<0>::no_refinement};
 }
 
 template <int spacedim>

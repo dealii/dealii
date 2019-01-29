@@ -1435,7 +1435,7 @@ namespace Functions
                                      const unsigned int /*component*/) const
   {
     Assert(false, ExcNotImplemented());
-    return Tensor<1, 2>();
+    return {};
   }
 
 

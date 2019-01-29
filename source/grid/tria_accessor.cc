@@ -210,7 +210,7 @@ namespace
                        t9 * y[1] - t11 * y[0] + x[0] * t53 - t59 * x[2] +
                        t59 * x[1] - t39 * x[0];
 
-    return Point<2>(t27 * t37 / 3, t63 * t37 / 3);
+    return {t27 * t37 / 3, t63 * t37 / 3};
   }
 
 
@@ -1233,7 +1233,7 @@ namespace
     s2                    = s3 * s4;
     const double unknown2 = s1 * s2;
 
-    return Point<3>(unknown0, unknown1, unknown2);
+    return {unknown0, unknown1, unknown2};
   }
 
 
@@ -2218,7 +2218,7 @@ CellAccessor<dim, spacedim>::id() const
   Assert(ptr.level() == 0, ExcInternalError());
   const unsigned int coarse_index = ptr.index();
 
-  return CellId(coarse_index, n_child_indices, id.data());
+  return {coarse_index, n_child_indices, id.data()};
 }
 
 

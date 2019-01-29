@@ -101,9 +101,9 @@ namespace internal
       Assert(position < 2, ExcIndexRange(position, 0, 2));
 
       if (position == 0)
-        return TableIndices<2>(new_index, numbers::invalid_unsigned_int);
+        return {new_index, numbers::invalid_unsigned_int};
       else
-        return TableIndices<2>(previous_indices[0], new_index);
+        return {previous_indices[0], new_index};
     }
 
 
@@ -124,28 +124,28 @@ namespace internal
       switch (position)
         {
           case 0:
-            return TableIndices<4>(new_index,
-                                   numbers::invalid_unsigned_int,
-                                   numbers::invalid_unsigned_int,
-                                   numbers::invalid_unsigned_int);
+            return {new_index,
+                    numbers::invalid_unsigned_int,
+                    numbers::invalid_unsigned_int,
+                    numbers::invalid_unsigned_int};
           case 1:
-            return TableIndices<4>(previous_indices[0],
-                                   new_index,
-                                   numbers::invalid_unsigned_int,
-                                   numbers::invalid_unsigned_int);
+            return {previous_indices[0],
+                    new_index,
+                    numbers::invalid_unsigned_int,
+                    numbers::invalid_unsigned_int};
           case 2:
-            return TableIndices<4>(previous_indices[0],
-                                   previous_indices[1],
-                                   new_index,
-                                   numbers::invalid_unsigned_int);
+            return {previous_indices[0],
+                    previous_indices[1],
+                    new_index,
+                    numbers::invalid_unsigned_int};
           case 3:
-            return TableIndices<4>(previous_indices[0],
-                                   previous_indices[1],
-                                   previous_indices[2],
-                                   new_index);
+            return {previous_indices[0],
+                    previous_indices[1],
+                    previous_indices[2],
+                    new_index};
         }
       Assert(false, ExcInternalError());
-      return TableIndices<4>();
+      return {};
     }
 
 
@@ -2463,7 +2463,7 @@ namespace internal
         {
           case 1:
             {
-              return TableIndices<2>(0, 0);
+              return {0, 0};
             }
 
           case 2:
@@ -2487,16 +2487,16 @@ namespace internal
 
           default:
             if (i < dim)
-              return TableIndices<2>(i, i);
+              return {i, i};
 
             for (unsigned int d = 0, c = 0; d < dim; ++d)
               for (unsigned int e = d + 1; e < dim; ++e, ++c)
                 if (c == i)
-                  return TableIndices<2>(d, e);
+                  return {d, e};
 
             // should never get here:
             Assert(false, ExcInternalError());
-            return TableIndices<2>(0, 0);
+            return {0, 0};
         }
     }
 

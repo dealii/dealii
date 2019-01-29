@@ -1105,14 +1105,14 @@ namespace ChunkSparsityPatternIterators
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::begin() const
 {
-  return iterator(this, 0);
+  return {this, 0};
 }
 
 
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::end() const
 {
-  return iterator(this, n_rows());
+  return {this, n_rows()};
 }
 
 
@@ -1121,7 +1121,7 @@ inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::begin(const unsigned int r) const
 {
   Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
-  return iterator(this, r);
+  return {this, r};
 }
 
 
@@ -1129,8 +1129,8 @@ ChunkSparsityPattern::begin(const unsigned int r) const
 inline ChunkSparsityPattern::iterator
 ChunkSparsityPattern::end(const unsigned int r) const
 {
-  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows())) return iterator(this,
-                                                                      r + 1);
+  Assert(r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+  return {this, r + 1};
 }
 
 

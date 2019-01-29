@@ -278,7 +278,7 @@ struct Grid6Func
 
   Point<2> operator()(const Point<2> &in) const
   {
-    return Point<2>(in(0), trans(in(1)));
+    return {in(0), trans(in(1))};
   }
 };
 

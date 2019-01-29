@@ -2032,14 +2032,13 @@ MatrixFree<dim, Number>::create_cell_subrange_hp(
       if (dof_info[dof_handler_component].fe_index_conversion[0][0] == degree)
         return range;
       else
-        return std::pair<unsigned int, unsigned int>(range.second,
-                                                     range.second);
+        return {range.second, range.second};
     }
 
   const unsigned int fe_index =
     dof_info[dof_handler_component].fe_index_from_degree(0, degree);
   if (fe_index >= dof_info[dof_handler_component].max_fe_index)
-    return std::pair<unsigned int, unsigned int>(range.second, range.second);
+    return {range.second, range.second};
   else
     return create_cell_subrange_hp_by_index(range,
                                             fe_index,

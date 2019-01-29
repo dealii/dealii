@@ -174,7 +174,7 @@ namespace internal
         if (std::abs(xi_denominator0) > 1e-10 * max_x)
           {
             const double xi = (x + subexpr0) / xi_denominator0;
-            return Point<2>(xi, eta);
+            return {xi, static_cast<double>(eta)};
           }
         else
           {
@@ -187,7 +187,7 @@ namespace internal
             if (std::abs(xi_denominator1) > 1e-10 * max_y)
               {
                 const double xi = (subexpr1 + y) / xi_denominator1;
-                return Point<2>(xi, eta);
+                return {xi, static_cast<double>(eta)};
               }
             else // give up and try Newton iteration
               {
@@ -200,8 +200,8 @@ namespace internal
         // bogus return to placate compiler. It should not be possible to get
         // here.
         Assert(false, ExcInternalError());
-        return Point<2>(std::numeric_limits<double>::quiet_NaN(),
-                        std::numeric_limits<double>::quiet_NaN());
+        return {std::numeric_limits<double>::quiet_NaN(),
+                std::numeric_limits<double>::quiet_NaN()};
       }
 
 
@@ -2517,7 +2517,7 @@ MappingQGeneric<1, 3>::transform_real_to_unit_cell_internal(
   const Point<1> &) const
 {
   Assert(false, ExcNotImplemented());
-  return Point<1>();
+  return {};
 }
 
 

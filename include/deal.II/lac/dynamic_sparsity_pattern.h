@@ -1089,7 +1089,7 @@ DynamicSparsityPattern::begin() const
 inline DynamicSparsityPattern::iterator
 DynamicSparsityPattern::end() const
 {
-  return iterator(this);
+  return {this};
 }
 
 
@@ -1100,7 +1100,7 @@ DynamicSparsityPattern::begin(const size_type r) const
   Assert(r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
 
   if (!have_entries)
-    return iterator(this);
+    return {this};
 
   if (rowset.size() > 0)
     {
@@ -1131,7 +1131,7 @@ DynamicSparsityPattern::begin(const size_type r) const
       if (it == rowset.end())
         return end();
       else
-        return iterator(this, *it, 0);
+        return {this, *it, 0};
     }
 
   // Without an index set we have to do a linear search starting at
@@ -1145,9 +1145,9 @@ DynamicSparsityPattern::begin(const size_type r) const
     }
 
   if (row == n_rows())
-    return iterator(this);
+    return {this};
   else
-    return iterator(this, row, 0);
+    return {this, row, 0};
 }
 
 
@@ -1159,7 +1159,7 @@ DynamicSparsityPattern::end(const size_type r) const
 
   unsigned int row = r + 1;
   if (row == n_rows())
-    return iterator(this);
+    return {this};
   else
     return begin(row);
 }

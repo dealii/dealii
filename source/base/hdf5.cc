@@ -1313,7 +1313,7 @@ namespace HDF5
   Group
   Group::open_group(const std::string &name) const
   {
-    return Group(name, *this, mpi, GroupAccessMode::open);
+    return {name, *this, mpi, GroupAccessMode::open};
   }
 
 
@@ -1321,7 +1321,7 @@ namespace HDF5
   Group
   Group::create_group(const std::string &name) const
   {
-    return Group(name, *this, mpi, GroupAccessMode::create);
+    return {name, *this, mpi, GroupAccessMode::create};
   }
 
 
@@ -1329,7 +1329,7 @@ namespace HDF5
   DataSet
   Group::open_dataset(const std::string &name) const
   {
-    return DataSet(name, *hdf5_reference, mpi);
+    return {name, *hdf5_reference, mpi};
   }
 
 
@@ -1340,7 +1340,7 @@ namespace HDF5
                         const std::vector<hsize_t> &dimensions) const
   {
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();
-    return DataSet(name, *hdf5_reference, dimensions, t_type, mpi);
+    return {name, *hdf5_reference, dimensions, t_type, mpi};
   }
 
 

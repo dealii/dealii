@@ -1022,7 +1022,7 @@ namespace internal
     inline EmptyPayload
     operator+(const EmptyPayload &, const EmptyPayload &)
     {
-      return EmptyPayload();
+      return {};
     }
 
     /**
@@ -1031,7 +1031,7 @@ namespace internal
      */
     inline EmptyPayload operator*(const EmptyPayload &, const EmptyPayload &)
     {
-      return EmptyPayload();
+      return {};
     }
 
 

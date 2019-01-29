@@ -4206,7 +4206,7 @@ namespace internal
         // multigrid is not currently implemented for shared triangulations
         Assert(false, ExcNotImplemented());
 
-        return NumberCache();
+        return {};
       }
 
 
