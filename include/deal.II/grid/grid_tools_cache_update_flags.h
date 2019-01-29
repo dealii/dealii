@@ -74,6 +74,16 @@ namespace GridTools
     update_cell_bounding_boxes_rtree = 0x020,
 
     /**
+     * Update the covering rtree object, initialized with pairs
+     * of a bounding box and an unsigned int. The bounding
+     * boxes are used to describe approximately which portion
+     * of the mesh contains locally owned cells by the
+     * process of rank the second element of the pair.
+     *
+     */
+    update_covering_rtree = 0x040,
+
+    /**
      * Update all objects.
      */
     update_all = 0x0FF,
@@ -94,6 +104,8 @@ namespace GridTools
       s << "|vertex_to_cell_map";
     if (u & update_vertex_to_cell_centers_directions)
       s << "|vertex_to_cells_centers_directions";
+    if (u & update_covering_rtree)
+      s << "|covering_rtree";
 #ifdef DEAL_II_WITH_NANOFLANN
     if (u & update_vertex_kdtree)
       s << "|vertex_kdtree";

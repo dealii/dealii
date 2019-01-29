@@ -150,6 +150,33 @@ namespace GridTools
     const Mapping<dim, spacedim> &
     get_mapping() const;
 
+
+    /**
+     * This function returns an object that allows identifying
+     * which process(es) in a parallel computation may own the
+     * cell that surrounds a given point. The elements of this
+     * object -- an Rtree -- are pairs of bounding boxes denoting
+     * areas that cover all or parts of the local portion of a
+     * parallel triangulation, and an unsigned int representing
+     * the process or subdomain that owns these cells.
+     * Given a point on a parallel::Triangulation, this tree
+     * allows to identify one, or few candidate processes, for
+     * which the point lies on a locally owned cell.
+     *
+     * Constructing or updating the rtree requires a call to
+     * GridTools::build_global_description_tree(), which exchanges
+     * bounding boxes between all processes using
+     * Utilities::MPI::all_gather(), a collective operation.
+     * Therefore this function must be called by all processes
+     * at the same time.
+     *
+     * While each box may only cover part of a process's locally
+     * owned part of the triangulation, the boxes associated with
+     * each process jointly cover the entire local portion.
+     */
+    const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &
+    get_covering_rtree() const;
+
 #ifdef DEAL_II_WITH_NANOFLANN
     /**
      * Return the cached vertex_kdtree object, constructed with the vertices of
@@ -190,6 +217,12 @@ namespace GridTools
      */
     mutable std::vector<std::vector<Tensor<1, spacedim>>>
       vertex_to_cell_centers;
+
+    /**
+     * An rtree object covering the whole mesh.
+     */
+    mutable RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
+      covering_rtree;
 
 #ifdef DEAL_II_WITH_NANOFLANN
     /**
