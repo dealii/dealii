@@ -55,6 +55,12 @@ ELSE()
   SET(DEAL_II_WORDS_BIGENDIAN "0")
 ENDIF()
 
+# IF SIMD is disabled, bail out
+IF (NOT DEAL_II_WITH_SIMD)
+  SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
+  SET(DEAL_II_OPENMP_SIMD_PRAGMA " ")
+  RETURN()
+ENDIF()
 
 #
 # Check whether the compiler allows for vectorization and that
