@@ -19,6 +19,10 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/utilities.h>
+
+#include <deal.II/matrix_free/cuda_matrix_free.templates.h>
+
 #ifdef DEAL_II_COMPILER_CUDA_AWARE
 
 DEAL_II_NAMESPACE_OPEN
