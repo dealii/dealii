@@ -328,6 +328,9 @@ namespace Differentiation
        * image space.
        * @param[in] clear_registered_tapes A flag that indicates the that
        * list of @p registered_tapes must be cleared.
+       * If set to <tt>true</tt> then the data structure that tracks which
+       * tapes have been recorded is cleared as well. It is then expected that
+       * any preexisting tapes be re-recorded.
        *
        * @note This also resets the active tape number to an invalid number, and
        * deactivates the recording mode for taped variables.
@@ -474,6 +477,101 @@ namespace Differentiation
       void
       activate_recorded_tape(
         const typename Types<ad_type>::tape_index tape_index);
+
+      /**
+       * Return a flag that, when <code>true</code>, indicates that the
+       * retaping of the dependent function is necessary for a reliable
+       * computation to be performed on a tape with the given @p tape_index.
+       * This may be necessary if a sign comparison within branched operations
+       * yields different results to those computed at the original tape
+       * evaluation point.
+       *
+       * This issue, known as "branch switching", can be clarified by means of
+       * a trivial, contrived example:
+       * @code
+       * ADNumberType func (ADNumberType x, ADNumberType y, ADNumberType z)
+       * {
+       *   if (x < y)
+       *     return y;
+       *   else
+       *     return x*z;
+       * }
+       * @endcode
+       * During taping, the conditional statement may be either <tt>true</tt> or
+       * <tt>false</tt>, and the result (with its sensitivities) returned by
+       * this function.
+       * The AD library doesn't just record the parse tree of the operations
+       * applied on the branch chosen at the time to taping, but also checks
+       * that the condition continues to be satisfied. For some other evaluation
+       * of the tape (i.e. for some different inputs @p x and @p y), the other
+       * branch of the conditional check may be chosen. The result of following
+       * this code path has not been recorded on the tape, and therefore cannot
+       * be evaluated. In such a case, the underlying AD library will be able to
+       * tell you that it is necessary to re-record the tape at the new
+       * evaluation point in order to resolve the new code branch. This function
+       * can be used to find out whether this is so.
+       *
+       * For the output of this function to be meaningful, it must be called
+       * after activate_recorded_tape() is called and the new evaluation
+       * point for the tape (i.e. values of the independent variables) have
+       * been set and subsequently used (i.e. in the determination of the values
+       * or derivatives of the dependent variables).
+       */
+      bool
+      recorded_tape_requires_retaping(
+        const typename Types<ad_type>::tape_index tape_index) const;
+
+      /**
+       * Return a flag that, when <code>true</code>, indicates that the
+       * retaping of the dependent function is necessary for a reliable
+       * computation to be performed on the currently active tape.
+       * This may be necessary if a sign comparison within branched operations
+       * yields different results to those computed at the original tape
+       * evaluation point.
+       *
+       * This issue, known as "branch switching", can be clarified by means of
+       * a trivial, contrived example:
+       * @code
+       * ADNumberType func (ADNumberType x, ADNumberType y, ADNumberType z)
+       * {
+       *   if (x < y)
+       *     return y;
+       *   else
+       *     return x*z;
+       * }
+       * @endcode
+       * During taping, the conditional statement may be either <tt>true</tt> or
+       * <tt>false</tt>, and the result (with its sensitivities) returned by
+       * this function.
+       * The AD library doesn't just record the parse tree of the operations
+       * applied on the branch chosen at the time to taping, but also checks
+       * that the condition continues to be satisfied. For some other evaluation
+       * of the tape (i.e. for some different inputs @p x and @p y), the other
+       * branch of the conditional check may be chosen. The result of following
+       * this code path has not been recorded on the tape, and therefore cannot
+       * be evaluated. In such a case, the underlying AD library will be able to
+       * tell you that it is necessary to re-record the tape at the new
+       * evaluation point in order to resolve the new code branch. This function
+       * can be used to find out whether this is so.
+       *
+       * For the output of this function to be meaningful, it must be called
+       * after activate_recorded_tape() is called and the new evaluation
+       * point for the tape (i.e. values of the independent variables) have
+       * been set and subsequently used (i.e. in the determination of the values
+       * or derivatives of the dependent variables).
+       */
+      bool
+      active_tape_requires_retaping() const;
+
+      /**
+       * Clears and removes the currently active tape.
+       *
+       * This is typically only necessary when branch switching is detected on
+       * the original tape at evaluation point. This state can be checked using
+       * the active_tape_requires_retaping() function.
+       */
+      void
+      clear_active_tape();
 
       //@}
 
@@ -902,7 +1000,7 @@ namespace Differentiation
        * Depending on the selected @p ADNumberTypeCode, this may or may not
        * correspond with the @p ScalarType prescribed as a template argument.
        *
-       * @note If the keep flag has been set when
+       * @note If the @p keep_independent_values flag has been set when
        * ADHelperBase::start_recording_operations() is called then the tape is
        * immediately usable after creation, and the values of the independent
        * variables set by register_dof_values() are those at which the function
@@ -922,7 +1020,7 @@ namespace Differentiation
        * which to extract the local degree of freedom values. This would
        * typically obtained by calling <code>cell->get_dof_indices()</code>.
        *
-       * @note If the keep flag has been set when
+       * @note If the @p keep_independent_values flag has been set when
        * ADHelperBase::start_recording_operations() is called then the tape is
        * immediately usable after creation, and the values of the independent
        * variables set by register_dof_values() are those at which the function
@@ -1327,7 +1425,7 @@ namespace Differentiation
      *     // must refer to one of these types. See the example for the
      *     // ADHelperEnergyFunctional for details on how to extend
      *     // support to taped AD numbers.
-     *     using ADHelper = AD::ADHelperEnergyFunctional<...>;
+     *     using ADHelper = AD::ADHelperResidualLinearization<...>;
      *     using ADNumberType = typename ADHelper::ad_type;
      *
      *     // Create and initialize an instance of the helper class.
