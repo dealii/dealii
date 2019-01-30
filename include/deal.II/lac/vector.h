@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/logstream.h>
@@ -29,14 +30,6 @@
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
-// boost::serialization::make_array used to be in array.hpp, but was
-// moved to a different file in BOOST 1.64
-#include <boost/version.hpp>
-#if BOOST_VERSION >= 106400
-#  include <boost/serialization/array_wrapper.hpp>
-#else
-#  include <boost/serialization/array.hpp>
-#endif
 #include <boost/serialization/split_member.hpp>
 
 #include <cstdio>
@@ -152,6 +145,8 @@ public:
    *
    * We would like to make this constructor explicit, but standard containers
    * insist on using it implicitly.
+   *
+   * @dealiiOperationIsMultithreaded
    */
   Vector(const Vector<Number> &v);
 
@@ -159,19 +154,13 @@ public:
    * Move constructor. Creates a new vector by stealing the internal data of
    * the vector @p v.
    */
-  Vector(Vector<Number> &&v) noexcept;
+  Vector(Vector<Number> &&v) noexcept = default;
 
   /**
    * Copy constructor taking a vector of another data type. This will fail if
    * there is no conversion path from @p OtherNumber to @p Number. Note that
    * you may lose accuracy when copying to a vector with data elements with
    * less accuracy.
-   *
-   * Older versions of gcc did not honor the @p explicit keyword on template
-   * constructors. In such cases, it is easy to accidentally write code that
-   * can be very inefficient, since the compiler starts performing hidden
-   * conversions. To avoid this, this function is disabled if we have detected
-   * a broken compiler during configuration.
    */
   template <typename OtherNumber>
   explicit Vector(const Vector<OtherNumber> &v);
@@ -365,7 +354,7 @@ public:
    * have after being newly default-constructed.
    */
   Vector<Number> &
-  operator=(Vector<Number> &&v) noexcept;
+  operator=(Vector<Number> &&v) noexcept = default;
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
@@ -993,27 +982,9 @@ public:
 
 private:
   /**
-   * Dimension. Actual number of components contained in the vector. Get this
-   * number by calling <tt>size()</tt>.
+   * Array of elements owned by this vector.
    */
-  size_type vec_size;
-
-  /**
-   * Amount of memory actually reserved for this vector. This number may be
-   * greater than @p vec_size if a @p reinit was called with less memory
-   * requirements than the vector needed last time. At present @p reinit does
-   * not free memory when the number of needed elements is reduced.
-   */
-  size_type max_vec_size;
-
-  /**
-   * Pointer to the array of elements of this vector.
-   *
-   * Because we allocate these arrays via Utilities::System::posix_memalign,
-   * we need to use a custom deleter for this object that does not call
-   * <code>delete[]</code>, but instead calls @p free().
-   */
-  std::unique_ptr<Number[], decltype(&free)> values;
+  AlignedVector<Number> values;
 
   /**
    * For parallel loops with TBB, this member variable stores the affinity
@@ -1023,24 +994,10 @@ private:
     thread_loop_partitioner;
 
   /**
-   * Allocate and align @p values along 64-byte boundaries. The size of the
-   * allocated memory is determined by @p max_vec_size . Copy first
-   * @p copy_n_el from the old values.
-   */
-  void
-  allocate(const size_type copy_n_el = 0);
-
-  /**
    * Make all other vector types friends.
    */
   template <typename Number2>
   friend class Vector;
-
-  /**
-   * LAPACK matrices need access to the data.
-   */
-  template <typename Number2>
-  friend class LAPACKFullMatrix;
 };
 
 /*@}*/
@@ -1060,9 +1017,6 @@ Vector<int>::lp_norm(const real_type) const;
 
 template <typename Number>
 inline Vector<Number>::Vector()
-  : vec_size(0)
-  , max_vec_size(0)
-  , values(nullptr, &free)
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class
@@ -1075,9 +1029,6 @@ inline Vector<Number>::Vector()
 template <typename Number>
 template <typename InputIterator>
 Vector<Number>::Vector(const InputIterator first, const InputIterator last)
-  : vec_size(0)
-  , max_vec_size(0)
-  , values(nullptr, &free)
 {
   // allocate memory. do not initialize it, as we will copy over to it in a
   // second
@@ -1089,9 +1040,6 @@ Vector<Number>::Vector(const InputIterator first, const InputIterator last)
 
 template <typename Number>
 inline Vector<Number>::Vector(const size_type n)
-  : vec_size(0)
-  , max_vec_size(0)
-  , values(nullptr, &free)
 {
   // virtual functions called in constructors and destructors never use the
   // override in a derived class
@@ -1105,7 +1053,7 @@ template <typename Number>
 inline typename Vector<Number>::size_type
 Vector<Number>::size() const
 {
-  return vec_size;
+  return values.size();
 }
 
 
@@ -1122,7 +1070,7 @@ template <typename Number>
 inline typename Vector<Number>::pointer
 Vector<Number>::data()
 {
-  return values.get();
+  return values.data();
 }
 
 
@@ -1131,7 +1079,7 @@ template <typename Number>
 inline typename Vector<Number>::const_pointer
 Vector<Number>::data() const
 {
-  return values.get();
+  return values.data();
 }
 
 
@@ -1140,7 +1088,7 @@ template <typename Number>
 inline typename Vector<Number>::iterator
 Vector<Number>::begin()
 {
-  return values.get();
+  return values.begin();
 }
 
 
@@ -1149,7 +1097,7 @@ template <typename Number>
 inline typename Vector<Number>::const_iterator
 Vector<Number>::begin() const
 {
-  return values.get();
+  return values.begin();
 }
 
 
@@ -1158,7 +1106,7 @@ template <typename Number>
 inline typename Vector<Number>::iterator
 Vector<Number>::end()
 {
-  return values.get() + vec_size;
+  return values.end();
 }
 
 
@@ -1167,7 +1115,7 @@ template <typename Number>
 inline typename Vector<Number>::const_iterator
 Vector<Number>::end() const
 {
-  return values.get() + vec_size;
+  return values.end();
 }
 
 
@@ -1176,7 +1124,7 @@ template <typename Number>
 inline Number
 Vector<Number>::operator()(const size_type i) const
 {
-  Assert(i < vec_size, ExcIndexRange(i, 0, vec_size));
+  Assert(i < size(), ExcIndexRange(i, 0, size()));
   return values[i];
 }
 
@@ -1186,7 +1134,7 @@ template <typename Number>
 inline Number &
 Vector<Number>::operator()(const size_type i)
 {
-  Assert(i < vec_size, ExcIndexRangeType<size_type>(i, 0, vec_size));
+  Assert(i < size(), ExcIndexRangeType<size_type>(i, 0, size()));
   return values[i];
 }
 
@@ -1271,7 +1219,7 @@ Vector<Number>::add(const std::vector<size_type> &indices,
 {
   Assert(indices.size() == values.size(),
          ExcDimensionMismatch(indices.size(), values.size()));
-  add(indices.size(), indices.data(), values.values.get());
+  add(indices.size(), indices.data(), values.values.begin());
 }
 
 
@@ -1285,7 +1233,7 @@ Vector<Number>::add(const size_type    n_indices,
 {
   for (size_type i = 0; i < n_indices; ++i)
     {
-      Assert(indices[i] < vec_size, ExcIndexRange(indices[i], 0, vec_size));
+      Assert(indices[i] < size(), ExcIndexRange(indices[i], 0, size()));
       Assert(
         numbers::is_finite(values[i]),
         ExcMessage(
@@ -1327,8 +1275,6 @@ template <typename Number>
 inline void
 Vector<Number>::swap(Vector<Number> &v)
 {
-  std::swap(vec_size, v.vec_size);
-  std::swap(max_vec_size, v.max_vec_size);
   std::swap(values, v.values);
 }
 
@@ -1341,9 +1287,7 @@ Vector<Number>::save(Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
   ar &static_cast<const Subscriptor &>(*this);
-
-  ar &vec_size &max_vec_size;
-  ar &          boost::serialization::make_array(values.get(), max_vec_size);
+  ar &values;
 }
 
 
@@ -1353,15 +1297,9 @@ template <class Archive>
 inline void
 Vector<Number>::load(Archive &ar, const unsigned int)
 {
-  // get rid of previous content
-  values.reset();
-
   // the load stuff again from the archive
   ar &static_cast<Subscriptor &>(*this);
-  ar &vec_size &max_vec_size;
-
-  allocate();
-  ar &boost::serialization::make_array(values.get(), max_vec_size);
+  ar &values;
 }
 
 #endif
