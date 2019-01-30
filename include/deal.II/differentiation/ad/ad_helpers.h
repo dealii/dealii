@@ -487,7 +487,7 @@ namespace Differentiation
        * evaluation point.
        *
        * This issue, known as "branch switching", can be clarified by means of
-       * a trivial example:
+       * a trivial, contrived example:
        * @code
        * ADNumberType func (ADNumberType x, ADNumberType y, ADNumberType z)
        * {
@@ -499,13 +499,17 @@ namespace Differentiation
        * @endcode
        * During taping, the conditional statement may be either <tt>true</tt> or
        * <tt>false</tt>, and the result (with its sensitivities) returned by
-       * this function. For some other evaluation of the tape (i.e. for some
-       * different
-       * inputs @p x and @p y, the other branch of the conditional check may be
-       * chosen. The result of following this code path has not been recorded on
-       * the tape, and therefore cannot be evaluated. In such a case, it is
-       * therefore necessary to re-record the tape at the new evaluation point
-       * in order to resolve the new code branch.
+       * this function.
+       * The AD library doesn't just record the parse tree of the operations
+       * applied on the branch chosen at the time to taping, but also checks
+       * that the condition continues to be satisfied. For some other evaluation
+       * of the tape (i.e. for some different inputs @p x and @p y), the other
+       * branch of the conditional check may be chosen. The result of following
+       * this code path has not been recorded on the tape, and therefore cannot
+       * be evaluated. In such a case, the underlying AD library will be able to
+       * tell you that it is necessary to re-record the tape at the new
+       * evaluation point in order to resolve the new code branch. This function
+       * can be used to find out whether this is so.
        *
        * For the output of this function to be meaningful, it must be called
        * after activate_recorded_tape() is called and the new evaluation
@@ -520,13 +524,13 @@ namespace Differentiation
       /**
        * Return a flag that, when <code>true</code>, indicates that the
        * retaping of the dependent function is necessary for a reliable
-       * computation to be performed on the active tape.
+       * computation to be performed on the currently active tape.
        * This may be necessary if a sign comparison within branched operations
        * yields different results to those computed at the original tape
        * evaluation point.
        *
        * This issue, known as "branch switching", can be clarified by means of
-       * a trivial example:
+       * a trivial, contrived example:
        * @code
        * ADNumberType func (ADNumberType x, ADNumberType y, ADNumberType z)
        * {
@@ -538,13 +542,17 @@ namespace Differentiation
        * @endcode
        * During taping, the conditional statement may be either <tt>true</tt> or
        * <tt>false</tt>, and the result (with its sensitivities) returned by
-       * this function. For some other evaluation of the tape (i.e. for some
-       * different
-       * inputs @p x and @p y, the other branch of the conditional check may be
-       * chosen. The result of following this code path has not been recorded on
-       * the tape, and therefore cannot be evaluated. In such a case, it is
-       * therefore necessary to re-record the tape at the new evaluation point
-       * in order to resolve the new code branch.
+       * this function.
+       * The AD library doesn't just record the parse tree of the operations
+       * applied on the branch chosen at the time to taping, but also checks
+       * that the condition continues to be satisfied. For some other evaluation
+       * of the tape (i.e. for some different inputs @p x and @p y), the other
+       * branch of the conditional check may be chosen. The result of following
+       * this code path has not been recorded on the tape, and therefore cannot
+       * be evaluated. In such a case, the underlying AD library will be able to
+       * tell you that it is necessary to re-record the tape at the new
+       * evaluation point in order to resolve the new code branch. This function
+       * can be used to find out whether this is so.
        *
        * For the output of this function to be meaningful, it must be called
        * after activate_recorded_tape() is called and the new evaluation
