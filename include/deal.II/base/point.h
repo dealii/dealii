@@ -148,11 +148,11 @@ public:
   /**
    * Convert a boost::geometry::point to a dealii::Point.
    */
-  template <int dummy_dim>
+  template <std::size_t dummy_dim,
+            typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0),
+                                    int>::type = 0>
   Point(const boost::geometry::model::
-          point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt,
-        typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0),
-                                int>::type = 0);
+          point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt);
 
   /**
    * Return a unit vector in coordinate direction <tt>i</tt>, i.e., a vector
@@ -371,11 +371,12 @@ inline Point<dim, Number>::Point(const Number x, const Number y, const Number z)
 
 
 template <int dim, typename Number>
-template <int dummy_dim>
+template <
+  std::size_t dummy_dim,
+  typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0), int>::type>
 inline Point<dim, Number>::Point(
   const boost::geometry::model::
-    point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt,
-  typename std::enable_if<(dim == dummy_dim) && (dummy_dim != 0), int>::type)
+    point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt)
 {
   Assert(dim <= 3, ExcNotImplemented());
   this->values[0]                = boost::geometry::get<0>(boost_pt);

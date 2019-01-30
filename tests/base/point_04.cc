@@ -26,27 +26,40 @@
 
 namespace bg = boost::geometry;
 
-template <int dim>
 void
-check()
+check3d()
 {
-  bg::model::point<double, dim, bg::cs::cartesian> bg_point;
+  bg::model::point<double, 3, boost::geometry::cs::cartesian> point(-1.0,
+                                                                    2.0,
+                                                                    0.15);
 
-  constexpr unsigned int y_index = (spacedim < 2) ? 0 : 1;
-  constexpr unsigned int z_index = (spacedim < 3) ? 0 : 2;
+  Point<3> p(point);
 
-  bg_point.set<0>(42.0);
-
-  if (dim >= 2)
-    bg_point.set<y_index>(42.0 + dim);
-
-  if (dim >= 3)
-    bg_point.set<z_index>(42.0 + dim + 1);
-
-  Point<dim> p(bg_point);
-
-  for (unsigned int i = 0; i < dim; ++i)
+  for (unsigned int i = 0; i < 3; ++i)
     deallog << p(i) << ' ';
+  deallog << std::endl;
+}
+
+void
+check2d()
+{
+  bg::model::point<double, 2, bg::cs::cartesian> point(2.0, 3.0);
+
+  Point<2> p(point);
+
+  for (unsigned int i = 0; i < 2; ++i)
+    deallog << p(i) << ' ';
+  deallog << std::endl;
+}
+
+void
+check1d()
+{
+  bg::model::point<double, 1, bg::cs::cartesian> point(12.0);
+
+  Point<1> p(point);
+
+  deallog << p(0) << ' ';
   deallog << std::endl;
 }
 
@@ -56,7 +69,7 @@ main()
   initlog();
   deallog << std::setprecision(3);
 
-  check<1>();
-  check<2>();
-  check<3>();
+  check1d();
+  check2d();
+  check3d();
 }
