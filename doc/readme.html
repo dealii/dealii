@@ -423,6 +423,22 @@
                 about compatibility and configuration can be found <a href=external-libs/cuda.html target="body">here</a>.
             </p>
 
+            <dt><a name="Ginkgo"/>
+                <a href="https://ginkgo-project.github.io/" target="_top">Ginkgo</a></dt>
+            <dd>
+                <p>
+                    <a href="https://ginkgo-project.github.io/" target="_top">Ginkgo</a>
+                    is a numerical linear algebra library with highly optimized kernels
+                    for many core architectures with a focus on fine level parallelism.
+                    It allows for easy switching of the executing paradigm (CUDA, OpenMP, .etc)
+                    while providing a multitude of linear solvers and preconditioners
+                    and extension to other linear operators with minimal changes required in the code.
+                    To enable Ginkgo, pass <code>-DGINKGO_DIR=/path/to/ginkgo</code> to CMake when
+                    configuring deal.II. For more detailed instructions, one can refer to 
+                    <a href="external-libs/ginkgo.html" target="body">this page</a>.
+                </p>
+            </dd>
+
             <dt><a name="Gmsh"/>
              <a href="http://gmsh.info/" target="_top">Gmsh</a></dt>
             <dd>
