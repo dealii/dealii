@@ -123,7 +123,7 @@ template <int rank, int dim, typename Number>
 typename TensorFunction<rank, dim, Number>::gradient_type
 ConstantTensorFunction<rank, dim, Number>::gradient(const Point<dim> &) const
 {
-  static const Tensor<rank + 1, dim, Number> zero;
+  static const Tensor<rank + 1, dim, Number> zero{};
 
   return zero;
 }
@@ -140,7 +140,7 @@ ConstantTensorFunction<rank, dim, Number>::gradient_list(
   Assert(gradients.size() == points.size(),
          ExcDimensionMismatch(gradients.size(), points.size()));
 
-  static const Tensor<rank + 1, dim, Number> zero;
+  static const Tensor<rank + 1, dim, Number> zero{};
 
   for (unsigned int i = 0; i < gradients.size(); ++i)
     gradients[i] = zero;
