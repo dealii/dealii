@@ -328,8 +328,16 @@ namespace Particles
   {
     Assert(property_pool != nullptr, ExcInternalError());
 
+    // If this particle has no properties yet, allocate and initialize them.
     if (properties == PropertyPool::invalid_handle)
-      properties = property_pool->allocate_properties_array();
+      {
+        properties = property_pool->allocate_properties_array();
+
+        ArrayView<double> my_properties =
+          property_pool->get_properties(properties);
+
+        std::fill(my_properties.begin(), my_properties.end(), 0.0);
+      }
 
     return property_pool->get_properties(properties);
   }
