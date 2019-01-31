@@ -2175,8 +2175,8 @@ GridIn<2>::read_netcdf(const std::string &filename)
                           n_bquads,
                           vertices_per_quad);
 
-  for (unsigned int i = 0; i < vertex_indices.size(); ++i)
-    AssertThrow(vertex_indices[i] >= 0, ExcIO());
+  for (const int idx : vertex_indices)
+    AssertThrow(idx >= 0, ExcIO());
 
   // next we read
   //   double points_xc(no_of_points)
@@ -2337,8 +2337,8 @@ GridIn<3>::read_netcdf(const std::string &filename)
   // vector<int>::iterator to int *
   vertex_indices_var->get(&*vertex_indices.begin(), n_cells, vertices_per_hex);
 
-  for (unsigned int i = 0; i < vertex_indices.size(); ++i)
-    AssertThrow(vertex_indices[i] >= 0, ExcIO());
+  for (const int idx : vertex_indices)
+    AssertThrow(idx >= 0, ExcIO());
 
   // next we read
   //   double points_xc(no_of_points)
@@ -2435,9 +2435,9 @@ GridIn<3>::read_netcdf(const std::string &filename)
   // types::boundary_id. Also, we don't
   // take numbers::internal_face_boundary_id
   // as it denotes an internal face
-  for (unsigned int i = 0; i < bmarker.size(); ++i)
-    Assert(0 <= bmarker[i] && static_cast<types::boundary_id>(bmarker[i]) !=
-                                numbers::internal_face_boundary_id,
+  for (const int id : bmarker)
+    Assert(0 <= id && static_cast<types::boundary_id>(id) !=
+                        numbers::internal_face_boundary_id,
            ExcIO());
 
   // finally we setup the boundary

@@ -1,0 +1,6 @@
+# Disable all checks because we don't want to fix things inside
+# bundled/. Clang-tidy fails if nothing is chosen, so we just enable a single
+# harmless warning:
+
+Checks: "-*,misc-sizeof-container"
+

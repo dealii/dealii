@@ -1,0 +1,9 @@
+# Settings file automatically used by clang-tidy
+#
+# See ./contrib/utilities/run_clang_tidy.sh for details
+
+# We disable performance-inefficient-string-concatenation because we don't care about "a"+to_string(5)+...
+
+Checks: "-*,cppcoreguidelines-pro-type-static-cast-downcast,google-readability-casting,modernize-*,-modernize-pass-by-value,-modernize-raw-string-literal,-modernize-use-auto,-modernize-use-override,-modernize-use-default-member-init,-modernize-use-transparent-functors,use-emplace,mpi-*,performance-*,-performance-inefficient-string-concatenation"
+
+WarningsAsErrors: '*'
