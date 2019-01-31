@@ -256,7 +256,12 @@ namespace Particles
     set_properties(const ArrayView<const double> &new_properties);
 
     /**
-     * Get write-access to properties of this particle.
+     * Get write-access to properties of this particle. If the
+     * particle has no properties yet, but has access to a
+     * PropertyPool object it will allocate properties to
+     * allow writing into them. If it has no properties and
+     * has no access to a PropertyPool this function will
+     * throw an exception.
      *
      * @return An ArrayView of the properties of this particle.
      */
@@ -264,7 +269,8 @@ namespace Particles
     get_properties();
 
     /**
-     * Get read-access to properties of this particle.
+     * Get read-access to properties of this particle. If the particle
+     * has no properties this function throws an exception.
      *
      * @return An ArrayView of the properties of this particle.
      */
