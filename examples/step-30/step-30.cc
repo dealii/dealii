@@ -80,6 +80,8 @@ namespace Step30
   class Beta
   {
   public:
+    Beta()
+    {}
     void value_list(const std::vector<Point<dim>> &points,
                     std::vector<Point<dim>> &      values) const;
   };

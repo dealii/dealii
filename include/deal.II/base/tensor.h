@@ -439,7 +439,7 @@ public:
    * @note This function can also be used in CUDA device code.
    */
   DEAL_II_CUDA_HOST_DEV
-  Tensor() = default;
+  Tensor();
 
   /**
    * Constructor, where the data is copied from a C-style array.
@@ -1008,6 +1008,15 @@ Tensor<0, dim, Number>::serialize(Archive &ar, const unsigned int)
 
 
 /*-------------------- Inline functions: Tensor<rank,dim> --------------------*/
+
+
+template <int rank_, int dim, typename Number>
+inline DEAL_II_ALWAYS_INLINE DEAL_II_CUDA_HOST_DEV
+                             Tensor<rank_, dim, Number>::Tensor()
+{
+  // All members of the c-style array values are already default initialized
+  // and thus all values are already set to zero recursively.
+}
 
 
 template <int rank_, int dim, typename Number>

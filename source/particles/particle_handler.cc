@@ -67,6 +67,12 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  ParticleHandler<dim, spacedim>::~ParticleHandler()
+  {}
+
+
+
+  template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::initialize(
     const parallel::distributed::Triangulation<dim, spacedim> &tria,

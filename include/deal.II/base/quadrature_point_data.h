@@ -372,6 +372,11 @@ namespace parallel
                                        const Quadrature<dim> &data_quadrature);
 
       /**
+       * Destructor.
+       */
+      ~ContinuousQuadratureDataTransfer();
+
+      /**
        * Prepare for coarsening and refinement of a triangulation @p tria .
        * @p data_storage represents the cell data which should be transferred
        * and it should be initialized for each locally owned active cell.
@@ -742,6 +747,13 @@ namespace parallel
       FETools::compute_interpolation_to_quadrature_points_matrix(
         *projection_fe.get(), rhs_quadrature, project_to_qp_matrix);
     }
+
+
+
+    template <int dim, typename DataType>
+    ContinuousQuadratureDataTransfer<dim, DataType>::
+      ~ContinuousQuadratureDataTransfer()
+    {}
 
 
 

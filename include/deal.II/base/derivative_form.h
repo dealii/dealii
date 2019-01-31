@@ -59,7 +59,7 @@ public:
   /**
    * Constructor. Initialize all entries to zero.
    */
-  DerivativeForm() = default;
+  DerivativeForm();
 
   /**
    * Constructor from a tensor.
@@ -165,6 +165,18 @@ private:
 /*--------------------------- Inline functions -----------------------------*/
 
 #ifndef DOXYGEN
+
+
+
+template <int order, int dim, int spacedim, typename Number>
+inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm()
+{
+  // default constructor. not specifying an initializer list calls
+  // the default constructor of the subobjects, which initialize them
+  // selves. therefore, the tensor array  is set to zero this way
+}
+
+
 
 template <int order, int dim, int spacedim, typename Number>
 inline DerivativeForm<order, dim, spacedim, Number>::DerivativeForm(

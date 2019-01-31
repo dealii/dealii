@@ -175,7 +175,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverBicgstab() override = default;
+  virtual ~SolverBicgstab() override;
 
   /**
    * Solve primal problem only.
@@ -329,6 +329,12 @@ SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &       cn,
   , Vx(nullptr)
   , Vb(nullptr)
   , additional_data(data)
+{}
+
+
+
+template <typename VectorType>
+SolverBicgstab<VectorType>::~SolverBicgstab()
 {}
 
 

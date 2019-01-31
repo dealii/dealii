@@ -296,6 +296,11 @@ namespace internal
     struct MappingInfo
     {
       /**
+       * Empty constructor.
+       */
+      MappingInfo();
+
+      /**
        * Compute the information in the given cells and faces. The cells are
        * specified by the level and the index within the level (as given by
        * CellIterator::level() and CellIterator::index(), in order to allow

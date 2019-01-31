@@ -592,13 +592,13 @@ public:
     /**
      * Copy constructor from @p other iterator.
      */
-    IntervalIterator(const IntervalIterator &other) = default;
+    IntervalIterator(const IntervalIterator &other);
 
     /**
      * Assignment of another iterator.
      */
     IntervalIterator &
-    operator=(const IntervalIterator &other) = default;
+    operator=(const IntervalIterator &other);
 
     /**
      * Prefix increment.
@@ -1129,6 +1129,22 @@ inline IndexSet::IntervalIterator::IntervalIterator()
 inline IndexSet::IntervalIterator::IntervalIterator(const IndexSet *idxset)
   : accessor(idxset)
 {}
+
+
+
+inline IndexSet::IntervalIterator::IntervalIterator(
+  const IndexSet::IntervalIterator &other)
+  : accessor(other.accessor)
+{}
+
+
+
+inline IndexSet::IntervalIterator &
+IndexSet::IntervalIterator::operator=(const IntervalIterator &other)
+{
+  accessor = other.accessor;
+  return *this;
+}
 
 
 

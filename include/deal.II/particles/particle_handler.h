@@ -85,7 +85,7 @@ namespace Particles
     /**
      * Destructor.
      */
-    virtual ~ParticleHandler() override = default;
+    ~ParticleHandler() override;
 
     /**
      * Initialize the particle handler. This function does not clear the

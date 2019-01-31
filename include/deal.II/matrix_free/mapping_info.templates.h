@@ -193,6 +193,12 @@ namespace internal
     /* ------------------------ MappingInfo implementation ----------------- */
 
     template <int dim, typename Number>
+    MappingInfo<dim, Number>::MappingInfo()
+    {}
+
+
+
+    template <int dim, typename Number>
     void
     MappingInfo<dim, Number>::clear()
     {
