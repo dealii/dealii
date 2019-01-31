@@ -1408,6 +1408,10 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   unsigned int n_cells;
   unsigned int dummy;
   std::string  line;
+  // This array stores maps from the 'entities' to the 'physical tags' for
+  // points, curves, surfaces and volumes. We use this information later to
+  // assign boundary ids.
+  std::array<std::map<int, int>, 4> tag_maps;
 
   in >> line;
 
@@ -1451,14 +1455,110 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
           in >> line;
         }
 
-      // if the next block is of kind $Entities, ignore it
+      // if the next block is of kind $Entities, parse it
       if (line == "$Entities")
         {
-          do
+          unsigned long n_points, n_curves, n_surfaces, n_volumes;
+
+          in >> n_points >> n_curves >> n_surfaces >> n_volumes;
+          for (unsigned int i = 0; i < n_points; ++i)
             {
-              in >> line;
+              // parse point ids
+              int          tag;
+              unsigned int n_physicals;
+              double box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+                box_max_z;
+
+              // we only care for 'tag' as key for tag_maps[0]
+              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                box_max_y >> box_max_z >> n_physicals;
+              // if there is a physical tag, we will use it as boundary id below
+              AssertThrow(n_physicals < 2,
+                          ExcMessage("More than one tag is not supported!"));
+              int physical_tag;
+              for (unsigned int j = 0; j < n_physicals; ++j)
+                in >> physical_tag;
+              // if there is no physical tag, use 0 as default
+              tag_maps[0][tag] = (n_physicals == 0) ? 0 : physical_tag;
             }
-          while (line != "$EndEntities");
+          for (unsigned int i = 0; i < n_curves; ++i)
+            {
+              // parse curve ids
+              int          tag;
+              unsigned int n_physicals;
+              double box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+                box_max_z;
+
+              // we only care for 'tag' as key for tag_maps[1]
+              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                box_max_y >> box_max_z >> n_physicals;
+              // if there is a physical tag, we will use it as boundary id below
+              AssertThrow(n_physicals < 2,
+                          ExcMessage("More than one tag is not supported!"));
+              int physical_tag;
+              for (unsigned int j = 0; j < n_physicals; ++j)
+                in >> physical_tag;
+              // if there is no physical tag, use 0 as default
+              tag_maps[1][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              // we don't care about the points associated to a curve, but have
+              // to parse them anyway because their format is unstructured
+              in >> n_points;
+              for (unsigned int j = 0; j < n_points; ++j)
+                in >> tag;
+            }
+
+          for (unsigned int i = 0; i < n_surfaces; ++i)
+            {
+              // parse surface ids
+              int          tag;
+              unsigned int n_physicals;
+              double box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+                box_max_z;
+
+              // we only care for 'tag' as key for tag_maps[2]
+              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                box_max_y >> box_max_z >> n_physicals;
+              // if there is a physical tag, we will use it as boundary id below
+              AssertThrow(n_physicals < 2,
+                          ExcMessage("More than one tag is not supported!"));
+              int physical_tag;
+              for (unsigned int j = 0; j < n_physicals; ++j)
+                in >> physical_tag;
+              // if there is no physical tag, use 0 as default
+              tag_maps[2][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              // we don't care about the curves associated to a surface, but
+              // have to parse them anyway because their format is unstructured
+              in >> n_curves;
+              for (unsigned int j = 0; j < n_curves; ++j)
+                in >> tag;
+            }
+          for (unsigned int i = 0; i < n_volumes; ++i)
+            {
+              // parse volume ids
+              int          tag;
+              unsigned int n_physicals;
+              double box_min_x, box_min_y, box_min_z, box_max_x, box_max_y,
+                box_max_z;
+
+              // we only care for 'tag' as key for tag_maps[3]
+              in >> tag >> box_min_x >> box_min_y >> box_min_z >> box_max_x >>
+                box_max_y >> box_max_z >> n_physicals;
+              // if there is a physical tag, we will use it as boundary id below
+              AssertThrow(n_physicals < 2,
+                          ExcMessage("More than one tag is not supported!"));
+              int physical_tag;
+              for (unsigned int j = 0; j < n_physicals; ++j)
+                in >> physical_tag;
+              // if there is no physical tag, use 0 as default
+              tag_maps[3][tag] = (n_physicals == 0) ? 0 : physical_tag;
+              // we don't care about the surfaces associated to a volume, but
+              // have to parse them anyway because their format is unstructured
+              in >> n_surfaces;
+              for (unsigned int j = 0; j < n_surfaces; ++j)
+                in >> tag;
+            }
+          in >> line;
+          AssertThrow(line == "$EndEntities", ExcInvalidGMSHInput(line));
           in >> line;
         }
 
@@ -1497,20 +1597,19 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
     unsigned int global_vertex = 0;
     for (int entity_block = 0; entity_block < n_entity_blocks; ++entity_block)
       {
-        int           tagEntity;
-        int           dimEntity;
         int           parametric;
         unsigned long numNodes;
 
         if (gmsh_file_format < 4)
           {
-            tagEntity  = 0;
-            dimEntity  = 0;
             numNodes   = n_vertices;
             parametric = 0;
           }
         else
-          in >> tagEntity >> dimEntity >> parametric >> numNodes;
+          {
+            int tagEntity, dimEntity;
+            in >> tagEntity >> dimEntity >> parametric >> numNodes;
+          }
         for (unsigned long vertex_per_entity = 0; vertex_per_entity < numNodes;
              ++vertex_per_entity, ++global_vertex)
           {
@@ -1574,20 +1673,21 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
     for (int entity_block = 0; entity_block < n_entity_blocks; ++entity_block)
       {
         unsigned int  material_id;
-        int           dimEntity;
         unsigned long numElements;
         int           cell_type;
 
         if (gmsh_file_format < 4)
           {
             material_id = 0;
-            dimEntity   = 0;
             cell_type   = 0;
             numElements = n_cells;
           }
         else
-          in >> material_id >> dimEntity >> cell_type >> numElements;
-
+          {
+            int tagEntity, dimEntity;
+            in >> tagEntity >> dimEntity >> cell_type >> numElements;
+            material_id = tag_maps[dimEntity][tagEntity];
+          }
         for (unsigned int cell_per_entity = 0; cell_per_entity < numElements;
              ++cell_per_entity, ++global_cell)
           {
