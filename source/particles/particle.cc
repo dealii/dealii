@@ -284,6 +284,8 @@ namespace Particles
   Particle<dim, spacedim>::set_properties(
     const ArrayView<const double> &new_properties)
   {
+    Assert(property_pool != nullptr, ExcInternalError());
+
     if (properties == PropertyPool::invalid_handle)
       properties = property_pool->allocate_properties_array();
 
@@ -313,7 +315,7 @@ namespace Particles
   const ArrayView<const double>
   Particle<dim, spacedim>::get_properties() const
   {
-    Assert(property_pool != nullptr, ExcInternalError());
+    Assert(has_properties(), ExcInternalError());
 
     return property_pool->get_properties(properties);
   }
@@ -325,6 +327,9 @@ namespace Particles
   Particle<dim, spacedim>::get_properties()
   {
     Assert(property_pool != nullptr, ExcInternalError());
+
+    if (properties == PropertyPool::invalid_handle)
+      properties = property_pool->allocate_properties_array();
 
     return property_pool->get_properties(properties);
   }

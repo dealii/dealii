@@ -1200,6 +1200,12 @@ namespace Particles
         data_range.end(),
         /*allow_compression=*/true);
 
+    // Update the reference to the current property pool for all particles.
+    // This was not stored, because they might be transported across process
+    // domains.
+    for (auto &particle : loaded_particles_on_cell)
+      particle.set_property_pool(*property_pool);
+
     switch (status)
       {
         case parallel::distributed::Triangulation<dim, spacedim>::CELL_PERSIST:
