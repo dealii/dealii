@@ -462,11 +462,13 @@ namespace GridGenerator
                         const bool          colorize           = false);
 
   /**
-   * A general quadrilateral in 2d or a general hexahedron in 3d. It is the
-   * responsibility of the user to provide the vertices in the right order (see
-   * the documentation of the GeometryInfo class) because the vertices are
-   * stored in the same order as they are given. It is also important to make
-   * sure that the volume of the cell is positive.
+   * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
+   * if @p dim is 2, or a hexahedron if @p dim is 3) immersed in a
+   * @p spacedim -dimensional space. It is the responsibility of the user to
+   * provide the vertices in the right order (see the documentation of the
+   * GeometryInfo class) because the vertices are stored in the same order as
+   * they are given. It is also important to make sure that the volume of the
+   * cell is positive.
    *
    * If the argument @p colorize is false, then all boundary indicators are
    * set to zero for 2d and 3d. If it is true, the boundary is colorized as in
@@ -474,13 +476,17 @@ namespace GridGenerator
    * @ref GlossColorization "the glossary entry on colorization"). In 1d the
    * indicators are always colorized, see hyper_rectangle().
    *
+   * @param tria The triangulation that will be created
+   * @param vertices The 2^dim vertices of the cell
+   * @param colorize If true, set different boundary ids.
+   *
    * @author Bruno Turcksin
    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  general_cell(Triangulation<dim> &           tria,
-               const std::vector<Point<dim>> &vertices,
-               const bool                     colorize = false);
+  general_cell(Triangulation<dim, spacedim> &      tria,
+               const std::vector<Point<spacedim>> &vertices,
+               const bool                          colorize = false);
 
   /**
    * A parallelogram. The first corner point is the origin. The @p dim
