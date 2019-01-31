@@ -112,6 +112,13 @@ IF(DEAL_II_WITH_SLEPC)
   )
 ENDIF()
 
+IF(DEAL_II_WITH_GINKGO)
+  SET(_unity_include_src
+    ${_unity_include_src}
+    ginkgo_solver.cc
+  )
+ENDIF()
+
 # Also add Trilinos wrapper files
 IF(DEAL_II_WITH_TRILINOS)
   SET(_unity_include_src

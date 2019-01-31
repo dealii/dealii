@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2016 by the deal.II authors
+## Copyright (C) 2013 - 2018 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -273,7 +273,7 @@ FOREACH(_var ${_variables})
   IF( _var MATCHES "^(TEST|DEAL_II|ALLOW|WITH|FORCE|COMPONENT)_" OR
       _var MATCHES "^(DOCUMENTATION|EXAMPLES)" OR
       _var MATCHES "^(ADOLC|ARPACK|BOOST|OPENCASCADE|MUPARSER|HDF5|METIS|MPI)_" OR
-      _var MATCHES "^(NETCDF|P4EST|PETSC|SCALAPACK|SLEPC|THREADS|TBB|TRILINOS)_" OR
+      _var MATCHES "^(GINKGO|NETCDF|P4EST|PETSC|SCALAPACK|SLEPC|THREADS|TBB|TRILINOS)_" OR
       _var MATCHES "^(UMFPACK|ZLIB|LAPACK|MUPARSER|CUDA)_" OR
       _var MATCHES "^(CMAKE|DEAL_II)_(C|CXX|Fortran|BUILD)_(COMPILER|FLAGS)" OR
       _var MATCHES "^CMAKE_BUILD_TYPE$" OR
