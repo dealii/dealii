@@ -2751,6 +2751,7 @@ namespace parallel
 
         tria->cell_attached_data.n_attached_data_sets = 0;
         tria->cell_attached_data.pack_callbacks_fixed.clear();
+        tria->cell_attached_data.pack_callbacks_variable.clear();
       }
     }
 

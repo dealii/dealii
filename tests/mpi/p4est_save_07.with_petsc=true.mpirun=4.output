@@ -1,0 +1,10 @@
+
+DEAL:0:2d::hyper_cube
+DEAL:0:2d::#cells = 19
+DEAL:0:2d::cells(0) = 10
+DEAL:0:2d::Checksum: 136119115
+DEAL:0:2d::#cells = 19
+DEAL:0:2d::cells(0) = 10
+DEAL:0:2d::Checksum: 136119115
+DEAL:0:2d::sum: 435.000 870.000
+DEAL:0:2d::OK
