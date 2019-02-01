@@ -178,7 +178,7 @@ public:
    * case, there is only one element. Specializations use SIMD intrinsics and
    * can work on multiple elements at the same time.
    */
-  static const unsigned int n_array_elements;
+  static const unsigned int n_array_elements = 1;
 
   // POD means that there should be no user-defined constructors, destructors
   // and copy functions (the standard is somewhat relaxed in C++2011, though).
@@ -453,7 +453,7 @@ private:
 
 // We need to have a separate declaration for static const members
 template <typename Number>
-const unsigned int VectorizedArray<Number>::n_array_elements = 1;
+const unsigned int VectorizedArray<Number>::n_array_elements;
 
 
 

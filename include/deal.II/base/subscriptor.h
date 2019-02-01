@@ -340,6 +340,11 @@ Subscriptor::list_subscribers(StreamType &stream) const
            << it.first << '\"' << std::endl;
 }
 
+// forward declare template specialization
+template <>
+void
+Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
+                                     const char *             id) const;
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
