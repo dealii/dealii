@@ -1521,7 +1521,7 @@ namespace Patterns
             std::is_same<T, signed char>::value || std::is_same<T, char>::value)
           str << static_cast<int>(value);
         else if (std::is_same<T, bool>::value)
-          str << (value ? "true" : "false");
+          str << (static_cast<bool>(value) ? "true" : "false");
         else
           str << value;
         AssertThrow(p->match(str.str()), ExcNoMatch(str.str(), p.get()));
