@@ -30,8 +30,8 @@
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
-#  include <Teuchos_RCP.hpp>
 #  include <Teuchos_Comm.hpp>
+#  include <Teuchos_RCP.hpp>
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
