@@ -101,6 +101,8 @@ main(int argc, char **argv)
   MPILogInitAll log;
   test<double>();
   test<float>();
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
   test<std::complex<double>>();
   test<std::complex<float>>();
+#endif
 }

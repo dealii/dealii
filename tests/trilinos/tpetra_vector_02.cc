@@ -217,8 +217,10 @@ main(int argc, char **argv)
 
   test<double>();
   test<float>();
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
   test<std::complex<double>>();
   test<std::complex<float>>();
+#endif
 
   deallog << "OK" << std::endl;
 
