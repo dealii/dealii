@@ -1,0 +1,114 @@
+
+DEAL:0::writing with 3
+DEAL:0::packing cell 0_2:00 with data size=4 accumulated data=0
+DEAL:0::packing cell 0_2:01 with data size=8 accumulated data=1
+DEAL:0::packing cell 0_2:02 with data size=12 accumulated data=3
+DEAL:0::packing cell 0_2:03 with data size=16 accumulated data=6
+DEAL:0::packing cell 0_1:1 with data size=20 accumulated data=10
+DEAL:0::#cells = 16
+DEAL:0::Checksum: 2822439380
+DEAL:0::writing with 3
+DEAL:0::packing cell 0_2:00 with data size=24 accumulated data=15
+DEAL:0::packing cell 0_2:01 with data size=28 accumulated data=21
+DEAL:0::packing cell 0_2:02 with data size=32 accumulated data=28
+DEAL:0::packing cell 0_2:03 with data size=36 accumulated data=36
+DEAL:0::packing cell 0_1:1 with data size=40 accumulated data=45
+DEAL:0::#cells = 16
+DEAL:0::Checksum: 2822439380
+DEAL:0::reading with 4
+DEAL:0::unpacking cell 0_2:00 with data size=24 accumulated data=15
+DEAL:0::unpacking cell 0_2:01 with data size=28 accumulated data=21
+DEAL:0::unpacking cell 0_2:02 with data size=32 accumulated data=28
+DEAL:0::unpacking cell 0_2:03 with data size=36 accumulated data=36
+DEAL:0::#cells = 16
+DEAL:0::Checksum: 2822439380
+DEAL:0::writing with 4
+DEAL:0::packing cell 0_2:00 with data size=44 accumulated data=55
+DEAL:0::packing cell 0_2:01 with data size=48 accumulated data=66
+DEAL:0::packing cell 0_2:02 with data size=52 accumulated data=78
+DEAL:0::packing cell 0_2:03 with data size=56 accumulated data=91
+DEAL:0::#cells = 16
+DEAL:0::Checksum: 2822439380
+DEAL:0::OK
+
+DEAL:1::writing with 3
+DEAL:1::packing cell 0_1:2 with data size=4 accumulated data=0
+DEAL:1::packing cell 0_1:3 with data size=8 accumulated data=1
+DEAL:1::packing cell 1_1:0 with data size=12 accumulated data=3
+DEAL:1::packing cell 1_1:1 with data size=16 accumulated data=6
+DEAL:1::packing cell 1_1:2 with data size=20 accumulated data=10
+DEAL:1::packing cell 1_1:3 with data size=24 accumulated data=15
+DEAL:1::#cells = 16
+DEAL:1::Checksum: 0
+DEAL:1::writing with 3
+DEAL:1::packing cell 0_1:2 with data size=28 accumulated data=21
+DEAL:1::packing cell 0_1:3 with data size=32 accumulated data=28
+DEAL:1::packing cell 1_1:0 with data size=36 accumulated data=36
+DEAL:1::packing cell 1_1:1 with data size=40 accumulated data=45
+DEAL:1::packing cell 1_1:2 with data size=44 accumulated data=55
+DEAL:1::packing cell 1_1:3 with data size=48 accumulated data=66
+DEAL:1::#cells = 16
+DEAL:1::Checksum: 0
+DEAL:1::reading with 4
+DEAL:1::unpacking cell 0_1:1 with data size=40 accumulated data=45
+DEAL:1::unpacking cell 0_1:2 with data size=28 accumulated data=21
+DEAL:1::unpacking cell 0_1:3 with data size=32 accumulated data=28
+DEAL:1::#cells = 16
+DEAL:1::Checksum: 0
+DEAL:1::writing with 4
+DEAL:1::packing cell 0_1:1 with data size=52 accumulated data=78
+DEAL:1::packing cell 0_1:2 with data size=56 accumulated data=91
+DEAL:1::packing cell 0_1:3 with data size=60 accumulated data=105
+DEAL:1::#cells = 16
+DEAL:1::Checksum: 0
+
+
+DEAL:2::writing with 3
+DEAL:2::packing cell 2_1:0 with data size=4 accumulated data=0
+DEAL:2::packing cell 2_1:1 with data size=8 accumulated data=1
+DEAL:2::packing cell 2_1:2 with data size=12 accumulated data=3
+DEAL:2::packing cell 2_1:3 with data size=16 accumulated data=6
+DEAL:2::packing cell 3_0: with data size=20 accumulated data=10
+DEAL:2::#cells = 16
+DEAL:2::Checksum: 0
+DEAL:2::writing with 3
+DEAL:2::packing cell 2_1:0 with data size=24 accumulated data=15
+DEAL:2::packing cell 2_1:1 with data size=28 accumulated data=21
+DEAL:2::packing cell 2_1:2 with data size=32 accumulated data=28
+DEAL:2::packing cell 2_1:3 with data size=36 accumulated data=36
+DEAL:2::packing cell 3_0: with data size=40 accumulated data=45
+DEAL:2::#cells = 16
+DEAL:2::Checksum: 0
+DEAL:2::reading with 4
+DEAL:2::unpacking cell 1_1:0 with data size=36 accumulated data=36
+DEAL:2::unpacking cell 1_1:1 with data size=40 accumulated data=45
+DEAL:2::unpacking cell 1_1:2 with data size=44 accumulated data=55
+DEAL:2::unpacking cell 1_1:3 with data size=48 accumulated data=66
+DEAL:2::#cells = 16
+DEAL:2::Checksum: 0
+DEAL:2::writing with 4
+DEAL:2::packing cell 1_1:0 with data size=44 accumulated data=55
+DEAL:2::packing cell 1_1:1 with data size=48 accumulated data=66
+DEAL:2::packing cell 1_1:2 with data size=52 accumulated data=78
+DEAL:2::packing cell 1_1:3 with data size=56 accumulated data=91
+DEAL:2::#cells = 16
+DEAL:2::Checksum: 0
+
+
+DEAL:3::reading with 4
+DEAL:3::unpacking cell 2_1:0 with data size=24 accumulated data=15
+DEAL:3::unpacking cell 2_1:1 with data size=28 accumulated data=21
+DEAL:3::unpacking cell 2_1:2 with data size=32 accumulated data=28
+DEAL:3::unpacking cell 2_1:3 with data size=36 accumulated data=36
+DEAL:3::unpacking cell 3_0: with data size=40 accumulated data=45
+DEAL:3::#cells = 16
+DEAL:3::Checksum: 0
+DEAL:3::writing with 4
+DEAL:3::packing cell 2_1:0 with data size=4 accumulated data=0
+DEAL:3::packing cell 2_1:1 with data size=8 accumulated data=1
+DEAL:3::packing cell 2_1:2 with data size=12 accumulated data=3
+DEAL:3::packing cell 2_1:3 with data size=16 accumulated data=6
+DEAL:3::packing cell 3_0: with data size=20 accumulated data=10
+DEAL:3::#cells = 16
+DEAL:3::Checksum: 0
+
