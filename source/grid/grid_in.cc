@@ -2436,9 +2436,12 @@ GridIn<3>::read_netcdf(const std::string &filename)
   // take numbers::internal_face_boundary_id
   // as it denotes an internal face
   for (const int id : bmarker)
-    Assert(0 <= id && static_cast<types::boundary_id>(id) !=
-                        numbers::internal_face_boundary_id,
-           ExcIO());
+    {
+      Assert(0 <= id && static_cast<types::boundary_id>(id) !=
+                          numbers::internal_face_boundary_id,
+             ExcIO());
+      (void)id;
+    }
 
   // finally we setup the boundary
   // information
