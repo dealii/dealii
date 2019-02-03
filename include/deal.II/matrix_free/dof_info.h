@@ -103,6 +103,30 @@ namespace internal
                            const unsigned int fe_degree) const;
 
       /**
+       * Populate the vector @p locall_indices with locally owned degrees of freedom
+       * stored on the cell block @p cell.
+       * If @p with_constraints is `true`, then the returned vector will contain indices
+       * required to resolve constraints.
+       *
+       * The image below illustrates the output of this function for cell blocks
+       * zero and one with zero Dirichlet boundary conditions at the bottom of
+       * the domain. Note that due to the presence of constraints, the DoFs
+       * returned by this function for the case `with_constraints = true` are
+       * not a simple union
+       * of per cell DoFs on the cell block @p cell.
+       *
+       * @image html dofinfo_get_dof_indices.png
+       *
+       * @note The returned indices may contain duplicates. The unique set can be
+       * obtain using `std::sort()` followed by `std::unique()` and
+       * `std::vector::erase()`.
+       */
+      void
+      get_dof_indices_on_cell_batch(std::vector<unsigned int> &locall_indices,
+                                    const unsigned int         cell,
+                                    const bool with_constraints = true) const;
+
+      /**
        * This internal method takes the local indices on a cell and fills them
        * into this class. It resolves the constraints and distributes the
        * results. Ghost indices, i.e., indices that are located on another
