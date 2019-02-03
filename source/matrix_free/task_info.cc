@@ -423,7 +423,6 @@ namespace internal
                   std::vector<color::PartitionWork *> blocked_worker(
                     n_blocked_workers);
                   unsigned int      worker_index = 0, slice_index = 0;
-                  unsigned int      spawn_index       = 0;
                   int               spawn_index_child = -2;
                   MPICommunication *worker_compr =
                     new (root->allocate_child()) MPICommunication(funct, true);
@@ -432,7 +431,6 @@ namespace internal
                        part < partition_row_index.size() - 1;
                        part++)
                     {
-                      const unsigned int spawn_index_new = worker_index;
                       if (part == 0)
                         worker[worker_index] =
                           new (worker_compr->allocate_child())
@@ -474,7 +472,6 @@ namespace internal
                                      ExcInternalError());
                               tbb::task::spawn(*worker[spawn_index_child]);
                             }
-                          spawn_index       = spawn_index_new;
                           spawn_index_child = -2;
                         }
                       else
