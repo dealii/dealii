@@ -118,7 +118,7 @@ namespace internal
           work();
 
           if (is_blocked == true)
-            dummy->spawn(*dummy);
+            tbb::empty_task::spawn(*dummy);
           return nullptr;
         }
 
@@ -172,7 +172,7 @@ namespace internal
                   worker[j]->set_ref_count(2);
                   blocked_worker[j - 1]->dummy =
                     new (worker[j]->allocate_child()) tbb::empty_task;
-                  worker[j - 1]->spawn(*blocked_worker[j - 1]);
+                  tbb::task::spawn(*blocked_worker[j - 1]);
                 }
               else
                 worker[j]->set_ref_count(1);
@@ -195,13 +195,13 @@ namespace internal
                                    2 * j + 1,
                                  task_info,
                                  false);
-                      worker[j]->spawn(*worker[evens]);
+                      tbb::task::spawn(*worker[evens]);
                     }
                   else
                     {
                       tbb::empty_task *child =
                         new (worker[j]->allocate_child()) tbb::empty_task();
-                      worker[j]->spawn(*child);
+                      tbb::task::spawn(*child);
                     }
                 }
             }
@@ -209,7 +209,7 @@ namespace internal
           root->wait_for_all();
           root->destroy(*root);
           if (is_blocked == true)
-            dummy->spawn(*dummy);
+            tbb::empty_task::spawn(*dummy);
           return nullptr;
         }
 
@@ -289,7 +289,7 @@ namespace internal
           parallel_for(tbb::blocked_range<unsigned int>(0, n_chunks, 1),
                        CellWork(worker, task_info, partition));
           if (is_blocked == true)
-            dummy->spawn(*dummy);
+            tbb::empty_task::spawn(*dummy);
           return nullptr;
         }
 
@@ -364,9 +364,9 @@ namespace internal
                       blocked_worker[j - 1]->dummy =
                         new (worker[j]->allocate_child()) tbb::empty_task;
                       if (j > 1)
-                        worker[j - 1]->spawn(*blocked_worker[j - 1]);
+                        tbb::task::spawn(*blocked_worker[j - 1]);
                       else
-                        worker_compr->spawn(*blocked_worker[j - 1]);
+                        tbb::task::spawn(*blocked_worker[j - 1]);
                     }
                   else
                     {
@@ -376,7 +376,7 @@ namespace internal
                       MPICommunication *worker_dist =
                         new (worker[j]->allocate_child())
                           MPICommunication(funct, false);
-                      worker_dist->spawn(*worker_dist);
+                      tbb::task::spawn(*worker_dist);
                     }
                   if (j < evens - 1)
                     {
@@ -392,13 +392,13 @@ namespace internal
                                                      2 * j + 1,
                                                      *this,
                                                      false);
-                          worker[j]->spawn(*worker[evens]);
+                          tbb::task::spawn(*worker[evens]);
                         }
                       else
                         {
                           tbb::empty_task *child =
                             new (worker[j]->allocate_child()) tbb::empty_task();
-                          worker[j]->spawn(*child);
+                          tbb::task::spawn(*child);
                         }
                     }
                 }
@@ -467,14 +467,12 @@ namespace internal
                               tbb::empty_task;
                           worker_index++;
                           if (spawn_index_child == -1)
-                            worker[spawn_index]->spawn(
-                              *blocked_worker[(part - 1) / 2]);
+                            tbb::task::spawn(*blocked_worker[(part - 1) / 2]);
                           else
                             {
                               Assert(spawn_index_child >= 0,
                                      ExcInternalError());
-                              worker[spawn_index]->spawn(
-                                *worker[spawn_index_child]);
+                              tbb::task::spawn(*worker[spawn_index_child]);
                             }
                           spawn_index       = spawn_index_new;
                           spawn_index_child = -2;
@@ -484,7 +482,7 @@ namespace internal
                           MPICommunication *worker_dist =
                             new (worker[worker_index]->allocate_child())
                               MPICommunication(funct, false);
-                          worker_dist->spawn(*worker_dist);
+                          tbb::task::spawn(*worker_dist);
                           worker_index++;
                         }
                       part += 1;
@@ -539,14 +537,14 @@ namespace internal
                           tbb::empty_task *final =
                             new (worker[worker_index - 1]->allocate_child())
                               tbb::empty_task;
-                          worker[spawn_index]->spawn(*final);
+                          tbb::task::spawn(*final);
                           spawn_index_child = worker_index - 1;
                         }
                     }
                   if (evens == odds)
                     {
                       Assert(spawn_index_child >= 0, ExcInternalError());
-                      worker[spawn_index]->spawn(*worker[spawn_index_child]);
+                      tbb::task::spawn(*worker[spawn_index_child]);
                     }
                   root->wait_for_all();
                   root->destroy(*root);
@@ -568,7 +566,7 @@ namespace internal
                       color::PartitionWork *worker =
                         new (root->allocate_child())
                           color::PartitionWork(funct, color, *this, false);
-                      root->spawn(*worker);
+                      tbb::empty_task::spawn(*worker);
                       root->wait_for_all();
                       root->destroy(*root);
                     }

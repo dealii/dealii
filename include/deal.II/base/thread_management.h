@@ -1353,16 +1353,7 @@ namespace Threads
       tbb::task *worker =
         new (task->allocate_child()) TaskEntryPoint<RT>(*this);
 
-      // in earlier versions of the TBB, task::spawn was a regular
-      // member function; however, in later versions, it was converted
-      // into a static function. we could always call it as a regular member
-      // function of *task, but that appears to confuse the NVidia nvcc
-      // compiler. consequently, the following work-around:
-#    if TBB_VERSION_MAJOR >= 4
       tbb::task::spawn(*worker);
-#    else
-      task->spawn(*worker);
-#    endif
     }
 
 
