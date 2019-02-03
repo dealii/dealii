@@ -203,7 +203,7 @@ namespace parallel
      * hp::DoFHandler<dim,spacedim> hp_dof_handler(triangulation);
      * // We need to introduce our dof_handler to the fe_collection
      * // before setting all active_fe_indices.
-     * hp_dof_handler.distribute_dofs(fe_collection);
+     * hp_dof_handler.set_fe(fe_collection);
      * hp_dof_handler.deserialize_active_fe_indices();
      * hp_dof_handler.distribute_dofs(fe_collection);
      *

@@ -1199,6 +1199,18 @@ DoFHandler<dim, spacedim>::memory_consumption() const
 
 template <int dim, int spacedim>
 void
+DoFHandler<dim, spacedim>::set_fe(const FiniteElement<dim, spacedim> &ff)
+{
+  // Only recreate the FECollection if we don't already store
+  // the exact same FiniteElement object.
+  if (fe_collection.size() == 0 || fe_collection[0] != ff)
+    fe_collection = hp::FECollection<dim, spacedim>(ff);
+}
+
+
+
+template <int dim, int spacedim>
+void
 DoFHandler<dim, spacedim>::distribute_dofs(
   const FiniteElement<dim, spacedim> &ff)
 {
@@ -1210,10 +1222,8 @@ DoFHandler<dim, spacedim>::distribute_dofs(
   Assert(tria->n_levels() > 0,
          ExcMessage("The Triangulation you are using is empty!"));
 
-  // Only recreate the FECollection if we don't already store
-  // the exact same FiniteElement object.
-  if (fe_collection.size() == 0 || fe_collection[0] != ff)
-    fe_collection = hp::FECollection<dim, spacedim>(ff);
+  // first, assign the finite_element
+  set_fe(ff);
 
   // delete all levels and set them
   // up newly. note that we still

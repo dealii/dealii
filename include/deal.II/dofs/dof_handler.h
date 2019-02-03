@@ -473,6 +473,25 @@ public:
              const FiniteElement<dim, spacedim> &fe);
 
   /**
+   * Assign a FiniteElement @p fe to this object.
+   *
+   * @note This function makes a copy of the finite element given as
+   * argument, and stores it as a member variable. Consequently, it is
+   * possible to write code such as
+   * @code
+   *   dof_handler.set_fe(FE_Q<dim>(2));
+   * @endcode
+   * You can then access the finite element later on by calling
+   * DoFHandler::get_fe(). However, it is often more convenient to
+   * keep a named finite element object as a member variable in your
+   * main class and refer to it directly whenever you need to access
+   * properties of the finite element (such as
+   * FiniteElementData::dofs_per_cell). This is what all tutorial programs do.
+   */
+  virtual void
+  set_fe(const FiniteElement<dim, spacedim> &fe);
+
+  /**
    * Go through the triangulation and "distribute" the degrees of
    * freedom needed for the given finite element. "Distributing"
    * degrees of freedom involves allocating memory to store the
@@ -498,17 +517,8 @@ public:
    * step-2 tutorial program.
    *
    * @note This function makes a copy of the finite element given as
-   * argument, and stores it as a member variable. Consequently, it is
-   * possible to write code such as
-   * @code
-   *   dof_handler.distribute_dofs (FE_Q<dim>(2));
-   * @endcode
-   * You can then access the finite element later on by calling
-   * DoFHandler::get_fe().  However, it is often more convenient to
-   * keep a named finite element object as a member variable in your
-   * main class and refer to it directly whenever you need to access
-   * properties of the finite element (such as FiniteElement::dofs_per_cell).
-   * This is what all tutorial programs do.
+   * argument, and stores it as a member variable, similarly to the above
+   * function set_fe().
    */
   virtual void
   distribute_dofs(const FiniteElement<dim, spacedim> &fe);

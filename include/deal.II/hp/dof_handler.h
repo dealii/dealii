@@ -418,6 +418,19 @@ namespace hp
                const hp::FECollection<dim, spacedim> &fe);
 
     /**
+     * Assign a hp::FECollection @p fe to this object.
+     *
+     * In case a parallel::Triangulation is assigned to this object,
+     * the active_fe_indices will be exchanged between processors so that
+     * each one knows the indices on its own cells and all ghost cells.
+     *
+     * @note In accordance with dealii::DoFHandler::set_fe(),
+     * this function also makes a copy of the object given as argument.
+     */
+    virtual void
+    set_fe(const hp::FECollection<dim, spacedim> &fe);
+
+    /**
      * Go through the triangulation and "distribute" the degrees of
      * freedom needed for the given finite element. "Distributing"
      * degrees of freedom involves allocating memory to store the

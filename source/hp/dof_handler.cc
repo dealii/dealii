@@ -1392,6 +1392,33 @@ namespace hp
 
   template <int dim, int spacedim>
   void
+  DoFHandler<dim, spacedim>::set_fe(const hp::FECollection<dim, spacedim> &ff)
+  {
+    // don't create a new object if the one we have is already appropriate
+    if (fe_collection != ff)
+      fe_collection = hp::FECollection<dim, spacedim>(ff);
+
+    // ensure that the active_fe_indices vectors are initialized correctly
+    create_active_fe_table();
+
+    // make sure every processor knows the active_fe_indices
+    // on both its own cells and all ghost cells
+    dealii::internal::hp::DoFHandlerImplementation::Implementation::
+      communicate_active_fe_indices(*this);
+
+    // make sure that the fe collection is large enough to
+    // cover all fe indices presently in use on the mesh
+    for (const auto &cell : active_cell_iterators())
+      if (cell->is_locally_owned())
+        Assert(cell->active_fe_index() < fe_collection.size(),
+               ExcInvalidFEIndex(cell->active_fe_index(),
+                                 fe_collection.size()));
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   DoFHandler<dim, spacedim>::distribute_dofs(
     const hp::FECollection<dim, spacedim> &ff)
   {
@@ -1404,14 +1431,8 @@ namespace hp
            ExcMessage("The Triangulation you are using is empty!"));
     Assert(ff.size() > 0, ExcMessage("The hp::FECollection given is empty!"));
 
-    // don't create a new object if the one we have is already appropriate
-    if (fe_collection != ff)
-      fe_collection = hp::FECollection<dim, spacedim>(ff);
-
-    // at the beginning, make sure every processor knows the
-    // active_fe_indices on both its own cells and all ghost cells
-    dealii::internal::hp::DoFHandlerImplementation::Implementation::
-      communicate_active_fe_indices(*this);
+    // first, assign the fe_collection
+    set_fe(ff);
 
     // If an underlying shared::Tria allows artificial cells,
     // then save the current set of subdomain ids, and set
@@ -1425,51 +1446,29 @@ namespace hp
         {
           saved_subdomain_ids.resize(shared_tria->n_active_cells());
 
-          typename parallel::shared::Triangulation<dim, spacedim>::
-            active_cell_iterator cell = get_triangulation().begin_active(),
-                                 endc = get_triangulation().end();
-
           const std::vector<types::subdomain_id> &true_subdomain_ids =
             shared_tria->get_true_subdomain_ids_of_cells();
 
-          for (unsigned int index = 0; cell != endc; ++cell, ++index)
+          for (const auto &cell : shared_tria->active_cell_iterators())
             {
+              const unsigned int index   = cell->active_cell_index();
               saved_subdomain_ids[index] = cell->subdomain_id();
               cell->set_subdomain_id(true_subdomain_ids[index]);
             }
         }
 
-    // ensure that the active_fe_indices vectors are
-    // initialized correctly.
-    create_active_fe_table();
-
-    // up front make sure that the fe collection is large enough to
-    // cover all fe indices presently in use on the mesh
-    for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
-      if (cell->is_locally_owned())
-        Assert(cell->active_fe_index() < fe_collection.size(),
-               ExcInvalidFEIndex(cell->active_fe_index(),
-                                 fe_collection.size()));
-
-
-    // then allocate space for all the other tables
+    // then allocate space for all tables
     dealii::internal::hp::DoFHandlerImplementation::Implementation::
       reserve_space(*this);
-
 
     // now undo the subdomain modification
     if (const parallel::shared::Triangulation<dim, spacedim> *shared_tria =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
             &get_triangulation())))
       if (shared_tria->with_artificial_cells())
-        {
-          typename parallel::shared::Triangulation<dim, spacedim>::
-            active_cell_iterator cell = get_triangulation().begin_active(),
-                                 endc = get_triangulation().end();
-
-          for (unsigned int index = 0; cell != endc; ++cell, ++index)
-            cell->set_subdomain_id(saved_subdomain_ids[index]);
-        }
+        for (const auto &cell : shared_tria->active_cell_iterators())
+          cell->set_subdomain_id(
+            saved_subdomain_ids[cell->active_cell_index()]);
 
 
     // Clear user flags because we will need them. But first we save

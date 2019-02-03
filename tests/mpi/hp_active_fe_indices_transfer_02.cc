@@ -48,10 +48,9 @@ test()
     GridGenerator::subdivided_hyper_cube(tria, 2);
     tria.refine_global(1);
 
-    // this distribute_dofs() call is necessary
-    // we need to introduce dof_handler to its fe_collection first
     hp::DoFHandler<dim> dh(tria);
-    dh.distribute_dofs(fe_collection);
+    // we need to introduce dof_handler to its fe_collection first
+    dh.set_fe(fe_collection);
 
     unsigned int i = 0;
     for (auto &cell : dh.active_cell_iterators())
@@ -85,10 +84,9 @@ test()
     GridGenerator::subdivided_hyper_cube(tria, 2);
     // triangulation has to be initialized with correct coarse cells
 
-    // this distribute_dofs() call is necessary
     // we need to introduce dof_handler to its fe_collection first
     hp::DoFHandler<dim> dh(tria);
-    dh.distribute_dofs(fe_collection);
+    dh.set_fe(fe_collection);
 
     // ----- transfer -----
     tria.load("file");
