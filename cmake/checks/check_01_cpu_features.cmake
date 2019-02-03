@@ -28,8 +28,8 @@
 #   DEAL_II_HAVE_AVX                     *)
 #   DEAL_II_HAVE_AVX512                  *)
 #   DEAL_II_HAVE_ALTIVEC                 *)
-#   DEAL_II_COMPILER_VECTORIZATION_LEVEL
 #   DEAL_II_HAVE_OPENMP_SIMD             *)
+#   DEAL_II_COMPILER_VECTORIZATION_LEVEL
 #   DEAL_II_OPENMP_SIMD_PRAGMA
 #
 # *)
@@ -245,7 +245,36 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     }
     "
     DEAL_II_HAVE_ALTIVEC)
-ENDIF()
+
+  #
+  # OpenMP 4.0 can be used for vectorization. Only the vectorization
+  # instructions are allowed, the threading must be done through TBB.
+  #
+
+  #
+  # Choosing the right compiler flag is a bit of a mess:
+  #
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    IF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "15" )
+      SET(_keyword "qopenmp")
+    ELSEIF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "14" )
+      SET(_keyword "openmp")
+    ENDIF()
+  ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    SET(_keyword "openmp")
+  ELSE()
+    SET(_keyword "fopenmp")
+  ENDIF()
+
+  CHECK_CXX_COMPILER_FLAG("-${_keyword}-simd" DEAL_II_HAVE_OPENMP_SIMD)
+
+ENDIF() # IF DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+
+
+#
+# Choose DEAL_II_COMPILER_VECTORIZATION level depending on AVX support
+# (that was autodetected or manually specified).
+#
 
 IF(DEAL_II_HAVE_AVX512)
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 3)
@@ -263,26 +292,9 @@ ENDIF()
 
 
 #
-# OpenMP 4.0 can be used for vectorization. Only the vectorization
-# instructions are allowed, the threading must be done through TBB.
+# If we have OpenMP SIMD support (i.e. DEAL_II_HAVE_OPENMP_SIMD is true)
+# populate DEAL_II_OPENMP_SIMD_PRAGMA.
 #
-
-#
-# Choosing the right compiler flag is a bit of a mess:
-#
-IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-  IF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "15" )
-    SET(_keyword "qopenmp")
-  ELSEIF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "14" )
-    SET(_keyword "openmp")
-  ENDIF()
-ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  SET(_keyword "openmp")
-ELSE()
-  SET(_keyword "fopenmp")
-ENDIF()
-
-CHECK_CXX_COMPILER_FLAG("-${_keyword}-simd" DEAL_II_HAVE_OPENMP_SIMD)
 
 SET(DEAL_II_OPENMP_SIMD_PRAGMA " ")
 IF(DEAL_II_HAVE_OPENMP_SIMD)
