@@ -730,6 +730,10 @@ MappingQGeneric<dim, spacedim>::InternalData::initialize(
 
   tensor_product_quadrature = q.is_tensor_product();
 
+  // use of MatrixFree only for higher order elements
+  if (polynomial_degree < 2)
+    tensor_product_quadrature = false;
+
   if (dim > 1)
     {
       // find out if the one-dimensional formula is the same
