@@ -198,8 +198,22 @@ main(int argc, char **argv)
   MPILogInitAll mpi_init_log;
 
   deallog.push("2d");
-  test<2, 1>();
-  test<2, 1, float>();
-  test<2, 1>(false);
+  // given that testers might have different SIMD width, try to run with a
+  // number that has width of 4:
+  if (VectorizedArray<double>::n_array_elements == 4)
+    {
+      test<2, 1, double>();
+      test<2, 1, double>(false);
+    }
+  else if (VectorizedArray<float>::n_array_elements == 4)
+    {
+      test<2, 1, float>();
+      test<2, 1, float>(false);
+    }
+  else
+    {
+      // let's hope that either float and double will have 4 n_array_elements
+      Assert(false, ExcNotImplemented());
+    }
   deallog.pop();
 }
