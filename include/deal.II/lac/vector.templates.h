@@ -83,6 +83,11 @@ namespace internal
   copy_petsc_vector(const PETScWrappers::VectorBase &v,
                     ::dealii::Vector<Number> &       out)
   {
+    if (v.size() == 0)
+      {
+        out.reinit(0);
+        return;
+      }
     // Create a sequential PETSc vector and then copy over the entries into
     // the deal.II vector.
     Vec        sequential_vector;
@@ -125,10 +130,7 @@ namespace internal
 template <typename Number>
 Vector<Number>::Vector(const PETScWrappers::VectorBase &v)
 {
-  if (v.size() != 0)
-    {
-      internal::copy_petsc_vector(v, *this);
-    }
+  internal::copy_petsc_vector(v, *this);
 }
 #endif
 
@@ -164,6 +166,8 @@ Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
       std::copy(start_ptr[0], start_ptr[0] + size(), begin());
+
+      maybe_reset_thread_partitioner();
     }
 }
 
@@ -177,7 +181,6 @@ Vector<Number>::operator=(const Vector<Number> &v)
   if (PointerComparison::equal(this, &v))
     return *this;
 
-  thread_loop_partitioner = v.thread_loop_partitioner;
   if (size() != v.size())
     reinit(v, true);
 
@@ -201,7 +204,6 @@ template <typename Number2>
 inline Vector<Number> &
 Vector<Number>::operator=(const Vector<Number2> &v)
 {
-  thread_loop_partitioner = v.thread_loop_partitioner;
   if (size() != v.size())
     reinit(v, true);
 
@@ -221,41 +223,7 @@ template <typename Number>
 inline void
 Vector<Number>::reinit(const size_type n, const bool omit_zeroing_entries)
 {
-  const std::size_t old_size = size();
-
-  // avoid allocating if the new size is not larger than the old size
-  if (n <= size())
-    {
-      thread_loop_partitioner =
-        std::make_shared<parallel::internal::TBBPartitioner>();
-      if (n == 0)
-        {
-          values.clear();
-        }
-      else if (n != size())
-        values.resize_fast(n);
-
-      if (!omit_zeroing_entries)
-        values.fill();
-      return;
-    }
-
-  // otherwise size() < n and we must allocate
-  AlignedVector<Number> new_values;
-  new_values.resize_fast(n);
-  if (!omit_zeroing_entries)
-    new_values.fill();
-  new_values.swap(values);
-
-  if (old_size != size())
-    {
-      // only reset the partitioner if we actually expect a significant vector
-      // size
-      if (size() >=
-          4 * internal::VectorImplementation::minimum_parallel_grain_size)
-        thread_loop_partitioner =
-          std::make_shared<parallel::internal::TBBPartitioner>();
-    }
+  do_reinit(n, omit_zeroing_entries, true);
 }
 
 
@@ -264,26 +232,9 @@ template <typename Number>
 inline void
 Vector<Number>::grow_or_shrink(const size_type n)
 {
-  const std::size_t old_size = size();
-  if (n == 0)
-    {
-      values.clear();
-      thread_loop_partitioner =
-        std::make_shared<parallel::internal::TBBPartitioner>();
-      return;
-    }
-
   values.resize(n);
 
-  if (old_size != n)
-    {
-      // only reset the partitioner if we actually expect a significant vector
-      // size
-      if (size() >=
-          4 * internal::VectorImplementation::minimum_parallel_grain_size)
-        thread_loop_partitioner =
-          std::make_shared<parallel::internal::TBBPartitioner>();
-    }
+  maybe_reset_thread_partitioner();
 }
 
 
@@ -294,9 +245,8 @@ void
 Vector<Number>::reinit(const Vector<Number2> &v,
                        const bool             omit_zeroing_entries)
 {
+  do_reinit(v.size(), omit_zeroing_entries, false);
   thread_loop_partitioner = v.thread_loop_partitioner;
-
-  reinit(v.size(), omit_zeroing_entries);
 }
 
 
@@ -1043,6 +993,57 @@ std::size_t
 Vector<Number>::memory_consumption() const
 {
   return sizeof(*this) + values.memory_consumption() - sizeof(values);
+}
+
+
+
+template <typename Number>
+void
+Vector<Number>::maybe_reset_thread_partitioner()
+{
+  if (size() >= 4 * internal::VectorImplementation::minimum_parallel_grain_size)
+    {
+      if (thread_loop_partitioner == nullptr)
+        thread_loop_partitioner =
+          std::make_shared<parallel::internal::TBBPartitioner>();
+    }
+  else
+    thread_loop_partitioner.reset();
+}
+
+
+
+template <typename Number>
+void
+Vector<Number>::do_reinit(const size_type new_size,
+                          const bool      omit_zeroing_entries,
+                          const bool      reset_partitioner)
+{
+  if (new_size <= size())
+    {
+      if (new_size == 0)
+        {
+          values.clear();
+        }
+      else
+        {
+          values.resize_fast(new_size);
+          if (!omit_zeroing_entries)
+            values.fill();
+        }
+    }
+  else
+    {
+      // otherwise size() < new_size and we must allocate
+      AlignedVector<Number> new_values;
+      new_values.resize_fast(new_size);
+      if (!omit_zeroing_entries)
+        new_values.fill();
+      new_values.swap(values);
+    }
+
+  if (reset_partitioner)
+    maybe_reset_thread_partitioner();
 }
 
 
