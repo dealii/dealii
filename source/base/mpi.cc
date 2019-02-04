@@ -448,7 +448,7 @@ namespace Utilities
       MPI_Aint     displacements[] = {0, offsetof(MinMaxAvg, min_index)};
       MPI_Datatype types[]         = {MPI_DOUBLE, MPI_INT};
 
-      ierr = MPI_Type_struct(2, lengths, displacements, types, &type);
+      ierr = MPI_Type_create_struct(2, lengths, displacements, types, &type);
       AssertThrowMPI(ierr);
 
       ierr = MPI_Type_commit(&type);
