@@ -186,7 +186,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
   for (unsigned int i = 0; i < dim; ++i)
     return_value += 4.0 * std::pow(p(i), 4.0);
 
-  return 1.; // return_value;
+  return return_value;
 }
 
 
