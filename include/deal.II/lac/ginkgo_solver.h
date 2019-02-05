@@ -100,7 +100,7 @@ namespace GinkgoWrappers
      * deal.II iterative solvers.
      */
     SolverBase(SolverControl &                solver_control,
-               std::shared_ptr<gko::Executor> executor);
+               std::string exec_type);
 
     /**
      * Destructor.
@@ -194,6 +194,13 @@ namespace GinkgoWrappers
      * @todo Templatize based on Matrix type.
      */
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> system_matrix;
+
+    /**
+     * The execution paradigm to be set by the user. The choices are between
+     * `omp`, `cuda` and `reference`
+     * and more details can be found in Ginkgo's documentation.
+     */
+    std::string exec_type;
   };
 
 
@@ -222,7 +229,7 @@ namespace GinkgoWrappers
      * @p executor The execution paradigm for the CG solver.
      */
     SolverCG(SolverControl &                solver_control,
-             std::shared_ptr<gko::Executor> executor,
+             std::string exec_type,
              const AdditionalData &         data = AdditionalData());
 
   /**
@@ -235,7 +242,7 @@ namespace GinkgoWrappers
    * @p executor The execution paradigm for the CG solver.
    */
   SolverCG(SolverControl &                solver_control,
-           std::shared_ptr<gko::Executor> executor,
+           std::string exec_type,
            std::shared_ptr<gko::LinOpFactory> preconditioner,
            const AdditionalData &         data = AdditionalData());
   protected:

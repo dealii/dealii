@@ -33,10 +33,22 @@ namespace GinkgoWrappers
   template <typename ValueType, typename IndexType>
   SolverBase<ValueType, IndexType>::SolverBase(
     SolverControl &                solver_control,
-    std::shared_ptr<gko::Executor> executor)
+    std::string  exec_type)
     : solver_control(solver_control)
-    , executor(executor)
+    , exec_type(exec_type)
   {
+    if (exec_type == "reference") {
+      executor = gko::ReferenceExecutor::create();
+    } else if (exec_type == "omp") {
+      executor = gko::OmpExecutor::create();
+    } else if (exec_type == "cuda" &&
+               gko::CudaExecutor::get_num_devices() > 0) {
+      executor = gko::CudaExecutor::create(0, gko::OmpExecutor::create());
+    } else {
+      std::cerr << "exec_type needs to be one of the three strings: reference, cuda or omp, but provided with"
+                << exec_type<< std::endl;
+      std::exit(-1);
+    }
     using ResidualCriterionFactory = gko::stop::ResidualNormReduction<>;
     residual_criterion             = ResidualCriterionFactory::build()
                            .with_reduction_factor(solver_control.tolerance())
@@ -278,28 +290,28 @@ namespace GinkgoWrappers
   template <typename ValueType, typename IndexType>
   SolverCG<ValueType, IndexType>::SolverCG(
     SolverControl &                solver_control,
-    std::shared_ptr<gko::Executor> executor,
+    std::string exec_type,
     const AdditionalData &         data)
-    : SolverBase<ValueType, IndexType>(solver_control, executor)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
     using cg = gko::solver::Cg<ValueType>;
     this->solver_gen =
-      cg::build().with_criteria(this->combined_factory).on(executor);
+      cg::build().with_criteria(this->combined_factory).on(this->executor);
   }
 
   template <typename ValueType, typename IndexType>
   SolverCG<ValueType, IndexType>::SolverCG(
                                            SolverControl &                solver_control,
-                                           std::shared_ptr<gko::Executor> executor,
+                                           std::string exec_type,
                                            std::shared_ptr<gko::LinOpFactory> preconditioner,
                                            const AdditionalData &         data)
-    : SolverBase<ValueType, IndexType>(solver_control, executor)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
     using cg = gko::solver::Cg<ValueType>;
     this->solver_gen =
-      cg::build().with_criteria(this->combined_factory).with_preconditioner(preconditioner).on(executor);
+      cg::build().with_criteria(this->combined_factory).with_preconditioner(preconditioner).on(this->executor);
   }
   // Explicit instantiations in GinkgoWrappers
 #  define DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
