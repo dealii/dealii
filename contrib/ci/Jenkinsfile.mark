@@ -20,7 +20,13 @@ Settings to apply inside Jenkins:
 
 pipeline
 {
-  agent none
+  agent
+  {
+    docker
+    {
+      image 'dealii/indent'
+    }
+  }
 
   stages
   {
