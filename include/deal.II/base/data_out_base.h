@@ -26,6 +26,9 @@
 
 #include <deal.II/numerics/data_component_interpretation.h>
 
+// To be able to serialize XDMFEntry
+#include <boost/serialization/map.hpp>
+
 #include <limits>
 #include <string>
 #include <tuple>
@@ -3599,7 +3602,7 @@ public:
   serialize(Archive &ar, const unsigned int /*version*/)
   {
     ar &valid &h5_sol_filename &h5_mesh_filename &entry_time &num_nodes
-      &num_cells &dimension &attribute_dims;
+      &num_cells &dimension &space_dimension &attribute_dims;
   }
 
   /**
