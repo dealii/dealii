@@ -42,6 +42,9 @@ pipeline
         {
           steps
           {
+            // we are finally running, so we can mark the 'ready' context from Jenkinsfile.mark as success:
+            githubNotify context: 'ready', description: ':-)',  status: 'SUCCESS'
+
             // We can not use 'indent' because we are missing the master branch:
             // "fatal: ambiguous argument 'master': unknown revision or path"
             sh '''
