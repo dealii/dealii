@@ -987,6 +987,22 @@ private:
   AlignedVector<Number> values;
 
   /**
+   * Convenience function used at the end of initialization or
+   * reinitialization. Resets (if necessary) the loop partitioner to the
+   * correct state, based on its current state and the length of the vector.
+   */
+  void
+  maybe_reset_thread_partitioner();
+
+  /**
+   * Actual implementation of the reinit functions.
+   */
+  void
+  do_reinit(const size_type new_size,
+            const bool      omit_zeroing_entries,
+            const bool      reset_partitioner);
+
+  /**
    * For parallel loops with TBB, this member variable stores the affinity
    * information of loops.
    */
@@ -1275,7 +1291,8 @@ template <typename Number>
 inline void
 Vector<Number>::swap(Vector<Number> &v)
 {
-  std::swap(values, v.values);
+  values.swap(v.values);
+  std::swap(thread_loop_partitioner, v.thread_loop_partitioner);
 }
 
 
@@ -1300,6 +1317,7 @@ Vector<Number>::load(Archive &ar, const unsigned int)
   // the load stuff again from the archive
   ar &static_cast<Subscriptor &>(*this);
   ar &values;
+  maybe_reset_thread_partitioner();
 }
 
 #endif
