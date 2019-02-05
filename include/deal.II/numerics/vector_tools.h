@@ -2163,17 +2163,50 @@ namespace VectorTools
    * vector is deleted. This function is for the case of a scalar finite
    * element.
    *
-   * It is worth noting that delta functions do not exist in reality, and
-   * consequently, using this function does not model any real situation. This
-   * is, because no real object is able to focus an infinite force density
-   * at an infinitesimally small part of the domain. Rather, all real
-   * devices will spread out the force over a finite area. Only if this
-   * area is so small that it cannot be resolved by any mesh does it make
-   * sense to model the situation in a way that uses a delta function with
-   * the same overall force. On the other hand, a situation that is probably
-   * more fruitfully simulated with a delta function is the electric potential
-   * of a point source; in this case, the solution is known to have a
-   * logarithmic singularity (in 2d) or a $\frac{1}{r}$ singularity (in 3d),
+   * This function is typically used in one of these two contexts:
+   * - Let's say you want to solve the same kind of problems many times
+   *   over, with different values for right hand sides or coefficients,
+   *   and then evaluate the solution at the same point every time. You
+   *   could do this by calling VectorTools::point_value() after each
+   *   solve, or you could realize that to evaluate the solution $u_h$
+   *   at a point $p$, you could rearrange operations like this:
+   *   @f{align*}{
+   *     u_h(p) &= \sum_j U_j \varphi_j(p) = \sum_j U_j F_j
+   *       \\   &= U \cdot F
+   *   @f}
+   *   with the vector as defined above. In other words, point evaluation
+   *   can be achieved with just a single vector-vector product, and the
+   *   vector $F$ can be computed once and for all and reused
+   *   for each solve, without having to go through the mesh every time
+   *   to find out which cell (and where in the cell) the point $p$ is
+   *   located.
+   * - This function is also useful if you wanted to compute the Green's
+   *   function for the problem you are solving. This is because the
+   *   Green's function $G(x,p)$ is defined by
+   *   @f{align*}{
+   *     L G(x,p) &= \delta(x-p)$
+   *   @f}
+   *   where $L$ is the differential operator of your problem. The discrete
+   *   version then requires computing the right hand side vector
+   *   $F_i = \int_\Omega \varphi_i(x) \delta(x-p)$, which is exactly
+   *   the vector computed by the current function.
+   *
+   * While maybe not relevant for documenting <i>what</i> this
+   * function does, it may be interesting to note that delta functions
+   * do not exist in reality, and consequently, using this function
+   * does not model any real situation. This is, because no real
+   * object is able to focus an infinite force density at an
+   * infinitesimally small part of the domain (rather, all real
+   * devices will spread out the force over a finite area); nor is it
+   * possible to measure values at individual points (but all
+   * measurements will somehow be averaged over small areas). Only if
+   * this area is so small that it cannot be resolved by any mesh does
+   * it make sense to model the situation in a way that uses a delta
+   * function with the same overall force or sensitivity. On the other
+   * hand, a situation that is probably more fruitfully simulated with
+   * a delta function is the electric potential of a point source; in
+   * this case, the solution is known to have a logarithmic
+   * singularity (in 2d) or a $\frac{1}{r}$ singularity (in 3d),
    * neither of which is bounded.
    *
    * Mathematically, the use of delta functions typically leads to exact
@@ -2610,13 +2643,24 @@ namespace VectorTools
    * point, and return the (vector) value of this function through the last
    * argument.
    *
-   * This function uses a Q1-mapping for the cell the point is evaluated
+   * This function uses a $Q_1$-mapping for the cell the point is evaluated
    * in. If you need to evaluate using a different mapping (for example when
    * using curved boundaries), use the point_difference() function that takes
    * a mapping.
    *
+   * This function is not particularly cheap. This is because it first
+   * needs to find which cell a given point is in, then find the point
+   * on the reference cell that matches the given evaluation point,
+   * and then evaluate the shape functions there. You probably do not
+   * want to use this function to evaluate the solution at <i>many</i>
+   * points. For this kind of application, the FEFieldFunction class
+   * offers at least some optimizations. On the other hand, if you
+   * want to evaluate <i>many solutions</i> at the same point, you may
+   * want to look at the VectorTools::create_point_source_vector()
+   * function.
+   *
    * @note If the cell in which the point is found is not locally owned, an
-   * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
+   *   exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    *
    * @note This function needs to find the cell within which a point lies,
    *   and this can only be done up to a certain numerical tolerance of course.
@@ -2669,6 +2713,17 @@ namespace VectorTools
    * in. If you need to evaluate using a different mapping (for example when
    * using curved boundaries), use the point_difference() function that takes
    * a mapping.
+   *
+   * This function is not particularly cheap. This is because it first
+   * needs to find which cell a given point is in, then find the point
+   * on the reference cell that matches the given evaluation point,
+   * and then evaluate the shape functions there. You probably do not
+   * want to use this function to evaluate the solution at <i>many</i>
+   * points. For this kind of application, the FEFieldFunction class
+   * offers at least some optimizations. On the other hand, if you
+   * want to evaluate <i>many solutions</i> at the same point, you may
+   * want to look at the VectorTools::create_point_source_vector()
+   * function.
    *
    * This function is used in the "Possibilities for extensions" part of the
    * results section of
@@ -2726,6 +2781,17 @@ namespace VectorTools
    * Compared with the other function of the same name, this function uses an
    * arbitrary mapping to evaluate the point value.
    *
+   * This function is not particularly cheap. This is because it first
+   * needs to find which cell a given point is in, then find the point
+   * on the reference cell that matches the given evaluation point,
+   * and then evaluate the shape functions there. You probably do not
+   * want to use this function to evaluate the solution at <i>many</i>
+   * points. For this kind of application, the FEFieldFunction class
+   * offers at least some optimizations. On the other hand, if you
+   * want to evaluate <i>many solutions</i> at the same point, you may
+   * want to look at the VectorTools::create_point_source_vector()
+   * function.
+   *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    *
@@ -2781,6 +2847,17 @@ namespace VectorTools
    * Compared with the other function of the same name, this function uses an
    * arbitrary mapping to evaluate the difference.
    *
+   * This function is not particularly cheap. This is because it first
+   * needs to find which cell a given point is in, then find the point
+   * on the reference cell that matches the given evaluation point,
+   * and then evaluate the shape functions there. You probably do not
+   * want to use this function to evaluate the solution at <i>many</i>
+   * points. For this kind of application, the FEFieldFunction class
+   * offers at least some optimizations. On the other hand, if you
+   * want to evaluate <i>many solutions</i> at the same point, you may
+   * want to look at the VectorTools::create_point_source_vector()
+   * function.
+   *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    *
@@ -2833,6 +2910,17 @@ namespace VectorTools
    *
    * This is a wrapper function using a Q1-mapping for cell boundaries to call
    * the other point_gradient() function.
+   *
+   * This function is not particularly cheap. This is because it first
+   * needs to find which cell a given point is in, then find the point
+   * on the reference cell that matches the given evaluation point,
+   * and then evaluate the shape functions there. You probably do not
+   * want to use this function to evaluate the solution at <i>many</i>
+   * points. For this kind of application, the FEFieldFunction class
+   * offers at least some optimizations. On the other hand, if you
+   * want to evaluate <i>many solutions</i> at the same point, you may
+   * want to look at the VectorTools::create_point_source_vector()
+   * function.
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
@@ -2887,6 +2975,17 @@ namespace VectorTools
    * Compared with the other function of the same name, this is a wrapper
    * function using a Q1-mapping for cells.
    *
+   * This function is not particularly cheap. This is because it first
+   * needs to find which cell a given point is in, then find the point
+   * on the reference cell that matches the given evaluation point,
+   * and then evaluate the shape functions there. You probably do not
+   * want to use this function to evaluate the solution at <i>many</i>
+   * points. For this kind of application, the FEFieldFunction class
+   * offers at least some optimizations. On the other hand, if you
+   * want to evaluate <i>many solutions</i> at the same point, you may
+   * want to look at the VectorTools::create_point_source_vector()
+   * function.
+   *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
    *
@@ -2935,6 +3034,17 @@ namespace VectorTools
    *
    * Compared with the other function of the same name, this function uses an
    * arbitrary mapping for evaluation.
+   *
+   * This function is not particularly cheap. This is because it first
+   * needs to find which cell a given point is in, then find the point
+   * on the reference cell that matches the given evaluation point,
+   * and then evaluate the shape functions there. You probably do not
+   * want to use this function to evaluate the solution at <i>many</i>
+   * points. For this kind of application, the FEFieldFunction class
+   * offers at least some optimizations. On the other hand, if you
+   * want to evaluate <i>many solutions</i> at the same point, you may
+   * want to look at the VectorTools::create_point_source_vector()
+   * function.
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
@@ -2990,6 +3100,17 @@ namespace VectorTools
    *
    * Compared with the other function of the same name, this function uses an
    * arbitrary mapping for evaluation.
+   *
+   * This function is not particularly cheap. This is because it first
+   * needs to find which cell a given point is in, then find the point
+   * on the reference cell that matches the given evaluation point,
+   * and then evaluate the shape functions there. You probably do not
+   * want to use this function to evaluate the solution at <i>many</i>
+   * points. For this kind of application, the FEFieldFunction class
+   * offers at least some optimizations. On the other hand, if you
+   * want to evaluate <i>many solutions</i> at the same point, you may
+   * want to look at the VectorTools::create_point_source_vector()
+   * function.
    *
    * @note If the cell in which the point is found is not locally owned, an
    * exception of type VectorTools::ExcPointNotAvailableHere is thrown.
