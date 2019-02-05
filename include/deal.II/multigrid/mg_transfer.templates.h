@@ -104,34 +104,6 @@ namespace internal
         }
     }
 
-    /**
-     * Adjust vectors on all levels to correct size.  Here, we just count the
-     * numbers of degrees of freedom on each level and @p reinit each level
-     * vector to this length.
-     */
-    template <int dim, typename number, int spacedim>
-    void
-    reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-                  const std::vector<unsigned int> &,
-                  MGLevelObject<LinearAlgebra::distributed::Vector<number>> &v)
-    {
-      const parallel::Triangulation<dim, spacedim> *tria =
-        (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
-          &mg_dof.get_triangulation()));
-
-      for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
-        {
-          if (v[level].size() != mg_dof.locally_owned_mg_dofs(level).size() ||
-              v[level].local_size() !=
-                mg_dof.locally_owned_mg_dofs(level).n_elements())
-            v[level].reinit(mg_dof.locally_owned_mg_dofs(level),
-                            tria != nullptr ? tria->get_communicator() :
-                                              MPI_COMM_SELF);
-          else
-            v[level] = 0.;
-        }
-    }
-
 
 #ifdef DEAL_II_WITH_TRILINOS
     /**
@@ -453,12 +425,37 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_to_mg(
       solution_transfer ? solution_copy_indices_level_mine :
                           copy_indices_level_mine;
 
+  (void)mg_dof_handler;
+
   AssertIndexRange(dst.max_level(),
                    mg_dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level() + 1);
-  internal::MGTransfer::reinit_vector(mg_dof_handler,
-                                      component_to_block_map,
-                                      dst);
+
+  for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
+    if (dst[level].size() != mg_dof_handler.n_dofs(level) ||
+        dst[level].local_size() !=
+          mg_dof_handler.locally_owned_mg_dofs(level).n_elements())
+      {
+        // In case a ghosted level vector has been initialized, we can simply
+        // use that as a template for the vector partitioning. If not, we
+        // resort to the locally owned range of the dof handler.
+        if (level <= ghosted_level_vector.max_level() &&
+            ghosted_level_vector[level].size() == mg_dof_handler.n_dofs(level))
+          dst[level].reinit(ghosted_level_vector[level], false);
+        else
+          {
+            const parallel::Triangulation<dim, spacedim> *tria =
+              (dynamic_cast<const parallel::Triangulation<dim, spacedim> *>(
+                &mg_dof_handler.get_triangulation()));
+            dst[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
+                              tria != nullptr ? tria->get_communicator() :
+                                                MPI_COMM_SELF);
+          }
+      }
+    else if ((perform_plain_copy == false &&
+              perform_renumbered_plain_copy == false) ||
+             level != dst.max_level())
+      dst[level] = 0;
 
   if (perform_plain_copy)
     {
