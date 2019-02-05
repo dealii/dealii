@@ -42,7 +42,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
 
     FOREACH(_module
-        Amesos Epetra Ifpack AztecOO Teuchos Tpetra ML MueLu
+        Amesos Epetra Ifpack AztecOO Teuchos ML MueLu
       )
       ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
@@ -146,7 +146,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     CHECK_MPI_INTERFACE(TRILINOS ${var})
 
     IF (${var})
-      FOREACH(_optional_module EpetraExt ROL Sacado Zoltan)
+      FOREACH(_optional_module EpetraExt ROL Sacado Tpetra Zoltan)
       ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
           MESSAGE(STATUS "Found ${_optional_module}")
@@ -227,8 +227,10 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
   IF (TRILINOS_WITH_MPI)
     SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
-    SET(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
-    SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+    IF (${DEAL_II_TRILINOS_WITH_TPETRA})
+      SET(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
+      SET(DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT "LinearAlgebra::TpetraWrappers::Vector<float>")
+    ENDIF()
   ENDIF()
   IF(${DEAL_II_TRILINOS_WITH_SACADO})
     # Note: Only CMake 3.0 and greater support line continuation with the "\" character

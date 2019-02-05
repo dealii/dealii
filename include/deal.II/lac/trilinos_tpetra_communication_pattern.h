@@ -19,16 +19,14 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
 
-#  ifdef DEAL_II_WITH_MPI
+#  include <deal.II/lac/communication_pattern_base.h>
 
-#    include <deal.II/lac/communication_pattern_base.h>
+#  include <Tpetra_Export.hpp>
+#  include <Tpetra_Import.hpp>
 
-#    include <Tpetra_Export.hpp>
-#    include <Tpetra_Import.hpp>
-
-#    include <memory>
+#  include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -101,8 +99,6 @@ namespace LinearAlgebra
 } // end of namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
-
-#  endif
 
 #endif
 

@@ -31,7 +31,9 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Map.h>
-#  include <Tpetra_Map.hpp>
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <Tpetra_Map.hpp>
+#  endif
 #endif
 
 #if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
@@ -448,9 +450,11 @@ public:
   make_trilinos_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
                     const bool      overlapping  = false) const;
 
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   Tpetra::Map<int, types::global_dof_index>
   make_tpetra_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
                   const bool      overlapping  = false) const;
+#  endif
 #endif
 
 

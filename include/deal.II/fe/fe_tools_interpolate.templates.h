@@ -513,6 +513,7 @@ namespace FETools
       AssertThrow(false, ExcNotImplemented());
     }
 
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <int dim, int spacedim, typename Number>
     void
     back_interpolate(
@@ -527,6 +528,7 @@ namespace FETools
     {
       AssertThrow(false, ExcNotImplemented());
     }
+#  endif
 #endif
 
 

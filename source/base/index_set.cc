@@ -519,6 +519,7 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 Tpetra::Map<int, types::global_dof_index>
 IndexSet::make_tpetra_map(const MPI_Comm &communicator,
@@ -527,7 +528,7 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
   compress();
   (void)communicator;
 
-#  ifdef DEBUG
+#    ifdef DEBUG
   if (!overlapping)
     {
       const size_type n_global_elements =
@@ -549,7 +550,7 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
                         "by any processor, or there are indices that are "
                         "claimed by multiple processors."));
     }
-#  endif
+#    endif
 
   // Find out if the IndexSet is ascending and 1:1. This corresponds to a
   // linear Tpetra::Map. Overlapping IndexSets are never 1:1.
@@ -560,11 +561,11 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
       size(),
       n_elements(),
       0,
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
       Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
-#  else
+#    else
       Teuchos::rcp(new Teuchos::Comm<int>())
-#  endif
+#    endif
     );
   else
     {
@@ -577,14 +578,15 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
         size(),
         arr_view,
         0,
-#  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_WITH_MPI
         Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
-#  else
+#    else
         Teuchos::rcp(new Teuchos::Comm<int>())
-#  endif
+#    endif
       );
     }
 }
+#  endif
 
 
 
@@ -655,7 +657,6 @@ IndexSet::make_trilinos_map(const MPI_Comm &communicator,
     }
 }
 #endif
-
 
 
 bool

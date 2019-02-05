@@ -125,6 +125,7 @@ namespace internal
 
 
 
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <>
   inline void
   ElementAccess<LinearAlgebra::TpetraWrappers::Vector<double>>::add(
@@ -270,6 +271,7 @@ namespace internal
     // We're going to modify the data on host.
     return vector_1d(trilinos_i);
   }
+#  endif
 #endif
 } // namespace internal
 

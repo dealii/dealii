@@ -335,6 +335,7 @@ namespace LinearAlgebra
                std::shared_ptr<const CommunicationPatternBase>());
 
 #  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Imports all the elements present in the vector's IndexSet from the input
      * vector @p tpetra_vec. VectorOperation::values @p operation is used to
@@ -349,6 +350,7 @@ namespace LinearAlgebra
            const std::shared_ptr<const CommunicationPatternBase>
              &communication_pattern =
                std::shared_ptr<const CommunicationPatternBase>());
+#    endif
 
     /**
      * Imports all the elements present in the vector's IndexSet from the input
@@ -609,6 +611,7 @@ namespace LinearAlgebra
 
   protected:
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Import all the elements present in the vector's IndexSet from the input
      * vector @p tpetra_vector. This is an helper function and it should not be
@@ -622,6 +625,7 @@ namespace LinearAlgebra
       const MPI_Comm &        mpi_comm,
       const std::shared_ptr<const CommunicationPatternBase>
         &communication_pattern);
+#  endif
 
     /**
      * Import all the elements present in the vector's IndexSet from the input
@@ -656,6 +660,7 @@ namespace LinearAlgebra
     resize_val(const size_type new_allocated_size);
 
 #if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
      * Return a TpetraWrappers::CommunicationPattern and store it for future
      * use.
@@ -663,6 +668,7 @@ namespace LinearAlgebra
     TpetraWrappers::CommunicationPattern
     create_tpetra_comm_pattern(const IndexSet &source_index_set,
                                const MPI_Comm &mpi_comm);
+#  endif
 
     /**
      * Return a EpetraWrappers::CommunicationPattern and store it for future

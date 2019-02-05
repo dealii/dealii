@@ -1534,6 +1534,7 @@ namespace internal
 
 
 
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
       template <typename ForwardIterator, typename Number>
       static void
       extract_subvector_to(
@@ -1559,6 +1560,7 @@ namespace internal
         for (unsigned int i = 0; i < cache_size; ++i, ++local_values_begin)
           *local_values_begin = read_write_vector[sorted_indices_pos[i]];
       }
+#  endif
 
 
 

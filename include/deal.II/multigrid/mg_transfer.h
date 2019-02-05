@@ -132,6 +132,7 @@ namespace internal
   };
 
 #  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   struct MatrixSelector<dealii::LinearAlgebra::TpetraWrappers::Vector<Number>>
   {
@@ -163,6 +164,7 @@ namespace internal
                     true);
     }
   };
+#    endif
 
   template <>
   struct MatrixSelector<dealii::LinearAlgebra::EpetraWrappers::Vector>
