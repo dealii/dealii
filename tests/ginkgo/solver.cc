@@ -57,11 +57,18 @@ main(int argc, char **argv)
     //                                                               gko::OmpExecutor::create());
     // std::shared_ptr<gko::Executor> exec = gko::OmpExecutor::create();
     std::shared_ptr<gko::Executor> exec = gko::ReferenceExecutor::create();
+    std::shared_ptr<gko::LinOpFactory> jacobi = gko::preconditioner::Jacobi<>::build().on(exec);
     GinkgoWrappers::SolverCG<>     solver(control, exec);
+    GinkgoWrappers::SolverCG<>     solver_with_jacobi_precond(control, exec, jacobi);
 
     check_solver_within_range(solver.solve(A, u, f),
                               control.last_step(),
                               35,
                               39);
+    u = 0.;
+    check_solver_within_range(solver_with_jacobi_precond.solve(A, u, f),
+                              control.last_step(),
+                              29,
+                              33);
   }
 }

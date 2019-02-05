@@ -225,6 +225,19 @@ namespace GinkgoWrappers
              std::shared_ptr<gko::Executor> executor,
              const AdditionalData &         data = AdditionalData());
 
+  /**
+   * Constructor.
+   *
+   * @p solver_control The solver control object is then used to set the
+   * parameters and setup the CG solver from the CG factory which solves the
+   * linear system.
+   *
+   * @p executor The execution paradigm for the CG solver.
+   */
+  SolverCG(SolverControl &                solver_control,
+           std::shared_ptr<gko::Executor> executor,
+           std::shared_ptr<gko::LinOpFactory> preconditioner,
+           const AdditionalData &         data = AdditionalData());
   protected:
     /**
      * Store a copy of the settings for this particular solver.

@@ -288,6 +288,19 @@ namespace GinkgoWrappers
       cg::build().with_criteria(this->combined_factory).on(executor);
   }
 
+  template <typename ValueType, typename IndexType>
+  SolverCG<ValueType, IndexType>::SolverCG(
+                                           SolverControl &                solver_control,
+                                           std::shared_ptr<gko::Executor> executor,
+                                           std::shared_ptr<gko::LinOpFactory> preconditioner,
+                                           const AdditionalData &         data)
+    : SolverBase<ValueType, IndexType>(solver_control, executor)
+    , additional_data(data)
+  {
+    using cg = gko::solver::Cg<ValueType>;
+    this->solver_gen =
+      cg::build().with_criteria(this->combined_factory).with_preconditioner(preconditioner).on(executor);
+  }
   // Explicit instantiations in GinkgoWrappers
 #  define DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
     template _macro(float, int32_t);                               \
