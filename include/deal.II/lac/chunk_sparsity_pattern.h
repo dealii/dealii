@@ -65,9 +65,14 @@ namespace ChunkSparsityPatternIterators
   {
   public:
     /**
+     * Declare the type for container size.
+     */
+    using size_type = types::global_dof_index;
+
+    /**
      * Constructor.
      */
-    Accessor(const ChunkSparsityPattern *matrix, const unsigned int row);
+    Accessor(const ChunkSparsityPattern *matrix, const size_type row);
 
     /**
      * Constructor. Construct the end accessor for the given sparsity pattern.
@@ -166,10 +171,15 @@ namespace ChunkSparsityPatternIterators
   {
   public:
     /**
+     * Declare the type for container size.
+     */
+    using size_type = types::global_dof_index;
+
+    /**
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
      * given row and the index within it.
      */
-    Iterator(const ChunkSparsityPattern *sp, const unsigned int row);
+    Iterator(const ChunkSparsityPattern *sp, const size_type row);
 
     /**
      * Prefix increment.
@@ -865,7 +875,7 @@ private:
 namespace ChunkSparsityPatternIterators
 {
   inline Accessor::Accessor(const ChunkSparsityPattern *sparsity_pattern,
-                            const unsigned int          row)
+                            const size_type             row)
     : sparsity_pattern(sparsity_pattern)
     , reduced_accessor(row == sparsity_pattern->n_rows() ?
                          *sparsity_pattern->sparsity_pattern.end() :
@@ -1039,7 +1049,7 @@ namespace ChunkSparsityPatternIterators
 
 
   inline Iterator::Iterator(const ChunkSparsityPattern *sparsity_pattern,
-                            const unsigned int          row)
+                            const size_type             row)
     : accessor(sparsity_pattern, row)
   {}
 
