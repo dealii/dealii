@@ -2296,15 +2296,15 @@ namespace Patterns
       }
 
     private:
-      template <std::size_t... I>
+      template <std::size_t... U>
       static std::array<std::string, std::tuple_size<T>::value>
       to_string_internal_1(const T &              t,
                            const Patterns::Tuple &pattern,
-                           std_cxx14::index_sequence<I...>)
+                           std_cxx14::index_sequence<U...>)
       {
         std::array<std::string, std::tuple_size<T>::value> a = {
-          {Convert<typename std::tuple_element<I, T>::type>::to_string(
-            std::get<I>(t), pattern.get_pattern(I).clone())...}};
+          {Convert<typename std::tuple_element<U, T>::type>::to_string(
+            std::get<U>(t), pattern.get_pattern(U).clone())...}};
         return a;
       }
 
@@ -2317,15 +2317,15 @@ namespace Patterns
           std_cxx14::make_index_sequence<std::tuple_size<T>::value>{});
       }
 
-      template <std::size_t... I>
+      template <std::size_t... U>
       static T
       to_value_internal_1(const std::vector<std::string> &s,
                           const Patterns::Tuple &         pattern,
-                          std_cxx14::index_sequence<I...>)
+                          std_cxx14::index_sequence<U...>)
       {
         return std::make_tuple(
-          Convert<typename std::tuple_element<I, T>::type>::to_value(
-            s[I], pattern.get_pattern(I).clone())...);
+          Convert<typename std::tuple_element<U, T>::type>::to_value(
+            s[U], pattern.get_pattern(U).clone())...);
       }
 
       static T
