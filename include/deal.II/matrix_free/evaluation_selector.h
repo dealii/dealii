@@ -251,6 +251,17 @@ namespace internal
                    n_q_points_1d,
                    typename std::enable_if<(n_q_points_1d < degree + 3)>::type>
     {
+      /**
+       * We enable a transformation to collocation for derivatives if it gives
+       * correct results (first condition), if it is the most efficient choice
+       * in terms of operation counts (second condition) and if we were able
+       * to initialize the fields in shape_info.templates.h from the
+       * polynomials (third condition).
+       */
+      static constexpr bool      use_collocation =
+        n_q_points_1d > degree &&n_q_points_1d <= 3 * degree / 2 + 1 &&
+        n_q_points_1d < 200;
+
       static inline void
       evaluate(
         const internal::MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
@@ -280,7 +291,7 @@ namespace internal
                            evaluate_values,
                            evaluate_gradients,
                            evaluate_hessians);
-            else if (degree < n_q_points_1d)
+            else if (use_collocation)
               internal::FEEvaluationImplTransformToCollocation<
                 dim,
                 degree,
@@ -352,7 +363,7 @@ namespace internal
                             integrate_values,
                             integrate_gradients,
                             sum_into_values_array);
-            else if (degree < n_q_points_1d)
+            else if (use_collocation)
               internal::FEEvaluationImplTransformToCollocation<
                 dim,
                 degree,
@@ -482,6 +493,17 @@ template <int dim,
 struct SelectEvaluator
 {
   /**
+   * We enable a transformation to collocation for derivatives if it gives
+   * correct results (first condition), if it is the most efficient choice in
+   * terms of operation counts (second condition) and if we were able to
+   * initialize the fields in shape_info.templates.h from the polynomials
+   * (third condition).
+   */
+  static constexpr bool         use_collocation =
+    n_q_points_1d > fe_degree &&n_q_points_1d <= 3 * fe_degree / 2 + 1 &&
+    n_q_points_1d < 200;
+
+  /**
    * Chooses an appropriate evaluation strategy for the evaluate function, i.e.
    * this calls internal::FEEvaluationImpl::evaluate(),
    * internal::FEEvaluationImplCollocation::evaluate() or
@@ -606,9 +628,10 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
                    evaluate_gradients,
                    evaluate_hessians);
     }
-  else if (fe_degree < n_q_points_1d &&
-           shape_info.element_type <=
-             internal::MatrixFreeFunctions::tensor_symmetric)
+  // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
+  // shape_info.h for more details
+  else if (use_collocation && shape_info.element_type <=
+                                internal::MatrixFreeFunctions::tensor_symmetric)
     {
       internal::FEEvaluationImplTransformToCollocation<
         dim,
@@ -625,7 +648,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::evaluate(
                           evaluate_gradients,
                           evaluate_hessians);
     }
-  else if (shape_info.element_type ==
+  else if (shape_info.element_type <=
            internal::MatrixFreeFunctions::tensor_symmetric)
     {
       internal::FEEvaluationImpl<
@@ -739,9 +762,10 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                     integrate_gradients,
                     sum_into_values_array);
     }
-  else if (fe_degree < n_q_points_1d &&
-           shape_info.element_type <=
-             internal::MatrixFreeFunctions::tensor_symmetric)
+  // '<=' on type means tensor_symmetric or tensor_symmetric_hermite, see
+  // shape_info.h for more details
+  else if (use_collocation && shape_info.element_type <=
+                                internal::MatrixFreeFunctions::tensor_symmetric)
     {
       internal::FEEvaluationImplTransformToCollocation<
         dim,
@@ -757,7 +781,7 @@ SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>::integrate(
                            integrate_gradients,
                            sum_into_values_array);
     }
-  else if (shape_info.element_type ==
+  else if (shape_info.element_type <=
            internal::MatrixFreeFunctions::tensor_symmetric)
     {
       internal::FEEvaluationImpl<
