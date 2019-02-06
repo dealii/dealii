@@ -333,11 +333,11 @@ BlockIndices::global_to_local(const size_type i) const
   Assert(i < total_size(), ExcIndexRangeType<size_type>(i, 0, total_size()));
   Assert(n_blocks > 0, ExcLowerRangeType<size_type>(i, size_type(1)));
 
-  unsigned int block = n_blocks - 1;
-  while (i < start_indices[block])
-    --block;
+  // start_indices[0] == 0 so we might as well start from the next one
+  const auto it =
+    --std::upper_bound(++start_indices.begin(), start_indices.end(), i);
 
-  return {block, i - start_indices[block]};
+  return {std::distance(start_indices.begin(), it), i - *it};
 }
 
 

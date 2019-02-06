@@ -1,0 +1,11 @@
+
+DEAL::n_blocks:   10000
+DEAL::block_size: 3
+DEAL::size:       10000
+DEAL::0 -> (0,0)
+DEAL::1 -> (0,1)
+DEAL::1502 -> (500,2)
+DEAL::1800 -> (600,0)
+DEAL::2102 -> (700,2)
+DEAL::29999 -> (9999,2)
+DEAL::

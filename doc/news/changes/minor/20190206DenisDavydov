@@ -1,0 +1,4 @@
+Improved: Use binary search in BlockIndices::global_to_local() to improve performance
+for large number of blocks.
+<br>
+(Denis Davydov, 2019/02/06)
