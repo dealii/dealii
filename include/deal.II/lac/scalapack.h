@@ -203,6 +203,8 @@ public:
    * The user has to ensure that all processes call this with identical @p rank.
    * The @p rank refers to a process of the MPI communicator used to create the process grid
    * of the distributed matrix.
+   *
+   * @note This function requires MPI-3.0 support
    */
   void
   copy_from(const LAPACKFullMatrix<NumberType> &matrix,
@@ -213,6 +215,7 @@ public:
    *
    * @note This function should only be used for relatively small matrix
    * dimensions. It is primarily intended for debugging purposes.
+   * This function requires MPI-3.0 support
    */
   void
   copy_to(FullMatrix<NumberType> &matrix) const;

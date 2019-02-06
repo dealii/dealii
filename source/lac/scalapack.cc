@@ -361,18 +361,19 @@ void
 ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
                                        const unsigned int                  rank)
 {
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
   if (n_rows * n_columns == 0)
     return;
 
   const unsigned int this_mpi_process(
     Utilities::MPI::this_mpi_process(this->grid->mpi_communicator));
 
-#  ifdef DEBUG
+#    ifdef DEBUG
   Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator) == rank,
          ExcMessage("All processes have to call routine with identical rank"));
   Assert(Utilities::MPI::min(rank, this->grid->mpi_communicator) == rank,
          ExcMessage("All processes have to call routine with identical rank"));
-#  endif
+#    endif
 
   // root process has to be active in the grid of A
   if (this_mpi_process == rank)
@@ -484,6 +485,11 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
     MPI_Comm_free(&communicator_B);
 
   state = LAPACKSupport::matrix;
+#  else
+  (void)B;
+  (void)rank;
+  AssertThrow(false, ExcNotImplemented());
+#  endif
 }
 
 
@@ -528,18 +534,19 @@ void
 ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
                                      const unsigned int            rank) const
 {
+#  if DEAL_II_MPI_VERSION_GTE(3, 0)
   if (n_rows * n_columns == 0)
     return;
 
   const unsigned int this_mpi_process(
     Utilities::MPI::this_mpi_process(this->grid->mpi_communicator));
 
-#  ifdef DEBUG
+#    ifdef DEBUG
   Assert(Utilities::MPI::max(rank, this->grid->mpi_communicator) == rank,
          ExcMessage("All processes have to call routine with identical rank"));
   Assert(Utilities::MPI::min(rank, this->grid->mpi_communicator) == rank,
          ExcMessage("All processes have to call routine with identical rank"));
-#  endif
+#    endif
 
   if (this_mpi_process == rank)
     {
@@ -650,6 +657,11 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
   MPI_Group_free(&group_B);
   if (MPI_COMM_NULL != communicator_B)
     MPI_Comm_free(&communicator_B);
+#  else
+  (void)B;
+  (void)rank;
+  AssertThrow(false, ExcNotImplemented());
+#  endif
 }
 
 
