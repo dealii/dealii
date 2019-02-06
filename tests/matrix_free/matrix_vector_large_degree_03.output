@@ -1,0 +1,7 @@
+
+DEAL::Testing FE_Q<2>(20)
+DEAL::Error with 22^2 quadrature points: 7.12679e-13
+DEAL::Error with 100^2 quadrature points: 3.09514e-13
+DEAL::Error with 200^2 quadrature points: 3.05924e-13
+DEAL::Error with 500^2 quadrature points: 3.28960e-13
+DEAL::Error with 1000^2 quadrature points: 3.39364e-13
