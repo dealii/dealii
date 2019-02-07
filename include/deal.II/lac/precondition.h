@@ -871,13 +871,26 @@ private:
  * matrices. This preconditioner is based on an iteration of an inner
  * preconditioner of type @p PreconditionerType with coefficients that are
  * adapted to optimally cover an eigenvalue range between the largest
- * eigenvalue down to a given lower eigenvalue specified by the optional
- * parameter @p smoothing_range. The typical use case for the preconditioner
- * is a Jacobi preconditioner specified through DiagonalMatrix, which is also
- * the default value for the preconditioner. Note that if the degree variable
- * is set to zero, the Chebyshev iteration corresponds to a Jacobi
- * preconditioner (or the underlying preconditioner type) with relaxation
- * parameter according to the specified smoothing range.
+ * eigenvalue $\lambda_{\max{}}$ down to a given lower eigenvalue
+ * $\lambda_{\min{}}$ specified by the optional parameter
+ * @p smoothing_range. The algorithm is based on the following three-term
+ * recurrence:
+ * @f[
+ *  x^{n+1} = x^{n} + \rho_n \rho_{n-1} (x^{n} - x^{n-1}) +
+ *     \frac{\rho_n}{\lambda_{\max{}}-\lambda_{\min{}}} P^{-1} (b-Ax^n).
+ * @f]
+ * where the parameter $rho_0$ is set to $rho_0 =
+ * \frac{\lambda_{\max{}}-\lambda_{\min{}}}{\lambda_{\max{}}+\lambda_{\min{}}}$
+ * for the maximal eigenvalue $\lambda_{\max{}}$ and updated via $\rho_n =
+ * \left(2\frac{\lambda_{\max{}}+\lambda_{\min{}}}
+ * {\lambda_{\max{}}-\lambda_{\min{}}} - \rho_{n-1}\right)^{-1}$.
+ *
+ * The typical use case for the preconditioner is a Jacobi preconditioner
+ * specified through DiagonalMatrix, which is also the default value for the
+ * preconditioner. Note that if the degree variable is set to zero, the
+ * Chebyshev iteration corresponds to a Jacobi preconditioner (or the
+ * underlying preconditioner type) with relaxation parameter according to the
+ * specified smoothing range.
  *
  * Besides the default choice of a pointwise Jacobi preconditioner, this class
  * also allows for more advanced types of preconditioners, for example
@@ -895,11 +908,13 @@ private:
  * The Chebyshev method relies on an estimate of the eigenvalues of the matrix
  * which are computed during the first invocation of vmult(). The algorithm
  * invokes a conjugate gradient solver so symmetry and positive definiteness
- * of the (preconditioned) matrix system are strong requirements. The
- * computation of eigenvalues needs to be deferred until the first vmult()
- * invocation because temporary vectors of the same layout as the source and
- * destination vectors are necessary for these computations and this
- * information gets only available through vmult().
+ * of the (preconditioned) matrix system are strong requirements. As a
+ * consequence, this class only makes sense if it is applied repeatedly,
+ * e.g. in a smoother for a multigrid algorithm. The computation of
+ * eigenvalues needs to be deferred until the first vmult() invocation because
+ * temporary vectors of the same layout as the source and destination vectors
+ * are necessary for these computations and this information gets only
+ * available through vmult().
  *
  * The estimation of eigenvalues can also be bypassed by setting
  * PreconditionChebyshev::AdditionalData::eig_cg_n_iterations to zero and
@@ -976,7 +991,7 @@ public:
     /**
      * Constructor.
      */
-    AdditionalData(const unsigned int degree              = 0,
+    AdditionalData(const unsigned int degree              = 1,
                    const double       smoothing_range     = 0.,
                    const bool         nonzero_starting    = false,
                    const unsigned int eig_cg_n_iterations = 8,
@@ -986,7 +1001,7 @@ public:
     /**
      * This determines the degree of the Chebyshev polynomial. The degree of
      * the polynomial gives the number of matrix-vector products to be
-     * performed for one application of the vmult() operation. Degree zero
+     * performed for one application of the vmult() operation. Degree one
      * corresponds to a damped Jacobi method.
      *
      * If the degree is set to numbers::invalid_unsigned_int, the algorithm
@@ -1132,17 +1147,17 @@ private:
   /**
    * Internal vector used for the <tt>vmult</tt> operation.
    */
-  mutable VectorType update1;
+  mutable VectorType solution_old;
 
   /**
    * Internal vector used for the <tt>vmult</tt> operation.
    */
-  mutable VectorType update2;
+  mutable VectorType temp_vector1;
 
   /**
    * Internal vector used for the <tt>vmult</tt> operation.
    */
-  mutable VectorType update3;
+  mutable VectorType temp_vector2;
 
   /**
    * Stores the additional data passed to the initialize function, obtained
@@ -1172,22 +1187,6 @@ private:
    * overwrite the temporary vectors.
    */
   mutable Threads::Mutex mutex;
-
-  /**
-   * Runs the inner loop of the Chebyshev preconditioner that is the same for
-   * vmult() and step() methods.
-   */
-  void
-  do_chebyshev_loop(VectorType &dst, const VectorType &src) const;
-
-  /**
-   * Runs the inner loop of the Chebyshev preconditioner that is the same for
-   * vmult() and step() methods. Uses a separate function to not force users
-   * to provide both vmult() and Tvmult() in case only one variant is
-   * requested in subsequent calls.
-   */
-  void
-  do_transpose_chebyshev_loop(VectorType &dst, const VectorType &src) const;
 
   /**
    * Initializes the factors theta and delta based on an eigenvalue
@@ -1760,33 +1759,42 @@ namespace internal
     // generic part for non-deal.II vectors
     template <typename VectorType, typename PreconditionerType>
     inline void
-    vector_updates(const VectorType &        src,
+    vector_updates(const VectorType &        rhs,
                    const PreconditionerType &preconditioner,
-                   const bool                start_zero,
+                   const unsigned int        iteration_index,
                    const double              factor1,
                    const double              factor2,
-                   VectorType &              update1,
-                   VectorType &              update2,
-                   VectorType &              update3,
-                   VectorType &              dst)
+                   VectorType &              solution_old,
+                   VectorType &              temp_vector1,
+                   VectorType &              temp_vector2,
+                   VectorType &              solution)
     {
-      if (start_zero)
+      if (iteration_index == 0)
         {
-          update1.equ(factor2, src);
-          preconditioner.vmult(dst, update1);
-          update1.equ(-1., dst);
+          solution.equ(factor2, rhs);
+          preconditioner.vmult(solution_old, solution);
+        }
+      else if (iteration_index == 1)
+        {
+          // compute t = P^{-1} * (b-A*x^{n})
+          temp_vector1.sadd(-1.0, 1.0, rhs);
+          preconditioner.vmult(solution_old, temp_vector1);
+
+          // compute x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * t
+          solution_old.sadd(factor2, 1 + factor1, solution);
         }
       else
         {
-          update2 -= src;
-          preconditioner.vmult(update3, update2);
-          update2 = update3;
-          if (factor1 == 0.)
-            update1.equ(factor2, update2);
-          else
-            update1.sadd(factor1, factor2, update2);
-          dst -= update1;
+          // compute t = P^{-1} * (b-A*x^{n})
+          temp_vector1.sadd(-1.0, 1.0, rhs);
+          preconditioner.vmult(temp_vector2, temp_vector1);
+
+          // compute x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1}) + f_2 * t
+          solution_old.sadd(-factor1, factor2, temp_vector2);
+          solution_old.add(1 + factor1, solution);
         }
+
+      solution.swap(solution_old);
     }
 
     // worker routine for deal.II vectors. Because of vectorization, we need
@@ -1795,23 +1803,22 @@ namespace internal
     template <typename Number>
     struct VectorUpdater
     {
-      VectorUpdater(const Number *src,
-                    const Number *matrix_diagonal_inverse,
-                    const bool    start_zero,
-                    const Number  factor1,
-                    const Number  factor2,
-                    Number *      update1,
-                    Number *      update2,
-                    Number *      dst)
-        : src(src)
+      VectorUpdater(const Number *     rhs,
+                    const Number *     matrix_diagonal_inverse,
+                    const unsigned int iteration_index,
+                    const Number       factor1,
+                    const Number       factor2,
+                    Number *           solution_old,
+                    Number *           tmp_vector,
+                    Number *           solution)
+        : rhs(rhs)
         , matrix_diagonal_inverse(matrix_diagonal_inverse)
-        , do_startup(factor1 == Number())
-        , start_zero(start_zero)
+        , iteration_index(iteration_index)
         , factor1(factor1)
         , factor2(factor2)
-        , update1(update1)
-        , update2(update2)
-        , dst(dst)
+        , solution_old(solution_old)
+        , tmp_vector(tmp_vector)
+        , solution(solution)
       {}
 
       void
@@ -1821,46 +1828,46 @@ namespace internal
         // (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63945), we create
         // copies of the variables factor1 and factor2 and do not check based on
         // factor1.
-        const Number factor1 = this->factor1;
-        const Number factor2 = this->factor2;
-        if (do_startup)
+        const Number factor1        = this->factor1;
+        const Number factor1_plus_1 = 1. + this->factor1;
+        const Number factor2        = this->factor2;
+        if (iteration_index == 0)
           {
-            if (start_zero)
-              DEAL_II_OPENMP_SIMD_PRAGMA
+            DEAL_II_OPENMP_SIMD_PRAGMA
             for (std::size_t i = begin; i < end; ++i)
-              {
-                dst[i]     = factor2 * src[i] * matrix_diagonal_inverse[i];
-                update1[i] = -dst[i];
-              }
-            else DEAL_II_OPENMP_SIMD_PRAGMA for (std::size_t i = begin; i < end;
-                                                 ++i)
-            {
-              update1[i] =
-                ((update2[i] - src[i]) * factor2 * matrix_diagonal_inverse[i]);
-              dst[i] -= update1[i];
-            }
+              solution[i] = factor2 * matrix_diagonal_inverse[i] * rhs[i];
+          }
+        else if (iteration_index == 1)
+          {
+            // x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * P^{-1} * (b-A*x^{n})
+            DEAL_II_OPENMP_SIMD_PRAGMA
+            for (std::size_t i = begin; i < end; ++i)
+              // for efficiency reason, write back to temp_vector that is
+              // already read (avoid read-for-ownership)
+              tmp_vector[i] =
+                factor1_plus_1 * solution[i] +
+                factor2 * matrix_diagonal_inverse[i] * (rhs[i] - tmp_vector[i]);
           }
         else
-          DEAL_II_OPENMP_SIMD_PRAGMA
-        for (std::size_t i = begin; i < end; ++i)
           {
-            const Number update =
-              factor1 * update1[i] +
-              factor2 * ((update2[i] - src[i]) * matrix_diagonal_inverse[i]);
-            update1[i] = update;
-            dst[i] -= update;
+            // x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1})
+            //           + f_2 * P^{-1} * (b-A*x^{n})
+            DEAL_II_OPENMP_SIMD_PRAGMA
+            for (std::size_t i = begin; i < end; ++i)
+              solution_old[i] =
+                factor1_plus_1 * solution[i] - factor1 * solution_old[i] +
+                factor2 * matrix_diagonal_inverse[i] * (rhs[i] - tmp_vector[i]);
           }
       }
 
-      const Number *  src;
-      const Number *  matrix_diagonal_inverse;
-      const bool      do_startup;
-      const bool      start_zero;
-      const Number    factor1;
-      const Number    factor2;
-      mutable Number *update1;
-      mutable Number *update2;
-      mutable Number *dst;
+      const Number *     rhs;
+      const Number *     matrix_diagonal_inverse;
+      const unsigned int iteration_index;
+      const Number       factor1;
+      const Number       factor2;
+      mutable Number *   solution_old;
+      mutable Number *   tmp_vector;
+      mutable Number *   solution;
     };
 
     template <typename Number>
@@ -1894,51 +1901,69 @@ namespace internal
     // selection for diagonal matrix around deal.II vector
     template <typename Number>
     inline void
-    vector_updates(const ::dealii::Vector<Number> &                src,
+    vector_updates(const ::dealii::Vector<Number> &                rhs,
                    const DiagonalMatrix<::dealii::Vector<Number>> &jacobi,
-                   const bool                                      start_zero,
-                   const double                                    factor1,
-                   const double                                    factor2,
-                   ::dealii::Vector<Number> &                      update1,
-                   ::dealii::Vector<Number> &                      update2,
+                   const unsigned int        iteration_index,
+                   const double              factor1,
+                   const double              factor2,
+                   ::dealii::Vector<Number> &solution_old,
+                   ::dealii::Vector<Number> &temp_vector1,
                    ::dealii::Vector<Number> &,
-                   ::dealii::Vector<Number> &dst)
+                   ::dealii::Vector<Number> &solution)
     {
-      VectorUpdater<Number> upd(src.begin(),
+      VectorUpdater<Number> upd(rhs.begin(),
                                 jacobi.get_vector().begin(),
-                                start_zero,
+                                iteration_index,
                                 factor1,
                                 factor2,
-                                update1.begin(),
-                                update2.begin(),
-                                dst.begin());
-      VectorUpdatesRange<Number>(upd, src.size());
+                                solution_old.begin(),
+                                temp_vector1.begin(),
+                                solution.begin());
+      VectorUpdatesRange<Number>(upd, rhs.size());
+
+      // swap vectors x^{n+1}->x^{n}, given the updates in the function above
+      if (iteration_index == 1)
+        {
+          solution.swap(temp_vector1);
+          solution_old.swap(temp_vector1);
+        }
+      else if (iteration_index > 1)
+        solution.swap(solution_old);
     }
 
     // selection for diagonal matrix around parallel deal.II vector
     template <typename Number, typename MemorySpace>
     inline void
     vector_updates(
-      const LinearAlgebra::distributed::Vector<Number, MemorySpace> &src,
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace> &rhs,
       const DiagonalMatrix<
         LinearAlgebra::distributed::Vector<Number, MemorySpace>> &jacobi,
-      const bool                                                  start_zero,
-      const double                                                factor1,
-      const double                                                factor2,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace> &   update1,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace> &   update2,
+      const unsigned int                                       iteration_index,
+      const double                                             factor1,
+      const double                                             factor2,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace> &solution_old,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace> &temp_vector1,
       LinearAlgebra::distributed::Vector<Number, MemorySpace> &,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace> &dst)
+      LinearAlgebra::distributed::Vector<Number, MemorySpace> &solution)
     {
-      VectorUpdater<Number> upd(src.begin(),
+      VectorUpdater<Number> upd(rhs.begin(),
                                 jacobi.get_vector().begin(),
-                                start_zero,
+                                iteration_index,
                                 factor1,
                                 factor2,
-                                update1.begin(),
-                                update2.begin(),
-                                dst.begin());
-      VectorUpdatesRange<Number>(upd, src.local_size());
+                                solution_old.begin(),
+                                temp_vector1.begin(),
+                                solution.begin());
+      VectorUpdatesRange<Number>(upd, rhs.local_size());
+
+      // swap vectors x^{n+1}->x^{n}, given the updates in the function above
+      if (iteration_index == 1)
+        {
+          solution.swap(temp_vector1);
+          solution_old.swap(temp_vector1);
+        }
+      else if (iteration_index > 1)
+        solution.swap(solution_old);
     }
 
     template <typename MatrixType,
@@ -2095,6 +2120,8 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::initialize(
 {
   matrix_ptr = &matrix;
   data       = additional_data;
+  Assert(data.degree > 0,
+         ExcMessage("The degree of the Chebyshev method must be positive."));
   internal::PreconditionChebyshevImplementation::initialize_preconditioner(
     matrix, data.preconditioner, data.matrix_diagonal_inverse);
   eigenvalues_are_initialized = false;
@@ -2112,9 +2139,9 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::clear()
   {
     VectorType empty_vector;
     data.matrix_diagonal_inverse.reinit(empty_vector);
-    update1.reinit(empty_vector);
-    update2.reinit(empty_vector);
-    update3.reinit(empty_vector);
+    solution_old.reinit(empty_vector);
+    temp_vector1.reinit(empty_vector);
+    temp_vector2.reinit(empty_vector);
   }
   data.preconditioner.reset();
 }
@@ -2129,8 +2156,8 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   Assert(eigenvalues_are_initialized == false, ExcInternalError());
   Assert(data.preconditioner.get() != nullptr, ExcNotInitialized());
 
-  update1.reinit(src);
-  update2.reinit(src, true);
+  solution_old.reinit(src);
+  temp_vector1.reinit(src, true);
 
   // calculate largest eigenvalue using a hand-tuned CG iteration on the
   // matrix weighted by its diagonal. we start with a vector that consists of
@@ -2161,11 +2188,15 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
       // set an initial guess which is close to the constant vector but where
       // one entry is different to trigger high frequencies
-      internal::PreconditionChebyshevImplementation::set_initial_guess(update2);
+      internal::PreconditionChebyshevImplementation::set_initial_guess(
+        temp_vector1);
 
       try
         {
-          solver.solve(*matrix_ptr, update1, update2, *data.preconditioner);
+          solver.solve(*matrix_ptr,
+                       solution_old,
+                       temp_vector1,
+                       *data.preconditioner);
         }
       catch (SolverControl::NoConvergence &)
         {}
@@ -2219,24 +2250,21 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
     ->theta = (max_eigenvalue + alpha) * 0.5;
 
-  // We do not need the third auxiliary vector in case we have a
+  // We do not need the second temporary vector in case we have a
   // DiagonalMatrix as preconditioner and use deal.II's own vectors
+  using NumberType = typename VectorType::value_type;
   if (std::is_same<PreconditionerType, DiagonalMatrix<VectorType>>::value ==
         false ||
-      (std::is_same<VectorType,
-                    dealii::Vector<typename VectorType::value_type>>::value ==
-         false &&
-       ((std::is_same<
-           VectorType,
-           LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                              MemorySpace::Host>>::value ==
+      (std::is_same<VectorType, dealii::Vector<NumberType>>::value == false &&
+       ((std::is_same<VectorType,
+                      LinearAlgebra::distributed::
+                        Vector<NumberType, MemorySpace::Host>>::value ==
          false) ||
-        (std::is_same<
-           VectorType,
-           LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                              MemorySpace::CUDA>>::value ==
+        (std::is_same<VectorType,
+                      LinearAlgebra::distributed::
+                        Vector<NumberType, MemorySpace::CUDA>>::value ==
          false))))
-    update3.reinit(src, true);
+    temp_vector2.reinit(src, true);
 
   const_cast<
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
@@ -2247,91 +2275,48 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
-PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  do_chebyshev_loop(VectorType &dst, const VectorType &src) const
-{
-  if (data.degree < 2)
-    return;
-
-  // if delta is zero, we do not need to iterate because the updates will be
-  // zero
-  if (std::abs(delta) < 1e-40)
-    return;
-
-  double rhok = delta / theta, sigma = theta / delta;
-  for (unsigned int k = 0; k < data.degree - 1; ++k)
-    {
-      matrix_ptr->vmult(update2, dst);
-      const double rhokp   = 1. / (2. * sigma - rhok);
-      const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
-      rhok = rhokp;
-      internal::PreconditionChebyshevImplementation::vector_updates(
-        src,
-        *data.preconditioner,
-        false,
-        factor1,
-        factor2,
-        update1,
-        update2,
-        update3,
-        dst);
-    }
-}
-
-
-
-template <typename MatrixType, typename VectorType, typename PreconditionerType>
-inline void
-PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
-  do_transpose_chebyshev_loop(VectorType &dst, const VectorType &src) const
-{
-  if (data.degree < 2)
-    return;
-
-  double rhok = delta / theta, sigma = theta / delta;
-  for (unsigned int k = 0; k < data.degree - 1; ++k)
-    {
-      matrix_ptr->Tvmult(update2, dst);
-      const double rhokp   = 1. / (2. * sigma - rhok);
-      const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
-      rhok = rhokp;
-      internal::PreconditionChebyshevImplementation::vector_updates(
-        src,
-        *data.preconditioner,
-        false,
-        factor1,
-        factor2,
-        update1,
-        update2,
-        update3,
-        dst);
-    }
-}
-
-
-
-template <typename MatrixType, typename VectorType, typename PreconditionerType>
-inline void
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::vmult(
-  VectorType &      dst,
-  const VectorType &src) const
+  VectorType &      solution,
+  const VectorType &rhs) const
 {
   std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
-    estimate_eigenvalues(src);
+    estimate_eigenvalues(rhs);
 
   internal::PreconditionChebyshevImplementation::vector_updates(
-    src,
+    rhs,
     *data.preconditioner,
-    true,
+    0,
     0.,
     1. / theta,
-    update1,
-    update2,
-    update3,
-    dst);
+    solution_old,
+    temp_vector1,
+    temp_vector2,
+    solution);
 
-  do_chebyshev_loop(dst, src);
+  // if delta is zero, we do not need to iterate because the updates will be
+  // zero
+  if (data.degree < 2 || std::abs(delta) < 1e-40)
+    return;
+
+  double rhok = delta / theta, sigma = theta / delta;
+  for (unsigned int k = 0; k < data.degree - 1; ++k)
+    {
+      matrix_ptr->vmult(temp_vector1, solution);
+      const double rhokp   = 1. / (2. * sigma - rhok);
+      const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
+      rhok = rhokp;
+      internal::PreconditionChebyshevImplementation::vector_updates(
+        rhs,
+        *data.preconditioner,
+        k + 1,
+        factor1,
+        factor2,
+        solution_old,
+        temp_vector1,
+        temp_vector2,
+        solution);
+    }
 }
 
 
@@ -2339,25 +2324,45 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::vmult(
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tvmult(
-  VectorType &      dst,
-  const VectorType &src) const
+  VectorType &      solution,
+  const VectorType &rhs) const
 {
   std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
-    estimate_eigenvalues(src);
+    estimate_eigenvalues(rhs);
 
   internal::PreconditionChebyshevImplementation::vector_updates(
-    src,
+    rhs,
     *data.preconditioner,
-    true,
+    0,
     0.,
     1. / theta,
-    update1,
-    update2,
-    update3,
-    dst);
+    solution_old,
+    temp_vector1,
+    temp_vector2,
+    solution);
 
-  do_transpose_chebyshev_loop(dst, src);
+  if (data.degree < 2 || std::abs(delta) < 1e-40)
+    return;
+
+  double rhok = delta / theta, sigma = theta / delta;
+  for (unsigned int k = 0; k < data.degree - 1; ++k)
+    {
+      matrix_ptr->Tvmult(temp_vector1, solution);
+      const double rhokp   = 1. / (2. * sigma - rhok);
+      const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
+      rhok = rhokp;
+      internal::PreconditionChebyshevImplementation::vector_updates(
+        rhs,
+        *data.preconditioner,
+        k + 1,
+        factor1,
+        factor2,
+        solution_old,
+        temp_vector1,
+        temp_vector2,
+        solution);
+    }
 }
 
 
@@ -2365,26 +2370,46 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tvmult(
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
-  VectorType &      dst,
-  const VectorType &src) const
+  VectorType &      solution,
+  const VectorType &rhs) const
 {
   std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
-    estimate_eigenvalues(src);
+    estimate_eigenvalues(rhs);
 
-  matrix_ptr->vmult(update2, dst);
+  matrix_ptr->vmult(temp_vector1, solution);
   internal::PreconditionChebyshevImplementation::vector_updates(
-    src,
+    rhs,
     *data.preconditioner,
-    false,
+    1,
     0.,
     1. / theta,
-    update1,
-    update2,
-    update3,
-    dst);
+    solution_old,
+    temp_vector1,
+    temp_vector2,
+    solution);
 
-  do_chebyshev_loop(dst, src);
+  if (data.degree < 2 || std::abs(delta) < 1e-40)
+    return;
+
+  double rhok = delta / theta, sigma = theta / delta;
+  for (unsigned int k = 0; k < data.degree - 1; ++k)
+    {
+      matrix_ptr->vmult(temp_vector1, solution);
+      const double rhokp   = 1. / (2. * sigma - rhok);
+      const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
+      rhok = rhokp;
+      internal::PreconditionChebyshevImplementation::vector_updates(
+        rhs,
+        *data.preconditioner,
+        k + 2,
+        factor1,
+        factor2,
+        solution_old,
+        temp_vector1,
+        temp_vector2,
+        solution);
+    }
 }
 
 
@@ -2392,26 +2417,46 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline void
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::Tstep(
-  VectorType &      dst,
-  const VectorType &src) const
+  VectorType &      solution,
+  const VectorType &rhs) const
 {
   std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
-    estimate_eigenvalues(src);
+    estimate_eigenvalues(rhs);
 
-  matrix_ptr->Tvmult(update2, dst);
+  matrix_ptr->Tvmult(temp_vector1, solution);
   internal::PreconditionChebyshevImplementation::vector_updates(
-    src,
+    rhs,
     *data.preconditioner,
-    false,
+    1,
     0.,
     1. / theta,
-    update1,
-    update2,
-    update3,
-    dst);
+    solution_old,
+    temp_vector1,
+    temp_vector2,
+    solution);
 
-  do_transpose_chebyshev_loop(dst, src);
+  if (data.degree < 2 || std::abs(delta) < 1e-40)
+    return;
+
+  double rhok = delta / theta, sigma = theta / delta;
+  for (unsigned int k = 0; k < data.degree - 1; ++k)
+    {
+      matrix_ptr->Tvmult(temp_vector1, solution);
+      const double rhokp   = 1. / (2. * sigma - rhok);
+      const double factor1 = rhokp * rhok, factor2 = 2. * rhokp / delta;
+      rhok = rhokp;
+      internal::PreconditionChebyshevImplementation::vector_updates(
+        rhs,
+        *data.preconditioner,
+        k + 2,
+        factor1,
+        factor2,
+        solution_old,
+        temp_vector1,
+        temp_vector2,
+        solution);
+    }
 }
 
 
