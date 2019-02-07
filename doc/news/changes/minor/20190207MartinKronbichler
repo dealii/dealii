@@ -1,0 +1,5 @@
+Improved: The iteration of PreconditionChebyshev has been overhauled to reduce
+the number of vectors written per iteration to one, leading to slightly faster
+execution of the vector updates.
+<br>
+(Martin Kronbichler, 2019/02/07)
