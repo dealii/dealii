@@ -443,11 +443,11 @@ public:
    * these iterators) must be a container itself that provides functions
    * <tt>begin</tt> and <tt>end</tt> designating a range of iterators that
    * describe the contents of one line. Dereferencing these inner iterators
-   * must either yield a pair of a scalar as column index and a
+   * must either yield a pair of an integer as column index and a
    * value of arbitrary type (such a type would be used if we wanted to
-   * describe a sparse matrix with one such object), or simply a scalar (if we
+   * describe a sparse matrix with one such object), or simply an integer (if we
    * only wanted to describe a sparsity pattern). The function is able to
-   * determine itself whether a scalar or a pair is what we get after
+   * determine itself whether an integer or a pair is what we get after
    * dereferencing the inner iterators, through some template magic.
    *
    * While the order of the outer iterators denotes the different rows of the
@@ -470,7 +470,7 @@ public:
    * Note that this example works since the iterators dereferenced yield
    * containers with functions <tt>begin</tt> and <tt>end</tt> (namely
    * <tt>std::vector</tt>s), and the inner iterators dereferenced yield
-   * scalars as column indices. Note that we could have replaced
+   * integers as column indices. Note that we could have replaced
    * each of the two <tt>std::vector</tt> occurrences by <tt>std::list</tt>,
    * and the inner one by <tt>std::set</tt> as well.
    *
@@ -492,7 +492,7 @@ public:
    * @endcode
    *
    * This example works because dereferencing iterators of the inner type
-   * yields a pair of scalars and a value, the first of which we
+   * yields a pair of integers and a value, the first of which we
    * take as column index. As previously, the outer <tt>std::vector</tt> could
    * be replaced by <tt>std::list</tt>, and the inner
    * <tt>std::map<size_type,double></tt> could be replaced by
