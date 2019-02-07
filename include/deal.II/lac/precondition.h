@@ -883,7 +883,10 @@ private:
  * \frac{\lambda_{\max{}}-\lambda_{\min{}}}{\lambda_{\max{}}+\lambda_{\min{}}}$
  * for the maximal eigenvalue $\lambda_{\max{}}$ and updated via $\rho_n =
  * \left(2\frac{\lambda_{\max{}}+\lambda_{\min{}}}
- * {\lambda_{\max{}}-\lambda_{\min{}}} - \rho_{n-1}\right)^{-1}$.
+ * {\lambda_{\max{}}-\lambda_{\min{}}} - \rho_{n-1}\right)^{-1}$. The
+ * Chebyshev polynomial is constructed to strongly damp the eigenvalue range
+ * between $\lambda_{\min{}}$ and $\lambda_{\max{}}$ and is visualized e.g. in
+ * Utilities::LinearAlgebra::chebyshev_filter().
  *
  * The typical use case for the preconditioner is a Jacobi preconditioner
  * specified through DiagonalMatrix, which is also the default value for the
@@ -903,28 +906,52 @@ private:
  * products are %parallel and the inner preconditioner is %parallel). Its use
  * is demonstrated in the step-37 tutorial program.
  *
- * <h4>Algorithm execution</h4>
+ * <h4>Estimation of the eigenvalues</h4>
  *
  * The Chebyshev method relies on an estimate of the eigenvalues of the matrix
  * which are computed during the first invocation of vmult(). The algorithm
  * invokes a conjugate gradient solver so symmetry and positive definiteness
- * of the (preconditioned) matrix system are strong requirements. As a
- * consequence, this class only makes sense if it is applied repeatedly,
- * e.g. in a smoother for a multigrid algorithm. The computation of
- * eigenvalues needs to be deferred until the first vmult() invocation because
+ * of the (preconditioned) matrix system are requirements. The eigenvalue
+ * algorithm can be controlled by
+ * PreconditionChebyshev::AdditionalData::eig_cg_n_iterations specifying how
+ * many iterations should be performed. The iterations are started from an
+ * initial vector that depends on the vector type. For the classes
+ * dealii::Vector or dealii::LinearAlgebra::distributed::Vector, which have
+ * fast element access, it is either a vector with entries `(-5.5, -4.5, -3.5,
+ * -2.5, ..., 3.5, 4.5, 5.5)` with appropriate epilogue and adjusted such that
+ * its mean is always zero, which works well for the Laplacian. For other
+ * vector types, the initial vector contains all ones, scaled by the length of
+ * the vector, except for the very first entry that is zero, triggering
+ * high-frequency content again.
+ *
+ * The computation of eigenvalues happens the first time one of the
+ * vmult(), Tvmult(), step() or Tstep() functions is called. This is because
  * temporary vectors of the same layout as the source and destination vectors
  * are necessary for these computations and this information gets only
  * available through vmult().
  *
- * The estimation of eigenvalues can also be bypassed by setting
- * PreconditionChebyshev::AdditionalData::eig_cg_n_iterations to zero and
- * providing sensible values for the largest eigenvalues in the field
- * PreconditionChebyshev::AdditionalData::max_eigenvalue. If the range
- * <tt>[max_eigenvalue/smoothing_range, max_eigenvalue]</tt> contains all
- * eigenvalues of the preconditioned matrix system and the degree (i.e.,
- * number of iterations) is high enough, this class can also be used as a
- * direct solver. For an error estimation of the Chebyshev iteration that can
- * be used to determine the number of iteration, see Varga (2009).
+ * Due to the cost of the eigenvalue estimate in the first vmult(), this class
+ * is most appropriate if it is applied repeatedly, e.g. in a smoother for a
+ * algorithm.
+ *
+ * <h4>Bypassing the eigenvalue computation</h4>
+ *
+ * In some contexts, the automatic eigenvalue computation of this class may
+ * result in bad quality, or it may be unstable when used in parallel with
+ * different enumerations of the degrees of freedom, making computations
+ * strongly dependent on the parallel configuration. It is possible to bypass
+ * the automatic eigenvalue computation by setting
+ * AdditionalData::eig_cg_n_iterations to zero, and provide the variable
+ * AdditionalData::max_eigenvalue instead. The minimal eigenvalue is
+ * implicitly specified via `max_eigenvalue/smoothing_range`.
+
+ * <h4>Using the PreconditionChebyshev as a solver</h4>
+ *
+ * If the range <tt>[max_eigenvalue/smoothing_range, max_eigenvalue]</tt>
+ * contains all eigenvalues of the preconditioned matrix system and the degree
+ * (i.e., number of iterations) is high enough, this class can also be used as
+ * a direct solver. For an error estimation of the Chebyshev iteration that
+ * can be used to determine the number of iteration, see Varga (2009).
  *
  * In order to use Chebyshev as a solver, set the degree to
  * numbers::invalid_unsigned_int to force the automatic computation of the
@@ -953,11 +980,11 @@ private:
  * PreconditionChebyshev. The preconditioner is held in a shared_ptr that is
  * copied into the AdditionalData member variable of the class, so the
  * variable used for initialization can safely be discarded after calling
- * initialize(). Both the matrix and the preconditioner need to provide @p
- * vmult functions for the matrix-vector product and @p m functions for
+ * initialize(). Both the matrix and the preconditioner need to provide
+ * @p vmult() functions for the matrix-vector product and @p m() functions for
  * accessing the number of rows in the (square) matrix. Furthermore, the
  * matrix must provide <tt>el(i,i)</tt> methods for accessing the matrix
- * diagonal in case the preconditioner type is a diagonal matrix. Even though
+ * diagonal in case the preconditioner type is DiagonalMatrix. Even though
  * it is highly recommended to pass the inverse diagonal entries inside a
  * separate preconditioner object for implementing the Jacobi method (which is
  * the only possible way to operate this class when computing in %parallel
@@ -1040,8 +1067,9 @@ public:
 
     /**
      * Maximum number of CG iterations performed for finding the maximum
-     * eigenvalue. If set to zero, no computations are performed and the
-     * eigenvalues according to the given input are used instead.
+     * eigenvalue. If set to zero, no computations are performed. Instead, the
+     * user must supply a largest eigenvalue via the variable
+     * PreconditionChebyshev::AdditionalData::max_eigenvalue.
      */
     unsigned int eig_cg_n_iterations;
 
@@ -2265,6 +2293,11 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
                         Vector<NumberType, MemorySpace::CUDA>>::value ==
          false))))
     temp_vector2.reinit(src, true);
+  else
+    {
+      VectorType empty_vector;
+      temp_vector2.reinit(empty_vector);
+    }
 
   const_cast<
     PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(this)
