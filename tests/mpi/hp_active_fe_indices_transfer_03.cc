@@ -1,0 +1,104 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+
+
+// active fe indices transfer on repartitioning
+
+
+#include <deal.II/distributed/cell_weights.h>
+#include <deal.II/distributed/tria.h>
+
+#include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/hp/dof_handler.h>
+
+#include "../tests.h"
+
+
+template <int dim>
+void
+test()
+{
+  const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+
+  // ------ setup ------
+  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+
+  GridGenerator::subdivided_hyper_cube(tria, 2);
+  tria.refine_global(1);
+  deallog << "cells before: " << tria.n_global_active_cells() << std::endl;
+
+  // prepare FECollection with arbitrary number of entries
+  hp::FECollection<dim> fe_collection;
+  for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+       ++i)
+    fe_collection.push_back(FE_Q<dim>(i + 1));
+
+  // we need to introduce dof_handler to its fe_collection first
+  hp::DoFHandler<dim> dh(tria);
+  dh.set_fe(fe_collection);
+
+  for (auto &cell : dh.active_cell_iterators())
+    if (cell->is_locally_owned())
+      {
+        // set active fe index
+        if (!(cell->is_artificial()))
+          cell->set_active_fe_index(myid);
+
+        deallog << "myid=" << myid << " cellid=" << cell->id()
+                << " fe_index=" << cell->active_fe_index() << std::endl;
+      }
+
+  // ----- transfer -----
+  parallel::CellWeights<dim> cell_weights(dh);
+  cell_weights.register_ndofs_weighting(100000);
+
+  tria.repartition();
+
+  deallog << "cells after: " << tria.n_global_active_cells() << std::endl;
+
+  // ------ verify ------
+  // check if all children adopted the correct id
+  for (auto &cell : dh.active_cell_iterators())
+    if (cell->is_locally_owned())
+      deallog << "myid=" << myid << " cellid=" << cell->id()
+              << " fe_index=" << cell->active_fe_index() << std::endl;
+
+  // for further calculations, distribute dofs, i.e.
+  // dh.distribute_dofs(fe_collection);
+
+  // make sure no processor is hanging
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  deallog << "OK" << std::endl;
+}
+
+
+int
+main(int argc, char *argv[])
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    log;
+
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
+  deallog.push("3d");
+  test<3>();
+  deallog.pop();
+}

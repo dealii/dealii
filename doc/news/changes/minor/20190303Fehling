@@ -1,0 +1,5 @@
+New: Signals Triangulation::pre_distributed_repartition and
+Triangulation::post_distributed_repartition which will be triggered in
+parallel::distributed::Triangulation::repartition().
+<br>
+(Marc Fehling, 2019/03/03)

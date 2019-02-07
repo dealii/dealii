@@ -1655,6 +1655,17 @@ namespace hp
             DoFHandler<dim, spacedim>>>(*this);
 
         tria_listeners.push_back(
+          this->tria->signals.pre_distributed_repartition.connect(std::bind(
+            &DoFHandler<dim,
+                        spacedim>::pre_distributed_active_fe_index_transfer,
+            std::ref(*this))));
+        tria_listeners.push_back(
+          this->tria->signals.post_distributed_repartition.connect(std::bind(
+            &DoFHandler<dim,
+                        spacedim>::post_distributed_active_fe_index_transfer,
+            std::ref(*this))));
+
+        tria_listeners.push_back(
           this->tria->signals.pre_distributed_refinement.connect(std::bind(
             &DoFHandler<dim,
                         spacedim>::pre_distributed_active_fe_index_transfer,

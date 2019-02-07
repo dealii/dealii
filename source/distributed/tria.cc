@@ -4085,6 +4085,9 @@ namespace parallel
               "Error: There shouldn't be any cells flagged for coarsening/refinement when calling repartition()."));
 #  endif
 
+      // signal that repartitioning is going to happen
+      this->signals.pre_distributed_repartition();
+
       // before repartitioning the mesh let others attach mesh related info
       // (such as SolutionTransfer data) to the p4est
       std::vector<typename dealii::internal::p4est::types<dim>::gloidx>
@@ -4160,6 +4163,12 @@ namespace parallel
 
       // update how many cells, edges, etc, we store locally
       this->update_number_cache();
+
+      // signal that repartitioning is finished,
+      // this is triggered before update_periodic_face_map
+      // to be consistent with the serial triangulation class
+      this->signals.post_distributed_repartition();
+
       this->update_periodic_face_map();
     }
 
