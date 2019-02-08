@@ -596,7 +596,6 @@ namespace Step20
 
     // Then, we will create corresponding LinearOperator objects and create
     // the <code>op_M_inv</code> operator:
-
     const auto op_M = linear_operator(M);
     const auto op_B = linear_operator(B);
 
@@ -611,7 +610,6 @@ namespace Step20
     // This puts us in the position to be able to declare the Schur
     // complement <code>op_S</code> and the approximate Schur complement
     // <code>op_aS</code>:
-
     const auto op_S = transpose_operator(op_B) * op_M_inv * op_B;
     const auto op_aS =
       transpose_operator(op_B) * linear_operator(preconditioner_M) * op_B;
@@ -619,7 +617,6 @@ namespace Step20
     // We now create a preconditioner out of <code>op_aS</code> that
     // applies a few number of CG iterations (until a very modest relative
     // reduction of $10^{-16}$ is reached):
-
     ReductionControl     reduction_control_aS(2000, 1.e-18, 1.0e-6);
     SolverCG<>           solver_aS(reduction_control_aS);
     PreconditionIdentity preconditioner_aS;
@@ -631,7 +628,6 @@ namespace Step20
     // $B^TM^{-1}F-G$, which is what we compute in the first few lines. We
     // then solve the first equation with a CG solver and the
     // preconditioner we just declared.
-
     const auto schur_rhs = transpose_operator(op_B) * op_M_inv * F - G;
 
     SolverControl solver_control_S(2000, 1.e-12);
@@ -649,7 +645,6 @@ namespace Step20
     // reads $MU=-BP+F$, and we solve it by first computing the right hand
     // side, and then multiplying it with the object that represents the
     // inverse of the mass matrix:
-
     U = op_M_inv * (F - op_B * P);
   }
 
