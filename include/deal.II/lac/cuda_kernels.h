@@ -451,12 +451,12 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
-      template <typename Number>
+      template <typename Number, typename IndexType>
       __global__ void
-      set_permutated(Number *         val,
+      set_permutated(const IndexType *indices,
+                     Number *         val,
                      const Number *   v,
-                     const size_type *indices,
-                     const size_type  N);
+                     const IndexType  N);
 
 
 
@@ -469,8 +469,8 @@ namespace LinearAlgebra
       template <typename Number, typename IndexType>
       __global__ void
       gather(Number *         val,
-             const Number *   v,
              const IndexType *indices,
+             const Number *   v,
              const IndexType  N);
 
 
@@ -483,9 +483,9 @@ namespace LinearAlgebra
        */
       template <typename Number>
       __global__ void
-      add_permutated(Number *         val,
+      add_permutated(const size_type *indices,
+                     Number *         val,
                      const Number *   v,
-                     const size_type *indices,
                      const size_type  N);
     } // namespace kernel
   }   // namespace CUDAWrappers

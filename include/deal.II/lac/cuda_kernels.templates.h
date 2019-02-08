@@ -533,12 +533,12 @@ namespace LinearAlgebra
 
 
 
-      template <typename Number>
+      template <typename Number, typename IndexType>
       __global__ void
-      set_permutated(Number *         val,
+      set_permutated(const IndexType *indices,
+                     Number *         val,
                      const Number *   v,
-                     const size_type *indices,
-                     const size_type  N)
+                     const IndexType  N)
       {
         const size_type idx_base =
           threadIdx.x + blockIdx.x * (blockDim.x * chunk_size);
@@ -555,8 +555,8 @@ namespace LinearAlgebra
       template <typename Number, typename IndexType>
       __global__ void
       gather(Number *         val,
-             const Number *   v,
              const IndexType *indices,
+             const Number *   v,
              const IndexType  N)
       {
         const IndexType idx_base =
@@ -573,9 +573,9 @@ namespace LinearAlgebra
 
       template <typename Number>
       __global__ void
-      add_permutated(Number *         val,
+      add_permutated(const size_type *indices,
+                     Number *         val,
                      const Number *   v,
-                     const size_type *indices,
                      const size_type  N)
       {
         const size_type idx_base =

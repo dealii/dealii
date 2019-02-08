@@ -94,12 +94,12 @@ namespace LinearAlgebra
                  const float *   V_val,
                  const size_type N);
       template __global__ void
-      equ(float *         val,
-          const float     a,
-          const float *   V_val,
-          const float     b,
-          const float *   W_val,
-          const size_type N);
+      equ<float>(float *         val,
+                 const float     a,
+                 const float *   V_val,
+                 const float     b,
+                 const float *   W_val,
+                 const size_type N);
       template __global__ void
       add_and_dot<float>(float *         res,
                          float *         v1,
@@ -110,19 +110,19 @@ namespace LinearAlgebra
       template __global__ void
       set<float>(float *val, const float s, const size_type N);
       template __global__ void
-      set_permutated<float>(float *          val,
-                            const float *    v,
-                            const size_type *indices,
-                            const size_type  N);
+      set_permutated<float, size_type>(const size_type *indices,
+                                       float *          val,
+                                       const float *    v,
+                                       const size_type  N);
       template __global__ void
-      gather(float *          val,
-             const float *    v,
-             const size_type *indices,
-             const size_type  N);
+      gather<float, size_type>(float *          val,
+                               const size_type *indices,
+                               const float *    v,
+                               const size_type  N);
       template __global__ void
-      add_permutated<float>(float *          val,
+      add_permutated<float>(const size_type *indices,
+                            float *          val,
                             const float *    v,
-                            const size_type *indices,
                             const size_type  N);
 
 
@@ -194,12 +194,12 @@ namespace LinearAlgebra
                   const double *  V_val,
                   const size_type N);
       template __global__ void
-      equ(double *        val,
-          const double    a,
-          const double *  V_val,
-          const double    b,
-          const double *  W_val,
-          const size_type N);
+      equ<double>(double *        val,
+                  const double    a,
+                  const double *  V_val,
+                  const double    b,
+                  const double *  W_val,
+                  const size_type N);
       template __global__ void
       add_and_dot<double>(double *        res,
                           double *        v1,
@@ -210,19 +210,19 @@ namespace LinearAlgebra
       template __global__ void
       set<double>(double *val, const double s, const size_type N);
       template __global__ void
-      set_permutated<double>(double *         val,
-                             const double *   v,
-                             const size_type *indices,
-                             const size_type  N);
+      set_permutated<double, size_type>(const size_type *indices,
+                                        double *         val,
+                                        const double *   v,
+                                        const size_type  N);
       template __global__ void
-      gather(double *         val,
-             const double *   v,
-             const size_type *indices,
-             const size_type  N);
+      gather<double, size_type>(double *         val,
+                                const size_type *indices,
+                                const double *   v,
+                                const size_type  N);
       template __global__ void
-      add_permutated<double>(double *         val,
+      add_permutated<double>(const size_type *indices,
+                             double *         val,
                              const double *   v,
-                             const size_type *indices,
                              const size_type  N);
     } // namespace kernel
   }   // namespace CUDAWrappers

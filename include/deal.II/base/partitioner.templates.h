@@ -161,8 +161,8 @@ namespace Utilities
               ::dealii::LinearAlgebra::CUDAWrappers::kernel::
                 gather<<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
                   temp_array_ptr,
-                  locally_owned_array.data(),
                   import_indices_plain_dev[i].first.get(),
+                  locally_owned_array.data(),
                   import_indices_plain_dev[i].second);
             }
           else
