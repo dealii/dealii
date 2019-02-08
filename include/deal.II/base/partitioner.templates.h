@@ -105,47 +105,9 @@ namespace Utilities
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
-        {
-          if (import_indices_plain_dev.size() == 0)
-            {
-              import_indices_plain_dev.reserve(n_import_targets);
-              for (unsigned int i = 0; i < n_import_targets; i++)
-                {
-                  // Expand the indices on the host
-                  std::vector<std::pair<unsigned int, unsigned int>>::
-                    const_iterator my_imports =
-                                     import_indices_data.begin() +
-                                     import_indices_chunks_by_rank_data[i],
-                                   end_my_imports =
-                                     import_indices_data.begin() +
-                                     import_indices_chunks_by_rank_data[i + 1];
-                  std::vector<unsigned int> import_indices_plain_host;
-                  for (; my_imports != end_my_imports; ++my_imports)
-                    {
-                      const unsigned int chunk_size =
-                        my_imports->second - my_imports->first;
-                      for (unsigned int j = 0; j < chunk_size; ++j)
-                        import_indices_plain_host.push_back(my_imports->first +
-                                                            j);
-                    }
-
-                  // Move the indices to the device
-                  import_indices_plain_dev.emplace_back(std::make_pair(
-                    std::unique_ptr<unsigned int[], void (*)(unsigned int *)>(
-                      nullptr,
-                      Utilities::CUDA::delete_device_data<unsigned int>),
-                    import_indices_plain_host.size()));
-
-                  import_indices_plain_dev[i].first.reset(
-                    Utilities::CUDA::allocate_device_data<unsigned int>(
-                      import_indices_plain_dev[i].second));
-                  Utilities::CUDA::copy_to_dev(
-                    import_indices_plain_host,
-                    import_indices_plain_dev[i].first.get());
-                }
-            }
-        }
+      if ((std::is_same<MemorySpaceType, MemorySpace::CUDA>::value) &&
+          (import_indices_plain_dev.size() == 0))
+        initialize_import_indices_plain_dev();
 #    endif
 
       for (unsigned int i = 0; i < n_import_targets; i++)
