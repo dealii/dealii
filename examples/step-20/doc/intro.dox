@@ -249,7 +249,7 @@ program we do that in the following way:
     for (unsigned int i=0; i<dofs_per_cell; ++i)
       for (unsigned int j=0; j<dofs_per_cell; ++j)
         local_matrix(i,j) += (fe_values[velocities].value (i, q) *
- 		              k_inverse_values[q] *
+                              k_inverse_values[q] *
                               fe_values[velocities].value (j, q)
                               -
                               fe_values[velocities].divergence (i, q) *
@@ -303,9 +303,9 @@ The final result then looks like this, working in every space dimension:
 
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               {
-		const Tensor<1,dim> phi_j_u     = fe_values[velocities].value (j, q);
-		const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
-		const double        phi_j_p     = fe_values[pressure].value (j, q);
+                const Tensor<1,dim> phi_j_u     = fe_values[velocities].value (j, q);
+                const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
+                const double        phi_j_p     = fe_values[pressure].value (j, q);
 
                 local_matrix(i,j) += (phi_i_u * k_inverse_values[q] * phi_j_u
                                       - div_phi_i_u * phi_j_p
@@ -333,23 +333,23 @@ the same way as above, i.e. the extractor classes also work on FEFaceValues obje
 
 @code
       for (unsigned int face_no=0;
-	   face_no<GeometryInfo<dim>::faces_per_cell;
-	   ++face_no)
-	if (cell->at_boundary(face_no))
-	  {
-	    fe_face_values.reinit (cell, face_no);
+           face_no<GeometryInfo<dim>::faces_per_cell;
+           ++face_no)
+        if (cell->at_boundary(face_no))
+          {
+            fe_face_values.reinit (cell, face_no);
 
-	    pressure_boundary_values
-	      .value_list (fe_face_values.get_quadrature_points(),
-			   boundary_values);
+            pressure_boundary_values
+              .value_list (fe_face_values.get_quadrature_points(),
+                           boundary_values);
 
-	    for (unsigned int q=0; q<n_face_q_points; ++q)
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		local_rhs(i) += -(fe_face_values[velocities].value (i, q) *
-				  fe_face_values.normal_vector(q) *
-				  boundary_values[q] *
-				  fe_face_values.JxW(q));
-	  }
+            for (unsigned int q=0; q<n_face_q_points; ++q)
+              for (unsigned int i=0; i<dofs_per_cell; ++i)
+                local_rhs(i) += -(fe_face_values[velocities].value (i, q) *
+                                  fe_face_values.normal_vector(q) *
+                                  boundary_values[q] *
+                                  fe_face_values.JxW(q));
+          }
 @endcode
 
 You will find the exact same code as above in the sources for the present
@@ -380,10 +380,11 @@ in the following, we will introduce some techniques that can be used in cases
 like these. Namely, we will consider the linear system as not consisting of one
 large matrix and vectors, but we will want to decompose matrices
 into <i>blocks</i> that correspond to the individual operators that appear in
-the system. We note that the resulting solver is not optimal -- there are much
-better ways, for example those explained in the results section of step-22 or
-the one we use in step-43 for a problem rather similar to the current one --
-but that the goal is to introduce techniques rather than optimal solvers.
+the system. We note that the resulting solver is not optimal -- there are
+much better ways to efficiently compute the system, for example those
+explained in the results section of step-22 or the one we use in step-43
+for a problem similar to the current one. Here, our goal shall be to
+introduce new solution techniques how they can be implemented in deal.II.
 
 
 <h4>Solving using the Schur complement</h4>
@@ -439,115 +440,162 @@ matrix-vector products.
 @note The key point in this consideration is to recognize that to implement
 an iterative solver such as CG or GMRES, we never actually need the actual
 <i>elements</i> of a matrix! All that is required is that we can form
-matrix-vector products. The same is true for preconditioners. In deal.II
-we encode this requirement by only requiring that matrices and preconditioners
-given to solver classes have a <code>vmult()</code> member function that does
-the matrix-vector product. How a class chooses to implement this function is
-not important to the solver. Consequently, classes can implement it by,
-for example, doing a sequence of products and linear solves as discussed
-above.
+matrix-vector products. The same is true for preconditioners. In deal.II we
+encode this requirement by only requiring that matrices and preconditioners
+given to solver classes have a <code>vmult()</code> member function that
+does the matrix-vector product. How a class chooses to implement this
+function is not important to the solver. Consequently, classes can
+implement it by, for example, doing a sequence of products and linear
+solves as discussed above.
 
-Using this strategy, we can then implement a class that provides the
-function <code>vmult()</code> that is all that the SolverCG class
-requires from an object representing a matrix. We can make our life a
-bit easier by also introducing an object that represents $M^{-1}$ and
-that has its own <code>vmult()</code> function that, if called, solves
-the linear system with $M$. Using this (which we will implement as the
-<code>InverseMatrix</code> class in the body of the program), the class
-that implements the Schur only needs to offer the <code>vmult()</code>
-function to perform a matrix-vector multiplication, using the algorithm
-above. Here are again the relevant parts of the code:
 
+<h4>The LinearOperator framework in deal.II</h4>
+
+deal.II includes support for describing such linear operations in a very
+general way. This is done with the LinearOperator class that, like
+@ref ConceptMatrixType "the MatrixType concept",
+defines a minimal interface for <i>applying</i> a linear operation to a
+vector:
 @code
-class SchurComplement : public Subscriptor
+    std::function<void(Range &, const Domain &)> vmult;
+    std::function<void(Range &, const Domain &)> vmult_add;
+    std::function<void(Domain &, const Range &)> Tvmult;
+    std::function<void(Domain &, const Range &)> Tvmult_add;
+@endcode
+The key difference between a LinearOperator and an ordinary matrix is
+however that a LinearOperator does not allow any further access to the
+underlying object. All you can do with a LinearOperator is to apply its
+"action" to a vector! We take the opportunity to introduce the
+LinearOperator concept at this point because it is a very useful tool that
+allows you to construct complex solvers and preconditioners in a very
+intuitive manner.
+
+As a first example let us construct a LinearOperator object that represents
+$M^{-1}$. This means that whenever the <code>vmult()</code> function of
+this operator is called it has to solve a linear system. This requires us
+to specify a solver (and corresponding) preconditioner. Assuming that
+<code>M</code> is a reference to the upper left block of the system matrix
+we can write:
+@code
+    const auto op_M = linear_operator(M);
+
+    PreconditionJacobi<> preconditioner_M;
+    preconditioner_M.initialize(M);
+
+    ReductionControl reduction_control_M(2000, 1.0e-18, 1.0e-10);
+    SolverCG<>    solver_M(reduction_control_M);
+
+    const auto op_M_inv = inverse_operator(op_M, solver_M, preconditioner_M);
+@endcode
+Rather than using a SolverControl we use the ReductionControl class here
+that stops iterations when either an absolute tolerance is reached (for
+which we choose $10^{-18}$) or when the residual is reduced by a certain
+factor (here, $10^{-10}$). In contrast the SolverControl class only checks
+for absolute tolerances. We have to use ReductionControl in our case to
+work around a minor issue: The right hand sides that we  will feed to
+<code>op_M_inv</code> are essentially formed by residuals that naturally
+have vastly differing norms. This makes control by an absolute tolerance
+very error prone.
+
+We now have a LinearOperator <code>op_M_inv</code> that we can use to
+construct more complicated operators such as the Schur complement $S$.
+Assuming that <code>B</code> is a reference to the upper right block
+constructing a LinearOperator <code>op_S</code> is a matter of two lines:
+@code
+    const auto op_B = linear_operator(B);
+    const auto op_S = transpose_operator(op_B) * op_M_inv * op_B;
+@endcode
+Here, the multiplication of three LinearOperator objects yields a composite
+object <code>op_S</code> whose <code>vmult()</code> function first applies
+$B$, then $M^{-1}$ (i.e. solving an equation with $M$), and finally $B^T$
+to any given input vector. In that sense <code>op_S.vmult()</code> is
+similar to the following code:
+@code
+    B.vmult (tmp1, src); // multiply with the top right block: B
+    solver_M(M, tmp2, tmp1, preconditioner_M); // multiply with M^-1
+    B.Tvmult (dst, tmp2); // multiply with the bottom left block: B^T
+@endcode
+(<code>tmp1</code> and <code>tmp2</code> are two temporary vectors).
+
+@note We could have achieved the same goal of creating a "matrix like"
+object by implementing a specialized class <code>SchurComplement</code>
+that provides a suitable <code>vmult()</code> function. Skipping over some
+details this might have looked like the following:
+@code
+class SchurComplement
 {
   public:
-    SchurComplement (const BlockSparseMatrix<double>            &A,
-                     const InverseMatrix<SparseMatrix<double> > &inverse_mass);
 
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
+  // ...
 
-  private:
-    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double> > > inverse_mass;
-
-    mutable Vector<double> tmp1, tmp2;
+  void SchurComplement::vmult (Vector<double>       &dst,
+                               const Vector<double> &src) const
+  {
+    B.vmult (tmp1, src);
+    solver_M(M, tmp2, tmp1, preconditioner_M);
+    B.Tvmult (dst, tmp2);
+  }
 };
-
-
-void SchurComplement::vmult (Vector<double>       &dst,
-                             const Vector<double> &src) const
-{
-  system_matrix->block(0,1).vmult (tmp1, src); // multiply with the top right block: B
-  inverse_mass->vmult (tmp2, tmp1);            // multiply with M^-1
-  system_matrix->block(1,0).vmult (dst, tmp2); // multiply with the bottom left block: B^T
-}
 @endcode
-
-In this code, the constructor takes a reference to a block sparse matrix for
-the entire system, and a reference to the object representing the inverse of
-the mass matrix. It stores these using <code>SmartPointer</code> objects (see
-step-7), and additionally allocates two temporary vectors <code>tmp1</code> and
-<code>tmp2</code> for the vectors labeled $w,y$ in the list above.
-
-In the matrix-vector multiplication function, the product $Sv$ is performed in
-exactly the order outlined above. Note how we access the blocks $B$ and $B^T$
-by calling <code>system_matrix->block(0,1)</code> and
-<code>system_matrix->block(1,0)</code> respectively, thereby picking out
-individual blocks of the block system. Multiplication by $M^{-1}$ happens
-using the object introduced above.
-
-With all this, we can go ahead and write down the solver we are going to
-use. Essentially, all we need to do is form the right hand sides of the two
-equations defining $P$ and $U$, and then solve them with the Schur complement
-matrix and the mass matrix, respectively:
-
+Even though both approaches are exactly equivalent, the LinearOperator
+class has a big advantage over this manual approach.
+It provides so-called <i>syntactic sugar</i>: Mathematically, we think
+about $S$ as being the composite matrix $S=B^TM^{-1}B$ and the
+LinearOperator class allows you to write this out more or less verbatim,
 @code
-template <int dim>
-void MixedLaplaceProblem<dim>::solve ()
-{
-  InverseMatrix<SparseMatrix<double> > inverse_mass (system_matrix.block(0,0));
-  Vector<double> tmp (solution.block(0).size());
-
-  {
-    SchurComplement schur_complement (system_matrix, inverse_mass);
-    Vector<double> schur_rhs (solution.block(1).size());
-    inverse_mass.vmult (tmp, system_rhs.block(0));
-    system_matrix.block(1,0).vmult (schur_rhs, tmp);
-    schur_rhs -= system_rhs.block(1);
-
-    SolverControl solver_control (solution.block(1).size(),
-                                  1e-12*schur_rhs.l2_norm());
-    SolverCG<> cg (solver_control);
-
-    PreconditionIdentity preconditioner;
-    cg.solve (schur_complement, solution.block(1), schur_rhs,
-              preconditioner);
-  }
-
-  {
-    system_matrix.block(0,1).vmult (tmp, solution.block(1));
-    tmp *= -1;
-    tmp += system_rhs.block(0);
-
-    inverse_mass.vmult (solution.block(0), tmp);
-  }
-}
+const auto op_M_inv = inverse_operator(op_M, solver_M, preconditioner_M);
+const auto op_S = transpose_operator(op_B) * op_M_inv * op_B;
 @endcode
+The manual approach on the other hand obscures this fact.
 
-This code looks more impressive than it actually is. At the beginning, we
-declare an object representing $M^{-1}$ and a temporary vector (of the size of
-the first block of the solution, i.e. with as many entries as there are
-velocity unknowns), and the two blocks surrounded by braces then solve the two
-equations for $P$ and $U$, in this order. Most of the code in each of the two
-blocks is actually devoted to constructing the proper right hand sides. For
-the first equation, this would be $B^TM^{-1}F-G$, and $-BP+F$ for the second
-one. The first hand side is then solved with the Schur complement matrix, and
-the second simply multiplied with $M^{-1}$. The code as shown uses no
-preconditioner (i.e. the identity matrix as preconditioner) for the Schur
-complement.
+All that is left for us to do now is to form the right hand sides of the
+two equations defining $P$ and $U$, and then solve them with the Schur
+complement matrix and the mass matrix, respectively. For example the right
+hand side of the first equation reads $B^TM^{-1}F-G$. This could be
+implemented as follows:
+@code
+    Vector<double> schur_rhs (U.size());
+    Vector<double> tmp (P.size());
+    op_M_inv.vmult (tmp, F);
+    transpose_operator(op_B).vmult (schur_rhs, tmp);
+    schur_rhs -= G;
+@endcode
+Again, this is a perfectly valid approach, but the fact that deal.II
+requires us to manually resize the final and temporary vector, and that
+every operation takes up a new line makes this hard to read. This is the
+point where a second class in the linear operator framework can will help
+us. Similarly in spirit to LinearOperator, a PackagedOperation stores a
+"computation":
+@code
+    std::function<void(Range &)> apply;
+    std::function<void(Range &)> apply_add;
+@endcode
+The class allows lazy evaluation of expressions involving vectors and
+linear operators. This is done by storing the computational expression and
+only performing the computation when either the object is converted to a
+vector object, or PackagedOperation::apply() (or
+PackagedOperation::apply_add()) is invoked by hand. Assuming that
+<code>F</code> and <code>G</code> are the two vectors of the right hand
+side we can simply write:
+@code
+    const auto schur_rhs = transpose_operator(op_B) * op_M_inv * F - G;
+@endcode
+Here, <code>schur_rhs</code> is a PackagedOperation that <i>records</i> the
+computation we specified. It does not create a vector with the actual
+result immediately.
 
+With these prerequisites at hand, solving for $P$ and $U$ is a matter of
+creating another solver and inverse:
+@code
+    SolverControl solver_control_S(2000, 1.e-12);
+    SolverCG<>    solver_S(solver_control_S);
+    PreconditionIdentity preconditioner_S;
+
+    const auto op_S_inv = inverse_operator(op_S, solver_S, preconditioner_S);
+
+    P = op_S_inv * schur_rhs;
+    U = op_M_inv * (F - op_B * P);
+@endcode
 
 
 <h4>A preconditioner for the Schur complement</h4>
@@ -579,81 +627,33 @@ this looks almost as expensive as solving with $S$ right away. However, note
 that in the inner iteration, we do not have to calculate $M^{-1}$, but only
 the inverse of its diagonal, which is cheap.
 
-The next step is to define a class that represents this approximate Schur
-complement. This should look very much like the Schur complement class itself,
-except that it doesn't need the object representing $M^{-1}$ any more
-since we can compute the inverse of the diagonal of $M$ on the fly:
-
+Thankfully, the LinearOperator framework makes this very easy to write out.
+We already used a Jacobi preconditioner (<code>preconditioner_M</code>) for
+the $M$ matrix earlier. So all that is left to do is to write out how the
+approximate Schur complement should look like:
 @code
-class ApproximateSchurComplement : public Subscriptor
-{
-public:
-  ApproximateSchurComplement (const BlockSparseMatrix<double> &A);
-
-  void vmult (Vector<double>       &dst,
-              const Vector<double> &src) const;
-
-private:
-  const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-
-  mutable Vector<double> tmp1, tmp2;
-};
-
-
-void
-ApproximateSchurComplement::vmult
-  (Vector<double>       &dst,
-   const Vector<double> &src) const
-  {
-    system_matrix->block(0,1).vmult (tmp1, src);
-    system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
-    system_matrix->block(1,0).vmult (dst, tmp2);
-  }
+    const auto op_aS =
+      transpose_operator(op_B) * linear_operator(preconditioner_M) * op_B;
 @endcode
-
-Note how the <code>vmult</code> function differs in simply doing one Jacobi sweep
+Note how this operator differs in simply doing one Jacobi sweep
 (i.e. multiplying with the inverses of the diagonal) instead of multiplying
-with the full $M^{-1}$. (This is how a single Jacobi preconditioner
-step with $M$ is defined: it is the multiplication with the inverse of
-the diagonal of $M$; in other words, the operation $({\textrm{diag}\
-}M)^{-1}x$ on a vector $x$ is exactly what the function
-SparseMatrix::precondition_Jacobi above does.)
+with the full $M^{-1}$. (This is how a single Jacobi preconditioner step
+with $M$ is defined: it is the multiplication with the inverse of the
+diagonal of $M$; in other words, the operation $({\textrm{diag}\ }M)^{-1}x$
+on a vector $x$ is exactly what PreconditionJacobi does.)
 
 With all this, we nearly already have the preconditioner: it should be the
-inverse of the approximate Schur complement. We implement this with
-the <code>InverseMatrix</code> class:
-
+inverse of the approximate Schur complement. We implement this again with
+the inverse_operator() function
 @code
-  ApproximateSchurComplement approximate_schur (system_matrix);
-  InverseMatrix<ApproximateSchurComplement> approximate_inverse
-  (approximate_schur);
+    ReductionControl     reduction_control_aS(2000, 1.e-18, 1.0e-6);
+    SolverCG<>           solver_aS(reduction_control_aS);
+    PreconditionIdentity preconditioner_aS;
+    const auto preconditioner_S =
+      inverse_operator(op_aS, solver_aS, preconditioner_aS);
 @endcode
 
 That's all!
-
-Taken together, the first block of our <code>solve()</code> function will then
-look like this:
-
-@code
-      SchurComplement schur_complement (system_matrix, inverse_mass);
-      Vector<double> schur_rhs (solution.block(1).size());
-      inverse_mass.vmult (tmp, system_rhs.block(0));
-      system_matrix.block(1,0).vmult (schur_rhs, tmp);
-      schur_rhs -= system_rhs.block(1);
-
-      SolverControl solver_control (solution.block(1).size(),
-                                    1e-12*schur_rhs.l2_norm());
-      SolverCG<> cg (solver_control);
-
-      ApproximateSchurComplement approximate_schur (system_matrix);
-      InverseMatrix<ApproximateSchurComplement> approximate_inverse
-      (approximate_schur);
-      cg.solve (schur_complement, solution.block(1), schur_rhs,
-                approximate_inverse);
-@endcode
-
-Note how we pass the so-defined preconditioner to the solver working on the
-Schur complement matrix.
 
 Obviously, applying this inverse of the approximate Schur complement is a very
 expensive preconditioner, almost as expensive as inverting the Schur
@@ -668,16 +668,6 @@ pronounced on finer meshes and with elements of higher order. For example, a
 six times refined mesh and using elements of order 2 yields an improvement of
 318 to 12 outer iterations, at a runtime of 338 seconds to 229 seconds. Not
 earth shattering, but significant.
-
-
-<h4>A remark on similar functionality in deal.II</h4>
-
-As a final remark about solvers and preconditioners, let us note that a
-significant amount of functionality introduced above is actually also present
-in the library itself. It probably even is more powerful and general, but we
-chose to introduce this material here anyway to demonstrate how to work with
-block matrices and to develop solvers and preconditioners, rather than using
-black box components from the library.
 
 
 <h3>Definition of the test case</h3>
