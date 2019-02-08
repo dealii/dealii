@@ -950,7 +950,7 @@ namespace Step37
     // do not have the matrix elements available explicitly, and it is
     // difficult to make it work efficiently in %parallel.)  The smoother is
     // initialized with our level matrices and the mandatory additional data
-    // for the Chebyshev smoother. We use a relatively high degree here (4),
+    // for the Chebyshev smoother. We use a relatively high degree here (5),
     // since matrix-vector products are comparably cheap. We choose to smooth
     // out a range of $[1.2 \hat{\lambda}_{\max}/15,1.2 \hat{\lambda}_{\max}]$
     // in the smoother where $\hat{\lambda}_{\max}$ is an estimate of the
@@ -1002,7 +1002,7 @@ namespace Step37
         if (level > 0)
           {
             smoother_data[level].smoothing_range     = 15.;
-            smoother_data[level].degree              = 4;
+            smoother_data[level].degree              = 5;
             smoother_data[level].eig_cg_n_iterations = 10;
           }
         else

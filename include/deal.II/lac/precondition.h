@@ -2250,13 +2250,16 @@ inline void
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   do_chebyshev_loop(VectorType &dst, const VectorType &src) const
 {
+  if (data.degree < 2)
+    return;
+
   // if delta is zero, we do not need to iterate because the updates will be
   // zero
   if (std::abs(delta) < 1e-40)
     return;
 
   double rhok = delta / theta, sigma = theta / delta;
-  for (unsigned int k = 0; k < data.degree; ++k)
+  for (unsigned int k = 0; k < data.degree - 1; ++k)
     {
       matrix_ptr->vmult(update2, dst);
       const double rhokp   = 1. / (2. * sigma - rhok);
@@ -2282,8 +2285,11 @@ inline void
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   do_transpose_chebyshev_loop(VectorType &dst, const VectorType &src) const
 {
+  if (data.degree < 2)
+    return;
+
   double rhok = delta / theta, sigma = theta / delta;
-  for (unsigned int k = 0; k < data.degree; ++k)
+  for (unsigned int k = 0; k < data.degree - 1; ++k)
     {
       matrix_ptr->Tvmult(update2, dst);
       const double rhokp   = 1. / (2. * sigma - rhok);

@@ -59,7 +59,7 @@ main()
                             SparseILU<double>>::AdditionalData cheby_data;
       cheby_data.preconditioner.reset(new SparseILU<double>());
       cheby_data.preconditioner->initialize(A);
-      cheby_data.degree          = 10;
+      cheby_data.degree          = 11;
       cheby_data.smoothing_range = 40;
       cheby.initialize(A, cheby_data);
 

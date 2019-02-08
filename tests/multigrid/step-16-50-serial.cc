@@ -470,6 +470,7 @@ int
 main()
 {
   initlog();
+  deallog << std::setprecision(10);
 
   try
     {

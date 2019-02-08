@@ -398,7 +398,7 @@ LaplaceProblem<dim>::solve()
                                     mg_smoother;
   typename Smoother::AdditionalData smoother_data;
   smoother_data.smoothing_range     = 20.;
-  smoother_data.degree              = 2;
+  smoother_data.degree              = 3;
   smoother_data.eig_cg_n_iterations = 20;
   mg_smoother.initialize(mg_matrices, smoother_data);
 

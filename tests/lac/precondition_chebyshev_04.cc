@@ -87,7 +87,7 @@ check()
                         Vector<double>,
                         DiagonalMatrixManual>::AdditionalData data;
   data.smoothing_range = 2 * size;
-  data.degree          = 3;
+  data.degree          = 4;
   data.preconditioner.reset(new DiagonalMatrixManual());
   data.preconditioner->set_vector_one(size);
   prec.initialize(m, data);
