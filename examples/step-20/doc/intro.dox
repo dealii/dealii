@@ -554,8 +554,8 @@ complement matrix and the mass matrix, respectively. For example the right
 hand side of the first equation reads $B^TM^{-1}F-G$. This could be
 implemented as follows:
 @code
-    Vector<double> schur_rhs (U.size());
-    Vector<double> tmp (P.size());
+    Vector<double> schur_rhs (P.size());
+    Vector<double> tmp (U.size());
     op_M_inv.vmult (tmp, F);
     transpose_operator(op_B).vmult (schur_rhs, tmp);
     schur_rhs -= G;

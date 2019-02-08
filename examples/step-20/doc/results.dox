@@ -3,33 +3,34 @@
 <h3>Output of the program and graphical visualization</h3>
 
 
-If we run the program as is, we get this output for the $8\times 8$
-mesh we use (for a total of 64 cells with 64 pressure degrees of
-freedom since we use piecewise constants, and 144 velocities because
+If we run the program as is, we get this output for the $32\times 32$
+mesh we use (for a total of 1024 cells with 1024 pressure degrees of
+freedom since we use piecewise constants, and 2112 velocities because
 the Raviart-Thomas element defines one degree per freedom per face and
-there are 72 faces parallel to the $x$-axis and the same number
-parallel to the $y$-axis):
+there are $1024 + 32 = 1056$ faces parallel to the $x$-axis and the same
+number parallel to the $y$-axis):
 @verbatim
 \$ make run
 [ 66%] Built target \step-20
 Scanning dependencies of target run
 [100%] Run \step-20 with Release configuration
-Number of active cells: 64
-Total number of cells: 85
-Number of degrees of freedom: 208 (144+64)
-15 CG Schur complement iterations to obtain convergence.
-Errors: ||e_p||_L2 = 0.178055,   ||e_u||_L2 = 0.0433435
+Number of active cells: 1024
+Total number of cells: 1365
+Number of degrees of freedom: 3136 (2112+1024)
+24 CG Schur complement iterations to obtain convergence.
+Errors: ||e_p||_L2 = 0.0445032,   ||e_u||_L2 = 0.010826
 [100%] Built target run
 @endverbatim
 
-The fact that the number of iterations is so small, of course, is due to good
-(but expensive!) preconditioner we have developed. To get confidence in the
-solution, let us take a look at it. The following three images show (from left
-to right) the x-velocity, the y-velocity, and the pressure:
+The fact that the number of iterations is so small, of course, is due to
+the good (but expensive!) preconditioner we have developed. To get
+confidence in the solution, let us take a look at it. The following three
+images show (from left to right) the x-velocity, the y-velocity, and the
+pressure:
 
-<img src="https://www.dealii.org/images/steps/developer/step-20.u.png" alt="">
-<img src="https://www.dealii.org/images/steps/developer/step-20.v.png" alt="">
-<img src="https://www.dealii.org/images/steps/developer/step-20.p.png" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-20.u_new.jpg" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-20.v_new.jpg" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-20.p_new.jpg" alt="">
 
 
 

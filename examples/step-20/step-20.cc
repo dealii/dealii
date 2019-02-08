@@ -327,7 +327,7 @@ namespace Step20
   void MixedLaplaceProblem<dim>::make_grid_and_dofs()
   {
     GridGenerator::hyper_cube(triangulation, -1, 1);
-    triangulation.refine_global(3);
+    triangulation.refine_global(5);
 
     dof_handler.distribute_dofs(fe);
 
@@ -615,9 +615,9 @@ namespace Step20
       transpose_operator(op_B) * linear_operator(preconditioner_M) * op_B;
 
     // We now create a preconditioner out of <code>op_aS</code> that
-    // applies a few number of CG iterations (until a very modest relative
-    // reduction of $10^{-16}$ is reached):
-    ReductionControl     reduction_control_aS(2000, 1.e-18, 1.0e-6);
+    // applies a few CG iterations (until a very modest relative reduction
+    // of $10^{-3}$ is reached):
+    ReductionControl     reduction_control_aS(2000, 1.e-18, 1.0e-3);
     SolverCG<>           solver_aS(reduction_control_aS);
     PreconditionIdentity preconditioner_aS;
 
