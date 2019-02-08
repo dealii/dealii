@@ -21,7 +21,6 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/active_fe_indices_transfer.h>
 #include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
@@ -93,8 +92,6 @@ test()
                                        locally_relevant_dofs,
                                        com_small);
 
-      parallel::distributed::ActiveFEIndicesTransfer<dim, dim> feidx_transfer(
-        dh);
       parallel::distributed::
         SolutionTransfer<dim, PETScWrappers::MPI::Vector, hp::DoFHandler<dim>>
           soltrans(dh);
@@ -109,7 +106,7 @@ test()
       x.compress(VectorOperation::insert);
       rel_x = x;
 
-      feidx_transfer.prepare_for_transfer();
+      dh.prepare_for_serialization_of_active_fe_indices();
       soltrans.prepare_serialization(rel_x);
 
       tr.save("file");
@@ -138,10 +135,7 @@ test()
       fe_collection.push_back(FE_Q<dim>(max_degree - i));
 
     dh.distribute_dofs(fe_collection);
-
-    parallel::distributed::ActiveFEIndicesTransfer<dim> feidx_transfer(dh);
-    feidx_transfer.deserialize();
-
+    dh.deserialize_active_fe_indices();
     dh.distribute_dofs(fe_collection);
 
     IndexSet locally_owned_dofs = dh.locally_owned_dofs();
