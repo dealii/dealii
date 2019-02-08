@@ -530,6 +530,18 @@ namespace Utilities
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
+#    if (defined(DEAL_II_COMPILER_CUDA_AWARE) && \
+         defined(DEAL_II_WITH_CUDA_AWARE_MPI))
+      // When using CUDAs-aware MPI, the set of local indices that are ghosts
+      // indices on other processors is expanded in arrays. This is for
+      // performance reasons as this can significantly decrease the number of
+      // kernel launched. The indices are expanded the first time the function
+      // is called.
+      if ((std::is_same<MemorySpaceType, MemorySpace::CUDA>::value) &&
+          (import_indices_plain_dev.size() == 0))
+        initialize_import_indices_plain_dev();
+#    endif
+
       if (vector_operation != dealii::VectorOperation::insert)
         AssertDimension(n_ghost_targets + n_import_targets, requests.size());
       // first wait for the receive to complete
@@ -595,70 +607,82 @@ namespace Utilities
 #    else
           if (vector_operation == dealii::VectorOperation::add)
             {
-              for (const auto &import_range : import_indices_data)
+              for (auto const &import_indices_plain : import_indices_plain_dev)
                 {
-                  const auto chunk_size =
-                    import_range.second - import_range.first;
+                  const auto chunk_size = import_indices_plain.second;
                   const int n_blocks =
                     1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
                                             ::dealii::CUDAWrappers::block_size);
-                  dealii::LinearAlgebra::CUDAWrappers::kernel::vector_bin_op<
-                    Number,
-                    dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Addition>
+                  dealii::LinearAlgebra::CUDAWrappers::kernel::
+                    masked_vector_bin_op<Number,
+                                         dealii::LinearAlgebra::CUDAWrappers::
+                                           kernel::Binop_Addition>
                     <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
-                      locally_owned_array.data() + import_range.first,
+                      import_indices_plain.first.get(),
+                      locally_owned_array.data(),
                       read_position,
                       chunk_size);
                   read_position += chunk_size;
                 }
             }
           else if (vector_operation == dealii::VectorOperation::min)
-            for (const auto &import_range : import_indices_data)
-              {
-                const auto chunk_size =
-                  import_range.second - import_range.first;
-                const int n_blocks =
-                  1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
-                                          ::dealii::CUDAWrappers::block_size);
-                dealii::LinearAlgebra::CUDAWrappers::kernel::vector_bin_op<
-                  Number,
-                  dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Min>
-                  <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
-                    locally_owned_array.data() + import_range.first,
-                    read_position,
-                    chunk_size);
-                read_position += chunk_size;
-              }
+            {
+              for (auto const &import_indices_plain : import_indices_plain_dev)
+                {
+                  const auto chunk_size = import_indices_plain.second;
+                  const int n_blocks =
+                    1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
+                                            ::dealii::CUDAWrappers::block_size);
+                  dealii::LinearAlgebra::CUDAWrappers::kernel::
+                    masked_vector_bin_op<
+                      Number,
+                      dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Min>
+                    <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
+                      import_indices_plain.first.get(),
+                      locally_owned_array.data(),
+                      read_position,
+                      chunk_size);
+                  read_position += chunk_size;
+                }
+            }
           else if (vector_operation == dealii::VectorOperation::max)
-            for (const auto &import_range : import_indices_data)
-              {
-                const auto chunk_size =
-                  import_range.second - import_range.first;
-                const int n_blocks =
-                  1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
-                                          ::dealii::CUDAWrappers::block_size);
-                dealii::LinearAlgebra::CUDAWrappers::kernel::vector_bin_op<
-                  Number,
-                  dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Max>
-                  <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
-                    locally_owned_array.data() + import_range.first,
-                    read_position,
-                    chunk_size);
-                read_position += chunk_size;
-              }
-          else // TODO
-            for (const auto &import_range : import_indices_data)
-              {
-                const auto chunk_size =
-                  import_range.second - import_range.first;
-                const cudaError_t cuda_error_code =
-                  cudaMemcpy(locally_owned_array.data() + import_range.first,
-                             read_position,
-                             chunk_size * sizeof(Number),
-                             cudaMemcpyDeviceToDevice);
-                AssertCuda(cuda_error_code);
-                read_position += chunk_size;
-              }
+            {
+              for (auto const &import_indices_plain : import_indices_plain_dev)
+                {
+                  const auto chunk_size = import_indices_plain.second;
+                  const int n_blocks =
+                    1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
+                                            ::dealii::CUDAWrappers::block_size);
+                  dealii::LinearAlgebra::CUDAWrappers::kernel::
+                    masked_vector_bin_op<
+                      Number,
+                      dealii::LinearAlgebra::CUDAWrappers::kernel::Binop_Max>
+                    <<<n_blocks, dealii::CUDAWrappers::block_size>>>(
+                      import_indices_plain.first.get(),
+                      locally_owned_array.data(),
+                      read_position,
+                      chunk_size);
+                  read_position += chunk_size;
+                }
+            }
+          else
+            {
+              for (auto const &import_indices_plain : import_indices_plain_dev)
+                {
+                  const auto chunk_size = import_indices_plain.second;
+                  const int n_blocks =
+                    1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
+                                            ::dealii::CUDAWrappers::block_size);
+                  dealii::LinearAlgebra::CUDAWrappers::kernel::
+                    set_permutated<<<n_blocks,
+                                     dealii::CUDAWrappers::block_size>>>(
+                      import_indices_plain.first.get(),
+                      locally_owned_array.data(),
+                      read_position,
+                      chunk_size);
+                  read_position += chunk_size;
+                }
+            }
 #    endif
           AssertDimension(read_position - temporary_storage.data(),
                           n_import_indices());
