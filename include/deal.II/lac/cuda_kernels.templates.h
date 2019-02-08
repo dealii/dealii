@@ -60,6 +60,24 @@ namespace LinearAlgebra
 
 
 
+      template <typename Number, template <typename> class Binop>
+      __global__ void
+      masked_vector_bin_op(const unsigned int *mask,
+                           Number *            v1,
+                           const Number *      v2,
+                           const size_type     N)
+      {
+        const size_type idx_base =
+          threadIdx.x + blockIdx.x * (blockDim.x * chunk_size);
+        for (unsigned int i = 0; i < chunk_size; ++i)
+          {
+            const size_type idx = idx_base + i * block_size;
+            if (idx < N)
+              v1[mask[idx]] = Binop<Number>::operation(v1[mask[idx]], v2[idx]);
+          }
+      }
+
+
       template <typename Number>
       __device__ Number
                  ElemSum<Number>::reduction_op(const Number a, const Number b)

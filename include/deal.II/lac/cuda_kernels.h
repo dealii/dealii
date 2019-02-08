@@ -182,6 +182,23 @@ namespace LinearAlgebra
 
 
       /**
+       * Apply the functor @tparam Binop to the elements of @p v1 that have
+       * indices in @p mask and @p v2. The size of @p mask should be greater
+       * than the size of @p v1. @p mask and @p v2 should have the same size @p
+       * N.
+       *
+       * @ingroup CUDAWrappers
+       */
+      template <typename Number, template <typename> class Binop>
+      __global__ void
+      masked_vector_bin_op(const unsigned int *mask,
+                           Number *            v1,
+                           const Number *      v2,
+                           const size_type     N);
+
+
+
+      /**
        * Structure implementing the functions used to add elements when
        * using a reduction.
        *

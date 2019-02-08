@@ -37,6 +37,16 @@ namespace LinearAlgebra
       vector_bin_op<float, Binop_Subtraction>(float *         v1,
                                               const float *   v2,
                                               const size_type N);
+      template __global__ void
+      masked_vector_bin_op<float, Binop_Addition>(const unsigned int *mask,
+                                                  float *             v1,
+                                                  const float *       v2,
+                                                  const size_type     N);
+      template __global__ void
+      masked_vector_bin_op<float, Binop_Subtraction>(const unsigned int *mask,
+                                                     float *             v1,
+                                                     const float *       v2,
+                                                     const size_type     N);
       template struct ElemSum<float>;
       template struct L1Norm<float>;
       template struct LInfty<float>;
@@ -137,6 +147,16 @@ namespace LinearAlgebra
       vector_bin_op<double, Binop_Subtraction>(double *        v1,
                                                const double *  v2,
                                                const size_type N);
+      template __global__ void
+      masked_vector_bin_op<double, Binop_Addition>(const unsigned int *mask,
+                                                   double *            v1,
+                                                   const double *      v2,
+                                                   const size_type     N);
+      template __global__ void
+      masked_vector_bin_op<double, Binop_Subtraction>(const unsigned int *mask,
+                                                      double *            v1,
+                                                      const double *      v2,
+                                                      const size_type     N);
       template struct ElemSum<double>;
       template struct L1Norm<double>;
       template struct LInfty<double>;
