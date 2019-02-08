@@ -147,6 +147,13 @@ namespace SparsityPatternIterators
     Accessor(const SparsityPattern *matrix);
 
     /**
+     * Default constructor creating a dummy accessor. This constructor is here
+     * only to be able to store accessors in STL containers such as
+     * `std::vector`.
+     */
+    Accessor();
+
+    /**
      * Row number of the element represented by this object. This function can
      * only be called for entries for which is_valid_entry() is true.
      */
@@ -209,6 +216,12 @@ namespace SparsityPatternIterators
     operator<(const Accessor &) const;
 
   protected:
+    DeclExceptionMsg(DummyAccessor,
+                     "The instance of this class was initialized"
+                     " without SparsityPattern object, which"
+                     " means that it is a dummy accessor that can"
+                     " not do any operations.");
+
     /**
      * The sparsity pattern we operate on accessed.
      */
@@ -1162,9 +1175,17 @@ namespace SparsityPatternIterators
 
 
 
+  inline Accessor::Accessor()
+    : container(nullptr)
+    , linear_index(numbers::invalid_size_type)
+  {}
+
+
+
   inline bool
   Accessor::is_valid_entry() const
   {
+    Assert(container != nullptr, DummyAccessor());
     return (linear_index < container->rowstart[container->rows] &&
             container->colnums[linear_index] != SparsityPattern::invalid_entry);
   }
@@ -1218,6 +1239,8 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator==(const Accessor &other) const
   {
+    Assert(container != nullptr, DummyAccessor());
+    Assert(other.container != nullptr, DummyAccessor());
     return (container == other.container && linear_index == other.linear_index);
   }
 
@@ -1226,6 +1249,8 @@ namespace SparsityPatternIterators
   inline bool
   Accessor::operator<(const Accessor &other) const
   {
+    Assert(container != nullptr, DummyAccessor());
+    Assert(other.container != nullptr, DummyAccessor());
     Assert(container == other.container, ExcInternalError());
 
     return linear_index < other.linear_index;
@@ -1236,6 +1261,7 @@ namespace SparsityPatternIterators
   inline void
   Accessor::advance()
   {
+    Assert(container != nullptr, DummyAccessor());
     Assert(linear_index < container->rowstart[container->rows],
            ExcIteratorPastEnd());
     ++linear_index;
