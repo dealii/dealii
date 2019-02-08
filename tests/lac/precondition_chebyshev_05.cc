@@ -67,7 +67,7 @@ main(int argc, char **argv)
       cheby_data.preconditioner.reset(
         new TrilinosWrappers::PreconditionJacobi());
       cheby_data.preconditioner->initialize(AA);
-      cheby_data.degree          = 10;
+      cheby_data.degree          = 11;
       cheby_data.smoothing_range = 40;
       cheby.initialize(AA, cheby_data);
 

@@ -56,7 +56,7 @@ check()
   PreconditionChebyshev<FullMatrixModified, Vector<double>>::AdditionalData
     data;
   data.smoothing_range = 2 * size;
-  data.degree          = 3;
+  data.degree          = 4;
   prec.initialize(m, data);
 
   deallog << "Exact inverse:     ";
