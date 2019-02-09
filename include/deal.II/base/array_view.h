@@ -1134,6 +1134,25 @@ make_array_view(const Table<2, ElementType> &                   table,
 
 
 
+/*
+ * Create a view that doesn't allow the container it points to to be modified.
+ * This is useful if the object passed in is not `const` already and a function
+ * requires a view to constant memory in its signature.
+ *
+ * This function returns an object of type `ArrayView<const T>` where `T` is the
+ * element type of the container.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename Container>
+inline auto
+make_const_array_view(const Container &container)
+  -> decltype(make_array_view(container))
+{
+  return make_array_view(container);
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
