@@ -158,6 +158,41 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDFOREACH()
     ENDIF()
 
+    IF(${DEAL_II_TRILINOS_WITH_TPETRA})
+      #
+      # Check if Tpetra is usable in fact.
+      #
+      LIST(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+      LIST(APPEND CMAKE_REQUIRED_LIBRARIES "${Trilinos_LIBRARIES}")
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <Tpetra_Vector.hpp>
+        int
+        main()
+        {
+          using LO       = int;
+          using GO       = unsigned int;
+          using Node     = Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial>;
+          using map_type = Tpetra::Map<LO, GO, Node>;
+          Teuchos::RCP<const map_type>         dummy_map = Teuchos::rcp(new map_type());
+          Tpetra::Vector<double, LO, GO, Node> dummy_vector(dummy_map);
+          (void)dummy_vector;
+          return 0;
+        }
+        "
+        TRILINOS_TPETRA_IS_FUNCTIONAL
+        )
+      RESET_CMAKE_REQUIRED()
+      IF(NOT TRILINOS_TPETRA_IS_FUNCTIONAL)
+        MESSAGE(
+          STATUS
+          "Tpetra was found but is not usable! Disabling Tpetra support."
+          )
+        SET(DEAL_II_TRILINOS_WITH_TPETRA OFF)
+      ENDIF()
+    ENDIF()
+
     IF(${DEAL_II_TRILINOS_WITH_SACADO})
       #
       # Look for Sacado_config.h - we'll query it to determine C++11 support:
