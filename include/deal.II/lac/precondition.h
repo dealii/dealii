@@ -1950,12 +1950,17 @@ namespace internal
       VectorUpdatesRange<Number>(upd, rhs.size());
 
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
-      if (iteration_index == 1)
+      if (iteration_index == 0)
+        {
+          // nothing to do here because we can immediately write into the
+          // solution vector without remembering any of the other vectors
+        }
+      else if (iteration_index == 1)
         {
           solution.swap(temp_vector1);
           solution_old.swap(temp_vector1);
         }
-      else if (iteration_index > 1)
+      else
         solution.swap(solution_old);
     }
 
@@ -1985,12 +1990,17 @@ namespace internal
       VectorUpdatesRange<Number>(upd, rhs.local_size());
 
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
-      if (iteration_index == 1)
+      if (iteration_index == 0)
+        {
+          // nothing to do here because we can immediately write into the
+          // solution vector without remembering any of the other vectors
+        }
+      else if (iteration_index == 1)
         {
           solution.swap(temp_vector1);
           solution_old.swap(temp_vector1);
         }
-      else if (iteration_index > 1)
+      else
         solution.swap(solution_old);
     }
 
