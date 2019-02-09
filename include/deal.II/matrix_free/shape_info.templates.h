@@ -266,44 +266,51 @@ namespace internal
         }
 
       // get gradient and Hessian transformation matrix for the polynomial
-      // space associated with the quadrature rule (collocation space)
-      {
-        const unsigned int stride = (n_q_points_1d + 1) / 2;
-        shape_gradients_collocation_eo.resize(n_q_points_1d * stride);
-        shape_hessians_collocation_eo.resize(n_q_points_1d * stride);
-        FE_DGQArbitraryNodes<1> fe(quad.get_points());
-        for (unsigned int i = 0; i < n_q_points_1d / 2; ++i)
-          for (unsigned int q = 0; q < stride; ++q)
-            {
-              shape_gradients_collocation_eo[i * stride + q] =
-                0.5 *
-                (fe.shape_grad(i, quad.get_points()[q])[0] +
-                 fe.shape_grad(i, quad.get_points()[n_q_points_1d - 1 - q])[0]);
-              shape_gradients_collocation_eo[(n_q_points_1d - 1 - i) * stride +
-                                             q] =
-                0.5 *
-                (fe.shape_grad(i, quad.get_points()[q])[0] -
-                 fe.shape_grad(i, quad.get_points()[n_q_points_1d - 1 - q])[0]);
-              shape_hessians_collocation_eo[i * stride + q] =
-                0.5 * (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] +
-                       fe.shape_grad_grad(
-                         i, quad.get_points()[n_q_points_1d - 1 - q])[0][0]);
-              shape_hessians_collocation_eo[(n_q_points_1d - 1 - i) * stride +
-                                            q] =
-                0.5 * (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] -
-                       fe.shape_grad_grad(
-                         i, quad.get_points()[n_q_points_1d - 1 - q])[0][0]);
-            }
-        if (n_q_points_1d % 2 == 1)
-          for (unsigned int q = 0; q < stride; ++q)
-            {
-              shape_gradients_collocation_eo[n_q_points_1d / 2 * stride + q] =
-                fe.shape_grad(n_q_points_1d / 2, quad.get_points()[q])[0];
-              shape_hessians_collocation_eo[n_q_points_1d / 2 * stride + q] =
-                fe.shape_grad_grad(n_q_points_1d / 2,
-                                   quad.get_points()[q])[0][0];
-            }
-      }
+      // space associated with the quadrature rule (collocation space). We
+      // need to avoid the case with more than a few hundreds of quadrature
+      // points when the Lagrange polynomials constructed in
+      // FE_DGQArbitraryNodes underflow.
+      if (n_q_points_1d < 200)
+        {
+          const unsigned int stride = (n_q_points_1d + 1) / 2;
+          shape_gradients_collocation_eo.resize(n_q_points_1d * stride);
+          shape_hessians_collocation_eo.resize(n_q_points_1d * stride);
+          FE_DGQArbitraryNodes<1> fe(quad.get_points());
+          for (unsigned int i = 0; i < n_q_points_1d / 2; ++i)
+            for (unsigned int q = 0; q < stride; ++q)
+              {
+                shape_gradients_collocation_eo[i * stride + q] =
+                  0.5 *
+                  (fe.shape_grad(i, quad.get_points()[q])[0] +
+                   fe.shape_grad(i,
+                                 quad.get_points()[n_q_points_1d - 1 - q])[0]);
+                shape_gradients_collocation_eo[(n_q_points_1d - 1 - i) *
+                                                 stride +
+                                               q] =
+                  0.5 *
+                  (fe.shape_grad(i, quad.get_points()[q])[0] -
+                   fe.shape_grad(i,
+                                 quad.get_points()[n_q_points_1d - 1 - q])[0]);
+                shape_hessians_collocation_eo[i * stride + q] =
+                  0.5 * (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] +
+                         fe.shape_grad_grad(
+                           i, quad.get_points()[n_q_points_1d - 1 - q])[0][0]);
+                shape_hessians_collocation_eo[(n_q_points_1d - 1 - i) * stride +
+                                              q] =
+                  0.5 * (fe.shape_grad_grad(i, quad.get_points()[q])[0][0] -
+                         fe.shape_grad_grad(
+                           i, quad.get_points()[n_q_points_1d - 1 - q])[0][0]);
+              }
+          if (n_q_points_1d % 2 == 1)
+            for (unsigned int q = 0; q < stride; ++q)
+              {
+                shape_gradients_collocation_eo[n_q_points_1d / 2 * stride + q] =
+                  fe.shape_grad(n_q_points_1d / 2, quad.get_points()[q])[0];
+                shape_hessians_collocation_eo[n_q_points_1d / 2 * stride + q] =
+                  fe.shape_grad_grad(n_q_points_1d / 2,
+                                     quad.get_points()[q])[0][0];
+              }
+        }
 
       if (element_type == tensor_general &&
           check_1d_shapes_symmetric(n_q_points_1d))

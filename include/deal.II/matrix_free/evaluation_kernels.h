@@ -1337,6 +1337,16 @@ namespace internal
             typename Number>
   struct FEFaceEvaluationImpl
   {
+    // We enable a transformation to collocation for derivatives if it gives
+    // correct results (first two conditions), if it is the most efficient
+    // choice in terms of operation counts (third condition) and if we were
+    // able to initialize the fields in shape_info.templates.h from the
+    // polynomials (fourth condition).
+    static constexpr bool use_collocation =
+      symmetric_evaluate &&
+      n_q_points_1d > fe_degree &&n_q_points_1d <= 3 * fe_degree / 2 + 1 &&
+      n_q_points_1d < 200;
+
     static void
     evaluate_in_face(const MatrixFreeFunctions::ShapeInfo<Number> &data,
                      Number *                                      values_dofs,
@@ -1431,7 +1441,7 @@ namespace internal
             switch (dim)
               {
                 case 3:
-                  if (symmetric_evaluate && n_q_points_1d > fe_degree)
+                  if (use_collocation)
                     {
                       eval1.template values<0, true, false>(values_dofs,
                                                             values_quad);
@@ -1590,7 +1600,7 @@ namespace internal
                                                            2 * n_q_points);
                   eval1.template values<0, false, false>(
                     gradients_quad + 2 * n_q_points, values_dofs + size_deg);
-                  if (symmetric_evaluate && n_q_points_1d > fe_degree)
+                  if (use_collocation)
                     {
                       internal::EvaluatorTensorProduct<
                         internal::evaluate_evenodd,

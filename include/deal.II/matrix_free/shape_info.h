@@ -36,6 +36,15 @@ namespace internal
      * initialization. FEEvaluation will select the most efficient algorithm
      * based on the given element type.
      *
+     * There is an implied ordering in the type ElementType::tensor_symmetric
+     * in the sense that both ElementType::tensor_symmetric_collocation and
+     * ElementType::tensor_symmetric_hermite are also of type
+     * ElementType::tensor_symmetric. Likewise, a configuration of type
+     * ElementType::tensor_symmetric is also of type
+     * ElementType::tensor_general. As a consequence, we support `<=`
+     * operations between the types with this sorting, but not against the
+     * even higher indexed types such as ElementType::truncated_tensor.
+     *
      * @ingroup matrixfree
      */
     enum ElementType
