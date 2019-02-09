@@ -76,7 +76,15 @@ pipeline
               image 'tjhei/candi:v9.0.1-r4'
             }
           }
-          post { cleanup { cleanWs() } }
+          post {
+	  always {
+	    sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/serial.xml || true"
+	    xunit tools: [CTest(pattern: '*.xml')]
+	    }
+	  cleanup {
+	    cleanWs()
+	  }
+	  }
 
           steps
           {
@@ -97,7 +105,7 @@ pipeline
                  $WORKSPACE/
                time ninja -j $NP
                time ninja setup_tests
-               time ctest --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP
+               time ctest --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
             '''
           }
           }
@@ -113,7 +121,15 @@ pipeline
               image 'tjhei/candi:v9.0.1-r4'
             }
           }
-          post { cleanup { cleanWs() } }
+          post {
+	  always {
+	    sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/mpi.xml || true"
+	    xunit tools: [CTest(pattern: '*.xml')]
+	  }
+	  cleanup {
+	    cleanWs()
+	  }
+	  }
 
           steps
           {
@@ -132,10 +148,11 @@ pipeline
                   $WORKSPACE/
                 time ninja -j $NP
                 time ninja setup_tests
-                time ctest -R "all-headers|multigrid/transfer" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP
+                time ctest -R "all-headers|multigrid/transfer" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
             '''
           }
           }
+
         }
 
       }
