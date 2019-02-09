@@ -138,21 +138,37 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       )
   ENDIF()
 
+  #
   # Define custom targets to easily switch the build type:
-  ADD_CUSTOM_TARGET(debug
-    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
-    COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
-    )
+  #
 
-  ADD_CUSTOM_TARGET(release
-    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
-    COMMENT "Switch CMAKE_BUILD_TYPE to Release"
-    )
+  IF(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
+    ADD_CUSTOM_TARGET(debug
+      COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
+      COMMAND ${CMAKE_COMMAND} -E echo "***"
+      COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
+      COMMAND ${CMAKE_COMMAND} -E echo "***"
+      COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
+      VERBATIM
+      )
+  ENDIF()
 
+  IF(${DEAL_II_BUILD_TYPE} MATCHES "Release")
+    ADD_CUSTOM_TARGET(release
+      COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+      COMMAND ${CMAKE_COMMAND} -E echo "***"
+      COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
+      COMMAND ${CMAKE_COMMAND} -E echo "***"
+      COMMENT "Switch CMAKE_BUILD_TYPE to Release"
+      VERBATIM
+      )
+  ENDIF()
+
+  #
   # Only mention release and debug targets if it is actually possible to
   # switch between them:
+  #
+
   IF(${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
     SET(_switch_targets
 "#      ${_make_command} debug          - to switch the build type to 'Debug'
