@@ -148,7 +148,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       COMMAND ${CMAKE_COMMAND} -E echo "***"
       COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Debug mode. Now recompile with: ${_make_command}"
       COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
+      COMMENT "Switching CMAKE_BUILD_TYPE to Debug"
       VERBATIM
       )
   ENDIF()
@@ -159,7 +159,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       COMMAND ${CMAKE_COMMAND} -E echo "***"
       COMMAND ${CMAKE_COMMAND} -E echo "*** Switched to Release mode. Now recompile with: ${_make_command}"
       COMMAND ${CMAKE_COMMAND} -E echo "***"
-      COMMENT "Switch CMAKE_BUILD_TYPE to Release"
+      COMMENT "Switching CMAKE_BUILD_TYPE to Release"
       VERBATIM
       )
   ENDIF()
