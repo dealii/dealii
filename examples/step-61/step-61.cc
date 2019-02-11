@@ -113,6 +113,7 @@ public:
   Coefficient()
     : TensorFunction<2, dim>()
   {}
+
   virtual void value_list(const std::vector<Point<dim>> &points,
                           std::vector<Tensor<2, dim>> &  values) const override;
 };
@@ -138,6 +139,7 @@ public:
   BoundaryValues()
     : Function<dim>(2)
   {}
+
   virtual double value(const Point<dim> & p,
                        const unsigned int component = 0) const override;
 };
@@ -156,8 +158,9 @@ public:
   RightHandSide()
     : Function<dim>()
   {}
+
   virtual double value(const Point<dim> & p,
-                       const unsigned int component = 0) const;
+                       const unsigned int component = 0) const override;
 };
 
 template <int dim>
@@ -176,7 +179,8 @@ public:
   Solution()
     : Function<dim>(1)
   {}
-  virtual double value(const Point<dim> &p, const unsigned int) const;
+
+  virtual double value(const Point<dim> &p, const unsigned int) const override;
 };
 
 template <int dim>
@@ -194,6 +198,7 @@ public:
   Velocity()
     : TensorFunction<1, dim>()
   {}
+
   virtual Tensor<1, dim> value(const Point<dim> &p) const override;
 };
 
