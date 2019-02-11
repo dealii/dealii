@@ -738,7 +738,7 @@ namespace Differentiation
     const std::vector<
       typename ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ad_type> &
     ADHelperCellLevelBase<ADNumberTypeCode,
-                          ScalarType>::get_sensitive_dof_values()
+                          ScalarType>::get_sensitive_dof_values() const
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {

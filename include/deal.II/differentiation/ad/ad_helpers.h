@@ -950,7 +950,7 @@ namespace Differentiation
        * @note For taped AD numbers, this operation is only valid in recording mode.
        */
       const std::vector<ad_type> &
-      get_sensitive_dof_values();
+      get_sensitive_dof_values() const;
 
       //@}
 
