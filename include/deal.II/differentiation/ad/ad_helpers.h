@@ -934,8 +934,9 @@ namespace Differentiation
        * auto-differentiable numbers. These are the independent
        * variables $\mathbf{X}$ about which the solution is linearized.
        *
-       * It is indicated to the AD library that operations performed with these
-       * numbers are to be tracked, so they are considered "sensitive"
+       * This function indicates to the AD library that implements the
+       * auto-differentiable number type that operations performed on these
+       * numbers are to be tracked so they are considered "sensitive"
        * variables. This is, therefore, the set of variables with which one
        * would then perform computations, and based on which one can then
        * extract both the value of the function and its derivatives with the
