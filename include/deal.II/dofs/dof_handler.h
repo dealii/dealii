@@ -487,6 +487,11 @@ public:
    * main class and refer to it directly whenever you need to access
    * properties of the finite element (such as
    * FiniteElementData::dofs_per_cell). This is what all tutorial programs do.
+   *
+   * @warning This function only sets a FiniteElement. Degrees of freedom have
+   * either not been distributed yet, or are distributed using a previously set
+   * element. In both cases, accessing degrees of freedom will lead to invalid
+   * results. To restore consistency, call distribute_dofs().
    */
   virtual void
   set_fe(const FiniteElement<dim, spacedim> &fe);
