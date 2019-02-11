@@ -2617,6 +2617,323 @@ namespace Differentiation
       }
 
     } // namespace internal
+
+
+
+    /**
+     * A base helper class that facilitates the evaluation of point-wise defined
+     * functions. This is the point-wise counterpart of the
+     * ADHelperCellLevelBase class, and was conceived for computations at a
+     * continuum point, or quadrature point, rather than for finite-element
+     * level calculations. That being said, the interface to this and the
+     * derived classes are sufficiently generic that the dependent function(s)
+     * and their argument(s), that are the independent variables, can be
+     * interpreted in any manner that the user may choose.
+     *
+     * As it offers a field-based interface, this class would
+     * typically be used to compute the derivatives of a constitutive law
+     * defined at a quadrature point; however, it may also be used in other
+     * contexts, such as to compute the linearization of a set of local
+     * nonlinear equations.
+     *
+     * @warning ADOL-C does not support the standard threading models used by
+     * deal.II, so this class should @b not be embedded within a multithreaded
+     * function when using ADOL-C number types. It is, however, suitable for use
+     * in both serial and MPI routines.
+     *
+     * @author Jean-Paul Pelteret, 2016, 2017, 2018
+     */
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType = double>
+    class ADHelperPointLevelFunctionsBase
+      : public ADHelperBase<ADNumberTypeCode, ScalarType>
+    {
+    public:
+      /**
+       * Type definition for the dimension of the associated input and output
+       * tensor types.
+       */
+      static const unsigned int dimension = dim;
+
+      /**
+       * Type definition for the floating point number type that is used in,
+       * and results from, all computations.
+       */
+      using scalar_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+
+      /**
+       * Type definition for the auto-differentiation number type that is used
+       * in all computations.
+       */
+      using ad_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+
+      /**
+       * @name Constructor / destructor
+       */
+      //@{
+
+      /**
+       * The constructor for the class.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * @param[in] n_dependent_variables The number of scalar functions to be
+       * defined that will have a sensitivity to the given independent
+       * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
+       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * image space.
+       */
+      ADHelperPointLevelFunctionsBase(
+        const unsigned int n_independent_variables,
+        const unsigned int n_dependent_variables);
+
+      /**
+       * Destructor
+       */
+      virtual ~ADHelperPointLevelFunctionsBase() = default;
+
+      //@}
+
+      /**
+       * @name Independent variables
+       */
+      //@{
+
+      /**
+       * @copydoc ADHelperBase::reset()
+       */
+      virtual void
+      reset(const unsigned int n_independent_variables =
+              dealii::numbers::invalid_unsigned_int,
+            const unsigned int n_dependent_variables =
+              dealii::numbers::invalid_unsigned_int,
+            const bool clear_registered_tapes = true) override;
+
+      /**
+       * Register the complete set of independent variables $\mathbf{X}$.
+       *
+       * @param[in] values A field that defines the values of all independent
+       * variables. When considering taped AD numbers with branching functions,
+       * to avoid potential issues with branch switching it may be a good idea
+       * to choose these values close or equal to those that will be later
+       * evaluated and differentiated around.
+       *
+       * @note The input value type must correspond to this class's @p scalar_type.
+       * Depending on the selected @p ADNumberTypeCode, this may or may not
+       * correspond with the @p ScalarType prescribed as a template argument.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      void
+      register_independent_variables(const std::vector<scalar_type> &values);
+
+      /**
+       * Register the subset of independent variables
+       * $\mathbf{A} \subset \mathbf{X}$.
+       *
+       * @param[in] value A field that defines a number of independent
+       * variables. When considering taped AD numbers with branching functions,
+       * to avoid potential issues with branch switching it may be a good idea
+       * to choose these values close or equal to those that will be later
+       * evaluated and differentiated around.
+       * @param[in] extractor An extractor associated with the input field
+       * variables. This effectively defines which components of the global set
+       * of independent variables this field is associated with.
+       *
+       * @note The input value type must correspond to this class's @p scalar_type.
+       * Depending on the selected @p ADNumberTypeCode, this may or may not
+       * correspond with the @p ScalarType prescribed as a template argument.
+       *
+       * @note The input extractor must correspond to the input @p ValueType.
+       * So, for example, if a value is a rank-1 tensor
+       * (i.e. of type Tensor<1,dim,scalar_type>), then the extractor must
+       * be an FEValuesExtractors::Vector or FEValuesExtractors::Tensor<1>.
+       *
+       * @note This function may be repeatedly used until a call to
+       * finalize_sensitive_independent_variables() or
+       * get_sensitive_variables() is made.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      template <typename ValueType, typename ExtractorType>
+      void
+      register_independent_variable(const ValueType &    value,
+                                    const ExtractorType &extractor);
+
+      /**
+       * Return the complete set of independent variables as represented by
+       * auto-differentiable numbers. These are the independent
+       * variables $\mathbf{X}$ at which the dependent values are evaluated
+       * and differentiated.
+       *
+       * This function indicates to the AD library that implements the
+       * auto-differentiable number type that operations performed on these
+       * numbers are to be tracked so they are considered "sensitive"
+       * variables. This is, therefore, the set of variables with which one
+       * would then perform computations, and based on which one can then
+       * extract both the value of the function and its derivatives with the
+       * member functions below. The values of the components of the returned
+       * object are initialized to the values set with
+       * register_independent_variable().
+       *
+       * @return An array of auto-differentiable type numbers.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      const std::vector<ad_type> &
+      get_sensitive_variables() const;
+
+      /*
+       * Extract a subset of the independent variables as represented by
+       * auto-differentiable numbers. These are the independent
+       * variables $\mathbf{A} \subset \mathbf{X}$ at which the dependent values
+       * are evaluated and differentiated.
+       *
+       * This function indicates to the AD library that implements the
+       * auto-differentiable number type that operations performed on these
+       * numbers are to be tracked so they are considered "sensitive"
+       * variables. This is, therefore, the set of variables with which one
+       * would then perform computations, and based on which one can then
+       * extract both the value of the function and its derivatives with the
+       * member functions below. The values of the components of the returned
+       * object are initialized to the values set with
+       * register_independent_variable().
+       *
+       * @param[in] extractor An extractor associated with the input field
+       * variables. This effectively defines which components of the global set
+       * of independent variables this field is associated with.
+       * @return An object of auto-differentiable type numbers. The return type is
+       * based on the input extractor, and will be either a scalar,
+       * Tensor<1,dim>, Tensor<2,dim>, or SymmetricTensor<2,dim>.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      template <typename ExtractorType>
+      typename internal::Extractor<dim,
+                                   ExtractorType>::template tensor_type<ad_type>
+      get_sensitive_variables(const ExtractorType &extractor) const;
+
+      //@}
+
+      /**
+       * @name Operations specific to taped mode: Reusing tapes
+       */
+      //@{
+
+      /**
+       * Set the values for the independent variables $\mathbf{X}$.
+       *
+       * @param[in] values A vector that defines the values of all
+       * independent variables.
+       *
+       * @note The input value type must correspond to this class's @p scalar_type.
+       * Depending on the selected @p ADNumberTypeCode, this may or may not
+       * correspond with the @p ScalarType prescribed as a template argument.
+       *
+       * @note If the @p keep_independent_values flag has been set when
+       * ADHelperBase::start_recording_operations() is called then the tape is
+       * immediately usable after creation, and the values of the independent
+       * variables set by register_independent_variables() are those at which
+       * the function is to be evaluated. In this case, a separate call to this
+       * function is not strictly necessary.
+       */
+      void
+      set_independent_variables(const std::vector<scalar_type> &values);
+
+      /**
+       * Set the values for a subset of independent variables
+       * $\mathbf{A} \subset \mathbf{X}$.
+       *
+       * @param[in] value A field that defines the values of a number of
+       * independent variables.
+       * @param[in] extractor An extractor associated with the input field
+       * variables. This effectively defines which components of the global set
+       * of independent variables this field is associated with.
+       *
+       * @note The input value type must correspond to this class's @p scalar_type.
+       * Depending on the selected @p ADNumberTypeCode, this may or may not
+       * correspond with the @p ScalarType prescribed as a template argument.
+       *
+       * @note The input extractor must correspond to the input @p ValueType.
+       * So, for example, if a value is a rank-1 tensor
+       * (i.e. of type Tensor<1,dim,scalar_type>), then the extractor must
+       * be an FEValuesExtractors::Vector or FEValuesExtractors::Tensor<1>.
+       *
+       * @note If the @p keep_independent_values flag has been set when
+       * ADHelperBase::start_recording_operations() is called then the tape is
+       * immediately usable after creation, and the values of the independent
+       * variables set by register_independent_variable() are those at which the
+       * function is to be evaluated. In this case, a separate call to this
+       * function is not strictly necessary.
+       */
+      template <typename ValueType, typename ExtractorType>
+      void
+      set_independent_variable(const ValueType &    value,
+                               const ExtractorType &extractor);
+
+      //@}
+
+    protected:
+      /**
+       * @name Independent variables
+       */
+      //@{
+
+      /**
+       * Set the actual value of the independent variable $X_{i}$.
+       *
+       * @param[in] index The index in the vector of independent variables.
+       * @param[in] symmetric_component Mark whether this index relates to a
+       * component of a field that has a symmetric counterpart
+       * (e.g. if @p index represents an off-diagonal entry in a symmetric
+       * tensor).
+       * @param[in] value The value to set the index'd independent variable to.
+       */
+      void
+      set_sensitivity_value(const unsigned int index,
+                            const bool         symmetric_component,
+                            const scalar_type &value);
+
+      /**
+       * Return whether the @p index'th independent variables is one for which
+       * we must take into account symmetry when extracting their gradient or
+       * Hessian values.
+       */
+      bool
+      is_symmetric_independent_variable(const unsigned int index) const;
+
+      /**
+       * Return the number of independent variables that have been marked as
+       * being components of a symmetric field.
+       */
+      unsigned int
+      n_symmetric_independent_variables() const;
+
+      //@}
+
+    private:
+      /**
+       * @name Independent variables
+       */
+      //@{
+
+      /**
+       * The independent variables for which we must take into account symmetry
+       * when extracting their gradient or Hessian values.
+       */
+      std::vector<bool> symmetric_independent_variables;
+
+      //@}
+
+    }; // class ADHelperPointLevelFunctionsBase
+
+
   } // namespace AD
 } // namespace Differentiation
 
@@ -2672,6 +2989,113 @@ namespace Differentiation
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
         ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
           i, values[local_dof_indices[i]]);
+    }
+
+
+
+    /* ----------------- ADHelperPointLevelFunctionsBase ----------------- */
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    template <typename ValueType, typename ExtractorType>
+    void
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      register_independent_variable(const ValueType &    value,
+                                    const ExtractorType &extractor)
+    {
+      // This is actually the same thing as the set_independent_variable
+      // function, in the sense that we simply populate our array of independent
+      // values with a meaningful number. However, in this case we need to
+      // double check that we're not registering these variables twice
+#    ifdef DEBUG
+      const std::vector<unsigned int> index_set(
+        internal::extract_field_component_indices<dim>(extractor));
+      for (unsigned int i = 0; i < index_set.size(); ++i)
+        {
+          Assert(
+            this->registered_independent_variable_values[index_set[i]] == false,
+            ExcMessage(
+              "Overlapping indices for independent variables. "
+              "One or more indices associated with the field that "
+              "is being registered as an independent variable have "
+              "already been associated with another field. This suggests "
+              "that the component offsets used to construct their counterpart "
+              "extractors are incompatible with one another. Make sure that "
+              "the first component for each extractor properly takes into "
+              "account the dimensionality of the preceeding fields."));
+        }
+#    endif
+      set_independent_variable(value, extractor);
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    template <typename ValueType, typename ExtractorType>
+    void
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      set_independent_variable(const ValueType &    value,
+                               const ExtractorType &extractor)
+    {
+      const std::vector<unsigned int> index_set(
+        internal::extract_field_component_indices<dim>(extractor));
+      for (unsigned int i = 0; i < index_set.size(); ++i)
+        {
+          set_sensitivity_value(
+            index_set[i],
+            internal::Extractor<dim, ExtractorType>::symmetric_component(i),
+            internal::get_tensor_entry(value, i));
+        }
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    template <typename ExtractorType>
+    typename internal::Extractor<dim, ExtractorType>::template tensor_type<
+      typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type>
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      get_sensitive_variables(const ExtractorType &extractor) const
+    {
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+        }
+
+      // If necessary, finalize the internally stored vector of
+      // AD numbers that represents the independent variables
+      this->finalize_sensitive_independent_variables();
+      Assert(this->independent_variables.size() ==
+               this->n_independent_variables(),
+             ExcDimensionMismatch(this->independent_variables.size(),
+                                  this->n_independent_variables()));
+
+      const std::vector<unsigned int> index_set(
+        internal::extract_field_component_indices<dim>(extractor));
+      typename internal::Extractor<dim,
+                                   ExtractorType>::template tensor_type<ad_type>
+        out;
+
+      for (unsigned int i = 0; i < index_set.size(); ++i)
+        {
+          const unsigned int index = index_set[i];
+          Assert(index < this->n_independent_variables(), ExcInternalError());
+          Assert(this->registered_independent_variable_values[index] == true,
+                 ExcInternalError());
+          internal::get_tensor_entry(out, i) =
+            this->independent_variables[index];
+        }
+
+      return out;
     }
 
 
