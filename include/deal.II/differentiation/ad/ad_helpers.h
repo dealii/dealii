@@ -955,36 +955,6 @@ namespace Differentiation
       //@}
 
       /**
-       * @name Post-processing
-       */
-      //@{
-
-      /*
-       * Return the complete set of degree of freedom values of
-       * auto-differentiable number type. These store the same scalar values as
-       * the independent variables $\mathbf{X}$ about which the solution is
-       * linearized.
-       *
-       * Operations performed with these numbers are not tracked by the AD,
-       * libraries so they are considered "non-sensitive" variables.
-       * The values of the components of the returned object are initialized to
-       * the values set with register_dof_values().
-       *
-       * @return An array of auto-differentiable type numbers representing the
-       * local degree of freedom values.
-       *
-       * @note This function is not typically used within the context of automatic
-       * differentation computations, but can make performing substutitions in
-       * other post-processing computations more straight forward.
-       *
-       * @note For taped AD numbers, this operation is only valid outside recording mode.
-       */
-      std::vector<ad_type>
-      get_non_sensitive_dof_values() const;
-
-      //@}
-
-      /**
        * @name Operations specific to taped mode: Reusing tapes
        */
       //@{

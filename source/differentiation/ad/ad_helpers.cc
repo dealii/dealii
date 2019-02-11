@@ -761,30 +761,6 @@ namespace Differentiation
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    std::vector<
-      typename ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ad_type>
-    ADHelperCellLevelBase<ADNumberTypeCode,
-                          ScalarType>::get_non_sensitive_dof_values() const
-    {
-      if (ADNumberTraits<ad_type>::is_taped == true)
-        {
-          Assert(this->active_tape_index() !=
-                   Numbers<ad_type>::invalid_tape_index,
-                 ExcMessage("Invalid tape index"));
-        }
-
-      std::vector<ad_type> out(this->n_independent_variables(),
-                               dealii::internal::NumberType<ad_type>::value(
-                                 0.0));
-      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
-        this->initialize_non_sensitive_independent_variable(i, out[i]);
-
-      return out;
-    }
-
-
-
-    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
     ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
       const std::vector<scalar_type> &values)
