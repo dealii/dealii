@@ -1,10 +1,14 @@
 #!groovy
 
-// This Jenkinsfile is used to mark jobs as "pending" as quickly as
-// possible. The other longer running jobs only set the status to pending once
-// they start running.
-//
-// See https://jenkins.tjhei.info/job/dealii-mark/ for details.
+/*
+
+This Jenkinsfile is used to mark jobs as "pending" as quickly as possible. The
+other longer running jobs only set the status to pending once they start
+running.
+
+See https://jenkins.tjhei.info/job/dealii-mark/ for details.
+
+*/
 
 /*
 Settings to apply inside Jenkins:
@@ -27,6 +31,8 @@ pipeline
       image 'dealii/indent'
     }
   }
+
+  post { cleanup { cleanWs() } }
 
   stages
   {
