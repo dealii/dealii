@@ -21,6 +21,8 @@
 #if defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
 
 #  include <deal.II/base/numbers.h>
+#  include <deal.II/base/symmetric_tensor.h>
+#  include <deal.II/base/tensor.h>
 
 #  include <deal.II/differentiation/ad/ad_drivers.h>
 #  include <deal.II/differentiation/ad/ad_number_traits.h>
@@ -28,6 +30,8 @@
 #  include <deal.II/differentiation/ad/adolc_product_types.h>
 #  include <deal.II/differentiation/ad/sacado_number_types.h>
 #  include <deal.II/differentiation/ad/sacado_product_types.h>
+
+#  include <deal.II/fe/fe_values_extractors.h>
 
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/vector.h>
@@ -1647,6 +1651,972 @@ namespace Differentiation
     }; // class ADHelperResidualLinearization
 
 
+
+    namespace internal
+    {
+      /**
+       * A helper struct that assists with the extraction of data associated
+       * with fields that are defined by FEExtractors.
+       */
+      template <int dim, typename ExtractorType>
+      struct Extractor;
+
+
+      /**
+       * A helper struct that assists with the extraction of data associated
+       * with fields that are defined by FEExtractors.
+       * This particular specialization is for scalar fields.
+       */
+      template <int dim>
+      struct Extractor<dim, FEValuesExtractors::Scalar>
+      {
+        /**
+         * The number of components of the field.
+         */
+        static const unsigned int n_components = 1;
+
+        /**
+         * The tensor rank of the field.
+         */
+        static const unsigned int rank = 0;
+
+        /**
+         * The tensor type associated with this field.
+         */
+        template <typename NumberType>
+        using tensor_type = Tensor<rank, dim, NumberType>;
+
+        static_assert(
+          n_components == tensor_type<double>::n_independent_components,
+          "The number of components doesn't match that of the corresponding tensor type.");
+        static_assert(
+          rank == tensor_type<double>::rank,
+          "The rank doesn't match that of the corresponding tensor type.");
+
+        /**
+         * The value type associated with this field.
+         */
+        // Note: FEValuesViews::Scalar::tensor_type is double, so we can't
+        // use it (FEValuesViews) in this context.
+        // In fact, sadly, all FEValuesViews objects expect doubles as value
+        // types.
+        template <typename NumberType>
+        using value_type = NumberType;
+
+        /**
+         * The gradient type associated with this field.
+         */
+        template <typename NumberType>
+        using gradient_type = Tensor<rank + 1, dim, NumberType>; // NumberType;
+
+        /**
+         * Return the first global component of this field.
+         */
+        static inline unsigned int
+        first_component(const FEValuesExtractors::Scalar &extractor)
+        {
+          return extractor.component;
+        }
+
+        /**
+         * Return a flag that indicates if the input @p unrolled_index
+         * corresponds to a symmetric component of the field.
+         *
+         * For a scalar field, the single component is defined
+         * to not have a symmetric counterpart.
+         */
+        static bool
+        symmetric_component(const unsigned int unrolled_index)
+        {
+          (void)unrolled_index;
+          return false;
+        }
+
+        /**
+         * Return the local unrolled component corresponding to
+         * @p column_offset entry of the @p table_indices.
+         *
+         * For a scalar field, the local component is always
+         * equal to zero.
+         */
+        template <typename IndexType = unsigned int, int rank_in>
+        static IndexType
+        local_component(const TableIndices<rank_in> &table_indices,
+                        const unsigned int           column_offset)
+        {
+          Assert(column_offset <= rank_in, ExcInternalError());
+          (void)table_indices;
+          (void)column_offset;
+          return 0;
+        }
+      };
+
+
+      /**
+       * A helper struct that assists with the extraction of data associated
+       * with fields that are defined by FEExtractors.
+       * This particular specialization is for vector fields.
+       */
+      template <int dim>
+      struct Extractor<dim, FEValuesExtractors::Vector>
+      {
+        /**
+         * The number of components of the field.
+         */
+        static const unsigned int n_components = dim;
+
+        /**
+         * The tensor rank of the field.
+         */
+        static const unsigned int rank = 1;
+
+        /**
+         * The tensor type associated with this field.
+         */
+        template <typename NumberType>
+        using tensor_type = Tensor<rank, dim, NumberType>;
+
+        static_assert(
+          n_components == tensor_type<double>::n_independent_components,
+          "The number of components doesn't match that of the corresponding tensor type.");
+        static_assert(
+          rank == tensor_type<double>::rank,
+          "The rank doesn't match that of the corresponding tensor type.");
+
+        /**
+         * The value type associated with this field.
+         */
+        template <typename NumberType>
+        using value_type = tensor_type<NumberType>;
+
+        /**
+         * The gradient type associated with this field.
+         */
+        template <typename NumberType>
+        using gradient_type = Tensor<rank + 1, dim, NumberType>;
+
+        /**
+         * Return the first global component of this field.
+         */
+        static inline unsigned int
+        first_component(const FEValuesExtractors::Vector &extractor)
+        {
+          return extractor.first_vector_component;
+        }
+
+        /**
+         *
+         * Return a flag that indicates if the input @p unrolled_index
+         * corresponds to a symmetric component of the field.
+         *
+         * For a vector field, the none of the vector components
+         * have a symmetric counterpart.
+         */
+        static bool
+        symmetric_component(const unsigned int unrolled_index)
+        {
+          (void)unrolled_index;
+          return false;
+        }
+
+        /**
+         * Return the table index corresponding to
+         * @p column_offset entry of the input @p table_indices.
+         */
+        template <int rank_in>
+        static TableIndices<rank>
+        table_index_view(const TableIndices<rank_in> &table_indices,
+                         const unsigned int           column_offset)
+        {
+          Assert(0 + column_offset < rank_in, ExcInternalError());
+          return TableIndices<rank>(table_indices[column_offset]);
+        }
+
+        /**
+         * Return the local unrolled component corresponding to
+         * @p column_offset entry of the @p table_indices.
+         *
+         * This function computes and returns a local component
+         * associated with the extractor's @p tensor_type from a
+         * set of @p table_indices that are generally associated
+         * with a tensor of equal or greater order. In effect, it
+         * creates a view of a selected number of indices of the
+         * input table, and interprets that subtable's indices as
+         * the local index to be returned. Since the @p table_indices
+         * may be of size greater than the extractor's @p rank,
+         * the @p column_offset specifies the first index of the
+         * input table to create the view from.
+         */
+        template <typename IndexType = unsigned int, int rank_in>
+        static IndexType
+        local_component(const TableIndices<rank_in> &table_indices,
+                        const unsigned int           column_offset)
+        {
+          static_assert(
+            rank_in >= rank,
+            "Cannot extract more table indices than the input table has!");
+          using TensorType = tensor_type<double>;
+          return TensorType::component_to_unrolled_index(
+            table_index_view(table_indices, column_offset));
+        }
+      };
+
+
+      /**
+       * A helper struct that assists with the extraction of data associated
+       * with fields that are defined by FEExtractors.
+       * This particular specialization is for rank-1 tensor fields.
+       */
+      template <int dim>
+      struct Extractor<dim, FEValuesExtractors::Tensor<1>>
+      {
+        /**
+         * The number of components of the field.
+         */
+        static const unsigned int n_components =
+          Tensor<1, dim>::n_independent_components;
+
+        /**
+         * The tensor rank of the field.
+         */
+        static const unsigned int rank = 1;
+
+        /**
+         * The tensor type associated with this field.
+         */
+        template <typename NumberType>
+        using tensor_type = Tensor<rank, dim, NumberType>;
+
+        /**
+         * The value type associated with this field.
+         */
+        template <typename NumberType>
+        using value_type = tensor_type<NumberType>;
+
+        /**
+         * The gradient type associated with this field.
+         */
+        template <typename NumberType>
+        using gradient_type = Tensor<rank + 1, dim, NumberType>;
+
+        /**
+         * Return the first global component of this field.
+         */
+        static inline unsigned int
+        first_component(const FEValuesExtractors::Tensor<1> &extractor)
+        {
+          return extractor.first_tensor_component;
+        }
+
+        /**
+         * Return a flag that indicates if the input @p unrolled_index
+         * corresponds to a symmetric component of the field.
+         *
+         * For a vector field, the none of the vector components
+         * have a symmetric counterpart.
+         */
+        static bool
+        symmetric_component(const unsigned int unrolled_index)
+        {
+          (void)unrolled_index;
+          return false;
+        }
+
+        /**
+         * Return the table index corresponding to
+         * @p column_offset entry of the input @p table_indices.
+         */
+        template <int rank_in>
+        static TableIndices<rank>
+        table_index_view(const TableIndices<rank_in> &table_indices,
+                         const unsigned int           column_offset)
+        {
+          Assert(column_offset < rank_in, ExcInternalError());
+          return TableIndices<rank>(table_indices[column_offset]);
+        }
+
+        /**
+         * Return the local unrolled component corresponding to
+         * a subset of table indices from the input @p table_indices.
+         *
+         * This function computes and returns a local component
+         * associated with the extractor's @p tensor_type from a
+         * set of @p table_indices that are generally associated
+         * with a tensor of equal or greater order. In effect, it
+         * creates a view of a selected number of indices of the
+         * input table, and interprets that subtable's indices as
+         * the local index to be returned. Since the @p table_indices
+         * may be of size greater than the extractor's @p rank,
+         * the @p column_offset specifies the first index of the
+         * input table to create the view from.
+         */
+        template <typename IndexType = unsigned int, int rank_in>
+        static IndexType
+        local_component(const TableIndices<rank_in> &table_indices,
+                        const unsigned int           column_offset)
+        {
+          static_assert(
+            rank_in >= rank,
+            "Cannot extract more table indices than the input table has!");
+          using TensorType = tensor_type<double>;
+          return TensorType::component_to_unrolled_index(
+            table_index_view(table_indices, column_offset));
+        }
+      };
+
+
+      /**
+       * A helper struct that assists with the extraction of data associated
+       * with fields that are defined by FEExtractors.
+       * This particular specialization is for rank-2 tensor fields.
+       */
+      template <int dim>
+      struct Extractor<dim, FEValuesExtractors::Tensor<2>>
+      {
+        /**
+         * The number of components of the field.
+         */
+        static const unsigned int n_components =
+          Tensor<2, dim>::n_independent_components;
+
+        /**
+         * The tensor rank of the field.
+         */
+        static const unsigned int rank = Tensor<2, dim>::rank;
+
+        /**
+         * The tensor type associated with this field.
+         */
+        template <typename NumberType>
+        using tensor_type = Tensor<rank, dim, NumberType>;
+
+        /**
+         * The value type associated with this field.
+         */
+        template <typename NumberType>
+        using value_type = tensor_type<NumberType>;
+
+        /**
+         * The gradient type associated with this field.
+         */
+        template <typename NumberType>
+        using gradient_type = Tensor<rank + 1, dim, NumberType>;
+
+        /**
+         * Return the first global component of this field.
+         */
+        static inline unsigned int
+        first_component(const FEValuesExtractors::Tensor<2> &extractor)
+        {
+          return extractor.first_tensor_component;
+        }
+
+        /**
+         * Return a flag that indicates if the input @p unrolled_index
+         * corresponds to a symmetric component of the field.
+         *
+         * For a rank-2 tensor field, the none of the tensor
+         * components have a symmetric counterpart.
+         */
+        static bool
+        symmetric_component(const unsigned int unrolled_index)
+        {
+          (void)unrolled_index;
+          return false;
+        }
+
+        /**
+         * Return the table indices corresponding to
+         * @p column_offset entry of the input @p table_indices.
+         */
+        template <int rank_in>
+        static TableIndices<rank>
+        table_index_view(const TableIndices<rank_in> &table_indices,
+                         const unsigned int           column_offset)
+        {
+          Assert(column_offset < rank_in, ExcInternalError());
+          Assert(column_offset + 1 < rank_in, ExcInternalError());
+          return TableIndices<rank>(table_indices[column_offset],
+                                    table_indices[column_offset + 1]);
+        }
+
+        /**
+         * Return the local unrolled component corresponding to
+         * @p column_offset entry of the @p table_indices.
+         *
+         * This function computes and returns a local component
+         * associated with the extractor's @p tensor_type from a
+         * set of @p table_indices that are generally associated
+         * with a tensor of equal or greater order. In effect, it
+         * creates a view of a selected number of indices of the
+         * input table, and interprets that subtable's indices as
+         * the local index to be returned. Since the @p table_indices
+         * may be of size greater than the extractor's @p rank,
+         * the @p column_offset specifies the first index of the
+         * input table to create the view from.
+         */
+        template <typename IndexType = unsigned int, int rank_in>
+        static IndexType
+        local_component(const TableIndices<rank_in> &table_indices,
+                        const unsigned int           column_offset)
+        {
+          static_assert(
+            rank_in >= rank,
+            "Cannot extract more table indices than the input table has!");
+          using TensorType = tensor_type<double>;
+          return TensorType::component_to_unrolled_index(
+            table_index_view(table_indices, column_offset));
+        }
+      };
+
+
+      /**
+       * A helper struct that assists with the extraction of data associated
+       * with fields that are defined by FEExtractors.
+       * This particular specialization is for rank-2 symmetric tensor fields.
+       */
+      template <int dim>
+      struct Extractor<dim, FEValuesExtractors::SymmetricTensor<2>>
+      {
+        /**
+         * The number of components of the field.
+         */
+        static const unsigned int n_components =
+          SymmetricTensor<2, dim>::n_independent_components;
+
+        /**
+         * The tensor rank of the field.
+         */
+        static const unsigned int rank = SymmetricTensor<2, dim>::rank;
+
+        /**
+         * The tensor type associated with this field.
+         */
+        template <typename NumberType>
+        using tensor_type = SymmetricTensor<rank, dim, NumberType>;
+
+        /**
+         * The value type associated with this field.
+         */
+        template <typename NumberType>
+        using value_type = tensor_type<NumberType>;
+
+        /**
+         * The gradient type associated with this field.
+         */
+        template <typename NumberType>
+        using gradient_type = Tensor<rank + 1, dim, NumberType>;
+
+        /**
+         * Return the first global component of this field.
+         */
+        static inline unsigned int
+        first_component(const FEValuesExtractors::SymmetricTensor<2> &extractor)
+        {
+          return extractor.first_tensor_component;
+        }
+
+        /**
+         * Return a flag that indicates if the input @p unrolled_index
+         * corresponds to a symmetric component of the field.
+         *
+         * For a rank-2 symmetric tensor field, each of the
+         * off-diagonal components have a symmetric counterpart,
+         * while the diagonal components do not.
+         */
+        static bool
+        symmetric_component(const unsigned int unrolled_index)
+        {
+          const TableIndices<2> table_indices =
+            tensor_type<double>::unrolled_to_component_indices(unrolled_index);
+          return table_indices[0] != table_indices[1];
+        }
+
+        /**
+         * Return the table indices corresponding to
+         * @p column_offset entry of the input @p table_indices.
+         */
+        template <int rank_in>
+        static TableIndices<rank>
+        table_index_view(const TableIndices<rank_in> &table_indices,
+                         const unsigned int           column_offset)
+        {
+          Assert(column_offset < rank_in, ExcInternalError());
+          Assert(column_offset + 1 < rank_in, ExcInternalError());
+          return TableIndices<rank>(table_indices[column_offset],
+                                    table_indices[column_offset + 1]);
+        }
+
+        /**
+         * Return the local unrolled component corresponding to
+         * @p column_offset entry of the @p table_indices.
+         *
+         * This function computes and returns a local component
+         * associated with the extractor's @p tensor_type from a
+         * set of @p table_indices that are generally associated
+         * with a tensor of equal or greater order. In effect, it
+         * creates a view of a selected number of indices of the
+         * input table, and interprets that subtable's indices as
+         * the local index to be returned. Since the @p table_indices
+         * may be of size greater than the extractor's @p rank,
+         * the @p column_offset specifies the first index of the
+         * input table to create the view from.
+         */
+        template <typename IndexType = unsigned int, int rank_in>
+        static IndexType
+        local_component(const TableIndices<rank_in> &table_indices,
+                        const unsigned int           column_offset)
+        {
+          static_assert(
+            rank_in >= rank,
+            "Cannot extract more table indices than the input table has!");
+          using TensorType = tensor_type<double>;
+          return TensorType::component_to_unrolled_index(
+            table_index_view(table_indices, column_offset));
+        }
+      };
+
+
+      /**
+       * A helper struct that defines the return type of gradient (first
+       * derivative) calculations of scalar fields with respect to a field
+       * defined by the @p ExtractorType template parameter.
+       */
+      template <int dim, typename NumberType, typename ExtractorType>
+      struct ScalarFieldGradient
+      {
+        /**
+         * The type associated with computing the gradient of a scalar
+         * field with respect to the given @p ExtractorType.
+         */
+        using type =
+          typename Extractor<dim,
+                             ExtractorType>::template tensor_type<NumberType>;
+      };
+
+
+      /**
+       * An intermediate helper struct that defines the return type of Hessian
+       * (second derivative) calculations of scalar fields with respect to
+       * fields defined by the two extractor-type template parameters.
+       * The first, @p ExtractorType_Row, defines the field that the first
+       * derivatives are taken with respect to while the second,
+       * @p ExtractorType_Col, defines the field that the second derivatives
+       * are taken with respect to.
+       */
+      template <typename ExtractorType_Row, typename ExtractorType_Col>
+      struct HessianType
+      {
+        /**
+         * The type associated with computing the gradient of a scalar
+         * field with respect to the given @p ExtractorType_Row
+         * followed by the @p ExtractorType_Col.
+         *
+         * @note We set the return type for
+         * HessianType<FEExtractor::Vector,FEExtractor::Vector>
+         * as a normal Tensor. This is because if one has two vector components,
+         * the coupling tensor (i.e. Hessian component<FE::V_1,FE::V_2>) is in
+         * general not symmetric.
+         */
+        template <int rank, int dim, typename NumberType>
+        using type = Tensor<rank, dim, NumberType>;
+      };
+
+
+      /**
+       * An intermediate helper struct that defines the return type of Hessian
+       * (second derivative) calculations of scalar fields with respect to
+       * fields defined by the two extractor-type template parameters. This
+       * particular specialization is for taking the first derivative with
+       * respect to a symmetric tensor field, and the second with respect to a
+       * scalar field.
+       */
+      template <>
+      struct HessianType<FEValuesExtractors::SymmetricTensor<2>,
+                         FEValuesExtractors::Scalar>
+      {
+        /**
+         * The type associated with computing the gradient of a scalar
+         * field with respect to the given
+         * <code>ExtractorType_Row =
+         * FEValuesExtractors::SymmetricTensor<2></code> followed by the
+         * <code>ExtractorType_Col = FEValuesExtractors::Scalar</code>.
+         */
+        template <int /*rank*/, int dim, typename NumberType>
+        using type = SymmetricTensor<2 /*rank*/, dim, NumberType>;
+      };
+
+
+      /**
+       * An intermediate helper struct that defines the return type of Hessian
+       * (second derivative) calculations of scalar fields with respect to
+       * fields defined by the two extractor-type template parameters. This
+       * particular specialization is for taking the first derivative with
+       * respect to a scalar field, and the second with respect to a symmetric
+       * tensor field.
+       */
+      template <>
+      struct HessianType<FEValuesExtractors::Scalar,
+                         FEValuesExtractors::SymmetricTensor<2>>
+      {
+        /**
+         * The type associated with computing the gradient of a scalar
+         * field with respect to the given
+         * <code>ExtractorType_Row = FEValuesExtractors::Scalar</code>
+         * followed by the
+         * <code>ExtractorType_Col =
+         * FEValuesExtractors::SymmetricTensor<2></code>.
+         */
+        template <int /*rank*/, int dim, typename NumberType>
+        using type = SymmetricTensor<2 /*rank*/, dim, NumberType>;
+      };
+
+
+      /**
+       * An intermediate helper struct that defines the return type of Hessian
+       * (second derivative) calculations of scalar fields with respect to
+       * fields defined by the two extractor-type template parameters. This
+       * particular specialization is for taking both the first and second
+       * derivatives with respect to symmetric tensor fields.
+       */
+      template <>
+      struct HessianType<FEValuesExtractors::SymmetricTensor<2>,
+                         FEValuesExtractors::SymmetricTensor<2>>
+      {
+        /**
+         * The type associated with computing the gradient of a scalar
+         * field with respect to the given
+         * <code>ExtractorType_Row =
+         * FEValuesExtractors::SymmetricTensor<2></code> followed by the
+         * <code>ExtractorType_Col =
+         * FEValuesExtractors::SymmetricTensor<2></code>.
+         */
+        template <int /*rank*/, int dim, typename NumberType>
+        using type = SymmetricTensor<4 /*rank*/, dim, NumberType>;
+      };
+
+
+      /**
+       * A helper struct that defines the final return type of Hessian
+       * (second derivative) calculations of scalar fields with respect to
+       * fields defined by the two extractor-type
+       * template parameters. The first, @p ExtractorType_Row, defines the field
+       * that the first derivatives are taken with respect to while the second,
+       * @p ExtractorType_Col, defines the field that the second derivatives
+       * are taken with respect to.
+       */
+      template <int dim,
+                typename NumberType,
+                typename ExtractorType_Row,
+                typename ExtractorType_Col>
+      struct ScalarFieldHessian
+      {
+        /**
+         * The tensor rank of the resulting derivative computation.
+         */
+        static const int rank = Extractor<dim, ExtractorType_Row>::rank +
+                                Extractor<dim, ExtractorType_Col>::rank;
+
+        /**
+         * The type associated with computing the Hessian of a scalar
+         * field with first respect to the field defined by the
+         * @p ExtractorType_Row and then with respect to the field defined by
+         * the @p ExtractorType_Col.
+         */
+        using type =
+          typename HessianType<ExtractorType_Row, ExtractorType_Col>::
+            template type<rank, dim, NumberType>;
+      };
+
+
+      /**
+       * A helper struct that defines the return type of value computations
+       * of vector fields the @p ExtractorType_Field template parameter.
+       */
+      template <int dim, typename NumberType, typename ExtractorType_Field>
+      using VectorFieldValue =
+        ScalarFieldGradient<dim, NumberType, ExtractorType_Field>;
+
+
+      /**
+       * A helper struct that defines the final return type of Jacobian
+       * (first derivative) calculations of vector fields with respect to
+       * fields as defined by the two extractor-type template parameters.
+       * The first, @p ExtractorType_Field, defines the field from which
+       * the initial field values are computed while the second,
+       * @p ExtractorType_Derivative, defines the field that the derivatives
+       * are taken with respect to.
+       */
+      template <int dim,
+                typename NumberType,
+                typename ExtractorType_Field,
+                typename ExtractorType_Derivative>
+      using VectorFieldJacobian = ScalarFieldHessian<dim,
+                                                     NumberType,
+                                                     ExtractorType_Field,
+                                                     ExtractorType_Derivative>;
+
+
+      /**
+       * Return a global view of the field component indices that correspond to
+       * the input @p extractor. For this general function the
+       * @p ignore_symmetries flag has no effect.
+       */
+      template <int dim,
+                typename IndexType = unsigned int,
+                typename ExtractorType>
+      std::vector<IndexType>
+      extract_field_component_indices(const ExtractorType &extractor,
+                                      const bool ignore_symmetries = true)
+      {
+        (void)ignore_symmetries;
+        const IndexType n_components =
+          internal::Extractor<dim, ExtractorType>::n_components;
+        const IndexType comp_first =
+          internal::Extractor<dim, ExtractorType>::first_component(extractor);
+        std::vector<IndexType> indices(n_components);
+        std::iota(indices.begin(), indices.end(), comp_first);
+        return indices;
+      }
+
+
+      /**
+       * Return a global view of the field component indices that correspond to
+       * the input FEValuesExtractors::SymmetricTensor @p extractor_symm_tensor.
+       * If the @p ignore_symmetries is set <code>true</code>, then all
+       * component of the tensor are considered to be independent. If set to
+       * code>false</code>, then the set of returned indices will contain
+       * duplicate entries for components that are symmetric.
+       */
+      template <int dim, typename IndexType = unsigned int>
+      std::vector<IndexType>
+      extract_field_component_indices(
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_symm_tensor,
+        const bool                                    ignore_symmetries = true)
+      {
+        using ExtractorType = FEValuesExtractors::SymmetricTensor<2>;
+        const IndexType n_components =
+          internal::Extractor<dim, ExtractorType>::n_components;
+        if (ignore_symmetries == true)
+          {
+            const IndexType comp_first =
+              internal::Extractor<dim, ExtractorType>::first_component(
+                extractor_symm_tensor);
+            std::vector<IndexType> indices(n_components);
+            std::iota(indices.begin(), indices.end(), comp_first);
+            return indices;
+          }
+        else
+          {
+            // First get all of the indices of the non-symmetric tensor
+            const FEValuesExtractors::Tensor<2> extractor_tensor(
+              extractor_symm_tensor.first_tensor_component);
+            std::vector<IndexType> indices =
+              extract_field_component_indices<dim>(extractor_tensor, true);
+
+            // Then we overwrite any illegal entries with the equivalent indices
+            // from the symmetric tensor
+            for (unsigned int i = 0; i < indices.size(); ++i)
+              {
+                if (indices[i] >= n_components)
+                  {
+                    const TableIndices<2> ti_tensor =
+                      Tensor<2, dim>::unrolled_to_component_indices(indices[i]);
+                    const IndexType sti_new_index =
+                      SymmetricTensor<2, dim>::component_to_unrolled_index(
+                        ti_tensor);
+                    indices[i] = sti_new_index;
+                  }
+              }
+
+            return indices;
+          }
+      }
+
+
+      /**
+       * Set the unrolled component given by @p index in the generic tensor
+       * @p t to the given @p value.
+       */
+      template <typename TensorType, typename NumberType>
+      inline void
+      set_tensor_entry(TensorType &        t,
+                       const unsigned int &unrolled_index,
+                       const NumberType &  value)
+      {
+        // Where possible, set values using TableIndices
+        Assert(unrolled_index < t.n_independent_components,
+               ExcIndexRange(unrolled_index, 0, t.n_independent_components));
+        t[TensorType::unrolled_to_component_indices(unrolled_index)] = value;
+      }
+
+
+      /**
+       * Set the unrolled component given by @p index in the rank-0 tensor
+       * @p t to the given @p value.
+       */
+      template <int dim, typename NumberType>
+      inline void set_tensor_entry(Tensor<0, dim, NumberType> &t,
+                                   const unsigned int &        unrolled_index,
+                                   const NumberType &          value)
+      {
+        Assert(unrolled_index == 0, ExcIndexRange(unrolled_index, 0, 1));
+        (void)unrolled_index;
+        t = value;
+      }
+
+
+      /**
+       * Set the value of @p t to the given @p value.
+       * This function exists to provide compatibility with similar functions
+       * that exist for use with the tensor classes.
+       */
+      template <typename NumberType>
+      inline void
+      set_tensor_entry(NumberType &        t,
+                       const unsigned int &unrolled_index,
+                       const NumberType &  value)
+      {
+        Assert(unrolled_index == 0, ExcIndexRange(unrolled_index, 0, 1));
+        (void)unrolled_index;
+        t = value;
+      }
+
+
+      /**
+       * Set the unrolled component given by the @p index_row and
+       * the @p index_col in the fourth-order symmetric tensor
+       * @p t to the given @p value.
+       */
+      template <int dim, typename NumberType>
+      inline void set_tensor_entry(SymmetricTensor<4, dim, NumberType> &t,
+                                   const unsigned int &unrolled_index_row,
+                                   const unsigned int &unrolled_index_col,
+                                   const NumberType &  value)
+      {
+        // Fourth order symmetric tensors require a specialized interface
+        // to extract values.
+        using SubTensorType = SymmetricTensor<2, dim, NumberType>;
+        Assert(unrolled_index_row < SubTensorType::n_independent_components,
+               ExcIndexRange(unrolled_index_row,
+                             0,
+                             SubTensorType::n_independent_components));
+        Assert(unrolled_index_col < SubTensorType::n_independent_components,
+               ExcIndexRange(unrolled_index_col,
+                             0,
+                             SubTensorType::n_independent_components));
+        const TableIndices<2> indices_row =
+          SubTensorType::unrolled_to_component_indices(unrolled_index_row);
+        const TableIndices<2> indices_col =
+          SubTensorType::unrolled_to_component_indices(unrolled_index_col);
+        t[indices_row[0]][indices_row[1]][indices_col[0]][indices_col[1]] =
+          value;
+      }
+
+
+      /**
+       * Return the value of the @p index'th unrolled component of the
+       * generic tensor @p t.
+       */
+      template <int rank,
+                int dim,
+                typename NumberType,
+                template <int, int, typename> class TensorType>
+      inline NumberType
+      get_tensor_entry(const TensorType<rank, dim, NumberType> &t,
+                       const unsigned int &                     unrolled_index)
+      {
+        // Where possible, get values using TableIndices
+        Assert(unrolled_index < t.n_independent_components,
+               ExcIndexRange(unrolled_index, 0, t.n_independent_components));
+        return t[TensorType<rank, dim, NumberType>::
+                   unrolled_to_component_indices(unrolled_index)];
+      }
+
+
+      /**
+       * Return the value of the @p index'th unrolled component of the
+       * rank-0 tensor @p t.
+       */
+      template <int dim,
+                typename NumberType,
+                template <int, int, typename> class TensorType>
+      inline NumberType
+      get_tensor_entry(const TensorType<0, dim, NumberType> &t,
+                       const unsigned int &                  unrolled_index)
+      {
+        Assert(unrolled_index == 0, ExcIndexRange(unrolled_index, 0, 1));
+        (void)unrolled_index;
+        return t;
+      }
+
+
+      /**
+       * Return the value of @p t.
+       * This function exists to provide compatibility with similar functions
+       * that exist for use with the tensor classes.
+       */
+      template <typename NumberType>
+      inline const NumberType &
+      get_tensor_entry(const NumberType &t, const unsigned int &unrolled_index)
+      {
+        Assert(unrolled_index == 0, ExcIndexRange(unrolled_index, 0, 1));
+        (void)unrolled_index;
+        return t;
+      }
+
+
+      /**
+       * Return a reference to the entry stored in the @p index'th unrolled
+       * component of the generic tensor @p t.
+       */
+      template <int rank,
+                int dim,
+                typename NumberType,
+                template <int, int, typename> class TensorType>
+      inline NumberType &
+      get_tensor_entry(TensorType<rank, dim, NumberType> &t,
+                       const unsigned int &               unrolled_index)
+      {
+        // Where possible, get values using TableIndices
+        Assert(unrolled_index < t.n_independent_components,
+               ExcIndexRange(unrolled_index, 0, t.n_independent_components));
+        return t[TensorType<rank, dim, NumberType>::
+                   unrolled_to_component_indices(unrolled_index)];
+      }
+
+
+      /**
+       * Return a reference to the entry stored in the @p index'th unrolled
+       * component of the rank-0 tensor @p t.
+       */
+      template <int dim,
+                typename NumberType,
+                template <int, int, typename> class TensorType>
+      NumberType &get_tensor_entry(TensorType<0, dim, NumberType> &t,
+                                   const unsigned int &            index)
+      {
+        Assert(index == 0, ExcIndexRange(index, 0, 1));
+        (void)index;
+        return t;
+      }
+
+
+      /**
+       * Return a reference to  @p t.
+       * This function exists to provide compatibility with similar functions
+       * that exist for use with the tensor classes.
+       */
+      template <typename NumberType>
+      inline NumberType &
+      get_tensor_entry(NumberType &t, const unsigned int &index)
+      {
+        Assert(index == 0, ExcIndexRange(index, 0, 1));
+        (void)index;
+        return t;
+      }
+
+    } // namespace internal
   } // namespace AD
 } // namespace Differentiation
 
