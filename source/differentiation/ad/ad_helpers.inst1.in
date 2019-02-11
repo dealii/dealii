@@ -101,3 +101,42 @@ for ()
     \}
     \}
 }
+
+
+for (deal_II_dimension : DIMENSIONS ; number : REAL_SCALARS)
+{
+  namespace Differentiation
+  \{
+  namespace AD
+  \{
+    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    \}
+    \}
+}
+
+// Instantiations for ADHelpers for which the underlying number type is fixed
+for (deal_II_dimension : DIMENSIONS)
+{
+    namespace Differentiation
+    \{
+    namespace AD
+    \{
+
+    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    \}
+    \}
+}

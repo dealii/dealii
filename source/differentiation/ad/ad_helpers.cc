@@ -738,7 +738,7 @@ namespace Differentiation
     const std::vector<
       typename ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ad_type> &
     ADHelperCellLevelBase<ADNumberTypeCode,
-                          ScalarType>::get_sensitive_dof_values()
+                          ScalarType>::get_sensitive_dof_values() const
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
@@ -756,30 +756,6 @@ namespace Differentiation
                                   this->n_independent_variables()));
 
       return this->independent_variables;
-    }
-
-
-
-    template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    std::vector<
-      typename ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ad_type>
-    ADHelperCellLevelBase<ADNumberTypeCode,
-                          ScalarType>::get_non_sensitive_dof_values() const
-    {
-      if (ADNumberTraits<ad_type>::is_taped == true)
-        {
-          Assert(this->active_tape_index() !=
-                   Numbers<ad_type>::invalid_tape_index,
-                 ExcMessage("Invalid tape index"));
-        }
-
-      std::vector<ad_type> out(this->n_independent_variables(),
-                               dealii::internal::NumberType<ad_type>::value(
-                                 0.0));
-      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
-        this->initialize_non_sensitive_independent_variable(i, out[i]);
-
-      return out;
     }
 
 
@@ -1164,6 +1140,175 @@ namespace Differentiation
                                          this->dependent_variables,
                                          jacobian);
         }
+    }
+
+
+
+    /* ----------------- ADHelperPointLevelFunctionsBase  ----------------- */
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      ADHelperPointLevelFunctionsBase(
+        const unsigned int n_independent_variables,
+        const unsigned int n_dependent_variables)
+      : ADHelperBase<ADNumberTypeCode, ScalarType>(n_independent_variables,
+                                                   n_dependent_variables)
+      , symmetric_independent_variables(n_independent_variables, false)
+    {}
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::reset(
+      const unsigned int n_independent_variables,
+      const unsigned int n_dependent_variables,
+      const bool         clear_registered_tapes)
+    {
+      ADHelperBase<ADNumberTypeCode, ScalarType>::reset(n_independent_variables,
+                                                        n_dependent_variables,
+                                                        clear_registered_tapes);
+
+      const unsigned int new_n_independent_variables =
+        (n_independent_variables != dealii::numbers::invalid_unsigned_int ?
+           n_independent_variables :
+           this->n_independent_variables());
+      symmetric_independent_variables =
+        std::vector<bool>(new_n_independent_variables, false);
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    bool
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      is_symmetric_independent_variable(const unsigned int index) const
+    {
+      Assert(index < symmetric_independent_variables.size(),
+             ExcInternalError());
+      return symmetric_independent_variables[index];
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    unsigned int
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      n_symmetric_independent_variables() const
+    {
+      return std::count(symmetric_independent_variables.begin(),
+                        symmetric_independent_variables.end(),
+                        true);
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      register_independent_variables(const std::vector<scalar_type> &values)
+    {
+      // This is actually the same thing the set_independent_variable function,
+      // in the sense that we simply populate our array of independent values
+      // with a meaningful number. However, in this case we need to double check
+      // that we're not registering these variables twice
+      Assert(values.size() == this->n_independent_variables(),
+             ExcMessage(
+               "Vector size does not match number of independent variables"));
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
+        {
+          Assert(this->registered_independent_variable_values[i] == false,
+                 ExcMessage("Independent variable value already registered."));
+        }
+      set_independent_variables(values);
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    const std::vector<
+      typename ADHelperPointLevelFunctionsBase<dim,
+                                               ADNumberTypeCode,
+                                               ScalarType>::ad_type> &
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      get_sensitive_variables() const
+    {
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+        }
+
+      // Just in case the user has not done so, we repeat the call to
+      // initialize the internally stored vector of AD numbers that
+      // represents the independent variables.
+      this->finalize_sensitive_independent_variables();
+      Assert(this->independent_variables.size() ==
+               this->n_independent_variables(),
+             ExcDimensionMismatch(this->independent_variables.size(),
+                                  this->n_independent_variables()));
+
+      return this->independent_variables;
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      set_sensitivity_value(const unsigned int index,
+                            const bool         symmetric_component,
+                            const scalar_type &value)
+    {
+      ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(index,
+                                                                        value);
+      Assert(
+        index < this->n_independent_variables(),
+        ExcMessage(
+          "Trying to set the symmetry flag of a non-existent independent variable."));
+      Assert(index < symmetric_independent_variables.size(),
+             ExcInternalError());
+      symmetric_independent_variables[index] = symmetric_component;
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      set_independent_variables(const std::vector<scalar_type> &values)
+    {
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+        }
+      Assert(values.size() == this->n_independent_variables(),
+             ExcMessage(
+               "Vector size does not match number of independent variables"));
+      for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
+        ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
+          i, values[i]);
     }
 
 

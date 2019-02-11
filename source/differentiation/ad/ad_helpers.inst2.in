@@ -149,3 +149,55 @@ for ()
     \}
     \}
 }
+
+
+for (deal_II_dimension : DIMENSIONS ; number : REAL_SCALARS)
+{
+  namespace Differentiation
+  \{
+  namespace AD
+  \{
+
+    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad_dfad,number>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad,number>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad,number>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
+
+    \}
+    \}
+}
+
+// Instantiations for ADHelpers for which the underlying number type is fixed
+for (deal_II_dimension : DIMENSIONS)
+{
+    namespace Differentiation
+    \{
+    namespace AD
+    \{
+
+    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+
+    \}
+    \}
+}
