@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2005 - 2018 by the deal.II authors
+ * Copyright (C) 2005 - 2019 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -12,10 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
- *
- * Authors: Wolfgang Bangerth, Texas A&M University, 2005, 2006;
- *          (port to LinearOperator:) Matthias Maier, 2019
  */
 
 
@@ -607,16 +603,15 @@ namespace Step20
 
     const auto op_M_inv = inverse_operator(op_M, solver_M, preconditioner_M);
 
-    // This puts us in the position to be able to declare the Schur
-    // complement <code>op_S</code> and the approximate Schur complement
-    // <code>op_aS</code>:
+    // This allows us to declare the Schur complement <code>op_S</code> and
+    // the approximate Schur complement <code>op_aS</code>:
     const auto op_S = transpose_operator(op_B) * op_M_inv * op_B;
     const auto op_aS =
       transpose_operator(op_B) * linear_operator(preconditioner_M) * op_B;
 
     // We now create a preconditioner out of <code>op_aS</code> that
-    // applies a few CG iterations (until a very modest relative reduction
-    // of $10^{-3}$ is reached):
+    // applies a small number of CG iterations (until a very modest
+    // relative reduction of $10^{-3}$ is reached):
     ReductionControl     reduction_control_aS(2000, 1.e-18, 1.0e-3);
     SolverCG<>           solver_aS(reduction_control_aS);
     PreconditionIdentity preconditioner_aS;

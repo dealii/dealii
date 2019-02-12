@@ -384,7 +384,8 @@ the system. We note that the resulting solver is not optimal -- there are
 much better ways to efficiently compute the system, for example those
 explained in the results section of step-22 or the one we use in step-43
 for a problem similar to the current one. Here, our goal shall be to
-introduce new solution techniques how they can be implemented in deal.II.
+introduce new solution techniques and how they can be implemented in
+deal.II.
 
 
 <h4>Solving using the Schur complement</h4>
@@ -494,8 +495,8 @@ factor (here, $10^{-10}$). In contrast the SolverControl class only checks
 for absolute tolerances. We have to use ReductionControl in our case to
 work around a minor issue: The right hand sides that we  will feed to
 <code>op_M_inv</code> are essentially formed by residuals that naturally
-have vastly differing norms. This makes control by an absolute tolerance
-very error prone.
+decrease vastly in norm as the outer iterations progress. This makes
+control by an absolute tolerance very error prone.
 
 We now have a LinearOperator <code>op_M_inv</code> that we can use to
 construct more complicated operators such as the Schur complement $S$.
@@ -515,7 +516,11 @@ similar to the following code:
     solver_M(M, tmp2, tmp1, preconditioner_M); // multiply with M^-1
     B.Tvmult (dst, tmp2); // multiply with the bottom left block: B^T
 @endcode
-(<code>tmp1</code> and <code>tmp2</code> are two temporary vectors).
+(<code>tmp1</code> and <code>tmp2</code> are two temporary vectors). The
+key point behind this approach is the fact that we never actually create an
+inner product of matrices. Instead, whenever we have to perform a matrix
+vector multiplication with <code>op_S</code> we simply run all individual
+<code>vmult</code> operations in above sequence.
 
 @note We could have achieved the same goal of creating a "matrix like"
 object by implementing a specialized class <code>SchurComplement</code>
@@ -539,9 +544,11 @@ class SchurComplement
 @endcode
 Even though both approaches are exactly equivalent, the LinearOperator
 class has a big advantage over this manual approach.
-It provides so-called <i>syntactic sugar</i>: Mathematically, we think
-about $S$ as being the composite matrix $S=B^TM^{-1}B$ and the
-LinearOperator class allows you to write this out more or less verbatim,
+It provides so-called
+<i><a href="https://en.wikipedia.org/wiki/Syntactic_sugar">syntactic sugar</a></i>:
+Mathematically, we think about $S$ as being the composite matrix
+$S=B^TM^{-1}B$ and the LinearOperator class allows you to write this out
+more or less verbatim,
 @code
 const auto op_M_inv = inverse_operator(op_M, solver_M, preconditioner_M);
 const auto op_S = transpose_operator(op_B) * op_M_inv * op_B;
@@ -570,13 +577,14 @@ us. Similarly in spirit to LinearOperator, a PackagedOperation stores a
     std::function<void(Range &)> apply;
     std::function<void(Range &)> apply_add;
 @endcode
-The class allows lazy evaluation of expressions involving vectors and
-linear operators. This is done by storing the computational expression and
-only performing the computation when either the object is converted to a
-vector object, or PackagedOperation::apply() (or
-PackagedOperation::apply_add()) is invoked by hand. Assuming that
-<code>F</code> and <code>G</code> are the two vectors of the right hand
-side we can simply write:
+The class allows
+<a href="https://en.wikipedia.org/wiki/Lazy_evaluation">lazy evaluation</a>
+of expressions involving vectors and linear operators. This is done by
+storing the computational expression and only performing the computation
+when either the object is converted to a vector object, or
+PackagedOperation::apply() (or PackagedOperation::apply_add()) is invoked
+by hand. Assuming that <code>F</code> and <code>G</code> are the two
+vectors of the right hand side we can simply write:
 @code
     const auto schur_rhs = transpose_operator(op_B) * op_M_inv * F - G;
 @endcode
