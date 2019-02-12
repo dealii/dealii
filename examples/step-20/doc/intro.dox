@@ -659,15 +659,16 @@ Obviously, applying this inverse of the approximate Schur complement is a very
 expensive preconditioner, almost as expensive as inverting the Schur
 complement itself. We can expect it to significantly reduce the number of
 outer iterations required for the Schur complement. In fact it does: in a
-typical run on 5 times refined meshes using elements of order 0, the number of
-outer iterations drops from 164 to 12. On the other hand, we now have to apply
-a very expensive preconditioner 12 times. A better measure is therefore simply
-the run-time of the program: on my laptop, it drops from 28 to 23 seconds for
-this test case. That doesn't seem too impressive, but the savings become more
-pronounced on finer meshes and with elements of higher order. For example, a
-six times refined mesh and using elements of order 2 yields an improvement of
-318 to 12 outer iterations, at a runtime of 338 seconds to 229 seconds. Not
-earth shattering, but significant.
+typical run on 7 times refined meshes using elements of order 0, the number of
+outer iterations drops from 592 to 25. On the other hand, we now have to apply
+a very expensive preconditioner 25 times. A better measure is therefore simply
+the run-time of the program: on a current laptop (as of January 2019), it
+drops from 3.57 to 2.48 seconds for this test case. That doesn't seem too
+impressive, but the savings become more pronounced on finer meshes and with
+elements of higher order. For example, an seven times refined mesh and
+using elements of order 2 (which amounts to about 0.4 million degrees of
+freedom) yields an improvement of 1134 to 28 outer iterations, at a runtime
+of 168 seconds to 78 seconds. Not earth shattering, but significant.
 
 
 <h3>Definition of the test case</h3>
