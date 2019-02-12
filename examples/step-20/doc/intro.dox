@@ -605,6 +605,10 @@ creating another solver and inverse:
     U = op_M_inv * (F - op_B * P);
 @endcode
 
+@note The functionality that we developed in this example step by hand is
+already readily available in the library. Have a look at
+schur_complement(), condense_schur_rhs(), and postprocess_schur_solution().
+
 
 <h4>A preconditioner for the Schur complement</h4>
 
