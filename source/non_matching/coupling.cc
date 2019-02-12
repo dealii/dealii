@@ -40,6 +40,92 @@
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
 {
+  namespace internal
+  {
+    /**
+     * Given two triangulations, the first immersed inside the other, this
+     * function computes and returns the real-space quadrature points of the
+     * immersed triangulation.
+     *
+     * For reference:
+     * cache->triangulation() is the imbdedding triangulation, which contains
+     * immersed_dh->get_triangulation() the embedded triangulation
+     *
+     * Mapping and quadrature are those of this second triangulation.
+     *
+     * If the triangulation inside @p cache is parallel, only points lying over
+     * locally onwed cells are returned. This is why a vector of unsigned int
+     * is returned: it describes the indices of cells from the immersed
+     * triangulation which have been used (relative to a loop over al cells). If
+     * embedding triangulation is not parallel, all cells shall be used.
+     */
+    template <int dim0, int dim1, int spacedim>
+    std::pair<std::vector<Point<spacedim>>, std::vector<unsigned int>>
+    qpoints_over_locally_owned_cells(
+      const GridTools::Cache<dim0, spacedim> &cache,
+      const DoFHandler<dim1, spacedim> &      immersed_dh,
+      const Quadrature<dim1> &                quad,
+      const Mapping<dim1, spacedim> &         immersed_mapping,
+      const bool                              tria_is_parallel)
+    {
+      const auto &                 immersed_fe = immersed_dh.get_fe();
+      std::vector<Point<spacedim>> points_over_local_cells;
+      // Keep track of which cells we actually used
+      std::vector<unsigned int> used_cells_ids;
+      {
+        FEValues<dim1, spacedim> fe_v(immersed_mapping,
+                                      immersed_fe,
+                                      quad,
+                                      update_quadrature_points);
+        unsigned int             cell_id = 0;
+        for (const auto &cell : immersed_dh.active_cell_iterators())
+          {
+            bool use_cell = false;
+            if (tria_is_parallel)
+              {
+                const auto bbox = cell->bounding_box();
+                std::vector<std::pair<
+                  BoundingBox<spacedim>,
+                  typename Triangulation<dim0, spacedim>::active_cell_iterator>>
+                  out_vals;
+                cache.get_cell_bounding_boxes_rtree().query(
+                  boost::geometry::index::intersects(bbox),
+                  std::back_inserter(out_vals));
+                // Each bounding box corresponds to an active cell
+                // of the imbedding triangulation: we now check if
+                // the current cell, of the imbedded triangulation,
+                // overlaps a locally owned cell of the imbedding one
+                for (const auto &bbox_it : out_vals)
+                  if (bbox_it.second->is_locally_owned())
+                    {
+                      use_cell = true;
+                      used_cells_ids.emplace_back(cell_id);
+                      break;
+                    }
+              }
+            else
+              // for sequential triangulations, simply use all cells
+              use_cell = true;
+
+            if (use_cell)
+              {
+                // Reinitialize the cell and the fe_values
+                fe_v.reinit(cell);
+                const std::vector<Point<spacedim>> &x_points =
+                  fe_v.get_quadrature_points();
+
+                // Insert the points to the vector
+                points_over_local_cells.insert(points_over_local_cells.end(),
+                                               x_points.begin(),
+                                               x_points.end());
+              }
+            ++cell_id;
+          }
+      }
+      return {std::move(points_over_local_cells), std::move(used_cells_ids)};
+    }
+  } // namespace internal
+
   template <int dim0,
             int dim1,
             int spacedim,
@@ -97,6 +183,9 @@ namespace NonMatching
               &immersed_dh.get_triangulation()) == nullptr),
            ExcNotImplemented());
 
+    const bool tria_is_parallel =
+      (dynamic_cast<const parallel::Triangulation<dim1, spacedim> *>(
+         &space_dh.get_triangulation()) != nullptr);
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
 
@@ -134,27 +223,13 @@ namespace NonMatching
     const unsigned int n_q_points = quad.size();
     const unsigned int n_active_c =
       immersed_dh.get_triangulation().n_active_cells();
-    std::vector<Point<spacedim>> all_points(n_active_c * n_q_points);
-    {
-      FEValues<dim1, spacedim> fe_v(immersed_mapping,
-                                    immersed_fe,
-                                    quad,
-                                    update_quadrature_points);
-      unsigned int             c = 0;
-      for (const auto &cell : immersed_dh.active_cell_iterators())
-        {
-          // Reinitialize the cell and the fe_values
-          fe_v.reinit(cell);
-          const std::vector<Point<spacedim>> &x_points =
-            fe_v.get_quadrature_points();
 
-          // Copy the points to the vector
-          std::copy(x_points.begin(),
-                    x_points.end(),
-                    all_points.begin() + c * n_q_points);
-          ++c;
-        }
-    }
+    const auto qpoints_cells_data = internal::qpoints_over_locally_owned_cells(
+      cache, immersed_dh, quad, immersed_mapping, tria_is_parallel);
+
+    const auto &points_over_local_cells = std::get<0>(qpoints_cells_data);
+    const auto &used_cells_ids          = std::get<1>(qpoints_cells_data);
+
     // [TODO]: when the add_entries_local_to_global below will implement
     // the version with the dof_mask, this should be uncommented.
     //
@@ -177,7 +252,8 @@ namespace NonMatching
 
 
     // Get a list of outer cells, qpoints and maps.
-    const auto  cpm = GridTools::compute_point_locations(cache, all_points);
+    const auto cpm =
+      GridTools::compute_point_locations(cache, points_over_local_cells);
     const auto &all_cells = std::get<0>(cpm);
     const auto &maps      = std::get<2>(cpm);
 
@@ -191,10 +267,15 @@ namespace NonMatching
         // the following index keeps track of the last id
         // where the current cell was inserted
         unsigned int last_id = std::numeric_limits<unsigned int>::max();
+        unsigned int cell_id;
         for (const unsigned int idx : maps[i])
           {
-            // Find in which cell the point lies
-            unsigned int cell_id = idx / n_q_points;
+            // Find in which cell of immersed triangulation the point lies
+            if (tria_is_parallel)
+              cell_id = used_cells_ids[idx / n_q_points];
+            else
+              cell_id = idx / n_q_points;
+
             if (last_id != cell_id)
               {
                 cell_sets[cell_id].insert(all_cells[i]);
@@ -285,6 +366,10 @@ namespace NonMatching
               &immersed_dh.get_triangulation()) == nullptr),
            ExcNotImplemented());
 
+    const bool tria_is_parallel =
+      (dynamic_cast<const parallel::Triangulation<dim1, spacedim> *>(
+         &space_dh.get_triangulation()) != nullptr);
+
     const auto &space_fe    = space_dh.get_fe();
     const auto &immersed_fe = immersed_dh.get_fe();
 
@@ -330,28 +415,16 @@ namespace NonMatching
     const unsigned int n_q_points = quad.size();
     const unsigned int n_active_c =
       immersed_dh.get_triangulation().n_active_cells();
-    std::vector<Point<spacedim>> all_points(n_active_c * n_q_points);
 
-    // Collecting all points
-    {
-      unsigned int c = 0;
-      for (const auto &cell : immersed_dh.active_cell_iterators())
-        {
-          // Reinitialize the cell and the fe_values
-          fe_v.reinit(cell);
-          const std::vector<Point<spacedim>> &x_points =
-            fe_v.get_quadrature_points();
+    const auto used_cells_data = internal::qpoints_over_locally_owned_cells(
+      cache, immersed_dh, quad, immersed_mapping, tria_is_parallel);
 
-          // Copy the points to the vector
-          std::copy(x_points.begin(),
-                    x_points.end(),
-                    all_points.begin() + c * n_q_points);
-          ++c;
-        }
-    }
+    const auto &points_over_local_cells = std::get<0>(used_cells_data);
+    const auto &used_cells_ids          = std::get<1>(used_cells_data);
 
     // Get a list of outer cells, qpoints and maps.
-    const auto  cpm = GridTools::compute_point_locations(cache, all_points);
+    const auto cpm =
+      GridTools::compute_point_locations(cache, points_over_local_cells);
     const auto &all_cells   = std::get<0>(cpm);
     const auto &all_qpoints = std::get<1>(cpm);
     const auto &all_maps    = std::get<2>(cpm);
@@ -372,8 +445,14 @@ namespace NonMatching
           {
             // Find the index of the "owner" cell and qpoint
             // with regard to the immersed mesh
-            const unsigned int cell_id = all_maps[o][j] / n_q_points;
-            const unsigned int n_pt    = all_maps[o][j] % n_q_points;
+            // Find in which cell of immersed triangulation the point lies
+            unsigned int cell_id;
+            if (tria_is_parallel)
+              cell_id = used_cells_ids[all_maps[o][j] / n_q_points];
+            else
+              cell_id = all_maps[o][j] / n_q_points;
+
+            const unsigned int n_pt = all_maps[o][j] % n_q_points;
 
             // If there are no cells, we just add our data
             if (cell_container[cell_id].empty())
