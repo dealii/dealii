@@ -28,9 +28,13 @@ confidence in the solution, let us take a look at it. The following three
 images show (from left to right) the x-velocity, the y-velocity, and the
 pressure:
 
-<img src="https://www.dealii.org/images/steps/developer/step-20.u_new.jpg" alt="">
-<img src="https://www.dealii.org/images/steps/developer/step-20.v_new.jpg" alt="">
-<img src="https://www.dealii.org/images/steps/developer/step-20.p_new.jpg" alt="">
+<table style="width:60%" align="center">
+  <tr>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-20.u_new.jpg" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-20.v_new.jpg" width="400" alt=""></td>
+    <td><img src="https://www.dealii.org/images/steps/developer/step-20.p_new.jpg" width="400" alt=""></td>
+  </tr>
+</table>
 
 
 
