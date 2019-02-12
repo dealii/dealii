@@ -654,12 +654,21 @@ with $M$ is defined: it is the multiplication with the inverse of the
 diagonal of $M$; in other words, the operation $({\textrm{diag}\ }M)^{-1}x$
 on a vector $x$ is exactly what PreconditionJacobi does.)
 
-With all this, we nearly already have the preconditioner: it should be the
-inverse of the approximate Schur complement. We implement this again with
-the inverse_operator() function
+With all this we almost have the preconditioner completed: it should be the
+inverse of the approximate Schur complement. We implement this again by
+creating a linear operator with inverse_operator() function. This time
+however we would like to choose a relatively modest tolerance for the CG
+solver (that inverts <code>op_aS</code>). The reasoning is that
+<code>op_aS</code> is only coarse approximation to <code>op_S</code>, so we
+actually do not need to invert it exactly. This, however creates a subtle
+problem: <code>preconditioner_S</code> will be used in the final outer CG
+iteration to create an orthogonal basis. But for this to work, it must be
+precisely the same linear operation for every invocation. We ensure this by
+using an IterationNumberControl that allows us to fix the number of CG
+iterations that are performed to a fixed small number (in our case 30):
 @code
-    ReductionControl     reduction_control_aS(2000, 1.e-18, 1.0e-6);
-    SolverCG<>           solver_aS(reduction_control_aS);
+    IterationNumberControl iteration_number_control_aS(30, 1.e-18);
+    SolverCG<>           solver_aS(iteration_number_control_aS);
     PreconditionIdentity preconditioner_aS;
     const auto preconditioner_S =
       inverse_operator(op_aS, solver_aS, preconditioner_aS);
@@ -672,15 +681,15 @@ expensive preconditioner, almost as expensive as inverting the Schur
 complement itself. We can expect it to significantly reduce the number of
 outer iterations required for the Schur complement. In fact it does: in a
 typical run on 7 times refined meshes using elements of order 0, the number of
-outer iterations drops from 592 to 25. On the other hand, we now have to apply
+outer iterations drops from 592 to 39. On the other hand, we now have to apply
 a very expensive preconditioner 25 times. A better measure is therefore simply
 the run-time of the program: on a current laptop (as of January 2019), it
-drops from 3.57 to 2.48 seconds for this test case. That doesn't seem too
+drops from 3.57 to 2.05 seconds for this test case. That doesn't seem too
 impressive, but the savings become more pronounced on finer meshes and with
 elements of higher order. For example, an seven times refined mesh and
 using elements of order 2 (which amounts to about 0.4 million degrees of
-freedom) yields an improvement of 1134 to 28 outer iterations, at a runtime
-of 168 seconds to 78 seconds. Not earth shattering, but significant.
+freedom) yields an improvement of 1134 to 83 outer iterations, at a runtime
+of 168 seconds to 40 seconds. Not earth shattering, but significant.
 
 
 <h3>Definition of the test case</h3>

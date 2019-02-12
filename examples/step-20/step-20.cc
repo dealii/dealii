@@ -610,11 +610,10 @@ namespace Step20
       transpose_operator(op_B) * linear_operator(preconditioner_M) * op_B;
 
     // We now create a preconditioner out of <code>op_aS</code> that
-    // applies a small number of CG iterations (until a very modest
-    // relative reduction of $10^{-3}$ is reached):
-    ReductionControl     reduction_control_aS(2000, 1.e-18, 1.0e-3);
-    SolverCG<>           solver_aS(reduction_control_aS);
-    PreconditionIdentity preconditioner_aS;
+    // applies a fixed number of 30 (inexpensive) CG iterations:
+    IterationNumberControl iteration_number_control_aS(30, 1.e-18);
+    SolverCG<>             solver_aS(iteration_number_control_aS);
+    PreconditionIdentity   preconditioner_aS;
 
     const auto preconditioner_S =
       inverse_operator(op_aS, solver_aS, preconditioner_aS);
