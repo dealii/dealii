@@ -301,7 +301,7 @@ namespace LinearAlgebra
                                     ::dealii::CUDAWrappers::block_size);
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::set_permutated<Number>
             <<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
-              tmp_vector.begin(), V_dev, indices_dev, n_elements);
+              indices_dev, tmp_vector.begin(), V_dev, n_elements);
 
           tmp_vector.compress(operation);
 
@@ -319,16 +319,16 @@ namespace LinearAlgebra
           if (operation == VectorOperation::add)
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_permutated<
               Number><<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
+              indices_dev,
               data.values_dev.get(),
               tmp_vector.begin(),
-              indices_dev,
               tmp_n_elements);
           else
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::set_permutated<
               Number><<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
+              indices_dev,
               data.values_dev.get(),
               tmp_vector.begin(),
-              indices_dev,
               tmp_n_elements);
 
           ::dealii::Utilities::CUDA::free(indices_dev);

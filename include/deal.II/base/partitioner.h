@@ -572,6 +572,13 @@ namespace Utilities
 
     private:
       /**
+       * Initialize import_indices_plain_dev from import_indices_data. This
+       * function is only used when using CUDA-aware MPI.
+       */
+      void
+      initialize_import_indices_plain_dev() const;
+
+      /**
        * The global size of the vector over all processors
        */
       types::global_dof_index global_size;

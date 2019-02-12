@@ -182,6 +182,23 @@ namespace LinearAlgebra
 
 
       /**
+       * Apply the functor @tparam Binop to the elements of @p v1 that have
+       * indices in @p mask and @p v2. The size of @p mask should be greater
+       * than the size of @p v1. @p mask and @p v2 should have the same size @p
+       * N.
+       *
+       * @ingroup CUDAWrappers
+       */
+      template <typename Number, template <typename> class Binop>
+      __global__ void
+      masked_vector_bin_op(const unsigned int *mask,
+                           Number *            v1,
+                           const Number *      v2,
+                           const size_type     N);
+
+
+
+      /**
        * Structure implementing the functions used to add elements when
        * using a reduction.
        *
@@ -451,12 +468,12 @@ namespace LinearAlgebra
        *
        * @ingroup CUDAWrappers
        */
-      template <typename Number>
+      template <typename Number, typename IndexType>
       __global__ void
-      set_permutated(Number *         val,
+      set_permutated(const IndexType *indices,
+                     Number *         val,
                      const Number *   v,
-                     const size_type *indices,
-                     const size_type  N);
+                     const IndexType  N);
 
 
 
@@ -469,8 +486,8 @@ namespace LinearAlgebra
       template <typename Number, typename IndexType>
       __global__ void
       gather(Number *         val,
-             const Number *   v,
              const IndexType *indices,
+             const Number *   v,
              const IndexType  N);
 
 
@@ -483,9 +500,9 @@ namespace LinearAlgebra
        */
       template <typename Number>
       __global__ void
-      add_permutated(Number *         val,
+      add_permutated(const size_type *indices,
+                     Number *         val,
                      const Number *   v,
-                     const size_type *indices,
                      const size_type  N);
     } // namespace kernel
   }   // namespace CUDAWrappers
