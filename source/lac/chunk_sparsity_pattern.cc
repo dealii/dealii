@@ -292,10 +292,10 @@ namespace internal
 
 template <typename Sparsity>
 void
-ChunkSparsityPattern::create_from(const unsigned int m,
-                                  const unsigned int n,
+ChunkSparsityPattern::create_from(const size_type m,
+                                  const size_type n,
                                   const Sparsity &sparsity_pattern_for_chunks,
-                                  const unsigned int chunk_size_in,
+                                  const size_type chunk_size_in,
                                   const bool)
 {
   Assert(m > (sparsity_pattern_for_chunks.n_rows() - 1) * chunk_size_in &&
@@ -598,17 +598,17 @@ ChunkSparsityPattern::copy_from<DynamicSparsityPattern>(
   const DynamicSparsityPattern &,
   const size_type);
 template void
-ChunkSparsityPattern::create_from<SparsityPattern>(const unsigned int,
-                                                   const unsigned int,
+ChunkSparsityPattern::create_from<SparsityPattern>(const size_type,
+                                                   const size_type,
                                                    const SparsityPattern &,
-                                                   const unsigned int,
+                                                   const size_type,
                                                    const bool);
 template void
 ChunkSparsityPattern::create_from<DynamicSparsityPattern>(
-  const unsigned int,
-  const unsigned int,
+  const size_type,
+  const size_type,
   const DynamicSparsityPattern &,
-  const unsigned int,
+  const size_type,
   const bool);
 template void
 ChunkSparsityPattern::copy_from<float>(const FullMatrix<float> &,
