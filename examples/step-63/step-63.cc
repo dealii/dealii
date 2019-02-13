@@ -20,7 +20,9 @@
 // @note: This is work in progress and will be an example for block smoothers
 // in geometric multigrid.
 
+#include <iostream>
 #include <deal.II/base/exceptions.h>
+
 
 int main()
 {
