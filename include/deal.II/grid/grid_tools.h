@@ -698,6 +698,8 @@ namespace GridTools
    *
    * @param[in] cache The triangulation's GridTools::Cache .
    * @param[in] points The point's vector.
+   * @param[in] cell_hint (optional) A cell iterator for a cell which likely
+   * contains the first point of @p points.
    *
    * @return A tuple containing the following information:
    *  - Cells, is a vector of a vector cells of the all cells
