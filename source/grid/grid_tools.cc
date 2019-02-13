@@ -4207,7 +4207,9 @@ namespace GridTools
 
     (void)missing_points;
 
-    return {std::move(cells), std::move(qpoints), std::move(maps)};
+    return std::make_tuple(std::move(cells),
+                           std::move(qpoints),
+                           std::move(maps));
   }
 
 

@@ -765,10 +765,11 @@ namespace GridTools
    *
    * @code
    *   std::tuple<
-   *     std::vector<typename Triangulation<dim,
-   * spacedim>::active_cell_iterator>, std::vector<std::vector<Point<dim>>>,
-   *     std::vector<std::vector<unsigned int>>,
-   *     std::vector<unsigned int>>
+   *     std::vector<
+   *        typename Triangulation<dim,spacedim>::active_cell_iterator>,
+   *        std::vector<std::vector<Point<dim>>>,
+   *        std::vector<std::vector<unsigned int>>,
+   *        std::vector<unsigned int> >
    * @endcode
    *
    * For a more detailed documentation see
