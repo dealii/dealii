@@ -3325,9 +3325,13 @@ namespace internals
   }
 
   // to make sure that the global matrix remains invertible, we need to do
-  // something with the diagonal elements. add the absolute value of the local
-  // matrix, so the resulting entry will always be positive and furthermore be
-  // in the same order of magnitude as the other elements of the matrix
+  // something with the diagonal elements. Add the average of the
+  // absolute values of the local matrix diagonals, so the resulting entry
+  // will always be positive and furthermore be in the same order of magnitude
+  // as the other elements of the matrix. If all local matrix diagonals are
+  // zero, add the l1 norm of the local matrix divided by the matrix size
+  // to the diagonal of the global matrix. If the entire local matrix is zero,
+  // add 1 to the diagonal of the global matrix.
   //
   // note that this also captures the special case that a dof is both
   // constrained and fixed (this can happen for hanging nodes in 3d that also
@@ -3354,6 +3358,16 @@ namespace internals
         for (size_type i = 0; i < local_matrix.m(); ++i)
           average_diagonal += std::abs(local_matrix(i, i));
         average_diagonal /= static_cast<number>(local_matrix.m());
+
+        // handle the case that all diagonal elements are zero
+        if (average_diagonal == static_cast<number>(0.))
+          {
+            average_diagonal = static_cast<number>(local_matrix.l1_norm()) /
+                               static_cast<number>(local_matrix.m());
+            // if the entire matrix is zero, use 1. for the diagonal
+            if (average_diagonal == static_cast<number>(0.))
+              average_diagonal = static_cast<number>(1.);
+          }
 
         for (size_type i = 0; i < global_rows.n_constraints(); i++)
           {
