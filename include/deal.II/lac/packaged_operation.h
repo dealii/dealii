@@ -93,6 +93,9 @@ class PackagedOperation;
  *   y -= residual;
  * @endcode
  *
+ * @note The step-20 tutorial program has a detailed usage example of the
+ * LinearOperator class.
+ *
  * @author Matthias Maier, 2015
  *
  * @ingroup LAOperators

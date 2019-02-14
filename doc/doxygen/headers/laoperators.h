@@ -89,6 +89,9 @@
  * encapsulation of individual linear operators into blocked linear
  * operator variants.
  *
+ * The step-20 tutorial program has a detailed usage example of the
+ * LinearOperator class.
+ *
  * @note As explained below, when using LinearOperator as <code>res = op_a*x</code>
  * a PackagedOperation class instance is generated behind-the-curtains.
  * Consequently, the user program has to include header files for both classes
@@ -174,6 +177,9 @@
  * @code
  *   Vector<double> residual =  b - op_a * x; // computes the residual at this point
  * @endcode
+ *
+ * The step-20 tutorial program has a detailed usage example of the
+ * PackagedOperation class.
  *
  *
  * @ingroup LAC
