@@ -1477,9 +1477,7 @@ linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
 
 //
 // Ensure that we never capture a reference to a temporary by accident.
-// This ensures that instead of silently allowing a "stack use after free",
-// we at least bail out with a runtime error message that is slightly more
-// understandable.
+// to avoid "stack use after free".
 //
 
 template <
@@ -1491,13 +1489,7 @@ template <
   typename =
     typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
 LinearOperator<Range, Domain, Payload>
-linear_operator(const OperatorExemplar &, Matrix &&)
-{
-  Assert(false,
-         ExcMessage(
-           "You are trying to construct a linear operator from a temporary "
-           "matrix object."));
-}
+linear_operator(const OperatorExemplar &, Matrix &&) = delete;
 
 template <
   typename Range   = Vector<double>,
@@ -1506,15 +1498,12 @@ template <
   typename OperatorExemplar,
   typename Matrix,
   typename = typename std::enable_if<
-    !std::is_lvalue_reference<OperatorExemplar>::value>::type>
+    !std::is_lvalue_reference<OperatorExemplar>::value>::type,
+  typename = typename std::enable_if<
+    !std::is_same<OperatorExemplar,
+                  LinearOperator<Range, Domain, Payload>>::value>::type>
 LinearOperator<Range, Domain, Payload>
-linear_operator(OperatorExemplar &&, const Matrix &)
-{
-  Assert(false,
-         ExcMessage(
-           "You are trying to construct a linear operator with a temporary "
-           "operator_exemplar object."));
-}
+linear_operator(OperatorExemplar &&, const Matrix &) = delete;
 
 template <
   typename Range   = Vector<double>,
@@ -1525,16 +1514,12 @@ template <
   typename =
     typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type,
   typename = typename std::enable_if<
-    !std::is_lvalue_reference<OperatorExemplar>::value>::type>
+    !std::is_lvalue_reference<OperatorExemplar>::value>::type,
+  typename = typename std::enable_if<
+    !std::is_same<OperatorExemplar,
+                  LinearOperator<Range, Domain, Payload>>::value>::type>
 LinearOperator<Range, Domain, Payload>
-linear_operator(OperatorExemplar &&, Matrix &&)
-{
-  Assert(false,
-         ExcMessage(
-           "You are trying to construct a linear operator from a temporary "
-           "matrix object."));
-}
-
+linear_operator(OperatorExemplar &&, Matrix &&) = delete;
 
 template <
   typename Range   = Vector<double>,
@@ -1544,13 +1529,8 @@ template <
   typename =
     typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
 LinearOperator<Range, Domain, Payload>
-linear_operator(const LinearOperator<Range, Domain, Payload> &, Matrix &&)
-{
-  Assert(false,
-         ExcMessage(
-           "You are trying to construct a linear operator from a temporary "
-           "matrix object."));
-}
+linear_operator(const LinearOperator<Range, Domain, Payload> &,
+                Matrix &&) = delete;
 
 template <
   typename Range   = Vector<double>,
@@ -1560,13 +1540,7 @@ template <
   typename =
     typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
 LinearOperator<Range, Domain, Payload>
-linear_operator(Matrix &&)
-{
-  Assert(false,
-         ExcMessage(
-           "You are trying to construct a linear operator from a temporary "
-           "matrix object."));
-}
+linear_operator(Matrix &&) = delete;
 
 template <typename Payload,
           typename Solver,
@@ -1583,13 +1557,7 @@ template <typename Payload,
 LinearOperator<Domain, Range, Payload>
 inverse_operator(const LinearOperator<Range, Domain, Payload> &,
                  Solver &,
-                 Preconditioner &&)
-{
-  Assert(false,
-         ExcMessage(
-           "You are trying to construct an inverse operator with a temporary "
-           "preconditioner object."));
-}
+                 Preconditioner &&) = delete;
 
 #endif // DOXYGEN
 

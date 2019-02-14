@@ -1,6 +1,0 @@
-
-DEAL::ExcMessage( "You are trying to construct a linear operator from a temporary " "matrix object.")
-DEAL::ExcMessage( "You are trying to construct a linear operator with a temporary " "operator_exemplar object.")
-DEAL::ExcMessage( "You are trying to construct a linear operator from a temporary " "matrix object.")
-DEAL::ExcMessage( "You are trying to construct a linear operator from a temporary " "matrix object.")
-DEAL::ExcMessage( "You are trying to construct an inverse operator with a temporary " "preconditioner object.")
