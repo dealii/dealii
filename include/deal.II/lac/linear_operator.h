@@ -1473,6 +1473,125 @@ linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
 
 //@}
 
+#ifndef DOXYGEN
+
+//
+// Ensure that we never capture a reference to a temporary by accident.
+// This ensures that instead of silently allowing a "stack use after free",
+// we at least bail out with a runtime error message that is slightly more
+// understandable.
+//
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename OperatorExemplar,
+  typename Matrix,
+  typename =
+    typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(const OperatorExemplar &, Matrix &&)
+{
+  Assert(false,
+         ExcMessage(
+           "You are trying to construct a linear operator from a temporary "
+           "matrix object."));
+}
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename OperatorExemplar,
+  typename Matrix,
+  typename = typename std::enable_if<
+    !std::is_lvalue_reference<OperatorExemplar>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(OperatorExemplar &&, const Matrix &)
+{
+  Assert(false,
+         ExcMessage(
+           "You are trying to construct a linear operator with a temporary "
+           "operator_exemplar object."));
+}
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename OperatorExemplar,
+  typename Matrix,
+  typename =
+    typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type,
+  typename = typename std::enable_if<
+    !std::is_lvalue_reference<OperatorExemplar>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(OperatorExemplar &&, Matrix &&)
+{
+  Assert(false,
+         ExcMessage(
+           "You are trying to construct a linear operator from a temporary "
+           "matrix object."));
+}
+
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename Matrix,
+  typename =
+    typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(const LinearOperator<Range, Domain, Payload> &, Matrix &&)
+{
+  Assert(false,
+         ExcMessage(
+           "You are trying to construct a linear operator from a temporary "
+           "matrix object."));
+}
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename Matrix,
+  typename =
+    typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(Matrix &&)
+{
+  Assert(false,
+         ExcMessage(
+           "You are trying to construct a linear operator from a temporary "
+           "matrix object."));
+}
+
+template <typename Payload,
+          typename Solver,
+          typename Preconditioner,
+          typename Range  = typename Solver::vector_type,
+          typename Domain = Range,
+          typename        = typename std::enable_if<
+            !std::is_lvalue_reference<Preconditioner>::value>::type,
+          typename = typename std::enable_if<
+            !std::is_same<Preconditioner, PreconditionIdentity>::value>::type,
+          typename = typename std::enable_if<
+            !std::is_same<Preconditioner,
+                          LinearOperator<Range, Domain, Payload>>::value>::type>
+LinearOperator<Domain, Range, Payload>
+inverse_operator(const LinearOperator<Range, Domain, Payload> &,
+                 Solver &,
+                 Preconditioner &&)
+{
+  Assert(false,
+         ExcMessage(
+           "You are trying to construct an inverse operator with a temporary "
+           "preconditioner object."));
+}
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
