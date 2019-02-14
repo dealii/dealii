@@ -1,6 +1,14 @@
 #!groovy
 
 /*
+
+This Jenkins job runs clang-tidy on the code base
+
+See https://jenkins.tjhei.info/job/dealii-tidy/ for details.
+
+*/
+
+/*
 Settings to apply inside Jenkins:
   - discover pull requests (remove branches/master)
   - Strategy: merged PR
@@ -13,7 +21,15 @@ Settings to apply inside Jenkins:
 
 pipeline
 {
-  agent none
+  agent
+  {
+    docker
+    {
+      image 'tjhei/candi-base-clang'
+    }
+  }
+
+  post { cleanup { cleanWs() } }
 
   stages
   {
@@ -22,14 +38,6 @@ pipeline
       when {
         allOf {
           not {branch 'master'}
-        }
-      }
-
-      agent
-      {
-        docker
-        {
-          image 'dealii/indent'
         }
       }
 
@@ -56,13 +64,6 @@ pipeline
 
     stage('build')
     {
-      agent
-      {
-        docker
-        {
-          image 'tjhei/candi-base-clang'
-        }
-      }
       steps
       {
         timeout(time: 2, unit: 'HOURS')

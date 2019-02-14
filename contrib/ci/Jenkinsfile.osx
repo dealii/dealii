@@ -1,6 +1,14 @@
 #!groovy
 
 /*
+
+This Jenkins job runs a build on OSX
+
+See https://jenkins.tjhei.info/job/dealii-osx/ for details.
+
+*/
+
+/*
 Settings to apply inside Jenkins:
   - discover pull requests (remove branches/master)
   - Strategy: merged PR
@@ -18,6 +26,8 @@ pipeline
         label 'osx'
     }
   }
+
+  post { cleanup { cleanWs() } }
 
   stages
   {
