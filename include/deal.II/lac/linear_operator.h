@@ -151,6 +151,9 @@ null_operator(const LinearOperator<Range, Domain, Payload> &);
  * for linear operators have been provided within the respective
  * TrilinosWrappers (and, in the future, PETScWrappers) namespaces.
  *
+ * @note The step-20 tutorial program has a detailed usage example of the
+ * LinearOperator class.
+ *
  * @author Luca Heltai, Matthias Maier, 2015; Jean-Paul Pelteret, 2016
  *
  * @ingroup LAOperators
