@@ -172,6 +172,20 @@ for (deal_II_dimension : DIMENSIONS ; number : REAL_SCALARS)
     template
     class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
 
+    // -------------------------- ADHelperScalarFunction ----------------------
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,number>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad,number>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_rad,number>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
+
     \}
     \}
 }
@@ -198,6 +212,20 @@ for (deal_II_dimension : DIMENSIONS)
     template
     class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
 
+    // -------------------------- ADHelperScalarFunction ----------------------
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+    
     \}
     \}
 }

@@ -117,6 +117,14 @@ for (deal_II_dimension : DIMENSIONS ; number : REAL_SCALARS)
     template
     class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
 
+    // -------------------------- ADHelperScalarFunction ----------------------
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
     \}
     \}
 }
@@ -136,6 +144,14 @@ for (deal_II_dimension : DIMENSIONS)
 
     template
     class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperScalarFunction ----------------------
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
     \}
     \}
