@@ -42,7 +42,8 @@ namespace LinearAlgebra
   {
     template <typename Number>
     Vector<Number>::Vector()
-      : vector(new Tpetra::Vector<Number, int, types::global_dof_index>(
+      : Subscriptor()
+      , vector(new Tpetra::Vector<Number, int, types::global_dof_index>(
           Teuchos::RCP<Tpetra::Map<int, types::global_dof_index>>(
             new Tpetra::Map<int, types::global_dof_index>(
               0,
@@ -65,7 +66,8 @@ namespace LinearAlgebra
     template <typename Number>
     Vector<Number>::Vector(const IndexSet &parallel_partitioner,
                            const MPI_Comm &communicator)
-      : vector(new Tpetra::Vector<Number, int, types::global_dof_index>(
+      : Subscriptor()
+      , vector(new Tpetra::Vector<Number, int, types::global_dof_index>(
           Teuchos::rcp(new Tpetra::Map<int, types::global_dof_index>(
             parallel_partitioner.make_tpetra_map(communicator, false)))))
     {}

@@ -41,7 +41,8 @@ namespace LinearAlgebra
   namespace EpetraWrappers
   {
     Vector::Vector()
-      : vector(new Epetra_FEVector(
+      : Subscriptor()
+      , vector(new Epetra_FEVector(
           Epetra_Map(0, 0, 0, Utilities::Trilinos::comm_self())))
     {}
 
@@ -56,7 +57,8 @@ namespace LinearAlgebra
 
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const MPI_Comm &communicator)
-      : vector(new Epetra_FEVector(
+      : Subscriptor()
+      , vector(new Epetra_FEVector(
           parallel_partitioner.make_trilinos_map(communicator, false)))
     {}
 
