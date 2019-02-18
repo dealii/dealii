@@ -126,147 +126,96 @@ namespace internal
 
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  template <>
+  template <typename NumberType>
+  struct ElementAccess<LinearAlgebra::TpetraWrappers::Vector<NumberType>>
+  {
+  public:
+    using VectorType = LinearAlgebra::TpetraWrappers::Vector<NumberType>;
+    static void
+    add(const typename VectorType::value_type value,
+        const types::global_dof_index         i,
+        VectorType &                          V);
+
+    static void
+    set(typename VectorType::value_type value,
+        const types::global_dof_index   i,
+        VectorType &                    V);
+
+    static typename VectorType::value_type
+    get(const VectorType &V, const types::global_dof_index i);
+  };
+
+
+
+  template <typename NumberType>
   inline void
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<double>>::add(
-    const double                                   value,
-    const types::global_dof_index                  i,
-    LinearAlgebra::TpetraWrappers::Vector<double> &V)
+  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<NumberType>>::add(
+    const typename VectorType::value_type              value,
+    const types::global_dof_index                      i,
+    LinearAlgebra::TpetraWrappers::Vector<NumberType> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<double, int, types::global_dof_index> vector =
+    Tpetra::Vector<NumberType, int, types::global_dof_index> vector =
       V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
 
-    vector.sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.getLocalView<Kokkos::HostSpace>();
+    vector.template sync<Kokkos::HostSpace>();
+    auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
     auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     // We're going to modify the data on host.
-    vector.modify<Kokkos::HostSpace>();
+    vector.template modify<Kokkos::HostSpace>();
     vector_1d(trilinos_i) += value;
-    vector.sync<Tpetra::Vector<double, int, types::global_dof_index>::
-                  device_type::memory_space>();
+    vector.template sync<
+      typename Tpetra::Vector<NumberType, int, types::global_dof_index>::
+        device_type::memory_space>();
   }
 
 
 
-  template <>
+  template <typename NumberType>
   inline void
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<float>>::add(
-    const float                                   value,
-    const types::global_dof_index                 i,
-    LinearAlgebra::TpetraWrappers::Vector<float> &V)
+  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<NumberType>>::set(
+    const typename VectorType::value_type              value,
+    const types::global_dof_index                      i,
+    LinearAlgebra::TpetraWrappers::Vector<NumberType> &V)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<float, int, types::global_dof_index> vector =
+    Tpetra::Vector<NumberType, int, types::global_dof_index> vector =
       V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
 
-    vector.sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.getLocalView<Kokkos::HostSpace>();
+    vector.template sync<Kokkos::HostSpace>();
+    auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
     auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     // We're going to modify the data on host.
-    vector.modify<Kokkos::HostSpace>();
-    vector_1d(trilinos_i) += value;
-    vector.sync<Tpetra::Vector<float, int, types::global_dof_index>::
-                  device_type::memory_space>();
-  }
-
-
-
-  template <>
-  inline void
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<double>>::set(
-    const double                                   value,
-    const types::global_dof_index                  i,
-    LinearAlgebra::TpetraWrappers::Vector<double> &V)
-  {
-    // Extract local indices in the vector.
-    Tpetra::Vector<double, int, types::global_dof_index> vector =
-      V.trilinos_vector();
-    TrilinosWrappers::types::int_type trilinos_i =
-      vector.getMap()->getLocalElement(
-        static_cast<TrilinosWrappers::types::int_type>(i));
-
-    vector.sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.getLocalView<Kokkos::HostSpace>();
-    auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
-    // We're going to modify the data on host.
-    vector.modify<Kokkos::HostSpace>();
+    vector.template modify<Kokkos::HostSpace>();
     vector_1d(trilinos_i) = value;
-    vector.sync<Tpetra::Vector<double, int, types::global_dof_index>::
-                  device_type::memory_space>();
+    vector.template sync<
+      typename Tpetra::Vector<NumberType, int, types::global_dof_index>::
+        device_type::memory_space>();
   }
 
 
 
-  template <>
-  inline void
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<float>>::set(
-    const float                                   value,
-    const types::global_dof_index                 i,
-    LinearAlgebra::TpetraWrappers::Vector<float> &V)
+  template <typename NumberType>
+  inline typename LinearAlgebra::TpetraWrappers::Vector<NumberType>::value_type
+  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<NumberType>>::get(
+    const LinearAlgebra::TpetraWrappers::Vector<NumberType> &V,
+    const types::global_dof_index                            i)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<float, int, types::global_dof_index> vector =
+    Tpetra::Vector<NumberType, int, types::global_dof_index> vector =
       V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
 
-    vector.sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.getLocalView<Kokkos::HostSpace>();
-    auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
-    // We're going to modify the data on host.
-    vector.modify<Kokkos::HostSpace>();
-    vector_1d(trilinos_i) = value;
-    vector.sync<Tpetra::Vector<float, int, types::global_dof_index>::
-                  device_type::memory_space>();
-  }
-
-
-
-  template <>
-  inline double
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<double>>::get(
-    const LinearAlgebra::TpetraWrappers::Vector<double> &V,
-    const types::global_dof_index                        i)
-  {
-    // Extract local indices in the vector.
-    Tpetra::Vector<double, int, types::global_dof_index> vector =
-      V.trilinos_vector();
-    TrilinosWrappers::types::int_type trilinos_i =
-      vector.getMap()->getLocalElement(
-        static_cast<TrilinosWrappers::types::int_type>(i));
-
-    vector.sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.getLocalView<Kokkos::HostSpace>();
-    auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
-    // We're going to modify the data on host.
-    return vector_1d(trilinos_i);
-  }
-
-
-
-  template <>
-  inline float
-  ElementAccess<LinearAlgebra::TpetraWrappers::Vector<float>>::get(
-    const LinearAlgebra::TpetraWrappers::Vector<float> &V,
-    const types::global_dof_index                       i)
-  {
-    // Extract local indices in the vector.
-    Tpetra::Vector<float, int, types::global_dof_index> vector =
-      V.trilinos_vector();
-    TrilinosWrappers::types::int_type trilinos_i =
-      vector.getMap()->getLocalElement(
-        static_cast<TrilinosWrappers::types::int_type>(i));
-
-    vector.sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.getLocalView<Kokkos::HostSpace>();
+    vector.template sync<Kokkos::HostSpace>();
+    auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
     auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     // We're going to modify the data on host.
     return vector_1d(trilinos_i);
