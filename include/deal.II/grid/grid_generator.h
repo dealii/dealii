@@ -327,8 +327,7 @@ namespace GridGenerator
    * All cells in this region will have a FlatManifold attached to them.
    * The final width of the plate will be <code>padding_left + 2*outer_radius +
    * padding_right</code>, while its length is <code>padding_top +
-   * 2*outer_radius + padding_bottom</code>. Three out of four paddings are
-   * allowed to be zero.
+   * 2*outer_radius + padding_bottom</code>.
    *
    * Here is the non-symmetric grid (after one global refinement, colored
    * according to manifold id) in 2D and 3D, respectively:

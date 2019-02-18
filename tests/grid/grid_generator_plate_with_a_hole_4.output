@@ -1,0 +1,261 @@
+
+DEAL:2d::center: -1.00000 -0.750000 boundary id: 0 manifold id: 1
+DEAL:2d::center: -1.00000 -0.250000 boundary id: 0 manifold id: 1
+DEAL:2d::center: -1.00000 0.250000 boundary id: 0 manifold id: 1
+DEAL:2d::center: -1.00000 0.750000 boundary id: 0 manifold id: 1
+DEAL:2d::center: 1.00000 -0.750000 boundary id: 1 manifold id: 1
+DEAL:2d::center: 1.00000 -0.250000 boundary id: 1 manifold id: 1
+DEAL:2d::center: 1.00000 0.250000 boundary id: 1 manifold id: 1
+DEAL:2d::center: 1.00000 0.750000 boundary id: 1 manifold id: 1
+DEAL:2d::center: -0.750000 -1.00000 boundary id: 2 manifold id: 1
+DEAL:2d::center: -0.250000 -1.00000 boundary id: 2 manifold id: 1
+DEAL:2d::center: 0.250000 -1.00000 boundary id: 2 manifold id: 1
+DEAL:2d::center: 0.750000 -1.00000 boundary id: 2 manifold id: 1
+DEAL:2d::center: -0.750000 1.00000 boundary id: 3 manifold id: 1
+DEAL:2d::center: -0.250000 1.00000 boundary id: 3 manifold id: 1
+DEAL:2d::center: 0.250000 1.00000 boundary id: 3 manifold id: 1
+DEAL:2d::center: 0.750000 1.00000 boundary id: 3 manifold id: 1
+DEAL:2d::center: -0.384776 -0.0765367 boundary id: 4 manifold id: 0
+DEAL:2d::center: -0.384776 0.0765367 boundary id: 4 manifold id: 0
+DEAL:2d::center: -0.326197 -0.217958 boundary id: 4 manifold id: 0
+DEAL:2d::center: -0.326197 0.217958 boundary id: 4 manifold id: 0
+DEAL:2d::center: -0.217958 -0.326197 boundary id: 4 manifold id: 0
+DEAL:2d::center: -0.217958 0.326197 boundary id: 4 manifold id: 0
+DEAL:2d::center: -0.0765367 -0.384776 boundary id: 4 manifold id: 0
+DEAL:2d::center: -0.0765367 0.384776 boundary id: 4 manifold id: 0
+DEAL:2d::center: 0.0765367 -0.384776 boundary id: 4 manifold id: 0
+DEAL:2d::center: 0.0765367 0.384776 boundary id: 4 manifold id: 0
+DEAL:2d::center: 0.217958 -0.326197 boundary id: 4 manifold id: 0
+DEAL:2d::center: 0.217958 0.326197 boundary id: 4 manifold id: 0
+DEAL:2d::center: 0.326197 -0.217958 boundary id: 4 manifold id: 0
+DEAL:2d::center: 0.326197 0.217958 boundary id: 4 manifold id: 0
+DEAL:2d::center: 0.384776 -0.0765367 boundary id: 4 manifold id: 0
+DEAL:2d::center: 0.384776 0.0765367 boundary id: 4 manifold id: 0
+DEAL:2d::
+DEAL:2d::
+DEAL:2d::center: 0.846194 0.206634 manifold id: 1
+DEAL:2d::center: 0.831549 0.616990 manifold id: 1
+DEAL:2d::center: 0.538582 0.119903 manifold id: 1
+DEAL:2d::center: 0.494648 0.350969 manifold id: 1
+DEAL:2d::center: 0.616990 0.831549 manifold id: 1
+DEAL:2d::center: 0.206634 0.846194 manifold id: 1
+DEAL:2d::center: 0.350969 0.494648 manifold id: 1
+DEAL:2d::center: 0.119903 0.538582 manifold id: 1
+DEAL:2d::center: -0.206634 0.846194 manifold id: 1
+DEAL:2d::center: -0.616990 0.831549 manifold id: 1
+DEAL:2d::center: -0.119903 0.538582 manifold id: 1
+DEAL:2d::center: -0.350969 0.494648 manifold id: 1
+DEAL:2d::center: -0.831549 0.616990 manifold id: 1
+DEAL:2d::center: -0.846194 0.206634 manifold id: 1
+DEAL:2d::center: -0.494648 0.350969 manifold id: 1
+DEAL:2d::center: -0.538582 0.119903 manifold id: 1
+DEAL:2d::center: -0.846194 -0.206634 manifold id: 1
+DEAL:2d::center: -0.831549 -0.616990 manifold id: 1
+DEAL:2d::center: -0.538582 -0.119903 manifold id: 1
+DEAL:2d::center: -0.494648 -0.350969 manifold id: 1
+DEAL:2d::center: -0.616990 -0.831549 manifold id: 1
+DEAL:2d::center: -0.206634 -0.846194 manifold id: 1
+DEAL:2d::center: -0.350969 -0.494648 manifold id: 1
+DEAL:2d::center: -0.119903 -0.538582 manifold id: 1
+DEAL:2d::center: 0.206634 -0.846194 manifold id: 1
+DEAL:2d::center: 0.616990 -0.831549 manifold id: 1
+DEAL:2d::center: 0.119903 -0.538582 manifold id: 1
+DEAL:2d::center: 0.350969 -0.494648 manifold id: 1
+DEAL:2d::center: 0.831549 -0.616990 manifold id: 1
+DEAL:2d::center: 0.846194 -0.206634 manifold id: 1
+DEAL:2d::center: 0.494648 -0.350969 manifold id: 1
+DEAL:2d::center: 0.538582 -0.119903 manifold id: 1
+DEAL:3d::center: -1.00000 -0.750000 -0.250000 boundary id: 0 manifold id: 1
+DEAL:3d::center: -1.00000 -0.750000 0.250000 boundary id: 0 manifold id: 1
+DEAL:3d::center: -1.00000 -0.250000 -0.250000 boundary id: 0 manifold id: 1
+DEAL:3d::center: -1.00000 -0.250000 0.250000 boundary id: 0 manifold id: 1
+DEAL:3d::center: -1.00000 0.250000 -0.250000 boundary id: 0 manifold id: 1
+DEAL:3d::center: -1.00000 0.250000 0.250000 boundary id: 0 manifold id: 1
+DEAL:3d::center: -1.00000 0.750000 -0.250000 boundary id: 0 manifold id: 1
+DEAL:3d::center: -1.00000 0.750000 0.250000 boundary id: 0 manifold id: 1
+DEAL:3d::center: 1.00000 -0.750000 -0.250000 boundary id: 1 manifold id: 1
+DEAL:3d::center: 1.00000 -0.750000 0.250000 boundary id: 1 manifold id: 1
+DEAL:3d::center: 1.00000 -0.250000 -0.250000 boundary id: 1 manifold id: 1
+DEAL:3d::center: 1.00000 -0.250000 0.250000 boundary id: 1 manifold id: 1
+DEAL:3d::center: 1.00000 0.250000 -0.250000 boundary id: 1 manifold id: 1
+DEAL:3d::center: 1.00000 0.250000 0.250000 boundary id: 1 manifold id: 1
+DEAL:3d::center: 1.00000 0.750000 -0.250000 boundary id: 1 manifold id: 1
+DEAL:3d::center: 1.00000 0.750000 0.250000 boundary id: 1 manifold id: 1
+DEAL:3d::center: -0.750000 -1.00000 -0.250000 boundary id: 2 manifold id: 1
+DEAL:3d::center: -0.750000 -1.00000 0.250000 boundary id: 2 manifold id: 1
+DEAL:3d::center: -0.250000 -1.00000 -0.250000 boundary id: 2 manifold id: 1
+DEAL:3d::center: -0.250000 -1.00000 0.250000 boundary id: 2 manifold id: 1
+DEAL:3d::center: 0.250000 -1.00000 -0.250000 boundary id: 2 manifold id: 1
+DEAL:3d::center: 0.250000 -1.00000 0.250000 boundary id: 2 manifold id: 1
+DEAL:3d::center: 0.750000 -1.00000 -0.250000 boundary id: 2 manifold id: 1
+DEAL:3d::center: 0.750000 -1.00000 0.250000 boundary id: 2 manifold id: 1
+DEAL:3d::center: -0.750000 1.00000 -0.250000 boundary id: 3 manifold id: 1
+DEAL:3d::center: -0.750000 1.00000 0.250000 boundary id: 3 manifold id: 1
+DEAL:3d::center: -0.250000 1.00000 -0.250000 boundary id: 3 manifold id: 1
+DEAL:3d::center: -0.250000 1.00000 0.250000 boundary id: 3 manifold id: 1
+DEAL:3d::center: 0.250000 1.00000 -0.250000 boundary id: 3 manifold id: 1
+DEAL:3d::center: 0.250000 1.00000 0.250000 boundary id: 3 manifold id: 1
+DEAL:3d::center: 0.750000 1.00000 -0.250000 boundary id: 3 manifold id: 1
+DEAL:3d::center: 0.750000 1.00000 0.250000 boundary id: 3 manifold id: 1
+DEAL:3d::center: -0.384776 -0.0765367 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.384776 -0.0765367 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.384776 0.0765367 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.384776 0.0765367 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.326197 -0.217958 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.326197 -0.217958 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.326197 0.217958 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.326197 0.217958 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.217958 -0.326197 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.217958 -0.326197 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.217958 0.326197 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.217958 0.326197 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.0765367 -0.384776 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.0765367 -0.384776 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.0765367 0.384776 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.0765367 0.384776 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.0765367 -0.384776 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.0765367 -0.384776 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.0765367 0.384776 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.0765367 0.384776 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.217958 -0.326197 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.217958 -0.326197 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.217958 0.326197 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.217958 0.326197 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.326197 -0.217958 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.326197 -0.217958 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.326197 0.217958 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.326197 0.217958 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.384776 -0.0765367 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.384776 -0.0765367 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.384776 0.0765367 -0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: 0.384776 0.0765367 0.250000 boundary id: 4 manifold id: 0
+DEAL:3d::center: -0.846194 -0.206634 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.846194 0.206634 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.831549 -0.616990 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.831549 0.616990 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.616990 -0.831549 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.616990 0.831549 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.538582 -0.119903 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.538582 0.119903 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.494648 -0.350969 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.494648 0.350969 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.350969 -0.494648 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.350969 0.494648 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.206634 -0.846194 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.206634 0.846194 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.119903 -0.538582 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.119903 0.538582 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.119903 -0.538582 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.119903 0.538582 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.206634 -0.846194 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.206634 0.846194 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.350969 -0.494648 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.350969 0.494648 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.494648 -0.350969 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.494648 0.350969 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.538582 -0.119903 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.538582 0.119903 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.616990 -0.831549 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.616990 0.831549 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.831549 -0.616990 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.831549 0.616990 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.846194 -0.206634 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: 0.846194 0.206634 -0.500000 boundary id: 5 manifold id: 1
+DEAL:3d::center: -0.846194 -0.206634 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.846194 0.206634 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.831549 -0.616990 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.831549 0.616990 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.616990 -0.831549 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.616990 0.831549 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.538582 -0.119903 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.538582 0.119903 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.494648 -0.350969 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.494648 0.350969 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.350969 -0.494648 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.350969 0.494648 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.206634 -0.846194 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.206634 0.846194 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.119903 -0.538582 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: -0.119903 0.538582 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.119903 -0.538582 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.119903 0.538582 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.206634 -0.846194 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.206634 0.846194 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.350969 -0.494648 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.350969 0.494648 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.494648 -0.350969 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.494648 0.350969 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.538582 -0.119903 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.538582 0.119903 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.616990 -0.831549 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.616990 0.831549 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.831549 -0.616990 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.831549 0.616990 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.846194 -0.206634 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::center: 0.846194 0.206634 0.500000 boundary id: 6 manifold id: 1
+DEAL:3d::
+DEAL:3d::
+DEAL:3d::center: 0.846194 0.206634 -0.250000 manifold id: 1
+DEAL:3d::center: 0.831549 0.616990 -0.250000 manifold id: 1
+DEAL:3d::center: 0.538582 0.119903 -0.250000 manifold id: 1
+DEAL:3d::center: 0.494648 0.350969 -0.250000 manifold id: 1
+DEAL:3d::center: 0.846194 0.206634 0.250000 manifold id: 1
+DEAL:3d::center: 0.831549 0.616990 0.250000 manifold id: 1
+DEAL:3d::center: 0.538582 0.119903 0.250000 manifold id: 1
+DEAL:3d::center: 0.494648 0.350969 0.250000 manifold id: 1
+DEAL:3d::center: 0.616990 0.831549 -0.250000 manifold id: 1
+DEAL:3d::center: 0.206634 0.846194 -0.250000 manifold id: 1
+DEAL:3d::center: 0.350969 0.494648 -0.250000 manifold id: 1
+DEAL:3d::center: 0.119903 0.538582 -0.250000 manifold id: 1
+DEAL:3d::center: 0.616990 0.831549 0.250000 manifold id: 1
+DEAL:3d::center: 0.206634 0.846194 0.250000 manifold id: 1
+DEAL:3d::center: 0.350969 0.494648 0.250000 manifold id: 1
+DEAL:3d::center: 0.119903 0.538582 0.250000 manifold id: 1
+DEAL:3d::center: -0.206634 0.846194 -0.250000 manifold id: 1
+DEAL:3d::center: -0.616990 0.831549 -0.250000 manifold id: 1
+DEAL:3d::center: -0.119903 0.538582 -0.250000 manifold id: 1
+DEAL:3d::center: -0.350969 0.494648 -0.250000 manifold id: 1
+DEAL:3d::center: -0.206634 0.846194 0.250000 manifold id: 1
+DEAL:3d::center: -0.616990 0.831549 0.250000 manifold id: 1
+DEAL:3d::center: -0.119903 0.538582 0.250000 manifold id: 1
+DEAL:3d::center: -0.350969 0.494648 0.250000 manifold id: 1
+DEAL:3d::center: -0.831549 0.616990 -0.250000 manifold id: 1
+DEAL:3d::center: -0.846194 0.206634 -0.250000 manifold id: 1
+DEAL:3d::center: -0.494648 0.350969 -0.250000 manifold id: 1
+DEAL:3d::center: -0.538582 0.119903 -0.250000 manifold id: 1
+DEAL:3d::center: -0.831549 0.616990 0.250000 manifold id: 1
+DEAL:3d::center: -0.846194 0.206634 0.250000 manifold id: 1
+DEAL:3d::center: -0.494648 0.350969 0.250000 manifold id: 1
+DEAL:3d::center: -0.538582 0.119903 0.250000 manifold id: 1
+DEAL:3d::center: -0.846194 -0.206634 -0.250000 manifold id: 1
+DEAL:3d::center: -0.831549 -0.616990 -0.250000 manifold id: 1
+DEAL:3d::center: -0.538582 -0.119903 -0.250000 manifold id: 1
+DEAL:3d::center: -0.494648 -0.350969 -0.250000 manifold id: 1
+DEAL:3d::center: -0.846194 -0.206634 0.250000 manifold id: 1
+DEAL:3d::center: -0.831549 -0.616990 0.250000 manifold id: 1
+DEAL:3d::center: -0.538582 -0.119903 0.250000 manifold id: 1
+DEAL:3d::center: -0.494648 -0.350969 0.250000 manifold id: 1
+DEAL:3d::center: -0.616990 -0.831549 -0.250000 manifold id: 1
+DEAL:3d::center: -0.206634 -0.846194 -0.250000 manifold id: 1
+DEAL:3d::center: -0.350969 -0.494648 -0.250000 manifold id: 1
+DEAL:3d::center: -0.119903 -0.538582 -0.250000 manifold id: 1
+DEAL:3d::center: -0.616990 -0.831549 0.250000 manifold id: 1
+DEAL:3d::center: -0.206634 -0.846194 0.250000 manifold id: 1
+DEAL:3d::center: -0.350969 -0.494648 0.250000 manifold id: 1
+DEAL:3d::center: -0.119903 -0.538582 0.250000 manifold id: 1
+DEAL:3d::center: 0.206634 -0.846194 -0.250000 manifold id: 1
+DEAL:3d::center: 0.616990 -0.831549 -0.250000 manifold id: 1
+DEAL:3d::center: 0.119903 -0.538582 -0.250000 manifold id: 1
+DEAL:3d::center: 0.350969 -0.494648 -0.250000 manifold id: 1
+DEAL:3d::center: 0.206634 -0.846194 0.250000 manifold id: 1
+DEAL:3d::center: 0.616990 -0.831549 0.250000 manifold id: 1
+DEAL:3d::center: 0.119903 -0.538582 0.250000 manifold id: 1
+DEAL:3d::center: 0.350969 -0.494648 0.250000 manifold id: 1
+DEAL:3d::center: 0.831549 -0.616990 -0.250000 manifold id: 1
+DEAL:3d::center: 0.846194 -0.206634 -0.250000 manifold id: 1
+DEAL:3d::center: 0.494648 -0.350969 -0.250000 manifold id: 1
+DEAL:3d::center: 0.538582 -0.119903 -0.250000 manifold id: 1
+DEAL:3d::center: 0.831549 -0.616990 0.250000 manifold id: 1
+DEAL:3d::center: 0.846194 -0.206634 0.250000 manifold id: 1
+DEAL:3d::center: 0.494648 -0.350969 0.250000 manifold id: 1
+DEAL:3d::center: 0.538582 -0.119903 0.250000 manifold id: 1

@@ -1966,8 +1966,9 @@ namespace GridGenerator
                          const unsigned int /*n_slices*/,
                          const bool colorize)
   {
-    Assert((pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0),
-           ExcMessage("At least one padding parameter has to be non-zero."));
+    const bool with_padding =
+      pad_bottom > 0 || pad_top > 0 || pad_left > 0 || pad_right > 0;
+
     Assert(pad_bottom >= 0., ExcMessage("Negative bottom padding."));
     Assert(pad_top >= 0., ExcMessage("Negative top padding."));
     Assert(pad_left >= 0., ExcMessage("Negative left padding."));
@@ -1984,7 +1985,8 @@ namespace GridGenerator
     };
 
     // start by setting up the cylinder triangulation
-    Triangulation<2> cylinder_tria;
+    Triangulation<2>  cylinder_tria_maybe;
+    Triangulation<2> &cylinder_tria = with_padding ? cylinder_tria_maybe : tria;
     GridGenerator::hyper_cube_with_cylindrical_hole(cylinder_tria,
                                                     inner_radius,
                                                     outer_radius,
@@ -1996,65 +1998,70 @@ namespace GridGenerator
     for (const auto &cell : cylinder_tria.active_cell_iterators())
       cell->set_manifold_id(tfi_manifold_id);
 
-    // hyper_cube_with_cylindrical_hole will have 2 cells along
-    // each face, so he element size is outer_radius
+    const Point<2> bl(-outer_radius - pad_left, -outer_radius - pad_bottom);
+    const Point<2> tr(outer_radius + pad_right, outer_radius + pad_top);
+    if (with_padding)
+      {
+        // hyper_cube_with_cylindrical_hole will have 2 cells along
+        // each face, so he element size is outer_radius
 
-    auto add_sizes = [](std::vector<double> &step_sizes,
-                        const double         padding,
-                        const double         h) -> void {
-      // use std::round instead of std::ceil to improve aspect ratio
-      // in case padding is only slightly larger than h.
-      const auto rounded = static_cast<unsigned int>(std::round(padding / h));
-      // in case padding is much smaller than h, make sure we
-      // have at least 1 element
-      const unsigned int num = (padding > 0. && rounded == 0) ? 1 : rounded;
-      for (unsigned int i = 0; i < num; ++i)
-        step_sizes.push_back(padding / num);
-    };
+        auto add_sizes = [](std::vector<double> &step_sizes,
+                            const double         padding,
+                            const double         h) -> void {
+          // use std::round instead of std::ceil to improve aspect ratio
+          // in case padding is only slightly larger than h.
+          const auto rounded =
+            static_cast<unsigned int>(std::round(padding / h));
+          // in case padding is much smaller than h, make sure we
+          // have at least 1 element
+          const unsigned int num = (padding > 0. && rounded == 0) ? 1 : rounded;
+          for (unsigned int i = 0; i < num; ++i)
+            step_sizes.push_back(padding / num);
+        };
 
-    std::vector<std::vector<double>> step_sizes(2);
-    // x-coord
-    // left:
-    add_sizes(step_sizes[0], pad_left, outer_radius);
-    // center
-    step_sizes[0].push_back(outer_radius);
-    step_sizes[0].push_back(outer_radius);
-    // right
-    add_sizes(step_sizes[0], pad_right, outer_radius);
-    // y-coord
-    //   bottom
-    add_sizes(step_sizes[1], pad_bottom, outer_radius);
-    //   center
-    step_sizes[1].push_back(outer_radius);
-    step_sizes[1].push_back(outer_radius);
-    //   top
-    add_sizes(step_sizes[1], pad_top, outer_radius);
+        std::vector<std::vector<double>> step_sizes(2);
+        // x-coord
+        // left:
+        add_sizes(step_sizes[0], pad_left, outer_radius);
+        // center
+        step_sizes[0].push_back(outer_radius);
+        step_sizes[0].push_back(outer_radius);
+        // right
+        add_sizes(step_sizes[0], pad_right, outer_radius);
+        // y-coord
+        //   bottom
+        add_sizes(step_sizes[1], pad_bottom, outer_radius);
+        //   center
+        step_sizes[1].push_back(outer_radius);
+        step_sizes[1].push_back(outer_radius);
+        //   top
+        add_sizes(step_sizes[1], pad_top, outer_radius);
 
-    // now create bulk
-    Triangulation<2> bulk_tria;
-    const Point<2>   bl(-outer_radius - pad_left, -outer_radius - pad_bottom);
-    const Point<2>   tr(outer_radius + pad_right, outer_radius + pad_top);
-    GridGenerator::subdivided_hyper_rectangle(
-      bulk_tria, step_sizes, bl, tr, colorize);
+        // now create bulk
+        Triangulation<2> bulk_tria;
+        GridGenerator::subdivided_hyper_rectangle(
+          bulk_tria, step_sizes, bl, tr, colorize);
 
-    // now remove cells reserved from the cylindrical hole
-    std::set<Triangulation<2>::active_cell_iterator> cells_to_remove;
-    for (const auto &cell : bulk_tria.active_cell_iterators())
-      if (internal::point_in_2d_box(cell->center(), center, outer_radius))
-        cells_to_remove.insert(cell);
+        // now remove cells reserved from the cylindrical hole
+        std::set<Triangulation<2>::active_cell_iterator> cells_to_remove;
+        for (const auto &cell : bulk_tria.active_cell_iterators())
+          if (internal::point_in_2d_box(cell->center(), center, outer_radius))
+            cells_to_remove.insert(cell);
 
-    Triangulation<2> tria_without_cylinder;
-    GridGenerator::create_triangulation_with_removed_cells(
-      bulk_tria, cells_to_remove, tria_without_cylinder);
+        Triangulation<2> tria_without_cylinder;
+        GridGenerator::create_triangulation_with_removed_cells(
+          bulk_tria, cells_to_remove, tria_without_cylinder);
 
-    const double tolerance = std::min(min_line_length(tria_without_cylinder),
-                                      min_line_length(cylinder_tria)) /
-                             2.0;
+        const double tolerance =
+          std::min(min_line_length(tria_without_cylinder),
+                   min_line_length(cylinder_tria)) /
+          2.0;
 
-    GridGenerator::merge_triangulations(tria_without_cylinder,
-                                        cylinder_tria,
-                                        tria,
-                                        tolerance);
+        GridGenerator::merge_triangulations(tria_without_cylinder,
+                                            cylinder_tria,
+                                            tria,
+                                            tolerance);
+      }
 
     // now set manifold ids:
     for (const auto &cell : tria.active_cell_iterators())
