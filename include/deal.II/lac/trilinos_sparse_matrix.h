@@ -1578,6 +1578,7 @@ namespace TrilinosWrappers
      *
      * This function will be called when the underlying number type for the
      * matrix object and the one for the vector object are the same.
+     * Despite looking complicated, the return type is just `void`.
      *
      * In case of a serial vector, this function will only work when
      * running on one processor, since the matrix object is inherently
@@ -1592,6 +1593,7 @@ namespace TrilinosWrappers
      * Same as the function above for the case that the underlying number type
      * for the matrix object and the one for the vector object do not coincide.
      * This case is not implemented. Calling it will result in a runtime error.
+     * Despite looking complicated, the return type is just `void`.
      */
     template <typename VectorType>
     typename std::enable_if<!std::is_same<typename VectorType::value_type,
@@ -1610,6 +1612,7 @@ namespace TrilinosWrappers
      *
      * This function will be called when the underlying number type for the
      * matrix object and the one for the vector object are the same.
+     * Despite looking complicated, the return type is just `void`.
      */
     template <typename VectorType>
     typename std::enable_if<std::is_same<typename VectorType::value_type,
@@ -1620,6 +1623,7 @@ namespace TrilinosWrappers
      * Same as the function above for the case that the underlying number type
      * for the matrix object and the one for the vector object do not coincide.
      * This case is not implemented. Calling it will result in a runtime error.
+     * Despite looking complicated, the return type is just `void`.
      */
     template <typename VectorType>
     typename std::enable_if<!std::is_same<typename VectorType::value_type,
