@@ -581,15 +581,39 @@ namespace LinearAlgebra
           break;
 
         case VectorOperation::min:
+          // To ensure that this code also compiles with complex
+          // numbers, we only compare the real part of the
+          // variable. Note that min/max do not make sense with complex
+          // numbers.
           for (size_type i = 0; i < size; ++i)
-            if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
-              values[i] = new_values[i];
+            {
+              Assert(
+                std::imag(new_values[i]) == 0.,
+                ExcMessage(
+                  "VectorOperation::min is not defined if there is an imaginary part!)"));
+              Assert(
+                std::imag(values[i]) == 0.,
+                ExcMessage(
+                  "VectorOperation::min is not defined if there is an imaginary part!)"));
+              if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
+                values[i] = new_values[i];
+            }
           break;
 
         case VectorOperation::max:
           for (size_type i = 0; i < size; ++i)
-            if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
-              values[i] = new_values[i];
+            {
+              Assert(
+                std::imag(new_values[i]) == 0.,
+                ExcMessage(
+                  "VectorOperation::max is not defined if there is an imaginary part!)"));
+              Assert(
+                std::imag(values[i]) == 0.,
+                ExcMessage(
+                  "VectorOperation::max is not defined if there is an imaginary part!)"));
+              if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
+                values[i] = new_values[i];
+            }
           break;
 
         default:
@@ -697,8 +721,18 @@ namespace LinearAlgebra
         // variable. Note that min/max do not make sense with complex
         // numbers.
         for (int i = 0; i < size; ++i)
-          if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
-            values[i] = new_values[i];
+          {
+            Assert(
+              std::imag(new_values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::min is not defined if there is an imaginary part!)"));
+            Assert(
+              std::imag(values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::min is not defined if there is an imaginary part!)"));
+            if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
+              values[i] = new_values[i];
+          }
       }
     else if (operation == VectorOperation::max)
       {
@@ -713,8 +747,18 @@ namespace LinearAlgebra
                ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
-          if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
-            values[i] = new_values[i];
+          {
+            Assert(
+              std::imag(new_values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::max is not defined if there is an imaginary part!)"));
+            Assert(
+              std::imag(values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::max is not defined if there is an imaginary part!)"));
+            if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
+              values[i] = new_values[i];
+          }
       }
     else
       AssertThrow(false, ExcNotImplemented());
@@ -828,8 +872,18 @@ namespace LinearAlgebra
         // variable. Note that min/max do not make sense with complex
         // numbers.
         for (unsigned int i = 0; i < n_elements; ++i)
-          if (std::real(tmp[i]) - std::real(values[i]) < 0.0)
-            values[i] = tmp[i];
+          {
+            Assert(
+              std::imag(new_values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::min is not defined if there is an imaginary part!)"));
+            Assert(
+              std::imag(values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::min is not defined if there is an imaginary part!)"));
+            if (std::real(tmp[i]) - std::real(values[i]) < 0.0)
+              values[i] = tmp[i];
+          }
       }
     else if (operation == VectorOperation::max)
       {
@@ -842,8 +896,18 @@ namespace LinearAlgebra
         AssertCuda(error_code);
 
         for (unsigned int i = 0; i < n_elements; ++i)
-          if (std::real(tmp[i]) - std::real(values[i]) > 0.0)
-            values[i] = tmp[i];
+          {
+            Assert(
+              std::imag(new_values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::max is not defined if there is an imaginary part!)"));
+            Assert(
+              std::imag(values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::max is not defined if there is an imaginary part!)"));
+            if (std::real(tmp[i]) - std::real(values[i]) > 0.0)
+              values[i] = tmp[i];
+          }
       }
     else
       AssertThrow(false, ExcNotImplemented());
