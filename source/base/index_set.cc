@@ -659,6 +659,7 @@ IndexSet::make_trilinos_map(const MPI_Comm &communicator,
 #endif
 
 
+
 bool
 IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
 {
