@@ -257,7 +257,7 @@ namespace LinearAlgebra
 
       // Downcast V. If fails, throws an exception.
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
-      // If the maps are the same we can Update right away.
+      // If the maps are the same we can update right away.
       if (vector->getMap()->isSameAs(*(down_V.trilinos_vector().getMap())))
         {
           vector->update(1., down_V.trilinos_vector(), 1.);
@@ -267,21 +267,16 @@ namespace LinearAlgebra
           Assert(this->size() == down_V.size(),
                  ExcDimensionMismatch(this->size(), down_V.size()));
 
-          // TODO: The code doesn't work as expected so we use a workaround.
-          /*Tpetra::Export<int, types::global_dof_index>
-          data_exchange(vector->getMap(), down_V.trilinos_vector().getMap());
-          vector->doExport(down_V.trilinos_vector(),
-                           data_exchange,
-                           Tpetra::ADD);*/
-
+          // TODO: Tpetra doesn't have a combine mode that also updates local
+          // elements, maybe there is a better workaround.
           Tpetra::Vector<Number, int, types::global_dof_index> dummy(
             vector->getMap(), false);
           Tpetra::Import<int, types::global_dof_index> data_exchange(
-            dummy.getMap(), down_V.trilinos_vector().getMap());
+            down_V.trilinos_vector().getMap(), dummy.getMap());
 
-          dummy.doExport(down_V.trilinos_vector(),
+          dummy.doImport(down_V.trilinos_vector(),
                          data_exchange,
-                         Tpetra::REPLACE);
+                         Tpetra::INSERT);
 
           vector->update(1.0, dummy, 1.0);
         }
