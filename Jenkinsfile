@@ -40,6 +40,12 @@ pipeline
 
         stage("indent")
         {
+          post {
+            failure {
+              githubNotify context: 'indent', description: 'failed',  status: 'FAILURE'
+            }
+          }
+
           steps
           {
             // we are finally running, so we can mark the 'ready' context from Jenkinsfile.mark as success:
@@ -76,15 +82,21 @@ pipeline
               image 'tjhei/candi:v9.0.1-r4'
             }
           }
+
           post {
-	  always {
-	    sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/serial.xml || true"
-	    xunit tools: [CTest(pattern: '*.xml')]
-	    }
-	  cleanup {
-	    cleanWs()
-	  }
-	  }
+            always {
+              sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/serial.xml || true"
+              xunit tools: [CTest(pattern: '*.xml')]
+            }
+
+            cleanup {
+              cleanWs()
+            }
+
+            failure {
+              githubNotify context: 'CI', description: 'serial build failed',  status: 'FAILURE'
+            }
+      }
 
           steps
           {
@@ -93,7 +105,7 @@ pipeline
             sh "echo \"building on node ${env.NODE_NAME}\""
             sh '''#!/bin/bash
                export NP=`grep -c ^processor /proc/cpuinfo`
-	       export TEST_TIME_LIMIT=1200
+               export TEST_TIME_LIMIT=1200
                echo $NP
                mkdir -p /home/dealii/build
                cd /home/dealii/build
@@ -121,15 +133,21 @@ pipeline
               image 'tjhei/candi:v9.0.1-r4'
             }
           }
+
           post {
-	  always {
-	    sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/mpi.xml || true"
-	    xunit tools: [CTest(pattern: '*.xml')]
-	  }
-	  cleanup {
-	    cleanWs()
-	  }
-	  }
+            always {
+              sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/mpi.xml || true"
+              xunit tools: [CTest(pattern: '*.xml')]
+            }
+
+            cleanup {
+              cleanWs()
+            }
+
+            failure {
+              githubNotify context: 'CI', description: 'mpi build failed',  status: 'FAILURE'
+            }
+          }
 
           steps
           {
