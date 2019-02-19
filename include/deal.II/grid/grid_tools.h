@@ -761,15 +761,16 @@ namespace GridTools
    * are documented in GridTools::compute_point_locations().
    * The last element of the @p return_type contains the
    * indices of points which are not not found inside the mesh
-   * or lie on artificial cells.
-   *
+   * or lie on artificial cells. The @p return_type equals the
+   * following tuple type:
    * @code
    *   std::tuple<
    *     std::vector<
    *        typename Triangulation<dim,spacedim>::active_cell_iterator>,
-   *        std::vector<std::vector<Point<dim>>>,
-   *        std::vector<std::vector<unsigned int>>,
-   *        std::vector<unsigned int> >
+   *     std::vector<std::vector<Point<dim>>>,
+   *     std::vector<std::vector<unsigned int>>,
+   *     std::vector<unsigned int>
+   *   >
    * @endcode
    *
    * For a more detailed documentation see
