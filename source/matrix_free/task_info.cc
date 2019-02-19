@@ -363,10 +363,7 @@ namespace internal
                       worker[j]->set_ref_count(2);
                       blocked_worker[j - 1]->dummy =
                         new (worker[j]->allocate_child()) tbb::empty_task;
-                      if (j > 1)
-                        tbb::task::spawn(*blocked_worker[j - 1]);
-                      else
-                        tbb::task::spawn(*blocked_worker[j - 1]);
+                      tbb::task::spawn(*blocked_worker[j - 1]);
                     }
                   else
                     {
