@@ -912,9 +912,36 @@ void WGDarcyEquation<dim>::run()
 // This is the main function. We can change the dimension here to run in 3d.
 int main()
 {
-  deallog.depth_console(2);
-  WGDarcyEquation<2> WGDarcyEquationTest;
-  WGDarcyEquationTest.run();
+  try
+    {
+      deallog.depth_console(2);
+      WGDarcyEquation<2> WGDarcyEquationTest;
+      WGDarcyEquationTest.run();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl
+                << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl
+                << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      throw;
+    }
 
   return 0;
 }
