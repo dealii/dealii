@@ -1134,6 +1134,16 @@ namespace DoFRenumbering
   random(DoFHandlerType &dof_handler);
 
   /**
+   * Renumber the degrees of freedom in a random way. It does the same thing as
+   * the above function, only that it does this for one single level of a
+   * multilevel discretization. The non-multigrid part of the DoFHandler
+   * is not touched.
+   */
+  template <typename DoFHandlerType>
+  void
+  random(DoFHandlerType &dof_handler, const unsigned int level);
+
+  /**
    * Compute the renumbering vector needed by the random() function. See
    * there for more information on the computed random renumbering.
    *
@@ -1144,6 +1154,17 @@ namespace DoFRenumbering
   void
   compute_random(std::vector<types::global_dof_index> &new_dof_indices,
                  const DoFHandlerType &                dof_handler);
+
+  /**
+   * Compute the renumbering vector needed by the random() function. Same
+   * as the above function but for a single level of a multilevel
+   * discretization.
+   */
+  template <typename DoFHandlerType>
+  void
+  compute_random(std::vector<types::global_dof_index> &new_dof_indices,
+                 const DoFHandlerType &                dof_handler,
+                 const unsigned int                    level);
 
   /**
    * @}
