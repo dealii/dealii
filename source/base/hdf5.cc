@@ -68,8 +68,10 @@ namespace HDF5
       else if (std::is_same<number, std::complex<float>>::value)
         {
           t_type  = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-            // Relase the HDF5 resource
-            H5Tclose(*pointer);
+            // Release the HDF5 resource
+            const herr_t ret = H5Tclose(*pointer);
+            Assert(ret >= 0, ExcInternalError());
+            (void)ret;
             delete pointer;
           });
           *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<float>));
@@ -77,15 +79,20 @@ namespace HDF5
           //  format used for the std::complex type be binary-compatible with
           //  the C99 type, i.e. an array T[2] with consecutive real [0] and
           //  imaginary [1] parts.
-          H5Tinsert(*t_type, "r", 0, H5T_NATIVE_FLOAT);
-          H5Tinsert(*t_type, "i", sizeof(float), H5T_NATIVE_FLOAT);
+          herr_t ret = H5Tinsert(*t_type, "r", 0, H5T_NATIVE_FLOAT);
+          Assert(ret >= 0, ExcInternalError());
+          ret = H5Tinsert(*t_type, "i", sizeof(float), H5T_NATIVE_FLOAT);
+          Assert(ret >= 0, ExcInternalError());
+          (void)ret;
           return t_type;
         }
       else if (std::is_same<number, std::complex<double>>::value)
         {
           t_type  = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-            // Relase the HDF5 resource
-            H5Tclose(*pointer);
+            // Release the HDF5 resource
+            const herr_t ret = H5Tclose(*pointer);
+            Assert(ret >= 0, ExcInternalError());
+            (void)ret;
             delete pointer;
           });
           *t_type = H5Tcreate(H5T_COMPOUND, sizeof(std::complex<double>));
@@ -93,8 +100,11 @@ namespace HDF5
           //  format used for the std::complex type be binary-compatible with
           //  the C99 type, i.e. an array T[2] with consecutive real [0] and
           //  imaginary [1] parts.
-          H5Tinsert(*t_type, "r", 0, H5T_NATIVE_DOUBLE);
-          H5Tinsert(*t_type, "i", sizeof(double), H5T_NATIVE_DOUBLE);
+          herr_t ret = H5Tinsert(*t_type, "r", 0, H5T_NATIVE_DOUBLE);
+          Assert(ret >= 0, ExcInternalError());
+          ret = H5Tinsert(*t_type, "i", sizeof(double), H5T_NATIVE_DOUBLE);
+          Assert(ret >= 0, ExcInternalError());
+          (void)ret;
           return t_type;
         }
 
@@ -434,7 +444,7 @@ namespace HDF5
     // https://support.hdfgroup.org/ftp/HDF5/examples/misc-examples/vlstratt.c
     //
     // In the case of a variable length string the user does not have to reserve
-    // memory for string_out. The call HAread will reserve the memory and the
+    // memory for string_out. H5Aread will reserve the memory and the
     // user has to free the memory.
     //
     // Todo:
@@ -466,8 +476,11 @@ namespace HDF5
     // The memory of the variable length string has to be freed.
     // H5Dvlen_reclaim could be also used
     free(string_out);
-    H5Tclose(type);
-    H5Aclose(attr);
+    ret = H5Tclose(type);
+    Assert(ret >= 0, ExcInternalError());
+
+    ret = H5Aclose(attr);
+    Assert(ret >= 0, ExcInternalError());
 
     (void)ret;
     return string_value;
@@ -588,13 +601,17 @@ namespace HDF5
     , global_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-      // Relase the HDF5 resource
-      H5Dclose(*pointer);
+      // Release the HDF5 resource
+      const herr_t ret = H5Dclose(*pointer);
+      Assert(ret >= 0, ExcInternalError());
+      (void)ret;
       delete pointer;
     });
     dataspace      = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-      // Relase the HDF5 resource
-      H5Sclose(*pointer);
+      // Release the HDF5 resource
+      const herr_t ret = H5Sclose(*pointer);
+      Assert(ret >= 0, ExcInternalError());
+      (void)ret;
       delete pointer;
     });
 
@@ -639,13 +656,17 @@ namespace HDF5
     , global_no_collective_cause(H5D_MPIO_SET_INDEPENDENT)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-      // Relase the HDF5 resource
-      H5Dclose(*pointer);
+      // Release the HDF5 resource
+      const herr_t ret = H5Dclose(*pointer);
+      Assert(ret >= 0, ExcInternalError());
+      (void)ret;
       delete pointer;
     });
     dataspace      = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-      // Relase the HDF5 resource
-      H5Sclose(*pointer);
+      // Release the HDF5 resource
+      const herr_t ret = H5Sclose(*pointer);
+      Assert(ret >= 0, ExcInternalError());
+      (void)ret;
       delete pointer;
     });
 
@@ -1273,8 +1294,10 @@ namespace HDF5
     : HDF5Object(name, mpi)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-      // Relase the HDF5 resource
-      H5Gclose(*pointer);
+      // Release the HDF5 resource
+      const herr_t ret = H5Gclose(*pointer);
+      Assert(ret >= 0, ExcInternalError());
+      (void)ret;
       delete pointer;
     });
     switch (mode)
@@ -1374,8 +1397,10 @@ namespace HDF5
     : Group(name, mpi)
   {
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
-      // Relase the HDF5 resource
-      H5Fclose(*pointer);
+      // Release the HDF5 resource
+      const herr_t err = H5Fclose(*pointer);
+      Assert(err >= 0, ExcInternalError());
+      (void)err;
       delete pointer;
     });
 
@@ -1419,7 +1444,7 @@ namespace HDF5
 
     if (mpi)
       {
-        // Relase the HDF5 resource
+        // Release the HDF5 resource
         ret = H5Pclose(plist);
         Assert(ret >= 0, ExcMessage("Error at H5Pclose"));
       }
