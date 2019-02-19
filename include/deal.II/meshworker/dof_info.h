@@ -96,7 +96,7 @@ namespace MeshWorker
      */
     unsigned int sub_number;
 
-    /*
+    /**
      * The DoF indices of the
      * current cell
      */
