@@ -70,7 +70,7 @@ namespace HDF5
           t_type  = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
             // Release the HDF5 resource
             const herr_t ret = H5Tclose(*pointer);
-            Assert(ret >= 0, ExcInternalError());
+            AssertNothrow(ret >= 0, ExcInternalError());
             (void)ret;
             delete pointer;
           });
@@ -91,7 +91,7 @@ namespace HDF5
           t_type  = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
             // Release the HDF5 resource
             const herr_t ret = H5Tclose(*pointer);
-            Assert(ret >= 0, ExcInternalError());
+            AssertNothrow(ret >= 0, ExcInternalError());
             (void)ret;
             delete pointer;
           });
@@ -603,14 +603,14 @@ namespace HDF5
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Release the HDF5 resource
       const herr_t ret = H5Dclose(*pointer);
-      Assert(ret >= 0, ExcInternalError());
+      AssertNothrow(ret >= 0, ExcInternalError());
       (void)ret;
       delete pointer;
     });
     dataspace      = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Release the HDF5 resource
       const herr_t ret = H5Sclose(*pointer);
-      Assert(ret >= 0, ExcInternalError());
+      AssertNothrow(ret >= 0, ExcInternalError());
       (void)ret;
       delete pointer;
     });
@@ -658,14 +658,14 @@ namespace HDF5
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Release the HDF5 resource
       const herr_t ret = H5Dclose(*pointer);
-      Assert(ret >= 0, ExcInternalError());
+      AssertNothrow(ret >= 0, ExcInternalError());
       (void)ret;
       delete pointer;
     });
     dataspace      = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Release the HDF5 resource
       const herr_t ret = H5Sclose(*pointer);
-      Assert(ret >= 0, ExcInternalError());
+      AssertNothrow(ret >= 0, ExcInternalError());
       (void)ret;
       delete pointer;
     });
@@ -1296,7 +1296,7 @@ namespace HDF5
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Release the HDF5 resource
       const herr_t ret = H5Gclose(*pointer);
-      Assert(ret >= 0, ExcInternalError());
+      AssertNothrow(ret >= 0, ExcInternalError());
       (void)ret;
       delete pointer;
     });
@@ -1399,7 +1399,7 @@ namespace HDF5
     hdf5_reference = std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
       // Release the HDF5 resource
       const herr_t err = H5Fclose(*pointer);
-      Assert(err >= 0, ExcInternalError());
+      AssertNothrow(err >= 0, ExcInternalError());
       (void)err;
       delete pointer;
     });
