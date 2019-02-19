@@ -613,10 +613,9 @@ namespace Step20
     // applies a fixed number of 30 (inexpensive) CG iterations:
     IterationNumberControl iteration_number_control_aS(30, 1.e-18);
     SolverCG<>             solver_aS(iteration_number_control_aS);
-    PreconditionIdentity   preconditioner_aS;
 
     const auto preconditioner_S =
-      inverse_operator(op_aS, solver_aS, preconditioner_aS);
+      inverse_operator(op_aS, solver_aS, PreconditionIdentity());
 
     // Now on to the first equation. The right hand side of it is
     // $B^TM^{-1}F-G$, which is what we compute in the first few lines. We

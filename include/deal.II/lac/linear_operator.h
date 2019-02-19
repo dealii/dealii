@@ -41,6 +41,8 @@ namespace internal
 template <typename Number>
 class Vector;
 
+class PreconditionIdentity;
+
 template <typename Range  = Vector<double>,
           typename Domain = Range,
           typename Payload =
@@ -70,6 +72,10 @@ template <
   typename Payload = internal::LinearOperatorImplementation::EmptyPayload>
 LinearOperator<Range, Domain, Payload>
 null_operator(const LinearOperator<Range, Domain, Payload> &);
+
+template <typename Range, typename Domain, typename Payload>
+LinearOperator<Range, Domain, Payload>
+identity_operator(const LinearOperator<Range, Domain, Payload> &);
 
 
 /**
@@ -629,6 +635,7 @@ operator*(const LinearOperator<Range, Intermediate, Payload> & first_op,
     }
 }
 
+
 /**
  * @relatesalso LinearOperator
  *
@@ -723,6 +730,105 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
   };
 
   return return_op;
+}
+
+
+/**
+ * @relatesalso LinearOperator
+ *
+ * Variant of above function that takes a LinearOperator @p preconditioner
+ * as preconditioner argument.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Payload,
+          typename Solver,
+          typename Range  = typename Solver::vector_type,
+          typename Domain = Range>
+LinearOperator<Domain, Range, Payload>
+inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
+                 Solver &                                      solver,
+                 const LinearOperator<Range, Domain, Payload> &preconditioner)
+{
+  LinearOperator<Domain, Range, Payload> return_op(
+    op.inverse_payload(solver, preconditioner));
+
+  return_op.reinit_range_vector  = op.reinit_domain_vector;
+  return_op.reinit_domain_vector = op.reinit_range_vector;
+
+  return_op.vmult = [op, &solver, preconditioner](Range &v, const Domain &u) {
+    op.reinit_range_vector(v, /*bool omit_zeroing_entries =*/false);
+    solver.solve(op, v, u, preconditioner);
+  };
+
+  return_op.vmult_add = [op, &solver, preconditioner](Range &       v,
+                                                      const Domain &u) {
+    GrowingVectorMemory<Range> vector_memory;
+
+    typename VectorMemory<Range>::Pointer v2(vector_memory);
+    op.reinit_range_vector(*v2, /*bool omit_zeroing_entries =*/false);
+    solver.solve(op, *v2, u, preconditioner);
+    v += *v2;
+  };
+
+  return_op.Tvmult = [op, &solver, preconditioner](Range &v, const Domain &u) {
+    op.reinit_range_vector(v, /*bool omit_zeroing_entries =*/false);
+    solver.solve(transpose_operator(op), v, u, preconditioner);
+  };
+
+  return_op.Tvmult_add = [op, &solver, preconditioner](Range &       v,
+                                                       const Domain &u) {
+    GrowingVectorMemory<Range> vector_memory;
+
+    typename VectorMemory<Range>::Pointer v2(vector_memory);
+    op.reinit_range_vector(*v2, /*bool omit_zeroing_entries =*/false);
+    solver.solve(transpose_operator(op), *v2, u, preconditioner);
+    v += *v2;
+  };
+
+  return return_op;
+}
+
+
+/**
+ * @relatesalso LinearOperator
+ *
+ * Variant of above function without a preconditioner argument. In this
+ * case the identity_operator() of the @p op argument is used as a
+ * preconditioner. This is equivalent to using PreconditionIdentity.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Payload,
+          typename Solver,
+          typename Range  = typename Solver::vector_type,
+          typename Domain = Range>
+LinearOperator<Domain, Range, Payload>
+inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
+                 Solver &                                      solver)
+{
+  return inverse_operator(op, solver, identity_operator(op));
+}
+
+
+/**
+ * @relatesalso LinearOperator
+ *
+ * Special overload of above function that takes a PreconditionIdentity
+ * argument.
+ *
+ * @ingroup LAOperators
+ */
+template <typename Payload,
+          typename Solver,
+          typename Range  = typename Solver::vector_type,
+          typename Domain = Range>
+LinearOperator<Domain, Range, Payload>
+inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
+                 Solver &                                      solver,
+                 const PreconditionIdentity &)
+{
+  return inverse_operator(op, solver);
 }
 
 //@}
@@ -1367,6 +1473,93 @@ linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
 
 //@}
 
+#ifndef DOXYGEN
+
+//
+// Ensure that we never capture a reference to a temporary by accident.
+// to avoid "stack use after free".
+//
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename OperatorExemplar,
+  typename Matrix,
+  typename =
+    typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(const OperatorExemplar &, Matrix &&) = delete;
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename OperatorExemplar,
+  typename Matrix,
+  typename = typename std::enable_if<
+    !std::is_lvalue_reference<OperatorExemplar>::value>::type,
+  typename = typename std::enable_if<
+    !std::is_same<OperatorExemplar,
+                  LinearOperator<Range, Domain, Payload>>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(OperatorExemplar &&, const Matrix &) = delete;
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename OperatorExemplar,
+  typename Matrix,
+  typename =
+    typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type,
+  typename = typename std::enable_if<
+    !std::is_lvalue_reference<OperatorExemplar>::value>::type,
+  typename = typename std::enable_if<
+    !std::is_same<OperatorExemplar,
+                  LinearOperator<Range, Domain, Payload>>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(OperatorExemplar &&, Matrix &&) = delete;
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename Matrix,
+  typename =
+    typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(const LinearOperator<Range, Domain, Payload> &,
+                Matrix &&) = delete;
+
+template <
+  typename Range   = Vector<double>,
+  typename Domain  = Range,
+  typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
+  typename Matrix,
+  typename =
+    typename std::enable_if<!std::is_lvalue_reference<Matrix>::value>::type>
+LinearOperator<Range, Domain, Payload>
+linear_operator(Matrix &&) = delete;
+
+template <typename Payload,
+          typename Solver,
+          typename Preconditioner,
+          typename Range  = typename Solver::vector_type,
+          typename Domain = Range,
+          typename        = typename std::enable_if<
+            !std::is_lvalue_reference<Preconditioner>::value>::type,
+          typename = typename std::enable_if<
+            !std::is_same<Preconditioner, PreconditionIdentity>::value>::type,
+          typename = typename std::enable_if<
+            !std::is_same<Preconditioner,
+                          LinearOperator<Range, Domain, Payload>>::value>::type>
+LinearOperator<Domain, Range, Payload>
+inverse_operator(const LinearOperator<Range, Domain, Payload> &,
+                 Solver &,
+                 Preconditioner &&) = delete;
+
+#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
