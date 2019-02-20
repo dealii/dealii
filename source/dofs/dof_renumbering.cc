@@ -2131,10 +2131,59 @@ namespace DoFRenumbering
 
   template <typename DoFHandlerType>
   void
+  random(DoFHandlerType &dof_handler, const unsigned int level)
+  {
+    Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
+           ExcDoFHandlerNotInitialized());
+
+    std::vector<types::global_dof_index> renumbering(
+      dof_handler.locally_owned_mg_dofs(level).n_elements(),
+      numbers::invalid_dof_index);
+
+    compute_random(renumbering, dof_handler, level);
+
+    dof_handler.renumber_dofs(level, renumbering);
+  }
+
+
+
+  template <typename DoFHandlerType>
+  void
   compute_random(std::vector<types::global_dof_index> &new_indices,
                  const DoFHandlerType &                dof_handler)
   {
     const types::global_dof_index n_dofs = dof_handler.n_dofs();
+    Assert(new_indices.size() == n_dofs,
+           ExcDimensionMismatch(new_indices.size(), n_dofs));
+
+    for (unsigned int i = 0; i < n_dofs; ++i)
+      new_indices[i] = i;
+
+    // shuffle the elements; the following is essentially std::shuffle (which
+    // is new in C++11) but with a boost URNG
+    ::boost::mt19937 random_number_generator;
+    for (unsigned int i = 1; i < n_dofs; ++i)
+      {
+        // get a random number between 0 and i (inclusive)
+        const unsigned int j =
+          ::boost::random::uniform_int_distribution<>(0, i)(
+            random_number_generator);
+
+        // if possible, swap the elements
+        if (i != j)
+          std::swap(new_indices[i], new_indices[j]);
+      }
+  }
+
+
+
+  template <typename DoFHandlerType>
+  void
+  compute_random(std::vector<types::global_dof_index> &new_indices,
+                 const DoFHandlerType &                dof_handler,
+                 const unsigned int                    level)
+  {
+    const types::global_dof_index n_dofs = dof_handler.n_dofs(level);
     Assert(new_indices.size() == n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
