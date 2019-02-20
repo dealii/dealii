@@ -874,7 +874,7 @@ namespace LinearAlgebra
         for (unsigned int i = 0; i < n_elements; ++i)
           {
             Assert(
-              std::imag(new_values[i]) == 0.,
+              std::imag(tmp[i]) == 0.,
               ExcMessage(
                 "VectorOperation::min is not defined if there is an imaginary part!)"));
             Assert(
@@ -898,7 +898,7 @@ namespace LinearAlgebra
         for (unsigned int i = 0; i < n_elements; ++i)
           {
             Assert(
-              std::imag(new_values[i]) == 0.,
+              std::imag(tmp[i]) == 0.,
               ExcMessage(
                 "VectorOperation::max is not defined if there is an imaginary part!)"));
             Assert(

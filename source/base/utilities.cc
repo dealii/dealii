@@ -60,6 +60,7 @@
 #    include <deal.II/lac/vector_memory.h>
 
 #    include <Epetra_MpiComm.h>
+#    include <Teuchos_DefaultComm.hpp>
 #  endif
 #  include <Epetra_SerialComm.h>
 #  include <Teuchos_RCP.hpp>

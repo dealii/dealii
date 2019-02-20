@@ -856,7 +856,7 @@ template <
 LinearOperator<Range, Range, Payload>
 identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 {
-  LinearOperator<Range, Range, Payload> return_op((Payload()));
+  LinearOperator<Range, Range, Payload> return_op{Payload()};
 
   return_op.reinit_range_vector  = reinit_vector;
   return_op.reinit_domain_vector = reinit_vector;
