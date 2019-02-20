@@ -24,14 +24,27 @@ Since the mesh is a rectangular mesh and numbers of refinement are even, we have
 We run the code with finer meshes and get the following convergence rates of pressure, 
 velocity and flux.
 
-@code
-number of refinements   $\|p-p_h^\circ\|$    $\|\mathbf{u}-\mathbf{u}_h\|$ $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$
-   2                      1.587e-01                5.113e-01                  7.062e-01 
-   3                      8.000e-02                2.529e-01                  3.554e-01  
-   4                      4.006e-02                1.260e-01                  1.780e-01
-   5                      2.004e-02                6.297e-02                  8.902e-02
-Conv.rate                   1.00                     1.00                        1.00  
-@endcode
+<table align="center">
+  <tr>
+   <td>number of refinements </td><td>  $\|p-p_h^\circ\|$  </td><td>  $\|\mathbf{u}-\mathbf{u}_h\|$ </td><td> $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$ </td>
+  </tr>
+  <tr>
+   <td>   2                  </td><td>    1.587e-01        </td><td>        5.113e-01               </td><td>   7.062e-01 </td>
+  </tr>
+  <tr>
+   <td>   3                  </td><td>    8.000e-02        </td><td>        2.529e-01               </td><td>   3.554e-01 </td>
+  </tr>
+  <tr>
+   <td>   4                  </td><td>    4.006e-02        </td><td>        1.260e-01               </td><td>   1.780e-01 </td>
+  </tr>
+  <tr>
+   <td>   5                  </td><td>    2.004e-02        </td><td>        6.297e-02               </td><td>   8.902e-02 </td>
+  </tr>
+  <tr>
+   <td>Conv.rate             </td><td>      1.00           </td><td>          1.00                  </td><td>      1.00   </td>
+  </tr>
+</table>
+
 We can see that the convergence rates of $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ are around 1.
 
 
@@ -52,14 +65,26 @@ to divide each cell interior into 4 subcells.
 
 These are the convergence rates of pressure, velocity and flux on $\mbox{WG}(Q_1,Q_1;RT_{[1]})$
 
-@code
-number of refinements   $\|p-p_h^\circ\|$    $\|\mathbf{u}-\mathbf{u}_h\|$ $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$
-   2                      1.613e-02                5.093e-02                  7.167e-02 
-   3                      4.056e-03                1.276e-02                  1.802e-02  
-   4                      1.015e-03                3.191e-03                  4.512e-03
-   5                      2.540e-04                7.979e-04                  1.128e-03
-Conv.rate                   2.00                     2.00                        2.00  
-@endcode
+<table align="center">
+  <tr>
+   <td>number of refinements </td><td>  $\|p-p_h^\circ\|$  </td><td>  $\|\mathbf{u}-\mathbf{u}_h\|$ </td><td> $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$ </td>
+  </tr>
+  <tr>
+    <td>  2           </td><td>           1.613e-02      </td><td>          5.093e-02     </td><td>             7.167e-02   </td>
+  </tr>
+  <tr>
+    <td>  3           </td><td>           4.056e-03      </td><td>          1.276e-02     </td><td>             1.802e-02    </td>
+  </tr>
+  <tr>
+    <td>  4           </td><td>           1.015e-03      </td><td>          3.191e-03     </td><td>             4.512e-03  </td>
+  </tr>
+  <tr>
+    <td>  5           </td><td>           2.540e-04      </td><td>          7.979e-04     </td><td>             1.128e-03  </td>
+  </tr>
+  <tr>
+    <td>Conv.rate     </td><td>              2.00        </td><td>             2.00       </td><td>                 2.00    </td>
+  </tr>
+</table>
 The convergence rates of $WG(Q_1,Q_1;RT_{[1]})$ are around 2.
 
 <h3>Test results on $WG(Q_2,Q_2;RT_{[2]})$</h3>
@@ -77,12 +102,24 @@ These are interior pressures and face pressures implemented on $WG(Q_2,Q_2;RT_{[
 
 This is the convergence table of $L_2$ errors of pressure, velocity and flux on $\mbox{WG}(Q_2,Q_2;RT_{[2]})$
 
-@code
-number of refinements   $\|p-p_h^\circ\|$    $\|\mathbf{u}-\mathbf{u}_h\|$ $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$
-   2                      1.072e-03                3.375e-03                  4.762e-03 
-   3                      1.347e-04                4.233e-04                  5.982e-04  
-   4                      1.685e-05                5.295e-05                  7.487e-05
-   5                      2.107e-06                6.620e-06                  9.362e-06
-Conv.rate                   3.00                     3.00                        3.00  
-@endcode
+<table align="center">
+  <tr>
+   <td>number of refinements </td><td>  $\|p-p_h^\circ\|$  </td><td>  $\|\mathbf{u}-\mathbf{u}_h\|$ </td><td> $\|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|$ </td>
+  </tr>
+  <tr>
+     <td>  2               </td><td>       1.072e-03       </td><td>         3.375e-03       </td><td>           4.762e-03   </td>
+  </tr>
+  <tr>
+    <td>   3               </td><td>       1.347e-04       </td><td>         4.233e-04       </td><td>           5.982e-04    </td>
+  </tr>
+  <tr>
+    <td>   4               </td><td>       1.685e-05      </td><td>          5.295e-05       </td><td>           7.487e-05  </td>
+  </tr>
+  <tr>
+    <td>   5               </td><td>       2.107e-06      </td><td>          6.620e-06       </td><td>           9.362e-06  </td>
+  </tr>
+  <tr>
+    <td>Conv.rate          </td><td>         3.00         </td><td>            3.00          </td><td>              3.00    </td>
+  </tr>
+</table>
 The convergence rates of $\mbox{WG}(Q_2,Q_2;RT_{[2]})$ are around 3.

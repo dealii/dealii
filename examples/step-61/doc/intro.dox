@@ -11,9 +11,11 @@ This tutorial program presents an implementation of the "weak Galerkin"
 finite element method for the Poisson equation. In some sense, the motivation for
 considering this method starts from the same point as in step-51: We would like to
 consider discontinuous shape functions, but then need to address the fact that
-the resulting problem has a large number of degrees of freedom (because, for
+the resulting problem has a much larger number of degrees of freedom compared to
+the usual continuous Galerkin method (because, for
 example, each vertex carries as many degrees of freedom as there are adjacent cells).
-We also have to address the fact that, in general, every degree of freedom
+We also have to address the fact that, unlike in the continuous
+Galerkin method, <i>every</i> degree of freedom
 on one cell couples with all of the degrees of freedom on each of its face neighbor
 cells. Consequently, the matrix one gets from the "traditional" discontinuous
 Galerkin methods are both large and relatively dense.
@@ -25,13 +27,15 @@ cells (i.e., on the "skeleton" of the mesh), and which therefore "insulate" the
 degrees of freedom on the adjacent cells from each other: cell degrees of freedom
 only couple with other cell degrees of freedom on the same cell, as well as face
 degrees of freedom, but not with cell degrees of freedom on neighboring cells.
-Consequently, the shape functions for these cell degrees of freedom are
-discontinuous and only "live" on exactly one cell.
+Consequently, the coupling of shape functions for these cell degrees of freedom
+indeed local to on exactly one cell and the degrees of freedom defined on its
+faces.
 
 For a given equation, say the second order Poisson equation,
-the difference between the HDG and the WG method is how exactly one formulates
-the problem that connects all of these different shape functions. The HDG does
-things by reformulating second order problems in terms of a system of first
+the difference between the HDG and the WG method is how precisely one formulates
+the problem that connects all of these different shape functions. (Indeed,
+for some WG and HDG formulation, it is possible to show that they are equivalent.)
+The HDG does things by reformulating second order problems in terms of a system of first
 order equations and then conceptually considers the face degrees of freedom
 to be "fluxes" of this first order system. In contrast, the WG method keeps things
 in second order form and considers the face degrees of freedom as of the same
@@ -48,19 +52,21 @@ additional effort is not prohibitive.
 <h3>  Weak Galerkin finite element methods</h3>
 
 Weak Galerkin Finite Element Methods (WGFEMs) use discrete weak functions 
-to approximate scalar unknowns and discrete weak gradients to 
+to approximate scalar unknowns, and discrete weak gradients to 
 approximate classical gradients. 
-It was introduced by Junping Wang and Xiu Ye 
-in the paper: <i>A weak Galerkin finite element method for second order elliptic problems</i>, 
-J. Comput. Appl. Math., 2013, 103-115. 
+The method was originally introduced by Junping Wang and Xiu Ye 
+in the paper 
+<a href="https://doi.org/10.1016/j.cam.2012.10.003">
+<i>A weak Galerkin finite element method for second order elliptic problems</i>, 
+J. Comput. Appl. Math., 103-115, 2013</a>. 
 Compared to the continuous Galerkin method, 
 the weak Galerkin method satisfies important physical properties, namely 
 local mass conservation and bulk normal flux continuity. 
-It results in a SPD linear system, and expected convergence rates can 
+It results in a SPD linear system, and optimal convergence rates can 
 be obtained with mesh refinement.
 
 
-<h3> WGFEM applied to the Poisson equation </h3>
+<h3> The equation to solve </h3>
 This program solves the Poisson equation 
 using the weak Galerkin finite element method:
 @f{eqnarray*}
@@ -74,38 +80,77 @@ using the weak Galerkin finite element method:
 where $\Omega \subset \mathbb{R}^n (n=2,3)$ is a bounded domain. 
 In the context of the flow of a fluid through a porous medium,
 $p$ is the pressure, $\mathbf{K}$ is a permeability tensor, 
-$ f $ is the source term, and
-$ p_D, u_N $ represent Dirichlet and Neumann boundary conditions.
+$f$ is the source term, and
+$p_D, u_N$ represent Dirichlet and Neumann boundary conditions.
 We can introduce a flux, $\mathbf{u} = -\mathbf{K} \nabla p$, that corresponds 
 to the Darcy velocity (in the way we did in step-20) and this variable will
 be important in the considerations below.
 
 In this program, we will consider a test case where the exact pressure 
-is $p = \sin \left( \pi x)\sin(\pi y \right)$ on the unit square domain,
-with homogenous Dirichelet boundary conditions and identity matrix $\mathbf{K}$.
-Then we will calculate $L_2$ errors of pressure, velocity and flux.
+is $p = \sin \left( \pi x\right)\sin\left(\pi y \right)$ on the unit square domain,
+with homogenous Dirichelet boundary conditions and $\mathbf{K}$ the identity matrix.
+Then we will calculate $L_2$ errors of pressure, velocity, and flux.
 
 
 <h3> Weak Galerkin scheme </h3>
 
-Via integration by parts, the weak Galerkin scheme for the Poisson equation is
+The Poisson equation above has a solution $p$ that needs to satisfy the weak
+formulation of the problem,
 @f{equation*}
-\mathcal{A}_h\left(p_h,q \right) = \mathcal{F} \left(q \right),
+\mathcal{A}\left(p,q \right) = \mathcal{F} \left(q \right),
 @f}
-where
+for all test functions $q$, where
 @f{equation*}
-\mathcal{A}_h\left(p_h,q\right)
-  := \sum_{T \in \mathcal{T}_h}
-    \int_T \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q \mathrm{d}x,
+\mathcal{A}\left(p,q\right)
+  := \int_\Omega \mathbf{K} \nabla p \cdot \nabla q \;\mathrm{d}x,
 @f}
 and 
 @f{equation*}
 \mathcal{F}\left(q\right)
-  := \sum_{T \in \mathcal{T}_h} \int_T f \, q^\circ \mathrm{d}x
-  - \sum_{\gamma \in \Gamma_h^N} \int_\gamma u_N q^\partial \mathrm{d}x,
+  := \int_\Omega f \, q \;\mathrm{d}x
+  - \int_{\Gamma^N} u_N q \; \mathrm{d}x.
 @f}
-$q^\circ$ is the shape function of the polynomial space in the interior, 
-$q^\partial$ is the shape function of the polynomial space on faces, $ \nabla_{w,d} $ means the discrete weak gradient used to approximate the classical gradient. 
+Here, we have integrated by parts in the bilinear form, and we are evaluating 
+the gradient of $p,p$ in the interior and the values of $q$ on the boundary
+of the domain. All of this is well defined because we assume that the solution
+is in $H^1$ for which taking the gradient and evaluating boundary values
+are valid operations. 
+
+The idea of the weak Galerkin method is now to approximate the exact $p$
+solution with a <i>discontinuous function</i> $p_h$. This function may only be
+discontinuous along interfaces between cells, and because we will want to
+evaluate this function also along interfaces, we have to
+prescribe not only what values it is supposed to have in the cell interiors
+but also its values along interfaces. We do this by saying that $p_h$ is
+actually a tuple, $p_h=(p^\circ,p^\partial)$, though it's really just
+a single function that is either equal to $p^\circ(x)$ or $p^\partial(x)$,
+depending on whether it is evaluated at a point $x$ that lies in the cell
+interior or on cell interfaces.
+
+We would then like to simply stick this approximation into the bilinear
+form above. This works for the case where we have to evaluate the
+test function $q_h$ on the boundary (where we would simply take its interface
+part $q_h^\partial$) but we have to be careful with the gradient because
+that is only defined in cell interiors. Consequently,
+ the weak Galerkin scheme for the Poisson equation is defined by
+@f{equation*}
+\mathcal{A}_h\left(p_h,q \right) = \mathcal{F} \left(q_h \right),
+@f}
+for all discrete test functions $q_h$, where
+@f{equation*}
+\mathcal{A}_h\left(p_h,q_h\right)
+  := \sum_{T \in \mathcal{T}_h}
+    \int_T \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q_h \;\mathrm{d}x,
+@f}
+and 
+@f{equation*}
+\mathcal{F}\left(q_h\right)
+  := \sum_{T \in \mathcal{T}_h} \int_T f \, q_h^\circ \;\mathrm{d}x
+  - \sum_{\gamma \in \Gamma_h^N} \int_\gamma u_N q_h^\partial \;\mathrm{d}x,
+@f}
+The key point is that here, we have replaced the gradient $\nabla p_h$ by the
+<i>discrete weak gradient</i>
+ $ \nabla_{w,d} p_h $ that is defined for our peculiarly defined approximation $p_h$. 
 We use FE_DGQ as the interior polynomial space, 
 FE_FaceQ as the face polynomial space, and Raviart-Thomas elements for the velocity 
 $\mathbf{u} = -{\mathbf{K}} \nabla_{w,d} p$. 
