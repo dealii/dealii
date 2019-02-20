@@ -127,8 +127,8 @@ public:
    * Connect a slot to retrieve a notification when the Givens rotations
    * are performed.
    *
-   * The function takes @p i'th and @p j'th indices of the plane of rotation
-   * and a triplet of numbers @p csr (cosine, sine and radius, see
+   * The function takes two indices, @p i and @p j, describing the plane of
+   * rotation, and a triplet of numbers @p csr (cosine, sine and radius, see
    * Utilities::LinearAlgebra::givens_rotation()) which represents the rotation
    * matrix.
    */
@@ -169,7 +169,7 @@ protected:
 
   /**
    * Signal used to retrieve a notification
-   * when Givens rotations are performed in plane @p i and @p j.
+   * when Givens rotations are performed in the `(i,j)`-plane.
    */
   boost::signals2::signal<void(const unsigned int i,
                                const unsigned int j,
@@ -254,7 +254,7 @@ public:
   virtual ~QR() = default;
 
   /**
-   * @copyfrom BaseQR::append_column
+   * @copydoc BaseQR::append_column
    *
    * @note Currently this function always returns <code>true</code>.
    */
@@ -310,7 +310,7 @@ public:
 
 private:
   /**
-   * Apply givens rotation in plane @p i @p k to @p Q and @p R so that
+   * Apply givens rotation in the `(i,j)`-plane to @p Q and @p R so that
    * <code>R(k,k)</code> is zeroed.
    *
    * See Chapter 5.1.9 of Golub 2013, Matrix computations.
@@ -396,7 +396,7 @@ public:
    * Connect a slot to implement a custom check of linear dependency
    * during addition of a column.
    *
-   * Here, @p u is the last column of the to-be R matrix , @p rho
+   * Here, @p u is the last column of the to-be R matrix, @p rho
    * is its diagonal and @p col_norm_sqr is the square of the $l2$ norm of the column.
    * The function should return <code>true</code> if the new column is
    * linearly independent.
@@ -409,7 +409,7 @@ public:
 
 private:
   /**
-   * Apply givens rotation in plane @i @p k to zero out $R(k,k)$.
+   * Apply givens rotation in the `(i,k)`-plane to zero out $R(k,k)$.
    */
   void
   apply_givens_rotation(const unsigned int i, const unsigned int k);
@@ -417,7 +417,7 @@ private:
   /**
    * Signal used to decide if the new column is linear dependent.
    *
-   * Here, @p u is the last column of the to-be R matrix , @p rho
+   * Here, @p u is the last column of the to-be R matrix, @p rho
    * is its diagonal and @p col_norm_sqr is the square of the $l2$ norm of the column.
    * The function should return <code>true</code> if the new column is
    * linearly independent.

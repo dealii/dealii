@@ -185,7 +185,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -210,7 +210,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -246,7 +246,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -283,7 +283,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -322,7 +322,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -363,7 +363,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -409,7 +409,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -461,7 +461,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -485,7 +485,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -507,7 +507,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -530,7 +530,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -553,7 +553,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -576,7 +576,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -602,7 +602,7 @@ private:
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1393,7 +1393,7 @@ namespace deal_II_exceptions
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1456,7 +1456,7 @@ namespace deal_II_exceptions
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1505,7 +1505,7 @@ namespace deal_II_exceptions
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1555,7 +1555,7 @@ namespace deal_II_exceptions
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1583,7 +1583,7 @@ namespace deal_II_exceptions
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1625,7 +1625,7 @@ namespace internal
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1657,7 +1657,7 @@ namespace internal
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1682,7 +1682,7 @@ namespace internal
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1709,7 +1709,7 @@ namespace internal
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1737,7 +1737,7 @@ namespace internal
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1766,7 +1766,7 @@ namespace internal
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1797,7 +1797,7 @@ namespace internal
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other
@@ -1829,7 +1829,7 @@ namespace internal
  * them unique to deal.II. As a consequence, it is possible that other
  * libraries your code interfaces with define the same name, and the result
  * will be name collisions (see
- * https://en.wikipedia.org/wiki/Name_collision). One can <code>#undef</code>
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
  * this macro, as well as all other macros defined by deal.II that are not
  * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
  * the header <code>deal.II/base/undefine_macros.h</code> after all other

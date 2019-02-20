@@ -2184,7 +2184,7 @@ namespace VectorTools
    *   function for the problem you are solving. This is because the
    *   Green's function $G(x,p)$ is defined by
    *   @f{align*}{
-   *     L G(x,p) &= \delta(x-p)$
+   *     L G(x,p) &= \delta(x-p)
    *   @f}
    *   where $L$ is the differential operator of your problem. The discrete
    *   version then requires computing the right hand side vector
