@@ -623,8 +623,8 @@ block_operator(const BlockMatrixType &block_matrix)
   using BlockType =
     typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType;
 
-  BlockLinearOperator<Range, Domain, BlockPayload> return_op(
-    BlockPayload(block_matrix, block_matrix));
+  BlockLinearOperator<Range, Domain, BlockPayload> return_op{
+    BlockPayload(block_matrix, block_matrix)};
 
   return_op.n_block_rows = [&block_matrix]() -> unsigned int {
     return block_matrix.n_block_rows();
@@ -698,9 +698,8 @@ block_operator(
   using BlockType =
     typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType;
 
-  BlockLinearOperator<Range, Domain, BlockPayload> return_op(
-    (BlockPayload())); // TODO: Create block payload so that this can be
-                       // initialized correctly
+  // TODO: Create block payload so that this can be initialized correctly
+  BlockLinearOperator<Range, Domain, BlockPayload> return_op{BlockPayload()};
 
   return_op.n_block_rows = []() -> unsigned int { return m; };
 
@@ -744,8 +743,8 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
   using BlockType =
     typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType;
 
-  BlockLinearOperator<Range, Domain, BlockPayload> return_op(
-    BlockPayload(block_matrix, block_matrix));
+  BlockLinearOperator<Range, Domain, BlockPayload> return_op{
+    BlockPayload(block_matrix, block_matrix)};
 
   return_op.n_block_rows = [&block_matrix]() -> unsigned int {
     return block_matrix.n_block_rows();
@@ -910,8 +909,8 @@ block_forward_substitution(
   const BlockLinearOperator<Range, Domain, BlockPayload> &block_operator,
   const BlockLinearOperator<Domain, Range, BlockPayload> &diagonal_inverse)
 {
-  LinearOperator<Range, Range, typename BlockPayload::BlockType> return_op(
-    (typename BlockPayload::BlockType(diagonal_inverse)));
+  LinearOperator<Range, Range, typename BlockPayload::BlockType> return_op{
+    typename BlockPayload::BlockType(diagonal_inverse)};
 
   return_op.reinit_range_vector  = diagonal_inverse.reinit_range_vector;
   return_op.reinit_domain_vector = diagonal_inverse.reinit_domain_vector;
@@ -1025,8 +1024,8 @@ block_back_substitution(
   const BlockLinearOperator<Range, Domain, BlockPayload> &block_operator,
   const BlockLinearOperator<Domain, Range, BlockPayload> &diagonal_inverse)
 {
-  LinearOperator<Range, Range, typename BlockPayload::BlockType> return_op(
-    (typename BlockPayload::BlockType(diagonal_inverse)));
+  LinearOperator<Range, Range, typename BlockPayload::BlockType> return_op{
+    typename BlockPayload::BlockType(diagonal_inverse)};
 
   return_op.reinit_range_vector  = diagonal_inverse.reinit_range_vector;
   return_op.reinit_domain_vector = diagonal_inverse.reinit_domain_vector;
