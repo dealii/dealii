@@ -115,8 +115,8 @@ namespace Differentiation
      *
      *   // Indicate that we are about to start tracing the operations for
      *   // function evaluation on the tape. If this tape has already been used
-     *   // (i.e. the operations are already recorded) then we (optionally) load
-     *   // the tape and reuse this data.
+     *   // (i.e. the operations are already recorded) then we (optionally)
+     *   // load the tape and reuse this data.
      *   const bool is_recording
      *     = ad_helper.start_recording_operations(tape_index);
      *   if (is_recording == true)
@@ -198,11 +198,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
       ADHelperBase(const unsigned int n_independent_variables,
@@ -324,11 +324,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        * @param[in] clear_registered_tapes A flag that indicates the that
        * list of @p registered_tapes must be cleared.
@@ -867,11 +867,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
       ADHelperCellLevelBase(const unsigned int n_independent_variables,
@@ -964,7 +964,7 @@ namespace Differentiation
       //@{
 
       /**
-       * Set the values for the independent variables $\mathbf{X}$, i.e. the
+       * Set the values for the independent variables $\mathbf{X}$, i.e., the
        * linearization point.
        *
        * @param[in] dof_values A vector field associated with local
@@ -986,7 +986,7 @@ namespace Differentiation
       set_dof_values(const std::vector<scalar_type> &dof_values);
 
       /**
-       * Set the values for the independent variables $\mathbf{X}$, i.e. the
+       * Set the values for the independent variables $\mathbf{X}$, i.e., the
        * linearization point.
        *
        * @param[in] values A vector field from which the values of all
@@ -1252,7 +1252,7 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\Psi(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        *
        * @note There is only one dependent variable associated with the total
        * energy attributed to the local finite element. That is to say, this
@@ -1568,11 +1568,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{r}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{r}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{r}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{r}$, i.e., the dimension of the
        * image space.
        */
       ADHelperResidualLinearization(const unsigned int n_independent_variables,
@@ -2682,11 +2682,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
       ADHelperPointLevelFunctionsBase(
@@ -2982,7 +2982,7 @@ namespace Differentiation
      *
      *   // Indicate that we are about to start tracing the operations for
      *   // function evaluation on the tape. If this tape has already been
-     *   // used (i.e., the operations are already recorded) then we
+     *   // used (i.e. the operations are already recorded) then we
      *   // (optionally) load the tape and reuse this data.
      *   const bool is_recording
      *     = ad_helper.start_recording_operations(tape_index);
@@ -3203,7 +3203,7 @@ namespace Differentiation
        * @f]
        *
        * @param[in] gradient The gradient of the scalar function with respect to
-       * all independent variables, i.e. that returned by compute_gradient().
+       * all independent variables, i.e., that returned by compute_gradient().
        * @param[in] extractor_row An extractor associated with the input field
        * variables. This effectively defines which components of the global set
        * of independent variables this field is associated with.
@@ -3226,7 +3226,7 @@ namespace Differentiation
        * @f]
        *
        * @param[in] hessian The Hessian of the scalar function with respect to
-       * all independent variables, i.e. that returned by compute_hessian().
+       * all independent variables, i.e., that returned by compute_hessian().
        * @param[in] extractor_row An extractor associated with the input field
        * variables for which the first index of the Hessian is extracted.
        * @param[in] extractor_col An extractor associated with the input field
