@@ -1566,6 +1566,7 @@ namespace TrilinosWrappers
      * <ul>
      * <li> TrilinosWrappers::MPI::Vector,
      * <li> LinearAlgebra::EpetraWrappers::Vector,
+     * <li> LinearAlgebra::TpetraWrappers::Vector,
      * <li> Vector<double>,
      * <li> LinearAlgebra::distributed::Vector<double>.
      * </ul>
