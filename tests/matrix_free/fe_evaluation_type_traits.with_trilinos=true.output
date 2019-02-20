@@ -1,0 +1,5 @@
+
+DEAL::has_local_element:
+DEAL::LinearAlgebra::distributed::Vector = 1
+DEAL::TrilinosWrappers::MPI::Vector = 0
+DEAL::OK

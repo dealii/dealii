@@ -3409,6 +3409,35 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_cell_data(
 
 namespace internal
 {
+  // a helper type-trait that leverage SFINAE to figure out if type T has
+  // ... T::local_element() const
+  template <typename T>
+  struct has_local_element
+  {
+  private:
+    // this will work always.
+    // we let it be void as we know T::local_element() (if exists) should
+    // certainly return something
+    static void
+    detect(...);
+
+    // this detecter will work only if we have "... T::local_element() const"
+    // and its return type will be the same as local_element(),
+    // that we expect to be T::value_type
+    template <typename U>
+    static decltype(std::declval<U const>().local_element(0))
+    detect(const U &);
+
+  public:
+    // finally here we check if our detector has return type same as
+    // T::value_type. This will happen if compiler can use second detector,
+    // otherwise SFINAE let it work with the more general first one that is void
+    static constexpr bool value =
+      std::is_same<typename T::value_type,
+                   decltype(detect(std::declval<T>()))>::value;
+  };
+
+
   // access to generic vectors that have operator ().
   template <typename VectorType>
   inline typename VectorType::value_type &
