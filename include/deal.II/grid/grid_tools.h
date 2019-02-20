@@ -722,6 +722,9 @@ namespace GridTools
    * they belong are the best case. Pre-sorting points, trying to minimize
    * distances between them, might make the function extremely faster.
    *
+   * @note If a point is not found inside the mesh, or is lying inside an
+   * artificial cell of a parallel::Triangulation, an exception is thrown.
+   *
    * @note The actual return type of this function, i.e., the type referenced
    * above as @p return_type, is
    * @code
@@ -746,6 +749,46 @@ namespace GridTools
   return_type
 #  endif
   compute_point_locations(
+    const Cache<dim, spacedim> &        cache,
+    const std::vector<Point<spacedim>> &points,
+    const typename Triangulation<dim, spacedim>::active_cell_iterator
+      &cell_hint =
+        typename Triangulation<dim, spacedim>::active_cell_iterator());
+
+  /**
+   * This function is similar to GridTools::compute_point_locations(),
+   * but it tries to find and transform every point of @p points.
+   *
+   * @return A tuple containing four elements; the first three
+   * are documented in GridTools::compute_point_locations().
+   * The last element of the @p return_type contains the
+   * indices of points which are not not found inside the mesh
+   * or lie on artificial cells. The @p return_type equals the
+   * following tuple type:
+   * @code
+   *   std::tuple<
+   *     std::vector<
+   *        typename Triangulation<dim,spacedim>::active_cell_iterator>,
+   *     std::vector<std::vector<Point<dim>>>,
+   *     std::vector<std::vector<unsigned int>>,
+   *     std::vector<unsigned int>
+   *   >
+   * @endcode
+   *
+   * For a more detailed documentation see
+   * GridTools::compute_point_locations().
+   */
+  template <int dim, int spacedim>
+#  ifndef DOXYGEN
+  std::tuple<
+    std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>,
+    std::vector<std::vector<Point<dim>>>,
+    std::vector<std::vector<unsigned int>>,
+    std::vector<unsigned int>>
+#  else
+  return_type
+#  endif
+  compute_point_locations_try_all(
     const Cache<dim, spacedim> &        cache,
     const std::vector<Point<spacedim>> &points,
     const typename Triangulation<dim, spacedim>::active_cell_iterator

@@ -1,0 +1,12 @@
+
+DEAL::Deal.II compute_pt_loc_try_all:
+DEAL::Testing for dim = 2
+DEAL::Testing on: 101 points.
+DEAL::Points found in 58 cells
+DEAL::All points where processed correctly
+DEAL::Test finished
+DEAL::Testing for dim = 3
+DEAL::Testing on: 202 points.
+DEAL::Points found in 119 cells
+DEAL::All points where processed correctly
+DEAL::Test finished
