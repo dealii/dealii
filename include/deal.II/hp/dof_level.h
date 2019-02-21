@@ -184,6 +184,20 @@ namespace internal
        */
       std::vector<types::global_dof_index> cell_dof_indices_cache;
 
+      /**
+       * Indicators for p-refinement for different cells on the current level.
+       * The vector stores one flag per cell, specifying whether the cell is
+       * scheduled for future p-refinement.
+       */
+      std::vector<bool> p_refine_flags;
+
+      /**
+       * Indicators for p-coarsening for different cells on the current level.
+       * The vector stores one flag per cell, specifying whether the cell is
+       * scheduled for future p-coarssening.
+       */
+      std::vector<bool> p_coarsen_flags;
+
     public:
       /**
        * Set the global index of the @p local_index-th degree of freedom
@@ -491,6 +505,8 @@ namespace internal
       ar & this->cell_dof_indices_cache;
       ar & this->dof_indices;
       ar & this->dof_offsets;
+      ar & this->p_refine_flags;
+      ar & this->p_coarsen_flags;
     }
   } // namespace hp
 

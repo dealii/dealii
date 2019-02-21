@@ -248,7 +248,9 @@ namespace internal
               MemoryConsumption::memory_consumption(dof_indices) +
               MemoryConsumption::memory_consumption(dof_offsets) +
               MemoryConsumption::memory_consumption(cell_cache_offsets) +
-              MemoryConsumption::memory_consumption(cell_dof_indices_cache));
+              MemoryConsumption::memory_consumption(cell_dof_indices_cache) +
+              MemoryConsumption::memory_consumption(p_refine_flags) +
+              MemoryConsumption::memory_consumption(p_coarsen_flags));
     }
 
 

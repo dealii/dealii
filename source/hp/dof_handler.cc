@@ -90,15 +90,25 @@ namespace internal
         static void
         reserve_space_release_space(DoFHandler<dim, spacedim> &dof_handler)
         {
-          // Release all space except the active_fe_indices field
-          // which we have to back up before
+          // Release all space except the fields for active_fe_indices and
+          // refinement flags which we have to back up before
           {
             std::vector<std::vector<DoFLevel::active_fe_index_type>>
-              active_fe_backup(dof_handler.levels.size());
+                                           active_fe_backup(dof_handler.levels.size());
+            std::vector<std::vector<bool>> p_refine_flags_backup(
+              dof_handler.levels.size());
+            std::vector<std::vector<bool>> p_coarsen_flags_backup(
+              dof_handler.levels.size());
             for (unsigned int level = 0; level < dof_handler.levels.size();
                  ++level)
-              active_fe_backup[level] =
-                std::move(dof_handler.levels[level]->active_fe_indices);
+              {
+                active_fe_backup[level] =
+                  std::move(dof_handler.levels[level]->active_fe_indices);
+                p_refine_flags_backup[level] =
+                  std::move(dof_handler.levels[level]->p_refine_flags);
+                p_coarsen_flags_backup[level] =
+                  std::move(dof_handler.levels[level]->p_coarsen_flags);
+              }
 
             // delete all levels and set them up newly, since vectors
             // are troublesome if you want to change their size
@@ -108,8 +118,13 @@ namespace internal
                  ++level)
               {
                 dof_handler.levels.emplace_back(new internal::hp::DoFLevel);
+                // recover backups
                 dof_handler.levels[level]->active_fe_indices =
                   std::move(active_fe_backup[level]);
+                dof_handler.levels[level]->p_refine_flags =
+                  std::move(p_refine_flags_backup[level]);
+                dof_handler.levels[level]->p_coarsen_flags =
+                  std::move(p_coarsen_flags_backup[level]);
               }
 
             if (dim > 1)
@@ -1538,6 +1553,9 @@ namespace hp
         Assert(cell->active_fe_index() < fe_collection.size(),
                ExcInvalidFEIndex(cell->active_fe_index(),
                                  fe_collection.size()));
+
+    // initialize all p-refinement and p-coarsening flags
+    create_p_adaptation_flags();
   }
 
 
@@ -1866,6 +1884,38 @@ namespace hp
 
   template <int dim, int spacedim>
   void
+  DoFHandler<dim, spacedim>::create_p_adaptation_flags()
+  {
+    Assert(fe_collection.size() > 0, ExcNoFESelected());
+    Assert(tria->n_levels() > 0,
+           ExcMessage("The current Triangulation must not be empty."));
+    Assert(tria->n_levels() == levels.size(), ExcInternalError());
+
+    for (unsigned int level = 0; level < tria->n_levels(); ++level)
+      if (levels[level]->p_refine_flags.size() == 0 &&
+          levels[level]->p_coarsen_flags.size() == 0)
+        {
+          levels[level]->p_refine_flags.resize(tria->n_raw_cells(level), false);
+          levels[level]->p_coarsen_flags.resize(tria->n_raw_cells(level),
+                                                false);
+        }
+      else
+        {
+          // Either the p_refine_flags and p_coarsen_flags have size zero
+          // because they were just created, or the correct size. Other sizes
+          // indicate that something went wrong.
+          Assert(levels[level]->p_refine_flags.size() ==
+                     tria->n_raw_cells(level) &&
+                   levels[level]->p_coarsen_flags.size() ==
+                     tria->n_raw_cells(level),
+                 ExcInternalError());
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   DoFHandler<dim, spacedim>::pre_refinement_action()
   {
     create_active_fe_table();
@@ -1893,7 +1943,11 @@ namespace hp
 
     // Resize active_fe_indices vectors. use zero indicator to extend
     for (unsigned int i = 0; i < levels.size(); ++i)
-      levels[i]->active_fe_indices.resize(tria->n_raw_cells(i), 0);
+      {
+        levels[i]->active_fe_indices.resize(tria->n_raw_cells(i), 0);
+        levels[i]->p_refine_flags.resize(tria->n_raw_cells(i), false);
+        levels[i]->p_coarsen_flags.resize(tria->n_raw_cells(i), false);
+      }
   }
 
 

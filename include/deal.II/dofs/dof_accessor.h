@@ -601,6 +601,23 @@ public:
    *
    * @ingroup Exceptions
    */
+  DeclExceptionMsg(ExcRefinementNotSupported,
+                   "DoFHandler is not of type hp::DoFHandler and "
+                   "does not support p-refinement.");
+  /**
+   * Exception
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcCoarseningNotSupported,
+                   "DoFHandler is not of type hp::DoFHandler and "
+                   "does not support p-coarsening.");
+
+  /**
+   * Exception
+   *
+   * @ingroup Exceptions
+   */
   DeclException0(ExcVectorNotEmpty);
   /**
    * Exception
@@ -1944,6 +1961,67 @@ public:
    */
   void
   update_cell_dof_indices_cache() const;
+
+  /**
+   * @name Dealing with refinement indicators
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Return whether the p-refinement flag is set or not.
+   *
+   * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   */
+  bool
+  p_refine_flag_set() const;
+
+  /**
+   * Flag the cell pointed to for p-refinement. This function is only allowed
+   * for active cells.
+   *
+   * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   */
+  void
+  set_p_refine_flag() const;
+
+  /**
+   * Clear the p-refinement flag.
+   *
+   * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   */
+  void
+  clear_p_refine_flag() const;
+
+  /**
+   * Return whether the p-coarsening flag is set or not.
+   *
+   * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   */
+  bool
+  p_coarsen_flag_set() const;
+
+  /**
+   * Flag the cell pointed to for p-coarsening. This function is only allowed
+   * for active cells.
+   *
+   * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   */
+  void
+  set_p_coarsen_flag() const;
+
+  /**
+   * Clear the p-coarsening flag.
+   *
+   * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   */
+  void
+  clear_p_coarsen_flag() const;
+
+  /**
+   * @}
+   */
 
 private:
   /**
