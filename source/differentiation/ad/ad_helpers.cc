@@ -1312,6 +1312,335 @@ namespace Differentiation
     }
 
 
+
+    /* -------------------- ADHelperScalarFunction -------------------- */
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+      ADHelperScalarFunction(const unsigned int n_independent_variables)
+      : ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>(
+          n_independent_variables,
+          1)
+    {}
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+      register_dependent_variable(const ad_type &func)
+    {
+      Assert(this->n_dependent_variables() == 1, ExcInternalError());
+      ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+        0, func);
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+      scalar_type
+      ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_value()
+        const
+    {
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false) ||
+          ADNumberTraits<ad_type>::is_tapeless == true)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      Assert(
+        this->n_dependent_variables() == 1,
+        ExcMessage(
+          "The ADHelperScalarFunction class expects there to be only one dependent variable."));
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute values while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          return this->taped_driver.value(this->active_tape_index(),
+                                          this->independent_variable_values);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          return this->tapeless_driver.value(this->dependent_variables);
+        }
+    }
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_gradient(
+      Vector<scalar_type> &gradient) const
+    {
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false) ||
+          ADNumberTraits<ad_type>::is_tapeless == true)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      Assert(
+        this->n_dependent_variables() == 1,
+        ExcMessage(
+          "The ADHelperScalarFunction class expects there to be only one dependent variable."));
+
+      // We can neglect correctly initializing the entries as
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::gradient().
+      if (gradient.size() != this->n_independent_variables())
+        gradient.reinit(this->n_independent_variables(),
+                        true /*omit_zeroing_entries*/);
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute gradient while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          this->taped_driver.gradient(this->active_tape_index(),
+                                      this->independent_variable_values,
+                                      gradient);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          Assert(this->independent_variables.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variables.size(),
+                                      this->n_independent_variables()));
+
+          this->tapeless_driver.gradient(this->independent_variables,
+                                         this->dependent_variables,
+                                         gradient);
+        }
+
+      // Account for symmetries of tensor components
+      for (unsigned int i = 0; i < this->n_independent_variables(); i++)
+        {
+          if (this->is_symmetric_independent_variable(i) == true)
+            gradient[i] *= 0.5;
+        }
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_hessian(
+      FullMatrix<scalar_type> &hessian) const
+    {
+      Assert(AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 2,
+             ExcMessage(
+               "Cannot computed function Hessian: AD number type does"
+               "not support the calculation of second order derivatives."));
+
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false))
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      Assert(
+        this->n_dependent_variables() == 1,
+        ExcMessage(
+          "The ADHelperScalarFunction class expects there to be only one dependent variable."));
+
+      // We can neglect correctly initializing the entries as
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::hessian().
+      if (hessian.m() != this->n_independent_variables() ||
+          hessian.n() != this->n_independent_variables())
+        hessian.reinit({this->n_independent_variables(),
+                        this->n_independent_variables()},
+                       true /*omit_default_initialization*/);
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute Hessian while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          this->taped_driver.hessian(this->active_tape_index(),
+                                     this->independent_variable_values,
+                                     hessian);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          Assert(this->independent_variables.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variables.size(),
+                                      this->n_independent_variables()));
+
+          this->tapeless_driver.hessian(this->independent_variables,
+                                        this->dependent_variables,
+                                        hessian);
+        }
+
+      // Account for symmetries of tensor components
+      for (unsigned int i = 0; i < this->n_independent_variables(); i++)
+        for (unsigned int j = 0; j < i + 1; j++)
+          {
+            if (this->is_symmetric_independent_variable(i) == true &&
+                this->is_symmetric_independent_variable(j) == true)
+              {
+                hessian[i][j] *= 0.25;
+                if (i != j)
+                  hessian[j][i] *= 0.25;
+              }
+            else if ((this->is_symmetric_independent_variable(i) == true &&
+                      this->is_symmetric_independent_variable(j) == false) ||
+                     (this->is_symmetric_independent_variable(j) == true &&
+                      this->is_symmetric_independent_variable(i) == false))
+              {
+                hessian[i][j] *= 0.5;
+                if (i != j)
+                  hessian[j][i] *= 0.5;
+              }
+          }
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    Tensor<0,
+           dim,
+           typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+             scalar_type>
+    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+      extract_hessian_component(
+        const FullMatrix<scalar_type> &   hessian,
+        const FEValuesExtractors::Scalar &extractor_row,
+        const FEValuesExtractors::Scalar &extractor_col) const
+    {
+      // NOTE: It is necessary to make special provision for the case when the
+      // HessianType is scalar. Unfortunately Tensor<0,dim> does not provide
+      // the function unrolled_to_component_indices!
+      // NOTE: The order of components must be consistently defined throughout
+      // this class.
+      Tensor<0, dim, scalar_type> out;
+
+      // Get indexsets for the subblocks from which we wish to extract the
+      // matrix values
+      const std::vector<unsigned int> row_index_set(
+        internal::extract_field_component_indices<dim>(extractor_row));
+      const std::vector<unsigned int> col_index_set(
+        internal::extract_field_component_indices<dim>(extractor_col));
+      Assert(row_index_set.size() == 1, ExcInternalError());
+      Assert(col_index_set.size() == 1, ExcInternalError());
+
+      internal::set_tensor_entry(out,
+                                 0,
+                                 hessian[row_index_set[0]][col_index_set[0]]);
+
+      return out;
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    SymmetricTensor<4,
+                    dim,
+                    typename ADHelperScalarFunction<dim,
+                                                    ADNumberTypeCode,
+                                                    ScalarType>::scalar_type>
+    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+      extract_hessian_component(
+        const FullMatrix<scalar_type> &               hessian,
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_col) const
+    {
+      // NOTE: The order of components must be consistently defined throughout
+      // this class. NOTE: We require a specialisation for rank-4 symmetric
+      // tensors because they
+      //       do not define their rank, and setting data using TableIndices is
+      //       somewhat specialised as well.
+      SymmetricTensor<4, dim, scalar_type> out;
+
+      // Get indexsets for the subblocks from which we wish to extract the
+      // matrix values
+      const std::vector<unsigned int> row_index_set(
+        internal::extract_field_component_indices<dim>(extractor_row));
+      const std::vector<unsigned int> col_index_set(
+        internal::extract_field_component_indices<dim>(extractor_col));
+
+      for (unsigned int r = 0; r < row_index_set.size(); ++r)
+        for (unsigned int c = 0; c < col_index_set.size(); ++c)
+          {
+            internal::set_tensor_entry(
+              out, r, c, hessian[row_index_set[r]][col_index_set[c]]);
+          }
+
+      return out;
+    }
+
+
   } // namespace AD
 } // namespace Differentiation
 

@@ -115,8 +115,8 @@ namespace Differentiation
      *
      *   // Indicate that we are about to start tracing the operations for
      *   // function evaluation on the tape. If this tape has already been used
-     *   // (i.e. the operations are already recorded) then we (optionally) load
-     *   // the tape and reuse this data.
+     *   // (i.e. the operations are already recorded) then we (optionally)
+     *   // load the tape and reuse this data.
      *   const bool is_recording
      *     = ad_helper.start_recording_operations(tape_index);
      *   if (is_recording == true)
@@ -198,11 +198,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
       ADHelperBase(const unsigned int n_independent_variables,
@@ -324,11 +324,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        * @param[in] clear_registered_tapes A flag that indicates the that
        * list of @p registered_tapes must be cleared.
@@ -867,11 +867,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
       ADHelperCellLevelBase(const unsigned int n_independent_variables,
@@ -964,7 +964,7 @@ namespace Differentiation
       //@{
 
       /**
-       * Set the values for the independent variables $\mathbf{X}$, i.e. the
+       * Set the values for the independent variables $\mathbf{X}$, i.e., the
        * linearization point.
        *
        * @param[in] dof_values A vector field associated with local
@@ -986,7 +986,7 @@ namespace Differentiation
       set_dof_values(const std::vector<scalar_type> &dof_values);
 
       /**
-       * Set the values for the independent variables $\mathbf{X}$, i.e. the
+       * Set the values for the independent variables $\mathbf{X}$, i.e., the
        * linearization point.
        *
        * @param[in] values A vector field from which the values of all
@@ -1252,7 +1252,7 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\Psi(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        *
        * @note There is only one dependent variable associated with the total
        * energy attributed to the local finite element. That is to say, this
@@ -1568,11 +1568,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{r}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{r}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{r}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{r}$, i.e., the dimension of the
        * image space.
        */
       ADHelperResidualLinearization(const unsigned int n_independent_variables,
@@ -2682,11 +2682,11 @@ namespace Differentiation
        * that will be used in the definition of the functions that it is
        * desired to compute the sensitivities of. In the computation of
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
-       * $\mathbf{X}$, i.e. the dimension of the domain space.
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
        * @param[in] n_dependent_variables The number of scalar functions to be
        * defined that will have a sensitivity to the given independent
        * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
-       * be the number of outputs $\mathbf{f}$, i.e. the dimension of the
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
       ADHelperPointLevelFunctionsBase(
@@ -2934,6 +2934,352 @@ namespace Differentiation
     }; // class ADHelperPointLevelFunctionsBase
 
 
+
+    /**
+     * A helper class that facilitates the evaluation of a scalar function,
+     * its first derivatives (gradient), and its second derivatives (Hessian).
+     * This class would typically be used to compute the first and second
+     * derivatives of a <b>stored energy function</b> defined at a quadrature
+     * point. It can also be used to compute derivatives of any other scalar
+     * field so long as all its dependencies on the independent variables are
+     * explicit (that is to say, no independent variables may have some implicit
+     * dependence on one another).
+     *
+     * An example of its usage in the case of a multi-field constitutive law
+     * might be as follows:
+     * @code
+     *   // Define some extractors that will help us set independent variables
+     *   // and later get the computed values related to the dependent
+     *   // variables. Each of these extractors is related to the gradient of a
+     *   // component of the solution field (in this case, displacement and
+     *   // magnetic scalar potential). Here "C" is the right Cauchy-Green
+     *   // tensor and "H" is the magnetic field.
+     *   const FEValuesExtractors::SymmetricTensor<2> C_dofs (0);
+     *   const FEValuesExtractors::Vector             H_dofs
+     *     (dealii::SymmetricTensor<2,dim>::n_independent_components);
+     *   const unsigned int n_independent_variables =
+     *     SymmetricTensor<2,dim>::n_independent_components +
+     *     Tensor<1,dim>::n_independent_components;
+     *
+     *   // Define the helper that we will use in the AD computations for our
+     *   // scalar energy function. Note that we expect it to return values of
+     *   // type double.
+     *   ADHelperScalarFunction<dim,double> ad_helper (n_independent_variables);
+     *   using ADNumberType = typename ADHelper::ad_type;
+     *
+     *   // Compute the fields that provide the independent values.
+     *   // When the tape is being replayed, these should be set to something
+     *   // meaningful.
+     *   const Tensor<1,dim> H = ...;
+     *   const SymmetricTensor<2,dim> C = ...;
+     *
+     *   // If using a taped AD number, then at this point we would initiate
+     *   // taping of the expression for the material stored energy function
+     *   // for this particular set of material parameters:
+     *
+     *   // Select a tape number to record to
+     *   const typename Types<ADNumberType>::tape_index tape_index = ...;
+     *
+     *   // Indicate that we are about to start tracing the operations for
+     *   // function evaluation on the tape. If this tape has already been
+     *   // used (i.e. the operations are already recorded) then we
+     *   // (optionally) load the tape and reuse this data.
+     *   const bool is_recording
+     *     = ad_helper.start_recording_operations(tape_index);
+     *
+     *   // The steps that follow in the recording phase are required for
+     *   // tapeless methods as well.
+     *   if (is_recording == true)
+     *   {
+     *     // This is the "recording" phase of the operations.
+     *
+     *     // First, we set the values for all fields.
+     *     // These could happily be set to anything, unless the function will
+     *     // be evaluated along a branch not otherwise traversed during later
+     *     // use. For this reason, in this example instead of using some dummy
+     *     // values, we'll actually map out the function at the same point
+     *     // around which we'll later linearize it.
+     *     ad_helper.register_independent_variable(H, H_dofs);
+     *     ad_helper.register_independent_variable(C, C_dofs);
+     *
+     *     // NOTE: We have to extract the sensitivities in the order we wish to
+     *     // introduce them. So this means we have to do it by logical order
+     *     // of the extractors that we've created.
+     *     const SymmetricTensor<2,dim,ADNumberType> C_AD =
+     *       ad_helper.get_sensitive_variables(C_dofs); const
+     *     const Tensor<1,dim,ADNumberType>          H_AD =
+     *       ad_helper.get_sensitive_variables(H_dofs);
+     *
+     *     // Here we define the material stored energy function.
+     *     // This example is sufficiently complex to warrant the use of AD to,
+     *     // at the very least, verify an unassisted implementation.
+     *     const double mu_e = 10;          // Shear modulus
+     *     const double lambda_e = 15;      // Lame parameter
+     *     const double mu_0 = 4*M_PI*1e-7; // Magnetic permeability constant
+     *     const double mu_r = 5;           // Relative magnetic permeability
+     *
+     *     const ADNumberType J = std::sqrt(determinant(C_AD));
+     *     const SymmetricTensor<2,dim,ADNumberType> C_inv_AD = invert(C_AD);
+     *     const ADNumberType psi =
+     *       0.5*mu_e*(1.0+std::tanh((H_AD*H_AD)/100.0))*
+     *         (trace(C_AD) - dim - 2*std::log(J)) +
+     *       lambda_e*std::log(J)*std::log(J) -
+     *       0.5*mu_0*mu_r*J*H_AD*C_inv_AD*H_AD;
+     *
+     *     // Register the definition of the total stored energy
+     *     ad_helper.register_dependent_variable(psi_CH);
+     *
+     *     // Indicate that we have completed tracing the operations onto
+     *     // the tape.
+     *     ad_helper.stop_recording_operations(false); // write_tapes_to_file
+     *   }
+     *   else
+     *   {
+     *     // This is the "tape reuse" phase of the operations.
+     *     // Here we will leverage the already traced operations that reside
+     *     // on a tape, and simply re-evaluate the tape at a different point
+     *     // to get the function values and their derivatives.
+     *
+     *     // Load the existing tape to be reused
+     *     ad_helper.activate_recorded_tape(tape_index);
+     *
+     *     // Set the new values of the independent variables where the
+     *     // recorded dependent functions are to be evaluated (and
+     *     // differentiated around).
+     *     ad_helper.set_independent_variable(C, C_dofs);
+     *     ad_helper.set_independent_variable(H, H_dofs);
+     *   }
+     *
+     *   // Play the tape and store the output function value, its gradient and
+     *   // linearization. These are expensive to compute, so we'll do this once
+     *   // and extract the desired values from these intermediate outputs.
+     *   Vector<double> Dpsi (ad_helper.n_dependent_variables());
+     *   FullMatrix<double> D2psi (ad_helper.n_dependent_variables(),
+     *                             ad_helper.n_dependent_variables());
+     *   const double psi = ad_helper.compute_value();
+     *   ad_helper.compute_gradient(Dpsi);
+     *   ad_helper.compute_hessian(D2psi);
+     *
+     *   // Extract the desired components of the gradient vector and Hessian
+     *   // matrix. In this example, we use them to compute the Piola-Kirchhoff
+     *   // stress tensor and its associated tangent, defined by thermodynamic
+     *   // arguments as S = 2*dpsi/dC and HH = 2*dS/dC...
+     *   const SymmetricTensor<2,dim> S =
+     *     2.0*ad_helper.extract_gradient_component(Dpsi,C_dofs);
+     *   const SymmetricTensor<4,dim> HH =
+     *     4.0*ad_helper.extract_hessian_component(D2psi,C_dofs,C_dofs);
+     *
+     *   // ... the magnetic induction and its associated tangent defined
+     *   // as B = -dpsi/dH and BB = dB/dH...
+     *   const Tensor<1,dim> B =
+     *     -ad_helper.extract_gradient_component(Dpsi,H_dofs);
+     *   const SymmetricTensor<2,dim> BB =
+     *     -symmetrize(ad_helper.extract_hessian_component(D2psi,H_dofs,H_dofs));
+     *
+     *   // ... and finally the magnetoelastic coupling tangent, defined
+     *   // as PP = -dS/dH = -d/dH(2*dpsi/dC). Here the order of the extractor
+     *   // arguments is especially important, as it dictates the order in which
+     *   // the directional derivatives are taken.
+     *   const Tensor<3,dim,double> PP =
+     *     -2.0*ad_helper.extract_hessian_component(D2psi,C_dofs,H_dofs)
+     * @endcode
+     *
+     * @warning ADOL-C does not support the standard threading models used by
+     * deal.II, so this class should @b not be embedded within a multithreaded
+     * function when using ADOL-C number types. It is, however, suitable for use
+     * in both serial and MPI routines.
+     *
+     * @author Jean-Paul Pelteret, 2016, 2017, 2018
+     */
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType = double>
+    class ADHelperScalarFunction
+      : public ADHelperPointLevelFunctionsBase<dim,
+                                               ADNumberTypeCode,
+                                               ScalarType>
+    {
+    public:
+      /**
+       * Type definition for the floating point number type that is used in,
+       * and results from, all computations.
+       */
+      using scalar_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+
+      /**
+       * Type definition for the auto-differentiation number type that is used
+       * in all computations.
+       */
+      using ad_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+
+      /**
+       * @name Constructor / destructor
+       */
+      //@{
+
+      /**
+       * The constructor for the class.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
+       */
+      ADHelperScalarFunction(const unsigned int n_independent_variables);
+
+      /**
+       * Destructor.
+       */
+      virtual ~ADHelperScalarFunction() = default;
+
+      //@}
+
+      /**
+       * @name Dependent variables
+       */
+      //@{
+
+      /**
+       * Register the definition of the scalar field $\Psi(\mathbf{X})$.
+       *
+       * @param[in] func The recorded function that defines a dependent
+       * variable.
+       *
+       * @note For this class that expects only one dependent variable, this
+       * function must only be called once per tape.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      void
+      register_dependent_variable(const ad_type &func);
+
+      /**
+       * Compute the value of the scalar field $\Psi(\mathbf{X})$ using the
+       * tape as opposed to executing the source code.
+       *
+       * @return A scalar object with the value for the scalar field evaluated
+       * at the point defined by the independent variable values.
+       */
+      scalar_type
+      compute_value() const;
+
+      /**
+       * Compute the gradient (first derivative) of the scalar field with
+       * respect to all independent variables, i.e.
+       * @f[
+       *   \frac{\partial\Psi(\mathbf{X})}{\partial\mathbf{X}}
+       * @f]
+       *
+       * @param[out] gradient A Vector with the values for the scalar field
+       * gradient (first derivatives) evaluated at the point defined by the
+       * independent variable values.
+       */
+      void
+      compute_gradient(Vector<scalar_type> &gradient) const;
+
+      /**
+       * Compute the Hessian (second derivative)  of the scalar field with
+       * respect to all independent variables, i.e.
+       * @f[
+       *   \frac{\partial^{2}\Psi(\mathbf{X})}{\partial\mathbf{X} \otimes
+       * \partial\mathbf{X}}
+       * @f]
+       *
+       * @param[out] hessian A FullMatrix with the values for the scalar field
+       * Hessian (second derivatives) evaluated at the point defined by the
+       * independent variable values.
+       */
+      void
+      compute_hessian(FullMatrix<scalar_type> &hessian) const;
+
+      /**
+       * Extract the function gradient for a subset of independent variables
+       * $\mathbf{A} \subset \mathbf{X}$, i.e.
+       * @f[
+       *   \frac{\partial\Psi(\mathbf{X})}{\partial\mathbf{A}}
+       * @f]
+       *
+       * @param[in] gradient The gradient of the scalar function with respect to
+       * all independent variables, i.e., that returned by compute_gradient().
+       * @param[in] extractor_row An extractor associated with the input field
+       * variables. This effectively defines which components of the global set
+       * of independent variables this field is associated with.
+       */
+      template <typename ExtractorType_Row>
+      typename internal::ScalarFieldGradient<dim,
+                                             scalar_type,
+                                             ExtractorType_Row>::type
+      extract_gradient_component(const Vector<scalar_type> &gradient,
+                                 const ExtractorType_Row &extractor_row) const;
+
+      /**
+       * Extract the function Hessian for a subset of independent variables
+       * $\mathbf{A},\mathbf{B} \subset \mathbf{X}$, i.e.
+       * @f[
+       *   \frac{}{\partial\mathbf{B}} \left[
+       * \frac{\partial\Psi(\mathbf{X})}{\partial\mathbf{A}} \right] =
+       * \frac{\partial^{2}\Psi(\mathbf{X})}{\partial\mathbf{B} \otimes
+       * \partial\mathbf{A}}
+       * @f]
+       *
+       * @param[in] hessian The Hessian of the scalar function with respect to
+       * all independent variables, i.e., that returned by compute_hessian().
+       * @param[in] extractor_row An extractor associated with the input field
+       * variables for which the first index of the Hessian is extracted.
+       * @param[in] extractor_col An extractor associated with the input field
+       * variables for which the second index of the Hessian is extracted.
+       */
+      template <typename ExtractorType_Row, typename ExtractorType_Col>
+      typename internal::ScalarFieldHessian<dim,
+                                            scalar_type,
+                                            ExtractorType_Row,
+                                            ExtractorType_Col>::type
+      extract_hessian_component(const FullMatrix<scalar_type> &hessian,
+                                const ExtractorType_Row &      extractor_row,
+                                const ExtractorType_Col &extractor_col) const;
+
+      /**
+       * Extract the function Hessian for a subset of independent variables
+       * $\mathbf{A},\mathbf{B} \subset \mathbf{X}$, i.e.
+       * @f[
+       *   \frac{}{\partial\mathbf{B}} \left[
+       * \frac{\partial\Psi(\mathbf{X})}{\partial\mathbf{A}} \right]
+       * @f]
+       *
+       * This function is a specialization of the above for rank-0 tensors
+       * (scalars)
+       */
+      Tensor<0, dim, scalar_type>
+      extract_hessian_component(
+        const FullMatrix<scalar_type> &   hessian,
+        const FEValuesExtractors::Scalar &extractor_row,
+        const FEValuesExtractors::Scalar &extractor_col) const;
+
+      /**
+       * Extract the function Hessian for a subset of independent variables
+       * $\mathbf{A},\mathbf{B} \subset \mathbf{X}$, i.e.
+       * @f[
+       *   \frac{}{\partial\mathbf{B}} \left[
+       * \frac{\partial\Psi(\mathbf{X})}{\partial\mathbf{A}} \right]
+       * @f]
+       *
+       * This function is a specialization of the above for rank-4 symmetric
+       * tensors
+       */
+      SymmetricTensor<4, dim, scalar_type>
+      extract_hessian_component(
+        const FullMatrix<scalar_type> &               hessian,
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_col) const;
+
+      //@}
+
+    }; // class ADHelperScalarFunction
+
+
   } // namespace AD
 } // namespace Differentiation
 
@@ -3093,6 +3439,107 @@ namespace Differentiation
                  ExcInternalError());
           internal::get_tensor_entry(out, i) =
             this->independent_variables[index];
+        }
+
+      return out;
+    }
+
+
+
+    /* ----------------- ADHelperScalarFunction ----------------- */
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    template <typename ExtractorType_Row>
+    typename internal::ScalarFieldGradient<
+      dim,
+      typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+        scalar_type,
+      ExtractorType_Row>::type
+    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+      extract_gradient_component(const Vector<scalar_type> &gradient,
+                                 const ExtractorType_Row &  extractor_row) const
+    {
+      // NOTE: The order of components must be consistently defined throughout
+      // this class.
+      typename internal::
+        ScalarFieldGradient<dim, scalar_type, ExtractorType_Row>::type out;
+
+      // Get indexsets for the subblock from which we wish to extract the
+      // gradient values
+      const std::vector<unsigned int> row_index_set(
+        internal::extract_field_component_indices<dim>(extractor_row));
+      Assert(out.n_independent_components == row_index_set.size(),
+             ExcMessage("Not all tensor components have been extracted!"));
+      for (unsigned int r = 0; r < row_index_set.size(); ++r)
+        internal::set_tensor_entry(out, r, gradient[row_index_set[r]]);
+
+      return out;
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    template <typename ExtractorType_Row, typename ExtractorType_Col>
+    typename internal::ScalarFieldHessian<
+      dim,
+      typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+        scalar_type,
+      ExtractorType_Row,
+      ExtractorType_Col>::type
+    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+      extract_hessian_component(const FullMatrix<scalar_type> &hessian,
+                                const ExtractorType_Row &      extractor_row,
+                                const ExtractorType_Col &extractor_col) const
+    {
+      using InternalHessian      = internal::ScalarFieldHessian<dim,
+                                                           scalar_type,
+                                                           ExtractorType_Row,
+                                                           ExtractorType_Col>;
+      using InternalExtractorRow = internal::Extractor<dim, ExtractorType_Row>;
+      using InternalExtractorCol = internal::Extractor<dim, ExtractorType_Col>;
+      using HessianType          = typename InternalHessian::type;
+
+      // NOTE: The order of components must be consistently defined throughout
+      // this class.
+      HessianType out;
+
+      // Get indexsets for the subblocks from which we wish to extract the
+      // Hessian values
+      // NOTE: Here we have to do some clever accounting when the
+      // one extractor is a symmetric Tensor and the other is not, e.g.
+      // <SymmTensor,Vector>. In this scenario the return type is a
+      // non-symmetric Tensor<3,dim> but we have to fetch information from a
+      // SymmTensor row/column that has too few entries to fill the output
+      // tensor. So we must duplicate the relevant entries in the row/column
+      // indexset to fetch off-diagonal components that are Otherwise
+      // non-existent in a SymmTensor.
+      const std::vector<unsigned int> row_index_set(
+        internal::extract_field_component_indices<dim>(
+          extractor_row, false /*ignore_symmetries*/));
+      const std::vector<unsigned int> col_index_set(
+        internal::extract_field_component_indices<dim>(
+          extractor_col, false /*ignore_symmetries*/));
+
+      for (unsigned int index = 0;
+           index < HessianType::n_independent_components;
+           ++index)
+        {
+          const TableIndices<HessianType::rank> ti_out =
+            HessianType::unrolled_to_component_indices(index);
+          const unsigned int r =
+            InternalExtractorRow::local_component(ti_out, 0);
+          const unsigned int c =
+            InternalExtractorCol::local_component(ti_out,
+                                                  InternalExtractorRow::rank);
+
+          internal::set_tensor_entry(
+            out, index, hessian[row_index_set[r]][col_index_set[c]]);
         }
 
       return out;

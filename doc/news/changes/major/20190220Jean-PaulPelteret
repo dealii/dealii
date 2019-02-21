@@ -1,0 +1,9 @@
+New: A new class Differentiation::AD::ADHelperScalarFunction has been
+added to help implement point-wise scalar functions using automatic 
+differentiation. In particular, this class is designed to compute the 
+gradient and Hessian of a scalar function that is parameterized in
+terms of scalar, vector, and tensor arguments. One example of its use
+would be to compute the derivatives of a multi-field constitutive law
+that is expressed in terms of an energy function.
+<br>
+(Jean-Paul Pelteret, 2019/02/20)
