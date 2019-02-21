@@ -40,15 +40,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-// forward declarations
-namespace LinearAlgebra
-{
-  namespace distributed
-  {
-    template <typename, typename>
-    class Vector;
-  }
-} // namespace LinearAlgebra
 namespace internal
 {
   DeclException0(ExcAccessToUninitializedField);
@@ -3487,9 +3478,13 @@ namespace internal
 
 
   // this is to make sure that the parallel partitioning in VectorType
-  // is really the same as stored in MatrixFree
+  // is really the same as stored in MatrixFree.
+  // version below is when has_partitioners_are_compatible == false
   // FIXME: this is incorrect for PETSc/Trilinos MPI vectors
-  template <typename VectorType>
+  template <
+    typename VectorType,
+    typename std::enable_if<!has_partitioners_are_compatible<VectorType>::value,
+                            VectorType>::type * = nullptr>
   inline void
   check_vector_compatibility(
     const VectorType &                            vec,
@@ -3502,14 +3497,15 @@ namespace internal
   }
 
 
-  // this is to make sure that the parallel partitioning in the
-  // LinearAlgebra::distributed::Vector is really the same as stored in
-  // MatrixFree
-  template <typename Number>
+  // same as above for has_partitioners_are_compatible == true
+  template <
+    typename VectorType,
+    typename std::enable_if<has_partitioners_are_compatible<VectorType>::value,
+                            VectorType>::type * = nullptr>
   inline void
   check_vector_compatibility(
-    const LinearAlgebra::distributed::Vector<Number> &vec,
-    const internal::MatrixFreeFunctions::DoFInfo &    dof_info)
+    const VectorType &                            vec,
+    const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
     (void)vec;
     (void)dof_info;
