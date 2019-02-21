@@ -1,0 +1,113 @@
+
+DEAL:3d::Testing orientation case 0
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          4.93e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          8.94e-16
+DEAL:3d::
+DEAL:3d::Testing orientation case 1
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          4.85e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          8.94e-16
+DEAL:3d::
+DEAL:3d::Testing orientation case 2
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          3.24e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          8.94e-16
+DEAL:3d::
+DEAL:3d::Testing orientation case 3
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          3.26e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          8.94e-16
+DEAL:3d::
+DEAL:3d::Testing orientation case 4
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          2.45e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          8.55e-16
+DEAL:3d::
+DEAL:3d::Testing orientation case 5
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          6.52e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          8.55e-16
+DEAL:3d::
+DEAL:3d::Testing orientation case 6
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          4.86e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          8.55e-16
+DEAL:3d::
+DEAL:3d::Testing orientation case 7
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          4.84e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(1)
+DEAL:3d::Norm of difference:          8.55e-16
+DEAL:3d::
+DEAL:3d::Testing orientation case 0
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          6.75e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          4.04e-15
+DEAL:3d::
+DEAL:3d::Testing orientation case 1
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          6.75e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          3.97e-15
+DEAL:3d::
+DEAL:3d::Testing orientation case 2
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          5.40e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          3.98e-15
+DEAL:3d::
+DEAL:3d::Testing orientation case 3
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          6.08e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          3.95e-15
+DEAL:3d::
+DEAL:3d::Testing orientation case 4
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          4.99e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          3.68e-15
+DEAL:3d::
+DEAL:3d::Testing orientation case 5
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          5.32e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          3.68e-15
+DEAL:3d::
+DEAL:3d::Testing orientation case 6
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          5.32e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          3.68e-15
+DEAL:3d::
+DEAL:3d::Testing orientation case 7
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          5.32e-16
+DEAL:3d::
+DEAL:3d::Testing FE_DGQ<3>(2)
+DEAL:3d::Norm of difference:          3.68e-15
+DEAL:3d::

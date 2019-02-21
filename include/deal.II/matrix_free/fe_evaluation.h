@@ -8562,10 +8562,10 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>::
         {
           if (integrate)
             for (unsigned int q = 0; q < n_q_points; ++q)
-              tmp_values[orientations[q]] = this->values_quad[c][q];
+              tmp_values[q] = this->values_quad[c][orientations[q]];
           else
             for (unsigned int q = 0; q < n_q_points; ++q)
-              tmp_values[q] = this->values_quad[c][orientations[q]];
+              tmp_values[orientations[q]] = this->values_quad[c][q];
           for (unsigned int q = 0; q < n_q_points; ++q)
             this->values_quad[c][q] = tmp_values[q];
         }
@@ -8574,10 +8574,10 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>::
           {
             if (integrate)
               for (unsigned int q = 0; q < n_q_points; ++q)
-                tmp_values[orientations[q]] = this->gradients_quad[c][d][q];
+                tmp_values[q] = this->gradients_quad[c][d][orientations[q]];
             else
               for (unsigned int q = 0; q < n_q_points; ++q)
-                tmp_values[q] = this->gradients_quad[c][d][orientations[q]];
+                tmp_values[orientations[q]] = this->gradients_quad[c][d][q];
             for (unsigned int q = 0; q < n_q_points; ++q)
               this->gradients_quad[c][d][q] = tmp_values[q];
           }
