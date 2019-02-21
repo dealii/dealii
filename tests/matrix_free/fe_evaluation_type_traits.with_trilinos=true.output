@@ -2,4 +2,9 @@
 DEAL::has_local_element:
 DEAL::LinearAlgebra::distributed::Vector = 1
 DEAL::TrilinosWrappers::MPI::Vector = 0
+DEAL::Dummy = 1
+DEAL::Dummy2 = 0
+DEAL::internal::vector_access:
+DEAL::Dummy::local_element()
+DEAL::Dummy2::operator()
 DEAL::OK

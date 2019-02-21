@@ -24,11 +24,79 @@
 
 #include "../tests.h"
 
+// dummy class we use to check typetraits and internal function.
+// this one mimics LA::d::Vec
+template <typename Number>
+class Dummy
+{
+public:
+  using value_type = Number;
+
+  Number
+  local_element(const unsigned int) const
+  {
+    deallog << "Dummy::local_element() const" << std::endl;
+    return Number();
+  }
+
+  Number &
+  local_element(const unsigned int)
+  {
+    deallog << "Dummy::local_element()" << std::endl;
+    return dummy;
+  }
+
+  Number
+  operator()(const unsigned int) const
+  {
+    deallog << "Dummy::operator() const" << std::endl;
+    return Number();
+  }
+
+  Number &
+  operator()(const unsigned int)
+  {
+    deallog << "Dummy::operator()" << std::endl;
+    return dummy;
+  }
+
+private:
+  Number dummy;
+};
+
+
+template <typename Number>
+class Dummy2
+{
+public:
+  using value_type = Number;
+
+  Number
+  operator()(const unsigned int) const
+  {
+    deallog << "Dummy2::operator() const" << std::endl;
+    return Number();
+  }
+
+  Number &
+  operator()(const unsigned int)
+  {
+    deallog << "Dummy2::operator()" << std::endl;
+    return dummy;
+  }
+
+private:
+  Number dummy;
+};
+
 
 int
 main()
 {
   initlog();
+
+  Dummy<double>  dummy;
+  Dummy2<double> dummy2;
 
   deallog << "has_local_element:" << std::endl
           << "LinearAlgebra::distributed::Vector = "
@@ -37,7 +105,18 @@ main()
           << std::endl
           << "TrilinosWrappers::MPI::Vector = "
           << internal::has_local_element<TrilinosWrappers::MPI::Vector>::value
+          << std::endl
+          << "Dummy = " << internal::has_local_element<Dummy<double>>::value
+          << std::endl
+          << "Dummy2 = " << internal::has_local_element<Dummy2<double>>::value
           << std::endl;
+
+  // now check internal::vector_access wrapper
+  // we expect local_element() to be called
+  deallog << "internal::vector_access:" << std::endl;
+  internal::vector_access(dummy, 0);
+  internal::vector_access(dummy2, 0);
+
 
   deallog << "OK" << std::endl;
 }

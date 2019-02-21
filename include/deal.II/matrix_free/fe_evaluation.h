@@ -3439,7 +3439,10 @@ namespace internal
 
 
   // access to generic vectors that have operator ().
-  template <typename VectorType>
+  // FIXME: this is wrong for Trilinos/Petsc MPI vectors
+  template <typename VectorType,
+            typename std::enable_if<!has_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
   inline typename VectorType::value_type &
   vector_access(VectorType &vec, const unsigned int entry)
   {
@@ -3451,19 +3454,20 @@ namespace internal
   // access to distributed MPI vectors that have a local_element(uint)
   // method to access data in local index space, which is what we use in
   // DoFInfo and hence in read_dof_values etc.
-  template <typename Number>
-  inline Number &
-  vector_access(LinearAlgebra::distributed::Vector<Number> &vec,
-                const unsigned int                          entry)
+  template <typename VectorType,
+            typename std::enable_if<has_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline typename VectorType::value_type &
+  vector_access(VectorType &vec, const unsigned int entry)
   {
     return vec.local_element(entry);
   }
 
 
 
-  // this is to make sure that the parallel partitioning in the
-  // LinearAlgebra::distributed::Vector is really the same as stored in
-  // MatrixFree
+  // this is to make sure that the parallel partitioning in VectorType
+  // is really the same as stored in MatrixFree
+  // FIXME: this is incorrect for PETSc/Trilinos MPI vectors
   template <typename VectorType>
   inline void
   check_vector_compatibility(
@@ -3476,6 +3480,10 @@ namespace internal
     AssertDimension(vec.size(), dof_info.vector_partitioner->size());
   }
 
+
+  // this is to make sure that the parallel partitioning in the
+  // LinearAlgebra::distributed::Vector is really the same as stored in
+  // MatrixFree
   template <typename Number>
   inline void
   check_vector_compatibility(
