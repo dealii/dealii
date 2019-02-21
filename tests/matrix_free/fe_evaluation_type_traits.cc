@@ -118,5 +118,16 @@ main()
   internal::vector_access(dummy2, 0);
 
 
+  // now check has_partitioners_are_compatible:
+  deallog << "has_partitioners_are_compatible:" << std::endl
+          << "LinearAlgebra::distributed::Vector = "
+          << internal::has_partitioners_are_compatible<
+               LinearAlgebra::distributed::Vector<double>>::value
+          << std::endl
+          << "TrilinosWrappers::MPI::Vector = "
+          << internal::has_partitioners_are_compatible<
+               TrilinosWrappers::MPI::Vector>::value
+          << std::endl;
+
   deallog << "OK" << std::endl;
 }

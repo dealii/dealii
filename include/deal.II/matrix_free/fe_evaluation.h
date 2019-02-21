@@ -3438,6 +3438,27 @@ namespace internal
   };
 
 
+  // same as above to check
+  // bool T::partitioners_are_compatible(const Utilities::MPI::Partitioner &)
+  // const
+  template <typename T>
+  struct has_partitioners_are_compatible
+  {
+  private:
+    static void
+    detect(...);
+
+    template <typename U>
+    static decltype(std::declval<U const>().partitioners_are_compatible(
+      std::declval<Utilities::MPI::Partitioner>()))
+    detect(const U &);
+
+  public:
+    static constexpr bool value =
+      std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+  };
+
+
   // access to generic vectors that have operator ().
   // FIXME: this is wrong for Trilinos/Petsc MPI vectors
   template <typename VectorType,
