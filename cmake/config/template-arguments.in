@@ -97,6 +97,8 @@ VECTOR_TYPES := {   Vector<double>;
                     @DEAL_II_EXPAND_EPETRA_VECTOR@;
                     @DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE@;
                     @DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT@;
+                    @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE@;
+                    @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT@;
                     @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
 
                     @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
@@ -153,6 +155,8 @@ EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                                @DEAL_II_EXPAND_EPETRA_VECTOR@;
                                @DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE@;
                                @DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT@;
+                               @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE@;
+                               @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT@;
                                @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
                                @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@
                              }
@@ -173,6 +177,8 @@ VECTORS_WITH_MATRIX := { Vector<double>;
                          @DEAL_II_EXPAND_EPETRA_VECTOR@;
                          @DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE@;
                          @DEAL_II_EXPAND_TPETRA_VECTOR_FLOAT@;
+                         @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_DOUBLE@;
+                         @DEAL_II_EXPAND_TPETRA_VECTOR_COMPLEX_FLOAT@;
                          @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
                        }
 
