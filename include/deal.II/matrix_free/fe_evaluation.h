@@ -3477,7 +3477,7 @@ namespace internal
   // if both begin() and local_element()
   // exist, then begin() + offset == local_element(offset)
   template <typename T, typename Number>
-  struct vectorizable
+  struct is_vectorizable
   {
     static constexpr bool value =
       has_begin<T>::value && has_local_element<T>::value &&
@@ -4084,6 +4084,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_write_operation(
          ExcNotImplemented("Masking currently not implemented for "
                            "non-contiguous DoF storage"));
 
+  std::integral_constant<bool,
+                         internal::is_vectorizable<VectorType, Number>::value>
+    vector_selector;
+
   const unsigned int dofs_per_component =
     this->data->dofs_per_component_on_cell;
   if (dof_info->index_storage_variants
@@ -4102,28 +4106,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_write_operation(
         for (unsigned int i = 0; i < dofs_per_component;
              ++i, dof_indices += n_vectorization)
           for (unsigned int comp = 0; comp < n_components; ++comp)
-            operation.process_dof_gather(
-              dof_indices,
-              *src[comp],
-              0,
-              values_dofs[comp][i],
-              std::integral_constant<
-                bool,
-                std::is_same<typename VectorType::value_type,
-                             Number>::value>());
+            operation.process_dof_gather(dof_indices,
+                                         *src[comp],
+                                         0,
+                                         values_dofs[comp][i],
+                                         vector_selector);
       else
         for (unsigned int comp = 0; comp < n_components; ++comp)
           for (unsigned int i = 0; i < dofs_per_component;
                ++i, dof_indices += n_vectorization)
             operation.process_dof_gather(
-              dof_indices,
-              *src[0],
-              0,
-              values_dofs[comp][i],
-              std::integral_constant<
-                bool,
-                std::is_same<typename VectorType::value_type,
-                             Number>::value>());
+              dof_indices, *src[0], 0, values_dofs[comp][i], vector_selector);
       return;
     }
 
@@ -4498,9 +4491,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
   // a vector and puts the data into the local data field or write local data
   // into the vector. Certain operations are no-ops for the given use case.
 
-  std::integral_constant<
-    bool,
-    std::is_same<typename VectorType::value_type, Number>::value>
+  std::integral_constant<bool,
+                         internal::is_vectorizable<VectorType, Number>::value>
                                                                vector_selector;
   const internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex ind =
     is_face ? dof_access_index :
@@ -7628,9 +7620,8 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     temp1 = this->scratch_data;
 
   internal::VectorReader<Number> reader;
-  std::integral_constant<
-    bool,
-    std::is_same<typename VectorType::value_type, Number>::value>
+  std::integral_constant<bool,
+                         internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
   // case 1: contiguous and interleaved indices
@@ -8188,9 +8179,8 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
 #  endif
 
   internal::VectorDistributorLocalToGlobal<Number> writer;
-  std::integral_constant<
-    bool,
-    std::is_same<typename VectorType::value_type, Number>::value>
+  std::integral_constant<bool,
+                         internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
   // case 1: contiguous and interleaved indices

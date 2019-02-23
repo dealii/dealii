@@ -13,7 +13,7 @@ DEAL::TrilinosWrappers::MPI::Vector = 0
 DEAL::has_begin:
 DEAL::LinearAlgebra::distributed::Vector = 1
 DEAL::TrilinosWrappers::MPI::Vector = 1
-DEAL::vectorizable:
+DEAL::is_vectorizable:
 DEAL::LinearAlgebra::distributed::Vector<double> && double = 1
 DEAL::LinearAlgebra::distributed::Vector<double> && float = 0
 DEAL::TrilinosWrappers::MPI::Vector && double = 0
