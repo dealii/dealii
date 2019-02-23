@@ -924,6 +924,35 @@ Tensor<0, dim, Number>::operator-=(const Tensor<0, dim, OtherNumber> &p)
 }
 
 
+
+#ifdef __CUDA_ARCH__
+namespace internal
+{
+  template <typename Number, typename OtherNumber>
+  DEAL_II_CUDA_HOST_DEV void
+  multiply_assign_scalar(Number &tensor, const OtherNumber &s)
+  {
+    tensor *= s;
+  }
+
+  template <typename Number, typename OtherNumber>
+  DEAL_II_CUDA_HOST_DEV void
+  multiply_assign_scalar(std::complex<Number> &, const OtherNumber &)
+  {
+    printf("This function is not implemented for std::complex<Number>!\n");
+    assert(false);
+  }
+} // namespace internal
+
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
+Tensor<0, dim, Number>::operator*=(const OtherNumber &s)
+{
+  internal::multiply_assign_scalar(value, s);
+  return *this;
+}
+#else
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
@@ -932,6 +961,8 @@ Tensor<0, dim, Number>::operator*=(const OtherNumber &s)
   value *= s;
   return *this;
 }
+#endif
+
 
 
 template <int dim, typename Number>
