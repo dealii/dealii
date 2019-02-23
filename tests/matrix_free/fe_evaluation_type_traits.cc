@@ -129,7 +129,7 @@ main()
                TrilinosWrappers::MPI::Vector>::value
           << std::endl;
 
-  // check has_begin():
+  // check has_begin:
   deallog
     << "has_begin:" << std::endl
     << "LinearAlgebra::distributed::Vector = "
@@ -137,6 +137,20 @@ main()
     << std::endl
     << "TrilinosWrappers::MPI::Vector = "
     << internal::has_begin<TrilinosWrappers::MPI::Vector>::value << std::endl;
+  // check vectorizable:
+  deallog
+    << "vectorizable:" << std::endl
+    << "LinearAlgebra::distributed::Vector<double> && double = "
+    << internal::vectorizable<LinearAlgebra::distributed::Vector<double>,
+                              double>::value
+    << std::endl
+    << "LinearAlgebra::distributed::Vector<double> && float = "
+    << internal::vectorizable<LinearAlgebra::distributed::Vector<double>,
+                              float>::value
+    << std::endl
+    << "TrilinosWrappers::MPI::Vector && double = "
+    << internal::vectorizable<TrilinosWrappers::MPI::Vector, double>::value
+    << std::endl;
 
   deallog << "OK" << std::endl;
 }

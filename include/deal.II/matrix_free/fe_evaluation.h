@@ -3471,8 +3471,24 @@ namespace internal
   };
 
 
+  // type trait for vector T and Number to see if
+  // we can do vectorized load/save.
+  // for VectorReader and VectorDistributorLocalToGlobal we assume that
+  // if both begin() and local_element()
+  // exist, then begin() + offset == local_element(offset)
+  template <typename T, typename Number>
+  struct vectorizable
+  {
+    static constexpr bool value =
+      has_begin<T>::value && has_local_element<T>::value &&
+      std::is_same<typename T::value_type, Number>::value;
+  };
+
+
+
   // access to generic vectors that have operator ().
   // FIXME: this is wrong for Trilinos/Petsc MPI vectors
+  // where we should first do Partitioner::local_to_global()
   template <typename VectorType,
             typename std::enable_if<!has_local_element<VectorType>::value,
                                     VectorType>::type * = nullptr>
