@@ -3450,6 +3450,27 @@ namespace internal
   };
 
 
+
+  // same as above to check
+  // T::const_iterator T::begin() const
+  template <typename T>
+  struct has_begin
+  {
+  private:
+    static void
+    detect(...);
+
+    template <typename U>
+    static decltype(std::declval<U const>().begin())
+    detect(const U &);
+
+  public:
+    static constexpr bool value =
+      std::is_same<typename T::const_iterator,
+                   decltype(detect(std::declval<T>()))>::value;
+  };
+
+
   // access to generic vectors that have operator ().
   // FIXME: this is wrong for Trilinos/Petsc MPI vectors
   template <typename VectorType,

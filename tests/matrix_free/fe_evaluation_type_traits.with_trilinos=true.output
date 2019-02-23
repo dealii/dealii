@@ -10,4 +10,7 @@ DEAL::Dummy2::operator()
 DEAL::has_partitioners_are_compatible:
 DEAL::LinearAlgebra::distributed::Vector = 1
 DEAL::TrilinosWrappers::MPI::Vector = 0
+DEAL::has_begin:
+DEAL::LinearAlgebra::distributed::Vector = 1
+DEAL::TrilinosWrappers::MPI::Vector = 1
 DEAL::OK
