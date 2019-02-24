@@ -3471,6 +3471,7 @@ namespace internal
   };
 
 
+
   // type trait for vector T and Number to see if
   // we can do vectorized load/save.
   // for VectorReader and VectorDistributorLocalToGlobal we assume that
@@ -3487,7 +3488,21 @@ namespace internal
 
 
 
-  // access to generic vectors that have operator ().
+  // access to generic const vectors that have operator ().
+  // FIXME: this is wrong for Trilinos/Petsc MPI vectors
+  // where we should first do Partitioner::local_to_global()
+  template <typename VectorType,
+            typename std::enable_if<!has_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline typename VectorType::value_type
+  vector_access(const VectorType &vec, const unsigned int entry)
+  {
+    return vec(entry);
+  }
+
+
+
+  // access to generic non-const vectors that have operator ().
   // FIXME: this is wrong for Trilinos/Petsc MPI vectors
   // where we should first do Partitioner::local_to_global()
   template <typename VectorType,
