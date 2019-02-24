@@ -3480,7 +3480,8 @@ namespace internal
   struct is_vectorizable
   {
     static constexpr bool value =
-      has_begin<T>::value && has_local_element<T>::value &&
+      has_begin<T>::value &&
+      (has_local_element<T>::value || is_serial_vector<T>::value) &&
       std::is_same<typename T::value_type, Number>::value;
   };
 

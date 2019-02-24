@@ -109,6 +109,8 @@ main()
           << "Dummy = " << internal::has_local_element<Dummy<double>>::value
           << std::endl
           << "Dummy2 = " << internal::has_local_element<Dummy2<double>>::value
+          << std::endl
+          << "Vector = " << internal::has_local_element<Vector<double>>::value
           << std::endl;
 
   // now check internal::vector_access wrapper
@@ -127,6 +129,9 @@ main()
           << "TrilinosWrappers::MPI::Vector = "
           << internal::has_partitioners_are_compatible<
                TrilinosWrappers::MPI::Vector>::value
+          << std::endl
+          << "Vector = "
+          << internal::has_partitioners_are_compatible<Vector<double>>::value
           << std::endl;
 
   // check has_begin:
@@ -136,7 +141,8 @@ main()
     << internal::has_begin<LinearAlgebra::distributed::Vector<double>>::value
     << std::endl
     << "TrilinosWrappers::MPI::Vector = "
-    << internal::has_begin<TrilinosWrappers::MPI::Vector>::value << std::endl;
+    << internal::has_begin<TrilinosWrappers::MPI::Vector>::value << std::endl
+    << "Vector = " << internal::has_begin<Vector<double>>::value << std::endl;
   // check is_vectorizable:
   deallog
     << "is_vectorizable:" << std::endl
@@ -150,6 +156,8 @@ main()
     << std::endl
     << "TrilinosWrappers::MPI::Vector && double = "
     << internal::is_vectorizable<TrilinosWrappers::MPI::Vector, double>::value
+    << std::endl
+    << "Vector = " << internal::is_vectorizable<Vector<double>, double>::value
     << std::endl;
 
   deallog << "OK" << std::endl;
