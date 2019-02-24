@@ -245,30 +245,29 @@
     (major)*1000000 + (minor)*10000 + (subminor)*100 + (patch))
 #endif
 
- /*
-  * SUNDIALS:
-  *
-  *  Note: The following definitions will be set in sundials_config.h,
-  *        so we don't repeat them here.
-  *
-  *  SUNDIALS_VERSION_MAJOR
-  *  SUNDIALS_VERSION_MINOR
-  *  SUNDIALS_VERSION_PATCH
-  */
+/*
+ * SUNDIALS:
+ */
 
- #define DEAL_II_SUNDIALS_VERSION_GTE(major,minor,subminor) \
-   ((SUNDIALS_VERSION_MAJOR * 10000 + \
-     SUNDIALS_VERSION_MINOR * 100 + \
-     SUNDIALS_VERSION_SUBMINOR) \
+#ifdef DEAL_II_WITH_SUNDIALS
+ #  define DEAL_II_SUNDIALS_VERSION_MAJOR @SUNDIALS_VERSION_MAJOR@
+ #  define DEAL_II_SUNDIALS_VERSION_MINOR @SUNDIALS_VERSION_MINOR@
+ #  define DEAL_II_SUNDIALS_VERSION_PATCH @SUNDIALS_VERSION_PATCH@
+
+ #define DEAL_II_SUNDIALS_VERSION_GTE(major,minor,patch) \
+   ((DEAL_II_SUNDIALS_VERSION_MAJOR * 10000 + \
+     DEAL_II_SUNDIALS_VERSION_MINOR * 100 + \
+     DEAL_II_SUNDIALS_VERSION_PATCH) \
      >=  \
-     (major)*10000 + (minor)*100 + (subminor))
+     (major)*10000 + (minor)*100 + (patch))
 
- #define DEAL_II_SUNDIALS_VERSION_LT(major,minor,subminor) \
-   ((SUNDIALS_VERSION_MAJOR * 10000 + \
-     SUNDIALS_VERSION_MINOR * 100 + \
-     SUNDIALS_VERSION_SUBMINOR) \
+ #define DEAL_II_SUNDIALS_VERSION_LT(major,minor,patch) \
+   ((DEAL_II_SUNDIALS_VERSION_MAJOR * 10000 + \
+     DEAL_II_SUNDIALS_VERSION_MINOR * 100 + \
+     DEAL_II_SUNDIALS_VERSION_PATCH) \
      <  \
-     (major)*10000 + (minor)*100 + (subminor))
+     (major)*10000 + (minor)*100 + (patch))
+#endif
 
 /*
  * PETSc:

@@ -17,6 +17,34 @@
 # Configuration for the SUNDIALS library:
 #
 
+MACRO(FEATURE_SUNDIALS_FIND_EXTERNAL var)
+  FIND_PACKAGE(SUNDIALS)
+
+  IF(SUNDIALS_FOUND)
+    SET(${var} TRUE)
+
+    #
+    # We don't support version 4.0.0 or later yet.
+    #
+    SET(_first_unsupported_sundials_version 4.0.0)
+    IF(NOT SUNDIALS_VERSION VERSION_LESS ${_first_unsupported_sundials_version})
+      MESSAGE(STATUS
+              "Insufficient SUNDIALS installation found: "
+              "version ${_first_unsupported_sundials_version} "
+              "or later is not yet supported, "
+              "but version ${SUNDIALS_VERSION} was found."
+        )
+      SET(SUNDIALS_ADDITIONAL_ERROR_STRING
+          "Insufficient SUNDIALS installation found!\n"
+          "Version ${_first_unsupported_sundials_version} "
+          "or later is not yet supported, "
+          "but version ${SUNDIALS_VERSION} was found.\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+  ENDIF()
+ENDMACRO()
+
 MACRO(FEATURE_SUNDIALS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_SUNDIALS_WITH_IDAS ${SUNDIALS_WITH_IDAS})
 ENDMACRO()
