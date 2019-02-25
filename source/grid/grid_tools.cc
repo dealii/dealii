@@ -2091,16 +2091,9 @@ namespace GridTools
           map_owners_guessed[pt] = owners_found;
       }
 
-    std::tuple<std::vector<std::vector<unsigned int>>,
-               std::map<unsigned int, unsigned int>,
-               std::map<unsigned int, std::vector<unsigned int>>>
-      output_tuple;
-
-    std::get<0>(output_tuple) = point_owners;
-    std::get<1>(output_tuple) = map_owners_found;
-    std::get<2>(output_tuple) = map_owners_guessed;
-
-    return output_tuple;
+    return std::make_tuple(std::move(point_owners),
+                           std::move(map_owners_found),
+                           std::move(map_owners_guessed));
   }
 
 
