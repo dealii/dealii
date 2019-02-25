@@ -2103,6 +2103,59 @@ namespace GridTools
     return output_tuple;
   }
 
+  template <int spacedim>
+#ifndef DOXYGEN
+  std::tuple<std::map<unsigned int, std::vector<unsigned int>>,
+             std::map<unsigned int, unsigned int>,
+             std::map<unsigned int, std::vector<unsigned int>>>
+#else
+  return_type
+#endif
+  guess_point_owner(
+    const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &covering_rtree,
+    const std::vector<Point<spacedim>> &                         points)
+  {
+    std::map<unsigned int, std::vector<unsigned int>> point_owners;
+    std::map<unsigned int, unsigned int>              map_owners_found;
+    std::map<unsigned int, std::vector<unsigned int>> map_owners_guessed;
+    std::vector<std::pair<BoundingBox<spacedim>, unsigned int>> search_result;
+
+    unsigned int n_points = points.size();
+    for (unsigned int pt_n = 0; pt_n < n_points; ++pt_n)
+      {
+        search_result.clear(); // clearing last output
+
+        // Running tree search
+        covering_rtree.query(boost::geometry::index::intersects(points[pt_n]),
+                             std::back_inserter(search_result));
+
+        // Keep track of how many processes we guess to own the point
+        std::set<unsigned int> owners_found;
+        // Check in which other processes the point might be
+        for (const auto &rank_bbox : search_result)
+          {
+            // Try to add the owner to the owners found,
+            // and check if it was already present
+            const bool pt_inserted = owners_found.insert(pt_n).second;
+            if (pt_inserted)
+              point_owners[rank_bbox.second].emplace_back(pt_n);
+          }
+        Assert(owners_found.size() > 0,
+               ExcMessage("No owners found for the point " +
+                          std::to_string(pt_n)));
+        if (owners_found.size() == 1)
+          map_owners_found[pt_n] = *owners_found.begin();
+        else
+          // Multiple owners
+          std::copy(owners_found.begin(),
+                    owners_found.end(),
+                    std::back_inserter(map_owners_guessed[pt_n]));
+      }
+
+    return std::make_tuple(std::move(point_owners),
+                           std::move(map_owners_found),
+                           std::move(map_owners_guessed));
+  }
 
 
   template <int dim, int spacedim>

@@ -1,0 +1,4 @@
+New: Function GridTools::guess_point_owner(), which uses a covering rtree
+to guess which processes own the points of the given vector of points.
+<br>
+(Giovanni Alzetta, 2019/02/25)

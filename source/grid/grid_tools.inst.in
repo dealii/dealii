@@ -163,6 +163,14 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
       const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
       const std::vector<Point<deal_II_space_dimension>> &);
 
+    template std::tuple<std::map<unsigned int, std::vector<unsigned int>>,
+                        std::map<unsigned int, unsigned int>,
+                        std::map<unsigned int, std::vector<unsigned int>>>
+    GridTools::guess_point_owner(
+      const RTree<std::pair<BoundingBox<deal_II_space_dimension>, unsigned int>>
+        &,
+      const std::vector<Point<deal_II_space_dimension>> &);
+
     template RTree<
       std::pair<BoundingBox<deal_II_space_dimension>, unsigned int>>
     GridTools::build_global_description_tree(
