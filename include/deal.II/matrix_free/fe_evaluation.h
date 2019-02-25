@@ -40,15 +40,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-// forward declarations
-namespace LinearAlgebra
-{
-  namespace distributed
-  {
-    template <typename, typename>
-    class Vector;
-  }
-} // namespace LinearAlgebra
 namespace internal
 {
   DeclException0(ExcAccessToUninitializedField);
@@ -3409,8 +3400,114 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_cell_data(
 
 namespace internal
 {
-  // access to generic vectors that have operator ().
-  template <typename VectorType>
+  // a helper type-trait that leverage SFINAE to figure out if type T has
+  // ... T::local_element() const
+  template <typename T>
+  struct has_local_element
+  {
+  private:
+    // this will work always.
+    // we let it be void as we know T::local_element() (if exists) should
+    // certainly return something
+    static void
+    detect(...);
+
+    // this detecter will work only if we have "... T::local_element() const"
+    // and its return type will be the same as local_element(),
+    // that we expect to be T::value_type
+    template <typename U>
+    static decltype(std::declval<U const>().local_element(0))
+    detect(const U &);
+
+  public:
+    // finally here we check if our detector has return type same as
+    // T::value_type. This will happen if compiler can use second detector,
+    // otherwise SFINAE let it work with the more general first one that is void
+    static constexpr bool value =
+      std::is_same<typename T::value_type,
+                   decltype(detect(std::declval<T>()))>::value;
+  };
+
+
+  // same as above to check
+  // bool T::partitioners_are_compatible(const Utilities::MPI::Partitioner &)
+  // const
+  template <typename T>
+  struct has_partitioners_are_compatible
+  {
+  private:
+    static void
+    detect(...);
+
+    template <typename U>
+    static decltype(std::declval<U const>().partitioners_are_compatible(
+      std::declval<Utilities::MPI::Partitioner>()))
+    detect(const U &);
+
+  public:
+    static constexpr bool value =
+      std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
+  };
+
+
+
+  // same as above to check
+  // T::const_iterator T::begin() const
+  template <typename T>
+  struct has_begin
+  {
+  private:
+    static void
+    detect(...);
+
+    template <typename U>
+    static decltype(std::declval<U const>().begin())
+    detect(const U &);
+
+  public:
+    static constexpr bool value =
+      std::is_same<typename T::const_iterator,
+                   decltype(detect(std::declval<T>()))>::value;
+  };
+
+
+
+  // type trait for vector T and Number to see if
+  // we can do vectorized load/save.
+  // for VectorReader and VectorDistributorLocalToGlobal we assume that
+  // if both begin() and local_element()
+  // exist, then begin() + offset == local_element(offset)
+  template <typename T, typename Number>
+  struct is_vectorizable
+  {
+    static constexpr bool value =
+      has_begin<T>::value &&
+      (has_local_element<T>::value || is_serial_vector<T>::value) &&
+      std::is_same<typename T::value_type, Number>::value;
+  };
+
+
+
+  // access to generic const vectors that have operator ().
+  // FIXME: this is wrong for Trilinos/Petsc MPI vectors
+  // where we should first do Partitioner::local_to_global()
+  template <typename VectorType,
+            typename std::enable_if<!has_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline typename VectorType::value_type
+  vector_access(const VectorType &vec, const unsigned int entry)
+  {
+    return vec(entry);
+  }
+
+
+
+  // access to generic non-const vectors that have operator ().
+  // FIXME: this is wrong for Trilinos/Petsc MPI vectors
+  // where we should first do Partitioner::local_to_global()
+  template <typename VectorType,
+            typename std::enable_if<!has_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
   inline typename VectorType::value_type &
   vector_access(VectorType &vec, const unsigned int entry)
   {
@@ -3422,20 +3519,25 @@ namespace internal
   // access to distributed MPI vectors that have a local_element(uint)
   // method to access data in local index space, which is what we use in
   // DoFInfo and hence in read_dof_values etc.
-  template <typename Number>
-  inline Number &
-  vector_access(LinearAlgebra::distributed::Vector<Number> &vec,
-                const unsigned int                          entry)
+  template <typename VectorType,
+            typename std::enable_if<has_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline typename VectorType::value_type &
+  vector_access(VectorType &vec, const unsigned int entry)
   {
     return vec.local_element(entry);
   }
 
 
 
-  // this is to make sure that the parallel partitioning in the
-  // LinearAlgebra::distributed::Vector is really the same as stored in
-  // MatrixFree
-  template <typename VectorType>
+  // this is to make sure that the parallel partitioning in VectorType
+  // is really the same as stored in MatrixFree.
+  // version below is when has_partitioners_are_compatible == false
+  // FIXME: this is incorrect for PETSc/Trilinos MPI vectors
+  template <
+    typename VectorType,
+    typename std::enable_if<!has_partitioners_are_compatible<VectorType>::value,
+                            VectorType>::type * = nullptr>
   inline void
   check_vector_compatibility(
     const VectorType &                            vec,
@@ -3447,11 +3549,16 @@ namespace internal
     AssertDimension(vec.size(), dof_info.vector_partitioner->size());
   }
 
-  template <typename Number>
+
+  // same as above for has_partitioners_are_compatible == true
+  template <
+    typename VectorType,
+    typename std::enable_if<has_partitioners_are_compatible<VectorType>::value,
+                            VectorType>::type * = nullptr>
   inline void
   check_vector_compatibility(
-    const LinearAlgebra::distributed::Vector<Number> &vec,
-    const internal::MatrixFreeFunctions::DoFInfo &    dof_info)
+    const VectorType &                            vec,
+    const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
     (void)vec;
     (void)dof_info;
@@ -3993,6 +4100,10 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_write_operation(
          ExcNotImplemented("Masking currently not implemented for "
                            "non-contiguous DoF storage"));
 
+  std::integral_constant<bool,
+                         internal::is_vectorizable<VectorType, Number>::value>
+    vector_selector;
+
   const unsigned int dofs_per_component =
     this->data->dofs_per_component_on_cell;
   if (dof_info->index_storage_variants
@@ -4011,28 +4122,17 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::read_write_operation(
         for (unsigned int i = 0; i < dofs_per_component;
              ++i, dof_indices += n_vectorization)
           for (unsigned int comp = 0; comp < n_components; ++comp)
-            operation.process_dof_gather(
-              dof_indices,
-              *src[comp],
-              0,
-              values_dofs[comp][i],
-              std::integral_constant<
-                bool,
-                std::is_same<typename VectorType::value_type,
-                             Number>::value>());
+            operation.process_dof_gather(dof_indices,
+                                         *src[comp],
+                                         0,
+                                         values_dofs[comp][i],
+                                         vector_selector);
       else
         for (unsigned int comp = 0; comp < n_components; ++comp)
           for (unsigned int i = 0; i < dofs_per_component;
                ++i, dof_indices += n_vectorization)
             operation.process_dof_gather(
-              dof_indices,
-              *src[0],
-              0,
-              values_dofs[comp][i],
-              std::integral_constant<
-                bool,
-                std::is_same<typename VectorType::value_type,
-                             Number>::value>());
+              dof_indices, *src[0], 0, values_dofs[comp][i], vector_selector);
       return;
     }
 
@@ -4407,9 +4507,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face>::
   // a vector and puts the data into the local data field or write local data
   // into the vector. Certain operations are no-ops for the given use case.
 
-  std::integral_constant<
-    bool,
-    std::is_same<typename VectorType::value_type, Number>::value>
+  std::integral_constant<bool,
+                         internal::is_vectorizable<VectorType, Number>::value>
                                                                vector_selector;
   const internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex ind =
     is_face ? dof_access_index :
@@ -7537,9 +7636,8 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     temp1 = this->scratch_data;
 
   internal::VectorReader<Number> reader;
-  std::integral_constant<
-    bool,
-    std::is_same<typename VectorType::value_type, Number>::value>
+  std::integral_constant<bool,
+                         internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
   // case 1: contiguous and interleaved indices
@@ -8097,9 +8195,8 @@ FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
 #  endif
 
   internal::VectorDistributorLocalToGlobal<Number> writer;
-  std::integral_constant<
-    bool,
-    std::is_same<typename VectorType::value_type, Number>::value>
+  std::integral_constant<bool,
+                         internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
   // case 1: contiguous and interleaved indices
