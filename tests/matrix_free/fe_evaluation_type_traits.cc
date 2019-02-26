@@ -142,7 +142,8 @@ main()
     << std::endl
     << "TrilinosWrappers::MPI::Vector = "
     << internal::has_begin<TrilinosWrappers::MPI::Vector>::value << std::endl
-    << "Vector = " << internal::has_begin<Vector<double>>::value << std::endl;
+    << "Vector = " << internal::has_begin<Vector<double>>::value << std::endl
+    << "Dummy = " << internal::has_begin<Dummy<double>>::value << std::endl;
   // check is_vectorizable:
   deallog
     << "is_vectorizable:" << std::endl
