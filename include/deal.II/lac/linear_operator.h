@@ -389,9 +389,9 @@ operator+(const LinearOperator<Range, Domain, Payload> &first_op,
     }
   else
     {
-      LinearOperator<Range, Domain, Payload> return_op(
+      LinearOperator<Range, Domain, Payload> return_op{
         static_cast<const Payload &>(first_op) +
-        static_cast<const Payload &>(second_op));
+        static_cast<const Payload &>(second_op)};
 
       return_op.reinit_range_vector  = first_op.reinit_range_vector;
       return_op.reinit_domain_vector = first_op.reinit_domain_vector;
@@ -585,9 +585,9 @@ operator*(const LinearOperator<Range, Intermediate, Payload> & first_op,
     }
   else
     {
-      LinearOperator<Range, Domain, Payload> return_op(
+      LinearOperator<Range, Domain, Payload> return_op{
         static_cast<const Payload &>(first_op) *
-        static_cast<const Payload &>(second_op));
+        static_cast<const Payload &>(second_op)};
 
       return_op.reinit_domain_vector = second_op.reinit_domain_vector;
       return_op.reinit_range_vector  = first_op.reinit_range_vector;
@@ -649,7 +649,7 @@ template <typename Range, typename Domain, typename Payload>
 LinearOperator<Domain, Range, Payload>
 transpose_operator(const LinearOperator<Range, Domain, Payload> &op)
 {
-  LinearOperator<Domain, Range, Payload> return_op(op.transpose_payload());
+  LinearOperator<Domain, Range, Payload> return_op{op.transpose_payload()};
 
   return_op.reinit_range_vector  = op.reinit_domain_vector;
   return_op.reinit_domain_vector = op.reinit_range_vector;
@@ -693,8 +693,8 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
                  Solver &                                      solver,
                  const Preconditioner &                        preconditioner)
 {
-  LinearOperator<Domain, Range, Payload> return_op(
-    op.inverse_payload(solver, preconditioner));
+  LinearOperator<Domain, Range, Payload> return_op{
+    op.inverse_payload(solver, preconditioner)};
 
   return_op.reinit_range_vector  = op.reinit_domain_vector;
   return_op.reinit_domain_vector = op.reinit_range_vector;
@@ -750,8 +750,8 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
                  Solver &                                      solver,
                  const LinearOperator<Range, Domain, Payload> &preconditioner)
 {
-  LinearOperator<Domain, Range, Payload> return_op(
-    op.inverse_payload(solver, preconditioner));
+  LinearOperator<Domain, Range, Payload> return_op{
+    op.inverse_payload(solver, preconditioner)};
 
   return_op.reinit_range_vector  = op.reinit_domain_vector;
   return_op.reinit_domain_vector = op.reinit_range_vector;
@@ -856,7 +856,7 @@ template <
 LinearOperator<Range, Range, Payload>
 identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 {
-  LinearOperator<Range, Range, Payload> return_op((Payload()));
+  LinearOperator<Range, Range, Payload> return_op{Payload()};
 
   return_op.reinit_range_vector  = reinit_vector;
   return_op.reinit_domain_vector = reinit_vector;
@@ -909,7 +909,7 @@ template <typename Range, typename Domain, typename Payload>
 LinearOperator<Range, Domain, Payload>
 null_operator(const LinearOperator<Range, Domain, Payload> &op)
 {
-  LinearOperator<Range, Domain, Payload> return_op(op.null_payload());
+  LinearOperator<Range, Domain, Payload> return_op{op.null_payload()};
 
   return_op.is_null_operator = true;
 
@@ -946,7 +946,7 @@ template <
 LinearOperator<Range, Range, Payload>
 mean_value_filter(const std::function<void(Range &, bool)> &reinit_vector)
 {
-  LinearOperator<Range, Range, Payload> return_op((Payload()));
+  LinearOperator<Range, Range, Payload> return_op{Payload()};
 
   return_op.reinit_range_vector  = reinit_vector;
   return_op.reinit_domain_vector = reinit_vector;
@@ -1402,8 +1402,8 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
 {
   using namespace internal::LinearOperatorImplementation;
   // Initialize the payload based on the input exemplar matrix
-  LinearOperator<Range, Domain, Payload> return_op(
-    Payload(operator_exemplar, matrix));
+  LinearOperator<Range, Domain, Payload> return_op{
+    Payload(operator_exemplar, matrix)};
 
   // Always store a reference to matrix and operator_exemplar in the lambda
   // functions. This ensures that a modification of the matrix after the
