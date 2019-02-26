@@ -161,8 +161,17 @@ namespace hp
 
 
   template <int dim, int spacedim>
+  FECollection<dim, spacedim>::FECollection()
+  {
+    set_default_hierarchy();
+  }
+
+
+
+  template <int dim, int spacedim>
   FECollection<dim, spacedim>::FECollection(
     const FiniteElement<dim, spacedim> &fe)
+    : FECollection()
   {
     push_back(fe);
   }
@@ -172,6 +181,7 @@ namespace hp
   template <int dim, int spacedim>
   FECollection<dim, spacedim>::FECollection(
     const std::vector<const FiniteElement<dim, spacedim> *> &fes)
+    : FECollection()
   {
     Assert(fes.size() > 0,
            ExcMessage("Need to pass at least one finite element."));
@@ -198,6 +208,64 @@ namespace hp
                         "same number of vector components!"));
 
     finite_elements.push_back(new_fe.clone());
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  FECollection<dim, spacedim>::set_hierarchy(
+    const std::function<
+      unsigned int(const typename hp::FECollection<dim, spacedim> &,
+                   const unsigned int)> &next,
+    const std::function<
+      unsigned int(const typename hp::FECollection<dim, spacedim> &,
+                   const unsigned int)> &prev)
+  {
+    // copy hierarchy functions
+    hierarchy_next = next;
+    hierarchy_prev = prev;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  FECollection<dim, spacedim>::set_default_hierarchy()
+  {
+    // establish hierarchy corresponding to order of indices
+    set_hierarchy(&DefaultHierarchy::next_index,
+                  &DefaultHierarchy::previous_index);
+  }
+
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  FECollection<dim, spacedim>::next_in_hierarchy(
+    const unsigned int fe_index) const
+  {
+    Assert(fe_index < size(), ExcIndexRange(fe_index, 0, size()));
+
+    const unsigned int new_fe_index = hierarchy_next(*this, fe_index);
+    Assert(new_fe_index < size(), ExcIndexRange(new_fe_index, 0, size()));
+
+    return new_fe_index;
+  }
+
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  FECollection<dim, spacedim>::previous_in_hierarchy(
+    const unsigned int fe_index) const
+  {
+    Assert(fe_index < size(), ExcIndexRange(fe_index, 0, size()));
+
+    const unsigned int new_fe_index = hierarchy_prev(*this, fe_index);
+    Assert(new_fe_index < size(), ExcIndexRange(new_fe_index, 0, size()));
+
+    return new_fe_index;
   }
 
 

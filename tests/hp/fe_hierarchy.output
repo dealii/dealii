@@ -1,0 +1,11 @@
+
+DEAL::size:1
+DEAL:: idx:0 next:0 prev:0
+DEAL::size:2
+DEAL:: idx:0 next:1 prev:0
+DEAL:: idx:1 next:1 prev:0
+DEAL::size:3
+DEAL:: idx:0 next:1 prev:0
+DEAL:: idx:1 next:2 prev:0
+DEAL:: idx:2 next:2 prev:1
+DEAL::OK
