@@ -140,6 +140,8 @@ namespace GridTools
     return cell_bounding_boxes_rtree;
   }
 
+
+
 #ifdef DEAL_II_WITH_NANOFLANN
   template <int dim, int spacedim>
   const KDTree<spacedim> &
@@ -152,6 +154,7 @@ namespace GridTools
       }
     return vertex_kdtree;
   }
+#endif
 
 
 
@@ -187,7 +190,6 @@ namespace GridTools
 
     return covering_rtree;
   }
-#endif
 
 #include "grid_tools_cache.inst"
 
