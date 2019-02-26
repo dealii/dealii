@@ -3466,8 +3466,7 @@ namespace internal
 
   public:
     static constexpr bool value =
-      std::is_same<typename T::const_iterator,
-                   decltype(detect(std::declval<T>()))>::value;
+      !std::is_same<void, decltype(detect(std::declval<T>()))>::value;
   };
 
 
