@@ -3423,10 +3423,13 @@ namespace internal
     // finally here we check if our detector has non-void return type
     // T::value_type. This will happen if compiler can use second detector,
     // otherwise SFINAE let it work with the more general first one that is void
-    static constexpr bool value =
+    static const bool value =
       !std::is_same<void, decltype(detect(std::declval<T>()))>::value;
   };
 
+  // We need to have a separate declaration for static const members
+  template <typename T>
+  const bool has_local_element<T>::value;
 
   // same as above to check
   // bool T::partitioners_are_compatible(const Utilities::MPI::Partitioner &)
@@ -3444,10 +3447,13 @@ namespace internal
     detect(const U &);
 
   public:
-    static constexpr bool value =
+    static const bool value =
       std::is_same<bool, decltype(detect(std::declval<T>()))>::value;
   };
 
+  // We need to have a separate declaration for static const members
+  template <typename T>
+  const bool has_partitioners_are_compatible<T>::value;
 
 
   // same as above to check
@@ -3464,10 +3470,13 @@ namespace internal
     detect(const U &);
 
   public:
-    static constexpr bool value =
+    static const bool value =
       !std::is_same<void, decltype(detect(std::declval<T>()))>::value;
   };
 
+  // We need to have a separate declaration for static const members
+  template <typename T>
+  const bool has_begin<T>::value;
 
 
   // type trait for vector T and Number to see if
@@ -3478,12 +3487,15 @@ namespace internal
   template <typename T, typename Number>
   struct is_vectorizable
   {
-    static constexpr bool value =
+    static const bool value =
       has_begin<T>::value &&
       (has_local_element<T>::value || is_serial_vector<T>::value) &&
       std::is_same<typename T::value_type, Number>::value;
   };
 
+  // We need to have a separate declaration for static const members
+  template <typename T, typename Number>
+  const bool is_vectorizable<T, Number>::value;
 
 
   // access to generic const vectors that have operator ().
