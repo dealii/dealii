@@ -3420,12 +3420,11 @@ namespace internal
     detect(const U &);
 
   public:
-    // finally here we check if our detector has return type same as
+    // finally here we check if our detector has non-void return type
     // T::value_type. This will happen if compiler can use second detector,
     // otherwise SFINAE let it work with the more general first one that is void
     static constexpr bool value =
-      std::is_same<typename T::value_type,
-                   decltype(detect(std::declval<T>()))>::value;
+      !std::is_same<void, decltype(detect(std::declval<T>()))>::value;
   };
 
 
@@ -3452,7 +3451,7 @@ namespace internal
 
 
   // same as above to check
-  // T::const_iterator T::begin() const
+  // ... T::begin() const
   template <typename T>
   struct has_begin
   {
