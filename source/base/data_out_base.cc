@@ -5990,20 +5990,30 @@ namespace DataOutBase
     std::vector<bool> data_set_written(n_data_sets, false);
     for (const auto &nonscalar_data_range : nonscalar_data_ranges)
       {
-        AssertThrow(std::get<1>(nonscalar_data_range) >=
-                      std::get<0>(nonscalar_data_range),
-                    ExcLowerRange(std::get<1>(nonscalar_data_range),
-                                  std::get<0>(nonscalar_data_range)));
-        AssertThrow(std::get<1>(nonscalar_data_range) < n_data_sets,
-                    ExcIndexRange(std::get<1>(nonscalar_data_range),
-                                  0,
-                                  n_data_sets));
-        AssertThrow(std::get<1>(nonscalar_data_range) + 1 -
-                        std::get<0>(nonscalar_data_range) <=
-                      3,
-                    ExcMessage(
-                      "Can't declare a vector with more than 3 components "
-                      "in VTK"));
+        const auto first_component = std::get<0>(nonscalar_data_range);
+        const auto last_component  = std::get<1>(nonscalar_data_range);
+        const bool is_tensor =
+          (std::get<3>(nonscalar_data_range) ==
+           DataComponentInterpretation::component_is_part_of_tensor);
+        const unsigned int n_components = (is_tensor ? 9 : 3);
+        AssertThrow(last_component >= first_component,
+                    ExcLowerRange(last_component, first_component));
+        AssertThrow(last_component < n_data_sets,
+                    ExcIndexRange(last_component, 0, n_data_sets));
+        if (is_tensor)
+          {
+            AssertThrow((last_component + 1 - first_component <= 9),
+                        ExcMessage(
+                          "Can't declare a tensor with more than 9 components "
+                          "in VTK"));
+          }
+        else
+          {
+            Assert((last_component + 1 - first_component <= 3),
+                   ExcMessage(
+                     "Can't declare a vector with more than 3 components "
+                     "in VTK"));
+          }
 
         // mark these components as already written:
         for (unsigned int i = std::get<0>(nonscalar_data_range);
@@ -6026,7 +6036,8 @@ namespace DataOutBase
             out << data_names[std::get<1>(nonscalar_data_range)];
           }
 
-        out << "\" NumberOfComponents=\"3\" format=\"ascii\"/>\n";
+        out << "\" NumberOfComponents=\"" << n_components
+            << "\" format=\"ascii\"/>\n";
       }
 
     for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)

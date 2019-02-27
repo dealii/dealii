@@ -1,0 +1,101 @@
+
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="4" NumberOfCells="1" >
+  <Points>
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAADAAAAAwAAAAFAAAAA==eNpjYEAGDfYMWPkgGsIGADHwAv0=
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAABAAAAAQAAAAEwAAAA==eNpjYGBgYARiZiBmAmIAADwABw==
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAAQAAAAEAAAADAAAAA==eNpjYWBgAAAAFAAF
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAAAEAAAABAAAACQAAAA==eNrjBAAACgAK
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float32" Name="vector" NumberOfComponents="3" format="binary">
+AQAAADAAAAAwAAAAFAAAAA==eNpjYGiwZ4ADdDaMj2ADAGQuBHs=    </DataArray>
+    <DataArray type="Float32" Name="tensor" NumberOfComponents="9" format="binary">
+AQAAAJAAAACQAAAAIgAAAA==eNpjYGiwZ0AB6HwQcHAgrAZdDF0PTAymDkxjqAEAycUGOw==    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+<?xml version="1.0"?>
+<!--
+#This file was generated 
+-->
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPointData Scalars="scalars">
+    <PDataArray type="Float32" Name="vector" NumberOfComponents="3" format="ascii"/>
+    <PDataArray type="Float32" Name="tensor" NumberOfComponents="9" format="ascii"/>
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float32" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="output_2d.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="8" NumberOfCells="1" >
+  <Points>
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAAGAAAABgAAAAGgAAAA==eNpjYEAGDfYMWPkgGpscsjyyGAIDAC3jCPU=
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAACAAAAAgAAAAHQAAAA==eNpjYGBgYARiZiBmAmIWIGYFYnYgZgNiAAF4AB0=
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAAQAAAAEAAAADAAAAA==eNrjYGBgAAAAJAAJ
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAAAEAAAABAAAACQAAAA==eNrjAQAADQAN
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float32" Name="vector" NumberOfComponents="3" format="binary">
+AQAAAGAAAABgAAAAFgAAAA==eNpjYGiwZ4ADdDaMj84mXj0An0sI9Q==    </DataArray>
+    <DataArray type="Float32" Name="tensor" NumberOfComponents="9" format="binary">
+AQAAACABAAAgAQAAhAAAAA==eNpjYGiwZ0ABWPkHUMXQ+Q4ODATMyRdqtgIphIjDMDrfwaFArtZuZ/JvO44qNjDN/HvvPlFRC3sQH0TPOSC/T39lv51GyHs78ch8exBt86TUlrM4Yh+ID6KntZbZ2+9tsE3Vc9zz44XWfhB9+8/xfbuNSveD+CB63lfXfQxEAACmEDx/    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+<?xml version="1.0"?>
+<!--
+#This file was generated 
+-->
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPointData Scalars="scalars">
+    <PDataArray type="Float32" Name="vector" NumberOfComponents="3" format="ascii"/>
+    <PDataArray type="Float32" Name="tensor" NumberOfComponents="9" format="ascii"/>
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float32" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="output_3d.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
