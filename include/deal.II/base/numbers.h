@@ -166,6 +166,15 @@ namespace numbers
   static const double SQRT1_2 = 0.70710678118654752440;
 
   /**
+   * Check whether the given type can be used in CUDA device code.
+   * If not, DEAL_II_CUDA_HOST_DEV needs to be disabled for functions
+   * that use this type.
+   */
+  template <typename Number, typename = void>
+  struct is_cuda_compatible : std::true_type
+  {};
+
+  /**
    * Check whether a value is not a number.
    *
    * This function uses either <code>std::isnan</code>, <code>isnan</code>, or
@@ -361,10 +370,21 @@ namespace numbers
      * general template is chosen for types not equal to std::complex, this
      * function simply returns the square of the given number.
      *
-     * @note This function can also be used in CUDA device code.
+     * @note If the template type can be used in CUDA device code, the same holds true
+     * for this function.
      */
-    static DEAL_II_CUDA_HOST_DEV real_type
-                                 abs_square(const number &x);
+    template <typename Dummy = number>
+    static DEAL_II_CUDA_HOST_DEV
+      typename std::enable_if<std::is_same<Dummy, number>::value &&
+                                is_cuda_compatible<Dummy>::value,
+                              real_type>::type
+      abs_square(const number &x);
+
+    template <typename Dummy = number>
+    static typename std::enable_if<std::is_same<Dummy, number>::value &&
+                                     !is_cuda_compatible<Dummy>::value,
+                                   real_type>::type
+    abs_square(const number &x);
 
     /**
      * Return the absolute value of a number.
@@ -423,11 +443,19 @@ namespace numbers
 
   // --------------- inline and template functions ---------------- //
 
+  template <typename Number>
+  struct is_cuda_compatible<std::complex<Number>, void> : std::false_type
+  {};
+
+
+
   inline bool
   is_nan(const double x)
   {
     return std::isnan(x);
   }
+
+
 
   inline bool
   is_finite(const double x)
@@ -475,7 +503,23 @@ namespace numbers
 
 
   template <typename number>
-  DEAL_II_CUDA_HOST_DEV typename NumberTraits<number>::real_type
+  template <typename Dummy>
+  DEAL_II_CUDA_HOST_DEV
+    typename std::enable_if<std::is_same<Dummy, number>::value &&
+                              is_cuda_compatible<Dummy>::value,
+                            typename NumberTraits<number>::real_type>::type
+    NumberTraits<number>::abs_square(const number &x)
+  {
+    return x * x;
+  }
+
+
+
+  template <typename number>
+  template <typename Dummy>
+  typename std::enable_if<std::is_same<Dummy, number>::value &&
+                            !is_cuda_compatible<Dummy>::value,
+                          typename NumberTraits<number>::real_type>::type
   NumberTraits<number>::abs_square(const number &x)
   {
     return x * x;

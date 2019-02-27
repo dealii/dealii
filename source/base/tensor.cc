@@ -19,6 +19,7 @@
 #include <deal.II/base/tensor.h>
 
 #include <deal.II/differentiation/ad/adolc_product_types.h>
+#include <deal.II/differentiation/ad/sacado_number_types.h>
 #include <deal.II/differentiation/ad/sacado_product_types.h>
 
 DEAL_II_NAMESPACE_OPEN
