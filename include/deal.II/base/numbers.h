@@ -175,6 +175,13 @@ namespace numbers
   {};
 
   /**
+   * std::complex cannot be used in CUDA device code.
+   */
+  template <typename Number>
+  struct is_cuda_compatible<std::complex<Number>, void> : std::false_type
+  {};
+
+  /**
    * Check whether a value is not a number.
    *
    * This function uses either <code>std::isnan</code>, <code>isnan</code>, or
@@ -442,12 +449,6 @@ namespace numbers
   };
 
   // --------------- inline and template functions ---------------- //
-
-  template <typename Number>
-  struct is_cuda_compatible<std::complex<Number>, void> : std::false_type
-  {};
-
-
 
   inline bool
   is_nan(const double x)
