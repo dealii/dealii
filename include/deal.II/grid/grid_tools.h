@@ -2018,6 +2018,11 @@ namespace GridTools
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
+   *
+   * @note This function can only be used with
+   * parallel::distributed::Triangulation when both meshes use the same
+   * Triangulation since, with a distributed Triangulation, not all cells are
+   * stored locally, so the resulting list may not cover the entire domain.
    */
   template <typename MeshType>
   std::list<std::pair<typename MeshType::cell_iterator,

@@ -1135,6 +1135,30 @@ namespace GridTools
     Assert(have_same_coarse_mesh(mesh_1, mesh_2),
            ExcMessage("The two meshes must be represent triangulations that "
                       "have the same coarse meshes"));
+    // We will allow the output to contain ghost cells when we have shared
+    // Triangulations (i.e., so that each processor will get exactly the same
+    // list of cell pairs), but not when we have two distributed
+    // Triangulations (so that all active cells are partitioned by processor).
+    // Non-parallel Triangulations have no ghost or artificial cells, so they
+    // work the same way as shared Triangulations here.
+    bool remove_ghost_cells = false;
+#ifdef DEAL_II_WITH_MPI
+    {
+      constexpr int dim      = MeshType::dimension;
+      constexpr int spacedim = MeshType::space_dimension;
+      if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                         *>(&mesh_1.get_triangulation()) != nullptr ||
+          dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                         *>(&mesh_2.get_triangulation()) != nullptr)
+        {
+          Assert(&mesh_1.get_triangulation() == &mesh_2.get_triangulation(),
+                 ExcMessage("This function can only be used with meshes "
+                            "corresponding to distributed Triangulations when "
+                            "both Triangulations are equal."));
+          remove_ghost_cells = true;
+        }
+    }
+#endif
 
     // the algorithm goes as follows: first, we fill a list with pairs of
     // iterators common to the two meshes on the coarsest level. then we
@@ -1172,14 +1196,27 @@ namespace GridTools
             // erasing an iterator keeps other iterators valid, so already
             // advance the present iterator by one and then delete the element
             // we've visited before
-            const typename CellList::iterator previous_cell_pair = cell_pair;
+            const auto previous_cell_pair = cell_pair;
             ++cell_pair;
-
             cell_list.erase(previous_cell_pair);
           }
         else
-          // both cells are active, do nothing
-          ++cell_pair;
+          {
+            // at least one cell is active
+            if (remove_ghost_cells &&
+                ((cell_pair->first->active() &&
+                  !cell_pair->first->is_locally_owned()) ||
+                 (cell_pair->second->active() &&
+                  !cell_pair->second->is_locally_owned())))
+              {
+                // we only exclude ghost cells for distributed Triangulations
+                const auto previous_cell_pair = cell_pair;
+                ++cell_pair;
+                cell_list.erase(previous_cell_pair);
+              }
+            else
+              ++cell_pair;
+          }
       }
 
     // just to make sure everything is ok, validate that all pairs have at
