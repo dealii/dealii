@@ -298,6 +298,12 @@ namespace SparsityPatternIterators
      * the zeroth row).
      */
     Iterator(const SparsityPattern *sp, const std::size_t linear_index);
+
+    /**
+     * Constructor. Create an iterator into the sparsity pattern @p sp for
+     * a given accessor.
+     */
+    Iterator(const Accessor &accessor);
   };
 } // namespace SparsityPatternIterators
 
@@ -1272,6 +1278,13 @@ namespace SparsityPatternIterators
                             const std::size_t      linear_index)
     : LinearIndexIterator<Iterator, Accessor>(Accessor(sp, linear_index))
   {}
+
+
+  inline Iterator::Iterator(const Accessor &accessor)
+    : LinearIndexIterator<Iterator, Accessor>(accessor)
+  {}
+
+
 } // namespace SparsityPatternIterators
 
 
