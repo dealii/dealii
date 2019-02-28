@@ -1327,7 +1327,7 @@ public:
      *
      * If the smoothing indicator given to the constructor contains the bit
      * for #limit_level_difference_at_vertices, situations as the above one
-     * are eliminated by also marking the lower left cell for refinement.
+     * are eliminated by also marking the upper right cell for refinement.
      *
      * In case of anisotropic refinement, the level of a cell is not linked to
      * the refinement of a cell as directly as in case of isotropic
