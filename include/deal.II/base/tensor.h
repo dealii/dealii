@@ -924,14 +924,40 @@ Tensor<0, dim, Number>::operator-=(const Tensor<0, dim, OtherNumber> &p)
 }
 
 
+
+namespace internal
+{
+  namespace ComplexWorkaround
+  {
+    template <typename Number, typename OtherNumber>
+    inline DEAL_II_CUDA_HOST_DEV void
+    multiply_assign_scalar(Number &val, const OtherNumber &s)
+    {
+      val *= s;
+    }
+
+#ifdef __CUDA_ARCH__
+    template <typename Number, typename OtherNumber>
+    inline DEAL_II_CUDA_HOST_DEV void
+    multiply_assign_scalar(std::complex<Number> &, const OtherNumber &)
+    {
+      printf("This function is not implemented for std::complex<Number>!\n");
+      assert(false);
+    }
+#endif
+  } // namespace ComplexWorkaround
+} // namespace internal
+
+
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline DEAL_II_CUDA_HOST_DEV Tensor<0, dim, Number> &
 Tensor<0, dim, Number>::operator*=(const OtherNumber &s)
 {
-  value *= s;
+  internal::ComplexWorkaround::multiply_assign_scalar(value, s);
   return *this;
 }
+
 
 
 template <int dim, typename Number>
