@@ -1156,6 +1156,17 @@ namespace hp
     post_distributed_active_fe_index_transfer();
 
     /**
+     * A function that will be triggered through a triangulation
+     * signal just after the associated parallel::distributed::Triangulation has
+     * been saved.
+     *
+     * The function frees all memory related to the transfer of
+     * active_fe_indices.
+     */
+    void
+    post_distributed_serialization_of_active_fe_indices();
+
+    /**
      * Space to store the DoF numbers for the different levels. Analogous to
      * the <tt>levels[]</tt> tree of the Triangulation objects.
      */
@@ -1213,33 +1224,49 @@ namespace hp
     std::vector<unsigned int> vertex_dof_offsets;
 
     /**
-     * Container to temporarily store the iterator and active FE index of
-     * cells that will be refined.
+     * Whenever the underlying triangulation changes by either
+     * refinement/coarsening and serialization, the active_fe_index of cells
+     * needs to be transferred. This structure stores all temporary information
+     * required during that process.
      */
-    std::map<const cell_iterator, const unsigned int> refined_cells_fe_index;
+    struct ActiveFEIndexTransfer
+    {
+      /**
+       * Container to temporarily store the iterator and active FE index of
+       * cells that will be refined.
+       */
+      std::map<const cell_iterator, const unsigned int> refined_cells_fe_index;
+
+      /**
+       * Container to temporarily store the iterator and active FE index of
+       * parent cells that will remain after coarsening.
+       */
+      std::map<const cell_iterator, const unsigned int>
+        coarsened_cells_fe_index;
+
+      /**
+       * Container to temporarily store the active_fe_index of every locally
+       * owned cell for transfer across parallel::distributed::Triangulation
+       * objects.
+       */
+      std::vector<unsigned int> active_fe_indices;
+
+      /**
+       * Helper object to transfer all active_fe_indices on
+       * parallel::distributed::Triangulation objects during
+       * refinement/coarsening and serialization.
+       */
+      std::unique_ptr<
+        parallel::distributed::
+          CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>
+        cell_data_transfer;
+    };
 
     /**
-     * Container to temporarily store the iterator and active FE index of
-     * parent cells that will remain after coarsening.
+     * We embed our data structure into a pointer to control that
+     * all transfer related data only exists during the actual transfer process.
      */
-    std::map<const cell_iterator, const unsigned int> coarsened_cells_fe_index;
-
-    /**
-     * Container to temporarily store the active_fe_index of every locally
-     * owned cell for transfer across parallel::distributed::Triangulation
-     * objects.
-     */
-    std::vector<unsigned int> active_fe_indices;
-
-    /**
-     * Helper object to transfer all active_fe_indices on
-     * parallel::distributed::Triangulation objects during refinement/coarsening
-     * and serialization.
-     */
-    std::unique_ptr<
-      parallel::distributed::
-        CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>
-      cell_data_transfer;
+    std::unique_ptr<ActiveFEIndexTransfer> active_fe_index_transfer;
 
     /**
      * A list of connections with which this object connects to the
