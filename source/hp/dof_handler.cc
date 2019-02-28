@@ -1431,9 +1431,6 @@ namespace hp
            ExcMessage("The Triangulation you are using is empty!"));
     Assert(ff.size() > 0, ExcMessage("The hp::FECollection given is empty!"));
 
-    // first, assign the fe_collection
-    set_fe(ff);
-
     // If an underlying shared::Tria allows artificial cells,
     // then save the current set of subdomain ids, and set
     // subdomain ids to the "true" owner of each cell. we later
@@ -1457,7 +1454,10 @@ namespace hp
             }
         }
 
-    // then allocate space for all tables
+    // assign the fe_collection and initialize all active_fe_indices
+    set_fe(ff);
+
+    // then allocate space for all the other tables
     dealii::internal::hp::DoFHandlerImplementation::Implementation::
       reserve_space(*this);
 
