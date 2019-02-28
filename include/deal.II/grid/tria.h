@@ -2337,6 +2337,21 @@ public:
 
     /**
      * This signal is triggered at the end of execution of the
+     * parallel::distributed::Triangulation::save()
+     * function when the triangulation has reached its final state.
+     */
+    boost::signals2::signal<void()> post_distributed_save;
+
+    /**
+     * This signal is triggered at the beginning of execution of the
+     * parallel::distributed::Triangulation::load()
+     * function. At the time this signal is triggered, the triangulation
+     * is still unchanged.
+     */
+    boost::signals2::signal<void()> pre_distributed_load;
+
+    /**
+     * This signal is triggered at the end of execution of the
      * parallel::distributed::Triangulation::load()
      * function when the triangulation has reached its final state.
      */

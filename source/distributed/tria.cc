@@ -2753,6 +2753,9 @@ namespace parallel
         tria->cell_attached_data.pack_callbacks_fixed.clear();
         tria->cell_attached_data.pack_callbacks_variable.clear();
       }
+
+      // signal that serialization has finished
+      this->signals.post_distributed_save();
     }
 
 
@@ -2771,6 +2774,8 @@ namespace parallel
         ExcMessage(
           "Triangulation may only contain coarse cells when calling load()."));
 
+      // signal that de-serialization is going to happen
+      this->signals.pre_distributed_load();
 
       if (parallel_ghost != nullptr)
         {

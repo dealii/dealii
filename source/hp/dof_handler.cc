@@ -1523,38 +1523,29 @@ namespace hp
     // decide whether we need a sequential or a parallel shared/distributed
     // policy and attach corresponding callback functions dealing with the
     // transfer of active_fe_indices
-    if (const auto *distributed_tria = dynamic_cast<
-          const parallel::distributed::Triangulation<dim, spacedim> *>(
-          &this->get_triangulation()))
+    if (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
+                       *>(&this->get_triangulation()))
       {
         policy = std_cxx14::make_unique<
           internal::DoFHandlerImplementation::Policy::ParallelDistributed<
             DoFHandler<dim, spacedim>>>(*this);
 
-#ifdef DEAL_II_WITH_P4EST
-        cell_data_transfer = std_cxx14::make_unique<
-          parallel::distributed::
-            CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
-          *distributed_tria,
-          /*transfer_variable_size_data=*/false,
-          &parallel::distributed::CellDataTransfer<
-            dim,
-            spacedim,
-            std::vector<unsigned int>>::CoarseningStrategies::check_equality);
-#endif
+        tria_listeners.push_back(
+          this->tria->signals.pre_distributed_refinement.connect(std::bind(
+            &DoFHandler<dim,
+                        spacedim>::pre_distributed_active_fe_index_transfer,
+            std::ref(*this))));
+        tria_listeners.push_back(
+          this->tria->signals.post_distributed_refinement.connect(std::bind(
+            &DoFHandler<dim,
+                        spacedim>::post_distributed_active_fe_index_transfer,
+            std::ref(*this))));
 
         tria_listeners.push_back(
-          distributed_tria->signals.pre_distributed_refinement.connect(
-            std::bind(
-              &DoFHandler<dim,
-                          spacedim>::pre_distributed_active_fe_index_transfer,
-              std::ref(*this))));
-        tria_listeners.push_back(
-          distributed_tria->signals.post_distributed_refinement.connect(
-            std::bind(
-              &DoFHandler<dim,
-                          spacedim>::post_distributed_active_fe_index_transfer,
-              std::ref(*this))));
+          this->tria->signals.post_distributed_save.connect(
+            std::bind(&DoFHandler<dim, spacedim>::
+                        post_distributed_serialization_of_active_fe_indices,
+                      std::ref(*this))));
       }
     else if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
                             *>(&this->get_triangulation()) != nullptr)
@@ -1791,8 +1782,10 @@ namespace hp
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
-        Assert(refined_cells_fe_index.empty(), ExcInternalError());
-        Assert(coarsened_cells_fe_index.empty(), ExcInternalError());
+        Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+
+        active_fe_index_transfer =
+          std_cxx14::make_unique<ActiveFEIndexTransfer>();
 
         // Store active_fe_index information for all cells that will be
         // affected by refinement/coarsening.
@@ -1803,7 +1796,7 @@ namespace hp
                 {
                   // Store the active_fe_index of each cell that will be refined
                   // to and distribute it later on its children.
-                  refined_cells_fe_index.insert(
+                  active_fe_index_transfer->refined_cells_fe_index.insert(
                     {cell, cell->active_fe_index()});
                 }
               else if (cell->coarsen_flag_set())
@@ -1816,8 +1809,9 @@ namespace hp
                   const auto &parent = cell->parent();
                   // Check if the active_fe_index for the current cell has been
                   // determined already.
-                  if (coarsened_cells_fe_index.find(parent) ==
-                      coarsened_cells_fe_index.end())
+                  if (active_fe_index_transfer->coarsened_cells_fe_index.find(
+                        parent) ==
+                      active_fe_index_transfer->coarsened_cells_fe_index.end())
                     {
                       std::set<unsigned int> fe_indices_children;
                       for (unsigned int child_index = 0;
@@ -1842,7 +1836,8 @@ namespace hp
                           "that dominates all children of a cell you are trying "
                           "to coarsen!"));
 
-                      coarsened_cells_fe_index.insert({parent, fe_index});
+                      active_fe_index_transfer->coarsened_cells_fe_index.insert(
+                        {parent, fe_index});
                     }
                 }
             }
@@ -1862,6 +1857,8 @@ namespace hp
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
+        Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+
         // If the underlying shared::Tria allows artificial cells,
         // then save the current set of subdomain ids, and set
         // subdomain ids to the "true" owner of each cell. We later
@@ -1922,6 +1919,8 @@ namespace hp
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
+        Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+
         // First, do what we would do in the sequential case.
         pre_active_fe_index_transfer();
 
@@ -1932,24 +1931,37 @@ namespace hp
         // the active_fe_indices on the new mesh.
 
         // Gather all current active_fe_indices.
-        get_active_fe_indices(active_fe_indices);
+        get_active_fe_indices(active_fe_index_transfer->active_fe_indices);
 
         // Overwrite values of cells that will be coarsened with the
         // active_fe_index determined beforehand for their parent.
-        for (const auto &pair : coarsened_cells_fe_index)
+        for (const auto &pair :
+             active_fe_index_transfer->coarsened_cells_fe_index)
           for (unsigned int child_index = 0;
                child_index < pair.first->n_children();
                ++child_index)
-            active_fe_indices[pair.first->child(child_index)
-                                ->active_cell_index()] = pair.second;
+            active_fe_index_transfer
+              ->active_fe_indices[pair.first->child(child_index)
+                                    ->active_cell_index()] = pair.second;
 
-        // Attach to transfer object.
-        cell_data_transfer->prepare_for_coarsening_and_refinement(
-          active_fe_indices);
+        // Create transfer object and attach to it.
+        const auto *distributed_tria = dynamic_cast<
+          const parallel::distributed::Triangulation<dim, spacedim> *>(
+          &this->get_triangulation());
 
-        // Free some memory.
-        refined_cells_fe_index.clear();
-        coarsened_cells_fe_index.clear();
+        active_fe_index_transfer->cell_data_transfer = std_cxx14::make_unique<
+          parallel::distributed::
+            CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
+          *distributed_tria,
+          /*transfer_variable_size_data=*/false,
+          &parallel::distributed::CellDataTransfer<
+            dim,
+            spacedim,
+            std::vector<unsigned int>>::CoarseningStrategies::check_equality);
+
+        active_fe_index_transfer->cell_data_transfer
+          ->prepare_for_coarsening_and_refinement(
+            active_fe_index_transfer->active_fe_indices);
       }
 #endif
   }
@@ -1964,6 +1976,8 @@ namespace hp
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
+        Assert(active_fe_index_transfer != nullptr, ExcInternalError());
+
         // For Triangulation and p::s::Triangulation, the old cell iterators
         // are still valid. There is no need to transfer data in this case,
         // and we can re-use our previously gathered information from the
@@ -1971,7 +1985,8 @@ namespace hp
 
         // Distribute active_fe_indices from all refined cells on their
         // respective children.
-        for (const auto &pair : refined_cells_fe_index)
+        for (const auto &pair :
+             active_fe_index_transfer->refined_cells_fe_index)
           {
             const cell_iterator &parent = pair.first;
 
@@ -1991,7 +2006,8 @@ namespace hp
 
         // Set active_fe_indices on coarsened cells that have been determined
         // before the actual coarsening happened.
-        for (const auto &pair : coarsened_cells_fe_index)
+        for (const auto &pair :
+             active_fe_index_transfer->coarsened_cells_fe_index)
           {
             const cell_iterator &cell = pair.first;
 
@@ -2002,9 +2018,8 @@ namespace hp
               }
           }
 
-        // Clear stored active_fe_indices.
-        refined_cells_fe_index.clear();
-        coarsened_cells_fe_index.clear();
+        // Free memory.
+        active_fe_index_transfer.reset();
       }
   }
 
@@ -2021,6 +2036,8 @@ namespace hp
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
+        Assert(active_fe_index_transfer != nullptr, ExcInternalError());
+
         // Do what we normally do in the sequential case.
         post_active_fe_index_transfer();
 
@@ -2046,17 +2063,19 @@ namespace hp
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
+        Assert(active_fe_index_transfer != nullptr, ExcInternalError());
+
         // Unpack active_fe_indices.
-        active_fe_indices.resize(tria->n_active_cells(),
-                                 numbers::invalid_unsigned_int);
-        cell_data_transfer->unpack(active_fe_indices);
+        active_fe_index_transfer->active_fe_indices.resize(
+          tria->n_active_cells(), numbers::invalid_unsigned_int);
+        active_fe_index_transfer->cell_data_transfer->unpack(
+          active_fe_index_transfer->active_fe_indices);
 
         // Update all locally owned active_fe_indices.
-        set_active_fe_indices(active_fe_indices);
+        set_active_fe_indices(active_fe_index_transfer->active_fe_indices);
 
-        // Free some memory.
-        active_fe_indices.clear();
-        active_fe_indices.shrink_to_fit();
+        // Free memory.
+        active_fe_index_transfer.reset();
       }
 #endif
   }
@@ -2084,15 +2103,56 @@ namespace hp
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
+        Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+
+        active_fe_index_transfer =
+          std_cxx14::make_unique<ActiveFEIndexTransfer>();
+
+        // Create transfer object and attach to it.
+        const auto *distributed_tria = dynamic_cast<
+          const parallel::distributed::Triangulation<dim, spacedim> *>(
+          &this->get_triangulation());
+
+        active_fe_index_transfer->cell_data_transfer = std_cxx14::make_unique<
+          parallel::distributed::
+            CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
+          *distributed_tria,
+          /*transfer_variable_size_data=*/false,
+          &parallel::distributed::CellDataTransfer<
+            dim,
+            spacedim,
+            std::vector<unsigned int>>::CoarseningStrategies::check_equality);
+
         // If we work on a p::d::Triangulation, we have to transfer all
         // active fe indices since ownership of cells may change.
 
         // Gather all current active_fe_indices
-        get_active_fe_indices(active_fe_indices);
+        get_active_fe_indices(active_fe_index_transfer->active_fe_indices);
 
         // Attach to transfer object
-        cell_data_transfer->prepare_for_serialization(active_fe_indices);
+        active_fe_index_transfer->cell_data_transfer->prepare_for_serialization(
+          active_fe_index_transfer->active_fe_indices);
       }
+#endif
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  DoFHandler<dim,
+             spacedim>::post_distributed_serialization_of_active_fe_indices()
+  {
+#ifndef DEAL_II_WITH_P4EST
+    Assert(false,
+           ExcMessage(
+             "You are attempting to use a functionality that is only available "
+             "if deal.II was configured to use p4est, but cmake did not find a "
+             "valid p4est library."));
+#else
+    Assert(active_fe_index_transfer != nullptr, ExcInternalError());
+
+    // Free memory.
+    active_fe_index_transfer.reset();
 #endif
   }
 
@@ -2119,17 +2179,37 @@ namespace hp
     // distribute_dofs() first to make this functionality available.
     if (fe_collection.size() > 0)
       {
+        Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+
+        active_fe_index_transfer =
+          std_cxx14::make_unique<ActiveFEIndexTransfer>();
+
+        // Create transfer object and attach to it.
+        const auto *distributed_tria = dynamic_cast<
+          const parallel::distributed::Triangulation<dim, spacedim> *>(
+          &this->get_triangulation());
+
+        active_fe_index_transfer->cell_data_transfer = std_cxx14::make_unique<
+          parallel::distributed::
+            CellDataTransfer<dim, spacedim, std::vector<unsigned int>>>(
+          *distributed_tria,
+          /*transfer_variable_size_data=*/false,
+          &parallel::distributed::CellDataTransfer<
+            dim,
+            spacedim,
+            std::vector<unsigned int>>::CoarseningStrategies::check_equality);
+
         // Unpack active_fe_indices.
-        active_fe_indices.resize(tria->n_active_cells(),
-                                 numbers::invalid_unsigned_int);
-        cell_data_transfer->deserialize(active_fe_indices);
+        active_fe_index_transfer->active_fe_indices.resize(
+          tria->n_active_cells(), numbers::invalid_unsigned_int);
+        active_fe_index_transfer->cell_data_transfer->deserialize(
+          active_fe_index_transfer->active_fe_indices);
 
         // Update all locally owned active_fe_indices.
-        set_active_fe_indices(active_fe_indices);
+        set_active_fe_indices(active_fe_index_transfer->active_fe_indices);
 
-        // Free some memory.
-        active_fe_indices.clear();
-        active_fe_indices.shrink_to_fit();
+        // Free memory.
+        active_fe_index_transfer.reset();
       }
 #endif
   }
