@@ -480,6 +480,19 @@ namespace hp
     get_active_fe_indices(std::vector<unsigned int> &active_fe_indices) const;
 
     /**
+     * Coarsen and refine the finite elements associated with each cell
+     * according to refinement and coarsening flags set and the hierarchy
+     * of the registered hp::FECollection.
+     *
+     * Since the current processor only has control over those cells it owns
+     * (i.e. the ones for which <code>cell-@>subdomain_id() ==
+     * this-@>locally_owned_subdomain()</code>), refinement and coarsening
+     * flags are only respected for those locally owned cells.
+     */
+    void
+    execute_coarsening_and_refinement();
+
+    /**
      * Clear all data of this object and especially delete the lock this
      * object has to the finite element used the last time when @p
      * distribute_dofs was called.
@@ -1111,9 +1124,6 @@ namespace hp
     /**
      * A function that will be triggered through a triangulation
      * signal just after the triangulation is modified.
-     *
-     * The function that restores the active_fe_flags of all cells that
-     * were refined.
      */
     void
     post_refinement_action();

@@ -1508,6 +1508,30 @@ namespace hp
 
   template <int dim, int spacedim>
   void
+  DoFHandler<dim, spacedim>::execute_coarsening_and_refinement()
+  {
+    for (const auto &cell : active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          if (cell->p_refine_flag_set())
+            {
+              cell->set_active_fe_index(
+                fe_collection.next_in_hierarchy(cell->active_fe_index()));
+              cell->clear_p_refine_flag();
+            }
+          else if (cell->p_coarsen_flag_set())
+            {
+              cell->set_active_fe_index(
+                fe_collection.previous_in_hierarchy(cell->active_fe_index()));
+              cell->clear_p_coarsen_flag();
+            }
+        }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   DoFHandler<dim, spacedim>::initialize(
     const Triangulation<dim, spacedim> &   tria,
     const hp::FECollection<dim, spacedim> &fe)
@@ -1929,6 +1953,12 @@ namespace hp
   void
   DoFHandler<dim, spacedim>::pre_refinement_action()
   {
+    for (const auto &cell : active_cell_iterators())
+      Assert(!cell->p_refine_flag_set() && !cell->p_coarsen_flag_set(),
+             ExcMessage("Refinement of the triangulation has been scheduled, "
+                        "before refinement of the hp::DoFHandler was executed. "
+                        "Please take care of p-refinement first!"));
+
     create_active_fe_table();
   }
 

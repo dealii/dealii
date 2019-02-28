@@ -1,0 +1,20 @@
+
+DEAL:0::OK
+
+DEAL:1:3d::cell:0_1:0, fe_index:0
+DEAL:1:3d::cell:0_1:1, fe_index:2
+DEAL:1:3d::cell:0_1:2, fe_index:0
+DEAL:1:3d::cell:0_1:3, fe_index:2
+DEAL:1:3d::cell:0_1:4, fe_index:0
+DEAL:1:3d::cell:0_1:5, fe_index:2
+DEAL:1:3d::cell:0_1:6, fe_index:0
+DEAL:1:3d::cell:0_1:7, fe_index:2
+DEAL:1::OK
+
+
+DEAL:2:2d::cell:0_1:0, fe_index:0
+DEAL:2:2d::cell:0_1:1, fe_index:2
+DEAL:2:2d::cell:0_1:2, fe_index:0
+DEAL:2:2d::cell:0_1:3, fe_index:2
+DEAL:2::OK
+
