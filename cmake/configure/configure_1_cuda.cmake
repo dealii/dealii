@@ -115,7 +115,8 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
           ${CUDA_ADDITIONAL_ERROR_STRING}
           "Couldn't detect CUDA Compute Capability! "
           "The error message was: ${CUDA_COMPUTE_CAPABILITY}\n"
-          "Please check the return value of ${_binary_test_dir}/cuda_compute_capability."
+          "Please check the return value of ${_binary_test_dir}/cuda_compute_capability.\n"
+          "If you want to disable the autodetection, set the compute capability to be used manually."
           )
         SET(${var} FALSE)
       ENDIF()
