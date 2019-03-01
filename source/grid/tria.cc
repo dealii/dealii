@@ -14119,9 +14119,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
   if (((smooth_grid & coarsest_level_1) || (smooth_grid & patch_level_1)) &&
       n_levels() >= 2)
     {
-      active_cell_iterator cell = begin_active(1), endc = end_active(1);
-
-      for (; cell != endc; ++cell)
+      for (const auto &cell : active_cell_iterators_on_level(1))
         cell->clear_coarsen_flag();
     }
 
@@ -14137,10 +14135,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       if (smooth_grid & do_not_produce_unrefined_islands &&
           !(smooth_grid & patch_level_1))
         {
-          cell_iterator       cell;
-          const cell_iterator endc = end();
-
-          for (cell = begin(); cell != endc; ++cell)
+          for (const auto &cell : cell_iterators())
             {
               // only do something if this
               // cell will be coarsened
@@ -14173,10 +14168,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                          eliminate_refined_boundary_islands) &&
           !(smooth_grid & patch_level_1))
         {
-          cell_iterator       cell;
-          const cell_iterator endc = end();
-
-          for (cell = begin(); cell != endc; ++cell)
+          for (const auto &cell : cell_iterators())
             if (!cell->active() || (cell->active() && cell->refine_flag_set() &&
                                     cell->is_locally_owned()))
               {
@@ -14271,9 +14263,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
 
           // store highest level one of the cells adjacent to a vertex
           // belongs to
-          std::vector<int>     vertex_level(vertices.size(), 0);
-          active_cell_iterator cell = begin_active(), endc = end();
-          for (; cell != endc; ++cell)
+          std::vector<int> vertex_level(vertices.size(), 0);
+          for (const auto &cell : active_cell_iterators())
             {
               if (cell->refine_flag_set())
                 for (unsigned int vertex = 0;
@@ -14315,7 +14306,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           // refinement flags, but we will also have to remove
           // coarsening flags on cells adjacent to vertices that will
           // see refinement
-          for (cell = last_active(); cell != endc; --cell)
+          for (active_cell_iterator cell = last_active(); cell != end(); --cell)
             if (cell->refine_flag_set() == false)
               {
                 for (unsigned int vertex = 0;
@@ -14363,9 +14354,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       //    may trigger more cells further down below
       if (smooth_grid & eliminate_unrefined_islands)
         {
-          active_cell_iterator cell = last_active(), endc = end();
-
-          for (; cell != endc; --cell)
+          for (active_cell_iterator cell = last_active(); cell != end(); --cell)
             // only do something if cell is not already flagged for
             // (isotropic) refinement
             if (cell->refine_flag_set() !=
@@ -14409,7 +14398,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           // active).  If the refine flag of at least one of the
           // children is set then set_refine_flag and
           // clear_coarsen_flag of all children.
-          for (cell_iterator cell = begin(); cell != end(); ++cell)
+          for (const auto &cell : cell_iterators())
             if (!cell->active())
               {
                 // ensure the invariant. we can then check whether all
@@ -14445,7 +14434,7 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
           //
           // for a case where this is a bit tricky, take a look at the
           // mesh_smoothing_0[12] testcases
-          for (cell_iterator cell = begin(); cell != end(); ++cell)
+          for (const auto &cell : cell_iterators())
             {
               // check if this cell has active grandchildren. note
               // that we know that it is patch_level_1, i.e. if one of
