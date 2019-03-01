@@ -15,7 +15,7 @@
 
 
 
-// Check that QuadraturePointManager class. To that end first evaluate some
+// Check CellDataStorage class. To that end first evaluate some
 // quadratic function at quadrature points. Then refine cells and project using
 // FE_Q(2). Finally check that the values at quadrature points are still
 // consistent with the original function.
