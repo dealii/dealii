@@ -57,17 +57,12 @@ test()
   fe_collection.push_back(FE_Q<dim>(5));
 
   hp::DoFHandler<dim> dh(tria);
+  dh.set_fe(fe_collection);
   // default: active_fe_index = 0
   for (auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       if (cell->id().to_string() == "0_2:00")
         cell->set_active_fe_index(1);
-  dh.distribute_dofs(fe_collection);
-
-
-  parallel::CellWeights<dim> cell_weights(dh);
-  cell_weights.register_ndofs_weighting(100000);
-
 
   deallog << "Number of cells before repartitioning: "
           << tria.n_locally_owned_active_cells() << std::endl;
@@ -80,8 +75,10 @@ test()
   }
 
 
+  parallel::CellWeights<dim> cell_weights(dh);
+  cell_weights.register_ndofs_weighting(100000);
+
   tria.repartition();
-  dh.distribute_dofs(fe_collection);
 
 
   deallog << "Number of cells after repartitioning: "
