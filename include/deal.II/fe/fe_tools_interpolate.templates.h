@@ -46,6 +46,7 @@
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/trilinos_tpetra_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
@@ -511,6 +512,23 @@ namespace FETools
     {
       AssertThrow(false, ExcNotImplemented());
     }
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    template <int dim, int spacedim, typename Number>
+    void
+    back_interpolate(
+      const DoFHandler<dim, spacedim> &,
+      const AffineConstraints<
+        typename LinearAlgebra::TpetraWrappers::Vector<Number>::value_type> &,
+      const LinearAlgebra::TpetraWrappers::Vector<Number> &,
+      const DoFHandler<dim, spacedim> &,
+      const AffineConstraints<
+        typename LinearAlgebra::TpetraWrappers::Vector<Number>::value_type> &,
+      LinearAlgebra::TpetraWrappers::Vector<Number> &)
+    {
+      AssertThrow(false, ExcNotImplemented());
+    }
+#  endif
 #endif
 
 

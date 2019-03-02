@@ -34,7 +34,6 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
-#  include <deal.II/lac/trilinos_epetra_vector.h>
 #  include <deal.II/lac/trilinos_vector.h>
 
 #  include <Epetra_Import.h>
@@ -507,6 +506,124 @@ namespace LinearAlgebra
 
 
 #if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
+    const Tpetra::Vector<Number, int, types::global_dof_index> &vector,
+    const IndexSet &                                            source_elements,
+    VectorOperation::values                                     operation,
+    const MPI_Comm &                                            mpi_comm,
+    const std::shared_ptr<const CommunicationPatternBase>
+      &communication_pattern)
+  {
+    std::shared_ptr<const TpetraWrappers::CommunicationPattern>
+      tpetra_comm_pattern;
+
+    // If no communication pattern is given, create one. Otherwise, use the one
+    // given.
+    if (communication_pattern == nullptr)
+      {
+        // The first time import is called, we create a communication pattern.
+        // Check if the communication pattern already exists and if it can be
+        // reused.
+        if ((source_elements.size() == source_stored_elements.size()) &&
+            (source_elements == source_stored_elements))
+          {
+            tpetra_comm_pattern = std::dynamic_pointer_cast<
+              const TpetraWrappers::CommunicationPattern>(comm_pattern);
+            if (tpetra_comm_pattern == nullptr)
+              tpetra_comm_pattern =
+                std::make_shared<const TpetraWrappers::CommunicationPattern>(
+                  create_tpetra_comm_pattern(source_elements, mpi_comm));
+          }
+        else
+          tpetra_comm_pattern =
+            std::make_shared<const TpetraWrappers::CommunicationPattern>(
+              create_tpetra_comm_pattern(source_elements, mpi_comm));
+      }
+    else
+      {
+        tpetra_comm_pattern =
+          std::dynamic_pointer_cast<const TpetraWrappers::CommunicationPattern>(
+            communication_pattern);
+        AssertThrow(tpetra_comm_pattern != nullptr,
+                    ExcMessage(
+                      std::string("The communication pattern is not of type ") +
+                      "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
+      }
+
+    Tpetra::Export<int, types::global_dof_index> tpetra_export(
+      tpetra_comm_pattern->get_tpetra_export());
+
+    Tpetra::Vector<Number, int, types::global_dof_index> target_vector(
+      tpetra_export.getSourceMap());
+    target_vector.doImport(vector, tpetra_export, Tpetra::REPLACE);
+
+    const auto *new_values = target_vector.getData().get();
+    const auto  size       = target_vector.getLocalLength();
+
+    using size_type = typename std::decay<decltype(size)>::type;
+
+    Assert(size == 0 || values != nullptr, ExcInternalError("Export failed."));
+    AssertDimension(size, stored_elements.n_elements());
+
+    switch (operation)
+      {
+        case VectorOperation::insert:
+          for (size_type i = 0; i < size; ++i)
+            values[i] = new_values[i];
+          break;
+
+        case VectorOperation::add:
+          for (size_type i = 0; i < size; ++i)
+            values[i] += new_values[i];
+          break;
+
+        case VectorOperation::min:
+          // To ensure that this code also compiles with complex
+          // numbers, we only compare the real part of the
+          // variable. Note that min/max do not make sense with complex
+          // numbers.
+          for (size_type i = 0; i < size; ++i)
+            {
+              Assert(
+                std::imag(new_values[i]) == 0.,
+                ExcMessage(
+                  "VectorOperation::min is not defined if there is an imaginary part!)"));
+              Assert(
+                std::imag(values[i]) == 0.,
+                ExcMessage(
+                  "VectorOperation::min is not defined if there is an imaginary part!)"));
+              if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
+                values[i] = new_values[i];
+            }
+          break;
+
+        case VectorOperation::max:
+          for (size_type i = 0; i < size; ++i)
+            {
+              Assert(
+                std::imag(new_values[i]) == 0.,
+                ExcMessage(
+                  "VectorOperation::max is not defined if there is an imaginary part!)"));
+              Assert(
+                std::imag(values[i]) == 0.,
+                ExcMessage(
+                  "VectorOperation::max is not defined if there is an imaginary part!)"));
+              if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
+                values[i] = new_values[i];
+            }
+          break;
+
+        default:
+          AssertThrow(false, ExcNotImplemented());
+      }
+  }
+#  endif
+
+
+
   template <typename Number>
   void
   ReadWriteVector<Number>::import(
@@ -604,8 +721,18 @@ namespace LinearAlgebra
         // variable. Note that min/max do not make sense with complex
         // numbers.
         for (int i = 0; i < size; ++i)
-          if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
-            values[i] = new_values[i];
+          {
+            Assert(
+              std::imag(new_values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::min is not defined if there is an imaginary part!)"));
+            Assert(
+              std::imag(values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::min is not defined if there is an imaginary part!)"));
+            if (std::real(new_values[i]) - std::real(values[i]) < 0.0)
+              values[i] = new_values[i];
+          }
       }
     else if (operation == VectorOperation::max)
       {
@@ -620,8 +747,18 @@ namespace LinearAlgebra
                ExcInternalError("Import failed."));
 
         for (int i = 0; i < size; ++i)
-          if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
-            values[i] = new_values[i];
+          {
+            Assert(
+              std::imag(new_values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::max is not defined if there is an imaginary part!)"));
+            Assert(
+              std::imag(values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::max is not defined if there is an imaginary part!)"));
+            if (std::real(new_values[i]) - std::real(values[i]) > 0.0)
+              values[i] = new_values[i];
+          }
       }
     else
       AssertThrow(false, ExcNotImplemented());
@@ -649,6 +786,25 @@ namespace LinearAlgebra
            trilinos_vec.get_mpi_communicator(),
            communication_pattern);
   }
+
+
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
+    const LinearAlgebra::TpetraWrappers::Vector<Number> &trilinos_vec,
+    VectorOperation::values                              operation,
+    const std::shared_ptr<const CommunicationPatternBase>
+      &communication_pattern)
+  {
+    import(trilinos_vec.trilinos_vector(),
+           trilinos_vec.locally_owned_elements(),
+           operation,
+           trilinos_vec.get_mpi_communicator(),
+           communication_pattern);
+  }
+#  endif
 
 
 
@@ -716,8 +872,18 @@ namespace LinearAlgebra
         // variable. Note that min/max do not make sense with complex
         // numbers.
         for (unsigned int i = 0; i < n_elements; ++i)
-          if (std::real(tmp[i]) - std::real(values[i]) < 0.0)
-            values[i] = tmp[i];
+          {
+            Assert(
+              std::imag(tmp[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::min is not defined if there is an imaginary part!)"));
+            Assert(
+              std::imag(values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::min is not defined if there is an imaginary part!)"));
+            if (std::real(tmp[i]) - std::real(values[i]) < 0.0)
+              values[i] = tmp[i];
+          }
       }
     else if (operation == VectorOperation::max)
       {
@@ -730,8 +896,18 @@ namespace LinearAlgebra
         AssertCuda(error_code);
 
         for (unsigned int i = 0; i < n_elements; ++i)
-          if (std::real(tmp[i]) - std::real(values[i]) > 0.0)
-            values[i] = tmp[i];
+          {
+            Assert(
+              std::imag(tmp[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::max is not defined if there is an imaginary part!)"));
+            Assert(
+              std::imag(values[i]) == 0.,
+              ExcMessage(
+                "VectorOperation::max is not defined if there is an imaginary part!)"));
+            if (std::real(tmp[i]) - std::real(values[i]) > 0.0)
+              values[i] = tmp[i];
+          }
       }
     else
       AssertThrow(false, ExcNotImplemented());
@@ -793,6 +969,25 @@ namespace LinearAlgebra
 
 
 #if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template <typename Number>
+  TpetraWrappers::CommunicationPattern
+  ReadWriteVector<Number>::create_tpetra_comm_pattern(
+    const IndexSet &source_index_set,
+    const MPI_Comm &mpi_comm)
+  {
+    source_stored_elements = source_index_set;
+    TpetraWrappers::CommunicationPattern epetra_comm_pattern(
+      source_stored_elements, stored_elements, mpi_comm);
+    comm_pattern = std::make_shared<TpetraWrappers::CommunicationPattern>(
+      source_stored_elements, stored_elements, mpi_comm);
+
+    return epetra_comm_pattern;
+  }
+#  endif
+
+
+
   template <typename Number>
   EpetraWrappers::CommunicationPattern
   ReadWriteVector<Number>::create_epetra_comm_pattern(

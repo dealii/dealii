@@ -1581,6 +1581,23 @@ namespace FETools
 
 
 #  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    template <int dim, int spacedim, typename Number>
+    void
+    reinit_distributed(const DoFHandler<dim, spacedim> &              dh,
+                       LinearAlgebra::TpetraWrappers::Vector<Number> &vector)
+    {
+      const parallel::distributed::Triangulation<dim, spacedim> *parallel_tria =
+        dynamic_cast<
+          const parallel::distributed::Triangulation<dim, spacedim> *>(
+          &dh.get_triangulation());
+      Assert(parallel_tria != nullptr, ExcNotImplemented());
+
+      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
+      vector.reinit(locally_owned_dofs, parallel_tria->get_communicator());
+    }
+#    endif
+
     template <int dim, int spacedim>
     void
     reinit_distributed(const DoFHandler<dim, spacedim> &      dh,

@@ -132,6 +132,40 @@ namespace internal
   };
 
 #  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template <typename Number>
+  struct MatrixSelector<dealii::LinearAlgebra::TpetraWrappers::Vector<Number>>
+  {
+    using Sparsity = ::dealii::TrilinosWrappers::SparsityPattern;
+    using Matrix   = ::dealii::TrilinosWrappers::SparseMatrix;
+
+    static const bool requires_distributed_sparsity_pattern = false;
+
+    template <typename SparsityPatternType, typename DoFHandlerType>
+    static void
+    reinit(Matrix &matrix,
+           Sparsity &,
+           int                        level,
+           const SparsityPatternType &sp,
+           DoFHandlerType &           dh)
+    {
+      const parallel::Triangulation<DoFHandlerType::dimension,
+                                    DoFHandlerType::space_dimension>
+        *dist_tria = dynamic_cast<
+          const parallel::Triangulation<DoFHandlerType::dimension,
+                                        DoFHandlerType::space_dimension> *>(
+          &(dh.get_triangulation()));
+      MPI_Comm communicator =
+        dist_tria != nullptr ? dist_tria->get_communicator() : MPI_COMM_SELF;
+      matrix.reinit(dh.locally_owned_mg_dofs(level + 1),
+                    dh.locally_owned_mg_dofs(level),
+                    sp,
+                    communicator,
+                    true);
+    }
+  };
+#    endif
+
   template <>
   struct MatrixSelector<dealii::LinearAlgebra::EpetraWrappers::Vector>
   {

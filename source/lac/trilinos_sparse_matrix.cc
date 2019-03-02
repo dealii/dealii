@@ -48,28 +48,28 @@ namespace TrilinosWrappers
   namespace internal
   {
     template <typename VectorType>
-    double *
+    typename VectorType::value_type *
     begin(VectorType &V)
     {
       return V.begin();
     }
 
     template <typename VectorType>
-    const double *
+    const typename VectorType::value_type *
     begin(const VectorType &V)
     {
       return V.begin();
     }
 
     template <typename VectorType>
-    double *
+    typename VectorType::value_type *
     end(VectorType &V)
     {
       return V.end();
     }
 
     template <typename VectorType>
-    const double *
+    const typename VectorType::value_type *
     end(const VectorType &V)
     {
       return V.end();
@@ -103,6 +103,38 @@ namespace TrilinosWrappers
     {
       return V.trilinos_vector()[0] + V.trilinos_vector().MyLength();
     }
+
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    template <typename Number>
+    Number *
+    begin(LinearAlgebra::TpetraWrappers::Vector<Number> &V)
+    {
+      return V.trilinos_vector().getDataNonConst().get();
+    }
+
+    template <typename Number>
+    const Number *
+    begin(const LinearAlgebra::TpetraWrappers::Vector<Number> &V)
+    {
+      return V.trilinos_vector().getData().get();
+    }
+
+    template <typename Number>
+    Number *
+    end(LinearAlgebra::TpetraWrappers::Vector<Number> &V)
+    {
+      return V.trilinos_vector().getDataNonConst().get() +
+             V.trilinos_vector().getLocalLength();
+    }
+
+    template <typename Number>
+    const Number *
+    end(const LinearAlgebra::TpetraWrappers::Vector<Number> &V)
+    {
+      return V.trilinos_vector().getData().get() +
+             V.trilinos_vector().getLocalLength();
+    }
+#    endif
 #  endif
   } // namespace internal
 
@@ -1510,12 +1542,13 @@ namespace TrilinosWrappers
 
 
 
+  template <>
   void
-  SparseMatrix::set(const size_type       row,
-                    const size_type       n_cols,
-                    const size_type *     col_indices,
-                    const TrilinosScalar *values,
-                    const bool            elide_zero_values)
+  SparseMatrix::set<TrilinosScalar>(const size_type       row,
+                                    const size_type       n_cols,
+                                    const size_type *     col_indices,
+                                    const TrilinosScalar *values,
+                                    const bool            elide_zero_values)
   {
     AssertIndexRange(row, this->m());
 
@@ -2078,7 +2111,8 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  void
+  typename std::enable_if<
+    std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
   SparseMatrix::vmult(VectorType &dst, const VectorType &src) const
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
@@ -2111,7 +2145,18 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  void
+  typename std::enable_if<
+    !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
+  SparseMatrix::vmult(VectorType & /*dst*/, const VectorType & /*src*/) const
+  {
+    AssertThrow(false, ExcNotImplemented());
+  }
+
+
+
+  template <typename VectorType>
+  typename std::enable_if<
+    std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
   SparseMatrix::Tvmult(VectorType &dst, const VectorType &src) const
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
@@ -2136,6 +2181,16 @@ namespace TrilinosWrappers
     const int ierr = matrix->Multiply(true, tril_src, tril_dst);
     Assert(ierr == 0, ExcTrilinosError(ierr));
     (void)ierr; // removes -Wunused-variable in optimized mode
+  }
+
+
+
+  template <typename VectorType>
+  typename std::enable_if<
+    !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>::type
+  SparseMatrix::Tvmult(VectorType & /*dst*/, const VectorType & /*src*/) const
+  {
+    AssertThrow(false, ExcNotImplemented());
   }
 
 
@@ -3446,59 +3501,122 @@ namespace TrilinosWrappers
 
   template void
   SparseMatrix::vmult(MPI::Vector &, const MPI::Vector &) const;
+
   template void
   SparseMatrix::vmult(dealii::Vector<double> &,
                       const dealii::Vector<double> &) const;
+
   template void
   SparseMatrix::vmult(
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
+
 #  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template void
+  SparseMatrix::vmult(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<double> &) const;
+
+  template void
+  SparseMatrix::vmult(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+#    endif
+
   template void
   SparseMatrix::vmult(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
 #  endif
+
   template void
   SparseMatrix::Tvmult(MPI::Vector &, const MPI::Vector &) const;
+
   template void
   SparseMatrix::Tvmult(dealii::Vector<double> &,
                        const dealii::Vector<double> &) const;
+
   template void
   SparseMatrix::Tvmult(
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
+
 #  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template void
+  SparseMatrix::Tvmult(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<double> &) const;
+
+  template void
+  SparseMatrix::Tvmult(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+#    endif
+
   template void
   SparseMatrix::Tvmult(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
 #  endif
+
   template void
   SparseMatrix::vmult_add(MPI::Vector &, const MPI::Vector &) const;
+
   template void
   SparseMatrix::vmult_add(dealii::Vector<double> &,
                           const dealii::Vector<double> &) const;
+
   template void
   SparseMatrix::vmult_add(
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
+
 #  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template void
+  SparseMatrix::vmult_add(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<double> &) const;
+
+  template void
+  SparseMatrix::vmult_add(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+#    endif
+
   template void
   SparseMatrix::vmult_add(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,
     const dealii::LinearAlgebra::EpetraWrappers::Vector &) const;
 #  endif
+
   template void
   SparseMatrix::Tvmult_add(MPI::Vector &, const MPI::Vector &) const;
+
   template void
   SparseMatrix::Tvmult_add(dealii::Vector<double> &,
                            const dealii::Vector<double> &) const;
+
   template void
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::distributed::Vector<double> &,
     const dealii::LinearAlgebra::distributed::Vector<double> &) const;
+
 #  ifdef DEAL_II_WITH_MPI
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template void
+  SparseMatrix::Tvmult_add(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<double> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<double> &) const;
+
+  template void
+  SparseMatrix::Tvmult_add(
+    dealii::LinearAlgebra::TpetraWrappers::Vector<float> &,
+    const dealii::LinearAlgebra::TpetraWrappers::Vector<float> &) const;
+#    endif
+
   template void
   SparseMatrix::Tvmult_add(
     dealii::LinearAlgebra::EpetraWrappers::Vector &,

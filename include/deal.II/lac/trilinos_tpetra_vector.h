@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2018 by the deal.II authors
+// Copyright (C) 2018 - 2019 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,23 +13,27 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_trilinos_epetra_vector_h
-#define dealii_trilinos_epetra_vector_h
+#ifndef dealii_trilinos_tpetra_vector_h
+#define dealii_trilinos_tpetra_vector_h
 
 
 #include <deal.II/base/config.h>
 
-#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(DEAL_II_WITH_MPI)
 
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/subscriptor.h>
 
-#  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
+#  include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_space_vector.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
-#  include <Epetra_FEVector.h>
+#  include <Teuchos_Comm.hpp>
+#  include <Teuchos_OrdinalTraits.hpp>
+#  include <Tpetra_Core.hpp>
+#  include <Tpetra_Vector.hpp>
+#  include <Tpetra_Version.hpp>
 #  include <mpi.h>
 
 #  include <memory>
@@ -42,29 +46,39 @@ namespace LinearAlgebra
   template <typename Number>
   class ReadWriteVector;
 
-  /**
-   * A namespace for classes that provide wrappers for Trilinos' Epetra vectors.
-   *
-   * This namespace provides wrappers for the Epetra_FEVector class from the
-   * Epetra package (https://trilinos.org/packages/epetra/) that is part of
-   * Trilinos.
-   */
-  namespace EpetraWrappers
+  namespace TpetraWrappers
   {
     /**
      * This class implements a wrapper to the Trilinos distributed vector
-     * class Epetra_FEVector. This class is derived from the
-     * LinearAlgebra::VectorSpaceVector class. Note however that Epetra only
-     * works with Number = double. This class requires Trilinos to be compiled
-     * with MPI support.
+     * class Tpetra::Vector. This class is derived from the
+     * LinearAlgebra::VectorSpaceVector class and requires Trilinos to be
+     * compiled with MPI support.
+     *
+     * Tpetra uses Kokkos for thread-parallelism and chooses the execution and
+     * memory space automatically depending on Kokkos configuration. The
+     * priority is ranked from highest to lowest:
+     * - Kokkos::Cuda
+     * - Kokkos::OpenMP
+     * - Kokkos::Threads
+     * - Kokkos::Serial
+     *
+     * In case Kokkos was configured with CUDA support, this class stores the
+     * values in unified virtual memory space and performs its action on the
+     * GPU. In particular, there is no need for manually synchronizing memory
+     * between host and device.
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
-     * @author Bruno Turcksin, 2015
+     * @author Daniel Arndt, 2019
      */
-    class Vector : public VectorSpaceVector<double>, public Subscriptor
+    template <typename Number>
+    class Vector : public VectorSpaceVector<Number>, public Subscriptor
     {
     public:
+      using value_type = Number;
+
+      using size_type = typename VectorSpaceVector<Number>::size_type;
+
       /**
        * Constructor. Create a vector of dimension zero.
        */
@@ -101,7 +115,7 @@ namespace LinearAlgebra
        * copied.
        */
       virtual void
-      reinit(const VectorSpaceVector<double> &V,
+      reinit(const VectorSpaceVector<Number> &V,
              const bool omit_zeroing_entries = false) override;
 
       /**
@@ -117,7 +131,7 @@ namespace LinearAlgebra
        * only allowed if @p s is equal to zero.
        */
       virtual Vector &
-      operator=(const double s) override;
+      operator=(const Number s) override;
 
       /**
        * Imports all the elements present in the vector's IndexSet from the
@@ -129,7 +143,7 @@ namespace LinearAlgebra
        */
       virtual void
       import(
-        const ReadWriteVector<double> &                 V,
+        const ReadWriteVector<Number> &                 V,
         VectorOperation::values                         operation,
         std::shared_ptr<const CommunicationPatternBase> communication_pattern =
           std::shared_ptr<const CommunicationPatternBase>()) override;
@@ -138,64 +152,64 @@ namespace LinearAlgebra
        * Multiply the entire vector by a fixed factor.
        */
       virtual Vector &
-      operator*=(const double factor) override;
+      operator*=(const Number factor) override;
 
       /**
        * Divide the entire vector by a fixed factor.
        */
       virtual Vector &
-      operator/=(const double factor) override;
+      operator/=(const Number factor) override;
 
       /**
        * Add the vector @p V to the present one.
        */
       virtual Vector &
-      operator+=(const VectorSpaceVector<double> &V) override;
+      operator+=(const VectorSpaceVector<Number> &V) override;
 
       /**
        * Subtract the vector @p V from the present one.
        */
       virtual Vector &
-      operator-=(const VectorSpaceVector<double> &V) override;
+      operator-=(const VectorSpaceVector<Number> &V) override;
 
       /**
        * Return the scalar product of two vectors. The vectors need to have the
        * same layout.
        */
-      virtual double
-      operator*(const VectorSpaceVector<double> &V) const override;
+      virtual Number
+      operator*(const VectorSpaceVector<Number> &V) const override;
 
       /**
        * Add @p a to all components. Note that @p is a scalar not a vector.
        */
       virtual void
-      add(const double a) override;
+      add(const Number a) override;
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this +=
        * a*V</tt>. The vectors need to have the same layout.
        */
       virtual void
-      add(const double a, const VectorSpaceVector<double> &V) override;
+      add(const Number a, const VectorSpaceVector<Number> &V) override;
 
       /**
        * Multiple addition of multiple of a vector, i.e. <tt>*this> +=
        * a*V+b*W</tt>. The vectors need to have the same layout.
        */
       virtual void
-      add(const double                     a,
-          const VectorSpaceVector<double> &V,
-          const double                     b,
-          const VectorSpaceVector<double> &W) override;
+      add(const Number                     a,
+          const VectorSpaceVector<Number> &V,
+          const Number                     b,
+          const VectorSpaceVector<Number> &W) override;
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this
        * = s*(*this)+a*V</tt>.
        */
       virtual void
-      sadd(const double                     s,
-           const double                     a,
-           const VectorSpaceVector<double> &V) override;
+      sadd(const Number                     s,
+           const Number                     a,
+           const VectorSpaceVector<Number> &V) override;
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -204,13 +218,13 @@ namespace LinearAlgebra
        * vectors need to have the same layout.
        */
       virtual void
-      scale(const VectorSpaceVector<double> &scaling_factors) override;
+      scale(const VectorSpaceVector<Number> &scaling_factors) override;
 
       /**
        * Assignment <tt>*this = a*V</tt>.
        */
       virtual void
-      equ(const double a, const VectorSpaceVector<double> &V) override;
+      equ(const Number a, const VectorSpaceVector<Number> &V) override;
 
       /**
        * Return whether the vector contains only elements with value zero.
@@ -221,28 +235,28 @@ namespace LinearAlgebra
       /**
        * Return the mean value of the element of this vector.
        */
-      virtual double
+      virtual Number
       mean_value() const override;
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
-      virtual double
+      virtual typename LinearAlgebra::VectorSpaceVector<Number>::real_type
       l1_norm() const override;
 
       /**
        * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
-      virtual double
+      virtual typename LinearAlgebra::VectorSpaceVector<Number>::real_type
       l2_norm() const override;
 
       /**
        * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
-      virtual double
+      virtual typename LinearAlgebra::VectorSpaceVector<Number>::real_type
       linfty_norm() const override;
 
       /**
@@ -267,10 +281,10 @@ namespace LinearAlgebra
        * implemented as
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
-      virtual double
-      add_and_dot(const double                     a,
-                  const VectorSpaceVector<double> &V,
-                  const VectorSpaceVector<double> &W) override;
+      virtual Number
+      add_and_dot(const Number                     a,
+                  const VectorSpaceVector<Number> &V,
+                  const VectorSpaceVector<Number> &W) override;
       /**
        * This function always returns false and is present only for backward
        * compatibility.
@@ -307,16 +321,16 @@ namespace LinearAlgebra
 
       /**
        * Return a const reference to the underlying Trilinos
-       * Epetra_FEVector class.
+       * Tpetra::Vector class.
        */
-      const Epetra_FEVector &
+      const Tpetra::Vector<Number, int, types::global_dof_index> &
       trilinos_vector() const;
 
       /**
-       * Return a (modifiable) reference to the underlying Trilinos
-       * Epetra_FEVector class.
+       * Return a (modifyable) reference to the underlying Trilinos
+       * Tpetra::Vector class.
        */
-      Epetra_FEVector &
+      Tpetra::Vector<Number, int, types::global_dof_index> &
       trilinos_vector();
 
       /**
@@ -364,13 +378,14 @@ namespace LinearAlgebra
        * on the communicator @p mpi_comm.
        */
       void
-      create_epetra_comm_pattern(const IndexSet &source_index_set,
+      create_tpetra_comm_pattern(const IndexSet &source_index_set,
                                  const MPI_Comm &mpi_comm);
 
       /**
-       * Pointer to the actual Epetra vector object.
+       * Pointer to the actual Tpetra vector object.
        */
-      std::unique_ptr<Epetra_FEVector> vector;
+      std::unique_ptr<Tpetra::Vector<Number, int, types::global_dof_index>>
+        vector;
 
       /**
        * IndexSet of the elements of the last imported vector.
@@ -381,24 +396,27 @@ namespace LinearAlgebra
        * CommunicationPattern for the communication between the
        * source_stored_elements IndexSet and the current vector.
        */
-      std::shared_ptr<const CommunicationPattern> epetra_comm_pattern;
+      std::shared_ptr<const TpetraWrappers::CommunicationPattern>
+        tpetra_comm_pattern;
     };
 
 
+    template <typename Number>
     inline bool
-    Vector::has_ghost_elements() const
+    Vector<Number>::has_ghost_elements() const
     {
       return false;
     }
-  } // namespace EpetraWrappers
+  } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
 
 /**
- * Declare dealii::LinearAlgebra::EpetraWrappers::Vector as distributed vector.
+ * Declare dealii::LinearAlgebra::TpetraWrappers::Vector as distributed vector.
  */
-template <>
-struct is_serial_vector<LinearAlgebra::EpetraWrappers::Vector> : std::false_type
+template <typename Number>
+struct is_serial_vector<LinearAlgebra::TpetraWrappers::Vector<Number>>
+  : std::false_type
 {};
 
 DEAL_II_NAMESPACE_CLOSE

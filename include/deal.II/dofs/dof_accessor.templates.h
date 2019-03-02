@@ -1534,6 +1534,36 @@ namespace internal
 
 
 
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+      template <typename ForwardIterator, typename Number>
+      static void
+      extract_subvector_to(
+        const LinearAlgebra::TpetraWrappers::Vector<Number> &values,
+        const types::global_dof_index *                      cache_begin,
+        const types::global_dof_index *                      cache_end,
+        ForwardIterator                                      local_values_begin)
+      {
+        std::vector<unsigned int> sorted_indices_pos =
+          sort_indices(cache_begin, cache_end);
+        const unsigned int cache_size = cache_end - cache_begin;
+        std::vector<types::global_dof_index> cache_indices(cache_size);
+        for (unsigned int i = 0; i < cache_size; ++i)
+          cache_indices[i] = *(cache_begin + sorted_indices_pos[i]);
+
+        IndexSet index_set(cache_indices.back() + 1);
+        index_set.add_indices(cache_indices.begin(), cache_indices.end());
+        index_set.compress();
+        LinearAlgebra::ReadWriteVector<Number> read_write_vector(index_set);
+        read_write_vector.import(values, VectorOperation::insert);
+
+        // Copy the elements from read_write_vector and reorder them.
+        for (unsigned int i = 0; i < cache_size; ++i, ++local_values_begin)
+          *local_values_begin = read_write_vector[sorted_indices_pos[i]];
+      }
+#  endif
+
+
+
       template <typename ForwardIterator>
       static void
       extract_subvector_to(const LinearAlgebra::EpetraWrappers::Vector &values,
