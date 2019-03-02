@@ -54,11 +54,18 @@ namespace LinearAlgebra
      * LinearAlgebra::VectorSpaceVector class and requires Trilinos to be
      * compiled with MPI support.
      *
-     * Tpetra uses Kokkos for thread-parallelism. In case Trilinos was
-     * configured with CUDA support, this class stores the values in unified
-     * virtual memory space and performs its action on the GPU. In particular,
-     * there is no need for manually synchronizing memory between host and
-     * device.
+     * Tpetra uses Kokkos for thread-parallelism and chooses the execution and
+     * memory space automatically depending on Kokkos configuration. The
+     * priority is ranked from highest to lowest:
+     * - Kokkos::Cuda
+     * - Kokkos::OpenMP
+     * - Kokkos::Threads
+     * - Kokkos::Serial
+     *
+     * In case Kokkos was configured with CUDA support, this class stores the
+     * values in unified virtual memory space and performs its action on the
+     * GPU. In particular, there is no need for manually synchronizing memory
+     * between host and device.
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
