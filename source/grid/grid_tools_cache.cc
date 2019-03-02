@@ -167,9 +167,16 @@ namespace GridTools
         // TO DO: the locally owned portion of the domain
         // might consists of more separate pieces: a single
         // bounding box might not always be the best choice.
+
+        // Note: we create the local variable ptr here, because gcc 4.8.5
+        // fails to compile if we pass the variable directly.
         IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
-        const BoundingBox<spacedim>       bbox =
-          GridTools::compute_bounding_box(*tria, locally_owned_cell_predicate);
+        std::function<bool(
+          const typename Triangulation<dim, spacedim>::active_cell_iterator &)>
+          ptr(locally_owned_cell_predicate);
+
+        const BoundingBox<spacedim> bbox =
+          GridTools::compute_bounding_box(get_triangulation(), ptr);
 
 
         std::vector<BoundingBox<spacedim>> bbox_v(1, bbox);
