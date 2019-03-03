@@ -4907,8 +4907,7 @@ namespace internal
                 }
         }
 
-
-        // first clear user flags and pointers of lines; we're going
+        // TODO[WB]: we clear user flags and pointers of lines; we're going
         // to use them to flag which lines need refinement
         for (typename Triangulation<dim, spacedim>::line_iterator line =
                triangulation.begin_line();
