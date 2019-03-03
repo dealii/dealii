@@ -1036,6 +1036,131 @@ namespace internal
                 ExcInternalError());
             }
         }
+
+
+
+        /**
+         * Collect all finite element indices on cells that will be affected by
+         * future refinement and coarsening. Further, prepare those indices to
+         * be distributed on on the updated triangulation later.
+         *
+         * On cells to be refined, the active_fe_index will be inherited to
+         * their childrean and thus will be stored as such.
+         *
+         * On cells to be coarsened, the active_fe_index on parent cells will be
+         * determined by the least dominating finite element of its children. We
+         * will thus assign the corresponding fe_index to the parent cell. See
+         * documentation of
+         * FECollection::find_least_dominating_fe_in_collection() for further
+         * information.
+         */
+        template <int dim, int spacedim>
+        static void
+        collect_fe_indices_on_cells_to_be_refined(
+          dealii::hp::DoFHandler<dim, spacedim> &dof_handler)
+        {
+          const auto &fe_transfer = dof_handler.active_fe_index_transfer;
+
+          for (const auto &cell : dof_handler.active_cell_iterators())
+            if (cell->is_locally_owned())
+              {
+                if (cell->refine_flag_set())
+                  {
+                    // Store the active_fe_index of each cell that will be
+                    // refined to and distribute it later on its children.
+                    fe_transfer->refined_cells_fe_index.insert(
+                      {cell, cell->active_fe_index()});
+                  }
+                else if (cell->coarsen_flag_set())
+                  {
+                    // From all cells that will be coarsened, determine their
+                    // parent and calculate its proper active_fe_index, so that
+                    // it can be set after refinement. But first, check if that
+                    // particular cell has a parent at all.
+                    Assert(cell->level() > 0, ExcInternalError());
+                    const auto &parent = cell->parent();
+                    // Check if the active_fe_index for the current cell has
+                    // been determined already.
+                    if (fe_transfer->coarsened_cells_fe_index.find(parent) ==
+                        fe_transfer->coarsened_cells_fe_index.end())
+                      {
+                        std::set<unsigned int> fe_indices_children;
+                        for (unsigned int child_index = 0;
+                             child_index < parent->n_children();
+                             ++child_index)
+                          {
+                            Assert(parent->child(child_index)->active(),
+                                   ExcInternalError());
+
+                            fe_indices_children.insert(
+                              parent->child(child_index)->active_fe_index());
+                          }
+
+                        const unsigned int fe_index =
+                          dof_handler.fe_collection
+                            .find_least_dominating_fe_in_collection(
+                              fe_indices_children, /*codim=*/0);
+
+                        Assert(
+                          fe_index != numbers::invalid_unsigned_int,
+                          ExcMessage(
+                            "No FiniteElement has been found in your FECollection "
+                            "that dominates all children of a cell you are trying "
+                            "to coarsen!"));
+
+                        fe_transfer->coarsened_cells_fe_index.insert(
+                          {parent, fe_index});
+                      }
+                  }
+              }
+        }
+
+
+
+        /**
+         * Distribute active finite element indices that have been previously
+         * prepared in collect_fe_indices_on_cells_to_be_refined().
+         */
+        template <int dim, int spacedim>
+        static void
+        distribute_fe_indices_on_refined_cells(
+          dealii::hp::DoFHandler<dim, spacedim> &dof_handler)
+        {
+          const auto &fe_transfer = dof_handler.active_fe_index_transfer;
+
+          // Distribute active_fe_indices from all refined cells on their
+          // respective children.
+          for (const auto &pair : fe_transfer->refined_cells_fe_index)
+            {
+              const auto &parent = pair.first;
+
+              for (unsigned int child_index = 0;
+                   child_index < parent->n_children();
+                   ++child_index)
+                {
+                  const auto &child = parent->child(child_index);
+
+                  if (child->is_locally_owned())
+                    {
+                      Assert(child->active(), ExcInternalError());
+                      child->set_active_fe_index(pair.second);
+                    }
+                }
+            }
+
+          // Set active_fe_indices on coarsened cells that have been determined
+          // before the actual coarsening happened.
+          for (const auto &pair : fe_transfer->coarsened_cells_fe_index)
+            {
+              const auto &cell = pair.first;
+
+              if (cell->is_locally_owned())
+                {
+                  Assert(cell->active(), ExcInternalError());
+                  cell->set_active_fe_index(pair.second);
+                }
+            }
+        }
       };
     } // namespace DoFHandlerImplementation
   }   // namespace hp
@@ -1786,60 +1911,8 @@ namespace hp
         active_fe_index_transfer =
           std_cxx14::make_unique<ActiveFEIndexTransfer>();
 
-        // Store active_fe_index information for all cells that will be
-        // affected by refinement/coarsening.
-        for (const auto &cell : active_cell_iterators())
-          if (cell->is_locally_owned())
-            {
-              if (cell->refine_flag_set())
-                {
-                  // Store the active_fe_index of each cell that will be refined
-                  // to and distribute it later on its children.
-                  active_fe_index_transfer->refined_cells_fe_index.insert(
-                    {cell, cell->active_fe_index()});
-                }
-              else if (cell->coarsen_flag_set())
-                {
-                  // From all cells that will be coarsened, determine their
-                  // parent and calculate its proper active_fe_index, so that it
-                  // can be set after refinement. But first, check if that
-                  // particular cell has a parent at all.
-                  Assert(cell->level() > 0, ExcInternalError());
-                  const auto &parent = cell->parent();
-                  // Check if the active_fe_index for the current cell has been
-                  // determined already.
-                  if (active_fe_index_transfer->coarsened_cells_fe_index.find(
-                        parent) ==
-                      active_fe_index_transfer->coarsened_cells_fe_index.end())
-                    {
-                      std::set<unsigned int> fe_indices_children;
-                      for (unsigned int child_index = 0;
-                           child_index < parent->n_children();
-                           ++child_index)
-                        {
-                          Assert(parent->child(child_index)->active(),
-                                 ExcInternalError());
-
-                          fe_indices_children.insert(
-                            parent->child(child_index)->active_fe_index());
-                        }
-
-                      const unsigned int fe_index =
-                        fe_collection.find_least_dominating_fe_in_collection(
-                          fe_indices_children, /*codim=*/0);
-
-                      Assert(
-                        fe_index != numbers::invalid_unsigned_int,
-                        ExcMessage(
-                          "No FiniteElement has been found in your FECollection "
-                          "that dominates all children of a cell you are trying "
-                          "to coarsen!"));
-
-                      active_fe_index_transfer->coarsened_cells_fe_index.insert(
-                        {parent, fe_index});
-                    }
-                }
-            }
+        dealii::internal::hp::DoFHandlerImplementation::Implementation::
+          collect_fe_indices_on_cells_to_be_refined(*this);
       }
   }
 
@@ -1857,6 +1930,9 @@ namespace hp
     if (fe_collection.size() > 0)
       {
         Assert(active_fe_index_transfer == nullptr, ExcInternalError());
+
+        active_fe_index_transfer =
+          std_cxx14::make_unique<ActiveFEIndexTransfer>();
 
         // If the underlying shared::Tria allows artificial cells,
         // then save the current set of subdomain ids, and set
@@ -1889,7 +1965,8 @@ namespace hp
           }
 
         // Now do what we would do in the sequential case.
-        pre_active_fe_index_transfer();
+        dealii::internal::hp::DoFHandlerImplementation::Implementation::
+          collect_fe_indices_on_cells_to_be_refined(*this);
 
         // Finally, restore current subdomain_ids.
         if (shared_tria->with_artificial_cells())
@@ -1920,8 +1997,12 @@ namespace hp
       {
         Assert(active_fe_index_transfer == nullptr, ExcInternalError());
 
+        active_fe_index_transfer =
+          std_cxx14::make_unique<ActiveFEIndexTransfer>();
+
         // First, do what we would do in the sequential case.
-        pre_active_fe_index_transfer();
+        dealii::internal::hp::DoFHandlerImplementation::Implementation::
+          collect_fe_indices_on_cells_to_be_refined(*this);
 
         // If we work on a p::d::Triangulation, we have to transfer all
         // active_fe_indices since ownership of cells may change. We will
@@ -1982,40 +2063,8 @@ namespace hp
         // and we can re-use our previously gathered information from the
         // container.
 
-        // Distribute active_fe_indices from all refined cells on their
-        // respective children.
-        for (const auto &pair :
-             active_fe_index_transfer->refined_cells_fe_index)
-          {
-            const cell_iterator &parent = pair.first;
-
-            for (unsigned int child_index = 0;
-                 child_index < parent->n_children();
-                 ++child_index)
-              {
-                const cell_iterator child = parent->child(child_index);
-
-                if (child->is_locally_owned())
-                  {
-                    Assert(child->active(), ExcInternalError());
-                    child->set_active_fe_index(pair.second);
-                  }
-              }
-          }
-
-        // Set active_fe_indices on coarsened cells that have been determined
-        // before the actual coarsening happened.
-        for (const auto &pair :
-             active_fe_index_transfer->coarsened_cells_fe_index)
-          {
-            const cell_iterator &cell = pair.first;
-
-            if (cell->is_locally_owned())
-              {
-                Assert(cell->active(), ExcInternalError());
-                cell->set_active_fe_index(pair.second);
-              }
-          }
+        dealii::internal::hp::DoFHandlerImplementation::Implementation::
+          distribute_fe_indices_on_refined_cells(*this);
 
         // Free memory.
         active_fe_index_transfer.reset();
@@ -2038,13 +2087,17 @@ namespace hp
         Assert(active_fe_index_transfer != nullptr, ExcInternalError());
 
         // Do what we normally do in the sequential case.
-        post_active_fe_index_transfer();
+        dealii::internal::hp::DoFHandlerImplementation::Implementation::
+          distribute_fe_indices_on_refined_cells(*this);
 
         // We have to distribute the information about active_fe_indices
         // on all processors, if a parallel::shared::Triangulation
         // has been used.
         dealii::internal::hp::DoFHandlerImplementation::Implementation::
           communicate_active_fe_indices(*this);
+
+        // Free memory.
+        active_fe_index_transfer.reset();
       }
 #endif
   }
