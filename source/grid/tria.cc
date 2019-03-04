@@ -4907,8 +4907,7 @@ namespace internal
                 }
         }
 
-
-        // first clear user flags and pointers of lines; we're going
+        // TODO[WB]: we clear user flags and pointers of lines; we're going
         // to use them to flag which lines need refinement
         for (typename Triangulation<dim, spacedim>::line_iterator line =
                triangulation.begin_line();
@@ -4984,29 +4983,7 @@ namespace internal
                           typename Triangulation<dim, spacedim>::line_iterator
                             line = cell->line(line_no);
                           if (line->has_children() == false)
-                            {
-                              line->set_user_flag();
-                              // TODO[WB]: we overwrite the user_index here
-                              // because we later on need
-                              // to find out which boundary object we have to
-                              // ask to refine this line. we can't use the
-                              // boundary_id field because that can only be used
-                              // for lines at the boundary of the domain, but we
-                              // also need a domain description for interior
-                              // lines in the codim-1 case
-                              if (spacedim > dim)
-                                {
-                                  if (line->at_boundary())
-                                    // if possible honor boundary
-                                    // indicator
-                                    line->set_user_index(line->boundary_id());
-                                  else
-                                    // otherwise take manifold
-                                    // description from the adjacent
-                                    // cell
-                                    line->set_user_index(cell->material_id());
-                                }
-                            }
+                            line->set_user_flag();
                         }
                     }
                 }
@@ -5098,29 +5075,7 @@ namespace internal
                     "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
                 triangulation.vertices_used[next_unused_vertex] = true;
 
-                if (spacedim == dim)
-                  {
-                    // for the case of a domain in an
-                    // equal-dimensional space we only have to treat
-                    // boundary lines differently; for interior
-                    // lines we can compute the midpoint as the mean
-                    // of the two vertices: if (line->at_boundary())
-                    triangulation.vertices[next_unused_vertex] =
-                      line->center(true);
-                  }
-                else
-                  // however, if spacedim>dim, we always have to ask
-                  // the boundary object for its answer. We use the
-                  // same object of the cell (which was stored in
-                  // line->user_index() before) unless a manifold_id
-                  // has been set on this very line.
-                  if (line->manifold_id() == numbers::flat_manifold_id)
-                  triangulation.vertices[next_unused_vertex] =
-                    triangulation.get_manifold(line->user_index())
-                      .get_new_point_on_line(line);
-                else
-                  triangulation.vertices[next_unused_vertex] =
-                    line->center(true);
+                triangulation.vertices[next_unused_vertex] = line->center(true);
 
                 // now that we created the right point, make up the
                 // two child lines.  To this end, find a pair of

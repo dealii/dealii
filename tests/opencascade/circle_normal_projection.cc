@@ -73,12 +73,13 @@ main()
   GridGenerator::hyper_cube(tria);
 
   // Set the exterior boundary
+  tria.set_all_manifold_ids(0);
   tria.set_manifold(0, boundary_line);
 
   // This is here to ignore the
   // points created in the interior
   // of the face.
-  tria.begin()->set_material_id(1);
+  tria.begin()->set_manifold_id(1);
 
   // We refine twice, and expect the
   // outer points to end up on the
