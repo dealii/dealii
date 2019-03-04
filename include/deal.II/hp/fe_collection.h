@@ -135,8 +135,19 @@ namespace hp
 
     /**
      * Move constructor.
+     *
+     * @note The implementation of standard datatypes may change with different
+     * libraries, so their move members may or may not be flagged non-throwing.
+     * We need to explicitly set the noexcept specifier according to its
+     * member variables to still get the performance benefits (and to satisfy
+     * clang-tidy).
      */
-    FECollection(FECollection<dim, spacedim> &&) = default;
+    FECollection(FECollection<dim, spacedim> &&) noexcept(
+      std::is_nothrow_move_constructible<
+        std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>>::value
+        &&std::is_nothrow_move_constructible<std::function<
+          unsigned int(const typename hp::FECollection<dim, spacedim> &,
+                       const unsigned int)>>::value) = default;
 
     /**
      * Move assignment operator.
