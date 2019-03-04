@@ -4059,12 +4059,10 @@ namespace parallel
 
       this->update_number_cache();
 
-      // signal that refinement is finished,
-      // this is triggered before update_periodic_face_map
-      // to be consistent with the serial triangulation class
-      this->signals.post_distributed_refinement();
-
       this->update_periodic_face_map();
+
+      // signal that refinement is finished
+      this->signals.post_distributed_refinement();
     }
 
 
@@ -4164,12 +4162,10 @@ namespace parallel
       // update how many cells, edges, etc, we store locally
       this->update_number_cache();
 
-      // signal that repartitioning is finished,
-      // this is triggered before update_periodic_face_map
-      // to be consistent with the serial triangulation class
-      this->signals.post_distributed_repartition();
-
       this->update_periodic_face_map();
+
+      // signal that repartitioning is finished
+      this->signals.post_distributed_repartition();
     }
 
 
