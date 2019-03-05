@@ -55,10 +55,52 @@ namespace hp
   {
   public:
     /**
-     * Default constructor. Leads to an empty collection that can later be
-     * filled using push_back().
+     * Whenever p adaptivity is considered in an hp finite element program,
+     * a hierarchy of finite elements needs to be established to determine
+     * succeeding finite elements for refinement and preceding ones for
+     * coarsening.
+     *
+     * In this struct, we supply a hierachy that is imposed on all FECollection
+     * objects by default.
      */
-    FECollection() = default;
+    struct DefaultHierarchy
+    {
+      /**
+       * Return the index succeeding @p fe_index in the @p fe_collection.
+       *
+       * Once the last element of the @p fe_collection is reached, there is no element on a higher level in
+       * the hierarchy and thus we return the last value.
+       */
+      static unsigned int
+      next_index(const typename hp::FECollection<dim, spacedim> &fe_collection,
+                 const unsigned int                              fe_index)
+      {
+        return ((fe_index + 1) < fe_collection.size()) ? fe_index + 1 :
+                                                         fe_index;
+      }
+
+      /**
+       * Return the index preceding @p fe_index in the @p fe_collection.
+       *
+       * Once the first element of the @p fe_collection is reached, there is no element on a lower level in
+       * the hierarchy and thus we return the first value.
+       */
+      static unsigned int
+      previous_index(
+        const typename hp::FECollection<dim, spacedim> &fe_collection,
+        const unsigned int                              fe_index)
+      {
+        (void)fe_collection;
+        return (fe_index > 0) ? fe_index - 1 : fe_index;
+      }
+    };
+
+    /**
+     * Default constructor. Leads to an empty collection that can later be
+     * filled using push_back(). Establishes a hierarchy of finite elements
+     * corresponding to their index in the collection.
+     */
+    FECollection();
 
     /**
      * Conversion constructor. This constructor creates a FECollection from a
@@ -93,8 +135,19 @@ namespace hp
 
     /**
      * Move constructor.
+     *
+     * @note The implementation of standard datatypes may change with different
+     * libraries, so their move members may or may not be flagged non-throwing.
+     * We need to explicitly set the noexcept specifier according to its
+     * member variables to still get the performance benefits (and to satisfy
+     * clang-tidy).
      */
-    FECollection(FECollection<dim, spacedim> &&) noexcept = default;
+    FECollection(FECollection<dim, spacedim> &&) noexcept(
+      std::is_nothrow_move_constructible<
+        std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>>::value
+        &&std::is_nothrow_move_constructible<std::function<
+          unsigned int(const typename hp::FECollection<dim, spacedim> &,
+                       const unsigned int)>>::value) = default;
 
     /**
      * Move assignment operator.
@@ -372,6 +425,60 @@ namespace hp
                                  const unsigned int            codim = 0) const;
 
     /**
+     * Set functions determining the hierarchy of finite elements, i.e. a
+     * function @p next that returns the index of the finite element following
+     * the given one, and a function @p prev returning the preceding one.
+     *
+     * Both functions expect an hp::FECollection to be passed along with a
+     * finite element index, on whose basis the new index will be found and
+     * returned.
+     *
+     * @note Both passed and returned indices have to be valid within the index
+     * range of this collection, i.e. within [0, size()).
+     */
+    void
+    set_hierarchy(const std::function<unsigned int(
+                    const typename hp::FECollection<dim, spacedim> &,
+                    const unsigned int)> &next,
+                  const std::function<unsigned int(
+                    const typename hp::FECollection<dim, spacedim> &,
+                    const unsigned int)> &prev);
+
+    /**
+     * Set the default hierarchy corresponding to the index of each finite
+     * element in the collection.
+     *
+     * This default hierarchy is established with functions
+     * DefaultHierarchy::next_index() and DefaultHierarchy::previous_index().
+     */
+    void
+    set_default_hierarchy();
+
+    /**
+     * Function returning the index of the finite element following the given
+     * @p fe_index in hierarchy.
+     *
+     * By default, the index succeeding @p fe_index will be returned. If @p fe_index
+     * already corresponds to the last index, the last index will be returned.
+     * A custom hierarchy can be supplied via the member function
+     * set_hierachy().
+     */
+    unsigned int
+    next_in_hierarchy(const unsigned int fe_index) const;
+
+    /**
+     * Function returning the index of the finite element preceding the given
+     * @p fe_index in hierarchy.
+     *
+     * By default, the index preceding @p fe_index will be returned. If @p fe_index
+     * already corresponds to the first index, the first index will be returned.
+     * A custom hierarchy can be supplied via the member function
+     * set_hierachy().
+     */
+    unsigned int
+    previous_in_hierarchy(const unsigned int fe_index) const;
+
+    /**
      * Return a component mask with as many elements as this object has vector
      * components and of which exactly the one component is true that
      * corresponds to the given argument.
@@ -576,6 +683,22 @@ namespace hp
      */
     std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>
       finite_elements;
+
+    /**
+     * Function returning the index of the finite element following the given
+     * one in hierarchy.
+     */
+    std::function<unsigned int(const typename hp::FECollection<dim, spacedim> &,
+                               const unsigned int)>
+      hierarchy_next;
+
+    /**
+     * Function returning the index of the finite element preceding the given
+     * one in hierarchy.
+     */
+    std::function<unsigned int(const typename hp::FECollection<dim, spacedim> &,
+                               const unsigned int)>
+      hierarchy_prev;
   };
 
 

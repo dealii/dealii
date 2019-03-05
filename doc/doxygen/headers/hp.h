@@ -89,6 +89,21 @@
  * collection of mappings is used, the same holds for hp::MappingCollection
  * objects as well.
  *
+ * Whenever p adaptivity is considered in an hp finite element program,
+ * a hierarchy of finite elements needs to be established to determine
+ * succeeding finite elements for refinement and preceding ones for coarsening.
+ * Typically, this hierarchy considers how finite element spaces are nested:
+ * for example, a $Q_1$ element describes a sub-space of a $Q_2$ element,
+ * and so doing $p$ refinement usually means using a larger (more accurate)
+ * finite element space. In other words, the hierarchy of finite elements is built
+ * by considering whether some elements of the collection are sub- or
+ * super-spaces of others.
+ *
+ * By default, we assume that finite elements are stored in an ascending order
+ * based on their polynomial degree. If the order of elements differs,
+ * a corresponding hierarchy needs to be supplied to the collection via the
+ * hp::FECollection::set_hierarchy() member function.
+ *
  * @ingroup hp
  */
 

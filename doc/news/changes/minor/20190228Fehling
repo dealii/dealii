@@ -1,0 +1,7 @@
+New: Hierarchy of finite elements in hp::FECollection objects. Get succeeding
+and preceding indices via hp::FECollection::next_in_hierarchy() and
+hp::FECollection::prev_in_hierarchy(). By default, a hierarchy corresponding
+to indices is established. Hierarchy can be overridden via
+hp::FECollection::set_hierarchy().
+<br>
+(Marc Fehling, 2019/02/28)
