@@ -1,0 +1,8 @@
+
+DEAL::has_add_local_element:
+DEAL::Dummy = 1
+DEAL::Dummy2 = 0
+DEAL::has_set_local_element:
+DEAL::Dummy = 1
+DEAL::Dummy2 = 0
+DEAL::OK

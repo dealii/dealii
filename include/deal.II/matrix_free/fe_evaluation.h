@@ -3431,6 +3431,58 @@ namespace internal
   template <typename T>
   const bool has_local_element<T>::value;
 
+
+
+  // a helper type-trait that leverage SFINAE to figure out if type T has
+  // void T::add_local_element(const uint, const typename T::value_type)
+  template <typename T>
+  struct has_add_local_element
+  {
+  private:
+    static int
+    detect(...);
+
+    template <typename U>
+    static decltype(
+      std::declval<U>().add_local_element(0, typename T::value_type()))
+    detect(const U &);
+
+  public:
+    static const bool value =
+      !std::is_same<int, decltype(detect(std::declval<T>()))>::value;
+  };
+
+  // We need to have a separate declaration for static const members
+  template <typename T>
+  const bool has_add_local_element<T>::value;
+
+
+
+  // a helper type-trait that leverage SFINAE to figure out if type T has
+  // void T::set_local_element(const uint, const typename T::value_type)
+  template <typename T>
+  struct has_set_local_element
+  {
+  private:
+    static int
+    detect(...);
+
+    template <typename U>
+    static decltype(
+      std::declval<U>().set_local_element(0, typename T::value_type()))
+    detect(const U &);
+
+  public:
+    static const bool value =
+      !std::is_same<int, decltype(detect(std::declval<T>()))>::value;
+  };
+
+  // We need to have a separate declaration for static const members
+  template <typename T>
+  const bool has_set_local_element<T>::value;
+
+
+
   // same as above to check
   // bool T::partitioners_are_compatible(const Utilities::MPI::Partitioner &)
   // const
