@@ -36,6 +36,7 @@
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -3592,6 +3593,96 @@ namespace internal
 
 
 
+  // same for const access
+  template <typename VectorType,
+            typename std::enable_if<has_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline typename VectorType::value_type
+  vector_access(const VectorType &vec, const unsigned int entry)
+  {
+    return vec.local_element(entry);
+  }
+
+
+
+  template <typename VectorType,
+            typename std::enable_if<has_add_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline void
+  vector_access_add(VectorType &                           vec,
+                    const unsigned int                     entry,
+                    const typename VectorType::value_type &val)
+  {
+    vec.add_local_element(entry, val);
+  }
+
+
+
+  template <typename VectorType,
+            typename std::enable_if<!has_add_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline void
+  vector_access_add(VectorType &                           vec,
+                    const unsigned int                     entry,
+                    const typename VectorType::value_type &val)
+  {
+    vector_access(vec, entry) += val;
+  }
+
+
+
+  template <typename VectorType,
+            typename std::enable_if<has_add_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline void
+  vector_access_add_global(VectorType &                           vec,
+                           const types::global_dof_index          entry,
+                           const typename VectorType::value_type &val)
+  {
+    vec.add(entry, val);
+  }
+
+
+
+  template <typename VectorType,
+            typename std::enable_if<!has_add_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline void
+  vector_access_add_global(VectorType &                           vec,
+                           const types::global_dof_index          entry,
+                           const typename VectorType::value_type &val)
+  {
+    vec(entry) += val;
+  }
+
+
+
+  template <typename VectorType,
+            typename std::enable_if<has_set_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline void
+  vector_access_set(VectorType &                           vec,
+                    const unsigned int                     entry,
+                    const typename VectorType::value_type &val)
+  {
+    vec.set_local_element(entry, val);
+  }
+
+
+
+  template <typename VectorType,
+            typename std::enable_if<!has_set_local_element<VectorType>::value,
+                                    VectorType>::type * = nullptr>
+  inline void
+  vector_access_set(VectorType &                           vec,
+                    const unsigned int                     entry,
+                    const typename VectorType::value_type &val)
+  {
+    vector_access(vec, entry) = val;
+  }
+
+
+
   // this is to make sure that the parallel partitioning in VectorType
   // is really the same as stored in MatrixFree.
   // version below is when has_partitioners_are_compatible == false
@@ -3610,6 +3701,7 @@ namespace internal
 
     AssertDimension(vec.size(), dof_info.vector_partitioner->size());
   }
+
 
 
   // same as above for has_partitioners_are_compatible == true
@@ -3632,16 +3724,27 @@ namespace internal
              "compatible vector."));
   }
 
-  // A class to use the same code to read from and write to vector
+
+
+  // Below, three classes (VectorReader, VectorSetter,
+  // VectorDistributorLocalToGlobal) implement the same interface and can be
+  // used to to read from vector, set elements of a vector and add to elements
+  // of the vector.
+
+  // 1. A class to read data from vector
   template <typename Number>
   struct VectorReader
   {
     template <typename VectorType>
     void
-    process_dof(const unsigned int index, VectorType &vec, Number &res) const
+    process_dof(const unsigned int index,
+                const VectorType & vec,
+                Number &           res) const
     {
       res = vector_access(vec, index);
     }
+
+
 
     template <typename VectorType>
     void
@@ -3658,11 +3761,12 @@ namespace internal
     }
 
 
+
     template <typename VectorType>
     void
     process_dofs_vectorized(const unsigned int       dofs_per_cell,
                             const unsigned int       dof_index,
-                            VectorType &             vec,
+                            const VectorType &       vec,
                             VectorizedArray<Number> *dof_values,
                             std::integral_constant<bool, false>) const
     {
@@ -3672,6 +3776,8 @@ namespace internal
           dof_values[i][v] = vector_access(
             vec, dof_index + v + i * VectorizedArray<Number>::n_array_elements);
     }
+
+
 
     template <typename VectorType>
     void
@@ -3688,11 +3794,12 @@ namespace internal
     }
 
 
+
     template <typename VectorType>
     void
     process_dofs_vectorized_transpose(const unsigned int       dofs_per_cell,
                                       const unsigned int *     dof_indices,
-                                      VectorType &             vec,
+                                      const VectorType &       vec,
                                       VectorizedArray<Number> *dof_values,
                                       std::integral_constant<bool, false>) const
     {
@@ -3701,6 +3808,8 @@ namespace internal
              ++v)
           dof_values[d][v] = vector_access(vec, dof_indices[v] + d);
     }
+
+
 
     // variant where VectorType::value_type is the same as Number -> can call
     // gather
@@ -3715,12 +3824,14 @@ namespace internal
       res.gather(vec.begin() + constant_offset, indices);
     }
 
+
+
     // variant where VectorType::value_type is not the same as Number -> must
     // manually load the data
     template <typename VectorType>
     void
     process_dof_gather(const unsigned int *     indices,
-                       VectorType &             vec,
+                       const VectorType &       vec,
                        const unsigned int       constant_offset,
                        VectorizedArray<Number> &res,
                        std::integral_constant<bool, false>) const
@@ -3730,14 +3841,18 @@ namespace internal
         res[v] = vector_access(vec, indices[v] + constant_offset);
     }
 
+
+
     template <typename VectorType>
     void
     process_dof_global(const types::global_dof_index index,
-                       VectorType &                  vec,
+                       const VectorType &            vec,
                        Number &                      res) const
     {
-      res = const_cast<const VectorType &>(vec)(index);
+      res = vec(index);
     }
+
+
 
     void
     pre_constraints(const Number &, Number &res) const
@@ -3745,21 +3860,27 @@ namespace internal
       res = Number();
     }
 
+
+
     template <typename VectorType>
     void
     process_constraint(const unsigned int index,
                        const Number       weight,
-                       VectorType &       vec,
+                       const VectorType & vec,
                        Number &           res) const
     {
       res += weight * vector_access(vec, index);
     }
+
+
 
     void
     post_constraints(const Number &sum, Number &write_pos) const
     {
       write_pos = sum;
     }
+
+
 
     void
     process_empty(VectorizedArray<Number> &res) const
@@ -3768,7 +3889,10 @@ namespace internal
     }
   };
 
-  // A class to use the same code to read from and write to vector
+
+
+  // 2. A class to add values to the vector during
+  // FEEvaluation::distribute_local_to_global() call
   template <typename Number>
   struct VectorDistributorLocalToGlobal
   {
@@ -3776,8 +3900,10 @@ namespace internal
     void
     process_dof(const unsigned int index, VectorType &vec, Number &res) const
     {
-      vector_access(vec, index) += res;
+      vector_access_add(vec, index, res);
     }
+
+
 
     template <typename VectorType>
     void
@@ -3798,6 +3924,8 @@ namespace internal
         }
     }
 
+
+
     template <typename VectorType>
     void
     process_dofs_vectorized(const unsigned int       dofs_per_cell,
@@ -3809,11 +3937,13 @@ namespace internal
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements;
              ++v)
-          vector_access(vec,
-                        dof_index + v +
-                          i * VectorizedArray<Number>::n_array_elements) +=
-            dof_values[i][v];
+          vector_access_add(vec,
+                            dof_index + v +
+                              i * VectorizedArray<Number>::n_array_elements,
+                            dof_values[i][v]);
     }
+
+
 
     template <typename VectorType>
     void
@@ -3827,6 +3957,8 @@ namespace internal
         true, dofs_per_cell, dof_values, dof_indices, vec.begin());
     }
 
+
+
     template <typename VectorType>
     void
     process_dofs_vectorized_transpose(const unsigned int       dofs_per_cell,
@@ -3838,8 +3970,10 @@ namespace internal
       for (unsigned int d = 0; d < dofs_per_cell; ++d)
         for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements;
              ++v)
-          vector_access(vec, dof_indices[v] + d) += dof_values[d][v];
+          vector_access_add(vec, dof_indices[v] + d, dof_values[d][v]);
     }
+
+
 
     // variant where VectorType::value_type is the same as Number -> can call
     // scatter
@@ -3864,6 +3998,8 @@ namespace internal
 #  endif
     }
 
+
+
     // variant where VectorType::value_type is not the same as Number -> must
     // manually append all data
     template <typename VectorType>
@@ -3876,8 +4012,10 @@ namespace internal
     {
       for (unsigned int v = 0; v < VectorizedArray<Number>::n_array_elements;
            ++v)
-        vector_access(vec, indices[v] + constant_offset) += res[v];
+        vector_access_add(vec, indices[v] + constant_offset, res[v]);
     }
+
+
 
     template <typename VectorType>
     void
@@ -3885,14 +4023,18 @@ namespace internal
                        VectorType &                  vec,
                        Number &                      res) const
     {
-      vec(index) += res;
+      vector_access_add_global(vec, index, res);
     }
+
+
 
     void
     pre_constraints(const Number &input, Number &res) const
     {
       res = input;
     }
+
+
 
     template <typename VectorType>
     void
@@ -3901,12 +4043,16 @@ namespace internal
                        VectorType &       vec,
                        Number &           res) const
     {
-      vector_access(vec, index) += weight * res;
+      vector_access_add(vec, index, weight * res);
     }
+
+
 
     void
     post_constraints(const Number &, Number &) const
     {}
+
+
 
     void
     process_empty(VectorizedArray<Number> &) const
@@ -3914,7 +4060,8 @@ namespace internal
   };
 
 
-  // A class to use the same code to read from and write to vector
+
+  // 3. A class to set elements of the vector
   template <typename Number>
   struct VectorSetter
   {
@@ -3924,6 +4071,8 @@ namespace internal
     {
       vector_access(vec, index) = res;
     }
+
+
 
     template <typename VectorType>
     void
@@ -3938,6 +4087,8 @@ namespace internal
            ++i, vec_ptr += VectorizedArray<Number>::n_array_elements)
         dof_values[i].store(vec_ptr);
     }
+
+
 
     template <typename VectorType>
     void
@@ -3956,6 +4107,8 @@ namespace internal
             dof_values[i][v];
     }
 
+
+
     template <typename VectorType>
     void
     process_dofs_vectorized_transpose(const unsigned int       dofs_per_cell,
@@ -3967,6 +4120,8 @@ namespace internal
       vectorized_transpose_and_store(
         false, dofs_per_cell, dof_values, dof_indices, vec.begin());
     }
+
+
 
     template <typename VectorType, bool booltype>
     void
@@ -3982,6 +4137,8 @@ namespace internal
           vector_access(vec, dof_indices[v] + i) = dof_values[i][v];
     }
 
+
+
     template <typename VectorType>
     void
     process_dof_gather(const unsigned int *     indices,
@@ -3992,6 +4149,8 @@ namespace internal
     {
       res.scatter(indices, vec.begin() + constant_offset);
     }
+
+
 
     template <typename VectorType>
     void
@@ -4006,6 +4165,8 @@ namespace internal
         vector_access(vec, indices[v] + constant_offset) = res[v];
     }
 
+
+
     template <typename VectorType>
     void
     process_dof_global(const types::global_dof_index index,
@@ -4015,9 +4176,13 @@ namespace internal
       vec(index) = res;
     }
 
+
+
     void
     pre_constraints(const Number &, Number &) const
     {}
+
+
 
     template <typename VectorType>
     void
@@ -4027,14 +4192,20 @@ namespace internal
                        Number &) const
     {}
 
+
+
     void
     post_constraints(const Number &, Number &) const
     {}
+
+
 
     void
     process_empty(VectorizedArray<Number> &) const
     {}
   };
+
+
 
   // allows to select between block vectors and non-block vectors, which
   // allows to use a unified interface for extracting blocks on block vectors

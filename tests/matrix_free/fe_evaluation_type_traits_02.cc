@@ -116,5 +116,14 @@ main()
           << internal::has_set_local_element<Dummy2<double>>::value
           << std::endl;
 
+  // now check internal::vector_access_[set|add] wrappers
+  deallog << "internal::vector_access_set:" << std::endl;
+  internal::vector_access_set(dummy, 0, 0);
+  internal::vector_access_set(dummy2, 0, 0);
+
+  deallog << "internal::vector_access_add:" << std::endl;
+  internal::vector_access_add(dummy, 0, 0);
+  internal::vector_access_add(dummy2, 0, 0);
+
   deallog << "OK" << std::endl;
 }
