@@ -1091,11 +1091,7 @@ CylindricalManifold<dim, spacedim>::push_forward(
   Assert(spacedim == 3,
          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
 
-  // Rotate the orthogonal direction by the given angle.
-  // Formula from Section 5.2 in
-  // http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
-  // simplified assuming normal_direction and direction are orthogonal
-  // and unit vectors.
+  // Rotate the orthogonal direction by the given angle
   const double sine_r           = std::sin(chart_point(1)) * chart_point(0);
   const double cosine_r         = std::cos(chart_point(1)) * chart_point(0);
   const Tensor<1, spacedim> dxn = cross_product_3d(direction, normal_direction);
@@ -1118,11 +1114,7 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
 
   Tensor<2, 3> derivatives;
 
-  // Rotate the orthogonal direction by the given angle.
-  // Formula from Section 5.2 in
-  // http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
-  // simplified assuming normal_direction and direction are orthogonal
-  // and unit vectors.
+  // Rotate the orthogonal direction by the given angle
   const double              sine   = std::sin(chart_point(1));
   const double              cosine = std::cos(chart_point(1));
   const Tensor<1, spacedim> dxn = cross_product_3d(direction, normal_direction);
@@ -1289,14 +1281,19 @@ DerivativeForm<1, 2, 2>
 EllipticalManifold<2, 2>::push_forward_gradient(
   const Point<2> &chart_point) const
 {
-  const double            cs = std::cos(chart_point[1]);
-  const double            sn = std::sin(chart_point[1]);
-  DerivativeForm<1, 2, 2> dX;
+  const double cs = std::cos(chart_point[1]);
+  const double sn = std::sin(chart_point[1]);
+  Tensor<2, 2> dX;
   dX[0][0] = cosh_u * cs;
   dX[0][1] = -chart_point[0] * cosh_u * sn;
   dX[1][0] = sinh_u * sn;
-  dX[1][1] = chart_point[1] * sinh_u * cs;
-  return dX;
+  dX[1][1] = chart_point[0] * sinh_u * cs;
+
+  // rotate according to the major axis direction
+  Tensor<2, 2, double> rot{
+    {{+direction[0], -direction[1]}, {direction[1], direction[0]}}};
+
+  return rot * dX;
 }
 
 
