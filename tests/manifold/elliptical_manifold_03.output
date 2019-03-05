@@ -1,0 +1,3 @@
+
+DEAL::Gradient by finite differences: 3.178128775 9.455130749 -9.470981865 3.130575430
+DEAL::Analytic gradient:              3.178128776 9.455130749 -9.470981865 3.130575429
