@@ -1049,7 +1049,7 @@ CylindricalManifold<dim, spacedim>::get_new_point(
   const double lambda = middle * direction;
 
   if ((middle - direction * lambda).square() < tolerance * average_length)
-    return Point<spacedim>() + direction * lambda;
+    return point_on_axis + direction * lambda;
   else // If not, using the ChartManifold should yield valid results.
     return ChartManifold<dim, spacedim, 3>::get_new_point(surrounding_points,
                                                           weights);
