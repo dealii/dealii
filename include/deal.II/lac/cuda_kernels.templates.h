@@ -517,7 +517,7 @@ namespace LinearAlgebra
         else
           res_buf[local_idx] = 0.;
 
-        for (unsigned int i = 1; i < block_size; ++i)
+        for (unsigned int i = 1; i < chunk_size; ++i)
           {
             const unsigned int idx = global_idx + i * block_size;
             if (idx < N)

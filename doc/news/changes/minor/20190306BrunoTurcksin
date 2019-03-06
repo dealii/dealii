@@ -1,0 +1,4 @@
+Fixed: LinearAlgebra::CUDAWrappers::Vector::add_and_dot was giving a wrong result
+if the size of vector was greater than 4096.
+<br>
+(Bruno Turcksin, 2018/03/06)
