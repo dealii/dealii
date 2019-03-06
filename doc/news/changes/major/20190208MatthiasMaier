@@ -1,4 +1,4 @@
 Improved: The preconditioner and solver setup in step-20 has been rewritten
 to highlight the new LinearOperator and PackagedOperation classes.
 <br>
-(2019/02/08, Matthias Maier)
+(Matthias Maier, 2019/02/08)
