@@ -2805,6 +2805,10 @@ namespace internal
           matrix_free.release_scratch_data_non_threadsafe(
             tmp_data[component_in_block_vector]);
           tmp_data[component_in_block_vector] = nullptr;
+
+          // let vector know that ghosts are being updated and we can read from
+          // them
+          vec.set_ghost_state(true);
 #  endif
         }
     }
@@ -2938,6 +2942,9 @@ namespace internal
                       .local_element(j + part.local_size()) = 0.;
                   }
             }
+
+          // let vector know that it's not ghosted anymore
+          vec.set_ghost_state(false);
 #  endif
         }
     }

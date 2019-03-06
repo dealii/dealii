@@ -1192,6 +1192,13 @@ namespace LinearAlgebra
       bool
       partitioners_are_globally_compatible(
         const Utilities::MPI::Partitioner &part) const;
+
+      /**
+       * Change the ghost state of this vector to @p ghosted.
+       */
+      void
+      set_ghost_state(const bool ghosted) const;
+
       //@}
 
       /**
@@ -1810,6 +1817,15 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::get_partitioner() const
     {
       return partitioner;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline void
+    Vector<Number, MemorySpace>::set_ghost_state(const bool ghosted) const
+    {
+      vector_is_ghosted = ghosted;
     }
 
 #endif
