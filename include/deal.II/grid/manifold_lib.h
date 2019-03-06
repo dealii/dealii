@@ -406,17 +406,19 @@ public:
   clone() const override;
 
   /**
-   * Compute the Cartesian coordinates for a point given in cylindrical
-   * coordinates.
+   * Compute the cylindrical coordinates $(r, \phi, \lambda)$ for the given
+   * space point where $r$ denotes the distance from the axis,
+   * $\phi$ the angle between the given point and the computed normal
+   * direction, and $\lambda$ the axial position.
    */
   virtual Point<3>
   pull_back(const Point<spacedim> &space_point) const override;
 
   /**
-   * Compute the cylindrical coordinates $(r, \phi, \lambda)$ for the given
-   * point where $r$ denotes the distance from the axis,
-   * $\phi$ the angle between the given point and the computed normal
-   * direction and $\lambda$ the axial position.
+   * Compute the Cartesian coordinates for a chart point given in cylindrical
+   * coordinates $(r, \phi, \lambda)$, where $r$ denotes the distance from the
+   * axis, $\phi$ the angle between the given point and the computed normal
+   * direction, and $\lambda$ the axial position.
    */
   virtual Point<spacedim>
   push_forward(const Point<3> &chart_point) const override;
@@ -425,7 +427,7 @@ public:
    * Compute the derivatives of the mapping from cylindrical coordinates
    * $(r, \phi, \lambda)$ to cartesian coordinates where $r$ denotes the
    * distance from the axis, $\phi$ the angle between the given point and the
-   * computed normal direction and $\lambda$ the axial position.
+   * computed normal direction, and $\lambda$ the axial position.
    */
   virtual DerivativeForm<1, 3, spacedim>
   push_forward_gradient(const Point<3> &chart_point) const override;
