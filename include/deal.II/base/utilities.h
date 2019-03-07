@@ -24,6 +24,7 @@
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 
@@ -41,6 +42,7 @@
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/core/demangle.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/vector.hpp>
@@ -342,6 +344,18 @@ namespace Utilities
   double
   generate_normal_random_number(const double a, const double sigma);
 
+  /**
+   * Return a string description of the type of the variable @p t.
+   *
+   * In general, C++ uses mangled names to identify types. This function
+   * uses boost::core::demangle to return a human readable string describing
+   * the type of the variable passed as argument.
+   *
+   * @author Luca Heltai, 2019.
+   */
+  template <class T>
+  std::string
+  type_to_string(const T &t);
 
   /**
    * Calculate a fixed power, provided as a template argument, of a number.
@@ -1028,6 +1042,15 @@ namespace Utilities
             result *= n;
           return result;
       }
+  }
+
+
+
+  template <class T>
+  inline std::string
+  type_to_string(const T &t)
+  {
+    return boost::core::demangle(typeid(t).name());
   }
 
 
