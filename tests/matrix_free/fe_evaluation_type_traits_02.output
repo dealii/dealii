@@ -1,0 +1,14 @@
+
+DEAL::has_add_local_element:
+DEAL::Dummy = 1
+DEAL::Dummy2 = 0
+DEAL::has_set_local_element:
+DEAL::Dummy = 1
+DEAL::Dummy2 = 0
+DEAL::internal::vector_access_set:
+DEAL::Dummy::set_local_element()
+DEAL::Dummy2::local_element()
+DEAL::internal::vector_access_add:
+DEAL::Dummy::add_local_element()
+DEAL::Dummy2::local_element()
+DEAL::OK
