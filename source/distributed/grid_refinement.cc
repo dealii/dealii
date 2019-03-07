@@ -260,7 +260,8 @@ namespace
                             return c > test_threshold;
                           });
 
-          unsigned int total_count;
+          unsigned int total_count = 0;
+
           ierr = MPI_Reduce(&my_count,
                             &total_count,
                             1,
@@ -270,7 +271,7 @@ namespace
                             mpi_communicator);
           AssertThrowMPI(ierr);
 
-          // now adjust the range. if we have to many cells, we take the upper
+          // now adjust the range. if we have too many cells, we take the upper
           // half of the previous range, otherwise the lower half. if we have
           // hit the right number, then set the range to the exact value.
           // slave nodes also update their own interesting_range, however their
@@ -369,7 +370,8 @@ namespace
             if (criteria(i) > test_threshold)
               my_error += criteria(i);
 
-          double total_error;
+          double total_error = 0.;
+
           ierr = MPI_Reduce(&my_error,
                             &total_error,
                             1,
@@ -379,7 +381,7 @@ namespace
                             mpi_communicator);
           AssertThrowMPI(ierr);
 
-          // now adjust the range. if we have to many cells, we take the upper
+          // now adjust the range. if we have too many cells, we take the upper
           // half of the previous range, otherwise the lower half. if we have
           // hit the right number, then set the range to the exact value.
           // slave nodes also update their own interesting_range, however their
