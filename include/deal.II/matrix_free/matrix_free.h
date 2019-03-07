@@ -2642,6 +2642,12 @@ namespace internal
     // set up
     static constexpr unsigned int channel_shift = 103;
 
+
+
+    /**
+     * Constructor. Takes MF data, flag for face access in DG and
+     * number of components.
+     */
     VectorDataExchange(
       const dealii::MatrixFree<dim, Number> &matrix_free,
       const typename dealii::MatrixFree<dim, Number>::DataAccessOnFaces
@@ -2667,6 +2673,11 @@ namespace internal
             3);
     }
 
+
+
+    /**
+     * Destructor.
+     */
     ~VectorDataExchange() // NOLINT
     {
 #  ifdef DEAL_II_WITH_MPI
@@ -2676,9 +2687,16 @@ namespace internal
 #  endif
     }
 
+
+
+    /**
+     * Go through all components in MF object and choose the one
+     * whose partitioner is compatible with the Partitioner in this component.
+     */
+    template <typename VectorType>
     unsigned int
-    find_vector_in_mf(const LinearAlgebra::distributed::Vector<Number> &vec,
-                      const bool check_global_compatibility = true) const
+    find_vector_in_mf(const VectorType &vec,
+                      const bool        check_global_compatibility = true) const
     {
       unsigned int mf_component = numbers::invalid_unsigned_int;
       (void)check_global_compatibility;
@@ -2698,6 +2716,12 @@ namespace internal
       return mf_component;
     }
 
+
+
+    /**
+     * Get partitioner for the given @p mf_component taking into
+     * account vector_face_access set in constructor.
+     */
     const Utilities::MPI::Partitioner &
     get_partitioner(const unsigned int mf_component) const
     {
@@ -2717,11 +2741,85 @@ namespace internal
                   .vector_partitioner_face_variants[2];
     }
 
+
+
+    /**
+     * Start update_ghost_value for serial vectors
+     */
+    template <typename VectorType,
+              typename std::enable_if<is_serial_or_dummy<VectorType>::value,
+                                      VectorType>::type * = nullptr>
     void
-    update_ghost_values_start(
-      const unsigned int component_in_block_vector,
-      const LinearAlgebra::distributed::Vector<Number> &vec)
+    update_ghost_values_start(const unsigned int /*component_in_block_vector*/,
+                              const VectorType & /*vec*/)
+    {}
+
+
+    /**
+     * Start update_ghost_value for vectors that do not support
+     * the split into _start() and finish() stages
+     */
+    template <typename VectorType,
+              typename std::enable_if<
+                !has_update_ghost_values_start<VectorType>::value &&
+                  !is_serial_or_dummy<VectorType>::value,
+                VectorType>::type * = nullptr>
+    void
+    update_ghost_values_start(const unsigned int component_in_block_vector,
+                              const VectorType & vec)
     {
+      (void)component_in_block_vector;
+      bool ghosts_set = vec.has_ghost_elements();
+      if (ghosts_set)
+        ghosts_were_set = true;
+
+      vec.update_ghost_values();
+    }
+
+
+
+    /**
+     * Start update_ghost_value for vectors that _do_ support
+     * the split into _start() and finish() stages, but don't support
+     * exchange on a subset of DoFs
+     */
+    template <typename VectorType,
+              typename std::enable_if<
+                has_update_ghost_values_start<VectorType>::value &&
+                  !has_exchange_on_subset<VectorType>::value,
+                VectorType>::type * = nullptr>
+    void
+    update_ghost_values_start(const unsigned int component_in_block_vector,
+                              const VectorType & vec)
+    {
+      (void)component_in_block_vector;
+      bool ghosts_set = vec.has_ghost_elements();
+      if (ghosts_set)
+        ghosts_were_set = true;
+
+      vec.update_ghost_values_start(component_in_block_vector + channel_shift);
+    }
+
+
+
+    /**
+     * Finally, start update_ghost_value for vectors that _do_ support
+     * the split into _start() and finish() stages and also support
+     * exchange on a subset of DoFs,
+     * i.e. LinearAlgebra::distributed::Vector
+     */
+    template <typename VectorType,
+              typename std::enable_if<
+                has_update_ghost_values_start<VectorType>::value &&
+                  has_exchange_on_subset<VectorType>::value,
+                VectorType>::type * = nullptr>
+    void
+    update_ghost_values_start(const unsigned int component_in_block_vector,
+                              const VectorType & vec)
+    {
+      static_assert(
+        std::is_same<Number, typename VectorType::value_type>::value,
+        "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       bool ghosts_set = vec.has_ghost_elements();
       if (ghosts_set)
@@ -2767,11 +2865,67 @@ namespace internal
         }
     }
 
+
+
+    /**
+     * Finish update_ghost_value for vectors that do not support
+     * the split into _start() and finish() stages and serial vectors
+     */
+    template <
+      typename VectorType,
+      typename std::enable_if<!has_update_ghost_values_start<VectorType>::value,
+                              VectorType>::type * = nullptr>
     void
-    update_ghost_values_finish(
-      const unsigned int component_in_block_vector,
-      const LinearAlgebra::distributed::Vector<Number> &vec)
+    update_ghost_values_finish(const unsigned int /*component_in_block_vector*/,
+                               const VectorType & /*vec*/)
+    {}
+
+
+
+    /**
+     * Finish update_ghost_value for vectors that _do_ support
+     * the split into _start() and finish() stages, but don't support
+     * exchange on a subset of DoFs
+     */
+    template <typename VectorType,
+              typename std::enable_if<
+                has_update_ghost_values_start<VectorType>::value &&
+                  !has_exchange_on_subset<VectorType>::value,
+                VectorType>::type * = nullptr>
+    void
+    update_ghost_values_finish(const unsigned int component_in_block_vector,
+                               const VectorType & vec)
     {
+      (void)component_in_block_vector;
+      Assert(
+        (vector_face_access ==
+           dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
+         vec.size() == 0),
+        ExcNotImplemented());
+
+      vec.update_ghost_values_finish();
+    }
+
+
+
+    /**
+     * Finish update_ghost_value for vectors that _do_ support
+     * the split into _start() and finish() stages and also support
+     * exchange on a subset of DoFs,
+     * i.e. LinearAlgebra::distributed::Vector
+     */
+    template <typename VectorType,
+              typename std::enable_if<
+                has_update_ghost_values_start<VectorType>::value &&
+                  has_exchange_on_subset<VectorType>::value,
+                VectorType>::type * = nullptr>
+    void
+    update_ghost_values_finish(const unsigned int component_in_block_vector,
+                               const VectorType & vec)
+    {
+      static_assert(
+        std::is_same<Number, typename VectorType::value_type>::value,
+        "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       if (vector_face_access ==
             dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
@@ -2814,10 +2968,79 @@ namespace internal
         }
     }
 
+
+
+    /**
+     * Start compress for serial vectors
+     */
+    template <typename VectorType,
+              typename std::enable_if<is_serial_or_dummy<VectorType>::value,
+                                      VectorType>::type * = nullptr>
+    void
+    compress_start(const unsigned int /*component_in_block_vector*/,
+                   VectorType & /*vec*/)
+    {}
+
+
+
+    /**
+     * Start compress for vectors that do not support
+     * the split into _start() and finish() stages
+     */
+    template <typename VectorType,
+              typename std::enable_if<!has_compress_start<VectorType>::value &&
+                                        !is_serial_or_dummy<VectorType>::value,
+                                      VectorType>::type * = nullptr>
     void
     compress_start(const unsigned int component_in_block_vector,
-                   LinearAlgebra::distributed::Vector<Number> &vec)
+                   VectorType &       vec)
     {
+      (void)component_in_block_vector;
+      Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
+      vec.compress(dealii::VectorOperation::add);
+    }
+
+
+
+    /**
+     * Start compress for vectors that _do_ support
+     * the split into _start() and finish() stages, but don't support
+     * exchange on a subset of DoFs
+     */
+    template <
+      typename VectorType,
+      typename std::enable_if<has_compress_start<VectorType>::value &&
+                                !has_exchange_on_subset<VectorType>::value,
+                              VectorType>::type * = nullptr>
+    void
+    compress_start(const unsigned int component_in_block_vector,
+                   VectorType &       vec)
+    {
+      (void)component_in_block_vector;
+      Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
+      vec.compress_start(component_in_block_vector + channel_shift);
+    }
+
+
+
+    /**
+     * Start compress for vectors that _do_ support
+     * the split into _start() and finish() stages and also support
+     * exchange on a subset of DoFs,
+     * i.e. LinearAlgebra::distributed::Vector
+     */
+    template <
+      typename VectorType,
+      typename std::enable_if<has_compress_start<VectorType>::value &&
+                                has_exchange_on_subset<VectorType>::value,
+                              VectorType>::type * = nullptr>
+    void
+    compress_start(const unsigned int component_in_block_vector,
+                   VectorType &       vec)
+    {
+      static_assert(
+        std::is_same<Number, typename VectorType::value_type>::value,
+        "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
       if (vector_face_access ==
@@ -2859,10 +3082,60 @@ namespace internal
         }
     }
 
+
+
+    /**
+     * Finish compress for vectors that do not support
+     * the split into _start() and finish() stages and serial vectors
+     */
+    template <typename VectorType,
+              typename std::enable_if<!has_compress_start<VectorType>::value,
+                                      VectorType>::type * = nullptr>
+    void
+    compress_finish(const unsigned int /*component_in_block_vector*/,
+                    VectorType & /*vec*/)
+    {}
+
+
+
+    /**
+     * Finish compress for vectors that _do_ support
+     * the split into _start() and finish() stages, but don't support
+     * exchange on a subset of DoFs
+     */
+    template <
+      typename VectorType,
+      typename std::enable_if<has_compress_start<VectorType>::value &&
+                                !has_exchange_on_subset<VectorType>::value,
+                              VectorType>::type * = nullptr>
     void
     compress_finish(const unsigned int component_in_block_vector,
-                    LinearAlgebra::distributed::Vector<Number> &vec)
+                    VectorType &       vec)
     {
+      (void)component_in_block_vector;
+      vec.compress_finish(dealii::VectorOperation::add);
+    }
+
+
+
+    /**
+     * Start compress for vectors that _do_ support
+     * the split into _start() and finish() stages and also support
+     * exchange on a subset of DoFs,
+     * i.e. LinearAlgebra::distributed::Vector
+     */
+    template <
+      typename VectorType,
+      typename std::enable_if<has_compress_start<VectorType>::value &&
+                                has_exchange_on_subset<VectorType>::value,
+                              VectorType>::type * = nullptr>
+    void
+    compress_finish(const unsigned int component_in_block_vector,
+                    VectorType &       vec)
+    {
+      static_assert(
+        std::is_same<Number, typename VectorType::value_type>::value,
+        "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       if (vector_face_access ==
             dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
@@ -2905,10 +3178,54 @@ namespace internal
         }
     }
 
+
+
+    /**
+     * Reset all ghost values for serial vectors
+     */
+    template <typename VectorType,
+              typename std::enable_if<is_serial_or_dummy<VectorType>::value,
+                                      VectorType>::type * = nullptr>
     void
-    reset_ghost_values(
-      const LinearAlgebra::distributed::Vector<Number> &vec) const
+    reset_ghost_values(const VectorType & /*vec*/) const
+    {}
+
+
+
+    /**
+     * Reset all ghost values for vector that don't support
+     * exchange on a subset of DoFs
+     */
+    template <
+      typename VectorType,
+      typename std::enable_if<!has_exchange_on_subset<VectorType>::value &&
+                                !is_serial_or_dummy<VectorType>::value,
+                              VectorType>::type * = nullptr>
+    void
+    reset_ghost_values(const VectorType &vec) const
     {
+      if (ghosts_were_set == true)
+        return;
+
+      vec.zero_out_ghosts();
+    }
+
+
+
+    /**
+     * Reset all ghost values for vector that _do_ support
+     * exchange on a subset of DoFs, i.e.
+     * LinearAlgebra::distributed::Vector
+     */
+    template <typename VectorType,
+              typename std::enable_if<has_exchange_on_subset<VectorType>::value,
+                                      VectorType>::type * = nullptr>
+    void
+    reset_ghost_values(const VectorType &vec) const
+    {
+      static_assert(
+        std::is_same<Number, typename VectorType::value_type>::value,
+        "Type mismatch between VectorType and VectorDataExchange");
       if (ghosts_were_set == true)
         return;
 
@@ -2950,10 +3267,22 @@ namespace internal
         }
     }
 
+
+
+    /**
+     * Zero out vector region for vector that _do_ support
+     * exchange on a subset of DoFs <==> begin() + ind == local_element(ind),
+     * i.e. LinearAlgebra::distributed::Vector
+     */
+    template <typename VectorType,
+              typename std::enable_if<has_exchange_on_subset<VectorType>::value,
+                                      VectorType>::type * = nullptr>
     void
-    zero_vector_region(const unsigned int                          range_index,
-                       LinearAlgebra::distributed::Vector<Number> &vec) const
+    zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
+      static_assert(
+        std::is_same<Number, typename VectorType::value_type>::value,
+        "Type mismatch between VectorType and VectorDataExchange");
       if (range_index == numbers::invalid_unsigned_int)
         vec = Number();
       else
@@ -2989,6 +3318,29 @@ namespace internal
         }
     }
 
+
+
+    /**
+     * Zero out vector region for vector that do _not_ support
+     * exchange on a subset of DoFs <==> begin() + ind == local_element(ind)
+     */
+    template <
+      typename VectorType,
+      typename std::enable_if<!has_exchange_on_subset<VectorType>::value,
+                              VectorType>::type * = nullptr>
+    void
+    zero_vector_region(const unsigned int range_index, VectorType &vec) const
+    {
+      if (range_index == numbers::invalid_unsigned_int)
+        vec = typename VectorType::value_type();
+      else
+        {
+          Assert(false, ExcNotImplemented());
+        }
+    }
+
+
+
     const dealii::MatrixFree<dim, Number> &matrix_free;
     const typename dealii::MatrixFree<dim, Number>::DataAccessOnFaces
          vector_face_access;
@@ -2997,7 +3349,7 @@ namespace internal
     std::vector<AlignedVector<Number> *>  tmp_data;
     std::vector<std::vector<MPI_Request>> requests;
 #  endif
-  };
+  }; // VectorDataExchange
 
   template <typename VectorStruct>
   unsigned int
