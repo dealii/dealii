@@ -1,0 +1,4 @@
+New: Added a new function Utilities::type_to_string() to demangle type names.
+<br>
+(Luca Heltai, 2019/03/07)
+
