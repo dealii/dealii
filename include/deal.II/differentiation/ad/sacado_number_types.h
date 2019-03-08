@@ -926,6 +926,17 @@ namespace Differentiation
   } // namespace AD
 } // namespace Differentiation
 
+
+namespace numbers
+{
+  template <typename NumberType>
+  struct is_cuda_compatible<
+    NumberType,
+    typename std::enable_if<dealii::Differentiation::AD::is_sacado_rad_number<
+      NumberType>::value>::type> : std::false_type
+  {};
+} // namespace numbers
+
 #  endif // DOXYGEN
 
 
