@@ -3097,6 +3097,7 @@ namespace internal
           const unsigned int         level,
           const bool                 check_validity)
         {
+          (void)check_validity;
           Assert(level < dof_handler.get_triangulation().n_levels(),
                  ExcInternalError());
 
@@ -3116,18 +3117,21 @@ namespace internal
                                  d,
                                  dof_handler.get_fe().dofs_per_vertex);
 
-                  if (check_validity)
-                    Assert(idx != numbers::invalid_dof_index,
-                           ExcInternalError());
-
                   if (idx != numbers::invalid_dof_index)
-                    i->set_index(level,
-                                 d,
-                                 dof_handler.get_fe().dofs_per_vertex,
-                                 (indices_we_care_about.size() == 0) ?
-                                   (new_numbers[idx]) :
-                                   (new_numbers[indices_we_care_about
-                                                  .index_within_set(idx)]));
+                    {
+                      Assert(check_validity == false ||
+                               (indices_we_care_about.size() > 0 ?
+                                  indices_we_care_about.is_element(idx) :
+                                  (idx < new_numbers.size())),
+                             ExcInternalError());
+                      i->set_index(level,
+                                   d,
+                                   dof_handler.get_fe().dofs_per_vertex,
+                                   (indices_we_care_about.size() == 0) ?
+                                     (new_numbers[idx]) :
+                                     (new_numbers[indices_we_care_about
+                                                    .index_within_set(idx)]));
+                    }
                 }
         }
 
@@ -3215,10 +3219,12 @@ namespace internal
               typename DoFHandler<2, spacedim>::level_cell_iterator cell,
                 endc = dof_handler.end(level);
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                for (unsigned int line = 0;
-                     line < GeometryInfo<2>::faces_per_cell;
-                     ++line)
-                  cell->face(line)->set_user_flag();
+                if (cell->level_subdomain_id() !=
+                    numbers::artificial_subdomain_id)
+                  for (unsigned int line = 0;
+                       line < GeometryInfo<2>::faces_per_cell;
+                       ++line)
+                    cell->face(line)->set_user_flag();
 
               for (typename DoFHandler<2, spacedim>::cell_iterator cell =
                      dof_handler.begin();
@@ -3283,10 +3289,12 @@ namespace internal
               typename DoFHandler<3, spacedim>::level_cell_iterator cell,
                 endc = dof_handler.end(level);
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                for (unsigned int line = 0;
-                     line < GeometryInfo<3>::lines_per_cell;
-                     ++line)
-                  cell->line(line)->set_user_flag();
+                if (cell->level_subdomain_id() !=
+                    numbers::artificial_subdomain_id)
+                  for (unsigned int line = 0;
+                       line < GeometryInfo<3>::lines_per_cell;
+                       ++line)
+                    cell->line(line)->set_user_flag();
 
               for (typename DoFHandler<3, spacedim>::cell_iterator cell =
                      dof_handler.begin();
@@ -3322,10 +3330,12 @@ namespace internal
               // those quads logically belong to the same level as the cell,
               // at least for isotropic refinement
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                for (unsigned int quad = 0;
-                     quad < GeometryInfo<3>::quads_per_cell;
-                     ++quad)
-                  cell->quad(quad)->set_user_flag();
+                if (cell->level_subdomain_id() !=
+                    numbers::artificial_subdomain_id)
+                  for (unsigned int quad = 0;
+                       quad < GeometryInfo<3>::quads_per_cell;
+                       ++quad)
+                    cell->quad(quad)->set_user_flag();
 
               for (typename DoFHandler<3, spacedim>::cell_iterator cell =
                      dof_handler.begin();
@@ -5898,7 +5908,8 @@ namespace internal
 
         // in case we do not own any of the given level (but only some remote
         // processor), we do not need to call the renumbering
-        if (level < this->dof_handler->get_triangulation().n_levels())
+        if (level < this->dof_handler->get_triangulation().n_levels() &&
+            relevant_dofs.n_elements() > 0)
           Implementation::renumber_mg_dofs(
             ghosted_new_numbers, relevant_dofs, *dof_handler, level, true);
 #else
