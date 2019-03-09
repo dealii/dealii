@@ -1,0 +1,22 @@
+
+DEAL::has_update_ghost_values_start:
+DEAL::LinearAlgebra::distributed::Vector = 1
+DEAL::TrilinosWrappers::MPI::Vector = 0
+DEAL::Vector = 0
+DEAL::has_compress_start:
+DEAL::LinearAlgebra::distributed::Vector = 1
+DEAL::TrilinosWrappers::MPI::Vector = 0
+DEAL::Vector = 0
+DEAL::has_exchange_on_subset:
+DEAL::LinearAlgebra::distributed::Vector = 1
+DEAL::TrilinosWrappers::MPI::Vector = 0
+DEAL::Vector = 0
+DEAL::has_communication_block_size:
+DEAL::LinearAlgebra::distributed::Vector = 0
+DEAL::LinearAlgebra::distributed::BlockVector = 1
+DEAL::is_serial_or_dummy:
+DEAL::LinearAlgebra::distributed::Vector = 0
+DEAL::TrilinosWrappers::MPI::Vector = 0
+DEAL::Vector = 1
+DEAL::unsigned int = 1
+DEAL::OK
