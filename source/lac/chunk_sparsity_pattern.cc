@@ -264,7 +264,7 @@ ChunkSparsityPattern::reinit(const size_type               m,
 {
   Assert(chunk_size > 0, ExcInvalidNumber(chunk_size));
 
-  reinit(m, n, make_slice(row_lengths), chunk_size);
+  reinit(m, n, make_array_view(row_lengths), chunk_size);
 }
 
 

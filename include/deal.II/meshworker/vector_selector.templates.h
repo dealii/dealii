@@ -132,21 +132,21 @@ namespace MeshWorker
     for (unsigned int i = 0; i < this->n_values(); ++i)
       {
         const VectorType *src = data.read_ptr<VectorType>(this->value_index(i));
-        VectorSlice<std::vector<std::vector<typename VectorType::value_type>>>
-          dst(values[i], component, n_comp);
-        fe.get_function_values(*src, make_slice(index, start, size), dst, true);
+        fe.get_function_values(*src,
+                               make_array_view(index, start, size),
+                               make_array_view(values[i], component, n_comp),
+                               true);
       }
 
     for (unsigned int i = 0; i < this->n_gradients(); ++i)
       {
         const VectorType *src =
           data.read_ptr<VectorType>(this->gradient_index(i));
-        VectorSlice<std::vector<
-          std::vector<Tensor<1, spacedim, typename VectorType::value_type>>>>
-          dst(gradients[i], component, n_comp);
         fe.get_function_gradients(*src,
-                                  make_slice(index, start, size),
-                                  dst,
+                                  make_array_view(index, start, size),
+                                  make_array_view(gradients[i],
+                                                  component,
+                                                  n_comp),
                                   true);
       }
 
@@ -154,12 +154,11 @@ namespace MeshWorker
       {
         const VectorType *src =
           data.read_ptr<VectorType>(this->hessian_index(i));
-        VectorSlice<std::vector<
-          std::vector<Tensor<2, spacedim, typename VectorType::value_type>>>>
-          dst(hessians[i], component, n_comp);
         fe.get_function_hessians(*src,
-                                 make_slice(index, start, size),
-                                 dst,
+                                 make_array_view(index, start, size),
+                                 make_array_view(hessians[i],
+                                                 component,
+                                                 n_comp),
                                  true);
       }
   }
@@ -233,11 +232,9 @@ namespace MeshWorker
       {
         const MGLevelObject<VectorType> *src =
           data.read_ptr<MGLevelObject<VectorType>>(this->value_index(i));
-        VectorSlice<std::vector<std::vector<typename VectorType::value_type>>>
-          dst(values[i], component, n_comp);
         fe.get_function_values((*src)[level],
-                               make_slice(index, start, size),
-                               dst,
+                               make_array_view(index, start, size),
+                               make_array_view(values[i], component, n_comp),
                                true);
       }
 
@@ -245,12 +242,11 @@ namespace MeshWorker
       {
         const MGLevelObject<VectorType> *src =
           data.read_ptr<MGLevelObject<VectorType>>(this->value_index(i));
-        VectorSlice<std::vector<
-          std::vector<Tensor<1, spacedim, typename VectorType::value_type>>>>
-          dst(gradients[i], component, n_comp);
         fe.get_function_gradients((*src)[level],
-                                  make_slice(index, start, size),
-                                  dst,
+                                  make_array_view(index, start, size),
+                                  make_array_view(gradients[i],
+                                                  component,
+                                                  n_comp),
                                   true);
       }
 
@@ -258,12 +254,11 @@ namespace MeshWorker
       {
         const MGLevelObject<VectorType> *src =
           data.read_ptr<MGLevelObject<VectorType>>(this->value_index(i));
-        VectorSlice<std::vector<
-          std::vector<Tensor<2, spacedim, typename VectorType::value_type>>>>
-          dst(hessians[i], component, n_comp);
         fe.get_function_hessians((*src)[level],
-                                 make_slice(index, start, size),
-                                 dst,
+                                 make_array_view(index, start, size),
+                                 make_array_view(hessians[i],
+                                                 component,
+                                                 n_comp),
                                  true);
       }
   }

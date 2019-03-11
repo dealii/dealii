@@ -605,7 +605,7 @@ SparsityPattern::reinit(const size_type                  m,
                         const size_type                  n,
                         const std::vector<unsigned int> &row_lengths)
 {
-  reinit(m, n, make_slice(row_lengths));
+  reinit(m, n, make_array_view(row_lengths));
 }
 
 
