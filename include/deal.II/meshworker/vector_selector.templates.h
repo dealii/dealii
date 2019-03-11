@@ -17,8 +17,6 @@
 #define dealii_vector_selector_templates_h
 
 
-#include <deal.II/base/vector_slice.h>
-
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/meshworker/vector_selector.h>
