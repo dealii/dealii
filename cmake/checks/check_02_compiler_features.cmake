@@ -420,19 +420,33 @@ RESET_CMAKE_REQUIRED()
 
 
 #
-# Use the 'gold' linker if possible, given that it's substantially faster.
+# Use 'lld' or the 'gold' linker if possible, given that either of them is
+# substantially faster.
 #
-# We have to try to link a full executable with -fuse-ld=gold to check
-# whether "ld.gold" is actually available.
+# We have to try to link a full executable with -fuse-ld=lld or -fuse-ld=gold
+# to check whether "ld.lld" or "ld.gold" is actually available.
 #
-# Clang always reports "argument unused during compilation"
-# if "-fuse-ld=" is used, but fails at link time for an unsupported linker.
+# Clang always reports "argument unused during compilation", but fails at link
+# time for an unsupported linker.
 #
 # ICC also emits a warning but passes for unsupported linkers
 # unless we turn diagnostic warnings into errors.
 #
 # Wolfgang Bangerth, Matthias Maier, Daniel Arndt, 2015, 2018
 #
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
+ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
+ENDIF()
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -fuse-ld=lld")
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  int main() { return 0; }
+  "
+  DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+RESET_CMAKE_REQUIRED()
+
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
 ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
@@ -446,7 +460,9 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
 RESET_CMAKE_REQUIRED()
 
-IF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+IF(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+  ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
+ELSEIF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
   ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
 ENDIF()
 

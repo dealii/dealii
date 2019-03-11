@@ -1,0 +1,3 @@
+New: If present, we will detect the LLD linker ld.lld at configuration time.
+<br>
+(Timo Heister, 2019/03/11)
