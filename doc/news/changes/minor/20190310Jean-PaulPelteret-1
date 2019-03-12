@@ -1,0 +1,6 @@
+Changed: The TrilinosWrappers::PreconditionAMG::AdditionalData data structure
+is now able to return a parameter list, which can be adjusted and fine-tuned by 
+the user and later used to initialize the AMG preconditioner. It can also
+initialize the null space settings of an existing parameter list.
+<br>
+(Jean-Paul Pelteret, 2019/03/10)

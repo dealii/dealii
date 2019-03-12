@@ -63,6 +63,164 @@ namespace TrilinosWrappers
   {}
 
 
+
+  void
+  PreconditionAMG::AdditionalData::set_parameters(
+    Teuchos::ParameterList &             parameter_list,
+    std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
+    const Epetra_RowMatrix &             matrix) const
+  {
+    if (elliptic == true)
+      {
+        ML_Epetra::SetDefaults("SA", parameter_list);
+
+        // uncoupled mode can give a lot of warnings or even fail when there
+        // are too many entries per row and aggreggation gets complicated, but
+        // MIS does not work if too few elements are located on one
+        // processor. work around these warnings by choosing the different
+        // strategies in different situations: for low order, always use the
+        // standard choice uncoupled. if higher order, right now we also just
+        // use Uncoupled, but we should be aware that maybe MIS might be
+        // needed
+        if (higher_order_elements)
+          parameter_list.set("aggregation: type", "Uncoupled");
+      }
+    else
+      {
+        ML_Epetra::SetDefaults("NSSA", parameter_list);
+        parameter_list.set("aggregation: type", "Uncoupled");
+        parameter_list.set("aggregation: block scaling", true);
+      }
+
+    parameter_list.set("smoother: type", smoother_type);
+    parameter_list.set("coarse: type", coarse_type);
+
+    // Force re-initialization of the random seed to make ML deterministic
+    // (only supported in trilinos >12.2):
+#  if DEAL_II_TRILINOS_VERSION_GTE(12, 4, 0)
+    parameter_list.set("initialize random seed", true);
+#  endif
+
+    parameter_list.set("smoother: sweeps", static_cast<int>(smoother_sweeps));
+    parameter_list.set("cycle applications", static_cast<int>(n_cycles));
+    if (w_cycle == true)
+      parameter_list.set("prec type", "MGW");
+    else
+      parameter_list.set("prec type", "MGV");
+
+    parameter_list.set("smoother: Chebyshev alpha", 10.);
+    parameter_list.set("smoother: ifpack overlap",
+                       static_cast<int>(smoother_overlap));
+    parameter_list.set("aggregation: threshold", aggregation_threshold);
+    parameter_list.set("coarse: max size", 2000);
+
+    if (output_details)
+      parameter_list.set("ML output", 10);
+    else
+      parameter_list.set("ML output", 0);
+
+    set_operator_null_space(parameter_list, distributed_constant_modes, matrix);
+  }
+
+
+
+  void
+  PreconditionAMG::AdditionalData::set_operator_null_space(
+    Teuchos::ParameterList &             parameter_list,
+    std::unique_ptr<Epetra_MultiVector> &ptr_distributed_constant_modes,
+    const Epetra_RowMatrix &             matrix) const
+  {
+    const Epetra_Map &domain_map = matrix.OperatorDomainMap();
+
+    const size_type constant_modes_dimension = constant_modes.size();
+    ptr_distributed_constant_modes.reset(new Epetra_MultiVector(
+      domain_map, constant_modes_dimension > 0 ? constant_modes_dimension : 1));
+    Assert(ptr_distributed_constant_modes, ExcNotInitialized());
+    Epetra_MultiVector &distributed_constant_modes =
+      *ptr_distributed_constant_modes;
+
+    if (constant_modes_dimension > 0)
+      {
+        const size_type global_size = TrilinosWrappers::n_global_rows(matrix);
+        (void)global_length; // work around compiler warning about unused
+                             // function in release mode
+        Assert(global_size ==
+                 static_cast<size_type>(
+                   TrilinosWrappers::global_length(distributed_constant_modes)),
+               ExcDimensionMismatch(global_size,
+                                    TrilinosWrappers::global_length(
+                                      distributed_constant_modes)));
+        const bool constant_modes_are_global =
+          constant_modes[0].size() == global_size;
+        const size_type my_size = domain_map.NumMyElements();
+
+        // Reshape null space as a contiguous vector of doubles so that
+        // Trilinos can read from it.
+        const size_type expected_mode_size =
+          constant_modes_are_global ? global_size : my_size;
+        for (size_type d = 0; d < constant_modes_dimension; ++d)
+          {
+            Assert(constant_modes[d].size() == expected_mode_size,
+                   ExcDimensionMismatch(constant_modes[d].size(),
+                                        expected_mode_size));
+            for (size_type row = 0; row < my_size; ++row)
+              {
+                const TrilinosWrappers::types::int_type mode_index =
+                  constant_modes_are_global ?
+                    TrilinosWrappers::global_index(domain_map, row) :
+                    row;
+                distributed_constant_modes[d][row] =
+                  constant_modes[d][mode_index];
+              }
+          }
+        (void)expected_mode_size;
+
+        parameter_list.set("null space: type", "pre-computed");
+        parameter_list.set("null space: dimension",
+                           distributed_constant_modes.NumVectors());
+        if (my_size > 0)
+          parameter_list.set("null space: vectors",
+                             distributed_constant_modes.Values());
+        else
+          {
+            // We need to set a valid pointer to data even if there is no data
+            // on the current processor. Therefore, pass a dummy in that case
+            static std::vector<double> dummy;
+            if (dummy.size() != constant_modes_dimension)
+              dummy.resize(constant_modes_dimension);
+            parameter_list.set("null space: vectors", dummy.data());
+          }
+      }
+  }
+
+
+
+  void
+  PreconditionAMG::AdditionalData::set_parameters(
+    Teuchos::ParameterList &             parameter_list,
+    std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
+    const SparseMatrix &                 matrix) const
+  {
+    return set_parameters(parameter_list,
+                          distributed_constant_modes,
+                          matrix.trilinos_matrix());
+  }
+
+
+
+  void
+  PreconditionAMG::AdditionalData::set_operator_null_space(
+    Teuchos::ParameterList &             parameter_list,
+    std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
+    const SparseMatrix &                 matrix) const
+  {
+    return set_operator_null_space(parameter_list,
+                                   distributed_constant_modes,
+                                   matrix.trilinos_matrix());
+  }
+
+
+
   PreconditionAMG::~PreconditionAMG()
   {
     preconditioner.reset();
@@ -85,118 +243,13 @@ namespace TrilinosWrappers
                               const AdditionalData &  additional_data)
   {
     // Build the AMG preconditioner.
-    Teuchos::ParameterList parameter_list;
+    Teuchos::ParameterList              ml_parameters;
+    std::unique_ptr<Epetra_MultiVector> distributed_constant_modes;
+    additional_data.set_parameters(ml_parameters,
+                                   distributed_constant_modes,
+                                   matrix);
 
-    if (additional_data.elliptic == true)
-      {
-        ML_Epetra::SetDefaults("SA", parameter_list);
-
-        // uncoupled mode can give a lot of warnings or even fail when there
-        // are too many entries per row and aggreggation gets complicated, but
-        // MIS does not work if too few elements are located on one
-        // processor. work around these warnings by choosing the different
-        // strategies in different situations: for low order, always use the
-        // standard choice uncoupled. if higher order, right now we also just
-        // use Uncoupled, but we should be aware that maybe MIS might be
-        // needed
-        if (additional_data.higher_order_elements)
-          parameter_list.set("aggregation: type", "Uncoupled");
-      }
-    else
-      {
-        ML_Epetra::SetDefaults("NSSA", parameter_list);
-        parameter_list.set("aggregation: type", "Uncoupled");
-        parameter_list.set("aggregation: block scaling", true);
-      }
-
-    parameter_list.set("smoother: type", additional_data.smoother_type);
-    parameter_list.set("coarse: type", additional_data.coarse_type);
-
-    // Force re-initialization of the random seed to make ML deterministic
-    // (only supported in trilinos >12.2):
-#  if DEAL_II_TRILINOS_VERSION_GTE(12, 4, 0)
-    parameter_list.set("initialize random seed", true);
-#  endif
-
-    parameter_list.set("smoother: sweeps",
-                       static_cast<int>(additional_data.smoother_sweeps));
-    parameter_list.set("cycle applications",
-                       static_cast<int>(additional_data.n_cycles));
-    if (additional_data.w_cycle == true)
-      parameter_list.set("prec type", "MGW");
-    else
-      parameter_list.set("prec type", "MGV");
-
-    parameter_list.set("smoother: Chebyshev alpha", 10.);
-    parameter_list.set("smoother: ifpack overlap",
-                       static_cast<int>(additional_data.smoother_overlap));
-    parameter_list.set("aggregation: threshold",
-                       additional_data.aggregation_threshold);
-    parameter_list.set("coarse: max size", 2000);
-
-    if (additional_data.output_details)
-      parameter_list.set("ML output", 10);
-    else
-      parameter_list.set("ML output", 0);
-
-    const Epetra_Map &domain_map = matrix.OperatorDomainMap();
-
-    const size_type constant_modes_dimension =
-      additional_data.constant_modes.size();
-    Epetra_MultiVector distributed_constant_modes(
-      domain_map, constant_modes_dimension > 0 ? constant_modes_dimension : 1);
-    std::vector<double> dummy(constant_modes_dimension);
-
-    if (constant_modes_dimension > 0)
-      {
-        const size_type global_size = TrilinosWrappers::n_global_rows(matrix);
-        (void)global_length; // work around compiler warning about unused
-                             // function in release mode
-        Assert(global_size ==
-                 static_cast<size_type>(
-                   TrilinosWrappers::global_length(distributed_constant_modes)),
-               ExcDimensionMismatch(global_size,
-                                    TrilinosWrappers::global_length(
-                                      distributed_constant_modes)));
-        const bool constant_modes_are_global =
-          additional_data.constant_modes[0].size() == global_size;
-        const size_type my_size = domain_map.NumMyElements();
-
-        // Reshape null space as a contiguous vector of doubles so that
-        // Trilinos can read from it.
-        const size_type expected_mode_size =
-          constant_modes_are_global ? global_size : my_size;
-        for (size_type d = 0; d < constant_modes_dimension; ++d)
-          {
-            Assert(
-              additional_data.constant_modes[d].size() == expected_mode_size,
-              ExcDimensionMismatch(additional_data.constant_modes[d].size(),
-                                   expected_mode_size));
-            for (size_type row = 0; row < my_size; ++row)
-              {
-                const TrilinosWrappers::types::int_type mode_index =
-                  constant_modes_are_global ?
-                    TrilinosWrappers::global_index(domain_map, row) :
-                    row;
-                distributed_constant_modes[d][row] =
-                  additional_data.constant_modes[d][mode_index];
-              }
-          }
-        (void)expected_mode_size;
-
-        parameter_list.set("null space: type", "pre-computed");
-        parameter_list.set("null space: dimension",
-                           distributed_constant_modes.NumVectors());
-        if (my_size > 0)
-          parameter_list.set("null space: vectors",
-                             distributed_constant_modes.Values());
-        // We need to set a valid pointer to data even if there is no data on
-        // the current processor. Therefore, pass a dummy in that case
-        else
-          parameter_list.set("null space: vectors", dummy.data());
-      }
-
-    initialize(matrix, parameter_list);
+    initialize(matrix, ml_parameters);
 
     if (additional_data.output_details)
       {
