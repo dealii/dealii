@@ -99,10 +99,17 @@ ENDIF()
 
 MACRO(_check_cxx_flag _suffix)
   IF("${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
-    CHECK_CXX_COMPILER_FLAG("-std=c++${_suffix}" DEAL_II_HAVE_FLAG_stdcxx${_suffix})
-    IF(DEAL_II_HAVE_FLAG_stdcxx${_suffix})
-      SET(DEAL_II_CXX_VERSION_FLAG "-std=c++${_suffix}")
-    ENDIF()
+    IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+      CHECK_CXX_COMPILER_FLAG("/std:c++${_suffix}" DEAL_II_HAVE_FLAG_stdcxx${_suffix})
+      IF(DEAL_II_HAVE_FLAG_stdcxx${_suffix})
+        SET(DEAL_II_CXX_VERSION_FLAG "/std:c++${_suffix}")
+      ENDIF()
+	ELSE()
+      CHECK_CXX_COMPILER_FLAG("-std=c++${_suffix}" DEAL_II_HAVE_FLAG_stdcxx${_suffix})
+      IF(DEAL_II_HAVE_FLAG_stdcxx${_suffix})
+        SET(DEAL_II_CXX_VERSION_FLAG "-std=c++${_suffix}")
+      ENDIF()
+	ENDIF()
   ENDIF()
 ENDMACRO()
 
@@ -126,7 +133,12 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
   IF(NOT "${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
     # Set CMAKE_REQUIRED_FLAGS for the unit tests
     MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG} -Werror")
+    IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX /EHsc")
+    ELSE()
+      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+    ENDIF()
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 
     UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX17_SAVED
       "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
@@ -512,6 +524,9 @@ _bailout("17" "1z")
 # try to avoid adding an extra flag by doing one last test:
 #
 RESET_CMAKE_REQUIRED()
+IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/Zc:__cplusplus")
+ENDIF()
 CHECK_CXX_SOURCE_COMPILES(
   "
   #include <memory>
@@ -527,6 +542,7 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_COMPILER_DEFAULTS_TO_CXX11_OR_NEWER)
+  RESET_CMAKE_REQUIRED()
 
 IF(_user_provided_cxx_version_flag OR
     NOT DEAL_II_COMPILER_DEFAULTS_TO_CXX11_OR_NEWER OR
@@ -570,7 +586,11 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
 # possibilities here.
 #
 ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wno-unused-command-line-argument")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX")
+ELSE()
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wno-unused-command-line-argument")
+ENDIF()
 #
 # first try the attribute [[fallthrough]]
 #
