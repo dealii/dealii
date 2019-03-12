@@ -1,0 +1,7 @@
+New: Introduced flags for p-refinement and p-coarsening that can be
+accessed and changed via member functions of the DoFCellAccessor class,
+namely DoFCellAccessor::p_refine_flag_set, DoFCellAccessor::set_p_refine_flag,
+DoFCellAccessor::clear_p_refine_flag, and DoFCellAccessor::p_coarsen_flag_set,
+DoFCellAccessor::set_p_coarsen_flag, DoFCellAccessor::clear_p_coarsen_flag.
+<br>
+(Marc Fehling, 2019/02/24)

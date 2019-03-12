@@ -1080,12 +1080,22 @@ namespace hp
     /**
      * Create default tables for the active_fe_indices in the
      * dealii::internal::hp::DoFLevel. They are initialized with a zero
-     * indicator, meaning that fe[0] is going to be used by default.  This
-     * method is called before refinement and before distribute_dofs is
-     * called. It ensures each cell has a valid active_fe_index.
+     * indicator, meaning that fe[0] is going to be used by default. This
+     * method is called before refinement and while setting the finite elements
+     * via set_fe(). It ensures each cell has a valid active_fe_index.
      */
     void
     create_active_fe_table();
+
+    /**
+     * Create default tables for the p_refine_flags and p_coarsen_flags in the
+     * dealii::internal::hp::DoFLevel. All of them are initialized with a false
+     * boolean, meaning that no cell is initially flagged for p-refinement or
+     * p-coarsening. This method is called while setting the finite elements via
+     * set_fe().
+     */
+    void
+    create_p_adaptation_flags();
 
     /**
      * A function that will be triggered through a triangulation
