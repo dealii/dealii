@@ -16,6 +16,7 @@
 
 // Test the functions in integrators/elasticity.h
 // Output matrices and assert consistency of residuals
+#include <deal.II/base/vector_slice.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nedelec.h>

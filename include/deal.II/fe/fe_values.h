@@ -25,7 +25,6 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/base/vector_slice.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
