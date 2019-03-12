@@ -78,15 +78,22 @@ namespace parallel
  */
 
 /**
- * Numerical vector of data.  For this class there are different types of
- * functions available. The first type of function initializes the vector,
- * changes its size, or computes the norm of the vector in order to measure
- * its length in a suitable norm. The second type helps us to manipulate the
- * components of the vector. The third type defines the algebraic operations
- * for vectors, while the last type defines a few input and output functions.
- * As opposed to the array of the C++ standard library called @p vector (with
- * a lowercase "v"), this class implements an element of a vector space
- * suitable for numerical computations.
+ * A class that represents a vector of numerical elements. As for the
+ * other classes, in the @ref Vectors group, this class has a substantial
+ * number of member functions. These include:
+ * - functions that initialize the vector or change its size;
+ * - functions that compute properties of the vector, such as a variety of
+ *   norms;
+ * - functions that allow reading from or writing to individual elements of the
+ *   vector;
+ * - functions that implement algebraic operations for vectors, such as
+ *   addition of vectors; and
+ * - functions that allow inputting and outputting the data stored by vectors.
+ *
+ * In contrast to the C++ standard library class `std::vector`, this class
+ * intends to implement not simply an array that allows access to its elements,
+ * but indeed a vector that is a member of the mathematical concept of a
+ * "vector space" suitable for numerical computations.
  *
  * @note Instantiations for this template are provided for <tt>@<float@>,
  * @<double@>, @<std::complex@<float@>@>, @<std::complex@<double@>@></tt>;
