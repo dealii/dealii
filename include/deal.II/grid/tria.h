@@ -2329,6 +2329,25 @@ public:
 
     /**
      * This signal is triggered at the beginning of execution of the
+     * parallel::distributed::Triangulation::repartition() function. At the time
+     * this signal is triggered, the triangulation is still unchanged.
+     *
+     * @note The parallel::distributed::Triangulation::repartition() function is
+     * also called by parallel::distributed::Triangulation::load(). Thus, the
+     * pre_distributed_repartition signal will be triggered after the
+     * pre_distributed_load one.
+     */
+    boost::signals2::signal<void()> pre_distributed_repartition;
+
+    /**
+     * This signal is triggered at the end of execution of the
+     * parallel::distributed::Triangulation::repartition()
+     * function when the triangulation has reached its final state.
+     */
+    boost::signals2::signal<void()> post_distributed_repartition;
+
+    /**
+     * This signal is triggered at the beginning of execution of the
      * parallel::distributed::Triangulation::save()
      * function. At the time this signal is triggered, the triangulation
      * is still unchanged.

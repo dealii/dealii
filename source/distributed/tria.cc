@@ -4059,12 +4059,10 @@ namespace parallel
 
       this->update_number_cache();
 
-      // signal that refinement is finished,
-      // this is triggered before update_periodic_face_map
-      // to be consistent with the serial triangulation class
-      this->signals.post_distributed_refinement();
-
       this->update_periodic_face_map();
+
+      // signal that refinement is finished
+      this->signals.post_distributed_refinement();
     }
 
 
@@ -4084,6 +4082,9 @@ namespace parallel
             ExcMessage(
               "Error: There shouldn't be any cells flagged for coarsening/refinement when calling repartition()."));
 #  endif
+
+      // signal that repartitioning is going to happen
+      this->signals.pre_distributed_repartition();
 
       // before repartitioning the mesh let others attach mesh related info
       // (such as SolutionTransfer data) to the p4est
@@ -4160,7 +4161,11 @@ namespace parallel
 
       // update how many cells, edges, etc, we store locally
       this->update_number_cache();
+
       this->update_periodic_face_map();
+
+      // signal that repartitioning is finished
+      this->signals.post_distributed_repartition();
     }
 
 
