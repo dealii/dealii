@@ -1493,22 +1493,38 @@ namespace Patterns
     struct Convert<T,
                    typename std::enable_if<std::is_arithmetic<T>::value>::type>
     {
-      static std::unique_ptr<Patterns::PatternBase>
-      to_pattern()
+      template <typename Dummy = T>
+      static
+        typename std::enable_if<std::is_same<Dummy, T>::value &&
+                                  std::is_same<T, bool>::value,
+                                std::unique_ptr<Patterns::PatternBase>>::type
+        to_pattern()
       {
-        if (std::is_same<T, bool>::value)
-          return std_cxx14::make_unique<Patterns::Bool>();
-        else if (std::is_integral<T>::value)
-          return std_cxx14::make_unique<Patterns::Integer>(
-            static_cast<int>(std::numeric_limits<T>::lowest()),
-            static_cast<int>(std::numeric_limits<T>::max()));
-        else if (std::is_floating_point<T>::value)
-          return std_cxx14::make_unique<Patterns::Double>(
-            std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
+        return std_cxx14::make_unique<Patterns::Bool>();
+      }
 
-        Assert(false, ExcNotImplemented());
-        // the following line should never be invoked
-        return nullptr;
+      template <typename Dummy = T>
+      static
+        typename std::enable_if<std::is_same<Dummy, T>::value &&
+                                  !std::is_same<T, bool>::value &&
+                                  std::is_integral<T>::value,
+                                std::unique_ptr<Patterns::PatternBase>>::type
+        to_pattern()
+      {
+        return std_cxx14::make_unique<Patterns::Integer>(
+          std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
+      }
+
+      template <typename Dummy = T>
+      static
+        typename std::enable_if<std::is_same<Dummy, T>::value &&
+                                  !std::is_same<T, bool>::value &&
+                                  std::is_floating_point<T>::value,
+                                std::unique_ptr<Patterns::PatternBase>>::type
+        to_pattern()
+      {
+        return std_cxx14::make_unique<Patterns::Double>(
+          std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max());
       }
 
       static std::string
