@@ -1436,7 +1436,6 @@ public:
    * Queries whether or not the geometry-related information for the cells has
    * been set.
    */
-
   bool
   mapping_initialized() const;
 
@@ -3321,13 +3320,15 @@ namespace internal
 
 
     /**
-     * Zero out vector region for vector that do _not_ support
-     * exchange on a subset of DoFs <==> begin() + ind == local_element(ind)
+     * Zero out vector region for vector that do _not_ support exchange on a
+     * subset of DoFs <==> begin() + ind == local_element(ind) but are still a
+     * vector type
      */
     template <
       typename VectorType,
       typename std::enable_if<!has_exchange_on_subset<VectorType>::value,
-                              VectorType>::type * = nullptr>
+                              VectorType>::type * = nullptr,
+      typename VectorType::value_type *           = nullptr>
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
@@ -3337,6 +3338,20 @@ namespace internal
         {
           Assert(false, ExcNotImplemented());
         }
+    }
+
+
+
+    /**
+     * Zero out vector region for non-vector types, i.e., classes that do not
+     * have VectorType::value_type
+     */
+    void
+    zero_vector_region(const unsigned int, ...) const
+    {
+      Assert(false,
+             ExcNotImplemented("Zeroing is only implemented for vector types "
+                               "which provide VectorType::value_type"));
     }
 
 

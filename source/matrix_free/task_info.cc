@@ -631,6 +631,7 @@ namespace internal
       n_blocks             = 0;
       scheme               = none;
       partition_row_index.clear();
+      partition_row_index.resize(2);
       cell_partition_data.clear();
       face_partition_data.clear();
       boundary_partition_data.clear();
