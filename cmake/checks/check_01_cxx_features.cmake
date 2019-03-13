@@ -32,6 +32,17 @@
 #
 
 
+#
+# MSVC needs different compiler flags to turn warnings into errors
+# additionally a suitable exception handling model is required
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  SET(_werror_flag "/WX /EHsc")
+ELSE()
+  SET(_werror_flag "-Werror")
+ENDIF()
+
+
 ########################################################################
 #                                                                      #
 #                         C++ Version Support:                         #
@@ -133,12 +144,7 @@ IF(NOT DEFINED DEAL_II_WITH_CXX17 OR DEAL_II_WITH_CXX17)
   IF(NOT "${DEAL_II_CXX_VERSION_FLAG}" STREQUAL "")
     # Set CMAKE_REQUIRED_FLAGS for the unit tests
     MESSAGE(STATUS "Using C++ version flag \"${DEAL_II_CXX_VERSION_FLAG}\"")
-    IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX /EHsc")
-    ELSE()
-      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
-    ENDIF()
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG} ${_werror_flag}")
 
     UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_CXX17_SAVED
       "${CMAKE_REQUIRED_FLAGS}${DEAL_II_CXX_VERSION_FLAG}"
@@ -586,10 +592,9 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
 # possibilities here.
 #
 ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
-IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX")
-ELSE()
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wno-unused-command-line-argument")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
 ENDIF()
 #
 # first try the attribute [[fallthrough]]

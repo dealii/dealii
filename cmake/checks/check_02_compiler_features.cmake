@@ -48,6 +48,15 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
   )
 
+#
+# MSVC needs different compiler flags to turn warnings into errors
+# additionally a suitable exception handling model is required
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  SET(_werror_flag "/WX /EHsc")
+ELSE()
+  SET(_werror_flag "-Werror")
+ENDIF()
 
 #
 # Check whether the compiler allows to use arithmetic operations
@@ -298,10 +307,9 @@ ENDIF()
 # "warning #1292: unknown attribute "deprecated"" (icc)
 # Hence, we treat warnings as errors:
 ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
-IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX")
-ELSE()
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wno-unused-command-line-argument")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
 ENDIF()
 
 # first see if the compiler accepts the attribute
@@ -409,11 +417,7 @@ ENDIF()
 #
 # - Matthias Maier, 2015
 #
-IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX")
-ELSE()
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
-ENDIF()
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
 CHECK_CXX_SOURCE_COMPILES(
   "
   _Pragma(\"GCC diagnostic push\")
