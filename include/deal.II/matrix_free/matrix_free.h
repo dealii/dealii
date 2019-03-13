@@ -2897,12 +2897,6 @@ namespace internal
                                const VectorType & vec)
     {
       (void)component_in_block_vector;
-      Assert(
-        (vector_face_access ==
-           dealii::MatrixFree<dim, Number>::DataAccessOnFaces::unspecified ||
-         vec.size() == 0),
-        ExcNotImplemented());
-
       vec.update_ghost_values_finish();
     }
 
