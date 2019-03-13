@@ -419,8 +419,9 @@ namespace boost
 
 #define BOOST_HASH_SPECIALIZE(type) \
     template <> struct hash<type> \
-         : public std::unary_function<type, std::size_t> \
     { \
+        typedef type argument_type; \
+        typedef std::size_t result_type; \
         std::size_t operator()(type v) const \
         { \
             return boost::hash_value(v); \
@@ -429,8 +430,9 @@ namespace boost
 
 #define BOOST_HASH_SPECIALIZE_REF(type) \
     template <> struct hash<type> \
-         : public std::unary_function<type, std::size_t> \
     { \
+        typedef type argument_type; \
+        typedef std::size_t result_type; \
         std::size_t operator()(type const& v) const \
         { \
             return boost::hash_value(v); \
@@ -483,8 +485,9 @@ namespace boost
 
     template <class T>
     struct hash<T*>
-        : public std::unary_function<T*, std::size_t>
     {
+        typedef T* argument_type;
+        typedef std::size_t result_type;
         std::size_t operator()(T* v) const
         {
 #if !BOOST_WORKAROUND(__SUNPRO_CC, <= 0x590)
@@ -516,8 +519,9 @@ namespace boost
         {
             template <class T>
             struct inner
-                : public std::unary_function<T, std::size_t>
             {
+                typedef T argument_type;
+                typedef std::size_t result_type;
                 std::size_t operator()(T val) const
                 {
 #if !BOOST_WORKAROUND(__SUNPRO_CC, <= 590)

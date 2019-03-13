@@ -180,7 +180,7 @@
 // If _HAS_AUTO_PTR_ETC is defined to 0, std::auto_ptr is not available.
 // See https://www.visualstudio.com/en-us/news/vs2015-vs.aspx#C++
 // and http://blogs.msdn.com/b/vcblog/archive/2015/06/19/c-11-14-17-features-in-vs-2015-rtm.aspx
-#  if defined(_HAS_AUTO_PTR_ETC) && (_HAS_AUTO_PTR_ETC == 0)
+#  if defined(_HAS_AUTO_PTR_ETC) && (_HAS_AUTO_PTR_ETC == 0) && !defined BOOST_NO_AUTO_PTR
 #    define BOOST_NO_AUTO_PTR
 #  endif
 #endif
