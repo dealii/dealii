@@ -2947,7 +2947,12 @@ namespace VectorTools
                             ExcMessage(
                               "This function can only deal with requested boundary "
                               "values that correspond to primitive (scalar) base "
-                              "elements"));
+                              "elements. You may want to look up in the deal.II "
+                              "glossary what the term 'primitive' means."
+                              "\n\n"
+                              "There are alternative boundary value interpolation "
+                              "functions in namespace 'VectorTools' that you can "
+                              "use for non-primitive finite elements."));
                     }
 
                   const typename DoFHandlerType<dim, spacedim>::face_iterator
