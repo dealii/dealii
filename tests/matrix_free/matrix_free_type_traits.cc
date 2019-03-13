@@ -90,5 +90,16 @@ main()
           << "unsigned int = "
           << internal::is_serial_or_dummy<unsigned int>::value << std::endl;
 
+  // check that MatrixFree::cell_loop can run for non-vector types
+  MatrixFree<2> matrix_free;
+  int           dummy = 0;
+  matrix_free.cell_loop(
+    std::function<void(const MatrixFree<2> &,
+                       int &,
+                       const int &,
+                       const std::pair<unsigned int, unsigned int> &)>(),
+    dummy,
+    dummy);
+
   deallog << "OK" << std::endl;
 }
