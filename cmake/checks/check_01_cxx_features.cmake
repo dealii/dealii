@@ -104,12 +104,12 @@ MACRO(_check_cxx_flag _suffix)
       IF(DEAL_II_HAVE_FLAG_stdcxx${_suffix})
         SET(DEAL_II_CXX_VERSION_FLAG "/std:c++${_suffix}")
       ENDIF()
-	ELSE()
+    ELSE()
       CHECK_CXX_COMPILER_FLAG("-std=c++${_suffix}" DEAL_II_HAVE_FLAG_stdcxx${_suffix})
       IF(DEAL_II_HAVE_FLAG_stdcxx${_suffix})
         SET(DEAL_II_CXX_VERSION_FLAG "-std=c++${_suffix}")
       ENDIF()
-	ENDIF()
+    ENDIF()
   ENDIF()
 ENDMACRO()
 
@@ -542,7 +542,7 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_COMPILER_DEFAULTS_TO_CXX11_OR_NEWER)
-  RESET_CMAKE_REQUIRED()
+RESET_CMAKE_REQUIRED()
 
 IF(_user_provided_cxx_version_flag OR
     NOT DEAL_II_COMPILER_DEFAULTS_TO_CXX11_OR_NEWER OR
