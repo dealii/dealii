@@ -209,7 +209,7 @@ namespace parallel
   transform(const InputIterator &begin_in,
             const InputIterator &end_in,
             OutputIterator       out,
-            Predicate &          predicate,
+            const Predicate &    predicate,
             const unsigned int   grainsize)
   {
 #ifndef DEAL_II_WITH_THREADS
@@ -265,7 +265,7 @@ namespace parallel
             const InputIterator1 &end_in1,
             InputIterator2        in2,
             OutputIterator        out,
-            Predicate &           predicate,
+            const Predicate &     predicate,
             const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_THREADS
@@ -324,7 +324,7 @@ namespace parallel
             InputIterator2        in2,
             InputIterator3        in3,
             OutputIterator        out,
-            Predicate &           predicate,
+            const Predicate &     predicate,
             const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_THREADS
