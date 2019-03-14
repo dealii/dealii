@@ -20,8 +20,6 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/lambda/lambda.hpp>
-
 #include "../tests.h"
 
 
@@ -48,8 +46,7 @@ main()
                       y.begin(),
                       z.begin(),
                       a.begin(),
-                      (boost::lambda::_1 + boost::lambda::_2 -
-                       boost::lambda::_3),
+                      [](double i, double j, double k) { return i + j - k; },
                       10);
 
   AssertThrow(a.l2_norm() == 0, ExcInternalError());
