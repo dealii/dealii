@@ -118,7 +118,19 @@ STRING(REGEX REPLACE
   )
 REMOVE_DUPLICATES(_symengine_include_dirs)
 
-SET(_symengine_libraries ${SYMENGINE_LIBRARIES})
+#
+# The SYMENGINE_LIBRARIES variable configured by SymEngine only lists the
+# libraries, but does not set their paths. So we configure this outselves.
+# 
+FOREACH(SYMENGINE_LIBRARY_NAME ${SYMENGINE_LIBRARIES})
+  DEAL_II_FIND_LIBRARY(SYMENGINE_LIBRARY
+    NAMES ${SYMENGINE_LIBRARY_NAME}
+    HINTS ${SYMENGINE_DIR}
+    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  )
+
+  SET(_symengine_libraries ${_symengine_libraries} ${SYMENGINE_LIBRARY})
+ENDFOREACH()
 
 
 DEAL_II_PACKAGE_HANDLE(SYMENGINE
