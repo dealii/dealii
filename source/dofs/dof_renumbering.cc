@@ -1592,8 +1592,9 @@ namespace DoFRenumbering
     DoFHandlerType &                                                  dof,
     const std::vector<typename DoFHandlerType::active_cell_iterator> &cells)
   {
-    std::vector<types::global_dof_index> renumbering(dof.n_dofs());
-    std::vector<types::global_dof_index> reverse(dof.n_dofs());
+    std::vector<types::global_dof_index> renumbering(
+      dof.n_locally_owned_dofs());
+    std::vector<types::global_dof_index> reverse(dof.n_locally_owned_dofs());
     compute_cell_wise(renumbering, reverse, dof, cells);
 
     dof.renumber_dofs(renumbering);
@@ -1609,69 +1610,70 @@ namespace DoFRenumbering
     const typename std::vector<typename DoFHandlerType::active_cell_iterator>
       &cells)
   {
-    Assert(cells.size() == dof.get_triangulation().n_active_cells(),
-           ExcDimensionMismatch(cells.size(),
-                                dof.get_triangulation().n_active_cells()));
+    if (const parallel::Triangulation<DoFHandlerType::dimension,
+                                      DoFHandlerType::space_dimension> *p =
+          dynamic_cast<
+            const parallel::Triangulation<DoFHandlerType::dimension,
+                                          DoFHandlerType::space_dimension> *>(
+            &dof.get_triangulation()))
+      {
+        AssertDimension(cells.size(), p->n_locally_owned_active_cells());
+      }
+    else
+      {
+        AssertDimension(cells.size(), dof.get_triangulation().n_active_cells());
+      }
 
-    types::global_dof_index n_global_dofs = dof.n_dofs();
+    const auto n_owned_dofs = dof.n_locally_owned_dofs();
 
-    // Actually, we compute the
-    // inverse of the reordering
-    // vector, called reverse here.
-    // Later, irs inverse is computed
-    // into new_indices, which is the
+    // Actually, we compute the inverse of the reordering vector, called reverse
+    // here. Later, its inverse is computed into new_indices, which is the
     // return argument.
 
-    Assert(new_indices.size() == n_global_dofs,
-           ExcDimensionMismatch(new_indices.size(), n_global_dofs));
-    Assert(reverse.size() == n_global_dofs,
-           ExcDimensionMismatch(reverse.size(), n_global_dofs));
+    AssertDimension(new_indices.size(), n_owned_dofs);
+    AssertDimension(reverse.size(), n_owned_dofs);
 
-    // For continuous elements, we must
-    // make sure, that each dof is
-    // reordered only once.
-    std::vector<bool>                    already_sorted(n_global_dofs, false);
+    // For continuous elements, we must make sure, that each dof is reordered
+    // only once.
+    std::vector<bool>                    already_sorted(n_owned_dofs, false);
     std::vector<types::global_dof_index> cell_dofs;
 
-    unsigned int global_index = 0;
+    const auto &owned_dofs = dof.locally_owned_dofs();
 
-    typename std::vector<
-      typename DoFHandlerType::active_cell_iterator>::const_iterator cell;
+    unsigned int index = 0;
 
-    for (cell = cells.begin(); cell != cells.end(); ++cell)
+    for (const auto &cell : cells)
       {
-        // Determine the number of dofs
-        // on this cell and reinit the
-        // vector storing these
-        // numbers.
-        unsigned int n_cell_dofs = (*cell)->get_fe().n_dofs_per_cell();
+        // Determine the number of dofs on this cell and reinit the
+        // vector storing these numbers.
+        const unsigned int n_cell_dofs = cell->get_fe().n_dofs_per_cell();
         cell_dofs.resize(n_cell_dofs);
 
-        (*cell)->get_active_or_mg_dof_indices(cell_dofs);
+        cell->get_active_or_mg_dof_indices(cell_dofs);
 
-        // Sort here to make sure that
-        // degrees of freedom inside a
-        // single cell are in the same
-        // order after renumbering.
+        // Sort here to make sure that degrees of freedom inside a single cell
+        // are in the same order after renumbering.
         std::sort(cell_dofs.begin(), cell_dofs.end());
 
-        for (unsigned int i = 0; i < n_cell_dofs; ++i)
+        for (const auto dof : cell_dofs)
           {
-            if (!already_sorted[cell_dofs[i]])
+            const auto local_dof = owned_dofs.index_within_set(dof);
+            if (local_dof != numbers::invalid_dof_index &&
+                !already_sorted[local_dof])
               {
-                already_sorted[cell_dofs[i]] = true;
-                reverse[global_index++]      = cell_dofs[i];
+                already_sorted[local_dof] = true;
+                reverse[index++]          = local_dof;
               }
           }
       }
-    Assert(global_index == n_global_dofs,
+    Assert(index == n_owned_dofs,
            ExcMessage(
              "Traversing over the given set of cells did not cover all "
              "degrees of freedom in the DoFHandler. Does the set of cells "
              "not include all active cells?"));
 
     for (types::global_dof_index i = 0; i < reverse.size(); ++i)
-      new_indices[reverse[i]] = i;
+      new_indices[reverse[i]] = owned_dofs.nth_index_in_set(i);
   }
 
 
