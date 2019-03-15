@@ -178,18 +178,8 @@ namespace TrilinosWrappers
         parameter_list.set("null space: type", "pre-computed");
         parameter_list.set("null space: dimension",
                            distributed_constant_modes.NumVectors());
-        if (my_size > 0)
-          parameter_list.set("null space: vectors",
-                             distributed_constant_modes.Values());
-        else
-          {
-            // We need to set a valid pointer to data even if there is no data
-            // on the current processor. Therefore, pass a dummy in that case
-            static std::vector<double> dummy;
-            if (dummy.size() != constant_modes_dimension)
-              dummy.resize(constant_modes_dimension);
-            parameter_list.set("null space: vectors", dummy.data());
-          }
+        parameter_list.set("null space: vectors",
+                           distributed_constant_modes.Values());
       }
   }
 
