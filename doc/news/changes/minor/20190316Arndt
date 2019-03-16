@@ -1,0 +1,4 @@
+Improved: The apply_all_indicators_to_manifold flag in GridIn::read_ucd()
+lets the indicators be used for cells as manifold id as well.
+<br>
+(Daniel Arndt, 2019/03/16)
