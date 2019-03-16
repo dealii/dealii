@@ -813,7 +813,6 @@ namespace VectorTools
     }
   } // namespace internal
 
-
   template <int dim,
             int spacedim,
             typename VectorType,
@@ -830,6 +829,9 @@ namespace VectorTools
       intergridmap.get_destination_grid();
     (void)dof2;
 
+    Assert(dof1.get_fe_collection() == dof2.get_fe_collection(),
+           ExcMessage(
+             "The FECollections of both DoFHandler objects must match"));
     Assert(u1.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u2.size() == dof2.n_dofs(),
@@ -875,17 +877,28 @@ namespace VectorTools
         if (cell2->active() && !cell2->is_locally_owned())
           continue;
 
-        Assert(
-          cell1->get_fe().get_name() == cell2->get_fe().get_name(),
-          ExcMessage(
-            "Source and destination cells need to use the same finite element"));
-
-        cache.reinit(cell1->get_fe().dofs_per_cell);
-
         // Get and set the corresponding
         // dof_values by interpolation.
-        cell1->get_interpolated_dof_values(u1, cache);
-        cell2->set_dof_values_by_interpolation(cache, u2);
+        if (cell1->active())
+          {
+            cache.reinit(cell1->get_fe().dofs_per_cell);
+            cell1->get_interpolated_dof_values(u1,
+                                               cache,
+                                               cell1->active_fe_index());
+            cell2->set_dof_values_by_interpolation(cache,
+                                                   u2,
+                                                   cell1->active_fe_index());
+          }
+        else
+          {
+            cache.reinit(cell2->get_fe().dofs_per_cell);
+            cell1->get_interpolated_dof_values(u1,
+                                               cache,
+                                               cell2->active_fe_index());
+            cell2->set_dof_values_by_interpolation(cache,
+                                                   u2,
+                                                   cell2->active_fe_index());
+          }
       }
 
     // finish the work on parallel vectors
@@ -893,7 +906,6 @@ namespace VectorTools
     // Apply hanging node constraints.
     constraints.distribute(u2);
   }
-
 
   namespace internal
   {

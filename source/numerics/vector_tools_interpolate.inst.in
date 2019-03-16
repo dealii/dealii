@@ -132,6 +132,29 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const VEC &,
         const AffineConstraints<VEC::value_type> &,
         VEC &);
+
+      template void
+      interpolate_to_different_mesh(
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const VEC &,
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        VEC &);
+
+      template void
+      interpolate_to_different_mesh(
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const VEC &,
+        const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const AffineConstraints<VEC::value_type> &,
+        VEC &);
+
+      template void
+      interpolate_to_different_mesh(
+        const InterGridMap<
+          hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>> &,
+        const VEC &,
+        const AffineConstraints<VEC::value_type> &,
+        VEC &);
     \}
 #endif
   }

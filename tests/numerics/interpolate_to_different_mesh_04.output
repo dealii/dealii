@@ -1,0 +1,25 @@
+
+DEAL::### 2D-Case, first cell unrefined, second cell refined once###
+
+distance=0.00000
+DEAL::
+DEAL::### 2D-Case, first cell refined once, second cell refined three times###
+
+distance=0.00000
+DEAL::
+DEAL::### 2D-Case, first cell refined twice, second cell refined once###
+
+distance=0.00000
+DEAL::
+DEAL::### 3D-Case, first cell unrefined, second cell refined once###
+
+distance=0.00000
+DEAL::
+DEAL::### 3D-Case, first cell refined once, second cell refined three times###
+
+distance=0.00000
+DEAL::
+DEAL::### 3D-Case, first cell refined twice, second cell refined once###
+
+distance=0.00000
+DEAL::
