@@ -20,8 +20,6 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <boost/lambda/lambda.hpp>
-
 #include "../tests.h"
 
 
@@ -39,7 +37,7 @@ main()
 
   // set y=2*x
   parallel::transform(
-    x.begin(), x.end(), y.begin(), (2 * boost::lambda::_1), 10);
+    x.begin(), x.end(), y.begin(), [](double i) { return 2. * i; }, 10);
 
   // compute y=0 from the previous result
   y -= x;

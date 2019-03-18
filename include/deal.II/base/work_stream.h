@@ -1154,14 +1154,13 @@ namespace WorkStream
                                                 sample_scratch_data,
                                                 sample_copy_data);
 
-              tbb::parallel_for(
-                tbb::blocked_range<RangeType>(colored_iterators[color].begin(),
-                                              colored_iterators[color].end(),
-                                              /*grain_size=*/chunk_size),
+              parallel::internal::parallel_for(
+                colored_iterators[color].begin(),
+                colored_iterators[color].end(),
                 std::bind(&WorkerAndCopier::operator(),
                           std::ref(worker_and_copier),
                           std::placeholders::_1),
-                tbb::auto_partitioner());
+                chunk_size);
             }
       }
 #  endif
