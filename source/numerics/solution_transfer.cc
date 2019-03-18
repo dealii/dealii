@@ -371,26 +371,23 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
           // to the current one. in the hp context, this also means
           // we need to figure out which finite element space to interpolate
           // to since that is not implied by the global FE as in the non-hp
-          // case.
-          bool different_fe_on_children = false;
-          for (unsigned int child = 1; child < cell->n_children(); ++child)
-            if (cell->child(child)->active_fe_index() !=
-                cell->child(0)->active_fe_index())
-              {
-                different_fe_on_children = true;
-                break;
-              }
+          // case. we choose the 'least dominant fe' on all children from
+          // the associated FECollection.
+          std::set<unsigned int> fe_indices_children;
+          for (unsigned int child_index = 0; child_index < cell->n_children();
+               ++child_index)
+            fe_indices_children.insert(
+              cell->child(child_index)->active_fe_index());
 
-          // take FE index from the child with most
-          // degrees of freedom locally
-          unsigned int most_general_child = 0;
-          if (different_fe_on_children == true)
-            for (unsigned int child = 1; child < cell->n_children(); ++child)
-              if (cell->child(child)->get_fe().dofs_per_cell >
-                  cell->child(most_general_child)->get_fe().dofs_per_cell)
-                most_general_child = child;
           const unsigned int target_fe_index =
-            cell->child(most_general_child)->active_fe_index();
+            dof_handler->get_fe_collection().find_dominated_fe_extended(
+              fe_indices_children, /*codim=*/0);
+
+          Assert(target_fe_index != numbers::invalid_unsigned_int,
+                 ExcMessage(
+                   "No FiniteElement has been found in your FECollection "
+                   "that is dominated by all children of a cell you are "
+                   "trying to coarsen!"));
 
           const unsigned int dofs_per_cell =
             dof_handler->get_fe(target_fe_index).dofs_per_cell;
