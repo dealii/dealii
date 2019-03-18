@@ -264,7 +264,7 @@ namespace parallel
                   // on all children from the associated FECollection.
                   std::set<unsigned int> fe_indices_children;
                   for (unsigned int child_index = 0;
-                       child_index < GeometryInfo<dim>::max_children_per_cell;
+                       child_index < cell->n_children();
                        ++child_index)
                     fe_indices_children.insert(
                       cell->child(child_index)->future_fe_index());
