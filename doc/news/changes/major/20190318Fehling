@@ -1,0 +1,4 @@
+New: Triangulation::execute_coarsening_and_refinement() now also performs
+p-coarsening and p-refinement on all attached hp::DoFHandler objects.
+<br>
+(Marc Fehling, 2019/03/18)

@@ -1068,6 +1068,10 @@ namespace internal
          * the parent cell. See documentation of
          * hp::FECollection::find_common_subspace() and
          * hp::FECollection::find_dominated_fe() for further information.
+         *
+         * On cells intended for p-refinement or p-coarsening, those
+         * active_fe_indices will be determined by the corresponding flags that
+         * have been set on the relevant cells.
          */
         template <int dim, int spacedim>
         static void
@@ -1083,8 +1087,11 @@ namespace internal
                   {
                     // Store the active_fe_index of each cell that will be
                     // refined to and distribute it later on its children.
+                    // Pick their future index if flagged for p-refinement.
                     fe_transfer->refined_cells_fe_index.insert(
-                      {cell, cell->active_fe_index()});
+                      {cell,
+                       cell
+                         ->active_fe_index_after_p_refinement_and_coarsening()});
                   }
                 else if (cell->coarsen_flag_set())
                   {
@@ -1099,6 +1106,10 @@ namespace internal
                     if (fe_transfer->coarsened_cells_fe_index.find(parent) ==
                         fe_transfer->coarsened_cells_fe_index.end())
                       {
+                        // Find a suitable active_fe_index for the parent cell
+                        // based on the least dominating finite element of its
+                        // children. Consider the childrens' hypothetical future
+                        // index when they have been flagged for p-refinement.
                         std::set<unsigned int> fe_indices_children;
                         for (unsigned int child_index = 0;
                              child_index < parent->n_children();
@@ -1108,7 +1119,8 @@ namespace internal
                                    ExcInternalError());
 
                             fe_indices_children.insert(
-                              parent->child(child_index)->active_fe_index());
+                              parent->child(child_index)
+                                ->active_fe_index_after_p_refinement_and_coarsening());
                           }
                         Assert(!fe_indices_children.empty(),
                                ExcInternalError());
@@ -1129,6 +1141,17 @@ namespace internal
                           {parent, fe_index});
                       }
                   }
+                else
+                  {
+                    // No h-refinement is scheduled for this cell.
+                    // However, it may have p-refinement indicators, so we
+                    // choose a new active_fe_index based on its flags.
+                    if (cell->p_refine_flag_set() || cell->p_coarsen_flag_set())
+                      fe_transfer->persisting_cells_fe_index.insert(
+                        {cell,
+                         cell
+                           ->active_fe_index_after_p_refinement_and_coarsening()});
+                  }
               }
         }
 
@@ -1144,6 +1167,18 @@ namespace internal
           dealii::hp::DoFHandler<dim, spacedim> &dof_handler)
         {
           const auto &fe_transfer = dof_handler.active_fe_index_transfer;
+
+          // Set active_fe_indices on persisting cells.
+          for (const auto &pair : fe_transfer->persisting_cells_fe_index)
+            {
+              const auto &cell = pair.first;
+
+              if (cell->is_locally_owned())
+                {
+                  Assert(cell->active(), ExcInternalError());
+                  cell->set_active_fe_index(pair.second);
+                }
+            }
 
           // Distribute active_fe_indices from all refined cells on their
           // respective children.
@@ -1953,13 +1988,14 @@ namespace hp
       }
 
     Assert(levels.size() == tria->n_levels(), ExcInternalError());
-
-    // Resize active_fe_indices vectors. use zero indicator to extend
     for (unsigned int i = 0; i < levels.size(); ++i)
       {
+        // Resize active_fe_indices vectors. Use zero indicator to extend.
         levels[i]->active_fe_indices.resize(tria->n_raw_cells(i), 0);
-        levels[i]->p_refine_flags.resize(tria->n_raw_cells(i), false);
-        levels[i]->p_coarsen_flags.resize(tria->n_raw_cells(i), false);
+
+        // Resize p-flags vectors. Clear all flags after refinement finished.
+        levels[i]->p_refine_flags.assign(tria->n_raw_cells(i), false);
+        levels[i]->p_coarsen_flags.assign(tria->n_raw_cells(i), false);
       }
   }
 
@@ -2080,8 +2116,18 @@ namespace hp
         // Gather all current active_fe_indices.
         get_active_fe_indices(active_fe_index_transfer->active_fe_indices);
 
-        // Overwrite values of cells that will be coarsened with the
-        // active_fe_index determined beforehand for their parent.
+        // Overwrite active_fe_indices of cells that change by either
+        // h/p refinement/coarsening.
+        for (const auto &pair :
+             active_fe_index_transfer->persisting_cells_fe_index)
+          active_fe_index_transfer
+            ->active_fe_indices[pair.first->active_cell_index()] = pair.second;
+
+        for (const auto &pair :
+             active_fe_index_transfer->refined_cells_fe_index)
+          active_fe_index_transfer
+            ->active_fe_indices[pair.first->active_cell_index()] = pair.second;
+
         for (const auto &pair :
              active_fe_index_transfer->coarsened_cells_fe_index)
           for (unsigned int child_index = 0;

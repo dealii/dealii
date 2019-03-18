@@ -1973,6 +1973,7 @@ public:
    * Return whether the p-refinement flag is set or not.
    *
    * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   * An exception is thrown otherwise.
    */
   bool
   p_refine_flag_set() const;
@@ -1982,6 +1983,7 @@ public:
    * for active cells.
    *
    * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   * An exception is thrown otherwise.
    */
   void
   set_p_refine_flag() const;
@@ -1990,6 +1992,7 @@ public:
    * Clear the p-refinement flag.
    *
    * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   * An exception is thrown otherwise.
    */
   void
   clear_p_refine_flag() const;
@@ -1998,6 +2001,7 @@ public:
    * Return whether the p-coarsening flag is set or not.
    *
    * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   * An exception is thrown otherwise.
    */
   bool
   p_coarsen_flag_set() const;
@@ -2007,6 +2011,7 @@ public:
    * for active cells.
    *
    * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   * An exception is thrown otherwise.
    */
   void
   set_p_coarsen_flag() const;
@@ -2015,10 +2020,32 @@ public:
    * Clear the p-coarsening flag.
    *
    * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   * An exception is thrown otherwise.
    */
   void
   clear_p_coarsen_flag() const;
 
+  /**
+   * Returns the active_fe_index that this cell would have if refinement would
+   * happen.
+   *
+   * Prediction is based on the current p-refinement flags set on this cell,
+   * returning FECollection::next_in_hierarchy() for p-refinement,
+   * FECollection::previous_in_hierarchy() for p-coarsening,
+   * or the current active_fe_index otherwise.
+   *
+   * If this cell is additionally flagged for h-refinement or h-coarsening,
+   * these predicted active_fe_indices will be used to determine the finite
+   * elements on the refined and coarsened cells. For h-refinement, the
+   * predicted active_fe_index will be distributed on its children. For
+   * h-coarsening, the predicted active_fe_index of this cell and its siblings
+   * will be used to determine the active_fe_index on parent cell.
+   *
+   * @note The DoFHandler in use has to be of type hp::DoFHandler.
+   * An exception is thrown otherwise.
+   */
+  unsigned int
+  active_fe_index_after_p_refinement_and_coarsening() const;
   /**
    * @}
    */

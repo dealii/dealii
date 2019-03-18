@@ -4300,6 +4300,29 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::clear_p_coarsen_flag() const
 }
 
 
+
+template <typename DoFHandlerType, bool level_dof_access>
+inline unsigned int
+DoFCellAccessor<DoFHandlerType, level_dof_access>::
+  active_fe_index_after_p_refinement_and_coarsening() const
+{
+  if (p_refine_flag_set())
+    {
+      Assert(!p_coarsen_flag_set(), ExcInternalError());
+      return this->get_dof_handler().get_fe_collection().next_in_hierarchy(
+        active_fe_index());
+    }
+  else if (p_coarsen_flag_set())
+    {
+      Assert(!p_refine_flag_set(), ExcInternalError());
+      return this->get_dof_handler().get_fe_collection().previous_in_hierarchy(
+        active_fe_index());
+    }
+
+  return active_fe_index();
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
