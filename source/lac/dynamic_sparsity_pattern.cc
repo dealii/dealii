@@ -19,6 +19,10 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern.h>
 
+// we will need to serialize pairs and maps
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/utility.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -321,10 +325,114 @@ DynamicSparsityPattern::reinit(const size_type m,
 
 
 
+#ifdef DEAL_II_WITH_MPI
+void
+DynamicSparsityPattern::reinit(const size_type m,
+                               const size_type n,
+                               const IndexSet &owned_rows_,
+                               const MPI_Comm  mpi_communicator_,
+                               const IndexSet &rowset)
+{
+  reinit(m, n, rowset);
+  owned_rows       = owned_rows_;
+  mpi_communicator = mpi_communicator_;
+}
+#endif
+
+
+
 void
 DynamicSparsityPattern::compress()
-{}
+{
+#ifdef DEAL_II_WITH_MPI
+  // don't do anything if we did not call reinit() with MPI_Comm and IndexSet
+  if (owned_rows.size() == 0)
+    return;
 
+  const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_communicator);
+
+  Assert(owned_rows.is_ascending_and_one_to_one(mpi_communicator),
+         ExcNotImplemented());
+  const auto b = owned_rows.nth_index_in_set(0);
+  const auto e = owned_rows.nth_index_in_set(owned_rows.n_elements() - 1) + 1;
+
+  // 1. need to know where owning range ends for each process.
+  const auto end_gathered = Utilities::MPI::all_gather(mpi_communicator, e);
+
+  // what we send to owning process:
+  std::map<unsigned int,
+           std::vector<std::pair<types::global_dof_index,
+                                 std::vector<types::global_dof_index>>>>
+    to_send;
+
+  // 2. go through sparsity and populate what we need to send
+  unsigned int rank     = 0;
+  auto         rank_end = end_gathered.cbegin();
+
+  std::vector<Line> new_lines(owned_rows.n_elements());
+
+  const IndexSet  full    = complete_index_set(rows);
+  const IndexSet &rowset_ = rowset.size() == 0 ? full : rowset;
+
+  AssertDimension(rowset_.n_elements(), lines.size());
+  auto line_it = lines.begin();
+  for (auto row_it = rowset_.begin(); row_it != rowset_.end();
+       ++row_it, ++line_it)
+    {
+      const auto r = *row_it;
+      // 2.1. adjust rank index if needed
+      if (r >= *rank_end)
+        {
+          // first simply try to increment:
+          ++rank;
+          ++rank_end;
+          // if still out of luck, do bisection
+          if (r >= *rank_end)
+            {
+              // note that we only support
+              // owned_rows.is_ascending_and_one_to_one()
+              // thus we can limit bisection to start from
+              // the current iterator rank_end
+              rank_end = std::upper_bound(rank_end, end_gathered.end(), r);
+              Assert(rank_end != end_gathered.end(), ExcInternalError());
+              rank = rank_end - end_gathered.begin();
+            }
+
+          AssertIndexRange(r, *rank_end);
+        }
+
+      auto &cols = line_it->entries;
+      // 2.2. if it's locally owned row, add to new lines
+      if (rank == myid)
+        {
+          AssertDimension(*rank_end, e);
+          Assert(r >= b && r < e, ExcInternalError());
+          new_lines[r - b].entries.swap(cols);
+        }
+      else
+        // otherwise collect columns in the to_send object
+        {
+          if (cols.size() > 0)
+            to_send[rank].push_back({r, cols});
+        }
+    }
+
+  // 3. exchange sparsity
+  auto received = Utilities::MPI::some_to_some(mpi_communicator, to_send);
+
+  // 4. set rowset and update lines
+  lines.swap(new_lines);
+  rowset = owned_rows;
+
+  // 5. add to our sparsity based on what we received
+  for (auto &el : received)
+    for (auto &sp : el.second)
+      {
+        Assert(sp.first >= b && sp.first < e, ExcInternalError());
+        this->add_entries(sp.first, sp.second.begin(), sp.second.end(), true);
+      }
+#endif
+}
 
 
 bool

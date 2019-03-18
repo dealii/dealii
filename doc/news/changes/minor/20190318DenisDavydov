@@ -1,0 +1,3 @@
+New: Extend DynamicSparsityPattern to exchange non-loca data during compress() call.
+<br>
+(Denis Davydov, 2019/03/18)

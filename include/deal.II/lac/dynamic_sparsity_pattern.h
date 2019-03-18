@@ -23,6 +23,10 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/utilities.h>
 
+#ifdef DEAL_II_WITH_MPI
+#  include <deal.II/base/mpi.h>
+#endif
+
 #include <deal.II/lac/exceptions.h>
 
 #include <algorithm>
@@ -401,10 +405,34 @@ public:
          const size_type n,
          const IndexSet &rowset = IndexSet());
 
+#ifdef DEAL_II_WITH_MPI
   /**
-   * Since this object is kept compressed at all times anyway, this function
-   * does nothing, but is declared to make the interface of this class as much
-   * alike as that of the SparsityPattern class.
+   * Reallocate memory and set up data structures for a new sparsity pattern
+   * with @p m rows and @p n columns. The @p owned_rows defines the MPI
+   * partitioning of this sparsity pattern within the @p mpi_communicator.
+   * An optionall parameter @p rowset restricts the storage to
+   * elements in rows of this set. After calling compress() only locally
+   * owned rows are stored in this object.
+   *
+   * @note Currently only partitioners @p owned_rows with a single range are supported.
+   */
+  void
+  reinit(const size_type m,
+         const size_type n,
+         const IndexSet &owned_rows,
+         const MPI_Comm  mpi_communicator,
+         const IndexSet &rowset = IndexSet());
+#endif
+
+  /**
+   * In serial case this object is kept compressed at all times,
+   * therefore this function will not do anything.
+   *
+   * However when this object was initialized with MPI_Communicator and
+   * an index set which defines locally owned rows, this function will exchanges
+   * non-local data that might have accumulated during the addition of new
+   * elements. After this function is called, it is only allowed to add data to
+   * locally owned rows.
    */
   void
   compress();
@@ -654,9 +682,22 @@ private:
   /**
    * A set that contains the valid rows.
    */
-
   IndexSet rowset;
 
+#ifdef DEAL_II_WITH_MPI
+
+  /**
+   * In case this object was initialized with MPI_Communicator, this
+   * index set will store locally owned rows by this process.
+   */
+  IndexSet owned_rows;
+
+  /**
+   * MPI communicator for this sparsity pattern.
+   */
+  MPI_Comm mpi_communicator;
+
+#endif
 
   /**
    * Store some data for each row describing which entries of this row are
