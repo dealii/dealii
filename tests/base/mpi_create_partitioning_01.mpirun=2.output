@@ -1,0 +1,13 @@
+
+DEAL:0::Total size=12
+DEAL:0::p=0:
+{[0,4]}
+DEAL:0::p=1:
+{[5,11]}
+
+DEAL:1::Total size=12
+DEAL:1::p=0:
+{[0,4]}
+DEAL:1::p=1:
+{[5,11]}
+

@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/multithread_info.h>
@@ -177,6 +178,30 @@ namespace Utilities
 
       return MPI_SUCCESS;
 #  endif
+    }
+
+
+
+    std::vector<IndexSet>
+    create_ascending_partitioning(const MPI_Comm &           comm,
+                                  const IndexSet::size_type &local_size)
+    {
+      const unsigned int                     n_proc = n_mpi_processes(comm);
+      const std::vector<IndexSet::size_type> sizes =
+        all_gather(comm, local_size);
+      const auto total_size =
+        std::accumulate(sizes.begin(), sizes.end(), IndexSet::size_type(0));
+
+      std::vector<IndexSet> res(n_proc, IndexSet(total_size));
+
+      IndexSet::size_type begin = 0;
+      for (unsigned int i = 0; i < n_proc; ++i)
+        {
+          res[i].add_range(begin, begin + sizes[i]);
+          begin = begin + sizes[i];
+        }
+
+      return res;
     }
 
 
@@ -481,6 +506,14 @@ namespace Utilities
     this_mpi_process(const MPI_Comm &)
     {
       return 0;
+    }
+
+
+    std::vector<IndexSet>
+    create_ascending_partitioning(const MPI_Comm & /*comm*/,
+                                  const IndexSet::size_type &local_size)
+    {
+      return std::vector<IndexSet>(1, complete_index_set(local_size));
     }
 
 
