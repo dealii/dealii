@@ -1,0 +1,5 @@
+New: The type alias FEValuesViews::View now allows one to infer the correct FEValuesViews type 
+that would be returned by FEValuesBase::operator[]() when called with a specified extractor type from the 
+FEValuesExtractors namespace. 
+<br>
+(Luca Heltai, 2019/03/20)
