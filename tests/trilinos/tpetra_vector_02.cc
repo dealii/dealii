@@ -196,7 +196,7 @@ test()
   AssertThrow(b.l1_norm() == 95., ExcMessage("Problem in l1_norm."));
 
   const double eps = 1e-6;
-  AssertThrow(std::fabs(b.l2_norm() - Number(31.3847096)) < eps,
+  AssertThrow(std::fabs(b.l2_norm() - 31.3847096) < eps,
               ExcMessage("Problem in l2_norm"));
 
   AssertThrow(b.linfty_norm() == 14., ExcMessage("Problem in linfty_norm."));
