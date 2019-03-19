@@ -3756,6 +3756,79 @@ namespace GridTools
       }
   }
 
+
+  template <int dim, int spacedim>
+  void
+  assign_co_dimensional_manifold_indicators(
+    Triangulation<dim, spacedim> &            tria,
+    const std::function<types::manifold_id(
+      const std::set<types::manifold_id> &)> &disambiguation_function)
+  {
+    // Easy case first:
+    if (dim == 1)
+      return;
+    const unsigned int size =
+      dim == 2 ? tria.n_lines() : tria.n_lines() + tria.n_quads();
+
+    // If user index is zero, then it has not been set.
+    std::vector<std::set<types::manifold_id>> manifold_ids(size + 1);
+    std::vector<unsigned int>                 backup;
+    tria.save_user_indices(backup);
+
+    unsigned next_index = 1;
+    for (auto cell : tria.active_cell_iterators())
+      {
+        if (dim > 1)
+          for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+            {
+              if (cell->line(l)->user_index() == 0)
+                {
+                  AssertIndexRange(next_index, size + 1);
+                  manifold_ids[next_index].insert(cell->manifold_id());
+                  cell->line(l)->set_user_index(next_index++);
+                }
+              else
+                manifold_ids[cell->line(l)->user_index()].insert(
+                  cell->manifold_id());
+            }
+        if (dim > 2)
+          for (unsigned int l = 0; l < GeometryInfo<dim>::quads_per_cell; ++l)
+            {
+              if (cell->quad(l)->user_index() == 0)
+                {
+                  AssertIndexRange(next_index, size + 1);
+                  manifold_ids[next_index].insert(cell->manifold_id());
+                  cell->quad(l)->set_user_index(next_index++);
+                }
+              else
+                manifold_ids[cell->quad(l)->user_index()].insert(
+                  cell->manifold_id());
+            }
+      }
+    for (auto cell : tria.active_cell_iterators())
+      {
+        if (dim > 1)
+          for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+            {
+              const auto id = cell->line(l)->user_index();
+              Assert(id != 0, ExcInternalError());
+              cell->line(l)->set_manifold_id(
+                disambiguation_function(manifold_ids[id]));
+            }
+        if (dim > 2)
+          for (unsigned int l = 0; l < GeometryInfo<dim>::quads_per_cell; ++l)
+            {
+              const auto id = cell->quad(l)->user_index();
+              Assert(id != 0, ExcInternalError());
+              cell->quad(l)->set_manifold_id(
+                disambiguation_function(manifold_ids[id]));
+            }
+      }
+    tria.load_user_indices(backup);
+  }
+
+
+
   template <int dim, int spacedim>
   std::pair<unsigned int, double>
   get_longest_direction(

@@ -1,0 +1,367 @@
+
+DEAL::dim = 1, spacedim = 1
+DEAL::Cell: 1
+DEAL::Cell: -1
+DEAL::Cell: -1
+DEAL::dim = 1, spacedim = 2
+DEAL::Cell: 1
+DEAL::Cell: -1
+DEAL::Cell: -1
+DEAL::dim = 2, spacedim = 2
+DEAL::Cell: 1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 1
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 1
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::dim = 2, spacedim = 3
+DEAL::Cell: 1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 1
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 1
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::dim = 3, spacedim = 3
+DEAL::Cell: 1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 1
+DEAL::Line 4, 1
+DEAL::Line 5, 1
+DEAL::Line 6, 1
+DEAL::Line 7, 1
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 1
+DEAL::Line 11, 1
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 1
+DEAL::Quad 4, 0
+DEAL::Quad 5, 1
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 1
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 1
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 1
+DEAL::Line 7, 0
+DEAL::Line 8, 1
+DEAL::Line 9, 1
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 1
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 1
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 1
+DEAL::Line 1, 1
+DEAL::Line 2, 1
+DEAL::Line 3, 1
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 1
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 1
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0
+DEAL::Cell: -1
+DEAL::Line 0, 0
+DEAL::Line 1, 0
+DEAL::Line 2, 0
+DEAL::Line 3, 0
+DEAL::Line 4, 0
+DEAL::Line 5, 0
+DEAL::Line 6, 0
+DEAL::Line 7, 0
+DEAL::Line 8, 0
+DEAL::Line 9, 0
+DEAL::Line 10, 0
+DEAL::Line 11, 0
+DEAL::Quad 0, 0
+DEAL::Quad 1, 0
+DEAL::Quad 2, 0
+DEAL::Quad 3, 0
+DEAL::Quad 4, 0
+DEAL::Quad 5, 0

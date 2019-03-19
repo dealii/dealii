@@ -376,6 +376,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::vector<types::boundary_id> &);
 
       template void
+      assign_co_dimensional_manifold_indicators(
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        const std::function<
+          types::manifold_id(const std::set<types::manifold_id> &)> &);
+
+      template void
       regularize_corner_cells(
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
         double);

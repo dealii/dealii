@@ -1,0 +1,5 @@
+New: The new method GridTools::assign_co_dimensional_manifold_indicators() propagate manifold ids from 
+cells to faces and edges, according to a disambiguation function that takes the set of manifold ids of
+the cells that share the given face or edge. 
+<br>
+(Luca Heltai, 2019/03/19)

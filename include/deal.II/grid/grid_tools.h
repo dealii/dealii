@@ -2632,7 +2632,36 @@ namespace GridTools
   copy_material_to_manifold_id(Triangulation<dim, spacedim> &tria,
                                const bool compute_face_ids = false);
 
-
+  /**
+   * Propagate manifold indicators associated to the cells of the Triangulation
+   * @p tria to their co-dimension one and two objects.
+   *
+   * This function sets the @p manifold_id of shared faces and edges to the value
+   * returnd by the @p disambiguation_function method, called with the set of
+   * manifold indicators of the cells that share the same face or edge.
+   *
+   * By default, the @p disambiguation_function returns
+   * numbers::flat_manifold_id when the set has size greater than one (i.e.,
+   * when it is not possible to decide what manifold indicator a face or edge
+   * should have according to the manifold indicators of the adjacent cells)
+   * and it returns the manifold indicator contained in the set when it has
+   * dimension one (i.e., when all adjacent cells and faces have the same
+   * manifold indicator).
+   *
+   * @author Luca Heltai, 2019.
+   */
+  template <int dim, int spacedim>
+  void
+  assign_co_dimensional_manifold_indicators(
+    Triangulation<dim, spacedim> &            tria,
+    const std::function<types::manifold_id(
+      const std::set<types::manifold_id> &)> &disambiguation_function =
+      [](const std::set<types::manifold_id> &manifold_ids) {
+        if (manifold_ids.size() == 1)
+          return *manifold_ids.begin();
+        else
+          return numbers::invalid_manifold_id;
+      });
   /*@}*/
 
   /**
