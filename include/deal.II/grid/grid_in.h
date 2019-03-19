@@ -417,7 +417,8 @@ public:
    * manifold_id for the same cell. Yet it is possible to use
    * the flag apply_all_indicators_to_manifolds to decide if
    * the indicators in the file refer to manifolds (flag set to true)
-   * or boundaries (flag set to false).
+   * or boundaries (flag set to false). If the flag is set, the
+   * indicators are used for cells as manifold id, too.
    */
   void
   read_ucd(std::istream &in,

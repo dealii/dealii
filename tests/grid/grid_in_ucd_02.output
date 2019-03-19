@@ -1,0 +1,53 @@
+
+DEAL::Testing dim=1 spacedim=1
+DEAL::cell->manifold_id: 99
+DEAL::
+DEAL::Testing dim=1 spacedim=2
+DEAL::cell->manifold_id: 99
+DEAL::
+DEAL::Testing dim=1 spacedim=3
+DEAL::cell->manifold_id: 99
+DEAL::
+DEAL::Testing dim=2 spacedim=2
+DEAL::cell->manifold_id: 99
+DEAL::cell->face(0)->manifold_id: 100
+DEAL::cell->face(1)->manifold_id: 100
+DEAL::cell->face(2)->manifold_id: 100
+DEAL::cell->face(3)->manifold_id: 100
+DEAL::cell->line(0)->manifold_id: 100
+DEAL::cell->line(1)->manifold_id: 100
+DEAL::cell->line(2)->manifold_id: 100
+DEAL::cell->line(3)->manifold_id: 100
+DEAL::
+DEAL::Testing dim=2 spacedim=3
+DEAL::cell->manifold_id: 99
+DEAL::cell->face(0)->manifold_id: 100
+DEAL::cell->face(1)->manifold_id: 100
+DEAL::cell->face(2)->manifold_id: 100
+DEAL::cell->face(3)->manifold_id: 100
+DEAL::cell->line(0)->manifold_id: 100
+DEAL::cell->line(1)->manifold_id: 100
+DEAL::cell->line(2)->manifold_id: 100
+DEAL::cell->line(3)->manifold_id: 100
+DEAL::
+DEAL::Testing dim=3 spacedim=3
+DEAL::cell->manifold_id: 99
+DEAL::cell->face(0)->manifold_id: 100
+DEAL::cell->face(1)->manifold_id: 100
+DEAL::cell->face(2)->manifold_id: 100
+DEAL::cell->face(3)->manifold_id: 100
+DEAL::cell->face(4)->manifold_id: 100
+DEAL::cell->face(5)->manifold_id: 100
+DEAL::cell->line(0)->manifold_id: 101
+DEAL::cell->line(1)->manifold_id: 101
+DEAL::cell->line(2)->manifold_id: 101
+DEAL::cell->line(3)->manifold_id: 101
+DEAL::cell->line(4)->manifold_id: 101
+DEAL::cell->line(5)->manifold_id: 101
+DEAL::cell->line(6)->manifold_id: 101
+DEAL::cell->line(7)->manifold_id: 101
+DEAL::cell->line(8)->manifold_id: 101
+DEAL::cell->line(9)->manifold_id: 101
+DEAL::cell->line(10)->manifold_id: 101
+DEAL::cell->line(11)->manifold_id: 101
+DEAL::

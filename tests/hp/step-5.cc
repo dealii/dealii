@@ -306,7 +306,7 @@ LaplaceProblem<dim>::run()
           std::ifstream input_file(SOURCE_DIR "/grids/circle-grid.inp");
           Assert(dim == 2, ExcInternalError());
 
-          grid_in.read_ucd(input_file, true);
+          grid_in.read_ucd(input_file);
           GridTools::copy_boundary_to_manifold_id(triangulation);
 
           static const SphericalManifold<dim> boundary;

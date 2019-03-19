@@ -834,6 +834,9 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
           Assert(material_id < numbers::invalid_material_id,
                  ExcIndexRange(material_id, 0, numbers::invalid_material_id));
 
+          if (apply_all_indicators_to_manifolds)
+            cells.back().manifold_id =
+              static_cast<types::manifold_id>(material_id);
           cells.back().material_id =
             static_cast<types::material_id>(material_id);
 
