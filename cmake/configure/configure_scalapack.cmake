@@ -28,36 +28,28 @@ MACRO(FEATURE_SCALAPACK_FIND_EXTERNAL var)
     CHECK_MPI_INTERFACE(SCALAPACK ${var})
 
     IF (${var})
-      CHECK_LIBRARY_EXISTS (${SCALAPACK_LIBRARY} pdsyevr_ {SCALAPACK_DIR} DEAL_II_SCALAPACK_HAS_PDSYEVR)
-      IF(NOT DEAL_II_SCALAPACK_HAS_PDSYEVR)
-        MESSAGE(STATUS "Could not find a sufficient SCALAPACK installation: "
-          "The required symbol pdsyevr_ was not found."
-          )
-        SET(SCALAPACK_ADDITIONAL_ERROR_STRING
-          ${SCALAPACK_ADDITIONAL_ERROR_STRING}
-          "Could not find a sufficient SCALAPACK installation: \n"
-          "SCALAPACK symbol check for pdsyevr_ failed! This usually means that "
-          "your SCALAPACK installation is incomplete or the link line is "
-          "broken. Consult\n"
-          "  CMakeFiles/CMakeError.log\n"
-          "for further information.\n"
-          )
-        SET(${var} FALSE)
-      ENDIF()
-    ENDIF()
+      SET(CMAKE_REQUIRED_LIBRARIES ${SCALAPACK_LIBRARY})
+      CHECK_C_SOURCE_COMPILES("
+        void pdsyevr_();
+        void pssyevr_();
+        int main(){
+          pdsyevr_();
+          pssyevr_();
+          return 0;
+        }"
+        DEAL_II_SCALAPACK_HAS_PDSYEVR_PSSYEVR)
+        RESET_CMAKE_REQUIRED()
 
-    IF(${var})
-      CHECK_LIBRARY_EXISTS (${SCALAPACK_LIBRARY} pssyevr_ {SCALAPACK_DIR} DEAL_II_SCALAPACK_HAS_PSSYEVR)
-      IF(NOT DEAL_II_SCALAPACK_HAS_PSSYEVR)
+      IF(NOT DEAL_II_SCALAPACK_HAS_PDSYEVR_PSSYEVR)
         MESSAGE(STATUS "Could not find a sufficient SCALAPACK installation: "
-          "The required symbol pssyevr_ was not found."
+          "The required symbols pdsyevr_ and pssyevr_ were not found."
           )
         SET(SCALAPACK_ADDITIONAL_ERROR_STRING
           ${SCALAPACK_ADDITIONAL_ERROR_STRING}
           "Could not find a sufficient SCALAPACK installation: \n"
-          "SCALAPACK symbol check for pssyevr_ failed! This usually means that "
-          "your SCALAPACK installation is incomplete or the link line is "
-          "broken. Consult\n"
+          "SCALAPACK symbol check for pdsyevr_ and pssyevr failed! "
+          "This usually means that your SCALAPACK installation is incomplete "
+          "or the link line is broken. Consult\n"
           "  CMakeFiles/CMakeError.log\n"
           "for further information.\n"
           )
