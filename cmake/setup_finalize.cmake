@@ -99,12 +99,14 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
       "Unable to compile a simple test program. "
       "Trying to drop \"${_linker_flag}\" from the linker flags."
       )
-    STRING(REPLACE "${_linker_flag}" "${_replacement_flag}"
-      DEAL_II_LINKER_FLAGS "${DEAL_II_LINKER_FLAGS}"
-      )
-    STRING(REPLACE "${_linker_flag}" "${_replacement_flag}"
-      DEAL_II_LINKER_FLAGS_${build} "${DEAL_II_LINKER_FLAGS_${_build}}"
-      )
+    FOREACH(_flags
+        DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_${build}
+        BASE_LINKER_FLAGS BASE_LINKER_FLAGS_${build}
+        )
+      STRING(REPLACE "${_linker_flag}" "${_replacement_flag}"
+        ${_flags} "${${_flags}}"
+        )
+    ENDFOREACH()
     SET(${_variable} FALSE CACHE INTERNAL "" FORCE)
     SET(${_variable} FALSE)
   ENDMACRO()
