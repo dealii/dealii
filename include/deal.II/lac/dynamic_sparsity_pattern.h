@@ -519,6 +519,12 @@ public:
   row_length(const size_type row) const;
 
   /**
+   * Clear all entries stored in a specific row.
+   */
+  void
+  clear_row(const size_type row);
+
+  /**
    * Access to column number field.  Return the column number of the @p
    * indexth entry in @p row.
    */

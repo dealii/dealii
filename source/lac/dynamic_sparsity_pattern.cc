@@ -406,6 +406,25 @@ DynamicSparsityPattern::symmetrize()
 
 
 
+void
+DynamicSparsityPattern::clear_row(const size_type row)
+{
+  AssertIndexRange(row, n_rows());
+  if (!have_entries)
+    return;
+
+  if (rowset.size() > 0 && !rowset.is_element(row))
+    return;
+
+  const size_type rowindex =
+    rowset.size() == 0 ? row : rowset.index_within_set(row);
+
+  AssertIndexRange(rowindex, lines.size());
+  lines[rowindex].entries = std::vector<size_type>();
+}
+
+
+
 template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
 void
 DynamicSparsityPattern::compute_Tmmult_pattern(
