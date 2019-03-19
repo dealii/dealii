@@ -149,7 +149,7 @@ namespace internal
       }
 
       void
-      operator()(const tbb::blocked_range<size_type> &range) const
+      operator()(const tbb::blocked_range<unsigned int> &range) const
       {
         const size_type r_begin = start + range.begin() * chunk_size;
         const size_type r_end = std::min(start + range.end() * chunk_size, end);
@@ -1317,7 +1317,7 @@ namespace internal
        * [range.begin(), range.end()).
        */
       void
-      operator()(const tbb::blocked_range<size_type> &range) const
+      operator()(const tbb::blocked_range<unsigned int> &range) const
       {
         for (size_type i = range.begin(); i < range.end(); ++i)
           accumulate_recursive(op,
