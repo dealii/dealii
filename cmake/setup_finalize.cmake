@@ -84,12 +84,52 @@ ENDFOREACH()
 #
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
-  CHECK_COMPILER_SETUP(
-    "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
-    "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
-    DEAL_II_HAVE_USABLE_FLAGS_${build}
-    ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
-    )
+
+  MACRO(_check_linker_flags)
+    CHECK_COMPILER_SETUP(
+      "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
+      "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
+      DEAL_II_HAVE_USABLE_FLAGS_${build}
+      ${DEAL_II_LIBRARIES} ${DEAL_II_LIBRARIES_${build}}
+      )
+  ENDMACRO()
+
+  MACRO(_drop_linker_flag _linker_flag _replacement_flag _variable)
+    MESSAGE(STATUS
+      "Unable to compile a simple test program. "
+      "Trying to drop \"${_linker_flag}\" from the linker flags."
+      )
+    STRING(REPLACE "${_linker_flag}" "${_replacement_flag}"
+      DEAL_II_LINKER_FLAGS "${DEAL_II_LINKER_FLAGS}"
+      )
+    STRING(REPLACE "${_linker_flag}" "${_replacement_flag}"
+      DEAL_II_LINKER_FLAGS_${build} "${DEAL_II_LINKER_FLAGS_${_build}}"
+      )
+    SET(${_variable} FALSE CACHE INTERNAL "" FORCE)
+    SET(${_variable} FALSE)
+  ENDMACRO()
+
+  _check_linker_flags()
+
+  IF(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+    SET(_replacement "")
+    IF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+      SET(_replacement "-fuse-ld=gold")
+    ENDIF()
+    _drop_linker_flag(
+      "-fuse-ld=lld" ${_replacement}
+      DEAL_II_COMPILER_HAS_FUSE_LD_LLD
+      )
+    _check_linker_flags()
+  ENDIF()
+
+  IF(NOT DEAL_II_HAVE_USABLE_FLAGS_${build} AND DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+    _drop_linker_flag(
+      "-fuse-ld=gold" ""
+      DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
+      )
+    _check_linker_flags()
+  ENDIF()
 
   IF(NOT DEAL_II_HAVE_USABLE_FLAGS_${build})
     MESSAGE(FATAL_ERROR "

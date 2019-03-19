@@ -460,11 +460,7 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
 RESET_CMAKE_REQUIRED()
 
-#
-# The ld.lld linker is not compatible with GCC. So we only enable it when
-# the Clang compiler is used. See https://github.com/dealii/dealii/issues/7811
-#
-IF(DEAL_II_COMPILER_HAS_FUSE_LD_LLD AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+IF(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
   ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
 ELSEIF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
   ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
