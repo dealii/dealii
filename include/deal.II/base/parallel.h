@@ -147,6 +147,7 @@ namespace parallel
 
 
 
+#ifdef DEAL_II_WITH_THREADS
     /**
      * Encapsulate tbb::parallel_for.
      */
@@ -179,6 +180,7 @@ namespace parallel
                         functor,
                         *partitioner);
     }
+#endif
   } // namespace internal
 
   /**
