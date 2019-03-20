@@ -101,6 +101,7 @@ namespace Step41
     TrilinosWrappers::SparseMatrix complete_system_matrix;
 
     TrilinosWrappers::MPI::Vector solution;
+    TrilinosWrappers::MPI::Vector active_set_vector;
     TrilinosWrappers::MPI::Vector system_rhs;
     TrilinosWrappers::MPI::Vector complete_system_rhs;
     TrilinosWrappers::MPI::Vector diagonal_of_mass_matrix;
@@ -261,6 +262,7 @@ namespace Step41
 
     IndexSet solution_index_set = dof_handler.locally_owned_dofs();
     solution.reinit(solution_index_set, MPI_COMM_WORLD);
+    active_set_vector.reinit(solution_index_set, MPI_COMM_WORLD);
     system_rhs.reinit(solution_index_set, MPI_COMM_WORLD);
     complete_system_rhs.reinit(solution_index_set, MPI_COMM_WORLD);
     contact_force.reinit(solution_index_set, MPI_COMM_WORLD);
@@ -542,6 +544,10 @@ namespace Step41
                                              BoundaryValues<dim>(),
                                              constraints);
     constraints.close();
+
+    active_set_vector = 0.;
+    for (const auto index : active_set)
+      active_set_vector[index] = 1.;
   }
 
   // @sect4{ObstacleProblem::solve}
@@ -576,11 +582,7 @@ namespace Step41
   // @sect4{ObstacleProblem::output_results}
 
   // We use the vtk-format for the output.  The file contains the displacement
-  // and a numerical representation of the active set. The function looks
-  // standard but note that we can add an IndexSet object to the DataOut
-  // object in exactly the same way as a regular solution vector: it is simply
-  // interpreted as a function that is either zero (when a degree of freedom
-  // is not part of the IndexSet) or one (if it is).
+  // and a numerical representation of the active set.
   template <int dim>
   void ObstacleProblem<dim>::output_results(const unsigned int iteration) const
   {
@@ -590,7 +592,7 @@ namespace Step41
 
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "displacement");
-    data_out.add_data_vector(active_set, "active_set");
+    data_out.add_data_vector(active_set_vector, "active_set");
     data_out.add_data_vector(contact_force, "lambda");
 
     data_out.build_patches();

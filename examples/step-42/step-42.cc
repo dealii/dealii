@@ -701,6 +701,7 @@ namespace Step42
     TrilinosWrappers::SparseMatrix newton_matrix;
 
     TrilinosWrappers::MPI::Vector solution;
+    TrilinosWrappers::MPI::Vector active_set_vector;
     TrilinosWrappers::MPI::Vector newton_rhs;
     TrilinosWrappers::MPI::Vector newton_rhs_uncondensed;
     TrilinosWrappers::MPI::Vector diag_mass_matrix_vector;
@@ -1022,6 +1023,7 @@ namespace Step42
     {
       TimerOutput::Scope t(computing_timer, "Setup: vectors");
       solution.reinit(locally_relevant_dofs, mpi_communicator);
+      active_set_vector.reinit(locally_relevant_dofs, MPI_COMM_WORLD);
       newton_rhs.reinit(locally_owned_dofs, mpi_communicator);
       newton_rhs_uncondensed.reinit(locally_owned_dofs, mpi_communicator);
       diag_mass_matrix_vector.reinit(locally_owned_dofs, mpi_communicator);
@@ -1339,6 +1341,14 @@ namespace Step42
     all_constraints.close();
     all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
 
+    // We misuse distributed_solution for updating active_set_vector.
+    // We can do that because distributed_solution has a compatible underlying
+    // IndexSet and we don't need the vector anymore.
+    distributed_solution = 0.;
+    for (const auto index : active_set)
+      distributed_solution[index] = 1.;
+    active_set_vector = distributed_solution;
+
     pcout << "         Size of active set: "
           << Utilities::MPI::sum((active_set & locally_owned_dofs).n_elements(),
                                  mpi_communicator)
@@ -1388,13 +1398,9 @@ namespace Step42
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
     const FEValuesExtractors::Vector displacement(0);
 
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1553,10 +1559,9 @@ namespace Step42
 
     fraction_of_plastic_q_points_per_cell = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    unsigned int cell_number                            = 0;
+    auto         cell        = dof_handler.begin_active();
+    const auto   endc        = dof_handler.end();
+    unsigned int cell_number = 0;
     for (; cell != endc; ++cell, ++cell_number)
       if (cell->is_locally_owned())
         {
@@ -2048,7 +2053,7 @@ namespace Step42
                              std::vector<std::string>(dim, "contact_force"),
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);
-    data_out.add_data_vector(active_set,
+    data_out.add_data_vector(active_set_vector,
                              std::vector<std::string>(dim, "active_set"),
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);

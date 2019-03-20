@@ -55,36 +55,6 @@ for (VEC : REAL_VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES;
 
 
 
-for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS;
-     deal_II_space_dimension : DIMENSIONS)
-  {
-#if deal_II_dimension < deal_II_space_dimension
-    template void
-    DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
-                    deal_II_dimension,
-                    deal_II_space_dimension>::
-      add_data_vector_internal<IndexSet>(
-        const DH<deal_II_dimension, deal_II_space_dimension> *,
-        const IndexSet &,
-        const std::vector<std::string> &,
-        const DataVectorType,
-        const std::vector<
-          DataComponentInterpretation::DataComponentInterpretation> &,
-        const bool);
-
-    template void
-    DataOut_DoFData<DH<deal_II_dimension, deal_II_space_dimension>,
-                    deal_II_dimension,
-                    deal_II_space_dimension>::
-      add_data_vector<IndexSet>(
-        const IndexSet &,
-        const DataPostprocessor<
-          DH<deal_II_dimension, deal_II_space_dimension>::space_dimension> &);
-#endif
-  }
-
-
-
 for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
   {
 #if deal_II_dimension < 3

@@ -730,9 +730,7 @@ public:
    *
    * @note The actual type for the vector argument may be any vector type from
    * which FEValues can extract values on a cell using the
-   * FEValuesBase::get_function_values() function. In particular, this
-   * includes all of the usual vector types, but also IndexSet (see step-41
-   * for a use of this).
+   * FEValuesBase::get_function_values() function.
    */
   template <class VectorType>
   void
@@ -824,9 +822,7 @@ public:
    *
    * @note The actual type for the vector argument may be any vector type from
    * which FEValues can extract values on a cell using the
-   * FEValuesBase::get_function_values() function. In particular, this
-   * includes all of the usual vector types, but also IndexSet (see step-41
-   * for a use of this).
+   * FEValuesBase::get_function_values() function.
    *
    * @note The DataPostprocessor object (i.e., in reality the object of your
    * derived class) has to live until the DataOut object is destroyed as the
