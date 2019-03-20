@@ -254,8 +254,9 @@ namespace boost
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 
     template <class T> struct hash
-        : std::unary_function<T, std::size_t>
     {
+        typedef T argument_type;
+        typedef std::size_t result_type;
 #if !defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
         std::size_t operator()(T const& val) const
         {
@@ -271,8 +272,9 @@ namespace boost
 
 #if BOOST_WORKAROUND(__DMC__, <= 0x848)
     template <class T, unsigned int n> struct hash<T[n]>
-        : std::unary_function<T[n], std::size_t>
     {
+        typedef T[n] argument_type;
+        typedef std::size_t result_type;
         std::size_t operator()(const T* val) const
         {
             return boost::hash_range(val, val+n);
@@ -296,8 +298,9 @@ namespace boost
         {
             template <class T>
             struct inner
-                : std::unary_function<T, std::size_t>
             {
+                typedef T argument_type;
+                typedef std::size_t result_type;
 #if !defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
                 std::size_t operator()(T const& val) const
                 {
