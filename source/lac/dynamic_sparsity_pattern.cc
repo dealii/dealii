@@ -23,6 +23,7 @@
 #include <cmath>
 #include <functional>
 #include <numeric>
+#include <set>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -552,6 +553,45 @@ DynamicSparsityPattern::n_nonzero_elements() const
 
   return n;
 }
+
+
+
+IndexSet
+DynamicSparsityPattern::nonempty_cols() const
+{
+  std::set<types::global_dof_index> cols;
+  for (const auto &line : lines)
+    cols.insert(line.entries.begin(), line.entries.end());
+
+  IndexSet res(this->n_cols());
+  res.add_indices(cols.begin(), cols.end());
+  return res;
+}
+
+
+
+IndexSet
+DynamicSparsityPattern::nonempty_rows() const
+{
+  const IndexSet  all_rows            = complete_index_set(this->n_rows());
+  const IndexSet &locally_stored_rows = rowset.size() == 0 ? all_rows : rowset;
+
+  std::vector<types::global_dof_index> rows;
+  auto                                 line = lines.begin();
+  AssertDimension(locally_stored_rows.n_elements(), lines.size());
+  for (const auto &row : locally_stored_rows)
+    {
+      if (line->entries.size() > 0)
+        rows.push_back(row);
+
+      ++line;
+    }
+
+  IndexSet res(this->n_rows());
+  res.add_indices(rows.begin(), rows.end());
+  return res;
+}
+
 
 
 DynamicSparsityPattern::size_type
