@@ -925,30 +925,27 @@ namespace SparsityTools
     for (DynamicSparsityPattern::size_type i = 0; i < rows_per_cpu.size(); ++i)
       start_index[i + 1] = start_index[i] + rows_per_cpu[i];
 
+    IndexSet owned(start_index.back());
+    owned.add_range(start_index[myid], start_index[myid] + rows_per_cpu[myid]);
+
+    IndexSet myrange_non_owned(myrange);
+    myrange_non_owned.subtract_set(owned);
+
     using map_vec_t =
       std::map<unsigned int, std::vector<DynamicSparsityPattern::size_type>>;
 
     map_vec_t send_data;
 
     {
-      unsigned int dest_cpu         = 0;
-      const auto   n_local_rel_rows = myrange.n_elements();
-      for (DynamicSparsityPattern::size_type row_idx = 0;
-           row_idx < n_local_rel_rows;
-           ++row_idx)
+      unsigned int dest_cpu = 0;
+      for (const auto &row : myrange_non_owned)
         {
-          const auto row = myrange.nth_index_in_set(row_idx);
-
           // calculate destination CPU
           while (row >= start_index[dest_cpu + 1])
             ++dest_cpu;
 
-          // skip myself
-          if (dest_cpu == myid)
-            {
-              row_idx += rows_per_cpu[myid] - 1;
-              continue;
-            }
+          // we removed owned, thus shall not hit ourselves
+          Assert(dest_cpu != myid, ExcInternalError());
 
           const auto rlen = dsp.row_length(row);
 
