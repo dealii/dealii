@@ -954,15 +954,13 @@ namespace SparsityTools
             continue;
 
           // save entries
-          auto &dst = send_data[dest_cpu];
-
-          dst.push_back(rlen); // number of entries
-          dst.push_back(row);  // row index
+          send_data[dest_cpu].push_back(row);  // row index
+          send_data[dest_cpu].push_back(rlen); // number of entries
           for (DynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
             {
               // columns
               const auto column = dsp.column_number(row, c);
-              dst.push_back(column);
+              send_data[dest_cpu].push_back(column);
             }
         }
     }
@@ -977,13 +975,13 @@ namespace SparsityTools
         const auto  end      = recv_buf.end();
         while (ptr != end)
           {
-            const DynamicSparsityPattern::size_type num = *(ptr++);
+            const auto row = *(ptr++);
             Assert(ptr != end, ExcInternalError());
-            const DynamicSparsityPattern::size_type row = *(ptr++);
+            const auto n_entries = *(ptr++);
 
-            Assert(ptr + (num - 1) != end, ExcInternalError());
-            dsp.add_entries(row, ptr, ptr + num, true);
-            ptr += num;
+            Assert(ptr + (n_entries - 1) != end, ExcInternalError());
+            dsp.add_entries(row, ptr, ptr + n_entries, true);
+            ptr += n_entries;
           }
         Assert(ptr == end, ExcInternalError());
       }
