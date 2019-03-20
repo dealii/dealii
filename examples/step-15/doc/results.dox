@@ -137,7 +137,7 @@ Wolfe and Armijo-Goldstein conditions. For these, one can show the following:
   satisfied, i.e., the iteration never gets stuck as long as the problem is
   convex.
 - If we are close enough to the solution, then the conditions allow for
-  $\alpha^n$, thereby enabling quadratic convergence.
+  $\alpha^n=1$, thereby enabling quadratic convergence.
 
 We will not dwell on this here any further but leave the implementation of
 such algorithms as an exercise. We note, however, that when implemented
@@ -145,6 +145,9 @@ correctly then it is a common observation that most reasonably nonlinear
 problems can be solved in anywhere between 5 and 15 Newton iterations to
 engineering accuracy &mdash; substantially fewer than we need with the current
 version of the program.
+
+More details on globalization methods including backtracking can be found,
+for example, in Griva, Nash, Sofer: Linear and nonlinear optimization (2009).
 
 
 <h4> Integrating mesh refinement and nonlinear and linear solvers </h4>
