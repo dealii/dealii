@@ -1,0 +1,35 @@
+
+DEAL:Integer::a: 4
+DEAL:Integer::b: 2
+DEAL:Integer::c = a+b: 6
+DEAL:Integer::c = a-b: 2
+DEAL:Integer::c = a*b: 8
+DEAL:Integer::c = a/b: 2
+DEAL:Integer::c = a: 4
+DEAL:Integer::c += a: 8
+DEAL:Integer::c -= a: 4
+DEAL:Integer::c *= a: 16
+DEAL:Integer::c /= a: 4
+DEAL:Float::a: 4.19999980926514
+DEAL:Float::b: 2.09999990463257
+DEAL:Float::c = a+b: 6.29999971389771
+DEAL:Float::c = a-b: 2.09999990463257
+DEAL:Float::c = a*b: 8.81999919891359
+DEAL:Float::c = a/b: 2.
+DEAL:Float::c = a: 4.19999980926514
+DEAL:Float::c += a: 8.39999961853027
+DEAL:Float::c -= a: 4.19999980926514
+DEAL:Float::c *= a: 17.6399983978272
+DEAL:Float::c /= a: 4.19999980926514
+DEAL:Double::a: 4.2
+DEAL:Double::b: 2.1
+DEAL:Double::c = a+b: 6.3
+DEAL:Double::c = a-b: 2.1
+DEAL:Double::c = a*b: 8.82
+DEAL:Double::c = a/b: 2.
+DEAL:Double::c = a: 4.2
+DEAL:Double::c += a: 8.4
+DEAL:Double::c -= a: 4.2
+DEAL:Double::c *= a: 17.64
+DEAL:Double::c /= a: 4.2
+DEAL::OK

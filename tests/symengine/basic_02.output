@@ -1,0 +1,35 @@
+
+DEAL:Integer::a: 3
+DEAL:Integer::b: 7
+DEAL:Integer::x: x
+DEAL:Integer::y: y
+DEAL:Integer::c = y*(y-b)*(a+x): y*(-7 + y)*(3 + x)
+DEAL:Integer::dc_dx = a*y*(y-b): y*(-7 + y)
+DEAL:Integer::dc_dy = 2*y*(a+x): y*(3 + x) + (-7 + y)*(3 + x)
+DEAL:Integer::dc_dy = 2*y*(a+x): y*(3 + x) + (-7 + y)*(3 + x)
+DEAL:Integer::dc_dx(x=1,y=2.2): -10
+DEAL:Integer::dc_dy(x=0.75,y=-1.08): -33
+DEAL:Integer::
+DEAL:Float::a: 3.09999990463257
+DEAL:Float::b: 7.5
+DEAL:Float::x: x
+DEAL:Float::y: y
+DEAL:Float::c = y*(y-b)*(a+x): y*(3.09999990463257 + x)*(-7.5 + y)
+DEAL:Float::dc_dx = a*y*(y-b): y*(-7.5 + y)
+DEAL:Float::dc_dy = 2*y*(a+x): y*(3.09999990463257 + x) + (3.09999990463257 + x)*(-7.5 + y)
+DEAL:Float::dc_dy = 2*y*(a+x): y*(3.09999990463257 + x) + (3.09999990463257 + x)*(-7.5 + y)
+DEAL:Float::dc_dx(x=1,y=2.2): -11.6600001478195
+DEAL:Float::dc_dy(x=0.75,y=-1.08): -44.8909983005524
+DEAL:Float::
+DEAL:Double::a: 3.1
+DEAL:Double::b: 7.5
+DEAL:Double::x: x
+DEAL:Double::y: y
+DEAL:Double::c = y*(y-b)*(a+x): y*(3.1 + x)*(-7.5 + y)
+DEAL:Double::dc_dx = a*y*(y-b): y*(-7.5 + y)
+DEAL:Double::dc_dy = 2*y*(a+x): y*(3.1 + x) + (3.1 + x)*(-7.5 + y)
+DEAL:Double::dc_dy = 2*y*(a+x): y*(3.1 + x) + (3.1 + x)*(-7.5 + y)
+DEAL:Double::dc_dx(x=1,y=2.2): -11.66
+DEAL:Double::dc_dy(x=0.75,y=-1.08): -44.891
+DEAL:Double::
+DEAL::OK

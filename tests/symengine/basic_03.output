@@ -1,0 +1,62 @@
+
+DEAL:Integer::x: x
+DEAL:Integer::y: y
+DEAL:Integer::f: f(x)
+DEAL:Integer::g: g(x, y)
+DEAL:Integer::h: h(x + y, x*y)
+DEAL:Integer::df_dx: Derivative(f(x), x)
+DEAL:Integer::dg_dx: Derivative(g(x, y), x)
+DEAL:Integer::dh_dx: y*Subs(Derivative(h(x + y, _xi_2), _xi_2), (_xi_2), (x*y)) + Subs(Derivative(h(_xi_1, x*y), _xi_1), (_xi_1), (x + y))
+DEAL:Integer::df_dy: 0
+DEAL:Integer::dg_dy: Derivative(g(x, y), y)
+DEAL:Integer::dh_dy: x*Subs(Derivative(h(x + y, _xi_2), _xi_2), (_xi_2), (x*y)) + Subs(Derivative(h(_xi_1, x*y), _xi_1), (_xi_1), (x + y))
+DEAL:Integer::f(x=1,y=2.2): x**2
+DEAL:Integer::g(x=1,y=2.2): x + y
+DEAL:Integer::h(x=1,y=2.2): x - y
+DEAL:Integer::Eval: f(x=1,y=2.2): 1.00
+DEAL:Integer::Eval: g(x=1,y=2.2): 3.00
+DEAL:Integer::Eval: h(x=1,y=2.2): -1.00
+DEAL:Integer::df_dx(x=1,y=2.2): 2*x
+DEAL:Integer::dg_dx(x=1,y=2.2): 1
+DEAL:Integer::dh_dx(x=1,y=2.2): 2*Subs(Derivative(h(3, _xi_2), _xi_2), (_xi_2), (2)) + Subs(Derivative(h(_xi_1, 2), _xi_1), (_xi_1), (3))
+DEAL:Float::x: x
+DEAL:Float::y: y
+DEAL:Float::f: f(x)
+DEAL:Float::g: g(x, y)
+DEAL:Float::h: h(x + y, x*y)
+DEAL:Float::df_dx: Derivative(f(x), x)
+DEAL:Float::dg_dx: Derivative(g(x, y), x)
+DEAL:Float::dh_dx: y*Subs(Derivative(h(x + y, _xi_2), _xi_2), (_xi_2), (x*y)) + Subs(Derivative(h(_xi_1, x*y), _xi_1), (_xi_1), (x + y))
+DEAL:Float::df_dy: 0
+DEAL:Float::dg_dy: Derivative(g(x, y), y)
+DEAL:Float::dh_dy: x*Subs(Derivative(h(x + y, _xi_2), _xi_2), (_xi_2), (x*y)) + Subs(Derivative(h(_xi_1, x*y), _xi_1), (_xi_1), (x + y))
+DEAL:Float::f(x=1,y=2.2): x**2
+DEAL:Float::g(x=1,y=2.2): x + y
+DEAL:Float::h(x=1,y=2.2): x - y
+DEAL:Float::Eval: f(x=1,y=2.2): 1.00
+DEAL:Float::Eval: g(x=1,y=2.2): 3.20
+DEAL:Float::Eval: h(x=1,y=2.2): -1.20
+DEAL:Float::df_dx(x=1,y=2.2): 2*x
+DEAL:Float::dg_dx(x=1,y=2.2): 1
+DEAL:Float::dh_dx(x=1,y=2.2): 2.20000004768372*Subs(Derivative(h(3.20000004768372, _xi_2), _xi_2), (_xi_2), (2.20000004768372)) + Subs(Derivative(h(_xi_1, 2.20000004768372), _xi_1), (_xi_1), (3.20000004768372))
+DEAL:Double::x: x
+DEAL:Double::y: y
+DEAL:Double::f: f(x)
+DEAL:Double::g: g(x, y)
+DEAL:Double::h: h(x + y, x*y)
+DEAL:Double::df_dx: Derivative(f(x), x)
+DEAL:Double::dg_dx: Derivative(g(x, y), x)
+DEAL:Double::dh_dx: y*Subs(Derivative(h(x + y, _xi_2), _xi_2), (_xi_2), (x*y)) + Subs(Derivative(h(_xi_1, x*y), _xi_1), (_xi_1), (x + y))
+DEAL:Double::df_dy: 0
+DEAL:Double::dg_dy: Derivative(g(x, y), y)
+DEAL:Double::dh_dy: x*Subs(Derivative(h(x + y, _xi_2), _xi_2), (_xi_2), (x*y)) + Subs(Derivative(h(_xi_1, x*y), _xi_1), (_xi_1), (x + y))
+DEAL:Double::f(x=1,y=2.2): x**2
+DEAL:Double::g(x=1,y=2.2): x + y
+DEAL:Double::h(x=1,y=2.2): x - y
+DEAL:Double::Eval: f(x=1,y=2.2): 1.00
+DEAL:Double::Eval: g(x=1,y=2.2): 3.20
+DEAL:Double::Eval: h(x=1,y=2.2): -1.20
+DEAL:Double::df_dx(x=1,y=2.2): 2*x
+DEAL:Double::dg_dx(x=1,y=2.2): 1
+DEAL:Double::dh_dx(x=1,y=2.2): 2.2*Subs(Derivative(h(3.2, _xi_2), _xi_2), (_xi_2), (2.2)) + Subs(Derivative(h(_xi_1, 2.2), _xi_1), (_xi_1), (3.2))
+DEAL::OK
