@@ -3233,11 +3233,10 @@ namespace Differentiation
        * corresponding to the column extractor.
        */
       template <typename ExtractorType_Row>
-      typename internal::ScalarFieldGradient<dim,
-                                             scalar_type,
-                                             ExtractorType_Row>::type
-      extract_gradient_component(const Vector<scalar_type> &gradient,
-                                 const ExtractorType_Row &extractor_row) const;
+      static typename internal::
+        ScalarFieldGradient<dim, scalar_type, ExtractorType_Row>::type
+        extract_gradient_component(const Vector<scalar_type> &gradient,
+                                   const ExtractorType_Row &  extractor_row);
 
       /**
        * Extract the function Hessian for a subset of independent variables
@@ -3278,13 +3277,13 @@ namespace Differentiation
        * corresponding to the column extractor.
        */
       template <typename ExtractorType_Row, typename ExtractorType_Col>
-      typename internal::ScalarFieldHessian<dim,
-                                            scalar_type,
-                                            ExtractorType_Row,
-                                            ExtractorType_Col>::type
+      static typename internal::ScalarFieldHessian<dim,
+                                                   scalar_type,
+                                                   ExtractorType_Row,
+                                                   ExtractorType_Col>::type
       extract_hessian_component(const FullMatrix<scalar_type> &hessian,
                                 const ExtractorType_Row &      extractor_row,
-                                const ExtractorType_Col &extractor_col) const;
+                                const ExtractorType_Col &      extractor_col);
 
       /**
        * Extract the function Hessian for a subset of independent variables
@@ -3299,11 +3298,11 @@ namespace Differentiation
        * Hessian matrix because both extractors imply selection of just a
        * single row or column of the matrix.
        */
-      Tensor<0, dim, scalar_type>
+      static Tensor<0, dim, scalar_type>
       extract_hessian_component(
         const FullMatrix<scalar_type> &   hessian,
         const FEValuesExtractors::Scalar &extractor_row,
-        const FEValuesExtractors::Scalar &extractor_col) const;
+        const FEValuesExtractors::Scalar &extractor_col);
 
       /**
        * Extract the function Hessian for a subset of independent variables
@@ -3314,13 +3313,13 @@ namespace Differentiation
        * @f]
        *
        * This function is a specialization of the above for rank-4 symmetric
-       * tensors
+       * tensors.
        */
-      SymmetricTensor<4, dim, scalar_type>
+      static SymmetricTensor<4, dim, scalar_type>
       extract_hessian_component(
         const FullMatrix<scalar_type> &               hessian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
-        const FEValuesExtractors::SymmetricTensor<2> &extractor_col) const;
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_col);
 
       //@}
 
@@ -3508,7 +3507,7 @@ namespace Differentiation
       ExtractorType_Row>::type
     ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_gradient_component(const Vector<scalar_type> &gradient,
-                                 const ExtractorType_Row &  extractor_row) const
+                                 const ExtractorType_Row &  extractor_row)
     {
       // NOTE: The order of components must be consistently defined throughout
       // this class.
@@ -3542,7 +3541,7 @@ namespace Differentiation
     ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_hessian_component(const FullMatrix<scalar_type> &hessian,
                                 const ExtractorType_Row &      extractor_row,
-                                const ExtractorType_Col &extractor_col) const
+                                const ExtractorType_Col &      extractor_col)
     {
       using InternalHessian      = internal::ScalarFieldHessian<dim,
                                                            scalar_type,

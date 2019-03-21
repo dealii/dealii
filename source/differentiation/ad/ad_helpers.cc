@@ -1572,10 +1572,9 @@ namespace Differentiation
            typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
              scalar_type>
     ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
-      extract_hessian_component(
-        const FullMatrix<scalar_type> &   hessian,
-        const FEValuesExtractors::Scalar &extractor_row,
-        const FEValuesExtractors::Scalar &extractor_col) const
+      extract_hessian_component(const FullMatrix<scalar_type> &   hessian,
+                                const FEValuesExtractors::Scalar &extractor_row,
+                                const FEValuesExtractors::Scalar &extractor_col)
     {
       // NOTE: It is necessary to make special provision for the case when the
       // HessianType is scalar. Unfortunately Tensor<0,dim> does not provide
@@ -1614,7 +1613,7 @@ namespace Differentiation
       extract_hessian_component(
         const FullMatrix<scalar_type> &               hessian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
-        const FEValuesExtractors::SymmetricTensor<2> &extractor_col) const
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_col)
     {
       // NOTE: The order of components must be consistently defined throughout
       // this class.
