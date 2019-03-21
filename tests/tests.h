@@ -527,6 +527,9 @@ struct MPILogInitAll
   {
 #ifdef DEAL_II_WITH_MPI
     const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+#else
+    constexpr unsigned int myid = 0;
+#endif
     if (myid == 0)
       {
         if (!deallog.has_file())
@@ -545,21 +548,16 @@ struct MPILogInitAll
     deallog.depth_console(console ? 10 : 0);
 
     deallog.push(Utilities::int_to_string(myid));
-#else
-    (void)console;
-    // can't use this function if not using MPI
-    Assert(false, ExcInternalError());
-#endif
   }
 
   ~MPILogInitAll()
   {
+    // pop the prefix for the MPI rank of the current process
+    deallog.pop();
+
 #ifdef DEAL_II_WITH_MPI
     const unsigned int myid  = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
     const unsigned int nproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-
-    // pop the prefix for the MPI rank of the current process
-    deallog.pop();
 
     if (myid != 0)
       {
@@ -583,10 +581,6 @@ struct MPILogInitAll
           }
       }
     MPI_Barrier(MPI_COMM_WORLD);
-
-#else
-    // can't use this function if not using MPI
-    Assert(false, ExcInternalError());
 #endif
   }
 };
