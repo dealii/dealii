@@ -28,7 +28,7 @@ MACRO(FEATURE_SCALAPACK_FIND_EXTERNAL var)
     CHECK_MPI_INTERFACE(SCALAPACK ${var})
 
     IF (${var})
-      SET(CMAKE_REQUIRED_LIBRARIES ${SCALAPACK_LIBRARY})
+      SET(CMAKE_REQUIRED_LIBRARIES ${SCALAPACK_LIBRARIES})
       CHECK_C_SOURCE_COMPILES("
         void pdsyevr_();
         void pssyevr_();
@@ -47,7 +47,7 @@ MACRO(FEATURE_SCALAPACK_FIND_EXTERNAL var)
         SET(SCALAPACK_ADDITIONAL_ERROR_STRING
           ${SCALAPACK_ADDITIONAL_ERROR_STRING}
           "Could not find a sufficient SCALAPACK installation: \n"
-          "SCALAPACK symbol check for pdsyevr_ and pssyevr failed! "
+          "SCALAPACK symbol check for pdsyevr_ and pssyevr_ failed! "
           "This usually means that your SCALAPACK installation is incomplete "
           "or the link line is broken. Consult\n"
           "  CMakeFiles/CMakeError.log\n"
