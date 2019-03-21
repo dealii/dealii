@@ -3813,21 +3813,31 @@ namespace GridTools
           for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
             {
               const auto id = cell->line(l)->user_index();
-              Assert(id != 0, ExcInternalError());
-              if (cell->line(l)->manifold_id() == numbers::flat_manifold_id ||
-                  overwrite_only_flat_manifold_ids == false)
-                cell->line(l)->set_manifold_id(
-                  disambiguation_function(manifold_ids[id]));
+              // Make sure we change the manifold indicator only once
+              if (id != 0)
+                {
+                  if (cell->line(l)->manifold_id() ==
+                        numbers::flat_manifold_id ||
+                      overwrite_only_flat_manifold_ids == false)
+                    cell->line(l)->set_manifold_id(
+                      disambiguation_function(manifold_ids[id]));
+                  cell->line(l)->set_user_index(0);
+                }
             }
         if (dim > 2)
           for (unsigned int l = 0; l < GeometryInfo<dim>::quads_per_cell; ++l)
             {
               const auto id = cell->quad(l)->user_index();
-              Assert(id != 0, ExcInternalError());
-              if (cell->quad(l)->manifold_id() == numbers::flat_manifold_id ||
-                  overwrite_only_flat_manifold_ids == false)
-                cell->quad(l)->set_manifold_id(
-                  disambiguation_function(manifold_ids[id]));
+              // Make sure we change the manifold indicator only once
+              if (id != 0)
+                {
+                  if (cell->quad(l)->manifold_id() ==
+                        numbers::flat_manifold_id ||
+                      overwrite_only_flat_manifold_ids == false)
+                    cell->quad(l)->set_manifold_id(
+                      disambiguation_function(manifold_ids[id]));
+                  cell->quad(l)->set_user_index(0);
+                }
             }
       }
     tria.load_user_indices(backup);
