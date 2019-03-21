@@ -125,6 +125,14 @@ for (deal_II_dimension : DIMENSIONS ; number : REAL_SCALARS)
     template
     class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
 
+    // -------------------------- ADHelperVectorFunction ----------------------
+
+    template
+    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
     \}
     \}
 }
@@ -152,6 +160,14 @@ for (deal_II_dimension : DIMENSIONS)
 
     template
     class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperVectorFunction ----------------------
+
+    template
+    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
     \}
     \}

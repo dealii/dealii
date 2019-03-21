@@ -1640,6 +1640,249 @@ namespace Differentiation
     }
 
 
+
+    /* -------------------- ADHelperVectorFunction -------------------- */
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+      ADHelperVectorFunction(const unsigned int n_independent_variables,
+                             const unsigned int n_dependent_variables)
+      : ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>(
+          n_independent_variables,
+          n_dependent_variables)
+    {}
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+      register_dependent_variables(const std::vector<ad_type> &funcs)
+    {
+      Assert(funcs.size() == this->n_dependent_variables(),
+             ExcMessage(
+               "Vector size does not match number of dependent variables"));
+      for (unsigned int i = 0; i < this->n_dependent_variables(); ++i)
+        ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+          i, funcs[i]);
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::compute_values(
+      Vector<scalar_type> &values) const
+    {
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false) ||
+          ADNumberTraits<ad_type>::is_tapeless == true)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      // We can neglect correctly initializing the entries as
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::values().
+      if (values.size() != this->n_dependent_variables())
+        values.reinit(this->n_dependent_variables(),
+                      true /*omit_zeroing_entries*/);
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute values while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          this->taped_driver.values(this->active_tape_index(),
+                                    this->n_dependent_variables(),
+                                    this->independent_variable_values,
+                                    values);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          this->tapeless_driver.values(this->dependent_variables, values);
+        }
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    void
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::compute_jacobian(
+      FullMatrix<scalar_type> &jacobian) const
+    {
+      if ((ADNumberTraits<ad_type>::is_taped == true &&
+           this->taped_driver.keep_independent_values() == false) ||
+          ADNumberTraits<ad_type>::is_tapeless == true)
+        {
+          Assert(
+            this->n_registered_independent_variables() ==
+              this->n_independent_variables(),
+            ExcMessage(
+              "Not all values of sensitivities have been registered or subsequently set!"));
+        }
+      Assert(this->n_registered_dependent_variables() ==
+               this->n_dependent_variables(),
+             ExcMessage("Not all dependent variables have been registered."));
+
+      // We can neglect correctly initializing the entries as
+      // we'll be overwriting them immediately in the succeeding call to
+      // Drivers::jacobian().
+      if (jacobian.m() != this->n_dependent_variables() ||
+          jacobian.n() != this->n_independent_variables())
+        jacobian.reinit({this->n_dependent_variables(),
+                         this->n_independent_variables()},
+                        true /*omit_default_initialization*/);
+
+      if (ADNumberTraits<ad_type>::is_taped == true)
+        {
+          Assert(this->active_tape_index() !=
+                   Numbers<ad_type>::invalid_tape_index,
+                 ExcMessage("Invalid tape index"));
+          Assert(this->is_recording() == false,
+                 ExcMessage(
+                   "Cannot compute Jacobian while tape is being recorded."));
+          Assert(this->independent_variable_values.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variable_values.size(),
+                                      this->n_independent_variables()));
+
+          this->taped_driver.jacobian(this->active_tape_index(),
+                                      this->n_dependent_variables(),
+                                      this->independent_variable_values,
+                                      jacobian);
+        }
+      else
+        {
+          Assert(ADNumberTraits<ad_type>::is_tapeless == true,
+                 ExcInternalError());
+          Assert(this->independent_variables.size() ==
+                   this->n_independent_variables(),
+                 ExcDimensionMismatch(this->independent_variables.size(),
+                                      this->n_independent_variables()));
+
+          this->tapeless_driver.jacobian(this->independent_variables,
+                                         this->dependent_variables,
+                                         jacobian);
+        }
+
+      for (unsigned int j = 0; j < this->n_independent_variables(); j++)
+        {
+          // Because we perform just a single differentiation
+          // operation with respect to the "column" variables,
+          // we only need to consider them for symmetry conditions.
+          if (this->is_symmetric_independent_variable(j) == true)
+            for (unsigned int i = 0; i < this->n_dependent_variables(); i++)
+              jacobian[i][j] *= 0.5;
+        }
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    Tensor<0,
+           dim,
+           typename ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+             scalar_type>
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+      extract_jacobian_component(
+        const FullMatrix<scalar_type> &   jacobian,
+        const FEValuesExtractors::Scalar &extractor_row,
+        const FEValuesExtractors::Scalar &extractor_col)
+    {
+      // NOTE: It is necessary to make special provision for the case when the
+      // HessianType is scalar. Unfortunately Tensor<0,dim> does not provide
+      // the function unrolled_to_component_indices!
+      // NOTE: The order of components must be consistently defined throughout
+      // this class.
+      Tensor<0, dim, scalar_type> out;
+
+      // Get indexsets for the subblocks from which we wish to extract the
+      // matrix values
+      const std::vector<unsigned int> row_index_set(
+        internal::extract_field_component_indices<dim>(extractor_row));
+      const std::vector<unsigned int> col_index_set(
+        internal::extract_field_component_indices<dim>(extractor_col));
+      Assert(row_index_set.size() == 1, ExcInternalError());
+      Assert(col_index_set.size() == 1, ExcInternalError());
+
+      internal::set_tensor_entry(out,
+                                 0,
+                                 jacobian[row_index_set[0]][col_index_set[0]]);
+
+      return out;
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    SymmetricTensor<4,
+                    dim,
+                    typename ADHelperVectorFunction<dim,
+                                                    ADNumberTypeCode,
+                                                    ScalarType>::scalar_type>
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+      extract_jacobian_component(
+        const FullMatrix<scalar_type> &               jacobian,
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_col)
+    {
+      // NOTE: The order of components must be consistently defined throughout
+      // this class.
+      // NOTE: We require a specialisation for rank-4 symmetric tensors because
+      // they do not define their rank, and setting data using TableIndices is
+      // somewhat specialised as well.
+      SymmetricTensor<4, dim, scalar_type> out;
+
+      // Get indexsets for the subblocks from which we wish to extract the
+      // matrix values
+      const std::vector<unsigned int> row_index_set(
+        internal::extract_field_component_indices<dim>(extractor_row));
+      const std::vector<unsigned int> col_index_set(
+        internal::extract_field_component_indices<dim>(extractor_col));
+
+      for (unsigned int r = 0; r < row_index_set.size(); ++r)
+        for (unsigned int c = 0; c < col_index_set.size(); ++c)
+          {
+            internal::set_tensor_entry(
+              out, r, c, jacobian[row_index_set[r]][col_index_set[c]]);
+          }
+
+      return out;
+    }
+
+
   } // namespace AD
 } // namespace Differentiation
 
