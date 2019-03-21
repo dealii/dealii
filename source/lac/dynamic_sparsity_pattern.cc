@@ -612,6 +612,11 @@ template void
 DynamicSparsityPattern::Line::add_entries(std::vector<size_type>::iterator,
                                           std::vector<size_type>::iterator,
                                           const bool);
+template void
+DynamicSparsityPattern::Line::add_entries(
+  std::vector<size_type>::const_iterator,
+  std::vector<size_type>::const_iterator,
+  const bool);
 #endif
 
 template void
