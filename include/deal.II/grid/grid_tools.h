@@ -2636,8 +2636,9 @@ namespace GridTools
    * Propagate manifold indicators associated to the cells of the Triangulation
    * @p tria to their co-dimension one and two objects.
    *
-   * This function sets the @p manifold_id of shared faces and edges to the value
-   * returnd by the @p disambiguation_function method, called with the set of
+   * This function sets the @p manifold_id of faces and edges (both on the
+   * interior and on the boundary) to the value returnd by the
+   * @p disambiguation_function method, called with the set of
    * manifold indicators of the cells that share the same face or edge.
    *
    * By default, the @p disambiguation_function returns
@@ -2647,6 +2648,13 @@ namespace GridTools
    * and it returns the manifold indicator contained in the set when it has
    * dimension one (i.e., when all adjacent cells and faces have the same
    * manifold indicator).
+   *
+   * The parameter @p overwrite_only_flat_manifold_ids allows you to specify
+   * what to do when a face or an edge already has a manifold indicator
+   * different from numbers::flat_manifold_id. If the flag is @p true, the edge
+   * or face will maintain its original manifold indicator.
+   * If it is @p false, then also the manifold indicator of these faces and edges
+   * is set according to the return value of the @p disambiguation_function.
    *
    * @author Luca Heltai, 2019.
    */
@@ -2660,8 +2668,9 @@ namespace GridTools
         if (manifold_ids.size() == 1)
           return *manifold_ids.begin();
         else
-          return numbers::invalid_manifold_id;
-      });
+          return numbers::flat_manifold_id;
+      },
+    bool overwrite_only_flat_manifold_ids = true);
   /*@}*/
 
   /**

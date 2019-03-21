@@ -3762,7 +3762,8 @@ namespace GridTools
   assign_co_dimensional_manifold_indicators(
     Triangulation<dim, spacedim> &            tria,
     const std::function<types::manifold_id(
-      const std::set<types::manifold_id> &)> &disambiguation_function)
+      const std::set<types::manifold_id> &)> &disambiguation_function,
+    bool                                      overwrite_only_flat_manifold_ids)
   {
     // Easy case first:
     if (dim == 1)
@@ -3812,16 +3813,20 @@ namespace GridTools
             {
               const auto id = cell->line(l)->user_index();
               Assert(id != 0, ExcInternalError());
-              cell->line(l)->set_manifold_id(
-                disambiguation_function(manifold_ids[id]));
+              if (cell->line(l)->manifold_id() == numbers::flat_manifold_id ||
+                  overwrite_only_flat_manifold_ids == false)
+                cell->line(l)->set_manifold_id(
+                  disambiguation_function(manifold_ids[id]));
             }
         if (dim > 2)
           for (unsigned int l = 0; l < GeometryInfo<dim>::quads_per_cell; ++l)
             {
               const auto id = cell->quad(l)->user_index();
               Assert(id != 0, ExcInternalError());
-              cell->quad(l)->set_manifold_id(
-                disambiguation_function(manifold_ids[id]));
+              if (cell->quad(l)->manifold_id() == numbers::flat_manifold_id ||
+                  overwrite_only_flat_manifold_ids == false)
+                cell->quad(l)->set_manifold_id(
+                  disambiguation_function(manifold_ids[id]));
             }
       }
     tria.load_user_indices(backup);
