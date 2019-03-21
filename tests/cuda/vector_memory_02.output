@@ -1,0 +1,23 @@
+
+DEAL::Exception: StandardExceptions::ExcMemoryLeak(current_alloc)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <vector_memory.templates.h> in function
+    dealii::GrowingVectorMemory<VectorType>::~GrowingVectorMemory() [with VectorType = dealii::LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::CUDA>]
+The violated condition was: 
+    current_alloc == 0
+Additional information: 
+    Destroying memory handler while 1 objects are still allocated.
+--------------------------------------------------------
+
+DEAL::Exception: StandardExceptions::ExcMemoryLeak(current_alloc)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <vector_memory.templates.h> in function
+    dealii::GrowingVectorMemory<VectorType>::~GrowingVectorMemory() [with VectorType = dealii::LinearAlgebra::distributed::Vector<float, dealii::MemorySpace::CUDA>]
+The violated condition was: 
+    current_alloc == 0
+Additional information: 
+    Destroying memory handler while 1 objects are still allocated.
+--------------------------------------------------------
+
