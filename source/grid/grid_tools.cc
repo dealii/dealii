@@ -3768,11 +3768,11 @@ namespace GridTools
     // Easy case first:
     if (dim == 1)
       return;
-    const unsigned int size =
+    const unsigned int n_subobjects =
       dim == 2 ? tria.n_lines() : tria.n_lines() + tria.n_quads();
 
     // If user index is zero, then it has not been set.
-    std::vector<std::set<types::manifold_id>> manifold_ids(size + 1);
+    std::vector<std::set<types::manifold_id>> manifold_ids(n_subobjects + 1);
     std::vector<unsigned int>                 backup;
     tria.save_user_indices(backup);
     tria.clear_user_data();
@@ -3785,7 +3785,7 @@ namespace GridTools
             {
               if (cell->line(l)->user_index() == 0)
                 {
-                  AssertIndexRange(next_index, size + 1);
+                  AssertIndexRange(next_index, n_subobjects + 1);
                   manifold_ids[next_index].insert(cell->manifold_id());
                   cell->line(l)->set_user_index(next_index++);
                 }
@@ -3798,7 +3798,7 @@ namespace GridTools
             {
               if (cell->quad(l)->user_index() == 0)
                 {
-                  AssertIndexRange(next_index, size + 1);
+                  AssertIndexRange(next_index, n_subobjects + 1);
                   manifold_ids[next_index].insert(cell->manifold_id());
                   cell->quad(l)->set_user_index(next_index++);
                 }
