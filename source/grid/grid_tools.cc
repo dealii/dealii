@@ -3775,6 +3775,7 @@ namespace GridTools
     std::vector<std::set<types::manifold_id>> manifold_ids(size + 1);
     std::vector<unsigned int>                 backup;
     tria.save_user_indices(backup);
+    tria.clear_user_data();
 
     unsigned next_index = 1;
     for (auto cell : tria.active_cell_iterators())
