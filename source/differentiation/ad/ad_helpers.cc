@@ -1617,10 +1617,10 @@ namespace Differentiation
         const FEValuesExtractors::SymmetricTensor<2> &extractor_col) const
     {
       // NOTE: The order of components must be consistently defined throughout
-      // this class. NOTE: We require a specialisation for rank-4 symmetric
-      // tensors because they
-      //       do not define their rank, and setting data using TableIndices is
-      //       somewhat specialised as well.
+      // this class.
+      // NOTE: We require a specialisation for rank-4 symmetric tensors because
+      // they do not define their rank, and setting data using TableIndices is
+      // somewhat specialised as well.
       SymmetricTensor<4, dim, scalar_type> out;
 
       // Get indexsets for the subblocks from which we wish to extract the

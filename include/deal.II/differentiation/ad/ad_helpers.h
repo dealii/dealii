@@ -2964,7 +2964,7 @@ namespace Differentiation
      *   // Define the helper that we will use in the AD computations for our
      *   // scalar energy function. Note that we expect it to return values of
      *   // type double.
-     *   ADHelperScalarFunction<dim,double> ad_helper (n_independent_variables);
+     *   ADHelperScalarFunction<dim,...> ad_helper (n_independent_variables);
      *   using ADNumberType = typename ADHelper::ad_type;
      *
      *   // Compute the fields that provide the independent values.
@@ -3006,7 +3006,7 @@ namespace Differentiation
      *     // introduce them. So this means we have to do it by logical order
      *     // of the extractors that we've created.
      *     const SymmetricTensor<2,dim,ADNumberType> C_AD =
-     *       ad_helper.get_sensitive_variables(C_dofs); const
+     *       ad_helper.get_sensitive_variables(C_dofs);
      *     const Tensor<1,dim,ADNumberType>          H_AD =
      *       ad_helper.get_sensitive_variables(H_dofs);
      *
@@ -3055,7 +3055,7 @@ namespace Differentiation
      *   // and extract the desired values from these intermediate outputs.
      *   Vector<double> Dpsi (ad_helper.n_dependent_variables());
      *   FullMatrix<double> D2psi (ad_helper.n_dependent_variables(),
-     *                             ad_helper.n_dependent_variables());
+     *                             ad_helper.n_independent_variables());
      *   const double psi = ad_helper.compute_value();
      *   ad_helper.compute_gradient(Dpsi);
      *   ad_helper.compute_hessian(D2psi);
@@ -3175,7 +3175,8 @@ namespace Differentiation
        *
        * @param[out] gradient A Vector with the values for the scalar field
        * gradient (first derivatives) evaluated at the point defined by the
-       * independent variable values.
+       * independent variable values. The output @p gradient vector has a length
+       * corresponding to @p n_independent_variables.
        */
       void
       compute_gradient(Vector<scalar_type> &gradient) const;
@@ -3190,7 +3191,9 @@ namespace Differentiation
        *
        * @param[out] hessian A FullMatrix with the values for the scalar field
        * Hessian (second derivatives) evaluated at the point defined by the
-       * independent variable values.
+       * independent variable values. The output @p hessian matrix has
+       * dimensions corresponding to
+       * <code>n_independent_variables</code>$\times$<code>n_independent_variables</code>.
        */
       void
       compute_hessian(FullMatrix<scalar_type> &hessian) const;
@@ -3207,6 +3210,27 @@ namespace Differentiation
        * @param[in] extractor_row An extractor associated with the input field
        * variables. This effectively defines which components of the global set
        * of independent variables this field is associated with.
+       *
+       * @return A Tensor or SymmetricTensor with its rank and symmetries
+       * determined by the @p extractor_row.
+       * This corresponds to subsetting a whole set of rows of the
+       * gradient vector, scaling those entries to take account of tensor
+       * symmetries, and then reshaping the (sub-)vector so obtained into a
+       * tensor, the final result.
+       * For example, if
+       * @p extractor_row is a FEValuesExtractors::Vector and
+       * @p extractor_col is a FEValuesExtractors::Tensor,
+       * then the returned object is a Tensor of rank 3, with its first
+       * index associated with the field corresponding to the row extractor and
+       * the second and third indices associated with the field corresponding to
+       * the column extractor.
+       * Similarly, if
+       * @p extractor_row is a FEValuesExtractors::SymmetricTensor and
+       * @p extractor_col is a FEValuesExtractors::SymmetricTensor,
+       * then the returned object is a SymmetricTensor of rank 4, with its first
+       * two indices associated with the field corresponding to the row
+       * extractor and the last two indices associated with the field
+       * corresponding to the column extractor.
        */
       template <typename ExtractorType_Row>
       typename internal::ScalarFieldGradient<dim,
@@ -3231,6 +3255,27 @@ namespace Differentiation
        * variables for which the first index of the Hessian is extracted.
        * @param[in] extractor_col An extractor associated with the input field
        * variables for which the second index of the Hessian is extracted.
+       *
+       * @return A Tensor or SymmetricTensor with its rank and symmetries
+       * determined by the @p extractor_row and @p extractor_col .
+       * This corresponds to subsetting a whole set of rows and columns of the
+       * Hessian matrix, scaling those entries to take account of tensor
+       * symmetries, and then reshaping the (sub-)matrix so obtained into a
+       * tensor, the final result.
+       * For example, if
+       * @p extractor_row is a FEValuesExtractors::Vector and
+       * @p extractor_col is a FEValuesExtractors::Tensor,
+       * then the returned object is a Tensor of rank 3, with its first
+       * index associated with the field corresponding to the row extractor and
+       * the second and third indices associated with the field corresponding to
+       * the column extractor.
+       * Similarly, if
+       * @p extractor_row is a FEValuesExtractors::SymmetricTensor and
+       * @p extractor_col is a FEValuesExtractors::SymmetricTensor,
+       * then the returned object is a SymmetricTensor of rank 4, with its first
+       * two indices associated with the field corresponding to the row
+       * extractor and the last two indices associated with the field
+       * corresponding to the column extractor.
        */
       template <typename ExtractorType_Row, typename ExtractorType_Col>
       typename internal::ScalarFieldHessian<dim,
@@ -3250,7 +3295,9 @@ namespace Differentiation
        * @f]
        *
        * This function is a specialization of the above for rank-0 tensors
-       * (scalars)
+       * (scalars). This corresponds to extracting a single entry of the
+       * Hessian matrix because both extractors imply selection of just a
+       * single row or column of the matrix.
        */
       Tensor<0, dim, scalar_type>
       extract_hessian_component(
