@@ -149,7 +149,7 @@ namespace internal
       }
 
       void
-      operator()(const tbb::blocked_range<unsigned int> &range) const
+      operator()(const tbb::blocked_range<size_type> &range) const
       {
         const size_type r_begin = start + range.begin() * chunk_size;
         const size_type r_end = std::min(start + range.end() * chunk_size, end);
@@ -188,8 +188,12 @@ namespace internal
             partitioner->acquire_one_partitioner();
 
           TBBForFunctor<Functor> generic_functor(functor, start, end);
-          parallel::internal::parallel_for(
-            0U, generic_functor.n_chunks, generic_functor, 1, tbb_partitioner);
+          parallel::internal::parallel_for(static_cast<size_type>(0),
+                                           static_cast<size_type>(
+                                             generic_functor.n_chunks),
+                                           generic_functor,
+                                           1,
+                                           tbb_partitioner);
           partitioner->release_one_partitioner(tbb_partitioner);
         }
       else if (vec_size > 0)
@@ -1317,7 +1321,7 @@ namespace internal
        * [range.begin(), range.end()).
        */
       void
-      operator()(const tbb::blocked_range<unsigned int> &range) const
+      operator()(const tbb::blocked_range<size_type> &range) const
       {
         for (size_type i = range.begin(); i < range.end(); ++i)
           accumulate_recursive(op,
@@ -1387,8 +1391,12 @@ namespace internal
           TBBReduceFunctor<Operation, ResultType> generic_functor(op,
                                                                   start,
                                                                   end);
-          parallel::internal::parallel_for(
-            0U, generic_functor.n_chunks, generic_functor, 1, tbb_partitioner);
+          parallel::internal::parallel_for(static_cast<size_type>(0),
+                                           static_cast<size_type>(
+                                             generic_functor.n_chunks),
+                                           generic_functor,
+                                           1,
+                                           tbb_partitioner);
           partitioner->release_one_partitioner(tbb_partitioner);
           result = generic_functor.do_sum();
         }

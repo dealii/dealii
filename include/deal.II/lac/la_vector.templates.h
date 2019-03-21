@@ -92,7 +92,7 @@ namespace LinearAlgebra
     dealii::internal::VectorOperations::Vector_copy<Number, Number> copier(
       in_vector.values.get(), this->values.get());
     internal::VectorOperations::parallel_for(copier,
-                                             0,
+                                             static_cast<size_type>(0),
                                              this->size(),
                                              this->thread_loop_partitioner);
 
@@ -113,7 +113,7 @@ namespace LinearAlgebra
     dealii::internal::VectorOperations::Vector_copy<Number, Number2> copier(
       in_vector.values.get(), this->values.get());
     internal::VectorOperations::parallel_for(copier,
-                                             0,
+                                             static_cast<size_type>(0),
                                              this->size(),
                                              this->thread_loop_partitioner);
 
@@ -151,7 +151,7 @@ namespace LinearAlgebra
     internal::VectorOperations::Vectorization_multiply_factor<Number>
       vector_multiply(this->values.get(), factor);
     internal::VectorOperations::parallel_for(vector_multiply,
-                                             0,
+                                             static_cast<size_type>(0),
                                              this->size(),
                                              this->thread_loop_partitioner);
 
