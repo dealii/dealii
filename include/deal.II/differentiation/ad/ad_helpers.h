@@ -2964,7 +2964,7 @@ namespace Differentiation
      *   // Define the helper that we will use in the AD computations for our
      *   // scalar energy function. Note that we expect it to return values of
      *   // type double.
-     *   ADHelperScalarFunction<dim,double> ad_helper (n_independent_variables);
+     *   ADHelperScalarFunction<dim,...> ad_helper (n_independent_variables);
      *   using ADNumberType = typename ADHelper::ad_type;
      *
      *   // Compute the fields that provide the independent values.
@@ -3006,7 +3006,7 @@ namespace Differentiation
      *     // introduce them. So this means we have to do it by logical order
      *     // of the extractors that we've created.
      *     const SymmetricTensor<2,dim,ADNumberType> C_AD =
-     *       ad_helper.get_sensitive_variables(C_dofs); const
+     *       ad_helper.get_sensitive_variables(C_dofs);
      *     const Tensor<1,dim,ADNumberType>          H_AD =
      *       ad_helper.get_sensitive_variables(H_dofs);
      *
@@ -3055,7 +3055,7 @@ namespace Differentiation
      *   // and extract the desired values from these intermediate outputs.
      *   Vector<double> Dpsi (ad_helper.n_dependent_variables());
      *   FullMatrix<double> D2psi (ad_helper.n_dependent_variables(),
-     *                             ad_helper.n_dependent_variables());
+     *                             ad_helper.n_independent_variables());
      *   const double psi = ad_helper.compute_value();
      *   ad_helper.compute_gradient(Dpsi);
      *   ad_helper.compute_hessian(D2psi);
@@ -3175,7 +3175,8 @@ namespace Differentiation
        *
        * @param[out] gradient A Vector with the values for the scalar field
        * gradient (first derivatives) evaluated at the point defined by the
-       * independent variable values.
+       * independent variable values. The output @p gradient vector has a length
+       * corresponding to @p n_independent_variables.
        */
       void
       compute_gradient(Vector<scalar_type> &gradient) const;
@@ -3190,7 +3191,9 @@ namespace Differentiation
        *
        * @param[out] hessian A FullMatrix with the values for the scalar field
        * Hessian (second derivatives) evaluated at the point defined by the
-       * independent variable values.
+       * independent variable values. The output @p hessian matrix has
+       * dimensions corresponding to
+       * <code>n_independent_variables</code>$\times$<code>n_independent_variables</code>.
        */
       void
       compute_hessian(FullMatrix<scalar_type> &hessian) const;
@@ -3207,13 +3210,33 @@ namespace Differentiation
        * @param[in] extractor_row An extractor associated with the input field
        * variables. This effectively defines which components of the global set
        * of independent variables this field is associated with.
+       *
+       * @return A Tensor or SymmetricTensor with its rank and symmetries
+       * determined by the @p extractor_row.
+       * This corresponds to subsetting a whole set of rows of the
+       * gradient vector, scaling those entries to take account of tensor
+       * symmetries, and then reshaping the (sub-)vector so obtained into a
+       * tensor, the final result.
+       * For example, if
+       * @p extractor_row is a FEValuesExtractors::Vector and
+       * @p extractor_col is a FEValuesExtractors::Tensor,
+       * then the returned object is a Tensor of rank 3, with its first
+       * index associated with the field corresponding to the row extractor and
+       * the second and third indices associated with the field corresponding to
+       * the column extractor.
+       * Similarly, if
+       * @p extractor_row is a FEValuesExtractors::SymmetricTensor and
+       * @p extractor_col is a FEValuesExtractors::SymmetricTensor,
+       * then the returned object is a SymmetricTensor of rank 4, with its first
+       * two indices associated with the field corresponding to the row
+       * extractor and the last two indices associated with the field
+       * corresponding to the column extractor.
        */
       template <typename ExtractorType_Row>
-      typename internal::ScalarFieldGradient<dim,
-                                             scalar_type,
-                                             ExtractorType_Row>::type
-      extract_gradient_component(const Vector<scalar_type> &gradient,
-                                 const ExtractorType_Row &extractor_row) const;
+      static typename internal::
+        ScalarFieldGradient<dim, scalar_type, ExtractorType_Row>::type
+        extract_gradient_component(const Vector<scalar_type> &gradient,
+                                   const ExtractorType_Row &  extractor_row);
 
       /**
        * Extract the function Hessian for a subset of independent variables
@@ -3231,15 +3254,36 @@ namespace Differentiation
        * variables for which the first index of the Hessian is extracted.
        * @param[in] extractor_col An extractor associated with the input field
        * variables for which the second index of the Hessian is extracted.
+       *
+       * @return A Tensor or SymmetricTensor with its rank and symmetries
+       * determined by the @p extractor_row and @p extractor_col .
+       * This corresponds to subsetting a whole set of rows and columns of the
+       * Hessian matrix, scaling those entries to take account of tensor
+       * symmetries, and then reshaping the (sub-)matrix so obtained into a
+       * tensor, the final result.
+       * For example, if
+       * @p extractor_row is a FEValuesExtractors::Vector and
+       * @p extractor_col is a FEValuesExtractors::Tensor,
+       * then the returned object is a Tensor of rank 3, with its first
+       * index associated with the field corresponding to the row extractor and
+       * the second and third indices associated with the field corresponding to
+       * the column extractor.
+       * Similarly, if
+       * @p extractor_row is a FEValuesExtractors::SymmetricTensor and
+       * @p extractor_col is a FEValuesExtractors::SymmetricTensor,
+       * then the returned object is a SymmetricTensor of rank 4, with its first
+       * two indices associated with the field corresponding to the row
+       * extractor and the last two indices associated with the field
+       * corresponding to the column extractor.
        */
       template <typename ExtractorType_Row, typename ExtractorType_Col>
-      typename internal::ScalarFieldHessian<dim,
-                                            scalar_type,
-                                            ExtractorType_Row,
-                                            ExtractorType_Col>::type
+      static typename internal::ScalarFieldHessian<dim,
+                                                   scalar_type,
+                                                   ExtractorType_Row,
+                                                   ExtractorType_Col>::type
       extract_hessian_component(const FullMatrix<scalar_type> &hessian,
                                 const ExtractorType_Row &      extractor_row,
-                                const ExtractorType_Col &extractor_col) const;
+                                const ExtractorType_Col &      extractor_col);
 
       /**
        * Extract the function Hessian for a subset of independent variables
@@ -3250,13 +3294,15 @@ namespace Differentiation
        * @f]
        *
        * This function is a specialization of the above for rank-0 tensors
-       * (scalars)
+       * (scalars). This corresponds to extracting a single entry of the
+       * Hessian matrix because both extractors imply selection of just a
+       * single row or column of the matrix.
        */
-      Tensor<0, dim, scalar_type>
+      static Tensor<0, dim, scalar_type>
       extract_hessian_component(
         const FullMatrix<scalar_type> &   hessian,
         const FEValuesExtractors::Scalar &extractor_row,
-        const FEValuesExtractors::Scalar &extractor_col) const;
+        const FEValuesExtractors::Scalar &extractor_col);
 
       /**
        * Extract the function Hessian for a subset of independent variables
@@ -3267,17 +3313,420 @@ namespace Differentiation
        * @f]
        *
        * This function is a specialization of the above for rank-4 symmetric
-       * tensors
+       * tensors.
        */
-      SymmetricTensor<4, dim, scalar_type>
+      static SymmetricTensor<4, dim, scalar_type>
       extract_hessian_component(
         const FullMatrix<scalar_type> &               hessian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
-        const FEValuesExtractors::SymmetricTensor<2> &extractor_col) const;
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_col);
 
       //@}
 
     }; // class ADHelperScalarFunction
+
+
+
+    /**
+     * A helper class that facilitates the evaluation of a vector of functions,
+     * typically one that represents a collection of coupled, multi-dimensional
+     * fields. This class would typically be used to compute the linearization
+     * of a set of kinetic field variables defined at the quadrature point
+     * level.
+     *
+     * An example of its usage in the case of linearizing the kinetic variables
+     * derived from a multi-field constitutive law might be as follows:
+     * @code
+     *   // Define some extractors that will help us set independent variables
+     *   // and later get the computed values related to the dependent
+     *   // variables. Each of these extractors is related to the gradient of a
+     *   // component of the solution field (in this case, displacement and
+     *   // magnetic scalar potential). Here "C" is the right Cauchy-Green
+     *   // tensor and "H" is the magnetic field.
+     *   const FEValuesExtractors::SymmetricTensor<2> C_dofs (0);
+     *   const FEValuesExtractors::Vector             H_dofs
+     *     (dealii::SymmetricTensor<2,dim>::n_independent_components);
+     *   const unsigned int n_independent_variables =
+     *     SymmetricTensor<2,dim>::n_independent_components +
+     *     Tensor<1,dim>::n_independent_components;
+     *
+     *   // Declare how many dependent variables we expect to compute.
+     *   // In this case, we will be computing a stress field (a symmetric
+     *   // rank-2 tensor) and the magnetic induction (a vector field).
+     *   // At the same time we define some additional extractors associated
+     *   // with these kinetic fields. In general, these need not be of the same
+     *   // layout as the independent variables.
+     *   const FEValuesExtractors::SymmetricTensor<2> S_dofs (0);
+     *   const FEValuesExtractors::Vector             B_dofs
+     *     (dealii::SymmetricTensor<2,dim>::n_independent_components);
+     *   const unsigned int n_dependent_variables =
+     *     SymmetricTensor<2,dim>::n_independent_components +
+     *     Tensor<1,dim>::n_independent_components;
+     *
+     *   // Define the helper that we will use in the AD computations for our
+     *   // scalar energy function. Note that we expect it to return values of
+     *   // type double.
+     *   ADHelperVectorFunction<dim,double> ad_helper (n_independent_variables,
+     *                                                 n_dependent_variables);
+     *   using ADNumberType = typename ADHelper::ad_type;
+     *
+     *   // Compute the fields that provide the independent values.
+     *   // When the tape is being replayed, these should be set to something
+     *   // meaningful.
+     *   const Tensor<1,dim> H = ...;
+     *   const SymmetricTensor<2,dim> C = ...;
+     *
+     *   // If using a taped AD number, then at this point we would initiate
+     *   // taping of the expression for the material stored energy function
+     *   // for this particular set of material parameters:
+     *
+     *   // Select a tape number to record to
+     *   const typename Types<ADNumberType>::tape_index tape_index = ...;
+     *
+     *   // Indicate that we are about to start tracing the operations for
+     *   // function evaluation on the tape. If this tape has already been
+     *   // used (i.e. the operations are already recorded) then we
+     *   // (optionally) load the tape and reuse this data.
+     *   const bool is_recording
+     *     = ad_helper.start_recording_operations(tape_index);
+     *
+     *   // The steps that follow in the recording phase are required for
+     *   // tapeless methods as well.
+     *   if (is_recording == true)
+     *   {
+     *     // This is the "recording" phase of the operations.
+     *
+     *     // First, we set the values for all fields.
+     *     // These could happily be set to anything, unless the function will
+     *     // be evaluated along a branch not otherwise traversed during later
+     *     // use. For this reason, in this example instead of using some dummy
+     *     // values, we'll actually map out the function at the same point
+     *     // around which we'll later linearize it.
+     *     ad_helper.register_independent_variable(H, H_dofs);
+     *     ad_helper.register_independent_variable(C, C_dofs);
+     *
+     *     // NOTE: We have to extract the sensitivities in the order we wish to
+     *     // introduce them. So this means we have to do it by logical order
+     *     // of the extractors that we've created.
+     *     const SymmetricTensor<2,dim,ADNumberType> C_AD =
+     *       ad_helper.get_sensitive_variables(C_dofs);
+     *     const Tensor<1,dim,ADNumberType>          H_AD =
+     *       ad_helper.get_sensitive_variables(H_dofs);
+     *
+     *     // Here we define the stress and magnetic induction in terms
+     *     // of the independent values C_AD and H_AD.
+     *     const SymmetricTensor<2, dim, ad_type> S_AD = ...;
+     *     const Tensor<1, dim, ad_type>          B_AD = ...;
+     *
+     *     // Register the definition of the kinetic fields. The second
+     *     // argument to the function provides a non-overlapping ordering
+     *     // of the
+     *     ad_helper.register_dependent_variable(S_AD, S_dofs);
+     *     ad_helper.register_dependent_variable(B_AD, B_dofs);
+     *
+     *     // Indicate that we have completed tracing the operations onto
+     *     // the tape.
+     *     ad_helper.stop_recording_operations(false); // write_tapes_to_file
+     *   }
+     *   else
+     *   {
+     *     // This is the "tape reuse" phase of the operations.
+     *     // Here we will leverage the already traced operations that reside
+     *     // on a tape, and simply re-evaluate the tape at a different point
+     *     // to get the function values and their derivatives.
+     *
+     *     // Load the existing tape to be reused
+     *     ad_helper.activate_recorded_tape(tape_index);
+     *
+     *     // Set the new values of the independent variables where the
+     *     // recorded dependent functions are to be evaluated (and
+     *     // differentiated around).
+     *     ad_helper.set_independent_variable(C, C_dofs);
+     *     ad_helper.set_independent_variable(H, H_dofs);
+     *   }
+     *
+     *   // Play the tape and store the output function value, its gradient and
+     *   // linearization. These are expensive to compute, so we'll do this once
+     *   // and extract the desired values from these intermediate outputs.
+     *   Vector<double> values (ad_helper.n_dependent_variables());
+     *   FullMatrix<double> jacobian (ad_helper.n_dependent_variables(),
+     *                                ad_helper.n_independent_variables());
+     *   ad_helper.compute_values(values);
+     *   ad_helper.compute_jacobian(jacobian);
+     *
+     *   // Extract the desired components of the value vector and its Jacobian
+     *   // matrix. In this example, we use them to compute the Piola-Kirchhoff
+     *   // stress tensor S and its associated tangent, defined
+     *   // as HH = 2*dS/dC...
+     *   const SymmetricTensor<2,dim> S =
+     *     ad_helper.extract_value_component(values,S_dofs);
+     *   const SymmetricTensor<4,dim> HH =
+     *     2.0*ad_helper.extract_jacobian_component(jacobian,S_dofs,C_dofs);
+     *
+     *   // ... the magnetic induction B and its associated tangent defined
+     *   // as BB = dB/dH...
+     *   const Tensor<1,dim> B =
+     *     ad_helper.extract_value_component(values,H_dofs);
+     *   const SymmetricTensor<2,dim> BB =
+     *     symmetrize(ad_helper.extract_jacobian_component(jacobian,B_dofs,H_dofs));
+     *
+     *   // ... and finally the magnetoelastic coupling tangent, defined
+     *   // as PP = -dS/dH. Here the order of the extractor arguments is
+     *   // especially important, as it dictates the field that is being
+     *   // differentiated, and which the directional derivatives are being
+     *   // computed.
+     *   const Tensor<3,dim,double> PP =
+     *     -ad_helper.extract_jacobian_component(jacobian,S_dofs,H_dofs)
+     * @endcode
+     *
+     * @warning ADOL-C does not support the standard threading models used by
+     * deal.II, so this class should @b not be embedded within a multithreaded
+     * function when using ADOL-C number types. It is, however, suitable for use
+     * in both serial and MPI routines.
+     *
+     * @author Jean-Paul Pelteret, 2016, 2017, 2018
+     */
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType = double>
+    class ADHelperVectorFunction
+      : public ADHelperPointLevelFunctionsBase<dim,
+                                               ADNumberTypeCode,
+                                               ScalarType>
+    {
+    public:
+      /**
+       * Type definition for the floating point number type that is used in,
+       * and results from, all computations.
+       */
+      using scalar_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+
+      /**
+       * Type definition for the auto-differentiation number type that is used
+       * in all computations.
+       */
+      using ad_type =
+        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+
+      /**
+       * @name Constructor / destructor
+       */
+      //@{
+
+      /**
+       * The constructor for the class.
+       *
+       * @param[in] n_independent_variables The number of independent variables
+       * that will be used in the definition of the functions that it is
+       * desired to compute the sensitivities of. In the computation of
+       * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
+       * $\mathbf{X}$, i.e., the dimension of the domain space.
+       * @param[in] n_dependent_variables The number of scalar functions to be
+       * defined that will have a sensitivity to the given independent
+       * variables. In the computation of $\mathbf{f}(\mathbf{X})$, this will
+       * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
+       * image space.
+       */
+      ADHelperVectorFunction(const unsigned int n_independent_variables,
+                             const unsigned int n_dependent_variables);
+
+      /**
+       * Destructor.
+       */
+      virtual ~ADHelperVectorFunction() = default;
+
+      //@}
+
+      /**
+       * @name Dependent variables
+       */
+      //@{
+
+      /**
+       * Register the definition of the vector field
+       * $\boldsymbol{\Psi}(\mathbf{X})$.
+       *
+       * @param[in] funcs A vector of recorded functions that defines the
+       * dependent variables.
+       *
+       * @note For this class that expects only vector field of dependent
+       * variables, this function must only be called once per tape.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      void
+      register_dependent_variables(const std::vector<ad_type> &funcs);
+
+      /**
+       * Register the definition of the vector field
+       * $\hat{\mathbf{g}}(\mathbf{X}) \subset \boldsymbol{\Psi}(\mathbf{X})$
+       * that may represent a subset of the dependent variables.
+       *
+       * @param[in] funcs The recorded functions that define a set of dependent
+       * variables.
+       * @param[in] extractor An extractor associated with the input field
+       * variables. This effectively defines which components of the global set
+       * of dependent variables this field is associated with.
+       *
+       * @note The input extractor must correspond to the input @p ValueType.
+       * So, for example, if a value is a rank-1 tensor
+       * (i.e. of type Tensor<1,dim,scalar_type>), then the extractor must
+       * be an FEValuesExtractors::Vector or FEValuesExtractors::Tensor<1>.
+       *
+       * @note For taped AD numbers, this operation is only valid in recording mode.
+       */
+      template <typename ValueType, typename ExtractorType>
+      void
+      register_dependent_variable(const ValueType &    funcs,
+                                  const ExtractorType &extractor);
+
+      /**
+       * Compute the value of the vector field $\boldsymbol{\Psi}(\mathbf{X})$.
+       *
+       * @param[out] values A Vector object with the value for each component
+       * of the vector field evaluated at the point defined by the independent
+       * variable values. The output @p values vector has a length
+       * corresponding to @p n_dependent_variables.
+       */
+      void
+      compute_values(Vector<scalar_type> &values) const;
+
+      /**
+       * Compute the Jacobian (first derivative) of the vector field with
+       * respect to all independent variables, i.e.
+       * @f[
+       *   \mathbf{J}(\boldsymbol{\Psi})
+       *      = \frac{\partial\boldsymbol{\Psi}(\mathbf{X})}{\partial\mathbf{X}}
+       * @f]
+       *
+       * @param[out] jacobian A FullMatrix with the gradient of each component
+       * of the vector field evaluated at the point defined by the independent
+       * variable values. The output @p jacobian matrix has
+       * dimensions corresponding to
+       * <code>n_dependent_variables</code>$\times$<code>n_independent_variables</code>.
+       */
+      void
+      compute_jacobian(FullMatrix<scalar_type> &jacobian) const;
+
+
+      /**
+       * Extract the set of functions' values for a subset of dependent
+       * variables
+       * $\mathbf{g} \subset \boldsymbol{\Psi}(\mathbf{X})$.
+       *
+       * @param[in] values A Vector object with the value for each component of
+       * the vector field evaluated at the point defined by the independent
+       * variable values.
+       * @param[in] extractor_row An extractor associated with the input field
+       * variables. This effectively defines which components of the global set
+       * of dependent variables this field is associated with.
+       */
+      template <typename ExtractorType_Row>
+      static typename internal::
+        VectorFieldValue<dim, scalar_type, ExtractorType_Row>::type
+        extract_value_component(const Vector<scalar_type> &values,
+                                const ExtractorType_Row &  extractor_row);
+
+      /**
+       * Extract the Jacobian of the subset of dependent functions
+       * $\mathbf{g} \subset \boldsymbol{\Psi}(\mathbf{X})$
+       * for a subset of independent variables
+       * $\mathbf{A} \subset \mathbf{X}$, i.e.
+       * @f[
+       *   \mathbf{J}(\mathbf{g})
+       *      = \frac{\partial\mathbf{g}(\mathbf{X})}{\partial\mathbf{A}}
+       * @f]
+       * The first index of the Jacobian matrix $\mathbf{J}(\mathbf{g})$
+       * relates to the dependent variables, while the second index relates
+       * to the independent variables.
+       *
+       * @param[in] jacobian The Jacobian of the vector function with respect to
+       * all independent variables, i.e., that returned by compute_jacobian().
+       * @param[in] extractor_row An extractor associated with the input field
+       * variables for which the first index of the Jacobian is extracted.
+       * This effectively defines the correspondence between components of the
+       * global set of dependent variables and the field (representing a
+       * subset of dependent functions) associated with the extractor.
+       * @param[in] extractor_col An extractor associated with the input field
+       * variables for which the second index of the Jacobian is extracted.
+       * This effectively defines the correspondence between components of the
+       * global set of independent variables and the field (representing a
+       * subset of independent variables) associated with the extractor.
+       *
+       * @return A Tensor or SymmetricTensor with its rank and symmetries
+       * determined by the @p extractor_row and @p extractor_col .
+       * This corresponds to subsetting a whole set of rows and columns of the
+       * Jacobian matrix, scaling those entries to take account of tensor
+       * symmetries, and then reshaping the (sub-)matrix so obtained into a
+       * tensor, the final result.
+       * For example, if
+       * @p extractor_row is a FEValuesExtractors::Vector and
+       * @p extractor_col is a FEValuesExtractors::Tensor,
+       * then the returned object is a Tensor of rank 3, with its first
+       * index associated with the field corresponding to the row extractor and
+       * the second and third indices associated with the field corresponding to
+       * the column extractor.
+       * Similarly, if
+       * @p extractor_row is a FEValuesExtractors::SymmetricTensor and
+       * @p extractor_col is a FEValuesExtractors::SymmetricTensor,
+       * then the returned object is a SymmetricTensor of rank 4, with its first
+       * two indices associated with the field corresponding to the row
+       * extractor and the last two indices associated with the field
+       * corresponding to the column extractor.
+       */
+      template <typename ExtractorType_Row, typename ExtractorType_Col>
+      static typename internal::VectorFieldJacobian<dim,
+                                                    scalar_type,
+                                                    ExtractorType_Row,
+                                                    ExtractorType_Col>::type
+      extract_jacobian_component(const FullMatrix<scalar_type> &jacobian,
+                                 const ExtractorType_Row &      extractor_row,
+                                 const ExtractorType_Col &      extractor_col);
+
+      /**
+       * Extract the Jacobian of the subset of dependent functions
+       * $\mathbf{g} \subset \boldsymbol{\Psi}(\mathbf{X})$
+       * for a subset of independent variables
+       * $\mathbf{A} \subset \mathbf{X}$, i.e.
+       * @f[
+       *   \mathbf{J}(\mathbf{g})
+       *      = \frac{\partial\mathbf{g}(\mathbf{X})}{\partial\mathbf{A}}
+       * @f]
+       *
+       * This function is a specialization of the above for rank-0 tensors
+       * (scalars). This corresponds to extracting a single entry of the
+       * Jacobian matrix because both extractors imply selection of just a
+       * single row or column of the matrix.
+       */
+      static Tensor<0, dim, scalar_type>
+      extract_jacobian_component(
+        const FullMatrix<scalar_type> &   jacobian,
+        const FEValuesExtractors::Scalar &extractor_row,
+        const FEValuesExtractors::Scalar &extractor_col);
+
+      /**
+       * Extract the Jacobian of the subset of dependent functions
+       * $\mathbf{g} \subset \boldsymbol{\Psi}(\mathbf{X})$
+       * for a subset of independent variables
+       * $\mathbf{A} \subset \mathbf{X}$, i.e.
+       * @f[
+       *   \mathbf{J}(\mathbf{g})
+       *      = \frac{\partial\mathbf{g}(\mathbf{X})}{\partial\mathbf{A}}
+       * @f]
+       *
+       * This function is a specialization of the above for rank-4 symmetric
+       * tensors.
+       */
+      static SymmetricTensor<4, dim, scalar_type>
+      extract_jacobian_component(
+        const FullMatrix<scalar_type> &               jacobian,
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
+        const FEValuesExtractors::SymmetricTensor<2> &extractor_col);
+
+      //@}
+
+    }; // class ADHelperVectorFunction
 
 
   } // namespace AD
@@ -3461,7 +3910,7 @@ namespace Differentiation
       ExtractorType_Row>::type
     ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_gradient_component(const Vector<scalar_type> &gradient,
-                                 const ExtractorType_Row &  extractor_row) const
+                                 const ExtractorType_Row &  extractor_row)
     {
       // NOTE: The order of components must be consistently defined throughout
       // this class.
@@ -3495,7 +3944,7 @@ namespace Differentiation
     ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_hessian_component(const FullMatrix<scalar_type> &hessian,
                                 const ExtractorType_Row &      extractor_row,
-                                const ExtractorType_Col &extractor_col) const
+                                const ExtractorType_Col &      extractor_col)
     {
       using InternalHessian      = internal::ScalarFieldHessian<dim,
                                                            scalar_type,
@@ -3540,6 +3989,131 @@ namespace Differentiation
 
           internal::set_tensor_entry(
             out, index, hessian[row_index_set[r]][col_index_set[c]]);
+        }
+
+      return out;
+    }
+
+
+
+    /* ----------------- ADHelperVectorFunction ----------------- */
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    template <typename ValueType, typename ExtractorType>
+    void
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+      register_dependent_variable(const ValueType &    funcs,
+                                  const ExtractorType &extractor)
+    {
+      const std::vector<unsigned int> index_set(
+        internal::extract_field_component_indices<dim>(extractor));
+      for (unsigned int i = 0; i < index_set.size(); ++i)
+        {
+          Assert(this->registered_marked_dependent_variables[index_set[i]] ==
+                   false,
+                 ExcMessage("Overlapping indices for dependent variables."));
+          ADHelperBase<ADNumberTypeCode, ScalarType>::
+            register_dependent_variable(index_set[i],
+                                        internal::get_tensor_entry(funcs, i));
+        }
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    template <typename ExtractorType_Row>
+    typename internal::VectorFieldValue<
+      dim,
+      typename ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+        scalar_type,
+      ExtractorType_Row>::type
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+      extract_value_component(const Vector<scalar_type> &values,
+                              const ExtractorType_Row &  extractor_row)
+    {
+      // NOTE: The order of components must be consistently defined throughout
+      // this class.
+      typename internal::VectorFieldValue<dim, scalar_type, ExtractorType_Row>::
+        type out;
+
+      // Get indexsets for the subblock from which we wish to extract the
+      // gradient values
+      const std::vector<unsigned int> row_index_set(
+        internal::extract_field_component_indices<dim>(extractor_row));
+      Assert(out.n_independent_components == row_index_set.size(),
+             ExcMessage("Not all tensor components have been extracted!"));
+      for (unsigned int r = 0; r < row_index_set.size(); ++r)
+        internal::set_tensor_entry(out, r, values[row_index_set[r]]);
+
+      return out;
+    }
+
+
+
+    template <int                  dim,
+              enum AD::NumberTypes ADNumberTypeCode,
+              typename ScalarType>
+    template <typename ExtractorType_Row, typename ExtractorType_Col>
+    typename internal::VectorFieldJacobian<
+      dim,
+      typename ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+        scalar_type,
+      ExtractorType_Row,
+      ExtractorType_Col>::type
+    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+      extract_jacobian_component(const FullMatrix<scalar_type> &jacobian,
+                                 const ExtractorType_Row &      extractor_row,
+                                 const ExtractorType_Col &      extractor_col)
+    {
+      using InternalJacobian     = internal::VectorFieldJacobian<dim,
+                                                             scalar_type,
+                                                             ExtractorType_Row,
+                                                             ExtractorType_Col>;
+      using InternalExtractorRow = internal::Extractor<dim, ExtractorType_Row>;
+      using InternalExtractorCol = internal::Extractor<dim, ExtractorType_Col>;
+      using JacobianType         = typename InternalJacobian::type;
+
+      // NOTE: The order of components must be consistently defined throughout
+      // this class.
+      JacobianType out;
+
+      // Get indexsets for the subblocks from which we wish to extract the
+      // Hessian values.
+      // NOTE: Here we have to do some clever accounting when the
+      // one extractor is a symmetric Tensor and the other is not, e.g.
+      // <SymmTensor,Vector>. In this scenario the return type is a
+      // non-symmetric Tensor<3,dim> but we have to fetch information from a
+      // SymmTensor row/column that has too few entries to fill the output
+      // tensor. So we must duplicate the relevant entries in the row/column
+      // indexset to fetch off-diagonal components that are Otherwise
+      // non-existent in a SymmTensor.
+      const std::vector<unsigned int> row_index_set(
+        internal::extract_field_component_indices<dim>(
+          extractor_row, false /*ignore_symmetries*/));
+      const std::vector<unsigned int> col_index_set(
+        internal::extract_field_component_indices<dim>(
+          extractor_col, false /*ignore_symmetries*/));
+
+      for (unsigned int index = 0;
+           index < JacobianType::n_independent_components;
+           ++index)
+        {
+          const TableIndices<JacobianType::rank> ti_out =
+            JacobianType::unrolled_to_component_indices(index);
+          const unsigned int r =
+            InternalExtractorRow::local_component(ti_out, 0);
+          const unsigned int c =
+            InternalExtractorCol::local_component(ti_out,
+                                                  InternalExtractorRow::rank);
+
+          internal::set_tensor_entry(
+            out, index, jacobian[row_index_set[r]][col_index_set[c]]);
         }
 
       return out;
