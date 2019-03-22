@@ -21,37 +21,37 @@ for (number : REAL_SCALARS)
   \{
   namespace AD
   \{
-    // -------------------------- ADHelperBase ----------------------
+    // -------------------------- HelperBase ----------------------
 
     template
-    class ADHelperBase<NumberTypes::adolc_taped,number>;
+    class HelperBase<NumberTypes::adolc_taped,number>;
 
     template
-    class ADHelperBase<NumberTypes::adolc_tapeless,number>;
+    class HelperBase<NumberTypes::adolc_tapeless,number>;
 
-    // -------------------------- ADHelperCellLevelBase ----------------------
-
-    template
-    class ADHelperCellLevelBase<NumberTypes::adolc_taped,number>;
+    // -------------------------- CellLevelBase ----------------------
 
     template
-    class ADHelperCellLevelBase<NumberTypes::adolc_tapeless,number>;
-
-    // -------------------------- ADHelperEnergyFunctional ----------------------
+    class CellLevelBase<NumberTypes::adolc_taped,number>;
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::adolc_taped,number>;
+    class CellLevelBase<NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- EnergyFunctional ----------------------
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::adolc_tapeless,number>;
-
-    // -------------------------- ADHelperResidualLinearization ----------------------
+    class EnergyFunctional<NumberTypes::adolc_taped,number>;
 
     template
-    class ADHelperResidualLinearization<NumberTypes::adolc_taped,number>;
+    class EnergyFunctional<NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ResidualLinearization ----------------------
 
     template
-    class ADHelperResidualLinearization<NumberTypes::adolc_tapeless,number>;
+    class ResidualLinearization<NumberTypes::adolc_taped,number>;
+
+    template
+    class ResidualLinearization<NumberTypes::adolc_tapeless,number>;
 
     \}
     \}
@@ -65,37 +65,37 @@ for ()
     namespace AD
     \{
 
-    // -------------------------- ADHelperBase ----------------------
+    // -------------------------- HelperBase ----------------------
 
     template
-    class ADHelperBase<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+    class HelperBase<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
 
     template
-    class ADHelperBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+    class HelperBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
-    // -------------------------- ADHelperCellLevelBase ----------------------
-
-    template
-    class ADHelperCellLevelBase<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+    // -------------------------- CellLevelBase ----------------------
 
     template
-    class ADHelperCellLevelBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
-
-    // -------------------------- ADHelperEnergyFunctional ----------------------
+    class CellLevelBase<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+    class CellLevelBase<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- EnergyFunctional ----------------------
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
-
-    // -------------------------- ADHelperResidualLinearization ----------------------
+    class EnergyFunctional<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
 
     template
-    class ADHelperResidualLinearization<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+    class EnergyFunctional<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ResidualLinearization ----------------------
 
     template
-    class ADHelperResidualLinearization<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+    class ResidualLinearization<NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ResidualLinearization<NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
 
     \}
@@ -109,29 +109,29 @@ for (deal_II_dimension : DIMENSIONS ; number : REAL_SCALARS)
   \{
   namespace AD
   \{
-    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+    // -------------------------- PointLevelFunctionsBase ----------------------
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_taped,number>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_taped,number>;
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
 
-    // -------------------------- ADHelperScalarFunction ----------------------
-
-    template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_taped,number>;
+    // -------------------------- ScalarFunction ----------------------
 
     template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
-
-    // -------------------------- ADHelperVectorFunction ----------------------
+    class ScalarFunction<deal_II_dimension,NumberTypes::adolc_taped,number>;
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_taped,number>;
+    class ScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- VectorFunction ----------------------
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+    class VectorFunction<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class VectorFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
 
     \}
     \}
@@ -145,29 +145,29 @@ for (deal_II_dimension : DIMENSIONS)
     namespace AD
     \{
 
-    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+    // -------------------------- PointLevelFunctionsBase ----------------------
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
-    // -------------------------- ADHelperScalarFunction ----------------------
-
-    template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+    // -------------------------- ScalarFunction ----------------------
 
     template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
-
-    // -------------------------- ADHelperVectorFunction ----------------------
+    class ScalarFunction<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+    class ScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- VectorFunction ----------------------
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+    class VectorFunction<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class VectorFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
 
     \}
     \}

@@ -1,4 +1,4 @@
-New: A new class Differentiation::AD::ADHelperScalarFunction has been
+New: A new class Differentiation::AD::ScalarFunction has been
 added to help implement point-wise scalar functions using automatic 
 differentiation. In particular, this class is designed to compute the 
 gradient and Hessian of a scalar function that is parameterized in
