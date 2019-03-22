@@ -1,0 +1,4 @@
+New: Add Utilities::MPI::create_ascending_partitioning() to create a one-to-one
+ascending partitioning from locally owned sizes.
+<br>
+(Denis Davydov, 2019/03/19)

@@ -90,6 +90,7 @@ template <int rank, int dim, typename Number>
 class SymmetricTensor;
 template <typename Number>
 class SparseMatrix;
+class IndexSet;
 
 namespace Utilities
 {
@@ -224,6 +225,18 @@ namespace Utilities
                  const int        tag,
                  MPI_Comm *       new_comm);
 #endif
+
+    /**
+     * Given the number of locally owned elements @p local_size,
+     * create a 1:1 partitioning of the of elements across the MPI communicator @p comm.
+     * The total size of elements is the sum of @p local_size across the MPI communicator.
+     * Each process will store contiguous subset of indices, and the index set
+     * on process p+1 starts at the index one larger than the last one stored on
+     * process p.
+     */
+    std::vector<IndexSet>
+    create_ascending_partitioning(const MPI_Comm &           comm,
+                                  const IndexSet::size_type &local_size);
 
     /**
      * Return the sum over all processors of the value @p t. This function is
