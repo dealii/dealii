@@ -188,8 +188,12 @@ namespace internal
             partitioner->acquire_one_partitioner();
 
           TBBForFunctor<Functor> generic_functor(functor, start, end);
-          parallel::internal::parallel_for(
-            0U, generic_functor.n_chunks, generic_functor, 1, tbb_partitioner);
+          parallel::internal::parallel_for(static_cast<size_type>(0),
+                                           static_cast<size_type>(
+                                             generic_functor.n_chunks),
+                                           generic_functor,
+                                           1,
+                                           tbb_partitioner);
           partitioner->release_one_partitioner(tbb_partitioner);
         }
       else if (vec_size > 0)
@@ -1387,8 +1391,12 @@ namespace internal
           TBBReduceFunctor<Operation, ResultType> generic_functor(op,
                                                                   start,
                                                                   end);
-          parallel::internal::parallel_for(
-            0U, generic_functor.n_chunks, generic_functor, 1, tbb_partitioner);
+          parallel::internal::parallel_for(static_cast<size_type>(0),
+                                           static_cast<size_type>(
+                                             generic_functor.n_chunks),
+                                           generic_functor,
+                                           1,
+                                           tbb_partitioner);
           partitioner->release_one_partitioner(tbb_partitioner);
           result = generic_functor.do_sum();
         }
