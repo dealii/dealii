@@ -53,6 +53,7 @@ namespace FEValuesExtractors
   }
 
   // Explicit instantiations
+  template struct Tensor<0>;
   template struct Tensor<1>;
   template struct Tensor<2>;
   template struct Tensor<3>;
