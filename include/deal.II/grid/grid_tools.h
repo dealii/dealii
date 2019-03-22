@@ -2633,8 +2633,8 @@ namespace GridTools
                                const bool compute_face_ids = false);
 
   /**
-   * Propagate manifold indicators associated with the cells of the Triangulation
-   * @p tria to their co-dimension one and two objects.
+   * Propagate manifold indicators associated with the cells of the
+   * Triangulation @p tria to their co-dimension one and two objects.
    *
    * This function sets the @p manifold_id of faces and edges (both on the
    * interior and on the boundary) to the value returnd by the
