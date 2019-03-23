@@ -1549,10 +1549,7 @@ namespace Step42
 
     fraction_of_plastic_q_points_per_cell = 0;
 
-    auto         cell        = dof_handler.begin_active();
-    const auto   endc        = dof_handler.end();
-    unsigned int cell_number = 0;
-    for (; cell != endc; ++cell, ++cell_number)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1569,7 +1566,8 @@ namespace Step42
                 constitutive_law.get_stress_strain_tensor(
                   strain_tensors[q_point], stress_strain_tensor);
               if (q_point_is_plastic)
-                ++fraction_of_plastic_q_points_per_cell(cell_number);
+                ++fraction_of_plastic_q_points_per_cell(
+                  cell->active_cell_index());
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
