@@ -45,7 +45,7 @@ public:
   void
   cell_worker(const CellIteratorType &cell, ScratchData &, CopyData &)
   {
-    deallog << "Workgin on cell " << cell << std::endl;
+    deallog << "Working on cell " << cell << std::endl;
   }
 
   void

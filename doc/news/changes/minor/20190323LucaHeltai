@@ -1,3 +1,4 @@
-New: Added a variant of mesh_loop that takes a class and its member functions as workers and copiers. 
+New: Added a variant of MeshWorker::mesh_loop() that takes a class and its member functions as workers 
+and copiers. 
 <br>
 (Luca Heltai, 2019/03/23)

@@ -394,13 +394,13 @@ namespace MeshWorker
   }
 
   /**
-   * This is a variant of the mesh_loop function, that can be used for worker
+   * This is a variant of the mesh_loop() function, that can be used for worker
    * and copier functions that are member functions of a class.
    *
    * The argument passed as @p end must be convertible to the same type as @p
    * begin, but doesn't have to be of the same type itself. This allows to
    * write code like <code>mesh_loop(dof_handler.begin_active(),
-   * dof_handler.end(), ...</code> where the first is of type
+   * dof_handler.end(), ...)</code> where the first is of type
    * DoFHandler::active_cell_iterator whereas the second is of type
    * DoFHandler::raw_cell_iterator.
    *
@@ -414,6 +414,33 @@ namespace MeshWorker
    * copies of the <tt>ScratchData</tt> object and
    * <tt>queue_length*chunk_size</tt> copies of the <tt>CopyData</tt> object
    * are generated.
+   *
+   * An example usage of the function is given by
+   * @code
+   * template <int dim, int spacedim>
+   * class TestClass
+   * {
+   * public:
+   *   void
+   *   cell_worker(const CellIteratorType &cell, ScratchData &, CopyData &);
+   *
+   *   ...
+   * };
+   *
+   *   ...
+   *   TestClass<dim, spacedim> test_class;
+   *   ScratchData              scratch;
+   *   CopyData                 copy;
+   *
+   *   mesh_loop(tria.begin_active(),
+   *             tria.end(),
+   *             test_class,
+   *             &TestClass<dim, spacedim>::cell_worker,
+   *             &TestClass<dim, spacedim>::copier,
+   *             scratch,
+   *             copy,
+   *             assemble_own_cells);
+   * @endcode
    *
    * @ingroup MeshWorker
    * @author Luca Heltai, 2019
