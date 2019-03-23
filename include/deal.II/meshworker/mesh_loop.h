@@ -417,29 +417,37 @@ namespace MeshWorker
    *
    * An example usage of the function is given by
    * @code
+   *
+   * struct ScratchData;
+   * struct CopyData;
+   *
    * template <int dim, int spacedim>
-   * class TestClass
+   * class MyClass
    * {
    * public:
    *   void
    *   cell_worker(const CellIteratorType &cell, ScratchData &, CopyData &);
    *
+   *   void
+   *   copier(const CopyData &);
+   *
    *   ...
    * };
    *
-   *   ...
-   *   TestClass<dim, spacedim> test_class;
-   *   ScratchData              scratch;
-   *   CopyData                 copy;
+   * ...
    *
-   *   mesh_loop(tria.begin_active(),
-   *             tria.end(),
-   *             test_class,
-   *             &TestClass<dim, spacedim>::cell_worker,
-   *             &TestClass<dim, spacedim>::copier,
-   *             scratch,
-   *             copy,
-   *             assemble_own_cells);
+   * MyClass<dim, spacedim> my_class;
+   * SratchData             scratch;
+   * CopyData               copy;
+   *
+   * mesh_loop(tria.begin_active(),
+   *           tria.end(),
+   *           my_class,
+   *           &MyClass<dim, spacedim>::cell_worker,
+   *           &MyClass<dim, spacedim>::copier,
+   *           scratch,
+   *           copy,
+   *           assemble_own_cells);
    * @endcode
    *
    * @ingroup MeshWorker
