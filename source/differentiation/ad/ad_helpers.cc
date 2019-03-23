@@ -30,12 +30,12 @@ namespace Differentiation
 {
   namespace AD
   {
-    /* -------------------------- ADHelperBase -------------------------- */
+    /* -------------------------- HelperBase -------------------------- */
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    ADHelperBase<ADNumberTypeCode, ScalarType>::ADHelperBase(
+    HelperBase<ADNumberTypeCode, ScalarType>::HelperBase(
       const unsigned int n_independent_variables,
       const unsigned int n_dependent_variables)
       : independent_variable_values(
@@ -65,8 +65,8 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode,
-                 ScalarType>::reset_registered_independent_variables()
+    HelperBase<ADNumberTypeCode,
+               ScalarType>::reset_registered_independent_variables()
     {
       for (typename std::vector<bool>::iterator it =
              registered_independent_variable_values.begin();
@@ -79,7 +79,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::
+    HelperBase<ADNumberTypeCode, ScalarType>::
       reset_registered_dependent_variables(const bool flag)
     {
       for (typename std::vector<bool>::iterator it =
@@ -93,7 +93,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
+    HelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
       const unsigned int index,
       const scalar_type &value)
     {
@@ -130,7 +130,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::mark_independent_variable(
+    HelperBase<ADNumberTypeCode, ScalarType>::mark_independent_variable(
       const unsigned int index,
       ad_type &          out) const
     {
@@ -168,8 +168,8 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode,
-                 ScalarType>::finalize_sensitive_independent_variables() const
+    HelperBase<ADNumberTypeCode,
+               ScalarType>::finalize_sensitive_independent_variables() const
     {
       // Double check that we've actually registered all DoFs
       Assert(n_registered_independent_variables() == n_independent_variables(),
@@ -192,7 +192,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::
+    HelperBase<ADNumberTypeCode, ScalarType>::
       initialize_non_sensitive_independent_variable(const unsigned int index,
                                                     ad_type &out) const
     {
@@ -217,8 +217,8 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     unsigned int
-    ADHelperBase<ADNumberTypeCode,
-                 ScalarType>::n_registered_independent_variables() const
+    HelperBase<ADNumberTypeCode,
+               ScalarType>::n_registered_independent_variables() const
     {
       return std::count(registered_independent_variable_values.begin(),
                         registered_independent_variable_values.end(),
@@ -229,7 +229,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     std::size_t
-    ADHelperBase<ADNumberTypeCode, ScalarType>::n_independent_variables() const
+    HelperBase<ADNumberTypeCode, ScalarType>::n_independent_variables() const
     {
       return independent_variable_values.size();
     }
@@ -238,8 +238,8 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     unsigned int
-    ADHelperBase<ADNumberTypeCode,
-                 ScalarType>::n_registered_dependent_variables() const
+    HelperBase<ADNumberTypeCode, ScalarType>::n_registered_dependent_variables()
+      const
     {
       return std::count(registered_marked_dependent_variables.begin(),
                         registered_marked_dependent_variables.end(),
@@ -250,7 +250,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     std::size_t
-    ADHelperBase<ADNumberTypeCode, ScalarType>::n_dependent_variables() const
+    HelperBase<ADNumberTypeCode, ScalarType>::n_dependent_variables() const
     {
       return dependent_variables.size();
     }
@@ -259,7 +259,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     bool
-    ADHelperBase<ADNumberTypeCode, ScalarType>::is_recording() const
+    HelperBase<ADNumberTypeCode, ScalarType>::is_recording() const
     {
       if (AD::is_taped_ad_number<ad_type>::value)
         return taped_driver.is_recording();
@@ -271,8 +271,8 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     typename Types<
-      typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type>::tape_index
-    ADHelperBase<ADNumberTypeCode, ScalarType>::active_tape_index() const
+      typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type>::tape_index
+    HelperBase<ADNumberTypeCode, ScalarType>::active_tape_index() const
     {
       if (AD::is_taped_ad_number<ad_type>::value)
         return taped_driver.active_tape_index();
@@ -284,7 +284,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     bool
-    ADHelperBase<ADNumberTypeCode, ScalarType>::is_registered_tape(
+    HelperBase<ADNumberTypeCode, ScalarType>::is_registered_tape(
       const typename Types<ad_type>::tape_index tape_index) const
     {
       if (AD::is_taped_ad_number<ad_type>::value)
@@ -297,8 +297,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::print(
-      std::ostream &stream) const
+    HelperBase<ADNumberTypeCode, ScalarType>::print(std::ostream &stream) const
     {
       // Store stream flags
       const std::ios_base::fmtflags stream_flags(stream.flags());
@@ -353,7 +352,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::print_values(
+    HelperBase<ADNumberTypeCode, ScalarType>::print_values(
       std::ostream &stream) const
     {
       for (unsigned int i = 0; i < n_independent_variables(); i++)
@@ -367,7 +366,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::print_tape_stats(
+    HelperBase<ADNumberTypeCode, ScalarType>::print_tape_stats(
       const typename Types<ad_type>::tape_index tape_index,
       std::ostream &                            stream) const
     {
@@ -384,7 +383,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::reset(
+    HelperBase<ADNumberTypeCode, ScalarType>::reset(
       const unsigned int n_independent_variables,
       const unsigned int n_dependent_variables,
       const bool         clear_registered_tapes)
@@ -442,7 +441,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::configure_tapeless_mode(
+    HelperBase<ADNumberTypeCode, ScalarType>::configure_tapeless_mode(
       const unsigned int n_independent_variables,
       const bool         ensure_persistent_setting)
     {
@@ -467,7 +466,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::activate_recorded_tape(
+    HelperBase<ADNumberTypeCode, ScalarType>::activate_recorded_tape(
       const typename Types<ad_type>::tape_index tape_index)
     {
       activate_tape(tape_index, true /*read_mode*/);
@@ -477,7 +476,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     bool
-    ADHelperBase<ADNumberTypeCode, ScalarType>::recorded_tape_requires_retaping(
+    HelperBase<ADNumberTypeCode, ScalarType>::recorded_tape_requires_retaping(
       const typename Types<ad_type>::tape_index tape_index) const
     {
       if (ADNumberTraits<ad_type>::is_tapeless == true)
@@ -490,7 +489,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     bool
-    ADHelperBase<ADNumberTypeCode, ScalarType>::active_tape_requires_retaping()
+    HelperBase<ADNumberTypeCode, ScalarType>::active_tape_requires_retaping()
       const
     {
       if (ADNumberTraits<ad_type>::is_tapeless == true)
@@ -503,7 +502,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::clear_active_tape()
+    HelperBase<ADNumberTypeCode, ScalarType>::clear_active_tape()
     {
       if (ADNumberTraits<ad_type>::is_tapeless == true)
         return;
@@ -515,7 +514,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::activate_tape(
+    HelperBase<ADNumberTypeCode, ScalarType>::activate_tape(
       const typename Types<ad_type>::tape_index tape_index,
       const bool                                read_mode)
     {
@@ -552,7 +551,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::set_tape_buffer_sizes(
+    HelperBase<ADNumberTypeCode, ScalarType>::set_tape_buffer_sizes(
       const typename Types<ad_type>::tape_buffer_sizes obufsize,
       const typename Types<ad_type>::tape_buffer_sizes lbufsize,
       const typename Types<ad_type>::tape_buffer_sizes vbufsize,
@@ -571,7 +570,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     bool
-    ADHelperBase<ADNumberTypeCode, ScalarType>::start_recording_operations(
+    HelperBase<ADNumberTypeCode, ScalarType>::start_recording_operations(
       const typename Types<ad_type>::tape_index tape_index,
       const bool                                overwrite_tape,
       const bool                                keep_independent_values)
@@ -636,7 +635,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::stop_recording_operations(
+    HelperBase<ADNumberTypeCode, ScalarType>::stop_recording_operations(
       const bool write_tapes_to_file)
     {
       Assert(is_recording() == true, ExcMessage("Not currently recording..."));
@@ -672,7 +671,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+    HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
       const unsigned int index,
       const ad_type &    func)
     {
@@ -698,23 +697,23 @@ namespace Differentiation
 
 
 
-    /* -------------------- ADHelperCellLevelBase -------------------- */
+    /* -------------------- CellLevelBase -------------------- */
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ADHelperCellLevelBase(
+    CellLevelBase<ADNumberTypeCode, ScalarType>::CellLevelBase(
       const unsigned int n_independent_variables,
       const unsigned int n_dependent_variables)
-      : ADHelperBase<ADNumberTypeCode, ScalarType>(n_independent_variables,
-                                                   n_dependent_variables)
+      : HelperBase<ADNumberTypeCode, ScalarType>(n_independent_variables,
+                                                 n_dependent_variables)
     {}
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::register_dof_values(
+    CellLevelBase<ADNumberTypeCode, ScalarType>::register_dof_values(
       const std::vector<scalar_type> &dof_values)
     {
       // This is actually the same thing the set_independent_variable function,
@@ -736,9 +735,9 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     const std::vector<
-      typename ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::ad_type> &
-    ADHelperCellLevelBase<ADNumberTypeCode,
-                          ScalarType>::get_sensitive_dof_values() const
+      typename CellLevelBase<ADNumberTypeCode, ScalarType>::ad_type> &
+    CellLevelBase<ADNumberTypeCode, ScalarType>::get_sensitive_dof_values()
+      const
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
@@ -762,7 +761,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
+    CellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
       const std::vector<scalar_type> &values)
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
@@ -775,42 +774,39 @@ namespace Differentiation
              ExcMessage(
                "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
-        ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
+        HelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
           i, values[i]);
     }
 
 
 
-    /* ------------------ ADHelperEnergyFunctional ------------------ */
+    /* ------------------ EnergyFunctional ------------------ */
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::
-      ADHelperEnergyFunctional(const unsigned int n_independent_variables)
-      : ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>(
-          n_independent_variables,
-          1)
+    EnergyFunctional<ADNumberTypeCode, ScalarType>::EnergyFunctional(
+      const unsigned int n_independent_variables)
+      : CellLevelBase<ADNumberTypeCode, ScalarType>(n_independent_variables, 1)
     {}
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::
-      register_energy_functional(const ad_type &energy)
+    EnergyFunctional<ADNumberTypeCode, ScalarType>::register_energy_functional(
+      const ad_type &energy)
     {
       Assert(this->n_dependent_variables() == 1, ExcInternalError());
-      ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+      HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
         0, energy);
     }
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    typename ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::scalar_type
-    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::compute_energy()
-      const
+    typename EnergyFunctional<ADNumberTypeCode, ScalarType>::scalar_type
+    EnergyFunctional<ADNumberTypeCode, ScalarType>::compute_energy() const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
            this->taped_driver.keep_independent_values() == false) ||
@@ -829,7 +825,7 @@ namespace Differentiation
       Assert(
         this->n_dependent_variables() == 1,
         ExcMessage(
-          "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
+          "The EnergyFunctional class expects there to be only one dependent variable."));
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
@@ -864,7 +860,7 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::compute_residual(
+    EnergyFunctional<ADNumberTypeCode, ScalarType>::compute_residual(
       Vector<scalar_type> &gradient) const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
@@ -884,7 +880,7 @@ namespace Differentiation
       Assert(
         this->n_dependent_variables() == 1,
         ExcMessage(
-          "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
+          "The EnergyFunctional class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately in the succeeding call to
@@ -929,8 +925,8 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperEnergyFunctional<ADNumberTypeCode, ScalarType>::
-      compute_linearization(FullMatrix<scalar_type> &hessian) const
+    EnergyFunctional<ADNumberTypeCode, ScalarType>::compute_linearization(
+      FullMatrix<scalar_type> &hessian) const
     {
       Assert(AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 2,
              ExcMessage(
@@ -953,7 +949,7 @@ namespace Differentiation
       Assert(
         this->n_dependent_variables() == 1,
         ExcMessage(
-          "The ADHelperEnergyFunctional class expects there to be only one dependent variable."));
+          "The EnergyFunctional class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately in the succeeding call to
@@ -997,31 +993,30 @@ namespace Differentiation
     }
 
 
-    /* ------------------- ADHelperResidualLinearization ------------------- */
+    /* ------------------- ResidualLinearization ------------------- */
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
-    ADHelperResidualLinearization<ADNumberTypeCode, ScalarType>::
-      ADHelperResidualLinearization(const unsigned int n_independent_variables,
-                                    const unsigned int n_dependent_variables)
-      : ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>(
-          n_independent_variables,
-          n_dependent_variables)
+    ResidualLinearization<ADNumberTypeCode, ScalarType>::ResidualLinearization(
+      const unsigned int n_independent_variables,
+      const unsigned int n_dependent_variables)
+      : CellLevelBase<ADNumberTypeCode, ScalarType>(n_independent_variables,
+                                                    n_dependent_variables)
     {}
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperResidualLinearization<ADNumberTypeCode, ScalarType>::
+    ResidualLinearization<ADNumberTypeCode, ScalarType>::
       register_residual_vector(const std::vector<ad_type> &residual)
     {
       Assert(residual.size() == this->n_dependent_variables(),
              ExcMessage(
                "Vector size does not match number of dependent variables"));
       for (unsigned int i = 0; i < this->n_dependent_variables(); ++i)
-        ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+        HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
           i, residual[i]);
     }
 
@@ -1029,8 +1024,8 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperResidualLinearization<ADNumberTypeCode, ScalarType>::
-      compute_residual(Vector<scalar_type> &values) const
+    ResidualLinearization<ADNumberTypeCode, ScalarType>::compute_residual(
+      Vector<scalar_type> &values) const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
            this->taped_driver.keep_independent_values() == false) ||
@@ -1083,8 +1078,8 @@ namespace Differentiation
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     void
-    ADHelperResidualLinearization<ADNumberTypeCode, ScalarType>::
-      compute_linearization(FullMatrix<scalar_type> &jacobian) const
+    ResidualLinearization<ADNumberTypeCode, ScalarType>::compute_linearization(
+      FullMatrix<scalar_type> &jacobian) const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
            this->taped_driver.keep_independent_values() == false) ||
@@ -1144,19 +1139,18 @@ namespace Differentiation
 
 
 
-    /* ----------------- ADHelperPointLevelFunctionsBase  ----------------- */
+    /* ----------------- PointLevelFunctionsBase  ----------------- */
 
 
 
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
-      ADHelperPointLevelFunctionsBase(
-        const unsigned int n_independent_variables,
-        const unsigned int n_dependent_variables)
-      : ADHelperBase<ADNumberTypeCode, ScalarType>(n_independent_variables,
-                                                   n_dependent_variables)
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      PointLevelFunctionsBase(const unsigned int n_independent_variables,
+                              const unsigned int n_dependent_variables)
+      : HelperBase<ADNumberTypeCode, ScalarType>(n_independent_variables,
+                                                 n_dependent_variables)
       , symmetric_independent_variables(n_independent_variables, false)
     {}
 
@@ -1166,14 +1160,14 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::reset(
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::reset(
       const unsigned int n_independent_variables,
       const unsigned int n_dependent_variables,
       const bool         clear_registered_tapes)
     {
-      ADHelperBase<ADNumberTypeCode, ScalarType>::reset(n_independent_variables,
-                                                        n_dependent_variables,
-                                                        clear_registered_tapes);
+      HelperBase<ADNumberTypeCode, ScalarType>::reset(n_independent_variables,
+                                                      n_dependent_variables,
+                                                      clear_registered_tapes);
 
       const unsigned int new_n_independent_variables =
         (n_independent_variables != dealii::numbers::invalid_unsigned_int ?
@@ -1189,7 +1183,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     bool
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       is_symmetric_independent_variable(const unsigned int index) const
     {
       Assert(index < symmetric_independent_variables.size(),
@@ -1203,7 +1197,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     unsigned int
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       n_symmetric_independent_variables() const
     {
       return std::count(symmetric_independent_variables.begin(),
@@ -1217,7 +1211,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       register_independent_variables(const std::vector<scalar_type> &values)
     {
       // This is actually the same thing the set_independent_variable function,
@@ -1240,11 +1234,10 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    const std::vector<
-      typename ADHelperPointLevelFunctionsBase<dim,
-                                               ADNumberTypeCode,
-                                               ScalarType>::ad_type> &
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+    const std::vector<typename PointLevelFunctionsBase<dim,
+                                                       ADNumberTypeCode,
+                                                       ScalarType>::ad_type> &
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       get_sensitive_variables() const
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
@@ -1272,13 +1265,13 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       set_sensitivity_value(const unsigned int index,
                             const bool         symmetric_component,
                             const scalar_type &value)
     {
-      ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(index,
-                                                                        value);
+      HelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(index,
+                                                                      value);
       Assert(
         index < this->n_independent_variables(),
         ExcMessage(
@@ -1294,7 +1287,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       set_independent_variables(const std::vector<scalar_type> &values)
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
@@ -1307,22 +1300,22 @@ namespace Differentiation
              ExcMessage(
                "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
-        ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
+        HelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
           i, values[i]);
     }
 
 
 
-    /* -------------------- ADHelperScalarFunction -------------------- */
+    /* -------------------- ScalarFunction -------------------- */
 
 
 
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
-      ADHelperScalarFunction(const unsigned int n_independent_variables)
-      : ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>(
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::ScalarFunction(
+      const unsigned int n_independent_variables)
+      : PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>(
           n_independent_variables,
           1)
     {}
@@ -1333,11 +1326,11 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       register_dependent_variable(const ad_type &func)
     {
       Assert(this->n_dependent_variables() == 1, ExcInternalError());
-      ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+      HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
         0, func);
     }
 
@@ -1346,10 +1339,8 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
-      scalar_type
-      ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_value()
-        const
+    typename ScalarFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_value() const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
            this->taped_driver.keep_independent_values() == false) ||
@@ -1368,7 +1359,7 @@ namespace Differentiation
       Assert(
         this->n_dependent_variables() == 1,
         ExcMessage(
-          "The ADHelperScalarFunction class expects there to be only one dependent variable."));
+          "The ScalarFunction class expects there to be only one dependent variable."));
 
       if (ADNumberTraits<ad_type>::is_taped == true)
         {
@@ -1399,7 +1390,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_gradient(
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_gradient(
       Vector<scalar_type> &gradient) const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
@@ -1419,7 +1410,7 @@ namespace Differentiation
       Assert(
         this->n_dependent_variables() == 1,
         ExcMessage(
-          "The ADHelperScalarFunction class expects there to be only one dependent variable."));
+          "The ScalarFunction class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately in the succeeding call to
@@ -1473,7 +1464,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_hessian(
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::compute_hessian(
       FullMatrix<scalar_type> &hessian) const
     {
       Assert(AD::ADNumberTraits<ad_type>::n_supported_derivative_levels >= 2,
@@ -1497,7 +1488,7 @@ namespace Differentiation
       Assert(
         this->n_dependent_variables() == 1,
         ExcMessage(
-          "The ADHelperScalarFunction class expects there to be only one dependent variable."));
+          "The ScalarFunction class expects there to be only one dependent variable."));
 
       // We can neglect correctly initializing the entries as
       // we'll be overwriting them immediately in the succeeding call to
@@ -1567,11 +1558,11 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    Tensor<0,
-           dim,
-           typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
-             scalar_type>
-    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+    Tensor<
+      0,
+      dim,
+      typename ScalarFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type>
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_hessian_component(const FullMatrix<scalar_type> &   hessian,
                                 const FEValuesExtractors::Scalar &extractor_row,
                                 const FEValuesExtractors::Scalar &extractor_col)
@@ -1604,12 +1595,11 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    SymmetricTensor<4,
-                    dim,
-                    typename ADHelperScalarFunction<dim,
-                                                    ADNumberTypeCode,
-                                                    ScalarType>::scalar_type>
-    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+    SymmetricTensor<
+      4,
+      dim,
+      typename ScalarFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type>
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_hessian_component(
         const FullMatrix<scalar_type> &               hessian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
@@ -1641,17 +1631,17 @@ namespace Differentiation
 
 
 
-    /* -------------------- ADHelperVectorFunction -------------------- */
+    /* -------------------- VectorFunction -------------------- */
 
 
 
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
-      ADHelperVectorFunction(const unsigned int n_independent_variables,
-                             const unsigned int n_dependent_variables)
-      : ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>(
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::VectorFunction(
+      const unsigned int n_independent_variables,
+      const unsigned int n_dependent_variables)
+      : PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>(
           n_independent_variables,
           n_dependent_variables)
     {}
@@ -1662,14 +1652,14 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       register_dependent_variables(const std::vector<ad_type> &funcs)
     {
       Assert(funcs.size() == this->n_dependent_variables(),
              ExcMessage(
                "Vector size does not match number of dependent variables"));
       for (unsigned int i = 0; i < this->n_dependent_variables(); ++i)
-        ADHelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+        HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
           i, funcs[i]);
     }
 
@@ -1679,7 +1669,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::compute_values(
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::compute_values(
       Vector<scalar_type> &values) const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
@@ -1735,7 +1725,7 @@ namespace Differentiation
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
     void
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::compute_jacobian(
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::compute_jacobian(
       FullMatrix<scalar_type> &jacobian) const
     {
       if ((ADNumberTraits<ad_type>::is_taped == true &&
@@ -1809,11 +1799,11 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    Tensor<0,
-           dim,
-           typename ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
-             scalar_type>
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+    Tensor<
+      0,
+      dim,
+      typename VectorFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type>
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_jacobian_component(
         const FullMatrix<scalar_type> &   jacobian,
         const FEValuesExtractors::Scalar &extractor_row,
@@ -1847,12 +1837,11 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType>
-    SymmetricTensor<4,
-                    dim,
-                    typename ADHelperVectorFunction<dim,
-                                                    ADNumberTypeCode,
-                                                    ScalarType>::scalar_type>
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+    SymmetricTensor<
+      4,
+      dim,
+      typename VectorFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type>
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_jacobian_component(
         const FullMatrix<scalar_type> &               jacobian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,

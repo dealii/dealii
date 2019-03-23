@@ -1,4 +1,4 @@
-New: A new class Differentiation::AD::ADHelperVectorFunction has been
+New: A new class Differentiation::AD::VectorFunction has been
 added to help implement point-wise vector functions using automatic 
 differentiation. In particular, this class is designed to compute the 
 Jacobian of a vector function that is parameterized in

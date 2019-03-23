@@ -169,7 +169,7 @@ namespace Differentiation
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
-    class ADHelperBase
+    class HelperBase
     {
     public:
       /**
@@ -205,13 +205,13 @@ namespace Differentiation
        * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
-      ADHelperBase(const unsigned int n_independent_variables,
-                   const unsigned int n_dependent_variables);
+      HelperBase(const unsigned int n_independent_variables,
+                 const unsigned int n_dependent_variables);
 
       /**
        * Destructor
        */
-      virtual ~ADHelperBase() = default;
+      virtual ~HelperBase() = default;
 
       //@}
 
@@ -279,7 +279,7 @@ namespace Differentiation
        * Pre-specify the number of @p independent_variables to be used in
        * tapeless mode.
        *
-       * Although this function is called internally in the ADHelperBase
+       * Although this function is called internally in the HelperBase
        * constructor, there may be occasions when ADOL-C tapeless numbers
        * (<tt>adtl::adoubles</tt>) are created before an instance of this class
        * is created. This function therefore allows one to declare at the
@@ -307,7 +307,7 @@ namespace Differentiation
       /**
        * Reset the state of the helper class.
        *
-       * When an instance of an ADHelperBase is stored as a class member object
+       * When an instance of an HelperBase is stored as a class member object
        * with the intention to reuse its instance, it may be necessary to reset
        * the state of the object before use. This is because, internally, there
        * is error checking performed to ensure that the correct
@@ -788,7 +788,7 @@ namespace Differentiation
 
       //@}
 
-    }; // class ADHelperBase
+    }; // class HelperBase
 
 
 
@@ -824,8 +824,8 @@ namespace Differentiation
      * @endcode
      * Note that the quotation marks are mandatory.
      * An alternative approach that allows for run-time decision making is to
-     * use the ADHelperBase::set_tape_buffer_sizes() function before starting
-     * taping (as done via the ADHelperBase::start_recording_operations()
+     * use the HelperBase::set_tape_buffer_sizes() function before starting
+     * taping (as done via the HelperBase::start_recording_operations()
      * function).
      *
      * @warning ADOL-C does not support the standard threading models used by
@@ -837,8 +837,7 @@ namespace Differentiation
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
-    class ADHelperCellLevelBase
-      : public ADHelperBase<ADNumberTypeCode, ScalarType>
+    class CellLevelBase : public HelperBase<ADNumberTypeCode, ScalarType>
     {
     public:
       /**
@@ -846,14 +845,14 @@ namespace Differentiation
        * and results from, all computations.
        */
       using scalar_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
 
       /**
        * Type definition for the auto-differentiation number type that is used
        * in all computations.
        */
       using ad_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type;
 
       /**
        * @name Constructor / destructor
@@ -874,13 +873,13 @@ namespace Differentiation
        * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
-      ADHelperCellLevelBase(const unsigned int n_independent_variables,
-                            const unsigned int n_dependent_variables);
+      CellLevelBase(const unsigned int n_independent_variables,
+                    const unsigned int n_dependent_variables);
 
       /**
        * Destructor
        */
-      virtual ~ADHelperCellLevelBase() = default;
+      virtual ~CellLevelBase() = default;
 
       //@}
 
@@ -976,7 +975,7 @@ namespace Differentiation
        * correspond with the @p ScalarType prescribed as a template argument.
        *
        * @note If the @p keep_independent_values flag has been set when
-       * ADHelperBase::start_recording_operations() is called then the tape is
+       * HelperBase::start_recording_operations() is called then the tape is
        * immediately usable after creation, and the values of the independent
        * variables set by register_dof_values() are those at which the function
        * is to be evaluated. In this case, a separate call to this function is
@@ -996,7 +995,7 @@ namespace Differentiation
        * typically obtained by calling <code>cell->get_dof_indices()</code>.
        *
        * @note If the @p keep_independent_values flag has been set when
-       * ADHelperBase::start_recording_operations() is called then the tape is
+       * HelperBase::start_recording_operations() is called then the tape is
        * immediately usable after creation, and the values of the independent
        * variables set by register_dof_values() are those at which the function
        * is to be evaluated. In this case, a separate call to this function is
@@ -1054,7 +1053,7 @@ namespace Differentiation
 
       //@}
 
-    }; // class ADHelperCellLevelBase
+    }; // class CellLevelBase
 
 
 
@@ -1091,7 +1090,7 @@ namespace Differentiation
      *     // Create some aliases for the AD helper.
      *     // In the example, the AD_typecode used for the template argument can
      *     // be refer to either a taped or tapeless type.
-     *     using ADHelper = AD::ADHelperEnergyFunctional<...>;
+     *     using ADHelper = AD::EnergyFunctional<...>;
      *     using ADNumberType = typename ADHelper::ad_type;
      *
      *     // Create and initialize an instance of the helper class.
@@ -1222,8 +1221,7 @@ namespace Differentiation
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
-    class ADHelperEnergyFunctional
-      : public ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>
+    class EnergyFunctional : public CellLevelBase<ADNumberTypeCode, ScalarType>
     {
     public:
       /**
@@ -1231,14 +1229,14 @@ namespace Differentiation
        * and results from, all computations.
        */
       using scalar_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
 
       /**
        * Type definition for the auto-differentiation number type that is used
        * in all computations.
        */
       using ad_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type;
 
       /**
        * @name Constructor / destructor
@@ -1260,12 +1258,12 @@ namespace Differentiation
        * is computed from the first and second derivatives of a scalar
        * function $\Psi(\mathbf{X})$.
        */
-      ADHelperEnergyFunctional(const unsigned int n_independent_variables);
+      EnergyFunctional(const unsigned int n_independent_variables);
 
       /**
        * Destructor
        */
-      virtual ~ADHelperEnergyFunctional() = default;
+      virtual ~EnergyFunctional() = default;
 
       //@}
 
@@ -1298,7 +1296,7 @@ namespace Differentiation
        * @f]
        *
        * The values at the evaluation point $\mathbf{X}$ are obtained by calling
-       * ADHelperCellLevelBase::set_dof_values().
+       * CellLevelBase::set_dof_values().
        *
        * @return The value of the energy functional at the evaluation point
        * corresponding to a chosen set of local degree of freedom values.
@@ -1318,7 +1316,7 @@ namespace Differentiation
        * @f]
        *
        * The values at the evaluation point $\mathbf{X}$ are obtained by calling
-       * ADHelperCellLevelBase::set_dof_values().
+       * CellLevelBase::set_dof_values().
        *
        * @param[out] residual A Vector object, for which the value for each
        * entry represents the residual value for the corresponding local
@@ -1341,7 +1339,7 @@ namespace Differentiation
        * @f]
        *
        * The values at the evaluation point $\mathbf{X}$ are obtained by calling
-       * ADHelperCellLevelBase::set_dof_values().
+       * CellLevelBase::set_dof_values().
        *
        * @param[out] linearization A FullMatrix representing the linearization
        * of the residual vector. The output @p linearization matrix has
@@ -1354,7 +1352,7 @@ namespace Differentiation
 
       //@}
 
-    }; // class ADHelperEnergyFunctional
+    }; // class EnergyFunctional
 
 
 
@@ -1398,9 +1396,9 @@ namespace Differentiation
      *     // In this example, we strictly assume that we're using tapeless
      *     // AD types, and so the AD_typecode used in the template argument
      *     // must refer to one of these types. See the example for the
-     *     // ADHelperEnergyFunctional for details on how to extend
+     *     // EnergyFunctional for details on how to extend
      *     // support to taped AD numbers.
-     *     using ADHelper = AD::ADHelperResidualLinearization<...>;
+     *     using ADHelper = AD::ResidualLinearization<...>;
      *     using ADNumberType = typename ADHelper::ad_type;
      *
      *     // Create and initialize an instance of the helper class.
@@ -1538,8 +1536,8 @@ namespace Differentiation
      */
     template <enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
-    class ADHelperResidualLinearization
-      : public ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>
+    class ResidualLinearization
+      : public CellLevelBase<ADNumberTypeCode, ScalarType>
     {
     public:
       /**
@@ -1547,14 +1545,14 @@ namespace Differentiation
        * and results from, all computations.
        */
       using scalar_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
 
       /**
        * Type definition for the auto-differentiation number type that is used
        * in all computations.
        */
       using ad_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type;
 
       /**
        * @name Constructor / destructor
@@ -1575,13 +1573,13 @@ namespace Differentiation
        * be the number of outputs $\mathbf{r}$, i.e., the dimension of the
        * image space.
        */
-      ADHelperResidualLinearization(const unsigned int n_independent_variables,
-                                    const unsigned int n_dependent_variables);
+      ResidualLinearization(const unsigned int n_independent_variables,
+                            const unsigned int n_dependent_variables);
 
       /**
        * Destructor
        */
-      virtual ~ADHelperResidualLinearization() = default;
+      virtual ~ResidualLinearization() = default;
 
       //@}
 
@@ -1615,7 +1613,7 @@ namespace Differentiation
        * @f]
        *
        * The values at the evaluation point $\mathbf{X}$ are obtained by calling
-       * ADHelperCellLevelBase::set_dof_values().
+       * CellLevelBase::set_dof_values().
        *
        * @param[out] residual A Vector object, for which the value for each
        * entry represents the residual value for the corresponding local
@@ -1635,7 +1633,7 @@ namespace Differentiation
        * @f]
        *
        * The values at the evaluation point $\mathbf{X}$ are obtained by calling
-       * ADHelperCellLevelBase::set_dof_values().
+       * CellLevelBase::set_dof_values().
        *
        * @param[out] linearization A FullMatrix representing the linearization
        * of the residual vector. The output @p linearization matrix has
@@ -1648,7 +1646,7 @@ namespace Differentiation
 
       //@}
 
-    }; // class ADHelperResidualLinearization
+    }; // class ResidualLinearization
 
 
 
@@ -2623,7 +2621,7 @@ namespace Differentiation
     /**
      * A base helper class that facilitates the evaluation of point-wise defined
      * functions. This is the point-wise counterpart of the
-     * ADHelperCellLevelBase class, and was conceived for computations at a
+     * CellLevelBase class, and was conceived for computations at a
      * continuum point, or quadrature point, rather than for finite-element
      * level calculations. That being said, the interface to this and the
      * derived classes are sufficiently generic that the dependent function(s)
@@ -2646,8 +2644,8 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
-    class ADHelperPointLevelFunctionsBase
-      : public ADHelperBase<ADNumberTypeCode, ScalarType>
+    class PointLevelFunctionsBase
+      : public HelperBase<ADNumberTypeCode, ScalarType>
     {
     public:
       /**
@@ -2661,14 +2659,14 @@ namespace Differentiation
        * and results from, all computations.
        */
       using scalar_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
 
       /**
        * Type definition for the auto-differentiation number type that is used
        * in all computations.
        */
       using ad_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type;
 
       /**
        * @name Constructor / destructor
@@ -2689,14 +2687,13 @@ namespace Differentiation
        * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
-      ADHelperPointLevelFunctionsBase(
-        const unsigned int n_independent_variables,
-        const unsigned int n_dependent_variables);
+      PointLevelFunctionsBase(const unsigned int n_independent_variables,
+                              const unsigned int n_dependent_variables);
 
       /**
        * Destructor
        */
-      virtual ~ADHelperPointLevelFunctionsBase() = default;
+      virtual ~PointLevelFunctionsBase() = default;
 
       //@}
 
@@ -2706,7 +2703,7 @@ namespace Differentiation
       //@{
 
       /**
-       * @copydoc ADHelperBase::reset()
+       * @copydoc HelperBase::reset()
        */
       virtual void
       reset(const unsigned int n_independent_variables =
@@ -2837,7 +2834,7 @@ namespace Differentiation
        * correspond with the @p ScalarType prescribed as a template argument.
        *
        * @note If the @p keep_independent_values flag has been set when
-       * ADHelperBase::start_recording_operations() is called then the tape is
+       * HelperBase::start_recording_operations() is called then the tape is
        * immediately usable after creation, and the values of the independent
        * variables set by register_independent_variables() are those at which
        * the function is to be evaluated. In this case, a separate call to this
@@ -2866,7 +2863,7 @@ namespace Differentiation
        * be an FEValuesExtractors::Vector or FEValuesExtractors::Tensor<1>.
        *
        * @note If the @p keep_independent_values flag has been set when
-       * ADHelperBase::start_recording_operations() is called then the tape is
+       * HelperBase::start_recording_operations() is called then the tape is
        * immediately usable after creation, and the values of the independent
        * variables set by register_independent_variable() are those at which the
        * function is to be evaluated. In this case, a separate call to this
@@ -2931,7 +2928,7 @@ namespace Differentiation
 
       //@}
 
-    }; // class ADHelperPointLevelFunctionsBase
+    }; // class PointLevelFunctionsBase
 
 
 
@@ -2964,7 +2961,7 @@ namespace Differentiation
      *   // Define the helper that we will use in the AD computations for our
      *   // scalar energy function. Note that we expect it to return values of
      *   // type double.
-     *   ADHelperScalarFunction<dim,...> ad_helper (n_independent_variables);
+     *   ScalarFunction<dim,...> ad_helper (n_independent_variables);
      *   using ADNumberType = typename ADHelper::ad_type;
      *
      *   // Compute the fields that provide the independent values.
@@ -3094,10 +3091,8 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
-    class ADHelperScalarFunction
-      : public ADHelperPointLevelFunctionsBase<dim,
-                                               ADNumberTypeCode,
-                                               ScalarType>
+    class ScalarFunction
+      : public PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>
     {
     public:
       /**
@@ -3105,14 +3100,14 @@ namespace Differentiation
        * and results from, all computations.
        */
       using scalar_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
 
       /**
        * Type definition for the auto-differentiation number type that is used
        * in all computations.
        */
       using ad_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type;
 
       /**
        * @name Constructor / destructor
@@ -3128,12 +3123,12 @@ namespace Differentiation
        * $\mathbf{f}(\mathbf{X})$, this will be the number of inputs
        * $\mathbf{X}$, i.e., the dimension of the domain space.
        */
-      ADHelperScalarFunction(const unsigned int n_independent_variables);
+      ScalarFunction(const unsigned int n_independent_variables);
 
       /**
        * Destructor.
        */
-      virtual ~ADHelperScalarFunction() = default;
+      virtual ~ScalarFunction() = default;
 
       //@}
 
@@ -3323,7 +3318,7 @@ namespace Differentiation
 
       //@}
 
-    }; // class ADHelperScalarFunction
+    }; // class ScalarFunction
 
 
 
@@ -3366,7 +3361,7 @@ namespace Differentiation
      *   // Define the helper that we will use in the AD computations for our
      *   // scalar energy function. Note that we expect it to return values of
      *   // type double.
-     *   ADHelperVectorFunction<dim,double> ad_helper (n_independent_variables,
+     *   VectorFunction<dim,double> ad_helper (n_independent_variables,
      *                                                 n_dependent_variables);
      *   using ADNumberType = typename ADHelper::ad_type;
      *
@@ -3489,10 +3484,8 @@ namespace Differentiation
     template <int                  dim,
               enum AD::NumberTypes ADNumberTypeCode,
               typename ScalarType = double>
-    class ADHelperVectorFunction
-      : public ADHelperPointLevelFunctionsBase<dim,
-                                               ADNumberTypeCode,
-                                               ScalarType>
+    class VectorFunction
+      : public PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>
     {
     public:
       /**
@@ -3500,14 +3493,14 @@ namespace Differentiation
        * and results from, all computations.
        */
       using scalar_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::scalar_type;
 
       /**
        * Type definition for the auto-differentiation number type that is used
        * in all computations.
        */
       using ad_type =
-        typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type;
+        typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type;
 
       /**
        * @name Constructor / destructor
@@ -3528,13 +3521,13 @@ namespace Differentiation
        * be the number of outputs $\mathbf{f}$, i.e., the dimension of the
        * image space.
        */
-      ADHelperVectorFunction(const unsigned int n_independent_variables,
-                             const unsigned int n_dependent_variables);
+      VectorFunction(const unsigned int n_independent_variables,
+                     const unsigned int n_dependent_variables);
 
       /**
        * Destructor.
        */
-      virtual ~ADHelperVectorFunction() = default;
+      virtual ~VectorFunction() = default;
 
       //@}
 
@@ -3726,7 +3719,7 @@ namespace Differentiation
 
       //@}
 
-    }; // class ADHelperVectorFunction
+    }; // class VectorFunction
 
 
   } // namespace AD
@@ -3742,14 +3735,14 @@ namespace Differentiation
 {
   namespace AD
   {
-    /* ----------------- ADHelperCellLevelBase ----------------- */
+    /* ----------------- CellLevelBase ----------------- */
 
 
 
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     template <typename VectorType>
     void
-    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::register_dof_values(
+    CellLevelBase<ADNumberTypeCode, ScalarType>::register_dof_values(
       const VectorType &                                  values,
       const std::vector<dealii::types::global_dof_index> &local_dof_indices)
     {
@@ -3774,7 +3767,7 @@ namespace Differentiation
     template <enum AD::NumberTypes ADNumberTypeCode, typename ScalarType>
     template <typename VectorType>
     void
-    ADHelperCellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
+    CellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
       const VectorType &                                  values,
       const std::vector<dealii::types::global_dof_index> &local_dof_indices)
     {
@@ -3782,13 +3775,13 @@ namespace Differentiation
              ExcMessage(
                "Vector size does not match number of independent variables"));
       for (unsigned int i = 0; i < this->n_independent_variables(); ++i)
-        ADHelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
+        HelperBase<ADNumberTypeCode, ScalarType>::set_sensitivity_value(
           i, values[local_dof_indices[i]]);
     }
 
 
 
-    /* ----------------- ADHelperPointLevelFunctionsBase ----------------- */
+    /* ----------------- PointLevelFunctionsBase ----------------- */
 
 
 
@@ -3797,7 +3790,7 @@ namespace Differentiation
               typename ScalarType>
     template <typename ValueType, typename ExtractorType>
     void
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       register_independent_variable(const ValueType &    value,
                                     const ExtractorType &extractor)
     {
@@ -3833,7 +3826,7 @@ namespace Differentiation
               typename ScalarType>
     template <typename ValueType, typename ExtractorType>
     void
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       set_independent_variable(const ValueType &    value,
                                const ExtractorType &extractor)
     {
@@ -3855,8 +3848,8 @@ namespace Differentiation
               typename ScalarType>
     template <typename ExtractorType>
     typename internal::Extractor<dim, ExtractorType>::template tensor_type<
-      typename ADHelperBase<ADNumberTypeCode, ScalarType>::ad_type>
-    ADHelperPointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
+      typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type>
+    PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       get_sensitive_variables(const ExtractorType &extractor) const
     {
       if (ADNumberTraits<ad_type>::is_taped == true)
@@ -3895,7 +3888,7 @@ namespace Differentiation
 
 
 
-    /* ----------------- ADHelperScalarFunction ----------------- */
+    /* ----------------- ScalarFunction ----------------- */
 
 
 
@@ -3905,10 +3898,9 @@ namespace Differentiation
     template <typename ExtractorType_Row>
     typename internal::ScalarFieldGradient<
       dim,
-      typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
-        scalar_type,
+      typename ScalarFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type,
       ExtractorType_Row>::type
-    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_gradient_component(const Vector<scalar_type> &gradient,
                                  const ExtractorType_Row &  extractor_row)
     {
@@ -3937,11 +3929,10 @@ namespace Differentiation
     template <typename ExtractorType_Row, typename ExtractorType_Col>
     typename internal::ScalarFieldHessian<
       dim,
-      typename ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
-        scalar_type,
+      typename ScalarFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type,
       ExtractorType_Row,
       ExtractorType_Col>::type
-    ADHelperScalarFunction<dim, ADNumberTypeCode, ScalarType>::
+    ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_hessian_component(const FullMatrix<scalar_type> &hessian,
                                 const ExtractorType_Row &      extractor_row,
                                 const ExtractorType_Col &      extractor_col)
@@ -3996,7 +3987,7 @@ namespace Differentiation
 
 
 
-    /* ----------------- ADHelperVectorFunction ----------------- */
+    /* ----------------- VectorFunction ----------------- */
 
 
 
@@ -4005,7 +3996,7 @@ namespace Differentiation
               typename ScalarType>
     template <typename ValueType, typename ExtractorType>
     void
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       register_dependent_variable(const ValueType &    funcs,
                                   const ExtractorType &extractor)
     {
@@ -4016,9 +4007,8 @@ namespace Differentiation
           Assert(this->registered_marked_dependent_variables[index_set[i]] ==
                    false,
                  ExcMessage("Overlapping indices for dependent variables."));
-          ADHelperBase<ADNumberTypeCode, ScalarType>::
-            register_dependent_variable(index_set[i],
-                                        internal::get_tensor_entry(funcs, i));
+          HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
+            index_set[i], internal::get_tensor_entry(funcs, i));
         }
     }
 
@@ -4030,12 +4020,11 @@ namespace Differentiation
     template <typename ExtractorType_Row>
     typename internal::VectorFieldValue<
       dim,
-      typename ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
-        scalar_type,
+      typename VectorFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type,
       ExtractorType_Row>::type
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
-      extract_value_component(const Vector<scalar_type> &values,
-                              const ExtractorType_Row &  extractor_row)
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::extract_value_component(
+      const Vector<scalar_type> &values,
+      const ExtractorType_Row &  extractor_row)
     {
       // NOTE: The order of components must be consistently defined throughout
       // this class.
@@ -4062,11 +4051,10 @@ namespace Differentiation
     template <typename ExtractorType_Row, typename ExtractorType_Col>
     typename internal::VectorFieldJacobian<
       dim,
-      typename ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
-        scalar_type,
+      typename VectorFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type,
       ExtractorType_Row,
       ExtractorType_Col>::type
-    ADHelperVectorFunction<dim, ADNumberTypeCode, ScalarType>::
+    VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_jacobian_component(const FullMatrix<scalar_type> &jacobian,
                                  const ExtractorType_Row &      extractor_row,
                                  const ExtractorType_Col &      extractor_col)

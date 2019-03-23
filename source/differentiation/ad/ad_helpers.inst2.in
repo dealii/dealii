@@ -21,61 +21,61 @@ for (number : REAL_SCALARS)
   \{
   namespace AD
   \{
-    // -------------------------- ADHelperBase ----------------------
+    // -------------------------- HelperBase ----------------------
 
     template
-    class ADHelperBase<NumberTypes::sacado_dfad_dfad,number>;
+    class HelperBase<NumberTypes::sacado_dfad_dfad,number>;
 
     template
-    class ADHelperBase<NumberTypes::sacado_dfad,number>;
+    class HelperBase<NumberTypes::sacado_dfad,number>;
 
     template
-    class ADHelperBase<NumberTypes::sacado_rad,number>;
+    class HelperBase<NumberTypes::sacado_rad,number>;
 
     template
-    class ADHelperBase<NumberTypes::sacado_rad_dfad,number>;
+    class HelperBase<NumberTypes::sacado_rad_dfad,number>;
 
-    // -------------------------- ADHelperCellLevelBase ----------------------
-
-    template
-    class ADHelperCellLevelBase<NumberTypes::sacado_dfad_dfad,number>;
+    // -------------------------- CellLevelBase ----------------------
 
     template
-    class ADHelperCellLevelBase<NumberTypes::sacado_dfad,number>;
+    class CellLevelBase<NumberTypes::sacado_dfad_dfad,number>;
 
     template
-    class ADHelperCellLevelBase<NumberTypes::sacado_rad,number>;
+    class CellLevelBase<NumberTypes::sacado_dfad,number>;
 
     template
-    class ADHelperCellLevelBase<NumberTypes::sacado_rad_dfad,number>;
-
-    // -------------------------- ADHelperEnergyFunctional ----------------------
+    class CellLevelBase<NumberTypes::sacado_rad,number>;
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::sacado_dfad_dfad,number>;
+    class CellLevelBase<NumberTypes::sacado_rad_dfad,number>;
+
+    // -------------------------- EnergyFunctional ----------------------
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::sacado_dfad,number>;
+    class EnergyFunctional<NumberTypes::sacado_dfad_dfad,number>;
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::sacado_rad,number>;
+    class EnergyFunctional<NumberTypes::sacado_dfad,number>;
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::sacado_rad_dfad,number>;
-
-    // -------------------------- ADHelperResidualLinearization ----------------------
+    class EnergyFunctional<NumberTypes::sacado_rad,number>;
 
     template
-    class ADHelperResidualLinearization<NumberTypes::sacado_dfad_dfad,number>;
+    class EnergyFunctional<NumberTypes::sacado_rad_dfad,number>;
+
+    // -------------------------- ResidualLinearization ----------------------
 
     template
-    class ADHelperResidualLinearization<NumberTypes::sacado_dfad,number>;
+    class ResidualLinearization<NumberTypes::sacado_dfad_dfad,number>;
 
     template
-    class ADHelperResidualLinearization<NumberTypes::sacado_rad,number>;
+    class ResidualLinearization<NumberTypes::sacado_dfad,number>;
 
     template
-    class ADHelperResidualLinearization<NumberTypes::sacado_rad_dfad,number>;
+    class ResidualLinearization<NumberTypes::sacado_rad,number>;
+
+    template
+    class ResidualLinearization<NumberTypes::sacado_rad_dfad,number>;
 
     \}
     \}
@@ -89,61 +89,61 @@ for ()
     namespace AD
     \{
 
-    // -------------------------- ADHelperBase ----------------------
+    // -------------------------- HelperBase ----------------------
 
     template
-    class ADHelperBase<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+    class HelperBase<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
 
     template
-    class ADHelperBase<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+    class HelperBase<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
 
     template
-    class ADHelperBase<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+    class HelperBase<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
 
     template
-    class ADHelperBase<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+    class HelperBase<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
 
-    // -------------------------- ADHelperCellLevelBase ----------------------
-
-    template
-    class ADHelperCellLevelBase<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+    // -------------------------- CellLevelBase ----------------------
 
     template
-    class ADHelperCellLevelBase<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+    class CellLevelBase<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
 
     template
-    class ADHelperCellLevelBase<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+    class CellLevelBase<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
 
     template
-    class ADHelperCellLevelBase<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
-
-    // -------------------------- ADHelperEnergyFunctional ----------------------
+    class CellLevelBase<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+    class CellLevelBase<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+
+    // -------------------------- EnergyFunctional ----------------------
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+    class EnergyFunctional<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+    class EnergyFunctional<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
 
     template
-    class ADHelperEnergyFunctional<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
-
-    // -------------------------- ADHelperResidualLinearization ----------------------
+    class EnergyFunctional<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
 
     template
-    class ADHelperResidualLinearization<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+    class EnergyFunctional<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+
+    // -------------------------- ResidualLinearization ----------------------
 
     template
-    class ADHelperResidualLinearization<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+    class ResidualLinearization<NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
 
     template
-    class ADHelperResidualLinearization<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+    class ResidualLinearization<NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
 
     template
-    class ADHelperResidualLinearization<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+    class ResidualLinearization<NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+
+    template
+    class ResidualLinearization<NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
 
 
     \}
@@ -158,47 +158,47 @@ for (deal_II_dimension : DIMENSIONS ; number : REAL_SCALARS)
   namespace AD
   \{
 
-    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+    // -------------------------- PointLevelFunctionsBase ----------------------
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad_dfad,number>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad_dfad,number>;
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad,number>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad,number>;
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad,number>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad,number>;
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
 
-    // -------------------------- ADHelperScalarFunction ----------------------
-
-    template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,number>;
+    // -------------------------- ScalarFunction ----------------------
 
     template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad,number>;
+    class ScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,number>;
 
     template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_rad,number>;
+    class ScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad,number>;
 
     template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
-
-    // -------------------------- ADHelperVectorFunction ----------------------
+    class ScalarFunction<deal_II_dimension,NumberTypes::sacado_rad,number>;
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,number>;
+    class ScalarFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
+
+    // -------------------------- VectorFunction ----------------------
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::sacado_dfad,number>;
+    class VectorFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,number>;
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::sacado_rad,number>;
+    class VectorFunction<deal_II_dimension,NumberTypes::sacado_dfad,number>;
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
+    class VectorFunction<deal_II_dimension,NumberTypes::sacado_rad,number>;
+
+    template
+    class VectorFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,number>;
 
     \}
     \}
@@ -212,47 +212,47 @@ for (deal_II_dimension : DIMENSIONS)
     namespace AD
     \{
 
-    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+    // -------------------------- PointLevelFunctionsBase ----------------------
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
 
     template
-    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+    class PointLevelFunctionsBase<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
 
-    // -------------------------- ADHelperScalarFunction ----------------------
-
-    template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+    // -------------------------- ScalarFunction ----------------------
 
     template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+    class ScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
 
     template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+    class ScalarFunction<deal_II_dimension,NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
 
     template
-    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
-
-    // -------------------------- ADHelperVectorFunction ----------------------
+    class ScalarFunction<deal_II_dimension,NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
+    class ScalarFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+
+    // -------------------------- VectorFunction ----------------------
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
+    class VectorFunction<deal_II_dimension,NumberTypes::sacado_dfad_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad_dfad>::ad_type>;
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+    class VectorFunction<deal_II_dimension,NumberTypes::sacado_dfad,typename NumberTraits<double,NumberTypes::sacado_dfad>::ad_type>;
 
     template
-    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
+    class VectorFunction<deal_II_dimension,NumberTypes::sacado_rad,typename NumberTraits<double,NumberTypes::sacado_rad>::ad_type>;
+
+    template
+    class VectorFunction<deal_II_dimension,NumberTypes::sacado_rad_dfad,typename NumberTraits<double,NumberTypes::sacado_rad_dfad>::ad_type>;
     
     \}
     \}
