@@ -535,7 +535,9 @@ namespace MeshWorker
               sample_copy_data,
               flags,
               f_boundary_worker,
-              f_face_worker);
+              f_face_worker,
+              queue_length,
+              chunk_size);
   }
 } // namespace MeshWorker
 
