@@ -101,7 +101,6 @@ namespace Step41
     TrilinosWrappers::SparseMatrix complete_system_matrix;
 
     TrilinosWrappers::MPI::Vector solution;
-    TrilinosWrappers::MPI::Vector active_set_vector;
     TrilinosWrappers::MPI::Vector system_rhs;
     TrilinosWrappers::MPI::Vector complete_system_rhs;
     TrilinosWrappers::MPI::Vector diagonal_of_mass_matrix;
@@ -262,7 +261,6 @@ namespace Step41
 
     IndexSet solution_index_set = dof_handler.locally_owned_dofs();
     solution.reinit(solution_index_set, MPI_COMM_WORLD);
-    active_set_vector.reinit(solution_index_set, MPI_COMM_WORLD);
     system_rhs.reinit(solution_index_set, MPI_COMM_WORLD);
     complete_system_rhs.reinit(solution_index_set, MPI_COMM_WORLD);
     contact_force.reinit(solution_index_set, MPI_COMM_WORLD);
@@ -544,10 +542,6 @@ namespace Step41
                                              BoundaryValues<dim>(),
                                              constraints);
     constraints.close();
-
-    active_set_vector = 0.;
-    for (const auto index : active_set)
-      active_set_vector[index] = 1.;
   }
 
   // @sect4{ObstacleProblem::solve}
@@ -587,6 +581,11 @@ namespace Step41
   void ObstacleProblem<dim>::output_results(const unsigned int iteration) const
   {
     std::cout << "   Writing graphical output..." << std::endl;
+
+    TrilinosWrappers::MPI::Vector active_set_vector(
+      dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
+    for (const auto index : active_set)
+      active_set_vector[index] = 1.;
 
     DataOut<dim> data_out;
 

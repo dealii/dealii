@@ -701,7 +701,6 @@ namespace Step42
     TrilinosWrappers::SparseMatrix newton_matrix;
 
     TrilinosWrappers::MPI::Vector solution;
-    TrilinosWrappers::MPI::Vector active_set_vector;
     TrilinosWrappers::MPI::Vector newton_rhs;
     TrilinosWrappers::MPI::Vector newton_rhs_uncondensed;
     TrilinosWrappers::MPI::Vector diag_mass_matrix_vector;
@@ -1023,7 +1022,6 @@ namespace Step42
     {
       TimerOutput::Scope t(computing_timer, "Setup: vectors");
       solution.reinit(locally_relevant_dofs, mpi_communicator);
-      active_set_vector.reinit(locally_relevant_dofs, MPI_COMM_WORLD);
       newton_rhs.reinit(locally_owned_dofs, mpi_communicator);
       newton_rhs_uncondensed.reinit(locally_owned_dofs, mpi_communicator);
       diag_mass_matrix_vector.reinit(locally_owned_dofs, mpi_communicator);
@@ -1340,14 +1338,6 @@ namespace Step42
 
     all_constraints.close();
     all_constraints.merge(constraints_dirichlet_and_hanging_nodes);
-
-    // We misuse distributed_solution for updating active_set_vector.
-    // We can do that because distributed_solution has a compatible underlying
-    // IndexSet and we don't need the vector anymore.
-    distributed_solution = 0.;
-    for (const auto index : active_set)
-      distributed_solution[index] = 1.;
-    active_set_vector = distributed_solution;
 
     pcout << "         Size of active set: "
           << Utilities::MPI::sum((active_set & locally_owned_dofs).n_elements(),
@@ -2037,6 +2027,16 @@ namespace Step42
                                          mpi_communicator);
     lambda = distributed_lambda;
 
+    TrilinosWrappers::MPI::Vector distributed_active_set_vector(
+      locally_owned_dofs, mpi_communicator);
+    distributed_active_set_vector = 0.;
+    for (const auto index : active_set)
+      distributed_active_set_vector[index] = 1.;
+    distributed_lambda.compress(VectorOperation::insert);
+
+    TrilinosWrappers::MPI::Vector active_set_vector(locally_relevant_dofs,
+                                                    mpi_communicator);
+    active_set_vector = distributed_active_set_vector;
 
     DataOut<dim> data_out;
 
