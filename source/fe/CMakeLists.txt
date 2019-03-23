@@ -63,6 +63,7 @@ SET(_unity_include_src
 
 SET(_separate_src
   fe_values.cc
+  fe_values_extractors.cc
   fe_values_inst2.cc
   fe_values_inst3.cc
   fe_values_inst4.cc

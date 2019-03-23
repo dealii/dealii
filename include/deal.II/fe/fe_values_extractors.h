@@ -112,6 +112,12 @@ namespace FEValuesExtractors
      * Constructor. Take the selected vector component as argument.
      */
     Scalar(const unsigned int component);
+
+    /**
+     * Return a string that uniquely identifies this finite element extractor.
+     */
+    std::string
+    get_name() const;
   };
 
 
@@ -162,6 +168,12 @@ namespace FEValuesExtractors
      * FEValues object as argument.
      */
     Vector(const unsigned int first_vector_component);
+
+    /**
+     * Return a string that uniquely identifies this finite element extractor.
+     */
+    std::string
+    get_name() const;
   };
 
 
@@ -205,6 +217,12 @@ namespace FEValuesExtractors
      * FEValues object as argument.
      */
     SymmetricTensor(const unsigned int first_tensor_component);
+
+    /**
+     * Return a string that uniquely identifies this finite element extractor.
+     */
+    std::string
+    get_name() const;
   };
 
 
@@ -248,6 +266,12 @@ namespace FEValuesExtractors
      * FEValues object as argument.
      */
     Tensor(const unsigned int first_tensor_component);
+
+    /**
+     * Return a string that uniquely identifies this finite element extractor.
+     */
+    std::string
+    get_name() const;
   };
 } // namespace FEValuesExtractors
 
