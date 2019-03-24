@@ -48,6 +48,15 @@ UNSET_IF_CHANGED(CHECK_CXX_FEATURES_FLAGS_SAVED
   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
   )
 
+#
+# MSVC needs different compiler flags to turn warnings into errors
+# additionally a suitable exception handling model is required
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  SET(_werror_flag "/WX /EHsc")
+ELSE()
+  SET(_werror_flag "-Werror")
+ENDIF()
 
 #
 # Check whether the compiler allows to use arithmetic operations
@@ -298,7 +307,10 @@ ENDIF()
 # "warning #1292: unknown attribute "deprecated"" (icc)
 # Hence, we treat warnings as errors:
 ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS}")
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -Wno-unused-command-line-argument")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
+ENDIF()
 
 # first see if the compiler accepts the attribute
 CHECK_CXX_SOURCE_COMPILES(
@@ -405,7 +417,7 @@ ENDIF()
 #
 # - Matthias Maier, 2015
 #
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_werror_flag}")
 CHECK_CXX_SOURCE_COMPILES(
   "
   _Pragma(\"GCC diagnostic push\")
@@ -434,35 +446,38 @@ RESET_CMAKE_REQUIRED()
 #
 # Wolfgang Bangerth, Matthias Maier, Daniel Arndt, 2015, 2018
 #
-IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
-ENDIF()
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -fuse-ld=lld")
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main() { return 0; }
-  "
-  DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
-RESET_CMAKE_REQUIRED()
+IF(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
+  ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
+  ENDIF()
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=lld")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    int main() { return 0; }
+    "
+    DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+  RESET_CMAKE_REQUIRED()
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
-ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
-ENDIF()
-ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror -fuse-ld=gold")
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main() { return 0; }
-  "
-  DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-RESET_CMAKE_REQUIRED()
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Wno-unused-command-line-argument")
+  ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-diag-error warn")
+  ENDIF()
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-fuse-ld=gold")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    int main() { return 0; }
+    "
+    DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+  RESET_CMAKE_REQUIRED()
 
-IF(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
-  ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
-ELSEIF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
-  ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
+  IF(DEAL_II_COMPILER_HAS_FUSE_LD_LLD)
+    ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=lld")
+  ELSEIF(DEAL_II_COMPILER_HAS_FUSE_LD_GOLD)
+    ADD_FLAGS(DEAL_II_LINKER_FLAGS "-fuse-ld=gold")
+  ENDIF()
 ENDIF()
-

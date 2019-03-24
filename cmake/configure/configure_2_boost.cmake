@@ -58,7 +58,11 @@ MACRO(FEATURE_BOOST_CONFIGURE_COMMON)
   # Older boost versions can't know about this but provide a possibility to
   # circumvent the issue. Hence, we just check ourselves.
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
-  ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+  IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "/WX /EHsc")
+  ELSE()
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "-Werror")
+  ENDIF()
 
   CHECK_CXX_SOURCE_COMPILES(
     "
