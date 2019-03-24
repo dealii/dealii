@@ -14,11 +14,11 @@
 // ---------------------------------------------------------------------
 
 /**
-@page changes_after_9_0_1 Changes after Version 9.0.1
+@page recent_changes Changes since the last release
 
 <p>
-This is the list of changes made after the release of deal.II version
-9.0.1. All entries are signed with the names of the authors.
+This is the list of changes made since the last release of deal.II.
+All entries are signed with the names of the authors.
 </p>
 
 
