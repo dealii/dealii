@@ -392,6 +392,153 @@ namespace MeshWorker
                     queue_length,
                     chunk_size);
   }
+
+  /**
+   * This is a variant of the mesh_loop() function, that can be used for worker
+   * and copier functions that are member functions of a class.
+   *
+   * The argument passed as @p end must be convertible to the same type as @p
+   * begin, but doesn't have to be of the same type itself. This allows to
+   * write code like <code>mesh_loop(dof_handler.begin_active(),
+   * dof_handler.end(), ...)</code> where the first is of type
+   * DoFHandler::active_cell_iterator whereas the second is of type
+   * DoFHandler::raw_cell_iterator.
+   *
+   * The @p queue_length argument indicates the number of items that can be
+   * live at any given time. Each item consists of @p chunk_size elements of
+   * the input stream that will be worked on by the worker and copier
+   * functions one after the other on the same thread.
+   *
+   * @note If your data objects are large, or their constructors are
+   * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
+   * copies of the <tt>ScratchData</tt> object and
+   * <tt>queue_length*chunk_size</tt> copies of the <tt>CopyData</tt> object
+   * are generated.
+   *
+   * An example usage of the function is given by
+   * @code
+   *
+   * struct ScratchData;
+   * struct CopyData;
+   *
+   * template <int dim, int spacedim>
+   * class MyClass
+   * {
+   * public:
+   *   void
+   *   cell_worker(const CellIteratorType &cell, ScratchData &, CopyData &);
+   *
+   *   void
+   *   copier(const CopyData &);
+   *
+   *   ...
+   * };
+   *
+   * ...
+   *
+   * MyClass<dim, spacedim> my_class;
+   * SratchData             scratch;
+   * CopyData               copy;
+   *
+   * mesh_loop(tria.begin_active(),
+   *           tria.end(),
+   *           my_class,
+   *           &MyClass<dim, spacedim>::cell_worker,
+   *           &MyClass<dim, spacedim>::copier,
+   *           scratch,
+   *           copy,
+   *           assemble_own_cells);
+   * @endcode
+   *
+   * @ingroup MeshWorker
+   * @author Luca Heltai, 2019
+   */
+  template <class CellIteratorType,
+            class ScratchData,
+            class CopyData,
+            class MainClass>
+  void
+  mesh_loop(const CellIteratorType &                         begin,
+            const typename identity<CellIteratorType>::type &end,
+            MainClass &                                      main_class,
+            void (MainClass::*cell_worker)(const CellIteratorType &,
+                                           ScratchData &,
+                                           CopyData &),
+            void (MainClass::*copier)(const CopyData &),
+            const ScratchData & sample_scratch_data,
+            const CopyData &    sample_copy_data,
+            const AssembleFlags flags                      = assemble_own_cells,
+            void (MainClass::*boundary_worker)(const CellIteratorType &,
+                                               const unsigned int,
+                                               ScratchData &,
+                                               CopyData &) = nullptr,
+            void (MainClass::*face_worker)(const CellIteratorType &,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const CellIteratorType &,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           ScratchData &,
+                                           CopyData &)     = nullptr,
+            const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+            const unsigned int chunk_size   = 8)
+  {
+    std::function<void(const CellIteratorType &, ScratchData &, CopyData &)>
+      f_cell_worker;
+
+    std::function<void(
+      const CellIteratorType &, const unsigned int, ScratchData &, CopyData &)>
+      f_boundary_worker;
+
+    std::function<void(const CellIteratorType &,
+                       const unsigned int,
+                       const unsigned int,
+                       const CellIteratorType &,
+                       const unsigned int,
+                       const unsigned int,
+                       ScratchData &,
+                       CopyData &)>
+      f_face_worker;
+
+    if (cell_worker != nullptr)
+      f_cell_worker = std::bind(cell_worker,
+                                std::ref(main_class),
+                                std::placeholders::_1,
+                                std::placeholders::_2,
+                                std::placeholders::_3);
+
+    if (boundary_worker != nullptr)
+      f_boundary_worker = std::bind(boundary_worker,
+                                    std::ref(main_class),
+                                    std::placeholders::_1,
+                                    std::placeholders::_2,
+                                    std::placeholders::_3,
+                                    std::placeholders::_4);
+
+    if (face_worker != nullptr)
+      f_face_worker = std::bind(face_worker,
+                                std::ref(main_class),
+                                std::placeholders::_1,
+                                std::placeholders::_2,
+                                std::placeholders::_3,
+                                std::placeholders::_4,
+                                std::placeholders::_5,
+                                std::placeholders::_6,
+                                std::placeholders::_7,
+                                std::placeholders::_8);
+
+    mesh_loop(begin,
+              end,
+              f_cell_worker,
+              std::bind(copier, main_class, std::placeholders::_1),
+              sample_scratch_data,
+              sample_copy_data,
+              flags,
+              f_boundary_worker,
+              f_face_worker,
+              queue_length,
+              chunk_size);
+  }
 } // namespace MeshWorker
 
 DEAL_II_NAMESPACE_CLOSE

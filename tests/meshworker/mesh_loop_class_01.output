@@ -1,0 +1,55 @@
+
+DEAL::CELLS ONLY
+DEAL::Working on cell 1.1
+DEAL::Working on cell 1.2
+DEAL::Working on cell 1.3
+DEAL::Working on cell 2.0
+DEAL::Working on cell 2.1
+DEAL::Working on cell 2.2
+DEAL::Working on cell 2.3
+DEAL::CELLS+BOUNDARY
+DEAL::Working on cell 1.1
+DEAL::Boundary worker on : 1.1, Face : 1
+DEAL::Boundary worker on : 1.1, Face : 2
+DEAL::Working on cell 1.2
+DEAL::Boundary worker on : 1.2, Face : 0
+DEAL::Boundary worker on : 1.2, Face : 3
+DEAL::Working on cell 1.3
+DEAL::Boundary worker on : 1.3, Face : 1
+DEAL::Boundary worker on : 1.3, Face : 3
+DEAL::Working on cell 2.0
+DEAL::Boundary worker on : 2.0, Face : 0
+DEAL::Boundary worker on : 2.0, Face : 2
+DEAL::Working on cell 2.1
+DEAL::Boundary worker on : 2.1, Face : 2
+DEAL::Working on cell 2.2
+DEAL::Boundary worker on : 2.2, Face : 0
+DEAL::Working on cell 2.3
+DEAL::CELLS+BOUNDARY+FACES
+DEAL::Working on cell 1.1
+DEAL::Boundary worker on : 1.1, Face : 1
+DEAL::Boundary worker on : 1.1, Face : 2
+DEAL::Face worker on : 1.1, Neighbor cell : 1.3, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Working on cell 1.2
+DEAL::Boundary worker on : 1.2, Face : 0
+DEAL::Face worker on : 1.2, Neighbor cell : 1.3, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Boundary worker on : 1.2, Face : 3
+DEAL::Working on cell 1.3
+DEAL::Boundary worker on : 1.3, Face : 1
+DEAL::Boundary worker on : 1.3, Face : 3
+DEAL::Working on cell 2.0
+DEAL::Boundary worker on : 2.0, Face : 0
+DEAL::Face worker on : 2.0, Neighbor cell : 2.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Boundary worker on : 2.0, Face : 2
+DEAL::Face worker on : 2.0, Neighbor cell : 2.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Working on cell 2.1
+DEAL::Face worker on : 2.1, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 0
+DEAL::Boundary worker on : 2.1, Face : 2
+DEAL::Face worker on : 2.1, Neighbor cell : 2.3, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Working on cell 2.2
+DEAL::Boundary worker on : 2.2, Face : 0
+DEAL::Face worker on : 2.2, Neighbor cell : 2.3, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.2, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 0
+DEAL::Working on cell 2.3
+DEAL::Face worker on : 2.3, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 1
+DEAL::Face worker on : 2.3, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 1
