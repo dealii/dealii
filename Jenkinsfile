@@ -1,11 +1,25 @@
 #!groovy
 
+// load library https://github.com/tjhei/jenkins-stuff to provide
+// killold.killOldBuilds() function:
+@Library('tjhei') _
+
 pipeline
 {
   agent none
 
   stages
   {
+    stage("abort old")
+    {
+      agent none
+      steps
+      {
+        // kill older builds in this PR:
+        script { killold.killOldBuilds() }
+      }
+    }
+
     stage("check")
     {
       agent
