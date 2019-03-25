@@ -2637,7 +2637,7 @@ namespace GridTools
    * Triangulation @p tria to their co-dimension one and two objects.
    *
    * This function sets the @p manifold_id of faces and edges (both on the
-   * interior and on the boundary) to the value returnd by the
+   * interior and on the boundary) to the value returned by the
    * @p disambiguation_function method, called with the set of
    * manifold indicators of the cells that share the same face or edge.
    *
