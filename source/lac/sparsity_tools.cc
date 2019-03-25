@@ -911,6 +911,117 @@ namespace SparsityTools
 
 
 #ifdef DEAL_II_WITH_MPI
+
+  void
+  gather_sparsity_pattern(DynamicSparsityPattern &     dsp,
+                          const std::vector<IndexSet> &owned,
+                          const MPI_Comm &             mpi_comm,
+                          const IndexSet &             ghost_range)
+  {
+    const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
+
+    AssertDimension(owned.size(), Utilities::MPI::n_mpi_processes(mpi_comm));
+#  ifdef DEBUG
+    for (const auto &set : owned)
+      Assert(set.is_contiguous(), ExcNotImplemented());
+#  endif
+
+    Assert(owned[myid].is_ascending_and_one_to_one(mpi_comm),
+           ExcNotImplemented());
+
+    std::vector<DynamicSparsityPattern::size_type> start_index(owned.size() +
+                                                               1);
+    start_index[0] = 0;
+    for (DynamicSparsityPattern::size_type i = 0; i < owned.size(); ++i)
+      start_index[i + 1] = start_index[i] + owned[i].n_elements();
+
+    using map_vec_t =
+      std::map<unsigned int, std::vector<DynamicSparsityPattern::size_type>>;
+
+    // 1. limit rows to non owned:
+    IndexSet requested_rows(ghost_range);
+    requested_rows.subtract_set(owned[myid]);
+
+    // 2. go through requested_rows, figure out the owner and add the row to
+    // request
+    map_vec_t rows_data;
+    {
+      unsigned int cpu_rank = 0;
+      for (const auto &row : requested_rows)
+        {
+          // calculate destination CPU
+          while (row >= start_index[cpu_rank + 1])
+            ++cpu_rank;
+
+          // since we removed owned, we should not end up with
+          // our rows
+          Assert(cpu_rank != myid, ExcInternalError());
+
+          rows_data[cpu_rank].push_back(row);
+        }
+    }
+
+    // 3. get what others ask us to send
+    const auto rows_data_received =
+      Utilities::MPI::some_to_some(mpi_comm, rows_data);
+
+    // 4. now prepare data to be sent in the same format as in
+    // distribute_sparsity_pattern() below, i.e.
+    // rX,num_rX,cols_rX
+    map_vec_t send_data;
+    for (const auto &data : rows_data_received)
+      {
+        for (const auto &row : data.second)
+          {
+            const auto rlen = dsp.row_length(row);
+
+            // skip empty lines
+            if (rlen == 0)
+              continue;
+
+            // save entries
+            send_data[data.first].push_back(row);  // row index
+            send_data[data.first].push_back(rlen); // number of entries
+            for (DynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
+              send_data[data.first].push_back(
+                dsp.column_number(row, c)); // columns
+          }                                 // loop over rows
+      }                                     // loop over received data
+
+    // 5. communicate rows
+    const auto received_data =
+      Utilities::MPI::some_to_some(mpi_comm, send_data);
+
+    // 6. add result to our sparsity
+    for (const auto &data : received_data)
+      {
+        const auto &recv_buf = data.second;
+        auto        ptr      = recv_buf.begin();
+        const auto  end      = recv_buf.end();
+        while (ptr != end)
+          {
+            const auto row = *(ptr++);
+            Assert(ptr != end, ExcInternalError());
+
+            const auto n_entries = *(ptr++);
+            Assert(n_entries > 0, ExcInternalError());
+            Assert(ptr != end, ExcInternalError());
+
+            // make sure we clear whatever was previously stored
+            // in these rows. Otherwise we can't guarantee that the
+            // data is consistent across MPI communicator.
+            dsp.clear_row(row);
+
+            Assert(ptr + (n_entries - 1) != end, ExcInternalError());
+            dsp.add_entries(row, ptr, ptr + n_entries, true);
+            ptr += n_entries;
+          }
+        Assert(ptr == end, ExcInternalError());
+      }
+  }
+
+
+
   void
   distribute_sparsity_pattern(
     DynamicSparsityPattern &                              dsp,

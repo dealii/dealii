@@ -292,6 +292,34 @@ namespace SparsityTools
                               const MPI_Comm &             mpi_comm,
                               const IndexSet &             myrange);
 
+  /**
+   * Gather rows in a dynamic sparsity pattern over MPI.
+   * The function is similar to SparsityTools::distribute(),
+   * however instead of distributing sparsity stored in non-owned
+   * rows on this MPI process, this function will gather sparsity
+   * from other MPI processes and will add this to the local
+   * DynamicSparsityPattern.
+   *
+   * @param dsp A dynamic sparsity pattern that has been built locally and which
+   * we need to extend according to the sparsity of rows stored on other MPI
+   * processes.
+   *
+   * @param owned_rows_per_processor A vector containing owned rows for each
+   * process in the MPI communicator. This input should be the same on all MPI
+   * processes.
+   *
+   * @param mpi_comm The MPI communicator shared between the processors that
+   * participate in this operation.
+   *
+   * @param ghost_range The range of rows this MPI process needs to gather.
+   * Only a part which is not included in the locally owned rows will be used.
+   */
+  void
+  gather_sparsity_pattern(DynamicSparsityPattern &     dsp,
+                          const std::vector<IndexSet> &owned_rows_per_processor,
+                          const MPI_Comm &             mpi_comm,
+                          const IndexSet &             ghost_range);
+
 #endif
 
 
