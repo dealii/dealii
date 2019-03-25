@@ -520,6 +520,40 @@ InvalidAccessor<structdim, dim, spacedim>::manifold_id() const
 }
 
 
+
+template <int structdim, int dim, int spacedim>
+unsigned int
+InvalidAccessor<structdim, dim, spacedim>::user_index() const
+{
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+void
+InvalidAccessor<structdim, dim, spacedim>::set_user_index(
+  const unsigned int) const
+{
+  Assert(false,
+         ExcMessage("You are trying to set the user index of an "
+                    "invalid object."));
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+void
+InvalidAccessor<structdim, dim, spacedim>::set_manifold_id(
+  const types::manifold_id) const
+{
+  Assert(false,
+         ExcMessage("You are trying to set the manifold id of an "
+                    "invalid object."));
+}
+
+
+
 template <int structdim, int dim, int spacedim>
 inline Point<spacedim> &
 InvalidAccessor<structdim, dim, spacedim>::vertex(const unsigned int) const

@@ -633,6 +633,24 @@ public:
   manifold_id() const;
 
   /**
+   * Dummy function that always returns numbers::invalid_unsigned_int.
+   */
+  unsigned int
+  user_index() const;
+
+  /**
+   * Dummy function that always throws.
+   */
+  void
+  set_user_index(const unsigned int p) const;
+
+  /**
+   * Dummy function that always throws.
+   */
+  void
+  set_manifold_id(const types::manifold_id) const;
+
+  /**
    * Dummy function to extract vertices. Returns the origin.
    */
   Point<spacedim> &
