@@ -1388,13 +1388,9 @@ namespace Step42
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
     const FEValuesExtractors::Vector displacement(0);
 
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1553,11 +1549,7 @@ namespace Step42
 
     fraction_of_plastic_q_points_per_cell = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    unsigned int cell_number                            = 0;
-    for (; cell != endc; ++cell, ++cell_number)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1574,7 +1566,8 @@ namespace Step42
                 constitutive_law.get_stress_strain_tensor(
                   strain_tensors[q_point], stress_strain_tensor);
               if (q_point_is_plastic)
-                ++fraction_of_plastic_q_points_per_cell(cell_number);
+                ++fraction_of_plastic_q_points_per_cell(
+                  cell->active_cell_index());
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
@@ -2032,6 +2025,16 @@ namespace Step42
                                          mpi_communicator);
     lambda = distributed_lambda;
 
+    TrilinosWrappers::MPI::Vector distributed_active_set_vector(
+      locally_owned_dofs, mpi_communicator);
+    distributed_active_set_vector = 0.;
+    for (const auto index : active_set)
+      distributed_active_set_vector[index] = 1.;
+    distributed_lambda.compress(VectorOperation::insert);
+
+    TrilinosWrappers::MPI::Vector active_set_vector(locally_relevant_dofs,
+                                                    mpi_communicator);
+    active_set_vector = distributed_active_set_vector;
 
     DataOut<dim> data_out;
 
@@ -2048,7 +2051,7 @@ namespace Step42
                              std::vector<std::string>(dim, "contact_force"),
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);
-    data_out.add_data_vector(active_set,
+    data_out.add_data_vector(active_set_vector,
                              std::vector<std::string>(dim, "active_set"),
                              DataOut<dim>::type_dof_data,
                              data_component_interpretation);

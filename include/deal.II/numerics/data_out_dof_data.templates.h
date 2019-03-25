@@ -629,21 +629,6 @@ namespace internal
     {}
 
 
-    template <typename VectorType>
-    inline typename VectorType::value_type
-    get_vector_element(const VectorType &vector, const unsigned int cell_number)
-    {
-      return internal::ElementAccess<VectorType>::get(vector, cell_number);
-    }
-
-
-    inline double
-    get_vector_element(const IndexSet &is, const unsigned int cell_number)
-    {
-      return (is.is_element(cell_number) ? 1 : 0);
-    }
-
-
 
     template <typename DoFHandlerType, typename VectorType>
     double
@@ -651,8 +636,9 @@ namespace internal
       const unsigned int       cell_number,
       const ComponentExtractor extract_component) const
     {
-      return get_component(get_vector_element(*vector, cell_number),
-                           extract_component);
+      return get_component(
+        internal::ElementAccess<VectorType>::get(*vector, cell_number),
+        extract_component);
     }
 
 

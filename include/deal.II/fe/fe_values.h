@@ -2290,9 +2290,7 @@ public:
    * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
    * vector wrapper classes. It represents a global vector of DoF values
    * associated with the DoFHandler object with which this FEValues object was
-   * last initialized. Alternatively, if the vector argument is of type
-   * IndexSet, then the function is represented as one that is either zero or
-   * one, depending on whether a DoF index is in the set or not.
+   * last initialized.
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
@@ -2449,9 +2447,7 @@ public:
    * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
    * vector wrapper classes. It represents a global vector of DoF values
    * associated with the DoFHandler object with which this FEValues object was
-   * last initialized. Alternatively, if the vector argument is of type
-   * IndexSet, then the function is represented as one that is either zero or
-   * one, depending on whether a DoF index is in the set or not.
+   * last initialized.
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
@@ -2554,9 +2550,7 @@ public:
    * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
    * vector wrapper classes. It represents a global vector of DoF values
    * associated with the DoFHandler object with which this FEValues object was
-   * last initialized. Alternatively, if the vector argument is of type
-   * IndexSet, then the function is represented as one that is either zero or
-   * one, depending on whether a DoF index is in the set or not.
+   * last initialized.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2657,9 +2651,7 @@ public:
    * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
    * vector wrapper classes. It represents a global vector of DoF values
    * associated with the DoFHandler object with which this FEValues object was
-   * last initialized. Alternatively, if the vector argument is of type
-   * IndexSet, then the function is represented as one that is either zero or
-   * one, depending on whether a DoF index is in the set or not.
+   * last initialized.
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
@@ -2772,9 +2764,7 @@ public:
    * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
    * vector wrapper classes. It represents a global vector of DoF values
    * associated with the DoFHandler object with which this FEValues object was
-   * last initialized. Alternatively, if the vector argument is of type
-   * IndexSet, then the function is represented as one that is either zero or
-   * one, depending on whether a DoF index is in the set or not.
+   * last initialized.
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
