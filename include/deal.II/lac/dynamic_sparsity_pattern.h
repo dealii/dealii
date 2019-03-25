@@ -622,6 +622,24 @@ public:
   row_index_set() const;
 
   /**
+   * Return the IndexSet that contains entries for all columns in which at least
+   * one element exists in this sparsity pattern.
+   *
+   * @note In a parallel context, this only considers the locally stored rows.
+   */
+  IndexSet
+  nonempty_cols() const;
+
+  /**
+   * Return the IndexSet that contains entries for all rows in which at least
+   * one element exists in this sparsity pattern.
+   *
+   * @note In a parallel context, this only considers the locally stored rows.
+   */
+  IndexSet
+  nonempty_rows() const;
+
+  /**
    * return whether this object stores only those entries that have been added
    * explicitly, or if the sparsity pattern contains elements that have been
    * added through other means (implicitly) while building it. For the current
