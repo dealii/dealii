@@ -34,6 +34,7 @@
 #      include <Epetra_SerialComm.h>
 #    endif
 #    include <Epetra_Map.h>
+#    include <Epetra_MultiVector.h>
 #    include <Epetra_RowMatrix.h>
 #    include <Epetra_Vector.h>
 #    include <Teuchos_ParameterList.hpp>
@@ -1381,6 +1382,77 @@ namespace TrilinosWrappers
                      const bool         output_details   = false,
                      const char *       smoother_type    = "Chebyshev",
                      const char *       coarse_type      = "Amesos-KLU");
+
+      /**
+       * Fill in a @p parameter_list that can be used to initialize the
+       * AMG preconditioner.
+       *
+       * The @p matrix is used in conjunction with the @p constant_modes to
+       * configure the null space settings for the preconditioner.
+       * The @p distributed_constant_modes are initialized by this function, and
+       * must remain in scope until PreconditionAMG::initialize() has been
+       * called.
+       *
+       * @note The set parameters reflect the current settings in this
+       * object, with various options being set both directly though the state
+       * of the member variables (e.g. the "smoother: type") as well as
+       * indirectly (e.g. the "aggregation: type"). If you wish to have
+       * fine-grained control over the configuration of the AMG preconditioner,
+       * then you can create the parameter list using this function (which
+       * conveniently sets the null space of the operator), change the relevant
+       * settings, and use the amended parameters list as an argument to
+       * PreconditionAMG::initialize(), instead of the AdditionalData object
+       * itself.
+       *
+       * See the documentation for the
+       * <a
+       * href="https://trilinos.org/docs/dev/packages/ml/doc/html/index.html">
+       * Trilinos ML package</a> for details on what options are available for
+       * modification.
+       *
+       * @note Any user-defined parameters that are not in conflict with those
+       * set by this data structure will be retained.
+       */
+      void
+      set_parameters(
+        Teuchos::ParameterList &             parameter_list,
+        std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
+        const Epetra_RowMatrix &             matrix) const;
+
+      /**
+       * Fill in a parameter list that can be used to initialize the
+       * AMG preconditioner.
+       *
+       * @note Any user-defined parameters that are not in conflict with those
+       * set by this data structure will be retained.
+       */
+      void
+      set_parameters(
+        Teuchos::ParameterList &             parameter_list,
+        std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
+        const SparseMatrix &                 matrix) const;
+
+      /**
+       * Configure the null space setting in the @p parameter_list for
+       * the input @p matrix based on the state of the @p constant_modes
+       * variable.
+       */
+      void
+      set_operator_null_space(
+        Teuchos::ParameterList &             parameter_list,
+        std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
+        const Epetra_RowMatrix &             matrix) const;
+
+      /**
+       * Configure the null space setting in the @p parameter_list for
+       * the input @p matrix based on the state of the @p constant_modes
+       * variable.
+       */
+      void
+      set_operator_null_space(
+        Teuchos::ParameterList &             parameter_list,
+        std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
+        const SparseMatrix &                 matrix) const;
 
       /**
        * Determines whether the AMG preconditioner should be optimized for
