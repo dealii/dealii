@@ -1872,6 +1872,69 @@ namespace internal
   namespace FEValuesViews
   {
     /**
+     * A class whose specialization is used to define what FEValuesViews
+     * object corresponds to the given FEValuesExtractors object.
+     *
+     * @author Luca Heltai, 2019.
+     */
+    template <int dim, int spacedim, typename Extractor>
+    struct ViewType
+    {};
+
+    /**
+     * A class whose specialization is used to define what FEValuesViews
+     * object corresponds to the given FEValuesExtractors object.
+     *
+     * When using FEValuesExtractors::Scalar, the corresponding view is an
+     * FEValuesViews::Scalar<dim, spacedim>.
+     */
+    template <int dim, int spacedim>
+    struct ViewType<dim, spacedim, FEValuesExtractors::Scalar>
+    {
+      using type = typename dealii::FEValuesViews::Scalar<dim, spacedim>;
+    };
+
+    /**
+     * A class whose specialization is used to define what FEValuesViews
+     * object corresponds to the given FEValuesExtractors object.
+     *
+     * When using FEValuesExtractors::Vector, the corresponding view is an
+     * FEValuesViews::Vector<dim, spacedim>.
+     */
+    template <int dim, int spacedim>
+    struct ViewType<dim, spacedim, FEValuesExtractors::Vector>
+    {
+      using type = typename dealii::FEValuesViews::Vector<dim, spacedim>;
+    };
+
+    /**
+     * A class whose specialization is used to define what FEValuesViews
+     * object corresponds to the given FEValuesExtractors object.
+     *
+     * When using FEValuesExtractors::Tensor<rank>, the corresponding view is an
+     * FEValuesViews::Tensor<rank, dim, spacedim>.
+     */
+    template <int dim, int spacedim, int rank>
+    struct ViewType<dim, spacedim, FEValuesExtractors::Tensor<rank>>
+    {
+      using type = typename dealii::FEValuesViews::Tensor<rank, dim, spacedim>;
+    };
+
+    /**
+     * A class whose specialization is used to define what FEValuesViews
+     * object corresponds to the given FEValuesExtractors object.
+     *
+     * When using FEValuesExtractors::SymmetricTensor<rank>, the corresponding
+     * view is an FEValuesViews::SymmetricTensor<rank, dim, spacedim>.
+     */
+    template <int dim, int spacedim, int rank>
+    struct ViewType<dim, spacedim, FEValuesExtractors::SymmetricTensor<rank>>
+    {
+      using type =
+        typename dealii::FEValuesViews::SymmetricTensor<rank, dim, spacedim>;
+    };
+
+    /**
      * A class objects of which store a collection of FEValuesViews::Scalar,
      * FEValuesViews::Vector, etc object. The FEValuesBase class uses it to
      * generate all possible Views classes upon construction time; we do this
@@ -1900,6 +1963,18 @@ namespace internal
   } // namespace FEValuesViews
 } // namespace internal
 
+namespace FEValuesViews
+{
+  /**
+   * A templated alias that associates to a given Extractor class
+   * the corresponding view in FEValuesViews.
+   *
+   * @author Luca Heltai, 2019.
+   */
+  template <int dim, int spacedim, typename Extractor>
+  using View =
+    typename internal::FEValuesViews::ViewType<dim, spacedim, Extractor>::type;
+} // namespace FEValuesViews
 
 
 /**
