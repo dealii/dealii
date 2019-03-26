@@ -39,8 +39,8 @@
       </pre>
       If you are using CUDA 9 or CUDA 10, you will need to turn off support for
       C++17 similarly.
-      By default, we assume that your GPU has compute capability 3.5 but you 
-      can easily set your own CUDA flags:
+      By default, we try to detect the compute capability of your device
+      but you can easily set your own CUDA flags:
       <pre>
 
         -DDEAL_II_CUDA_FLAGS="-arch=sm_60"

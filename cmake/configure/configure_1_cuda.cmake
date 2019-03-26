@@ -85,6 +85,41 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
       SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
     ELSEIF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch=sm_([0-9]*)")
       SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
+    ELSEIF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+      #
+      # Try to autodetect the CUDA Compute Capability by asking the device
+      #
+      SET(_binary_test_dir ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/CUDAComputeCapabilityWorkdir)
+      FILE(REMOVE_RECURSE ${_binary_test_dir})
+      FILE(MAKE_DIRECTORY ${_binary_test_dir})
+
+      EXECUTE_PROCESS(
+        COMMAND ${CUDA_NVCC_EXECUTABLE}
+          -ccbin=${CMAKE_CXX_COMPILER}
+          ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure/CUDAComputeCapability/cuda_compute_capability.cu
+          -o cuda_compute_capability
+        WORKING_DIRECTORY ${_binary_test_dir}
+        OUTPUT_QUIET
+        ERROR_QUIET
+        )
+      EXECUTE_PROCESS(COMMAND ${_binary_test_dir}/cuda_compute_capability
+                      RESULT_VARIABLE _result
+                      OUTPUT_VARIABLE CUDA_COMPUTE_CAPABILITY)
+      IF(${_result} EQUAL 0)
+        ADD_FLAGS(DEAL_II_CUDA_FLAGS "-arch=sm_${CUDA_COMPUTE_CAPABILITY}")
+        MESSAGE(STATUS "Detected CUDA Compute Capability ${CUDA_COMPUTE_CAPABILITY}")
+      ELSE()
+        MESSAGE(STATUS "Couldn't detect CUDA Compute Capability! "
+                       "The error message was: ${CUDA_COMPUTE_CAPABILITY}")
+        SET(CUDA_ADDITIONAL_ERROR_STRING
+          ${CUDA_ADDITIONAL_ERROR_STRING}
+          "Couldn't detect CUDA Compute Capability! "
+          "The error message was: ${CUDA_COMPUTE_CAPABILITY}\n"
+          "Please check the return value of ${_binary_test_dir}/cuda_compute_capability.\n"
+          "If you want to disable the autodetection, set the compute capability to be used manually."
+          )
+        SET(${var} FALSE)
+      ENDIF()
     ELSE()
       #
       # Assume a cuda compute capability of 35
