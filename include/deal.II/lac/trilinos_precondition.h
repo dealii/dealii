@@ -1369,6 +1369,25 @@ namespace TrilinosWrappers
       /**
        * Constructor. By default, we pretend to work on elliptic problems with
        * linear finite elements on a scalar equation.
+       *
+       * Making use of the DoFTools::extract_constant_modes() function, the
+       * @p constant_modes vector can be initialized for a given field in the
+       * following manner:
+       *
+       * @code
+       *   #include <deal.II/dofs/dof_tools.h>
+       *   ...
+       *
+       *   DoFHandlerType<...> dof_handler;
+       *   FEValuesExtractors::Type... field_extractor;
+       *   ...
+       *
+       *   TrilinosWrappers::PreconditionAMG::AdditionalData data;
+       *   DoFTools::extract_constant_modes(
+       *     dof_handler,
+       *     dof_handler.get_fe_collection().component_mask(field_extractor),
+       *     data.constant_modes );
+       * @endcode
        */
       AdditionalData(const bool         elliptic              = true,
                      const bool         higher_order_elements = false,
