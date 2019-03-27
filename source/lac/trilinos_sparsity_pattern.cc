@@ -793,17 +793,34 @@ namespace TrilinosWrappers
         if (nonlocal_graph->IndicesAreGlobal() == false &&
             nonlocal_graph->RowMap().NumMyElements() > 0)
           {
-            // insert dummy element
+            // Insert dummy element at (row, column) that corresponds to row 0
+            // in local index counting.
             TrilinosWrappers::types::int_type row =
-              nonlocal_graph->RowMap().MyGID(0);
-            nonlocal_graph->InsertGlobalIndices(row, 1, &row);
+              TrilinosWrappers::global_index(nonlocal_graph->RowMap(), 0);
+            TrilinosWrappers::types::int_type column = 0;
+
+            // in case we have a square sparsity pattern, add the entry on the
+            // diagonal
+            if (TrilinosWrappers::n_global_elements(*column_space_map) ==
+                TrilinosWrappers::n_global_elements(graph->RangeMap()))
+              column = row;
+            // if not, take a column index that we have ourselves since we
+            // know for sure it is there (and it will not create spurious
+            // messages to many ranks like putting index 0 on many processors)
+            else if (column_space_map->NumMyElements() > 0)
+              column = TrilinosWrappers::global_index(*column_space_map, 0);
+            ierr = nonlocal_graph->InsertGlobalIndices(row, 1, &column);
+            AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           }
         Assert(nonlocal_graph->RowMap().NumMyElements() == 0 ||
                  nonlocal_graph->IndicesAreGlobal() == true,
                ExcInternalError());
 
-        nonlocal_graph->FillComplete(*column_space_map, graph->RangeMap());
-        nonlocal_graph->OptimizeStorage();
+        ierr =
+          nonlocal_graph->FillComplete(*column_space_map, graph->RangeMap());
+        AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
+        ierr = nonlocal_graph->OptimizeStorage();
+        AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
         Epetra_Export exporter(nonlocal_graph->RowMap(), graph->RowMap());
         ierr = graph->Export(*nonlocal_graph, exporter, Add);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
