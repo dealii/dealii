@@ -53,7 +53,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Denis Davydov, 2018
  */
 template <typename VectorType>
-class SolverBFGS : public Solver<VectorType>
+class SolverBFGS : public SolverBase<VectorType>
 {
 public:
   /**
@@ -195,7 +195,7 @@ SolverBFGS<VectorType>::AdditionalData::AdditionalData(
 template <typename VectorType>
 SolverBFGS<VectorType>::SolverBFGS(SolverControl &       solver_control,
                                    const AdditionalData &data)
-  : Solver<VectorType>(solver_control)
+  : SolverBase<VectorType>(solver_control)
   , additional_data(data)
 {}
 

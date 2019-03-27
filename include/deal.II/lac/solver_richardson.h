@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann
  */
 template <class VectorType = Vector<double>>
-class SolverRichardson : public Solver<VectorType>
+class SolverRichardson : public SolverBase<VectorType>
 {
 public:
   /**
@@ -175,7 +175,7 @@ template <class VectorType>
 SolverRichardson<VectorType>::SolverRichardson(SolverControl &           cn,
                                                VectorMemory<VectorType> &mem,
                                                const AdditionalData &    data)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
 
@@ -184,7 +184,7 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl &           cn,
 template <class VectorType>
 SolverRichardson<VectorType>::SolverRichardson(SolverControl &       cn,
                                                const AdditionalData &data)
-  : Solver<VectorType>(cn)
+  : SolverBase<VectorType>(cn)
   , additional_data(data)
 {}
 

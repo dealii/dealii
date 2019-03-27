@@ -17,5 +17,5 @@
 
 for (S : VECTOR_TYPES)
   {
-    template class Solver<S>;
+    template class SolverBase<S>;
   }

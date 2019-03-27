@@ -121,7 +121,7 @@ namespace internal
  *
  */
 template <typename VectorType = Vector<double>>
-class SolverBicgstab : public Solver<VectorType>,
+class SolverBicgstab : public SolverBase<VectorType>,
                        protected internal::SolverBicgstabData
 {
 public:
@@ -314,7 +314,7 @@ template <typename VectorType>
 SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &           cn,
                                            VectorMemory<VectorType> &mem,
                                            const AdditionalData &    data)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , Vx(nullptr)
   , Vb(nullptr)
   , additional_data(data)
@@ -325,7 +325,7 @@ SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &           cn,
 template <typename VectorType>
 SolverBicgstab<VectorType>::SolverBicgstab(SolverControl &       cn,
                                            const AdditionalData &data)
-  : Solver<VectorType>(cn)
+  : SolverBase<VectorType>(cn)
   , Vx(nullptr)
   , Vb(nullptr)
   , additional_data(data)

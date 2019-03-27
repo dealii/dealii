@@ -92,7 +92,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 1999; Ingo Kligge 2017
  */
 template <typename VectorType = Vector<double>>
-class SolverQMRS : public Solver<VectorType>
+class SolverQMRS : public SolverBase<VectorType>
 {
 public:
   /**
@@ -255,7 +255,7 @@ template <class VectorType>
 SolverQMRS<VectorType>::SolverQMRS(SolverControl &           cn,
                                    VectorMemory<VectorType> &mem,
                                    const AdditionalData &    data)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
   , step(0)
 {}
@@ -263,7 +263,7 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl &           cn,
 template <class VectorType>
 SolverQMRS<VectorType>::SolverQMRS(SolverControl &       cn,
                                    const AdditionalData &data)
-  : Solver<VectorType>(cn)
+  : SolverBase<VectorType>(cn)
   , additional_data(data)
   , step(0)
 {}
