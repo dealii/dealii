@@ -135,8 +135,7 @@ namespace parallel
     SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_serialization(
       const VectorType &in)
     {
-      std::vector<const VectorType *> all_in(1, &in);
-      prepare_for_serialization(all_in);
+      prepare_for_serialization(in);
     }
 
 
@@ -146,7 +145,7 @@ namespace parallel
     SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_serialization(
       const std::vector<const VectorType *> &all_in)
     {
-      prepare_for_coarsening_and_refinement(all_in);
+      prepare_for_serialization(all_in);
     }
 
 
