@@ -1,26 +1,26 @@
 
-DEAL:0::0
+DEAL:0::8
 
-DEAL:1::0
-
-
-DEAL:2::0
+DEAL:1::8
 
 
-DEAL:3::0
+DEAL:2::8
 
 
-DEAL:4::0
+DEAL:3::8
 
 
-DEAL:5::0
+DEAL:4::8
 
 
-DEAL:6::0
+DEAL:5::8
 
 
-DEAL:7::0
+DEAL:6::8
 
 
-DEAL:8::0
+DEAL:7::8
+
+
+DEAL:8::8
 
