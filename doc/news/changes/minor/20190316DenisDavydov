@@ -1,0 +1,3 @@
+Improved: DoFRenumbering::cell_wise() now support parallel::Triangulation .
+<br>
+(Denis Davydov, 2019/03/16)
