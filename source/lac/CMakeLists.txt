@@ -60,6 +60,14 @@ SET(_separate_src
   sparse_matrix_inst2.cc
   )
 
+# Add CUDA wrapper files
+IF(DEAL_II_WITH_CUDA)
+  SET(_separate_src
+    ${_separate_src}
+    vector_memory.cu
+    )
+ENDIF()
+
 SET(_inst
   affine_constraints.inst.in
   block_sparse_matrix.inst.in
