@@ -50,6 +50,11 @@ namespace LocalIntegrators
      * integrals \f[ \int_F uv\,ds \quad \text{or} \quad \int_F \mathbf u\cdot
      * \mathbf v\,ds \f]
      *
+     * @param M The mass matrix matrix obtained as result.
+     * @param fe The FEValues object describing the local trial function
+     * space. #update_values and #update_JxW_values must be set.
+     * @param factor A constant that multiplies the mass matrix.
+     *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -97,8 +102,12 @@ namespace LocalIntegrators
      * integrals \f[ \int_F \omega(x) uv\,ds \quad \text{or} \quad \int_F
      * \omega(x) \mathbf u\cdot \mathbf v\,ds \f]
      *
-     * The size of the vector <tt>weights</tt> must be equal to the number of
-     * quadrature points in the finite element.
+     * @param M The weighted mass matrix matrix obtained as result.
+     * @param fe The FEValues object describing the local trial function
+     * space. #update_values and #update_JxW_values must be set.
+     * @param weights The weights, $\omega(x)$, evaluated at the quadrature
+     * points in the finite element (size must be equal to the number of
+     * quadrature points in the element).
      *
      * @author Guido Kanschat
      * @date 2014
@@ -146,6 +155,14 @@ namespace LocalIntegrators
      *
      * \f[ \int_Z fv\,dx \quad \text{or} \quad \int_F fv\,ds \f]
      *
+     * @param result The vector obtained as result.
+     * @param fe The FEValues object describing the local trial function
+     * space. #update_values and #update_JxW_values must be set.
+     * @param input The representation of $f$ evaluated at the quadrature
+     * points in the finite element (size must be equal to the number of
+     * quadrature points in the element).
+     * @param factor A constant that multiplies the result.
+     *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -170,6 +187,14 @@ namespace LocalIntegrators
      * <i>L<sup>2</sup></i>-inner product for a slice of a vector valued right
      * hand side. \f[ \int_Z \mathbf f\cdot \mathbf v\,dx \quad \text{or}
      * \quad \int_F \mathbf f\cdot \mathbf v\,ds \f]
+     *
+     * @param result The vector obtained as result.
+     * @param fe The FEValues object describing the local trial function
+     * space. #update_values and #update_JxW_values must be set.
+     * @param input The vector valued representation of $\mathbf f$ evaluated
+     * at the quadrature points in the finite element (size of each component
+     * must be equal to the number of quadrature points in the element).
+     * @param factor A constant that multiplies the result.
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
@@ -202,6 +227,25 @@ namespace LocalIntegrators
      *
      * Using appropriate weights, this term can be used to penalize violation
      * of conformity in <i>H<sup>1</sup></i>.
+     *
+     * Note that for the parameters that follow, the external matrix refers to
+     * the flux between cells, while the internal matrix refers to entries
+     * coupling inside the cell.
+     *
+     * @param M11 The internal matrix for the first cell obtained as result.
+     * @param M12 The external matrix for the first cell obtained as result.
+     * @param M12 The external matrix for the second cell obtained as result.
+     * @param M22 The internal matrix for the second cell obtained as result.
+     * @param fe1 The FEValues object describing the local trial function
+     * space for the first cell. #update_values and #update_JxW_values must be
+     * set.
+     * @param fe2 The FEValues object describing the local trial function
+     * space for the second cell. #update_values and #update_JxW_values must be
+     * set.
+     * @param factor1 A constant that multiplies the shape functions for the
+     * first cell.
+     * @param factor2 A constant that multiplies the shape functions for the
+     * second cell.
      *
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
