@@ -1056,7 +1056,8 @@ public:
    * globally, i.e. what n_dofs() returns.
    *
    * Each element of the vector returned by this function equals the number of
-   * elements of the corresponding sets returned by global_dof_indices().
+   * elements of the corresponding sets returned by
+   * locally_owned_dofs_per_processor().
    *
    * If this is a sequential DoFHandler, then the vector has a single element
    * equal to n_dofs(). (Here, "sequential" means that either the whole program
