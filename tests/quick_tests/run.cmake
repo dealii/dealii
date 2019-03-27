@@ -25,6 +25,7 @@ ENDIF()
 SEPARATE_ARGUMENTS(ALL_TESTS)
 
 EXECUTE_PROCESS(COMMAND ${CMAKE_CTEST_COMMAND} -j${_n_processors}
+  -C ${CMAKE_BUILD_TYPE}
   --force-new-ctest-process
   --output-on-failure
   -O quicktests.log

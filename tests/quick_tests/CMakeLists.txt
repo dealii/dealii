@@ -44,9 +44,9 @@ MACRO(make_quicktest test_basename build_name mpi_run)
   DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${build_name})
 
   IF("${mpi_run}" STREQUAL "")
-    SET(_command ./${_target})
+    SET(_command ${_target})
   ELSE()
-    SET(_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${mpi_run} ${MPIEXEC_PREFLAGS} ./${_target})
+    SET(_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${mpi_run} ${MPIEXEC_PREFLAGS} ${_target})
   ENDIF()
   ADD_CUSTOM_TARGET(${_target}.run
     DEPENDS ${_target}
@@ -200,7 +200,7 @@ ENDIF()
 
 # A custom test target:
 ADD_CUSTOM_TARGET(test
-  COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${ALL_TESTS}" -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake
+  COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${ALL_TESTS}" -DCMAKE_BUILD_TYPE=${_mybuild} -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Running quicktests..."
   )
