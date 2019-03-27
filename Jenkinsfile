@@ -183,6 +183,8 @@ pipeline
       steps
       {
         githubNotify context: 'CI', description: 'OK',  status: 'SUCCESS'
+        // In case the Jenkinsfile.mark job started after we did, make sure we don't leave a pending status around:
+        githubNotify context: 'ready', description: ':-)',  status: 'SUCCESS'
       }
     }
   }
