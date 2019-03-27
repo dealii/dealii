@@ -43,9 +43,9 @@ namespace parallel
      * <h3>Note on ghost elements</h3> In a parallel computation PETSc or
      * Trilinos vector may contain ghost elements or not. For reading in
      * information with prepare_for_coarsening_and_refinement() or
-     * prepare_serialization() you need to supply vectors with ghost elements,
-     * so that all locally_active elements can be read. On the other hand,
-     * ghosted vectors are generally not writable, so for calls to
+     * prepare_for_serialization() you need to supply vectors with ghost
+     * elements, so that all locally_active elements can be read. On the other
+     * hand, ghosted vectors are generally not writable, so for calls to
      * interpolate() or deserialize() you need to supply distributed vectors
      * without ghost elements. More precisely, during interpolation the
      * current algorithm writes into all locally active degrees of freedom.
@@ -133,7 +133,7 @@ namespace parallel
      * @code
      * parallel::distributed::SolutionTransfer<dim,VectorType>
      *   sol_trans(dof_handler);
-     * sol_trans.prepare_serialization (vector);
+     * sol_trans.prepare_for_serialization (vector);
      *
      * triangulation.save(filename);
      * @endcode
@@ -186,7 +186,7 @@ namespace parallel
      *     sol_trans(hp_dof_handler);
      *
      * hp_dof_handler.prepare_for_serialization_of_active_fe_indices();
-     * sol_trans.prepare_serialization(vector);
+     * sol_trans.prepare_for_serialization(vector);
      *
      * triangulation.save(filename);
      * @endcode
@@ -292,7 +292,6 @@ namespace parallel
       void
       interpolate(VectorType &out);
 
-
       /**
        * Prepare the serialization of the given vector. The serialization is
        * done by Triangulation::save(). The given vector needs all information
@@ -300,15 +299,34 @@ namespace parallel
        * this class for more information.
        */
       void
-      prepare_serialization(const VectorType &in);
-
+      prepare_for_serialization(const VectorType &in);
 
       /**
        * Same as the function above, only for a list of vectors.
        */
       void
-      prepare_serialization(const std::vector<const VectorType *> &all_in);
+      prepare_for_serialization(const std::vector<const VectorType *> &all_in);
 
+      /**
+       * Prepare the serialization of the given vector. The serialization is
+       * done by Triangulation::save(). The given vector needs all information
+       * on the locally active DoFs (it must be ghosted). See documentation of
+       * this class for more information.
+       *
+       * @deprecated Use parallel::distributed::SolutionTransfer::prepare_for_serialization() instead.
+       */
+      DEAL_II_DEPRECATED
+      void
+      prepare_serialization(const VectorType &in);
+
+      /**
+       * Same as the function above, only for a list of vectors.
+       *
+       * @deprecated Use parallel::distributed::SolutionTransfer::prepare_for_serialization() instead.
+       */
+      DEAL_II_DEPRECATED
+      void
+      prepare_serialization(const std::vector<const VectorType *> &all_in);
 
       /**
        * Execute the deserialization of the given vector. This needs to be
