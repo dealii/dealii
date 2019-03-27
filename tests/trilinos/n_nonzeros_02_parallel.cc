@@ -15,7 +15,8 @@
 
 
 
-// check n_nonzero_elements() for an empty matrix
+// check n_nonzero_elements() for an empty matrix. We generate a few dummy
+// non-zero entries.
 
 #include <deal.II/distributed/tria.h>
 
@@ -71,8 +72,11 @@ test()
   TrilinosWrappers::SparseMatrix A;
   A.reinit(sparsity);
 
-  // see how many nonzero elements it reports
+  // See how many nonzero elements it reports. Note that we have a
+  // nonlocal Trilinos graph for the off-processor entries and we need
+  // to enter a few dummy elements:
   deallog << A.n_nonzero_elements() << std::endl;
+  A.print(deallog.get_file_stream());
 }
 
 
