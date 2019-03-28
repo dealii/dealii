@@ -19,79 +19,101 @@ Settings to apply inside Jenkins:
   - discard: 5+ items
 */
 
+// load library https://github.com/tjhei/jenkins-stuff to provide
+// killold.killOldBuilds() function:
+@Library('tjhei') _
+
 pipeline
 {
-  agent {
-    node {
-        label 'osx'
-    }
-  }
-
-  post { cleanup { cleanWs() } }
+  agent none
 
   stages
   {
-    stage("check")
+    stage("abort old")
     {
-      when {
-        allOf {
-          not {branch 'master'}
+      agent none
+      steps
+      {
+        // kill older builds in this PR:
+        script { killold.killOldBuilds() }
+      }
+    }
+
+    stage("main")
+    {
+      agent {
+        node {
+          label 'osx'
         }
       }
 
-      steps
+      post { cleanup { cleanWs() } }
+
+      stages
       {
-        githubNotify context: 'OSX', description: 'pending...',  status: 'PENDING'
-        sh '''
+        stage("check")
+        {
+          when {
+            allOf {
+              not {branch 'master'}
+            }
+          }
+
+          steps
+          {
+            githubNotify context: 'OSX', description: 'pending...',  status: 'PENDING'
+            sh '''
                wget -q -O - https://api.github.com/repos/dealii/dealii/issues/${CHANGE_ID}/labels | grep 'ready to test' || \
                { echo "This commit will only be tested when it has the label 'ready to test'. Trigger a rebuild by adding a comment that contains '/rebuild'..."; exit 1; }
-            '''
-      }
-      post
-      {
-        failure
-        {
-          githubNotify context: 'OSX', description: 'need ready to test label and /rebuild',  status: 'PENDING'
-          script
+               '''
+          }
+          post
           {
-            currentBuild.result='NOT_BUILT'
+            failure
+            {
+              githubNotify context: 'OSX', description: 'need ready to test label and /rebuild',  status: 'PENDING'
+              script
+              {
+                currentBuild.result='NOT_BUILT'
+              }
+            }
           }
         }
-      }
-    }
 
-    stage('build')
-    {
-      steps
-      {
-        timeout(time: 1, unit: 'HOURS')
+        stage('build')
         {
-           sh "echo \"building on node ${env.NODE_NAME}\""
-           sh '''#!/bin/bash
-              mkdir build && cd build
-              cmake \
-                -D DEAL_II_WITH_MPI=OFF \
-                -D DEAL_II_CXX_FLAGS='-Werror' \
-                -D CMAKE_BUILD_TYPE=Debug \
-                $WORKSPACE/ && make -j 4
-            '''
-        }
-      }
+          steps
+          {
+            timeout(time: 1, unit: 'HOURS')
+            {
+              sh "echo \"building on node ${env.NODE_NAME}\""
+              sh '''#!/bin/bash
+                    mkdir build && cd build
+                    cmake \
+                      -D DEAL_II_WITH_MPI=OFF \
+                      -D DEAL_II_CXX_FLAGS='-Werror' \
+                      -D CMAKE_BUILD_TYPE=Debug \
+                      $WORKSPACE/ && make -j 4
+                 '''
+            }
+          }
 
-      post
-      {
-        failure
+          post
+          {
+            failure
+            {
+              githubNotify context: 'OSX', description: 'build failed',  status: 'FAILURE'
+            }
+          }
+        }
+
+        stage("finalize")
         {
-          githubNotify context: 'OSX', description: 'build failed',  status: 'FAILURE'
+          steps
+          {
+            githubNotify context: 'OSX', description: 'OK',  status: 'SUCCESS'
+          }
         }
-      }
-    }
-
-    stage("finalize")
-    {
-      steps
-      {
-        githubNotify context: 'OSX', description: 'OK',  status: 'SUCCESS'
       }
     }
   }
