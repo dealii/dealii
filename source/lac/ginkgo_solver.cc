@@ -289,20 +289,20 @@ namespace GinkgoWrappers
   }
 
   // Explicit instantiations in GinkgoWrappers
-#  define GKO_DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
-    template _macro(float, int32_t);                                   \
-    template _macro(double, int32_t);                                  \
-    template _macro(float, int64_t);                                   \
+#  define DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
+    template _macro(float, int32_t);                               \
+    template _macro(double, int32_t);                              \
+    template _macro(float, int64_t);                               \
     template _macro(double, int64_t);
 
 #  define DECLARE_SOLVER_BASE(ValueType, IndexType) \
     class SolverBase<ValueType, IndexType>
-  GKO_DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_BASE);
+  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_BASE)
 #  undef DECLARE_SOLVER_BASE
 
 #  define DECLARE_SOLVER_CG(ValueType, IndexType) \
     class SolverCG<ValueType, IndexType>
-  GKO_DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_CG);
+  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_CG)
 #  undef DECLARE_SOLVER_CG
 
 } // namespace GinkgoWrappers
