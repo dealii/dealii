@@ -107,7 +107,7 @@ test()
       rel_x = x;
 
       dh.prepare_for_serialization_of_active_fe_indices();
-      soltrans.prepare_serialization(rel_x);
+      soltrans.prepare_for_serialization(rel_x);
 
       tr.save("file");
       deallog << "#cells: " << tr.n_global_active_cells() << std::endl

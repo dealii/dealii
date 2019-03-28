@@ -100,7 +100,7 @@ test()
       x.compress(VectorOperation::insert);
       rel_x = x;
 
-      soltrans.prepare_serialization(rel_x);
+      soltrans.prepare_for_serialization(rel_x);
 
       tr.save("file");
       //    tr.write_mesh_vtk("before");

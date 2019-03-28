@@ -108,8 +108,8 @@ test()
     solution2 = x;
 
 
-    soltrans.prepare_serialization(solution);
-    soltrans2.prepare_serialization(solution2);
+    soltrans.prepare_for_serialization(solution);
+    soltrans2.prepare_for_serialization(solution2);
 
     tr.save(filename.c_str());
 

@@ -97,7 +97,7 @@ test()
     x.compress(VectorOperation::insert);
     solution = x;
 
-    soltrans.prepare_serialization(solution);
+    soltrans.prepare_for_serialization(solution);
 
     tr.save(filename.c_str());
 
