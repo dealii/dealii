@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2000
  */
 template <typename VectorType = Vector<double>>
-class EigenPower : private Solver<VectorType>
+class EigenPower : private SolverBase<VectorType>
 {
 public:
   /**
@@ -131,7 +131,7 @@ protected:
  * @author Guido Kanschat, 2000, 2003
  */
 template <typename VectorType = Vector<double>>
-class EigenInverse : private Solver<VectorType>
+class EigenInverse : private SolverBase<VectorType>
 {
 public:
   /**
@@ -208,7 +208,7 @@ template <class VectorType>
 EigenPower<VectorType>::EigenPower(SolverControl &           cn,
                                    VectorMemory<VectorType> &mem,
                                    const AdditionalData &    data)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
 
@@ -297,7 +297,7 @@ template <class VectorType>
 EigenInverse<VectorType>::EigenInverse(SolverControl &           cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData &    data)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
 

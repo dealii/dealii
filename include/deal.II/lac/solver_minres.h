@@ -69,7 +69,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Thomas Richter, 2000, Luca Heltai, 2006
  */
 template <class VectorType = Vector<double>>
-class SolverMinRes : public Solver<VectorType>
+class SolverMinRes : public SolverBase<VectorType>
 {
 public:
   /**
@@ -155,7 +155,7 @@ template <class VectorType>
 SolverMinRes<VectorType>::SolverMinRes(SolverControl &           cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData &)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , res2(numbers::signaling_nan<double>())
 {}
 
@@ -164,7 +164,7 @@ SolverMinRes<VectorType>::SolverMinRes(SolverControl &           cn,
 template <class VectorType>
 SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn,
                                        const AdditionalData &)
-  : Solver<VectorType>(cn)
+  : SolverBase<VectorType>(cn)
   , res2(numbers::signaling_nan<double>())
 {}
 

@@ -93,7 +93,7 @@ class PreconditionIdentity;
  * @author W. Bangerth, G. Kanschat, R. Becker and F.-T. Suttmeier
  */
 template <typename VectorType = Vector<double>>
-class SolverCG : public Solver<VectorType>
+class SolverCG : public SolverBase<VectorType>
 {
 public:
   /**
@@ -242,7 +242,7 @@ template <typename VectorType>
 SolverCG<VectorType>::SolverCG(SolverControl &           cn,
                                VectorMemory<VectorType> &mem,
                                const AdditionalData &    data)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
 
@@ -250,7 +250,7 @@ SolverCG<VectorType>::SolverCG(SolverControl &           cn,
 
 template <typename VectorType>
 SolverCG<VectorType>::SolverCG(SolverControl &cn, const AdditionalData &data)
-  : Solver<VectorType>(cn)
+  : SolverBase<VectorType>(cn)
   , additional_data(data)
 {}
 

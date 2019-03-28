@@ -175,7 +175,7 @@ namespace internal
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann.
  */
 template <class VectorType = Vector<double>>
-class SolverGMRES : public Solver<VectorType>
+class SolverGMRES : public SolverBase<VectorType>
 {
 public:
   /**
@@ -457,7 +457,7 @@ protected:
  * @author Guido Kanschat, 2003
  */
 template <class VectorType = Vector<double>>
-class SolverFGMRES : public Solver<VectorType>
+class SolverFGMRES : public SolverBase<VectorType>
 {
 public:
   /**
@@ -621,7 +621,7 @@ template <class VectorType>
 SolverGMRES<VectorType>::SolverGMRES(SolverControl &           cn,
                                      VectorMemory<VectorType> &mem,
                                      const AdditionalData &    data)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
 
@@ -630,7 +630,7 @@ SolverGMRES<VectorType>::SolverGMRES(SolverControl &           cn,
 template <class VectorType>
 SolverGMRES<VectorType>::SolverGMRES(SolverControl &       cn,
                                      const AdditionalData &data)
-  : Solver<VectorType>(cn)
+  : SolverBase<VectorType>(cn)
   , additional_data(data)
 {}
 
@@ -1182,7 +1182,7 @@ template <class VectorType>
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl &           cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData &    data)
-  : Solver<VectorType>(cn, mem)
+  : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
 
@@ -1191,7 +1191,7 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl &           cn,
 template <class VectorType>
 SolverFGMRES<VectorType>::SolverFGMRES(SolverControl &       cn,
                                        const AdditionalData &data)
-  : Solver<VectorType>(cn)
+  : SolverBase<VectorType>(cn)
   , additional_data(data)
 {}
 

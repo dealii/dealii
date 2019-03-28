@@ -129,7 +129,7 @@ class Vector;
  * deal.II library for the built-in vector types, but must be explicitly added
  * for user-provided vector classes. Otherwise, the linker will complain that
  * it cannot find the constructors and destructors of GrowingVectorMemory that
- * happen in the @p Solver class.
+ * happen in the @p SolverBase class.
  *
  * @code
  * // Definition and implementation of vector class
@@ -185,7 +185,7 @@ class Vector;
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
- * The Solver class, being the base class for all of the iterative solvers
+ * The SolverBase class, being the base class for all of the iterative solvers
  * such as SolverCG, SolverGMRES, etc, provides the facilities by which actual
  * solver implementations determine whether the iteration is converged, not
  * yet converged, or has failed. Typically, this is done using an object of
@@ -234,7 +234,7 @@ class Vector;
  * into this scheme: when a SolverControl object is passed to the constructor
  * of the current class, we simply connect the SolverControl::check() function
  * of that object as a slot to the signal we maintain here. In other words,
- * since a Solver object is always constructed using a SolverControl object,
+ * since a SolverBase object is always constructed using a SolverControl object,
  * there is always at least one slot associated with the signal, namely the
  * one that determines convergence.
  *
@@ -325,7 +325,7 @@ class Vector;
  * 2014
  */
 template <class VectorType = Vector<double>>
-class Solver : public Subscriptor
+class SolverBase : public Subscriptor
 {
 public:
   /**
@@ -342,8 +342,8 @@ public:
    * responsibility to guarantee that the lifetime of the two arguments is at
    * least as long as that of the solver object.
    */
-  Solver(SolverControl &           solver_control,
-         VectorMemory<VectorType> &vector_memory);
+  SolverBase(SolverControl &           solver_control,
+             VectorMemory<VectorType> &vector_memory);
 
   /**
    * Constructor. Takes a control object which evaluates the conditions for
@@ -355,7 +355,7 @@ public:
    * responsibility to guarantee that the lifetime of the argument is at least
    * as long as that of the solver object.
    */
-  Solver(SolverControl &solver_control);
+  SolverBase(SolverControl &solver_control);
 
   /**
    * Connect a function object that will be called periodically within
@@ -459,12 +459,24 @@ protected:
 };
 
 
+
+/**
+ * Type definition for the base class for iterative linear solvers.
+ * This class provides interfaces to a memory pool and the objects that
+ * determine whether a solver has converged.
+ *
+ * @deprecated Use <code>SolverBase</code> instead.
+ */
+template <class VectorType = Vector<double>>
+using Solver DEAL_II_DEPRECATED = SolverBase<VectorType>;
+
+
 /*-------------------------------- Inline functions ------------------------*/
 
 
 template <class VectorType>
 inline SolverControl::State
-Solver<VectorType>::StateCombiner::
+SolverBase<VectorType>::StateCombiner::
 operator()(const SolverControl::State state1,
            const SolverControl::State state2) const
 {
@@ -481,8 +493,8 @@ operator()(const SolverControl::State state1,
 template <class VectorType>
 template <typename Iterator>
 inline SolverControl::State
-Solver<VectorType>::StateCombiner::operator()(const Iterator begin,
-                                              const Iterator end) const
+SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
+                                                  const Iterator end) const
 {
   Assert(begin != end,
          ExcMessage("You can't combine iterator states if no state is given."));
@@ -499,8 +511,9 @@ Solver<VectorType>::StateCombiner::operator()(const Iterator begin,
 
 
 template <class VectorType>
-inline Solver<VectorType>::Solver(SolverControl &           solver_control,
-                                  VectorMemory<VectorType> &vector_memory)
+inline SolverBase<VectorType>::SolverBase(
+  SolverControl &           solver_control,
+  VectorMemory<VectorType> &vector_memory)
   : memory(vector_memory)
 {
   // connect the solver control object to the signal. SolverControl::check
@@ -516,7 +529,7 @@ inline Solver<VectorType>::Solver(SolverControl &           solver_control,
 
 
 template <class VectorType>
-inline Solver<VectorType>::Solver(SolverControl &solver_control)
+inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
   : // use the static memory object this class owns
   memory(static_vector_memory)
 {
@@ -534,7 +547,7 @@ inline Solver<VectorType>::Solver(SolverControl &solver_control)
 
 template <class VectorType>
 inline boost::signals2::connection
-Solver<VectorType>::connect(
+SolverBase<VectorType>::connect(
   const std::function<SolverControl::State(const unsigned int iteration,
                                            const double       check_value,
                                            const VectorType & current_iterate)>
