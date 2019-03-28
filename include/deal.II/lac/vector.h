@@ -34,6 +34,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <initializer_list>
 #include <iostream>
 #include <vector>
 
@@ -164,13 +165,33 @@ public:
   Vector(Vector<Number> &&v) noexcept = default;
 
   /**
-   * Copy constructor taking a vector of another data type. This will fail if
-   * there is no conversion path from @p OtherNumber to @p Number. Note that
-   * you may lose accuracy when copying to a vector with data elements with
+   * Copy constructor taking a vector of another data type.
+   *
+   * This constructor will fail to compile if
+   * there is no conversion path from @p OtherNumber to @p Number. You may
+   * lose accuracy when copying to a vector with data elements with
    * less accuracy.
    */
   template <typename OtherNumber>
   explicit Vector(const Vector<OtherNumber> &v);
+
+  /**
+   * Copy constructor taking an object of type `std::initializer_list`. This
+   * constructor can be used to initialize a vector using a brace-enclosed
+   * list of numbers, such as in the following example:
+   * @code
+   *   Vector<double> v({1,2,3});
+   * @endcode
+   * This creates a vector of size 3, whose (double precision) elements have
+   * values 1.0, 2.0, and 3.0.
+   *
+   * This constructor will fail to compile if
+   * there is no conversion path from @p OtherNumber to @p Number. You may
+   * lose accuracy when copying to a vector with data elements with
+   * less accuracy.
+   */
+  template <typename OtherNumber>
+  explicit Vector(const std::initializer_list<OtherNumber> &v);
 
 #ifdef DEAL_II_WITH_PETSC
   /**
@@ -1046,6 +1067,14 @@ inline Vector<Number>::Vector()
   // for clarity be explicit on which function is called
   Vector<Number>::reinit(0);
 }
+
+
+
+template <typename Number>
+template <typename OtherNumber>
+Vector<Number>::Vector(const std::initializer_list<OtherNumber> &v)
+  : Vector(v.begin(), v.end())
+{}
 
 
 
