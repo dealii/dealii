@@ -1,5 +1,5 @@
 Changed: parallel::distributed::SolutionTransfer::prepare_serialization() has
 been deprecated in favor of
 parallel::distributed::SolutionTransfer::prepare_for_serialization().
-<br<
+<br>
 (Daniel Arndt, 2019/03/26)
