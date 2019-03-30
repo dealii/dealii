@@ -32,10 +32,10 @@
 
 #include <boost/serialization/split_member.hpp>
 
-#include <cstdio>
-#include <cstring>
+#include <algorithm>
 #include <initializer_list>
-#include <iostream>
+#include <iosfwd>
+#include <iterator>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -353,10 +353,7 @@ public:
   swap(Vector<Number> &v);
 
   /**
-   * Set all components of the vector to the given number @p s. Simply pass
-   * this down to the individual block objects, but we still need to declare
-   * this function to make the example given in the discussion about making
-   * the constructor explicit work.
+   * Set all components of the vector to the given number @p s.
    *
    * Since the semantics of assigning a scalar to a vector are not immediately
    * clear, this operator should really only be used if you want to set the
@@ -645,7 +642,7 @@ public:
    * If the current vector is called @p v, then this function is the equivalent
    * to the code
    * @code
-   *   for (unsigned int i=0; i<indices.size(); ++i)
+   *   for (unsigned int i = 0; i < indices.size(); ++i)
    *     values[i] = v[indices[i]];
    * @endcode
    *
@@ -672,11 +669,11 @@ public:
    *   ForwardIterator indices_p = indices_begin;
    *   OutputIterator  values_p  = values_begin;
    *   while (indices_p != indices_end)
-   *   {
-   *     *values_p = v[*indices_p];
-   *     ++indices_p;
-   *     ++values_p;
-   *   }
+   *     {
+   *       *values_p = v[*indices_p];
+   *       ++indices_p;
+   *       ++values_p;
+   *     }
    * @endcode
    *
    * @pre It must be possible to write into as many memory locations
