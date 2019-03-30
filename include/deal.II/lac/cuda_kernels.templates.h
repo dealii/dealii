@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__cuda_kernels_templates_h
-#define dealii__cuda_kernels_templates_h
+#ifndef dealii_cuda_kernels_templates_h
+#define dealii_cuda_kernels_templates_h
 
 #include <deal.II/lac/cuda_kernels.h>
 

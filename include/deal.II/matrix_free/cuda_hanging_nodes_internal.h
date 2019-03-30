@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__cuda_hanging_nodes_internal_h
-#define dealii__cuda_hanging_nodes_internal_h
+#ifndef dealii_cuda_hanging_nodes_internal_h
+#define dealii_cuda_hanging_nodes_internal_h
 
 #include <deal.II/base/config.h>
 

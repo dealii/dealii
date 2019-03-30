@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_nedelec_sz_h
-#define dealii__fe_nedelec_sz_h
+#ifndef dealii_fe_nedelec_sz_h
+#define dealii_fe_nedelec_sz_h
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
