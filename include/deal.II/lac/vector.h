@@ -32,10 +32,10 @@
 
 #include <boost/serialization/split_member.hpp>
 
-#include <cstdio>
-#include <cstring>
+#include <algorithm>
 #include <initializer_list>
-#include <iostream>
+#include <iosfwd>
+#include <iterator>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -642,7 +642,7 @@ public:
    * If the current vector is called @p v, then this function is the equivalent
    * to the code
    * @code
-   *   for (unsigned int i=0; i<indices.size(); ++i)
+   *   for (unsigned int i = 0; i < indices.size(); ++i)
    *     values[i] = v[indices[i]];
    * @endcode
    *
@@ -669,11 +669,11 @@ public:
    *   ForwardIterator indices_p = indices_begin;
    *   OutputIterator  values_p  = values_begin;
    *   while (indices_p != indices_end)
-   *   {
-   *     *values_p = v[*indices_p];
-   *     ++indices_p;
-   *     ++values_p;
-   *   }
+   *     {
+   *       *values_p = v[*indices_p];
+   *       ++indices_p;
+   *       ++values_p;
+   *     }
    * @endcode
    *
    * @pre It must be possible to write into as many memory locations
