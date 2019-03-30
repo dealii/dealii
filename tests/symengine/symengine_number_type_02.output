@@ -1,0 +1,300 @@
+
+DEAL:Float:Power functions::pow(a_,x_): 13.8271
+DEAL:Float:Power functions::pow(a__,x__): 13.827086465678
+DEAL:Float:Power functions::pow(a,x):   13.8271
+DEAL:Float:Power functions::pow(a,x_):  13.8271
+DEAL:Float:Power functions::pow(a_,x):  13.8271
+DEAL:Float:Power functions::sqrt(a_): 1.81659
+DEAL:Float:Power functions::sqrt(a__): 1.81659019933398
+DEAL:Float:Power functions::sqrt(a):  1.81659019933398
+DEAL:Float:Power functions::sqrt(a):  1.81659
+DEAL:Float:Power functions::cbrt(a_): 1.48881
+DEAL:Float:Power functions::cbrt(a__): 1.48880554578294
+DEAL:Float:Power functions::cbrt(a):  1.48880554578294
+DEAL:Float:Power functions::cbrt(a):  1.48881
+DEAL:Float:Power functions::exp(a_): 27.1126
+DEAL:Float:Power functions::exp(a__): 27.1126376278265
+DEAL:Float:Power functions::exp(a):  27.1126376278265
+DEAL:Float:Power functions::exp(a):  27.1126
+DEAL:Float:Power functions::log(a_): 1.19392
+DEAL:Float:Power functions::log(a__): 1.19392245402282
+DEAL:Float:Power functions::log(a):  1.19392245402282
+DEAL:Float:Power functions::log(a):  1.19392
+DEAL:Float:Other functions::abs(b_): 4.40000
+DEAL:Float:Other functions::abs(b):  4.40000
+DEAL:Float:Other functions::copysign(1.0, b_): -1.00000
+DEAL:Float:Other functions::sign(b):  -1.00000
+DEAL:Float:Other functions::copysign(a_, b_): -3.30000
+DEAL:Float:Other functions::copysign(a, b):  -3.30000
+DEAL:Float:Other functions::floor(b_): -5.00000
+DEAL:Float:Other functions::floor(b):  -5.00000
+DEAL:Float:Other functions::ceil(b_): -4.00000
+DEAL:Float:Other functions::ceil(b):  -4.00000
+DEAL:Float:Other functions::max(a_,x_): 3.30000
+DEAL:Float:Other functions::max(a__,x__): 3.29999995231628
+DEAL:Float:Other functions::max(a,x):   3.30000
+DEAL:Float:Other functions::max(a,x_):  3.30000
+DEAL:Float:Other functions::max(a_,x):  3.30000
+DEAL:Float:Other functions::min(a_,x_): 2.20000
+DEAL:Float:Other functions::min(a__,x__): 2.20000004768372
+DEAL:Float:Other functions::min(a,x):   2.20000
+DEAL:Float:Other functions::min(a,x_):  2.20000
+DEAL:Float:Other functions::min(a_,x):  2.20000
+DEAL:Float:Other functions::erf(a_): 0.999997
+DEAL:Float:Other functions::erf(a__): 0.9999969422892
+DEAL:Float:Other functions::erf(a):  0.9999969422892
+DEAL:Float:Other functions::erf(a):  0.999997
+DEAL:Float:Other functions::erfc(a_): 3.05771e-06
+DEAL:Float:Other functions::erfc(a__): 3.05771079957068e-06
+DEAL:Float:Other functions::erfc(a):  3.05771079957068e-06
+DEAL:Float:Other functions::erfc(a):  3.05771e-06
+DEAL:Float:Trig functions::sin(a_): -0.157746
+DEAL:Float:Trig functions::sin(a__): -0.157745647056543
+DEAL:Float:Trig functions::sin(a):  -0.157745647056543
+DEAL:Float:Trig functions::sin(a):  -0.157746
+DEAL:Float:Trig functions::cos(a_): -0.987480
+DEAL:Float:Trig functions::cos(a__): -0.987479777430765
+DEAL:Float:Trig functions::cos(a):  -0.987479777430765
+DEAL:Float:Trig functions::cos(a):  -0.987480
+DEAL:Float:Trig functions::tan(a_): 0.159746
+DEAL:Float:Trig functions::tan(a__): 0.15974569875949
+DEAL:Float:Trig functions::tan(a):  0.15974569875949
+DEAL:Float:Trig functions::tan(a):  0.159746
+DEAL:Float:Reciprocal trig functions::csc(a_): -6.33932
+DEAL:Float:Reciprocal trig functions::csc(a__): -6.33931914229971
+DEAL:Float:Reciprocal trig functions::csc(a):  -6.33931914229971
+DEAL:Float:Reciprocal trig functions::csc(a):  -6.33932
+DEAL:Float:Reciprocal trig functions::sec(a_): -1.01268
+DEAL:Float:Reciprocal trig functions::sec(a__): -1.01267896604608
+DEAL:Float:Reciprocal trig functions::sec(a):  -1.01267896604608
+DEAL:Float:Reciprocal trig functions::sec(a):  -1.01268
+DEAL:Float:Reciprocal trig functions::cot(a_): 6.25995
+DEAL:Float:Reciprocal trig functions::cot(a__): 6.2599494557007
+DEAL:Float:Reciprocal trig functions::cot(a):  6.2599494557007
+DEAL:Float:Reciprocal trig functions::cot(a):  6.25995
+DEAL:Float:Inverse trig functions::asin(inv_a_): 0.307871
+DEAL:Float:Inverse trig functions::asin(inv_a__): 0.30787087787464
+DEAL:Float:Inverse trig functions::asin(inv_a):  0.30787087787464
+DEAL:Float:Inverse trig functions::asin(inv_a):  0.307871
+DEAL:Float:Inverse trig functions::acos(inv_a_): 1.26293
+DEAL:Float:Inverse trig functions::acos(inv_a__): 1.26292544892026
+DEAL:Float:Inverse trig functions::acos(inv_a):  1.26292544892026
+DEAL:Float:Inverse trig functions::acos(inv_a):  1.26293
+DEAL:Float:Inverse trig functions::atan(inv_a_): 0.294235
+DEAL:Float:Inverse trig functions::atan(inv_a__): 0.294234573382648
+DEAL:Float:Inverse trig functions::atan(inv_a):  0.294234573382648
+DEAL:Float:Inverse trig functions::atan(inv_a):  0.294235
+DEAL:Float:Inverse trig functions::atan2(x_,a_): 0.588003
+DEAL:Float:Inverse trig functions::atan2(x__,a__): atan2(2.20000004768372, 3.29999995231628)
+DEAL:Float:Inverse trig functions::atan2(x,a):  atan2(2.20000004768372, 3.29999995231628)
+DEAL:Float:Inverse trig functions::atan2(x,a):  0.588003
+DEAL:Float:Reciprocal inverse trig functions::acsc(a_): 0.307871
+DEAL:Float:Reciprocal inverse trig functions::acsc(a__): 0.307870872992762
+DEAL:Float:Reciprocal inverse trig functions::acsc(a):  0.307870872992762
+DEAL:Float:Reciprocal inverse trig functions::acsc(a):  0.307871
+DEAL:Float:Reciprocal inverse trig functions::asec(a_): 1.26293
+DEAL:Float:Reciprocal inverse trig functions::asec(a__): 1.26292545380213
+DEAL:Float:Reciprocal inverse trig functions::asec(a):  1.26292545380213
+DEAL:Float:Reciprocal inverse trig functions::asec(a):  1.26293
+DEAL:Float:Reciprocal inverse trig functions::acot(a_): 0.294235
+DEAL:Float:Reciprocal inverse trig functions::acot(a__): 0.294234569121593
+DEAL:Float:Reciprocal inverse trig functions::acot(a):  0.294234569121593
+DEAL:Float:Reciprocal inverse trig functions::acot(a):  0.294235
+DEAL:Float:Hyperbolic trig functions::sinh(a_): 13.5379
+DEAL:Float:Hyperbolic trig functions::sinh(a__): 13.5378772293333
+DEAL:Float:Hyperbolic trig functions::sinh(a):  13.5378772293333
+DEAL:Float:Hyperbolic trig functions::sinh(a):  13.5379
+DEAL:Float:Hyperbolic trig functions::cosh(a_): 13.5748
+DEAL:Float:Hyperbolic trig functions::cosh(a__): 13.5747603984933
+DEAL:Float:Hyperbolic trig functions::cosh(a):  13.5747603984933
+DEAL:Float:Hyperbolic trig functions::cosh(a):  13.5748
+DEAL:Float:Hyperbolic trig functions::tanh(a_): 0.997283
+DEAL:Float:Hyperbolic trig functions::tanh(a__): 0.997282959840377
+DEAL:Float:Hyperbolic trig functions::tanh(a):  0.997282959840377
+DEAL:Float:Hyperbolic trig functions::tanh(a):  0.997283
+DEAL:Float:Reciprocal hyperbolic trig functions::csch(a_): 0.0738668
+DEAL:Float:Reciprocal hyperbolic trig functions::csch(a__): 0.0738668243964602
+DEAL:Float:Reciprocal hyperbolic trig functions::csch(a):  0.0738668243964602
+DEAL:Float:Reciprocal hyperbolic trig functions::csch(a):  0.0738668
+DEAL:Float:Reciprocal hyperbolic trig functions::sech(a_): 0.0736661
+DEAL:Float:Reciprocal hyperbolic trig functions::sech(a__): 0.0736661252681112
+DEAL:Float:Reciprocal hyperbolic trig functions::sech(a):  0.0736661252681112
+DEAL:Float:Reciprocal hyperbolic trig functions::sech(a):  0.0736661
+DEAL:Float:Reciprocal hyperbolic trig functions::coth(a_): 1.00272
+DEAL:Float:Reciprocal hyperbolic trig functions::coth(a__): 1.00272444257952
+DEAL:Float:Reciprocal hyperbolic trig functions::coth(a):  1.00272444257952
+DEAL:Float:Reciprocal hyperbolic trig functions::coth(a):  1.00272
+DEAL:Float:Inverse hyperbolic trig functions::asinh(inv_a_): 0.298574
+DEAL:Float:Inverse hyperbolic trig functions::asinh(inv_a__): 0.298574346656372
+DEAL:Float:Inverse hyperbolic trig functions::asinh(inv_a):  0.298574346656372
+DEAL:Float:Inverse hyperbolic trig functions::asinh(inv_a):  0.298574
+DEAL:Float:Inverse hyperbolic trig functions::acosh(a_): 1.86328
+DEAL:Float:Inverse hyperbolic trig functions::acosh(a__): 1.86327933599091
+DEAL:Float:Inverse hyperbolic trig functions::acosh(a):  1.86327933599091
+DEAL:Float:Inverse hyperbolic trig functions::acosh(a):  1.86328
+DEAL:Float:Inverse hyperbolic trig functions::atanh(inv_a_): 0.312853
+DEAL:Float:Inverse hyperbolic trig functions::atanh(inv_a__): 0.312852959826358
+DEAL:Float:Inverse hyperbolic trig functions::atanh(inv_a):  0.312852959826358
+DEAL:Float:Inverse hyperbolic trig functions::atanh(inv_a):  0.312853
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::acsch(a_): 0.298574
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::acsch(a__): 0.298574342203972
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::acsch(a):  0.298574342203972
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::acsch(a):  0.298574
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::asech(inv_a_): 1.86328
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::asech(inv_a__): 1.86327931988071
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::asech(inv_a):  1.86327931988071
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::asech(inv_a):  1.86328
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::acoth(a_): 0.312853
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::acoth(a__): 0.312852954703614
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::acoth(a):  0.312852959826358 + 1.5707963267949*I
+DEAL:Float:Reciprocal inverse hyperbolic trig functions::acoth(a):  0.312853
+DEAL:Double:Power functions::pow(a_,x_): 13.8271
+DEAL:Double:Power functions::pow(a__,x__): 13.8270861180441
+DEAL:Double:Power functions::pow(a,x):   13.8271
+DEAL:Double:Power functions::pow(a,x_):  13.8271
+DEAL:Double:Power functions::pow(a_,x):  13.8271
+DEAL:Double:Power functions::sqrt(a_): 1.81659
+DEAL:Double:Power functions::sqrt(a__): 1.81659021245849
+DEAL:Double:Power functions::sqrt(a):  1.81659021245849
+DEAL:Double:Power functions::sqrt(a):  1.81659
+DEAL:Double:Power functions::cbrt(a_): 1.48881
+DEAL:Double:Power functions::cbrt(a__): 1.48880555295383
+DEAL:Double:Power functions::cbrt(a):  1.48880555295383
+DEAL:Double:Power functions::cbrt(a):  1.48881
+DEAL:Double:Power functions::exp(a_): 27.1126
+DEAL:Double:Power functions::exp(a__): 27.1126389206579
+DEAL:Double:Power functions::exp(a):  27.1126389206579
+DEAL:Double:Power functions::exp(a):  27.1126
+DEAL:Double:Power functions::log(a_): 1.19392
+DEAL:Double:Power functions::log(a__): 1.19392246847243
+DEAL:Double:Power functions::log(a):  1.19392246847243
+DEAL:Double:Power functions::log(a):  1.19392
+DEAL:Double:Other functions::abs(b_): 4.40000
+DEAL:Double:Other functions::abs(b):  4.40000
+DEAL:Double:Other functions::copysign(1.0, b_): -1.00000
+DEAL:Double:Other functions::sign(b):  -1.00000
+DEAL:Double:Other functions::copysign(a_, b_): -3.30000
+DEAL:Double:Other functions::copysign(a, b):  -3.30000
+DEAL:Double:Other functions::floor(b_): -5.00000
+DEAL:Double:Other functions::floor(b):  -5.00000
+DEAL:Double:Other functions::ceil(b_): -4.00000
+DEAL:Double:Other functions::ceil(b):  -4.00000
+DEAL:Double:Other functions::max(a_,x_): 3.30000
+DEAL:Double:Other functions::max(a__,x__): 3.3
+DEAL:Double:Other functions::max(a,x):   3.30000
+DEAL:Double:Other functions::max(a,x_):  3.30000
+DEAL:Double:Other functions::max(a_,x):  3.30000
+DEAL:Double:Other functions::min(a_,x_): 2.20000
+DEAL:Double:Other functions::min(a__,x__): 2.2
+DEAL:Double:Other functions::min(a,x):   2.20000
+DEAL:Double:Other functions::min(a,x_):  2.20000
+DEAL:Double:Other functions::min(a_,x):  2.20000
+DEAL:Double:Other functions::erf(a_): 0.999997
+DEAL:Double:Other functions::erf(a__): 0.999996942290204
+DEAL:Double:Other functions::erf(a):  0.999996942290204
+DEAL:Double:Other functions::erf(a):  0.999997
+DEAL:Double:Other functions::erfc(a_): 3.05771e-06
+DEAL:Double:Other functions::erfc(a__): 3.05770979643816e-06
+DEAL:Double:Other functions::erfc(a):  3.05770979643816e-06
+DEAL:Double:Other functions::erfc(a):  3.05771e-06
+DEAL:Double:Trig functions::sin(a_): -0.157746
+DEAL:Double:Trig functions::sin(a__): -0.157745694143248
+DEAL:Double:Trig functions::sin(a):  -0.157745694143248
+DEAL:Double:Trig functions::sin(a):  -0.157746
+DEAL:Double:Trig functions::cos(a_): -0.987480
+DEAL:Double:Trig functions::cos(a__): -0.987479769908865
+DEAL:Double:Trig functions::cos(a):  -0.987479769908865
+DEAL:Double:Trig functions::cos(a):  -0.987480
+DEAL:Double:Trig functions::tan(a_): 0.159746
+DEAL:Double:Trig functions::tan(a__): 0.159745747660032
+DEAL:Double:Trig functions::tan(a):  0.159745747660032
+DEAL:Double:Trig functions::tan(a):  0.159746
+DEAL:Double:Reciprocal trig functions::csc(a_): -6.33932
+DEAL:Double:Reciprocal trig functions::csc(a__): -6.33931725002842
+DEAL:Double:Reciprocal trig functions::csc(a):  -6.33931725002842
+DEAL:Double:Reciprocal trig functions::csc(a):  -6.33932
+DEAL:Double:Reciprocal trig functions::sec(a_): -1.01268
+DEAL:Double:Reciprocal trig functions::sec(a__): -1.01267897375993
+DEAL:Double:Reciprocal trig functions::sec(a):  -1.01267897375993
+DEAL:Double:Reciprocal trig functions::sec(a):  -1.01268
+DEAL:Double:Reciprocal trig functions::cot(a_): 6.25995
+DEAL:Double:Reciprocal trig functions::cot(a__): 6.25994753943736
+DEAL:Double:Reciprocal trig functions::cot(a):  6.25994753943736
+DEAL:Double:Reciprocal trig functions::cot(a):  6.25995
+DEAL:Double:Inverse trig functions::asin(inv_a_): 0.307871
+DEAL:Double:Inverse trig functions::asin(inv_a__): 0.307870868398053
+DEAL:Double:Inverse trig functions::asin(inv_a):  0.307870868398053
+DEAL:Double:Inverse trig functions::asin(inv_a):  0.307871
+DEAL:Double:Inverse trig functions::acos(inv_a_): 1.26293
+DEAL:Double:Inverse trig functions::acos(inv_a__): 1.26292545839684
+DEAL:Double:Inverse trig functions::acos(inv_a):  1.26292545839684
+DEAL:Double:Inverse trig functions::acos(inv_a):  1.26293
+DEAL:Double:Inverse trig functions::atan(inv_a_): 0.294235
+DEAL:Double:Inverse trig functions::atan(inv_a__): 0.294234565111188
+DEAL:Double:Inverse trig functions::atan(inv_a):  0.294234565111188
+DEAL:Double:Inverse trig functions::atan(inv_a):  0.294235
+DEAL:Double:Inverse trig functions::atan2(x_,a_): 0.588003
+DEAL:Double:Inverse trig functions::atan2(x__,a__): atan2(2.2, 3.3)
+DEAL:Double:Inverse trig functions::atan2(x,a):  atan2(2.2, 3.3)
+DEAL:Double:Inverse trig functions::atan2(x,a):  0.588003
+DEAL:Double:Reciprocal inverse trig functions::acsc(a_): 0.307871
+DEAL:Double:Reciprocal inverse trig functions::acsc(a__): 0.307870868398053
+DEAL:Double:Reciprocal inverse trig functions::acsc(a):  0.307870868398053
+DEAL:Double:Reciprocal inverse trig functions::acsc(a):  0.307871
+DEAL:Double:Reciprocal inverse trig functions::asec(a_): 1.26293
+DEAL:Double:Reciprocal inverse trig functions::asec(a__): 1.26292545839684
+DEAL:Double:Reciprocal inverse trig functions::asec(a):  1.26292545839684
+DEAL:Double:Reciprocal inverse trig functions::asec(a):  1.26293
+DEAL:Double:Reciprocal inverse trig functions::acot(a_): 0.294235
+DEAL:Double:Reciprocal inverse trig functions::acot(a__): 0.294234565111188
+DEAL:Double:Reciprocal inverse trig functions::acot(a):  0.294234565111188
+DEAL:Double:Reciprocal inverse trig functions::acot(a):  0.294235
+DEAL:Double:Hyperbolic trig functions::sinh(a_): 13.5379
+DEAL:Double:Hyperbolic trig functions::sinh(a__): 13.5378778766283
+DEAL:Double:Hyperbolic trig functions::sinh(a):  13.5378778766283
+DEAL:Double:Hyperbolic trig functions::sinh(a):  13.5379
+DEAL:Double:Hyperbolic trig functions::cosh(a_): 13.5748
+DEAL:Double:Hyperbolic trig functions::cosh(a__): 13.5747610440296
+DEAL:Double:Hyperbolic trig functions::cosh(a):  13.5747610440296
+DEAL:Double:Hyperbolic trig functions::cosh(a):  13.5748
+DEAL:Double:Hyperbolic trig functions::tanh(a_): 0.997283
+DEAL:Double:Hyperbolic trig functions::tanh(a__): 0.997282960099142
+DEAL:Double:Hyperbolic trig functions::tanh(a):  0.997282960099142
+DEAL:Double:Hyperbolic trig functions::tanh(a):  0.997283
+DEAL:Double:Reciprocal hyperbolic trig functions::csch(a_): 0.0738668
+DEAL:Double:Reciprocal hyperbolic trig functions::csch(a__): 0.0738668208646195
+DEAL:Double:Reciprocal hyperbolic trig functions::csch(a):  0.0738668208646195
+DEAL:Double:Reciprocal hyperbolic trig functions::csch(a):  0.0738668
+DEAL:Double:Reciprocal hyperbolic trig functions::sech(a_): 0.0736661
+DEAL:Double:Reciprocal hyperbolic trig functions::sech(a__): 0.0736661217649808
+DEAL:Double:Reciprocal hyperbolic trig functions::sech(a):  0.0736661217649808
+DEAL:Double:Reciprocal hyperbolic trig functions::sech(a):  0.0736661
+DEAL:Double:Reciprocal hyperbolic trig functions::coth(a_): 1.00272
+DEAL:Double:Reciprocal hyperbolic trig functions::coth(a__): 1.00272444231935
+DEAL:Double:Reciprocal hyperbolic trig functions::coth(a):  1.00272444231935
+DEAL:Double:Reciprocal hyperbolic trig functions::coth(a):  1.00272
+DEAL:Double:Inverse hyperbolic trig functions::asinh(inv_a_): 0.298574
+DEAL:Double:Inverse hyperbolic trig functions::asinh(inv_a__): 0.298574338013478
+DEAL:Double:Inverse hyperbolic trig functions::asinh(inv_a):  0.298574338013478
+DEAL:Double:Inverse hyperbolic trig functions::asinh(inv_a):  0.298574
+DEAL:Double:Inverse hyperbolic trig functions::acosh(a_): 1.86328
+DEAL:Double:Inverse hyperbolic trig functions::acosh(a__): 1.86327935115345
+DEAL:Double:Inverse hyperbolic trig functions::acosh(a):  1.86327935115345
+DEAL:Double:Inverse hyperbolic trig functions::acosh(a):  1.86328
+DEAL:Double:Inverse hyperbolic trig functions::atanh(inv_a_): 0.312853
+DEAL:Double:Inverse hyperbolic trig functions::atanh(inv_a__): 0.312852949882206
+DEAL:Double:Inverse hyperbolic trig functions::atanh(inv_a):  0.312852949882206
+DEAL:Double:Inverse hyperbolic trig functions::atanh(inv_a):  0.312853
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::acsch(a_): 0.298574
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::acsch(a__): 0.298574338013478
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::acsch(a):  0.298574338013478
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::acsch(a):  0.298574
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::asech(inv_a_): 1.86328
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::asech(inv_a__): 1.86327935115345
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::asech(inv_a):  1.86327935115345
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::asech(inv_a):  1.86328
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::acoth(a_): 0.312853
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::acoth(a__): 0.312852949882206
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::acoth(a):  0.312852949882206 + 1.5707963267949*I
+DEAL:Double:Reciprocal inverse hyperbolic trig functions::acoth(a):  0.312853
+DEAL::OK
