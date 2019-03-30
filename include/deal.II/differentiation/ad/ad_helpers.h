@@ -4119,4 +4119,4 @@ DEAL_II_NAMESPACE_CLOSE
 
 #endif // defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
 
-#endif // dealii__adolc_helpers_h
+#endif // dealii_differentiation_ad_ad_helpers_h

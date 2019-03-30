@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_tpetra_vector_templates_h
-#define dealii__trilinos_tpetra_vector_templates_h
+#ifndef dealii_trilinos_tpetra_vector_templates_h
+#define dealii_trilinos_tpetra_vector_templates_h
 
 #include <deal.II/base/std_cxx14/memory.h>
 
