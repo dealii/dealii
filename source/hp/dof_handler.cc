@@ -1222,8 +1222,8 @@ namespace hp
   {
     // unsubscribe as a listener to refinement of the underlying
     // triangulation
-    for (unsigned int i = 0; i < tria_listeners.size(); ++i)
-      tria_listeners[i].disconnect();
+    for (auto &connection : tria_listeners)
+      connection.disconnect();
     tria_listeners.clear();
 
     // ...and release allocated memory
@@ -1514,8 +1514,8 @@ namespace hp
   {
     if (this->tria != &tria)
       {
-        for (unsigned int i = 0; i < tria_listeners.size(); ++i)
-          tria_listeners[i].disconnect();
+        for (auto &connection : tria_listeners)
+          connection.disconnect();
         tria_listeners.clear();
 
         this->tria = &tria;
