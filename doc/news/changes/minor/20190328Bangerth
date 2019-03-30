@@ -1,0 +1,5 @@
+New: The Vector class can now be initialized using an object of type
+std::initializer_list. Such objects are, in particular, created when
+the compiler sees a brace-enclosed list of numbers.
+<br>
+(Wolfgang Bangerth, 2019/03/28)
