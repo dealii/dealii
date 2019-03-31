@@ -102,7 +102,7 @@ pipeline
           {
             always
 	    {
-              archiveArtifacts artifacts: '$WORKSPACE/build/detailed.log', fingerprint: true
+              archiveArtifacts artifacts: 'build/detailed.log', fingerprint: true
             }
             failure
             {
