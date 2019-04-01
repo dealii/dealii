@@ -101,6 +101,8 @@ pipeline
             always {
               sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/serial.xml || true"
               xunit tools: [CTest(pattern: '*.xml')]
+              sh "cp /home/dealii/build/detailed.log $WORKSPACE/detailed-serial.log || true"
+              archiveArtifacts artifacts: 'detailed-serial.log', fingerprint: true
             }
 
             cleanup {
@@ -120,7 +122,6 @@ pipeline
             sh '''#!/bin/bash
                export NP=`grep -c ^processor /proc/cpuinfo`
                export TEST_TIME_LIMIT=1200
-               echo $NP
                mkdir -p /home/dealii/build
                cd /home/dealii/build
                cmake -G "Ninja" \
@@ -152,6 +153,8 @@ pipeline
             always {
               sh "cp /home/dealii/build/Testing/*/*.xml $WORKSPACE/mpi.xml || true"
               xunit tools: [CTest(pattern: '*.xml')]
+              sh "cp /home/dealii/build/detailed.log $WORKSPACE/detailed-mpi.log || true"
+              archiveArtifacts artifacts: 'detailed-mpi.log', fingerprint: true
             }
 
             cleanup {
