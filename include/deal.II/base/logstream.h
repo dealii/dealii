@@ -145,6 +145,8 @@ public:
   /**
    * Enable output to a second stream <tt>o</tt>.
    *
+   * @param o Attach this output stream.
+   *
    * @param[in] print_job_id Whether or not the JobIdentifier for the current
    * process should be printed to the stream.
    *
