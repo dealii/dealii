@@ -90,6 +90,7 @@ FOREACH(_lib ${_fortran_libs})
 ENDFOREACH()
 
 
+SET(_lapack_include_dirs ${LAPACK_INCLUDE_DIRS})
 SET(_lapack_libraries ${LAPACK_LIBRARIES})
 SET(_lapack_linker_flags ${LAPACK_LINKER_FLAGS})
 DEAL_II_PACKAGE_HANDLE(LAPACK
@@ -97,6 +98,10 @@ DEAL_II_PACKAGE_HANDLE(LAPACK
     REQUIRED _lapack_libraries
     OPTIONAL BLAS_LIBRARIES ${_additional_libraries}
   LINKER_FLAGS OPTIONAL _lapack_linker_flags BLAS_LINKER_FLAGS
+  INCLUDE_DIRS
+    OPTIONAL _lapack_include_dirs
+  USER_INCLUDE_DIRS
+    OPTIONAL _lapack_include_dirs
   CLEAR
     atlas_LIBRARY atlcblas_LIBRARY atllapack_LIBRARY blas_LIBRARY
     eigen_blas_LIBRARY f77blas_LIBRARY gslcblas_LIBRARY lapack_LIBRARY
