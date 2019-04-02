@@ -231,11 +231,6 @@ namespace internal
        * represented by a chunk of cells. The cell chunks are formed before
        * subdivision into partitions and colors.
        *
-       * @param cell_active_fe_index The active FE index corresponding to the
-       * individual indices in the list of all cell indices, in order to be
-       * able to not place cells with different indices into the same cell
-       * batch with vectorization.
-       *
        * @param connectivity (in/out) Determines whether cells `i` and `j` are
        * conflicting, expressed by an entry in position (i,j).
        *

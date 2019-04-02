@@ -78,8 +78,7 @@ namespace Step43
   using namespace dealii;
 
 
-  // @sect3{Pressure right hand side, pressure boundary values and saturation
-  // initial value classes}
+  // @sect3{Right hand side, boundary and initial value classes}
 
   // The following part is taken directly from step-21 so there is no need to
   // repeat the descriptions found there.

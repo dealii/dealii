@@ -2383,7 +2383,7 @@ namespace Differentiation
        * the input FEValuesExtractors::SymmetricTensor @p extractor_symm_tensor.
        * If the @p ignore_symmetries is set <code>true</code>, then all
        * component of the tensor are considered to be independent. If set to
-       * code>false</code>, then the set of returned indices will contain
+       * <code>false</code>, then the set of returned indices will contain
        * duplicate entries for components that are symmetric.
        */
       template <int dim, typename IndexType = unsigned int>

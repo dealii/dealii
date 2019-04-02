@@ -135,16 +135,18 @@ namespace Step57
     BlockVector<double> evaluation_point;
   };
 
-  // @sect3{Boundary values and right hand side} In this problem we set the
-  // velocity along the upper surface of the cavity to be one and zero on the
-  // other three walls. The right hand side function is zero so we do not need
-  // to set the right hand side function in this tutorial. The number of
-  // components of the boundary function is <code>dim+1</code>. We will
-  // ultimately use VectorTools::interpolate_boundary_values to set boundary
-  // values, which requires the boundary value functions to have the same
-  // number of components as the solution, even if all are not used. Put
-  // another way: to make this function happy we define boundary values for
-  // the pressure even though we will never actually use them.
+  // @sect3{Boundary values and right hand side}
+
+  // In this problem we set the velocity along the upper surface of the cavity
+  // to be one and zero on the other three walls. The right hand side function
+  // is zero so we do not need to set the right hand side function in this
+  // tutorial. The number of components of the boundary function is
+  // <code>dim+1</code>. We will ultimately use
+  // VectorTools::interpolate_boundary_values to set boundary values, which
+  // requires the boundary value functions to have the same number of
+  // components as the solution, even if all are not used. Put another way: to
+  // make this function happy we define boundary values for the pressure even
+  // though we will never actually use them.
   template <int dim>
   class BoundaryValues : public Function<dim>
   {
@@ -254,6 +256,7 @@ namespace Step57
 
   // @sect3{StationaryNavierStokes class implementation}
   // @sect4{StationaryNavierStokes::StationaryNavierStokes}
+  //
   // The constructor of this class looks very similar to the one in step-22. The
   // only difference is the viscosity and the Augmented Lagrangian coefficient
   // <code>gamma</code>.
@@ -268,6 +271,7 @@ namespace Step57
   {}
 
   // @sect4{StationaryNavierStokes::setup_dofs}
+  //
   // This function initializes the DoFHandler enumerating the degrees of freedom
   // and constraints on the current mesh.
   template <int dim>
@@ -331,6 +335,7 @@ namespace Step57
   }
 
   // @sect4{StationaryNavierStokes::initialize_system}
+  //
   // On each mesh the SparsityPattern and the size of the linear system
   // are different. This function initializes them after mesh refinement.
   template <int dim>
@@ -350,7 +355,7 @@ namespace Step57
   }
 
   // @sect4{StationaryNavierStokes::assemble}
-
+  //
   // This function builds the system matrix and right hand side that we
   // currently work on. The @p initial_step argument is used to determine
   // which set of constraints we apply (nonzero for the initial step and zero
@@ -513,6 +518,7 @@ namespace Step57
   }
 
   // @sect4{StationaryNavierStokes::solve}
+  //
   // In this function, we use FGMRES together with the block preconditioner,
   // which is defined at the beginning of the program, to solve the linear
   // system. What we obtain at this step is the solution vector. If this is
@@ -728,6 +734,7 @@ namespace Step57
   }
 
   // @sect4{StationaryNavierStokes::output_results}
+  //
   // This function is the same as in step-22 except that we choose a name
   // for the output file that also contains the Reynolds number (i.e., the
   // inverse of the viscosity in the current context).
@@ -757,6 +764,7 @@ namespace Step57
   }
 
   // @sect4{StationaryNavierStokes::process_solution}
+  //
   // In our test case, we do not know the analytical solution. This function
   // outputs the velocity components along $x=0.5$ and $0 \leq y \leq 1$ so they
   // can be compared with data from the literature.
@@ -788,6 +796,7 @@ namespace Step57
   }
 
   // @sect4{StationaryNavierStokes::run}
+  //
   // This is the last step of this program. In this part, we generate the grid
   // and run the other functions respectively. The max refinement can be set by
   // the argument.

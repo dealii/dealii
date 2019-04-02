@@ -1233,8 +1233,7 @@ namespace Step28
   };
 
 
-  // @sect4{Implementation of the
-  // <code>NeutronDiffusionProblem::Parameters</code> class}
+  // @sect4{Implementation of the <code>Parameters</code> class}
 
   // Before going on to the implementation of the outer class, we have to
   // implement the functions of the parameters structure. This is pretty

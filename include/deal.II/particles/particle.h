@@ -147,7 +147,8 @@ namespace Particles
      * contains serialized data of the same length and type that is allocated
      * by @p property_pool.
      */
-    Particle(const void *&begin_data, PropertyPool *const = nullptr);
+    Particle(const void *&       begin_data,
+             PropertyPool *const property_pool = nullptr);
 
     /**
      * Move constructor for Particle, creates a particle from an existing

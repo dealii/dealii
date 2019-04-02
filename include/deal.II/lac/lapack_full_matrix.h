@@ -866,6 +866,8 @@ public:
    *
    * The parameters allow for a flexible setting of the output format:
    *
+   * @param out This specifies the stream to write to.
+   *
    * @param precision denotes the number of trailing digits.
    *
    * @param scientific is used to determine the number format, where
