@@ -264,22 +264,25 @@ namespace HDF5
     void
     set_plist(hid_t &plist, const bool mpi)
     {
-      herr_t ret;
-
       if (mpi)
         {
+#  ifdef DEAL_II_WITH_MPI
+          herr_t ret;
           plist = H5Pcreate(H5P_DATASET_XFER);
           Assert(plist >= 0, ExcInternalError());
           ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
           Assert(ret >= 0, ExcInternalError());
+#  else
+          AssertThrow(false, ExcNotImplemented());
+#  endif
         }
       else
         {
           plist = H5P_DEFAULT;
         }
 
-      // This avoids the unused warning
-      (void)ret;
+      (void)plist;
+      (void)mpi;
     }
 
 
@@ -297,10 +300,10 @@ namespace HDF5
                   const bool                 mpi,
                   const bool                 query_io_mode)
     {
-      herr_t ret;
-
       if (mpi)
         {
+#  ifdef DEAL_II_WITH_MPI
+          herr_t ret;
           if (query_io_mode)
             {
               ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
@@ -313,9 +316,17 @@ namespace HDF5
             }
           ret = H5Pclose(plist);
           Assert(ret >= 0, ExcInternalError());
+#  else
+          AssertThrow(false, ExcNotImplemented());
+#  endif
         }
 
-      (void)ret;
+      (void)plist;
+      (void)io_mode;
+      (void)local_no_collective_cause;
+      (void)global_no_collective_cause;
+      (void)mpi;
+      (void)query_io_mode;
     }
 
 
@@ -1377,7 +1388,15 @@ namespace HDF5
 
 
   File::File(const std::string &name, const FileAccessMode mode)
-    : File(name, mode, false, MPI_COMM_NULL)
+    : File(name,
+           mode,
+           false,
+#  ifdef DEAL_II_WITH_MPI
+           MPI_COMM_NULL
+#  else
+           0
+#  endif
+      )
   {}
 
 
@@ -1404,22 +1423,25 @@ namespace HDF5
       delete pointer;
     });
 
-    hid_t          plist;
-    herr_t         ret;
-    const MPI_Info info = MPI_INFO_NULL;
+    hid_t  plist;
+    herr_t ret;
 
     if (mpi)
       {
-#  ifndef DEAL_II_WITH_MPI
-        AssertThrow(false, ExcMessage("MPI support is disabled."));
-#  endif // DEAL_II_WITH_MPI
-#  ifndef H5_HAVE_PARALLEL
-        AssertThrow(false, ExcMessage("HDF5 parallel support is disabled."));
-#  endif // H5_HAVE_PARALLEL
+#  ifdef DEAL_II_WITH_MPI
+#    ifdef H5_HAVE_PARALLEL
+        const MPI_Info info = MPI_INFO_NULL;
+
         plist = H5Pcreate(H5P_FILE_ACCESS);
         Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
         ret = H5Pset_fapl_mpio(plist, mpi_communicator, info);
         Assert(ret >= 0, ExcMessage("Error at H5Pset_fapl_mpio"));
+#    else
+        AssertThrow(false, ExcMessage("HDF5 parallel support is disabled."));
+#    endif // H5_HAVE_PARALLEL
+#  else
+        AssertThrow(false, ExcMessage("MPI support is disabled."));
+#  endif // DEAL_II_WITH_MPI
       }
     else
       {
@@ -1450,6 +1472,7 @@ namespace HDF5
       }
 
     (void)ret;
+    (void)mpi_communicator;
   }
 
 
