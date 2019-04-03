@@ -310,7 +310,7 @@ public:
         "single zero eigenvalue and its rank is therefore "
         "deficient by one."
         "\n\n"
-        "The other common situation is that you run out of memory."
+        "The other common situation is that you run out of memory. "
         "On a typical laptop or desktop, it should easily be possible "
         "to solve problems with 100,000 unknowns in 2d. If you are "
         "solving problems with many more unknowns than that, in "
