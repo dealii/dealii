@@ -94,6 +94,11 @@ public:
   using const_iterator = const ElementType *;
 
   /**
+   * Default constructor.
+   */
+  ArrayView();
+
+  /**
    * Constructor.
    *
    * @param[in] starting_element A pointer to the first element of the array
@@ -158,6 +163,28 @@ public:
    *   such as <code>ArrayView@<double@></code>.
    */
   ArrayView(std::vector<typename std::remove_cv<value_type>::type> &vector);
+
+  /**
+   * Reinitialize a view.
+   *
+   * @param[in] starting_element A pointer to the first element of the array
+   * this object should represent.
+   * @param[in] n_elements The length (in elements) of the chunk of memory
+   * this object should represent.
+   *
+   * @note The object that is constructed from these arguments has no
+   * knowledge how large the object into which it points really is. As a
+   * consequence, whenever you call ArrayView::operator[], the array view can
+   * check that the given index is within the range of the view, but it can't
+   * check that the view is indeed a subset of the valid range of elements of
+   * the underlying object that allocated that range. In other words, you need
+   * to ensure that the range of the view specified by the two arguments to
+   * this constructor is in fact a subset of the elements of the array into
+   * which it points. The appropriate way to do this is to use the
+   * make_array_view() functions.
+   */
+  void
+  reinit(value_type *starting_element, const std::size_t n_elements);
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
@@ -252,12 +279,12 @@ private:
    * A pointer to the first element of the range of locations in memory that
    * this object represents.
    */
-  value_type *const starting_element;
+  value_type *starting_element;
 
   /**
    * The length of the array this object represents.
    */
-  const std::size_t n_elements;
+  std::size_t n_elements;
 
   friend class ArrayView<const ElementType, MemorySpaceType>;
 };
@@ -306,6 +333,14 @@ namespace internal
 
 
 template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView()
+  : starting_element(nullptr)
+  , n_elements(0)
+{}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   value_type *      starting_element,
   const std::size_t n_elements)
@@ -318,6 +353,16 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
         starting_element),
     ExcMessage("The memory space indicated by the template parameter "
                "and the one derived from the pointer value do not match!"));
+}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+inline void
+ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
+                                                const std::size_t n_elements)
+{
+  *this = ArrayView(starting_element, n_elements);
 }
 
 
