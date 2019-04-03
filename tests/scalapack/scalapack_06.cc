@@ -104,7 +104,7 @@ test(const unsigned int size,
          &*work.begin(),
          &lwork,
          &info);
-    lwork = work[0];
+    lwork = static_cast<int>(work[0]);
     work.resize(lwork);
     syev(&jobz,
          &uplo,
