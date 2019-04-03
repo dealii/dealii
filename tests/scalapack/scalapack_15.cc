@@ -128,7 +128,7 @@ test(const unsigned int size,
           &liwork,
           &info);
 
-    lwork = work[0];
+    lwork = static_cast<int>(work[0]);
     work.resize(lwork);
     liwork = iwork[0];
     iwork.resize(liwork);
