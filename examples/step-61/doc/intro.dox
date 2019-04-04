@@ -102,7 +102,7 @@ formulation of the problem,
 for all test functions $q$, where
 @f{equation*}
 \mathcal{A}\left(p,q\right)
-  := \int_\Omega \mathbf{K} \nabla p \cdot \nabla q \;\mathrm{d}x,
+  := \int_\Omega \left(\mathbf{K} \nabla p\right) \cdot \nabla q \;\mathrm{d}x,
 @f}
 and 
 @f{equation*}
@@ -139,186 +139,330 @@ that is only defined in cell interiors. Consequently,
 for all discrete test functions $q_h$, where
 @f{equation*}
 \mathcal{A}_h\left(p_h,q_h\right)
-  := \sum_{T \in \mathcal{T}_h}
-    \int_T \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q_h \;\mathrm{d}x,
+  := \sum_{K \in \mathbb{T}}
+    \int_K \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q_h \;\mathrm{d}x,
 @f}
 and 
 @f{equation*}
 \mathcal{F}\left(q_h\right)
-  := \sum_{T \in \mathcal{T}_h} \int_T f \, q_h^\circ \;\mathrm{d}x
+  := \sum_{K \in \mathbb{T}} \int_K f \, q_h^\circ \;\mathrm{d}x
   - \sum_{\gamma \in \Gamma_h^N} \int_\gamma u_N q_h^\partial \;\mathrm{d}x,
 @f}
 The key point is that here, we have replaced the gradient $\nabla p_h$ by the
-<i>discrete weak gradient</i>
- $ \nabla_{w,d} p_h $ that is defined for our peculiarly defined approximation $p_h$. 
-We use FE_DGQ as the interior polynomial space, 
-FE_FaceQ as the face polynomial space, and Raviart-Thomas elements for the velocity 
-$\mathbf{u} = -{\mathbf{K}} \nabla_{w,d} p$. 
+<i>discrete weak gradient</i> operator
+ $ \nabla_{w,d} p_h $ that makes sense for our peculiarly defined approximation $p_h$.
+ 
+The question is then how that operator works. For this, let us first say how we
+think of the discrete approximation $p_h$ of the pressure. As mentioned above,
+the "function" $p_h$ actually consists of two parts: the values $p_h^\circ$ in
+the interior of cells, and $p_h^\partial$ on the interfaces. We have to define
+discrete (finite-dimensional) function spaces for both of these; in this
+program, we will use FE_DGQ for $p_h^\circ$ as the space in the interior of
+cells (defined on each cell, but in general discontinuous along interfaces),
+and FE_FaceQ for $p_h^\partial$ as the space on the interfaces.
+
+Then let us consider just a single cell (because the integrals above are all
+defined cell-wise, and because the weak discrete gradient is defined cell-by-cell).
+The restriction of $p_h$ to cell $K$, $p_h|_K$ then consists
+of the pair $(p_h^\circ|_K,p_h^\partial|_{\partial K})$. In essence, we can
+think of $\nabla_{w,d} p_h$ of some function defined on $K$ that approximates
+the gradient; in particular, if $p_h|_K$ was the restriction of a differentiable
+function (to the interior and boundary of $K$ -- which would make it continuous
+between the interior and boundary), then  
+$\nabla_{w,d} p_h$ would simply be the exact gradient $\nabla p_h$. But, since
+$p_h|_K$ is not continuous between interior and boundary of $K$, we need a more
+general definition; furthermore, we can not deal with arbitrary functions, and
+so require that $\nabla_{w,d} p_h$ is also in a finite element space (which, since
+the gradient is a vector, has to be vector-valued).
+
+The way this is done is to define this weak gradient operator $\nabla_{w,d}|_K :
+DGQ_k(K) \times DGQ_r(\partial K) \rightarrow RT_s(K)$ (where $RT_s(K)$ is the
+vector-valued Raviart-Thomas space of order $s$ on cell $K$) in the following way:
+@f{equation*}{
+  \int_K \mathbf v_h \cdot (\nabla_{w,d} p_h) 
+  =
+  -\int_K (\nabla \cdot \mathbf v_h) p_h^\circ
+  +\int_{\partial K} (\mathbf v_h \cdot \mathbf n) p_h^\partial,
+@f} 
+for all test functions $\mathbf v_h \in RT_s(K)$.
+This is, in essence, simply an application of the integration-by-parts
+formula. In other words, for a given $p_h=(p^\circ_h,p^\partial_h)$,
+we need to think of $\nabla_{w,d} p_h|_K$ as that
+Raviart-Thomas function of degree $s$ for which the left hand side and right hand side
+are equal for all test functions. 
+
+@note It may be worth pointing out that while the weak discrete
+  gradient is an element of the Raviart-Thomas space $RT_s(K)$ on each
+  cell $K$, it is discontinuous between cells. On the other hand, the
+  Raviart-Thomas space $RT_s=RT_s({\mathbb T})$ defined on the entire
+  mesh and implemented by the FE_RaviartThomas class represents
+  functions that have continuous normal components at interfaces
+  between cells. This means that <i>globally</i>, $\nabla_{w,d} p_h$
+  is not in $RT_s$, even though it is on every cell $K$ in $RT_s(K)$.
+  Rather, it is in a "broken" Raviart-Thomas space that below we will
+  represent by the symbol $DGRT_s$. (The term "broken" here refers to
+  the process of "breaking something apart", and not to the synonym to
+  the expression "not functional".)
+
+
+<h3> Representing the weak gradient </h3>
+
+Since $p_h$ is an element of a finite element space, we can expand it in a basis
+as we always do, i.e., we can write
+@f{equation*}{
+  p_h(\mathbf x) = \sum_j P_j \varphi_j(\mathbf x).
+@f} 
+Here, since $p_h$ has two components (the interior and the interface components),
+the same must hold true for the basis functions $\varphi_j(\mathbf x)$, which we
+can write as $\varphi_j = (\varphi_j^\circ,\varphi_j^\partial)$. If you've
+followed the descriptions in step-8, step-20, and the
+@ref vector_valued "documentation module on vector-valued problems",
+it will be no surprise that for some values of $j$, $\varphi_j^\circ$ will be
+zero, whereas for other values of $j$, $\varphi_j^\partial$ will be zero -- i.e.,
+shape functions will be of either one or the other kind. That is not important,
+here, however. What is important is that we need to wonder how we can represent
+$\nabla_{w,d} \varphi_j$ because that is clearly what will appear in the
+problem when we want to implement the bilinear form 
+@f{equation*}
+\mathcal{A}_h\left(p_h,q_h\right)
+  = \sum_{K \in \mathbb{T}}
+    \int_K \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q_h \;\mathrm{d}x,
+@f}
+
+The key point is that $\nabla_{w,d} \varphi_j$ is known to be a member of the
+"broken" Raviart-Thomas space $DGRT_s$. What this means is that we can
+represent (on each cell $K$ separately)
+@f{equation*}
+\nabla_{w,d} \varphi_j|_K
+  = \sum_k C_{jk}^K \mathbf v_k|_K
+@f}
+where the functions $\mathbf v_k \in DGRT_s$, and where $C^K$ is a matrix of
+dimension 
+@f{align*}{
+ \text{dim}\left(DGQ_k(K) \times DGQ_r(K)\right) &\times \text{dim}\left(RT_s(K)\right)
+  \\
+ &=
+ \left(\text{dim}(DGQ_k(K)) + \text{dim}(DGQ_r(K))\right) \times \text{dim}\left(RT_s(K)\right).
+@f}
+(That the weak discrete gradient can be represented as a matrix should not come
+as a surprise: It is a linear operator from one finite dimensional
+space to another finite dimensional space. If one chooses bases
+for both of these spaces, then <i>every linear operator</i> can
+of course be written as a matrix mapping the vector of expansion coefficients
+with regards to the basis of the domain space of the operator, to
+the vector of expansion coefficients with regards to the basis in the image
+space.)
+
+Using this expansion, we can easily use the definition of the weak
+discrete gradient above to define what the matrix is going to be:
+@f{equation*}{
+  \int_K \mathbf v_i \cdot \left(\sum_k C_{jk}^K \mathbf v_k\right) 
+  =
+  -\int_K (\nabla \cdot \mathbf v_i) \varphi_j^\circ
+  +\int_{\partial K} (\mathbf v_i \cdot \mathbf n) \varphi_j^\partial,
+@f}
+for all test functions $\mathbf v_i \in DGRT_s$.
+
+This clearly leads to a linear system of the form
+@f{equation*}{
+  \sum_k M_{ik}^K C_{jk}^K 
+  =
+  G_{ij}^K
+@f}
+with
+@f{equation*}{
+  M_{ik}^K = \int_K \mathbf v_i \cdot \mathbf v_k,
+  \qquad\qquad 
+  G_{ij}^K = -\int_K (\nabla \cdot \mathbf v_i) \varphi_j^\circ
+             +\int_{\partial K} (\mathbf v_i \cdot \mathbf n) \varphi_j^\partial,
+@f}
+and consequently 
+@f{equation*}{
+  \left(C^K\right)^T = \left(M^K\right)^{-1} G^K.
+@f}
+(In this last step, we have assumed that the indices $i,j,k$ only range
+over those degrees of freedom active on cell $K$,
+thereby ensuring that the mass matrix on the space $RT_s(K)$ is invertible.) 
+Equivalently, using the symmetry of the matrix $M$, we have that
+@f{equation*}{
+  C^K = \left(G^K\right)^{T} \left(M^K\right)^{-1}.
+@f}
+Also worth pointing out is that the
+matrices $C^K$ and $G^K$ are of course not square but rectangular.
+
 
 <h3> Assembling the linear system </h3>
 
-First, we solve for the pressure. 
-We collect two local spaces together in one FESystem, 
-the first component in this finite element system denotes 
-the space for interior pressure, and the second denotes 
-the space for face pressure. 
-For the interior component, we use the polynomial space FE_DGQ. 
-For the face component, we use FE_FaceQ.
-
-We use shape functions defined on spaces FE_DGQ and FE_FaceQ to 
-approximate pressures, i.e., $p_h = \sum a_i \phi_i,$ 
-where $\phi_i$ are shape functions of FESystem. 
-We construct the local system by using discrete weak gradients of 
-shape functions of FE_DGQ and FE_FaceQ.
-The discrete weak gradients of shape functions $\nabla_{w,d} \phi$ are defined as 
-$\nabla_{w,d} \phi = \sum_{i=1}^m c_i \mathbf{w}_i,$ 
-where $\mathbf{w}_i$ is the basis function of $RT(k)$. 
-
-Using integration by parts, we have a small linear system 
-on each element $T$,
-@f{equation*}
-\int_{T} \left(\nabla_{w,d} \phi \right) \cdot \mathbf{w} \mathrm{d}x= 
-\int_{T^\partial} \phi^{\partial} \left(\mathbf{w} \cdot \mathbf{n}\right) \mathrm{d}x- 
-\int_{T^\circ} \phi^{\circ} \left(\nabla \cdot \mathbf{w}\right) \mathrm{d}x,  
-\quad \forall \mathbf{w} \in RT_{[k]}(E),
+Having explained how the weak discrete gradient is defined, we can now
+come back to the question of how the linear system for the equation in question
+should be assembled. Specifically, using the definition of the bilinear
+form ${\cal A}_h$ shown above, we then need to compute the elements of the
+local contribution to the global matrix,
+@f{equation*}{
+  A^K_{ij} = \int_K \left({\mathbf K} \nabla_{w,d} \varphi_i\right) \cdot \nabla_{w,d} \varphi_j.
 @f}
-
-@f{equation*}
-\sum_{i=1}^m c_i \int_T \mathbf{w}_i \cdot \mathbf{w}_j \mathrm{d}x = 
-\int_{T^{\partial}} \phi_i^{\partial} 
-\left(\mathbf{w}_j \cdot \mathbf{n} \right) \mathrm{d}x - 
-\int_{T^{\circ}} \phi_i^{\circ} \left (\nabla \cdot \mathbf{w}_j \right)\mathrm{d}x,
+As explained above, we can expand $\nabla_{w,d} \varphi_i$ in terms of the 
+Raviart-Thomas basis on each cell, and similarly for $\nabla_{w,d} \varphi_j$:
+@f{equation*}{
+  A^K_{ij} = \int_K 
+    \left(
+      {\mathbf K} 
+      \sum_k C_{ik}^K \mathbf v_k|_K
+    \right) 
+    \cdot 
+    \sum_l C_{jl}^K \mathbf v_l|_K.
 @f}
-which can be simplified to be
-@f{equation*}
-\mathbf{C}_{E}\mathbf{M}_{E} = \mathbf{F}_{E},
+By re-arranging sums, this yields the following expression:
+@f{equation*}{
+  A^K_{ij} =
+    \sum_k \sum_l C_{ik}^K C_{jl}^K
+     \int_K  
+    \left(
+      {\mathbf K} 
+      \mathbf v_k|_K
+    \right) 
+    \cdot 
+    \mathbf v_l|_K.
 @f}
-where $\mathbf{C}_E$ is the matrix with unknown coefficients $c$, 
-$\mathbf{M}_E$ is the Gram matrix 
-$\left[  \int_T \mathbf{w}_i \cdot \mathbf{w}_j \right] \mathrm{d}x$, 
-$\mathbf{F}_E$ is the matrix of right hand side, 
-$\mathbf{w}$ and $\phi_i^{\circ}$ are in FEValues, 
-$\phi_i^{\partial}$ is in FEFaceValues. 
-Then we solve for $\mathbf{C}_E = \mathbf{F}_E \mathbf{M}_E^{-1}$. 
-Now, discrete weak gradients of shape functions are written as 
-linear combinations of basis functions of the $RT$ space. 
-In our code, we name $\mathbf{C}_E$ as <code>cell_matrix_C</code>, 
-$\mathbf{M}_E$ as <code>cell_matrix_rt</code>, 
-$\mathbf{F}_E$ as <code>cell_matrix_F</code>.
-
-The components of the local cell matrices $\mathbf{A}$ are 
-@f{equation*}
-\mathbf{A}_{ij} = 
-\int_{T} \mathbf{K} \nabla_{w,d} \phi_i \cdot \nabla_{w,d} \phi_j \mathrm{d}x.
+So, if we have the matrix $C^K$ for each cell $K$, then we can easily compute
+the contribution $A^K$ for cell $K$ to the matrix $A$ as follows:
+@f{equation*}{
+  A^K_{ij} =
+    \sum_k \sum_l C_{ik}^K C_{jl}^K
+    H^K_{kl}
+    =
+    \sum_k \sum_l C_{ik}^K H^K_{kl} C_{jl}^K
+    =
+    \left(C^K H^K (C^K)^T \right)_{ij}.
 @f}
-From previous steps, we know $\nabla_{w,d} \phi_i = \sum_{k=1}^m c_{ik} \mathbf{w}_k,$
-and $\nabla_{w,d} \phi_j = \sum_{l=1}^m c_{jl} \mathbf{w}_l.$
-Then combining the coefficients we have calculated, components of $\mathbf{A}$ are calculated as
-@f{equation*}
-\int_T \sum_{k,l = 1}^{m}c_{ik} c_{jl} \left(\mathbf{K} \mathbf{w}_i \cdot \mathbf{w}_j\right) \mathrm{d}x
-= \sum_{k,l = 1}^{m}c_{ik} c_{jl} \int_{T} \mathbf{K} \mathbf{w}_i \cdot \mathbf{w}_j \mathrm{d}x.
+Here,
+@f{equation*}{
+  H^K_{kl} =
+  \int_K 
+    \left(
+      {\mathbf K} 
+      \mathbf v_k|_K
+    \right) 
+    \cdot 
+    \mathbf v_l|_K,
 @f}
+which is really just the mass matrix on cell $K$ using the Raviart-Thomas
+basis and weighting by the permeability tensor $\mathbf K$. The derivation
+here then shows that the weak Galerkin method really just requires us
+to compute these $C^K$ and $H^K$ matrices on each cell $K$, and then
+$A^K = C^K H^K (C^K)^T$, which is easily computed. The code to be shown
+below does exactly this.
 
-Next, we use ConstraintMatrix::distribute_local_to_global to 
-distribute contributions from local matrices $\mathbf{A}$ to the system matrix. 
+Having so computed the contribution $A^K$ of cell $K$ to the global
+matrix, all we have to do is to "distribute" these local contributions
+into the global matrix. How this is done is first shown in step-3 and
+step-4. In the current program, this will be facilitated by calling
+AffineConstraints::distribute_local_to_global().
 
-In the scheme 
-$\mathcal{A}_h\left(p_h,q \right) = \mathcal{F} \left( q \right),$ 
-we have system matrix and system right hand side, 
-we can solve for the coefficients of the system matrix. 
-The solution vector of the scheme represents the pressure values in interiors and on faces.
+A linear system of course also needs a right hand side. There is no difficulty
+associated with computing the right hand side here other than the fact
+that we only need to use the cell-interior part $\varphi_i^\circ$ for
+each shape function $\varphi_i$.
+
 
 <h3> Post-processing and $L_2$-errors </h3>
 
-After we have calculated the numerical pressure $p$, 
-we use discrete weak gradients of $p$ to calculate the velocity on each element.
+The discussions in the previous sections have given us a linear
+system that we can solve for the numerical pressure $p_h$. We can use
+this to compute an approximation to the variable $\mathbf u = -{\mathbf K}\nabla p$
+that corresponds to the velocity with which the medium flows in a porous
+medium if this is the model we are trying to solve. This kind of
+step -- computing a derived quantity from the solution of the discrete
+problem -- is typically called "post-processing".
 
-On each element the gradient of the numerical pressure $\nabla p$ can be
-approximated by discrete weak gradients  $ \nabla_{w,d}\phi_i$, so
+Here, instead of using the exact gradient of $p_h$, let us instead
+use the discrete weak gradient of $p_h$ to calculate the velocity on each element.
+As discussed above,
+on each element the gradient of the numerical pressure $\nabla p$ can be
+approximated by discrete weak gradients  $ \nabla_{w,d}\phi_i$:
 @f{equation*}
-\nabla_{w,d} p_h = \sum_{i} a_i \nabla_{w,d}\phi_i.
+\nabla_{w,d} p_h 
+= \nabla_{w,d} \left(\sum_{i} P_i \phi_i\right) 
+= \sum_{i} P_i \nabla_{w,d}\phi_i.
 @f}
 
-The numerical velocity $ \mathbf{u}_h = -\mathbf{K} \nabla_{w,d}p_h$ can be written as
-@f{equation*}
-\mathbf{u}_h = -\mathbf{K} \nabla_{w,d} p = 
--\sum_{i} \sum_{j} a_ic_{ij}\mathbf{K}\mathbf{w}_j,
+On cell $K$,
+the numerical velocity $ \mathbf{u}_h = -\mathbf{K} \nabla_{w,d}p_h$ can be written as
+@f{align*}{
+  \mathbf{u}_h 
+  &= -\mathbf{K} \nabla_{w,d} p 
+   = -\mathbf{K}\sum_{i} \sum_{j} P_i C^K_{ij}\mathbf{v}_j,
 @f}
-where $c_{ij}$ is the coefficient of Gram matrix, 
-$\mathbf{w}_j$ is the basis function of the $RT$ space. 
-$\mathbf{K} \mathbf{w}_j$ may not be in the $RT$ space. 
-So we need $L_2$-projection to project it back to the $RT$ space. 
+where $C^K$ is the expansion matrix from above, and
+$\mathbf{v}_j$ is the basis function of the $RT$ space on a cell.
+
+Unfortunately, $\mathbf{K} \mathbf{v}_j$ may not be in the $RT$ space
+(unless, of course, if $\mathbf K$ is constant times the identity matrix). 
+So, in order to represent it in a finite element program, we need to
+project it back into a finite dimensional space we can work with. Here,
+we we will use the $L_2$-projection to project it back to the (broken) $RT$
+space. 
 
 We define the projection as 
-$ \mathbf{Q}_h \left( \mathbf{K}\mathbf{w}_j \right) = 
-\sum_{k} d_{jk}\mathbf{w}_k$. 
+$ \mathbf{Q}_h \left( \mathbf{K}\mathbf{v}_j \right) = 
+\sum_{k} d_{jk}\mathbf{v}_k$ on each cell $K$. 
 For any $j$, 
-$\left( \mathbf{Q}_h \left( \mathbf{Kw}_j \right),\mathbf{w}_k \right)_E = 
-\left( \mathbf{Kw}_j,\mathbf{w}_k \right)_E.$ 
-So the numerical velocity becomes
+$\left( \mathbf{Q}_h \left( \mathbf{Kv}_j \right),\mathbf{v}_k \right)_K = 
+\left( \mathbf{Kv}_j,\mathbf{v}_k \right)_K.$ 
+So, rather than the formula shown above, the numerical velocity on cell $K$
+instead becomes
 @f{equation*}
 \mathbf{u}_h = \mathbf{Q}_h \left( -\mathbf{K}\nabla_{w,d}p_h \right) = 
--\sum_{i=0}^{4} \sum_{j=1}^{4}a_ib_{ij}\mathbf{Q}_h \left( \mathbf{K}\mathbf{w}_j \right),
+-\sum_i \sum_j P_i B^K_{ij}\mathbf{Q}_h \left( \mathbf{K}\mathbf{v}_j \right),
 @f}
-and we have the following system to solve for the coefficients $d_{jk}$,
+and we have the following system to solve for the coefficients $d_{jk}$:
 @f{equation*}
- \left[
-  \begin{matrix}
-  \left(\mathbf{w}_i,\mathbf{w}_j \right) 
-  \end{matrix}
-  \right]
-  \left[
-   \begin{matrix}
+ \sum_j
+  \left(\mathbf{v}_i,\mathbf{v}_j\right)
    d_{jk}
-   \end{matrix}
-   \right]
    =
-   \left[
-    \begin{matrix}
-    \left( \mathbf{Kw}_j,\mathbf{w}_k \right)
-    \end{matrix}
-    \right].
+    \left( \mathbf{Kv}_j,\mathbf{v}_k \right).
 @f}
+In the implementation below, the matrix with elements 
 $
- \left[
-   \begin{matrix}
    d_{jk}
-   \end{matrix}
-   \right]
 $
-is named <code>cell_matrix_D</code>, 
+is called <code>cell_matrix_D</code>,
+whereas the matrix with elements 
 $
-\left[
-    \begin{matrix}
-     \left( \mathbf{Kw}_j,\mathbf{w}_k \right)
-    \end{matrix}
-    \right]
+      \left( \mathbf{Kv}_j,\mathbf{v}_k \right)
 $
-is named <code>cell_matrix_E</code>.
+is called <code>cell_matrix_E</code>.
 
 Then the elementwise velocity is
 @f{equation*}
-\mathbf{u}_h = -\sum_{i} \sum_{j}a_ic_{ij}\sum_{k}d_{jk}\mathbf{w}_k = 
-\sum_{k}- \left(\sum_{j} \sum_{i} a_ic_{ij}d_{jk} \right)\mathbf{w}_k,
+\mathbf{u}_h = -\sum_{i} \sum_{j}P_ic_{ij}\sum_{k}d_{jk}\mathbf{v}_k = 
+\sum_{k}- \left(\sum_{j} \sum_{i} P_ic_{ij}d_{jk} \right)\mathbf{v}_k,
 @f}
-where $-\sum_{j} \sum_{i} a_ic_{ij}d_{jk}$ is named 
+where $-\sum_{j} \sum_{i} P_ic_{ij}d_{jk}$ is called 
 <code>beta</code> in the code.
 
-We calculate the $L_2$-errors of pressure, velocity and flux 
-by the following formulas,
+Using this velocity obtained by "postprocessing" the solution, we can
+define the $L_2$-errors of pressure, velocity, and flux 
+by the following formulas:
 @f{eqnarray*}
 \|p-p_h^\circ\|^2
-  = \sum_{T \in \mathcal{T}_h} \|p-p_h^\circ\|_{L^2(E)}^2, \\
+  = \sum_{K \in \mathbb{T}} \|p-p_h^\circ\|_{L_2(K)}^2, \\
  \|\mathbf{u}-\mathbf{u}_h\|^2
-  = \sum_{T \in \mathcal{T}_h} \|\mathbf{u}-\mathbf{u}_h\|_{L^2(E)^2}^2,\\
+  = \sum_{K \in \mathbb{T}} \|\mathbf{u}-\mathbf{u}_h\|_{L_2(K)^2}^d,\\
 \|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|^2
-  = \sum_{T \in \mathcal{T}_h} \sum_{\gamma \subset T^\partial}
-    \frac{|T|}{|\gamma|} \|\mathbf{u} \cdot \mathbf{n} - \mathbf{u}_h \cdot \mathbf{n}\|_{L^2(\gamma)}^2,
+  = \sum_{K \in \mathbb{T}} \sum_{\gamma \subset \partial K}
+    \frac{|K|}{|\gamma|} \|\mathbf{u} \cdot \mathbf{n} - \mathbf{u}_h \cdot \mathbf{n}\|_{L_2(\gamma)}^2,
 @f}
-where $| T |$ is the area of the element, 
+where $| K |$ is the area of the element, 
 $\gamma$ are faces of the element, 
-$\mathbf{n}$ are unit normal vectors of each face.
+$\mathbf{n}$ are unit normal vectors of each face. The last of these
+norms measures the accuracy of the normal component of the velocity
+vectors over the interfaces between the cells of the mesh. The scaling
+factor $|K|/|\gamma|$ is chosen so as to scale out the difference in
+the length (or area) of the collection of interfaces as the mesh size
+changes.
 
-We will extract interior pressure solutions of each cell 
-from the global solution and calculate the $L_2$ error 
-by using function VectorTools::integrate_difference.
+The first of these errors above is easily computed using
+VectorTools::integrate_difference. The others require a bit more work
+and are implemented in the code below.
