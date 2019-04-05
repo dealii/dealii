@@ -66,19 +66,12 @@
 #include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/multigrid/mg_matrix.h>
 
-
-
 #include <fstream>
 #include <iostream>
+#include <random>
 
 
-
-#include <boost/random.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-
-
-
-namespace Step100
+namespace Step63
 {
   using namespace dealii;
 
@@ -103,8 +96,13 @@ namespace Step100
 
     FEValues<dim> fe_values;
   };
+
+
+
   struct CopyData
   {
+    CopyData() = default;
+
     unsigned int level;
     unsigned int dofs_per_cell;
 
@@ -116,38 +114,51 @@ namespace Step100
 
   struct Settings
   {
-    bool try_parse(const std::string &prm_filename);
+    enum DoFRenumberingStrategy
+    {
+      none,
+      downstream,
+      upstream,
+      random
+    };
 
-    unsigned int fe_degree;
-    std::string  smoother_type;
-    std::string  dof_renum;
-    bool         with_sd;
-    bool         output;
+    bool get_parameters(const std::string &prm_filename);
+
+    unsigned int           fe_degree;
+    std::string            smoother_type;
+    DoFRenumberingStrategy dof_renumbering;
+    bool                   with_streamline_diffusion;
+    bool                   output;
   };
 
-
-  bool Settings::try_parse(const std::string &prm_filename)
+  bool Settings::get_parameters(const std::string &prm_filename)
   {
+    if (prm_filename.size() == 0)
+      {
+        std::cerr << "Usage: please pass a .prm file as the first argument"
+                  << std::endl;
+        return false;
+      }
+
     ParameterHandler prm;
 
-    prm.declare_entry("fe degree",
+    prm.declare_entry("Fe degree",
                       "1",
                       Patterns::Integer(0),
                       "Finite Element degree");
-    prm.declare_entry("smoother type",
-                      "block sor",
-                      Patterns::Selection("sor|jacobi|block sor|block jacobi"),
-                      "Smoother Type: sor|jacobi|block sor|block jacobi");
-    prm.declare_entry("dof renumbering",
+    prm.declare_entry("Smoother type",
+                      "block SOR",
+                      Patterns::Selection("sor|Jacobi|block SOR|block Jacobi"),
+                      "Smoother Type: SOR|Jacobi|block SOR|block Jacobi");
+    prm.declare_entry("DoF renumbering",
                       "downstream",
-                      Patterns::Selection("none|random|downstream|upstream"),
-                      "Dof renumbering: none|random|downstream|upstream");
-    prm.declare_entry("with sd",
+                      Patterns::Selection("none|downstream|upstream|random"),
+                      "DoF renumbering: none|downstream|upstream|random");
+    prm.declare_entry("With streamline diffusion",
                       "true",
                       Patterns::Bool(),
                       "With streamline diffusion: true|false");
-    prm.declare_entry("output",
-                      "true",
+    prm.declare_entry("Output","true",
                       Patterns::Bool(),
                       "Generate graphical output: true|false");
 
@@ -157,183 +168,155 @@ namespace Step100
       }
     catch (const dealii::PathSearch::ExcFileNotFound &)
       {
-        if (prm_filename.size() > 0)
-          std::cerr << "ERRROR: could not open the .prm file '" << prm_filename
-                    << "'" << std::endl;
-        else
-          std::cerr << "Usage: please pass a .prm file as the first argument"
-                    << std::endl;
+        std::cerr << "ERROR: could not parse input from given .prm file"
+                  << prm_filename << "'" << std::endl;
 
         prm.print_parameters(std::cout, ParameterHandler::Text);
         return false;
       }
-    this->fe_degree     = prm.get_integer("fe degree");
-    this->smoother_type = prm.get("smoother type");
-    this->dof_renum     = prm.get("dof renumbering");
-    this->with_sd       = prm.get_bool("with sd");
-    this->output        = prm.get_bool("output");
+
+    fe_degree     = prm.get_integer("Fe degree");
+    smoother_type = prm.get("Smoother type");
+
+    std::string renumbering = prm.get("DoF renumbering");
+    if (renumbering == "none")
+      dof_renumbering = DoFRenumberingStrategy::none;
+    else if (renumbering == "downstream")
+      dof_renumbering = DoFRenumberingStrategy::downstream;
+    else if (renumbering == "upstream")
+      dof_renumbering = DoFRenumberingStrategy::upstream;
+    else if (renumbering == "random")
+      dof_renumbering = DoFRenumberingStrategy::random;
+
+    with_streamline_diffusion = prm.get_bool("With streamline diffusion");
+    output                    = prm.get_bool("Output");
 
     return true;
   }
 
 
-
-  namespace
+  // Functions for creating permutation of cells for output and Block
+  // smoothers
+  template <int dim>
+  std::vector<unsigned int>
+  create_downstream_cell_ordering(const DoFHandler<dim> &dof,
+                                  const Tensor<1, dim>   direction,
+                                  const unsigned int     level)
   {
-    template <class Iterator, int dim>
-    struct CompareDownstream
-    {
-      /**
-       * Constructor.
-       */
-      CompareDownstream(const Tensor<1, dim> &dir)
-        : dir(dir)
-      {}
-      /**
-       * Return true if c1 less c2.
-       */
-      bool operator()(const Iterator &c1, const Iterator &c2) const
+    std::vector<typename DoFHandler<dim>::level_cell_iterator> ordered_cells;
+    ordered_cells.reserve(dof.get_triangulation().n_cells(level));
+    const DoFRenumbering::
+      CompareDownstream<typename DoFHandler<dim>::level_cell_iterator, dim>
+        comparator(direction);
+
+    typename DoFHandler<dim>::level_cell_iterator cell = dof.begin(level);
+    typename DoFHandler<dim>::level_cell_iterator endc = dof.end(level);
+    for (; cell != endc; ++cell)
+      ordered_cells.push_back(cell);
+
+    std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
+
+    std::vector<unsigned> ordered_indices;
+    ordered_indices.reserve(dof.get_triangulation().n_cells(level));
+
+    for (unsigned int i = 0; i < ordered_cells.size(); ++i)
+      ordered_indices.push_back(ordered_cells[i]->index());
+
+    return ordered_indices;
+  }
+
+  template <int dim>
+  std::vector<unsigned int>
+  create_downstream_cell_ordering(const DoFHandler<dim> &dof,
+                                  const Tensor<1, dim>   direction)
+  {
+    std::vector<typename DoFHandler<dim>::active_cell_iterator> ordered_cells;
+    ordered_cells.reserve(dof.get_triangulation().n_active_cells());
+    const DoFRenumbering::
+      CompareDownstream<typename DoFHandler<dim>::active_cell_iterator, dim>
+        comparator(direction);
+
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+    typename DoFHandler<dim>::active_cell_iterator endc = dof.end();
+    for (; cell != endc; ++cell)
+      ordered_cells.push_back(cell);
+
+    std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
+
+    std::vector<unsigned int> ordered_indices;
+    ordered_indices.reserve(dof.get_triangulation().n_active_cells());
+
+    for (unsigned int i = 0; i < ordered_cells.size(); ++i)
+      ordered_indices.push_back(ordered_cells[i]->index());
+
+    return ordered_indices;
+  }
+
+
+
+  template <int dim>
+  std::vector<unsigned int>
+  create_random_cell_ordering(const DoFHandler<dim> &dof,
+                              const unsigned int     level)
+  {
+    const unsigned int n_cells = dof.get_triangulation().n_cells(level);
+
+    std::vector<unsigned int> ordered_cells;
+    ordered_cells.reserve(n_cells);
+
+    typename DoFHandler<dim>::cell_iterator cell = dof.begin(level);
+    typename DoFHandler<dim>::cell_iterator endc = dof.end(level);
+    for (; cell != endc; ++cell)
+      ordered_cells.push_back(cell->index());
+
+    // shuffle the elements
+    std::mt19937 random_number_generator;
+    for (unsigned int i = 1; i < n_cells; ++i)
       {
-        const Tensor<1, dim> diff = c2->center() - c1->center();
-        return (diff * dir > 0);
+        // get a random number between 0 and i (inclusive)
+        const unsigned int j =
+          std::uniform_int_distribution<>(0, i)(random_number_generator);
+
+        // if possible, swap the elements
+        if (i != j)
+          std::swap(ordered_cells[i], ordered_cells[j]);
       }
 
-    private:
-      /**
-       * Flow direction.
-       */
-      const Tensor<1, dim> dir;
-    };
+    return ordered_cells;
+  }
 
-    // Functions for creating permutation of cells for output and Block
-    // smoothers
-    template <int dim>
-    std::vector<unsigned int>
-    create_downstream_order(const DoFHandler<dim> &dof,
-                            const Tensor<1, dim>   direction,
-                            const unsigned int     level)
-    {
-      std::vector<typename DoFHandler<dim>::level_cell_iterator> ordered_cells;
-      ordered_cells.reserve(dof.get_triangulation().n_cells(level));
-      const CompareDownstream<typename DoFHandler<dim>::level_cell_iterator,
-                              dim>
-        comparator(direction);
+  template <int dim>
+  std::vector<unsigned int>
+  create_random_cell_ordering(const DoFHandler<dim> &dof)
+  {
+    const unsigned int n_cells = dof.get_triangulation().n_active_cells();
 
-      typename DoFHandler<dim>::level_cell_iterator cell = dof.begin(level);
-      typename DoFHandler<dim>::level_cell_iterator endc = dof.end(level);
-      for (; cell != endc; ++cell)
-        ordered_cells.push_back(cell);
+    std::vector<unsigned int> ordered_cells;
+    ordered_cells.reserve(n_cells);
 
-      std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
+    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
+    typename DoFHandler<dim>::active_cell_iterator endc = dof.end();
+    for (; cell != endc; ++cell)
+      ordered_cells.push_back(cell->index());
 
-      std::vector<unsigned> ordered_indices;
-      ordered_indices.reserve(dof.get_triangulation().n_cells(level));
+    // shuffle the elements
+    std::mt19937 random_number_generator;
+    for (unsigned int i = 1; i < n_cells; ++i)
+      {
+        // get a random number between 0 and i (inclusive)
+        const unsigned int j =
+          std::uniform_int_distribution<>(0, i)(random_number_generator);
 
-      for (unsigned int i = 0; i < ordered_cells.size(); ++i)
-        ordered_indices.push_back(ordered_cells[i]->index());
+        // if possible, swap the elements
+        if (i != j)
+          std::swap(ordered_cells[i], ordered_cells[j]);
+      }
 
-      return ordered_indices;
-    }
-
-    template <int dim>
-    std::vector<unsigned int>
-    create_downstream_order(const DoFHandler<dim> &dof,
-                            const Tensor<1, dim>   direction)
-    {
-      std::vector<typename DoFHandler<dim>::active_cell_iterator> ordered_cells;
-      ordered_cells.reserve(dof.get_triangulation().n_active_cells());
-      const CompareDownstream<typename DoFHandler<dim>::active_cell_iterator,
-                              dim>
-        comparator(direction);
-
-      typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-      typename DoFHandler<dim>::active_cell_iterator endc = dof.end();
-      for (; cell != endc; ++cell)
-        ordered_cells.push_back(cell);
-
-      std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
-
-      std::vector<unsigned int> ordered_indices;
-      ordered_indices.reserve(dof.get_triangulation().n_active_cells());
-
-      for (unsigned int i = 0; i < ordered_cells.size(); ++i)
-        ordered_indices.push_back(ordered_cells[i]->index());
-
-      return ordered_indices;
-    }
+    return ordered_cells;
+  }
 
 
 
-    template <int dim>
-    std::vector<unsigned int> create_random_order(const DoFHandler<dim> &dof,
-                                                  const unsigned int     level)
-    {
-      const unsigned int n_cells = dof.get_triangulation().n_cells(level);
-
-      std::vector<unsigned int> ordered_cells;
-      ordered_cells.reserve(n_cells);
-
-      typename DoFHandler<dim>::cell_iterator cell = dof.begin(level);
-      typename DoFHandler<dim>::cell_iterator endc = dof.end(level);
-      for (; cell != endc; ++cell)
-        ordered_cells.push_back(cell->index());
-
-      // shuffle the elements; the following is essentially std::shuffle (which
-      // is new in C++11) but with a boost URNG
-      ::boost::mt19937 random_number_generator;
-      for (unsigned int i = 1; i < n_cells; ++i)
-        {
-          // get a random number between 0 and i (inclusive)
-          const unsigned int j =
-            ::boost::random::uniform_int_distribution<>(0, i)(
-              random_number_generator);
-
-          // if possible, swap the elements
-          if (i != j)
-            std::swap(ordered_cells[i], ordered_cells[j]);
-        }
-
-      return ordered_cells;
-    }
-
-    template <int dim>
-    std::vector<unsigned int> create_random_order(const DoFHandler<dim> &dof)
-    {
-      const unsigned int n_cells = dof.get_triangulation().n_active_cells();
-
-      std::vector<unsigned int> ordered_cells;
-      ordered_cells.reserve(n_cells);
-
-      typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-      typename DoFHandler<dim>::active_cell_iterator endc = dof.end();
-      for (; cell != endc; ++cell)
-        ordered_cells.push_back(cell->index());
-
-      // shuffle the elements; the following is essentially std::shuffle (which
-      // is new in C++11) but with a boost URNG
-      ::boost::mt19937 random_number_generator;
-      for (unsigned int i = 1; i < n_cells; ++i)
-        {
-          // get a random number between 0 and i (inclusive)
-          const unsigned int j =
-            ::boost::random::uniform_int_distribution<>(0, i)(
-              random_number_generator);
-
-          // if possible, swap the elements
-          if (i != j)
-            std::swap(ordered_cells[i], ordered_cells[j]);
-        }
-
-      return ordered_cells;
-    }
-
-  } // namespace
-
-
-
-  // RHS and boundary is an adaptation from one in
-  // Finite Elements and Fast Iterative Solvers: with Applications
-  // in Incompressible Fluid Dynamics
   template <int dim>
   class RightHandSide : public Function<dim>
   {
@@ -348,9 +331,6 @@ namespace Step100
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
                             const unsigned int             component = 0) const;
-
-  private:
-    static const Point<dim> center_point;
   };
 
   template <int dim>
@@ -440,15 +420,15 @@ namespace Step100
   }
 
   template <int dim>
-  double delta_value(const double         hk,
-                     const double         eps,
-                     const Tensor<1, dim> dir,
-                     const double         pk)
+  double compute_stabilization_delta(const double         hk,
+                                     const double         eps,
+                                     const Tensor<1, dim> dir,
+                                     const double         pk)
   {
     // Value defined in 'On discontinuity–capturing methods for
     // convection–diffusion equations'
-    double Peclet = dir.norm() * hk / (2.0 * eps * pk);
-    double coth =
+    const double Peclet = dir.norm() * hk / (2.0 * eps * pk);
+    const double coth =
       (1.0 + std::exp(-2.0 * Peclet)) / (1.0 - std::exp(-2.0 * Peclet));
 
     return hk / (2.0 * dir.norm() * pk) * (coth - 1.0 / Peclet);
@@ -480,9 +460,8 @@ namespace Step100
     Triangulation<dim> triangulation;
     DoFHandler<dim>    dof_handler;
 
-    FE_Q<dim>     fe;
-    MappingQ<dim> mapping;
-    unsigned int  quad_degree;
+    const FE_Q<dim>     fe;
+    const MappingQ<dim> mapping;
 
     AffineConstraints<double> constraints;
 
@@ -499,11 +478,17 @@ namespace Step100
     MGLevelObject<SparseMatrix<double>> mg_interface_in;
     MGLevelObject<SparseMatrix<double>> mg_interface_out;
 
+    mg::Matrix<Vector<double>> mg_matrix;
+    mg::Matrix<Vector<double>> mg_interface_matrix_in;
+    mg::Matrix<Vector<double>> mg_interface_matrix_out;
+
+
     MGConstrainedDoFs mg_constrained_dofs;
 
-    Settings       settings;
     const double   epsilon;
     Tensor<1, dim> advection_direction;
+
+    const Settings settings;
   };
 
 
@@ -514,13 +499,9 @@ namespace Step100
     , dof_handler(triangulation)
     , fe(settings.fe_degree)
     , mapping(settings.fe_degree)
-    , quad_degree(2 * fe.degree + 2)
-    , settings(settings)
     , epsilon(0.005)
+    , settings(settings)
   {
-    // Set Advection direction (problem is an adaptation from one in
-    // Finite Elements and Fast Iterative Solvers: with Applications
-    // in Incompressible Fluid Dynamics)
     advection_direction[0] = -std::sin(numbers::PI / 6.0);
     if (dim > 1)
       advection_direction[1] = std::cos(numbers::PI / 6.0);
@@ -571,13 +552,18 @@ namespace Step100
     // Renumber DoFs on each level in downstream or upstream direction if
     // needed. This is only necessary for point smoothers (SOR and Jacobi) as
     // the block smoothers operate on cells (see create_smoother()):
-    if (settings.smoother_type == "sor" || settings.smoother_type == "jacobi")
+    if (settings.smoother_type == "SOR" || settings.smoother_type == "Jacobi")
       {
-        if (settings.dof_renum == "downstream" ||
-            settings.dof_renum == "upstream")
+        if (settings.dof_renumbering ==
+              Settings::DoFRenumberingStrategy::downstream ||
+            settings.dof_renumbering ==
+              Settings::DoFRenumberingStrategy::upstream)
           {
             const Tensor<1, dim> direction =
-              (settings.dof_renum == "upstream" ? -1.0 : 1.0) *
+              (settings.dof_renumbering ==
+                   Settings::DoFRenumberingStrategy::upstream ?
+                 -1.0 :
+                 1.0) *
               advection_direction;
 
             for (unsigned int level = 0; level < n_levels; ++level)
@@ -586,7 +572,8 @@ namespace Step100
                                          direction,
                                          /*dof_wise_renumbering = */ true);
           }
-        else if (settings.dof_renum == "random")
+        else if (settings.dof_renumbering ==
+                 Settings::DoFRenumberingStrategy::random)
           {
             for (unsigned int level = 0; level < n_levels; ++level)
               DoFRenumbering::random(dof_handler, level);
@@ -598,9 +585,7 @@ namespace Step100
     mg_constrained_dofs.clear();
     mg_constrained_dofs.initialize(dof_handler);
 
-    std::set<types::boundary_id> dirichlet_boundary_ids = {0, 1};
-    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                       dirichlet_boundary_ids);
+    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler, {0, 1});
 
     mg_matrices.resize(0, n_levels - 1);
     mg_matrices.clear_elements();
@@ -650,12 +635,12 @@ namespace Step100
     const unsigned int dofs_per_cell =
       scratch_data.fe_values.get_fe().dofs_per_cell;
     copy_data.dofs_per_cell = dofs_per_cell;
+    copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 
     const unsigned int n_q_points =
       scratch_data.fe_values.get_quadrature().size();
-    copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 
-    if (!cell->is_level_cell())
+    if (cell->is_level_cell() == false)
       copy_data.cell_rhs.reinit(dofs_per_cell);
 
     copy_data.local_dof_indices.resize(dofs_per_cell);
@@ -669,11 +654,11 @@ namespace Step100
     right_hand_side.value_list(scratch_data.fe_values.get_quadrature_points(),
                                rhs_values);
 
-    const double delta = settings.with_sd ? delta_value(cell->diameter(),
-                                                        epsilon,
-                                                        advection_direction,
-                                                        settings.fe_degree) :
-                                            0.0;
+    const double delta = settings.with_streamline_diffusion ?
+                           compute_stabilization_delta(cell->diameter(),
+                                                       epsilon,
+                                                       advection_direction,
+                                                       settings.fe_degree) : 0.0;
 
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -689,7 +674,7 @@ namespace Step100
                  scratch_data.fe_values.shape_value(i, q_point)) *
                   scratch_data.fe_values.JxW(q_point);
 
-              if (settings.with_sd)
+              if (settings.with_streamline_diffusion)
                 copy_data.cell_matrix(i, j) +=
                   delta *
                     (advection_direction *
@@ -703,12 +688,12 @@ namespace Step100
                      scratch_data.fe_values.shape_grad(i, q_point)) *
                     scratch_data.fe_values.JxW(q_point);
             }
-          if (!cell->is_level_cell())
+          if (cell->is_level_cell() == false)
             {
               copy_data.cell_rhs(i) +=
                 scratch_data.fe_values.shape_value(i, q_point) *
                 rhs_values[q_point] * scratch_data.fe_values.JxW(q_point);
-              if (settings.with_sd)
+              if (settings.with_streamline_diffusion)
                 copy_data.cell_rhs(i) +=
                   delta * rhs_values[q_point] * advection_direction *
                   scratch_data.fe_values.shape_grad(i, q_point) *
@@ -743,7 +728,7 @@ namespace Step100
                           dof_handler.end(),
                           cell_worker_active,
                           copier_active,
-                          ScratchData<dim>(fe, quad_degree),
+                          ScratchData<dim>(fe, fe.degree + 1),
                           CopyData(),
                           MeshWorker::assemble_own_cells);
 
@@ -754,11 +739,10 @@ namespace Step100
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {
-        IndexSet dofset;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      dofset);
-        boundary_constraints[level].reinit(dofset);
+        IndexSet locally_owned_level_dof_indices;
+        DoFTools::extract_locally_relevant_level_dofs(
+          dof_handler, level, locally_owned_level_dof_indices);
+        boundary_constraints[level].reinit(locally_owned_level_dof_indices);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));
         boundary_constraints[level].add_lines(
@@ -804,7 +788,7 @@ namespace Step100
                           dof_handler.end_mg(),
                           cell_worker_mg,
                           copier_mg,
-                          ScratchData<dim>(fe, quad_degree),
+                          ScratchData<dim>(fe, fe.degree + 1),
                           CopyData(),
                           MeshWorker::assemble_own_cells);
   }
@@ -814,9 +798,9 @@ namespace Step100
   std::unique_ptr<MGSmoother<Vector<double>>>
   AdvectionProblem<dim>::create_smoother()
   {
-    if (settings.smoother_type == "sor")
+    if (settings.smoother_type == "SOR")
       {
-        typedef PreconditionSOR<SparseMatrix<double>> Smoother;
+        using Smoother = PreconditionSOR<SparseMatrix<double>>;
 
         auto smoother =
           std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
@@ -828,10 +812,10 @@ namespace Step100
         smoother->set_steps(2);
         return smoother;
       }
-    else if (settings.smoother_type == "jacobi")
+    else if (settings.smoother_type == "Jacobi")
       {
-        typedef PreconditionJacobi<SparseMatrix<double>> Smoother;
-        auto                                             smoother =
+        using Smoother = PreconditionJacobi<SparseMatrix<double>>;
+        auto smoother =
           std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
                                                         Smoother,
                                                         Vector<double>>>();
@@ -841,11 +825,12 @@ namespace Step100
         smoother->set_steps(4);
         return smoother;
       }
-    else if (settings.smoother_type == "block sor")
+    else if (settings.smoother_type == "block SOR")
       {
-        typedef RelaxationBlockSOR<SparseMatrix<double>, double, Vector<double>>
-          Smoother;
+        using Smoother =
+          RelaxationBlockSOR<SparseMatrix<double>, double, Vector<double>>;
 
+        // TODO: try and remove static
         static MGLevelObject<typename Smoother::AdditionalData> smoother_data;
         smoother_data.resize(0, triangulation.n_levels() - 1);
 
@@ -859,23 +844,34 @@ namespace Step100
             smoother_data[level].inversion = PreconditionBlockBase<double>::svd;
 
             std::vector<unsigned int> ordered_indices;
-            if (settings.dof_renum == "downstream")
-              ordered_indices = create_downstream_order(dof_handler,
-                                                        advection_direction,
-                                                        level);
-            else if (settings.dof_renum == "upstream")
-              ordered_indices =
-                create_downstream_order(dof_handler,
-                                        -1.0 * advection_direction,
-                                        level);
-            else if (settings.dof_renum == "random")
-              ordered_indices = create_random_order(dof_handler, level);
-            else if (settings.dof_renum == "none")
+            switch (settings.dof_renumbering)
               {
-                // Do nothing
+                case Settings::DoFRenumberingStrategy::downstream:
+                  ordered_indices =
+                    create_downstream_cell_ordering(dof_handler,
+                                                    advection_direction,
+                                                    level);
+                  break;
+
+                case Settings::DoFRenumberingStrategy::upstream:
+                  ordered_indices =
+                    create_downstream_cell_ordering(dof_handler,
+                                                    -1.0 * advection_direction,
+                                                    level);
+                  break;
+
+                case Settings::DoFRenumberingStrategy::random:
+                  ordered_indices =
+                    create_random_cell_ordering(dof_handler, level);
+                  break;
+
+                case Settings::DoFRenumberingStrategy::none: // Do nothing
+                  break;
+
+                default:
+                  AssertThrow(false, ExcNotImplemented());
+                  break;
               }
-            else
-              AssertThrow(false, ExcNotImplemented());
 
             smoother_data[level].order =
               std::vector<std::vector<unsigned int>>(1, ordered_indices);
@@ -889,13 +885,12 @@ namespace Step100
         smoother->set_steps(1);
         return smoother;
       }
-    else if (settings.smoother_type == "block jacobi")
+    else if (settings.smoother_type == "block Jacobi")
       {
-        typedef RelaxationBlockJacobi<SparseMatrix<double>,
-                                      double,
-                                      Vector<double>>
-          Smoother;
+        using Smoother =
+          RelaxationBlockJacobi<SparseMatrix<double>, double, Vector<double>>;
 
+        // TODO: try and remove static
         static MGLevelObject<typename Smoother::AdditionalData> smoother_data;
         smoother_data.resize(0, triangulation.n_levels() - 1);
 
@@ -909,23 +904,34 @@ namespace Step100
             smoother_data[level].inversion = PreconditionBlockBase<double>::svd;
 
             std::vector<unsigned int> ordered_indices;
-            if (settings.dof_renum == "downstream")
-              ordered_indices = create_downstream_order(dof_handler,
-                                                        advection_direction,
-                                                        level);
-            else if (settings.dof_renum == "upstream")
-              ordered_indices =
-                create_downstream_order(dof_handler,
-                                        -1.0 * advection_direction,
-                                        level);
-            else if (settings.dof_renum == "random")
-              ordered_indices = create_random_order(dof_handler, level);
-            else if (settings.dof_renum == "none")
+            switch (settings.dof_renumbering)
               {
-                // Do nothing
+                case Settings::DoFRenumberingStrategy::downstream:
+                  ordered_indices =
+                    create_downstream_cell_ordering(dof_handler,
+                                                    advection_direction,
+                                                    level);
+                  break;
+
+                case Settings::DoFRenumberingStrategy::upstream:
+                  ordered_indices =
+                    create_downstream_cell_ordering(dof_handler,
+                                                    -1.0 * advection_direction,
+                                                    level);
+                  break;
+
+                case Settings::DoFRenumberingStrategy::random:
+                  ordered_indices =
+                    create_random_cell_ordering(dof_handler, level);
+                  break;
+
+                case Settings::DoFRenumberingStrategy::none: // Do nothing
+                  break;
+
+                default:
+                  AssertThrow(false, ExcNotImplemented());
+                  break;
               }
-            else
-              AssertThrow(false, ExcNotImplemented());
 
             smoother_data[level].order =
               std::vector<std::vector<unsigned int>>(1, ordered_indices);
@@ -947,15 +953,13 @@ namespace Step100
   template <int dim>
   void AdvectionProblem<dim>::solve()
   {
-    Timer time;
-
-    const double       solve_tol = 1e-8 * system_rhs.l2_norm();
-    const unsigned int max_iters = 200;
-    SolverControl      solver_control(max_iters, solve_tol, true, true);
+    const unsigned int max_iters       = 200;
+    const double       solve_tolerance = 1e-8 * system_rhs.l2_norm();
+    SolverControl      solver_control(max_iters, solve_tolerance, true, true);
     solver_control.enable_history_data();
 
-    typedef MGTransferPrebuilt<Vector<double>> Transfer;
-    Transfer                                   mg_transfer(mg_constrained_dofs);
+    using Transfer = MGTransferPrebuilt<Vector<double>>;
+    Transfer mg_transfer(mg_constrained_dofs);
     mg_transfer.build_matrices(dof_handler);
 
     FullMatrix<double> coarse_matrix;
@@ -963,11 +967,12 @@ namespace Step100
     MGCoarseGridHouseholder<double, Vector<double>> coarse_grid_solver;
     coarse_grid_solver.initialize(coarse_matrix);
 
-    std::unique_ptr<MGSmoother<Vector<double>>> mg_smoother = create_smoother();
+    const std::unique_ptr<MGSmoother<Vector<double>>> mg_smoother =
+      create_smoother();
 
-    mg::Matrix<Vector<double>> mg_matrix(mg_matrices);
-    mg::Matrix<Vector<double>> mg_interface_matrix_in(mg_interface_in);
-    mg::Matrix<Vector<double>> mg_interface_matrix_out(mg_interface_out);
+    mg_matrix.initialize(mg_matrices);
+    mg_interface_matrix_in.initialize(mg_interface_in);
+    mg_interface_matrix_out.initialize(mg_interface_out);
 
     Multigrid<Vector<double>> mg(
       mg_matrix, coarse_grid_solver, mg_transfer, *mg_smoother, *mg_smoother);
@@ -977,12 +982,12 @@ namespace Step100
                                                                  mg,
                                                                  mg_transfer);
 
-
-    std::cout << "     Solving with GMRES to tol " << solve_tol << "..."
+    std::cout << "     Solving with GMRES to tol " << solve_tolerance << "..."
               << std::endl;
     SolverGMRES<> solver(solver_control);
 
-    time.restart();
+    Timer time;
+    time.start();
     solver.solve(system_matrix, solution, system_rhs, preconditioner);
     time.stop();
 
@@ -998,10 +1003,6 @@ namespace Step100
   template <int dim>
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, "solution");
-
     // Here we generate an index for each cell to visualize the ordering used
     // by the smoothers. Note that we do this only for the active cells
     // instead of the levels, where the smoothers are actually used. For the
@@ -1011,40 +1012,46 @@ namespace Step100
     // that).
     const unsigned int n_active_cells = triangulation.n_active_cells();
     Vector<double>     cell_indices(n_active_cells);
-
     {
       // First generate a permutation vector for the cell indices:
       std::vector<unsigned int> ordered_indices;
-      if (settings.dof_renum == "downstream")
+      switch (settings.dof_renumbering)
         {
-          ordered_indices =
-            create_downstream_order(dof_handler, advection_direction);
+          case Settings::DoFRenumberingStrategy::downstream:
+            ordered_indices =
+              create_downstream_cell_ordering(dof_handler, advection_direction);
+            break;
+
+          case Settings::DoFRenumberingStrategy::upstream:
+            ordered_indices =
+              create_downstream_cell_ordering(dof_handler,
+                                              -1.0 * advection_direction);
+            break;
+
+          case Settings::DoFRenumberingStrategy::random:
+            ordered_indices = create_random_cell_ordering(dof_handler);
+            break;
+
+          case Settings::DoFRenumberingStrategy::none:
+            ordered_indices.resize(n_active_cells);
+            for (unsigned int i = 0; i < n_active_cells; ++i)
+              ordered_indices[i] = i;
+            break;
+
+          default:
+            AssertThrow(false, ExcNotImplemented());
+            break;
         }
-      else if (settings.dof_renum == "upstream")
-        {
-          ordered_indices =
-            create_downstream_order(dof_handler, -1.0 * advection_direction);
-        }
-      else if (settings.dof_renum == "random")
-        {
-          ordered_indices = create_random_order(dof_handler);
-        }
-      else if (settings.dof_renum == "none")
-        {
-          ordered_indices.resize(n_active_cells);
-          for (unsigned int i = 0; i < n_active_cells; ++i)
-            ordered_indices[i] = i;
-        }
-      else
-        AssertThrow(false, ExcNotImplemented());
 
       // Then copy the permutation in ordered_indices into an output vector:
       for (unsigned int i = 0; i < n_active_cells; ++i)
         cell_indices(ordered_indices[i]) = static_cast<double>(i);
     }
 
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "solution");
     data_out.add_data_vector(cell_indices, "cell_index");
-
     data_out.build_patches();
 
     std::string filename =
@@ -1091,18 +1098,19 @@ namespace Step100
         std::cout << std::endl;
       }
   }
-} // namespace Step100
+} // namespace Step63
+
 
 
 int main(int argc, char *argv[])
 {
   try
     {
-      Step100::Settings settings;
-      if (!settings.try_parse((argc > 1) ? (argv[1]) : ""))
+      Step63::Settings settings;
+      if (!settings.get_parameters((argc > 1) ? (argv[1]) : ""))
         return 0;
 
-      Step100::AdvectionProblem<2> advection_problem_2d(settings);
+      Step63::AdvectionProblem<2> advection_problem_2d(settings);
       advection_problem_2d.run();
     }
   catch (std::exception &exc)

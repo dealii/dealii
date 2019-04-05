@@ -1,14 +1,14 @@
 # Finite Element degree
-set fe degree       =  1 
+set Fe degree = 1 
 
-# Smoother Type: sor|jacobi|block sor|block jacobi
-set smoother type   = block sor
+# Smoother Type: SOR|Jacobi|block SOR|block Jacobi
+set Smoother type = block SOR
 
-# Dof renumbering: none|random|downstream|upstream
-set dof renumbering = downstream 
+# DoF renumbering: no|downstream|upstream|random
+set DoF renumbering = downstream 
 
 # With streamline diffusion: true|false
-set with sd         = true
+set With streamline diffusion = true
 
 # Output: true|false
-set output          = false
+set Output = false
