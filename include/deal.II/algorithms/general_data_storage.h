@@ -98,9 +98,11 @@ public:
   /**
    * Clear all data stored in this class instance.
    *
-   * After this function is called, all copied data owned by this class will
-   * go out of scope. Furthermore, all scoping requirements for data referenced
-   * by this class instance will be lifted.
+   * When you call this function, it destroys all objects you asked to be stored
+   * as copies, and it forgets about the references to data you asked to store
+   * by reference. As a consequence, you are now free to destroy the objects to
+   * which references were stored at whatever time you want -- before or after
+   * the current `GeneralDataStorage` object is destroyed.
    *
    * To clarify this point, consider the following small example:
    *
@@ -289,7 +291,7 @@ public:
   stores_object_with_name(const std::string &name) const;
 
   /**
-   * Find out if we store an object with given name.
+   * Remove the object with given name.
    */
   void
   remove_object_with_name(const std::string &name);
