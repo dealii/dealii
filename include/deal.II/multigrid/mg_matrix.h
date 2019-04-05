@@ -35,8 +35,8 @@ namespace mg
 {
   /**
    * Multilevel matrix. This matrix stores an MGLevelObject of
-   * LinearOpetors. It implements the interface defined in MGMatrixBase, so
-   * that it can be used as a matrix in Multigrid.
+   * LinearOperator objects. It implements the interface defined in
+   * MGMatrixBase, so that it can be used as a matrix in Multigrid.
    *
    * @author Guido Kanschat
    * @date 2002, 2010
