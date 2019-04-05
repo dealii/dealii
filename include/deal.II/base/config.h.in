@@ -61,6 +61,7 @@
 #cmakedefine DEAL_II_WITH_SCALAPACK
 #cmakedefine DEAL_II_WITH_SLEPC
 #cmakedefine DEAL_II_WITH_SUNDIALS
+#cmakedefine DEAL_II_WITH_SYMENGINE
 #cmakedefine DEAL_II_WITH_THREADS
 #cmakedefine DEAL_II_WITH_TRILINOS
 #cmakedefine DEAL_II_WITH_UMFPACK
@@ -176,6 +177,9 @@
 
 /* cmake/modules/FindSUNDIALS.cmake */
 #cmakedefine DEAL_II_SUNDIALS_WITH_IDAS
+
+/* cmake/modules/FindSYMENGINE.cmake */
+#cmakedefine DEAL_II_SYMENGINE_WITH_LLVM
 
 /* cmake/configure/configure_1_threads.cmake */
 #cmakedefine DEAL_II_USE_MT_POSIX
