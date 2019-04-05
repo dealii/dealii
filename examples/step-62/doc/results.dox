@@ -1,0 +1,67 @@
+<h1>Results</h1>
+
+The results are analyzed in the 
+[jupyter notebook](https://github.com/dangars/dealii/blob/phononic-cavity/examples/step-62/step-62.ipynb)
+with the following code
+@code{.py}
+h5_file = h5py.File('results.h5', 'r')
+data = h5_file['data']
+
+# Gaussian function that we use to fit the resonance
+def resonance_f(freq, freq_m, quality_factor, max_amplitude):
+    omega = 2 * constants.pi * freq
+    omega_m = 2 * constants.pi * freq_m
+    gamma = omega_m / quality_factor
+    return max_amplitude * omega_m**2 * gamma**2 / (((omega_m**2 - omega**2)**2 + gamma**2 * omega**2))
+
+frequency = data['displacement']['frequency'][...]
+# Average the probe points
+displacement = np.mean(data['displacement']['displacement'], axis=0)
+calibration_displacement = np.mean(data['calibration']['displacement'], axis=0)
+reflection_coefficient = displacement / calibration_displacement
+reflectivity = (np.abs(np.mean(data['displacement']['displacement'][...]**2, axis=0))/
+                np.abs(np.mean(data['calibration']['displacement'][...]**2, axis=0)))
+
+try:
+    x_data = frequency
+    y_data = reflectivity
+    quality_factor_guess = 1e3
+    freq_guess = x_data[np.argmax(y_data)]
+    amplitude_guess = np.max(y_data)
+    fit_result, covariance = scipy.optimize.curve_fit(resonance_f, x_data, y_data,
+                                                      [freq_guess, quality_factor_guess, amplitude_guess])
+    freq_m = fit_result[0]
+    quality_factor = np.abs(fit_result[1])
+    max_amplitude = fit_result[2]
+    y_data_fit = resonance_f(x_data, freq_m, quality_factor, max_amplitude)
+
+    fig = plt.figure()
+    plt.plot(frequency / 1e6, reflectivity, frequency / 1e6, y_data_fit)
+    plt.xlabel('frequency (MHz)')
+    plt.ylabel('amplitude^2 (a.u.)')
+    plt.title('Transmission\n' + 'freq = ' + "%.7g" % (freq_guess / 1e6) + 'MHz Q = ' + "%.6g" % quality_factor)
+except:
+    fig = plt.figure()
+    plt.plot(frequency / 1e6, reflectivity)
+    plt.xlabel('frequency (MHz)')
+    plt.ylabel('amplitude^2 (a.u.)')
+    plt.title('Transmission')
+
+fig = plt.figure()
+plt.plot(frequency / 1e6, np.angle(reflection_coefficient))
+plt.xlabel('frequency (MHz)')
+plt.ylabel('phase (rad)')
+plt.title('Phase (reflection coefficient)\n')
+
+plt.show()
+h5_file.close()
+@endcode
+
+The micropillar cavity exhibits a mechanical resonance at 20MHz and a quality factor of 5091
+
+<img alt="Phononic superlattice cavity" src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.05.svg?sanitize=true" height="400" />
+<img alt="Phononic superlattice cavity" src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.06.svg?sanitize=true" height="400" />
+
+To obtain the phononic bandgap around the mechanical resonance, the parameter frequency range can be set to 16 MHz.
+
+<img alt="Phononic superlattice cavity" src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.07.svg?sanitize=true" height="400" />
