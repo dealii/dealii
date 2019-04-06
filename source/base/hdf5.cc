@@ -267,10 +267,10 @@ namespace HDF5
       if (mpi)
         {
 #  ifdef DEAL_II_WITH_MPI
-          herr_t ret;
           plist = H5Pcreate(H5P_DATASET_XFER);
           Assert(plist >= 0, ExcInternalError());
-          ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+          const herr_t ret = H5Pset_dxpl_mpio(plist, H5FD_MPIO_COLLECTIVE);
+          (void)ret;
           Assert(ret >= 0, ExcInternalError());
 #  else
           AssertThrow(false, ExcNotImplemented());
@@ -304,6 +304,7 @@ namespace HDF5
         {
 #  ifdef DEAL_II_WITH_MPI
           herr_t ret;
+          (void)ret;
           if (query_io_mode)
             {
               ret = H5Pget_mpio_actual_io_mode(plist, &io_mode);
