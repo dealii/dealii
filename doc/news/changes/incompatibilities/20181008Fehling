@@ -1,6 +1,0 @@
-Changed: The function previously called
-FECollection::find_least_face_dominating_fe()
-is now named
-FECollection::find_least_face_dominating_fe_in_collection().
-<br>
-(Marc Fehling, 2018/10/08)

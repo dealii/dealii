@@ -1,5 +1,0 @@
-New: Member function hp::FECollection::find_face_dominating_fe_in_subset()
-returns the index of the most dominating finite element out of a given
-set of indices.
-<br>
-(Marc Fehling, 2018/10/05)

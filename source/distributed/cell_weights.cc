@@ -149,10 +149,9 @@ namespace parallel
               fe_indices_children.insert(
                 cell->child(child_index)->active_fe_index());
 
-            fe_index =
-              dof_handler->get_fe_collection()
-                .find_least_dominating_fe_in_collection(fe_indices_children,
-                                                        /*codim=*/0);
+            unsigned int fe_index =
+              dof_handler->get_fe_collection().find_dominating_fe_extended(
+                fe_indices_children, /*codim=*/0);
 
             Assert(fe_index != numbers::invalid_unsigned_int,
                    ExcMessage(

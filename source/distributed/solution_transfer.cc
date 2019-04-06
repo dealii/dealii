@@ -263,8 +263,8 @@ namespace parallel
                 DoFHandlerType::space_dimension>::CELL_COARSEN:
                 {
                   // In case of coarsening, we need to find a suitable fe index
-                  // for the parent cell. We choose the 'least face dominating
-                  // fe index' on all children from the associated FECollection.
+                  // for the parent cell. We choose the 'least dominating fe'
+                  // on all children from the associated FECollection.
                   std::set<unsigned int> fe_indices_children;
                   for (unsigned int child_index = 0;
                        child_index < GeometryInfo<dim>::max_children_per_cell;
@@ -273,8 +273,8 @@ namespace parallel
                       cell->child(child_index)->active_fe_index());
 
                   fe_index = dof_handler->get_fe_collection()
-                               .find_least_dominating_fe_in_collection(
-                                 fe_indices_children, /*codim=*/0);
+                               .find_dominating_fe_extended(fe_indices_children,
+                                                            /*codim=*/0);
 
                   Assert(
                     fe_index != numbers::invalid_unsigned_int,
