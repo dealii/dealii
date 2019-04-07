@@ -17,6 +17,7 @@ DEAL::Data post-merge:
 DEAL::value		double
 DEAL::value_2		double
 DEAL::Size: 2
+DEAL::Ambiguous construction
 DEAL::Try to overwrite existing entry: Copy
 DEAL::Try to overwrite existing entry: Reference
 DEAL::Fetch non-existing entry

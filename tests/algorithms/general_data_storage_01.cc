@@ -138,6 +138,29 @@ main()
     deallog << "Size: " << data.size() << std::endl;
   }
 
+  deallog << "Ambiguous construction" << std::endl;
+  {
+    // Pass Arguments by lvalue reference
+    {
+      const double  val_1 = 1.0;
+      const double &val_2 =
+        data.get_or_add_object_with_name<double>("value", val_1);
+    }
+
+    // Pass Arguments by rvalue reference
+    {
+      double        val_1 = 1.0;
+      const double &val_2 =
+        data.get_or_add_object_with_name<double>("value", std::move(val_1));
+    }
+
+    // Pass Arguments ambiguously
+    {
+      const double &val_2 =
+        data.get_or_add_object_with_name<double>("value", 1.0);
+    }
+  }
+
 
   deal_II_exceptions::disable_abort_on_exception();
 
