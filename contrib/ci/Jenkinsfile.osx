@@ -88,6 +88,7 @@ pipeline
             {
               sh "echo \"building on node ${env.NODE_NAME}\""
               sh '''#!/bin/bash
+                    set -e
                     mkdir build && cd build
                     cmake \
                       -D DEAL_II_WITH_MPI=OFF \
