@@ -94,6 +94,7 @@ pipeline
                       -D DEAL_II_CXX_FLAGS='-Werror' \
                       -D CMAKE_BUILD_TYPE=Debug \
                       $WORKSPACE/ && make -j 4
+                    make test # quicktests
                  '''
             }
           }
