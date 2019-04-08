@@ -244,9 +244,11 @@ public:
    * arguments. For this function, the @p arguments are passed as
    * <tt>lvalue</tt> references.
    */
-  template <typename Type, typename... Args>
+  template <typename Type, typename Arg, typename... Args>
   Type &
-  get_or_add_object_with_name(const std::string &name, Args &... arguments);
+  get_or_add_object_with_name(const std::string &name,
+                              Arg &              argument,
+                              Args &... arguments);
 
   /**
    * Return a reference to the object with given name. If the object does
@@ -258,9 +260,11 @@ public:
    * arguments. In contrast to the previous function of the same name, for
    * this function the @p arguments are passed as <tt>rvalue</tt> references.
    */
-  template <typename Type, typename... Args>
+  template <typename Type, typename Arg, typename... Args>
   Type &
-  get_or_add_object_with_name(const std::string &name, Args &&... arguments);
+  get_or_add_object_with_name(const std::string &name,
+                              Arg &&             argument,
+                              Args &&... arguments);
 
   /**
    * Return a reference to the object with given name.
@@ -443,25 +447,29 @@ GeneralDataStorage::get_object_with_name(const std::string &name) const
 }
 
 
-template <typename Type, typename... Args>
+template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
+                                                Arg &              argument,
                                                 Args &... arguments)
 {
   if (!stores_object_with_name(name))
-    add_unique_copy(name, Type(arguments...));
+    add_unique_copy(name, Type(argument, arguments...));
 
   return get_object_with_name<Type>(name);
 }
 
 
-template <typename Type, typename... Args>
+template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
+                                                Arg &&             argument,
                                                 Args &&... arguments)
 {
   if (!stores_object_with_name(name))
-    add_unique_copy(name, Type(std::forward<Args>(arguments)...));
+    add_unique_copy(name,
+                    Type(std::forward<Arg>(argument),
+                         std::forward<Args>(arguments)...));
 
   return get_object_with_name<Type>(name);
 }
