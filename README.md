@@ -45,7 +45,7 @@ on how to set this up.
 License:
 --------
 
-Please see the file [./LICENSE](LICENSE) for details
+Please see the file [./LICENSE.md](LICENSE.md) for details
 
 Further information:
 --------------------
