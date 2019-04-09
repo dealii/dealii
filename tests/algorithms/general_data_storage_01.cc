@@ -145,6 +145,8 @@ main()
       const double  val_1 = 1.0;
       const double &val_2 =
         data.get_or_add_object_with_name<double>("value", val_1);
+      const std::string &str =
+        data.get_or_add_object_with_name<std::string>("empty string");
     }
 
     // Pass Arguments by rvalue reference
@@ -152,12 +154,16 @@ main()
       double        val_1 = 1.0;
       const double &val_2 =
         data.get_or_add_object_with_name<double>("value", std::move(val_1));
+      const std::string &str =
+        data.get_or_add_object_with_name<std::string>("empty string");
     }
 
     // Pass Arguments ambiguously
     {
       const double &val_2 =
         data.get_or_add_object_with_name<double>("value", 1.0);
+      const std::string &str =
+        data.get_or_add_object_with_name<std::string>("empty string");
     }
   }
 

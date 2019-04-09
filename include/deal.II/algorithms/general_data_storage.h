@@ -267,6 +267,13 @@ public:
                               Args &&... arguments);
 
   /**
+   * Same as above for default constructors.
+   */
+  template <typename Type>
+  Type &
+  get_or_add_object_with_name(const std::string &name);
+
+  /**
    * Return a reference to the object with given name.
    *
    * This function throws an exception if either an object with the given name
@@ -470,6 +477,17 @@ GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
     add_unique_copy(name,
                     Type(std::forward<Arg>(argument),
                          std::forward<Args>(arguments)...));
+
+  return get_object_with_name<Type>(name);
+}
+
+
+template <typename Type>
+Type &
+GeneralDataStorage::get_or_add_object_with_name(const std::string &name)
+{
+  if (!stores_object_with_name(name))
+    add_unique_copy(name, Type());
 
   return get_object_with_name<Type>(name);
 }
