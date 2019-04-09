@@ -84,7 +84,7 @@ Subscriptor::check_no_subscribers() const noexcept
                               std::string(map_entry.first);
             }
 
-          if (infostring == "")
+          if (infostring.empty())
             infostring = "<none>";
 
           AssertNothrow(counter == 0,
@@ -136,7 +136,7 @@ Subscriptor::subscribe(std::atomic<bool> *const validity,
     object_info = &typeid(*this);
   ++counter;
 
-  const std::string name = (id != "") ? id : unknown_subscriber;
+  const std::string name = (!id.empty()) ? id : unknown_subscriber;
 
   map_iterator it = counter_map.find(name);
   if (it == counter_map.end())
@@ -154,7 +154,7 @@ void
 Subscriptor::unsubscribe(std::atomic<bool> *const validity,
                          const std::string &      id) const
 {
-  const std::string name = (id != "") ? id : unknown_subscriber;
+  const std::string name = (!id.empty()) ? id : unknown_subscriber;
   if (counter == 0)
     {
       AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));

@@ -494,8 +494,8 @@ namespace
             // make sure we have a corresponding entry in the destination
             // object as well
             const std::string full_path =
-              (current_path == "" ? p->first :
-                                    current_path + path_separator + p->first);
+              (current_path.empty() ? p->first :
+                                      current_path + path_separator + p->first);
 
             const std::string new_value = p->second.get<std::string>("value");
             AssertThrow(destination.get_optional<std::string>(full_path) &&
@@ -533,7 +533,7 @@ namespace
           {
             // it must be a subsection
             read_xml_recursively(p->second,
-                                 (current_path == "" ?
+                                 (current_path.empty() ?
                                     p->first :
                                     current_path + path_separator + p->first),
                                  path_separator,

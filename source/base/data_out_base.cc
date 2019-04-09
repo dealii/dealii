@@ -5345,7 +5345,7 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "VECTORS ";
 
-        if (std::get<2>(nonscalar_data_range) != "")
+        if (!std::get<2>(nonscalar_data_range).empty())
           out << std::get<2>(nonscalar_data_range);
         else
           {
@@ -5580,7 +5580,7 @@ namespace DataOutBase
             // underscores unless a vector name has been specified
             out << "    <DataArray type=\"Float32\" Name=\"";
 
-            if (std::get<2>(nonscalar_data_range) != "")
+            if (!std::get<2>(nonscalar_data_range).empty())
               out << std::get<2>(nonscalar_data_range);
             else
               {
@@ -5811,7 +5811,7 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "    <DataArray type=\"Float32\" Name=\"";
 
-        if (name != "")
+        if (!name.empty())
           out << name;
         else
           {
@@ -6025,7 +6025,7 @@ namespace DataOutBase
         // underscores unless a vector name has been specified
         out << "    <PDataArray type=\"Float32\" Name=\"";
 
-        if (std::get<2>(nonscalar_data_range) != "")
+        if (!std::get<2>(nonscalar_data_range).empty())
           out << std::get<2>(nonscalar_data_range);
         else
           {
@@ -7820,7 +7820,7 @@ DataOutBase::write_filtered_data(
 
           // Determine the vector name. Concatenate all the component names with
           // double underscores unless a vector name has been specified
-          if (std::get<2>(nonscalar_data_ranges[n_th_vector]) != "")
+          if (!std::get<2>(nonscalar_data_ranges[n_th_vector]).empty())
             {
               vector_name = std::get<2>(nonscalar_data_ranges[n_th_vector]);
             }
@@ -8565,7 +8565,7 @@ DataOutInterface<dim, spacedim>::validate_dataset_names() const
     for (const auto &range : ranges)
       {
         const std::string &name = std::get<2>(range);
-        if (name != "")
+        if (!name.empty())
           {
             Assert(all_names.find(name) == all_names.end(),
                    ExcMessage(
@@ -9013,7 +9013,7 @@ namespace DataOutBase
           while ((header.size() != 0) && (header[header.size() - 1] == ' '))
             header.erase(header.size() - 1);
         }
-      while ((header == "") && in);
+      while ((header.empty()) && in);
 
       std::ostringstream s;
       s << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]";

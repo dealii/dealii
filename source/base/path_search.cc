@@ -146,7 +146,7 @@ PathSearch::find(const std::string &filename,
 
       // try again with the suffix appended, unless there is
       // no suffix
-      if (suffix != "")
+      if (!suffix.empty())
         {
           real_name = *path + filename + suffix;
           if (debug > 1)

@@ -59,7 +59,7 @@ namespace Gmsh
   {
     std::string base_name      = prm.output_base_name;
     char        dir_template[] = "ctfbc-XXXXXX";
-    if (base_name == "")
+    if (base_name.empty())
       {
         const char *temp = mkdtemp(dir_template);
         AssertThrow(temp != nullptr,

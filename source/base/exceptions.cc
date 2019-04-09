@@ -147,7 +147,7 @@ const char *
 ExceptionBase::what() const noexcept
 {
   // If no error c_string was generated so far, do it now:
-  if (what_str == "")
+  if (what_str.empty())
     {
 #ifdef DEAL_II_HAVE_GLIBC_STACKTRACE
       // We have deferred the symbol lookup to this point to avoid costly
