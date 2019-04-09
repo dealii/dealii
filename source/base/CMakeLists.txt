@@ -51,6 +51,7 @@ SET(_unity_include_src
   parallel.cc
   parameter_handler.cc
   parameter_acceptor.cc
+  parsed_convergence_table.cc
   parsed_function.cc
   partitioner.cc
   patterns.cc
