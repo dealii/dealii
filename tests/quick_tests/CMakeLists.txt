@@ -46,7 +46,11 @@ MACRO(make_quicktest test_basename build_name mpi_run)
   IF("${mpi_run}" STREQUAL "")
     SET(_command ${_target})
   ELSE()
-    SET(_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${mpi_run} ${MPIEXEC_PREFLAGS} ${_target})
+    IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+      SET(_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${mpi_run} ${MPIEXEC_PREFLAGS} ${_target})
+    ELSE()
+      SET(_command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${mpi_run} ${MPIEXEC_PREFLAGS} ./${_target})
+    ENDIF()
   ENDIF()
   ADD_CUSTOM_TARGET(${_target}.run
     DEPENDS ${_target}
