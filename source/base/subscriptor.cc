@@ -136,13 +136,9 @@ Subscriptor::subscribe(std::atomic<bool> *const validity,
     object_info = &typeid(*this);
   ++counter;
 
-  const std::string name = (!id.empty()) ? id : unknown_subscriber;
+  const std::string &name = id.empty() ? unknown_subscriber : id;
 
-  map_iterator it = counter_map.find(name);
-  if (it == counter_map.end())
-    counter_map.insert(map_value_type(name, 1U));
-  else
-    it->second++;
+  ++counter_map[name];
 
   *validity = true;
   validity_pointers.push_back(validity);
@@ -154,7 +150,8 @@ void
 Subscriptor::unsubscribe(std::atomic<bool> *const validity,
                          const std::string &      id) const
 {
-  const std::string name = (!id.empty()) ? id : unknown_subscriber;
+  const std::string &name = id.empty() ? unknown_subscriber : id;
+
   if (counter == 0)
     {
       AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
