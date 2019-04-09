@@ -105,23 +105,11 @@ public:
 
   /**
    * Subscribes a user of the object by storing the pointer @p validity. The
-   * subscriber may be identified by text supplied as @p identifier. The latter
-   * variable must not be a temporary and its type must decay to
-   * const char *. In particular, calling this function with a rvalue reference
-   * is not allowed.
-   */
-  template <typename ConstCharStar = const char *>
-  typename std::enable_if<
-    std::is_same<ConstCharStar, const char *>::value>::type
-  subscribe(std::atomic<bool> *const validity,
-            ConstCharStar            identifier = nullptr) const;
-
-  /**
-   * Calling subscribe() with a rvalue reference as identifier is not allowed.
+   * subscriber may be identified by text supplied as @p identifier.
    */
   void
   subscribe(std::atomic<bool> *const validity,
-            const char *&&           identifier) const = delete;
+            const std::string &      identifier = "") const;
 
   /**
    * Unsubscribes a user from the object.
@@ -131,7 +119,7 @@ public:
    */
   void
   unsubscribe(std::atomic<bool> *const validity,
-              const char *             identifier = nullptr) const;
+              const std::string &      identifier = "") const;
 
   /**
    * Return the present number of subscriptions to this object. This allows to
@@ -222,24 +210,11 @@ private:
    */
   mutable std::atomic<unsigned int> counter;
 
-  /*
-   * Functor struct used for key comparison in #counter_map.
-   * Not the memory location but the actual C-string content is compared.
-   */
-  struct MapCompare
-  {
-    bool
-    operator()(const char *lhs, const char *rhs) const
-    {
-      return std::strcmp(lhs, rhs) > 0;
-    }
-  };
-
   /**
    * In this map, we count subscriptions for each different identification
    * string supplied to subscribe().
    */
-  mutable std::map<const char *, unsigned int, MapCompare> counter_map;
+  mutable std::map<std::string, unsigned int> counter_map;
 
   /**
    * The data type used in #counter_map.
@@ -340,11 +315,6 @@ Subscriptor::list_subscribers(StreamType &stream) const
            << it.first << '\"' << std::endl;
 }
 
-// forward declare template specialization
-template <>
-void
-Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
-                                     const char *             id) const;
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

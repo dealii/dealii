@@ -126,10 +126,9 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 
 
 
-template <>
 void
-Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
-                                     const char *             id) const
+Subscriptor::subscribe(std::atomic<bool> *const validity,
+                       const std::string &      id) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -137,7 +136,7 @@ Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
     object_info = &typeid(*this);
   ++counter;
 
-  const char *const name = (id != nullptr) ? id : unknown_subscriber;
+  const std::string name = (id != "") ? id : unknown_subscriber;
 
   map_iterator it = counter_map.find(name);
   if (it == counter_map.end())
@@ -153,9 +152,9 @@ Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
 
 void
 Subscriptor::unsubscribe(std::atomic<bool> *const validity,
-                         const char *             id) const
+                         const std::string &      id) const
 {
-  const char *name = (id != nullptr) ? id : unknown_subscriber;
+  const std::string name = (id != "") ? id : unknown_subscriber;
   if (counter == 0)
     {
       AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));

@@ -95,7 +95,7 @@ public:
    * The <tt>id</tt> is used in the call to Subscriptor::subscribe(id) and by
    * ~SmartPointer() in the call to Subscriptor::unsubscribe().
    */
-  SmartPointer(T *t, const char *id);
+  SmartPointer(T *t, const std::string &id);
 
   /**
    * Constructor taking a normal pointer. If possible, i.e. if the pointer is
@@ -200,7 +200,7 @@ private:
   /**
    * The identification for the subscriptor.
    */
-  const char *const id;
+  const std::string id;
 
   /**
    * The Smartpointer is invalidated when the object pointed to is destroyed
@@ -235,7 +235,7 @@ inline SmartPointer<T, P>::SmartPointer(T *t)
 
 
 template <typename T, typename P>
-inline SmartPointer<T, P>::SmartPointer(T *t, const char *id)
+inline SmartPointer<T, P>::SmartPointer(T *t, const std::string &id)
   : t(t)
   , id(id)
   , pointed_to_object_is_alive(false)

@@ -3,7 +3,7 @@ DEAL::Exception: ExcNoSubscriber(object_info->name(), name)
 DEAL::
 --------------------------------------------------------
 An error occurred in file <subscriptor.cc> in function
-    void dealii::Subscriptor::unsubscribe(std::atomic<bool>*, const char*) const
+    void dealii::Subscriptor::unsubscribe(std::atomic<bool>*, const string&) const
 The violated condition was: 
     it != counter_map.end()
 Additional information: 
@@ -14,7 +14,7 @@ DEAL::Exception: ExcMessage( "This Subscriptor object does not know anything abo
 DEAL::
 --------------------------------------------------------
 An error occurred in file <subscriptor.cc> in function
-    void dealii::Subscriptor::unsubscribe(std::atomic<bool>*, const char*) const
+    void dealii::Subscriptor::unsubscribe(std::atomic<bool>*, const string&) const
 The violated condition was: 
     validity_ptr_it != validity_pointers.end()
 Additional information: 

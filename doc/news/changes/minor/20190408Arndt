@@ -1,0 +1,4 @@
+Changed: SmartPointer and Subscriptor use a std::string
+instead of a const char * as identifier.
+<br>
+(Daniel Arndt, 2019/04/08)
