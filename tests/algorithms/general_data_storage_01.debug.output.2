@@ -1,0 +1,75 @@
+
+DEAL::Add by copy
+DEAL::Size: 2
+DEAL::Add by reference
+DEAL::Size: 2
+DEAL::Add or construct
+DEAL::Size: 1
+DEAL::Merge
+DEAL::Data pre-merge:
+DEAL::value		double
+DEAL::Size: 1
+DEAL::Data 2 pre-merge:
+DEAL::value		double
+DEAL::value_2		double
+DEAL::Size: 2
+DEAL::Data post-merge:
+DEAL::value		double
+DEAL::value_2		double
+DEAL::Size: 2
+DEAL::Ambiguous construction
+DEAL::Try to overwrite existing entry: Copy
+DEAL::
+--------------------------------------------------------
+An error occurred in file <general_data_storage.h> in function
+    void dealii::GeneralDataStorage::add_unique_copy(const string&, const Type&) [with Type = double; std::__cxx11::string = std::__cxx11::basic_string<char>]
+The violated condition was: 
+    !stores_object_with_name(name)
+Additional information: 
+    An entry with the name value already exists.
+--------------------------------------------------------
+
+DEAL::Try to overwrite existing entry: Reference
+DEAL::
+--------------------------------------------------------
+An error occurred in file <general_data_storage.h> in function
+    void dealii::GeneralDataStorage::add_unique_reference(const string&, Type&) [with Type = const double; std::__cxx11::string = std::__cxx11::basic_string<char>]
+The violated condition was: 
+    !stores_object_with_name(name)
+Additional information: 
+    An entry with the name value already exists.
+--------------------------------------------------------
+
+DEAL::Fetch non-existing entry
+DEAL::
+--------------------------------------------------------
+An error occurred in file <general_data_storage.h> in function
+    Type& dealii::GeneralDataStorage::get_object_with_name(const string&) [with Type = double; std::__cxx11::string = std::__cxx11::basic_string<char>]
+The violated condition was: 
+    stores_object_with_name(name)
+Additional information: 
+    No entry with the name value exists.
+--------------------------------------------------------
+
+DEAL::Access removed entry (reference)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <general_data_storage.h> in function
+    Type& dealii::GeneralDataStorage::get_object_with_name(const string&) [with Type = double; std::__cxx11::string = std::__cxx11::basic_string<char>]
+The violated condition was: 
+    stores_object_with_name(name)
+Additional information: 
+    No entry with the name value exists.
+--------------------------------------------------------
+
+DEAL::Access removed entry (copy)
+DEAL::
+--------------------------------------------------------
+An error occurred in file <general_data_storage.h> in function
+    Type& dealii::GeneralDataStorage::get_object_with_name(const string&) [with Type = double; std::__cxx11::string = std::__cxx11::basic_string<char>]
+The violated condition was: 
+    stores_object_with_name(name)
+Additional information: 
+    No entry with the name value exists.
+--------------------------------------------------------
+
