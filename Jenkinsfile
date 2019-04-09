@@ -120,6 +120,7 @@ pipeline
           {
             sh "echo \"building on node ${env.NODE_NAME}\""
             sh '''#!/bin/bash
+               set -e
                export NP=`grep -c ^processor /proc/cpuinfo`
                export TEST_TIME_LIMIT=1200
                mkdir -p /home/dealii/build
@@ -131,6 +132,7 @@ pipeline
                  -D DEAL_II_UNITY_BUILD=ON \
                  $WORKSPACE/
                time ninja -j $NP
+               time ninja test # quicktests
                time ninja setup_tests
                time ctest --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
             '''
@@ -172,6 +174,7 @@ pipeline
           {
             sh "echo \"building on node ${env.NODE_NAME}\""
             sh '''#!/bin/bash
+                set -e
                 export NP=`grep -c ^processor /proc/cpuinfo`
                 mkdir -p /home/dealii/build
                 cd /home/dealii/build
@@ -182,6 +185,7 @@ pipeline
                   -D DEAL_II_UNITY_BUILD=OFF \
                   $WORKSPACE/
                 time ninja -j $NP
+                time ninja test # quicktests
                 time ninja setup_tests
                 time ctest -R "all-headers|multigrid/transfer" --output-on-failure -DDESCRIPTION="CI-$JOB_NAME" -j $NP --no-compress-output -T test
             '''
