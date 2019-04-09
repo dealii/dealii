@@ -17,11 +17,32 @@
 # Configuration for the SymEngine library:
 #
 
-#
-# We require at least version 0.3 of the symengine library:
-#
-SET(SYMENGINE_MINIMUM_REQUIRED_VERSION "0.3")
 
+MACRO(FEATURE_SYMENGINE_FIND_EXTERNAL var)
+  FIND_PACKAGE(SYMENGINE)
+
+  IF(SYMENGINE_FOUND)
+    SET(${var} TRUE)
+
+    #
+    # We require at least version 0.4 of the symengine library:
+    #
+    SET(_version_required "0.4")
+
+    IF(SYMENGINE_VERSION VERSION_LESS ${_version_required})
+      MESSAGE(STATUS "Insufficient SymEngine installation found: "
+              "At least version ${_version_required} is required "
+              "but version ${SYMENGINE_VERSION} was found."
+             )
+      SET(SYMENGINE_ADDITIONAL_ERROR_STRING
+          "Insufficient SymEngine installation found!\n"
+          "At least version ${_version_required} is required "
+          "but version ${SYMENGINE_VERSION} was found.\n"
+         )
+      SET(${var} FALSE)
+    ENDIF()
+  ENDIF()
+ENDMACRO()
 
 MACRO(FEATURE_SYMENGINE_CONFIGURE_EXTERNAL)
   SET(DEAL_II_SYMENGINE_WITH_LLVM ${SYMENGINE_WITH_LLVM})
