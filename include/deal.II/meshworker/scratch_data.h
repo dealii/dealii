@@ -334,7 +334,7 @@ namespace MeshWorker
     ScratchData(const ScratchData<dim, spacedim> &scratch);
 
     /**
-     * \defgroup CurrentCellMethos Methods to work on current cell
+     * @name CurrentCellMethos Methods to work on current cell
      */
     /**@{*/
 
@@ -416,7 +416,7 @@ namespace MeshWorker
     /** @} */ // CurrentCellMethods
 
     /**
-     * @defgroup NeighborCellMethods Methods to work on neighbor cell
+     * @name NeighborCellMethods Methods to work on neighbor cell
      */
     /** @{ */
 
@@ -502,7 +502,7 @@ namespace MeshWorker
     GeneralDataStorage &
     get_general_data_storage();
 
-    /** @defgroup CurrentCellEvaluation Evaluation of finite element fields
+    /** @name CurrentCellEvaluation Evaluation of finite element fields
      * and their derivatives on the current cell
      *  @{
      */
