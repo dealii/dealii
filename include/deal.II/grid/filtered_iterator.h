@@ -849,7 +849,7 @@ namespace internal
  *   ...
  *   const auto filtered_iterators_range =
  *     filter_iterators(dof_handler.active_cell_iterators(),
- *                      IteratorFilters::LocallyOwned());
+ *                      IteratorFilters::LocallyOwnedCell());
  *   for (const auto &cell : filtered_iterators_range)
  *     {
  *       fe_values.reinit (cell);
