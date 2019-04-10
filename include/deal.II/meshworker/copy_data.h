@@ -40,9 +40,9 @@ namespace MeshWorker
    *
    * In particular, you can specify the following template arguments
    *
-   * - @p n_matrices: Size of the array of matrices
-   * - @p n_vectors: size of the array of vectors
-   * - @p n_dof_indices: size of the array of local dof indices
+   * - @tparam n_matrices: Size of the array of matrices
+   * - @tparam n_vectors: size of the array of vectors
+   * - @tparam n_dof_indices: size of the array of local dof indices
    *
    * @author Luca Heltai, 2019.
    */
