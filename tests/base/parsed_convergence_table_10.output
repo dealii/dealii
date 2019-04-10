@@ -1,0 +1,35 @@
+
+dofs cells   dt      u_cycle     
+   9     4 1.0000 1.000e+00    - 
+  25    16 2.0000 2.500e-01 2.00 
+  81    64 3.0000 1.111e-01 1.17 
+ 289   256 4.0000 6.250e-02 0.83 
+1089  1024 5.0000 4.000e-02 0.64 
+
+| dofs | cells | dt     | u_cycle   | u_cycle...red.rate.log2 | 
+| 9    | 4     | 1.0000 | 1.000e+00 | -                       | 
+| 25   | 16    | 2.0000 | 2.500e-01 | 2.00                    | 
+| 81   | 64    | 3.0000 | 1.111e-01 | 1.17                    | 
+| 289  | 256   | 4.0000 | 6.250e-02 | 0.83                    | 
+| 1089 | 1024  | 5.0000 | 4.000e-02 | 0.64                    | 
+
+\documentclass[10pt]{report}
+\usepackage{float}
+
+
+\begin{document}
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|r|r|r|c|c|} \hline
+\# dofs & \# cells & \Delta t & 
+\multicolumn{2}{|c|}{$\| u - u_h \|_{\text{cycle} $}\\ \hline
+9 & 4 & 1.0000 & 1.000e+00 & -\\ \hline
+25 & 16 & 2.0000 & 2.500e-01 & 2.00\\ \hline
+81 & 64 & 3.0000 & 1.111e-01 & 1.17\\ \hline
+289 & 256 & 4.0000 & 6.250e-02 & 0.83\\ \hline
+1089 & 1024 & 5.0000 & 4.000e-02 & 0.64\\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+\end{document}
+
