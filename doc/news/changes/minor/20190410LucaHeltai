@@ -1,0 +1,4 @@
+New: The ParsedConvergenceTable class allows convenient construction of convergence tables, exploiting
+parameter files. 
+<br>
+(Luca Heltai, 2019/04/10)
