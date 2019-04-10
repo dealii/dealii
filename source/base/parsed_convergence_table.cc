@@ -48,10 +48,10 @@ namespace
     for (unsigned int i = 0; i < component_names.size(); ++i)
       {
         if (unique_component_names[j] != component_names[i])
-          masks.push_back(ComponentMask(bools[j++]));
+          masks.emplace_back(ComponentMask(bools[j++]));
         bools[j][i] = true;
       }
-    masks.push_back(ComponentMask(bools[j++]));
+    masks.emplace_back(ComponentMask(bools[j++]));
     AssertDimension(j, unique_component_names.size());
     return masks;
   }
@@ -174,7 +174,7 @@ ParsedConvergenceTable::output_table(std::ostream &out)
       if (error_file_name != "")
         {
           const std::string error_file_format =
-            error_file_name.substr(error_file_name.find_last_of(".") + 1);
+            error_file_name.substr(error_file_name.find_last_of('.') + 1);
 
           std::ofstream table_file(error_file_name);
 

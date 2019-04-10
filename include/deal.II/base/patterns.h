@@ -1803,7 +1803,7 @@ namespace Patterns
         std::vector<std::string> vec(t.size());
 
         unsigned int i = 0;
-        for (const auto entry : t)
+        for (const auto &entry : t)
           vec[i++] = Convert<typename T::value_type>::to_string(entry, base_p);
 
         std::string s;
