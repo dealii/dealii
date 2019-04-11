@@ -722,9 +722,9 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
     }
 
   out << "\\end{tabular}" << std::endl << "\\end{center}" << std::endl;
-  if (tex_table_caption != "")
+  if (!tex_table_caption.empty())
     out << "\\caption{" << tex_table_caption << "}" << std::endl;
-  if (tex_table_label != "")
+  if (!tex_table_label.empty())
     out << "\\label{" << tex_table_label << "}" << std::endl;
   out << "\\end{table}" << std::endl;
   if (with_header)

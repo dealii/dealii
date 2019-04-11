@@ -459,7 +459,7 @@ TimerOutput::leave_subsection(const std::string &section_name)
 
   std::lock_guard<std::mutex> lock(mutex);
 
-  if (section_name != "")
+  if (!section_name.empty())
     {
       Assert(sections.find(section_name) != sections.end(),
              ExcMessage("Cannot delete a section that was never created."));
@@ -472,7 +472,7 @@ TimerOutput::leave_subsection(const std::string &section_name)
   // if no string is given, exit the last
   // active section.
   const std::string actual_section_name =
-    (section_name == "" ? active_sections.back() : section_name);
+    (section_name.empty() ? active_sections.back() : section_name);
 
   sections[actual_section_name].timer.stop();
   sections[actual_section_name].total_wall_time +=

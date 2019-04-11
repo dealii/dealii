@@ -382,7 +382,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                             set = keyword;
                             break;
                           }
-                      if (set == "")
+                      if (set.empty())
                         // keep ignoring everything until the next SCALARS
                         // keyword
                         continue;

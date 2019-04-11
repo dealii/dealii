@@ -609,7 +609,7 @@ BlockMatrixArray<number, BlockVectorType>::print_latex(StreamType &out) const
 
       std::ostringstream stream;
 
-      if (array(m->row, m->col) != "" && m->prefix >= 0)
+      if (!array(m->row, m->col).empty() && m->prefix >= 0)
         stream << "+";
       if (m->prefix != 1.)
         stream << m->prefix << 'x';

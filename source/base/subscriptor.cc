@@ -84,7 +84,7 @@ Subscriptor::check_no_subscribers() const noexcept
                               std::string(map_entry.first);
             }
 
-          if (infostring == "")
+          if (infostring.empty())
             infostring = "<none>";
 
           AssertNothrow(counter == 0,
@@ -126,10 +126,9 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 
 
 
-template <>
 void
-Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
-                                     const char *             id) const
+Subscriptor::subscribe(std::atomic<bool> *const validity,
+                       const std::string &      id) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -137,13 +136,9 @@ Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
     object_info = &typeid(*this);
   ++counter;
 
-  const char *const name = (id != nullptr) ? id : unknown_subscriber;
+  const std::string &name = id.empty() ? unknown_subscriber : id;
 
-  map_iterator it = counter_map.find(name);
-  if (it == counter_map.end())
-    counter_map.insert(map_value_type(name, 1U));
-  else
-    it->second++;
+  ++counter_map[name];
 
   *validity = true;
   validity_pointers.push_back(validity);
@@ -153,9 +148,10 @@ Subscriptor::subscribe<const char *>(std::atomic<bool> *const validity,
 
 void
 Subscriptor::unsubscribe(std::atomic<bool> *const validity,
-                         const char *             id) const
+                         const std::string &      id) const
 {
-  const char *name = (id != nullptr) ? id : unknown_subscriber;
+  const std::string &name = id.empty() ? unknown_subscriber : id;
+
   if (counter == 0)
     {
       AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
