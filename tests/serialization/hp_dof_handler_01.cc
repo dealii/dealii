@@ -93,11 +93,7 @@ namespace dealii
           return false;
 
         if (c1->active() && c2->active() &&
-            c1->p_refine_flag_set() != c2->p_refine_flag_set())
-          return false;
-
-        if (c1->active() && c2->active() &&
-            c1->p_coarsen_flag_set() != c2->p_coarsen_flag_set())
+            c1->future_fe_index() != c2->future_fe_index())
           return false;
 
         // compare dofs on this cell and then on the faces
@@ -194,11 +190,11 @@ test()
   dof_1.distribute_dofs(fe_collection);
   dof_2.distribute_dofs(fe_collection);
 
-  dof_1.begin_active()->set_p_refine_flag();
-  dof_2.begin_active()->set_p_refine_flag();
+  dof_1.begin_active()->set_future_fe_index(0);
+  dof_2.begin_active()->set_future_fe_index(0);
 
-  (++dof_1.begin_active())->set_p_coarsen_flag();
-  (++dof_2.begin_active())->set_p_coarsen_flag();
+  (++dof_1.begin_active())->set_future_fe_index(1);
+  (++dof_2.begin_active())->set_future_fe_index(1);
 
   // right now, both hp::DoFHandlers are the same. Renumber one of them
   DoFRenumbering::random(dof_1);

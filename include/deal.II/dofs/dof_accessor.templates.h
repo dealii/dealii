@@ -3051,16 +3051,15 @@ namespace internal
 
 
       /**
-       * Do what the active_fe_index function in the parent class is supposed
-       * to do.
+       * Do what the active_fe_index function in the parent class is supposed to
+       * do.
        */
       template <int dim, int spacedim, bool level_dof_access>
       static unsigned int
       active_fe_index(
         const DoFCellAccessor<DoFHandler<dim, spacedim>, level_dof_access> &)
       {
-        // ::DoFHandler only supports a single active fe with index
-        // zero
+        // ::DoFHandler only supports a single active fe with index zero
         return 0;
       }
 
@@ -3072,6 +3071,9 @@ namespace internal
         const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
                               level_dof_access> &accessor)
       {
+        Assert(
+          accessor.dof_handler != nullptr,
+          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert(static_cast<unsigned int>(accessor.level()) <
                  accessor.dof_handler->levels.size(),
                ExcMessage("DoFHandler not initialized"));
@@ -3094,8 +3096,7 @@ namespace internal
       {
         (void)accessor;
         (void)i;
-        // ::DoFHandler only supports a single active fe with index
-        // zero
+        // ::DoFHandler only supports a single active fe with index zero
         Assert(
           i == 0,
           (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
@@ -3123,16 +3124,90 @@ namespace internal
 
 
 
+      /**
+       * Do what the future_fe_index function in the parent class is supposed to
+       * do.
+       */
       template <int dim, int spacedim, bool level_dof_access>
-      static bool
-      p_refine_flag_set(const DoFCellAccessor<DoFHandler<dim, spacedim>,
-                                              level_dof_access> &accessor)
+      static unsigned int
+      future_fe_index(
+        const DoFCellAccessor<DoFHandler<dim, spacedim>, level_dof_access> &)
+      {
+        // ::DoFHandler only supports a single active fe with index zero
+        return 0;
+      }
+
+
+
+      template <int dim, int spacedim, bool level_dof_access>
+      static unsigned int
+      future_fe_index(
+        const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
+                              level_dof_access> &accessor)
+      {
+        Assert(
+          accessor.dof_handler != nullptr,
+          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
+        Assert(static_cast<unsigned int>(accessor.level()) <
+                 accessor.dof_handler->levels.size(),
+               ExcMessage("DoFHandler not initialized"));
+
+        return accessor.dof_handler->levels[accessor.level()]->future_fe_index(
+          accessor.present_index);
+      }
+
+
+      /**
+       * Do what the set_future_fe_index function in the parent class is
+       * supposed to do.
+       */
+      template <int dim, int spacedim, bool level_dof_access>
+      static void
+      set_future_fe_index(const DoFCellAccessor<DoFHandler<dim, spacedim>,
+                                                level_dof_access> &accessor,
+                          const unsigned int                       i)
       {
         (void)accessor;
-        // ::DoFHandler does not support p-refinement
-        Assert(false,
-               (typename std::decay<decltype(
-                  accessor)>::type::ExcRefinementNotSupported()));
+        (void)i;
+        // ::DoFHandler only supports a single active fe with index zero
+        Assert(
+          i == 0,
+          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
+      }
+
+
+
+      template <int dim, int spacedim, bool level_dof_access>
+      static void
+      set_future_fe_index(
+        const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
+                              level_dof_access> &accessor,
+        const unsigned int                       i)
+      {
+        Assert(
+          accessor.dof_handler != nullptr,
+          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
+        Assert(static_cast<unsigned int>(accessor.level()) <
+                 accessor.dof_handler->levels.size(),
+               ExcMessage("DoFHandler not initialized"));
+
+        accessor.dof_handler->levels[accessor.level()]->set_future_fe_index(
+          accessor.present_index, i);
+      }
+
+
+
+      /**
+       * Do what the future_fe_index_set function in the parent class is
+       * supposed to do.
+       */
+      template <int dim, int spacedim, bool level_dof_access>
+      static bool
+      future_fe_index_set(
+        const DoFCellAccessor<dealii::DoFHandler<dim, spacedim>,
+                              level_dof_access> &)
+      {
+        // ::DoFHandler only supports a single active fe with index zero
         return false;
       }
 
@@ -3140,7 +3215,7 @@ namespace internal
 
       template <int dim, int spacedim, bool level_dof_access>
       static bool
-      p_refine_flag_set(
+      future_fe_index_set(
         const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
                               level_dof_access> &accessor)
       {
@@ -3151,34 +3226,30 @@ namespace internal
                  accessor.dof_handler->levels.size(),
                ExcMessage("DoFHandler not initialized"));
 
-        const auto &p_refine_flags =
-          accessor.dof_handler->levels[accessor.level()]->p_refine_flags;
-        Assert(static_cast<unsigned int>(accessor.present_index) <
-                 p_refine_flags.size(),
-               ExcIndexRange(accessor.present_index, 0, p_refine_flags.size()));
-
-        return p_refine_flags[accessor.present_index];
+        return accessor.dof_handler->levels[accessor.level()]
+          ->future_fe_index_set(accessor.present_index);
       }
 
 
 
+      /**
+       * Do what the clear_fe_index function in the parent class is supposed to
+       * do.
+       */
       template <int dim, int spacedim, bool level_dof_access>
       static void
-      set_p_refine_flag(const DoFCellAccessor<DoFHandler<dim, spacedim>,
-                                              level_dof_access> &accessor)
+      clear_future_fe_index(
+        const DoFCellAccessor<dealii::DoFHandler<dim, spacedim>,
+                              level_dof_access> &)
       {
-        (void)accessor;
-        // ::DoFHandler does not support p-refinement
-        Assert(false,
-               (typename std::decay<decltype(
-                  accessor)>::type::ExcRefinementNotSupported()));
+        // ::DoFHandler only supports a single active fe with index zero
       }
 
 
 
       template <int dim, int spacedim, bool level_dof_access>
       static void
-      set_p_refine_flag(
+      clear_future_fe_index(
         const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
                               level_dof_access> &accessor)
       {
@@ -3189,172 +3260,8 @@ namespace internal
                  accessor.dof_handler->levels.size(),
                ExcMessage("DoFHandler not initialized"));
 
-        auto &p_refine_flags =
-          accessor.dof_handler->levels[accessor.level()]->p_refine_flags;
-        Assert(static_cast<unsigned int>(accessor.present_index) <
-                 p_refine_flags.size(),
-               ExcIndexRange(accessor.present_index, 0, p_refine_flags.size()));
-
-        p_refine_flags[accessor.present_index] = true;
-      }
-
-
-
-      template <int dim, int spacedim, bool level_dof_access>
-      static void
-      clear_p_refine_flag(const DoFCellAccessor<DoFHandler<dim, spacedim>,
-                                                level_dof_access> &accessor)
-      {
-        (void)accessor;
-        // ::DoFHandler does not support p-refinement
-        Assert(false,
-               (typename std::decay<decltype(
-                  accessor)>::type::ExcRefinementNotSupported()));
-      }
-
-
-
-      template <int dim, int spacedim, bool level_dof_access>
-      static void
-      clear_p_refine_flag(
-        const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
-                              level_dof_access> &accessor)
-      {
-        Assert(
-          accessor.dof_handler != nullptr,
-          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
-        Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
-               ExcMessage("DoFHandler not initialized"));
-
-        auto &p_refine_flags =
-          accessor.dof_handler->levels[accessor.level()]->p_refine_flags;
-        Assert(static_cast<unsigned int>(accessor.present_index) <
-                 p_refine_flags.size(),
-               ExcIndexRange(accessor.present_index, 0, p_refine_flags.size()));
-
-        p_refine_flags[accessor.present_index] = false;
-      }
-
-
-
-      template <int dim, int spacedim, bool level_dof_access>
-      static bool
-      p_coarsen_flag_set(const DoFCellAccessor<DoFHandler<dim, spacedim>,
-                                               level_dof_access> &accessor)
-      {
-        (void)accessor;
-        // ::DoFHandler does not support p-coarsening
-        Assert(false,
-               (typename std::decay<decltype(
-                  accessor)>::type::ExcCoarseningNotSupported()));
-        return false;
-      }
-
-
-
-      template <int dim, int spacedim, bool level_dof_access>
-      static bool
-      p_coarsen_flag_set(
-        const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
-                              level_dof_access> &accessor)
-      {
-        Assert(
-          accessor.dof_handler != nullptr,
-          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
-        Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
-               ExcMessage("DoFHandler not initialized"));
-
-        const auto &p_coarsen_flags =
-          accessor.dof_handler->levels[accessor.level()]->p_coarsen_flags;
-        Assert(static_cast<unsigned int>(accessor.present_index) <
-                 p_coarsen_flags.size(),
-               ExcIndexRange(accessor.present_index,
-                             0,
-                             p_coarsen_flags.size()));
-
-        return p_coarsen_flags[accessor.present_index];
-      }
-
-
-
-      template <int dim, int spacedim, bool level_dof_access>
-      static void
-      set_p_coarsen_flag(const DoFCellAccessor<DoFHandler<dim, spacedim>,
-                                               level_dof_access> &accessor)
-      {
-        (void)accessor;
-        // ::DoFHandler does not support p-coarsening
-        Assert(false,
-               (typename std::decay<decltype(
-                  accessor)>::type::ExcCoarseningNotSupported()));
-      }
-
-
-
-      template <int dim, int spacedim, bool level_dof_access>
-      static void
-      set_p_coarsen_flag(
-        const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
-                              level_dof_access> &accessor)
-      {
-        Assert(
-          accessor.dof_handler != nullptr,
-          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
-        Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
-               ExcMessage("DoFHandler not initialized"));
-
-        auto &p_coarsen_flags =
-          accessor.dof_handler->levels[accessor.level()]->p_coarsen_flags;
-        Assert(static_cast<unsigned int>(accessor.present_index) <
-                 p_coarsen_flags.size(),
-               ExcIndexRange(accessor.present_index,
-                             0,
-                             p_coarsen_flags.size()));
-
-        p_coarsen_flags[accessor.present_index] = true;
-      }
-
-
-
-      template <int dim, int spacedim, bool level_dof_access>
-      static void
-      clear_p_coarsen_flag(const DoFCellAccessor<DoFHandler<dim, spacedim>,
-                                                 level_dof_access> &accessor)
-      {
-        (void)accessor;
-        // ::DoFHandler does not support p-coarsening
-        Assert(false,
-               (typename std::decay<decltype(
-                  accessor)>::type::ExcCoarseningNotSupported()));
-      }
-
-
-
-      template <int dim, int spacedim, bool level_dof_access>
-      static void
-      clear_p_coarsen_flag(
-        const DoFCellAccessor<dealii::hp::DoFHandler<dim, spacedim>,
-                              level_dof_access> &accessor)
-      {
-        Assert(
-          accessor.dof_handler != nullptr,
-          (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
-        Assert(static_cast<unsigned int>(accessor.level()) <
-                 accessor.dof_handler->levels.size(),
-               ExcMessage("DoFHandler not initialized"));
-
-        auto &p_coarsen_flags =
-          accessor.dof_handler->levels[accessor.level()]->p_coarsen_flags;
-        Assert(static_cast<unsigned int>(accessor.present_index) <
-                 p_coarsen_flags.size(),
-               ExcIndexRange(accessor.present_index,
-                             0,
-                             p_coarsen_flags.size()));
-
-        p_coarsen_flags[accessor.present_index] = false;
+        accessor.dof_handler->levels[accessor.level()]->clear_future_fe_index(
+          accessor.present_index);
       }
 
 
@@ -4112,8 +4019,118 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::set_active_fe_index(
                "will automatically be propagated from the owning process "
                "of that cell, and there is no information at all on "
                "artificial cells."));
+
   dealii::internal::DoFCellAccessorImplementation::Implementation::
     set_active_fe_index(*this, i);
+}
+
+
+
+template <typename DoFHandlerType, bool level_dof_access>
+inline unsigned int
+DoFCellAccessor<DoFHandlerType, level_dof_access>::future_fe_index() const
+{
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      (this->has_children() == false),
+    ExcMessage("You can not ask for the future_fe_index on a cell that has "
+               "children because no degrees of freedom are assigned "
+               "to this cell and, consequently, no finite element "
+               "is associated with it."));
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      (this->is_locally_owned()),
+    ExcMessage("You can only query future_fe_index information on cells "
+               "that are locally owned."));
+
+  return dealii::internal::DoFCellAccessorImplementation::Implementation::
+    future_fe_index(*this);
+}
+
+
+
+template <typename DoFHandlerType, bool level_dof_access>
+inline void
+DoFCellAccessor<DoFHandlerType, level_dof_access>::set_future_fe_index(
+  const unsigned int i) const
+{
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      (this->has_children() == false),
+    ExcMessage("You can not set the future_fe_index on a cell that has "
+               "children because no degrees of freedom will be assigned "
+               "to this cell."));
+
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      this->is_locally_owned(),
+    ExcMessage("You can only set future_fe_index information on cells "
+               "that are locally owned."));
+
+  dealii::internal::DoFCellAccessorImplementation::Implementation::
+    set_future_fe_index(*this, i);
+}
+
+
+
+template <typename DoFHandlerType, bool level_dof_access>
+inline bool
+DoFCellAccessor<DoFHandlerType, level_dof_access>::future_fe_index_set() const
+{
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      (this->has_children() == false),
+    ExcMessage("You can not ask for the future_fe_index on a cell that has "
+               "children because no degrees of freedom are assigned "
+               "to this cell and, consequently, no finite element "
+               "is associated with it."));
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      (this->is_locally_owned()),
+    ExcMessage("You can only query future_fe_index information on cells "
+               "that are locally owned."));
+
+  return dealii::internal::DoFCellAccessorImplementation::Implementation::
+    future_fe_index_set(*this);
+}
+
+
+
+template <typename DoFHandlerType, bool level_dof_access>
+inline void
+DoFCellAccessor<DoFHandlerType, level_dof_access>::clear_future_fe_index() const
+{
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      (this->has_children() == false),
+    ExcMessage("You can not ask for the future_fe_index on a cell that has "
+               "children because no degrees of freedom are assigned "
+               "to this cell and, consequently, no finite element "
+               "is associated with it."));
+  Assert(
+    (dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,
+                                           DoFHandlerType::space_dimension> *>(
+       this->dof_handler) != nullptr) ||
+      (this->is_locally_owned()),
+    ExcMessage("You can only query future_fe_index information on cells "
+               "that are locally owned."));
+
+  dealii::internal::DoFCellAccessorImplementation::Implementation::
+    clear_future_fe_index(*this);
 }
 
 
@@ -4197,130 +4214,6 @@ DoFCellAccessor<DoFHandlerType, level_dof_access>::distribute_local_to_global(
       *this, local_matrix, local_vector, global_matrix, global_vector);
 }
 
-
-
-template <typename DoFHandlerType, bool level_dof_access>
-inline bool
-DoFCellAccessor<DoFHandlerType, level_dof_access>::p_refine_flag_set() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  // cells flagged for refinement must be active
-  // (the @p set_p_refine_flag function checks this,
-  // but activity may change when refinement is
-  // executed and for some reason the refine
-  // flag is not cleared).
-  Assert(this->active() || !dealii::internal::DoFCellAccessorImplementation::
-                             Implementation::p_refine_flag_set(*this),
-         (typename CellAccessor<dim, spacedim>::ExcRefineCellNotActive()));
-
-  return dealii::internal::DoFCellAccessorImplementation::Implementation::
-    p_refine_flag_set(*this);
-}
-
-
-
-template <typename DoFHandlerType, bool level_dof_access>
-inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::set_p_refine_flag() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->active(),
-         (typename CellAccessor<dim, spacedim>::ExcRefineCellNotActive()));
-  Assert(!dealii::internal::DoFCellAccessorImplementation::Implementation::
-           p_coarsen_flag_set(*this),
-         (typename CellAccessor<dim, spacedim>::ExcCellFlaggedForCoarsening()));
-
-  dealii::internal::DoFCellAccessorImplementation::Implementation::
-    set_p_refine_flag(*this);
-}
-
-
-
-template <typename DoFHandlerType, bool level_dof_access>
-inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::clear_p_refine_flag() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->active(),
-         (typename CellAccessor<dim, spacedim>::ExcRefineCellNotActive()));
-
-  dealii::internal::DoFCellAccessorImplementation::Implementation::
-    clear_p_refine_flag(*this);
-}
-
-
-
-template <typename DoFHandlerType, bool level_dof_access>
-inline bool
-DoFCellAccessor<DoFHandlerType, level_dof_access>::p_coarsen_flag_set() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  // cells flagged for coarsening must be active
-  // (the @p set_refine_flag function checks this,
-  // but activity may change when refinement is
-  // executed and for some reason the refine
-  // flag is not cleared).
-  Assert(this->active() || !dealii::internal::DoFCellAccessorImplementation::
-                             Implementation::p_coarsen_flag_set(*this),
-         (typename CellAccessor<dim, spacedim>::ExcRefineCellNotActive()));
-
-  return dealii::internal::DoFCellAccessorImplementation::Implementation::
-    p_coarsen_flag_set(*this);
-}
-
-
-
-template <typename DoFHandlerType, bool level_dof_access>
-inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::set_p_coarsen_flag() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->active(),
-         (typename CellAccessor<dim, spacedim>::ExcRefineCellNotActive()));
-  Assert(!dealii::internal::DoFCellAccessorImplementation::Implementation::
-           p_refine_flag_set(*this),
-         (typename CellAccessor<dim, spacedim>::ExcCellFlaggedForRefinement()));
-
-  dealii::internal::DoFCellAccessorImplementation::Implementation::
-    set_p_coarsen_flag(*this);
-}
-
-
-
-template <typename DoFHandlerType, bool level_dof_access>
-inline void
-DoFCellAccessor<DoFHandlerType, level_dof_access>::clear_p_coarsen_flag() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->active(),
-         (typename CellAccessor<dim, spacedim>::ExcRefineCellNotActive()));
-
-  dealii::internal::DoFCellAccessorImplementation::Implementation::
-    clear_p_coarsen_flag(*this);
-}
-
-
-
-template <typename DoFHandlerType, bool level_dof_access>
-inline unsigned int
-DoFCellAccessor<DoFHandlerType, level_dof_access>::
-  active_fe_index_after_p_refinement_and_coarsening() const
-{
-  if (p_refine_flag_set())
-    {
-      Assert(!p_coarsen_flag_set(), ExcInternalError());
-      return this->get_dof_handler().get_fe_collection().next_in_hierarchy(
-        active_fe_index());
-    }
-  else if (p_coarsen_flag_set())
-    {
-      Assert(!p_refine_flag_set(), ExcInternalError());
-      return this->get_dof_handler().get_fe_collection().previous_in_hierarchy(
-        active_fe_index());
-    }
-
-  return active_fe_index();
-}
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -393,7 +393,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::
             cell->child(most_general_child)->active_fe_index();
 
           const unsigned int dofs_per_cell =
-            cell->get_dof_handler().get_fe(target_fe_index).dofs_per_cell;
+            dof_handler->get_fe(target_fe_index).dofs_per_cell;
 
           std::vector<Vector<typename VectorType::value_type>>(
             in_size, Vector<typename VectorType::value_type>(dofs_per_cell))

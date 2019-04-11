@@ -83,6 +83,27 @@ namespace internal
       struct Implementation
       {
         /**
+         * No future_fe_indices should have been assigned when partitioning a
+         * triangulation, since they are only available locally and will not be
+         * communicated.
+         */
+        template <int dim, int spacedim>
+        static void
+        ensure_absence_of_future_fe_indices(
+          DoFHandler<dim, spacedim> &dof_handler)
+        {
+          (void)dof_handler;
+          for (const auto &cell : dof_handler.active_cell_iterators())
+            if (cell->is_locally_owned())
+              Assert(
+                !cell->future_fe_index_set(),
+                ExcMessage(
+                  "There shouldn't be any cells flagged for p-adaptation when partitioning."));
+        }
+
+
+
+        /**
          * Do that part of reserving space that pertains to releasing
          * the previously used memory.
          */
@@ -94,20 +115,15 @@ namespace internal
           // refinement flags which we have to back up before
           {
             std::vector<std::vector<DoFLevel::active_fe_index_type>>
-                                           active_fe_backup(dof_handler.levels.size());
-            std::vector<std::vector<bool>> p_refine_flags_backup(
-              dof_handler.levels.size());
-            std::vector<std::vector<bool>> p_coarsen_flags_backup(
-              dof_handler.levels.size());
+              active_fe_backup(dof_handler.levels.size()),
+              future_fe_backup(dof_handler.levels.size());
             for (unsigned int level = 0; level < dof_handler.levels.size();
                  ++level)
               {
                 active_fe_backup[level] =
                   std::move(dof_handler.levels[level]->active_fe_indices);
-                p_refine_flags_backup[level] =
-                  std::move(dof_handler.levels[level]->p_refine_flags);
-                p_coarsen_flags_backup[level] =
-                  std::move(dof_handler.levels[level]->p_coarsen_flags);
+                future_fe_backup[level] =
+                  std::move(dof_handler.levels[level]->future_fe_indices);
               }
 
             // delete all levels and set them up newly, since vectors
@@ -121,10 +137,8 @@ namespace internal
                 // recover backups
                 dof_handler.levels[level]->active_fe_indices =
                   std::move(active_fe_backup[level]);
-                dof_handler.levels[level]->p_refine_flags =
-                  std::move(p_refine_flags_backup[level]);
-                dof_handler.levels[level]->p_coarsen_flags =
-                  std::move(p_coarsen_flags_backup[level]);
+                dof_handler.levels[level]->future_fe_indices =
+                  std::move(future_fe_backup[level]);
               }
 
             if (dim > 1)
@@ -967,7 +981,7 @@ namespace internal
          * this information is distributed on both ghost and artificial cells.
          *
          * In case a parallel::distributed::Triangulation is used,
-         * active_fe_indices are communicated only to ghost cells.
+         * indices are communicated only to ghost cells.
          */
         template <int dim, int spacedim>
         static void
@@ -1095,9 +1109,7 @@ namespace internal
                     // refined to and distribute it later on its children.
                     // Pick their future index if flagged for p-refinement.
                     fe_transfer->refined_cells_fe_index.insert(
-                      {cell,
-                       cell
-                         ->active_fe_index_after_p_refinement_and_coarsening()});
+                      {cell, cell->future_fe_index()});
                   }
                 else if (cell->coarsen_flag_set())
                   {
@@ -1125,8 +1137,7 @@ namespace internal
                                    ExcInternalError());
 
                             fe_indices_children.insert(
-                              parent->child(child_index)
-                                ->active_fe_index_after_p_refinement_and_coarsening());
+                              parent->child(child_index)->future_fe_index());
                           }
                         Assert(!fe_indices_children.empty(),
                                ExcInternalError());
@@ -1152,11 +1163,9 @@ namespace internal
                     // No h-refinement is scheduled for this cell.
                     // However, it may have p-refinement indicators, so we
                     // choose a new active_fe_index based on its flags.
-                    if (cell->p_refine_flag_set() || cell->p_coarsen_flag_set())
+                    if (cell->future_fe_index_set() == true)
                       fe_transfer->persisting_cells_fe_index.insert(
-                        {cell,
-                         cell
-                           ->active_fe_index_after_p_refinement_and_coarsening()});
+                        {cell, cell->future_fe_index()});
                   }
               }
         }
@@ -1587,9 +1596,6 @@ namespace hp
     // ensure that the active_fe_indices vectors are initialized correctly
     create_active_fe_table();
 
-    // initialize all p-refinement and p-coarsening flags
-    create_p_adaptation_flags();
-
     // make sure every processor knows the active_fe_indices
     // on both its own cells and all ghost cells
     dealii::internal::hp::DoFHandlerImplementation::Implementation::
@@ -1707,6 +1713,11 @@ namespace hp
 
         // repartitioning signals
         tria_listeners.push_back(
+          this->tria->signals.pre_distributed_repartition.connect(
+            std::bind(&internal::hp::DoFHandlerImplementation::Implementation::
+                        ensure_absence_of_future_fe_indices<dim, spacedim>,
+                      std::ref(*this))));
+        tria_listeners.push_back(
           this->tria->signals.pre_distributed_repartition.connect(std::bind(
             &DoFHandler<dim,
                         spacedim>::pre_distributed_active_fe_index_transfer,
@@ -1736,19 +1747,34 @@ namespace hp
                         post_distributed_serialization_of_active_fe_indices,
                       std::ref(*this))));
       }
+    else if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
+                            *>(&this->get_triangulation()) != nullptr)
+      {
+        policy =
+          std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
+                                   ParallelShared<DoFHandler<dim, spacedim>>>(
+            *this);
+
+        // partitioning signals
+        tria_listeners.push_back(this->tria->signals.pre_partition.connect(
+          std::bind(&internal::hp::DoFHandlerImplementation::Implementation::
+                      ensure_absence_of_future_fe_indices<dim, spacedim>,
+                    std::ref(*this))));
+
+        // refinement signals
+        tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
+          std::bind(&DoFHandler<dim, spacedim>::pre_active_fe_index_transfer,
+                    std::ref(*this))));
+        tria_listeners.push_back(this->tria->signals.post_refinement.connect(
+          std::bind(&DoFHandler<dim, spacedim>::post_active_fe_index_transfer,
+                    std::ref(*this))));
+      }
     else
       {
-        if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
-                           *>(&this->get_triangulation()) != nullptr)
-          policy =
-            std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
-                                     ParallelShared<DoFHandler<dim, spacedim>>>(
-              *this);
-        else
-          policy =
-            std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
-                                     Sequential<DoFHandler<dim, spacedim>>>(
-              *this);
+        policy =
+          std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::
+                                   Sequential<DoFHandler<dim, spacedim>>>(
+            *this);
 
         // refinement signals
         tria_listeners.push_back(this->tria->signals.pre_refinement.connect(
@@ -1896,15 +1922,24 @@ namespace hp
     // of active_fe_indices; preset them to zero, i.e. the default FE
     for (unsigned int level = 0; level < levels.size(); ++level)
       {
-        if (levels[level]->active_fe_indices.size() == 0)
-          levels[level]->active_fe_indices.resize(tria->n_raw_cells(level), 0);
+        if (levels[level]->active_fe_indices.size() == 0 &&
+            levels[level]->future_fe_indices.size() == 0)
+          {
+            levels[level]->active_fe_indices.resize(tria->n_raw_cells(level),
+                                                    0);
+            levels[level]->future_fe_indices.resize(
+              tria->n_raw_cells(level),
+              dealii::internal::hp::DoFLevel::invalid_active_fe_index);
+          }
         else
           {
             // Either the active_fe_indices have size zero because
             // they were just created, or the correct size. Other
             // sizes indicate that something went wrong.
             Assert(levels[level]->active_fe_indices.size() ==
-                     tria->n_raw_cells(level),
+                       tria->n_raw_cells(level) &&
+                     levels[level]->future_fe_indices.size() ==
+                       tria->n_raw_cells(level),
                    ExcInternalError());
           }
 
@@ -1916,38 +1951,6 @@ namespace hp
         // the levels anyway
         levels[level]->normalize_active_fe_indices();
       }
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  DoFHandler<dim, spacedim>::create_p_adaptation_flags()
-  {
-    Assert(fe_collection.size() > 0, ExcNoFESelected());
-    Assert(tria->n_levels() > 0,
-           ExcMessage("The current Triangulation must not be empty."));
-    Assert(tria->n_levels() == levels.size(), ExcInternalError());
-
-    for (unsigned int level = 0; level < tria->n_levels(); ++level)
-      if (levels[level]->p_refine_flags.size() == 0 &&
-          levels[level]->p_coarsen_flags.size() == 0)
-        {
-          levels[level]->p_refine_flags.resize(tria->n_raw_cells(level), false);
-          levels[level]->p_coarsen_flags.resize(tria->n_raw_cells(level),
-                                                false);
-        }
-      else
-        {
-          // Either the p_refine_flags and p_coarsen_flags have size zero
-          // because they were just created, or the correct size. Other sizes
-          // indicate that something went wrong.
-          Assert(levels[level]->p_refine_flags.size() ==
-                     tria->n_raw_cells(level) &&
-                   levels[level]->p_coarsen_flags.size() ==
-                     tria->n_raw_cells(level),
-                 ExcInternalError());
-        }
   }
 
 
@@ -1983,9 +1986,14 @@ namespace hp
         // Resize active_fe_indices vectors. Use zero indicator to extend.
         levels[i]->active_fe_indices.resize(tria->n_raw_cells(i), 0);
 
-        // Resize p-flags vectors. Clear all flags after refinement finished.
-        levels[i]->p_refine_flags.assign(tria->n_raw_cells(i), false);
-        levels[i]->p_coarsen_flags.assign(tria->n_raw_cells(i), false);
+        // Resize future_fe_indices vectors. Make sure that all
+        // future_fe_indices have been cleared after refinement happened.
+        //
+        // We have used future_fe_indices to update all active_fe_indices
+        // before refinement happened, thus we are safe to clear them now.
+        levels[i]->future_fe_indices.assign(
+          tria->n_raw_cells(i),
+          dealii::internal::hp::DoFLevel::invalid_active_fe_index);
       }
   }
 

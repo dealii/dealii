@@ -36,34 +36,29 @@ template <int dim>
 void
 test()
 {
+  // we pick a subdivided hyper cube so that the domain is
+  // distributed on more than one processor.
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::subdivided_hyper_cube(tria, 2);
   tria.refine_global(1);
 
   hp::FECollection<dim> fe;
-  for (unsigned int i = 0; i < 3; ++i)
-    fe.push_back(FE_Q<dim>(i + 1));
+  for (unsigned int i = 0; i < std::pow(2, dim); ++i)
+    fe.push_back(FE_Q<dim>(1));
 
   hp::DoFHandler<dim> dh(tria);
   dh.set_fe(fe);
 
-  // set default active_fe_index and refine flags
-  bool flag = false;
+  // set future_fe_indices
+  unsigned int future_feidx = 0;
   for (const auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       {
-        cell->set_active_fe_index(1);
+        // check if cell is initialized correctly
+        Assert(cell->active_fe_index() == 0, ExcInternalError());
 
-        if (flag)
-          {
-            cell->set_p_refine_flag();
-            flag = false;
-          }
-        else
-          {
-            cell->set_p_coarsen_flag();
-            flag = true;
-          }
+        cell->set_future_fe_index(future_feidx);
+        future_feidx = ((future_feidx + 1) < fe.size()) ? future_feidx + 1 : 0;
       }
 
   tria.execute_coarsening_and_refinement();
@@ -72,8 +67,7 @@ test()
   for (const auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned())
       {
-        Assert(!cell->p_refine_flag_set() && !cell->p_coarsen_flag_set(),
-               ExcInternalError());
+        Assert(cell->future_fe_index_set() == false, ExcInternalError());
 
         deallog << "cell:" << cell->id().to_string()
                 << ", fe_index:" << cell->active_fe_index() << std::endl;

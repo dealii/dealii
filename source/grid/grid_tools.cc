@@ -2839,6 +2839,9 @@ namespace GridTools
     Assert(cell_connection_graph.n_cols() == triangulation.n_active_cells(),
            ExcMessage("Connectivity graph has wrong size"));
 
+    // signal that partitioning is going to happen
+    triangulation.signals.pre_partition();
+
     // check for an easy return
     if (n_partitions == 1)
       {
@@ -2909,6 +2912,9 @@ namespace GridTools
                       "are already partitioned implicitly and can not be "
                       "partitioned again explicitly."));
     Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+
+    // signal that partitioning is going to happen
+    triangulation.signals.pre_partition();
 
     // check for an easy return
     if (n_partitions == 1)

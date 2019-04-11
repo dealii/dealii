@@ -15,7 +15,7 @@
 
 
 
-// check if p-adaptive flags will be set correctly
+// check if future fe indices will be set correctly
 
 
 #include <deal.II/fe/fe_q.h>
@@ -39,34 +39,39 @@ test()
 
   hp::FECollection<dim> fe_collection;
   fe_collection.push_back(FE_Q<dim>(1));
+  fe_collection.push_back(FE_Q<dim>(1));
 
   hp::DoFHandler<dim> dh(tria);
   dh.distribute_dofs(fe_collection);
 
-  // check if flags are initialized correctly
+  // check if indices are initialized correctly
   for (const auto &cell : dh.active_cell_iterators())
-    Assert(!cell->p_refine_flag_set() && !cell->p_coarsen_flag_set(),
-           ExcInternalError());
+    Assert(cell->future_fe_index_set() == false, ExcInternalError());
 
-  // set flags at least once
+  // set future index at least once
   auto cell = dh.begin_active();
-  cell->set_p_refine_flag();
-  (++cell)->set_p_coarsen_flag();
+  cell->set_future_fe_index(1);
+
+  // try to set future index to an invalid one
+  try
+    {
+      (++cell)->set_future_fe_index(2);
+    }
+  catch (const ExcIndexRange &)
+    {
+      deallog << "Set to 2 failed" << std::endl;
+    }
 
   // verify flags
   for (const auto &cell : dh.active_cell_iterators())
     deallog << "cell:" << cell->id().to_string()
-            << ", refine:" << cell->p_refine_flag_set()
-            << ", coarsen:" << cell->p_coarsen_flag_set() << std::endl;
+            << ", future_fe:" << cell->future_fe_index() << std::endl;
 
   // clear all flags and check if all were cleared
   for (const auto &cell : dh.active_cell_iterators())
     {
-      cell->clear_p_refine_flag();
-      Assert(!cell->p_refine_flag_set(), ExcInternalError());
-
-      cell->clear_p_coarsen_flag();
-      Assert(!cell->p_coarsen_flag_set(), ExcInternalError());
+      cell->clear_future_fe_index();
+      Assert(cell->future_fe_index_set() == false, ExcInternalError());
     }
 }
 

@@ -2206,9 +2206,17 @@ public:
     /**
      * This signal is triggered at the end of execution of the
      * Triangulation::execute_coarsening_and_refinement() function when the
-     * triangulation has reached its final state
+     * triangulation has reached its final state.
      */
     boost::signals2::signal<void()> post_refinement;
+
+    /**
+     * This signal is triggered at the beginning of execution of the
+     * GridTools::partition_triangulation() and
+     * GridTools::partition_triangulation_zorder() functions. At the time this
+     * signal is triggered, the triangulation is still unchanged.
+     */
+    boost::signals2::signal<void()> pre_partition;
 
     /**
      * This signal is triggered when a function in deal.II moves the grid

@@ -26,6 +26,11 @@ namespace internal
 {
   namespace hp
   {
+    const DoFLevel::active_fe_index_type DoFLevel::invalid_active_fe_index =
+      static_cast<DoFLevel::active_fe_index_type>(-1);
+
+
+
     template <int dim, int spacedim>
     void
     DoFLevel::compress_data(
@@ -249,8 +254,7 @@ namespace internal
               MemoryConsumption::memory_consumption(dof_offsets) +
               MemoryConsumption::memory_consumption(cell_cache_offsets) +
               MemoryConsumption::memory_consumption(cell_dof_indices_cache) +
-              MemoryConsumption::memory_consumption(p_refine_flags) +
-              MemoryConsumption::memory_consumption(p_coarsen_flags));
+              MemoryConsumption::memory_consumption(future_fe_indices));
     }
 
 

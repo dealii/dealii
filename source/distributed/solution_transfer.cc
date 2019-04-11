@@ -241,9 +241,7 @@ namespace parallel
 
       if (DoFHandlerType::is_hp_dof_handler)
         {
-          unsigned int dofs_per_cell = numbers::invalid_unsigned_int;
-          unsigned int fe_index      = numbers::invalid_unsigned_int;
-
+          unsigned int fe_index = numbers::invalid_unsigned_int;
           switch (status)
             {
               case parallel::distributed::Triangulation<
@@ -253,8 +251,7 @@ namespace parallel
                 dim,
                 DoFHandlerType::space_dimension>::CELL_REFINE:
                 {
-                  dofs_per_cell = cell->get_fe().dofs_per_cell;
-                  fe_index      = cell->active_fe_index();
+                  fe_index = cell->future_fe_index();
                   break;
                 }
 
@@ -270,7 +267,7 @@ namespace parallel
                        child_index < GeometryInfo<dim>::max_children_per_cell;
                        ++child_index)
                     fe_indices_children.insert(
-                      cell->child(child_index)->active_fe_index());
+                      cell->child(child_index)->future_fe_index());
 
                   fe_index = dof_handler->get_fe_collection()
                                .find_dominating_fe_extended(fe_indices_children,
@@ -283,14 +280,16 @@ namespace parallel
                       "that dominates all children of a cell you are trying "
                       "to coarsen!"));
 
-                  dofs_per_cell = dof_handler->get_fe(fe_index).dofs_per_cell;
+                  break;
                 }
-                break;
 
               default:
                 Assert(false, ExcInternalError());
                 break;
             }
+
+          const unsigned int dofs_per_cell =
+            dof_handler->get_fe(fe_index).dofs_per_cell;
 
           auto it_input  = input_vectors.cbegin();
           auto it_output = dofvalues.begin();
