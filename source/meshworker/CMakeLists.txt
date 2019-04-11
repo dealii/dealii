@@ -19,11 +19,13 @@ SET(_src
   mesh_worker.cc
   mesh_worker_info.cc
   mesh_worker_vector_selector.cc
+  scratch_data.cc
   )
 
 SET(_inst
   mesh_worker_info.inst.in
   mesh_worker_vector_selector.inst.in
+  scratch_data.inst.in
   )
 
 FILE(GLOB _header
