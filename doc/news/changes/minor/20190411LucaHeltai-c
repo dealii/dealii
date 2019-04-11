@@ -1,0 +1,3 @@
+Fixed: Make sure that GridTools::Cache::get_cell_bounding_boxes_rtree() honors mappings. 
+<br>
+(Luca Heltai, 2019/04/11)

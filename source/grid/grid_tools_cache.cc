@@ -131,15 +131,34 @@ namespace GridTools
         std::vector<std::pair<
           BoundingBox<spacedim>,
           typename Triangulation<dim, spacedim>::active_cell_iterator>>
-                     boxes(tria->n_active_cells());
-        unsigned int i = 0;
-        for (const auto &cell : tria->active_cell_iterators())
-          boxes[i++] = std::make_pair(cell->bounding_box(), cell);
+          boxes(tria->n_active_cells());
+        if (mapping->preserves_vertex_locations())
+          {
+            unsigned int i = 0;
+            for (const auto &cell : tria->active_cell_iterators())
+              boxes[i++] = std::make_pair(cell->bounding_box(), cell);
+          }
+        else
+          {
+            unsigned int i = 0;
+            for (const auto &cell : tria->active_cell_iterators())
+              {
+                const auto      vertices = mapping->get_vertices(cell);
+                Point<spacedim> p0 = vertices[0], p1 = vertices[0];
+                for (unsigned int j = 1; j < vertices.size(); ++j)
+                  for (unsigned int d = 0; d < spacedim; ++d)
+                    {
+                      p0[d] = std::min(p0[d], vertices[j][d]);
+                      p1[d] = std::max(p1[d], vertices[j][d]);
+                    }
+                boxes[i++] =
+                  std::make_pair(BoundingBox<spacedim>({p0, p1}), cell);
+              }
+          }
         cell_bounding_boxes_rtree = pack_rtree(boxes);
       }
     return cell_bounding_boxes_rtree;
   }
-
 
 
 #ifdef DEAL_II_WITH_NANOFLANN

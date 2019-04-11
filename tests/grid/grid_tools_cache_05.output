@@ -1,0 +1,10 @@
+
+DEAL::dim=1
+DEAL::No Mapping      : -1.00000, 1.00000
+DEAL::MappingQEulerian: 1.00000, 3.00000
+DEAL::dim=2
+DEAL::No Mapping      : -1.00000 -1.00000, 1.00000 1.00000
+DEAL::MappingQEulerian: 1.00000 1.00000, 3.00000 3.00000
+DEAL::dim=3
+DEAL::No Mapping      : -1.00000 -1.00000 -1.00000, 1.00000 1.00000 1.00000
+DEAL::MappingQEulerian: 1.00000 1.00000 1.00000, 3.00000 3.00000 3.00000
