@@ -452,7 +452,7 @@ namespace Step63
                        CopyData &          copy_data);
     void assemble_system_and_multigrid();
 
-    std::unique_ptr<MGSmoother<Vector<double>>> create_smoother();
+    void setup_smoother();
 
     void solve();
     void refine_grid();
@@ -483,6 +483,12 @@ namespace Step63
     mg::Matrix<Vector<double>> mg_interface_matrix_in;
     mg::Matrix<Vector<double>> mg_interface_matrix_out;
 
+    using SmootherType =
+      RelaxationBlock<SparseMatrix<double>, double, Vector<double>>;
+    using SmootherAdditionalDataType = SmootherType::AdditionalData;
+    std::unique_ptr<MGSmoother<Vector<double>>> mg_smoother;
+
+    MGLevelObject<SmootherAdditionalDataType> smoother_data;
 
     MGConstrainedDoFs mg_constrained_dofs;
 
@@ -797,8 +803,7 @@ namespace Step63
 
 
   template <int dim>
-  std::unique_ptr<MGSmoother<Vector<double>>>
-  AdvectionProblem<dim>::create_smoother()
+  void AdvectionProblem<dim>::setup_smoother()
   {
     if (settings.smoother_type == "SOR")
       {
@@ -812,7 +817,7 @@ namespace Step63
                              Smoother::AdditionalData(fe.degree == 1 ? 1.0 :
                                                                        0.62));
         smoother->set_steps(2);
-        return smoother;
+        mg_smoother = std::move(smoother);
       }
     else if (settings.smoother_type == "Jacobi")
       {
@@ -825,15 +830,13 @@ namespace Step63
                              Smoother::AdditionalData(fe.degree == 1 ? 0.6667 :
                                                                        0.47));
         smoother->set_steps(4);
-        return smoother;
+        mg_smoother = std::move(smoother);
       }
     else if (settings.smoother_type == "block SOR")
       {
         using Smoother =
           RelaxationBlockSOR<SparseMatrix<double>, double, Vector<double>>;
 
-        // TODO: try and remove static
-        static MGLevelObject<typename Smoother::AdditionalData> smoother_data;
         smoother_data.resize(0, triangulation.n_levels() - 1);
 
         for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
@@ -885,15 +888,13 @@ namespace Step63
                                                         Vector<double>>>();
         smoother->initialize(mg_matrices, smoother_data);
         smoother->set_steps(1);
-        return smoother;
+        mg_smoother = std::move(smoother);
       }
     else if (settings.smoother_type == "block Jacobi")
       {
         using Smoother =
           RelaxationBlockJacobi<SparseMatrix<double>, double, Vector<double>>;
 
-        // TODO: try and remove static
-        static MGLevelObject<typename Smoother::AdditionalData> smoother_data;
         smoother_data.resize(0, triangulation.n_levels() - 1);
 
         for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
@@ -945,7 +946,7 @@ namespace Step63
                                                         Vector<double>>>();
         smoother->initialize(mg_matrices, smoother_data);
         smoother->set_steps(2);
-        return smoother;
+        mg_smoother = std::move(smoother);
       }
     else
       AssertThrow(false, ExcNotImplemented());
@@ -969,8 +970,7 @@ namespace Step63
     MGCoarseGridHouseholder<double, Vector<double>> coarse_grid_solver;
     coarse_grid_solver.initialize(coarse_matrix);
 
-    const std::unique_ptr<MGSmoother<Vector<double>>> mg_smoother =
-      create_smoother();
+    setup_smoother();
 
     mg_matrix.initialize(mg_matrices);
     mg_interface_matrix_in.initialize(mg_interface_in);
@@ -998,6 +998,8 @@ namespace Step63
               << " in " << time.last_wall_time() << " seconds " << std::endl;
 
     constraints.distribute(solution);
+
+    mg_smoother.release();
   }
 
 
