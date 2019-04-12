@@ -158,7 +158,8 @@ namespace Step63
                       "true",
                       Patterns::Bool(),
                       "With streamline diffusion: true|false");
-    prm.declare_entry("Output","true",
+    prm.declare_entry("Output",
+                      "true",
                       Patterns::Bool(),
                       "Generate graphical output: true|false");
 
@@ -658,7 +659,8 @@ namespace Step63
                            compute_stabilization_delta(cell->diameter(),
                                                        epsilon,
                                                        advection_direction,
-                                                       settings.fe_degree) : 0.0;
+                                                       settings.fe_degree) :
+                           0.0;
 
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
