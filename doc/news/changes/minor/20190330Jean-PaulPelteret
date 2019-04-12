@@ -1,0 +1,4 @@
+New: The Differentiation::SD::Expression class can now be used to perform
+symbolic math calculations.
+<br>
+(Jean-Paul Pelteret, 2019/03/30)
