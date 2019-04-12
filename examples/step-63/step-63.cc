@@ -122,7 +122,7 @@ namespace Step63
       random
     };
 
-    bool get_parameters(const std::string &prm_filename);
+    void get_parameters(const std::string &prm_filename);
 
     unsigned int           fe_degree;
     std::string            smoother_type;
@@ -131,15 +131,8 @@ namespace Step63
     bool                   output;
   };
 
-  bool Settings::get_parameters(const std::string &prm_filename)
+  void Settings::get_parameters(const std::string &prm_filename)
   {
-    if (prm_filename.size() == 0)
-      {
-        std::cerr << "Usage: please pass a .prm file as the first argument"
-                  << std::endl;
-        return false;
-      }
-
     ParameterHandler prm;
 
     prm.declare_entry("Fe degree",
@@ -163,18 +156,14 @@ namespace Step63
                       Patterns::Bool(),
                       "Generate graphical output: true|false");
 
-    try
+    if (prm_filename.size() == 0)
       {
-        prm.parse_input(prm_filename);
-      }
-    catch (const dealii::PathSearch::ExcFileNotFound &)
-      {
-        std::cerr << "ERROR: could not parse input from given .prm file"
-                  << prm_filename << "'" << std::endl;
-
         prm.print_parameters(std::cout, ParameterHandler::Text);
-        return false;
+        AssertThrow(
+          false, ExcMessage("please pass a .prm file as the first argument!"));
       }
+
+    prm.parse_input(prm_filename);
 
     fe_degree     = prm.get_integer("Fe degree");
     smoother_type = prm.get("Smoother type");
@@ -191,8 +180,6 @@ namespace Step63
 
     with_streamline_diffusion = prm.get_bool("With streamline diffusion");
     output                    = prm.get_bool("Output");
-
-    return true;
   }
 
 
@@ -1111,8 +1098,7 @@ int main(int argc, char *argv[])
   try
     {
       Step63::Settings settings;
-      if (!settings.get_parameters((argc > 1) ? (argv[1]) : ""))
-        return 0;
+      settings.get_parameters((argc > 1) ? (argv[1]) : "");
 
       Step63::AdvectionProblem<2> advection_problem_2d(settings);
       advection_problem_2d.run();
