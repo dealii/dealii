@@ -1133,6 +1133,7 @@ namespace Functions
    * exponents are of course equally valid. Exponents can't be real when the
    * bases are negative numbers.
    *
+   * @ingroup functions
    * @author Wolfgang Bangerth, 2006
    */
   template <int dim>
@@ -1217,6 +1218,7 @@ namespace Functions
    * @note The use of the related class InterpolatedUniformGridData is
    * discussed in step-53.
    *
+   * @ingroup functions
    * @author Wolfgang Bangerth, 2013
    */
   template <int dim>
@@ -1320,6 +1322,7 @@ namespace Functions
    *
    * @note The use of this class is discussed in step-53.
    *
+   * @ingroup functions
    * @author Wolfgang Bangerth, 2013
    */
   template <int dim>
@@ -1386,6 +1389,7 @@ namespace Functions
    * takes a Table<2,double> to describe the set of exponents and a
    * Vector<double> to describe the set of coefficients.
    *
+   * @ingroup functions
    * @author Ángel Rodríguez, 2015
    */
   template <int dim>

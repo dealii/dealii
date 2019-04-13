@@ -29,6 +29,7 @@ namespace Functions
   /**
    * The Bessel functions of first kind or positive integer order.
    *
+   * @ingroup functions
    * @author Guido Kanschat
    * @date 2010
    */
