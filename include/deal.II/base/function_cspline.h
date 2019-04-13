@@ -68,6 +68,7 @@ namespace Functions
    *
    * @note This function is only implemented for dim==1 .
    *
+   * @ingroup functions
    * @author Denis Davydov
    * @date 2016
    */

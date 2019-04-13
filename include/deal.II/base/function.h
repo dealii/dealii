@@ -704,6 +704,7 @@ protected:
  * @endcode
  * The savings in work to write this are apparent.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 2011
  */
 template <int dim, typename RangeNumberType = double>
@@ -770,6 +771,7 @@ private:
  * obviously easily extended to functions that are non-constant in their one
  * component.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 2011
  */
 template <int dim, typename RangeNumberType = double>
@@ -858,6 +860,7 @@ private:
  * where the <code>dim</code> components of the tensor function are placed
  * into the first <code>dim</code> components of the function object.
  *
+ * @ingroup functions
  * @author Spencer Patty, 2013
  */
 template <int dim, typename RangeNumberType = double>

@@ -38,6 +38,7 @@ namespace Functions
    *
    * @note This function is currently only implemented for dim==3 .
    *
+   * @ingroup functions
    * @author Denis Davydov, 2017
    */
   template <int dim>
