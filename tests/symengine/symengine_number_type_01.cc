@@ -1125,6 +1125,10 @@ main()
 
       // No condition is met
       {
+#if defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+        fedisableexcept(FE_INVALID);
+#endif
+
         const double                x_val = -1.0;
         SD::types::substitution_map sub_map;
         sub_map[x]               = SD_number_t(x_val);
