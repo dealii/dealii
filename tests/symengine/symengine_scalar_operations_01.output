@@ -1,0 +1,5 @@
+
+DEAL::Symbol: d
+DEAL::Symbolic function (vector of arguments): f(c, b, a)
+DEAL::Symbolic function (map of arguments): g(a, b, c)
+DEAL::OK

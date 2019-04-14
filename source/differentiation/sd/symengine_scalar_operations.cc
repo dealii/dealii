@@ -13,15 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_differentiation_sd_h
-#define dealii_differentiation_sd_h
 
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
-#  include <deal.II/differentiation/sd/symengine_math.h>
-#  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
 #  include <deal.II/differentiation/sd/symengine_scalar_operations.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
@@ -31,19 +27,38 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Differentiation
 {
-  /**
-   * Wrappers for symbolic differentiation libraries. Currently there is support
-   * for the following libraries:
-   *   - SymEngine
-   *
-   * @ingroup auto_symb_diff
-   */
   namespace SD
-  {}
+  {
+    /* ------------------------- Symbol creation -----------------------*/
+
+
+    Expression
+    make_symbol(const std::string &symbol)
+    {
+      return Expression(symbol);
+    }
+
+
+    Expression
+    make_symbolic_function(const std::string &             symbol,
+                           const SD::types::symbol_vector &arguments)
+    {
+      return Expression(symbol, arguments);
+    }
+
+
+    Expression
+    make_symbolic_function(const std::string &                symbol,
+                           const SD::types::substitution_map &arguments)
+    {
+      return make_symbolic_function(symbol,
+                                    SD::Utilities::extract_symbols(arguments));
+    }
+
+
+  } // namespace SD
 } // namespace Differentiation
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SYMENGINE
-
-#endif // dealii_differentiation_sd_h
