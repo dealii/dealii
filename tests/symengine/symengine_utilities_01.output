@@ -1,0 +1,10 @@
+
+DEAL::Print substitution map
+DEAL::a = 3.0
+b = 2
+c = 1.0
+Print extracted symbol-value pairs
+DEAL::a = 3.00000
+DEAL::b = 2.00000
+DEAL::c = 1.00000
+DEAL::OK

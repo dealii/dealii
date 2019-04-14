@@ -24,6 +24,7 @@
 #  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
+#  include <deal.II/differentiation/sd/symengine_utilities.h>
 
 DEAL_II_NAMESPACE_OPEN
 
