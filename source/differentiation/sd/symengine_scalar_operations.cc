@@ -56,6 +56,15 @@ namespace Differentiation
     }
 
 
+    /* --------------------------- Differentiation ------------------------- */
+
+
+    Expression
+    differentiate(const Expression &func, const Expression &op)
+    {
+      return func.differentiate(op);
+    }
+
   } // namespace SD
 } // namespace Differentiation
 

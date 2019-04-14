@@ -109,6 +109,27 @@ namespace Differentiation
 
     //@}
 
+    /**
+     * @name Symbolic differentiation
+     */
+    //@{
+
+    /**
+     * Return the symbolic result of computing the partial derivative of the
+     * scalar @p f with respect to the scalar @p x.
+     * In most use cases the function or variable @f would be called the
+     * dependent variable, and @p x the independent variable.
+     *
+     * @param[in] f A scalar symbolic function or (dependent) variable.
+     * @param[in] x A scalar symbolic (independent) variable.
+     * @return The symbolic function or variable representing the result
+     *         $\frac{\partial f}{\partial x}$.
+     */
+    Expression
+    differentiate(const Expression &f, const Expression &x);
+
+    //@}
+
   } // namespace SD
 } // namespace Differentiation
 
