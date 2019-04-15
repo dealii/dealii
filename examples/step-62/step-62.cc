@@ -77,16 +77,16 @@ namespace step62
   // @sect3{Auxiliary classes and functions}
   // The following classes are used to store the parameters of the simulation.
 
-  // @sect4{`RightHandSide` class}
+  // @sect4{The `RightHandSide` class}
   // This class is used to define the force pulse on the left side of the
-  // structure.
+  // structure:
   template <int dim>
   class RightHandSide : public Function<dim>
   {
   public:
     RightHandSide(HDF5::Group &data);
     virtual double value(const Point<dim> & p,
-                         const unsigned int component) const;
+                         const unsigned int component) const override;
 
   private:
     // `data` is the HDF5::Group in which all the simulation results will be
@@ -113,8 +113,9 @@ namespace step62
     const unsigned int force_component = 0;
   };
 
-  // @sect4{`PML` class}
-  // This class is used to define the shape of the PML.
+  // @sect4{The `PML` class}
+  // This class is used to define the shape of the Perfectly Matches
+  // Layer (PML) to absorb waves traveling towards the boundary:
   template <int dim>
   class PML : public Function<dim, std::complex<double>>
   {
@@ -144,7 +145,7 @@ namespace step62
 
 
 
-  // @sect4{`Rho` class}
+  // @sect4{The `Rho` class}
   // This class is used to define the mass density.
   template <int dim>
   class Rho : public Function<dim>
@@ -174,7 +175,7 @@ namespace step62
 
 
 
-  // @sect4{`Parameters` class}
+  // @sect4{The `Parameters` class}
   // This class contains all the parameters that will be used in the simulation.
   template <int dim>
   class Parameters
@@ -215,9 +216,8 @@ namespace step62
   // The calculation of the mass and stiffness matrices is very expensive. These
   // matrices are the same for all the frequency steps. The right hand side
   // vector is also the same for all the frequency steps. We use this class to
-  // store these values and re-use them at each frequency step. The
+  // store these objects and re-use them at each frequency step. The
   // `PointHistory` class has already been used in step-18.
-
   template <int dim>
   class PointHistory
   {
@@ -240,7 +240,7 @@ namespace step62
 
 
 
-  // @sect4{`get_stiffness_tensor` function}
+  // @sect4{The `get_stiffness_tensor()` function}
 
   // This class returns the stiffness tensor of the material. For the sake of
   // simplicity we consider the stiffness to be isotropic and homogeneous; only
@@ -272,15 +272,15 @@ namespace step62
 
 
 
-  // @sect3{`ElasticWave` class}
+  // @sect3{The `ElasticWave` class}
 
   // Next let's declare the main class of this program. Its structure is very
   // similar to the step-40 tutorial program. The main differences are:
-  // - The sweep over the frequency vector.
+  // - The sweep over the frequency values.
   // - We save the stiffness and mass matrices in `quadrature_point_history` and
-  // use them for each frequency step.
+  //   use them for each frequency step.
   // - We store the measured energy by the probe for each frequency step in the
-  // HDF5 file.
+  //   HDF5 file.
   template <int dim>
   class ElasticWave
   {
@@ -1398,7 +1398,7 @@ namespace step62
   }
 } // namespace step62
 
-using namespace dealii;
+
 
 // @sect4{The main function}
 
@@ -1407,7 +1407,8 @@ int main(int argc, char *argv[])
 {
   try
     {
-      const int dim = 2;
+      using namespace dealii;
+      const unsigned int dim = 2;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 

@@ -33,8 +33,8 @@ The simulations of this tutorial are done in 2D;
 although because we use templates it is very easy to convert this program to 3D.
 There are two regimes that depend on the waveguide width:
 - Single mode: In this case the width of the structure is much
-  smaller that the wavelength, therefore the waveguide is single mode.
-  This case can be solved either with FEM (approach that we take here) or with
+  smaller than the wavelength, therefore the waveguide is single mode.
+  This case can be solved either with FEM (the approach that we take here) or with
   a simple semi-analytical
   [1D transfer matrix formalism](https://en.wikipedia.org/wiki/Transfer_matrix).
 - Multimode: In this case the width of the structure is larger than the
@@ -42,7 +42,7 @@ There are two regimes that depend on the waveguide width:
   This case can be solved using FEM
   or with a [scattering matrix formalism](https://doi.org/10.1103/PhysRevA.94.033813).
   Although we do not study this case in this tutorial, it is very easy to reach the multimode
-  by increasing the parameter waveguide width (`dimension_y` in the jupyter notebook).
+  case by increasing the parameter waveguide width (`dimension_y` in the jupyter notebook).
 
 The simulations of this tutorial are performed in the frequency domain.
 To calculate the transmission spectrum, we use a
@@ -51,12 +51,12 @@ that is commonly used in time domain [FDTD](https://en.wikipedia.org/wiki/Finite
 simulations. A pulse at a certain frequency is generated on the left side of the
 structure and the transmitted energy is measured on the right side of the structure.
 The simulation is run twice. First, we run the simulation with the phononic
-structure and measure the transmitted energy.
+structure and measure the transmitted energy:
 
 <img alt="Phononic superlattice cavity" src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.02.svg?sanitize=true" height="200" />
 
-Then we run the simulation without the phononic structure and measure the transmitted
-energy; we use the simulation without the structure for the calibration.
+Then, we run the simulation without the phononic structure and measure the transmitted
+energy; we use the simulation without the structure for the calibration:
 
 <img alt="Phononic superlattice cavity" src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.03.svg?sanitize=true" height="200" />
 
@@ -66,21 +66,28 @@ We repeat this procedure for each frequency step.
 
 
 <h3>Elastic equations</h3>
-The elastic equations in the time domain are 
+What we want to simulate here is the transmission of elastic
+waves. Consequently, the right description of the problem uses the
+elastic equations, which in the time domain are given by
 @f[
 \rho\partial_{tt} u_i - \partial_j (c_{ijkl} \varepsilon_{kl}) = f_i,
 \qquad i=0,1,2
 @f]
-where the stiffness tensor $c_{ijkl}$ depends on the spacial coordinates and
-the strain is given by
+where the stiffness tensor $c_{ijkl}$ depends on the spatial coordinates and
+the strain is the symmetrized gradient of the displacement, given by
 @f[
 \varepsilon_{kl} =\frac{1}{2}(\partial_k u_l + \partial_l u_k)
 @f]
 
 [A perfectly matched layer (PML)](https://en.wikipedia.org/wiki/Perfectly_matched_layer)
 can be used to truncate the solution at the boundaries.
-A PML is a transformation that results in a complex coordinate stretching.
-The elastic equations in the frequency domain read as follows
+A PML is a transformation that results in a complex coordinate
+stretching.
+
+Instead of a time domain approach, this tutorial program converts the
+equations above into the frequency domain by performing a Fourier
+transform with regard to the time variable.
+The elastic equations in the frequency domain then read as follows
 @f{eqnarray*}
 \nabla\cdot(\boldsymbol{\bar\sigma} \xi \boldsymbol{\Lambda})&=&-\omega^2\rho\xi\mathbf{\bar u}\\
 \boldsymbol{\bar \sigma} &=&\mathbf{C}\boldsymbol{\bar\varepsilon}\\
