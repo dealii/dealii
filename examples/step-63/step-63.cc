@@ -372,17 +372,8 @@ namespace Step63
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     (void)component;
 
-    if (std::fabs(p[0] * p[0] + p[1] * p[1] - 0.3 * 0.3) <
-          1e-8                                        // around cylinder
-        || std::fabs(p[0] + 1) < 1e-8                 // x == -1
-        || std::fabs(p[1] - 1) < 1e-8                 // y == 1
-        || (std::fabs(p[1] + 1) < 1e-8 && p[0] < 0.5) // y == -1, x <= 0.5
-    )
-      {
-        return 0.0;
-      }
-    else if (std::fabs(p[0] - 1) < 1e-8                     // x = 1
-             || (std::fabs(p[1] + 1) < 1e-8 && p[0] >= 0.5) // y == -1, x > 0.5
+    if (std::fabs(p[0] - 1) < 1e-8                     // x == 1
+        || (std::fabs(p[1] + 1) < 1e-8 && p[0] >= 0.5) // y == -1, x > 0.5
     )
       {
         return 1.0;
@@ -623,8 +614,7 @@ namespace Step63
                                             ScratchData<dim> &  scratch_data,
                                             CopyData &          copy_data)
   {
-    const unsigned int level = cell->level();
-    copy_data.level          = level;
+    copy_data.level = cell->level();
 
     const unsigned int dofs_per_cell =
       scratch_data.fe_values.get_fe().dofs_per_cell;
@@ -727,8 +717,6 @@ namespace Step63
                           CopyData(),
                           MeshWorker::assemble_own_cells);
 
-
-    // Assemble GMG
     std::vector<AffineConstraints<double>> boundary_constraints(
       triangulation.n_global_levels());
     for (unsigned int level = 0; level < triangulation.n_global_levels();
@@ -819,11 +807,9 @@ namespace Step63
         smoother->set_steps(4);
         mg_smoother = std::move(smoother);
       }
-    else if (settings.smoother_type == "block SOR")
+    else if (settings.smoother_type == "block SOR" ||
+             settings.smoother_type == "block Jacobi")
       {
-        using Smoother =
-          RelaxationBlockSOR<SparseMatrix<double>, double, Vector<double>>;
-
         smoother_data.resize(0, triangulation.n_levels() - 1);
 
         for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
@@ -832,7 +818,8 @@ namespace Step63
                                         dof_handler,
                                         level);
 
-            smoother_data[level].relaxation = 1.0;
+            smoother_data[level].relaxation =
+              (settings.smoother_type == "block SOR" ? 1.0 : 0.25);
             smoother_data[level].inversion = PreconditionBlockBase<double>::svd;
 
             std::vector<unsigned int> ordered_indices;
@@ -869,71 +856,28 @@ namespace Step63
               std::vector<std::vector<unsigned int>>(1, ordered_indices);
           }
 
-        auto smoother =
-          std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
-                                                        Smoother,
-                                                        Vector<double>>>();
-        smoother->initialize(mg_matrices, smoother_data);
-        smoother->set_steps(1);
-        mg_smoother = std::move(smoother);
-      }
-    else if (settings.smoother_type == "block Jacobi")
-      {
-        using Smoother =
-          RelaxationBlockJacobi<SparseMatrix<double>, double, Vector<double>>;
-
-        smoother_data.resize(0, triangulation.n_levels() - 1);
-
-        for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
+        if (settings.smoother_type == "block SOR")
           {
-            DoFTools::make_cell_patches(smoother_data[level].block_list,
-                                        dof_handler,
-                                        level);
-
-            smoother_data[level].relaxation = 0.25;
-            smoother_data[level].inversion = PreconditionBlockBase<double>::svd;
-
-            std::vector<unsigned int> ordered_indices;
-            switch (settings.dof_renumbering)
-              {
-                case Settings::DoFRenumberingStrategy::downstream:
-                  ordered_indices =
-                    create_downstream_cell_ordering(dof_handler,
-                                                    advection_direction,
-                                                    level);
-                  break;
-
-                case Settings::DoFRenumberingStrategy::upstream:
-                  ordered_indices =
-                    create_downstream_cell_ordering(dof_handler,
-                                                    -1.0 * advection_direction,
-                                                    level);
-                  break;
-
-                case Settings::DoFRenumberingStrategy::random:
-                  ordered_indices =
-                    create_random_cell_ordering(dof_handler, level);
-                  break;
-
-                case Settings::DoFRenumberingStrategy::none: // Do nothing
-                  break;
-
-                default:
-                  AssertThrow(false, ExcNotImplemented());
-                  break;
-              }
-
-            smoother_data[level].order =
-              std::vector<std::vector<unsigned int>>(1, ordered_indices);
+            auto smoother = std_cxx14::make_unique<MGSmootherPrecondition<
+              SparseMatrix<double>,
+              RelaxationBlockSOR<SparseMatrix<double>, double, Vector<double>>,
+              Vector<double>>>();
+            smoother->initialize(mg_matrices, smoother_data);
+            smoother->set_steps(1);
+            mg_smoother = std::move(smoother);
           }
-
-        auto smoother =
-          std_cxx14::make_unique<MGSmootherPrecondition<SparseMatrix<double>,
-                                                        Smoother,
-                                                        Vector<double>>>();
-        smoother->initialize(mg_matrices, smoother_data);
-        smoother->set_steps(2);
-        mg_smoother = std::move(smoother);
+        else if (settings.smoother_type == "block Jacobi")
+          {
+            auto smoother = std_cxx14::make_unique<
+              MGSmootherPrecondition<SparseMatrix<double>,
+                                     RelaxationBlockJacobi<SparseMatrix<double>,
+                                                           double,
+                                                           Vector<double>>,
+                                     Vector<double>>>();
+            smoother->initialize(mg_matrices, smoother_data);
+            smoother->set_steps(2);
+            mg_smoother = std::move(smoother);
+          }
       }
     else
       AssertThrow(false, ExcNotImplemented());
