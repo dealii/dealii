@@ -1125,7 +1125,7 @@ main()
 
       // No condition is met
       {
-#if defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
         fedisableexcept(FE_INVALID);
 #endif
 
