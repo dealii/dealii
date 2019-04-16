@@ -514,11 +514,6 @@ namespace CUDAWrappers
       constexpr unsigned int cells_per_block =
         cells_per_block_shmem(dim, Functor::n_dofs_1d - 1);
 
-      constexpr unsigned int n_dofs_per_block =
-        cells_per_block * Functor::n_local_dofs;
-      constexpr unsigned int n_q_points_per_block =
-        cells_per_block * Functor::n_q_points;
-
       const unsigned int local_cell = threadIdx.x / Functor::n_dofs_1d;
       const unsigned int cell =
         local_cell + cells_per_block * (blockIdx.x + gridDim.x * blockIdx.y);

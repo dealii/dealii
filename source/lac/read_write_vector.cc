@@ -39,6 +39,33 @@ namespace LinearAlgebra
 #endif
 
 #undef TEMPL_COPY_CONSTRUCTOR
+
+  template void
+  ReadWriteVector<float>::import(
+    const distributed::Vector<float, ::dealii::MemorySpace::Host> &,
+    VectorOperation::values,
+    const std::shared_ptr<const CommunicationPatternBase> &);
+
+  template void
+  ReadWriteVector<double>::import(
+    const distributed::Vector<double, ::dealii::MemorySpace::Host> &,
+    VectorOperation::values,
+    const std::shared_ptr<const CommunicationPatternBase> &);
+#ifdef DEAL_II_WITH_COMPLEX_VALUES
+  template void
+  ReadWriteVector<std::complex<float>>::import(
+    const distributed::Vector<std::complex<float>, ::dealii::MemorySpace::Host>
+      &,
+    VectorOperation::values,
+    const std::shared_ptr<const CommunicationPatternBase> &);
+
+  template void
+  ReadWriteVector<std::complex<double>>::import(
+    const distributed::Vector<std::complex<double>, ::dealii::MemorySpace::Host>
+      &,
+    VectorOperation::values,
+    const std::shared_ptr<const CommunicationPatternBase> &);
+#endif
 } // namespace LinearAlgebra
 
 DEAL_II_NAMESPACE_CLOSE
