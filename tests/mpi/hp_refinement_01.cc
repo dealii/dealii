@@ -88,7 +88,7 @@ test()
         }
     }
 
-  dh.distribute_dofs(fe_collection);
+  dh.set_fe(fe_collection);
 
   // ----- refine -----
   tria.execute_coarsening_and_refinement();
