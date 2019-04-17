@@ -30,6 +30,7 @@
 #  include <symengine/expression.h>
 #  include <symengine/integer.h>
 #  include <symengine/logic.h>
+#  include <symengine/number.h>
 #  include <symengine/rational.h>
 
 // Number operations
@@ -1291,6 +1292,42 @@ namespace Differentiation
   } // namespace SD
 } // namespace Differentiation
 
+
+// Specializations from numbers.h
+// These are required in order to make the SD::Expression class a compatible
+// number for the Tensor and SymmetricTensor classes
+namespace numbers
+{
+  template <>
+  inline bool
+  value_is_zero(const Differentiation::SD::Expression &value)
+  {
+    if (SymEngine::is_a_Number(value.get_value()))
+      {
+        const SymEngine::RCP<const SymEngine::Number> number_rcp =
+          SymEngine::rcp_static_cast<const SymEngine::Number>(value.get_RCP());
+        return number_rcp->is_zero();
+      }
+
+    return false;
+  }
+
+  template <>
+  inline bool
+  values_are_equal(const Differentiation::SD::Expression &value_1,
+                   const Differentiation::SD::Expression &value_2)
+  {
+    return (value_1.get_value().__cmp__(value_2.get_value()) == 0);
+  }
+
+  template <>
+  inline bool
+  value_is_less_than(const Differentiation::SD::Expression &value_1,
+                     const Differentiation::SD::Expression &value_2)
+  {
+    return (value_1.get_value().__cmp__(value_2.get_value()) == -1);
+  }
+} // namespace numbers
 
 DEAL_II_NAMESPACE_CLOSE
 
