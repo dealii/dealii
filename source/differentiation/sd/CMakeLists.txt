@@ -19,11 +19,13 @@ SET(_src
   symengine_math.cc
   symengine_number_types.cc
   symengine_scalar_operations.cc
+  symengine_tensor_operations.cc
   symengine_types.cc
   symengine_utilities.cc
   )
 
 SET(_inst
+  symengine_tensor_operations.inst.in
   )
 
 FILE(GLOB _header
