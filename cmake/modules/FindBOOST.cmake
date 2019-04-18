@@ -51,7 +51,9 @@ ENDIF()
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
-# Workaround a CMake compatibility issue with boost-1.70.0
+# Work around a CMake compatibility issue with boost-1.70.0
+# compare https://gitlab.kitware.com/cmake/cmake/issues/18865
+# and https://lists.boost.org/Archives/boost/2019/02/245016.php
 SET(Boost_NO_BOOST_CMAKE ON)
 
 IF(DEAL_II_WITH_ZLIB)
