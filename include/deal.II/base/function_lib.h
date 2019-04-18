@@ -912,8 +912,12 @@ namespace Functions
    * radius of the supporting ball of a cut-off function. It also stores the
    * number of the non-zero component, if the function is vector-valued.
    *
+   * This class can also be used for approximated Dirac delta functions. These
+   * are special cut-off functions whose integral is always equal to one,
+   * independently on the radius of the supporting ball.
+   *
    * @ingroup functions
-   * @author Guido Kanschat, 2002
+   * @author Guido Kanschat, 2002, Luca Heltai, 2019.
    */
   template <int dim>
   class CutOffFunctionBase : public Function<dim>
@@ -930,12 +934,17 @@ namespace Functions
      *
      * If an argument <tt>select</tt> is given and not -1, the cut-off
      * function will be non-zero for this component only.
+     *
+     * If the argument @p integrate_to_one is set to true, then the value of
+     * the function is rescaled whenever a new radius is set.
      */
     CutOffFunctionBase(
       const double radius             = 1.,
       const Point<dim>                = Point<dim>(),
       const unsigned int n_components = 1,
-      const unsigned int select       = CutOffFunctionBase<dim>::no_component);
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      const bool         integrate_to_one       = false,
+      const double       unitary_integral_value = 1.0);
 
     /**
      * Move the center of the ball to new point <tt>p</tt>.
@@ -948,6 +957,18 @@ namespace Functions
      */
     void
     new_radius(const double r);
+
+    /**
+     * Return the center stored in this object.
+     */
+    const Point<dim> &
+    get_center() const;
+
+    /**
+     * Return the radius stored in this object.
+     */
+    double
+    get_radius() const;
 
   protected:
     /**
@@ -965,6 +986,22 @@ namespace Functions
      * in all components.
      */
     const unsigned int selected;
+
+    /**
+     * Flag that controls wether we rescale the value when the radius changes.
+     */
+    const bool integrate_to_one;
+
+    /**
+     * The reference integral value. Derived classes should specify what their
+     * integral is when @p radius = 1.0.
+     */
+    const double unitary_integral_value;
+
+    /**
+     * Current rescaling to apply the the cut-off function.
+     */
+    double rescaling;
   };
 
 
@@ -992,7 +1029,8 @@ namespace Functions
       const double radius             = 1.,
       const Point<dim>                = Point<dim>(),
       const unsigned int n_components = 1,
-      const unsigned int select       = CutOffFunctionBase<dim>::no_component);
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      const bool         integrate_to_one = false);
 
     /**
      * Function value at one point.
@@ -1040,7 +1078,8 @@ namespace Functions
       const double radius             = 1.,
       const Point<dim>                = Point<dim>(),
       const unsigned int n_components = 1,
-      const unsigned int select       = CutOffFunctionBase<dim>::no_component);
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      const bool         integrate_to_one = false);
 
     /**
      * Function value at one point.
@@ -1089,7 +1128,8 @@ namespace Functions
       const double radius             = 1.,
       const Point<dim>                = Point<dim>(),
       const unsigned int n_components = 1,
-      const unsigned int select       = CutOffFunctionBase<dim>::no_component);
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      bool               integrate_to_one = false);
 
     /**
      * Function value at one point.
