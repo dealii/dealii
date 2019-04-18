@@ -50,6 +50,10 @@ ENDIF()
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+
+# Workaround a CMake compatibility issue with boost-1.70.0
+SET(Boost_NO_BOOST_CMAKE ON)
+
 IF(DEAL_II_WITH_ZLIB)
   FIND_PACKAGE(Boost ${BOOST_VERSION_REQUIRED} COMPONENTS
     iostreams serialization system thread
@@ -77,7 +81,7 @@ IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
   LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 ENDIF()
 
-
+UNSET(Boost_NO_BOOST_CMAKE)
 
 IF(Boost_FOUND)
   #
