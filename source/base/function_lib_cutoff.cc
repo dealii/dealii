@@ -189,16 +189,29 @@ namespace Functions
   //////////////////////////////////////////////////////////////////////
   namespace
   {
-    double integral_Linfty[] = {2.0,
-                                3.14159265358979323846264338328,
-                                4.18879020478639098461685784437};
-    double integral_W1[]     = {1.0,
-                            1.04719755119659774615421446109,
-                            1.04719755119659774615421446109};
+    // Integral of CutOffFunctionLinfty in dimension 1, 2, and 3 when the radius
+    // is one
+    const double integral_Linfty[] = {2.0,
+                                      3.14159265358979323846264338328,
+                                      4.18879020478639098461685784437};
 
-    double integral_Cinfty[] = {1.20690032243787617533623799633,
-                                1.26811216112759608094632335664,
-                                1.1990039070192139033798473858};
+    // Integral of CutOffFunctionW1 in dimension 1, 2, and 3 when the radius
+    // is one
+    const double integral_W1[] = {1.0,
+                                  1.04719755119659774615421446109,
+                                  1.04719755119659774615421446109};
+
+    // Integral of CutOffFunctionCinfty in dimension 1, 2, and 3 when the radius
+    // is one
+    const double integral_Cinfty[] = {1.20690032243787617533623799633,
+                                      1.26811216112759608094632335664,
+                                      1.1990039070192139033798473858};
+
+    // Integral of CutOffFunctionC1 in dimension 1, 2, and 3 when the radius
+    // is one
+    const double integral_C1[] = {1.0,
+                                  0.93417655442731527615578663815,
+                                  0.821155557658032806157358815206};
   } // namespace
 
 
@@ -478,6 +491,115 @@ namespace Functions
   }
 
 
+
+  template <int dim>
+  CutOffFunctionC1<dim>::CutOffFunctionC1(const double       r,
+                                          const Point<dim>   p,
+                                          const unsigned int n_components,
+                                          const unsigned int select,
+                                          bool               integrate_to_one)
+    : CutOffFunctionBase<dim>(r,
+                              p,
+                              n_components,
+                              select,
+                              integrate_to_one,
+                              integral_C1[dim - 1])
+  {}
+
+
+  template <int dim>
+  double
+  CutOffFunctionC1<dim>::value(const Point<dim> & p,
+                               const unsigned int component) const
+  {
+    if (this->selected == CutOffFunctionBase<dim>::no_component ||
+        component == this->selected)
+      {
+        const double d = this->center.distance(p);
+        const double r = this->radius;
+        if (d >= r)
+          return 0.;
+        return .5 * (std::cos(numbers::PI * d / r) + 1) * this->rescaling;
+      }
+    return 0.;
+  }
+
+
+  template <int dim>
+  void
+  CutOffFunctionC1<dim>::value_list(const std::vector<Point<dim>> &points,
+                                    std::vector<double> &          values,
+                                    const unsigned int component) const
+  {
+    Assert(values.size() == points.size(),
+           ExcDimensionMismatch(values.size(), points.size()));
+
+    const double r = this->radius;
+
+    if (this->selected == CutOffFunctionBase<dim>::no_component ||
+        component == this->selected)
+      for (unsigned int i = 0; i < values.size(); ++i)
+        {
+          const double d = this->center.distance(points[i]);
+          if (d >= r)
+            {
+              values[i] = 0.;
+            }
+          else
+            {
+              values[i] =
+                .5 * (std::cos(numbers::PI * d / r) + 1) * this->rescaling;
+            }
+        }
+    else
+      std::fill(values.begin(), values.end(), 0.);
+  }
+
+
+  template <int dim>
+  void
+  CutOffFunctionC1<dim>::vector_value_list(
+    const std::vector<Point<dim>> &points,
+    std::vector<Vector<double>> &  values) const
+  {
+    Assert(values.size() == points.size(),
+           ExcDimensionMismatch(values.size(), points.size()));
+
+    for (unsigned int k = 0; k < values.size(); ++k)
+      {
+        const double d   = this->center.distance(points[k]);
+        const double r   = this->radius;
+        double       val = 0.;
+        if (d < this->radius)
+          {
+            val = .5 * (std::cos(numbers::PI * d / r) + 1) * this->rescaling;
+          }
+
+        if (this->selected == CutOffFunctionBase<dim>::no_component)
+          values[k] = val;
+        else
+          {
+            values[k]                 = 0;
+            values[k](this->selected) = val;
+          }
+      }
+  }
+
+
+
+  template <int dim>
+  Tensor<1, dim>
+  CutOffFunctionC1<dim>::gradient(const Point<dim> &p, const unsigned int) const
+  {
+    const double d = this->center.distance(p);
+    const double r = this->radius;
+    if (d >= r)
+      return Tensor<1, dim>();
+    return (-0.5 * numbers::PI * std::sin(numbers::PI * d / r) / r) *
+           (p - this->center) / d * this->rescaling;
+  }
+
+
   // explicit instantiations
   template class CutOffFunctionBase<1>;
   template class CutOffFunctionBase<2>;
@@ -494,6 +616,14 @@ namespace Functions
   template class CutOffFunctionCinfty<1>;
   template class CutOffFunctionCinfty<2>;
   template class CutOffFunctionCinfty<3>;
+
+  template class CutOffFunctionC1<1>;
+  template class CutOffFunctionC1<2>;
+  template class CutOffFunctionC1<3>;
+
+  template class CutOffFunctionTensorProduct<1>;
+  template class CutOffFunctionTensorProduct<2>;
+  template class CutOffFunctionTensorProduct<3>;
 } // namespace Functions
 
 DEAL_II_NAMESPACE_CLOSE

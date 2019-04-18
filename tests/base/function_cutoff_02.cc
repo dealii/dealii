@@ -117,4 +117,8 @@ main()
   test<1, Functions::CutOffFunctionCinfty>();
   test<2, Functions::CutOffFunctionCinfty>();
   test<3, Functions::CutOffFunctionCinfty>();
+
+  test<1, Functions::CutOffFunctionC1>();
+  test<2, Functions::CutOffFunctionC1>();
+  test<3, Functions::CutOffFunctionC1>();
 }

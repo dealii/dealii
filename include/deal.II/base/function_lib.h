@@ -915,7 +915,7 @@ namespace Functions
    *
    * This class can also be used for approximated Dirac delta functions. These
    * are special cut-off functions whose integral is always equal to one,
-   * independently on the radius of the supporting ball.
+   * independently of the radius of the supporting ball.
    *
    * @ingroup functions
    * @author Guido Kanschat, 2002, Luca Heltai, 2019.
@@ -931,17 +931,23 @@ namespace Functions
     static const unsigned int no_component = numbers::invalid_unsigned_int;
 
     /**
-     * Constructor. Arguments are the center of the ball and its radius.
+     * Constructor.
      *
-     * If an argument <tt>select</tt> is given and not -1, the cut-off
-     * function will be non-zero for this component only.
-     *
-     * If the argument @p integrate_to_one is set to true, then the value of
-     * the function is rescaled whenever a new radius is set.
+     * @param[in] radius Radius of the ball
+     * @param[in] center Center of the ball
+     * @param[in] n_components Number of components of this function object
+     * @param[in] select If this is different from
+     * CutOffFunctionBase<dim>::no_component, then the function will be non-zero
+     * for this component only
+     * @param[in] integrate_to_one Rescale the value of the function whenever a
+     * new radius is set, to guarantee that the integral is equal to one
+     * @param[in] unitary_integral_value Value of the integral when the radius
+     * is equal to 1.0. Derived classes will need to supply this value, to
+     * guarantee that the rescaling is performed correctly.
      */
     CutOffFunctionBase(
-      const double radius             = 1.,
-      const Point<dim>                = Point<dim>(),
+      const double       radius       = 1.,
+      const Point<dim>   center       = Point<dim>(),
       const unsigned int n_components = 1,
       const unsigned int select       = CutOffFunctionBase<dim>::no_component,
       const bool         integrate_to_one       = false,
@@ -976,8 +982,6 @@ namespace Functions
 
     /**
      * Set the radius of the ball to @p r
-     *
-     * @deprecated Use set_radius() instead.
      */
     virtual void
     set_radius(const double r);
@@ -995,7 +999,7 @@ namespace Functions
     get_radius() const;
 
     /**
-     * Return a boolean indicating if this function integrates to one.
+     * Return a boolean indicating whether this function integrates to one.
      */
     bool
     integrates_to_one() const;
@@ -1201,6 +1205,63 @@ namespace Functions
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
                       std::vector<Vector<double>> &  values) const override;
+  };
+
+
+  /**
+   * A cut-off function for an arbitrarily-sized ball that is in the space $C^1$
+   * (i.e., continuously differentiable). This is a cut-off function that is
+   * often used in the literature of the Immersed Boundary Method.
+   *
+   * The expression of the function in radial coordinates is given by
+   * $f(r)=1/2(cos(\pi r/s)+1)$ where $r<s$ is the distance to the center, and
+   * $s$ is the radius of the sphere. If vector valued, it can be restricted to
+   * a single component.
+   *
+   * @ingroup functions
+   * @author Luca Heltai, 2019
+   */
+  template <int dim>
+  class CutOffFunctionC1 : public CutOffFunctionBase<dim>
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    CutOffFunctionC1(
+      const double radius             = 1.,
+      const Point<dim>                = Point<dim>(),
+      const unsigned int n_components = 1,
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      bool               integrate_to_one = false);
+
+    /**
+     * Function value at one point.
+     */
+    virtual double
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
+
+    /**
+     * Function values at multiple points.
+     */
+    virtual void
+    value_list(const std::vector<Point<dim>> &points,
+               std::vector<double> &          values,
+               const unsigned int             component = 0) const override;
+
+    /**
+     * Function values at multiple points.
+     */
+    virtual void
+    vector_value_list(const std::vector<Point<dim>> &points,
+                      std::vector<Vector<double>> &  values) const override;
+
+    /**
+     * Function gradient at one point.
+     */
+    virtual Tensor<1, dim>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
   };
 
 
