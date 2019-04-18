@@ -948,15 +948,33 @@ namespace Functions
 
     /**
      * Move the center of the ball to new point <tt>p</tt>.
+     *
+     * @deprecated Use set_center() instead.
      */
-    void
+    DEAL_II_DEPRECATED void
     new_center(const Point<dim> &p);
 
     /**
      * Set the radius of the ball to <tt>r</tt>.
+     *
+     * @deprecated Use set_radius() instead.
+     */
+    DEAL_II_DEPRECATED void
+    new_radius(const double r);
+
+    /**
+     * Set the center of the ball to the point @p p.
      */
     void
-    new_radius(const double r);
+    set_center(const Point<dim> &p);
+
+    /**
+     * Set the radius of the ball to @p r
+     *
+     * @deprecated Use set_radius() instead.
+     */
+    void
+    set_radius(const double r);
 
     /**
      * Return the center stored in this object.

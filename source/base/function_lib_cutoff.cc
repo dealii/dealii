@@ -52,6 +52,15 @@ namespace Functions
   void
   CutOffFunctionBase<dim>::new_center(const Point<dim> &p)
   {
+    set_center(p);
+  }
+
+
+
+  template <int dim>
+  void
+  CutOffFunctionBase<dim>::set_center(const Point<dim> &p)
+  {
     center = p;
   }
 
@@ -69,6 +78,15 @@ namespace Functions
   template <int dim>
   void
   CutOffFunctionBase<dim>::new_radius(const double r)
+  {
+    set_radius(r);
+  }
+
+
+
+  template <int dim>
+  void
+  CutOffFunctionBase<dim>::set_radius(const double r)
   {
     radius = r;
     Assert(r > 0, ExcMessage("You must specify a radius > 0."));

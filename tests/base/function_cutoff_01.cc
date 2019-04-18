@@ -92,8 +92,8 @@ test()
   for (unsigned int i = 0; i < dim; ++i)
     new_center[i] = .5;
 
-  fun.new_center(new_center);
-  fun.new_radius(.5);
+  fun.set_center(new_center);
+  fun.set_radius(.5);
 
   deallog << "Center: " << fun.get_center() << std::endl
           << "Radius: " << fun.get_radius() << std::endl;
