@@ -107,6 +107,85 @@ namespace Functions
   }
 
 
+
+  template <int dim>
+  bool
+  CutOffFunctionBase<dim>::integrates_to_one() const
+  {
+    return integrate_to_one;
+  }
+
+
+
+  template <int dim>
+  CutOffFunctionTensorProduct<dim>::CutOffFunctionTensorProduct(
+    double             radius,
+    const Point<dim> & center,
+    const unsigned int n_components,
+    const unsigned int select,
+    const bool         integrate_to_one)
+    : CutOffFunctionBase<dim>(radius,
+                              center,
+                              n_components,
+                              select,
+                              integrate_to_one)
+    , initialized(false)
+  {}
+
+
+
+  template <int dim>
+  void
+  CutOffFunctionTensorProduct<dim>::set_center(const Point<dim> &p)
+  {
+    Assert(initialized, ExcNotInitialized());
+    for (unsigned int i = 0; i < dim; ++i)
+      base[i]->set_center(Point<1>(p[i]));
+    CutOffFunctionBase<dim>::set_center(p);
+  }
+
+
+
+  template <int dim>
+  void
+  CutOffFunctionTensorProduct<dim>::set_radius(const double r)
+  {
+    Assert(initialized, ExcNotInitialized());
+    for (unsigned int i = 0; i < dim; ++i)
+      base[i]->set_radius(r);
+    CutOffFunctionBase<dim>::set_radius(r);
+  }
+
+
+
+  template <int dim>
+  double
+  CutOffFunctionTensorProduct<dim>::value(const Point<dim> & p,
+                                          const unsigned int component) const
+  {
+    Assert(initialized, ExcNotInitialized());
+    double ret = 1.0;
+    for (unsigned int i = 0; i < dim; ++i)
+      ret *= base[i]->value(Point<1>(p[i]), component);
+    return ret;
+  }
+
+
+
+  template <int dim>
+  Tensor<1, dim>
+  CutOffFunctionTensorProduct<dim>::gradient(const Point<dim> & p,
+                                             const unsigned int component) const
+  {
+    Assert(initialized, ExcNotInitialized());
+    Tensor<1, dim> ret;
+    for (unsigned int i = 0; i < dim; ++i)
+      ret[i] = base[i]->gradient(Point<1>(p[i]), component)[0];
+    return ret;
+  }
+
+
+
   //////////////////////////////////////////////////////////////////////
   namespace
   {

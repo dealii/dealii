@@ -21,6 +21,7 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/table.h>
 
 #include <array>
@@ -947,6 +948,11 @@ namespace Functions
       const double       unitary_integral_value = 1.0);
 
     /**
+     * Virtual destructor.
+     */
+    virtual ~CutOffFunctionBase() = default;
+
+    /**
      * Move the center of the ball to new point <tt>p</tt>.
      *
      * @deprecated Use set_center() instead.
@@ -965,7 +971,7 @@ namespace Functions
     /**
      * Set the center of the ball to the point @p p.
      */
-    void
+    virtual void
     set_center(const Point<dim> &p);
 
     /**
@@ -973,7 +979,7 @@ namespace Functions
      *
      * @deprecated Use set_radius() instead.
      */
-    void
+    virtual void
     set_radius(const double r);
 
     /**
@@ -987,6 +993,12 @@ namespace Functions
      */
     double
     get_radius() const;
+
+    /**
+     * Return a boolean indicating if this function integrates to one.
+     */
+    bool
+    integrates_to_one() const;
 
   protected:
     /**
@@ -1008,7 +1020,7 @@ namespace Functions
     /**
      * Flag that controls wether we rescale the value when the radius changes.
      */
-    const bool integrate_to_one;
+    bool integrate_to_one;
 
     /**
      * The reference integral value. Derived classes should specify what their
@@ -1020,6 +1032,76 @@ namespace Functions
      * Current rescaling to apply the the cut-off function.
      */
     double rescaling;
+  };
+
+
+  /**
+   * Tensor product of CutOffFunctionBase objects.
+   *
+   * Instead of using the distance to compute the cut-off function, this class
+   * performs a tensor product of the same CutOffFunctionBase object in each
+   * coordinate direction.
+   *
+   * @ingroup functions
+   * @author Luca Heltai, 2019.
+   */
+  template <int dim>
+  class CutOffFunctionTensorProduct : public CutOffFunctionBase<dim>
+  {
+  public:
+    /**
+     * Construct an empty CutOffFunctionTensorProduct object.
+     *
+     * Before you can use this class, you have to call the set_base() method
+     * with a class derived from the CutOffFunctionBase object.
+     *
+     * If you try to use this class before you call the set_base() method,
+     * and exception will be triggered.
+     */
+    CutOffFunctionTensorProduct(
+      double             radius       = 1.0,
+      const Point<dim> & center       = Point<dim>(),
+      const unsigned int n_components = 1,
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      const bool         integrate_to_one = false);
+
+    /**
+     * Initialize the class with an objet of type
+     * @tparam CutOffFunctionBaseType<1>.
+     */
+    template <template <int> class CutOffFunctionBaseType>
+    void
+    set_base();
+
+    /**
+     * Set the new center.
+     */
+    virtual void
+    set_center(const Point<dim> &center) override;
+
+    /**
+     * Set the new radius.
+     */
+    virtual void
+    set_radius(const double radius) override;
+
+    /**
+     * Function value at one point.
+     */
+    virtual double
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
+
+    /**
+     * Function gradient at one point.
+     */
+    virtual Tensor<1, dim>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
+
+  private:
+    std::array<std::unique_ptr<CutOffFunctionBase<1>>, dim> base;
+
+    bool initialized;
   };
 
 
@@ -1500,7 +1582,28 @@ namespace Functions
     const std::vector<double> coefficients;
   };
 
+#ifndef DOXYGEN
 
+
+
+  // Template definitions
+  template <int dim>
+  template <template <int> class CutOffFunctionBaseType>
+  void
+  CutOffFunctionTensorProduct<dim>::set_base()
+  {
+    initialized = true;
+    for (unsigned int i = 0; i < dim; ++i)
+      base[i].reset(new CutOffFunctionBaseType<1>(this->radius,
+                                                  Point<1>(this->center[i]),
+                                                  this->n_components,
+                                                  this->selected,
+                                                  this->integrate_to_one));
+  }
+
+
+
+#endif
 
 } // namespace Functions
 DEAL_II_NAMESPACE_CLOSE
