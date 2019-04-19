@@ -1,0 +1,10 @@
+
+DEAL::dim=1
+DEAL::Center: [0.00000], with mapping [0.500000]
+DEAL::Center: [0.00000], with mapping + flag [0.00000]
+DEAL::dim=2
+DEAL::Center: [0.00000 0.00000], with mapping [0.500000 0.00000]
+DEAL::Center: [0.00000 0.00000], with mapping + flag [0.00000 0.00000]
+DEAL::dim=3
+DEAL::Center: [0.00000 0.00000 0.00000], with mapping [0.500000 0.00000 0.00000]
+DEAL::Center: [0.00000 0.00000 0.00000], with mapping + flag [0.00000 0.00000 0.00000]
