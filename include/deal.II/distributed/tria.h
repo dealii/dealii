@@ -1177,7 +1177,7 @@ namespace parallel
        * @return A vector of unsigned integers representing the weight or
        * computational load of every cell after the refinement/coarsening/
        * repartition cycle. Note that the number of entries does not need to
-       * be equal to either n_active_cells or n_locally_owned_active_cells,
+       * be equal to either n_active_cells() or n_locally_owned_active_cells(),
        * because the triangulation is not updated yet. The weights are sorted
        * in the order that p4est will encounter them while iterating over
        * them.
