@@ -1,0 +1,5 @@
+
+DEAL::x: x
+DEAL::f: 2*x**2
+DEAL::df_dx: 4*x
+DEAL::OK

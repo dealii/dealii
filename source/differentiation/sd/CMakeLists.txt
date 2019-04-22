@@ -18,6 +18,7 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 SET(_src
   symengine_math.cc
   symengine_number_types.cc
+  symengine_scalar_operations.cc
   symengine_types.cc
   symengine_utilities.cc
   )

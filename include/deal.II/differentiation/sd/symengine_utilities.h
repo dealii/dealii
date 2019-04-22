@@ -49,10 +49,95 @@ namespace Differentiation
       convert_expression_vector_to_basic_vector(
         const SD::types::symbol_vector &symbol_vector);
 
+      /**
+       * Extract the symbols (key entries) from a substitution map.
+       *
+       * @note It is guarenteed that the order of extraction of data into the
+       * output vector is the same as that for extract_values().
+       * That is to say that the unzipped key and value pairs as given by
+       * extract_symbols() and extract_values() always have a 1:1
+       * correspondence.
+       */
+      SD::types::symbol_vector
+      extract_symbols(const SD::types::substitution_map &substitution_values);
+
+      /**
+       * Extract the values from a substitution map.
+       * The value entries will be converted into the @p NumberType given
+       * as a template parameter to this function via the @p ExpressionType.
+       *
+       * @note It is guarenteed that the order of extraction of data into the
+       * output vector is the same as that for extract_symbols().
+       * That is to say that the unzipped key and value pairs as given by
+       * extract_symbols() and extract_values() always have a 1:1
+       * correspondence.
+       */
+      template <typename NumberType, typename ExpressionType = SD::Expression>
+      std::vector<NumberType>
+      extract_values(const SD::types::substitution_map &substitution_values);
+
+      /**
+       * Print the key and value pairs stored in a substitution map.
+       */
+      template <typename StreamType>
+      StreamType &
+      print_substitution_map(
+        StreamType &                       stream,
+        const SD::types::substitution_map &symbol_value_map);
+
     } // namespace Utilities
 
   } // namespace SD
 } // namespace Differentiation
+
+
+/* -------------------- inline and template functions ------------------ */
+
+
+#  ifndef DOXYGEN
+
+
+namespace Differentiation
+{
+  namespace SD
+  {
+    namespace Utilities
+    {
+      template <typename NumberType, typename ExpressionType>
+      std::vector<NumberType>
+      extract_values(const SD::types::substitution_map &substitution_values)
+      {
+        std::vector<NumberType> values;
+        values.reserve(substitution_values.size());
+
+        for (const auto &entry : substitution_values)
+          values.push_back(
+            static_cast<NumberType>(ExpressionType(entry.second)));
+
+        return values;
+      }
+
+
+      template <typename StreamType>
+      StreamType &
+      print_substitution_map(
+        StreamType &                       stream,
+        const SD::types::substitution_map &symbol_value_map)
+      {
+        for (const auto &entry : symbol_value_map)
+          stream << entry.first << " = " << entry.second << "\n";
+
+        stream << std::flush;
+        return stream;
+      }
+
+    } // namespace Utilities
+
+  } // namespace SD
+} // namespace Differentiation
+
+
+#  endif // DOXYGEN
 
 
 DEAL_II_NAMESPACE_CLOSE

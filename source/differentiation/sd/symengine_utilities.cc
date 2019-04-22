@@ -52,6 +52,22 @@ namespace Differentiation
         return symb_vec;
       }
 
+
+      SD::types::symbol_vector
+      extract_symbols(const SD::types::substitution_map &substitution_values)
+      {
+        SD::types::symbol_vector symbols;
+        symbols.reserve(substitution_values.size());
+
+        for (typename SD::types::substitution_map::const_iterator it =
+               substitution_values.begin();
+             it != substitution_values.end();
+             ++it)
+          symbols.push_back(it->first);
+
+        return symbols;
+      }
+
     } // namespace Utilities
 
   } // namespace SD
