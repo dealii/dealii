@@ -360,6 +360,11 @@ DynamicSparsityPattern::exists(const size_type i, const size_type j) const
   Assert(j < cols, ExcIndexRange(j, 0, cols));
   Assert(rowset.size() == 0 || rowset.is_element(i), ExcInternalError());
 
+  // Avoid a segmentation fault in below code if the row index happens to
+  // not be present in the IndexSet rowset:
+  if (!(rowset.size() == 0 || rowset.is_element(i)))
+    return false;
+
   if (!have_entries)
     return false;
 
