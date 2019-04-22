@@ -358,7 +358,11 @@ DynamicSparsityPattern::exists(const size_type i, const size_type j) const
 {
   Assert(i < rows, ExcIndexRange(i, 0, rows));
   Assert(j < cols, ExcIndexRange(j, 0, cols));
-  Assert(rowset.size() == 0 || rowset.is_element(i), ExcInternalError());
+  Assert(
+    rowset.size() == 0 || rowset.is_element(i),
+    ExcMessage(
+      "The row IndexSet does not contain the index i. This sparsity pattern "
+      "object cannot know whether the entry (i, j) exists or not."));
 
   // Avoid a segmentation fault in below code if the row index happens to
   // not be present in the IndexSet rowset:
