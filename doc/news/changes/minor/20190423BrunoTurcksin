@@ -1,0 +1,4 @@
+Changed: The chunk_size used in CUDA kernels has been reduced from 8 to 1 to
+improve performance on newer architectures.
+<br>
+(Bruno Turcksin, 2019/04/23)
