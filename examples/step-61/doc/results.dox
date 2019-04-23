@@ -2,7 +2,7 @@
 
 We run the test example $p = \sin(\pi x) \sin(\pi y)$ with homogenous Dirichelet boundary conditions in the domain $\Omega = (0,1)^2$. And  $\mathbf{K}$ is the identity matrix. We test it on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, $\mbox{WG}(Q_1,Q_1;RT_{[1]})$ and $\mbox{WG}(Q_2,Q_2;RT_{[2]})$. We will visualize pressure values in interiors and on faces. We want to see the pressure maximum is around 1 and the minimum is around 0. With the mesh refinement, the convergence rates of pressure, velocity and flux should be around 1 on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ , 2 on $\mbox{WG}(Q_1,Q_1;RT_{[1]})$, and 3 on $\mbox{WG}(Q_2,Q_2;RT_{[2]})$.
 
-<h3>Test results on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$</h3>
+<h3>Test results on <i>WG(Q<sub>0</sub>,Q<sub>0</sub>;RT<sub>[0]</sub>)</i></h3>
 The following figures are interior pressures and face pressures implemented on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$. The mesh is refined 2 times and 4 times separately. 
 
 <table align="center">
@@ -48,7 +48,7 @@ velocity and flux.
 We can see that the convergence rates of $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ are around 1.
 
 
-<h3>Test results on $\mbox{WG}(Q_1,Q_1;RT_{[1]})$</h3>
+<h3>Test results on <i>WG(Q<sub>1</sub>,Q<sub>1</sub>;RT<sub>[1]</sub>)</i></h3>
 
 The following figures are interior pressures and face pressures implemented on $\mbox{WG}(Q_1,Q_1;RT_{[1]})$. The mesh is refined 4 times.  Compared to the previous figures on 
 $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, on each cell, the result is not a constant. Because we use higher order polynomials to do approximation. So there are 4 pressure values in one interior, 2 pressure values on each face. We use data_out_face.build_patches (fe.degree)
@@ -87,7 +87,7 @@ These are the convergence rates of pressure, velocity and flux on $\mbox{WG}(Q_1
 </table>
 The convergence rates of $WG(Q_1,Q_1;RT_{[1]})$ are around 2.
 
-<h3>Test results on $WG(Q_2,Q_2;RT_{[2]})$</h3>
+<h3>Test results on <i>WG(Q<sub>2</sub>,Q<sub>2</sub>;RT<sub>[2]</sub>)</i></h3>
 
 These are interior pressures and face pressures implemented on $WG(Q_2,Q_2;RT_{[2]})$, with mesh size $h = 1/32$.
 
