@@ -141,7 +141,8 @@ public:
   point_inside(const Point<spacedim, Number> &p) const;
 
   /**
-   * Increase (or decrease) the size of the bounding box by the given amount.
+   * Increase (or decrease) the size of the bounding box by the given amount,
+   * in both directions in all coordinate directions.
    *
    * If you call this method with a negative number, and one of the axes of the
    * original bounding box is smaller than amount/2, the method will trigger
@@ -195,7 +196,7 @@ BoundingBox<spacedim, Number>::extend(const Number &amount)
       boundary_points.first[d] -= amount;
       boundary_points.second[d] += amount;
       Assert(boundary_points.first[d] <= boundary_points.second[d],
-             ExcMessage("Bounding Box can't be shrinked this much: the points' "
+             ExcMessage("Bounding Box can't be shrunk this much: the points' "
                         "order should remain bottom left, top right."));
     }
 }
