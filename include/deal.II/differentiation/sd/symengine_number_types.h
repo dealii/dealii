@@ -30,6 +30,7 @@
 #  include <symengine/expression.h>
 #  include <symengine/integer.h>
 #  include <symengine/logic.h>
+#  include <symengine/number.h>
 #  include <symengine/rational.h>
 
 // Number operations
@@ -45,6 +46,7 @@
 
 // Differentiation
 #  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/numbers.h>
 
 #  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
@@ -1292,10 +1294,106 @@ namespace Differentiation
 } // namespace Differentiation
 
 
-DEAL_II_NAMESPACE_CLOSE
+// Specializations from numbers.h
+// These are required in order to make the SD::Expression class a compatible
+// number for the Tensor and SymmetricTensor classes
+
+// Forward declarations:
+template <int rank_, int dim, typename Number>
+class Tensor;
+
+namespace internal
+{
+  template <>
+  struct NumberType<Differentiation::SD::Expression>
+  {
+    static const Differentiation::SD::Expression &
+    value(const Differentiation::SD::Expression &t)
+    {
+      return t;
+    }
+
+    template <
+      typename T,
+      typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    static Differentiation::SD::Expression
+    value(const T &t)
+    {
+      return Differentiation::SD::Expression(t);
+    }
+
+    template <
+      typename T,
+      typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    static Differentiation::SD::Expression
+    value(T &&t)
+    {
+      return Differentiation::SD::Expression(t);
+    }
+
+    template <
+      typename T,
+      typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    static Differentiation::SD::Expression
+    value(const std::complex<T> &t)
+    {
+      return Differentiation::SD::Expression(t);
+    }
+
+    template <typename T, int dim>
+    static Differentiation::SD::Expression
+    value(const Tensor<0, dim, T> &t)
+    {
+      return Differentiation::SD::Expression(static_cast<T>(t));
+    }
+
+    template <typename T, int dim>
+    static Differentiation::SD::Expression
+    value(const Tensor<0, dim, std::complex<T>> &t)
+    {
+      return Differentiation::SD::Expression(static_cast<std::complex<T>>(t));
+    }
+  };
+} // namespace internal
+
+
+namespace numbers
+{
+  template <>
+  inline bool
+  value_is_zero(const Differentiation::SD::Expression &value)
+  {
+    if (SymEngine::is_a_Number(value.get_value()))
+      {
+        const SymEngine::RCP<const SymEngine::Number> number_rcp =
+          SymEngine::rcp_static_cast<const SymEngine::Number>(value.get_RCP());
+        return number_rcp->is_zero();
+      }
+
+    return false;
+  }
+
+  template <>
+  inline bool
+  values_are_equal(const Differentiation::SD::Expression &value_1,
+                   const Differentiation::SD::Expression &value_2)
+  {
+    return (value_1.get_value().__cmp__(value_2.get_value()) == 0);
+  }
+
+  template <>
+  inline bool
+  value_is_less_than(const Differentiation::SD::Expression &value_1,
+                     const Differentiation::SD::Expression &value_2)
+  {
+    return (value_1.get_value().__cmp__(value_2.get_value()) == -1);
+  }
+} // namespace numbers
 
 
 #  endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SYMENGINE
 

@@ -1,0 +1,12 @@
+
+DEAL::Copy
+DEAL::0: 1 -> 1
+DEAL::1: True -> True
+DEAL::2: 2.5 -> 2.5
+DEAL::3: a -> a
+DEAL::Swap
+DEAL::0: 1
+DEAL::1: True
+DEAL::2: 2.5
+DEAL::3: a
+DEAL::OK

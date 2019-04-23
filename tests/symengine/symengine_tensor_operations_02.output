@@ -1,0 +1,253 @@
+
+DEAL:Integer:Initialize::a: 10 11 12 13
+DEAL:Integer:Initialize::b: 10 11 12 13
+DEAL:Integer:Initialize::as: 10 12 12 11
+DEAL:Integer:Initialize::bs: 10 12 12 11
+DEAL:Integer:Relational operators 1::a == b: 1
+DEAL:Integer:Relational operators 1::a != b: 0
+DEAL:Integer:Relational operators 1::a.norm() < b.norm(): False
+DEAL:Integer:Set new values::a: 5 6 7 8
+DEAL:Integer:Set new values::b: 9 10 11 12
+DEAL:Integer:Set new values::as: 5 7 7 6
+DEAL:Integer:Set new values::bs: 7 9 9 8
+DEAL:Integer:Relational operators 2::a == b: 0
+DEAL:Integer:Relational operators 2::a != b: 1
+DEAL:Integer:Relational operators 2::a.norm() < b.norm(): sqrt(174) < sqrt(446)
+DEAL:Integer:Math operators:Tensor::a+b: 14 16 18 20
+DEAL:Integer:Math operators:Tensor::a-b: -4 -4 -4 -4
+DEAL:Integer:Math operators:Tensor::a*b: 111 122 151 166
+DEAL:Integer:Math operators:SymmetricTensor::as+bs: 12 16 16 14
+DEAL:Integer:Math operators:SymmetricTensor::as-bs: -2 -2 -2 -2
+DEAL:Integer:Math operators:SymmetricTensor::as*bs: 209
+DEAL:Integer:Math operators:SymmetricTensor::as: 5 7 7 6
+DEAL:Integer:Math operators:SymmetricTensor::as_ns: 5 7 7 6
+DEAL:Integer:Math operators:SymmetricTensor::as+b: 14 17 18 18
+DEAL:Integer:Math operators:SymmetricTensor::as-b: -4 -3 -4 -6
+DEAL:Integer:Math operators:SymmetricTensor::as*b: 122 134 129 142
+DEAL:Integer:Copy constructor::c: 5 6 7 8
+DEAL:Integer:Copy constructor::cs: 5 7 7 6
+DEAL:Integer:Math operators:Tensor::c+=b: 14 16 18 20
+DEAL:Integer:Math operators:Tensor::c*=s: 28 32 36 40
+DEAL:Integer:Math operators:Tensor::c-=b: 19 22 25 28
+DEAL:Integer:Math operators:Tensor::c/=s: 19/2 11 25/2 14
+DEAL:Integer:Math operators:SymmetricTensor::cs+=bs: 12 16 16 14
+DEAL:Integer:Math operators:SymmetricTensor::cs*=s: 24 32 32 28
+DEAL:Integer:Math operators:SymmetricTensor::cs-=bs: 17 23 23 20
+DEAL:Integer:Math operators:SymmetricTensor::cs/=s: 17/2 23/2 23/2 10
+DEAL:Integer:Symbols::x: x_00 x_01 x_10 x_11
+DEAL:Integer:Symbols::y: y
+DEAL:Integer:Symbols::z: z_00 z_01 z_01 z_11
+DEAL:Integer:Math operators:Tensor::c+=x: 19/2 + x_00 11 + x_01 25/2 + x_10 14 + x_11
+DEAL:Integer:Math operators:Tensor::c*=y: y*(19/2 + x_00) y*(11 + x_01) y*(25/2 + x_10) y*(14 + x_11)
+DEAL:Integer:Math operators:Tensor::c*=s: 2*y*(19/2 + x_00) 2*y*(11 + x_01) 2*y*(25/2 + x_10) 2*y*(14 + x_11)
+DEAL:Integer:Math operators:Tensor::c-=x: -x_00 + 2*y*(19/2 + x_00) -x_01 + 2*y*(11 + x_01) -x_10 + 2*y*(25/2 + x_10) -x_11 + 2*y*(14 + x_11)
+DEAL:Integer:Math operators:Tensor::c/=y: (-x_00 + 2*y*(19/2 + x_00))/y (-x_01 + 2*y*(11 + x_01))/y (-x_10 + 2*y*(25/2 + x_10))/y (-x_11 + 2*y*(14 + x_11))/y
+DEAL:Integer:Math operators:Tensor::c/=s: (1/2)*(-x_00 + 2*y*(19/2 + x_00))/y (1/2)*(-x_01 + 2*y*(11 + x_01))/y (1/2)*(-x_10 + 2*y*(25/2 + x_10))/y (1/2)*(-x_11 + 2*y*(14 + x_11))/y
+DEAL:Integer:Math operators:SymmetricTensor::cs+=z: 17/2 + z_00 23/2 + z_01 23/2 + z_01 10 + z_11
+DEAL:Integer:Math operators:SymmetricTensor::cs*=y: y*(17/2 + z_00) y*(23/2 + z_01) y*(23/2 + z_01) y*(10 + z_11)
+DEAL:Integer:Math operators:SymmetricTensor::cs*=s: 2*y*(17/2 + z_00) 2*y*(23/2 + z_01) 2*y*(23/2 + z_01) 2*y*(10 + z_11)
+DEAL:Integer:Math operators:SymmetricTensor::cs-=z: -z_00 + 2*y*(17/2 + z_00) -z_01 + 2*y*(23/2 + z_01) -z_01 + 2*y*(23/2 + z_01) -z_11 + 2*y*(10 + z_11)
+DEAL:Integer:Math operators:SymmetricTensor::cs/=y: (-z_00 + 2*y*(17/2 + z_00))/y (-z_01 + 2*y*(23/2 + z_01))/y (-z_01 + 2*y*(23/2 + z_01))/y (-z_11 + 2*y*(10 + z_11))/y
+DEAL:Integer:Math operators:SymmetricTensor::cs/=s: (1/2)*(-z_00 + 2*y*(17/2 + z_00))/y (1/2)*(-z_01 + 2*y*(23/2 + z_01))/y (1/2)*(-z_01 + 2*y*(23/2 + z_01))/y (1/2)*(-z_11 + 2*y*(10 + z_11))/y
+DEAL:Integer::OK
+DEAL:Float:Initialize::a: 10.0 11.0 12.0 13.0
+DEAL:Float:Initialize::b: 10.0 11.0 12.0 13.0
+DEAL:Float:Initialize::as: 10.0 12.0 12.0 11.0
+DEAL:Float:Initialize::bs: 10.0 12.0 12.0 11.0
+DEAL:Float:Relational operators 1::a == b: 1
+DEAL:Float:Relational operators 1::a != b: 0
+DEAL:Float:Relational operators 1::a.norm() < b.norm(): False
+DEAL:Float:Set new values::a: 5.0 6.0 7.0 8.0
+DEAL:Float:Set new values::b: 9.0 10.0 11.0 12.0
+DEAL:Float:Set new values::as: 5.0 7.0 7.0 6.0
+DEAL:Float:Set new values::bs: 7.0 9.0 9.0 8.0
+DEAL:Float:Relational operators 2::a == b: 0
+DEAL:Float:Relational operators 2::a != b: 1
+DEAL:Float:Relational operators 2::a.norm() < b.norm(): True
+DEAL:Float:Math operators:Tensor::a+b: 14.0 16.0 18.0 20.0
+DEAL:Float:Math operators:Tensor::a-b: -4.0 -4.0 -4.0 -4.0
+DEAL:Float:Math operators:Tensor::a*b: 111.0 122.0 151.0 166.0
+DEAL:Float:Math operators:SymmetricTensor::as+bs: 12.0 16.0 16.0 14.0
+DEAL:Float:Math operators:SymmetricTensor::as-bs: -2.0 -2.0 -2.0 -2.0
+DEAL:Float:Math operators:SymmetricTensor::as*bs: 209.0
+DEAL:Float:Math operators:SymmetricTensor::as: 5.0 7.0 7.0 6.0
+DEAL:Float:Math operators:SymmetricTensor::as_ns: 5.0 7.0 7.0 6.0
+DEAL:Float:Math operators:SymmetricTensor::as+b: 14.0 17.0 18.0 18.0
+DEAL:Float:Math operators:SymmetricTensor::as-b: -4.0 -3.0 -4.0 -6.0
+DEAL:Float:Math operators:SymmetricTensor::as*b: 122.0 134.0 129.0 142.0
+DEAL:Float:Copy constructor::c: 5.0 6.0 7.0 8.0
+DEAL:Float:Copy constructor::cs: 5.0 7.0 7.0 6.0
+DEAL:Float:Math operators:Tensor::c+=b: 14.0 16.0 18.0 20.0
+DEAL:Float:Math operators:Tensor::c*=s: 28.0 32.0 36.0 40.0
+DEAL:Float:Math operators:Tensor::c-=b: 19.0 22.0 25.0 28.0
+DEAL:Float:Math operators:Tensor::c/=s: 9.5 11.0 12.5 14.0
+DEAL:Float:Math operators:SymmetricTensor::cs+=bs: 12.0 16.0 16.0 14.0
+DEAL:Float:Math operators:SymmetricTensor::cs*=s: 24.0 32.0 32.0 28.0
+DEAL:Float:Math operators:SymmetricTensor::cs-=bs: 17.0 23.0 23.0 20.0
+DEAL:Float:Math operators:SymmetricTensor::cs/=s: 8.5 11.5 11.5 10.0
+DEAL:Float:Symbols::x: x_00 x_01 x_10 x_11
+DEAL:Float:Symbols::y: y
+DEAL:Float:Symbols::z: z_00 z_01 z_01 z_11
+DEAL:Float:Math operators:Tensor::c+=x: 9.5 + x_00 11.0 + x_01 12.5 + x_10 14.0 + x_11
+DEAL:Float:Math operators:Tensor::c*=y: y*(9.5 + x_00) y*(11.0 + x_01) y*(12.5 + x_10) y*(14.0 + x_11)
+DEAL:Float:Math operators:Tensor::c*=s: 2.0*y*(9.5 + x_00) 2.0*y*(11.0 + x_01) 2.0*y*(12.5 + x_10) 2.0*y*(14.0 + x_11)
+DEAL:Float:Math operators:Tensor::c-=x: -x_00 + 2.0*y*(9.5 + x_00) -x_01 + 2.0*y*(11.0 + x_01) -x_10 + 2.0*y*(12.5 + x_10) -x_11 + 2.0*y*(14.0 + x_11)
+DEAL:Float:Math operators:Tensor::c/=y: (-x_00 + 2.0*y*(9.5 + x_00))/y (-x_01 + 2.0*y*(11.0 + x_01))/y (-x_10 + 2.0*y*(12.5 + x_10))/y (-x_11 + 2.0*y*(14.0 + x_11))/y
+DEAL:Float:Math operators:Tensor::c/=s: 0.5*(-x_00 + 2.0*y*(9.5 + x_00))/y 0.5*(-x_01 + 2.0*y*(11.0 + x_01))/y 0.5*(-x_10 + 2.0*y*(12.5 + x_10))/y 0.5*(-x_11 + 2.0*y*(14.0 + x_11))/y
+DEAL:Float:Math operators:SymmetricTensor::cs+=z: 8.5 + z_00 11.5 + z_01 11.5 + z_01 10.0 + z_11
+DEAL:Float:Math operators:SymmetricTensor::cs*=y: y*(8.5 + z_00) y*(11.5 + z_01) y*(11.5 + z_01) y*(10.0 + z_11)
+DEAL:Float:Math operators:SymmetricTensor::cs*=s: 2.0*y*(8.5 + z_00) 2.0*y*(11.5 + z_01) 2.0*y*(11.5 + z_01) 2.0*y*(10.0 + z_11)
+DEAL:Float:Math operators:SymmetricTensor::cs-=z: -z_00 + 2.0*y*(8.5 + z_00) -z_01 + 2.0*y*(11.5 + z_01) -z_01 + 2.0*y*(11.5 + z_01) -z_11 + 2.0*y*(10.0 + z_11)
+DEAL:Float:Math operators:SymmetricTensor::cs/=y: (-z_00 + 2.0*y*(8.5 + z_00))/y (-z_01 + 2.0*y*(11.5 + z_01))/y (-z_01 + 2.0*y*(11.5 + z_01))/y (-z_11 + 2.0*y*(10.0 + z_11))/y
+DEAL:Float:Math operators:SymmetricTensor::cs/=s: 0.5*(-z_00 + 2.0*y*(8.5 + z_00))/y 0.5*(-z_01 + 2.0*y*(11.5 + z_01))/y 0.5*(-z_01 + 2.0*y*(11.5 + z_01))/y 0.5*(-z_11 + 2.0*y*(10.0 + z_11))/y
+DEAL:Float::OK
+DEAL:Double:Initialize::a: 10.0 11.0 12.0 13.0
+DEAL:Double:Initialize::b: 10.0 11.0 12.0 13.0
+DEAL:Double:Initialize::as: 10.0 12.0 12.0 11.0
+DEAL:Double:Initialize::bs: 10.0 12.0 12.0 11.0
+DEAL:Double:Relational operators 1::a == b: 1
+DEAL:Double:Relational operators 1::a != b: 0
+DEAL:Double:Relational operators 1::a.norm() < b.norm(): False
+DEAL:Double:Set new values::a: 5.0 6.0 7.0 8.0
+DEAL:Double:Set new values::b: 9.0 10.0 11.0 12.0
+DEAL:Double:Set new values::as: 5.0 7.0 7.0 6.0
+DEAL:Double:Set new values::bs: 7.0 9.0 9.0 8.0
+DEAL:Double:Relational operators 2::a == b: 0
+DEAL:Double:Relational operators 2::a != b: 1
+DEAL:Double:Relational operators 2::a.norm() < b.norm(): True
+DEAL:Double:Math operators:Tensor::a+b: 14.0 16.0 18.0 20.0
+DEAL:Double:Math operators:Tensor::a-b: -4.0 -4.0 -4.0 -4.0
+DEAL:Double:Math operators:Tensor::a*b: 111.0 122.0 151.0 166.0
+DEAL:Double:Math operators:SymmetricTensor::as+bs: 12.0 16.0 16.0 14.0
+DEAL:Double:Math operators:SymmetricTensor::as-bs: -2.0 -2.0 -2.0 -2.0
+DEAL:Double:Math operators:SymmetricTensor::as*bs: 209.0
+DEAL:Double:Math operators:SymmetricTensor::as: 5.0 7.0 7.0 6.0
+DEAL:Double:Math operators:SymmetricTensor::as_ns: 5.0 7.0 7.0 6.0
+DEAL:Double:Math operators:SymmetricTensor::as+b: 14.0 17.0 18.0 18.0
+DEAL:Double:Math operators:SymmetricTensor::as-b: -4.0 -3.0 -4.0 -6.0
+DEAL:Double:Math operators:SymmetricTensor::as*b: 122.0 134.0 129.0 142.0
+DEAL:Double:Copy constructor::c: 5.0 6.0 7.0 8.0
+DEAL:Double:Copy constructor::cs: 5.0 7.0 7.0 6.0
+DEAL:Double:Math operators:Tensor::c+=b: 14.0 16.0 18.0 20.0
+DEAL:Double:Math operators:Tensor::c*=s: 28.0 32.0 36.0 40.0
+DEAL:Double:Math operators:Tensor::c-=b: 19.0 22.0 25.0 28.0
+DEAL:Double:Math operators:Tensor::c/=s: 9.5 11.0 12.5 14.0
+DEAL:Double:Math operators:SymmetricTensor::cs+=bs: 12.0 16.0 16.0 14.0
+DEAL:Double:Math operators:SymmetricTensor::cs*=s: 24.0 32.0 32.0 28.0
+DEAL:Double:Math operators:SymmetricTensor::cs-=bs: 17.0 23.0 23.0 20.0
+DEAL:Double:Math operators:SymmetricTensor::cs/=s: 8.5 11.5 11.5 10.0
+DEAL:Double:Symbols::x: x_00 x_01 x_10 x_11
+DEAL:Double:Symbols::y: y
+DEAL:Double:Symbols::z: z_00 z_01 z_01 z_11
+DEAL:Double:Math operators:Tensor::c+=x: 9.5 + x_00 11.0 + x_01 12.5 + x_10 14.0 + x_11
+DEAL:Double:Math operators:Tensor::c*=y: y*(9.5 + x_00) y*(11.0 + x_01) y*(12.5 + x_10) y*(14.0 + x_11)
+DEAL:Double:Math operators:Tensor::c*=s: 2.0*y*(9.5 + x_00) 2.0*y*(11.0 + x_01) 2.0*y*(12.5 + x_10) 2.0*y*(14.0 + x_11)
+DEAL:Double:Math operators:Tensor::c-=x: -x_00 + 2.0*y*(9.5 + x_00) -x_01 + 2.0*y*(11.0 + x_01) -x_10 + 2.0*y*(12.5 + x_10) -x_11 + 2.0*y*(14.0 + x_11)
+DEAL:Double:Math operators:Tensor::c/=y: (-x_00 + 2.0*y*(9.5 + x_00))/y (-x_01 + 2.0*y*(11.0 + x_01))/y (-x_10 + 2.0*y*(12.5 + x_10))/y (-x_11 + 2.0*y*(14.0 + x_11))/y
+DEAL:Double:Math operators:Tensor::c/=s: 0.5*(-x_00 + 2.0*y*(9.5 + x_00))/y 0.5*(-x_01 + 2.0*y*(11.0 + x_01))/y 0.5*(-x_10 + 2.0*y*(12.5 + x_10))/y 0.5*(-x_11 + 2.0*y*(14.0 + x_11))/y
+DEAL:Double:Math operators:SymmetricTensor::cs+=z: 8.5 + z_00 11.5 + z_01 11.5 + z_01 10.0 + z_11
+DEAL:Double:Math operators:SymmetricTensor::cs*=y: y*(8.5 + z_00) y*(11.5 + z_01) y*(11.5 + z_01) y*(10.0 + z_11)
+DEAL:Double:Math operators:SymmetricTensor::cs*=s: 2.0*y*(8.5 + z_00) 2.0*y*(11.5 + z_01) 2.0*y*(11.5 + z_01) 2.0*y*(10.0 + z_11)
+DEAL:Double:Math operators:SymmetricTensor::cs-=z: -z_00 + 2.0*y*(8.5 + z_00) -z_01 + 2.0*y*(11.5 + z_01) -z_01 + 2.0*y*(11.5 + z_01) -z_11 + 2.0*y*(10.0 + z_11)
+DEAL:Double:Math operators:SymmetricTensor::cs/=y: (-z_00 + 2.0*y*(8.5 + z_00))/y (-z_01 + 2.0*y*(11.5 + z_01))/y (-z_01 + 2.0*y*(11.5 + z_01))/y (-z_11 + 2.0*y*(10.0 + z_11))/y
+DEAL:Double:Math operators:SymmetricTensor::cs/=s: 0.5*(-z_00 + 2.0*y*(8.5 + z_00))/y 0.5*(-z_01 + 2.0*y*(11.5 + z_01))/y 0.5*(-z_01 + 2.0*y*(11.5 + z_01))/y 0.5*(-z_11 + 2.0*y*(10.0 + z_11))/y
+DEAL:Double::OK
+DEAL:Complex float:Initialize::a: 10.0 + 0.0*I 11.0 + 0.0*I 12.0 + 0.0*I 13.0 + 0.0*I
+DEAL:Complex float:Initialize::b: 10.0 + 0.0*I 11.0 + 0.0*I 12.0 + 0.0*I 13.0 + 0.0*I
+DEAL:Complex float:Initialize::as: 10.0 + 0.0*I 12.0 + 0.0*I 12.0 + 0.0*I 11.0 + 0.0*I
+DEAL:Complex float:Initialize::bs: 10.0 + 0.0*I 12.0 + 0.0*I 12.0 + 0.0*I 11.0 + 0.0*I
+DEAL:Complex float:Relational operators 1::a == b: 1
+DEAL:Complex float:Relational operators 1::a != b: 0
+DEAL:Complex float:Set new values::a: 5.0 + 0.0*I 6.0 + 0.0*I 7.0 + 0.0*I 8.0 + 0.0*I
+DEAL:Complex float:Set new values::b: 9.0 + 0.0*I 10.0 + 0.0*I 11.0 + 0.0*I 12.0 + 0.0*I
+DEAL:Complex float:Set new values::as: 5.0 + 0.0*I 7.0 + 0.0*I 7.0 + 0.0*I 6.0 + 0.0*I
+DEAL:Complex float:Set new values::bs: 7.0 + 0.0*I 9.0 + 0.0*I 9.0 + 0.0*I 8.0 + 0.0*I
+DEAL:Complex float:Relational operators 2::a == b: 0
+DEAL:Complex float:Relational operators 2::a != b: 1
+DEAL:Complex float:Math operators:Tensor::a+b: 14.0 + 0.0*I 16.0 + 0.0*I 18.0 + 0.0*I 20.0 + 0.0*I
+DEAL:Complex float:Math operators:Tensor::a-b: -4.0 + 0.0*I -4.0 + 0.0*I -4.0 + 0.0*I -4.0 + 0.0*I
+DEAL:Complex float:Math operators:Tensor::a*b: 111.0 + 0.0*I 122.0 + 0.0*I 151.0 + 0.0*I 166.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::as+bs: 12.0 + 0.0*I 16.0 + 0.0*I 16.0 + 0.0*I 14.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::as-bs: -2.0 + 0.0*I -2.0 + 0.0*I -2.0 + 0.0*I -2.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::as*bs: 209.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::as: 5.0 + 0.0*I 7.0 + 0.0*I 7.0 + 0.0*I 6.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::as_ns: 5.0 + 0.0*I 7.0 + 0.0*I 7.0 + 0.0*I 6.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::as+b: 14.0 + 0.0*I 17.0 + 0.0*I 18.0 + 0.0*I 18.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::as-b: -4.0 + 0.0*I -3.0 + 0.0*I -4.0 + 0.0*I -6.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::as*b: 122.0 + 0.0*I 134.0 + 0.0*I 129.0 + 0.0*I 142.0 + 0.0*I
+DEAL:Complex float:Copy constructor::c: 5.0 + 0.0*I 6.0 + 0.0*I 7.0 + 0.0*I 8.0 + 0.0*I
+DEAL:Complex float:Copy constructor::cs: 5.0 + 0.0*I 7.0 + 0.0*I 7.0 + 0.0*I 6.0 + 0.0*I
+DEAL:Complex float:Math operators:Tensor::c+=b: 14.0 + 0.0*I 16.0 + 0.0*I 18.0 + 0.0*I 20.0 + 0.0*I
+DEAL:Complex float:Math operators:Tensor::c*=s: 28.0 + 0.0*I 32.0 + 0.0*I 36.0 + 0.0*I 40.0 + 0.0*I
+DEAL:Complex float:Math operators:Tensor::c-=b: 19.0 + 0.0*I 22.0 + 0.0*I 25.0 + 0.0*I 28.0 + 0.0*I
+DEAL:Complex float:Math operators:Tensor::c/=s: 9.5 + 0.0*I 11.0 + 0.0*I 12.5 + 0.0*I 14.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::cs+=bs: 12.0 + 0.0*I 16.0 + 0.0*I 16.0 + 0.0*I 14.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::cs*=s: 24.0 + 0.0*I 32.0 + 0.0*I 32.0 + 0.0*I 28.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::cs-=bs: 17.0 + 0.0*I 23.0 + 0.0*I 23.0 + 0.0*I 20.0 + 0.0*I
+DEAL:Complex float:Math operators:SymmetricTensor::cs/=s: 8.5 + 0.0*I 11.5 + 0.0*I 11.5 + 0.0*I 10.0 + 0.0*I
+DEAL:Complex float:Symbols::x: x_00 x_01 x_10 x_11
+DEAL:Complex float:Symbols::y: y
+DEAL:Complex float:Symbols::z: z_00 z_01 z_01 z_11
+DEAL:Complex float:Math operators:Tensor::c+=x: 9.5 + 0.0*I + x_00 11.0 + 0.0*I + x_01 12.5 + 0.0*I + x_10 14.0 + 0.0*I + x_11
+DEAL:Complex float:Math operators:Tensor::c*=y: y*(9.5 + 0.0*I + x_00) y*(11.0 + 0.0*I + x_01) y*(12.5 + 0.0*I + x_10) y*(14.0 + 0.0*I + x_11)
+DEAL:Complex float:Math operators:Tensor::c*=s: (2.0 + 0.0*I)*y*(9.5 + 0.0*I + x_00) (2.0 + 0.0*I)*y*(11.0 + 0.0*I + x_01) (2.0 + 0.0*I)*y*(12.5 + 0.0*I + x_10) (2.0 + 0.0*I)*y*(14.0 + 0.0*I + x_11)
+DEAL:Complex float:Math operators:Tensor::c-=x: -x_00 + (2.0 + 0.0*I)*y*(9.5 + 0.0*I + x_00) -x_01 + (2.0 + 0.0*I)*y*(11.0 + 0.0*I + x_01) -x_10 + (2.0 + 0.0*I)*y*(12.5 + 0.0*I + x_10) -x_11 + (2.0 + 0.0*I)*y*(14.0 + 0.0*I + x_11)
+DEAL:Complex float:Math operators:Tensor::c/=y: (-x_00 + (2.0 + 0.0*I)*y*(9.5 + 0.0*I + x_00))/y (-x_01 + (2.0 + 0.0*I)*y*(11.0 + 0.0*I + x_01))/y (-x_10 + (2.0 + 0.0*I)*y*(12.5 + 0.0*I + x_10))/y (-x_11 + (2.0 + 0.0*I)*y*(14.0 + 0.0*I + x_11))/y
+DEAL:Complex float:Math operators:Tensor::c/=s: (0.5 + 0.0*I)*(-x_00 + (2.0 + 0.0*I)*y*(9.5 + 0.0*I + x_00))/y (0.5 + 0.0*I)*(-x_01 + (2.0 + 0.0*I)*y*(11.0 + 0.0*I + x_01))/y (0.5 + 0.0*I)*(-x_10 + (2.0 + 0.0*I)*y*(12.5 + 0.0*I + x_10))/y (0.5 + 0.0*I)*(-x_11 + (2.0 + 0.0*I)*y*(14.0 + 0.0*I + x_11))/y
+DEAL:Complex float:Math operators:SymmetricTensor::cs+=z: 8.5 + 0.0*I + z_00 11.5 + 0.0*I + z_01 11.5 + 0.0*I + z_01 10.0 + 0.0*I + z_11
+DEAL:Complex float:Math operators:SymmetricTensor::cs*=y: y*(8.5 + 0.0*I + z_00) y*(11.5 + 0.0*I + z_01) y*(11.5 + 0.0*I + z_01) y*(10.0 + 0.0*I + z_11)
+DEAL:Complex float:Math operators:SymmetricTensor::cs*=s: (2.0 + 0.0*I)*y*(8.5 + 0.0*I + z_00) (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01) (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01) (2.0 + 0.0*I)*y*(10.0 + 0.0*I + z_11)
+DEAL:Complex float:Math operators:SymmetricTensor::cs-=z: -z_00 + (2.0 + 0.0*I)*y*(8.5 + 0.0*I + z_00) -z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01) -z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01) -z_11 + (2.0 + 0.0*I)*y*(10.0 + 0.0*I + z_11)
+DEAL:Complex float:Math operators:SymmetricTensor::cs/=y: (-z_00 + (2.0 + 0.0*I)*y*(8.5 + 0.0*I + z_00))/y (-z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01))/y (-z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01))/y (-z_11 + (2.0 + 0.0*I)*y*(10.0 + 0.0*I + z_11))/y
+DEAL:Complex float:Math operators:SymmetricTensor::cs/=s: (0.5 + 0.0*I)*(-z_00 + (2.0 + 0.0*I)*y*(8.5 + 0.0*I + z_00))/y (0.5 + 0.0*I)*(-z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01))/y (0.5 + 0.0*I)*(-z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01))/y (0.5 + 0.0*I)*(-z_11 + (2.0 + 0.0*I)*y*(10.0 + 0.0*I + z_11))/y
+DEAL:Complex float::OK
+DEAL:Complex double:Initialize::a: 10.0 + 0.0*I 11.0 + 0.0*I 12.0 + 0.0*I 13.0 + 0.0*I
+DEAL:Complex double:Initialize::b: 10.0 + 0.0*I 11.0 + 0.0*I 12.0 + 0.0*I 13.0 + 0.0*I
+DEAL:Complex double:Initialize::as: 10.0 + 0.0*I 12.0 + 0.0*I 12.0 + 0.0*I 11.0 + 0.0*I
+DEAL:Complex double:Initialize::bs: 10.0 + 0.0*I 12.0 + 0.0*I 12.0 + 0.0*I 11.0 + 0.0*I
+DEAL:Complex double:Relational operators 1::a == b: 1
+DEAL:Complex double:Relational operators 1::a != b: 0
+DEAL:Complex double:Set new values::a: 5.0 + 0.0*I 6.0 + 0.0*I 7.0 + 0.0*I 8.0 + 0.0*I
+DEAL:Complex double:Set new values::b: 9.0 + 0.0*I 10.0 + 0.0*I 11.0 + 0.0*I 12.0 + 0.0*I
+DEAL:Complex double:Set new values::as: 5.0 + 0.0*I 7.0 + 0.0*I 7.0 + 0.0*I 6.0 + 0.0*I
+DEAL:Complex double:Set new values::bs: 7.0 + 0.0*I 9.0 + 0.0*I 9.0 + 0.0*I 8.0 + 0.0*I
+DEAL:Complex double:Relational operators 2::a == b: 0
+DEAL:Complex double:Relational operators 2::a != b: 1
+DEAL:Complex double:Math operators:Tensor::a+b: 14.0 + 0.0*I 16.0 + 0.0*I 18.0 + 0.0*I 20.0 + 0.0*I
+DEAL:Complex double:Math operators:Tensor::a-b: -4.0 + 0.0*I -4.0 + 0.0*I -4.0 + 0.0*I -4.0 + 0.0*I
+DEAL:Complex double:Math operators:Tensor::a*b: 111.0 + 0.0*I 122.0 + 0.0*I 151.0 + 0.0*I 166.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::as+bs: 12.0 + 0.0*I 16.0 + 0.0*I 16.0 + 0.0*I 14.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::as-bs: -2.0 + 0.0*I -2.0 + 0.0*I -2.0 + 0.0*I -2.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::as*bs: 209.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::as: 5.0 + 0.0*I 7.0 + 0.0*I 7.0 + 0.0*I 6.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::as_ns: 5.0 + 0.0*I 7.0 + 0.0*I 7.0 + 0.0*I 6.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::as+b: 14.0 + 0.0*I 17.0 + 0.0*I 18.0 + 0.0*I 18.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::as-b: -4.0 + 0.0*I -3.0 + 0.0*I -4.0 + 0.0*I -6.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::as*b: 122.0 + 0.0*I 134.0 + 0.0*I 129.0 + 0.0*I 142.0 + 0.0*I
+DEAL:Complex double:Copy constructor::c: 5.0 + 0.0*I 6.0 + 0.0*I 7.0 + 0.0*I 8.0 + 0.0*I
+DEAL:Complex double:Copy constructor::cs: 5.0 + 0.0*I 7.0 + 0.0*I 7.0 + 0.0*I 6.0 + 0.0*I
+DEAL:Complex double:Math operators:Tensor::c+=b: 14.0 + 0.0*I 16.0 + 0.0*I 18.0 + 0.0*I 20.0 + 0.0*I
+DEAL:Complex double:Math operators:Tensor::c*=s: 28.0 + 0.0*I 32.0 + 0.0*I 36.0 + 0.0*I 40.0 + 0.0*I
+DEAL:Complex double:Math operators:Tensor::c-=b: 19.0 + 0.0*I 22.0 + 0.0*I 25.0 + 0.0*I 28.0 + 0.0*I
+DEAL:Complex double:Math operators:Tensor::c/=s: 9.5 + 0.0*I 11.0 + 0.0*I 12.5 + 0.0*I 14.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::cs+=bs: 12.0 + 0.0*I 16.0 + 0.0*I 16.0 + 0.0*I 14.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::cs*=s: 24.0 + 0.0*I 32.0 + 0.0*I 32.0 + 0.0*I 28.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::cs-=bs: 17.0 + 0.0*I 23.0 + 0.0*I 23.0 + 0.0*I 20.0 + 0.0*I
+DEAL:Complex double:Math operators:SymmetricTensor::cs/=s: 8.5 + 0.0*I 11.5 + 0.0*I 11.5 + 0.0*I 10.0 + 0.0*I
+DEAL:Complex double:Symbols::x: x_00 x_01 x_10 x_11
+DEAL:Complex double:Symbols::y: y
+DEAL:Complex double:Symbols::z: z_00 z_01 z_01 z_11
+DEAL:Complex double:Math operators:Tensor::c+=x: 9.5 + 0.0*I + x_00 11.0 + 0.0*I + x_01 12.5 + 0.0*I + x_10 14.0 + 0.0*I + x_11
+DEAL:Complex double:Math operators:Tensor::c*=y: y*(9.5 + 0.0*I + x_00) y*(11.0 + 0.0*I + x_01) y*(12.5 + 0.0*I + x_10) y*(14.0 + 0.0*I + x_11)
+DEAL:Complex double:Math operators:Tensor::c*=s: (2.0 + 0.0*I)*y*(9.5 + 0.0*I + x_00) (2.0 + 0.0*I)*y*(11.0 + 0.0*I + x_01) (2.0 + 0.0*I)*y*(12.5 + 0.0*I + x_10) (2.0 + 0.0*I)*y*(14.0 + 0.0*I + x_11)
+DEAL:Complex double:Math operators:Tensor::c-=x: -x_00 + (2.0 + 0.0*I)*y*(9.5 + 0.0*I + x_00) -x_01 + (2.0 + 0.0*I)*y*(11.0 + 0.0*I + x_01) -x_10 + (2.0 + 0.0*I)*y*(12.5 + 0.0*I + x_10) -x_11 + (2.0 + 0.0*I)*y*(14.0 + 0.0*I + x_11)
+DEAL:Complex double:Math operators:Tensor::c/=y: (-x_00 + (2.0 + 0.0*I)*y*(9.5 + 0.0*I + x_00))/y (-x_01 + (2.0 + 0.0*I)*y*(11.0 + 0.0*I + x_01))/y (-x_10 + (2.0 + 0.0*I)*y*(12.5 + 0.0*I + x_10))/y (-x_11 + (2.0 + 0.0*I)*y*(14.0 + 0.0*I + x_11))/y
+DEAL:Complex double:Math operators:Tensor::c/=s: (0.5 + 0.0*I)*(-x_00 + (2.0 + 0.0*I)*y*(9.5 + 0.0*I + x_00))/y (0.5 + 0.0*I)*(-x_01 + (2.0 + 0.0*I)*y*(11.0 + 0.0*I + x_01))/y (0.5 + 0.0*I)*(-x_10 + (2.0 + 0.0*I)*y*(12.5 + 0.0*I + x_10))/y (0.5 + 0.0*I)*(-x_11 + (2.0 + 0.0*I)*y*(14.0 + 0.0*I + x_11))/y
+DEAL:Complex double:Math operators:SymmetricTensor::cs+=z: 8.5 + 0.0*I + z_00 11.5 + 0.0*I + z_01 11.5 + 0.0*I + z_01 10.0 + 0.0*I + z_11
+DEAL:Complex double:Math operators:SymmetricTensor::cs*=y: y*(8.5 + 0.0*I + z_00) y*(11.5 + 0.0*I + z_01) y*(11.5 + 0.0*I + z_01) y*(10.0 + 0.0*I + z_11)
+DEAL:Complex double:Math operators:SymmetricTensor::cs*=s: (2.0 + 0.0*I)*y*(8.5 + 0.0*I + z_00) (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01) (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01) (2.0 + 0.0*I)*y*(10.0 + 0.0*I + z_11)
+DEAL:Complex double:Math operators:SymmetricTensor::cs-=z: -z_00 + (2.0 + 0.0*I)*y*(8.5 + 0.0*I + z_00) -z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01) -z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01) -z_11 + (2.0 + 0.0*I)*y*(10.0 + 0.0*I + z_11)
+DEAL:Complex double:Math operators:SymmetricTensor::cs/=y: (-z_00 + (2.0 + 0.0*I)*y*(8.5 + 0.0*I + z_00))/y (-z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01))/y (-z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01))/y (-z_11 + (2.0 + 0.0*I)*y*(10.0 + 0.0*I + z_11))/y
+DEAL:Complex double:Math operators:SymmetricTensor::cs/=s: (0.5 + 0.0*I)*(-z_00 + (2.0 + 0.0*I)*y*(8.5 + 0.0*I + z_00))/y (0.5 + 0.0*I)*(-z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01))/y (0.5 + 0.0*I)*(-z_01 + (2.0 + 0.0*I)*y*(11.5 + 0.0*I + z_01))/y (0.5 + 0.0*I)*(-z_11 + (2.0 + 0.0*I)*y*(10.0 + 0.0*I + z_11))/y
+DEAL:Complex double::OK
+DEAL::OK

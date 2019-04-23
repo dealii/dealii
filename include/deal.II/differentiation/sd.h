@@ -23,7 +23,9 @@
 #  include <deal.II/differentiation/sd/symengine_math.h>
 #  include <deal.II/differentiation/sd/symengine_number_traits.h>
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
+#  include <deal.II/differentiation/sd/symengine_product_types.h>
 #  include <deal.II/differentiation/sd/symengine_scalar_operations.h>
+#  include <deal.II/differentiation/sd/symengine_tensor_operations.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
 #  include <deal.II/differentiation/sd/symengine_utilities.h>
 

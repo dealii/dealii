@@ -266,6 +266,9 @@ SPACE_DIMENSIONS := { 1; 2; 3 }
 // all ranks used for instantiating tensors
 RANKS := { 1; 2; 3; 4 }
 
+// all ranks used for instantiating symmetric tensors
+SYM_RANKS := { 2; 4 }
+
 // Flags that are allowed in DataOutInterface::set_flags
 OUTPUT_FLAG_TYPES := { DXFlags; UcdFlags; GnuplotFlags; PovrayFlags; EpsFlags;
                        GmvFlags; TecplotFlags; VtkFlags; SvgFlags;
