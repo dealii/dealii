@@ -365,7 +365,7 @@ that we only need to use the cell-interior part $\varphi_i^\circ$ for
 each shape function $\varphi_i$.
 
 
-<h3> Post-processing and $L_2$-errors </h3>
+<h3> Post-processing and <i>L<sub>2</sub></i>-errors </h3>
 
 The discussions in the previous sections have given us a linear
 system that we can solve for the numerical pressure $p_h$. We can use
