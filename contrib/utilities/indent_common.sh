@@ -205,7 +205,7 @@ export -f fix_permissions
 #   serves as a good candidate to separate individual file names.
 # - For 'xargs', -0 does the opposite: it separates filenames that are
 #   delimited by \0
-# - the options "-n 1 -P 10" make sure that the following script with be
+# - the options "-n 1 -P 10" make sure that the following script will be
 #   called exactly with one file name as argument at a time, but we allow
 #   execution for up to 10 times in parallel
 #
