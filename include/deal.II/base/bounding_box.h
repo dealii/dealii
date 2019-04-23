@@ -141,8 +141,10 @@ public:
   point_inside(const Point<spacedim, Number> &p) const;
 
   /**
-   * Increase (or decrease) the size of the bounding box by the given amount,
-   * in both directions in all coordinate directions.
+   * Increase (or decrease) the size of the bounding box by the given amount.
+   * After calling this method, the lower left corner of the bounding box will
+   * have each coordinate decreased by @p amount, and the upper right corner
+   * of the bounding box will have each coordinate increased by @p amount.
    *
    * If you call this method with a negative number, and one of the axes of the
    * original bounding box is smaller than amount/2, the method will trigger
