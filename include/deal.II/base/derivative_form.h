@@ -367,8 +367,8 @@ DerivativeForm<order, dim, spacedim, Number>::memory_consumption()
 
 /**
  * One of the uses of DerivativeForm is to apply it as a transformation. This
- * is what this function does.  If @p T is DerivativeForm<1,dim,1> it computes
- * $DF * T$, if @p T is DerivativeForm<1,dim,rank> it computes $T*DF^{T}$.
+ * is what this function does.  If @p DF is DerivativeForm<1,dim,1> it computes
+ * $DF * T$, if @p DF is DerivativeForm<1,dim,rank> it computes $T*DF^{T}$.
  *
  * @relatesalso DerivativeForm
  * @author Sebastian Pauletti, 2011
