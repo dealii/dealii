@@ -20,6 +20,7 @@
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
+#  include <deal.II/differentiation/sd/symengine_number_types.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
 
 #  include <symengine/basic.h>
