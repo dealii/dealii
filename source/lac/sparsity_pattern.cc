@@ -489,13 +489,39 @@ SparsityPattern::copy_from(const SparsityPattern &sp)
 void
 SparsityPattern::copy_from(const DynamicSparsityPattern &dsp)
 {
-  const bool                do_diag_optimize = (dsp.n_rows() == dsp.n_cols());
+  const bool  do_diag_optimize = (dsp.n_rows() == dsp.n_cols());
+  const auto &row_index_set    = dsp.row_index_set();
+
   std::vector<unsigned int> row_lengths(dsp.n_rows());
-  for (size_type i = 0; i < dsp.n_rows(); ++i)
+
+  if (row_index_set.size() == 0)
     {
-      row_lengths[i] = dsp.row_length(i);
-      if (do_diag_optimize && !dsp.exists(i, i))
-        ++row_lengths[i];
+      for (size_type i = 0; i < dsp.n_rows(); ++i)
+        {
+          row_lengths[i] = dsp.row_length(i);
+          if (do_diag_optimize && !dsp.exists(i, i))
+            ++row_lengths[i];
+        }
+    }
+  else
+    {
+      for (size_type i = 0; i < dsp.n_rows(); ++i)
+        {
+          if (row_index_set.is_element(i))
+            {
+              row_lengths[i] = dsp.row_length(i);
+              if (do_diag_optimize && !dsp.exists(i, i))
+                ++row_lengths[i];
+            }
+          else
+            {
+              // If the row i is not stored in the DynamicSparsityPattern we
+              // nevertheless need to allocate 1 entry per row for the
+              // "diagonal optimization". (We store a pointer to the next row
+              // in place of the repeated index i for the diagonal element.)
+              row_lengths[i] = do_diag_optimize ? 1 : 0;
+            }
+        }
     }
   reinit(dsp.n_rows(), dsp.n_cols(), row_lengths);
 
