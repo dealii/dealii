@@ -2389,6 +2389,13 @@ namespace internal
                                                     static_cast<unsigned int>(
                                                       size));
 
+#  ifdef DEBUG
+        // Check that the kernel was launched correctly
+        AssertCuda(cudaGetLastError());
+        // Check that there was no problem during the execution of the kernel
+        AssertCuda(cudaDeviceSynchronize());
+#  endif
+
         // Copy the result back to the host
         Number result;
         error_code = cudaMemcpy(&result,
