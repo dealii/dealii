@@ -33,7 +33,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The purpose of this class is so that classes such as Triangulation and
  * DoFHandler can return ranges of cell iterators using an object of the
- * current type from functions such as Triangulation::cells() and that such an
+ * current type from functions such as
+ * Triangulation::cell_iterators() and that such an
  * object can then be used in a range-based for loop as supported by C++11,
  * see also
  * @ref CPP11 "C++11 standard".
@@ -75,11 +76,13 @@ DEAL_II_NAMESPACE_OPEN
  *       statement;
  *     }
  * @endcode
+ * (The precise definition can be found here:
+ * https://en.cppreference.com/w/cpp/language/range-for .)
  * In other words, the compiler introduces a temporary variable that
  * <i>iterates</i> over the elements of the container or collection, and the
  * original variable <code>v</code> that appeared in the range-based for loop
- * represents the <i>dereferenced</i> state of these iterators -- in other
- * words, the <i>elements</i> of the collection.
+ * represents the <i>dereferenced</i> state of these iterators -- namely,
+ * the <i>elements</i> of the collection.
  *
  * In the context of loops over cells, we typically want to retain the fact
  * that the loop variable is an iterator, not a value. This is because in
