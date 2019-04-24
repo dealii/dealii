@@ -1742,7 +1742,7 @@ namespace Step18
           Assert(local_quadrature_points_history >=
                    &quadrature_point_history.front(),
                  ExcInternalError());
-          Assert(local_quadrature_points_history <
+          Assert(local_quadrature_points_history <=
                    &quadrature_point_history.back(),
                  ExcInternalError());
 
