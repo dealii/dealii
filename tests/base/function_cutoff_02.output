@@ -1,0 +1,85 @@
+
+DEAL::Testing dim = 1
+DEAL::Center: 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<1> -2,2 cube: 1.00000
+DEAL::Center: 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<1> -2,2 cube: 1.00000
+DEAL::Testing dim = 2
+DEAL::Center: 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<2> -2,2 cube: 1.00000
+DEAL::Center: 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<2> -2,2 cube: 1.00000
+DEAL::Testing dim = 3
+DEAL::Center: 0.00000 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<3> -2,2 cube: 1.00000
+DEAL::Center: 0.500000 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<3> -2,2 cube: 1.00000
+DEAL::Testing dim = 1
+DEAL::Center: 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<1> -2,2 cube: 1.00000
+DEAL::Center: 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<1> -2,2 cube: 1.00000
+DEAL::Testing dim = 2
+DEAL::Center: 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<2> -2,2 cube: 1.00000
+DEAL::Center: 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<2> -2,2 cube: 1.00000
+DEAL::Testing dim = 3
+DEAL::Center: 0.00000 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<3> -2,2 cube: 1.00000
+DEAL::Center: 0.500000 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<3> -2,2 cube: 1.17474
+DEAL::Testing dim = 1
+DEAL::Center: 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<1> -2,2 cube: 1.00002
+DEAL::Center: 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<1> -2,2 cube: 0.999735
+DEAL::Testing dim = 2
+DEAL::Center: 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<2> -2,2 cube: 0.999471
+DEAL::Center: 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<2> -2,2 cube: 1.00322
+DEAL::Testing dim = 3
+DEAL::Center: 0.00000 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<3> -2,2 cube: 1.00484
+DEAL::Center: 0.500000 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<3> -2,2 cube: 1.00779
+DEAL::Testing dim = 1
+DEAL::Center: 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<1> -2,2 cube: 1.00000
+DEAL::Center: 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<1> -2,2 cube: 1.00000
+DEAL::Testing dim = 2
+DEAL::Center: 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<2> -2,2 cube: 1.00000
+DEAL::Center: 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<2> -2,2 cube: 1.00000
+DEAL::Testing dim = 3
+DEAL::Center: 0.00000 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<3> -2,2 cube: 1.00000
+DEAL::Center: 0.500000 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionTensorProduct<3> -2,2 cube: 1.00009

@@ -27,41 +27,207 @@ DEAL_II_NAMESPACE_OPEN
 namespace Functions
 {
   template <int dim>
-  CutOffFunctionBase<dim>::CutOffFunctionBase(const double       r,
-                                              const Point<dim>   p,
-                                              const unsigned int n_components,
-                                              const unsigned int select)
+  CutOffFunctionBase<dim>::CutOffFunctionBase(
+    const double       r,
+    const Point<dim>   p,
+    const unsigned int n_components,
+    const unsigned int select,
+    const bool         integrate_to_one,
+    const double       unitary_integral_value)
     : Function<dim>(n_components)
     , center(p)
     , radius(r)
     , selected(select)
-  {}
+    , integrate_to_one(integrate_to_one)
+    , unitary_integral_value(unitary_integral_value)
+    , rescaling(integrate_to_one ? 1. / (unitary_integral_value *
+                                         Utilities::fixed_power<dim>(radius)) :
+                                   1.0)
+  {
+    Assert(r > 0, ExcMessage("You must specify a radius > 0."));
+  }
 
 
   template <int dim>
   void
   CutOffFunctionBase<dim>::new_center(const Point<dim> &p)
   {
+    set_center(p);
+  }
+
+
+
+  template <int dim>
+  void
+  CutOffFunctionBase<dim>::set_center(const Point<dim> &p)
+  {
     center = p;
   }
+
+
+
+  template <int dim>
+  const Point<dim> &
+  CutOffFunctionBase<dim>::get_center() const
+  {
+    return center;
+  }
+
 
 
   template <int dim>
   void
   CutOffFunctionBase<dim>::new_radius(const double r)
   {
-    radius = r;
+    set_radius(r);
   }
 
+
+
+  template <int dim>
+  void
+  CutOffFunctionBase<dim>::set_radius(const double r)
+  {
+    radius = r;
+    Assert(r > 0, ExcMessage("You must specify a radius > 0."));
+    if (integrate_to_one)
+      rescaling =
+        1. / (unitary_integral_value * Utilities::fixed_power<dim>(radius));
+    else
+      rescaling = 1.0;
+  }
+
+
+
+  template <int dim>
+  double
+  CutOffFunctionBase<dim>::get_radius() const
+  {
+    return radius;
+  }
+
+
+
+  template <int dim>
+  bool
+  CutOffFunctionBase<dim>::integrates_to_one() const
+  {
+    return integrate_to_one;
+  }
+
+
+
+  template <int dim>
+  CutOffFunctionTensorProduct<dim>::CutOffFunctionTensorProduct(
+    double             radius,
+    const Point<dim> & center,
+    const unsigned int n_components,
+    const unsigned int select,
+    const bool         integrate_to_one)
+    : CutOffFunctionBase<dim>(radius,
+                              center,
+                              n_components,
+                              select,
+                              integrate_to_one)
+    , initialized(false)
+  {}
+
+
+
+  template <int dim>
+  void
+  CutOffFunctionTensorProduct<dim>::set_center(const Point<dim> &p)
+  {
+    Assert(initialized, ExcNotInitialized());
+    for (unsigned int i = 0; i < dim; ++i)
+      base[i]->set_center(Point<1>(p[i]));
+    CutOffFunctionBase<dim>::set_center(p);
+  }
+
+
+
+  template <int dim>
+  void
+  CutOffFunctionTensorProduct<dim>::set_radius(const double r)
+  {
+    Assert(initialized, ExcNotInitialized());
+    for (unsigned int i = 0; i < dim; ++i)
+      base[i]->set_radius(r);
+    CutOffFunctionBase<dim>::set_radius(r);
+  }
+
+
+
+  template <int dim>
+  double
+  CutOffFunctionTensorProduct<dim>::value(const Point<dim> & p,
+                                          const unsigned int component) const
+  {
+    Assert(initialized, ExcNotInitialized());
+    double ret = 1.0;
+    for (unsigned int i = 0; i < dim; ++i)
+      ret *= base[i]->value(Point<1>(p[i]), component);
+    return ret;
+  }
+
+
+
+  template <int dim>
+  Tensor<1, dim>
+  CutOffFunctionTensorProduct<dim>::gradient(const Point<dim> & p,
+                                             const unsigned int component) const
+  {
+    Assert(initialized, ExcNotInitialized());
+    Tensor<1, dim> ret;
+    for (unsigned int i = 0; i < dim; ++i)
+      ret[i] = base[i]->gradient(Point<1>(p[i]), component)[0];
+    return ret;
+  }
+
+
+
   //////////////////////////////////////////////////////////////////////
+  namespace
+  {
+    // Integral of CutOffFunctionLinfty in dimension 1, 2, and 3 when the radius
+    // is one
+    const double integral_Linfty[] = {2.0,
+                                      3.14159265358979323846264338328,
+                                      4.18879020478639098461685784437};
+
+    // Integral of CutOffFunctionW1 in dimension 1, 2, and 3 when the radius
+    // is one
+    const double integral_W1[] = {1.0,
+                                  1.04719755119659774615421446109,
+                                  1.04719755119659774615421446109};
+
+    // Integral of CutOffFunctionCinfty in dimension 1, 2, and 3 when the radius
+    // is one
+    const double integral_Cinfty[] = {1.20690032243787617533623799633,
+                                      1.26811216112759608094632335664,
+                                      1.1990039070192139033798473858};
+
+    // Integral of CutOffFunctionC1 in dimension 1, 2, and 3 when the radius
+    // is one
+    const double integral_C1[] = {1.0,
+                                  0.93417655442731527615578663815,
+                                  0.821155557658032806157358815206};
+  } // namespace
+
 
   template <int dim>
   CutOffFunctionLinfty<dim>::CutOffFunctionLinfty(
     const double       r,
     const Point<dim>   p,
     const unsigned int n_components,
-    const unsigned int select)
-    : CutOffFunctionBase<dim>(r, p, n_components, select)
+    const unsigned int select,
+    const bool         integrate_to_one)
+    : CutOffFunctionBase<dim>(r,
+                              p,
+                              n_components,
+                              select,
+                              integrate_to_one,
+                              integral_Linfty[dim - 1])
   {}
 
 
@@ -72,7 +238,7 @@ namespace Functions
   {
     if (this->selected == CutOffFunctionBase<dim>::no_component ||
         component == this->selected)
-      return ((this->center.distance(p) < this->radius) ? 1. : 0.);
+      return ((this->center.distance(p) < this->radius) ? this->rescaling : 0.);
     return 0.;
   }
 
@@ -92,7 +258,9 @@ namespace Functions
     if (this->selected == CutOffFunctionBase<dim>::no_component ||
         component == this->selected)
       for (unsigned int k = 0; k < values.size(); ++k)
-        values[k] = (this->center.distance(points[k]) < this->radius) ? 1. : 0.;
+        values[k] = (this->center.distance(points[k]) < this->radius) ?
+                      this->rescaling :
+                      0.;
     else
       std::fill(values.begin(), values.end(), 0.);
   }
@@ -109,8 +277,9 @@ namespace Functions
 
     for (unsigned int k = 0; k < values.size(); ++k)
       {
-        const double val =
-          (this->center.distance(points[k]) < this->radius) ? 1. : 0.;
+        const double val = (this->center.distance(points[k]) < this->radius) ?
+                             this->rescaling :
+                             0.;
         if (this->selected == CutOffFunctionBase<dim>::no_component)
           values[k] = val;
         else
@@ -121,13 +290,18 @@ namespace Functions
       }
   }
 
-
   template <int dim>
   CutOffFunctionW1<dim>::CutOffFunctionW1(const double       r,
                                           const Point<dim>   p,
                                           const unsigned int n_components,
-                                          const unsigned int select)
-    : CutOffFunctionBase<dim>(r, p, n_components, select)
+                                          const unsigned int select,
+                                          const bool         integrate_to_one)
+    : CutOffFunctionBase<dim>(r,
+                              p,
+                              n_components,
+                              select,
+                              integrate_to_one,
+                              integral_W1[dim - 1])
   {}
 
 
@@ -140,7 +314,9 @@ namespace Functions
         component == this->selected)
       {
         const double d = this->center.distance(p);
-        return ((d < this->radius) ? (this->radius - d) : 0.);
+        return ((d < this->radius) ?
+                  (this->radius - d) / this->radius * this->rescaling :
+                  0.);
       }
     return 0.;
   }
@@ -160,7 +336,9 @@ namespace Functions
       for (unsigned int i = 0; i < values.size(); ++i)
         {
           const double d = this->center.distance(points[i]);
-          values[i]      = ((d < this->radius) ? (this->radius - d) : 0.);
+          values[i]      = ((d < this->radius) ?
+                         (this->radius - d) / this->radius * this->rescaling :
+                         0.);
         }
     else
       std::fill(values.begin(), values.end(), 0.);
@@ -179,8 +357,11 @@ namespace Functions
 
     for (unsigned int k = 0; k < values.size(); ++k)
       {
-        const double d   = this->center.distance(points[k]);
-        const double val = (d < this->radius) ? (this->radius - d) : 0.;
+        const double d = this->center.distance(points[k]);
+        const double val =
+          (d < this->radius) ?
+            (this->radius - d) / this->radius * this->rescaling :
+            0.;
         if (this->selected == CutOffFunctionBase<dim>::no_component)
           values[k] = val;
         else
@@ -197,8 +378,14 @@ namespace Functions
     const double       r,
     const Point<dim>   p,
     const unsigned int n_components,
-    const unsigned int select)
-    : CutOffFunctionBase<dim>(r, p, n_components, select)
+    const unsigned int select,
+    bool               integrate_to_one)
+    : CutOffFunctionBase<dim>(r,
+                              p,
+                              n_components,
+                              select,
+                              integrate_to_one,
+                              integral_Cinfty[dim - 1])
   {}
 
 
@@ -215,7 +402,7 @@ namespace Functions
         if (d >= r)
           return 0.;
         const double e = -r * r / (r * r - d * d);
-        return ((e < -50) ? 0. : numbers::E * std::exp(e));
+        return ((e < -50) ? 0. : numbers::E * std::exp(e) * this->rescaling);
       }
     return 0.;
   }
@@ -244,7 +431,8 @@ namespace Functions
           else
             {
               const double e = -r * r / (r * r - d * d);
-              values[i]      = (e < -50) ? 0. : numbers::E * std::exp(e);
+              values[i] =
+                (e < -50) ? 0. : numbers::E * std::exp(e) * this->rescaling;
             }
         }
     else
@@ -270,7 +458,7 @@ namespace Functions
           {
             const double e = -r * r / (r * r - d * d);
             if (e > -50)
-              val = numbers::E * std::exp(e);
+              val = numbers::E * std::exp(e) * this->rescaling;
           }
 
         if (this->selected == CutOffFunctionBase<dim>::no_component)
@@ -298,11 +486,125 @@ namespace Functions
     return ((e < -50) ? Point<dim>() :
                         (p - this->center) / d *
                           (-2.0 * r * r / std::pow(-r * r + d * d, 2.0) * d *
-                           std::exp(e)));
+                           std::exp(e)) *
+                          this->rescaling);
+  }
+
+
+
+  template <int dim>
+  CutOffFunctionC1<dim>::CutOffFunctionC1(const double       r,
+                                          const Point<dim>   p,
+                                          const unsigned int n_components,
+                                          const unsigned int select,
+                                          bool               integrate_to_one)
+    : CutOffFunctionBase<dim>(r,
+                              p,
+                              n_components,
+                              select,
+                              integrate_to_one,
+                              integral_C1[dim - 1])
+  {}
+
+
+  template <int dim>
+  double
+  CutOffFunctionC1<dim>::value(const Point<dim> & p,
+                               const unsigned int component) const
+  {
+    if (this->selected == CutOffFunctionBase<dim>::no_component ||
+        component == this->selected)
+      {
+        const double d = this->center.distance(p);
+        const double r = this->radius;
+        if (d >= r)
+          return 0.;
+        return .5 * (std::cos(numbers::PI * d / r) + 1) * this->rescaling;
+      }
+    return 0.;
+  }
+
+
+  template <int dim>
+  void
+  CutOffFunctionC1<dim>::value_list(const std::vector<Point<dim>> &points,
+                                    std::vector<double> &          values,
+                                    const unsigned int component) const
+  {
+    Assert(values.size() == points.size(),
+           ExcDimensionMismatch(values.size(), points.size()));
+
+    const double r = this->radius;
+
+    if (this->selected == CutOffFunctionBase<dim>::no_component ||
+        component == this->selected)
+      for (unsigned int i = 0; i < values.size(); ++i)
+        {
+          const double d = this->center.distance(points[i]);
+          if (d >= r)
+            {
+              values[i] = 0.;
+            }
+          else
+            {
+              values[i] =
+                .5 * (std::cos(numbers::PI * d / r) + 1) * this->rescaling;
+            }
+        }
+    else
+      std::fill(values.begin(), values.end(), 0.);
+  }
+
+
+  template <int dim>
+  void
+  CutOffFunctionC1<dim>::vector_value_list(
+    const std::vector<Point<dim>> &points,
+    std::vector<Vector<double>> &  values) const
+  {
+    Assert(values.size() == points.size(),
+           ExcDimensionMismatch(values.size(), points.size()));
+
+    for (unsigned int k = 0; k < values.size(); ++k)
+      {
+        const double d   = this->center.distance(points[k]);
+        const double r   = this->radius;
+        double       val = 0.;
+        if (d < this->radius)
+          {
+            val = .5 * (std::cos(numbers::PI * d / r) + 1) * this->rescaling;
+          }
+
+        if (this->selected == CutOffFunctionBase<dim>::no_component)
+          values[k] = val;
+        else
+          {
+            values[k]                 = 0;
+            values[k](this->selected) = val;
+          }
+      }
+  }
+
+
+
+  template <int dim>
+  Tensor<1, dim>
+  CutOffFunctionC1<dim>::gradient(const Point<dim> &p, const unsigned int) const
+  {
+    const double d = this->center.distance(p);
+    const double r = this->radius;
+    if (d >= r)
+      return Tensor<1, dim>();
+    return (-0.5 * numbers::PI * std::sin(numbers::PI * d / r) / r) *
+           (p - this->center) / d * this->rescaling;
   }
 
 
   // explicit instantiations
+  template class CutOffFunctionBase<1>;
+  template class CutOffFunctionBase<2>;
+  template class CutOffFunctionBase<3>;
+
   template class CutOffFunctionLinfty<1>;
   template class CutOffFunctionLinfty<2>;
   template class CutOffFunctionLinfty<3>;
@@ -314,6 +616,14 @@ namespace Functions
   template class CutOffFunctionCinfty<1>;
   template class CutOffFunctionCinfty<2>;
   template class CutOffFunctionCinfty<3>;
+
+  template class CutOffFunctionC1<1>;
+  template class CutOffFunctionC1<2>;
+  template class CutOffFunctionC1<3>;
+
+  template class CutOffFunctionTensorProduct<1>;
+  template class CutOffFunctionTensorProduct<2>;
+  template class CutOffFunctionTensorProduct<3>;
 } // namespace Functions
 
 DEAL_II_NAMESPACE_CLOSE

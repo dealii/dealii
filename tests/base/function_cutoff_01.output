@@ -1,0 +1,85 @@
+
+DEAL::Testing dim = 1
+DEAL::Center: 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionLinfty<1> -2,2 cube: 1.00000
+DEAL::Center: 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionLinfty<1> -2,2 cube: 1.00000
+DEAL::Testing dim = 2
+DEAL::Center: 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionLinfty<2> -2,2 cube: 0.993980
+DEAL::Center: 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionLinfty<2> -2,2 cube: 1.02445
+DEAL::Testing dim = 3
+DEAL::Center: 0.00000 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionLinfty<3> -2,2 cube: 1.00850
+DEAL::Center: 0.500000 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionLinfty<3> -2,2 cube: 0.958427
+DEAL::Testing dim = 1
+DEAL::Center: 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionW1<1> -2,2 cube: 1.00000
+DEAL::Center: 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionW1<1> -2,2 cube: 1.00000
+DEAL::Testing dim = 2
+DEAL::Center: 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionW1<2> -2,2 cube: 1.00030
+DEAL::Center: 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionW1<2> -2,2 cube: 1.00316
+DEAL::Testing dim = 3
+DEAL::Center: 0.00000 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionW1<3> -2,2 cube: 1.00445
+DEAL::Center: 0.500000 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionW1<3> -2,2 cube: 1.03922
+DEAL::Testing dim = 1
+DEAL::Center: 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionCinfty<1> -2,2 cube: 1.00002
+DEAL::Center: 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionCinfty<1> -2,2 cube: 0.999735
+DEAL::Testing dim = 2
+DEAL::Center: 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionCinfty<2> -2,2 cube: 0.999958
+DEAL::Center: 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionCinfty<2> -2,2 cube: 0.998842
+DEAL::Testing dim = 3
+DEAL::Center: 0.00000 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionCinfty<3> -2,2 cube: 0.999614
+DEAL::Center: 0.500000 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionCinfty<3> -2,2 cube: 1.00165
+DEAL::Testing dim = 1
+DEAL::Center: 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionC1<1> -2,2 cube: 1.00000
+DEAL::Center: 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionC1<1> -2,2 cube: 1.00000
+DEAL::Testing dim = 2
+DEAL::Center: 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionC1<2> -2,2 cube: 0.999972
+DEAL::Center: 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionC1<2> -2,2 cube: 0.999764
+DEAL::Testing dim = 3
+DEAL::Center: 0.00000 0.00000 0.00000
+DEAL::Radius: 1.00000
+DEAL::Integrating dealii::Functions::CutOffFunctionC1<3> -2,2 cube: 0.999478
+DEAL::Center: 0.500000 0.500000 0.500000
+DEAL::Radius: 0.500000
+DEAL::Integrating dealii::Functions::CutOffFunctionC1<3> -2,2 cube: 1.00089

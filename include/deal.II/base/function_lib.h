@@ -21,6 +21,7 @@
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/table.h>
 
 #include <array>
@@ -912,8 +913,12 @@ namespace Functions
    * radius of the supporting ball of a cut-off function. It also stores the
    * number of the non-zero component, if the function is vector-valued.
    *
+   * This class can also be used for approximated Dirac delta functions. These
+   * are special cut-off functions whose integral is always equal to one,
+   * independently of the radius of the supporting ball.
+   *
    * @ingroup functions
-   * @author Guido Kanschat, 2002
+   * @author Guido Kanschat, 2002, Luca Heltai, 2019.
    */
   template <int dim>
   class CutOffFunctionBase : public Function<dim>
@@ -926,28 +931,78 @@ namespace Functions
     static const unsigned int no_component = numbers::invalid_unsigned_int;
 
     /**
-     * Constructor. Arguments are the center of the ball and its radius.
+     * Constructor.
      *
-     * If an argument <tt>select</tt> is given and not -1, the cut-off
-     * function will be non-zero for this component only.
+     * @param[in] radius Radius of the ball
+     * @param[in] center Center of the ball
+     * @param[in] n_components Number of components of this function object
+     * @param[in] select If this is different from
+     * CutOffFunctionBase<dim>::no_component, then the function will be non-zero
+     * for this component only
+     * @param[in] integrate_to_one Rescale the value of the function whenever a
+     * new radius is set, to guarantee that the integral is equal to one
+     * @param[in] unitary_integral_value Value of the integral when the radius
+     * is equal to 1.0. Derived classes will need to supply this value, to
+     * guarantee that the rescaling is performed correctly.
      */
     CutOffFunctionBase(
-      const double radius             = 1.,
-      const Point<dim>                = Point<dim>(),
+      const double       radius       = 1.,
+      const Point<dim>   center       = Point<dim>(),
       const unsigned int n_components = 1,
-      const unsigned int select       = CutOffFunctionBase<dim>::no_component);
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      const bool         integrate_to_one       = false,
+      const double       unitary_integral_value = 1.0);
+
+    /**
+     * Virtual destructor.
+     */
+    virtual ~CutOffFunctionBase() = default;
 
     /**
      * Move the center of the ball to new point <tt>p</tt>.
+     *
+     * @deprecated Use set_center() instead.
      */
-    void
+    DEAL_II_DEPRECATED void
     new_center(const Point<dim> &p);
 
     /**
      * Set the radius of the ball to <tt>r</tt>.
+     *
+     * @deprecated Use set_radius() instead.
      */
-    void
+    DEAL_II_DEPRECATED void
     new_radius(const double r);
+
+    /**
+     * Set the center of the ball to the point @p p.
+     */
+    virtual void
+    set_center(const Point<dim> &p);
+
+    /**
+     * Set the radius of the ball to @p r
+     */
+    virtual void
+    set_radius(const double r);
+
+    /**
+     * Return the center stored in this object.
+     */
+    const Point<dim> &
+    get_center() const;
+
+    /**
+     * Return the radius stored in this object.
+     */
+    double
+    get_radius() const;
+
+    /**
+     * Return a boolean indicating whether this function integrates to one.
+     */
+    bool
+    integrates_to_one() const;
 
   protected:
     /**
@@ -965,6 +1020,92 @@ namespace Functions
      * in all components.
      */
     const unsigned int selected;
+
+    /**
+     * Flag that controls wether we rescale the value when the radius changes.
+     */
+    bool integrate_to_one;
+
+    /**
+     * The reference integral value. Derived classes should specify what their
+     * integral is when @p radius = 1.0.
+     */
+    const double unitary_integral_value;
+
+    /**
+     * Current rescaling to apply the the cut-off function.
+     */
+    double rescaling;
+  };
+
+
+  /**
+   * Tensor product of CutOffFunctionBase objects.
+   *
+   * Instead of using the distance to compute the cut-off function, this class
+   * performs a tensor product of the same CutOffFunctionBase object in each
+   * coordinate direction.
+   *
+   * @ingroup functions
+   * @author Luca Heltai, 2019.
+   */
+  template <int dim>
+  class CutOffFunctionTensorProduct : public CutOffFunctionBase<dim>
+  {
+  public:
+    /**
+     * Construct an empty CutOffFunctionTensorProduct object.
+     *
+     * Before you can use this class, you have to call the set_base() method
+     * with a class derived from the CutOffFunctionBase object.
+     *
+     * If you try to use this class before you call the set_base() method,
+     * and exception will be triggered.
+     */
+    CutOffFunctionTensorProduct(
+      double             radius       = 1.0,
+      const Point<dim> & center       = Point<dim>(),
+      const unsigned int n_components = 1,
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      const bool         integrate_to_one = false);
+
+    /**
+     * Initialize the class with an objet of type
+     * @tparam CutOffFunctionBaseType<1>.
+     */
+    template <template <int> class CutOffFunctionBaseType>
+    void
+    set_base();
+
+    /**
+     * Set the new center.
+     */
+    virtual void
+    set_center(const Point<dim> &center) override;
+
+    /**
+     * Set the new radius.
+     */
+    virtual void
+    set_radius(const double radius) override;
+
+    /**
+     * Function value at one point.
+     */
+    virtual double
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
+
+    /**
+     * Function gradient at one point.
+     */
+    virtual Tensor<1, dim>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
+
+  private:
+    std::array<std::unique_ptr<CutOffFunctionBase<1>>, dim> base;
+
+    bool initialized;
   };
 
 
@@ -992,7 +1133,8 @@ namespace Functions
       const double radius             = 1.,
       const Point<dim>                = Point<dim>(),
       const unsigned int n_components = 1,
-      const unsigned int select       = CutOffFunctionBase<dim>::no_component);
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      const bool         integrate_to_one = false);
 
     /**
      * Function value at one point.
@@ -1040,7 +1182,8 @@ namespace Functions
       const double radius             = 1.,
       const Point<dim>                = Point<dim>(),
       const unsigned int n_components = 1,
-      const unsigned int select       = CutOffFunctionBase<dim>::no_component);
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      const bool         integrate_to_one = false);
 
     /**
      * Function value at one point.
@@ -1062,6 +1205,63 @@ namespace Functions
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
                       std::vector<Vector<double>> &  values) const override;
+  };
+
+
+  /**
+   * A cut-off function for an arbitrarily-sized ball that is in the space $C^1$
+   * (i.e., continuously differentiable). This is a cut-off function that is
+   * often used in the literature of the Immersed Boundary Method.
+   *
+   * The expression of the function in radial coordinates is given by
+   * $f(r)=1/2(cos(\pi r/s)+1)$ where $r<s$ is the distance to the center, and
+   * $s$ is the radius of the sphere. If vector valued, it can be restricted to
+   * a single component.
+   *
+   * @ingroup functions
+   * @author Luca Heltai, 2019
+   */
+  template <int dim>
+  class CutOffFunctionC1 : public CutOffFunctionBase<dim>
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    CutOffFunctionC1(
+      const double radius             = 1.,
+      const Point<dim>                = Point<dim>(),
+      const unsigned int n_components = 1,
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      bool               integrate_to_one = false);
+
+    /**
+     * Function value at one point.
+     */
+    virtual double
+    value(const Point<dim> &p, const unsigned int component = 0) const override;
+
+    /**
+     * Function values at multiple points.
+     */
+    virtual void
+    value_list(const std::vector<Point<dim>> &points,
+               std::vector<double> &          values,
+               const unsigned int             component = 0) const override;
+
+    /**
+     * Function values at multiple points.
+     */
+    virtual void
+    vector_value_list(const std::vector<Point<dim>> &points,
+                      std::vector<Vector<double>> &  values) const override;
+
+    /**
+     * Function gradient at one point.
+     */
+    virtual Tensor<1, dim>
+    gradient(const Point<dim> & p,
+             const unsigned int component = 0) const override;
   };
 
 
@@ -1089,7 +1289,8 @@ namespace Functions
       const double radius             = 1.,
       const Point<dim>                = Point<dim>(),
       const unsigned int n_components = 1,
-      const unsigned int select       = CutOffFunctionBase<dim>::no_component);
+      const unsigned int select       = CutOffFunctionBase<dim>::no_component,
+      bool               integrate_to_one = false);
 
     /**
      * Function value at one point.
@@ -1442,7 +1643,33 @@ namespace Functions
     const std::vector<double> coefficients;
   };
 
+#ifndef DOXYGEN
 
+
+
+  // Template definitions
+  template <int dim>
+  template <template <int> class CutOffFunctionBaseType>
+  void
+  CutOffFunctionTensorProduct<dim>::set_base()
+  {
+    initialized = true;
+    static_assert(
+      std::is_base_of<CutOffFunctionBase<1>, CutOffFunctionBaseType<1>>::value,
+      "You can only construct a CutOffFunctionTensorProduct function from "
+      "a class derived from CutOffFunctionBase.");
+
+    for (unsigned int i = 0; i < dim; ++i)
+      base[i].reset(new CutOffFunctionBaseType<1>(this->radius,
+                                                  Point<1>(this->center[i]),
+                                                  this->n_components,
+                                                  this->selected,
+                                                  this->integrate_to_one));
+  }
+
+
+
+#endif
 
 } // namespace Functions
 DEAL_II_NAMESPACE_CLOSE
