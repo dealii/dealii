@@ -447,11 +447,11 @@ define the $L_2$-errors of pressure, velocity, and flux
 by the following formulas:
 @f{eqnarray*}
 \|p-p_h^\circ\|^2
-  = \sum_{K \in \mathbb{T}} \|p-p_h^\circ\|_{L_2(K)}^2, \\
+  &= \sum_{K \in \mathbb{T}} \|p-p_h^\circ\|_{L_2(K)}^2, \\
  \|\mathbf{u}-\mathbf{u}_h\|^2
-  = \sum_{K \in \mathbb{T}} \|\mathbf{u}-\mathbf{u}_h\|_{L_2(K)^2}^d,\\
+  &= \sum_{K \in \mathbb{T}} \|\mathbf{u}-\mathbf{u}_h\|_{L_2(K)^2}^d,\\
 \|(\mathbf{u}-\mathbf{u}_h) \cdot \mathbf{n}\|^2
-  = \sum_{K \in \mathbb{T}} \sum_{\gamma \subset \partial K}
+  &= \sum_{K \in \mathbb{T}} \sum_{\gamma \subset \partial K}
     \frac{|K|}{|\gamma|} \|\mathbf{u} \cdot \mathbf{n} - \mathbf{u}_h \cdot \mathbf{n}\|_{L_2(\gamma)}^2,
 @f}
 where $| K |$ is the area of the element, 
