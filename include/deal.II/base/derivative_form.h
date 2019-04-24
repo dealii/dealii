@@ -120,7 +120,7 @@ public:
   /**
    * Compute the volume element associated with the jacobian of the
    * transformation $\mathbf F$. That is to say if $DF$ is square, it computes
-   * $\det(DF)$, in case DF is not square returns $\sqrt{\det(DF^T * DF)}$.
+   * $\det(DF)$, in case DF is not square returns $\sqrt{\det(DF^T \,DF)}$.
    */
   Number
   determinant() const;
@@ -153,7 +153,7 @@ public:
 
 private:
   /**
-   * Auxiliary function that computes (*this) * $T^{T}$
+   * Auxiliary function that computes [*this]  $T^{T}$
    */
   DerivativeForm<1, dim, spacedim, Number>
   times_T_t(const Tensor<2, dim, Number> &T) const;
@@ -407,7 +407,7 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
 /**
  * Similar to the previous apply_transformation().
  * Each row of the result corresponds to one of the rows of @p D_X transformed
- * by @p grad_F, equivalent to $\text{D\_X} * \text{grad\_F}^T$ in matrix notation.
+ * by @p grad_F, equivalent to $\text{D\_X} \, \text{grad\_F}^T$ in matrix notation.
  *
  * @relatesalso DerivativeForm
  * @author Sebastian Pauletti, 2011, Reza Rastak, 2019
@@ -427,7 +427,7 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number> &grad_F,
 
 /**
  * Similar to the previous apply_transformation(). In matrix notation, it
- * computes $DF2 * DF1^{T}$. Moreover, the result of this operation $\mathbf A$
+ * computes $DF2 \, DF1^{T}$. Moreover, the result of this operation $\mathbf A$
  * can be interpreted as a metric tensor in
  * ${\mathbb R}^\text{spacedim}$ which corresponds to the Euclidean metric
  * tensor in
