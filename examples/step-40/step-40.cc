@@ -39,7 +39,7 @@
 // if we are using PETSc (see solve() for an example where this is necessary)
 namespace LA
 {
-#if defined(DEAL_II_WITH_PETSC) && \
+#if defined(DEAL_II_WITH_PETSC) && !defined(DEAL_II_PETSC_WITH_COMPLEX) && \
   !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
   using namespace dealii::LinearAlgebraPETSc;
 #  define USE_PETSC_LA
