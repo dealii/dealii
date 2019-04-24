@@ -25,6 +25,9 @@
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
 #  include <deal.II/differentiation/sd/symengine_types.h>
 
+#  include <symengine/basic.h>
+#  include <symengine/symengine_rcp.h>
+
 #  include <algorithm>
 #  include <type_traits>
 #  include <utility>
@@ -36,6 +39,8 @@ namespace Differentiation
 {
   namespace SD
   {
+    namespace SE = ::SymEngine;
+
     /**
      * @name Symbolic variable creation
      */
@@ -130,8 +135,487 @@ namespace Differentiation
 
     //@}
 
+    /**
+     * @name Symbolic map creation
+     */
+    //@{
+
+    namespace internal
+    {
+      /**
+       * Return whether or not an @p entry is a valid symbol that
+       * we can expect to perform substitution on.
+       */
+      bool
+      is_valid_substitution_symbol(const SE::Basic &entry);
+    } // namespace internal
+
+    //@}
+
+    /**
+     * @name Symbolic substitution map enlargement
+     */
+    //@{
+
+    namespace internal
+    {
+      /**
+       * A convenience function to add an entry to the @p substitution_map.
+       * The new entry will have the key given by @p symbol with its paired
+       * @p value. Such maps are required to perform substitution of symbolic
+       * expressions, where all entries given as keys in the map are substituted
+       * by their value counterparts.
+       *
+       * There are cases where it is convenient to simply ignore the fact that
+       * we may be trying to add invalid symbols. For example, one may wish to
+       * add a tensor where only some entries are symbols and the others are
+       * zero'd. In this case we ensure that the user knows what they're doing
+       * by forcing them to override this safety mechanism with a template
+       * parameter. These types of functions are typically called in a manner
+       * indicating that the user knows exactly what they're passing into it.
+       *
+       * @tparam ignore_invalid_symbols A template parameter that enforces whether
+       *         or not the @p symbol has to be a valid one or not. In the
+       *         overwhelming majority of cases, the default value of
+       *         <tt>false</tt> should be selected, with the result that an
+       *         exception will be thrown if the input @p symbolic is, in fact,
+       *         not a symbolic value or expression.
+       */
+      template <bool ignore_invalid_symbols = false>
+      void
+      add_to_substitution_map(types::substitution_map &       substitution_map,
+                              const SE::RCP<const SE::Basic> &symbol,
+                              const SE::RCP<const SE::Basic> &value);
+    } // namespace internal
+
+    /**
+     * A convenience function to add an entry to the @p substitution_map.
+     * The new entry will have the key given by @p symbol with its paired
+     * @p value. Such maps are required to perform substitution of symbolic
+     * expressions, with key entries being exchanges with their pair values.
+     *
+     * This function is guaranteed to create an ordering that is identical
+     * to the typical add_to_symbol_map() call that may be used when initially
+     * configuring a BatchOptimizer.
+     * This helps one conform to the requirement that the arguments sent into
+     * lambda and LLVM JIT compiled functions (created by optimizing symbolic
+     * expressions) (i) be the same, and (ii) have a constant ordering.
+     *
+     * @tparam ignore_invalid_symbols A template parameter that enforces whether
+     *         or not the @p symbol has to be a valid one or not. In the
+     *         overwhelming majority of cases, the default value of
+     *         <tt>false</tt> should be selected, with the result that an
+     *         exception will be thrown if the input @p symbolic is, in fact,
+     *         not a symbolic value or expression.
+     *         An exceptional case is, for example, when performing symbolic
+     *         assembly on a finite element level. When extracting the symbolic
+     *         equivalent of the shape function gradients using FEExtractors,
+     *         the returned tensor will have some <em>a priori</em> determined
+     *         zero-valued components. These trivial components are not valid
+     *         symbols (as they are not symbolic expressions), and we would
+     *         typically wish to guard against their (erroneous) inclusion. In
+     *         this scenario, for convenience, one could set
+     *         @p ignore_invalid_symbols to <tt>true</tt> and these zero-valued
+     *         entries would be skipped over and ignored.
+     *
+     * @note In this function, the @p ValueType is somewhat arbitrary as
+     * it is only used to create dummy values.
+     */
+    template <bool ignore_invalid_symbols = false>
+    void
+    add_to_substitution_map(types::substitution_map &substitution_map,
+                            const Expression &       symbol,
+                            const Expression &       value);
+
+    /**
+     * A convenience function to add an entry to the @p substitution_map.
+     * The new entry will have the key given by @p symbol with its paired
+     * @p value.
+     *
+     * The @p ExpressionType will be used to convert the @p value to a
+     * compatible SymEngine number type.
+     * It is therefore required that the @p ExpressionType
+     * 1. can be constructed from a @p ValueType, and that
+     * 2. it is convertible to a `const SE::RCP<const SE::Basic> &`.
+     *
+     * For more context which this function is used, see the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &, const Expression &) function.
+     *
+     * @tparam ignore_invalid_symbols See the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &,const Expression &) function for a detailed
+     * discussion on the role of this template argument.
+     */
+    template <bool ignore_invalid_symbols = false,
+              typename ExpressionType     = SD::Expression,
+              typename ValueType,
+              typename = typename std::enable_if<
+                dealii::internal::is_explicitly_convertible<
+                  ExpressionType,
+                  const SE::RCP<const SE::Basic> &>::value &&
+                std::is_constructible<ExpressionType, ValueType>::value>::type>
+    void
+    add_to_substitution_map(types::substitution_map &substitution_map,
+                            const ExpressionType &   symbol,
+                            const ValueType &        value);
+
+    /**
+     * A convenience function for adding multiple entries to the
+     * @p substitution_map. The new entries will have the keys given in the
+     * @p symbols vector, each of which will be paired index-wise with its
+     * corresponding element in the @p values vector.
+     *
+     * The class represented by the @p ExpressionType template parameter will
+     * be used to convert the p value to a compatible SymEngine number type.
+     * It is therefore required that the @p ExpressionType
+     * 1. can be constructed from a @p ValueType, and that
+     * 2. it is convertible to a `const SE::RCP<const SE::Basic> &`.
+     *
+     * For more context which this function is used, see the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &, const Expression &) function.
+     *
+     * @tparam ignore_invalid_symbols See the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &,const Expression &) function for a detailed
+     * discussion on the role of this template argument.
+     */
+    template <bool ignore_invalid_symbols = false,
+              typename ExpressionType     = SD::Expression,
+              typename ValueType,
+              typename = typename std::enable_if<
+                dealii::internal::is_explicitly_convertible<
+                  ExpressionType,
+                  const SE::RCP<const SE::Basic> &>::value &&
+                std::is_constructible<ExpressionType, ValueType>::value>::type>
+    void
+    add_to_substitution_map(types::substitution_map &     substitution_map,
+                            const types::symbol_vector &  symbols,
+                            const std::vector<ValueType> &values);
+
+    /**
+     * A convenience function for adding multiple entries to the
+     * @p substitution_map. The new entries will have the keys given in the
+     * @p symbols vector, each of which will be paired index-wise with its
+     * corresponding element in the @p values vector. It is expected that there
+     * are no duplicate entries between the two maps.
+     *
+     * For more context which this function is used, see the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &, const Expression &) function.
+     *
+     * @tparam ignore_invalid_symbols See the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &,const Expression &) function for a detailed
+     * discussion on the role of this template argument.
+     */
+    template <bool ignore_invalid_symbols = false>
+    void
+    add_to_substitution_map(types::substitution_map &      substitution_map,
+                            const types::substitution_map &symbol_values);
+
+    /**
+     * A convenience function to add an entry to the @p substitution_map.
+     * The new entry will have the key given by the first element of
+     * @p symbol_value and the value given by its second element.
+     * It is expected that the key entry be a valid symbol or symbolic
+     * expression, and that the paired @p symbol_value elements are compatible
+     * with the other add_to_substitution_map() functions.
+     *
+     * The @p SymbolicType and its associated @ValueType need not be scalar
+     * types. So, for example, this function could be used to add tensor-valued
+     * data to the map in the following way:
+     *
+     * @code
+     *   types::substitution_map symbol_value_map = ...;
+     *   add_to_substitution_map(
+     *     symbol_value_map,
+     *     std::make_pair(Tensor<1,dim,Expression>(...),
+     *                    Tensor<1,dim,double>(...))
+     *   );
+     * @endcode
+     *
+     * For more context which this function is used, see the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &, const Expression &) function.
+     *
+     * @tparam ignore_invalid_symbols See the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &,const Expression &) function for a detailed
+     * discussion on the role of this template argument.
+     */
+    template <bool ignore_invalid_symbols = false,
+              typename SymbolicType,
+              typename ValueType>
+    void
+    add_to_substitution_map(
+      types::substitution_map &                 substitution_map,
+      const std::pair<SymbolicType, ValueType> &symbol_value);
+
+    /**
+     * A convenience function for adding multiple entries to the
+     * @p substitution_map. The new entries will have the keys given by first
+     * entry of each element of @p symbol_values, and the values given its
+     * second entry. It is expected that the key entry be a valid symbols or
+     * symbolic expressions, and that the paired @p symbol_value elements are
+     * compatible with the other add_to_substitution_map() functions.
+     *
+     * The @p SymbolicType and its associated @ValueType need not be scalar
+     * types. So, for example, this function could be used to add tensor-valued
+     * data to the map in the following way:
+     *
+     * @code
+     *   types::substitution_map symbol_value_map = ...;
+     *   using vector_entry_t = std::vector<std::pair<
+     *     Tensor<1,dim,Expression>, Tensor<1,dim,double>
+     *   >>;
+     *   add_to_substitution_map(
+     *     symbol_value_map,
+     *     vector_entry_t{
+     *       {Tensor<1,dim,Expression>(...), Tensor<1,dim,double>(...)},
+     *       {Tensor<1,dim,Expression>(...), Tensor<1,dim,double>(...)}
+     *     });
+     * @endcode
+     *
+     * For more context which this function is used, see the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &, const Expression &) function.
+     *
+     * @tparam ignore_invalid_symbols See the other
+     * \ref add_to_substitution_map(types::substitution_map &,const
+     * Expression &,const Expression &) function for a detailed
+     * discussion on the role of this template argument.
+     */
+    template <bool ignore_invalid_symbols = false,
+              typename SymbolicType,
+              typename ValueType>
+    void
+    add_to_substitution_map(
+      types::substitution_map &                              substitution_map,
+      const std::vector<std::pair<SymbolicType, ValueType>> &symbol_values);
+
+    /**
+     * A convenience function for adding multiple entries to the
+     * @p substitution_map. The new entries will have the keys given by first
+     * entry of each element of @p symbol_values, and the values given its
+     * second entry, along with the addition of the @p other_symbol_values.
+     * It is expected that the key entry be a valid symbols or symbolic
+     * expressions, and that the paired @p symbol_value elements are compatible
+     * with the other add_to_substitution_map() functions.
+     *
+     * With this function it is possible to construct a symbolic substitution
+     * map from different types, so long as there exists a
+     * add_to_substitution_map() function with the signature corresponding to
+     * the pair types. An example may be as follows:
+     *
+     * @code
+     *   types::substitution_map symbol_value_map = ...;
+     *   add_to_substitution_map(
+     *     symbol_value_map,
+     *     std::make_pair(Expression(...), 3),
+     *     std::make_pair(Tensor<1,dim,Expression>(...),
+     *                    Tensor<1,dim,float>(...)),
+     *     std::make_pair(SymmetricTensor<2,dim,Expression>(...),
+     *                    SymmetricTensor<2,dim,double>(...)));
+     * @endcode
+     *
+     * It is possible to map symbolic types to other symbolic types
+     * using this function. For more details on this, see the other
+     * \ref make_symbol_value_map(const Expression &,const ValueType &)
+     * function.
+     */
+    template <bool ignore_invalid_symbols = false,
+              typename SymbolicType,
+              typename ValueType,
+              typename... Args>
+    void
+    add_to_substitution_map(
+      types::substitution_map &                 substitution_map,
+      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const Args &... other_symbol_values);
+
+    //@}
+
   } // namespace SD
 } // namespace Differentiation
+
+
+/* -------------------- inline and template functions ------------------ */
+
+
+#  ifndef DOXYGEN
+
+
+namespace Differentiation
+{
+  namespace SD
+  {
+    /* ---------------- Symbolic substitution map enlargement --------------*/
+
+    namespace internal
+    {
+      /**
+       * There are cases where it is convenient to simply ignore
+       * the fact that we may be trying to add invalid symbols.
+       * For example, one may wish to add a tensor where only
+       * some entries are symbols and the others are zero'd.
+       * In this case we ensure that the user knows what they're
+       * doing by forcing them to override this safety mechanism
+       * with a template parameter. These types of functions are
+       * typically called in a manner indicating that the user
+       * knows exactly what they're passing into it.
+       */
+      template <bool ignore_invalid_symbols>
+      void
+      add_to_substitution_map(types::substitution_map &       substitution_map,
+                              const SE::RCP<const SE::Basic> &symbol,
+                              const SE::RCP<const SE::Basic> &value)
+      {
+        if (ignore_invalid_symbols == false)
+          {
+            Assert(
+              internal::is_valid_substitution_symbol(*symbol),
+              ExcMessage(
+                "Substitution with a number that does not represent a symbol or symbolic derivative"));
+            Assert(substitution_map.find(symbol) == substitution_map.end(),
+                   ExcMessage("This symbol is already in the map."));
+            substitution_map[Expression(symbol)] = Expression(value);
+          }
+        else
+          {
+            if (internal::is_valid_substitution_symbol(*symbol))
+              {
+                Assert(substitution_map.find(symbol) == substitution_map.end(),
+                       ExcMessage("This symbol is already in the map."));
+                substitution_map[Expression(symbol)] = Expression(value);
+              }
+          }
+      }
+
+    } // namespace internal
+
+
+    template <bool ignore_invalid_symbols>
+    void
+    add_to_substitution_map(types::substitution_map &substitution_map,
+                            const Expression &       symbol,
+                            const Expression &       value)
+    {
+      internal::add_to_substitution_map<ignore_invalid_symbols>(
+        substitution_map, symbol.get_RCP(), value.get_RCP());
+    }
+
+
+    template <bool ignore_invalid_symbols,
+              typename ExpressionType,
+              typename ValueType,
+              typename>
+    void
+    add_to_substitution_map(types::substitution_map &substitution_map,
+                            const ExpressionType &   symbol,
+                            const ValueType &        value)
+    {
+      using SE_RCP_Basic = const SE::RCP<const SE::Basic> &;
+      internal::add_to_substitution_map<ignore_invalid_symbols>(
+        substitution_map,
+        static_cast<SE_RCP_Basic>(symbol),
+        static_cast<SE_RCP_Basic>(ExpressionType(value)));
+    }
+
+    template <bool ignore_invalid_symbols,
+              typename ExpressionType,
+              typename ValueType,
+              typename>
+    void
+    add_to_substitution_map(types::substitution_map &     substitution_map,
+                            const types::symbol_vector &  symbols,
+                            const std::vector<ValueType> &values)
+    {
+      Assert(symbols.size() == values.size(),
+             ExcMessage(
+               "Vector of symbols and values must be of equal length."));
+
+      typename types::symbol_vector::const_iterator   it_s = symbols.begin();
+      typename std::vector<ValueType>::const_iterator it_v = values.begin();
+      using SE_RCP_Basic = const SE::RCP<const SE::Basic> &;
+      for (; it_s != symbols.end(); ++it_s, ++it_v)
+        {
+          Assert(it_v != values.end(), ExcInternalError());
+          internal::add_to_substitution_map<ignore_invalid_symbols>(
+            substitution_map,
+            static_cast<SE_RCP_Basic>(*it_s),
+            static_cast<SE_RCP_Basic>(ExpressionType(*it_v)));
+        }
+    }
+
+
+    template <bool ignore_invalid_symbols,
+              typename SymbolicType,
+              typename ValueType>
+    void
+    add_to_substitution_map(
+      types::substitution_map &                 substitution_map,
+      const std::pair<SymbolicType, ValueType> &symbol_value)
+    {
+      add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
+                                                      symbol_value.first,
+                                                      symbol_value.second);
+    }
+
+
+    template <bool ignore_invalid_symbols,
+              typename SymbolicType,
+              typename ValueType>
+    void
+    add_to_substitution_map(
+      types::substitution_map &                              substitution_map,
+      const std::vector<std::pair<SymbolicType, ValueType>> &symbol_values)
+    {
+      for (const auto &entry : symbol_values)
+        {
+          add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
+                                                          entry);
+        }
+    }
+
+
+    template <bool ignore_invalid_symbols>
+    void
+    add_to_substitution_map(types::substitution_map &      substitution_map,
+                            const types::substitution_map &symbol_values)
+    {
+      for (const auto &entry : symbol_values)
+        {
+          const SE::RCP<const SE::Basic> &symbol = entry.first;
+          const SE::RCP<const SE::Basic> &value  = entry.second;
+          internal::add_to_substitution_map<ignore_invalid_symbols>(
+            substitution_map, symbol, value);
+        }
+    }
+
+
+    template <bool ignore_invalid_symbols,
+              typename SymbolicType,
+              typename ValueType,
+              typename... Args>
+    void
+    add_to_substitution_map(
+      types::substitution_map &                 substitution_map,
+      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const Args &... other_symbol_values)
+    {
+      add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
+                                                      symbol_value);
+      add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
+                                                      other_symbol_values...);
+    }
+
+  } // namespace SD
+} // namespace Differentiation
+
+
+#  endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
