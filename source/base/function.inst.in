@@ -22,6 +22,7 @@ for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
     template class ComponentSelectFunction<dim, S>;
     template class ScalarFunctionFromFunctionObject<dim, S>;
     template class VectorFunctionFromScalarFunctionObject<dim, S>;
+    template class FunctionFromFunctionObjects<dim, S>;
     template class VectorFunctionFromTensorFunction<dim, S>;
   }
 
@@ -33,5 +34,6 @@ for (S : COMPLEX_SCALARS; dim : SPACE_DIMENSIONS)
     template class ComponentSelectFunction<dim, S>;
     template class ScalarFunctionFromFunctionObject<dim, S>;
     template class VectorFunctionFromScalarFunctionObject<dim, S>;
+    template class FunctionFromFunctionObjects<dim, S>;
     template class VectorFunctionFromTensorFunction<dim, S>;
   }

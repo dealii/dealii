@@ -783,6 +783,96 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_value_list(
 }
 
 
+
+template <int dim, typename RangeNumberType>
+FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
+  const unsigned int n_components,
+  const double       initial_time)
+  : Function<dim, RangeNumberType>(n_components, initial_time)
+  , function_values(n_components)
+  , function_gradients(n_components)
+{}
+
+
+
+template <int dim, typename RangeNumberType>
+FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
+  const std::vector<std::function<RangeNumberType(const Point<dim> &)>> &values,
+  const double initial_time)
+  : Function<dim, RangeNumberType>(values.size(), initial_time)
+  , function_values(values)
+  , function_gradients(values.size())
+{}
+
+
+
+template <int dim, typename RangeNumberType>
+FunctionFromFunctionObjects<dim, RangeNumberType>::FunctionFromFunctionObjects(
+  const std::vector<std::function<RangeNumberType(const Point<dim> &)>> &values,
+  const std::vector<
+    std::function<Tensor<1, dim, RangeNumberType>(const Point<dim> &)>>
+    &          gradients,
+  const double initial_time)
+  : Function<dim, RangeNumberType>(values.size(), initial_time)
+  , function_values(values)
+  , function_gradients(gradients)
+{}
+
+
+
+template <int dim, typename RangeNumberType>
+RangeNumberType
+FunctionFromFunctionObjects<dim, RangeNumberType>::value(
+  const Point<dim> & p,
+  const unsigned int component) const
+{
+  AssertIndexRange(component, this->n_components);
+  Assert(function_values[component],
+         ExcMessage("Accessing value() in FunctionFromFunctionObjects requires "
+                    "setting the std::function objects for the value"));
+  return function_values[component](p);
+}
+
+
+
+template <int dim, typename RangeNumberType>
+Tensor<1, dim, RangeNumberType>
+FunctionFromFunctionObjects<dim, RangeNumberType>::gradient(
+  const Point<dim> & p,
+  const unsigned int component) const
+{
+  AssertIndexRange(component, this->n_components);
+  Assert(function_gradients[component],
+         ExcMessage(
+           "Accessing gradient() in FunctionFromFunctionObjects "
+           "requires setting the std::function objects for the gradient"));
+  return function_gradients[component](p);
+}
+
+
+
+template <int dim, typename RangeNumberType>
+void
+FunctionFromFunctionObjects<dim, RangeNumberType>::set_function_values(
+  const std::vector<std::function<RangeNumberType(const Point<dim> &)>> &values)
+{
+  AssertDimension(this->n_components, values.size());
+  function_values = values;
+}
+
+
+
+template <int dim, typename RangeNumberType>
+void
+FunctionFromFunctionObjects<dim, RangeNumberType>::set_function_gradients(
+  const std::vector<
+    std::function<Tensor<1, dim, RangeNumberType>(const Point<dim> &)>>
+    &gradients)
+{
+  AssertDimension(this->n_components, gradients.size());
+  function_gradients = gradients;
+}
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif /* dealii_function_templates_h */
