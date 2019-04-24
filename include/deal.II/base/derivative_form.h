@@ -112,7 +112,7 @@ public:
   /**
    * Compute the Frobenius norm of this form, i.e., the expression
    * $\sqrt{\sum_{ij} |DF_{ij}|^2} =
-   * \sqrt{\sum_{ij} |\frac{\partial F_i}{\partial x_j}|}$.
+   * \sqrt{\sum_{ij} |\frac{\partial F_i}{\partial x_j}|^2}$.
    */
   typename numbers::NumberTraits<Number>::real_type
   norm() const;
@@ -129,7 +129,7 @@ public:
    * Assuming that the current object stores the Jacobian of a mapping
    * $\mathbf F$, then the current function computes the <i>covariant</i> form
    * of the derivative, namely $(\nabla \mathbf F) {\mathbf G}^{-1}$, where
-   * $\mathbf G = (\nabla \mathbf F)^{T}*(\nabla \mathbf F)$. If $\nabla \mathbf
+   * $\mathbf G = (\nabla \mathbf F)^{T}(\nabla \mathbf F)$. If $\nabla \mathbf
    * F$ is a square matrix (i.e., $\mathbf F:
    * {\mathbb R}^n \mapsto {\mathbb R}^n$), then this function
    * simplifies to computing $\nabla {\mathbf F}^{-T}$.
