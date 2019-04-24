@@ -120,9 +120,9 @@ namespace Differentiation
      * In most use cases the function or variable @f would be called the
      * dependent variable, and @p x the independent variable.
      *
-     * @param[in] f A scalar symbolic function or (dependent) variable.
+     * @param[in] f A scalar symbolic function or (dependent) expression.
      * @param[in] x A scalar symbolic (independent) variable.
-     * @return The symbolic function or variable representing the result
+     * @return The symbolic function or expression representing the result
      *         $\frac{\partial f}{\partial x}$.
      */
     Expression

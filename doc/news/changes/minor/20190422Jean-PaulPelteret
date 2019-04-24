@@ -1,0 +1,5 @@
+New: Some utility functions that facilitate the creation of both scalar and 
+tensor symbolic variables and symbolic functions have been added to the 
+Differentiation::SD namespace.
+<br>
+(Jean-Paul Pelteret, 2019/04/22)

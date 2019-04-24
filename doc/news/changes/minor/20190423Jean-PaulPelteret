@@ -1,0 +1,5 @@
+New: Some utility functions that perform symbolic differentiation of scalar
+symbolic expressions, as well as tensorial expressions, have been added to the
+Differentiation::SD namespace.
+<br>
+(Jean-Paul Pelteret, 2019/04/23)
