@@ -1654,6 +1654,11 @@ namespace Functions
   CutOffFunctionTensorProduct<dim>::set_base()
   {
     initialized = true;
+    static_assert(
+      std::is_base_of<CutOffFunctionBase<1>, CutOffFunctionBaseType<1>>::value,
+      "You can only construct a CutOffFunctionTensorProduct function from "
+      "a class derived from CutOffFunctionBase.");
+
     for (unsigned int i = 0; i < dim; ++i)
       base[i].reset(new CutOffFunctionBaseType<1>(this->radius,
                                                   Point<1>(this->center[i]),
