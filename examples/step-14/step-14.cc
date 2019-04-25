@@ -878,7 +878,7 @@ namespace Step14
         this->triangulation->n_active_cells());
       KellyErrorEstimator<dim>::estimate(
         this->dof_handler,
-        QGauss<dim - 1>(3),
+        QGauss<dim - 1>(this->fe->degree + 1),
         std::map<types::boundary_id, const Function<dim> *>(),
         this->solution,
         estimated_error_per_cell);
@@ -1530,7 +1530,7 @@ namespace Step14
       // Initialize a <code>FEValues</code> object with a quadrature formula,
       // have abbreviations for the number of quadrature points and shape
       // functions...
-      QGauss<dim>        quadrature(4);
+      QGauss<dim>        quadrature(dof_handler.get_fe().degree + 1);
       FEValues<dim>      fe_values(dof_handler.get_fe(),
                               quadrature,
                               update_gradients | update_quadrature_points |

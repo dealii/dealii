@@ -462,7 +462,7 @@ namespace Step17
   template <int dim>
   void ElasticProblem<dim>::assemble_system()
   {
-    QGauss<dim>   quadrature_formula(2);
+    QGauss<dim>   quadrature_formula(fe.degree + 1);
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients |
@@ -765,7 +765,7 @@ namespace Step17
     Vector<float> local_error_per_cell(triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
-      QGauss<dim - 1>(2),
+      QGauss<dim - 1>(fe.degree + 1),
       std::map<types::boundary_id, const Function<dim> *>(),
       localized_solution,
       local_error_per_cell,

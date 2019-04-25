@@ -308,9 +308,11 @@ namespace Step25
     mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
+    MatrixCreator::create_mass_matrix(dof_handler,
+                                      QGauss<dim>(fe.degree + 1),
+                                      mass_matrix);
     MatrixCreator::create_laplace_matrix(dof_handler,
-                                         QGauss<dim>(3),
+                                         QGauss<dim>(fe.degree + 1),
                                          laplace_matrix);
 
     solution.reinit(dof_handler.n_dofs());
@@ -398,7 +400,7 @@ namespace Step25
                                                Vector<double> &nl_term) const
   {
     nl_term = 0;
-    const QGauss<dim> quadrature_formula(3);
+    const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
                             update_values | update_JxW_values |
@@ -462,7 +464,7 @@ namespace Step25
     const Vector<double> &new_data,
     SparseMatrix<double> &nl_matrix) const
   {
-    QGauss<dim>   quadrature_formula(3);
+    QGauss<dim>   quadrature_formula(fe.degree + 1);
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
                             update_values | update_JxW_values |
@@ -601,7 +603,7 @@ namespace Step25
       constraints.close();
       VectorTools::project(dof_handler,
                            constraints,
-                           QGauss<dim>(3),
+                           QGauss<dim>(fe.degree + 1),
                            InitialValues<dim>(1, time),
                            solution);
     }

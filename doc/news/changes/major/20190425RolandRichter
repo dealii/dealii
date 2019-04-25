@@ -1,0 +1,3 @@
+New: The tutorial examples now all use an interpolation formula with a degree depending on the degree of the finite element, which can be changed dynamically.
+<br>
+(Roland Richter, 2019/04/25)

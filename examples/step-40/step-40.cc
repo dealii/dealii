@@ -366,7 +366,7 @@ namespace Step40
   {
     TimerOutput::Scope t(computing_timer, "assembly");
 
-    const QGauss<dim> quadrature_formula(3);
+    const QGauss<dim> quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -523,7 +523,7 @@ namespace Step40
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
-      QGauss<dim - 1>(3),
+      QGauss<dim - 1>(fe.degree + 1),
       std::map<types::boundary_id, const Function<dim> *>(),
       locally_relevant_solution,
       estimated_error_per_cell);

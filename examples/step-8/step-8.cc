@@ -269,7 +269,7 @@ namespace Step8
   template <int dim>
   void ElasticProblem<dim>::assemble_system()
   {
-    QGauss<dim> quadrature_formula(2);
+    QGauss<dim> quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -490,7 +490,7 @@ namespace Step8
 
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
-      QGauss<dim - 1>(2),
+      QGauss<dim - 1>(fe.degree + 1),
       std::map<types::boundary_id, const Function<dim> *>(),
       solution,
       estimated_error_per_cell);

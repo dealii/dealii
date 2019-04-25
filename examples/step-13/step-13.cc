@@ -1221,7 +1221,7 @@ namespace Step13
         this->triangulation->n_active_cells());
       KellyErrorEstimator<dim>::estimate(
         this->dof_handler,
-        QGauss<dim - 1>(3),
+        QGauss<dim - 1>(this->fe->degree + 1),
         std::map<types::boundary_id, const Function<dim> *>(),
         this->solution,
         estimated_error_per_cell);

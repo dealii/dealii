@@ -691,7 +691,7 @@ namespace Step55
         FEValuesExtractors::Vector velocities(0);
         KellyErrorEstimator<dim>::estimate(
           dof_handler,
-          QGauss<dim - 1>(3),
+          QGauss<dim - 1>(fe.degree + 1),
           std::map<types::boundary_id, const Function<dim> *>(),
           locally_relevant_solution,
           estimated_error_per_cell,

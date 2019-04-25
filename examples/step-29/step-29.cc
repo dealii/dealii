@@ -554,8 +554,8 @@ namespace Step29
     // used. Since our bilinear form involves boundary integrals on
     // $\Gamma_2$, we also need a quadrature rule for surface integration on
     // the faces, which are $dim-1$ dimensional:
-    QGauss<dim>     quadrature_formula(2);
-    QGauss<dim - 1> face_quadrature_formula(2);
+    QGauss<dim>     quadrature_formula(fe.degree + 1);
+    QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
 
     const unsigned int n_q_points      = quadrature_formula.size(),
                        n_face_q_points = face_quadrature_formula.size(),

@@ -716,7 +716,7 @@ namespace Step18
     : triangulation(MPI_COMM_WORLD)
     , fe(FE_Q<dim>(1), dim)
     , dof_handler(triangulation)
-    , quadrature_formula(2)
+    , quadrature_formula(fe.degree + 1)
     , present_time(0.0)
     , present_timestep(1.0)
     , end_time(10.0)
@@ -1441,7 +1441,7 @@ namespace Step18
     Vector<float> error_per_cell(triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate(
       dof_handler,
-      QGauss<dim - 1>(2),
+      QGauss<dim - 1>(fe.degree + 1),
       std::map<types::boundary_id, const Function<dim> *>(),
       incremental_displacement,
       error_per_cell,

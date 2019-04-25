@@ -289,9 +289,11 @@ namespace Step24
     mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
+    MatrixCreator::create_mass_matrix(dof_handler,
+                                      QGauss<dim>(fe.degree + 1),
+                                      mass_matrix);
     MatrixCreator::create_laplace_matrix(dof_handler,
-                                         QGauss<dim>(3),
+                                         QGauss<dim>(fe.degree + 1),
                                          laplace_matrix);
 
     // The second difference, as mentioned, to step-23 is that we need to
@@ -336,7 +338,7 @@ namespace Step24
     // do something only if that particular face is at the boundary of the
     // domain. Like this:
     {
-      const QGauss<dim - 1> quadrature_formula(3);
+      const QGauss<dim - 1> quadrature_formula(fe.degree + 1);
       FEFaceValues<dim>     fe_values(fe,
                                   quadrature_formula,
                                   update_values | update_JxW_values);
@@ -472,7 +474,7 @@ namespace Step24
 
     VectorTools::project(dof_handler,
                          constraints,
-                         QGauss<dim>(3),
+                         QGauss<dim>(fe.degree + 1),
                          InitialValuesP<dim>(),
                          old_solution_p);
     old_solution_v = 0;

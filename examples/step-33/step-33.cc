@@ -1381,8 +1381,8 @@ namespace Step33
     : mapping()
     , fe(FE_Q<dim>(1), EulerEquations<dim>::n_components)
     , dof_handler(triangulation)
-    , quadrature(2)
-    , face_quadrature(2)
+    , quadrature(fe.degree + 1)
+    , face_quadrature(fe.degree + 1)
     , verbose_cout(std::cout, false)
   {
     ParameterHandler prm;

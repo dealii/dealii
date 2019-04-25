@@ -373,9 +373,11 @@ namespace Step23
     matrix_u.reinit(sparsity_pattern);
     matrix_v.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
+    MatrixCreator::create_mass_matrix(dof_handler,
+                                      QGauss<dim>(fe.degree + 1),
+                                      mass_matrix);
     MatrixCreator::create_laplace_matrix(dof_handler,
-                                         QGauss<dim>(3),
+                                         QGauss<dim>(fe.degree + 1),
                                          laplace_matrix);
 
     // The rest of the function is spent on setting vector sizes to the
@@ -478,12 +480,12 @@ namespace Step23
 
     VectorTools::project(dof_handler,
                          constraints,
-                         QGauss<dim>(3),
+                         QGauss<dim>(fe.degree + 1),
                          InitialValuesU<dim>(),
                          old_solution_u);
     VectorTools::project(dof_handler,
                          constraints,
-                         QGauss<dim>(3),
+                         QGauss<dim>(fe.degree + 1),
                          InitialValuesV<dim>(),
                          old_solution_v);
 

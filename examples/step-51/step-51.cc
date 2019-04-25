@@ -1333,7 +1333,7 @@ namespace Step51
               std::map<types::boundary_id, const Function<dim> *>
                 neumann_boundary;
               KellyErrorEstimator<dim>::estimate(dof_handler_local,
-                                                 QGauss<dim - 1>(3),
+                                                 QGauss<dim - 1>(fe.degree + 1),
                                                  neumann_boundary,
                                                  solution_local,
                                                  estimated_error_per_cell,

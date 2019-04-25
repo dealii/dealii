@@ -53,15 +53,15 @@ Cycle 8:
    Number of degrees of freedom: 15912
 
 cycle cells dofs     L2        H1      Linfty   
-    0    64    81 1.576e-01 1.418e+00 2.707e-01 
-    1   124   157 4.285e-02 1.285e+00 1.469e-01 
-    2   280   341 1.593e-02 7.909e-01 8.034e-02 
-    3   577   690 9.359e-03 5.096e-01 2.784e-02 
-    4  1099  1264 2.865e-03 3.038e-01 9.822e-03 
-    5  2191  2452 1.480e-03 2.106e-01 5.679e-03 
-    6  4165  4510 6.907e-04 1.462e-01 2.338e-03 
-    7  7915  8440 4.743e-04 1.055e-01 1.442e-03 
-    8 15196 15912 1.920e-04 7.468e-02 7.259e-04 
+    0    64    81 1.840e+00 2.858e+00 1.835e+00 
+    1   124   157 5.190e-02 1.200e+00 1.344e-01 
+    2   280   341 1.439e-02 7.892e-01 7.554e-02 
+    3   577   690 8.627e-03 5.061e-01 2.805e-02 
+    4  1099  1264 3.217e-03 3.030e-01 1.073e-02 
+    5  2191  2452 1.445e-03 2.097e-01 5.073e-03 
+    6  4165  4510 8.387e-04 1.460e-01 2.013e-03 
+    7  7915  8440 7.051e-04 1.053e-01 1.804e-03 
+    8 15196 15912 2.774e-04 7.463e-02 6.911e-04 
 
 Solving with Q1 elements, global refinement
 ===========================================
@@ -83,18 +83,18 @@ Cycle 4:
    Number of degrees of freedom: 16641
 
 cycle cells dofs     L2        H1      Linfty   
-    0    64    81 1.576e-01 1.418e+00 2.707e-01 
-    1   256   289 4.280e-02 1.285e+00 1.444e-01 
-    2  1024  1089 1.352e-02 7.556e-01 7.772e-02 
-    3  4096  4225 3.423e-03 3.822e-01 2.332e-02 
-    4 16384 16641 8.586e-04 1.917e-01 6.097e-03 
+    0    64    81 1.840e+00 2.858e+00 1.835e+00 
+    1   256   289 3.570e-02 1.199e+00 1.307e-01 
+    2  1024  1089 1.192e-02 7.565e-01 7.168e-02 
+    3  4096  4225 3.047e-03 3.823e-01 2.128e-02 
+    4 16384 16641 7.660e-04 1.917e-01 5.554e-03 
 
-n cells         H1                  L2          
-0    64 1.418e+00    -    - 1.576e-01    -    - 
-1   256 1.285e+00 1.10 0.14 4.280e-02 3.68 1.88 
-2  1024 7.556e-01 1.70 0.77 1.352e-02 3.17 1.66 
-3  4096 3.822e-01 1.98 0.98 3.423e-03 3.95 1.98 
-4 16384 1.917e-01 1.99 1.00 8.586e-04 3.99 2.00 
+n cells         H1                   L2          
+0    64 2.858e+00    -    - 1.840e+00     -    - 
+1   256 1.199e+00 2.38 1.25 3.570e-02 51.54 5.69 
+2  1024 7.565e-01 1.58 0.66 1.192e-02  2.99 1.58 
+3  4096 3.823e-01 1.98 0.98 3.047e-03  3.91 1.97 
+4 16384 1.917e-01 1.99 1.00 7.660e-04  3.98 1.99 
 
 Solving with Q2 elements, global refinement
 ===========================================
@@ -169,7 +169,7 @@ cycle cells dofs     L2        H1      Linfty
     5  2059  9223 7.738e-05 1.974e-02 7.270e-04 
     6  3913 17887 2.925e-05 8.772e-03 1.463e-04 
     7  7441 33807 1.024e-05 4.121e-03 8.567e-05 
-    8 14212 64731 3.761e-06 2.108e-03 2.167e-05 
+    8 14212 64731 3.761e-06 2.108e-03 2.167e-05  
 @endcode
 
 
@@ -192,11 +192,8 @@ here).
 
 Go ahead and run the program with higher order elements (Q3, Q4, ...). You
 will notice that assertions in several parts of the code will trigger (for
-example in the generation of the filename for the data output). After fixing
-these you will not see the correct convergence orders that the theory
-predicts. This is because the orders for the quadrature formulas are
-hard-coded in this program and this order is not enough for higher order
-discretizations. What is a good way to pick the orders dynamically?
+example in the generation of the filename for the data output). You might have to address these,
+but it should not be very hard to get the program to work!
 
 <h4> Convergence Comparison </h4>
 
