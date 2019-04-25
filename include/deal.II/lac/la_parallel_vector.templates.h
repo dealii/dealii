@@ -349,7 +349,7 @@ namespace LinearAlgebra
           Number *    result_device;
           cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
           AssertCuda(error_code);
-          error_code = cudaMemset(result_device, Number(), sizeof(Number));
+          error_code = cudaMemset(result_device, 0, sizeof(Number));
 
           const int n_blocks =
             1 + (size - 1) / (::dealii::CUDAWrappers::chunk_size *
