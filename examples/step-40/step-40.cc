@@ -151,7 +151,6 @@ namespace Step40
   {
   public:
     LaplaceProblem();
-    ~LaplaceProblem();
 
     void run();
 
@@ -166,8 +165,8 @@ namespace Step40
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    DoFHandler<dim> dof_handler;
     FE_Q<dim>       fe;
+    DoFHandler<dim> dof_handler;
 
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
@@ -185,7 +184,7 @@ namespace Step40
 
   // @sect3{The <code>LaplaceProblem</code> class implementation}
 
-  // @sect4{Constructors and destructors}
+  // @sect4{Constructor}
 
   // Constructors and destructors are rather trivial. In addition to what we
   // do in step-6, we set the set of processors we want to work on to all
@@ -202,8 +201,8 @@ namespace Step40
                     typename Triangulation<dim>::MeshSmoothing(
                       Triangulation<dim>::smoothing_on_refinement |
                       Triangulation<dim>::smoothing_on_coarsening))
-    , dof_handler(triangulation)
     , fe(2)
+    , dof_handler(triangulation)
     , pcout(std::cout,
             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
     , computing_timer(mpi_communicator,
@@ -212,13 +211,6 @@ namespace Step40
                       TimerOutput::wall_times)
   {}
 
-
-
-  template <int dim>
-  LaplaceProblem<dim>::~LaplaceProblem()
-  {
-    dof_handler.clear();
-  }
 
 
   // @sect4{LaplaceProblem::setup_system}
