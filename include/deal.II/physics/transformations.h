@@ -44,8 +44,8 @@ namespace Physics
        * Return the rotation matrix for 2-d Euclidean space, namely
        * @f[
        *  \mathbf{R} \dealcoloneq \left[ \begin{array}{cc}
-       *  cos(\theta) & sin(\theta) \\
-       *  -sin(\theta) & cos(\theta)
+       *  cos(\theta) & -sin(\theta) \\
+       *  sin(\theta) & cos(\theta)
        * \end{array}\right]
        * @f]
        * where $\theta$ is the rotation angle given in radians. In particular,
