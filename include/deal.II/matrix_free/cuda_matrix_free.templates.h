@@ -894,7 +894,8 @@ namespace CUDAWrappers
       }
 
     // Setup row starts
-    row_start[0] = 0;
+    if (n_colors > 0)
+      row_start[0] = 0;
     for (unsigned int i = 1; i < n_colors; ++i)
       row_start[i] = row_start[i - 1] + n_cells[i - 1] * get_padding_length();
 
