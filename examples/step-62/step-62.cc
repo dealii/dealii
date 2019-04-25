@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2018 by the deal.II authors
+ * Copyright (C) 2018 - 2019 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -53,7 +53,7 @@
 #include <fstream>
 #include <iostream>
 
-// The following header provides the Tensor class that we use represent the
+// The following header provides the Tensor class that we use to represent the
 // material properties.
 #include <deal.II/base/tensor.h>
 
@@ -62,12 +62,11 @@
 #include <deal.II/base/hdf5.h>
 
 // This header is required for the function VectorTools::point_value that we use
-// to read the result of the simulation.
-
+// to evaluate the result of the simulation.
 #include <deal.II/numerics/vector_tools.h>
 
 // We need this header for the function GridTools::find_active_cell_around_point
-// that we use in the function ElasticWave<dim>::store_frequency_step_data
+// that we use in the function `ElasticWave<dim>::store_frequency_step_data()`
 #include <deal.II/grid/grid_tools.h>
 
 namespace step62
@@ -89,12 +88,11 @@ namespace step62
                          const unsigned int component) const override;
 
   private:
-    // `data` is the HDF5::Group in which all the simulation results will be
-    // stored. Note that this variable points to the same HDF5::Group of
-    // `RightHandSide::data`, `PML::data` and `Parameters::data`. When a
-    // HDF5::Group is copied, it will point to the same HDF5 Group; this is
-    // achieved with the protected std::shared_ptr<hid_t>
-    // HDF5::Group::hdf5_reference.
+    // The variable `data` is the HDF5::Group in which all the simulation
+    // results will be stored. Note that the variables `RightHandSide::data`,
+    // `PML::data`, `Rho::data` and `Parameters::data` point to the same group
+    // of the HDF5 file. When a HDF5::Group is copied, it will point to the same
+    // group of the HDF5 file.
     HDF5::Group data;
 
     // The simulation parameters are stored in `data` as HDF5 attributes. The
@@ -190,7 +188,7 @@ namespace step62
     // notebook, stored in `data` as HDF5 attributes and then read by the
     // constructor.
     const std::string        simulation_name;
-    bool                     save_vtu_files;
+    const bool               save_vtu_files;
     const double             start_frequency;
     const double             stop_frequency;
     const unsigned int       nb_frequency_points;
@@ -200,8 +198,8 @@ namespace step62
     const double             dimension_y;
     const unsigned int       nb_probe_points;
     const unsigned int       grid_level;
-    Point<dim>               probe_start_point;
-    Point<dim>               probe_stop_point;
+    const Point<dim>         probe_start_point;
+    const Point<dim>         probe_stop_point;
     const RightHandSide<dim> right_hand_side;
     const PML<dim>           pml;
     const Rho<dim>           rho;
@@ -212,17 +210,19 @@ namespace step62
 
 
 
-  // @sect4{`PointHistory` class}
+  // @sect4{The `QuadratureCache` class}
   // The calculation of the mass and stiffness matrices is very expensive. These
   // matrices are the same for all the frequency steps. The right hand side
   // vector is also the same for all the frequency steps. We use this class to
-  // store these objects and re-use them at each frequency step. The
-  // `PointHistory` class has already been used in step-18.
+  // store these objects and re-use them at each frequency step. Note that here
+  // we don't store the assembled mass and stiffness matrices and right hand
+  // sides, but instead the data for a single cell. `QuadratureCache` class is
+  // very similar to the `PointHistory` class that has been used in step-18.
   template <int dim>
-  class PointHistory
+  class QuadratureCache
   {
   public:
-    PointHistory(unsigned int dofs_per_cell);
+    QuadratureCache(const unsigned int dofs_per_cell);
 
   private:
     unsigned int dofs_per_cell;
@@ -235,19 +235,19 @@ namespace step62
     FullMatrix<std::complex<double>>  mass_coefficient;
     FullMatrix<std::complex<double>>  stiffness_coefficient;
     std::vector<std::complex<double>> right_hand_side;
-    std::complex<double>              JxW;
+    double                            JxW;
   };
 
 
 
   // @sect4{The `get_stiffness_tensor()` function}
 
-  // This class returns the stiffness tensor of the material. For the sake of
+  // This function returns the stiffness tensor of the material. For the sake of
   // simplicity we consider the stiffness to be isotropic and homogeneous; only
-  // the density $\rho$ depends on the position. As we have previously done in
-  // step-8. The stiffness coefficients $c_{ijkl}$ can be expressed in function
-  // of the two coefficients $\lambda$ and $\mu$. The coefficient tensor reduces
-  // to
+  // the density $\rho$ depends on the position. As we have previously shown in
+  // step-8, if the stiffness is isotropic and homogeneous, the stiffness
+  // coefficients $c_{ijkl}$ can be expressed as a function of the two
+  // coefficients $\lambda$ and $\mu$. The coefficient tensor reduces to
   // @f[
   //   c_{ijkl}
   //   =
@@ -277,7 +277,7 @@ namespace step62
   // Next let's declare the main class of this program. Its structure is very
   // similar to the step-40 tutorial program. The main differences are:
   // - The sweep over the frequency values.
-  // - We save the stiffness and mass matrices in `quadrature_point_history` and
+  // - We save the stiffness and mass matrices in `quadrature_cache` and
   //   use them for each frequency step.
   // - We store the measured energy by the probe for each frequency step in the
   //   HDF5 file.
@@ -285,21 +285,21 @@ namespace step62
   class ElasticWave
   {
   public:
-    ElasticWave(Parameters<dim> parameters_);
-    ~ElasticWave();
+    ElasticWave(const Parameters<dim> &parameters);
     void run();
 
   private:
     void setup_system();
-    void assemble_system(double omega, bool calculate_quadrature_data);
+    void assemble_system(const double omega,
+                         const bool   calculate_quadrature_data);
     void solve();
-    void set_position_vector();
-    void store_frequency_step_data(unsigned int frequency_idx);
+    void initialize_probe_positions_vector();
+    void store_frequency_step_data(const unsigned int frequency_idx);
     void output_results();
 
-    //  This is called before every time step to set up a pristine state for the
-    //  history variables.
-    void setup_quadrature_point_history();
+    //  This is called before every frequency step to set up a pristine state
+    //  for the cache variables.
+    void setup_quadrature_cache();
 
     // This function loops over the frequency vector and runs the simulation for
     // each frequency step.
@@ -312,15 +312,14 @@ namespace step62
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    QGauss<dim>        quadrature_formula;
-    const unsigned int n_q_points;
+    QGauss<dim> quadrature_formula;
 
-    // We store the mass and stiffness matrices in this vector.
-    std::vector<PointHistory<dim>> quadrature_point_history;
+    // We store the mass and stiffness matrices for each cell this vector.
+    std::vector<QuadratureCache<dim>> quadrature_cache;
 
+
+    FESystem<dim>   fe;
     DoFHandler<dim> dof_handler;
-
-    FESystem<dim> fe;
 
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
@@ -333,16 +332,16 @@ namespace step62
 
 
     // This vector contains the range of frequencies that we are going to
-    // simulate
+    // simulate.
     std::vector<double> frequency;
 
     // This vector contains the coordinates $(x,y)$ of the points of the
     // measurement probe.
-    FullMatrix<double> position;
+    FullMatrix<double> probe_positions;
 
-    // HDF5 datasets to store the frequency and position vectors.
+    // HDF5 datasets to store the frequency and `probe_positions` vectors.
     HDF5::DataSet frequency_dataset;
-    HDF5::DataSet position_dataset;
+    HDF5::DataSet probe_positions_dataset;
 
     // HDF5 dataset that stores the values of the energy measured by the proble.
     HDF5::DataSet displacement;
@@ -354,12 +353,12 @@ namespace step62
 
 
 
-  // @sect3{Implementation of the auxiliary classes and functions}
+  // @sect3{Implementation of the auxiliary classes}
 
-  // @sect4{`RightHandSide` class}
+  // @sect4{The `RightHandSide` class}
 
   // The constructor reads all the parameters from the HDF5::Group `data` using
-  // the HDF5::Group::get_attribute function.
+  // the HDF5::Group::get_attribute() function.
   template <int dim>
   RightHandSide<dim>::RightHandSide(HDF5::Group &data)
     : Function<dim>(dim)
@@ -373,8 +372,8 @@ namespace step62
                               data.get_attribute<double>("force_y_pos")))
   {}
 
-  // This function defines the spacial shape of the force vector pulse which
-  // takes the form of a gaussian function
+  // This function defines the spatial shape of the force vector pulse which
+  // takes the form of a Gaussian function
   // @f{align*}
   // F_x &=
   // \left\{
@@ -389,7 +388,7 @@ namespace step62
   // \right.\\
   // F_y &= 0
   // @f}
-  // where a is the maximum amplitude that takes the force and $\sigma_x$ and
+  // where $a$ is the maximum amplitude that takes the force and $\sigma_x$ and
   // $\sigma_y$ are the standard deviations for the $x$ and $y$ components. Note
   // that the pulse has been cropped to $x_\textrm{min}<x<x_\textrm{max}$ and
   // $y_\textrm{min} <y<y_\textrm{max}$.
@@ -421,14 +420,14 @@ namespace step62
 
 
 
-  // @sect4{`PML` class}
+  // @sect4{The `PML` class}
 
   // As before, the constructor reads all the parameters from the HDF5::Group
-  // `data` using the HDF5::Group::get_attribute function. As we have discussed,
-  // a quadratic turn-on of the PML has been defined in the jupyter notebook. It
-  // is possible to use a linear, cubic or another power degree by changing the
-  // parameter pml_coeff_degree. The parameters `pml_x` and `pml_y` can be used
-  // to turn on and off the `x` and `y` PMLs.
+  // `data` using the HDF5::Group::get_attribute() function. As we have
+  // discussed, a quadratic turn-on of the PML has been defined in the jupyter
+  // notebook. It is possible to use a linear, cubic or another power degree by
+  // changing the parameter `pml_coeff_degree`. The parameters `pml_x` and
+  // `pml_y` can be used to turn on and off the `x` and `y` PMLs.
   template <int dim>
   PML<dim>::PML(HDF5::Group &data)
     : Function<dim, std::complex<double>>(dim)
@@ -485,15 +484,15 @@ namespace step62
 
 
 
-  // @sect4{`Rho` class}
+  // @sect4{The `Rho` class}
 
-  // This class is used to define the mass density. As we have explained, before
+  // This class is used to define the mass density. As we have explaine before,
   // a phononic superlattice cavity is formed by two
-  //[Distributed Reflector](https://en.wikipedia.org/wiki/Band_gap),
+  // [Distributed Reflector](https://en.wikipedia.org/wiki/Band_gap),
   // mirrors and a $\lambda/2$ cavity where $\lambda$ is the acoustic
-  // wavelength. Acoustic DBRs are  periodic structures where a set of bilayer
+  // wavelength. Acoustic DBRs are periodic structures where a set of bilayer
   // stacks with contrasting physical properties (sound velocity index) is
-  // repeated $N$ times. The change of in the velocity will be obtained by
+  // repeated $N$ times. The change of in the wave velocity is generated by
   // alternating layers with different density.
   template <int dim>
   Rho<dim>::Rho(HDF5::Group &data)
@@ -528,12 +527,12 @@ namespace step62
     // @f]
     // where $K_e$ is the effective elastic constant and $\rho$ the density.
     // Here we consider the case in which the waveguide width is much smaller
-    // than the wavelength. In this case it can be shown that for a two
+    // than the wavelength. In this case it can be shown that for the two
     // dimensional case
     // @f[
     //  K_e = 4\mu\frac{\lambda +\mu}{\lamda+2\mu}
     // @f]
-    // and for a three dimensional case $K_e$ is equal to the Young's modulus.
+    // and for the three dimensional case $K_e$ is equal to the Young's modulus.
     // @f[
     //  K_e = 4\mu\frac{\lambda +\mu}{\lamda+2\mu}
     // @f]
@@ -560,23 +559,24 @@ namespace step62
       material_b_speed_of_sound / cavity_resonance_frequency;
 
     // The density $\rho$ takes the following form
-    //<img alt="Phononic superlattice cavity"
-    // src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.04.svg?sanitize=true"
+    // <img alt="Phononic superlattice cavity"
+    // src="https://www.dealii.org/images/steps/developer/step-62.04.svg"
     // height="200" />
     // where the brown color represents material_a and the green color
     // represents material_b.
     for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
       {
-        double layer_transition_center =
+        const double layer_transition_center =
           material_a_wavelength / 2 +
           idx * (material_b_wavelength / 4 + material_a_wavelength / 4);
         if (std::abs(p[0]) >=
               (layer_transition_center - average_rho_width / 2) &&
             std::abs(p[0]) <= (layer_transition_center + average_rho_width / 2))
           {
-            double coefficient = (std::abs(p[0]) - (layer_transition_center -
-                                                    average_rho_width / 2)) /
-                                 average_rho_width;
+            const double coefficient =
+              (std::abs(p[0]) -
+               (layer_transition_center - average_rho_width / 2)) /
+              average_rho_width;
             return (1 - coefficient) * material_a_rho +
                    coefficient * material_b_rho;
           }
@@ -588,7 +588,7 @@ namespace step62
     // which improves the precision of the simulation.
     for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
       {
-        double layer_transition_center =
+        const double layer_transition_center =
           material_a_wavelength / 2 +
           idx * (material_b_wavelength / 4 + material_a_wavelength / 4) +
           material_b_wavelength / 4;
@@ -596,9 +596,10 @@ namespace step62
               (layer_transition_center - average_rho_width / 2) &&
             std::abs(p[0]) <= (layer_transition_center + average_rho_width / 2))
           {
-            double coefficient = (std::abs(p[0]) - (layer_transition_center -
-                                                    average_rho_width / 2)) /
-                                 average_rho_width;
+            const double coefficient =
+              (std::abs(p[0]) -
+               (layer_transition_center - average_rho_width / 2)) /
+              average_rho_width;
             return (1 - coefficient) * material_b_rho +
                    coefficient * material_a_rho;
           }
@@ -613,11 +614,11 @@ namespace step62
     // the material_a layers
     for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
       {
-        double layer_center =
+        const double layer_center =
           material_a_wavelength / 2 +
           idx * (material_b_wavelength / 4 + material_a_wavelength / 4) +
           material_b_wavelength / 4 + material_a_wavelength / 8;
-        double layer_width = material_a_wavelength / 4;
+        const double layer_width = material_a_wavelength / 4;
         if (std::abs(p[0]) >= (layer_center - layer_width / 2) &&
             std::abs(p[0]) <= (layer_center + layer_width / 2))
           {
@@ -628,11 +629,11 @@ namespace step62
     // the material_b layers
     for (unsigned int idx = 0; idx < nb_mirror_pairs; idx++)
       {
-        double layer_center =
+        const double layer_center =
           material_a_wavelength / 2 +
           idx * (material_b_wavelength / 4 + material_a_wavelength / 4) +
           material_b_wavelength / 8;
-        double layer_width = material_b_wavelength / 4;
+        const double layer_width = material_b_wavelength / 4;
         if (std::abs(p[0]) >= (layer_center - layer_width / 2) &&
             std::abs(p[0]) <= (layer_center + layer_width / 2))
           {
@@ -646,10 +647,10 @@ namespace step62
 
 
 
-  // @sect4{`Parameters` class}
+  // @sect4{The `Parameters` class}
 
   // The constructor reads all the parameters from the HDF5::Group `data` using
-  // the HDF5::Group::get_attribute function.
+  // the HDF5::Group::get_attribute() function.
   template <int dim>
   Parameters<dim>::Parameters(HDF5::Group &data)
     : data(data)
@@ -664,28 +665,27 @@ namespace step62
     , dimension_y(data.get_attribute<double>("dimension_y"))
     , nb_probe_points(data.get_attribute<int>("nb_probe_points"))
     , grid_level(data.get_attribute<int>("grid_level"))
+    , probe_start_point(
+        Point<dim>(data.get_attribute<double>("probe_pos_x"),
+                   data.get_attribute<double>("probe_pos_y") -
+                     data.get_attribute<double>("probe_width_y") / 2))
+    , probe_stop_point(
+        Point<dim>(data.get_attribute<double>("probe_pos_x"),
+                   data.get_attribute<double>("probe_pos_y") +
+                     data.get_attribute<double>("probe_width_y") / 2))
     , right_hand_side(data)
     , pml(data)
     , rho(data)
-  {
-    probe_start_point =
-      Point<dim>(data.get_attribute<double>("probe_pos_x"),
-                 data.get_attribute<double>("probe_pos_y") -
-                   data.get_attribute<double>("probe_width_y") / 2);
-    probe_stop_point =
-      Point<dim>(data.get_attribute<double>("probe_pos_x"),
-                 data.get_attribute<double>("probe_pos_y") +
-                   data.get_attribute<double>("probe_width_y") / 2);
-  }
+  {}
 
 
 
-  // @sect4{`PointHistory` class}
+  // @sect4{The `QuadratureCache` class}
 
   // We need to reserve enough space for the mass and stiffness matrices and the
   // right hand side vector.
   template <int dim>
-  PointHistory<dim>::PointHistory(unsigned int dofs_per_cell)
+  QuadratureCache<dim>::QuadratureCache(const unsigned int dofs_per_cell)
     : dofs_per_cell(dofs_per_cell)
     , mass_coefficient(dofs_per_cell, dofs_per_cell)
     , stiffness_coefficient(dofs_per_cell, dofs_per_cell)
@@ -696,31 +696,30 @@ namespace step62
 
   // @sect3{Implementation of the `ElasticWave` class}
 
-  // @sect4{Constructors and destructors}
+  // @sect4{Constructor}
 
   // This is very similar to the constructor of step-40. In addition we create
   // the HDF5 datasets `frequency_dataset`, `position_dataset` and
-  // `displacement`. Note the use of the `template` for the creation of the HDF5
-  // datasets. It is a C++ requirement to use the `template` keyword in order to
-  // treat `create_dataset` as a dependent template name.
+  // `displacement`. Note the use of the `template` keyword for the creation of
+  // the HDF5 datasets. It is a C++ requirement to use the `template` keyword in
+  // order to treat `create_dataset` as a dependent template name.
   template <int dim>
-  ElasticWave<dim>::ElasticWave(Parameters<dim> parameters_)
-    : parameters(parameters_)
+  ElasticWave<dim>::ElasticWave(const Parameters<dim> &parameters)
+    : parameters(parameters)
     , mpi_communicator(MPI_COMM_WORLD)
     , triangulation(mpi_communicator,
                     typename Triangulation<dim>::MeshSmoothing(
                       Triangulation<dim>::smoothing_on_refinement |
                       Triangulation<dim>::smoothing_on_coarsening))
     , quadrature_formula(2)
-    , n_q_points(quadrature_formula.size())
-    , dof_handler(triangulation)
     , fe(FE_Q<dim>(1), dim)
+    , dof_handler(triangulation)
     , frequency(parameters.nb_frequency_points)
-    , position(parameters.nb_probe_points, dim)
+    , probe_positions(parameters.nb_probe_points, dim)
     , frequency_dataset(parameters.data.template create_dataset<double>(
         "frequency",
         std::vector<hsize_t>{parameters.nb_frequency_points}))
-    , position_dataset(parameters.data.template create_dataset<double>(
+    , probe_positions_dataset(parameters.data.template create_dataset<double>(
         "position",
         std::vector<hsize_t>{parameters.nb_probe_points, dim}))
     , displacement(
@@ -735,14 +734,6 @@ namespace step62
                       TimerOutput::summary,
                       TimerOutput::wall_times)
   {}
-
-
-
-  template <int dim>
-  ElasticWave<dim>::~ElasticWave()
-  {
-    dof_handler.clear();
-  }
 
 
 
@@ -792,14 +783,14 @@ namespace step62
 
   // @sect4{ElasticWave::assemble_system}
 
-  // This very similar to step-40. Although there are notable differences. We
-  // assembly the system for each frequency/omega step. In the first step we set
-  // `calculate_quadrature_data = True` and we calculate the mass and stiffness
-  // matrices and the right hand side vector. In the subsequent steps we will
-  // use that data to accelerate the calculation.
+  // This function is also very similar to step-40, though there are notable
+  // differences. We assemble the system for each frequency/omega step. In the
+  // first step we set `calculate_quadrature_data = True` and we calculate the
+  // mass and stiffness matrices and the right hand side vector. In the
+  // subsequent steps we will use that data to accelerate the calculation.
   template <int dim>
-  void ElasticWave<dim>::assemble_system(double omega,
-                                         bool   calculate_quadrature_data)
+  void ElasticWave<dim>::assemble_system(const double omega,
+                                         const bool   calculate_quadrature_data)
   {
     TimerOutput::Scope t(computing_timer, "assembly");
 
@@ -808,6 +799,7 @@ namespace step62
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<std::complex<double>> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<std::complex<double>>     cell_rhs(dofs_per_cell);
@@ -820,7 +812,7 @@ namespace step62
     std::vector<Vector<std::complex<double>>> pml_values(
       n_q_points, Vector<std::complex<double>>(dim));
 
-    // We calculate the stiffness tensor for the $\lambda$ and $\mu$ that has
+    // We calculate the stiffness tensor for the $\lambda$ and $\mu$ that have
     // been defined in the jupyter notebook. Note that contrary to $\rho$ the
     // stiffness is constant among for the whole domain.
     const SymmetricTensor<4, dim> stiffness_tensor =
@@ -853,23 +845,21 @@ namespace step62
               }
 
             // We have done this in step-18. Get a pointer to the quadrature
-            // point history data local to the present cell, and, as a defensive
+            // cache data local to the present cell, and, as a defensive
             // measure, make sure that this pointer is within the bounds of the
             // global array:
-            PointHistory<dim> *local_quadrature_points_data =
-              reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
-            Assert(local_quadrature_points_data >=
-                     &quadrature_point_history.front(),
+            QuadratureCache<dim> *local_quadrature_points_data =
+              reinterpret_cast<QuadratureCache<dim> *>(cell->user_pointer());
+            Assert(local_quadrature_points_data >= &quadrature_cache.front(),
                    ExcInternalError());
-            Assert(local_quadrature_points_data <
-                     &quadrature_point_history.back(),
+            Assert(local_quadrature_points_data <= &quadrature_cache.back(),
                    ExcInternalError());
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
                 // The quadrature_data variable is used to store the mass and
                 // stiffness matrices, the right hand side vector and the value
                 // of `JxW`.
-                PointHistory<dim> &quadrature_data =
+                QuadratureCache<dim> &quadrature_data =
                   local_quadrature_points_data[q];
 
                 // Below we declare the force vector and the parameters of the
@@ -939,9 +929,9 @@ namespace step62
                                             // matrix is not symmetric because
                                             // of the PMLs. We use the gradient
                                             // function (see the
-                                            // [documentation](https://www.dealii.org/current/doxygen/deal.II/group__vector__valued.html)
+                                            // [documentation](https://www.dealii.org/current/doxygen/deal.II/group__vector__valued.html))
                                             // which is a
-                                            // <code>Tensor@<2,dim@></code>,
+                                            // <code>Tensor@<2,dim@></code>.
                                             // The matrix $G_{ij}$
                                             // consists of entries
                                             // @f[
@@ -1035,13 +1025,12 @@ namespace step62
     locally_relevant_solution = completely_distributed_solution;
   }
 
-  // @sect4{ElasticWave::set_position_vector}
+  // @sect4{ElasticWave::initialize_position_vector}
 
   // We use this function to calculate the values of the position vector.
   template <int dim>
-  void ElasticWave<dim>::set_position_vector()
+  void ElasticWave<dim>::initialize_probe_positions_vector()
   {
-    Point<dim> p;
     for (unsigned int position_idx = 0;
          position_idx < parameters.nb_probe_points;
          ++position_idx)
@@ -1049,14 +1038,15 @@ namespace step62
         // Because of the way the operator + and - are overloaded. To substract
         // two points, the following has to be done:
         // `Point_b<dim> + (-Point_a<dim>)`
-        p = (position_idx / ((double)(parameters.nb_probe_points - 1))) *
-              (parameters.probe_stop_point + (-parameters.probe_start_point)) +
-            parameters.probe_start_point;
-        position[position_idx][0] = p[0];
-        position[position_idx][1] = p[1];
+        const Point<dim> p =
+          (position_idx / ((double)(parameters.nb_probe_points - 1))) *
+            (parameters.probe_stop_point + (-parameters.probe_start_point)) +
+          parameters.probe_start_point;
+        probe_positions[position_idx][0] = p[0];
+        probe_positions[position_idx][1] = p[1];
         if (dim == 3)
           {
-            position[position_idx][2] = p[2];
+            probe_positions[position_idx][2] = p[2];
           }
       }
   }
@@ -1065,13 +1055,14 @@ namespace step62
 
   // This function stores in the HDF5 file the measured energy by the probe.
   template <int dim>
-  void ElasticWave<dim>::store_frequency_step_data(unsigned int frequency_idx)
+  void
+  ElasticWave<dim>::store_frequency_step_data(const unsigned int frequency_idx)
   {
     TimerOutput::Scope t(computing_timer, "store_frequency_step_data");
 
     // We store the displacement in the $x$ direction; the displacement in the
     // $y$ direction is negligible.
-    const int probe_displacement_component = 0;
+    const unsigned int probe_displacement_component = 0;
 
     // The vector coordinates contains the coordinates in the HDF5 file of the
     // points of the probe that are located in locally owned cells. The vector
@@ -1085,7 +1076,7 @@ namespace step62
         Point<dim> point;
         for (unsigned int dim_idx = 0; dim_idx < dim; ++dim_idx)
           {
-            point(dim_idx) = position[position_idx][dim_idx];
+            point[dim_idx] = probe_positions[position_idx][dim_idx];
           }
         bool point_in_locally_owned_cell;
         {
@@ -1131,7 +1122,7 @@ namespace step62
         displacement.write_none<std::complex<double>>();
       }
 
-    // If the variable of the jupyter notbook `save_vtu_files = True` then all
+    // If the variable `save_vtu_files` in the input file equals `True` then all
     // the data will be saved as vtu. The procedure to write `vtu` files has
     // been described in step-40.
     if (parameters.save_vtu_files)
@@ -1186,10 +1177,10 @@ namespace step62
               {
                 for (unsigned int dim_idx = 0; dim_idx < dim; ++dim_idx)
                   {
-                    force[dim_idx](cell->active_cell_index()) =
-                      parameters.right_hand_side.value(cell->center(), dim_idx);
-                    pml[dim_idx](cell->active_cell_index()) = -1e+20;
+                    force[dim_idx](cell->active_cell_index()) = -1e+20;
+                    pml[dim_idx](cell->active_cell_index())   = -1e+20;
                   }
+                rho(cell->active_cell_index()) = -1e+20;
               }
           }
 
@@ -1204,9 +1195,8 @@ namespace step62
 
         data_out.build_patches();
 
-        unsigned int      nb_number_positions;
-        std::stringstream frequency_idx_stream;
-        nb_number_positions =
+        std::stringstream  frequency_idx_stream;
+        const unsigned int nb_number_positions =
           ((unsigned int)std::log10(parameters.nb_frequency_points)) + 1;
         frequency_idx_stream << std::setw(nb_number_positions)
                              << std::setfill('0') << frequency_idx;
@@ -1231,83 +1221,75 @@ namespace step62
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
         frequency_dataset.write(frequency);
-        position_dataset.write(position);
+        probe_positions_dataset.write(probe_positions);
       }
     else
       {
         frequency_dataset.write_none<double>();
-        position_dataset.write_none<double>();
+        probe_positions_dataset.write_none<double>();
       }
   }
 
 
 
-  // @sect4{ElasticWave::setup_quadrature_point_history}
+  // @sect4{ElasticWave::setup_quadrature_cache}
 
   // We use this function at the beginning of our computations to set up initial
-  // values of the history variables. This function has been described in
-  // step-18. There are no differences with the function of step-18.
+  // values of the cache variables. This function has been described in step-18.
+  // There are no differences with the function of step-18.
   template <int dim>
-  void ElasticWave<dim>::setup_quadrature_point_history()
+  void ElasticWave<dim>::setup_quadrature_cache()
   {
-    unsigned int our_cells = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
-      if (cell->is_locally_owned())
-        ++our_cells;
-
     triangulation.clear_user_data();
 
     {
-      std::vector<PointHistory<dim>> tmp;
-      tmp.swap(quadrature_point_history);
+      std::vector<QuadratureCache<dim>> tmp;
+      quadrature_cache.swap(tmp);
     }
 
-    quadrature_point_history.resize(our_cells * quadrature_formula.size(),
-                                    PointHistory<dim>(fe.dofs_per_cell));
-    unsigned int history_index = 0;
+    quadrature_cache.resize(triangulation.n_locally_owned_active_cells() *
+                              quadrature_formula.size(),
+                            QuadratureCache<dim>(fe.dofs_per_cell));
+    unsigned int cache_index = 0;
     for (typename Triangulation<dim>::active_cell_iterator cell =
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
       if (cell->is_locally_owned())
         {
-          cell->set_user_pointer(&quadrature_point_history[history_index]);
-          history_index += quadrature_formula.size();
+          cell->set_user_pointer(&quadrature_cache[cache_index]);
+          cache_index += quadrature_formula.size();
         }
-    Assert(history_index == quadrature_point_history.size(),
-           ExcInternalError());
+    Assert(cache_index == quadrature_cache.size(), ExcInternalError());
   }
 
 
 
   // @sect4{ElasticWave::frequency_sweep}
-  template <int dim>
 
   // For clarity we divide the function `run` of step-40 into the functions
   // `run` and `frequency_sweep`. In the function `frequency_sweep` we place the
   // iteration over the frequency vector.
+  template <int dim>
   void ElasticWave<dim>::frequency_sweep()
   {
     for (unsigned int frequency_idx = 0;
          frequency_idx < parameters.nb_frequency_points;
          ++frequency_idx)
       {
-        std::cout << parameters.simulation_name + " frequency idx: "
-                  << frequency_idx << '/' << parameters.nb_frequency_points - 1
-                  << std::endl;
+        pcout << parameters.simulation_name + " frequency idx: "
+              << frequency_idx << '/' << parameters.nb_frequency_points - 1
+              << std::endl;
 
 
 
         setup_system();
         if (frequency_idx == 0)
           {
-            std::cout << "   Number of active cells :       "
-                      << triangulation.n_active_cells() << std::endl;
-            std::cout << "   Number of degrees of freedom : "
-                      << dof_handler.n_dofs() << std::endl;
+            pcout << "   Number of active cells :       "
+                  << triangulation.n_active_cells() << std::endl;
+            pcout << "   Number of degrees of freedom : "
+                  << dof_handler.n_dofs() << std::endl;
           }
 
         if (frequency_idx == 0)
@@ -1320,12 +1302,13 @@ namespace step62
           }
 
         // We calculate the frequency and omega values for this particular step.
-        double current_loop_frequency =
+        const double current_loop_frequency =
           (parameters.start_frequency +
            frequency_idx *
              (parameters.stop_frequency - parameters.start_frequency) /
              (parameters.nb_frequency_points - 1));
-        double current_loop_omega = 2 * numbers::PI * current_loop_frequency;
+        const double current_loop_omega =
+          2 * numbers::PI * current_loop_frequency;
 
         // In the first frequency step we calculate the mass and stiffness
         // matrices and the right hand side. In the subsequent frequency steps
@@ -1353,9 +1336,9 @@ namespace step62
   void ElasticWave<dim>::run()
   {
 #ifdef DEBUG
-    std::cout << "Debug mode" << std::endl;
+    pcout << "Debug mode" << std::endl;
 #else
-    std::cout << "Release mode" << std::endl;
+    pcout << "Release mode" << std::endl;
 #endif
 
     {
@@ -1388,9 +1371,9 @@ namespace step62
 
     triangulation.refine_global(parameters.grid_level);
 
-    setup_quadrature_point_history();
+    setup_quadrature_cache();
 
-    set_position_vector();
+    initialize_probe_positions_vector();
 
     frequency_sweep();
 
@@ -1429,7 +1412,7 @@ int main(int argc, char *argv[])
       }
 
       {
-        // Calibration simulation. The parameters are read from the displacement
+        // Calibration simulation. The parameters are read from the calibration
         // HDF5 group and the results are saved in the same HDF5 group.
         auto                    calibration = data.open_group("calibration");
         step62::Parameters<dim> parameters(calibration);

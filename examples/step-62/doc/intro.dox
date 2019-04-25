@@ -10,39 +10,57 @@ together with these additional libraries is described in the <a
 href="../../readme.html" target="body">README</a> file.
 
 <h1>Introduction</h1>
-In this tutorial we calculate the
-[energy gap](https://en.wikipedia.org/wiki/Band_gap) and the
-mechanical resonance of a
-[phononic superlattice cavity](https://doi.org/10.1103/PhysRevA.94.033813).
+A phononic crystal is a periodic nanostructure that modifies the motion of
+mechanical vibrations or [phonons](https://en.wikipedia.org/wiki/Phonon).
+Phononic structures can be used to disperse, route and confine mechanical vibrations.
+These structures have potential applications in
+[quantum information](https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.86.1391)
+and have been used to study
+[macroscopic quantum phenomena](https://science.sciencemag.org/content/358/6360/203).
+Phononic crystals are usually fabricated in
+[cleanrooms](https://en.wikipedia.org/wiki/Cleanroom).
 
-
-A phononic superlattice cavity is formed by two
-[Distributed Reflector](https://en.wikipedia.org/wiki/Band_gap),
+In this tutorial we show how to a design a
+[phononic superlattice cavity](https://doi.org/10.1103/PhysRevA.94.033813)
+which is a particular type of phononic crystal that can be used to confine
+mechanical vibrations. A phononic superlattice cavity is formed by two
+[Distributed Bragg Reflector](https://en.wikipedia.org/wiki/Distributed_Bragg_reflector),
 mirrors and a $\lambda/2$ cavity where $\lambda$ is the acoustic
 wavelength. Acoustic DBRs are  periodic structures where a set of bilayer
 stacks with contrasting physical properties (sound velocity index) is
 repeated $N$ times.
+Superlattice cavities are usually grown on a
+[Gallium Arsenide](https://en.wikipedia.org/wiki/Gallium_arsenide)
+wafer by
+[Molecular Beam Epitaxy](https://en.wikipedia.org/wiki/Molecular-beam_epitaxy).
+The bilayers correspond to GaAs/AlAs mirror pairs.
 As shown below, the thickness of the mirror layers (brown and green) is
 $\lambda/4$ and the thickness of the cavity (blue) is $\lambda/2$.
 
+<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.01.svg" height="200" />
 
-<img alt="Phononic superlattice cavity" src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.01.svg?sanitize=true" height="200" />
+In this tutorial we calculate the
+[band gap](https://en.wikipedia.org/wiki/Band_gap) and the
+mechanical resonance of a phononic superlattice cavity but the code presented here
+can be easily used to design and calculate other types of
+[phononic crystals](https://science.sciencemag.org/content/358/6360/203).
 
 The device is a waveguide in which the wave goes from left to right.
-The simulations of this tutorial are done in 2D;
-although because we use templates it is very easy to convert this program to 3D.
+The simulations of this tutorial are done in 2D, but the code is dimension
+independent and can be easily used with 3D simulations.
+The waveguide width is equal to the $y$ dimension of the domain and the
+waveguide length is equal to the $x$ dimension of the domain.
 There are two regimes that depend on the waveguide width:
 - Single mode: In this case the width of the structure is much
-  smaller than the wavelength, therefore the waveguide is single mode.
+  smaller than the wavelength.
   This case can be solved either with FEM (the approach that we take here) or with
   a simple semi-analytical
   [1D transfer matrix formalism](https://en.wikipedia.org/wiki/Transfer_matrix).
-- Multimode: In this case the width of the structure is larger than the
-  wavelength, therefore the waveguide is multimode.
+- Multimode: In this case the width of the structure is larger than the wavelength.
   This case can be solved using FEM
   or with a [scattering matrix formalism](https://doi.org/10.1103/PhysRevA.94.033813).
   Although we do not study this case in this tutorial, it is very easy to reach the multimode
-  case by increasing the parameter waveguide width (`dimension_y` in the jupyter notebook).
+  regime by increasing the parameter waveguide width (`dimension_y` in the jupyter notebook).
 
 The simulations of this tutorial are performed in the frequency domain.
 To calculate the transmission spectrum, we use a
@@ -53,12 +71,12 @@ structure and the transmitted energy is measured on the right side of the struct
 The simulation is run twice. First, we run the simulation with the phononic
 structure and measure the transmitted energy:
 
-<img alt="Phononic superlattice cavity" src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.02.svg?sanitize=true" height="200" />
+<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.02.svg" height="200" />
 
 Then, we run the simulation without the phononic structure and measure the transmitted
-energy; we use the simulation without the structure for the calibration:
+energy. We use the simulation without the structure for the calibration:
 
-<img alt="Phononic superlattice cavity" src="https://raw.githubusercontent.com/dangars/dealii/phononic-cavity/examples/step-62/doc/step-62.03.svg?sanitize=true" height="200" />
+<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.03.svg" height="200" />
 
 The transmission coefficient corresponds to the energy of the first simulation
 divided by the calibration energy.
@@ -92,11 +110,13 @@ The elastic equations in the frequency domain then read as follows
 \nabla\cdot(\boldsymbol{\bar\sigma} \xi \boldsymbol{\Lambda})&=&-\omega^2\rho\xi\mathbf{\bar u}\\
 \boldsymbol{\bar \sigma} &=&\mathbf{C}\boldsymbol{\bar\varepsilon}\\
 \boldsymbol{\bar\varepsilon}&=&\frac{1}{2}[(\nabla\mathbf{\bar{u}}\boldsymbol{\Lambda}+\boldsymbol{\Lambda}^\mathrm{T}(\nabla\mathbf{\bar{u}})^\mathrm{T})]\\
-\xi &=&s_0\cdot s_1\cdot s_2\\
-\boldsymbol{\Lambda} &=& \operatorname{diag}(1/s_0,1/s_1,1/s_2)
+\xi &=&\prod_i^\textrm{dim}s_i\\
+\boldsymbol{\Lambda} &=& \operatorname{diag}(1/s_0,1/s_1,1/s_2)\qquad\textrm{for 3D}\\
+\boldsymbol{\Lambda} &=& \operatorname{diag}(1/s_0,1/s_1)\qquad\textrm{for 2D}
 @f}
 where the coefficients $s_i = 1+is_i'(x,y,z)$ account for the absorption.
-The imaginary par of $s_i$ is equal to zero outside of the PML.
+There are 3 $s_i$ coefficients in 3D and 2 in 2D.
+The imaginary par of $s_i$ is equal to zero outside the PML.
 The PMLs are reflectionless only for the exact wave equations.
 When the set of equations is discretized the PML is no longer reflectionless.
 The reflections can be made arbitrarily small as long as the
@@ -114,13 +134,17 @@ These equations can be expanded into
 \varepsilon_{kl} =\frac{1}{2}\left(\frac{1}{s_k}\partial_k u_l
 + \frac{1}{s_l}\partial_l u_k\right)
 @f]
-which can be written as
+where summation over repeated indices (here $n$, as well as $k$ and $l$) is as always implied.
+Note that the strain is no longer symmetric after applying the complex coordinate
+stretching of the PML.
+This set of equations can be written as
 @f[
 -\omega^2\rho \xi  u_m - \partial_n \left(\frac{\xi c_{mnkl}}{2s_n s_k} \partial_k u_l
 + \frac{\xi c_{mnkl}}{2s_n s_l} \partial_l u_k\right) = f_m
 @f]
 
-Note that the stress tensor is not symmetric inside the PML ($s_j\neq 0$).
+The same as the strain, the stress tensor is not symmetric inside the PML ($s_j\neq 0$).
+Indeed the fields inside the PML are not physical.
 It is useful to introduce the tensors $\alpha_{mnkl}$ and $\beta_{mnkl}$.
 @f[
 -\omega^2\rho \xi  u_m - \partial_n \left(\alpha_{mnkl}\partial_k u_l
@@ -132,16 +156,19 @@ We can multiply by $\varphi_m$ and integrate over the domain $\Omega$ and integr
 -\omega^2\int_\Omega\rho\xi\varphi_m u_m + \int_\Omega\partial_n\varphi_m \left(\frac{\xi c_{mnkl}}{2s_n s_k} \partial_k u_l
 + \frac{\xi c_{mnkl}}{2s_n s_l} \partial_l u_k\right) = \int_\Omega\varphi_m f_m
 @f}
-
-Then the linear system becomes
+It is this set of equations we want to solve for a set of frequencies $\omega$ in order to compute the
+transmission coefficient as function of frequency.
+The linear system becomes
 @f{eqnarray*}
--\omega^2\int_\Omega\rho \xi\varphi_m^i \varphi_m^j + \int_\Omega\partial_n\varphi_m^i \left(\frac{\xi c_{mnkl}}{2s_n s_k} \partial_k \varphi_l^j
-+ \frac{\xi c_{mnkl}}{2s_n s_l} \partial_l \varphi_k^j\right) = A_{ij}
+AU&=&F\\
+A_{ij} &=& -\omega^2\int_\Omega\rho \xi\varphi_m^i \varphi_m^j + \int_\Omega\partial_n\varphi_m^i \left(\frac{\xi c_{mnkl}}{2s_n s_k} \partial_k \varphi_l^j
++ \frac{\xi c_{mnkl}}{2s_n s_l} \partial_l \varphi_k^j\right)\\
+F_i &=& \int_\Omega\varphi_m^i f_m
 @f}
 
 <h3>Simulation parameters</h3>
 In this tutorial we use a python
-[jupyter notebook](https://github.com/dangars/dealii/blob/phononic-cavity/examples/step-62/step-62.ipynb)
+[jupyter notebook](https://github.com/dealii/dealii/blob/phononic-cavity/examples/step-62/step-62.ipynb)
 to set up the parameters and run the simulation.
 First we create a HDF5 file where we store the parameters and the results of
 the simulation.
@@ -152,6 +179,11 @@ import numpy as np
 import h5py
 import matplotlib.pyplot as plt
 import subprocess
+import scipy.constants as constants
+import scipy.optimize
+
+# This considerably reduces the size of the svg data
+plt.rcParams['svg.fonttype'] = 'none'
 
 h5_file = h5py.File('results.h5', 'w')
 data = h5_file.create_group('data')
@@ -161,13 +193,15 @@ calibration = data.create_group('calibration')
 # Set the parameters
 for group in [displacement, calibration]:
     # Dimensions of the domain
-    group.attrs['dimension_x'] = 0.02
-    group.attrs['dimension_y'] = 2e-5
+    # The waveguide length is equal to dimension_x
+    group.attrs['dimension_x'] = 2e-5
+    # The waveguide width is equal to dimension_y
+    group.attrs['dimension_y'] = 2e-8
     
     # Position of the probe that we use to measure the flux
-    group.attrs['probe_pos_x'] = 0.008
-    group.attrs['probe_pos_y'] = 0
-    group.attrs['probe_width_y'] = 2e-05
+    group.attrs['probe_pos_x']   = 8e-6
+    group.attrs['probe_pos_y']   = 0
+    group.attrs['probe_width_y'] = 2e-08
     
     # Number of points in the probe
     group.attrs['nb_probe_points'] = 5
@@ -176,8 +210,8 @@ for group in [displacement, calibration]:
     group.attrs['grid_level'] = 1
 
     # Cavity
-    group.attrs['cavity_resonance_frequency'] = 20000000.0
-    group.attrs['nb_mirror_pairs'] = 30
+    group.attrs['cavity_resonance_frequency'] = 20e9
+    group.attrs['nb_mirror_pairs']            = 15
 
     # Material
     group.attrs['poissons_ratio'] = 0.27
@@ -193,35 +227,35 @@ for group in [displacement, calibration]:
     group.attrs['mu']= (group.attrs['youngs_modulus'] / (2 * (1 + group.attrs['poissons_ratio'])))
 
     # Force
-    group.attrs['max_force_amplitude'] = 1e20
-    group.attrs['force_sigma_x'] = 1
-    group.attrs['force_sigma_y'] = 1
-    group.attrs['max_force_width_x'] = 0.0003
-    group.attrs['max_force_width_y'] = 0.001
-    group.attrs['force_x_pos'] = -0.008
-    group.attrs['force_y_pos'] = 0
+    group.attrs['max_force_amplitude'] = 1e26
+    group.attrs['force_sigma_x']       = 1e-7
+    group.attrs['force_sigma_y']       = 1
+    group.attrs['max_force_width_x']   = 3e-7
+    group.attrs['max_force_width_y']   = 2e-8
+    group.attrs['force_x_pos']         = -8e-6
+    group.attrs['force_y_pos']         = 0
 
     # PML
-    group.attrs['pml_x'] = True
-    group.attrs['pml_y'] = False
-    group.attrs['pml_width_x'] = 0.0018
-    group.attrs['pml_width_y'] = 0.0005
-    group.attrs['pml_coeff'] = 1.6
+    group.attrs['pml_x']            = True
+    group.attrs['pml_y']            = False
+    group.attrs['pml_width_x']      = 1.8e-6
+    group.attrs['pml_width_y']      = 5e-7
+    group.attrs['pml_coeff']        = 1.6
     group.attrs['pml_coeff_degree'] = 2
 
     # Frequency sweep
-    group.attrs['center_frequency'] = 19990180.0
-    group.attrs['frequency_range'] = 6000000.0
-    group.attrs['start_frequency'] = group.attrs['center_frequency'] - group.attrs['frequency_range'] / 2
-    group.attrs['stop_frequency'] = group.attrs['center_frequency'] + group.attrs['frequency_range'] / 2
-    group.attrs['nb_frequency_points'] = 10
+    group.attrs['center_frequency']    = 20e9
+    group.attrs['frequency_range']     = 0.5e9
+    group.attrs['start_frequency']     = group.attrs['center_frequency'] - group.attrs['frequency_range'] / 2
+    group.attrs['stop_frequency']      = group.attrs['center_frequency'] + group.attrs['frequency_range'] / 2
+    group.attrs['nb_frequency_points'] = 400
 
     # Other parameters
     if group == displacement:
         group.attrs['simulation_name'] = 'phononic_cavity_displacement'
     else:
         group.attrs['simulation_name'] = 'phononic_cavity_calibration'
-    group.attrs['save_vtu_files'] = True
+    group.attrs['save_vtu_files'] = False
     
 h5_file.close()
 @endcode
