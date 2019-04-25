@@ -156,35 +156,7 @@ namespace CUDAWrappers
      * degrees of freedom, the DoFHandler and the mapping describe the
      * transformation from unit to real cell, and the finite element
      * underlying the DoFHandler together with the quadrature formula
-     * describe the local operations. This function supports distributed
-     * computation (MPI).
-     */
-    void
-    reinit(const Mapping<dim> &             mapping,
-           const DoFHandler<dim> &          dof_handler,
-           const AffineConstraints<Number> &constraints,
-           const Quadrature<1> &            quad,
-           const MPI_Comm &                 comm,
-           const AdditionalData             additional_data = AdditionalData());
-
-    /**
-     * Initializes the data structures. Same as above but using a Q1 mapping.
-     */
-    void
-    reinit(const DoFHandler<dim> &          dof_handler,
-           const AffineConstraints<Number> &constraints,
-           const Quadrature<1> &            quad,
-           const MPI_Comm &                 comm,
-           const AdditionalData             AdditionalData = AdditionalData());
-
-    /**
-     * Extracts the information needed to perform loops over cells. The
-     * DoFHandler and AffineConstraints objects describe the layout of
-     * degrees of freedom, the DoFHandler and the mapping describe the
-     * transformation from unit to real cell, and the finite element
-     * underlying the DoFHandler together with the quadrature formula
-     * describe the local operations. This function does not support distributed
-     * computation.
+     * describe the local operations.
      */
     void
     reinit(const Mapping<dim> &             mapping,
