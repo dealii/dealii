@@ -297,8 +297,8 @@ namespace LinearAlgebra
 
           // Set the values in tmp_vector
           const int n_blocks =
-            1 + (n_elements - 1) / (::dealii::CUDAWrappers::chunk_size *
-                                    ::dealii::CUDAWrappers::block_size);
+            1 + n_elements / (::dealii::CUDAWrappers::chunk_size *
+                              ::dealii::CUDAWrappers::block_size);
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::set_permutated<Number>
             <<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
               indices_dev, tmp_vector.begin(), V_dev, n_elements);
@@ -351,9 +351,8 @@ namespace LinearAlgebra
           AssertCuda(error_code);
           error_code = cudaMemset(result_device, 0, sizeof(Number));
 
-          const int n_blocks =
-            1 + (size - 1) / (::dealii::CUDAWrappers::chunk_size *
-                              ::dealii::CUDAWrappers::block_size);
+          const int n_blocks = 1 + size / (::dealii::CUDAWrappers::chunk_size *
+                                           ::dealii::CUDAWrappers::block_size);
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
             Number,
             ::dealii::LinearAlgebra::CUDAWrappers::kernel::LInfty<Number>>
