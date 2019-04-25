@@ -120,6 +120,30 @@ namespace Differentiation
 
     } // namespace internal
 
+
+    /* ---------------- Symbolic substitution map enlargement --------------*/
+
+
+    void
+    merge_substitution_maps(types::substitution_map &      symb_map_out,
+                            const types::substitution_map &symb_map_in)
+    {
+      // Do this by hand so that we can perform some sanity checks
+      for (const auto &entry : symb_map_in)
+        {
+          const typename types::substitution_map::const_iterator it_other =
+            symb_map_out.find(entry.first);
+          if (it_other == symb_map_out.end())
+            symb_map_out.insert(std::make_pair(entry.first, entry.second));
+          else
+            {
+              Assert(SE::eq(*(entry.second.get_RCP()),
+                            *(it_other->second.get_RCP())),
+                     ExcMessage("Key already in map, but values don't match"));
+            }
+        }
+    }
+
   } // namespace SD
 } // namespace Differentiation
 

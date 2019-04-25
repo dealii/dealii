@@ -435,6 +435,45 @@ namespace Differentiation
       const std::pair<SymbolicType, ValueType> &symbol_value,
       const Args &... other_symbol_values);
 
+    /**
+     * Concatenate two symbolic maps, merging a second map @p substitution_map_in
+     * in-place into the initial and resultant map @p substitution_map_out. The map
+     * @p substitution_map_out need not initially be empty.
+     *
+     * @note Duplicate symbols (keys) in the maps are permitted, so long as their
+     * values are equal. If this is not the case then an error will be thrown.
+     */
+    void
+    merge_substitution_maps(types::substitution_map &      substitution_map_out,
+                            const types::substitution_map &substitution_map_in);
+
+    /**
+     * Concatenate multiple symbolic maps, merging the maps @p substitution_map_in
+     * and @p other_substitution_maps_in, a collection of other maps,
+     * in-place into the resultant map @p substitution_map_out. The map
+     * @p substitution_map_out need not initially be empty.
+     *
+     * @note Duplicate symbols (keys) in the maps are permitted, so long as their
+     * values are equal. If this is not the case then an error will be thrown.
+     */
+    template <typename... Args>
+    void
+    merge_substitution_maps(types::substitution_map &      substitution_map_out,
+                            const types::substitution_map &substitution_map_in,
+                            const Args &... other_substitution_maps_in);
+
+    /**
+     * Concatenate multiple symbolic maps, merging the maps @p substitution_map_in
+     * and @p other_substitution_maps_in and returning the result.
+     *
+     * @note Duplicate symbols (keys) in the maps are permitted, so long as their
+     * values are equal. If this is not the case then an error will be thrown.
+     */
+    template <typename... Args>
+    types::substitution_map
+    merge_substitution_maps(const types::substitution_map &substitution_map_in,
+                            const Args &... other_substitution_maps_in);
+
     //@}
 
   } // namespace SD
@@ -609,6 +648,32 @@ namespace Differentiation
                                                       symbol_value);
       add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
                                                       other_symbol_values...);
+    }
+
+
+    template <typename... Args>
+    types::substitution_map
+    merge_substitution_maps(
+      const types::substitution_map &substitution_map_in_1,
+      const Args &... other_substitution_maps_in)
+    {
+      types::substitution_map substitution_map_out = substitution_map_in_1;
+      merge_substitution_maps(substitution_map_out,
+                              other_substitution_maps_in...);
+      return substitution_map_out;
+    }
+
+
+    template <typename... Args>
+    void
+    merge_substitution_maps(
+      types::substitution_map &      substitution_map_out,
+      const types::substitution_map &substitution_map_in_1,
+      const Args &... other_substitution_maps_in)
+    {
+      merge_substitution_maps(substitution_map_out, substitution_map_in_1);
+      merge_substitution_maps(substitution_map_out,
+                              other_substitution_maps_in...);
     }
 
   } // namespace SD
