@@ -211,7 +211,7 @@ namespace LinearAlgebraTrilinos
     using BlockSparseMatrix = TrilinosWrappers::BlockSparseMatrix;
 
     /**
-     * Typedef for thei type used for compressed block sparsity pattern.
+     * Typedef for the type used for compressed block sparsity pattern.
      */
     using BlockCompressedSparsityPattern =
       TrilinosWrappers::BlockSparsityPattern;
