@@ -153,7 +153,8 @@ public:
 
 private:
   /**
-   * Auxiliary function that computes [*this]  $T^{T}$
+   * Auxiliary function that computes $A T^{T}$ where A represents the current
+   * object.
    */
   DerivativeForm<1, dim, spacedim, Number>
   times_T_t(const Tensor<2, dim, Number> &T) const;
