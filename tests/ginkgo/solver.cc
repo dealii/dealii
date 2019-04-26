@@ -56,23 +56,27 @@ main(int argc, char **argv)
     // std::shared_ptr<gko::Executor> exec = gko::CudaExecutor::create(0,
     //                                                               gko::OmpExecutor::create());
     // std::shared_ptr<gko::Executor> exec = gko::OmpExecutor::create();
-    auto executor = "reference";
-    std::shared_ptr<gko::Executor> exec = gko::ReferenceExecutor::create();
-    std::shared_ptr<gko::LinOpFactory> jacobi = gko::preconditioner::Jacobi<>::build().on(exec);
-    std::shared_ptr<gko::LinOpFactory> inner_cg = gko::solver::Cg<>::build()
-      .with_criteria(
-                     gko::stop::Iteration::build().with_max_iters(45u).on(exec),
-                     gko::stop::ResidualNormReduction<>::build()
-                     .with_reduction_factor(1e-5)
-                     .on(exec))
-      .on(exec);
-    GinkgoWrappers::SolverCG<>     cg_solver(control, executor);
-    GinkgoWrappers::SolverBICGSTAB<>     bicgstab_solver(control, executor);
-    GinkgoWrappers::SolverCGS<>     cgs_solver(control, executor);
-    GinkgoWrappers::SolverFCG<>     fcg_solver(control, executor);
-    GinkgoWrappers::SolverGMRES<>     gmres_solver(control, executor);
-    GinkgoWrappers::SolverIR<>     ir_solver_cg(control, executor, inner_cg);
-    GinkgoWrappers::SolverCG<>     cg_solver_with_jacobi_precond(control, executor, jacobi);
+    auto                               executor = "reference";
+    std::shared_ptr<gko::Executor>     exec = gko::ReferenceExecutor::create();
+    std::shared_ptr<gko::LinOpFactory> jacobi =
+      gko::preconditioner::Jacobi<>::build().on(exec);
+    std::shared_ptr<gko::LinOpFactory> inner_cg =
+      gko::solver::Cg<>::build()
+        .with_criteria(gko::stop::Iteration::build().with_max_iters(45u).on(
+                         exec),
+                       gko::stop::ResidualNormReduction<>::build()
+                         .with_reduction_factor(1e-5)
+                         .on(exec))
+        .on(exec);
+    GinkgoWrappers::SolverCG<>       cg_solver(control, executor);
+    GinkgoWrappers::SolverBICGSTAB<> bicgstab_solver(control, executor);
+    GinkgoWrappers::SolverCGS<>      cgs_solver(control, executor);
+    GinkgoWrappers::SolverFCG<>      fcg_solver(control, executor);
+    GinkgoWrappers::SolverGMRES<>    gmres_solver(control, executor);
+    GinkgoWrappers::SolverIR<>       ir_solver_cg(control, executor, inner_cg);
+    GinkgoWrappers::SolverCG<>       cg_solver_with_jacobi_precond(control,
+                                                             executor,
+                                                             jacobi);
 
     check_solver_within_range(cg_solver.solve(A, u, f),
                               control.last_step(),

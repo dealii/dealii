@@ -48,17 +48,17 @@
                                       target="_top">Ginkgo</a>.
         The different flags that can be added are:
         <ul>
-           <li> <code> -DBUILD_REFERENCE={ON,OFF}</code>: Builds the reference single thread implementation
+           <li> <code> -DGINKGO_BUILD_REFERENCE={ON,OFF}</code>: Builds the reference single thread implementation
         used to check the more sophisticated implementations of the GPU/CPU.
-           <li> <code> -DBUILD_CUDA={ON,OFF}</code>: Builds the GPU implementation, specifically the NVIDIA
+           <li> <code> -DGINKGO_BUILD_CUDA={ON,OFF}</code>: Builds the GPU implementation, specifically the NVIDIA
         CUDA implementations. This needs CUDA to be installed on the machine.
-           <li> <code> -DBUILD_OMP={ON,OFF}</code>: Builds the multithreaded OpenMP implementations.
+           <li> <code> -DGINKGO_BUILD_OMP={ON,OFF}</code>: Builds the multithreaded OpenMP implementations.
         </ul>
         To install Ginkgo, you would need to:
       <pre>
 	git clone https://github.com/ginkgo-project/ginkgo.git
-  mkdir build; cd build 
-  cmake -DBUILD_REFERENCE=on/off -DBUILD_CUDA=on/off -DBUILD_OMP=on/off -DCMAKE_INSTALL_PREFIX=/path/to/install/ -DCMAKE_BUILD_TYPE=Debug
+  mkdir build; cd build
+  cmake -DGINKGO_BUILD_REFERENCE=on/off -DGINKGO_BUILD_CUDA=on/off -DGINKGO_BUILD_OMP=on/off -DCMAKE_INSTALL_PREFIX=/path/to/install/ -DCMAKE_BUILD_TYPE=Release/Debug
 	make install
       </pre>
     </p>
