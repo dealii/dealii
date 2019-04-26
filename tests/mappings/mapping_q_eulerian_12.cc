@@ -77,7 +77,7 @@ test()
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       deallog << "Center: [" << cell->center() << "], with mapping ["
-              << euler.get_center(cell) << "]" << std::endl;
+              << euler.get_center(cell, false) << "]" << std::endl;
       deallog << "Center: [" << cell->center() << "], with mapping + flag ["
               << euler.get_center(cell, true) << "]" << std::endl;
     }
