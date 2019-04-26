@@ -1639,7 +1639,7 @@ namespace Step18
     // includes setting the stress variables to zero.
     {
       std::vector<PointHistory<dim>> tmp;
-      tmp.swap(quadrature_point_history);
+      quadrature_point_history.swap(tmp);
     }
     quadrature_point_history.resize(our_cells * quadrature_formula.size());
 
