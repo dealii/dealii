@@ -33,7 +33,7 @@ main(int argc, char **argv)
   deallog << std::setprecision(4);
 
   {
-    SolverControl control(100, 1e-3);
+    SolverControl control(200, 1e-3);
 
     const unsigned int size = 32;
     unsigned int       dim  = (size - 1) * (size - 1);
@@ -59,15 +59,52 @@ main(int argc, char **argv)
     auto executor = "reference";
     std::shared_ptr<gko::Executor> exec = gko::ReferenceExecutor::create();
     std::shared_ptr<gko::LinOpFactory> jacobi = gko::preconditioner::Jacobi<>::build().on(exec);
-    GinkgoWrappers::SolverCG<>     solver(control, executor);
-    GinkgoWrappers::SolverCG<>     solver_with_jacobi_precond(control, executor, jacobi);
+    std::shared_ptr<gko::LinOpFactory> inner_cg = gko::solver::Cg<>::build()
+      .with_criteria(
+                     gko::stop::Iteration::build().with_max_iters(45u).on(exec),
+                     gko::stop::ResidualNormReduction<>::build()
+                     .with_reduction_factor(1e-5)
+                     .on(exec))
+      .on(exec);
+    GinkgoWrappers::SolverCG<>     cg_solver(control, executor);
+    GinkgoWrappers::SolverBICGSTAB<>     bicgstab_solver(control, executor);
+    GinkgoWrappers::SolverCGS<>     cgs_solver(control, executor);
+    GinkgoWrappers::SolverFCG<>     fcg_solver(control, executor);
+    GinkgoWrappers::SolverGMRES<>     gmres_solver(control, executor);
+    GinkgoWrappers::SolverIR<>     ir_solver_cg(control, executor, inner_cg);
+    GinkgoWrappers::SolverCG<>     cg_solver_with_jacobi_precond(control, executor, jacobi);
 
-    check_solver_within_range(solver.solve(A, u, f),
+    check_solver_within_range(cg_solver.solve(A, u, f),
                               control.last_step(),
                               35,
                               39);
     u = 0.;
-    check_solver_within_range(solver_with_jacobi_precond.solve(A, u, f),
+    check_solver_within_range(bicgstab_solver.solve(A, u, f),
+                              control.last_step(),
+                              59,
+                              65);
+    u = 0.;
+    check_solver_within_range(cgs_solver.solve(A, u, f),
+                              control.last_step(),
+                              72,
+                              79);
+    u = 0.;
+    check_solver_within_range(fcg_solver.solve(A, u, f),
+                              control.last_step(),
+                              33,
+                              39);
+    u = 0.;
+    check_solver_within_range(gmres_solver.solve(A, u, f),
+                              control.last_step(),
+                              23,
+                              29);
+    u = 0.;
+    check_solver_within_range(ir_solver_cg.solve(A, u, f),
+                              control.last_step(),
+                              0,
+                              2);
+    u = 0.;
+    check_solver_within_range(cg_solver_with_jacobi_precond.solve(A, u, f),
                               control.last_step(),
                               29,
                               33);
