@@ -1608,40 +1608,33 @@ namespace Step18
   template <int dim>
   void TopLevel<dim>::setup_quadrature_point_history()
   {
-    // What we need to do here is to first count how many quadrature points
-    // are within the responsibility of this processor. This, of course,
-    // equals the number of cells that belong to this processor times the
-    // number of quadrature points our quadrature formula has on each cell.
-    //
-    // For good measure, we also set all user pointers of all cells, whether
+    // For good measure, we set all user pointers of all cells, whether
     // ours of not, to the null pointer. This way, if we ever access the user
     // pointer of a cell which we should not have accessed, a segmentation
     // fault will let us know that this should not have happened:
-    unsigned int our_cells = 0;
-    for (auto cell : triangulation.active_cell_iterators())
-      if (cell->is_locally_owned())
-        ++our_cells;
 
     triangulation.clear_user_data();
 
-    // Next, allocate as many quadrature objects as we need. Since the
-    // <code>resize</code> function does not actually shrink the amount of
-    // allocated memory if the requested new size is smaller than the old
-    // size, we resort to a trick to first free all memory, and then
-    // reallocate it: we declare an empty vector as a temporary variable and
-    // then swap the contents of the old vector and this temporary
-    // variable. This makes sure that the
-    // <code>quadrature_point_history</code> is now really empty, and we can
-    // let the temporary variable that now holds the previous contents of the
-    // vector go out of scope and be destroyed. In the next step. we can then
-    // re-allocate as many elements as we need, with the vector
-    // default-initializing the <code>PointHistory</code> objects, which
-    // includes setting the stress variables to zero.
+    // Next, allocate the quadrature objects that are within the responsibility
+    // of this processor. This, of course, equals the number of cells that
+    // belong to this processor times the number of quadrature points our
+    // quadrature formula has on each cell. Since the `resize()` function does
+    // not actually shrink the amount of allocated memory if the requested new
+    // size is smaller than the old size, we resort to a trick to first free all
+    // memory, and then reallocate it: we declare an empty vector as a temporary
+    // variable and then swap the contents of the old vector and this temporary
+    // variable. This makes sure that the `quadrature_point_history` is now
+    // really empty, and we can let the temporary variable that now holds the
+    // previous contents of the vector go out of scope and be destroyed. In the
+    // next step we can then re-allocate as many elements as we need, with the
+    // vector default-initializing the `PointHistory` objects, which includes
+    // setting the stress variables to zero.
     {
       std::vector<PointHistory<dim>> tmp;
       quadrature_point_history.swap(tmp);
     }
-    quadrature_point_history.resize(our_cells * quadrature_formula.size());
+    quadrature_point_history.resize(
+      triangulation.n_locally_owned_active_cells() * quadrature_formula.size());
 
     // Finally loop over all cells again and set the user pointers from the
     // cells that belong to the present processor to point to the first
