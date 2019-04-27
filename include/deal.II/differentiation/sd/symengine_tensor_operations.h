@@ -379,7 +379,7 @@ namespace Differentiation
 {
   namespace SD
   {
-    // --- Symbolic differentiation ---
+    /* ---------------- Symbolic differentiation --------------*/
 
 
     namespace internal
