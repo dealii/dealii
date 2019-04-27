@@ -1,17 +1,17 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal2lkit library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE at
-//    the top level of the deal2lkit distribution.
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
-//-----------------------------------------------------------
+// -------------------------------------------------------------------
 
 #ifndef dealii_base_parsed_convergence_table_flags_h
 #define dealii_base_parsed_convergence_table_flags_h
@@ -62,7 +62,7 @@ namespace Patterns
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
       {
-        return std::make_unique<Patterns::Selection>(
+        return std_cxx14::make_unique<Patterns::Selection>(
           "none|Linfty|L2|W1infty|H1|custom");
       }
 
@@ -136,7 +136,7 @@ namespace Patterns
           }
         else
           {
-            AssertThrow(false, ExcMessage("Didn't recognize a norm type."));
+            AssertThrow(false, ExcMessage("The norm type <" + norm_string + "> is not recognized."));
           }
 
         return norm;
@@ -154,7 +154,7 @@ namespace Patterns
       static std::unique_ptr<Patterns::PatternBase>
       to_pattern()
       {
-        return std::make_unique<Patterns::Selection>("none|cells|dofs|dt");
+        return std_cxx14::make_unique<Patterns::Selection>("none|cells|dofs|dt");
       }
 
 
@@ -218,7 +218,7 @@ namespace Patterns
         else
           {
             AssertThrow(false,
-                        ExcMessage("Didn't recognize an extra column type."));
+                        ExcMessage("The column type <" + column_string + "> is not recognized."));
           }
 
         return column;

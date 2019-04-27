@@ -1,17 +1,17 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 by the deal.II authors
 //
-//    This file is part of the deal.II library.
+// This file is part of the deal.II library.
 //
-//    The deal2lkit library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE at
-//    the top level of the deal2lkit distribution.
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
 //
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 
 #ifndef dealii_base_parsed_convergence_table_h
 #define dealii_base_parsed_convergence_table_h
@@ -55,10 +55,11 @@ DEAL_II_NAMESPACE_OPEN
  * ParameterHandler prm;
  * table.add_parameters(prm);
  *
- * for(unsigned int i=0; i<n_cycles; ++i) {
- *   ... // do some computations
- *   table.error_from_exact(dof_handler, solution, exact_solution);
- * }
+ * for (unsigned int i = 0; i < n_cycles; ++i)
+ *   {
+ *     ... // do some computations
+ *     table.error_from_exact(dof_handler, solution, exact_solution);
+ *   }
  * table.output_table(std::cout);
  * @endcode
  *
@@ -69,7 +70,7 @@ DEAL_II_NAMESPACE_OPEN
  * Whenever a call to the methods error_from_exact() or difference() is made,
  * the instance of this class inspects its parameters, and computes all norms
  * specified by the parameter given at construction time, possibly modified
- * via a ParameterFile.
+ * via a parameter file.
  *
  * With a small modification, the same code can be used to estimate the errors
  * of mixed or multi-physics problems, e.g.:
@@ -80,10 +81,11 @@ DEAL_II_NAMESPACE_OPEN
  * ParameterHandler prm;
  * table.add_parameters(prm);
  *
- * for(unsigned int i=0; i<n_cycles; ++i) {
- *   ... // do some computations
- *   table.error_from_exact(dof_handler, solution, exact_solution);
- * }
+ * for (unsigned int i = 0; i < n_cycles; ++i)
+ *   {
+ *     ... // do some computations
+ *     table.error_from_exact(dof_handler, solution, exact_solution);
+ *   }
  * table.output_table(std::cout);
  * @endcode
  *
@@ -212,7 +214,7 @@ public:
    * # Number of digits to use when printing the error.
    * set Error precision                  = 3
    *
-   * # Extra columns to add to the table. Availabl options are dofs, cells, and
+   * # Extra columns to add to the table. Available options are dofs, cells, and
    * # dt.
    * set Extra columns                    = dofs, cells
    *
@@ -278,14 +280,14 @@ public:
 
   /**
    * Call the given custom function to compute a custom error for any component
-   * for which you specify the ConvergenceTableFlags::custom norm. This function
+   * for which you specify the ParsedConvergenceTableFlags::custom norm. This function
    * may be called several times to add different columns with different names,
    * provided you use an appropriate function every time, and
-   * that you update @p column_name everytime.
+   * that you also update @p column_name every time.
    *
    * Should you wish to do so, then make sure the parameter
-   * @p add_table_extras is set to false for each call, except one, so
-   * that you only add extra columns informations once.
+   * @p add_table_extras is set to `false` for each call, except one, so
+   * that you only add extra column information once.
    *
    * An example usage of this class with a custom error function is the
    * following:
@@ -293,13 +295,14 @@ public:
    * using namespace ParsedConvergenceTableFlags;
    * ParsedConvergenceTable table({"u"}, {{"custom"}});
    *
-   * for(unsigned int i=0; i<n_cycles; ++i) {
-   *   // ... refine and distribute dofs
-   *   auto cycle_function = [&](const unsigned int component) {
-   *      return i;
-   *   };
-   *   table.custom_error(cycle_function, dof_handler, "cycle", true);
-   * }
+   * for (unsigned int i = 0; i < n_cycles; ++i)
+   *   {
+   *     // ... refine and distribute dofs
+   *     auto cycle_function = [&](const unsigned int component) {
+   *        return i;
+   *     };
+   *     table.custom_error(cycle_function, dof_handler, "cycle", true);
+   *   }
    * table.output_table(std::cout);
    * @endcode
    *
@@ -319,18 +322,19 @@ public:
    * using namespace ParsedConvergenceTableFlags;
    * ParsedConvergenceTable table({"u"}, {"custom"});
    *
-   * for(unsigned int i=0; i<n_cycles; ++i) {
-   *   // ... refine and distribute dofs
-   *   auto cycle_function = [&](const unsigned int) {
-   *      return i;
-   *   };
-   *   auto cycle_square_function = [&](const unsigned int) {
-   *      return i*i;
-   *   };
-   *   table.custom_error(cycle_function, dof_handler, "cycle", false);
-   *   table.custom_error(cycle_square_function, dof_handler,
-   *                      "cycle_square", true);
-   * }
+   * for (unsigned int i = 0; i < n_cycles; ++i)
+   *   {
+   *     // ... refine and distribute dofs
+   *     auto cycle_function = [&](const unsigned int) {
+   *        return i;
+   *     };
+   *     auto cycle_square_function = [&](const unsigned int) {
+   *        return i*i;
+   *     };
+   *     table.custom_error(cycle_function, dof_handler, "cycle", false);
+   *     table.custom_error(cycle_square_function, dof_handler,
+   *                        "cycle_square", true);
+   *   }
    * table.output_table(std::cout);
    * @endcode
    *
@@ -408,13 +412,14 @@ private:
    * The actual table
    */
   ConvergenceTable table;
+  
   /**
    * Extra columns to add to the table.
    */
   std::set<ParsedConvergenceTableFlags::ExtraColumns> extra_columns;
 
   /**
-   * Wether or not to calculate the rates according to the given keys.
+   * Whether or not to calculate the rates according to the given keys.
    */
   ParsedConvergenceTableFlags::ExtraColumns rate_key;
 
@@ -444,7 +449,7 @@ private:
 
 #ifndef DOXYGEN
 // ============================================================
-// Template instantiations
+// Template functions
 // ============================================================
 template <typename DoFHandlerType, typename VectorType>
 void
@@ -706,7 +711,6 @@ ParsedConvergenceTable::custom_error(
   if (compute_error)
     {
       const unsigned int  n_components = norms_per_unique_component.size();
-      std::vector<double> c_error(norms_per_unique_component.size());
       const unsigned int  n_active_cells =
         dh.get_triangulation().n_global_active_cells();
       const unsigned int n_dofs = dh.n_dofs();

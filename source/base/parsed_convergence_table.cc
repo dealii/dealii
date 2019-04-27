@@ -57,6 +57,8 @@ namespace
   }
 } // namespace
 
+
+
 ParsedConvergenceTable::ParsedConvergenceTable(
   const std::vector<std::string> &solution_names,
   const std::vector<std::set<ParsedConvergenceTableFlags::NormType>>
@@ -126,13 +128,13 @@ ParsedConvergenceTable::add_parameters(ParameterHandler &prm)
   prm.add_parameter(
     "List of error norms to compute",
     norms_per_unique_component,
-    "Each component is separated by a semicolon, "
+    "Each component is separated by a semicolon "
     "and each norm by a comma. Implemented norms are Linfty, L2, "
     "W1infty, H1, and custom. If you want to skip a component, use none.");
 
   prm.add_parameter("Extra columns",
                     extra_columns,
-                    "Extra columns to add to the table. Availabl options "
+                    "Extra columns to add to the table. Available options "
                     "are dofs, cells, and dt.");
 
   prm.add_parameter("Rate key",
