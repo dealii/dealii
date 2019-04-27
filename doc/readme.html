@@ -161,15 +161,19 @@
 
     <p>
         <acronym>deal.II</acronym> uses the
-        <a href="http://www.cmake.org/" target="_top">CMake</a> integrated configuration and build system. Unpacking will create a subdirectory <tt>deal.II/</tt> in the current directory. Then do the following steps:</p>
+        <a href="http://www.cmake.org/" target="_top">CMake</a> integrated configuration and build system. Unpacking will create a subdirectory <tt>deal.II/</tt> in the current directory. Then do the following steps to configure the build process:</p>
 
     <pre>
   mkdir build
   cd build
   cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/dir ../deal.II
-  make install
+    </pre>
+    We recommend compiling deal.II in parallel if your machine has more than one processor core. This can be done by providing the <code>--jobs</code> flag to <code>make</code> with a numerical argument. Here we compile with four <code>make</code> jobs:
+    <pre>
+  make --jobs=4 install
   make test
     </pre>
+    One should usually use one job for each processor core on the machine.
 
     <p>
         These steps compile, link, install the deal.II library, and run a few consistency checks. The whole process should take between a few minutes and an hour, depending on your machine.
@@ -182,9 +186,7 @@
             Another option is to use something like <code>`pwd`/../installed/</code> (note the backticks). Make sure the installation directory is not the same as the location where you unpacked <tt>deal.II/</tt>.
         </li>
 
-        <li> If your machine has multiple processors, use <code>make
-	  -jN install</code> in the second to last step instead, where <code>N</code> is the number of simultaneous build processes you want <code>make</code> to use at any given time. Allowing <code>make</code> to use more simultaneous build processes (assuming you have that many processor
-            cores) will greatly lower the build time. <code>make test</code> automatically runs in parallel and no <code>-jN</code> flag should be supplied to it.
+        <li> <code>make test</code> automatically runs in parallel and no <code>-jN</code> flag should be supplied to it.
         </li>
 
         <li> If you do not intend to modify the <acronym>deal.II</acronym> sources and recompile things, then you can remove the <code>build/</code> directory after the last step.
