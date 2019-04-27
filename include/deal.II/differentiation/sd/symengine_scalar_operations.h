@@ -287,9 +287,9 @@ namespace Differentiation
                   const SE::RCP<const SE::Basic> &>::value &&
                 std::is_constructible<ExpressionType, ValueType>::value>::type>
     void
-    add_to_substitution_map(types::substitution_map &     substitution_map,
-                            const types::symbol_vector &  symbols,
-                            const std::vector<ValueType> &values);
+    add_to_substitution_map(types::substitution_map &          substitution_map,
+                            const std::vector<ExpressionType> &symbols,
+                            const std::vector<ValueType> &     values);
 
     /**
      * A convenience function for adding multiple entries to the
@@ -559,14 +559,15 @@ namespace Differentiation
         static_cast<SE_RCP_Basic>(ExpressionType(value)));
     }
 
+
     template <bool ignore_invalid_symbols,
               typename ExpressionType,
               typename ValueType,
               typename>
     void
-    add_to_substitution_map(types::substitution_map &     substitution_map,
-                            const types::symbol_vector &  symbols,
-                            const std::vector<ValueType> &values)
+    add_to_substitution_map(types::substitution_map &          substitution_map,
+                            const std::vector<ExpressionType> &symbols,
+                            const std::vector<ValueType> &     values)
     {
       Assert(symbols.size() == values.size(),
              ExcMessage(
