@@ -32,7 +32,7 @@ namespace GinkgoWrappers
 {
   template <typename ValueType, typename IndexType>
   SolverBase<ValueType, IndexType>::SolverBase(SolverControl &solver_control,
-                                               std::string    exec_type)
+                                               const std::string &exec_type)
     : solver_control(solver_control)
     , exec_type(exec_type)
   {
@@ -51,7 +51,7 @@ namespace GinkgoWrappers
     else
       {
         std::cerr
-          << "exec_type needs to be one of the three strings: reference, cuda or omp, but provided with"
+          << "exec_type needs to be one of the three strings: \"reference\", \"cuda\" or \"omp\", but provided with"
           << exec_type << std::endl;
         std::exit(-1);
       }
@@ -295,7 +295,7 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename IndexType>
   SolverCG<ValueType, IndexType>::SolverCG(SolverControl &       solver_control,
-                                           std::string           exec_type,
+                                           const std::string &   exec_type,
                                            const AdditionalData &data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
@@ -307,10 +307,10 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename IndexType>
   SolverCG<ValueType, IndexType>::SolverCG(
-    SolverControl &                    solver_control,
-    std::string                        exec_type,
-    std::shared_ptr<gko::LinOpFactory> preconditioner,
-    const AdditionalData &             data)
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
@@ -322,12 +322,12 @@ namespace GinkgoWrappers
   }
 
 
-  /* ---------------------- SolverBICGSTAB ------------------------ */
+  /* ---------------------- SolverBicgstab ------------------------ */
 
   template <typename ValueType, typename IndexType>
-  SolverBICGSTAB<ValueType, IndexType>::SolverBICGSTAB(
+  SolverBicgstab<ValueType, IndexType>::SolverBicgstab(
     SolverControl &       solver_control,
-    std::string           exec_type,
+    const std::string &   exec_type,
     const AdditionalData &data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
@@ -339,11 +339,11 @@ namespace GinkgoWrappers
   }
 
   template <typename ValueType, typename IndexType>
-  SolverBICGSTAB<ValueType, IndexType>::SolverBICGSTAB(
-    SolverControl &                    solver_control,
-    std::string                        exec_type,
-    std::shared_ptr<gko::LinOpFactory> preconditioner,
-    const AdditionalData &             data)
+  SolverBicgstab<ValueType, IndexType>::SolverBicgstab(
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
@@ -357,8 +357,8 @@ namespace GinkgoWrappers
   /* ---------------------- SolverCGS ------------------------ */
 
   template <typename ValueType, typename IndexType>
-  SolverCGS<ValueType, IndexType>::SolverCGS(SolverControl &solver_control,
-                                             std::string    exec_type,
+  SolverCGS<ValueType, IndexType>::SolverCGS(SolverControl &    solver_control,
+                                             const std::string &exec_type,
                                              const AdditionalData &data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
@@ -370,10 +370,10 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename IndexType>
   SolverCGS<ValueType, IndexType>::SolverCGS(
-    SolverControl &                    solver_control,
-    std::string                        exec_type,
-    std::shared_ptr<gko::LinOpFactory> preconditioner,
-    const AdditionalData &             data)
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
@@ -387,8 +387,8 @@ namespace GinkgoWrappers
   /* ---------------------- SolverFCG ------------------------ */
 
   template <typename ValueType, typename IndexType>
-  SolverFCG<ValueType, IndexType>::SolverFCG(SolverControl &solver_control,
-                                             std::string    exec_type,
+  SolverFCG<ValueType, IndexType>::SolverFCG(SolverControl &    solver_control,
+                                             const std::string &exec_type,
                                              const AdditionalData &data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
@@ -400,10 +400,10 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename IndexType>
   SolverFCG<ValueType, IndexType>::SolverFCG(
-    SolverControl &                    solver_control,
-    std::string                        exec_type,
-    std::shared_ptr<gko::LinOpFactory> preconditioner,
-    const AdditionalData &             data)
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
@@ -424,7 +424,7 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename IndexType>
   SolverGMRES<ValueType, IndexType>::SolverGMRES(SolverControl &solver_control,
-                                                 std::string    exec_type,
+                                                 const std::string &exec_type,
                                                  const AdditionalData &data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
@@ -438,10 +438,10 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename IndexType>
   SolverGMRES<ValueType, IndexType>::SolverGMRES(
-    SolverControl &                    solver_control,
-    std::string                        exec_type,
-    std::shared_ptr<gko::LinOpFactory> preconditioner,
-    const AdditionalData &             data)
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
@@ -457,7 +457,7 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename IndexType>
   SolverIR<ValueType, IndexType>::SolverIR(SolverControl &       solver_control,
-                                           std::string           exec_type,
+                                           const std::string &   exec_type,
                                            const AdditionalData &data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
@@ -469,10 +469,10 @@ namespace GinkgoWrappers
 
   template <typename ValueType, typename IndexType>
   SolverIR<ValueType, IndexType>::SolverIR(
-    SolverControl &                    solver_control,
-    std::string                        exec_type,
-    std::shared_ptr<gko::LinOpFactory> inner_solver,
-    const AdditionalData &             data)
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &inner_solver,
+    const AdditionalData &                    data)
     : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
@@ -500,10 +500,10 @@ namespace GinkgoWrappers
   DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_CG)
 #  undef DECLARE_SOLVER_CG
 
-#  define DECLARE_SOLVER_BICGSTAB(ValueType, IndexType) \
-    class SolverBICGSTAB<ValueType, IndexType>
-  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_BICGSTAB)
-#  undef DECLARE_SOLVER_BICGSTAB
+#  define DECLARE_SOLVER_Bicgstab(ValueType, IndexType) \
+    class SolverBicgstab<ValueType, IndexType>
+  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_Bicgstab)
+#  undef DECLARE_SOLVER_Bicgstab
 
 #  define DECLARE_SOLVER_CGS(ValueType, IndexType) \
     class SolverCGS<ValueType, IndexType>

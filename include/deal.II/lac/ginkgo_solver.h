@@ -54,6 +54,9 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * The @p exec_type defines the paradigm where the solution is computed.
+     * It is a string and the choices are "omp" , "reference" or "cuda".
+     * The respective strings create the respective executors as given below.
+     *
      * Ginkgo currently supports three different executor types:
      *
      * +    OmpExecutor specifies that the data should be stored and the
@@ -99,7 +102,7 @@ namespace GinkgoWrappers
      * The @p solver_control object is the same as for other
      * deal.II iterative solvers.
      */
-    SolverBase(SolverControl &solver_control, std::string exec_type);
+    SolverBase(SolverControl &solver_control, const std::string &exec_type);
 
     /**
      * Destructor.
@@ -195,11 +198,11 @@ namespace GinkgoWrappers
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> system_matrix;
 
     /**
-     * The execution paradigm to be set by the user. The choices are between
-     * `omp`, `cuda` and `reference`
-     * and more details can be found in Ginkgo's documentation.
+     * The execution paradigm as a string to be set by the user . The choices
+     * are between `omp`, `cuda` and `reference` and more details can be found
+     * in Ginkgo's documentation.
      */
-    std::string exec_type;
+    const std::string exec_type;
   };
 
 
@@ -228,7 +231,7 @@ namespace GinkgoWrappers
      * @p exec_type The execution paradigm for the CG solver.
      */
     SolverCG(SolverControl &       solver_control,
-             std::string           exec_type,
+             const std::string &   exec_type,
              const AdditionalData &data = AdditionalData());
 
     /**
@@ -242,10 +245,10 @@ namespace GinkgoWrappers
      *
      * @p preconditioner The preconditioner for the solver.
      */
-    SolverCG(SolverControl &                    solver_control,
-             std::string                        exec_type,
-             std::shared_ptr<gko::LinOpFactory> preconditioner,
-             const AdditionalData &             data = AdditionalData());
+    SolverCG(SolverControl &                           solver_control,
+             const std::string &                       exec_type,
+             const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+             const AdditionalData &                    data = AdditionalData());
 
   protected:
     /**
@@ -256,12 +259,12 @@ namespace GinkgoWrappers
 
 
   /**
-   * An implementation of the solver interface using the Ginkgo BICGSTAB solver.
+   * An implementation of the solver interface using the Ginkgo Bicgstab solver.
    *
    * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
-  class SolverBICGSTAB : public SolverBase<ValueType, IndexType>
+  class SolverBicgstab : public SolverBase<ValueType, IndexType>
   {
   public:
     /**
@@ -274,30 +277,30 @@ namespace GinkgoWrappers
      * Constructor.
      *
      * @p solver_control The solver control object is then used to set the
-     * parameters and setup the BICGSTAB solver from the BICGSTAB factory which
+     * parameters and setup the Bicgstab solver from the Bicgstab factory which
      * solves the linear system.
      *
-     * @p exec_type The execution paradigm for the BICGSTAB solver.
+     * @p exec_type The execution paradigm for the Bicgstab solver.
      */
-    SolverBICGSTAB(SolverControl &       solver_control,
-                   std::string           exec_type,
+    SolverBicgstab(SolverControl &       solver_control,
+                   const std::string &   exec_type,
                    const AdditionalData &data = AdditionalData());
 
     /**
      * Constructor.
      *
      * @p solver_control The solver control object is then used to set the
-     * parameters and setup the BICGSTAB solver from the BICGSTAB factory which
+     * parameters and setup the Bicgstab solver from the Bicgstab factory which
      * solves the linear system.
      *
-     * @p exec_type The execution paradigm for the BICGSTAB solver.
+     * @p exec_type The execution paradigm for the Bicgstab solver.
      *
      * @p preconditioner The preconditioner for the solver.
      */
-    SolverBICGSTAB(SolverControl &                    solver_control,
-                   std::string                        exec_type,
-                   std::shared_ptr<gko::LinOpFactory> preconditioner,
-                   const AdditionalData &             data = AdditionalData());
+    SolverBicgstab(SolverControl &                           solver_control,
+                   const std::string &                       exec_type,
+                   const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+                   const AdditionalData &data = AdditionalData());
 
   protected:
     /**
@@ -331,7 +334,7 @@ namespace GinkgoWrappers
      * @p exec_type The execution paradigm for the CGS solver.
      */
     SolverCGS(SolverControl &       solver_control,
-              std::string           exec_type,
+              const std::string &   exec_type,
               const AdditionalData &data = AdditionalData());
 
     /**
@@ -345,10 +348,10 @@ namespace GinkgoWrappers
      *
      * @p preconditioner The preconditioner for the solver.
      */
-    SolverCGS(SolverControl &                    solver_control,
-              std::string                        exec_type,
-              std::shared_ptr<gko::LinOpFactory> preconditioner,
-              const AdditionalData &             data = AdditionalData());
+    SolverCGS(SolverControl &                           solver_control,
+              const std::string &                       exec_type,
+              const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+              const AdditionalData &data = AdditionalData());
 
   protected:
     /**
@@ -382,7 +385,7 @@ namespace GinkgoWrappers
      * @p exec_type The execution paradigm for the FCG solver.
      */
     SolverFCG(SolverControl &       solver_control,
-              std::string           exec_type,
+              const std::string &   exec_type,
               const AdditionalData &data = AdditionalData());
 
     /**
@@ -396,10 +399,10 @@ namespace GinkgoWrappers
      *
      * @p preconditioner The preconditioner for the solver.
      */
-    SolverFCG(SolverControl &                    solver_control,
-              std::string                        exec_type,
-              std::shared_ptr<gko::LinOpFactory> preconditioner,
-              const AdditionalData &             data = AdditionalData());
+    SolverFCG(SolverControl &                           solver_control,
+              const std::string &                       exec_type,
+              const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+              const AdditionalData &data = AdditionalData());
 
   protected:
     /**
@@ -444,7 +447,7 @@ namespace GinkgoWrappers
      * @p exec_type The execution paradigm for the GMRES solver.
      */
     SolverGMRES(SolverControl &       solver_control,
-                std::string           exec_type,
+                const std::string &   exec_type,
                 const AdditionalData &data = AdditionalData());
 
     /**
@@ -458,10 +461,10 @@ namespace GinkgoWrappers
      *
      * @p preconditioner The preconditioner for the solver.
      */
-    SolverGMRES(SolverControl &                    solver_control,
-                std::string                        exec_type,
-                std::shared_ptr<gko::LinOpFactory> preconditioner,
-                const AdditionalData &             data = AdditionalData());
+    SolverGMRES(SolverControl &                           solver_control,
+                const std::string &                       exec_type,
+                const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+                const AdditionalData &data = AdditionalData());
 
   protected:
     /**
@@ -495,7 +498,7 @@ namespace GinkgoWrappers
      * @p exec_type The execution paradigm for the IR solver.
      */
     SolverIR(SolverControl &       solver_control,
-             std::string           exec_type,
+             const std::string &   exec_type,
              const AdditionalData &data = AdditionalData());
 
     /**
@@ -509,10 +512,10 @@ namespace GinkgoWrappers
      *
      * @p inner_solver The Inner solver for the IR solver.
      */
-    SolverIR(SolverControl &                    solver_control,
-             std::string                        exec_type,
-             std::shared_ptr<gko::LinOpFactory> inner_solver,
-             const AdditionalData &             data = AdditionalData());
+    SolverIR(SolverControl &                           solver_control,
+             const std::string &                       exec_type,
+             const std::shared_ptr<gko::LinOpFactory> &inner_solver,
+             const AdditionalData &                    data = AdditionalData());
 
   protected:
     /**

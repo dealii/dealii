@@ -69,7 +69,7 @@ main(int argc, char **argv)
                          .on(exec))
         .on(exec);
     GinkgoWrappers::SolverCG<>       cg_solver(control, executor);
-    GinkgoWrappers::SolverBICGSTAB<> bicgstab_solver(control, executor);
+    GinkgoWrappers::SolverBicgstab<> bicgstab_solver(control, executor);
     GinkgoWrappers::SolverCGS<>      cgs_solver(control, executor);
     GinkgoWrappers::SolverFCG<>      fcg_solver(control, executor);
     GinkgoWrappers::SolverGMRES<>    gmres_solver(control, executor);
