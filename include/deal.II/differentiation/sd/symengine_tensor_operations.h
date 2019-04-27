@@ -367,6 +367,44 @@ namespace Differentiation
     //@}
 
     /**
+     * @name Symbol substitution map creation
+     */
+    //@{
+
+    /**
+     * Return a substitution map that has the entry keys given by the
+     * @p symbol_tensor and the values given by the @p value_tensor. It is
+     * expected that all key entries be valid symbols or symbolic expressions.
+     *
+     * It is possible to map symbolic types to other symbolic types
+     * using this function. For more details on this, see the other
+     * \ref make_substitution_map(const Expression &,const ValueType &)
+     * function.
+     */
+    template <int rank, int dim, typename ValueType>
+    types::substitution_map
+    make_substitution_map(const Tensor<rank, dim, Expression> &symbol_tensor,
+                          const Tensor<rank, dim, ValueType> & value_tensor);
+
+    /**
+     * Return a substitution map that has the entry keys given by the
+     * @p symbol_tensor and the values given by the @p value_tensor. It is
+     * expected that all key entries be valid symbols or symbolic expressions.
+     *
+     * It is possible to map symbolic types to other symbolic types
+     * using this function. For more details on this, see the other
+     * \ref make_substitution_map(const Expression &,const ValueType &)
+     * function.
+     */
+    template <int rank, int dim, typename ValueType>
+    types::substitution_map
+    make_substitution_map(
+      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> & value_tensor);
+
+    //@}
+
+    /**
      * @name Symbol substitution map enlargement
      */
     //@{
@@ -808,6 +846,32 @@ namespace Differentiation
                   const Tensor<rank_2, dim, Expression> &         op)
     {
       return internal::tensor_diff_tensor(symbol_tensor, op);
+    }
+
+
+    /* ---------------- Symbolic substitution map creation --------------*/
+
+
+    template <int rank, int dim, typename ValueType>
+    types::substitution_map
+    make_substitution_map(const Tensor<rank, dim, Expression> &symbol_tensor,
+                          const Tensor<rank, dim, ValueType> & value_tensor)
+    {
+      types::substitution_map substitution_map;
+      add_to_substitution_map(substitution_map, symbol_tensor, value_tensor);
+      return substitution_map;
+    }
+
+
+    template <int rank, int dim, typename ValueType>
+    types::substitution_map
+    make_substitution_map(
+      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> & value_tensor)
+    {
+      types::substitution_map substitution_map;
+      add_to_substitution_map(substitution_map, symbol_tensor, value_tensor);
+      return substitution_map;
     }
 
 
