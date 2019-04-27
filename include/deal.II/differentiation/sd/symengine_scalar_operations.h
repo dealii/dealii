@@ -217,9 +217,6 @@ namespace Differentiation
      *         this scenario, for convenience, one could set
      *         @p ignore_invalid_symbols to <tt>true</tt> and these zero-valued
      *         entries would be skipped over and ignored.
-     *
-     * @note In this function, the @p ValueType is somewhat arbitrary as
-     * it is only used to create dummy values.
      */
     template <bool ignore_invalid_symbols = false>
     void
@@ -328,9 +325,9 @@ namespace Differentiation
      * data to the map in the following way:
      *
      * @code
-     *   types::substitution_map symbol_value_map = ...;
+     *   types::substitution_map substitution_map = ...;
      *   add_to_substitution_map(
-     *     symbol_value_map,
+     *     substitution_map,
      *     std::make_pair(Tensor<1,dim,Expression>(...),
      *                    Tensor<1,dim,double>(...))
      *   );
@@ -366,12 +363,12 @@ namespace Differentiation
      * data to the map in the following way:
      *
      * @code
-     *   types::substitution_map symbol_value_map = ...;
+     *   types::substitution_map substitution_map = ...;
      *   using vector_entry_t = std::vector<std::pair<
      *     Tensor<1,dim,Expression>, Tensor<1,dim,double>
      *   >>;
      *   add_to_substitution_map(
-     *     symbol_value_map,
+     *     substitution_map,
      *     vector_entry_t{
      *       {Tensor<1,dim,Expression>(...), Tensor<1,dim,double>(...)},
      *       {Tensor<1,dim,Expression>(...), Tensor<1,dim,double>(...)}
@@ -410,9 +407,9 @@ namespace Differentiation
      * the pair types. An example may be as follows:
      *
      * @code
-     *   types::substitution_map symbol_value_map = ...;
+     *   types::substitution_map substitution_map = ...;
      *   add_to_substitution_map(
-     *     symbol_value_map,
+     *     substitution_map,
      *     std::make_pair(Expression(...), 3),
      *     std::make_pair(Tensor<1,dim,Expression>(...),
      *                    Tensor<1,dim,float>(...)),
@@ -422,7 +419,7 @@ namespace Differentiation
      *
      * It is possible to map symbolic types to other symbolic types
      * using this function. For more details on this, see the other
-     * \ref make_symbol_value_map(const Expression &,const ValueType &)
+     * \ref make_substitution_map(const Expression &,const ValueType &)
      * function.
      */
     template <bool ignore_invalid_symbols = false,
