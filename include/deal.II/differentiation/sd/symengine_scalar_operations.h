@@ -153,6 +153,123 @@ namespace Differentiation
     //@}
 
     /**
+     * @name Symbol substitution map creation
+     */
+    //@{
+
+    /**
+     * Return a substitution map that has the entry key given by @p symbol
+     * and the value given by @p value. It is expected that the key entry
+     * be valid symbol or symbolic expression.
+     *
+     * The values that map to a @p symbol would typically be of an arithmetic
+     * type. However, in some instances is may be useful to map a symbolic type
+     * to another symbolic type (i.e. perform partial substitution). In such
+     * a situation the resolve_explicit_dependencies() function may be useful
+     * to simplify the final substitution map by resolving all explicit
+     * interdependencies between entries in the substitution map.
+     */
+    types::substitution_map
+    make_substitution_map(const Expression &symbol, const Expression &value);
+
+    /**
+     * Return a substitution map that has the entry key given by @p symbol
+     * and the value given by @p value. It is expected that the key entry
+     * be valid symbol or symbolic expression.
+     *
+     * The values that map to a @p symbol would typically be of a @p ValueType
+     * (i.e., an arithmetic type).
+     * However, in some instances is may be useful to map a symbolic type
+     * to another symbolic type (i.e. perform partial substitution). In such
+     * a situation the resolve_explicit_dependencies() function may be useful
+     * to simplify the final substitution map by resolving all explicit
+     * interdependencies between entries in the substitution map.
+     */
+    template <typename ExpressionType = SD::Expression, typename ValueType>
+    types::substitution_map
+    make_substitution_map(const ExpressionType &symbol, const ValueType &value);
+
+    /**
+     * Return a substitution map that has the entry keys given by @p symbols
+     * and the values given by @p values. It is expected that all key entries
+     * be valid symbols or symbolic expressions.
+     *
+     * It is possible to map symbolic types to other symbolic types
+     * using this function. For more details on this, see the other
+     * \ref make_substitution_map(const Expression &,const ValueType &)
+     * function.
+     */
+    template <typename ExpressionType = SD::Expression, typename ValueType>
+    types::substitution_map
+    make_substitution_map(const std::vector<ExpressionType> &symbols,
+                          const std::vector<ValueType> &     values);
+
+    /**
+     * Return a substitution map that has the key given by the first entry in
+     * @p symbol_value, and the value of its second entry. It is expected that
+     * the key entry be a valid symbol or symbolic expression.
+     *
+     * It is possible to map symbolic types to other symbolic types
+     * using this function. For more details on this, see the other
+     * \ref make_substitution_map(const Expression &,const ValueType &)
+     * function.
+     */
+    template <typename ExpressionType = SD::Expression, typename ValueType>
+    types::substitution_map
+    make_substitution_map(
+      const std::pair<ExpressionType, ValueType> &symbol_value);
+
+    /**
+     * Return a substitution map that has the keys given by the first entry of
+     * each element of @p symbol_values, and the values given its second entry.
+     * It is expected that all key entries be valid symbols or symbolic
+     * expressions.
+     *
+     * It is possible to map symbolic types to other symbolic types
+     * using this function. For more details on this, see the other
+     * \ref make_substitution_map(const Expression &,const ValueType &)
+     * function.
+     */
+    template <typename ExpressionType = SD::Expression, typename ValueType>
+    types::substitution_map
+    make_substitution_map(
+      const std::vector<std::pair<ExpressionType, ValueType>> &symbol_values);
+
+    /**
+     * Return a substitution map that has the key given by the first entry in
+     * @p symbol_value, and the value of its second entry, followed by the
+     * addition of the @p other_symbol_values. It is expected that all key
+     * entries be valid symbols or symbolic expressions.
+     *
+     * With this function it is possible to construct a symbolic substitution
+     * map from different types, so long as there exists a
+     * add_to_substitution_map() function with the signature corresponding to
+     * the pair types. An example may be as follows:
+     *
+     * @code
+     *   const types::substitution_map substitution_map
+     *     = make_substitution_map(
+     *         std::make_pair(Expression(...), 3),
+     *         std::make_pair(Tensor<1,dim,Expression>(...),
+     *                        Tensor<1,dim,float>(...)),
+     *         std::make_pair(SymmetricTensor<2,dim,Expression>(...),
+     *                        SymmetricTensor<2,dim,double>(...)));
+     * @endcode
+     *
+     * It is possible to map symbolic types to other symbolic types
+     * using this function. For more details on this, see the other
+     * \ref make_substitution_map(const Expression &,const ValueType &)
+     * function.
+     */
+    template <typename SymbolicType, typename ValueType, typename... Args>
+    types::substitution_map
+    make_substitution_map(
+      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const Args &... other_symbol_values);
+
+    //@}
+
+    /**
      * @name Symbolic substitution map enlargement
      */
     //@{
@@ -487,6 +604,66 @@ namespace Differentiation
 {
   namespace SD
   {
+    /* ---------------- Symbolic substitution map creation --------------*/
+
+
+    template <typename ValueType>
+    types::substitution_map
+    make_substitution_map(const Expression &symbol, const ValueType &value)
+    {
+      types::substitution_map substitution_map;
+      add_to_substitution_map(substitution_map, symbol, value);
+      return substitution_map;
+    }
+
+
+    template <typename ExpressionType, typename ValueType>
+    types::substitution_map
+    make_substitution_map(const std::vector<ExpressionType> &symbols,
+                          const std::vector<ValueType> &     values)
+    {
+      types::substitution_map substitution_map;
+      add_to_substitution_map(substitution_map, symbols, values);
+      return substitution_map;
+    }
+
+
+    template <typename ExpressionType, typename ValueType>
+    types::substitution_map
+    make_substitution_map(
+      const std::pair<ExpressionType, ValueType> &symbol_value)
+    {
+      types::substitution_map substitution_map;
+      add_to_substitution_map(substitution_map, symbol_value);
+      return substitution_map;
+    }
+
+
+    template <typename ExpressionType, typename ValueType>
+    types::substitution_map
+    make_substitution_map(
+      const std::vector<std::pair<ExpressionType, ValueType>> &symbol_values)
+    {
+      types::substitution_map substitution_map;
+      add_to_substitution_map(substitution_map, symbol_values);
+      return substitution_map;
+    }
+
+
+    template <typename SymbolicType, typename ValueType, typename... Args>
+    types::substitution_map
+    make_substitution_map(
+      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const Args &... other_symbol_values)
+    {
+      types::substitution_map substitution_map;
+      add_to_substitution_map(substitution_map,
+                              symbol_value,
+                              other_symbol_values...);
+      return substitution_map;
+    }
+
+
     /* ---------------- Symbolic substitution map enlargement --------------*/
 
     namespace internal
