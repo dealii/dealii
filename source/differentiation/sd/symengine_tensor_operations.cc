@@ -38,24 +38,23 @@ namespace Differentiation
 
     namespace internal
     {
+      template <int dim>
+      TableIndices<4>
+      make_rank_4_tensor_indices(const unsigned int &idx_i,
+                                 const unsigned int &idx_j)
+      {
+        const TableIndices<2> indices_i(
+          SymmetricTensor<2, dim>::unrolled_to_component_indices(idx_i));
+        const TableIndices<2> indices_j(
+          SymmetricTensor<2, dim>::unrolled_to_component_indices(idx_j));
+        return TableIndices<4>(indices_i[0],
+                               indices_i[1],
+                               indices_j[0],
+                               indices_j[1]);
+      }
+
       namespace
       {
-        template <int dim>
-        TableIndices<4>
-        make_rank_4_tensor_indices(const unsigned int &idx_i,
-                                   const unsigned int &idx_j)
-        {
-          const TableIndices<2> indices_i(
-            SymmetricTensor<2, dim>::unrolled_to_component_indices(idx_i));
-          const TableIndices<2> indices_j(
-            SymmetricTensor<2, dim>::unrolled_to_component_indices(idx_j));
-          return TableIndices<4>(indices_i[0],
-                                 indices_i[1],
-                                 indices_j[0],
-                                 indices_j[1]);
-        }
-
-
         template <int rank>
         std::string
         make_index_string(const TableIndices<rank> &indices)
