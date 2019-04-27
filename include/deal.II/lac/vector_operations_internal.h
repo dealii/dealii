@@ -2363,7 +2363,7 @@ namespace internal
         cudaError_t error_code =
           cudaMalloc(&result_device, size * sizeof(Number));
         AssertCuda(error_code);
-        error_code = cudaMemset(result_device, Number(), sizeof(Number));
+        error_code = cudaMemset(result_device, 0, sizeof(Number));
 
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::double_vector_reduction<
@@ -2414,7 +2414,7 @@ namespace internal
         Number *    result_device;
         cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
         AssertCuda(error_code);
-        error_code = cudaMemset(result_device, Number(), sizeof(Number));
+        error_code = cudaMemset(result_device, 0, sizeof(Number));
 
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
@@ -2451,7 +2451,7 @@ namespace internal
         Number *    result_device;
         cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
         AssertCuda(error_code);
-        error_code = cudaMemset(result_device, Number(), sizeof(Number));
+        error_code = cudaMemset(result_device, 0, sizeof(Number));
 
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
@@ -2501,7 +2501,7 @@ namespace internal
         Number *    res_d;
         cudaError_t error_code = cudaMalloc(&res_d, sizeof(Number));
         AssertCuda(error_code);
-        error_code = cudaMemset(res_d, 0., sizeof(Number));
+        error_code = cudaMemset(res_d, 0, sizeof(Number));
         AssertCuda(error_code);
 
         const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);

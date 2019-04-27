@@ -313,7 +313,7 @@ namespace LinearAlgebra
       cudaError_t error_code =
         cudaMalloc(&result_device, n_elements * sizeof(Number));
       AssertCuda(error_code);
-      error_code = cudaMemset(result_device, Number(), sizeof(Number));
+      error_code = cudaMemset(result_device, 0, sizeof(Number));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::double_vector_reduction<Number, kernel::DotProduct<Number>>
@@ -540,7 +540,7 @@ namespace LinearAlgebra
       Number *    result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
       AssertCuda(error_code);
-      error_code = cudaMemset(result_device, Number(), sizeof(Number));
+      error_code = cudaMemset(result_device, 0, sizeof(Number));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::reduction<Number, kernel::ElemSum<Number>>
@@ -571,7 +571,7 @@ namespace LinearAlgebra
       Number *    result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
       AssertCuda(error_code);
-      error_code = cudaMemset(result_device, Number(), sizeof(Number));
+      error_code = cudaMemset(result_device, 0, sizeof(Number));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::reduction<Number, kernel::L1Norm<Number>>
@@ -619,7 +619,7 @@ namespace LinearAlgebra
       Number *    result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
       AssertCuda(error_code);
-      error_code = cudaMemset(result_device, Number(), sizeof(Number));
+      error_code = cudaMemset(result_device, 0, sizeof(Number));
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
       kernel::reduction<Number, kernel::LInfty<Number>>
@@ -667,7 +667,7 @@ namespace LinearAlgebra
       Number *    result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
       AssertCuda(error_code);
-      error_code = cudaMemset(result_device, 0., sizeof(Number));
+      error_code = cudaMemset(result_device, 0, sizeof(Number));
       AssertCuda(error_code);
 
       const int n_blocks = 1 + (n_elements - 1) / (chunk_size * block_size);
