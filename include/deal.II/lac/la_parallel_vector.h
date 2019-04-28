@@ -43,13 +43,10 @@ namespace LinearAlgebra
     template <typename>
     class BlockVector;
   }
-} // namespace LinearAlgebra
 
-namespace LinearAlgebra
-{
   template <typename>
   class ReadWriteVector;
-}
+} // namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
