@@ -866,8 +866,9 @@ namespace CUDAWrappers
       return internal::get_conflict_indices<dim, Number>(filter, constraints);
     };
 
-    std::vector<std::vector<CellFilter>> graph =
-      GraphColoring::make_graph_coloring(begin, end, fun);
+    std::vector<std::vector<CellFilter>> graph;
+    if (begin != end)
+      graph = GraphColoring::make_graph_coloring(begin, end, fun);
     n_colors = graph.size();
 
     helper.setup_color_arrays(n_colors);
@@ -893,9 +894,10 @@ namespace CUDAWrappers
       }
 
     // Setup row starts
-    row_start[0] = 0;
-    for (unsigned int i = 0; i < n_colors - 1; ++i)
-      row_start[i + 1] = row_start[i] + n_cells[i] * get_padding_length();
+    if (n_colors > 0)
+      row_start[0] = 0;
+    for (unsigned int i = 1; i < n_colors; ++i)
+      row_start[i] = row_start[i - 1] + n_cells[i - 1] * get_padding_length();
 
     // Constrained indices
     n_constrained_dofs = constraints.n_constraints();

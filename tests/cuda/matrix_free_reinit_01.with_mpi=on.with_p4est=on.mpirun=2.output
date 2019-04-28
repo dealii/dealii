@@ -1,0 +1,13 @@
+
+DEAL:0:0::locally owned dofs :
+{[0,8]}
+DEAL:0:0::locally relevant dofs :
+{[0,8]}
+DEAL:0:0::OK
+
+DEAL:1:1::locally owned dofs :
+{}
+DEAL:1:1::locally relevant dofs :
+{}
+DEAL:1:1::OK
+
