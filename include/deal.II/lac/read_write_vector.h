@@ -107,7 +107,7 @@ namespace LinearAlgebra
    *
    * <h3>Storing elements</h3> Most of the time, one will simply read from or
    * write into a vector of the current class using the global numbers of
-   * these degrees of freedom. This is done using operator() or operator[]
+   * these degrees of freedom. This is done using operator()() or operator[]()
    * which call global_to_local() to transform the <i>global</i> index into a
    * <i>local</i> one. In such cases, it is clear that one can only access
    * elements of the vector that the current object indeed stores.
@@ -120,7 +120,7 @@ namespace LinearAlgebra
    * function. To this end, it is necessary to know <i>in which order</i> the
    * current class stores its element. The elements of all the consecutive
    * ranges are stored in ascending order of the first index of each range.
-   * The function largest_range_starting_index() of IndexSet can be used to
+   * The function IndexSet::largest_range_starting_index() can be used to
    * get the first index of the largest range.
    *
    * @author Bruno Turcksin, 2015.
