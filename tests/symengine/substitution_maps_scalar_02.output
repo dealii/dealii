@@ -1,0 +1,14 @@
+
+DEAL:2 maps::x2 = 2
+x1 = 1
+
+DEAL:Multiple maps::x2 = 2
+x1 = 1
+x4 = 4
+x3 = 3
+x5 = 5
+
+DEAL:Const maps::x2 = 2
+x1 = 1
+
+DEAL:Const maps::OK
