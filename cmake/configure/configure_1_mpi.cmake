@@ -42,6 +42,17 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   ENDIF()
 ENDMACRO()
 
+MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL)
+
+  #
+  # TODO: We might consider refactoring this option into an automatic check
+  # (in Modules/FindMPI.cmake) at some point. For the time being this is an
+  # advanced configuration option.
+  #
+  OPTION(DEAL_II_MPI_WITH_CUDA_SUPPORT "Enable MPI Cuda support" OFF)
+  MARK_AS_ADVANCED(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+ENDMACRO()
+
 MACRO(FEATURE_MPI_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find any suitable mpi library!\n"
@@ -61,3 +72,12 @@ ENDMACRO()
 
 
 CONFIGURE_FEATURE(MPI)
+
+
+IF(NOT DEAL_II_WITH_MPI)
+  #
+  # Disable and hide the DEAL_II_MPI_WITH_CUDA_SUPPORT option
+  #
+  SET(DEAL_II_MPI_WITH_CUDA_SUPPORT)
+  UNSET(DEAL_II_MPI_WITH_CUDA_SUPPORT CACHE)
+ENDIF()
