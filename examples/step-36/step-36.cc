@@ -237,7 +237,7 @@ namespace Step36
   template <int dim>
   void EigenvalueProblem<dim>::assemble_system()
   {
-    QGauss<dim> quadrature_formula(2);
+    QGauss<dim> quadrature_formula(fe.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,

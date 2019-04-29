@@ -269,7 +269,7 @@ void Step6<dim>::setup_system()
 template <int dim>
 void Step6<dim>::assemble_system()
 {
-  const QGauss<dim> quadrature_formula(3);
+  const QGauss<dim> quadrature_formula(fe.degree + 1);
 
   FEValues<dim> fe_values(fe,
                           quadrature_formula,
@@ -422,7 +422,7 @@ void Step6<dim>::refine_grid()
 
   KellyErrorEstimator<dim>::estimate(
     dof_handler,
-    QGauss<dim - 1>(3),
+    QGauss<dim - 1>(fe.degree + 1),
     std::map<types::boundary_id, const Function<dim> *>(),
     solution,
     estimated_error_per_cell);

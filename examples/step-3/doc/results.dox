@@ -192,7 +192,7 @@ suggestions:
   @code
     std::cout << "Mean value: "
               << VectorTools::compute_mean_value (dof_handler,
-						  QGauss<2>(3),
+						  QGauss<2>(fe.degree + 1),
 						  solution,
 						  0)
               << std::endl;

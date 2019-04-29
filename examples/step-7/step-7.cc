@@ -541,8 +541,8 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::assemble_system()
   {
-    QGauss<dim>     quadrature_formula(3);
-    QGauss<dim - 1> face_quadrature_formula(3);
+    QGauss<dim>     quadrature_formula(fe->degree + 1);
+    QGauss<dim - 1> face_quadrature_formula(fe->degree + 1);
 
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();
@@ -797,7 +797,7 @@ namespace Step7
 
             KellyErrorEstimator<dim>::estimate(
               dof_handler,
-              QGauss<dim - 1>(3),
+              QGauss<dim - 1>(fe->degree + 1),
               std::map<types::boundary_id, const Function<dim> *>(),
               solution,
               estimated_error_per_cell);
@@ -853,7 +853,7 @@ namespace Step7
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(3),
+                                      QGauss<dim>(fe->degree + 1),
                                       VectorTools::L2_norm);
     const double L2_error =
       VectorTools::compute_global_error(triangulation,
@@ -871,7 +871,7 @@ namespace Step7
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(3),
+                                      QGauss<dim>(fe->degree + 1),
                                       VectorTools::H1_seminorm);
     const double H1_error =
       VectorTools::compute_global_error(triangulation,
@@ -883,8 +883,9 @@ namespace Step7
     // points. Since this depends quite sensitively on the quadrature rule
     // being used, and since we would like to avoid false results due to
     // super-convergence effects at some points, we use a special quadrature
-    // rule that is obtained by iterating the trapezoidal rule five times in
-    // each space direction. Note that the constructor of the QIterated class
+    // rule that is obtained by iterating the trapezoidal rule by the degree of
+    // of the finite element times two plus one in each space direction.
+    // Note that the constructor of the QIterated class
     // takes a one-dimensional quadrature rule and a number that tells it how
     // often it shall use this rule in each space direction.
     //
@@ -893,7 +894,7 @@ namespace Step7
     // from the L infinity errors on each cell with a call to
     // VectorTools::compute_global_error.
     const QTrapez<1>     q_trapez;
-    const QIterated<dim> q_iterated(q_trapez, 5);
+    const QIterated<dim> q_iterated(q_trapez, fe->degree * 2 + 1);
     VectorTools::integrate_difference(dof_handler,
                                       solution,
                                       Solution<dim>(),

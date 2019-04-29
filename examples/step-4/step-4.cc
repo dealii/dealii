@@ -308,7 +308,7 @@ void Step4<dim>::setup_system()
 template <int dim>
 void Step4<dim>::assemble_system()
 {
-  QGauss<dim> quadrature_formula(2);
+  QGauss<dim> quadrature_formula(fe.degree + 1);
 
   // We wanted to have a non-constant right hand side, so we use an object of
   // the class declared above to generate the necessary data. Since this right
