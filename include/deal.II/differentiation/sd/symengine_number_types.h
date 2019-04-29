@@ -345,7 +345,7 @@ namespace Differentiation
        * This constructor initializes a symbolic type with a string
        * representing its symbolic value.
        * If the @p parse_as_expression flag is <tt>false</tt>, then the
-       * @p symb_expr (potentially composed of mulitple characters) will be
+       * @p symb_expr (potentially composed of multiple characters) will be
        * interpreted as a single symbol.
        * If the @p parse_as_expression flag is <tt>true</tt>, then the
        * @p symb_expr will be parsed as a symbolic expression (potentially

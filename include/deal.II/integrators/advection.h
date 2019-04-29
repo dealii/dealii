@@ -373,7 +373,7 @@ namespace LocalIntegrators
      * Here, the numerical flux $\widehat u$ is the upwind value at the face,
      * namely the finite element function whose values are given in the
      * argument `input` on the outflow boundary. On the inflow boundary, it is
-     * the inhomogenous boundary value in the argument `data`.
+     * the inhomogeneous boundary value in the argument `data`.
      *
      * The <tt>velocity</tt> is provided as an ArrayView, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must
@@ -440,7 +440,7 @@ namespace LocalIntegrators
      * Here, the numerical flux $\widehat u$ is the upwind value at the face,
      * namely the finite element function whose values are given in the
      * argument `input` on the outflow boundary. On the inflow boundary, it is
-     * the inhomogenous boundary value in the argument `data`.
+     * the inhomogeneous boundary value in the argument `data`.
      *
      * The <tt>velocity</tt> is provided as an ArrayView, having <tt>dim</tt>
      * vectors, one for each velocity component. Each of the vectors must

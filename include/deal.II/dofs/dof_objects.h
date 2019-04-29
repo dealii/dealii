@@ -56,7 +56,7 @@ namespace internal
      * associated with vertices are not stored in the DoFObjects classes but
      * rather in the DoFHandler::vertex_dofs array.
      *
-     * The DoFObjects classes are not used directly, but objects of theses
+     * The DoFObjects classes are not used directly, but objects of these
      * classes are included in the DoFLevel and DoFFaces classes.
      *
      * @ingroup dofs

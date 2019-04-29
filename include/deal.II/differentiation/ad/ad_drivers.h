@@ -368,7 +368,7 @@ namespace Differentiation
       reset(const bool clear_registered_tapes);
 
       /**
-       * Print the status of all queriable data. Exactly what is printed and
+       * Print the status of all queryable data. Exactly what is printed and
        * its format depends on the @p ad_type, as is determined by the
        * @p ADNumberTypeCode template parameter.
        *

@@ -557,7 +557,7 @@ def main():
                     routines.append(FortranRoutine(file_name, guard_fp))
                 except NotImplementedError:
                     # not a lot we can do. If its in the whitelist we will fail
-                    # again later anway
+                    # again later anyway
                     continue
             routines.sort(key=lambda u: u.general_name)
 

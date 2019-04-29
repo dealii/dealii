@@ -18,7 +18,7 @@
 // We check if active_fe_indices are set correctly
 // before and after coarsening and refinement.
 //
-// We use a parallel::share::Triangulation that allows artifical cells.
+// We use a parallel::share::Triangulation that allows artificial cells.
 //
 // This test is inspired by 'mpi/hp_active_fe_indices_transfer_01.cc'.
 

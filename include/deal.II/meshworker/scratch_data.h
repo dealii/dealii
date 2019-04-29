@@ -76,7 +76,7 @@ namespace MeshWorker
    *
    * Similarly, the methods in @ref NeighborCellMethods initialize on demand
    * (different) internal FEValues, FEFaceValues, and FESubfaceValues, on
-   * neighbor cells, allowing the use of this class aslo as a single substitute
+   * neighbor cells, allowing the use of this class also as a single substitute
    * for the additional three objects you would typically need to integrate on
    * the neighbor cell, and on its faces and subfaces (for example, in
    * discontinuous Galerkin methods).

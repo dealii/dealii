@@ -1022,7 +1022,7 @@ namespace Functions
     const unsigned int selected;
 
     /**
-     * Flag that controls wether we rescale the value when the radius changes.
+     * Flag that controls whether we rescale the value when the radius changes.
      */
     bool integrate_to_one;
 
@@ -1070,7 +1070,7 @@ namespace Functions
       const bool         integrate_to_one = false);
 
     /**
-     * Initialize the class with an objet of type
+     * Initialize the class with an object of type
      * @tparam CutOffFunctionBaseType<1>.
      */
     template <template <int> class CutOffFunctionBaseType>

@@ -1187,7 +1187,7 @@ public:
   {
     /**
      * A data type in which we store the list of entries that make up the
-     * homogenous part of a constraint.
+     * homogeneous part of a constraint.
      */
     using Entries = std::vector<std::pair<size_type, number>>;
 

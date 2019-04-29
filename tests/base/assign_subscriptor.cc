@@ -93,7 +93,7 @@ main()
   }
 
   {
-    deallog << "Checking move assignement" << std::endl;
+    deallog << "Checking move assignment" << std::endl;
 
     Subscriptor               subscriptor_1;
     Subscriptor               subscriptor_2;

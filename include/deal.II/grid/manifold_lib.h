@@ -465,7 +465,7 @@ private:
 
 /**
  * Elliptical manifold description derived from ChartManifold.
- * More informations on the elliptical coordinate system can be found
+ * More information on the elliptical coordinate system can be found
  * at <a
  * href="https://en.wikipedia.org/wiki/Elliptic_coordinate_system">Wikipedia
  * </a>.

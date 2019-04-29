@@ -601,7 +601,7 @@ namespace internal
       eig_vals_vecs[1].second /= eig_vals_vecs[1].second.norm();
 
       // If vectors are nearly linearly dependent, or if there might have
-      // been large cancelations in the calculation of A[i][i] - w[0], fall
+      // been large cancellations in the calculation of A[i][i] - w[0], fall
       // back to QL algorithm
       if (eig_vals_vecs[0].second * eig_vals_vecs[1].second > error)
         {

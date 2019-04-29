@@ -16,7 +16,7 @@
 
 // Test the correct handling of data members within the TensorProductManifold
 // class. The test generates a general hypercube grid and, in an inner scope,
-// attempts to assign a TensorProductManifold to it. The test is succesfull if
+// attempts to assign a TensorProductManifold to it. The test is successful if
 // it terminates without subscriptor errors or memory leaks.
 
 #include <deal.II/grid/grid_generator.h>

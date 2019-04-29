@@ -101,7 +101,7 @@ namespace CUDAWrappers
     /**
      * Reference to the object that controls convergence of the iterative
      * solver. In fact, for these CUDA wrappers, cuSOLVER and cuSPARSE do so
-     * themselve, but we copy the data from this object before starting the
+     * themselves, but we copy the data from this object before starting the
      * solution process, and copy the data back into it afterwards.
      */
     SolverControl &solver_control;

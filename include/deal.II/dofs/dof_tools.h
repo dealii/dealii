@@ -160,7 +160,7 @@ namespace GridTools
  *
  * In some cases, one wants to only work with DoFs that sit on the boundary.
  * One application is, for example, if rather than interpolating non-
- * homogenous boundary values, one would like to project them. For this, we
+ * homogeneous boundary values, one would like to project them. For this, we
  * need two things: a way to identify nodes that are located on (parts of) the
  * boundary, and a way to build matrices out of only degrees of freedom that
  * are on the boundary (i.e. much smaller matrices, in which we do not even
@@ -899,7 +899,7 @@ namespace DoFTools
    * in ${\cal V}_1$ since by construction ${\cal V}_0 \subset {\cal V}_1$.
    * However, not every function in ${\cal V}_1$ can be expressed as a linear
    * combination of the shape functions of ${\cal V}_0$. The functions that
-   * can be represented lie in a homogenous subspace of ${\cal V}_1$ (namely,
+   * can be represented lie in a homogeneous subspace of ${\cal V}_1$ (namely,
    * ${\cal V}_0$, of course) and this subspace can be represented by a linear
    * constraint of the form $CV=0$ where $V$ is the vector of nodal values of
    * functions $v\in {\cal V}_1$. In other words, every function $v_h=\sum_j

@@ -60,7 +60,7 @@
  *   in the Mapping class (see the @ref mapping module), which however obtains
  *   its information about the boundary of the domain from the classes
  *   described here. The same is, of course, true when integrating boundary
- *   terms (e.g., inhomogenous Neumann boundary conditions).
+ *   terms (e.g., inhomogeneous Neumann boundary conditions).
  *
  *   <li> Domains with nonzero codimension: In cases where a Triangulation is
  *   embedded into a higher dimensional space, i.e., whenever the second

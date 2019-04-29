@@ -92,9 +92,9 @@ namespace NonMatching
                   boost::geometry::index::intersects(bbox),
                   std::back_inserter(out_vals));
                 // Each bounding box corresponds to an active cell
-                // of the imbedding triangulation: we now check if
-                // the current cell, of the imbedded triangulation,
-                // overlaps a locally owned cell of the imbedding one
+                // of the embedding triangulation: we now check if
+                // the current cell, of the embedded triangulation,
+                // overlaps a locally owned cell of the embedding one
                 for (const auto &bbox_it : out_vals)
                   if (bbox_it.second->is_locally_owned())
                     {

@@ -327,7 +327,7 @@ namespace LinearAlgebra
       trilinos_vector() const;
 
       /**
-       * Return a (modifyable) reference to the underlying Trilinos
+       * Return a (modifiable) reference to the underlying Trilinos
        * Tpetra::Vector class.
        */
       Tpetra::Vector<Number, int, types::global_dof_index> &

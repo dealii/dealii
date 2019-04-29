@@ -6,7 +6,7 @@ DEAL::
 DEAL::Checking copy construction
 DEAL::Checking smart_pointer_1
 DEAL::
-DEAL::Checking move assignement
+DEAL::Checking move assignment
 DEAL::Checking smart_pointer_1
 DEAL::ExcMessage("The object pointed to is not valid anymore.")
 DEAL::Checking smart_pointer_2

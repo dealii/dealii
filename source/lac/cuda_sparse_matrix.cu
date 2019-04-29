@@ -545,7 +545,7 @@ namespace CUDAWrappers
                                  row_ptr_dev.get(),
                                  row_sums.get_values());
 
-#  ifdef DEUG
+#  ifdef DEBUG
     // Check that the kernel was launched correctly
     AssertCuda(cudaGetLastError());
     // Check that there was no problem during the execution of the kernel

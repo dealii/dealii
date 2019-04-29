@@ -137,7 +137,7 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   matrix.reinit(dsp);
   vector.reinit(locally_owned_partitioning, mpi_communicator);
 
-  // Assemble system: Mass matrix and constrant RHS vector
+  // Assemble system: Mass matrix and constraint RHS vector
   FEValues<dim>      fe_values(fe,
                           quadrature_formula,
                           update_values | update_JxW_values);

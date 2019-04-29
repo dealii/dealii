@@ -88,7 +88,7 @@ be important in the considerations below.
 
 In this program, we will consider a test case where the exact pressure 
 is $p = \sin \left( \pi x\right)\sin\left(\pi y \right)$ on the unit square domain,
-with homogenous Dirichelet boundary conditions and $\mathbf{K}$ the identity matrix.
+with homogeneous Dirichelet boundary conditions and $\mathbf{K}$ the identity matrix.
 Then we will calculate $L_2$ errors of pressure, velocity, and flux.
 
 

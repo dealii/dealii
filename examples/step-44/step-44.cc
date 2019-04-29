@@ -2440,7 +2440,7 @@ namespace Step44
     // build non-homogeneous constraints in the zeroth iteration (that is, when
     // `apply_dirichlet_bc == true`) and build only the corresponding
     // homogeneous constraints in the following step. While the current
-    // example has only homogenous constraints, previous experiences have
+    // example has only homogeneous constraints, previous experiences have
     // shown that a common error is forgetting to add the extra condition when
     // refactoring the code to specific uses. This could lead errors that are
     // hard to debug. In this spirit, we choose to make the code more verbose

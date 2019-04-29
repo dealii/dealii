@@ -88,7 +88,7 @@ main(int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        // Standard intialiser...
+        // Standard initialiser...
         PETScWrappers::FullMatrix m(3, 3);
         test(m);
       }

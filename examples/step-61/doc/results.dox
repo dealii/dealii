@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-We run the test example $p = \sin(\pi x) \sin(\pi y)$ with homogenous Dirichelet 
+We run the test example $p = \sin(\pi x) \sin(\pi y)$ with homogeneous Dirichelet 
 boundary conditions in the domain $\Omega = (0,1)^2$. And  $\mathbf{K}$ is the 
 identity matrix. We test it on $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, $\mbox{WG}(Q_1,Q_1;RT_{[1]})$ 
 and $\mbox{WG}(Q_2,Q_2;RT_{[2]})$. We will visualize pressure values in interiors 

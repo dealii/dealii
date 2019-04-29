@@ -362,7 +362,7 @@ namespace Differentiation
       // the terminal, of the form
       // ADOL-C error: reading integer tape number 4!
       //               >>> File or directory not found! <<<
-      // , every time a query is made about a non-existant tape.
+      // , every time a query is made about a non-existent tape.
       // So either way we have to guard that check with something more
       // conervative so that we don't output useless messages for our users.
       const std::vector<typename Types<ADNumberType>::tape_index>
@@ -517,7 +517,7 @@ namespace Differentiation
       const auto it_status_tape = status.find(tape_index);
 
       // This tape's status has not been found in the map. This could be
-      // because a non-existant tape_index has been used as an argument, or
+      // because a non-existent tape_index has been used as an argument, or
       // because the tape exists but has not been used (in a way that
       // initiated a status update). For example, on can create a tape in one
       // section of code and then query the status of all existing tapes in a

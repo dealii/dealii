@@ -53,7 +53,7 @@ namespace Differentiation
      * For example, if the @p symbol is the string `"x"` then the scalar
      * symbolic variable that is returned represents the scalar $x$.
      *
-     * @param[in] symbol An indentifier (or name) for the returned symbolic
+     * @param[in] symbol An identifier (or name) for the returned symbolic
      *            variable.
      * @return A scalar symbolic variable with the name @p symbol.
      *
@@ -73,7 +73,7 @@ namespace Differentiation
      * symbolic variable `x` and the symbolic expression `y+z`, then the
      * generic symbolic function that is returned represents $f(x, y+z)$.
      *
-     * @param[in] symbol An indentifier (or name) for the returned symbolic
+     * @param[in] symbol An identifier (or name) for the returned symbolic
      *            function.
      * @param[in] arguments A vector of input arguments to the returned
      *            symbolic function.
@@ -98,7 +98,7 @@ namespace Differentiation
      * symbolic variable `x` and the symbolic expression `y+z`, then the
      * generic symbolic function that is returned represents $f(x, y+z)$.
      *
-     * @param[in] symbol An indentifier (or name) for the returned symbolic
+     * @param[in] symbol An identifier (or name) for the returned symbolic
      *            function.
      * @param[in] arguments A map of input arguments to the returned
      *            symbolic function.

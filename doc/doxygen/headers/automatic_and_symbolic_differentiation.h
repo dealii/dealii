@@ -96,7 +96,7 @@
  *    that, with the appropriate implementation, both first and second derivatives can be computed exactly.
  * -# With <em>taped</em> approaches, a specified subregion of code is selected as one for which all
  *    operations executed with active (marked) input variables are tracked and recorded in a data structure
- *    referred to as a tape. At the end of the taped region, the recorded function(s) may be revaluated
+ *    referred to as a tape. At the end of the taped region, the recorded function(s) may be reevaluated
  *    by "replaying" the tape with a different set of input variables instead of recomputing the function
  *    directly. Assuming that the taped region represents a smooth function, arbitrarily high-order
  *    derivatives of the function then can be computed by referring to the code path tracked and stored on
@@ -232,7 +232,7 @@
  * graph is required.
  *
  * In reverse-mode, the chain-rule is computed somewhat unnaturally from the "outside in". The
- * values of the dependent variables first get computed and fixed, and then the preceeding
+ * values of the dependent variables first get computed and fixed, and then the preceding
  * differential operations are evaluated and multiplied in succession with the previous results
  * from left to right. Again, if we encapsulate and fix the order of operations using parentheses,
  * this implies that the reverse calculation is performed by

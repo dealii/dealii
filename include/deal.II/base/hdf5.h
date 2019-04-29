@@ -954,7 +954,7 @@ namespace HDF5
     };
     /**
      * This constructor creates or opens a group depending on the value of
-     * @p mode. The group will be placed insided the group @p parent_group. The
+     * @p mode. The group will be placed inside the group @p parent_group. The
      * parameter @p mpi defines if the the I/O operations are serial or
      * parallel. This is an internal constructor, the functions open_group() and
      * create_group() of the current class should be used to open or create a
