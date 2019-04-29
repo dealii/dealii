@@ -172,6 +172,7 @@
 #cmakedefine DEAL_II_ARPACK_WITH_PARPACK
 
 /* cmake/modules/FindPETSC.cmake */
+#cmakedefine DEAL_II_PETSC_WITH_COMPLEX
 #cmakedefine DEAL_II_PETSC_WITH_HYPRE
 #cmakedefine DEAL_II_PETSC_WITH_MUMPS
 
