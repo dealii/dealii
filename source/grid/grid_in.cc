@@ -3563,19 +3563,18 @@ namespace
 
     AssertThrow(input_stream, ExcIO());
     std::string line;
-    std::getline(input_stream, line);
 
-    while (!input_stream.fail() && !input_stream.eof())
+    while (std::getline(input_stream, line))
       {
+      cont:
         std::transform(line.begin(), line.end(), line.begin(), ::toupper);
 
         if (line.compare("*HEADING") == 0 || line.compare(0, 2, "**") == 0 ||
             line.compare(0, 5, "*PART") == 0)
           {
             // Skip header and comments
-            while (!input_stream.fail() && !input_stream.eof())
+            while (std::getline(input_stream, line))
               {
-                std::getline(input_stream, line);
                 if (line[0] == '*')
                   goto cont; // My eyes, they burn!
               }
@@ -3589,9 +3588,8 @@ namespace
 
             // Contains lines in the form:
             // Index, x, y, z
-            while (!input_stream.fail() && !input_stream.eof())
+            while (std::getline(input_stream, line))
               {
-                std::getline(input_stream, line);
                 if (line[0] == '*')
                   goto cont;
 
@@ -3631,8 +3629,7 @@ namespace
             }
 
             // Read ELEMENT definition
-            std::getline(input_stream, line);
-            while (!input_stream.fail() && !input_stream.eof())
+            while (std::getline(input_stream, line))
               {
                 if (line[0] == '*')
                   goto cont;
@@ -3652,8 +3649,6 @@ namespace
                 // Overwrite cell index from file by material
                 cell[0] = static_cast<double>(material);
                 cell_list.push_back(cell);
-
-                std::getline(input_stream, line);
               }
           }
         else if (line.compare(0, 8, "*SURFACE") == 0)
@@ -3683,8 +3678,7 @@ namespace
             // definition of each "set" of faces that comprise the surface
             // These are either marked by an "S" or "E" in 3d or 2d
             // respectively.
-            std::getline(input_stream, line);
-            while (!input_stream.fail() && !input_stream.eof())
+            while (std::getline(input_stream, line))
               {
                 if (line[0] == '*')
                   goto cont;
@@ -3736,8 +3730,6 @@ namespace
 
                     face_list.push_back(quad_node_list);
                   }
-
-                std::getline(input_stream, line);
               }
           }
         else if (line.compare(0, 6, "*ELSET") == 0)
@@ -3819,8 +3811,7 @@ namespace
             else
               {
                 // Option (2)
-                std::getline(input_stream, line);
-                while (!input_stream.fail() && !input_stream.eof())
+                while (std::getline(input_stream, line))
                   {
                     if (line[0] == '*')
                       break;
@@ -3841,8 +3832,6 @@ namespace
 
                         elements.push_back(elid);
                       }
-
-                    std::getline(input_stream, line);
                   }
 
                 elsets_list[elset_name] = elements;
@@ -3853,9 +3842,8 @@ namespace
         else if (line.compare(0, 5, "*NSET") == 0)
           {
             // Skip nodesets; we have no use for them
-            while (!input_stream.fail() && !input_stream.eof())
+            while (std::getline(input_stream, line))
               {
-                std::getline(input_stream, line);
                 if (line[0] == '*')
                   goto cont;
               }
@@ -3891,11 +3879,6 @@ namespace
               }
           }
         // Note: All other lines / entries are ignored
-
-        std::getline(input_stream, line);
-
-      cont:
-        (void)0;
       }
   }
 
