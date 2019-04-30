@@ -2026,7 +2026,7 @@ namespace internal
                                                  ::dealii::MemorySpace::CUDA>
             &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::set<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), s, size);
 
@@ -2048,7 +2048,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(),
                                      1.,
@@ -2073,7 +2073,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(),
                                      -1.,
@@ -2097,7 +2097,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_add<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), a, size);
 
@@ -2120,7 +2120,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aV<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(),
                                      a,
@@ -2149,7 +2149,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_aVbW<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     a,
@@ -2177,7 +2177,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), 1., v_data.values_dev.get(), size);
@@ -2202,7 +2202,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(
             x, data.values_dev.get(), a, v_data.values_dev.get(), size);
@@ -2230,7 +2230,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::sadd<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(x,
                                                     data.values_dev.get(),
@@ -2257,7 +2257,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::vec_scale<Number>
           <<<n_blocks, block_size>>>(data.values_dev.get(), factor, size);
 
@@ -2279,7 +2279,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::scale<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     v_data.values_dev.get(),
@@ -2304,7 +2304,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     a,
@@ -2333,7 +2333,7 @@ namespace internal
                                                ::dealii::MemorySpace::CUDA>
           &data)
       {
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::equ<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(data.values_dev.get(),
                                                     a,
@@ -2360,12 +2360,12 @@ namespace internal
             &data)
       {
         Number *    result_device;
-        cudaError_t error_code =
-          cudaMalloc(&result_device, size * sizeof(Number));
+        cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
         AssertCuda(error_code);
         error_code = cudaMemset(result_device, 0, sizeof(Number));
+        AssertCuda(error_code);
 
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::double_vector_reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::DotProduct<Number>>
@@ -2416,7 +2416,7 @@ namespace internal
         AssertCuda(error_code);
         error_code = cudaMemset(result_device, 0, sizeof(Number));
 
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::ElemSum<Number>>
@@ -2453,7 +2453,7 @@ namespace internal
         AssertCuda(error_code);
         error_code = cudaMemset(result_device, 0, sizeof(Number));
 
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::reduction<
           Number,
           ::dealii::LinearAlgebra::CUDAWrappers::kernel::L1Norm<Number>>
@@ -2504,7 +2504,7 @@ namespace internal
         error_code = cudaMemset(res_d, 0, sizeof(Number));
         AssertCuda(error_code);
 
-        const int n_blocks = 1 + (size - 1) / (chunk_size * block_size);
+        const int n_blocks = 1 + size / (chunk_size * block_size);
         ::dealii::LinearAlgebra::CUDAWrappers::kernel::add_and_dot<Number>
           <<<dim3(n_blocks, 1), dim3(block_size)>>>(res_d,
                                                     data.values_dev.get(),

@@ -116,16 +116,16 @@ namespace Utilities
       defined(DEAL_II_WITH_CUDA_AWARE_MPI)
           if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
             {
-              const int n_blocks =
-                1 + (import_indices_plain_dev[i].second - 1) /
-                      (::dealii::CUDAWrappers::chunk_size *
-                       ::dealii::CUDAWrappers::block_size);
+              const auto chunk_size = import_indices_plain_dev[i].second;
+              const int  n_blocks =
+                1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
+                                  ::dealii::CUDAWrappers::block_size);
               ::dealii::LinearAlgebra::CUDAWrappers::kernel::
                 gather<<<n_blocks, ::dealii::CUDAWrappers::block_size>>>(
                   temp_array_ptr,
                   import_indices_plain_dev[i].first.get(),
                   locally_owned_array.data(),
-                  import_indices_plain_dev[i].second);
+                  chunk_size);
             }
           else
 #    endif
@@ -611,8 +611,8 @@ namespace Utilities
                 {
                   const auto chunk_size = import_indices_plain.second;
                   const int n_blocks =
-                    1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
-                                            ::dealii::CUDAWrappers::block_size);
+                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
+                                      ::dealii::CUDAWrappers::block_size);
                   dealii::LinearAlgebra::CUDAWrappers::kernel::
                     masked_vector_bin_op<Number,
                                          dealii::LinearAlgebra::CUDAWrappers::
@@ -631,8 +631,8 @@ namespace Utilities
                 {
                   const auto chunk_size = import_indices_plain.second;
                   const int n_blocks =
-                    1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
-                                            ::dealii::CUDAWrappers::block_size);
+                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
+                                      ::dealii::CUDAWrappers::block_size);
                   dealii::LinearAlgebra::CUDAWrappers::kernel::
                     masked_vector_bin_op<
                       Number,
@@ -651,8 +651,8 @@ namespace Utilities
                 {
                   const auto chunk_size = import_indices_plain.second;
                   const int n_blocks =
-                    1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
-                                            ::dealii::CUDAWrappers::block_size);
+                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
+                                      ::dealii::CUDAWrappers::block_size);
                   dealii::LinearAlgebra::CUDAWrappers::kernel::
                     masked_vector_bin_op<
                       Number,
@@ -671,8 +671,8 @@ namespace Utilities
                 {
                   const auto chunk_size = import_indices_plain.second;
                   const int n_blocks =
-                    1 + (chunk_size - 1) / (::dealii::CUDAWrappers::chunk_size *
-                                            ::dealii::CUDAWrappers::block_size);
+                    1 + chunk_size / (::dealii::CUDAWrappers::chunk_size *
+                                      ::dealii::CUDAWrappers::block_size);
                   dealii::LinearAlgebra::CUDAWrappers::kernel::
                     set_permutated<<<n_blocks,
                                      dealii::CUDAWrappers::block_size>>>(
