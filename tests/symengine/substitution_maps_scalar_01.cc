@@ -69,6 +69,7 @@ main()
 
   SD::Utilities::print_substitution_map(deallog, substitution_map);
 
+#ifdef DEBUG
   // Check that exceptions are raised when duplicate symbols
   // are found in a substitution map
   deal_II_exceptions::disable_abort_on_exception();
@@ -79,8 +80,9 @@ main()
 
       deallog << "Duplicate symbol in map did not raise an error." << std::endl;
     }
-  catch (...)
+  catch (const ExcMessage &)
     {}
+#endif
 
   deallog << "OK" << std::endl;
 }
