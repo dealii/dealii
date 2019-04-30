@@ -119,15 +119,15 @@ DEAL_II_NAMESPACE_OPEN
  * When using this class, please cite
  * @code{.bib}
  * @article{SartoriGiulianiBardelloni-2018-a,
- * 	Author = {Sartori, Alberto and Giuliani, Nicola and
+ *  Author = {Sartori, Alberto and Giuliani, Nicola and
  *            Bardelloni, Mauro and Heltai, Luca},
- * 	Journal = {SoftwareX},
- * 	Pages = {318--327},
- * 	Title = {{deal2lkit: A toolkit library for high performance
+ *  Journal = {SoftwareX},
+ *  Pages = {318--327},
+ *  Title = {{deal2lkit: A toolkit library for high performance
  *            programming in deal.II}},
  *  Doi = {10.1016/j.softx.2018.09.004},
- * 	Volume = {7},
- * 	Year = {2018}}
+ *  Volume = {7},
+ *  Year = {2018}}
  * @endcode
  *
  * @author Luca Heltai, 2019.
