@@ -22,7 +22,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/parameter_handler.h>
-#include <deal.II/base/parsed_convergence_table_flags.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
@@ -64,19 +63,24 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * The above code constructs a ParsedConvergenceTable that works for
- * scalar problems, and will produce an error table with `H1`, `L2`, and
- * `Linfty` norms of the error.
+ * scalar problems, and will produce an error table with `H1_norm`, `L2_norm`,
+ * and `Linfty_norm` norms of the error.
  *
  * Whenever a call to the methods error_from_exact() or difference() is made,
- * the instance of this class inspects its parameters, and computes all norms
+ * the instance of this class inspects its parameters, computes all norms
  * specified by the parameter given at construction time, possibly modified
- * via a parameter file.
+ * via a parameter file, computes all extra column entries specified using the
+ * method add_extra_column(), and writes one row of the convergence table.
+ *
+ * Once you have finished with the computations, a call to output_table() will
+ * generate a formatted convergence table on the provided stream, and to the
+ * file (if any) specified in the parameter file.
  *
  * With a small modification, the same code can be used to estimate the errors
  * of mixed or multi-physics problems, e.g.:
  * @code
- * using namespace ParsedConvergenceTableFlags;
- * ParsedConvergenceTable table({"u,u,p"},{{H1, L2}, {L2}});
+ * using namespace VectorTools;
+ * ParsedConvergenceTable table({"u,u,p"},{{H1_norm, L2_norm}, {L2_norm}});
  *
  * ParameterHandler prm;
  * table.add_parameters(prm);
@@ -96,16 +100,20 @@ DEAL_II_NAMESPACE_OPEN
  * components) and `L2` error in the pressure field.
  *
  * By calling the method add_parameters() passing a ParameterHandler object,
- * the following options will be defined in the given ParameterHandler object,
+ * the following options will be defined in the given ParameterHandler object
+ * (in the current level of the ParameterHandler object, i.e., whatever level
+ * you have entered with the ParamterHandler::enter_subsection() method),
  * and can be modified at run time through a parameter file:
  * @code
  * set Enable computation of the errors = true
  * set Enable output to streams         = true
  * set Error file name                  =
  * set Error precision                  = 3
+ * set Exponent for p-norms             = 2
  * set Extra columns                    = dofs, cells
- * set List of error norms to compute   = Linfty, L2, H1
+ * set List of error norms to compute   = Linfty_norm, L2_norm, H1_norm
  * set Rate key                         = dofs
+ * set Rate mode                        = reduction_rate_log2
  * @endcode
  *
  * When using this class, please cite
@@ -141,13 +149,14 @@ public:
    *
    * For example, the following constructor
    * @code
-   * using namespace ParsedConvergenceTableFlags;
-   * ParsedConvergenceTable table({"u", "v", "v"}, {{Linfty}, {L2, H1}});
+   * using namespace VectorTools;
+   * ParsedConvergenceTable table({"u", "v", "v"},
+   *                              {{Linfty_norm}, {L2_norm, H1_norm}});
    * @endcode
    *
-   * Will produce (if the parameter file is left untouched) the following table:
+   * Would produce (if the parameter file is left untouched) a table similar to
    * @code
-   * cells dofs    u_Linfty         v_L2           v_H1
+   * cells dofs u_Linfty_norm    v_L2_norm      v_H1_norm
    * 4     9    1.183e-01 -    5.156e-02 -    2.615e-01 -
    * 16    25   3.291e-02 2.50 1.333e-02 2.65 1.272e-01 1.41
    * 64    81   8.449e-03 2.31 3.360e-03 2.34 6.313e-02 1.19
@@ -155,7 +164,7 @@ public:
    * 1024  1089 5.325e-04 2.09 2.106e-04 2.09 1.574e-02 1.05
    * @endcode
    *
-   * Se the documentation of NormType for a list of
+   * Se the documentation of VectorTools::NormType for a list of
    * available norms you can compute using this class, and see the other
    * constructor for a documentation of all the parameters you can change.
    *
@@ -164,11 +173,9 @@ public:
    * unique component name
    */
   ParsedConvergenceTable(
-    const std::vector<std::string> &component_names = {"u"},
-    const std::vector<std::set<ParsedConvergenceTableFlags::NormType>>
-      &list_of_error_norms = {{ParsedConvergenceTableFlags::H1,
-                               ParsedConvergenceTableFlags::L2,
-                               ParsedConvergenceTableFlags::Linfty}});
+    const std::vector<std::string> &                    component_names = {"u"},
+    const std::vector<std::set<VectorTools::NormType>> &list_of_error_norms = {
+      {VectorTools::H1_norm, VectorTools::L2_norm, VectorTools::Linfty_norm}});
 
   /**
    * Full constructor for ParsedConvergenceTable.
@@ -177,19 +184,27 @@ public:
    * names are interpreted as components of a vector valued field;
    * @param list_of_error_norms Specify what error norms to compute for each
    * unique component name;
-   * @param extra_columns Extra columns to add;
+   * @param exponent The exponent to use in p-norms;
+   * @param extra_columns Extra columns to add. These may be "cells" or "dofs";
    * @param rate_key Specify the extra column by which we will compute the
-   * error rates;
+   * error rates. This key can either be one of "cells" or "dofs", or, if you
+   * add extra columns to the table via the method add_extra_column(), it may
+   * be one of the extra columns you added;
+   * @param rate_mode Specify the rate mode to use when computing error rates.
+   * This maybe either "reduction_rate", "reduction_rate_log2", or "none". See
+   * the documentation of ConvergenceTable::RateMode for an explanation of how
+   * each of this mode behaves;
    * @param error_file_name Name of error output file (with extension txt,
    * gpl, tex, or org). If different from the empty string, than
    * output_table() also writes in this file in the format deduced from its
    * extension;
    * @param precision How many digits to use when writing the error;
-   * @param compute_error If set to `false`, then no error computation is
-   * performed, and no output is produced;
-   * @param output_error If set to `false`, then the call to output_table()
-   * will produce only an output file (if @p error_file_name is not empty),
-   * but no output will be written on the given stream.
+   * @param compute_error Control wether the filling of the table is enabled
+   * or not. This flag may be used to disable at run time any error computation;
+   * @param output_error Control the behaviour of the output_table() method. Set
+   * this to true if you want output_table() to write the table to its input
+   * argument. This flag may be used to disable at run time any explicit output
+   * to stream.
    *
    * The parameters you specify with this constructor can be written to a
    * ParameterHandler object by calling the add_parameters() method. Once you
@@ -214,9 +229,11 @@ public:
    * # Number of digits to use when printing the error.
    * set Error precision                  = 3
    *
-   * # Extra columns to add to the table. Available options are dofs, cells, and
-   * # dt.
+   * # Extra columns to add to the table. Available options are dofs and cells
    * set Extra columns                    = dofs, cells
+   *
+   * # The exponent to use when computing p-norms.
+   * set Exponent for p-norms             = 2
    *
    * # Each component is separated by a semicolon, and each norm by a comma.
    * # Implemented norms are Linfty, L2, W1infty, H1, and custom. If you want to
@@ -226,18 +243,23 @@ public:
    * # Key to use when computing convergence rates. If this is set to a
    * # column that is not present, or to none, then no error rates are computed.
    * set Rate key                         = dofs
+   *
+   * # What type of error rate to compute. Available options are
+   * # reduction_rate_log2, reduction_rate, and none.
+   * set Rate mode                        = reduction_rate_log2
    * @endcode
    */
   ParsedConvergenceTable(
-    const std::vector<std::string> &component_names,
-    const std::vector<std::set<ParsedConvergenceTableFlags::NormType>>
-      &list_of_error_norms,
-    const std::set<ParsedConvergenceTableFlags::ExtraColumns> &extra_columns,
-    const ParsedConvergenceTableFlags::ExtraColumns &          rate_key,
-    const std::string &                                        error_file_name,
-    const unsigned int &                                       precision,
-    const bool &                                               compute_error,
-    const bool &                                               output_error);
+    const std::vector<std::string> &                    component_names,
+    const std::vector<std::set<VectorTools::NormType>> &list_of_error_norms,
+    const double &                                      exponent,
+    const std::set<std::string> &                       extra_columns,
+    const std::string &                                 rate_key,
+    const std::string &                                 rate_mode,
+    const std::string &                                 error_file_name,
+    const unsigned int &                                precision,
+    const bool &                                        compute_error,
+    const bool &                                        output_error);
 
   /**
    * Attach all the parameters in this class to entries of the parameter
@@ -251,111 +273,100 @@ public:
    * Add a row to the error table, containing the error between @p solution and
    * the @p exact function, in the norm(s) specified in the parameter file.
    *
-   * If you specify a @p weight expression during this call, then this is used
-   * to compute weighted errors. If the weight is different from "1.0", then
-   * you have to make sure that muparser is installed and enabled, otherwise an
-   * exception will be thrown.
+   * If you specify a @p weight function during this call, then this is used
+   * to compute weighted errors. The weight function can be either a scalar
+   * function (which will be used for all components), or a vector function.
+   * When it is a vector function, an assertion is triggered if the number of
+   * components does not coincide with the number of components of the
+   * underlying finite element space.
    */
   template <typename DoFHandlerType, typename VectorType>
   void
-  error_from_exact(const DoFHandlerType &                           vspace,
-                   const VectorType &                               solution,
-                   const Function<DoFHandlerType::space_dimension> &exact,
-                   double                                           dt = 0.,
-                   const std::string &weight                           = "1.0");
+  error_from_exact(
+    const DoFHandlerType &                           vspace,
+    const VectorType &                               solution,
+    const Function<DoFHandlerType::space_dimension> &exact,
+    const Function<DoFHandlerType::space_dimension> *weight = nullptr);
 
   /**
    * Same as above, with a different mapping.
    */
   template <typename DoFHandlerType, typename VectorType>
   void
-  error_from_exact(const Mapping<DoFHandlerType::dimension,
-                                 DoFHandlerType::space_dimension> & mapping,
-                   const DoFHandlerType &                           vspace,
-                   const VectorType &                               solution,
-                   const Function<DoFHandlerType::space_dimension> &exact,
-                   double                                           dt = 0.,
-                   const std::string &weight                           = "1.0");
-
+  error_from_exact(
+    const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
+      &                                              mapping,
+    const DoFHandlerType &                           vspace,
+    const VectorType &                               solution,
+    const Function<DoFHandlerType::space_dimension> &exact,
+    const Function<DoFHandlerType::space_dimension> *weight = nullptr);
 
   /**
-   * Call the given custom function to compute a custom error for any component
-   * for which you specify the ParsedConvergenceTableFlags::custom norm. This function
-   * may be called several times to add different columns with different names,
-   * provided you use an appropriate function every time, and
-   * that you also update @p column_name every time.
+   * Add an additional column (with name @p name) to the table, by invoking
+   * the function @p custom_function, when calling error_from_exact() or
+   * difference().
    *
-   * Should you wish to do so, then make sure the parameter
-   * @p add_table_extras is set to `false` for each call, except one, so
-   * that you only add extra column information once.
+   * You can call this method as many times as you want. If @p column_name was
+   * already used in a previous call, then calling this method with the same
+   * name will overwrite whatever function you had previously specified. If
+   * you use a lambda function for this call, make sure that the variables used
+   * internally in the lambda function remain valid until the call to
+   * error_from_exact() or difference().
    *
-   * An example usage of this class with a custom error function is the
-   * following:
+   * This method may be used, for example, to compute the error w.r.t. to
+   * time step increments in time, for example:
    * @code
-   * using namespace ParsedConvergenceTableFlags;
-   * ParsedConvergenceTable table({"u"}, {{"custom"}});
+   * using namespace VectorTools;
+   * ParsedConvergenceTable table({"u"}, {{L2_norm}});
+   *
+   * double dt = .5;
+   * auto dt_function = [&]() {
+   *        return dt;
+   * };
+   *
+   * table.add_extra_column("dt", dt_function,  true);
    *
    * for (unsigned int i = 0; i < n_cycles; ++i)
    *   {
-   *     // ... refine and distribute dofs
-   *     auto cycle_function = [&](const unsigned int component) {
-   *        return i;
-   *     };
-   *     table.custom_error(cycle_function, dof_handler, "cycle", true);
+   *     // ... compute solution at the current dt
+   *
+   *     table.error_from_exact(dof_handler, solution, exact_solution);
+   *     dt /= 2.0;
    *   }
    * table.output_table(std::cout);
    * @endcode
    *
-   * Will produce (if the parameter file is left untouched) the following table:
+   * will produce a table similar to
+   *
    * @code
-   * cells dofs  cycle
-   * 4     9     0
-   * 16    25    1
-   * 64    81    2
-   * 256   289   3
-   * 1024  1089  4
+   *    dt        u_L2_norm
+   * 5.000e-1    5.156e-02 -
+   * 2.500e-2    1.333e-02 2.65
+   * 1.250e-2    3.360e-03 2.34
+   * 6.250e-3    8.418e-04 2.18
    * @endcode
    *
-   * Should you wish to add another column, then the above code should be
-   * replaced by:
-   * @code
-   * using namespace ParsedConvergenceTableFlags;
-   * ParsedConvergenceTable table({"u"}, {"custom"});
+   * provided that you use the following parameter file (only non default
+   * entries are shown here):
    *
-   * for (unsigned int i = 0; i < n_cycles; ++i)
-   *   {
-   *     // ... refine and distribute dofs
-   *     auto cycle_function = [&](const unsigned int) {
-   *        return i;
-   *     };
-   *     auto cycle_square_function = [&](const unsigned int) {
-   *        return i*i;
-   *     };
-   *     table.custom_error(cycle_function, dof_handler, "cycle", false);
-   *     table.custom_error(cycle_square_function, dof_handler,
-   *                        "cycle_square", true);
-   *   }
-   * table.output_table(std::cout);
+   * @code
+   * set Extra columns =
+   * set List of error norms to compute   = L2_norm
+   * set Rate key                         = dt
    * @endcode
    *
-   * This will produce the table:
-   * @code
-   * cells dofs  cycle cycle_square
-   * 4     9     0     0
-   * 16    25    1     1
-   * 64    81    2     4
-   * 256   289   3     9
-   * 1024  1089  4     16
-   * @endcode
+   *
+   * @param name Name of the column to add.
+   * @param custom_function Function that will be called to fill the given
+   * entry. You need to make sure that the scope of this function is valid
+   * up to the
+   * @param exclude_from_rates If set to true, then no error rates will be
+   * computed for this column.
    */
-  template <typename DoFHandlerType>
   void
-  custom_error(const std::function<double(const unsigned int component)>
-                 &                   custom_error_function,
-               const DoFHandlerType &dh,
-               const std::string &   column_name      = "custom",
-               const bool            add_table_extras = false,
-               const double          dt               = 0.);
+  add_extra_column(const std::string &            column_name,
+                   const std::function<double()> &custom_function,
+                   const bool &                   exclude_from_rates = false);
 
   /**
    * Difference between two solutions in the same vector space.
@@ -365,7 +376,7 @@ public:
   difference(const DoFHandlerType &,
              const VectorType &,
              const VectorType &,
-             double dt = 0.);
+             const Function<DoFHandlerType::space_dimension> *weight = nullptr);
 
   /**
    * Same as above, with a non default mapping.
@@ -377,7 +388,7 @@ public:
              const DoFHandlerType &,
              const VectorType &,
              const VectorType &,
-             double dt = 0.);
+             const Function<DoFHandlerType::space_dimension> *weight = nullptr);
 
   /**
    * Write the error table to the @p out stream, and (possibly) to the file
@@ -403,25 +414,40 @@ private:
   const std::vector<ComponentMask> unique_component_masks;
 
   /**
+   * Additional methods to call when adding rows to the table.
+   */
+  std::map<std::string, std::pair<std::function<double()>, bool>>
+    extra_column_functions;
+
+  /**
    * Type of error to compute per components.
    */
-  std::vector<std::set<ParsedConvergenceTableFlags::NormType>>
-    norms_per_unique_component;
+  std::vector<std::set<VectorTools::NormType>> norms_per_unique_component;
+
+  /**
+   * Exponent to use in the p-norm types.
+   */
+  double exponent;
 
   /**
    * The actual table
    */
   ConvergenceTable table;
-  
+
   /**
    * Extra columns to add to the table.
    */
-  std::set<ParsedConvergenceTableFlags::ExtraColumns> extra_columns;
+  std::set<std::string> extra_columns;
 
   /**
-   * Whether or not to calculate the rates according to the given keys.
+   * The name of column with respect to which we compute convergence rates.
    */
-  ParsedConvergenceTableFlags::ExtraColumns rate_key;
+  std::string rate_key;
+
+  /**
+   * Reduction rate mode. See ConvergenceTable::RateMode for a documentation.
+   */
+  std::string rate_mode;
 
   /**
    * The precision used to output the table.
@@ -453,10 +479,11 @@ private:
 // ============================================================
 template <typename DoFHandlerType, typename VectorType>
 void
-ParsedConvergenceTable::difference(const DoFHandlerType &dh,
-                                   const VectorType &    solution1,
-                                   const VectorType &    solution2,
-                                   double                dt)
+ParsedConvergenceTable::difference(
+  const DoFHandlerType &                           dh,
+  const VectorType &                               solution1,
+  const VectorType &                               solution2,
+  const Function<DoFHandlerType::space_dimension> *weight)
 {
   AssertThrow(solution1.size() == solution2.size(),
               ExcDimensionMismatch(solution1.size(), solution2.size()));
@@ -466,7 +493,7 @@ ParsedConvergenceTable::difference(const DoFHandlerType &dh,
                    solution,
                    ConstantFunction<DoFHandlerType::space_dimension>(
                      0, component_names.size()),
-                   dt);
+                   weight);
 }
 
 
@@ -475,11 +502,11 @@ template <typename DoFHandlerType, typename VectorType>
 void
 ParsedConvergenceTable::difference(
   const Mapping<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
-    &                   mapping,
-  const DoFHandlerType &dh,
-  const VectorType &    solution1,
-  const VectorType &    solution2,
-  double                dt)
+    &                                              mapping,
+  const DoFHandlerType &                           dh,
+  const VectorType &                               solution1,
+  const VectorType &                               solution2,
+  const Function<DoFHandlerType::space_dimension> *weight)
 {
   AssertThrow(solution1.size() == solution2.size(),
               ExcDimensionMismatch(solution1.size(), solution2.size()));
@@ -490,7 +517,7 @@ ParsedConvergenceTable::difference(
                    solution,
                    ConstantFunction<DoFHandlerType::space_dimension>(
                      0, component_names.size()),
-                   dt);
+                   weight);
 }
 
 
@@ -501,15 +528,13 @@ ParsedConvergenceTable::error_from_exact(
   const DoFHandlerType &                           dh,
   const VectorType &                               solution,
   const Function<DoFHandlerType::space_dimension> &exact,
-  double                                           dt,
-  const std::string &                              weight)
+  const Function<DoFHandlerType::space_dimension> *weight)
 {
   error_from_exact(StaticMappingQ1<DoFHandlerType::dimension,
                                    DoFHandlerType::space_dimension>::mapping,
                    dh,
                    solution,
                    exact,
-                   dt,
                    weight);
 }
 
@@ -523,80 +548,80 @@ ParsedConvergenceTable::error_from_exact(
   const DoFHandlerType &                           dh,
   const VectorType &                               solution,
   const Function<DoFHandlerType::space_dimension> &exact,
-  double                                           dt,
-  const std::string &                              weight)
+  const Function<DoFHandlerType::space_dimension> *weight)
 {
-  const int dim      = DoFHandlerType::dimension;
-  const int spacedim = DoFHandlerType::space_dimension;
+  const int  dim          = DoFHandlerType::dimension;
+  const int  spacedim     = DoFHandlerType::space_dimension;
+  const auto n_components = component_names.size();
+
   if (compute_error)
     {
-      AssertDimension(exact.n_components, component_names.size());
+      AssertDimension(exact.n_components, n_components);
+      AssertDimension(dh.get_fe().n_components(), n_components);
 
       const unsigned int n_active_cells =
         dh.get_triangulation().n_global_active_cells();
       const unsigned int n_dofs = dh.n_dofs();
 
       for (const auto &col : extra_columns)
-        if (col == ParsedConvergenceTableFlags::cells)
+        if (col == "cells")
           {
             table.add_value("cells", n_active_cells);
             table.set_tex_caption("cells", "\\# cells");
             table.set_tex_format("cells", "r");
           }
-        else if (col == ParsedConvergenceTableFlags::dofs)
+        else if (col == "dofs")
           {
             table.add_value("dofs", n_dofs);
             table.set_tex_caption("dofs", "\\# dofs");
             table.set_tex_format("dofs", "r");
           }
-        else if (col == ParsedConvergenceTableFlags::dt)
-          {
-            table.add_value("dt", dt);
-            table.set_tex_caption("dt", "\\Delta t");
-            table.set_tex_format("dt", "r");
-          }
 
+      // A vector of zero std::functions with n_components components
+      const std::vector<std::function<double(const Point<spacedim> &)>>
+        zero_components(n_components,
+                        [](const Point<spacedim> &) { return 0.0; });
 
-      std::map<ParsedConvergenceTableFlags::NormType, unsigned int>
-        norm_to_index;
-      norm_to_index[ParsedConvergenceTableFlags::L2]      = 0;
-      norm_to_index[ParsedConvergenceTableFlags::H1]      = 1;
-      norm_to_index[ParsedConvergenceTableFlags::Linfty]  = 2;
-      norm_to_index[ParsedConvergenceTableFlags::W1infty] = 3;
-      norm_to_index[ParsedConvergenceTableFlags::custom]  = 4;
+      // The default weight function, with n_components components
+      std::vector<std::function<double(const Point<spacedim> &)>>
+        weight_components(n_components,
+                          [](const Point<spacedim> &) { return 1.0; });
 
-      const auto n_components = component_names.size();
-      for (unsigned int i = 0; i < unique_component_names.size(); ++i)
+      if (weight != nullptr)
         {
-          std::vector<double> error(5, 0.0);
-          const auto &        norms = norms_per_unique_component[i];
-          const auto &        mask  = unique_component_masks[i];
+          if (weight->n_components == 1)
+            {
+              for (auto &f : weight_components)
+                f = [&](const Point<spacedim> &p) { return weight->value(p); };
+            }
+          else
+            {
+              AssertDimension(weight->n_components, n_components);
+              for (unsigned int i = 0; i < n_components; ++i)
+                weight_components[i] = [&](const Point<spacedim> &p) {
+                  return weight->value(p, i);
+                };
+            }
+        }
 
-#  ifndef DEAL_II_WITH_MUPARSER
-          Assert(weight == "1.0",
-                 ExcMessage("If you want to use a weight which is "
-                            "different from 1.0, you have to "
-                            "install deal.II with muparser enabled."));
-          ComponentSelectFunction<spacedim> select_component(
-            {mask.first_selected_component(),
-             mask.first_selected_component() + mask.n_selected_components()},
-            n_components);
-#  else
-          std::string comp_sel;
-          {
-            // Select all required components
-            std::vector<std::string> expr(n_components, "0");
+      for (unsigned int i = 0; i < norms_per_unique_component.size(); ++i)
+        {
+          std::map<VectorTools::NormType, double> errors;
 
-            for (unsigned int i = 0; i < n_components; ++i)
-              if (mask[i] == true)
-                expr[i] = weight;
+          const auto &norms = norms_per_unique_component[i];
+          const auto &mask  = unique_component_masks[i];
 
-            comp_sel = expr[0];
-            for (unsigned int i = 1; i < expr.size(); ++i)
-              comp_sel += "; " + expr[i];
-          }
-          FunctionParser<spacedim> select_component(comp_sel);
-#  endif
+          // Simple case first
+          if (norms.empty())
+            continue;
+
+          auto components_expr = zero_components;
+          for (unsigned int i = 0; i < n_components; ++i)
+            if (mask[i] == true)
+              components_expr[i] = weight_components[i];
+
+          FunctionFromFunctionObjects<spacedim> select_component(
+            components_expr);
 
           Vector<float> difference_per_cell(
             dh.get_triangulation().n_global_active_cells());
@@ -605,164 +630,46 @@ ParsedConvergenceTable::error_from_exact(
 
           for (const auto &norm : norms)
             {
-              if (norm == ParsedConvergenceTableFlags::L2)
-                {
-                  VectorTools::integrate_difference(mapping,
-                                                    dh,
-                                                    solution,
-                                                    exact,
-                                                    difference_per_cell,
-                                                    q_gauss,
-                                                    VectorTools::L2_norm,
-                                                    &select_component);
-                }
-
-              error[norm_to_index[ParsedConvergenceTableFlags::L2]] =
-                VectorTools::compute_global_error(dh.get_triangulation(),
-                                                  difference_per_cell,
-                                                  VectorTools::L2_norm);
               difference_per_cell = 0;
+              VectorTools::integrate_difference(mapping,
+                                                dh,
+                                                solution,
+                                                exact,
+                                                difference_per_cell,
+                                                q_gauss,
+                                                norm,
+                                                &select_component,
+                                                exponent);
 
-              if (norm == ParsedConvergenceTableFlags::H1)
-                {
-                  VectorTools::integrate_difference(mapping,
-                                                    dh,
-                                                    solution,
-                                                    exact,
-                                                    difference_per_cell,
-                                                    q_gauss,
-                                                    VectorTools::H1_norm,
-                                                    &select_component);
-                }
-              error[norm_to_index[ParsedConvergenceTableFlags::H1]] =
-                VectorTools::compute_global_error(dh.get_triangulation(),
-                                                  difference_per_cell,
-                                                  VectorTools::H1_norm);
-              difference_per_cell = 0;
+              errors[norm] = VectorTools::compute_global_error(
+                dh.get_triangulation(), difference_per_cell, norm, exponent);
 
-              if (norm == ParsedConvergenceTableFlags::W1infty)
-                {
-                  VectorTools::integrate_difference(mapping,
-                                                    dh,
-                                                    solution,
-                                                    exact,
-                                                    difference_per_cell,
-                                                    q_gauss,
-                                                    VectorTools::W1infty_norm,
-                                                    &select_component);
-                }
+              std::string name = unique_component_names[i] + "_" +
+                                 Patterns::Tools::to_string(norm);
+              std::string latex_name = "$\\| " + unique_component_names[i] +
+                                       " - " + unique_component_names[i] +
+                                       "_h \\|_{" +
+                                       Patterns::Tools::to_string(norm) + "}$";
 
-              error[norm_to_index[ParsedConvergenceTableFlags::W1infty]] =
-                VectorTools::compute_global_error(
-                  dh.get_triangulation(),
-                  difference_per_cell,
-                  VectorTools::W1infty_seminorm);
-              difference_per_cell = 0;
-
-              if (norm == ParsedConvergenceTableFlags::Linfty)
-                {
-                  VectorTools::integrate_difference(mapping,
-                                                    dh,
-                                                    solution,
-                                                    exact,
-                                                    difference_per_cell,
-                                                    q_gauss,
-                                                    VectorTools::Linfty_norm,
-                                                    &select_component);
-                }
-
-              error[norm_to_index[ParsedConvergenceTableFlags::Linfty]] =
-                VectorTools::compute_global_error(dh.get_triangulation(),
-                                                  difference_per_cell,
-                                                  VectorTools::Linfty_norm);
-              difference_per_cell = 0;
-
-              // Now add what we just computed.
-              if (norm != ParsedConvergenceTableFlags::none)
-                {
-                  std::string name = unique_component_names[i] + "_" +
-                                     Patterns::Tools::to_string(norm);
-                  std::string latex_name =
-                    "$\\| " + unique_component_names[i] + " - " +
-                    unique_component_names[i] + "_h \\|_{" +
-                    Patterns::Tools::to_string(norm) + "}$";
-
-                  table.add_value(name, error[norm_to_index[norm]]);
-                  table.set_precision(name, precision);
-                  table.set_scientific(name, true);
-                  table.set_tex_caption(name, latex_name);
-                }
+              table.add_value(name, errors[norm]);
+              table.set_precision(name, precision);
+              table.set_scientific(name, true);
+              table.set_tex_caption(name, latex_name);
             }
+        }
+
+      for (const auto &extra_col : extra_column_functions)
+        {
+          const double custom_error = extra_col.second.first();
+
+          std::string name = extra_col.first;
+          table.add_value(name, custom_error);
+          table.set_precision(name, precision);
+          table.set_scientific(name, true);
         }
     }
 }
 
-
-template <typename DoFHandlerType>
-void
-ParsedConvergenceTable::custom_error(
-  const std::function<double(const unsigned int component)>
-    &                   custom_error_function,
-  const DoFHandlerType &dh,
-  const std::string &   column_name,
-  const bool            add_table_extras,
-  const double          dt)
-{
-  if (compute_error)
-    {
-      const unsigned int  n_components = norms_per_unique_component.size();
-      const unsigned int  n_active_cells =
-        dh.get_triangulation().n_global_active_cells();
-      const unsigned int n_dofs = dh.n_dofs();
-      if (add_table_extras)
-        {
-          for (const auto &col : extra_columns)
-            {
-              if (col == ParsedConvergenceTableFlags::cells)
-                {
-                  table.add_value("cells", n_active_cells);
-                  table.set_tex_caption("cells", "\\# cells");
-                  table.set_tex_format("cells", "r");
-                }
-              if (col == ParsedConvergenceTableFlags::dofs)
-                {
-                  table.add_value("dofs", n_dofs);
-                  table.set_tex_caption("dofs", "\\# dofs");
-                  table.set_tex_format("dofs", "r");
-                }
-              if (col == ParsedConvergenceTableFlags::dt)
-                {
-                  table.add_value("dt", dt);
-                  table.set_tex_caption("dt", "\\Delta t");
-                  table.set_tex_format("dt", "r");
-                }
-            }
-        }
-
-      for (unsigned int j = 0; j < n_components; ++j)
-        {
-          const auto &norms = norms_per_unique_component[j];
-
-          for (const auto &norm : norms)
-            if (norm == ParsedConvergenceTableFlags::custom)
-              {
-                const double custom_error = custom_error_function(j);
-
-                std::string name =
-                  unique_component_names[j] + "_" + column_name;
-                std::string latex_name = "$\\| " + unique_component_names[j] +
-                                         " - " + unique_component_names[j] +
-                                         "_h \\|_{\\text{" + column_name +
-                                         "} $";
-
-                table.add_value(name, custom_error);
-                table.set_precision(name, precision);
-                table.set_scientific(name, true);
-                table.set_tex_caption(name, latex_name);
-              }
-        }
-    }
-}
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

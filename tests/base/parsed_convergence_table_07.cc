@@ -38,7 +38,7 @@ main()
 {
   initlog();
 
-  ParsedConvergenceTable table({"u"}, {{ParsedConvergenceTableFlags::custom}});
+  ParsedConvergenceTable table({"u"}, {{}});
 
   ParameterHandler prm;
   table.add_parameters(prm);
@@ -49,12 +49,16 @@ main()
   FESystem<2>   fe(FE_Q<2>(1), 1);
   DoFHandler<2> dh(tria);
 
+  Functions::CosineFunction<2> exact(1);
+
   for (unsigned int i = 0; i < 5; ++i)
     {
       tria.refine_global(1);
       dh.distribute_dofs(fe);
-      auto cycle = [&](const unsigned int) { return (i + 1) * 1.0; };
-      table.custom_error(cycle, dh, "cycle", true);
+      Vector<double> sol(dh.n_dofs());
+      auto           cycle = [&]() { return (i + 1) * 1.0; };
+      table.add_extra_column("cycle", cycle);
+      table.error_from_exact(dh, sol, exact);
     }
   table.output_table(deallog.get_file_stream());
 }

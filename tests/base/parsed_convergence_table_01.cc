@@ -47,13 +47,15 @@ main()
   FE_Q<2>       fe(1);
   DoFHandler<2> dh(tria);
 
+  Functions::CosineFunction<2> exact(1);
+
   for (unsigned int i = 0; i < 5; ++i)
     {
       tria.refine_global(1);
       dh.distribute_dofs(fe);
       Vector<double> sol(dh.n_dofs());
-      VectorTools::interpolate(dh, Functions::CosineFunction<2>(1), sol);
-      table.error_from_exact(dh, sol, Functions::CosineFunction<2>(1));
+      VectorTools::interpolate(dh, exact, sol);
+      table.error_from_exact(dh, sol, exact);
     }
   table.output_table(deallog.get_file_stream());
 }

@@ -3,6 +3,8 @@ DEAL:parameters::Enable computation of the errors: true
 DEAL:parameters::Enable output to streams: true
 DEAL:parameters::Error file name: 
 DEAL:parameters::Error precision: 3
-DEAL:parameters::Extra columns: dofs, cells
-DEAL:parameters::List of error norms to compute: Linfty, L2, H1
+DEAL:parameters::Exponent for p-norms: 2
+DEAL:parameters::Extra columns: cells, dofs
+DEAL:parameters::List of error norms to compute: L2_norm, Linfty_norm, H1_norm
 DEAL:parameters::Rate key: dofs
+DEAL:parameters::Rate mode: reduction_rate_log2

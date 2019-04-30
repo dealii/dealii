@@ -60,14 +60,14 @@ namespace
 
 
 ParsedConvergenceTable::ParsedConvergenceTable(
-  const std::vector<std::string> &solution_names,
-  const std::vector<std::set<ParsedConvergenceTableFlags::NormType>>
-    &list_of_error_norms)
+  const std::vector<std::string> &                    solution_names,
+  const std::vector<std::set<VectorTools::NormType>> &list_of_error_norms)
   : ParsedConvergenceTable(solution_names,
                            list_of_error_norms,
-                           {ParsedConvergenceTableFlags::cells,
-                            ParsedConvergenceTableFlags::dofs},
-                           ParsedConvergenceTableFlags::dofs,
+                           2.0,
+                           {"cells", "dofs"},
+                           "dofs",
+                           "reduction_rate_log2",
                            "",
                            3,
                            true,
@@ -77,27 +77,31 @@ ParsedConvergenceTable::ParsedConvergenceTable(
 
 
 ParsedConvergenceTable::ParsedConvergenceTable(
-  const std::vector<std::string> &component_names,
-  const std::vector<std::set<ParsedConvergenceTableFlags::NormType>>
-    &list_of_error_norms,
-  const std::set<ParsedConvergenceTableFlags::ExtraColumns> &extra_columns,
-  const ParsedConvergenceTableFlags::ExtraColumns &          rate_key,
-  const std::string &                                        error_file_name,
-  const unsigned int &                                       precision,
-  const bool &                                               compute_error,
-  const bool &                                               output_error)
+  const std::vector<std::string> &                    component_names,
+  const std::vector<std::set<VectorTools::NormType>> &list_of_error_norms,
+  const double &                                      exponent,
+  const std::set<std::string> &                       extra_columns,
+  const std::string &                                 rate_key,
+  const std::string &                                 rate_mode,
+  const std::string &                                 error_file_name,
+  const unsigned int &                                precision,
+  const bool &                                        compute_error,
+  const bool &                                        output_error)
   : component_names(component_names)
   , unique_component_names(get_unique_component_names(component_names))
   , unique_component_masks(get_unique_component_masks(component_names))
   , norms_per_unique_component(list_of_error_norms)
+  , exponent(exponent)
   , extra_columns(extra_columns)
   , rate_key(rate_key)
+  , rate_mode(rate_mode)
   , precision(precision)
   , error_file_name(error_file_name)
   , compute_error(compute_error)
   , output_error(output_error)
 {
-  AssertDimension(unique_component_names.size(), list_of_error_norms.size());
+  AssertDimension(norms_per_unique_component.size(),
+                  unique_component_names.size());
 }
 
 
@@ -132,16 +136,30 @@ ParsedConvergenceTable::add_parameters(ParameterHandler &prm)
     "and each norm by a comma. Implemented norms are Linfty, L2, "
     "W1infty, H1, and custom. If you want to skip a component, use none.");
 
+
+  prm.add_parameter("Exponent for p-norms",
+                    exponent,
+                    "The exponent to use when computing p-norms.",
+                    Patterns::Double(1));
+
   prm.add_parameter("Extra columns",
                     extra_columns,
                     "Extra columns to add to the table. Available options "
-                    "are dofs, cells, and dt.");
+                    "are dofs and cells.",
+                    Patterns::List(Patterns::Selection("dofs|cells")));
 
   prm.add_parameter("Rate key",
                     rate_key,
                     "Key to use when computing convergence rates. If "
-                    "this is set to a column that is not present, or to none, "
-                    "then no error rates are computed.");
+                    "this is set to a column that is not present, or to the "
+                    "empty string, then no error rates are computed.");
+
+  prm.add_parameter("Rate mode",
+                    rate_mode,
+                    "What type of error rate to compute. Available options are "
+                    "reduction_rate_log2, reduction_rate, and none.",
+                    Patterns::Selection(
+                      "reduction_rate|reduction_rate_log2|none"));
 }
 
 
@@ -152,7 +170,7 @@ ParsedConvergenceTable::output_table(std::ostream &out)
   if (compute_error)
     {
       // Add convergence rates if the rate_key is not empty
-      if (rate_key != ParsedConvergenceTableFlags::no_columns)
+      if (rate_key != "")
         {
           bool has_key = false;
           for (const auto &col : extra_columns)
@@ -160,14 +178,43 @@ ParsedConvergenceTable::output_table(std::ostream &out)
               if (rate_key == col)
                 has_key = true;
 
-              if (col != ParsedConvergenceTableFlags::no_columns)
+              if (col != "")
                 table.omit_column_from_convergence_rate_evaluation(
                   Patterns::Tools::to_string(col));
             }
+
+          for (const auto &extra_col : extra_column_functions)
+            if (extra_col.second.second)
+              {
+                if (rate_key == extra_col.first)
+                  has_key = true;
+                table.omit_column_from_convergence_rate_evaluation(
+                  extra_col.first);
+              }
+
           if (has_key)
-            table.evaluate_all_convergence_rates(
-              Patterns::Tools::to_string(rate_key),
-              ConvergenceTable::reduction_rate_log2);
+            {
+              if (rate_mode == "reduction_rate_log2")
+                table.evaluate_all_convergence_rates(
+                  Patterns::Tools::to_string(rate_key),
+                  ConvergenceTable::reduction_rate_log2);
+              else if (rate_mode == "reduction_rate")
+                table.evaluate_all_convergence_rates(
+                  Patterns::Tools::to_string(rate_key),
+                  ConvergenceTable::reduction_rate);
+              else
+                {
+                  Assert(rate_mode != "none", ExcInternalError());
+                }
+            }
+          else
+            {
+              AssertThrow(rate_key != "",
+                          ExcMessage(
+                            "You specified the key <" + rate_key +
+                            "> to compute convergence rates, but that key does "
+                            "not exist in the current table."));
+            }
         }
 
       if (output_error)
@@ -200,4 +247,16 @@ ParsedConvergenceTable::output_table(std::ostream &out)
         }
     }
 }
+
+
+
+void
+ParsedConvergenceTable::add_extra_column(
+  const std::string &            column_name,
+  const std::function<double()> &custom_function,
+  const bool &                   exclude_from_rates)
+{
+  extra_column_functions[column_name] = {custom_function, exclude_from_rates};
+}
+
 DEAL_II_NAMESPACE_CLOSE

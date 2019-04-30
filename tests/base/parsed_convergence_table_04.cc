@@ -38,7 +38,7 @@ main()
 {
   initlog();
 
-  ParsedConvergenceTable table({"u", "u"}, {{ParsedConvergenceTableFlags::L2}});
+  ParsedConvergenceTable table({"u", "u"}, {{VectorTools::L2_norm}});
 
   ParameterHandler prm;
   table.add_parameters(prm);
@@ -46,16 +46,17 @@ main()
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria);
 
-  FESystem<2>   fe(FE_Q<2>(1), 2);
-  DoFHandler<2> dh(tria);
+  FESystem<2>                  fe(FE_Q<2>(1), 2);
+  DoFHandler<2>                dh(tria);
+  Functions::CosineFunction<2> exact(2);
 
   for (unsigned int i = 0; i < 5; ++i)
     {
       tria.refine_global(1);
       dh.distribute_dofs(fe);
       Vector<double> sol(dh.n_dofs());
-      VectorTools::interpolate(dh, Functions::CosineFunction<2>(2), sol);
-      table.error_from_exact(dh, sol, Functions::CosineFunction<2>(2));
+      VectorTools::interpolate(dh, exact, sol);
+      table.error_from_exact(dh, sol, exact);
     }
   table.output_table(deallog.get_file_stream());
 }

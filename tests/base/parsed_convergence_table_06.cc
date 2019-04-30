@@ -36,11 +36,9 @@
 int
 main()
 {
-  initlog();
+  initlog(1);
 
-  ParsedConvergenceTable table({"u", "u", "p"},
-                               {{ParsedConvergenceTableFlags::H1},
-                                {ParsedConvergenceTableFlags::none}});
+  ParsedConvergenceTable table({"u", "u", "p"}, {{VectorTools::H1_norm}, {}});
 
   ParameterHandler prm;
   table.add_parameters(prm);
@@ -51,13 +49,15 @@ main()
   FESystem<2>   fe(FE_Q<2>(1), 3);
   DoFHandler<2> dh(tria);
 
+  Functions::CosineFunction<2> exact(3);
+
   for (unsigned int i = 0; i < 5; ++i)
     {
       tria.refine_global(1);
       dh.distribute_dofs(fe);
       Vector<double> sol(dh.n_dofs());
-      VectorTools::interpolate(dh, Functions::CosineFunction<2>(3), sol);
-      table.error_from_exact(dh, sol, Functions::CosineFunction<2>(3));
+      VectorTools::interpolate(dh, exact, sol);
+      table.error_from_exact(dh, sol, exact);
     }
   table.output_table(deallog.get_file_stream());
 }
