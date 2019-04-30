@@ -590,7 +590,7 @@ struct MPILogInitAll
 // By default, all the ranks will try to access the device 0.
 // If we are running with MPI support it is better to address different graphic
 // cards for different processes even if only one node is used. The choice below
-// is based on the MPI proccess id.
+// is based on the MPI process id.
 // MPI needs to be initialized before using this function.
 void
 init_cuda(const bool use_mpi = false)

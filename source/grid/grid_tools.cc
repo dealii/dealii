@@ -1119,7 +1119,7 @@ namespace GridTools
                                                   0,
                                   false);
     // for parallel::shared::Triangulation we need to work on all vertices,
-    // not just the ones related to loacally owned cells;
+    // not just the ones related to locally owned cells;
     const bool is_parallel_shared =
       (dynamic_cast<parallel::shared::Triangulation<dim, spacedim> *>(
          &triangulation) != nullptr);

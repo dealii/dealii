@@ -3173,7 +3173,7 @@ namespace FETools
 
     const unsigned int dofs_per_cell = Utilities::fixed_power<dim>(n);
 
-    // Assert size maches degree
+    // Assert size matches degree
     AssertDimension(h2l.size(), dofs_per_cell);
 
     // polynomial degree

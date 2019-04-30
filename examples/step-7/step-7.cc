@@ -378,7 +378,7 @@ namespace Step7
     //
     // We will show here how the library managed to find out that there are
     // still active references to an object and the object is still alive
-    // frome the point of view of a using object. Basically, the method is along
+    // from the point of view of a using object. Basically, the method is along
     // the following line: all objects that are subject to such potentially
     // dangerous pointers are derived from a class called Subscriptor. For
     // example, the Triangulation, DoFHandler, and a base class of the

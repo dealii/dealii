@@ -112,7 +112,7 @@ def parse_arguments():
                         "By default only \"examples\", \"include\", "
                         "\"source\" and \"tests\" "
                         "directories are chosen to work on."
-                        "Path to directories can be both abosulte or relative.")
+                        "Path to directories can be both absolute or relative.")
 
     parser.add_argument("-j", metavar="THREAD_COUNT", type=int, default=0,
                         help="Number of clang-format instances to be run "

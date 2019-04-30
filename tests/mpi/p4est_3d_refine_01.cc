@@ -79,7 +79,7 @@ test()
                 cell->set_refine_flag();
               }
 
-          // and atleast one cell:
+          // and at least one cell:
           if (!locals)
             {
               for (typename Triangulation<dim>::active_cell_iterator cell =

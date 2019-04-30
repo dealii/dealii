@@ -3813,7 +3813,7 @@ namespace Differentiation
               "that the component offsets used to construct their counterpart "
               "extractors are incompatible with one another. Make sure that "
               "the first component for each extractor properly takes into "
-              "account the dimensionality of the preceeding fields."));
+              "account the dimensionality of the preceding fields."));
         }
 #    endif
       set_independent_variable(value, extractor);

@@ -53,7 +53,7 @@ namespace Differentiation
       /**
        * Extract the symbols (key entries) from a substitution map.
        *
-       * @note It is guarenteed that the order of extraction of data into the
+       * @note It is guaranteed that the order of extraction of data into the
        * output vector is the same as that for extract_values().
        * That is to say that the unzipped key and value pairs as given by
        * extract_symbols() and extract_values() always have a 1:1
@@ -67,7 +67,7 @@ namespace Differentiation
        * The value entries will be converted into the @p NumberType given
        * as a template parameter to this function via the @p ExpressionType.
        *
-       * @note It is guarenteed that the order of extraction of data into the
+       * @note It is guaranteed that the order of extraction of data into the
        * output vector is the same as that for extract_symbols().
        * That is to say that the unzipped key and value pairs as given by
        * extract_symbols() and extract_values() always have a 1:1

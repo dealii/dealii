@@ -60,7 +60,7 @@ namespace hp
      * succeeding finite elements for refinement and preceding ones for
      * coarsening.
      *
-     * In this struct, we supply a hierachy that is imposed on all FECollection
+     * In this struct, we supply a hierarchy that is imposed on all FECollection
      * objects by default.
      */
     struct DefaultHierarchy

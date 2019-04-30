@@ -50,7 +50,7 @@ namespace Differentiation
      * indicates its component index.
      *
      * @tparam dim The dimension of the returned tensor.
-     * @param[in] symbol An indentifier (or name) for the vector of returned
+     * @param[in] symbol An identifier (or name) for the vector of returned
      *            symbolic variables.
      * @return A vector (a rank-1 tensor) of symbolic variables with the name of
      *         each individual component prefixed by @p symbol.
@@ -73,7 +73,7 @@ namespace Differentiation
      *
      * @tparam rank The rank of the returned tensor.
      * @tparam dim The dimension of the returned tensor.
-     * @param[in] symbol An indentifier (or name) for the tensor of returned
+     * @param[in] symbol An identifier (or name) for the tensor of returned
      *            symbolic variables.
      * @return A tensor of symbolic variables with the name of each individual
      *         component prefixed by @p symbol.
@@ -96,7 +96,7 @@ namespace Differentiation
      *
      * @tparam rank The rank of the returned tensor.
      * @tparam dim The dimension of the returned tensor.
-     * @param[in] symbol An indentifier (or name) for the tensor of returned
+     * @param[in] symbol An identifier (or name) for the tensor of returned
      *            symbolic variables.
      * @return A tensor of symbolic variables with the name of each individual
      *         component prefixed by @p symbol.
@@ -115,7 +115,7 @@ namespace Differentiation
      * @p arguments map; the values stored in the map are ignored.
      *
      * @tparam dim The dimension of the returned tensor.
-     * @param[in] symbol An indentifier (or name) for the vector of returned
+     * @param[in] symbol An identifier (or name) for the vector of returned
      *            symbolic functions.
      * @param[in] arguments A map of input arguments to the returned
      *            symbolic functions.
@@ -140,7 +140,7 @@ namespace Differentiation
      *
      * @tparam rank The rank of the returned tensor.
      * @tparam dim The dimension of the returned tensor.
-     * @param[in] symbol An indentifier (or name) for the tensor of returned
+     * @param[in] symbol An identifier (or name) for the tensor of returned
      *            symbolic functions.
      * @param[in] arguments A map of input arguments to the returned
      *            symbolic functions.
@@ -165,7 +165,7 @@ namespace Differentiation
      *
      * @tparam rank The rank of the returned tensor.
      * @tparam dim The dimension of the returned tensor.
-     * @param[in] symbol An indentifier (or name) for the tensor of returned
+     * @param[in] symbol An identifier (or name) for the tensor of returned
      *            symbolic functions.
      * @param[in] arguments A map of input arguments to the returned
      *            symbolic functions.

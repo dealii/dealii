@@ -17,7 +17,7 @@
 #
 # This script does the same thing as contrib/utilities/indent-all but only
 # reformats files which have changed (or have been added but neither
-# staged/commited) since the last merge commit to the master branch.
+# staged/committed) since the last merge commit to the master branch.
 #
 # The script needs to be executed as
 #   ./contrib/utilities/indent

@@ -145,7 +145,7 @@ public:
    *     = *ptr_to_some_number; // Invalid call
    * @endcode
    *
-   * Similar to the first example, we must be concious of the fact that the
+   * Similar to the first example, we must be conscious of the fact that the
    * copies of any @p Type stored by @p data only remains valid while the
    * GeneralDataStorage instance in which it is stored is alive.
    *

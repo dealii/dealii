@@ -122,7 +122,7 @@ namespace CUDAWrappers
 
       // The element is placed in the 'first position' along *-axis. These also
       // determine which face is constrained. For example, in 2D, if
-      // constr_face_x and constr_type are set, then x = 0 is contrained.
+      // constr_face_x and constr_type are set, then x = 0 is constrained.
       constexpr unsigned int constr_type_x = 1 << 0;
       constexpr unsigned int constr_type_y = 1 << 1;
       constexpr unsigned int constr_type_z = 1 << 2;

@@ -1316,7 +1316,7 @@ namespace Step44
 
         // Here (in a most inefficient way) we check the effect of
         // taking the proposed Newton step, and adjust it using
-        // the line-search algorith.
+        // the line-search algorithm.
 
         // Previous step residual
         BlockVector<double> residual_0 = this->system_rhs;

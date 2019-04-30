@@ -169,7 +169,7 @@ namespace LinearAlgebra
       VectorOperation::values                         operation,
       std::shared_ptr<const CommunicationPatternBase> communication_pattern)
     {
-      // If no communication pattern is given, create one. Otherwsie, use the
+      // If no communication pattern is given, create one. Otherwise, use the
       // one given.
       if (communication_pattern == nullptr)
         {

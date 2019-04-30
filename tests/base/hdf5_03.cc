@@ -109,7 +109,7 @@ get_factor()
   return static_cast<Number>(std::complex<float>(1, 1));
 }
 
-// This function assignes data to the elements of the container
+// This function assigns data to the elements of the container
 template <template <class...> class Container, typename Number>
 typename std::enable_if<
   std::is_same<Container<Number>, std::vector<Number>>::value,

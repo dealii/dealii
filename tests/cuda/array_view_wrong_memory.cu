@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// check that we detect creating ArrayView objects wit the wrong memory space.
+// check that we detect creating ArrayView objects with the wrong memory space.
 
 #include <deal.II/base/array_view.h>
 

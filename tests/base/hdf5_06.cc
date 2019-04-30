@@ -64,7 +64,7 @@ initialize_container(std::vector<hsize_t> dimensions)
 
 
 
-// This function assignes data to the elements of the container
+// This function assigns data to the elements of the container
 template <template <class...> class Container, typename Number>
 typename std::enable_if<
   std::is_same<Container<Number>, std::vector<Number>>::value,

@@ -1297,7 +1297,7 @@ namespace ColorEnriched
                ++face)
             {
               // cell shouldn't be at the boundary and
-              // neigboring cell is not already visited (to avoid visiting
+              // neighboring cell is not already visited (to avoid visiting
               // same face twice). Note that the cells' material ids are
               // labeled according to their order in dof_handler previously.
               if (!cell->at_boundary(face) &&
