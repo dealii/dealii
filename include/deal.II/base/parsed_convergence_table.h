@@ -153,8 +153,7 @@ public:
    * ParsedConvergenceTable table({"u", "v", "v"},
    *                              {{Linfty_norm}, {L2_norm, H1_norm}});
    * @endcode
-   *
-   * Would produce (if the parameter file is left untouched) a table similar to
+   * would produce (if the parameter file is left untouched) a table similar to
    * @code
    * cells dofs u_Linfty_norm    v_L2_norm      v_H1_norm
    * 4     9    1.183e-01 -    5.156e-02 -    2.615e-01 -
@@ -164,13 +163,13 @@ public:
    * 1024  1089 5.325e-04 2.09 2.106e-04 2.09 1.574e-02 1.05
    * @endcode
    *
-   * Se the documentation of VectorTools::NormType for a list of
+   * See the documentation of VectorTools::NormType for a list of
    * available norms you can compute using this class, and see the other
    * constructor for a documentation of all the parameters you can change.
    *
-   * @param component_names Specify the names of the components
+   * @param component_names Specify the names of the components;
    * @param list_of_error_norms Specify what error norms to compute for each
-   * unique component name
+   * unique component name.
    */
   ParsedConvergenceTable(
     const std::vector<std::string> &                    component_names = {"u"},
@@ -335,9 +334,7 @@ public:
    *   }
    * table.output_table(std::cout);
    * @endcode
-   *
    * will produce a table similar to
-   *
    * @code
    *    dt        u_L2_norm
    * 5.000e-1    5.156e-02 -
@@ -345,10 +342,8 @@ public:
    * 1.250e-2    3.360e-03 2.34
    * 6.250e-3    8.418e-04 2.18
    * @endcode
-   *
    * provided that you use the following parameter file (only non default
    * entries are shown here):
-   *
    * @code
    * set Extra columns =
    * set List of error norms to compute   = L2_norm
