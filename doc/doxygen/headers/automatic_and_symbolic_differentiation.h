@@ -14,13 +14,13 @@
 // ---------------------------------------------------------------------
 
 /**
- * @defgroup auto_symb_diff Automatic differentiation
+ * @defgroup auto_symb_diff Automatic and symbolic differentiation
  *
  * @brief A module dedicated to the implementation of functions and classes that relate
- * to automatic differentiation.
+ * to automatic and symbolic differentiation.
  *
- * Below we provide a very brief introduction as to what automatic differentiation is,
- * what variations of this computational / numerical scheme exist, and how it is integrated
+ * Below we provide a very brief introduction as to what automatic and symbolic differentiation are,
+ * what variations of these computational / numerical schemes exist, and how they are integrated
  * within deal.II's framework.
  *
  * @section auto_diff_1 Automatic differentiation
@@ -464,4 +464,10 @@
  * - a <a href="https://github.com/dealii/code-gallery/tree/master/Quasi_static_Finite_strain_Compressible_Elasticity">code-gallery example</a>, and
  * - our <a href="https://github.com/dealii/dealii/tree/master/tests/sacado">test-suite</a>.
  *
+ *
+ * @section symb_diff_1 Symbolic differentiation
+ *
+ * TODO. As a temporary placeholder, here is a link to the Wikipedia article on
+ * <a href="https://en.wikipedia.org/wiki/Symbolic_differentiation">symbolic differentiation</a> and the
+ * <a href="https://www.sympy.org/en/index.html">SymPy</a> library.
  */
