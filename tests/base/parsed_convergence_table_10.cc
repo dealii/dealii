@@ -66,7 +66,7 @@ main()
       auto dt    = [&]() { return i + 1.0; };
 
       table.add_extra_column("cycle", cycle);
-      table.add_extra_column("dt", dt, true);
+      table.add_extra_column("dt", dt, false);
       table.error_from_exact(dh, sol, exact);
     }
 

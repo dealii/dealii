@@ -171,12 +171,11 @@ ParsedConvergenceTable::prepare_table_for_output()
                 has_key = true;
 
               if (col != "")
-                table.omit_column_from_convergence_rate_evaluation(
-                  Patterns::Tools::to_string(col));
+                table.omit_column_from_convergence_rate_evaluation(col);
             }
 
           for (const auto &extra_col : extra_column_functions)
-            if (extra_col.second.second)
+            if (extra_col.second.second == false)
               {
                 if (rate_key == extra_col.first)
                   has_key = true;
@@ -188,12 +187,10 @@ ParsedConvergenceTable::prepare_table_for_output()
             {
               if (rate_mode == "reduction_rate_log2")
                 table.evaluate_all_convergence_rates(
-                  Patterns::Tools::to_string(rate_key),
-                  ConvergenceTable::reduction_rate_log2);
+                  rate_key, ConvergenceTable::reduction_rate_log2);
               else if (rate_mode == "reduction_rate")
                 table.evaluate_all_convergence_rates(
-                  Patterns::Tools::to_string(rate_key),
-                  ConvergenceTable::reduction_rate);
+                  rate_key, ConvergenceTable::reduction_rate);
               else
                 {
                   Assert(rate_mode != "none", ExcInternalError());
@@ -264,9 +261,9 @@ void
 ParsedConvergenceTable::add_extra_column(
   const std::string &            column_name,
   const std::function<double()> &custom_function,
-  const bool &                   exclude_from_rates)
+  const bool &                   compute_rate)
 {
-  extra_column_functions[column_name] = {custom_function, exclude_from_rates};
+  extra_column_functions[column_name] = {custom_function, compute_rate};
 }
 
 DEAL_II_NAMESPACE_CLOSE

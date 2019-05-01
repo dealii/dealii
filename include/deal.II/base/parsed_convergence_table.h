@@ -222,7 +222,7 @@ public:
    * # Number of digits to use when printing the error.
    * set Error precision                  = 3
    *
-   * # Extra columns to add to the table. Available options are dofs and cells
+   * # Extra columns to add to the table. Available options are dofs and cells.
    * set Extra columns                    = dofs, cells
    *
    * # The exponent to use when computing p-norms.
@@ -306,7 +306,7 @@ public:
    * error_from_exact() or difference().
    *
    * Make sure you add all extra columns before the first call to
-   * error_from_exact() or difference(), since adding additional columns to the
+   * error_from_exact() or difference(). Adding additional columns to the
    * convergence table after you already started filling the table will trigger
    * an exception.
    *
@@ -321,7 +321,7 @@ public:
    *        return dt;
    * };
    *
-   * table.add_extra_column("dt", dt_function,  true);
+   * table.add_extra_column("dt", dt_function, false);
    *
    * for (unsigned int i = 0; i < n_cycles; ++i)
    *   {
@@ -343,9 +343,9 @@ public:
    * provided that you use the following parameter file (only non default
    * entries are shown here):
    * @code
-   * set Extra columns =
-   * set List of error norms to compute   = L2_norm
-   * set Rate key                         = dt
+   * set Extra columns                  =
+   * set List of error norms to compute = L2_norm
+   * set Rate key                       = dt
    * @endcode
    *
    *
@@ -353,13 +353,16 @@ public:
    * @param custom_function Function that will be called to fill the given
    * entry. You need to make sure that the scope of this function is valid
    * up to the call to error_from_exact() or difference();
-   * @param exclude_from_rates If set to true, then no error rates will be
-   * computed for this column.
+   * @param compute_rate If set to true, then this column will be included in
+   * the list of columns for which error rates are computed. You may want to set
+   * this to false if you want to compute error rates with respect to this
+   * column. In this case, you should also specify @p column_name as the rate
+   * key in the parameter file.
    */
   void
   add_extra_column(const std::string &            column_name,
                    const std::function<double()> &custom_function,
-                   const bool &                   exclude_from_rates = false);
+                   const bool &                   compute_rate = true);
 
   /**
    * Difference between two solutions in the same vector space.
@@ -434,7 +437,7 @@ private:
   std::vector<std::set<VectorTools::NormType>> norms_per_unique_component;
 
   /**
-   * Exponent to use in the p-norm types.
+   * Exponent to use in p-norm types.
    */
   double exponent;
 
@@ -469,8 +472,8 @@ private:
   std::string error_file_name;
 
   /**
-   * Compute the error. If this is false, all functions regarding
-   * errors are disabled and don't do anything.
+   * Compute the error. If this is false, all methods that perform the
+   * computation of the error are disabled and don't do anything.
    */
   bool compute_error;
 };
