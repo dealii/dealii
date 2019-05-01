@@ -108,8 +108,7 @@ test()
   additional_data.mapping_update_flags = update_values | update_gradients |
                                          update_JxW_values |
                                          update_quadrature_points;
-  mf_data.reinit(
-    mapping, dof, constraints, quad, MPI_COMM_WORLD, additional_data);
+  mf_data.reinit(mapping, dof, constraints, quad, additional_data);
 
   const unsigned int coef_size =
     tria.n_locally_owned_active_cells() * std::pow(fe_degree + 1, dim);

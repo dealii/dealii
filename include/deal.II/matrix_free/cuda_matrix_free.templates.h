@@ -539,47 +539,21 @@ namespace CUDAWrappers
                                   const DoFHandler<dim> &          dof_handler,
                                   const AffineConstraints<Number> &constraints,
                                   const Quadrature<1> &            quad,
-                                  const MPI_Comm &                 comm,
                                   const AdditionalData additional_data)
   {
-    internal_reinit(mapping,
-                    dof_handler,
-                    constraints,
-                    quad,
-                    std::make_shared<const MPI_Comm>(comm),
-                    additional_data);
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::reinit(const DoFHandler<dim> &          dof_handler,
-                                  const AffineConstraints<Number> &constraints,
-                                  const Quadrature<1> &            quad,
-                                  const MPI_Comm &                 comm,
-                                  const AdditionalData additional_data)
-  {
-    internal_reinit(StaticMappingQ1<dim>::mapping,
-                    dof_handler,
-                    constraints,
-                    quad,
-                    std::make_shared<const MPI_Comm>(comm),
-                    additional_data);
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::reinit(const Mapping<dim> &             mapping,
-                                  const DoFHandler<dim> &          dof_handler,
-                                  const AffineConstraints<Number> &constraints,
-                                  const Quadrature<1> &            quad,
-                                  const AdditionalData additional_data)
-  {
-    internal_reinit(
-      mapping, dof_handler, constraints, quad, nullptr, additional_data);
+    const auto &triangulation = dof_handler.get_triangulation();
+    if (const auto parallel_triangulation =
+          dynamic_cast<const parallel::Triangulation<dim> *>(&triangulation))
+      internal_reinit(mapping,
+                      dof_handler,
+                      constraints,
+                      quad,
+                      std::make_shared<const MPI_Comm>(
+                        parallel_triangulation->get_communicator()),
+                      additional_data);
+    else
+      internal_reinit(
+        mapping, dof_handler, constraints, quad, nullptr, additional_data);
   }
 
 
@@ -591,12 +565,11 @@ namespace CUDAWrappers
                                   const Quadrature<1> &            quad,
                                   const AdditionalData additional_data)
   {
-    internal_reinit(StaticMappingQ1<dim>::mapping,
-                    dof_handler,
-                    constraints,
-                    quad,
-                    nullptr,
-                    additional_data);
+    reinit(StaticMappingQ1<dim>::mapping,
+           dof_handler,
+           constraints,
+           quad,
+           additional_data);
   }
 
 
