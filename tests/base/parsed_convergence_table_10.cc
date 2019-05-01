@@ -44,8 +44,7 @@ main()
   table.add_parameters(prm);
 
   std::string input = "set Extra columns = dofs, cells\n"
-                      "set Rate key = dt\n"
-                      "set Enable output to streams = false\n";
+                      "set Rate key = dt\n";
 
   prm.parse_input_from_string(input);
 

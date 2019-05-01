@@ -1,6 +1,5 @@
 
 DEAL:parameters::Enable computation of the errors: true
-DEAL:parameters::Enable output to streams: true
 DEAL:parameters::Error file name: 
 DEAL:parameters::Error precision: 3
 DEAL:parameters::Exponent for p-norms: 2

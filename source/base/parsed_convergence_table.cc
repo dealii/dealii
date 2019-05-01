@@ -70,7 +70,6 @@ ParsedConvergenceTable::ParsedConvergenceTable(
                            "reduction_rate_log2",
                            "",
                            3,
-                           true,
                            true)
 {}
 
@@ -85,8 +84,7 @@ ParsedConvergenceTable::ParsedConvergenceTable(
   const std::string &                                 rate_mode,
   const std::string &                                 error_file_name,
   const unsigned int &                                precision,
-  const bool &                                        compute_error,
-  const bool &                                        output_error)
+  const bool &                                        compute_error)
   : component_names(component_names)
   , unique_component_names(get_unique_component_names(component_names))
   , unique_component_masks(get_unique_component_masks(component_names))
@@ -98,7 +96,6 @@ ParsedConvergenceTable::ParsedConvergenceTable(
   , precision(precision)
   , error_file_name(error_file_name)
   , compute_error(compute_error)
-  , output_error(output_error)
 {
   AssertDimension(norms_per_unique_component.size(),
                   unique_component_names.size());
@@ -109,15 +106,10 @@ ParsedConvergenceTable::ParsedConvergenceTable(
 void
 ParsedConvergenceTable::add_parameters(ParameterHandler &prm)
 {
-  prm.add_parameter("Enable output to streams",
-                    output_error,
-                    "When set to false, printing of the convergence table "
-                    "to the stream specified as input to output_table() "
-                    "is disabled.");
-
   prm.add_parameter("Enable computation of the errors",
                     compute_error,
                     "When set to false, no computations are performed.");
+
   prm.add_parameter("Error precision",
                     precision,
                     "Number of digits to use when printing the error.",
@@ -165,7 +157,7 @@ ParsedConvergenceTable::add_parameters(ParameterHandler &prm)
 
 
 void
-ParsedConvergenceTable::output_table(std::ostream &out)
+ParsedConvergenceTable::prepare_table_for_output()
 {
   if (compute_error)
     {
@@ -216,35 +208,53 @@ ParsedConvergenceTable::output_table(std::ostream &out)
                             "not exist in the current table."));
             }
         }
+    }
+}
 
-      if (output_error)
-        table.write_text(out);
 
-      if (error_file_name != "")
+
+void
+ParsedConvergenceTable::output_table(std::ostream &out)
+{
+  if (compute_error)
+    {
+      prepare_table_for_output();
+      table.write_text(out);
+      output_table();
+    }
+}
+
+
+
+void
+ParsedConvergenceTable::output_table()
+{
+  if (compute_error && error_file_name != "")
+    {
+      prepare_table_for_output();
+
+      const std::string error_file_format =
+        error_file_name.substr(error_file_name.find_last_of('.') + 1);
+
+      std::ofstream table_file(error_file_name);
+
+      if (error_file_format == "tex")
+        table.write_tex(table_file);
+      else if (error_file_format == "txt")
+        table.write_text(table_file);
+      else if (error_file_format == "gpl")
+        table.write_text(table_file,
+                         TableHandler::table_with_separate_column_description);
+      else if (error_file_format == "org")
+        table.write_text(table_file, TableHandler::org_mode_table);
+      else
         {
-          const std::string error_file_format =
-            error_file_name.substr(error_file_name.find_last_of('.') + 1);
-
-          std::ofstream table_file(error_file_name);
-
-          if (error_file_format == "tex")
-            table.write_tex(table_file);
-          else if (error_file_format == "txt")
-            table.write_text(table_file);
-          else if (error_file_format == "gpl")
-            table.write_text(
-              table_file, TableHandler::table_with_separate_column_description);
-          else if (error_file_format == "org")
-            table.write_text(table_file, TableHandler::org_mode_table);
-          else
-            {
-              AssertThrow(false,
-                          ExcInternalError(
-                            std::string("Unrecognized file format: ") +
-                            error_file_format));
-            }
-          table_file.close();
+          AssertThrow(false,
+                      ExcInternalError(
+                        std::string("Unrecognized file format: ") +
+                        error_file_format));
         }
+      table_file.close();
     }
 }
 

@@ -99,6 +99,9 @@ DEAL_II_NAMESPACE_OPEN
  * table with `H1` and `L2` norm of the error in the velocity field (first two,
  * components) and `L2` error in the pressure field.
  *
+ * You may also call `table.output_table()` without arguments, to write the
+ * table only to the file specified in the parameter file.
+ *
  * By calling the method add_parameters() passing a ParameterHandler object,
  * the following options will be defined in the given ParameterHandler object
  * (in the current level of the ParameterHandler object, i.e., whatever level
@@ -106,7 +109,6 @@ DEAL_II_NAMESPACE_OPEN
  * and can be modified at run time through a parameter file:
  * @code
  * set Enable computation of the errors = true
- * set Enable output to streams         = true
  * set Error file name                  =
  * set Error precision                  = 3
  * set Exponent for p-norms             = 2
@@ -145,7 +147,8 @@ public:
    *
    * The size of the vector @p list_of_error_norms must match the number of
    * unique component names, and may contain zero or more comma separated
-   * strings that identify the norm types to compute for each component.
+   * identifiers for the norm to compute for each component (see the
+   * documentation of VectorTools::NormType for the available options).
    *
    * For example, the following constructor
    * @code
@@ -163,9 +166,8 @@ public:
    * 1024  1089 5.325e-04 2.09 2.106e-04 2.09 1.574e-02 1.05
    * @endcode
    *
-   * See the documentation of VectorTools::NormType for a list of
-   * available norms you can compute using this class, and see the other
-   * constructor for a documentation of all the parameters you can change.
+   * See the other constructor for a documentation of all the parameters you can
+   * change.
    *
    * @param component_names Specify the names of the components;
    * @param list_of_error_norms Specify what error norms to compute for each
@@ -200,10 +202,6 @@ public:
    * @param precision How many digits to use when writing the error;
    * @param compute_error Control wether the filling of the table is enabled
    * or not. This flag may be used to disable at run time any error computation;
-   * @param output_error Control the behaviour of the output_table() method. Set
-   * this to true if you want output_table() to write the table to its input
-   * argument. This flag may be used to disable at run time any explicit output
-   * to stream.
    *
    * The parameters you specify with this constructor can be written to a
    * ParameterHandler object by calling the add_parameters() method. Once you
@@ -216,10 +214,6 @@ public:
    * # ---------------------
    * # When set to false, no computations are performed.
    * set Enable computation of the errors = true
-   *
-   * # When set to false, printing of the convergence table to the stream
-   * # specified as input to output_table() is disabled.
-   * set Enable output to streams         = true
    *
    * # Set this to a filename with extension .txt, .gpl, .org, or .tex to enable
    * # writing the convergence table to a file.
@@ -257,8 +251,7 @@ public:
     const std::string &                                 rate_mode,
     const std::string &                                 error_file_name,
     const unsigned int &                                precision,
-    const bool &                                        compute_error,
-    const bool &                                        output_error);
+    const bool &                                        compute_error);
 
   /**
    * Attach all the parameters in this class to entries of the parameter
@@ -312,6 +305,11 @@ public:
    * internally in the lambda function remain valid until the call to
    * error_from_exact() or difference().
    *
+   * Make sure you add all extra columns before the first call to
+   * error_from_exact() or difference(), since adding additional columns to the
+   * convergence table after you already started filling the table will trigger
+   * an exception.
+   *
    * This method may be used, for example, to compute the error w.r.t. to
    * time step increments in time, for example:
    * @code
@@ -351,10 +349,10 @@ public:
    * @endcode
    *
    *
-   * @param name Name of the column to add.
+   * @param name Name of the column to add;
    * @param custom_function Function that will be called to fill the given
    * entry. You need to make sure that the scope of this function is valid
-   * up to the
+   * up to the call to error_from_exact() or difference();
    * @param exclude_from_rates If set to true, then no error rates will be
    * computed for this column.
    */
@@ -386,13 +384,29 @@ public:
              const Function<DoFHandlerType::space_dimension> *weight = nullptr);
 
   /**
-   * Write the error table to the @p out stream, and (possibly) to the file
-   * stream specified in the parameters.
+   * Write the error table to the @p out stream (in text format), and
+   * (possibly) to the file stream specified in the parameters (with the format
+   * deduced from the file name extension).
    */
   void
-  output_table(std::ostream &out = std::cout);
+  output_table(std::ostream &out);
+
+  /**
+   * Write the error table to the file stream specified in the parameters.
+   *
+   * If the "Error file name" option in the parameter file is set to the empty
+   * string, no output is written.
+   */
+  void
+  output_table();
 
 private:
+  /**
+   * Add rates to the output table.
+   */
+  void
+  prepare_table_for_output();
+
   /**
    * Names of the solution components.
    */
@@ -459,11 +473,6 @@ private:
    * errors are disabled and don't do anything.
    */
   bool compute_error;
-
-  /**
-   * Output the error file also on screen.
-   */
-  bool output_error;
 };
 
 
