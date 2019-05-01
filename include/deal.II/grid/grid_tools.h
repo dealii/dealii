@@ -1102,7 +1102,8 @@ namespace GridTools
    * only search among @p marked_vertices for the closest vertex.
    * The size of this array should be equal to n_vertices() of the
    * triangulation (as opposed to n_used_vertices() ).
-   * @return An pair of an iterators into the mesh that points to the
+   *
+   * @return A pair of an iterators into the mesh that points to the
    * surrounding cell, and of the coordinates of that point inside the cell in
    * the reference coordinates of that cell. This local position might be
    * located slightly outside an actual unit cell, due to numerical roundoff.
