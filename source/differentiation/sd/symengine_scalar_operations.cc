@@ -121,6 +121,15 @@ namespace Differentiation
     } // namespace internal
 
 
+    types::substitution_map
+    make_substitution_map(const Expression &symbol, const Expression &value)
+    {
+      types::substitution_map substitution_map;
+      add_to_substitution_map(substitution_map, symbol, value);
+      return substitution_map;
+    }
+
+
     /* ---------------- Symbolic substitution map enlargement --------------*/
 
 
