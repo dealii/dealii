@@ -337,6 +337,35 @@ public:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
   /**
+   * Return the mapped center of a cell.
+   *
+   * If you are using a (bi-,tri-)linear mapping that preserves vertex
+   * locations, this function simply returns the value also produced by
+   * `cell->center()`. However, there are also mappings that add displacements
+   * or choose completely different locations, e.g., MappingQEulerian,
+   * MappingQ1Eulerian, or MappingFEField, and mappings based on high order
+   * polynomials, for which the center may not coincide with the average of
+   * the vertex locations.
+   *
+   * By default, this function returns the push forward of the center of the
+   * reference cell. If the parameter
+   * @p map_center_of_reference_cell is set to false, than the return value
+   * will be the average of the vertex locations, as returned by the
+   * get_vertices() method.
+   *
+   * @param[in] cell The cell for which you want to compute the center
+   * @param[in] map_center_of_reference_cell A flag that switches the algorithm
+   * for the computation of the cell center from
+   * transform_unit_to_real_cell() applied to the center of the reference cell
+   * to computing the vertex averages.
+   *
+   * @author Luca Heltai, 2019.
+   */
+  virtual Point<spacedim>
+  get_center(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+             const bool map_center_of_reference_cell = true) const;
+
+  /**
    * Return whether the mapping preserves vertex locations. In other words,
    * this function returns whether the mapped location of the reference cell
    * vertices (given by GeometryInfo::unit_cell_vertex()) equals the result of

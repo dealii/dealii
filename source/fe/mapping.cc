@@ -37,6 +37,31 @@ Mapping<dim, spacedim>::get_vertices(
 
 
 template <int dim, int spacedim>
+Point<spacedim>
+Mapping<dim, spacedim>::get_center(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  const bool map_center_of_reference_cell) const
+{
+  if (map_center_of_reference_cell)
+    {
+      Point<dim> reference_center;
+      for (unsigned int d = 0; d < dim; ++d)
+        reference_center[d] = .5;
+      return transform_unit_to_real_cell(cell, reference_center);
+    }
+  else
+    {
+      const auto      vertices = get_vertices(cell);
+      Point<spacedim> center;
+      for (const auto &v : vertices)
+        center += v;
+      return center / GeometryInfo<dim>::vertices_per_cell;
+    }
+}
+
+
+
+template <int dim, int spacedim>
 Point<dim - 1>
 Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
