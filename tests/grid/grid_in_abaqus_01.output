@@ -8,6 +8,9 @@ DEAL::  hash=19
 DEAL::2d_test_abaqus.inp
 DEAL::  75 active cells
 DEAL::  hash=7783
+DEAL::2d_short_handwritten.inp
+DEAL::  1 active cells
+DEAL::  hash=0
 DEAL::3d_test_cube_1.inp
 DEAL::  1 active cells
 DEAL::  hash=0

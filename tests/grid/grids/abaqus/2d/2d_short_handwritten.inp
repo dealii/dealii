@@ -1,0 +1,12 @@
+*HEADING
+This file is the simplest mesh that can
+be written by hand.
+No space between values. No decimal points.
+It does not have a new line at the end of the last line.
+*NODE
+1,0,0
+2,1,0
+3,0,1
+4,1,1
+*ELEMENT, TYPE=CPE4, ELSET=EB0
+1,1,2,4,3
