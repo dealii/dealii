@@ -44,9 +44,9 @@ namespace internal
       //---------------------------------------------------------------------------
 
       /**
-       * On noncartesian grids, the sign of the DoFs associated with the faces
+       * On non-Cartesian grids, the sign of the DoFs associated with the faces
        * of the elements has to be changed in some cases.  This procedure
-       * implements an algorithm, which determines the DoFs, which need this
+       * implements an algorithm that determines those DoFs that need this
        * sign change for a given cell.
        */
       void
@@ -358,7 +358,7 @@ FE_PolyTensor<PolynomialType, dim, spacedim>::fill_fe_values(
 
   // Create table with sign changes, due to the special structure of the RT
   // elements.
-  // TODO: Preliminary hack to demonstrate the overall prinicple!
+  // TODO: Preliminary hack to demonstrate the overall principle!
 
   // Compute eventual sign changes depending on the neighborhood
   // between two faces.
