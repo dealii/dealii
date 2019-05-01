@@ -69,7 +69,7 @@ be obtained with mesh refinement.
 <h3> The equation to solve </h3>
 This program solves the Poisson equation 
 using the weak Galerkin finite element method:
-@f{eqnarray*}
+@f{align*}{
   \nabla \cdot \left( -\mathbf{K} \nabla p \right)
     = f,
     \quad \mathbf{x} \in \Omega, \\
@@ -445,7 +445,7 @@ where $-\sum_{j} \sum_{i} P_ic_{ij}d_{jk}$ is called
 Using this velocity obtained by "postprocessing" the solution, we can
 define the $L_2$-errors of pressure, velocity, and flux 
 by the following formulas:
-@f{eqnarray*}
+@f{align*}{
 \|p-p_h^\circ\|^2
   &= \sum_{K \in \mathbb{T}} \|p-p_h^\circ\|_{L_2(K)}^2, \\
  \|\mathbf{u}-\mathbf{u}_h\|^2
