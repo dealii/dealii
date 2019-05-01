@@ -71,11 +71,11 @@ This program solves the Poisson equation
 using the weak Galerkin finite element method:
 @f{align*}{
   \nabla \cdot \left( -\mathbf{K} \nabla p \right)
-    = f,
-    \quad \mathbf{x} \in \Omega, \\
-  p =  p_D,\quad \mathbf{x} \in \Gamma^D, \\
-  \mathbf{u} \cdot \mathbf{n} = u_N,
-  \quad \mathbf{x} \in \Gamma^N, 
+    &= f,
+    \qquad \mathbf{x} \in \Omega, \\
+  p &=  p_D,\qquad \mathbf{x} \in \Gamma^D, \\
+  \mathbf{u} \cdot \mathbf{n} &= u_N,
+  \qquad \mathbf{x} \in \Gamma^N, 
 @f}
 where $\Omega \subset \mathbb{R}^n (n=2,3)$ is a bounded domain. 
 In the context of the flow of a fluid through a porous medium,
