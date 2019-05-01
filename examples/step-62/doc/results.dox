@@ -1,0 +1,134 @@
+<h1>Results</h1>
+
+<h3>Resonance frequency and bandgap</h3>
+
+The results are analyzed in the 
+[jupyter notebook](https://github.com/dealii/dealii/blob/phononic-cavity/examples/step-62/step-62.ipynb)
+with the following code
+@code{.py}
+h5_file = h5py.File('results.h5', 'r')
+data = h5_file['data']
+
+# Gaussian function that we use to fit the resonance
+def resonance_f(freq, freq_m, quality_factor, max_amplitude):
+    omega = 2 * constants.pi * freq
+    omega_m = 2 * constants.pi * freq_m
+    gamma = omega_m / quality_factor
+    return max_amplitude * omega_m**2 * gamma**2 / (((omega_m**2 - omega**2)**2 + gamma**2 * omega**2))
+
+frequency = data['displacement']['frequency'][...]
+# Average the probe points
+displacement = np.mean(data['displacement']['displacement'], axis=0)
+calibration_displacement = np.mean(data['calibration']['displacement'], axis=0)
+reflection_coefficient = displacement / calibration_displacement
+reflectivity = (np.abs(np.mean(data['displacement']['displacement'][...]**2, axis=0))/
+                np.abs(np.mean(data['calibration']['displacement'][...]**2, axis=0)))
+
+try:
+    x_data = frequency
+    y_data = reflectivity
+    quality_factor_guess = 1e3
+    freq_guess = x_data[np.argmax(y_data)]
+    amplitude_guess = np.max(y_data)
+    fit_result, covariance = scipy.optimize.curve_fit(resonance_f, x_data, y_data,
+                                                      [freq_guess, quality_factor_guess, amplitude_guess])
+    freq_m = fit_result[0]
+    quality_factor = np.abs(fit_result[1])
+    max_amplitude = fit_result[2]
+    y_data_fit = resonance_f(x_data, freq_m, quality_factor, max_amplitude)
+
+    fig = plt.figure()
+    plt.plot(frequency / 1e9, reflectivity, frequency / 1e9, y_data_fit)
+    plt.xlabel('frequency (GHz)')
+    plt.ylabel('amplitude^2 (a.u.)')
+    plt.title('Transmission\n' + 'freq = ' + "%.7g" % (freq_guess / 1e9) + 'GHz Q = ' + "%.6g" % quality_factor)
+except:
+    fig = plt.figure()
+    plt.plot(frequency / 1e9, reflectivity)
+    plt.xlabel('frequency (GHz)')
+    plt.ylabel('amplitude^2 (a.u.)')
+    plt.title('Transmission')
+
+fig = plt.figure()
+plt.plot(frequency / 1e9, np.angle(reflection_coefficient))
+plt.xlabel('frequency (GHz)')
+plt.ylabel('phase (rad)')
+plt.title('Phase (transmission coefficient)\n')
+
+plt.show()
+h5_file.close()
+@endcode
+
+A phononic cavity is characterized by the
+[resonance frequency](https://en.wikipedia.org/wiki/Resonance) and the
+[the quality factor](https://en.wikipedia.org/wiki/Q_factor).
+The quality factor is equal to the ratio between the stored energy in the resonator and the energy
+dissipated energy per cycle, which is approximately equivalent to the ratio between the
+resonance frequency and the
+[full width at half maximum (FWHM)](https://en.wikipedia.org/wiki/Full_width_at_half_maximum).
+The FWHM is equal to the bandwidth over which the power of vibration is greater than half the
+power at the resonant frequency.
+@f[
+Q = \frac{f_r}{\Delta f} = \frac{\omega_r}{\Delta \omega} =
+2 \pi \times \frac{\text{energy stored}}{\text{energy dissipated per cycle}}
+@f]
+
+The square of the amplitude of the mechanical resonance $a^2$ as a function of the frequency
+has a gaussian shape 
+@f[
+a^2 = a_\textrm{max}^2\frac{\omega^2\Gamma^2}{(\omega_r^2-\omega^2)^2+\Gamma^2\omega^2}
+@f]
+where $f_r = \frac{\omega_r}{2\pi}$ is the resonance frequency and $\Gamma=\frac{\omega_r}{Q}$ is the dissipation rate.
+We used the previous equation in the jupyter notebook to fit the mechanical resonance.
+
+Given the values we have chosen for the parameters, one could estimate the resonance frequency
+analytically. Indeed, this is then confirmed by what we get in this program:
+the phononic superlattice cavity exhibits a mechanical resonance at 20GHz and a quality factor of 5046.
+The following images show the transmission amplitude and phase as a function of frequency in the
+vicinity of the resonance frequency:
+
+<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.05.png" height="400" />
+<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.06.png" height="400" />
+
+The images above suggest that the periodic structure has its intended effect: It really only lets waves of a very
+specific frequency pass through, whereas all other waves are reflected. This is of course precisely what one builds
+these sorts of devices for.
+But it is not quite this easy. In practice, there is really only a "band gap", i.e., the device blocks waves other than
+the desired one at 20GHz only within a certain frequency range. Indeed, to find out how large this "gap" is within
+which waves are blocked, we can extend the frequency range to 16 GHz through the appropriate parameters in the
+input file. We then obtain the following image:
+
+<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.07.png" height="400" />
+
+What this image suggests is that in the range of around 18 to around 22 GHz, really only the waves with a frequency
+of 20 GHz are allowed to pass through, but beyond this range, there are plenty of other frequencies that can pass
+through the device.
+
+<h3>Mode profile</h3>
+
+We can inspect the mode profile with Paraview or Visit. 
+As we have discussed, at resonance all the mechanical
+energy is transmitted and the amplitude of motion is amplified inside the cavity.
+It can be observed that the PMLs are quite effective to truncate the solution.
+The following image shows the mode profile at resonance:
+
+<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.08.png" height="400" />
+
+On the other hand,  out of resonance all the mechanical energy is
+reflected. The following image shows the profile at 19.75 GHz.
+Note the interference between the force pulse and the reflected wave
+at the position $x=-8\mu\textrm{m}$.
+
+<img alt="Phononic superlattice cavity" src="https://www.dealii.org/images/steps/developer/step-62.09.png" height="400" />
+
+<h3>Experimental applications</h3>
+
+Phononic superlattice cavities find application in
+[quantum optomechanics](https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.86.1391).
+Here we have presented the simulation of a 2D superlattice cavity,
+but this code can be used as well to simulate "real world" 3D devices such as
+[micropillar superlattice cavities](https://journals.aps.org/prb/abstract/10.1103/PhysRevB.99.060101),
+which are promising candidates to study macroscopic quantum phenomena.
+The 20GHz mode of a micropillar superlattice cavity is essentially a mechanical harmonic oscillator that is very well isolated
+from the environment. If the device is cooled down to 20mK in a dilution fridge, the mode would then become a
+macroscopic quantum harmonic oscillator.

@@ -31,6 +31,7 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "*.cc"
     PATTERN "*.prm"
     PATTERN "*.inp"
+    PATTERN "*.ipynb"
     PATTERN "step*/CMakeLists.txt"
     PATTERN "doxygen/CMakeLists.txt"
     #
