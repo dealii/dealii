@@ -34,6 +34,26 @@ IF(NOT ${deal.II_FOUND})
     )
 ENDIF()
 
+#
+# Are all dependencies fulfilled?
+#
+IF(NOT (DEAL_II_WITH_PETSC AND DEAL_II_PETSC_WITH_COMPLEX AND DEAL_II_WITH_P4EST AND DEAL_II_WITH_HDF5)) # keep in one line
+  MESSAGE(FATAL_ERROR "
+Error! This tutorial requires a deal.II library that was configured with the following options:
+    DEAL_II_WITH_PETSC = ON
+    DEAL_II_PETSC_WITH_COMPLEX = ON
+    DEAL_II_WITH_P4EST = ON
+    DEAL_II_WITH_HDF5 = ON
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+    DEAL_II_WITH_PETSC = ${DEAL_II_WITH_PETSC}
+    DEAL_II_PETSC_WITH_COMPLEX = ${DEAL_II_PETSC_WITH_COMPLEX}
+    DEAL_II_WITH_P4EST = ${DEAL_II_WITH_P4EST}
+    DEAL_II_WITH_HDF5 = ${DEAL_II_WITH_HDF5}
+which conflict with the requirements.
+One or both of the aforementioned combinations of prerequisites are not met by your installation, but at least one is required for this tutorial step."
+    )
+ENDIF()
+
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET})
 DEAL_II_INVOKE_AUTOPILOT()
