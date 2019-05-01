@@ -135,9 +135,9 @@ dseupd_(int *         rvec,
  * The ArpackSolver can be used in application codes with serial objects in
  * the following way:
  * @code
- * SolverControl solver_control (1000, 1e-9);
- * ArpackSolver (solver_control);
- * system.solve (A, B, OP, lambda, x, size_of_spectrum);
+ * SolverControl solver_control(1000, 1e-9);
+ * ArpackSolver solver(solver_control);
+ * solver.solve(A, B, OP, lambda, x, size_of_spectrum);
  * @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where the variable
  * <code>size_of_spectrum</code> tells ARPACK the number of
