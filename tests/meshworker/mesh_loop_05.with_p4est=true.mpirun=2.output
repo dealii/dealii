@@ -1,0 +1,13 @@
+
+DEAL::Testing <2,2>
+DEAL::Volume: 1.00000
+DEAL::Boundary surface: 4.00000
+DEAL::Interior surface: 2.00000
+DEAL::Testing <2,3>
+DEAL::Volume: 1.00000
+DEAL::Boundary surface: 4.00000
+DEAL::Interior surface: 2.00000
+DEAL::Testing <3,3>
+DEAL::Volume: 1.00000
+DEAL::Boundary surface: 6.00000
+DEAL::Interior surface: 3.00000

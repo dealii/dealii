@@ -1,0 +1,5 @@
+Improved: The `Meshworker::mesh_loop()` function is now capable of working with an
+IteratorRange, and also supports iterator ranges constructed from
+FilteredIterators. 
+<br>
+(Jean-Paul Pelteret, 2019/05/02)
