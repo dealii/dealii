@@ -125,8 +125,9 @@ ParsedConvergenceTable::add_parameters(ParameterHandler &prm)
     "List of error norms to compute",
     norms_per_unique_component,
     "Each component is separated by a semicolon "
-    "and each norm by a comma. Implemented norms are Linfty, L2, "
-    "W1infty, H1, and custom. If you want to skip a component, use none.");
+    "and each norm by a comma. See the documentation of VectorTools::NormType "
+    "for a list of implemented norms. If you want to skip a component, leave "
+    "its entry empty.");
 
 
   prm.add_parameter("Exponent for p-norms",

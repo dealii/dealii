@@ -228,10 +228,10 @@ public:
    * # The exponent to use when computing p-norms.
    * set Exponent for p-norms             = 2
    *
-   * # Each component is separated by a semicolon, and each norm by a comma.
-   * # Implemented norms are Linfty, L2, W1infty, H1, and custom. If you want to
-   * # skip a component, use none.
-   * set List of error norms to compute   = Linfty, L2, H1
+   * # Each component is separated by a semicolon and each norm by a comma. See
+   * # the documentation of VectorTools::NormType for a list of implemented
+   * # norms. If you want to skip a component, leave its entry empty.
+   * set List of error norms to compute   = Linfty_norm, L2_norm, H1_norm
    *
    * # Key to use when computing convergence rates. If this is set to a
    * # column that is not present, or to none, then no error rates are computed.
