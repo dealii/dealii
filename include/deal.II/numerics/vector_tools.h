@@ -21,6 +21,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/patterns.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -3307,6 +3308,119 @@ namespace VectorTools
                    "locally owned by this processor.");
 } // namespace VectorTools
 
+
+// Make sure we can use NormType with Patterns.
+namespace Patterns
+{
+  namespace Tools
+  {
+    template <>
+    struct Convert<VectorTools::NormType, void>
+    {
+      /**
+       * Return the Correct pattern for NormType.
+       */
+      static std::unique_ptr<Patterns::PatternBase>
+      to_pattern()
+      {
+        return std_cxx14::make_unique<Patterns::Selection>(
+          "mean|L1_norm|L2_norm|Lp_norm|"
+          "Linfty_norm|H1_seminorm|Hdiv_seminorm|"
+          "H1_norm|W1p_seminorm|W1p_norm|"
+          "W1infty_seminorm|W1infty_norm");
+      }
+
+
+
+      /**
+       * Convert a NormType to a string.
+       */
+      static std::string
+      to_string(const VectorTools::NormType &                 s,
+                const std::unique_ptr<Patterns::PatternBase> &p =
+                  Convert<VectorTools::NormType>::to_pattern())
+      {
+        std::string str;
+        if (s == VectorTools::mean)
+          str = "mean";
+        else if (s == VectorTools::L1_norm)
+          str = "L1_norm";
+        else if (s == VectorTools::L2_norm)
+          str = "L2_norm";
+        else if (s == VectorTools::Lp_norm)
+          str = "Lp_norm";
+        else if (s == VectorTools::Linfty_norm)
+          str = "Linfty_norm";
+        else if (s == VectorTools::H1_seminorm)
+          str = "H1_seminorm";
+        else if (s == VectorTools::Hdiv_seminorm)
+          str = "Hdiv_seminorm";
+        else if (s == VectorTools::H1_norm)
+          str = "H1_norm";
+        else if (s == VectorTools::W1p_seminorm)
+          str = "W1p_seminorm";
+        else if (s == VectorTools::W1infty_seminorm)
+          str = "W1infty_seminorm";
+        else if (s == VectorTools::W1infty_norm)
+          str = "W1infty_norm";
+        else if (s == VectorTools::W1p_norm)
+          str = "W1p_norm";
+        else
+          {
+            AssertThrow(false, ExcMessage("Didn't recognize a norm type."));
+          }
+        AssertThrow(p->match(str), ExcInternalError());
+        return str;
+      }
+
+
+      /**
+       * Convert a string to a NormType.
+       */
+      static VectorTools::NormType
+      to_value(const std::string &                           str,
+               const std::unique_ptr<Patterns::PatternBase> &p =
+                 Convert<VectorTools::NormType>::to_pattern())
+      {
+        VectorTools::NormType norm = VectorTools::mean;
+        AssertThrow(p->match(str),
+                    ExcMessage(
+                      "String " + str +
+                      " cannot be converted to VectorTools::NormType"));
+
+        if (str == "mean")
+          norm = VectorTools::mean;
+        else if (str == "L1_norm")
+          norm = VectorTools::L1_norm;
+        else if (str == "L2_norm")
+          norm = VectorTools::L2_norm;
+        else if (str == "Lp_norm")
+          norm = VectorTools::Lp_norm;
+        else if (str == "Linfty_norm")
+          norm = VectorTools::Linfty_norm;
+        else if (str == "H1_seminorm")
+          norm = VectorTools::H1_seminorm;
+        else if (str == "Hdiv_seminorm")
+          norm = VectorTools::Hdiv_seminorm;
+        else if (str == "H1_norm")
+          norm = VectorTools::H1_norm;
+        else if (str == "W1p_seminorm")
+          norm = VectorTools::W1p_seminorm;
+        else if (str == "W1infty_seminorm")
+          norm = VectorTools::W1infty_seminorm;
+        else if (str == "W1infty_norm")
+          norm = VectorTools::W1infty_norm;
+        else if (str == "W1p_norm")
+          norm = VectorTools::W1p_norm;
+        else
+          {
+            AssertThrow(false, ExcMessage("Didn't recognize a norm type."));
+          }
+        return norm;
+      }
+    };
+  } // namespace Tools
+} // namespace Patterns
 
 DEAL_II_NAMESPACE_CLOSE
 

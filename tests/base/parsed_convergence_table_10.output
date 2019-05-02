@@ -1,0 +1,35 @@
+
+cells dofs      cycle         dt     
+    4    9 1.000e+00     - 1.000e+00 
+   16   25 2.000e+00 -2.00 2.000e+00 
+   64   81 3.000e+00 -2.00 3.000e+00 
+  256  289 4.000e+00 -2.00 4.000e+00 
+ 1024 1089 5.000e+00 -2.00 5.000e+00 
+
+| cells | dofs | cycle     | cycle...red.rate.log2 | dt        | 
+| 4     | 9    | 1.000e+00 | -                     | 1.000e+00 | 
+| 16    | 25   | 2.000e+00 | -2.00                 | 2.000e+00 | 
+| 64    | 81   | 3.000e+00 | -2.00                 | 3.000e+00 | 
+| 256   | 289  | 4.000e+00 | -2.00                 | 4.000e+00 | 
+| 1024  | 1089 | 5.000e+00 | -2.00                 | 5.000e+00 | 
+
+\documentclass[10pt]{report}
+\usepackage{float}
+
+
+\begin{document}
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|r|r|c|c|c|} \hline
+\# cells & \# dofs & 
+\multicolumn{2}{|c|}{cycle} & dt\\ \hline
+4 & 9 & 1.000e+00 & - & 1.000e+00\\ \hline
+16 & 25 & 2.000e+00 & -2.00 & 2.000e+00\\ \hline
+64 & 81 & 3.000e+00 & -2.00 & 3.000e+00\\ \hline
+256 & 289 & 4.000e+00 & -2.00 & 4.000e+00\\ \hline
+1024 & 1089 & 5.000e+00 & -2.00 & 5.000e+00\\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+\end{document}
+
