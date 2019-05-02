@@ -270,7 +270,7 @@ namespace Differentiation
     //@}
 
     /**
-     * @name Symbolic substitution map enlargement
+     * @name Symbol substitution map enlargement
      */
     //@{
 
