@@ -30,15 +30,13 @@ namespace Differentiation
 {
   namespace SD
   {
-    namespace SE = ::SymEngine;
-
     /**
      * @name Mathematical functions
      *
      * It is necessary that all computed inputs to SymEngine functions are
-     * of type SE::RCP<SE::Basic>. So we instead simply offer a unified
-     * interface to Expression types and with other permutations of numbers
-     * we convert between them.
+     * of type SymEngine::RCP<SymEngine::Basic>. So we instead simply offer a
+     * unified interface to Expression types and with other permutations of
+     * numbers we convert between them.
      *
      * For a full list of functions that we (ultimately) expect to support, see
      * http://www.cplusplus.com/reference/cmath/. Those that are currently
