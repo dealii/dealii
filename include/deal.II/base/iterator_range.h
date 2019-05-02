@@ -175,6 +175,21 @@ public:
     operator!=(const IteratorOverIterators &i_o_i) const;
 
     /**
+     * Implicit conversion operator.
+     *
+     * @warning When you call this conversion operator (i.e., you convert this
+     * iterator-over-iterators to the iterator we are currently pointing to),
+     * you obtain a `const` reference to this underlying iterator. The only
+     * thing you can really do with this result is dereferencing itself: it
+     * presumably points to something useful, but since you don't know where
+     * the pointed to object lives, you shouldn't increment or decrement the
+     * iterator you get from this operator. As a consequence, the returned
+     * iterator is marked as `const`, as this should prevent you from doing
+     * anything other than dereference it.
+     */
+    operator const BaseIterator &() const;
+
+    /**
      * Mark the class as forward iterator and declare some alias which are
      * standard for iterators and are used by algorithms to enquire about the
      * specifics of the iterators they work on.
@@ -295,6 +310,16 @@ operator!=(const IteratorOverIterators &i_o_i) const
 {
   return element_of_iterator_collection != i_o_i.element_of_iterator_collection;
 }
+
+
+
+template <typename Iterator>
+inline IteratorRange<Iterator>::IteratorOverIterators::
+operator const BaseIterator &() const
+{
+  return element_of_iterator_collection;
+}
+
 
 
 template <typename Iterator>
