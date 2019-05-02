@@ -172,7 +172,7 @@ public:
      * object than the iterator represented by the argument.
      */
     bool
-    operator!=(const IteratorOverIterators &i_o_i);
+    operator!=(const IteratorOverIterators &i_o_i) const;
 
     /**
      * Mark the class as forward iterator and declare some alias which are
@@ -291,7 +291,7 @@ IteratorRange<Iterator>::IteratorOverIterators::operator++(int)
 template <typename Iterator>
 inline bool
 IteratorRange<Iterator>::IteratorOverIterators::
-operator!=(const IteratorOverIterators &i_o_i)
+operator!=(const IteratorOverIterators &i_o_i) const
 {
   return element_of_iterator_collection != i_o_i.element_of_iterator_collection;
 }
