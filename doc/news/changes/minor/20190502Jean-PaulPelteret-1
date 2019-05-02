@@ -1,0 +1,5 @@
+Improved: The Workstream::run() function is now capable of working with iterator
+ranges, or any general iterable object that defines the `begin()` and `end()`
+of a range of elements to iterate over.
+<br>
+(Jean-Paul Pelteret, 2019/05/02)
