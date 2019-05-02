@@ -303,6 +303,10 @@ ADD_CUSTOM_TARGET(doxygen ALL
   )
 ADD_DEPENDENCIES(documentation doxygen)
 
+# Set the canonical link for the doxygen webpages
+ADD_CUSTOM_COMMAND(TARGET doxygen POST_BUILD
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.py)
+
 INSTALL(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/deal.tag
   DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen
