@@ -32,21 +32,19 @@ namespace Differentiation
 {
   namespace SD
   {
-    namespace SE = ::SymEngine;
-
     namespace Utilities
     {
       /**
        * Convert a map of Expressions to its SymEngine counterpart.
        */
-      SE::map_basic_basic
+      SymEngine::map_basic_basic
       convert_expression_map_to_basic_map(
         const SD::types::substitution_map &substitution_map);
 
       /**
        * Convert a vector of Expressions to its SymEngine counterpart.
        */
-      SE::vec_basic
+      SymEngine::vec_basic
       convert_expression_vector_to_basic_vector(
         const SD::types::symbol_vector &symbol_vector);
 

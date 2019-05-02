@@ -39,8 +39,6 @@ namespace Differentiation
 {
   namespace SD
   {
-    namespace SE = ::SymEngine;
-
     /**
      * @name Symbolic variable creation
      */
@@ -147,7 +145,7 @@ namespace Differentiation
        * we can expect to perform substitution on.
        */
       bool
-      is_valid_substitution_symbol(const SE::Basic &entry);
+      is_valid_substitution_symbol(const SymEngine::Basic &entry);
     } // namespace internal
 
     //@}
@@ -300,9 +298,10 @@ namespace Differentiation
        */
       template <bool ignore_invalid_symbols = false>
       void
-      add_to_substitution_map(types::substitution_map &       substitution_map,
-                              const SE::RCP<const SE::Basic> &symbol,
-                              const SE::RCP<const SE::Basic> &value);
+      add_to_substitution_map(
+        types::substitution_map &                     substitution_map,
+        const SymEngine::RCP<const SymEngine::Basic> &symbol,
+        const SymEngine::RCP<const SymEngine::Basic> &value);
     } // namespace internal
 
     /**
@@ -350,7 +349,8 @@ namespace Differentiation
      * compatible SymEngine number type.
      * It is therefore required that the @p ExpressionType
      * 1. can be constructed from a @p ValueType, and that
-     * 2. it is convertible to a `const SE::RCP<const SE::Basic> &`.
+     * 2. it is convertible to a `const SymEngine::RCP<const SymEngine::Basic>
+     * &`.
      *
      * For more context which this function is used, see the other
      * \ref add_to_substitution_map(types::substitution_map &,const
@@ -367,7 +367,7 @@ namespace Differentiation
               typename = typename std::enable_if<
                 dealii::internal::is_explicitly_convertible<
                   ExpressionType,
-                  const SE::RCP<const SE::Basic> &>::value &&
+                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
                 std::is_constructible<ExpressionType, ValueType>::value>::type>
     void
     add_to_substitution_map(types::substitution_map &substitution_map,
@@ -384,7 +384,8 @@ namespace Differentiation
      * be used to convert the p value to a compatible SymEngine number type.
      * It is therefore required that the @p ExpressionType
      * 1. can be constructed from a @p ValueType, and that
-     * 2. it is convertible to a `const SE::RCP<const SE::Basic> &`.
+     * 2. it is convertible to a `const SymEngine::RCP<const SymEngine::Basic>
+     * &`.
      *
      * For more context which this function is used, see the other
      * \ref add_to_substitution_map(types::substitution_map &,const
@@ -401,7 +402,7 @@ namespace Differentiation
               typename = typename std::enable_if<
                 dealii::internal::is_explicitly_convertible<
                   ExpressionType,
-                  const SE::RCP<const SE::Basic> &>::value &&
+                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
                 std::is_constructible<ExpressionType, ValueType>::value>::type>
     void
     add_to_substitution_map(types::substitution_map &          substitution_map,
@@ -681,9 +682,10 @@ namespace Differentiation
        */
       template <bool ignore_invalid_symbols>
       void
-      add_to_substitution_map(types::substitution_map &       substitution_map,
-                              const SE::RCP<const SE::Basic> &symbol,
-                              const SE::RCP<const SE::Basic> &value)
+      add_to_substitution_map(
+        types::substitution_map &                     substitution_map,
+        const SymEngine::RCP<const SymEngine::Basic> &symbol,
+        const SymEngine::RCP<const SymEngine::Basic> &value)
       {
         if (ignore_invalid_symbols == false)
           {
@@ -729,7 +731,7 @@ namespace Differentiation
                             const ExpressionType &   symbol,
                             const ValueType &        value)
     {
-      using SE_RCP_Basic = const SE::RCP<const SE::Basic> &;
+      using SE_RCP_Basic = const SymEngine::RCP<const SymEngine::Basic> &;
       internal::add_to_substitution_map<ignore_invalid_symbols>(
         substitution_map,
         static_cast<SE_RCP_Basic>(symbol),
@@ -752,7 +754,7 @@ namespace Differentiation
 
       typename types::symbol_vector::const_iterator   it_s = symbols.begin();
       typename std::vector<ValueType>::const_iterator it_v = values.begin();
-      using SE_RCP_Basic = const SE::RCP<const SE::Basic> &;
+      using SE_RCP_Basic = const SymEngine::RCP<const SymEngine::Basic> &;
       for (; it_s != symbols.end(); ++it_s, ++it_v)
         {
           Assert(it_v != values.end(), ExcInternalError());
@@ -801,8 +803,8 @@ namespace Differentiation
     {
       for (const auto &entry : symbol_values)
         {
-          const SE::RCP<const SE::Basic> &symbol = entry.first;
-          const SE::RCP<const SE::Basic> &value  = entry.second;
+          const SymEngine::RCP<const SymEngine::Basic> &symbol = entry.first;
+          const SymEngine::RCP<const SymEngine::Basic> &value  = entry.second;
           internal::add_to_substitution_map<ignore_invalid_symbols>(
             substitution_map, symbol, value);
         }

@@ -66,8 +66,6 @@ namespace Differentiation
 {
   namespace SD
   {
-    namespace SE = ::SymEngine;
-
     /**
      * @addtogroup Exceptions
      * @{
@@ -225,7 +223,7 @@ namespace Differentiation
       /**
        * Constructor for integer types.
        */
-      Expression(const SE::integer_class &value);
+      Expression(const SymEngine::integer_class &value);
 
       /**
        * Constructor for rational types.
@@ -241,7 +239,7 @@ namespace Differentiation
       /**
        * Constructor for rational types.
        */
-      Expression(const SE::rational_class &value);
+      Expression(const SymEngine::rational_class &value);
 
       /**
        * Constructor for a piecewise defined function.
@@ -375,7 +373,7 @@ namespace Differentiation
        * from implicit conversion when both the deal.II and SymEngine namespaces
        * are imported.
        */
-      explicit Expression(const SE::Expression &rhs);
+      explicit Expression(const SymEngine::Expression &rhs);
 
       /**
        * Copy constructor.
@@ -385,7 +383,7 @@ namespace Differentiation
        * "diff", because the returned result is not primitive, but rather a set
        * of compound operations.
        */
-      Expression(const SE::RCP<const SE::Basic> &rhs);
+      Expression(const SymEngine::RCP<const SymEngine::Basic> &rhs);
 
       /**
        * Move constructor.
@@ -400,7 +398,7 @@ namespace Differentiation
        * "diff", because the returned result is not primitive, but rather a set
        * of compound operations.
        */
-      Expression(SE::RCP<const SE::Basic> &&rhs);
+      Expression(SymEngine::RCP<const SymEngine::Basic> &&rhs);
 
       /**
        * Destructor.
@@ -479,21 +477,21 @@ namespace Differentiation
       /**
        * Return the value or expression that this class instance represents.
        */
-      const SE::Expression &
+      const SymEngine::Expression &
       get_expression() const;
 
       /**
        * Return the primitive SymEngine data type that stores the value or
        * expression represented by this object.
        */
-      const SE::Basic &
+      const SymEngine::Basic &
       get_value() const;
 
       /**
        * Return the pointer to the primitive SymEngine data type that stores
        * the value or expression represented by this object.
        */
-      const SE::RCP<const SE::Basic> &
+      const SymEngine::RCP<const SymEngine::Basic> &
       get_RCP() const;
 
       //@}
@@ -644,14 +642,15 @@ namespace Differentiation
        * with respect to the given @p symbol.
        */
       Expression
-      differentiate(const SE::RCP<const SE::Symbol> &symbol) const;
+      differentiate(
+        const SymEngine::RCP<const SymEngine::Symbol> &symbol) const;
 
       /**
        * Return the derivative of this object's @p expression
        * with respect to the potential @p symbol.
        */
       Expression
-      differentiate(const SE::RCP<const SE::Basic> &symbol) const;
+      differentiate(const SymEngine::RCP<const SymEngine::Basic> &symbol) const;
 
       //@}
 
@@ -755,7 +754,8 @@ namespace Differentiation
        *     template <typename ResultType>
        *     explicit operator ResultType() const
        *     {
-       *       if (this->get_value()->get_type_code() == SE::NUMBER_WRAPPER)
+       *       if (this->get_value()->get_type_code() ==
+       * SymEngine::NUMBER_WRAPPER)
        *       {
        *         // Implement custom evaluation function
        *         const ResultType result = ...;
@@ -775,13 +775,13 @@ namespace Differentiation
        * Conversion operator that returns the value or expression that this
        * class instance represents.
        */
-      explicit operator const SE::Expression &() const;
+      explicit operator const SymEngine::Expression &() const;
 
       /**
        * Conversion operator that returns a SymEngine reference counted pointer
        * to the fundamental type.
        */
-      operator const SE::RCP<const SE::Basic> &() const;
+      operator const SymEngine::RCP<const SymEngine::Basic> &() const;
 
       //@}
 
@@ -789,7 +789,7 @@ namespace Differentiation
       /**
        * Return the value or expression that this class instance represents.
        */
-      SE::Expression &
+      SymEngine::Expression &
       get_expression();
 
     private:
@@ -797,7 +797,7 @@ namespace Differentiation
        * The value or expression that this instance of this class is to
        * represent.
        */
-      SE::Expression expression;
+      SymEngine::Expression expression;
     };
 
     /**
@@ -1170,8 +1170,9 @@ namespace Differentiation
     template <typename NumberType, typename>
     Expression::Expression(const NumberType &numerator,
                            const NumberType &denominator)
-      : expression(SE::Rational::from_two_ints(*SE::integer(numerator),
-                                               *SE::integer(denominator)))
+      : expression(
+          SymEngine::Rational::from_two_ints(*SymEngine::integer(numerator),
+                                             *SymEngine::integer(denominator)))
     {}
 
 
@@ -1220,7 +1221,7 @@ namespace Differentiation
     Expression::substitute(const Expression &symbol,
                            const NumberType &value) const
     {
-      Assert(SE::is_a<SE::Symbol>(symbol.get_value()),
+      Assert(SymEngine::is_a<SymEngine::Symbol>(symbol.get_value()),
              ExcMessage(
                "Substitution with a number that does not represent a symbol."));
 
@@ -1252,7 +1253,7 @@ namespace Differentiation
     Expression &
     Expression::operator+=(const NumberType &rhs)
     {
-      *this = Expression(SE::add(get_RCP(), Expression(rhs).get_RCP()));
+      *this = Expression(SymEngine::add(get_RCP(), Expression(rhs).get_RCP()));
       return *this;
     }
 
@@ -1261,7 +1262,7 @@ namespace Differentiation
     Expression &
     Expression::operator-=(const NumberType &rhs)
     {
-      *this = Expression(SE::sub(get_RCP(), Expression(rhs).get_RCP()));
+      *this = Expression(SymEngine::sub(get_RCP(), Expression(rhs).get_RCP()));
       return *this;
     }
 
@@ -1270,7 +1271,7 @@ namespace Differentiation
     Expression &
     Expression::operator*=(const NumberType &rhs)
     {
-      *this = Expression(SE::mul(get_RCP(), Expression(rhs).get_RCP()));
+      *this = Expression(SymEngine::mul(get_RCP(), Expression(rhs).get_RCP()));
       return *this;
     }
 
@@ -1279,7 +1280,7 @@ namespace Differentiation
     Expression &
     Expression::operator/=(const NumberType &rhs)
     {
-      *this = Expression(SE::div(get_RCP(), Expression(rhs).get_RCP()));
+      *this = Expression(SymEngine::div(get_RCP(), Expression(rhs).get_RCP()));
       return *this;
     }
 

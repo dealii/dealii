@@ -31,6 +31,9 @@ namespace Differentiation
 {
   namespace SD
   {
+    namespace SE = ::SymEngine;
+
+
     /* ------------------------- Symbol creation -----------------------*/
 
 
