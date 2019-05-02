@@ -1364,27 +1364,27 @@ namespace GridTools
 
     // If marked_indices is empty, consider all used_vertices for finding the
     // closest vertex to the point. Otherwise, marked_indices is used.
-    const std::vector<bool> &used = (marked_vertices.size() == 0) ?
-                                      tria.get_used_vertices() :
-                                      marked_vertices;
+    const std::vector<bool> &vertices_to_use = (marked_vertices.size() == 0) ?
+                                                 tria.get_used_vertices() :
+                                                 marked_vertices;
 
     // At the beginning, the first used vertex is considered to be the closest
     // one.
     std::vector<bool>::const_iterator first =
-      std::find(used.begin(), used.end(), true);
+      std::find(vertices_to_use.begin(), vertices_to_use.end(), true);
 
     // Assert that at least one vertex is actually used
-    Assert(first != used.end(), ExcInternalError());
+    Assert(first != vertices_to_use.end(), ExcInternalError());
 
-    unsigned int best_vertex = std::distance(used.begin(), first);
+    unsigned int best_vertex = std::distance(vertices_to_use.begin(), first);
     double       best_dist   = (p - vertices[best_vertex]).norm_square();
 
     // For all remaining vertices, test
     // whether they are any closer
     for (unsigned int j = best_vertex + 1; j < vertices.size(); j++)
-      if (used[j])
+      if (vertices_to_use[j])
         {
-          double dist = (p - vertices[j]).norm_square();
+          const double dist = (p - vertices[j]).norm_square();
           if (dist < best_dist)
             {
               best_vertex = j;
