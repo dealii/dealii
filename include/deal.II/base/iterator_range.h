@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/template_constraints.h>
+
 #include <iterator>
 
 
@@ -249,6 +251,23 @@ private:
   const IteratorOverIterators it_begin;
   const IteratorOverIterators it_end;
 };
+
+
+
+/**
+ * Create an object of type IteratorRange given the beginning and
+ * end iterator.
+ *
+ * @author Jean-Paul Pelteret, 2019
+ */
+template <typename BaseIterator>
+IteratorRange<BaseIterator>
+make_iterator_range(const BaseIterator &                         begin,
+                    const typename identity<BaseIterator>::type &end)
+{
+  IteratorRange<BaseIterator> ir(begin, end);
+  return ir;
+}
 
 
 // ------------------- template member functions
