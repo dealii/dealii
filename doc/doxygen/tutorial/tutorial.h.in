@@ -445,6 +445,13 @@
  *       on non-matching grids.
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-62</td>
+ *       <td> Resonance frequency and bandgap of a phononic crystal. Elastic
+ *       wave equation in the frequency domain with Perfectly Matched Layer
+ *       boundary conditions. Parallelization via MUMPS and MPI.
+ *       </td></tr>
+ *
  * </table>
  *
  * <a name="topic"></a>
@@ -571,6 +578,14 @@
  *   </tr>
  *
  *   <tr valign="top">
+ *     <td> Parallelization via MUMPS and MPI
+ *     </td>
+ *     <td>
+ *       step-62
+ *     </td>
+ *   </tr>
+ *
+ *   <tr valign="top">
  *     <td> Parallelization on very large numbers of processors
  *     </td>
  *     <td>
@@ -597,7 +612,8 @@
  *       step-36,
  *       step-42,
  *       step-44,
- *       step-60
+ *       step-60,
+ *       step-62
  *     </td>
  *   </tr>
  *
@@ -721,6 +737,14 @@
  *     </td>
  *   </tr>
  *
+ *   <tr valign="top">
+ *     <td> HDF5 and Python
+ *     </td>
+ *     <td>
+ *       step-62
+ *     </td>
+ *   </tr>
+ *
  * </table>
  * <h4><b>Linear solvers</b></h4>
  * <table align="center" width="90%">
@@ -835,7 +859,8 @@
  *     </td>
  *     <td>
  *       step-7,
- *       step-29
+ *       step-29,
+ *       step-62
  *     </td>
  *   </tr>
  *
@@ -845,7 +870,8 @@
  *     <td>
  *       step-8,
  *       step-42,
- *       step-46
+ *       step-46,
+ *       step-62
  *     </td>
  *   </tr>
  *
