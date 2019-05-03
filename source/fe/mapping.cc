@@ -62,6 +62,29 @@ Mapping<dim, spacedim>::get_center(
 
 
 template <int dim, int spacedim>
+BoundingBox<spacedim>
+Mapping<dim, spacedim>::get_bounding_box(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  if (preserves_vertex_locations())
+    return cell->bounding_box();
+  else
+    {
+      const auto      vertices = get_vertices(cell);
+      Point<spacedim> p0 = vertices[0], p1 = vertices[0];
+      for (unsigned int j = 1; j < vertices.size(); ++j)
+        for (unsigned int d = 0; d < spacedim; ++d)
+          {
+            p0[d] = std::min(p0[d], vertices[j][d]);
+            p1[d] = std::max(p1[d], vertices[j][d]);
+          }
+      return BoundingBox<spacedim>({p0, p1});
+    }
+}
+
+
+
+template <int dim, int spacedim>
 Point<dim - 1>
 Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
