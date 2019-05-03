@@ -530,11 +530,11 @@ namespace step62
     // than the wavelength. In this case it can be shown that for the two
     // dimensional case
     // @f[
-    //  K_e = 4\mu\frac{\lambda +\mu}{\lamda+2\mu}
+    //  K_e = 4\mu\frac{\lambda +\mu}{\lambda+2\mu}
     // @f]
     // and for the three dimensional case $K_e$ is equal to the Young's modulus.
     // @f[
-    //  K_e = 4\mu\frac{\lambda +\mu}{\lamda+2\mu}
+    //  K_e = \mu\frac{3\lambda +2\mu}{\lambda+\mu}
     // @f]
     double elastic_constant;
     if (dim == 2)
