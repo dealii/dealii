@@ -1,0 +1,35 @@
+
+DEAL:Double::is_registered_tape? false
+DEAL:Double::Recording new tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? false
+DEAL:Double::Recording new tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? false
+DEAL:Double::Recording new tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? false
+DEAL:Double::Recording new tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::is_registered_tape? false
+DEAL:Double::Recording new tape
+DEAL:Double::is_registered_tape? true
+DEAL:Double::Reusing prerecorded tape
+DEAL:Double::OK
+DEAL::OK
