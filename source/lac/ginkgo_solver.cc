@@ -50,10 +50,10 @@ namespace GinkgoWrappers
       }
     else
       {
-        std::cerr
-          << "exec_type needs to be one of the three strings: \"reference\", \"cuda\" or \"omp\", but provided with"
-          << exec_type << std::endl;
-        std::exit(-1);
+        Assert(
+          false,
+          ExcMessage(
+            " exec_type needs to be one of the three strings: \"reference\", \"cuda\" or \"omp\" "));
       }
     using ResidualCriterionFactory = gko::stop::ResidualNormReduction<>;
     residual_criterion             = ResidualCriterionFactory::build()
@@ -69,6 +69,8 @@ namespace GinkgoWrappers
         .on(executor);
   }
 
+
+
   template <typename ValueType, typename IndexType>
   void
   SolverBase<ValueType, IndexType>::initialize_ginkgo_log()
@@ -78,6 +80,8 @@ namespace GinkgoWrappers
     convergence_logger = gko::log::Convergence<>::create(
       executor, gko::log::Logger::criterion_check_completed_mask);
   }
+
+
 
   template <typename ValueType, typename IndexType>
   void
@@ -199,12 +203,14 @@ namespace GinkgoWrappers
   }
 
 
+
   template <typename ValueType, typename IndexType>
   SolverControl &
   SolverBase<ValueType, IndexType>::control() const
   {
     return solver_control;
   }
+
 
 
   template <typename ValueType, typename IndexType>
@@ -280,6 +286,7 @@ namespace GinkgoWrappers
   }
 
 
+
   template <typename ValueType, typename IndexType>
   void
   SolverBase<ValueType, IndexType>::solve(const SparseMatrix<ValueType> &matrix,
@@ -291,8 +298,8 @@ namespace GinkgoWrappers
   }
 
 
-  /* ---------------------- SolverCG ------------------------ */
 
+  /* ---------------------- SolverCG ------------------------ */
   template <typename ValueType, typename IndexType>
   SolverCG<ValueType, IndexType>::SolverCG(SolverControl &       solver_control,
                                            const std::string &   exec_type,
@@ -304,6 +311,8 @@ namespace GinkgoWrappers
     this->solver_gen =
       cg::build().with_criteria(this->combined_factory).on(this->executor);
   }
+
+
 
   template <typename ValueType, typename IndexType>
   SolverCG<ValueType, IndexType>::SolverCG(
@@ -322,8 +331,8 @@ namespace GinkgoWrappers
   }
 
 
-  /* ---------------------- SolverBicgstab ------------------------ */
 
+  /* ---------------------- SolverBicgstab ------------------------ */
   template <typename ValueType, typename IndexType>
   SolverBicgstab<ValueType, IndexType>::SolverBicgstab(
     SolverControl &       solver_control,
@@ -337,6 +346,8 @@ namespace GinkgoWrappers
                          .with_criteria(this->combined_factory)
                          .on(this->executor);
   }
+
+
 
   template <typename ValueType, typename IndexType>
   SolverBicgstab<ValueType, IndexType>::SolverBicgstab(
@@ -354,8 +365,9 @@ namespace GinkgoWrappers
                          .on(this->executor);
   }
 
-  /* ---------------------- SolverCGS ------------------------ */
 
+
+  /* ---------------------- SolverCGS ------------------------ */
   template <typename ValueType, typename IndexType>
   SolverCGS<ValueType, IndexType>::SolverCGS(SolverControl &    solver_control,
                                              const std::string &exec_type,
@@ -367,6 +379,8 @@ namespace GinkgoWrappers
     this->solver_gen =
       cgs::build().with_criteria(this->combined_factory).on(this->executor);
   }
+
+
 
   template <typename ValueType, typename IndexType>
   SolverCGS<ValueType, IndexType>::SolverCGS(
@@ -384,8 +398,9 @@ namespace GinkgoWrappers
                          .on(this->executor);
   }
 
-  /* ---------------------- SolverFCG ------------------------ */
 
+
+  /* ---------------------- SolverFCG ------------------------ */
   template <typename ValueType, typename IndexType>
   SolverFCG<ValueType, IndexType>::SolverFCG(SolverControl &    solver_control,
                                              const std::string &exec_type,
@@ -397,6 +412,8 @@ namespace GinkgoWrappers
     this->solver_gen =
       fcg::build().with_criteria(this->combined_factory).on(this->executor);
   }
+
+
 
   template <typename ValueType, typename IndexType>
   SolverFCG<ValueType, IndexType>::SolverFCG(
@@ -414,13 +431,16 @@ namespace GinkgoWrappers
                          .on(this->executor);
   }
 
-  /* ---------------------- SolverGMRES ------------------------ */
 
+
+  /* ---------------------- SolverGMRES ------------------------ */
   template <typename ValueType, typename IndexType>
   SolverGMRES<ValueType, IndexType>::AdditionalData::AdditionalData(
     const unsigned int restart_parameter)
     : restart_parameter(restart_parameter)
   {}
+
+
 
   template <typename ValueType, typename IndexType>
   SolverGMRES<ValueType, IndexType>::SolverGMRES(SolverControl &solver_control,
@@ -435,6 +455,8 @@ namespace GinkgoWrappers
                          .with_criteria(this->combined_factory)
                          .on(this->executor);
   }
+
+
 
   template <typename ValueType, typename IndexType>
   SolverGMRES<ValueType, IndexType>::SolverGMRES(
@@ -453,8 +475,9 @@ namespace GinkgoWrappers
                          .on(this->executor);
   }
 
-  /* ---------------------- SolverIR ------------------------ */
 
+
+  /* ---------------------- SolverIR ------------------------ */
   template <typename ValueType, typename IndexType>
   SolverIR<ValueType, IndexType>::SolverIR(SolverControl &       solver_control,
                                            const std::string &   exec_type,
@@ -466,6 +489,8 @@ namespace GinkgoWrappers
     this->solver_gen =
       ir::build().with_criteria(this->combined_factory).on(this->executor);
   }
+
+
 
   template <typename ValueType, typename IndexType>
   SolverIR<ValueType, IndexType>::SolverIR(
@@ -482,6 +507,8 @@ namespace GinkgoWrappers
                          .with_solver(inner_solver)
                          .on(this->executor);
   }
+
+
 
   // Explicit instantiations in GinkgoWrappers
 #  define DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
