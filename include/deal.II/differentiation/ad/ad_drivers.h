@@ -744,8 +744,17 @@ namespace Differentiation
       // verification that we cannot use or exceed this value. This value is
       // defined as TBUFNUM; see
       // https://gitlab.com/adol-c/adol-c/blob/master/ADOL-C/include/adolc/internal/usrparms.h#L34
+#    ifdef __clang__
       static const typename Types<ADNumberType>::tape_index max_tape_index =
         TBUFNUM;
+#    else
+      // For some reason, the test adolc/helper_tape_index_01 indicates that
+      // ADOL-C does not reliably perform correct computations for the full
+      // range of tape indices when GCC is the compiler. So we limit this number
+      // according to the results of the test.
+      static const typename Types<ADNumberType>::tape_index max_tape_index =
+        TBUFNUM - 2;
+#    endif
     }; // struct Numbers
 
 
