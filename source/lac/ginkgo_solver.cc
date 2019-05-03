@@ -31,12 +31,30 @@ DEAL_II_NAMESPACE_OPEN
 namespace GinkgoWrappers
 {
   template <typename ValueType, typename IndexType>
-  SolverBase<ValueType, IndexType>::SolverBase(
-    SolverControl &                solver_control,
-    std::shared_ptr<gko::Executor> executor)
+  SolverBase<ValueType, IndexType>::SolverBase(SolverControl &solver_control,
+                                               const std::string &exec_type)
     : solver_control(solver_control)
-    , executor(executor)
+    , exec_type(exec_type)
   {
+    if (exec_type == "reference")
+      {
+        executor = gko::ReferenceExecutor::create();
+      }
+    else if (exec_type == "omp")
+      {
+        executor = gko::OmpExecutor::create();
+      }
+    else if (exec_type == "cuda" && gko::CudaExecutor::get_num_devices() > 0)
+      {
+        executor = gko::CudaExecutor::create(0, gko::OmpExecutor::create());
+      }
+    else
+      {
+        Assert(
+          false,
+          ExcMessage(
+            " exec_type needs to be one of the three strings: \"reference\", \"cuda\" or \"omp\" "));
+      }
     using ResidualCriterionFactory = gko::stop::ResidualNormReduction<>;
     residual_criterion             = ResidualCriterionFactory::build()
                            .with_reduction_factor(solver_control.tolerance())
@@ -51,6 +69,8 @@ namespace GinkgoWrappers
         .on(executor);
   }
 
+
+
   template <typename ValueType, typename IndexType>
   void
   SolverBase<ValueType, IndexType>::initialize_ginkgo_log()
@@ -60,6 +80,8 @@ namespace GinkgoWrappers
     convergence_logger = gko::log::Convergence<>::create(
       executor, gko::log::Logger::criterion_check_completed_mask);
   }
+
+
 
   template <typename ValueType, typename IndexType>
   void
@@ -181,12 +203,14 @@ namespace GinkgoWrappers
   }
 
 
+
   template <typename ValueType, typename IndexType>
   SolverControl &
   SolverBase<ValueType, IndexType>::control() const
   {
     return solver_control;
   }
+
 
 
   template <typename ValueType, typename IndexType>
@@ -262,6 +286,7 @@ namespace GinkgoWrappers
   }
 
 
+
   template <typename ValueType, typename IndexType>
   void
   SolverBase<ValueType, IndexType>::solve(const SparseMatrix<ValueType> &matrix,
@@ -273,20 +298,217 @@ namespace GinkgoWrappers
   }
 
 
-  /* ---------------------- SolverCG ------------------------ */
 
+  /* ---------------------- SolverCG ------------------------ */
   template <typename ValueType, typename IndexType>
-  SolverCG<ValueType, IndexType>::SolverCG(
-    SolverControl &                solver_control,
-    std::shared_ptr<gko::Executor> executor,
-    const AdditionalData &         data)
-    : SolverBase<ValueType, IndexType>(solver_control, executor)
+  SolverCG<ValueType, IndexType>::SolverCG(SolverControl &       solver_control,
+                                           const std::string &   exec_type,
+                                           const AdditionalData &data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
     , additional_data(data)
   {
     using cg = gko::solver::Cg<ValueType>;
     this->solver_gen =
-      cg::build().with_criteria(this->combined_factory).on(executor);
+      cg::build().with_criteria(this->combined_factory).on(this->executor);
   }
+
+
+
+  template <typename ValueType, typename IndexType>
+  SolverCG<ValueType, IndexType>::SolverCG(
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using cg         = gko::solver::Cg<ValueType>;
+    this->solver_gen = cg::build()
+                         .with_criteria(this->combined_factory)
+                         .with_preconditioner(preconditioner)
+                         .on(this->executor);
+  }
+
+
+
+  /* ---------------------- SolverBicgstab ------------------------ */
+  template <typename ValueType, typename IndexType>
+  SolverBicgstab<ValueType, IndexType>::SolverBicgstab(
+    SolverControl &       solver_control,
+    const std::string &   exec_type,
+    const AdditionalData &data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using bicgstab   = gko::solver::Bicgstab<ValueType>;
+    this->solver_gen = bicgstab::build()
+                         .with_criteria(this->combined_factory)
+                         .on(this->executor);
+  }
+
+
+
+  template <typename ValueType, typename IndexType>
+  SolverBicgstab<ValueType, IndexType>::SolverBicgstab(
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using bicgstab   = gko::solver::Bicgstab<ValueType>;
+    this->solver_gen = bicgstab::build()
+                         .with_criteria(this->combined_factory)
+                         .with_preconditioner(preconditioner)
+                         .on(this->executor);
+  }
+
+
+
+  /* ---------------------- SolverCGS ------------------------ */
+  template <typename ValueType, typename IndexType>
+  SolverCGS<ValueType, IndexType>::SolverCGS(SolverControl &    solver_control,
+                                             const std::string &exec_type,
+                                             const AdditionalData &data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using cgs = gko::solver::Cgs<ValueType>;
+    this->solver_gen =
+      cgs::build().with_criteria(this->combined_factory).on(this->executor);
+  }
+
+
+
+  template <typename ValueType, typename IndexType>
+  SolverCGS<ValueType, IndexType>::SolverCGS(
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using cgs        = gko::solver::Cgs<ValueType>;
+    this->solver_gen = cgs::build()
+                         .with_criteria(this->combined_factory)
+                         .with_preconditioner(preconditioner)
+                         .on(this->executor);
+  }
+
+
+
+  /* ---------------------- SolverFCG ------------------------ */
+  template <typename ValueType, typename IndexType>
+  SolverFCG<ValueType, IndexType>::SolverFCG(SolverControl &    solver_control,
+                                             const std::string &exec_type,
+                                             const AdditionalData &data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using fcg = gko::solver::Fcg<ValueType>;
+    this->solver_gen =
+      fcg::build().with_criteria(this->combined_factory).on(this->executor);
+  }
+
+
+
+  template <typename ValueType, typename IndexType>
+  SolverFCG<ValueType, IndexType>::SolverFCG(
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using fcg        = gko::solver::Fcg<ValueType>;
+    this->solver_gen = fcg::build()
+                         .with_criteria(this->combined_factory)
+                         .with_preconditioner(preconditioner)
+                         .on(this->executor);
+  }
+
+
+
+  /* ---------------------- SolverGMRES ------------------------ */
+  template <typename ValueType, typename IndexType>
+  SolverGMRES<ValueType, IndexType>::AdditionalData::AdditionalData(
+    const unsigned int restart_parameter)
+    : restart_parameter(restart_parameter)
+  {}
+
+
+
+  template <typename ValueType, typename IndexType>
+  SolverGMRES<ValueType, IndexType>::SolverGMRES(SolverControl &solver_control,
+                                                 const std::string &exec_type,
+                                                 const AdditionalData &data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using gmres      = gko::solver::Gmres<ValueType>;
+    this->solver_gen = gmres::build()
+                         .with_krylov_dim(additional_data.restart_parameter)
+                         .with_criteria(this->combined_factory)
+                         .on(this->executor);
+  }
+
+
+
+  template <typename ValueType, typename IndexType>
+  SolverGMRES<ValueType, IndexType>::SolverGMRES(
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+    const AdditionalData &                    data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using gmres      = gko::solver::Gmres<ValueType>;
+    this->solver_gen = gmres::build()
+                         .with_krylov_dim(additional_data.restart_parameter)
+                         .with_criteria(this->combined_factory)
+                         .with_preconditioner(preconditioner)
+                         .on(this->executor);
+  }
+
+
+
+  /* ---------------------- SolverIR ------------------------ */
+  template <typename ValueType, typename IndexType>
+  SolverIR<ValueType, IndexType>::SolverIR(SolverControl &       solver_control,
+                                           const std::string &   exec_type,
+                                           const AdditionalData &data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using ir = gko::solver::Ir<ValueType>;
+    this->solver_gen =
+      ir::build().with_criteria(this->combined_factory).on(this->executor);
+  }
+
+
+
+  template <typename ValueType, typename IndexType>
+  SolverIR<ValueType, IndexType>::SolverIR(
+    SolverControl &                           solver_control,
+    const std::string &                       exec_type,
+    const std::shared_ptr<gko::LinOpFactory> &inner_solver,
+    const AdditionalData &                    data)
+    : SolverBase<ValueType, IndexType>(solver_control, exec_type)
+    , additional_data(data)
+  {
+    using ir         = gko::solver::Ir<ValueType>;
+    this->solver_gen = ir::build()
+                         .with_criteria(this->combined_factory)
+                         .with_solver(inner_solver)
+                         .on(this->executor);
+  }
+
+
 
   // Explicit instantiations in GinkgoWrappers
 #  define DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(_macro) \
@@ -304,6 +526,31 @@ namespace GinkgoWrappers
     class SolverCG<ValueType, IndexType>
   DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_CG)
 #  undef DECLARE_SOLVER_CG
+
+#  define DECLARE_SOLVER_Bicgstab(ValueType, IndexType) \
+    class SolverBicgstab<ValueType, IndexType>
+  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_Bicgstab)
+#  undef DECLARE_SOLVER_Bicgstab
+
+#  define DECLARE_SOLVER_CGS(ValueType, IndexType) \
+    class SolverCGS<ValueType, IndexType>
+  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_CGS)
+#  undef DECLARE_SOLVER_CGS
+
+#  define DECLARE_SOLVER_FCG(ValueType, IndexType) \
+    class SolverFCG<ValueType, IndexType>
+  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_FCG)
+#  undef DECLARE_SOLVER_FCG
+
+#  define DECLARE_SOLVER_GMRES(ValueType, IndexType) \
+    class SolverGMRES<ValueType, IndexType>
+  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_GMRES)
+#  undef DECLARE_SOLVER_GMRES
+
+#  define DECLARE_SOLVER_IR(ValueType, IndexType) \
+    class SolverIR<ValueType, IndexType>
+  DEALII_INSTANTIATE_FOR_EACH_VALUE_AND_INDEX_TYPE(DECLARE_SOLVER_IR)
+#  undef DECLARE_SOLVER_IR
 
 } // namespace GinkgoWrappers
 

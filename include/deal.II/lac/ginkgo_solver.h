@@ -53,7 +53,10 @@ namespace GinkgoWrappers
     /**
      * Constructor.
      *
-     * The @p executor defines the paradigm where the solution is computed.
+     * The @p exec_type defines the paradigm where the solution is computed.
+     * It is a string and the choices are "omp" , "reference" or "cuda".
+     * The respective strings create the respective executors as given below.
+     *
      * Ginkgo currently supports three different executor types:
      *
      * +    OmpExecutor specifies that the data should be stored and the
@@ -99,8 +102,7 @@ namespace GinkgoWrappers
      * The @p solver_control object is the same as for other
      * deal.II iterative solvers.
      */
-    SolverBase(SolverControl &                solver_control,
-               std::shared_ptr<gko::Executor> executor);
+    SolverBase(SolverControl &solver_control, const std::string &exec_type);
 
     /**
      * Destructor.
@@ -194,6 +196,13 @@ namespace GinkgoWrappers
      * @todo Templatize based on Matrix type.
      */
     std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> system_matrix;
+
+    /**
+     * The execution paradigm as a string to be set by the user. The choices
+     * are between `omp`, `cuda` and `reference` and more details can be found
+     * in Ginkgo's documentation.
+     */
+    const std::string exec_type;
   };
 
 
@@ -215,15 +224,341 @@ namespace GinkgoWrappers
     /**
      * Constructor.
      *
-     * @p solver_control The solver control object is then used to set the
-     * parameters and setup the CG solver from the CG factory which solves the
-     * linear system.
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the CG solver from the CG factory which
+     * solves the linear system.
      *
-     * @p executor The execution paradigm for the CG solver.
+     * @param[in] exec_type The execution paradigm for the CG solver.
+     *
+     * @param[in] data The additional data required by the solver.
      */
-    SolverCG(SolverControl &                solver_control,
-             std::shared_ptr<gko::Executor> executor,
-             const AdditionalData &         data = AdditionalData());
+    SolverCG(SolverControl &       solver_control,
+             const std::string &   exec_type,
+             const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the CG solver from the CG factory which
+     * solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the CG solver.
+     *
+     * @param[in] preconditioner The preconditioner for the solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverCG(SolverControl &                           solver_control,
+             const std::string &                       exec_type,
+             const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+             const AdditionalData &                    data = AdditionalData());
+
+  protected:
+    /**
+     * Store a copy of the settings for this particular solver.
+     */
+    const AdditionalData additional_data;
+  };
+
+
+  /**
+   * An implementation of the solver interface using the Ginkgo Bicgstab solver.
+   *
+   * @ingroup GinkgoWrappers
+   */
+  template <typename ValueType = double, typename IndexType = int32_t>
+  class SolverBicgstab : public SolverBase<ValueType, IndexType>
+  {
+  public:
+    /**
+     * A standardized data struct to pipe additional data to the solver.
+     */
+    struct AdditionalData
+    {};
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the Bicgstab solver from the Bicgstab
+     * factory which solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the Bicgstab solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverBicgstab(SolverControl &       solver_control,
+                   const std::string &   exec_type,
+                   const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the Bicgstab solver from the Bicgstab
+     * factory which solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the Bicgstab solver.
+     *
+     * @param[in] preconditioner The preconditioner for the solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverBicgstab(SolverControl &                           solver_control,
+                   const std::string &                       exec_type,
+                   const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+                   const AdditionalData &data = AdditionalData());
+
+  protected:
+    /**
+     * Store a copy of the settings for this particular solver.
+     */
+    const AdditionalData additional_data;
+  };
+
+  /**
+   * An implementation of the solver interface using the Ginkgo CGS solver.
+   *
+   * CGS or the conjugate gradient square method is an iterative type Krylov
+   * subspace method which is suitable for general systems.
+   *
+   * @ingroup GinkgoWrappers
+   */
+  template <typename ValueType = double, typename IndexType = int32_t>
+  class SolverCGS : public SolverBase<ValueType, IndexType>
+  {
+  public:
+    /**
+     * A standardized data struct to pipe additional data to the solver.
+     */
+    struct AdditionalData
+    {};
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the CGS solver from the CGS factory which
+     * solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the CGS solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverCGS(SolverControl &       solver_control,
+              const std::string &   exec_type,
+              const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the CGS solver from the CGS factory which
+     * solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the CGS solver.
+     *
+     * @param[in] preconditioner The preconditioner for the solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverCGS(SolverControl &                           solver_control,
+              const std::string &                       exec_type,
+              const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+              const AdditionalData &data = AdditionalData());
+
+  protected:
+    /**
+     * Store a copy of the settings for this particular solver.
+     */
+    const AdditionalData additional_data;
+  };
+
+  /**
+   * An implementation of the solver interface using the Ginkgo FCG solver.
+   *
+   * FCG or the flexible conjugate gradient method is an iterative type Krylov
+   * subspace method which is suitable for symmetric positive definite methods.
+   *
+   * Though this method performs very well for symmetric positive definite
+   * matrices, it is in general not suitable for general matrices.
+   *
+   * In contrast to the standard CG based on the Polack-Ribiere formula, the
+   * flexible CG uses the Fletcher-Reeves formula for creating the orthonormal
+   * vectors spanning the Krylov subspace. This increases the computational cost
+   * of every Krylov solver iteration but allows for non-constant
+   * preconditioners.
+   *
+   * @ingroup GinkgoWrappers
+   */
+  template <typename ValueType = double, typename IndexType = int32_t>
+  class SolverFCG : public SolverBase<ValueType, IndexType>
+  {
+  public:
+    /**
+     * A standardized data struct to pipe additional data to the solver.
+     */
+    struct AdditionalData
+    {};
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the FCG solver from the FCG factory which
+     * solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the FCG solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverFCG(SolverControl &       solver_control,
+              const std::string &   exec_type,
+              const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the FCG solver from the FCG factory which
+     * solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the FCG solver.
+     *
+     * @param[in] preconditioner The preconditioner for the solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverFCG(SolverControl &                           solver_control,
+              const std::string &                       exec_type,
+              const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+              const AdditionalData &data = AdditionalData());
+
+  protected:
+    /**
+     * Store a copy of the settings for this particular solver.
+     */
+    const AdditionalData additional_data;
+  };
+
+  /**
+   * An implementation of the solver interface using the Ginkgo GMRES solver.
+   *
+   * @ingroup GinkgoWrappers
+   */
+  template <typename ValueType = double, typename IndexType = int32_t>
+  class SolverGMRES : public SolverBase<ValueType, IndexType>
+  {
+  public:
+    /**
+     * A standardized data struct to pipe additional data to the solver.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor. By default, set the number of temporary vectors to 30,
+       * i.e. do a restart every 30 iterations.
+       */
+      AdditionalData(const unsigned int restart_parameter = 30);
+
+      /**
+       * Maximum number of tmp vectors.
+       */
+      unsigned int restart_parameter;
+    };
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the GMRES solver from the GMRES factory
+     * which solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the GMRES solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverGMRES(SolverControl &       solver_control,
+                const std::string &   exec_type,
+                const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the GMRES solver from the GMRES factory
+     * which solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the GMRES solver.
+     *
+     * @param[in] preconditioner The preconditioner for the solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverGMRES(SolverControl &                           solver_control,
+                const std::string &                       exec_type,
+                const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+                const AdditionalData &data = AdditionalData());
+
+  protected:
+    /**
+     * Store a copy of the settings for this particular solver.
+     */
+    const AdditionalData additional_data;
+  };
+
+  /**
+   * An implementation of the solver interface using the Ginkgo IR solver.
+   *
+   * Iterative refinement (IR) is an iterative method that uses another coarse
+   * method to approximate the error of the current solution via the current
+   * residual.
+   *
+   * @ingroup GinkgoWrappers
+   */
+  template <typename ValueType = double, typename IndexType = int32_t>
+  class SolverIR : public SolverBase<ValueType, IndexType>
+  {
+  public:
+    /**
+     * A standardized data struct to pipe additional data to the solver.
+     */
+    struct AdditionalData
+    {};
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the IR solver from the IR factory which
+     * solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the IR solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverIR(SolverControl &       solver_control,
+             const std::string &   exec_type,
+             const AdditionalData &data = AdditionalData());
+
+    /**
+     * Constructor.
+     *
+     * @param[in,out] solver_control The solver control object is then used to
+     * set the parameters and setup the IR solver from the IR factory which
+     * solves the linear system.
+     *
+     * @param[in] exec_type The execution paradigm for the IR solver.
+     *
+     * @param[in] inner_solver The Inner solver for the IR solver.
+     *
+     * @param[in] data The additional data required by the solver.
+     */
+    SolverIR(SolverControl &                           solver_control,
+             const std::string &                       exec_type,
+             const std::shared_ptr<gko::LinOpFactory> &inner_solver,
+             const AdditionalData &                    data = AdditionalData());
 
   protected:
     /**
