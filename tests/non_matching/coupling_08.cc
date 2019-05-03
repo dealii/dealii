@@ -55,7 +55,7 @@ test()
   GridGenerator::hyper_cube(tria0, -.4, .3);
   GridGenerator::hyper_cube(tria1, -1, 1);
 
-  tria0.refine_global(1);
+  tria0.refine_global(3);
   tria1.refine_global(2);
 
   FE_Q<dim0, spacedim> fe0(1);
@@ -73,14 +73,14 @@ test()
   dh0.distribute_dofs(fe0);
   dh1.distribute_dofs(fe1);
 
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dh1, constraints);
+  AffineConstraints<double> constraints0;
+  DoFTools::make_hanging_node_constraints(dh0, constraints0);
 
-  constraints.close();
+  constraints0.close();
 
   deallog << "Dofs 0          : " << dh0.n_dofs() << std::endl
           << "Dofs 1          : " << dh1.n_dofs() << std::endl
-          << "Constrained dofs: " << constraints.n_constraints() << std::endl;
+          << "Constrained dofs: " << constraints0.n_constraints() << std::endl;
 
   QGauss<dim0> quad0(3); // Quadrature for coupling
   QGauss<dim1> quad1(3); // Quadrature for coupling
@@ -94,7 +94,7 @@ test()
   {
     DynamicSparsityPattern dsp(dh0.n_dofs(), dh1.n_dofs());
     NonMatching::create_coupling_sparsity_pattern(
-      epsilon, cache0, cache1, dh0, dh1, dsp, constraints);
+      epsilon, cache0, cache1, dh0, dh1, dsp, constraints0);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
@@ -115,37 +115,37 @@ test()
                                            quad0,
                                            quad1,
                                            coupling,
-                                           constraints);
+                                           constraints0);
 
-  SparsityPattern mass_sparsity0;
+  SparsityPattern mass_sparsity1;
   {
-    DynamicSparsityPattern dsp(dh0.n_dofs(), dh0.n_dofs());
-    DoFTools::make_sparsity_pattern(dh0, dsp);
-    mass_sparsity0.copy_from(dsp);
+    DynamicSparsityPattern dsp(dh1.n_dofs(), dh1.n_dofs());
+    DoFTools::make_sparsity_pattern(dh1, dsp);
+    mass_sparsity1.copy_from(dsp);
   }
-  SparseMatrix<double> mass_matrix0(mass_sparsity0);
-  MatrixTools::create_mass_matrix(dh0, quad0, mass_matrix0);
+  SparseMatrix<double> mass_matrix1(mass_sparsity1);
+  MatrixTools::create_mass_matrix(dh1, quad1, mass_matrix1);
 
-  SparseDirectUMFPACK mass_matrix0_inv;
-  mass_matrix0_inv.factorize(mass_matrix0);
+  SparseDirectUMFPACK mass_matrix1_inv;
+  mass_matrix1_inv.factorize(mass_matrix1);
 
-  // now take ones in dh1, project them onto dh0,
+  // now take ones in dh0, project them onto dh1,
   // get back ones, and check for the error.
   //
-  // WARNINGS: Only works if dh0 is immersed in dh1
+  // WARNINGS: Only works if dh1 is immersed in dh0
 
   Vector<double> ones0(dh0.n_dofs());
   Vector<double> ones1(dh1.n_dofs());
 
-  ones1 = 1.0;
-  coupling.vmult(ones0, ones1);
-  mass_matrix0_inv.solve(ones0);
+  ones0 = 1.0;
+  coupling.Tvmult(ones1, ones0);
+  mass_matrix1_inv.solve(ones1);
 
-  Vector<double> exact_ones0(dh0.n_dofs());
-  exact_ones0 = 1.0;
-  ones0 -= exact_ones0;
+  Vector<double> exact_ones1(dh1.n_dofs());
+  exact_ones1 = 1.0;
+  ones1 -= exact_ones1;
 
-  deallog << "Error on constants: " << ones0.l2_norm() << std::endl;
+  deallog << "Error on constants: " << ones1.l2_norm() << std::endl;
 }
 
 
@@ -155,8 +155,8 @@ main()
 {
   initlog(1);
   test<1, 1, 1>();
-  test<1, 2, 2>();
+  test<2, 1, 2>();
   test<2, 2, 2>();
-  test<2, 3, 3>();
+  test<3, 2, 3>();
   test<3, 3, 3>();
 }
