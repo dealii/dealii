@@ -27,6 +27,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+// Forward declarations
+template <typename Iterator>
+class IteratorOverIterators;
+
+
+
 /**
  * A class that is used to denote a collection of iterators that can be
  * expressed in terms of a range of iterators characterized by a begin and an
@@ -120,94 +126,9 @@ class IteratorRange
 {
 public:
   /**
-   * A class that implements the semantics of iterators over iterators as
-   * discussed in the design sections of the IteratorRange class.
+   * Typedef for the iterator type that iterates over other iterators.
    */
-  class IteratorOverIterators
-  {
-  public:
-    /**
-     * Typedef the elements of the collection to give them a name that is more
-     * distinct.
-     */
-    using BaseIterator = Iterator;
-
-    /**
-     * Constructor. Initialize this iterator-over-iterator in such a way that
-     * it points to the given argument.
-     *
-     * @param iterator An iterator to which this object is supposed to point.
-     */
-    IteratorOverIterators(const BaseIterator &iterator);
-
-    /**
-     * Dereferencing operator.
-     * @return The iterator within the collection currently pointed to.
-     */
-    const BaseIterator &operator*() const;
-
-    /**
-     * Dereferencing operator.
-     * @return The iterator within the collection currently pointed to.
-     */
-    const BaseIterator *operator->() const;
-
-    /**
-     * Prefix increment operator. Move the current iterator to the next
-     * element of the collection and return the new value.
-     */
-    IteratorOverIterators &
-    operator++();
-
-    /**
-     * Postfix increment operator. Move the current iterator to the next
-     * element of the collection, but return the previous value of the
-     * iterator.
-     */
-    IteratorOverIterators
-    operator++(int);
-
-    /**
-     * Comparison operator
-     * @param i_o_i Another iterator over iterators.
-     * @return Returns whether the current iterator points to a different
-     * object than the iterator represented by the argument.
-     */
-    bool
-    operator!=(const IteratorOverIterators &i_o_i) const;
-
-    /**
-     * Implicit conversion operator.
-     *
-     * @warning When you call this conversion operator (i.e., you convert this
-     * iterator-over-iterators to the iterator we are currently pointing to),
-     * you obtain a `const` reference to this underlying iterator. The only
-     * thing you can really do with this result is dereferencing itself: it
-     * presumably points to something useful, but since you don't know where
-     * the pointed to object lives, you shouldn't increment or decrement the
-     * iterator you get from this operator. As a consequence, the returned
-     * iterator is marked as `const`, as this should prevent you from doing
-     * anything other than dereference it.
-     */
-    operator const BaseIterator &() const;
-
-    /**
-     * Mark the class as forward iterator and declare some alias which are
-     * standard for iterators and are used by algorithms to enquire about the
-     * specifics of the iterators they work on.
-     */
-    using iterator_category = std::forward_iterator_tag;
-    using value_type        = Iterator;
-    using difference_type   = typename Iterator::difference_type;
-    using pointer           = Iterator *;
-    using reference         = Iterator &;
-
-  private:
-    /**
-     * The object this iterator currently points to.
-     */
-    BaseIterator element_of_iterator_collection;
-  };
+  using IteratorOverIterators = dealii::IteratorOverIterators<Iterator>;
 
 
   /**
@@ -255,6 +176,99 @@ private:
 
 
 /**
+ * A class that implements the semantics of iterators over iterators as
+ * discussed in the design sections of the IteratorRange class.
+ */
+template <typename Iterator>
+class IteratorOverIterators
+{
+public:
+  /**
+   * Typedef the elements of the collection to give them a name that is more
+   * distinct.
+   */
+  using BaseIterator = Iterator;
+
+  /**
+   * Constructor. Initialize this iterator-over-iterator in such a way that
+   * it points to the given argument.
+   *
+   * @param iterator An iterator to which this object is supposed to point.
+   */
+  explicit IteratorOverIterators(const BaseIterator &iterator);
+
+  /**
+   * Dereferencing operator.
+   * @return The iterator within the collection currently pointed to.
+   */
+  const BaseIterator &operator*() const;
+
+  /**
+   * Dereferencing operator.
+   * @return The iterator within the collection currently pointed to.
+   */
+  const BaseIterator *operator->() const;
+
+  /**
+   * Prefix increment operator. Move the current iterator to the next
+   * element of the collection and return the new value.
+   */
+  IteratorOverIterators &
+  operator++();
+
+  /**
+   * Postfix increment operator. Move the current iterator to the next
+   * element of the collection, but return the previous value of the
+   * iterator.
+   */
+  IteratorOverIterators
+  operator++(int);
+
+  /**
+   * Comparison operator
+   * @param i_o_i Another iterator over iterators.
+   * @return Returns whether the current iterator points to a different
+   * object than the iterator represented by the argument.
+   */
+  bool
+  operator!=(const IteratorOverIterators &i_o_i) const;
+
+  /**
+   * Implicit conversion operator.
+   *
+   * @warning When you call this conversion operator (i.e., you convert this
+   * iterator-over-iterators to the iterator we are currently pointing to),
+   * you obtain a `const` reference to this underlying iterator. The only
+   * thing you can really do with this result is dereferencing itself: it
+   * presumably points to something useful, but since you don't know where
+   * the pointed to object lives, you shouldn't increment or decrement the
+   * iterator you get from this operator. As a consequence, the returned
+   * iterator is marked as `const`, as this should prevent you from doing
+   * anything other than dereference it.
+   */
+  operator const BaseIterator &() const;
+
+  /**
+   * Mark the class as forward iterator and declare some alias which are
+   * standard for iterators and are used by algorithms to enquire about the
+   * specifics of the iterators they work on.
+   */
+  using iterator_category = std::forward_iterator_tag;
+  using value_type        = Iterator;
+  using difference_type   = typename Iterator::difference_type;
+  using pointer           = Iterator *;
+  using reference         = Iterator &;
+
+private:
+  /**
+   * The object this iterator currently points to.
+   */
+  BaseIterator element_of_iterator_collection;
+};
+
+
+
+/**
  * Create an object of type IteratorRange given the beginning and
  * end iterator.
  *
@@ -274,7 +288,7 @@ make_iterator_range(const BaseIterator &                         begin,
 
 
 template <typename Iterator>
-inline IteratorRange<Iterator>::IteratorOverIterators::IteratorOverIterators(
+inline IteratorOverIterators<Iterator>::IteratorOverIterators(
   const BaseIterator &iterator)
   : element_of_iterator_collection(iterator)
 {}
@@ -282,9 +296,8 @@ inline IteratorRange<Iterator>::IteratorOverIterators::IteratorOverIterators(
 
 
 template <typename Iterator>
-inline const typename IteratorRange<
-  Iterator>::IteratorOverIterators::BaseIterator &
-  IteratorRange<Iterator>::IteratorOverIterators::operator*() const
+inline const typename IteratorOverIterators<Iterator>::BaseIterator &
+  IteratorOverIterators<Iterator>::operator*() const
 {
   return element_of_iterator_collection;
 }
@@ -292,9 +305,8 @@ inline const typename IteratorRange<
 
 
 template <typename Iterator>
-inline const typename IteratorRange<
-  Iterator>::IteratorOverIterators::BaseIterator *
-  IteratorRange<Iterator>::IteratorOverIterators::operator->() const
+inline const typename IteratorOverIterators<Iterator>::BaseIterator *
+  IteratorOverIterators<Iterator>::operator->() const
 {
   return &element_of_iterator_collection;
 }
@@ -302,8 +314,8 @@ inline const typename IteratorRange<
 
 
 template <typename Iterator>
-inline typename IteratorRange<Iterator>::IteratorOverIterators &
-IteratorRange<Iterator>::IteratorOverIterators::operator++()
+inline IteratorOverIterators<Iterator> &
+IteratorOverIterators<Iterator>::operator++()
 {
   ++element_of_iterator_collection;
   return *this;
@@ -312,8 +324,8 @@ IteratorRange<Iterator>::IteratorOverIterators::operator++()
 
 
 template <typename Iterator>
-inline typename IteratorRange<Iterator>::IteratorOverIterators
-IteratorRange<Iterator>::IteratorOverIterators::operator++(int)
+inline IteratorOverIterators<Iterator>
+IteratorOverIterators<Iterator>::operator++(int)
 {
   const IteratorOverIterators old_value = *this;
   ++element_of_iterator_collection;
@@ -324,7 +336,7 @@ IteratorRange<Iterator>::IteratorOverIterators::operator++(int)
 
 template <typename Iterator>
 inline bool
-IteratorRange<Iterator>::IteratorOverIterators::
+IteratorOverIterators<Iterator>::
 operator!=(const IteratorOverIterators &i_o_i) const
 {
   return element_of_iterator_collection != i_o_i.element_of_iterator_collection;
@@ -333,8 +345,7 @@ operator!=(const IteratorOverIterators &i_o_i) const
 
 
 template <typename Iterator>
-inline IteratorRange<Iterator>::IteratorOverIterators::
-operator const BaseIterator &() const
+inline IteratorOverIterators<Iterator>::operator const BaseIterator &() const
 {
   return element_of_iterator_collection;
 }

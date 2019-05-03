@@ -1301,10 +1301,9 @@ namespace WorkStream
             typename ScratchData,
             typename CopyData>
   void
-  run(const typename IteratorRange<Iterator>::IteratorOverIterators &begin,
-      const typename IteratorRange<
-        typename identity<Iterator>::type>::IteratorOverIterators &end,
-      MainClass &                                                  main_object,
+  run(const IteratorOverIterators<Iterator> &                         begin,
+      const IteratorOverIterators<typename identity<Iterator>::type> &end,
+      MainClass &main_object,
       void (MainClass::*worker)(const Iterator &, ScratchData &, CopyData &),
       void (MainClass::*copier)(const CopyData &),
       const ScratchData &sample_scratch_data,

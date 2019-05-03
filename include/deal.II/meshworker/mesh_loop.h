@@ -64,17 +64,15 @@ namespace MeshWorker
      * TriaActiveIterator or a FilteredIterator as its base type.
      */
     template <class CellIteratorType>
-    struct CellIteratorBaseType<
-      typename IteratorRange<CellIteratorType>::IteratorOverIterators>
+    struct CellIteratorBaseType<IteratorOverIterators<CellIteratorType>>
     {
       /**
        * Type definition for the cell iterator type.
        */
-      using type = typename IteratorRange<
-        CellIteratorType>::IteratorOverIterators::BaseIterator;
-
-      static_assert(std::is_same<type, CellIteratorType>::value,
-                    "Expected another type as the base iterator.");
+      // Since we can have filtered iterators and the like as template
+      // arguments, we recursivelyremove the template layers to retrieve the
+      // underlying iterator type.
+      using type = typename CellIteratorBaseType<CellIteratorType>::type;
     };
 
     /**
@@ -94,26 +92,6 @@ namespace MeshWorker
       // Since we can have nested filtered iterators, we recursively
       // remove the template layers to retrieve the underlying iterator type.
       using type = typename CellIteratorBaseType<CellIteratorType>::type;
-    };
-
-    /**
-     * A helper class to provide a type definition for the underlying cell
-     * iterator type.
-     *
-     * This specialization is for an IteratorRange that iterates over
-     * FilteredIterators.
-     */
-    template <class CellIteratorType>
-    struct CellIteratorBaseType<typename IteratorRange<
-      FilteredIterator<CellIteratorType>>::IteratorOverIterators>
-    {
-      /**
-       * Type definition for the cell iterator type.
-       */
-      // Since we can have nested filtered iterators, we recursively
-      // remove the template layers to retrieve the underlying iterator type.
-      using type =
-        typename CellIteratorBaseType<FilteredIterator<CellIteratorType>>::type;
     };
   } // namespace internal
 
