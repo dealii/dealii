@@ -890,7 +890,7 @@ private:
  *
  * The typical use case for the preconditioner is a Jacobi preconditioner
  * specified through DiagonalMatrix, which is also the default value for the
- * preconditioner. Note that if the degree variable is set to zero, the
+ * preconditioner. Note that if the degree variable is set to one, the
  * Chebyshev iteration corresponds to a Jacobi preconditioner (or the
  * underlying preconditioner type) with relaxation parameter according to the
  * specified smoothing range.
@@ -904,7 +904,7 @@ private:
  * matrix-free computations. In that context, this class can be used as a
  * multigrid smoother that is trivially %parallel (assuming that matrix-vector
  * products are %parallel and the inner preconditioner is %parallel). Its use
- * is demonstrated in the step-37 tutorial program.
+ * is demonstrated in the step-37 and step-59 tutorial programs.
  *
  * <h4>Estimation of the eigenvalues</h4>
  *
@@ -919,10 +919,13 @@ private:
  * dealii::Vector or dealii::LinearAlgebra::distributed::Vector, which have
  * fast element access, it is either a vector with entries `(-5.5, -4.5, -3.5,
  * -2.5, ..., 3.5, 4.5, 5.5)` with appropriate epilogue and adjusted such that
- * its mean is always zero, which works well for the Laplacian. For other
- * vector types, the initial vector contains all ones, scaled by the length of
- * the vector, except for the very first entry that is zero, triggering
- * high-frequency content again.
+ * its mean is always zero, which works well for the Laplacian. This setup is
+ * stable in parallel in the sense that for a different number of processors
+ * but the same ordering of unknowns, the same initial vector and thus
+ * eigenvalue distribution will be computed, apart from roundoff errors. For
+ * other vector types, the initial vector contains all ones, scaled by the
+ * length of the vector, except for the very first entry that is zero,
+ * triggering high-frequency content again.
  *
  * The computation of eigenvalues happens the first time one of the
  * vmult(), Tvmult(), step() or Tstep() functions is called. This is because
@@ -932,7 +935,8 @@ private:
  *
  * Due to the cost of the eigenvalue estimate in the first vmult(), this class
  * is most appropriate if it is applied repeatedly, e.g. in a smoother for a
- * algorithm.
+ * geometric multigrid solver, that can in turn be used to solve several
+ * linear systems.
  *
  * <h4>Bypassing the eigenvalue computation</h4>
  *
