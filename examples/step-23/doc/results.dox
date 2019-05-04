@@ -115,11 +115,11 @@ If you want to explore a bit, try out some of the following things:
   possible to avoid copying by not eliminating columns in the linear systems,
   which is implemented by appending a @p false argument to the call:
   @code
-    MatrixTools::apply_boundary_values (boundary_values,
-    					matrix_u,
-					solution_u,
-					system_rhs,
-					false);
+    MatrixTools::apply_boundary_values(boundary_values,
+                                       matrix_u,
+                                       solution_u,
+                                       system_rhs,
+                                       false);
   @endcode
 
   <li>deal.II being a library that supports adaptive meshes it would of course be
