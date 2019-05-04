@@ -117,10 +117,10 @@ namespace Step24
   // @sect3{Equation data}
 
   // As usual, we have to define our initial values, boundary conditions, and
-  // right hand side functions. Except things are a bit simpler this time: we
-  // are to consider a problem that is driven by initial conditions, so there
+  // right hand side functions. Things are a bit simpler this time: we
+  // consider a problem that is driven by initial conditions, so there
   // is no right hand side function (though you could look up in step-23 to
-  // see how this can be done. Secondly, there are no boundary conditions: the
+  // see how this can be done). Secondly, there are no boundary conditions: the
   // entire boundary of the domain consists of absorbing boundary
   // conditions. That only leaves initial conditions, and there things are
   // simple too since for this particular application only nonzero initial
@@ -139,12 +139,22 @@ namespace Step24
   class InitialValuesP : public Function<dim>
   {
   public:
-    InitialValuesP()
-      : Function<dim>()
-    {}
+    virtual double value(const Point<dim> &p,
+                         const unsigned int /*component*/ = 0) const override
+    {
+      static const std::array<Source, 5> sources{
+        Source(Point<dim>(0, 0), 0.025),
+        Source(Point<dim>(-0.135, 0), 0.05),
+        Source(Point<dim>(0.17, 0), 0.03),
+        Source(Point<dim>(-0.25, 0), 0.02),
+        Source(Point<dim>(-0.05, -0.15), 0.015)};
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+      for (const auto &source : sources)
+        if (p.distance(source.location) < source.radius)
+          return 1;
+
+      return 0;
+    }
 
   private:
     struct Source
@@ -158,25 +168,6 @@ namespace Step24
       const double     radius;
     };
   };
-
-
-  template <int dim>
-  double InitialValuesP<dim>::value(const Point<dim> &p,
-                                    const unsigned int /*component*/) const
-  {
-    static const Source       sources[] = {Source(Point<dim>(0, 0), 0.025),
-                                     Source(Point<dim>(-0.135, 0), 0.05),
-                                     Source(Point<dim>(0.17, 0), 0.03),
-                                     Source(Point<dim>(-0.25, 0), 0.02),
-                                     Source(Point<dim>(-0.05, -0.15), 0.015)};
-    static const unsigned int n_sources = sizeof(sources) / sizeof(sources[0]);
-
-    for (unsigned int i = 0; i < n_sources; ++i)
-      if (p.distance(sources[i].location) < sources[i].radius)
-        return 1;
-
-    return 0;
-  }
 
 
   // @sect3{Implementation of the <code>TATForwardProblem</code> class}
@@ -231,11 +222,10 @@ namespace Step24
   // The following system is pretty much what we've already done in step-23,
   // but with two important differences. First, we have to create a circular
   // (or spherical) mesh around the origin, with a radius of 1. This nothing
-  // new: we've done so before in step-6, step-10, and step-11, where we also
-  // explain how to attach a boundary object to a triangulation to be used
-  // whenever the triangulation needs to know where new boundary points lie
-  // when a cell is refined. Following this, the mesh is refined a number of
-  // times.
+  // new: we've done so before in step-6 and step-10, where we also explain
+  // how the PolarManifold or SphericalManifold object places new points on
+  // concentric circles when a cell is refined, which we will use here as
+  // well.
   //
   // One thing we had to make sure is that the time step satisfies the CFL
   // condition discussed in the introduction of step-23. Back in that program,
@@ -350,12 +340,7 @@ namespace Step24
 
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-
-
-      typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
-                                                              .begin_active(),
-                                                     endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
           if (cell->at_boundary(f))
             {
@@ -417,6 +402,7 @@ namespace Step24
   }
 
 
+
   template <int dim>
   void TATForwardProblem<dim>::solve_v()
   {
@@ -446,9 +432,12 @@ namespace Step24
     data_out.build_patches();
 
     const std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".gnuplot";
+      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtu";
+    DataOutBase::VtkFlags vtk_flags;
+    vtk_flags.compression_level =
+      DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
     std::ofstream output(filename);
-    data_out.write_gnuplot(output);
+    data_out.write_vtu(output);
   }
 
 
@@ -510,7 +499,6 @@ namespace Step24
 
         solve_p();
 
-
         system_rhs_v = G2;
         laplace_matrix.vmult(tmp, solution_p);
         system_rhs_v.add(-time_step * theta * wave_speed * wave_speed, tmp);
@@ -522,7 +510,6 @@ namespace Step24
 
         output_results();
 
-
         detector_data << time;
         for (unsigned int i = 0; i < detector_locations.size(); ++i)
           detector_data << " "
@@ -531,7 +518,6 @@ namespace Step24
                                                     detector_locations[i])
                         << " ";
         detector_data << std::endl;
-
 
         old_solution_p = solution_p;
         old_solution_v = solution_v;
