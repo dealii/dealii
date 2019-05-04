@@ -146,6 +146,21 @@ namespace Differentiation
        */
       bool
       is_valid_substitution_symbol(const SymEngine::Basic &entry);
+
+      /**
+       * A convenience function to set the @p value associated with
+       * the @p symbol in the @p substitution_map.
+       *
+       * Using this function ensures that the @p symbol is one that is
+       * valid specifically for the purpose of symbolic substitution.
+       * It must therefore represent a symbol or symbolic derivative,
+       * otherwise an error will be thrown.
+       */
+      void
+      set_value_in_symbol_map(
+        types::substitution_map &                     substitution_map,
+        const SymEngine::RCP<const SymEngine::Basic> &symbol,
+        const SymEngine::RCP<const SymEngine::Basic> &value);
     } // namespace internal
 
     /**
@@ -330,6 +345,117 @@ namespace Differentiation
     add_to_symbol_map(types::substitution_map &symbol_map,
                       const SymbolicType &     symbol,
                       const Args &... other_symbols);
+
+    /**
+     * Find the input @p symbol in the @p substitution_map and set its
+     * corresponding @p value.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    void
+    set_value_in_symbol_map(types::substitution_map &substitution_map,
+                            const Expression &       symbol,
+                            const Expression &       value);
+
+    /**
+     * Find the input @p symbol in the @p substitution_map and set its
+     * corresponding @p value.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    template <typename SymbolicType = SD::Expression,
+              typename ValueType,
+              typename = typename std::enable_if<
+                dealii::internal::is_explicitly_convertible<
+                  SymbolicType,
+                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
+                std::is_constructible<SymbolicType, ValueType>::value>::type>
+    void
+    set_value_in_symbol_map(types::substitution_map &substitution_map,
+                            const SymbolicType &     symbol,
+                            const ValueType &        value);
+
+    /**
+     * Find the input @p symbols in the @p substitution_map and set their
+     * corresponding @p values.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    template <typename SymbolicType = SD::Expression, typename ValueType>
+    void
+    set_value_in_symbol_map(types::substitution_map &        substitution_map,
+                            const std::vector<SymbolicType> &symbols,
+                            const std::vector<ValueType> &   values);
+
+    /**
+     * Find the input @p symbols in the @p substitution_map and set their
+     * corresponding @p values. The modified symbol will have the key given by
+     * the first element of  @p symbol_value and the value given by its second
+     * element.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    template <typename SymbolicType = SD::Expression, typename ValueType>
+    void
+    set_value_in_symbol_map(
+      types::substitution_map &                 substitution_map,
+      const std::pair<SymbolicType, ValueType> &symbol_value);
+
+    /**
+     * Find the input @p symbols in the @p substitution_map and set their
+     * corresponding @p values, followed by the same operation for the
+     * @p other_symbol_values.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    template <typename SymbolicType = SD::Expression,
+              typename ValueType,
+              typename... Args>
+    void
+    set_value_in_symbol_map(
+      types::substitution_map &                 substitution_map,
+      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const Args &... other_symbol_values);
+
+    /**
+     * Find the input @p symbols in the @p substitution_map and set their
+     * corresponding @p values. The modified symbol will have the key given by
+     * the first element of each paired entry in the @p symbol_values vector
+     * and the value given by its respective second element.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    template <typename SymbolicType = SD::Expression, typename ValueType>
+    void
+    set_value_in_symbol_map(
+      types::substitution_map &                              substitution_map,
+      const std::vector<std::pair<SymbolicType, ValueType>> &symbol_values);
+
+    /**
+     * Find the input @p symbols in the @p substitution_map and set their
+     * corresponding @p values. The modified symbol will have the key given by
+     * the each element the @p symbol_values map and the value given by its
+     * respective mapped element.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    void
+    set_value_in_symbol_map(types::substitution_map &      substitution_map,
+                            const types::substitution_map &symbol_values);
 
     //@}
 
@@ -883,6 +1009,77 @@ namespace Differentiation
     {
       add_to_symbol_map<ignore_invalid_symbols>(symbol_map, symbol);
       add_to_symbol_map<ignore_invalid_symbols>(symbol_map, other_symbols...);
+    }
+
+
+    template <typename ExpressionType, typename ValueType, typename>
+    void
+    set_value_in_symbol_map(types::substitution_map &substitution_map,
+                            const ExpressionType &   symbol,
+                            const ValueType &        value)
+    {
+      // Call the above function
+      using SE_RCP_Basic = const SymEngine::RCP<const SymEngine::Basic> &;
+      internal::set_value_in_symbol_map(substitution_map,
+                                        static_cast<SE_RCP_Basic>(symbol),
+                                        static_cast<SE_RCP_Basic>(
+                                          ExpressionType(value)));
+    }
+
+
+    template <typename SymbolicType, typename ValueType>
+    void
+    set_value_in_symbol_map(types::substitution_map &        substitution_map,
+                            const std::vector<SymbolicType> &symbols,
+                            const std::vector<ValueType> &   values)
+    {
+      Assert(symbols.size() == values.size(),
+             ExcDimensionMismatch(symbols.size(), values.size()));
+
+      typename std::vector<SymbolicType>::const_iterator it_symb =
+        symbols.begin();
+      typename std::vector<ValueType>::const_iterator it_val = values.begin();
+      for (; it_symb != symbols.end(); ++it_symb, ++it_val)
+        {
+          Assert(it_val != values.end(), ExcInternalError());
+          set_value_in_symbol_map(substitution_map, *it_symb, *it_val);
+        }
+    }
+
+
+    template <typename SymbolicType, typename ValueType>
+    void
+    set_value_in_symbol_map(
+      types::substitution_map &                 substitution_map,
+      const std::pair<SymbolicType, ValueType> &symbol_value)
+    {
+      set_value_in_symbol_map(substitution_map,
+                              symbol_value.first,
+                              symbol_value.second);
+    }
+
+
+    template <typename SymbolicType, typename ValueType, typename... Args>
+    void
+    set_value_in_symbol_map(
+      types::substitution_map &                 substitution_map,
+      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const Args &... other_symbol_values)
+    {
+      set_value_in_symbol_map(substitution_map, symbol_value);
+      set_value_in_symbol_map(substitution_map, other_symbol_values...);
+    }
+
+
+    template <typename SymbolicType, typename ValueType>
+    void
+    set_value_in_symbol_map(
+      types::substitution_map &                              substitution_map,
+      const std::vector<std::pair<SymbolicType, ValueType>> &symbol_values)
+    {
+      // Call the above function
+      for (const auto &entry : symbol_values)
+        set_value_in_symbol_map(substitution_map, entry.first, entry.second);
     }
 
 

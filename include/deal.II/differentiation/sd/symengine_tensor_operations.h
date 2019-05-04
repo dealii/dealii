@@ -422,6 +422,37 @@ namespace Differentiation
       types::substitution_map &                     symbol_map,
       const SymmetricTensor<rank, dim, Expression> &symbol_tensor);
 
+    /**
+     * Find the input @p symbols in the @p substitution_map and set the entries
+     * corresponding to the key values given by @p symbol_tensor to the values
+     * given by @p value_tensor.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    template <int rank, int dim, typename ValueType>
+    void
+    set_value_in_symbol_map(types::substitution_map &substitution_map,
+                            const Tensor<rank, dim, Expression> &symbol_tensor,
+                            const Tensor<rank, dim, ValueType> & value_tensor);
+
+    /**
+     * Find the input @p symbols in the @p substitution_map and set the entries
+     * corresponding to the key values given by @p symbol_tensor to the values
+     * given by @p value_tensor.
+     *
+     * This function may be used to safely transform an existing or null
+     * symbolic map (one with uninitialized entries) into one that can be used
+     * to conduct symbolic substitution operations (i.e., a substitution map).
+     */
+    template <int rank, int dim, typename ValueType>
+    void
+    set_value_in_symbol_map(
+      types::substitution_map &                     substitution_map,
+      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> & value_tensor);
+
     //@}
 
     /**
@@ -908,6 +939,57 @@ namespace Differentiation
 
 
     /* ---------------- Symbol map creation and manipulation --------------*/
+
+
+    namespace internal
+    {
+      template <typename ValueType,
+                int rank,
+                int dim,
+                template <int, int, typename> class TensorType>
+      void
+      tensor_set_value_in_symbol_map(
+        types::substitution_map &                substitution_map,
+        const TensorType<rank, dim, Expression> &symbol_tensor,
+        const TensorType<rank, dim, ValueType> & value_tensor)
+      {
+        TensorType<rank, dim, Expression> out;
+        for (unsigned int i = 0; i < out.n_independent_components; ++i)
+          {
+            const TableIndices<rank> indices(
+              out.unrolled_to_component_indices(i));
+            set_value_in_symbol_map(substitution_map,
+                                    symbol_tensor[indices],
+                                    value_tensor[indices]);
+          }
+      }
+
+
+      template <typename ValueType, int dim>
+      void
+      tensor_set_value_in_symbol_map(
+        types::substitution_map &                  substitution_map,
+        const SymmetricTensor<4, dim, Expression> &symbol_tensor,
+        const SymmetricTensor<4, dim, ValueType> & value_tensor)
+      {
+        SymmetricTensor<4, dim, Expression> out;
+        for (unsigned int i = 0;
+             i < SymmetricTensor<2, dim>::n_independent_components;
+             ++i)
+          for (unsigned int j = 0;
+               j < SymmetricTensor<2, dim>::n_independent_components;
+               ++j)
+            {
+              const TableIndices<4> indices =
+                make_rank_4_tensor_indices<dim>(i, j);
+              set_value_in_symbol_map(substitution_map,
+                                      symbol_tensor[indices],
+                                      value_tensor[indices]);
+            }
+      }
+    } // namespace internal
+
+
     template <bool ignore_invalid_symbols,
               int  rank,
               int  dim,
@@ -934,6 +1016,31 @@ namespace Differentiation
       // Call the above function
       add_to_substitution_map<ignore_invalid_symbols>(
         symbol_map, symbol_tensor, SymmetricTensor<rank, dim, ValueType>());
+    }
+
+
+    template <int rank, int dim, typename ValueType>
+    void
+    set_value_in_symbol_map(types::substitution_map &substitution_map,
+                            const Tensor<rank, dim, Expression> &symbol_tensor,
+                            const Tensor<rank, dim, ValueType> & value_tensor)
+    {
+      internal::tensor_set_value_in_symbol_map(substitution_map,
+                                               symbol_tensor,
+                                               value_tensor);
+    }
+
+
+    template <int rank, int dim, typename ValueType>
+    void
+    set_value_in_symbol_map(
+      types::substitution_map &                     substitution_map,
+      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> & value_tensor)
+    {
+      internal::tensor_set_value_in_symbol_map(substitution_map,
+                                               symbol_tensor,
+                                               value_tensor);
     }
 
 

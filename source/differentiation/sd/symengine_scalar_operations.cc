@@ -121,7 +121,47 @@ namespace Differentiation
         return false;
       }
 
+
+      void
+      set_value_in_symbol_map(
+        types::substitution_map &                     substitution_map,
+        const SymEngine::RCP<const SymEngine::Basic> &symbol,
+        const SymEngine::RCP<const SymEngine::Basic> &value)
+      {
+        Assert(
+          internal::is_valid_substitution_symbol(*symbol),
+          ExcMessage(
+            "Substitution with a number that does not represent a symbol or symbolic derivative"));
+
+        types::substitution_map::iterator it_sym =
+          substitution_map.find(Expression(symbol));
+        Assert(it_sym != substitution_map.end(),
+               ExcMessage("Did not find this symbol in the map."));
+
+        it_sym->second = Expression(value);
+      }
+
     } // namespace internal
+
+
+    void
+    set_value_in_symbol_map(types::substitution_map &substitution_map,
+                            const Expression &       symbol,
+                            const Expression &       value)
+    {
+      internal::set_value_in_symbol_map(substitution_map,
+                                        symbol.get_RCP(),
+                                        value.get_RCP());
+    }
+
+
+    void
+    set_value_in_symbol_map(types::substitution_map &      substitution_map,
+                            const types::substitution_map &symbol_values)
+    {
+      for (const auto &entry : symbol_values)
+        set_value_in_symbol_map(substitution_map, entry.first, entry.second);
+    }
 
 
     /* ------------------ Symbol substitution map creation ----------------*/
