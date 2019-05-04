@@ -695,24 +695,8 @@ namespace NonMatching
           if (cell0->is_locally_owned())
             {
               intersection.resize(0);
-
-              BoundingBox<spacedim> box0;
-              if (cache0.get_mapping().preserves_vertex_locations())
-                box0 = cell0->bounding_box();
-              else
-                {
-                  const auto vertices =
-                    cache0.get_mapping().get_vertices(cell0);
-                  Point<spacedim> p0 = vertices[0], p1 = vertices[0];
-                  for (unsigned int j = 1; j < vertices.size(); ++j)
-                    for (unsigned int d = 0; d < spacedim; ++d)
-                      {
-                        p0[d] = std::min(p0[d], vertices[j][d]);
-                        p1[d] = std::max(p1[d], vertices[j][d]);
-                      }
-                  box0 = BoundingBox<spacedim>({p0, p1});
-                }
-
+              BoundingBox<spacedim> box0 =
+                cache0.get_mapping().get_bounding_box(cell0);
               box0.extend(epsilon);
               boost::geometry::index::query(tree1,
                                             boost::geometry::index::intersects(
@@ -747,25 +731,8 @@ namespace NonMatching
           if (cell1->is_locally_owned())
             {
               intersection.resize(0);
-
-              BoundingBox<spacedim> box1;
-              Assert(&cache1.get_mapping() != nullptr, ExcInternalError());
-              if (cache1.get_mapping().preserves_vertex_locations())
-                box1 = cell1->bounding_box();
-              else
-                {
-                  const auto vertices =
-                    cache1.get_mapping().get_vertices(cell1);
-                  Point<spacedim> p0 = vertices[0], p1 = vertices[0];
-                  for (unsigned int j = 1; j < vertices.size(); ++j)
-                    for (unsigned int d = 0; d < spacedim; ++d)
-                      {
-                        p0[d] = std::min(p0[d], vertices[j][d]);
-                        p1[d] = std::max(p1[d], vertices[j][d]);
-                      }
-                  box1 = BoundingBox<spacedim>({p0, p1});
-                }
-
+              BoundingBox<spacedim> box1 =
+                cache1.get_mapping().get_bounding_box(cell1);
               box1.extend(epsilon);
               boost::geometry::index::query(tree0,
                                             boost::geometry::index::intersects(
@@ -928,24 +895,8 @@ namespace NonMatching
           if (cell0->is_locally_owned())
             {
               intersection.resize(0);
-
-              BoundingBox<spacedim> box0;
-              if (cache0.get_mapping().preserves_vertex_locations())
-                box0 = cell0->bounding_box();
-              else
-                {
-                  const auto vertices =
-                    cache0.get_mapping().get_vertices(cell0);
-                  Point<spacedim> p0 = vertices[0], p1 = vertices[0];
-                  for (unsigned int j = 1; j < vertices.size(); ++j)
-                    for (unsigned int d = 0; d < spacedim; ++d)
-                      {
-                        p0[d] = std::min(p0[d], vertices[j][d]);
-                        p1[d] = std::max(p1[d], vertices[j][d]);
-                      }
-                  box0 = BoundingBox<spacedim>({p0, p1});
-                }
-
+              BoundingBox<spacedim> box0 =
+                cache0.get_mapping().get_bounding_box(cell0);
               box0.extend(epsilon);
               boost::geometry::index::query(tree1,
                                             boost::geometry::index::intersects(
@@ -980,22 +931,8 @@ namespace NonMatching
           if (cell1->is_locally_owned())
             {
               intersection.resize(0);
-              BoundingBox<spacedim> box1;
-              if (cache1.get_mapping().preserves_vertex_locations())
-                box1 = cell1->bounding_box();
-              else
-                {
-                  const auto vertices =
-                    cache1.get_mapping().get_vertices(cell1);
-                  Point<spacedim> p0 = vertices[0], p1 = vertices[0];
-                  for (unsigned int j = 1; j < vertices.size(); ++j)
-                    for (unsigned int d = 0; d < spacedim; ++d)
-                      {
-                        p0[d] = std::min(p0[d], vertices[j][d]);
-                        p1[d] = std::max(p1[d], vertices[j][d]);
-                      }
-                  box1 = BoundingBox<spacedim>({p0, p1});
-                }
+              BoundingBox<spacedim> box1 =
+                cache1.get_mapping().get_bounding_box(cell1);
               box1.extend(epsilon);
               boost::geometry::index::query(tree0,
                                             boost::geometry::index::intersects(

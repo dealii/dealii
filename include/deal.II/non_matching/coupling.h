@@ -288,7 +288,7 @@ namespace NonMatching
     const ComponentMask &            comps1       = ComponentMask());
 
   /**
-   * Create a coupling  mass matrix for non-matching independent grids,
+   * Create a coupling mass matrix for non-matching independent grids,
    * using a convolution kernel with compact support.
    *
    * Given two non-matching triangulations, representing the domains
