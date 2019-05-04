@@ -367,6 +367,64 @@ namespace Differentiation
     //@}
 
     /**
+     * @name Symbol map creation and manipulation
+     */
+    //@{
+
+    /**
+     * A convenience function for adding empty entries, with the key values
+     * equal to the entries in the @p symbol_tensor, to the symbolic
+     * map @p symbol_map.
+     *
+     * For more context which this function is used, see the other
+     * \ref add_to_symbol_map(types::substitution_map &,const
+     * Expression &) function.
+     *
+     * @tparam ignore_invalid_symbols See the other
+     * \ref add_to_symbol_map(types::substitution_map &,const
+     * Expression &) function for a detailed discussion on the role of this
+     * template argument.
+     *
+     * @note In this function, the @p ValueType is somewhat arbitrary as
+     * it is only used to create dummy values.
+     */
+    template <bool ignore_invalid_symbols = false,
+              int  rank,
+              int  dim,
+              typename ValueType = double>
+    void
+    add_to_symbol_map(types::substitution_map &            symbol_map,
+                      const Tensor<rank, dim, Expression> &symbol_tensor);
+
+    /**
+     * A convenience function for adding empty entries, with the key values
+     * equal to the entries in the @p symbol_tensor, to the symbolic
+     * map @p symbol_map.
+     *
+     * For more context which this function is used, see the other
+     * \ref add_to_symbol_map(types::substitution_map &,const
+     * Expression &) function.
+     *
+     * @tparam ignore_invalid_symbols See the other
+     * \ref add_to_symbol_map(types::substitution_map &,const
+     * Expression &) function for a detailed discussion on the role of this
+     * template argument.
+     *
+     * @note In this function, the @p ValueType is somewhat arbitrary as
+     * it is only used to create dummy values.
+     */
+    template <bool ignore_invalid_symbols = false,
+              int  rank,
+              int  dim,
+              typename ValueType = double>
+    void
+    add_to_symbol_map(
+      types::substitution_map &                     symbol_map,
+      const SymmetricTensor<rank, dim, Expression> &symbol_tensor);
+
+    //@}
+
+    /**
      * @name Symbol substitution map creation
      */
     //@{
@@ -849,7 +907,37 @@ namespace Differentiation
     }
 
 
-    /* ---------------- Symbolic substitution map creation --------------*/
+    /* ---------------- Symbol map creation and manipulation --------------*/
+    template <bool ignore_invalid_symbols,
+              int  rank,
+              int  dim,
+              typename ValueType>
+    void
+    add_to_symbol_map(types::substitution_map &            symbol_map,
+                      const Tensor<rank, dim, Expression> &symbol_tensor)
+    {
+      // Call the above function
+      add_to_substitution_map<ignore_invalid_symbols>(
+        symbol_map, symbol_tensor, Tensor<rank, dim, ValueType>());
+    }
+
+
+    template <bool ignore_invalid_symbols,
+              int  rank,
+              int  dim,
+              typename ValueType>
+    void
+    add_to_symbol_map(
+      types::substitution_map &                     symbol_map,
+      const SymmetricTensor<rank, dim, Expression> &symbol_tensor)
+    {
+      // Call the above function
+      add_to_substitution_map<ignore_invalid_symbols>(
+        symbol_map, symbol_tensor, SymmetricTensor<rank, dim, ValueType>());
+    }
+
+
+    /* ------------------ Symbol substitution map creation ----------------*/
 
 
     template <int rank, int dim, typename ValueType>
