@@ -134,7 +134,7 @@ namespace Differentiation
     //@}
 
     /**
-     * @name Symbolic map creation
+     * @name Symbol map creation and manipulation
      */
     //@{
 

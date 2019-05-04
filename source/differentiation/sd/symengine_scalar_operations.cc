@@ -71,7 +71,7 @@ namespace Differentiation
     }
 
 
-    /* ------------------------ Symbolic map creation ----------------------*/
+    /* ---------------- Symbol map creation and manipulation --------------*/
 
 
     namespace internal
@@ -122,6 +122,9 @@ namespace Differentiation
       }
 
     } // namespace internal
+
+
+    /* ------------------ Symbol substitution map creation ----------------*/
 
 
     types::substitution_map
