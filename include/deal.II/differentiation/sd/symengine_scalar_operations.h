@@ -149,6 +149,44 @@ namespace Differentiation
     } // namespace internal
 
     /**
+     * Return a symbolic map that has the entry key given by @p symbol.
+     * It is expected that all entries be valid symbols or symbolic expressions.
+     *
+     * @tparam SymbolicType Any symbolic type that is understood by the
+     *         add_to_symbol_map() functions. This includes individual
+     *         Expression, std::vector<Expression>, as well as
+     *         Tensors and SymmetricTensors of Expressions.
+     */
+    template <typename SymbolicType>
+    types::substitution_map
+    make_symbol_map(const SymbolicType &symbol);
+
+    /**
+     * Return a symbolic map that has the entry keys given by @p symbol and all
+     * @p other_symbols. It is expected that all entries be valid symbols or
+     * symbolic expressions.
+     *
+     * With this function it is possible to construct a symbolic map from
+     * different types. An example may be as follows:
+     *
+     * @code
+     *   const types::substitution_map symbol_map
+     *     = make_symbol_map(
+     *         Expression(...),
+     *         Tensor<1,dim,Expression>(...),
+     *         SymmetricTensor<2,dim,Expression>(...));
+     * @endcode
+     *
+     * @tparam SymbolicType Any symbolic type that is understood by the
+     *         add_to_symbol_map() functions. This includes individual
+     *         Expression, std::vector<Expression>, as well as
+     *         Tensors and SymmetricTensors of Expressions.
+     */
+    template <typename SymbolicType, typename... Args>
+    types::substitution_map
+    make_symbol_map(const SymbolicType &symbol, const Args &... other_symbols);
+
+    /**
      * A convenience function for an adding empty entry, with the key value
      * given by @p symbol, to the symbolic map @p substitution_map.
      *
@@ -751,6 +789,26 @@ namespace Differentiation
   namespace SD
   {
     /* ---------------- Symbol map creation and manipulation --------------*/
+
+
+    template <typename SymbolicType>
+    types::substitution_map
+    make_symbol_map(const SymbolicType &symbol)
+    {
+      types::substitution_map symbol_map;
+      add_to_symbol_map(symbol_map, symbol);
+      return symbol_map;
+    }
+
+
+    template <typename SymbolicType, typename... Args>
+    types::substitution_map
+    make_symbol_map(const SymbolicType &symbol, const Args &... other_symbols)
+    {
+      types::substitution_map symbol_map;
+      add_to_symbol_map(symbol_map, symbol, other_symbols...);
+      return symbol_map;
+    }
 
 
     template <bool ignore_invalid_symbols, typename ValueType>
