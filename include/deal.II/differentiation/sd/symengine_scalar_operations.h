@@ -183,7 +183,13 @@ namespace Differentiation
      * to simplify the final substitution map by resolving all explicit
      * interdependencies between entries in the substitution map.
      */
-    template <typename ExpressionType = SD::Expression, typename ValueType>
+    template <typename ExpressionType = SD::Expression,
+              typename ValueType,
+              typename = typename std::enable_if<
+                dealii::internal::is_explicitly_convertible<
+                  ExpressionType,
+                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
+                std::is_constructible<ExpressionType, ValueType>::value>::type>
     types::substitution_map
     make_substitution_map(const ExpressionType &symbol, const ValueType &value);
 
@@ -608,9 +614,9 @@ namespace Differentiation
     /* ---------------- Symbolic substitution map creation --------------*/
 
 
-    template <typename ValueType>
+    template <typename ExpressionType, typename ValueType, typename>
     types::substitution_map
-    make_substitution_map(const Expression &symbol, const ValueType &value)
+    make_substitution_map(const ExpressionType &symbol, const ValueType &value)
     {
       types::substitution_map substitution_map;
       add_to_substitution_map(substitution_map, symbol, value);
