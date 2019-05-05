@@ -1301,6 +1301,10 @@ namespace GridGenerator
    * diagonal points given in @p diagonals by however many time  along each axis
    * specified by repetitions @repetitions.
    *
+   * This function assumes that the mesh is bounded by hyper-rectangle whose
+   * faces are parallel to the coordinate axis and it is also user's
+   * responsibility to ensure this assumption is valid.
+   *
    * @author Weixiong Zheng, 2018
    */
   template <int dim, int spacedim>
