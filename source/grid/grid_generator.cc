@@ -4410,7 +4410,7 @@ namespace GridGenerator
                           Triangulation<dim, spacedim> &        result)
   {
     Assert(basic_tria.n_levels() == 1,
-           ExcMessage("The input triangulations must be coarse meshes."));
+           ExcMessage("The input triangulation must not be refined."));
     const Point<spacedim> p1 = diagonals.front(), p2 = diagonals.back();
 
     // side lengths
@@ -4425,12 +4425,12 @@ namespace GridGenerator
     const unsigned int x_rep = reps[0], y_rep = reps[1], z_rep = reps[2];
 
     // vertices vector for new triangulation
-    std::vector<Point<spacedim>> vertices(basic_tria.get_vertices());
-    const unsigned int           vsize = vertices.size();
+    std::vector<Point<spacedim>> vertices;
+    vertices.reserve(basic_tria.get_vertices());
+    const unsigned int vsize = vertices.size();
 
     // all cell data
     std::vector<CellData<dim>> cells;
-    // std::vector<CellData<dim>> cells(basic_tria.n_cells()*x_rep*y_rep*z_rep);
     cells.reserve(basic_tria.n_cells() * x_rep * y_rep * z_rep);
 
     // shifting counter
