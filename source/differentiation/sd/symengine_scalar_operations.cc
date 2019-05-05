@@ -156,6 +156,61 @@ namespace Differentiation
         }
     }
 
+
+    /* ---------------- Symbol substitution and evaluation --------------*/
+
+
+    types::substitution_map
+    resolve_explicit_dependencies(const types::substitution_map &symbol_values,
+                                  const bool force_cyclic_dependency_resolution)
+    {
+      types::substitution_map symbol_values_resolved = symbol_values;
+      const std::size_t       size                   = symbol_values.size();
+      (void)size;
+      for (auto &entry : symbol_values_resolved)
+        {
+          // Perform dictionary-based substitution to
+          // resolve all explicit relations in a map.
+          // Instead of checking by value (and thus having
+          // to store a temporary value), we check to see
+          // if the hash of the map entry changes.
+          Expression & out = entry.second;
+          SE::hash_t   hash_old;
+          SE::hash_t   hash_new = out.get_RCP()->hash();
+          unsigned int iter     = 0;
+          do
+            {
+              // Write the substituted value straight back
+              // into the map.
+              if (force_cyclic_dependency_resolution)
+                {
+                  // Here we substitute in symbol_values_resolved instead of
+                  // symbol_values, in order to break any cyclic dependencies.
+                  // The earlier entries in the dictionary are in this way
+                  // guarenteed to be resolved before any subsequent entries,
+                  // thereby breaking the dependency loop.
+                  out = out.substitute(symbol_values_resolved);
+                }
+              else
+                {
+                  out = out.substitute(symbol_values);
+                }
+
+              // Compute and store the hash of the new object
+              hash_old = std::move(hash_new);
+              hash_new = out.get_RCP()->hash();
+              AssertThrow(
+                iter < size,
+                ExcMessage(
+                  "Unresolvable cyclic dependency detected in substitution map."));
+              ++iter;
+            }
+          while (hash_new != hash_old);
+        }
+
+      return symbol_values_resolved;
+    }
+
   } // namespace SD
 } // namespace Differentiation
 
