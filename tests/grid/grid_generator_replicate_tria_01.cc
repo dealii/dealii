@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2017 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,6 +38,8 @@ test()
        ++cell)
     deallog << "(" << cell->center()[0] << ")" << std::endl;
 
+  deallog << "Number of global vertices: " << res1.n_vertices() << std::endl;
+
   Triangulation<2, 2> tr2;
   GridGenerator::hyper_cube_with_cylindrical_hole(tr2, 0.3, 0.5);
   const std::array<Point<2>, 2> diags2 = {
@@ -52,6 +54,8 @@ test()
        ++cell)
     deallog << "(" << cell->center()[0] << "," << cell->center()[1] << ")"
             << std::endl;
+
+  deallog << "Number of global vertices: " << res2.n_vertices() << std::endl;
 
   Triangulation<3, 3>     tr3;
   std::array<Point<3>, 2> diags3 = {
@@ -71,6 +75,8 @@ test()
        ++cell)
     deallog << "(" << cell->center()[0] << "," << cell->center()[1] << ","
             << cell->center()[2] << ")" << std::endl;
+
+  deallog << "Number of global vertices: " << res3.n_vertices() << std::endl;
 }
 
 int
