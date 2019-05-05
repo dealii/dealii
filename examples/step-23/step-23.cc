@@ -24,10 +24,8 @@
 // many of the previous tests:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
@@ -36,15 +34,11 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_values.h>
 
 #include <deal.II/numerics/data_out.h>
 
@@ -78,7 +72,7 @@
 // string representation of it. It is particularly useful since it allows for
 // a second parameter indicating the number of digits to which we want the
 // result padded with leading zeros. We will use this to write output files
-// that have the form <code>solution-XXX.gnuplot</code> where <code>XXX</code>
+// that have the form <code>solution-XXX.vtu</code> where <code>XXX</code>
 // denotes the number of the time step and always consists of three digits
 // even if we are still in the single or double digit time steps.
 #include <deal.II/base/utilities.h>
@@ -163,48 +157,29 @@ namespace Step23
   class InitialValuesU : public Function<dim>
   {
   public:
-    InitialValuesU()
-      : Function<dim>()
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> & /*p*/,
+                         const unsigned int component = 0) const override
+    {
+      (void)component;
+      Assert(component == 0, ExcIndexRange(component, 0, 1));
+      return 0;
+    }
   };
+
 
 
   template <int dim>
   class InitialValuesV : public Function<dim>
   {
   public:
-    InitialValuesV()
-      : Function<dim>()
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> & /*p*/,
+                         const unsigned int component = 0) const override
+    {
+      (void)component;
+      Assert(component == 0, ExcIndexRange(component, 0, 1));
+      return 0;
+    }
   };
-
-
-
-  template <int dim>
-  double InitialValuesU<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int component) const
-  {
-    (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-    return 0;
-  }
-
-
-
-  template <int dim>
-  double InitialValuesV<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int component) const
-  {
-    (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-    return 0;
-  }
 
 
 
@@ -214,24 +189,14 @@ namespace Step23
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> & /*p*/,
+                         const unsigned int component = 0) const override
+    {
+      (void)component;
+      Assert(component == 0, ExcIndexRange(component, 0, 1));
+      return 0;
+    }
   };
-
-
-
-  template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                   const unsigned int component) const
-  {
-    (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-    return 0;
-  }
 
 
 
@@ -241,12 +206,18 @@ namespace Step23
   class BoundaryValuesU : public Function<dim>
   {
   public:
-    BoundaryValuesU()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+                         const unsigned int component = 0) const override
+    {
+      (void)component;
+      Assert(component == 0, ExcIndexRange(component, 0, 1));
+
+      if ((this->get_time() <= 0.5) && (p[0] < 0) && (p[1] < 1. / 3) &&
+          (p[1] > -1. / 3))
+        return std::sin(this->get_time() * 4 * numbers::PI);
+      else
+        return 0;
+    }
   };
 
 
@@ -255,45 +226,19 @@ namespace Step23
   class BoundaryValuesV : public Function<dim>
   {
   public:
-    BoundaryValuesV()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+                         const unsigned int component = 0) const override
+    {
+      (void)component;
+      Assert(component == 0, ExcIndexRange(component, 0, 1));
+
+      if ((this->get_time() <= 0.5) && (p[0] < 0) && (p[1] < 1. / 3) &&
+          (p[1] > -1. / 3))
+        return (std::cos(this->get_time() * 4 * numbers::PI) * 4 * numbers::PI);
+      else
+        return 0;
+    }
   };
-
-
-
-  template <int dim>
-  double BoundaryValuesU<dim>::value(const Point<dim> & p,
-                                     const unsigned int component) const
-  {
-    (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-
-    if ((this->get_time() <= 0.5) && (p[0] < 0) && (p[1] < 1. / 3) &&
-        (p[1] > -1. / 3))
-      return std::sin(this->get_time() * 4 * numbers::PI);
-    else
-      return 0;
-  }
-
-
-
-  template <int dim>
-  double BoundaryValuesV<dim>::value(const Point<dim> & p,
-                                     const unsigned int component) const
-  {
-    (void)component;
-    Assert(component == 0, ExcIndexRange(component, 0, 1));
-
-    if ((this->get_time() <= 0.5) && (p[0] < 0) && (p[1] < 1. / 3) &&
-        (p[1] > -1. / 3))
-      return (std::cos(this->get_time() * 4 * numbers::PI) * 4 * numbers::PI);
-    else
-      return 0;
-  }
 
 
 
@@ -365,9 +310,12 @@ namespace Step23
     // integration. Note that in many respects these functions are better than
     // what we would usually do in application programs, for example because
     // they automatically parallelize building the matrices if multiple
-    // processors are available in a machine. The matrices for solving linear
-    // systems will be filled in the run() method because we need to re-apply
-    // boundary conditions every time step.
+    // processors are available in a machine: for more information see the
+    // documentation of WorkStream or the
+    // @ref threads "Parallel computing with multiple processors"
+    // module. The matrices for solving linear systems will be filled in the
+    // run() method because we need to re-apply boundary conditions every time
+    // step.
     mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);
     matrix_u.reinit(sparsity_pattern);
@@ -396,6 +344,7 @@ namespace Step23
   }
 
 
+
   // @sect4{WaveEquation::solve_u and WaveEquation::solve_v}
 
   // The next two functions deal with solving the linear systems associated
@@ -421,6 +370,7 @@ namespace Step23
     std::cout << "   u-equation: " << solver_control.last_step()
               << " CG iterations." << std::endl;
   }
+
 
 
   template <int dim>
@@ -456,9 +406,17 @@ namespace Step23
     data_out.build_patches();
 
     const std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".gnuplot";
+      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtu";
+    // Like step-15, since we write output at every time step (and the system
+    // we have to solve is relatively easy), we instruct DataOut to use the
+    // zlib compression algorithm that is optimized for speed instead of disk
+    // usage since otherwise plotting the output becomes a bottleneck:
+    DataOutBase::VtkFlags vtk_flags;
+    vtk_flags.compression_level =
+      DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+    data_out.set_flags(vtk_flags);
     std::ofstream output(filename);
-    data_out.write_gnuplot(output);
+    data_out.write_vtu(output);
   }
 
 
@@ -530,7 +488,7 @@ namespace Step23
         RightHandSide<dim> rhs_function;
         rhs_function.set_time(time);
         VectorTools::create_right_hand_side(dof_handler,
-                                            QGauss<dim>(2),
+                                            QGauss<dim>(fe.degree + 1),
                                             rhs_function,
                                             tmp);
         forcing_terms = tmp;
@@ -538,7 +496,7 @@ namespace Step23
 
         rhs_function.set_time(time - time_step);
         VectorTools::create_right_hand_side(dof_handler,
-                                            QGauss<dim>(2),
+                                            QGauss<dim>(fe.degree + 1),
                                             rhs_function,
                                             tmp);
 
