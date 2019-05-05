@@ -1,14 +1,13 @@
 <h1>Results</h1>
 
 The program writes both graphical data for each time step as well as the
-values evaluated at each detector location to disk. We then 
-draw them in plots. Experimental data were also collected for comparison. 
-Currently our experiments have only been done in two dimensions by 
-circularly scanning a single detector. The tissue sample here is a thin slice 
-in the X-Y plane (Z=0), and we assume that signals from other Z directions 
-won't contribute to the data. Consequently, we only have to compare
-our experimental data with two dimensional simulated data.  
-
+values evaluated at each detector location to disk. We then
+draw them in plots. Experimental data were also collected for comparison.
+Currently our experiments have only been done in two dimensions by
+circularly scanning a single detector. The tissue sample here is a thin slice
+in the $X-Y$ plane ($Z=0$), and we assume that signals from other $Z$
+directions won't contribute to the data. Consequently, we only have to compare
+our experimental data with two dimensional simulated data.
 
 <h3> One absorber </h3>
 
@@ -75,7 +74,7 @@ data:
 In our simulations, we see spurious signals behind the main wave that
 result from numerical artifacts. This problem can be alleviated by using finer
 mesh, resulting in the following plot:
- 
+
 <img src="https://www.dealii.org/images/steps/developer/step-24.one_s2.png" alt="">
 
 
@@ -106,7 +105,7 @@ Note that in the experimental data, the first signal (i.e. the left-most dark
 line) results from absorption at the tissue boundary, and therefore reaches
 the detectors first and before any of the signals from the interior. This
 signal is also faintly visible at the end of the traces, around 30 $\mu s$,
-which indicates that the signal travelled through the entire tissue to reach
+which indicates that the signal traveled through the entire tissue to reach
 detectors at the other side, after all the signals originating from the
 interior have reached them.
 
@@ -138,7 +137,3 @@ coarse mesh) is not isotropic either. The net result is that the signal fronts
 are not sinusoidal unless the mesh is sufficiently fine. The right image is a
 lot better in this respect, though artifacts in the form of trailing spurious
 waves can still be seen.
-
-
-
-

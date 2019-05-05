@@ -25,7 +25,7 @@ step_23 "step-23", where the wave equation was first introduced.
 <h3>The problem</h3>
 
 The temperature at a given location, neglecting thermal diffusion, can be
-stated as 
+stated as
 
 @f[
 \rho C_p \frac{\partial}{\partial t}T(t,\mathbf r) = H(t,\mathbf r)
@@ -43,7 +43,7 @@ acoustically homogeneous medium can be described as follows: if $u$ is the
 vector-valued displacement, then tissue certainly reacts to changes in
 pressure by acceleration:
 @f[
-\rho \frac{\partial^2}{\partial t^2}u(t,\mathbf r) = 
+\rho \frac{\partial^2}{\partial t^2}u(t,\mathbf r) =
 -\nabla p(t,\mathbf r).
 @f]
 Furthermore, it contracts due to excess pressure and expands based on changes in temperature:
@@ -59,7 +59,7 @@ time it takes a wave to cross the domain). In that case, the heating
 rate $H(t,\mathbf r)$ can be written as $H(t,\mathbf r) = a(\mathbf
 r)\delta(t)$ (where $a(\mathbf r)$ is a map of absorption strengths for
 microwave energy and $\delta(t)$ is the Dirac delta function), which together
-with the first equation above will yield 
+with the first equation above will yield
 an instantaneous jump in the temperature $T(\mathbf r)$ at time $t=0$.
 Using this assumption, and taking all equations together, we can
 rewrite and combine the above as follows:
@@ -67,14 +67,14 @@ rewrite and combine the above as follows:
 \Delta p-\frac{1}{c_0^2} \frac{\partial^2 p}{\partial t^2} = \lambda
 a(\mathbf r)\frac{d\delta(t)}{dt}
 @f]
-where $\lambda = - \frac{\beta}{C_p}$. 
+where $\lambda = - \frac{\beta}{C_p}$.
 
 This somewhat strange equation with the derivative of a Dirac delta function
 on the right hand side can be rewritten as an initial value problem as follows:
-@f{eqnarray*} 
+@f{eqnarray*}
 \Delta \bar{p}- \frac{1}{c_0^2} \frac{\partial^2 \bar{p}}{\partial t^2} & = &
-0 \\ 
-\bar{p}(0,\mathbf r) &=& c_0^2 \lambda a(\mathbf r) = b(\mathbf r)  \\ 
+0 \\
+\bar{p}(0,\mathbf r) &=& c_0^2 \lambda a(\mathbf r) = b(\mathbf r)  \\
 \frac{\partial\bar{p}(0,\mathbf r)}{\partial t} &=& 0.
 @f}
 (A derivation of this transformation into an initial value problem is given at
@@ -102,7 +102,7 @@ In general, this is a hard problem: Good absorbing boundary conditions are
 nonlinear and/or numerically very expensive. We therefore opt for a simple
 first order approximation to absorbing boundary conditions that reads
 @f[
-\frac{\partial\bar{p}}{\partial\mathbf n} = 
+\frac{\partial\bar{p}}{\partial\mathbf n} =
 -\frac{1}{c_0} \frac{\partial\bar{p}}{\partial t}
 @f]
 Here, $\frac{\partial\bar{p}}{\partial\mathbf n}$ is the normal derivative at
@@ -114,15 +114,15 @@ condition, but it is one of the very few that are reasonably simple to implement
 
 As in step-23, one first introduces a second variable, which is
 defined as the derivative of the pressure potential:
-@f[ 
-v = \frac{\partial\bar{p}}{\partial t} 
+@f[
+v = \frac{\partial\bar{p}}{\partial t}
 @f]
 
 With the second variable, one then transforms the forward problem into
 two separate equations:
 @f{eqnarray*}
 \bar{p}_{t} - v & = & 0 \\
-\Delta\bar{p} - \frac{1}{c_0^2}\,v_{t} & = & f 
+\Delta\bar{p} - \frac{1}{c_0^2}\,v_{t} & = & f
 @f}
 with initial conditions:
 @f{eqnarray*}
@@ -139,16 +139,16 @@ introduced in step-23 is then:
 \left(\frac{\bar{p}^n-\bar{p}^{n-1}}{k},\phi\right)_\Omega-
 \left(\theta v^{n}+(1-\theta)v^{n-1},\phi\right)_\Omega & = & 0   \\
 -\left(\nabla((\theta\bar{p}^n+(1-\theta)\bar{p}^{n-1})),\nabla\phi\right)_\Omega-
-\frac{1}{c_0}\left(\frac{\bar{p}^n-\bar{p}^{n-1}}{k},\phi\right)_{\partial\Omega} - 
-\frac{1}{c_0^2}\left(\frac{v^n-v^{n-1}}{k},\phi\right)_\Omega & = 
+\frac{1}{c_0}\left(\frac{\bar{p}^n-\bar{p}^{n-1}}{k},\phi\right)_{\partial\Omega} -
+\frac{1}{c_0^2}\left(\frac{v^n-v^{n-1}}{k},\phi\right)_\Omega & =
 & \left(\theta f^{n}+(1-\theta)f^{n-1}, \phi\right)_\Omega,
 @f}
 where $\phi$ is an arbitrary test function, and where we have used the
 absorbing boundary condition to integrate by parts:
-absorbing boundary conditions are incorporated into the weak form by using 
-@f[ 
+absorbing boundary conditions are incorporated into the weak form by using
+@f[
 \int_\Omega\varphi \, \Delta p\; dx =
--\int_\Omega\nabla \varphi \cdot \nabla p dx + 
+-\int_\Omega\nabla \varphi \cdot \nabla p dx +
 \int_{\partial\Omega}\varphi \frac{\partial p}{\partial {\mathbf n}}ds.
 @f]
 
@@ -157,7 +157,7 @@ functions, and get
 @f{eqnarray*}
 M\bar{p}^{n}-k \theta M v^n & = & M\bar{p}^{n-1}+k (1-\theta)Mv^{n-1},\\
 
-(-c_0^2k \theta A-c_0 B)\bar{p}^n-Mv^{n} & = & 
+(-c_0^2k \theta A-c_0 B)\bar{p}^n-Mv^{n} & = &
 (c_0^2k(1-\theta)A-c_0B)\bar{p}^{n-1}-Mv^{n-1}+c_0^2k(\theta F^{n}+(1-\theta)F^{n-1}).
 @f}
 The matrices $M$ and $A$ are here as in step-23, and the
@@ -234,22 +234,22 @@ the indefinite integral with respect to time of both sides:
 @f[
 \int^t \Delta p\; dt -\int^t \frac{1}{c_0^2} \frac{\partial^2 p}{\partial t^2}
 \; dt
-= 
+=
 \int^t \lambda a(\mathbf r)\frac{d\delta(t)}{dt} \;dt.
 @f]
 This immediately leads to the statement
 @f[
 P(t,\mathbf r) - \frac{1}{c_0^2} \frac{\partial p}{\partial t}
-= 
+=
 \lambda a(\mathbf r) \delta(t),
 @f]
 where $P(t,\mathbf r)$ is such that $\frac{dP(t,\mathbf r)}{dt}=\Delta
 p$. Next, we form the (definite) integral over time from $t=-\epsilon$ to
-$t=+\epsilon$ to find 
+$t=+\epsilon$ to find
 @f[
-\int_{-\epsilon}^{\epsilon} P(t,\mathbf r)\; dt 
+\int_{-\epsilon}^{\epsilon} P(t,\mathbf r)\; dt
 - \frac{1}{c_0^2} \left[ p(\epsilon,\mathbf r) - p(-\epsilon,\mathbf r) \right]
-= 
+=
 \int_{-\epsilon}^{\epsilon} \lambda a(\mathbf r) \delta(t) \; dt.
 @f]
 If we use the property of the delta function that $\int_{-\epsilon}^{\epsilon}
@@ -257,13 +257,13 @@ If we use the property of the delta function that $\int_{-\epsilon}^{\epsilon}
 as we let $\epsilon$ go to zero that
 @f[
 - \lim_{\epsilon\rightarrow 0}\frac{1}{c_0^2} \left[ p(\epsilon,\mathbf r) - p(-\epsilon,\mathbf r) \right]
-= 
+=
 \lambda a(\mathbf r).
 @f]
 In other words, using that $p(-\epsilon,\mathbf r)=0$, we retrieve the initial
-condition 
+condition
 @f[
-  \frac{1}{c_0^2} p(0,\mathbf r)  
+  \frac{1}{c_0^2} p(0,\mathbf r)
   =
   \lambda a(\mathbf r).
 @f]
@@ -303,7 +303,7 @@ see that in fact
 @f]
 
 Now, let $\epsilon\rightarrow 0$. Assuming that $P$ is a continuous function in
-time, we see that 
+time, we see that
 @f[
   P(\epsilon)-P(-\epsilon) \rightarrow 0,
 @f]
@@ -319,4 +319,3 @@ Consequently, we obtain as the second initial condition that
   \frac{\partial p(0)}{\partial t} = 0,
 @f]
 completing the system of equations.
-
