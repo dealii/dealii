@@ -188,6 +188,13 @@ namespace internal
             partitioner->acquire_one_partitioner();
 
           TBBForFunctor<Functor> generic_functor(functor, start, end);
+          // We use a minimum grain size of 1 here since the grains at this
+          // stage of dividing the work refer to the number of vector chunks
+          // that are processed by (possibly different) threads in the
+          // parallelized for loop (i.e., they do not refer to individual
+          // vector entries). The number of chunks here is calculated inside
+          // TBBForFunctor. See also GitHub issue #2496 for further discussion
+          // of this strategy.
           parallel::internal::parallel_for(static_cast<size_type>(0),
                                            static_cast<size_type>(
                                              generic_functor.n_chunks),
@@ -1391,6 +1398,13 @@ namespace internal
           TBBReduceFunctor<Operation, ResultType> generic_functor(op,
                                                                   start,
                                                                   end);
+          // We use a minimum grain size of 1 here since the grains at this
+          // stage of dividing the work refer to the number of vector chunks
+          // that are processed by (possibly different) threads in the
+          // parallelized for loop (i.e., they do not refer to individual
+          // vector entries). The number of chunks here is calculated inside
+          // TBBForFunctor. See also GitHub issue #2496 for further discussion
+          // of this strategy.
           parallel::internal::parallel_for(static_cast<size_type>(0),
                                            static_cast<size_type>(
                                              generic_functor.n_chunks),
