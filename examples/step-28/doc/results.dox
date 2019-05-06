@@ -89,7 +89,7 @@ Then we plot the convergence data with polynomial order being equal to 1,2 and 3
 
 <img src="https://www.dealii.org/images/steps/developer/step-28.convergence.png" alt="">
 
-The estimated ``exact'' k-effective = 0.906834721253 which is simply from last
+The estimated `exact' k-effective = 0.906834721253 which is simply from last
 mesh iteration of polynomial order 3 minus 2e-10. We see that h-adaptive calculations
 deliver an algebraic convergence. And the higher polynomial order is, the faster mesh 
 iteration converges. In our problem, we need smaller number of DoFs to achieve same
