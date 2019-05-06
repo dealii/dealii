@@ -22,10 +22,6 @@ end
 
 
 subsection Linear solver
-  # Linear solver iterations (multiples of the system matrix size)
-  # In 2-d, this value is best set at 2. In 3-d, a value of 1 work fine.
-  set Max iteration multiplier = 2
-
   # Linear solver residual (scaled by residual norm)
   set Residual                 = 1e-6
 
