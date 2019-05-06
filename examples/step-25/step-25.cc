@@ -28,8 +28,8 @@
 // headers for file input/output and string streams.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
+
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -37,15 +37,16 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/affine_constraints.h>
+
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
+
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
+
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
@@ -156,59 +157,58 @@ namespace Step25
     ExactSolution(const unsigned int n_components = 1, const double time = 0.)
       : Function<dim>(n_components, time)
     {}
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+
+
+
+    virtual double value(const Point<dim> &p,
+                         const unsigned int /*component*/ = 0) const override
+    {
+      const double t = this->get_time();
+
+      switch (dim)
+        {
+          case 1:
+            {
+              const double m  = 0.5;
+              const double c1 = 0.;
+              const double c2 = 0.;
+              return -4. * std::atan(m / std::sqrt(1. - m * m) *
+                                     std::sin(std::sqrt(1. - m * m) * t + c2) /
+                                     std::cosh(m * p[0] + c1));
+            }
+
+          case 2:
+            {
+              const double theta  = numbers::PI / 4.;
+              const double lambda = 1.;
+              const double a0     = 1.;
+              const double s      = 1.;
+              const double arg    = p[0] * std::cos(theta) +
+                                 std::sin(theta) * (p[1] * std::cosh(lambda) +
+                                                    t * std::sinh(lambda));
+              return 4. * std::atan(a0 * std::exp(s * arg));
+            }
+
+          case 3:
+            {
+              const double theta = numbers::PI / 4;
+              const double phi   = numbers::PI / 4;
+              const double tau   = 1.;
+              const double c0    = 1.;
+              const double s     = 1.;
+              const double arg   = p[0] * std::cos(theta) +
+                                 p[1] * std::sin(theta) * std::cos(phi) +
+                                 std::sin(theta) * std::sin(phi) *
+                                   (p[2] * std::cosh(tau) + t * std::sinh(tau));
+              return 4. * std::atan(c0 * std::exp(s * arg));
+            }
+
+          default:
+            Assert(false, ExcNotImplemented());
+            return -1e8;
+        }
+    }
   };
-
-  template <int dim>
-  double ExactSolution<dim>::value(const Point<dim> &p,
-                                   const unsigned int /*component*/) const
-  {
-    double t = this->get_time();
-
-    switch (dim)
-      {
-        case 1:
-          {
-            const double m  = 0.5;
-            const double c1 = 0.;
-            const double c2 = 0.;
-            return -4. * std::atan(m / std::sqrt(1. - m * m) *
-                                   std::sin(std::sqrt(1. - m * m) * t + c2) /
-                                   std::cosh(m * p[0] + c1));
-          }
-
-        case 2:
-          {
-            const double theta  = numbers::PI / 4.;
-            const double lambda = 1.;
-            const double a0     = 1.;
-            const double s      = 1.;
-            const double arg    = p[0] * std::cos(theta) +
-                               std::sin(theta) * (p[1] * std::cosh(lambda) +
-                                                  t * std::sinh(lambda));
-            return 4. * std::atan(a0 * std::exp(s * arg));
-          }
-
-        case 3:
-          {
-            const double theta = numbers::PI / 4;
-            const double phi   = numbers::PI / 4;
-            const double tau   = 1.;
-            const double c0    = 1.;
-            const double s     = 1.;
-            const double arg   = p[0] * std::cos(theta) +
-                               p[1] * std::sin(theta) * std::cos(phi) +
-                               std::sin(theta) * std::sin(phi) *
-                                 (p[2] * std::cosh(tau) + t * std::sinh(tau));
-            return 4. * std::atan(c0 * std::exp(s * arg));
-          }
-
-        default:
-          Assert(false, ExcNotImplemented());
-          return -1e8;
-      }
-  }
 
   // In the second part of this section, we provide the initial conditions. We
   // are lazy (and cautious) and don't want to implement the same functions as
@@ -224,16 +224,11 @@ namespace Step25
     {}
 
     virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+                         const unsigned int component = 0) const override
+    {
+      return ExactSolution<dim>(1, this->get_time()).value(p, component);
+    }
   };
-
-  template <int dim>
-  double InitialValues<dim>::value(const Point<dim> & p,
-                                   const unsigned int component) const
-  {
-    return ExactSolution<dim>(1, this->get_time()).value(p, component);
-  }
-
 
 
   // @sect3{Implementation of the <code>SineGordonProblem</code> class}
@@ -414,11 +409,7 @@ namespace Step25
     std::vector<double>                  old_data_values(n_q_points);
     std::vector<double>                  new_data_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         local_nl_term = 0;
         // Once we re-initialize our <code>FEValues</code> instantiation to
@@ -478,11 +469,7 @@ namespace Step25
     std::vector<double>                  old_data_values(n_q_points);
     std::vector<double>                  new_data_values(n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         local_nl_matrix = 0;
         // Again, first we re-initialize our <code>FEValues</code>
@@ -570,10 +557,13 @@ namespace Step25
     data_out.build_patches();
 
     const std::string filename =
-      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtk";
-
+      "solution-" + Utilities::int_to_string(timestep_number, 3) + ".vtu";
+    DataOutBase::VtkFlags vtk_flags;
+    vtk_flags.compression_level =
+      DataOutBase::VtkFlags::ZlibCompressionLevel::best_speed;
+    data_out.set_flags(vtk_flags);
     std::ofstream output(filename);
-    data_out.write_vtk(output);
+    data_out.write_vtu(output);
   }
 
   // @sect4{SineGordonProblem::run}
