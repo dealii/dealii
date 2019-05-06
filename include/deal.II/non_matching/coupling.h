@@ -264,9 +264,9 @@ namespace NonMatching
    * of radius @p epsilon. If epsilon is set to zero, then we assume that the
    * kernel is the Dirac delta distribution, and the call is forwarded to the
    * method in this namespace with the same name, that does not take an epsilon
-   * as input. In this case, more restrictive conditions are required on the
-   * two spaces. See the documentation of the other
-   * create_coupling_sparsity_pattern() function.
+   * as input (but a quadrature formula @p quad is required). In this case, more
+   * restrictive conditions are required on the two spaces. See the
+   * documentation of the other create_coupling_sparsity_pattern() function.
    *
    * @author Luca Heltai, 2019.
    */
@@ -282,6 +282,7 @@ namespace NonMatching
     const GridTools::Cache<dim1, spacedim> &cache1,
     const DoFHandler<dim0, spacedim> &      dh0,
     const DoFHandler<dim1, spacedim> &      dh1,
+    const Quadrature<dim1> &                quad,
     Sparsity &                              sparsity,
     const AffineConstraints<Number> &constraints0 = AffineConstraints<Number>(),
     const ComponentMask &            comps0       = ComponentMask(),
