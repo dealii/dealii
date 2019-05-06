@@ -1,0 +1,25 @@
+
+DEAL:Material ID 0::Testing <2,2>
+DEAL:Material ID 0::Volume: 0.750000
+DEAL:Material ID 0::Boundary surface: 3.00000
+DEAL:Material ID 0::Interior surface: 1.00000
+DEAL:Material ID 0::Testing <2,3>
+DEAL:Material ID 0::Volume: 0.750000
+DEAL:Material ID 0::Boundary surface: 3.00000
+DEAL:Material ID 0::Interior surface: 1.00000
+DEAL:Material ID 0::Testing <3,3>
+DEAL:Material ID 0::Volume: 0.875000
+DEAL:Material ID 0::Boundary surface: 5.25000
+DEAL:Material ID 0::Interior surface: 2.25000
+DEAL:Material ID 1::Testing <2,2>
+DEAL:Material ID 1::Volume: 0.250000
+DEAL:Material ID 1::Boundary surface: 1.00000
+DEAL:Material ID 1::Interior surface: 2.00000
+DEAL:Material ID 1::Testing <2,3>
+DEAL:Material ID 1::Volume: 0.250000
+DEAL:Material ID 1::Boundary surface: 1.00000
+DEAL:Material ID 1::Interior surface: 2.00000
+DEAL:Material ID 1::Testing <3,3>
+DEAL:Material ID 1::Volume: 0.125000
+DEAL:Material ID 1::Boundary surface: 0.750000
+DEAL:Material ID 1::Interior surface: 1.50000

@@ -20,6 +20,7 @@
 #  include <deal.II/base/config.h>
 
 #  include <deal.II/base/graph_coloring.h>
+#  include <deal.II/base/iterator_range.h>
 #  include <deal.II/base/multithread_info.h>
 #  include <deal.II/base/parallel.h>
 #  include <deal.II/base/template_constraints.h>
@@ -33,6 +34,7 @@
 #  endif
 
 #  include <functional>
+#  include <iterator>
 #  include <memory>
 #  include <utility>
 #  include <vector>
@@ -1089,6 +1091,72 @@ namespace WorkStream
   }
 
 
+
+  /**
+   * Same as the function above, but for iterator ranges and C-style arrays.
+   * A class that fulfills the requirements of an iterator range defines the
+   * functions `IteratorRangeType::begin()` and `IteratorRangeType::end()`,
+   * both of which return iterators to elements that form the bounds of the
+   * range.
+   */
+  template <typename Worker,
+            typename Copier,
+            typename IteratorRangeType,
+            typename ScratchData,
+            typename CopyData,
+            typename = typename std::enable_if<
+              has_begin_and_end<IteratorRangeType>::value>::type>
+  void
+  run(IteratorRangeType  iterator_range,
+      Worker             worker,
+      Copier             copier,
+      const ScratchData &sample_scratch_data,
+      const CopyData &   sample_copy_data,
+      const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+      const unsigned int chunk_size   = 8)
+  {
+    // Call the function above
+    run(iterator_range.begin(),
+        iterator_range.end(),
+        worker,
+        copier,
+        sample_scratch_data,
+        sample_copy_data,
+        queue_length,
+        chunk_size);
+  }
+
+
+
+  /**
+   * Same as the function above, but for deal.II's IteratorRange.
+   */
+  template <typename Worker,
+            typename Copier,
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
+  void
+  run(const IteratorRange<Iterator> &iterator_range,
+      Worker                         worker,
+      Copier                         copier,
+      const ScratchData &            sample_scratch_data,
+      const CopyData &               sample_copy_data,
+      const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+      const unsigned int chunk_size   = 8)
+  {
+    // Call the function above
+    run(iterator_range.begin(),
+        iterator_range.end(),
+        worker,
+        copier,
+        sample_scratch_data,
+        sample_copy_data,
+        queue_length,
+        chunk_size);
+  }
+
+
   // Implementation 3:
   template <typename Worker,
             typename Copier,
@@ -1221,6 +1289,108 @@ namespace WorkStream
                   std::placeholders::_2,
                   std::placeholders::_3),
         std::bind(copier, std::ref(main_object), std::placeholders::_1),
+        sample_scratch_data,
+        sample_copy_data,
+        queue_length,
+        chunk_size);
+  }
+
+
+  template <typename MainClass,
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
+  void
+  run(const IteratorOverIterators<Iterator> &                         begin,
+      const IteratorOverIterators<typename identity<Iterator>::type> &end,
+      MainClass &main_object,
+      void (MainClass::*worker)(const Iterator &, ScratchData &, CopyData &),
+      void (MainClass::*copier)(const CopyData &),
+      const ScratchData &sample_scratch_data,
+      const CopyData &   sample_copy_data,
+      const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+      const unsigned int chunk_size   = 8)
+  {
+    // forward to the other function
+    run(begin,
+        end,
+        std::bind(worker,
+                  std::ref(main_object),
+                  std::placeholders::_1,
+                  std::placeholders::_2,
+                  std::placeholders::_3),
+        std::bind(copier, std::ref(main_object), std::placeholders::_1),
+        sample_scratch_data,
+        sample_copy_data,
+        queue_length,
+        chunk_size);
+  }
+
+
+
+  /**
+   * Same as the function above, but for iterator ranges and C-style arrays.
+   * A class that fulfills the requirements of an iterator range defines the
+   * functions `IteratorRangeType::begin()` and `IteratorRangeType::end()`,
+   * both of which return iterators to elements that form the bounds of the
+   * range.
+   */
+  template <typename MainClass,
+            typename IteratorRangeType,
+            typename ScratchData,
+            typename CopyData,
+            typename = typename std::enable_if<
+              has_begin_and_end<IteratorRangeType>::value>::type>
+  void
+  run(IteratorRangeType iterator_range,
+      MainClass &       main_object,
+      void (MainClass::*worker)(
+        const typename identity<IteratorRangeType>::type::iterator &,
+        ScratchData &,
+        CopyData &),
+      void (MainClass::*copier)(const CopyData &),
+      const ScratchData &sample_scratch_data,
+      const CopyData &   sample_copy_data,
+      const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+      const unsigned int chunk_size   = 8)
+  {
+    // Call the function above
+    run(std::begin(iterator_range),
+        std::end(iterator_range),
+        main_object,
+        worker,
+        copier,
+        sample_scratch_data,
+        sample_copy_data,
+        queue_length,
+        chunk_size);
+  }
+
+
+
+  /**
+   * Same as the function above, but for deal.II's IteratorRange.
+   */
+  template <typename MainClass,
+            typename Iterator,
+            typename ScratchData,
+            typename CopyData>
+  void
+  run(IteratorRange<Iterator> iterator_range,
+      MainClass &             main_object,
+      void (MainClass::*worker)(const Iterator &, ScratchData &, CopyData &),
+      void (MainClass::*copier)(const CopyData &),
+      const ScratchData &sample_scratch_data,
+      const CopyData &   sample_copy_data,
+      const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
+      const unsigned int chunk_size   = 8)
+  {
+    // Call the function above
+    run(std::begin(iterator_range),
+        std::end(iterator_range),
+        main_object,
+        worker,
+        copier,
         sample_scratch_data,
         sample_copy_data,
         queue_length,

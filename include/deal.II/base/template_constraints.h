@@ -22,6 +22,7 @@
 #include <deal.II/base/complex_overloads.h>
 
 #include <complex>
+#include <iterator>
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN
@@ -88,6 +89,32 @@ template <bool... Values>
 struct enable_if_all
   : std::enable_if<internal::TemplateConstraints::all_true<Values...>::value>
 {};
+
+
+
+/**
+ * A type trait that checks to see if a class behaves as an iterable container
+ * that has a beginning and an end. This implies that the class either defines
+ * the `begin()` and `end()` functions, or is a C-style array.
+ */
+template <typename T>
+class has_begin_and_end
+{
+  template <typename C>
+  static std::false_type
+  test(...);
+
+  template <typename C>
+  static auto
+  test(int) -> decltype(std::begin(std::declval<C>()),
+                        std::end(std::declval<C>()),
+                        std::true_type());
+
+public:
+  using type = decltype(test<T>(0));
+
+  static const bool value = type::value;
+};
 
 
 
