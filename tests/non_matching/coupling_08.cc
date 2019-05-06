@@ -38,9 +38,8 @@
 using namespace dealii;
 
 // Test that a coupling matrix can be constructed for each pair of dimension and
-// immersed dimension, and check that constants are projected correctly.
-//
-// Even when locally refined grids are used.
+// immersed dimension, and check that constants are projected correctly
+// even when locally refined grids are used.
 
 template <int dim0, int dim1, int spacedim>
 void
@@ -94,7 +93,7 @@ test()
   {
     DynamicSparsityPattern dsp(dh0.n_dofs(), dh1.n_dofs());
     NonMatching::create_coupling_sparsity_pattern(
-      epsilon, cache0, cache1, dh0, dh1, dsp, constraints0);
+      epsilon, cache0, cache1, dh0, dh1, quad1, dsp, constraints0);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);

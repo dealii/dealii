@@ -228,8 +228,8 @@ namespace NonMatching
    * using a convolution kernel with compact support of radius epsilon.
    *
    * Given two non-matching triangulations, representing the domains $\Omega^0$
-   * and $\Omega^1$, both embedded in $R^d$, and two finite element spaces
-   * $V^0(\Omega^0) = \text{span}\{v_i\}_{i=0}^n$ and $V^1(\Omega^1) =
+   * and $\Omega^1$, both embedded in $\mathbb{R}^d$, and two finite element
+   * spaces $V^0(\Omega^0) = \text{span}\{v_i\}_{i=0}^n$ and $V^1(\Omega^1) =
    * \text{span}\{w_\alpha\}_{\alpha=0}^m$, compute the sparsity pattern that
    * would be necessary to assemble the matrix
    *
@@ -240,17 +240,18 @@ namespace NonMatching
    * \f]
    *
    * where $V^0(\Omega^0)$ is the finite element space associated with the
-   * `dh0` passed to this function (or part of it, if specified in
-   * `comps0`), while $V^1(\Omega^1)$ is the finite element space associated
-   * with the `dh1` passed to this function (or part of it, if specified
-   * in `comps1`), and $K^\epsilon$ is a function with compact support included
-   * in a ball of radius $\epsilon$, derived from CutOffFunctionBase.
+   * @p dh0 passed to this function (or part of it, if specified in
+   * @p comps0), while $V^1(\Omega^1)$ is the finite element space associated
+   * with the @p dh1 passed to this function (or part of it, if specified
+   * in @p comps1), and $K^\epsilon$ is a function derived from
+   * CutOffFunctionBase with compact support included in a ball of radius
+   * $\epsilon$.
    *
-   * The `comps0` and `comps1` masks are assumed to be ordered in
-   * the same way: the first component of `comps0` will couple with the
-   * first component of `comps1`, the second with the second, and so
-   * on. If one of the two masks has more non-zero than the other, then the
-   * excess components will be ignored.
+   * The @p comps0 and @p comps1 masks are assumed to be ordered in
+   * the same way: the first component of @p comps0 will couple with the
+   * first component of @p comps1, the second with the second, and so
+   * on. If one of the two masks has more active components than the other, then
+   * the excess components will be ignored.
    *
    * For both spaces, it is possible to specify a custom Mapping, which
    * defaults to StaticMappingQ1 for both.
@@ -293,9 +294,9 @@ namespace NonMatching
    * using a convolution kernel with compact support.
    *
    * Given two non-matching triangulations, representing the domains
-   * $\Omega^0$ and $\Omega^1$, both embedded in $R^d$, and two finite element
-   * spaces $V^0(\Omega^0) = \text{span}\{v_i\}_{i=0}^n$ and $V^1(\Omega^1) =
-   * \text{span}\{w_\alpha\}_{\alpha=0}^m$, compute the matrix
+   * $\Omega^0$ and $\Omega^1$, both embedded in $\mathbb{R}^d$, and two finite
+   * element spaces $V^0(\Omega^0) = \text{span}\{v_i\}_{i=0}^n$ and
+   * $V^1(\Omega^1) = \text{span}\{w_\alpha\}_{\alpha=0}^m$, compute the matrix
    *
    * \f[
    * M_{i\alpha} \dealcoloneq \int_{\Omega^0} \int_{\Omega^1}
@@ -304,20 +305,21 @@ namespace NonMatching
    * \f]
    *
    * where $V^0(\Omega^0)$ is the finite element space associated with the
-   * `dh0` passed to this function (or part of it, if specified in
-   * `comps0`), while $V^1(\Omega^1)$ is the finite element space associated
-   * with the `dh1` passed to this function (or part of it, if specified
-   * in `comps1`), and $K^\epsilon$ is a function with compact support included,
-   * in a ball of radius $\epsilon$, derived from CutOffFunctionBase.
+   * @p dh0 passed to this function (or part of it, if specified in
+   * @p comps0), while $V^1(\Omega^1)$ is the finite element space associated
+   * with the @p dh1 passed to this function (or part of it, if specified
+   * in @p comps1), and $K^\epsilon$ is a function derived from
+   * CutOffFunctionBase with compact support included in a ball of radius
+   * $\epsilon$.
    *
    * The corresponding sparsity patterns can be computed by calling the
    * make_coupling_sparsity_pattern() function.
    *
-   * The `comps0` and `comps1` masks are assumed to be ordered in
-   * the same way: the first component of `comps0` will couple with the
-   * first component of `comps1`, the second with the second, and so
-   * on. If one of the two masks has more non-zero than the other, then the
-   * excess components will be ignored.
+   * The @p comps0 and @p comps1 masks are assumed to be ordered in
+   * the same way: the first component of @p comps0 will couple with the
+   * first component of @p comps1, the second with the second, and so
+   * on. If one of the two masks has more active components than the other, then
+   * the excess components will be ignored.
    *
    * For both spaces, it is possible to specify a custom Mapping, which
    * defaults to StaticMappingQ1 for both.

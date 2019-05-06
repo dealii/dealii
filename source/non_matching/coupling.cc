@@ -662,11 +662,11 @@ namespace NonMatching
     Assert(!zero_is_distributed || !one_is_distributed, ExcNotImplemented());
 
     // If we can loop on both, we decide where to make the outer loop according
-    // to the size of triangulation. The reasoning is the following:
-    // - Access to the tree: log(N)
-    // - We compute intersection for each of the outer loop cells (M)
+    // to the size of the triangulation. The reasoning is the following:
+    // - cost for accessing the tree: log(N)
+    // - cost for computing the intersection for each of the outer loop cells: M
     // Total cost (besides the setup) is: M log(N)
-    // If we can, make sure M is the smallest number
+    // If we can, make sure M is the smaller number of the two.
     const bool outer_loop_on_zero =
       (zero_is_distributed && !one_is_distributed) ||
       (dh1.get_triangulation().n_active_cells() >
@@ -681,8 +681,6 @@ namespace NonMatching
 
     if (outer_loop_on_zero)
       {
-        std::cout << "Looping on zero." << std::endl;
-
         Assert(one_is_distributed == false, ExcInternalError());
 
         const auto &tree1 = cache1.get_cell_bounding_boxes_rtree();
@@ -805,11 +803,11 @@ namespace NonMatching
     Assert(!zero_is_distributed || !one_is_distributed, ExcNotImplemented());
 
     // If we can loop on both, we decide where to make the outer loop according
-    // to the size of triangulation. The reasoning is the following:
-    // - Access to the tree: log(N)
-    // - We compute intersection for each of the outer loop cells (M)
+    // to the size of the triangulation. The reasoning is the following:
+    // - cost for accessing the tree: log(N)
+    // - cost for computing the intersection for each of the outer loop cells: M
     // Total cost (besides the setup) is: M log(N)
-    // If we can, make sure M is the smallest number
+    // If we can, make sure M is the smaller number of the two.
     const bool outer_loop_on_zero =
       (zero_is_distributed && !one_is_distributed) ||
       (dh1.get_triangulation().n_active_cells() >
@@ -839,7 +837,8 @@ namespace NonMatching
                                                         fe1.dofs_per_cell);
 
     // Global to local indices
-    auto p = internal::compute_components_coupling(comps0, comps1, fe0, fe1);
+    const auto p =
+      internal::compute_components_coupling(comps0, comps1, fe0, fe1);
     const auto &gtl0 = p.first;
     const auto &gtl1 = p.second;
 
