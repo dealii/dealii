@@ -529,7 +529,7 @@ test_symmetric_tensor_tensor_vector_scalar_coupled()
     FunctionsTestSymmetricTensorTensorVectorScalarCoupled<dim,
                                                           ScalarNumberType>;
   static const ScalarNumberType tol =
-    1e5 * std::numeric_limits<ScalarNumberType>::epsilon();
+    1e6 * std::numeric_limits<ScalarNumberType>::epsilon();
   Assert(std::abs(psi - func::psi(st, t, v, s)) < tol,
          ExcMessage("No match for function value."));
   Assert(std::abs((dpsi_dst - func::dpsi_dst(st, t, v, s)).norm()) < tol,
