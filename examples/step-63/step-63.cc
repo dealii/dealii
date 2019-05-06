@@ -187,23 +187,23 @@ namespace Step63
   // smoothers
   template <int dim>
   std::vector<unsigned int>
-  create_downstream_cell_ordering(const DoFHandler<dim> &dof,
+  create_downstream_cell_ordering(const DoFHandler<dim> &dof_handler,
                                   const Tensor<1, dim>   direction,
                                   const unsigned int     level)
   {
     std::vector<typename DoFHandler<dim>::level_cell_iterator> ordered_cells;
-    ordered_cells.reserve(dof.get_triangulation().n_cells(level));
+    ordered_cells.reserve(dof_handler.get_triangulation().n_cells(level));
     const DoFRenumbering::
       CompareDownstream<typename DoFHandler<dim>::level_cell_iterator, dim>
         comparator(direction);
 
-    for (const auto &cell : dof.cell_iterators_on_level(level))
+    for (const auto &cell : dof_handler.cell_iterators_on_level(level))
       ordered_cells.push_back(cell);
 
     std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
 
     std::vector<unsigned> ordered_indices;
-    ordered_indices.reserve(dof.get_triangulation().n_cells(level));
+    ordered_indices.reserve(dof_handler.get_triangulation().n_cells(level));
 
     for (const auto &cell : ordered_cells)
       ordered_indices.push_back(cell->index());
@@ -213,22 +213,22 @@ namespace Step63
 
   template <int dim>
   std::vector<unsigned int>
-  create_downstream_cell_ordering(const DoFHandler<dim> &dof,
+  create_downstream_cell_ordering(const DoFHandler<dim> &dof_handler,
                                   const Tensor<1, dim>   direction)
   {
     std::vector<typename DoFHandler<dim>::active_cell_iterator> ordered_cells;
-    ordered_cells.reserve(dof.get_triangulation().n_active_cells());
+    ordered_cells.reserve(dof_handler.get_triangulation().n_active_cells());
     const DoFRenumbering::
       CompareDownstream<typename DoFHandler<dim>::active_cell_iterator, dim>
         comparator(direction);
 
-    for (const auto &cell : dof.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
       ordered_cells.push_back(cell);
 
     std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
 
     std::vector<unsigned int> ordered_indices;
-    ordered_indices.reserve(dof.get_triangulation().n_active_cells());
+    ordered_indices.reserve(dof_handler.get_triangulation().n_active_cells());
 
     for (const auto &cell : ordered_cells)
       ordered_indices.push_back(cell->index());
@@ -240,15 +240,15 @@ namespace Step63
 
   template <int dim>
   std::vector<unsigned int>
-  create_random_cell_ordering(const DoFHandler<dim> &dof,
+  create_random_cell_ordering(const DoFHandler<dim> &dof_handler,
                               const unsigned int     level)
   {
-    const unsigned int n_cells = dof.get_triangulation().n_cells(level);
+    const unsigned int n_cells = dof_handler.get_triangulation().n_cells(level);
 
     std::vector<unsigned int> ordered_cells;
     ordered_cells.reserve(n_cells);
 
-    for (const auto &cell : dof.cell_iterators_on_level(level))
+    for (const auto &cell : dof_handler.cell_iterators_on_level(level))
       ordered_cells.push_back(cell->index());
 
     // shuffle the elements
@@ -269,14 +269,15 @@ namespace Step63
 
   template <int dim>
   std::vector<unsigned int>
-  create_random_cell_ordering(const DoFHandler<dim> &dof)
+  create_random_cell_ordering(const DoFHandler<dim> &dof_handler)
   {
-    const unsigned int n_cells = dof.get_triangulation().n_active_cells();
+    const unsigned int n_cells =
+      dof_handler.get_triangulation().n_active_cells();
 
     std::vector<unsigned int> ordered_cells;
     ordered_cells.reserve(n_cells);
 
-    for (const auto &cell : dof.active_cell_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
       ordered_cells.push_back(cell->index());
 
     // shuffle the elements
