@@ -156,7 +156,7 @@ namespace Step63
                       Patterns::Bool(),
                       "Generate graphical output: true|false");
 
-    if (prm_filename.size() == 0)
+    if (prm_filename.empty())
       {
         prm.print_parameters(std::cout, ParameterHandler::Text);
         AssertThrow(
@@ -197,9 +197,7 @@ namespace Step63
       CompareDownstream<typename DoFHandler<dim>::level_cell_iterator, dim>
         comparator(direction);
 
-    typename DoFHandler<dim>::level_cell_iterator cell = dof.begin(level);
-    typename DoFHandler<dim>::level_cell_iterator endc = dof.end(level);
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.cell_iterators_on_level(level))
       ordered_cells.push_back(cell);
 
     std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
@@ -207,8 +205,8 @@ namespace Step63
     std::vector<unsigned> ordered_indices;
     ordered_indices.reserve(dof.get_triangulation().n_cells(level));
 
-    for (unsigned int i = 0; i < ordered_cells.size(); ++i)
-      ordered_indices.push_back(ordered_cells[i]->index());
+    for (const auto &cell : ordered_cells)
+      ordered_indices.push_back(cell->index());
 
     return ordered_indices;
   }
@@ -224,9 +222,7 @@ namespace Step63
       CompareDownstream<typename DoFHandler<dim>::active_cell_iterator, dim>
         comparator(direction);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-    typename DoFHandler<dim>::active_cell_iterator endc = dof.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.active_cell_iterators())
       ordered_cells.push_back(cell);
 
     std::sort(ordered_cells.begin(), ordered_cells.end(), comparator);
@@ -234,8 +230,8 @@ namespace Step63
     std::vector<unsigned int> ordered_indices;
     ordered_indices.reserve(dof.get_triangulation().n_active_cells());
 
-    for (unsigned int i = 0; i < ordered_cells.size(); ++i)
-      ordered_indices.push_back(ordered_cells[i]->index());
+    for (const auto &cell : ordered_cells)
+      ordered_indices.push_back(cell->index());
 
     return ordered_indices;
   }
@@ -252,9 +248,7 @@ namespace Step63
     std::vector<unsigned int> ordered_cells;
     ordered_cells.reserve(n_cells);
 
-    typename DoFHandler<dim>::cell_iterator cell = dof.begin(level);
-    typename DoFHandler<dim>::cell_iterator endc = dof.end(level);
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.cell_iterators_on_level(level))
       ordered_cells.push_back(cell->index());
 
     // shuffle the elements
@@ -282,9 +276,7 @@ namespace Step63
     std::vector<unsigned int> ordered_cells;
     ordered_cells.reserve(n_cells);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-    typename DoFHandler<dim>::active_cell_iterator endc = dof.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.active_cell_iterators())
       ordered_cells.push_back(cell->index());
 
     // shuffle the elements
@@ -322,12 +314,11 @@ namespace Step63
   };
 
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & p,
+  double RightHandSide<dim>::value(const Point<dim> &,
                                    const unsigned int component) const
   {
     Assert(component == 0, ExcIndexRange(component, 0, 1));
     (void)component;
-    (void)p;
 
     return 0.0;
   }
