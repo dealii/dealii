@@ -2888,6 +2888,17 @@ namespace parallel
 
 
     template <int dim, int spacedim>
+    typename dealii::internal::p4est::types<dim>::forest *
+    Triangulation<dim, spacedim>::get_p4est() const
+    {
+      Assert(parallel_forest != nullptr,
+             ExcMessage("The forest has not been allocated yet."));
+      return parallel_forest;
+    }
+
+
+
+    template <int dim, int spacedim>
     void
     Triangulation<dim, spacedim>::update_number_cache()
     {
