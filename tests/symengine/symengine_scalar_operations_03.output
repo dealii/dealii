@@ -1,0 +1,7 @@
+
+DEAL:Substitution: Individual::Symbolic a+b: a + b
+DEAL:Substitution: Individual::Symbolic a+b (a=1): 1.0 + b
+DEAL:Substitution: Individual::Symbolic a+b (a=1, b=2): 3.0
+DEAL:Substitution: Vector::Symbolic a+b (a=1, b=2): 3.0
+DEAL:Substitution: Map::Symbolic a+b (a=1, b=2): 3.0
+DEAL::OK
