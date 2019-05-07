@@ -1203,10 +1203,14 @@ namespace Step28
     // group:
     double k_eff;
 
-    // Finally, (v), we have an array of pointers to the energy group
-    // objects. The length of this array is, of course, equal to the number of
-    // energy groups specified in the parameter file.
+    // The last computational object (v) is an array of pointers to the energy
+    // group objects. The length of this array is, of course, equal to the
+    // number of energy groups specified in the parameter file.
     std::vector<std::unique_ptr<EnergyGroup<dim>>> energy_groups;
+
+    // Finally (vi) we have a file stream to which we will save summarized
+    // output.
+    std::ofstream convergence_table_stream;
   };
 
 
@@ -1457,6 +1461,8 @@ namespace Step28
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
       energy_groups.emplace_back(std_cxx14::make_unique<EnergyGroup<dim>>(
         group, material_data, coarse_grid, fe));
+    convergence_table_stream.open("convergence_table");
+    convergence_table_stream.precision(12);
   }
 
 
@@ -1628,9 +1634,14 @@ namespace Step28
               }
 
             k_eff = get_total_fission_source();
-            error = fabs(k_eff - k_eff_old) / fabs(k_eff);
-            std::cout << "   Iteration " << iteration << ": k_eff=" << k_eff
-                      << std::endl;
+            error = std::abs(k_eff - k_eff_old) / std::abs(k_eff);
+            const double flux_ratio = energy_groups[0]->solution.linfty_norm() /
+                                      energy_groups[1]->solution.linfty_norm();
+            const double max_thermal = energy_groups[1]->solution.linfty_norm();
+            std::cout << "Iter number:" << std::setw(2) << std::right
+                      << iteration << " k_eff=" << k_eff
+                      << " flux_ratio=" << flux_ratio
+                      << " max_thermal=" << max_thermal << std::endl;
             k_eff_old = k_eff;
 
             for (unsigned int group = 0; group < parameters.n_groups; ++group)
@@ -1643,6 +1654,12 @@ namespace Step28
             ++iteration;
           }
         while ((error > parameters.convergence_tolerance) && (iteration < 500));
+        convergence_table_stream << cycle << " " << energy_groups[0]->n_dofs()
+                                 << " " << energy_groups[1]->n_dofs() << " "
+                                 << k_eff << " "
+                                 << energy_groups[0]->solution.linfty_norm() /
+                                      energy_groups[1]->solution.linfty_norm()
+                                 << '\n';
 
         for (unsigned int group = 0; group < parameters.n_groups; ++group)
           energy_groups[group]->output_results(cycle);
