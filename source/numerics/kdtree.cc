@@ -48,7 +48,15 @@ KDTree<dim>::get_points_within_ball(const Point<dim> &center,
   params.sorted = sorted;
 
   std::vector<std::pair<unsigned int, double>> matches;
+#  if NANOFLANN_VERSION < 0x130
   kdtree->radiusSearch(center.begin_raw(), radius, matches, params);
+#  else
+  // nanoflann 1.3 performs distance comparisons with squared distances, so
+  // square the radius before we query and square root after:
+  kdtree->radiusSearch(center.begin_raw(), radius * radius, matches, params);
+  for (std::pair<unsigned int, double> &match : matches)
+    match.second = std::sqrt(match.second);
+#  endif
 
   return matches;
 }
@@ -75,7 +83,13 @@ KDTree<dim>::get_closest_points(const Point<dim> & target,
   // convert it to the format we want to return
   std::vector<std::pair<unsigned int, double>> matches(n_points);
   for (unsigned int i = 0; i < n_points; ++i)
+#  if NANOFLANN_VERSION < 0x130
     matches[i] = std::make_pair(indices[i], distances[i]);
+#  else
+    // nanoflann 1.3 performs distance comparisons with squared distances, so
+    // take a square root:
+    matches[i] = std::make_pair(indices[i], std::sqrt(distances[i]));
+#  endif
 
   return matches;
 }
