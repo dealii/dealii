@@ -635,6 +635,111 @@ namespace Differentiation
 
     //@}
 
+    /**
+     * @name Symbol substitution and evaluation
+     */
+    //@{
+
+    /**
+     * Perform a single substitution sweep of a set of symbols into the given
+     * tensor of symbolic expressions.
+     * The symbols in the @p expression_tensor that correspond to the entry keys
+     * of the @p substitution_map are substituted with the map entry's associated
+     * value.
+     * This substitution function may be used to give a set of symbolic
+     * variables either a numeric interpretation or some symbolic definition.
+     *
+     * For more information regarding the performance of symbolic substitution,
+     * and the outcome of evaluation using a substitution map with cyclic
+     * dependencies, see the @ref substitute(const Expression &,
+     * const types::substitution_map &) function.
+     *
+     * @note It is not required that all symbolic expressions be fully resolved
+     * when using this function. In other words, partial substitutions are
+     * valid.
+     */
+    template <int rank, int dim>
+    Tensor<rank, dim, Expression>
+    substitute(const Tensor<rank, dim, Expression> &expression_tensor,
+               const types::substitution_map &      substitution_map);
+
+    /**
+     * Perform a single substitution sweep of a set of symbols into the given
+     * symmetric tensor of symbolic expressions.
+     * The symbols in the @p expression_tensor that correspond to the entry keys
+     * of the @p substitution_map are substituted with the map entry's associated
+     * value.
+     * This substitution function may be used to give a set of symbolic
+     * variables either a numeric interpretation or some symbolic definition.
+     *
+     * For more information regarding the performance of symbolic substitution,
+     * and the outcome of evaluation using a substitution map with cyclic
+     * dependencies, see the @ref substitute(const Expression &,
+     * const types::substitution_map &) function.
+     *
+     * @note It is not required that all symbolic expressions be fully resolved
+     * when using this function. In other words, partial substitutions are
+     * valid.
+     */
+    template <int rank, int dim>
+    SymmetricTensor<rank, dim, Expression>
+    substitute(const SymmetricTensor<rank, dim, Expression> &expression_tensor,
+               const types::substitution_map &               substitution_map);
+
+    /**
+     * Perform a single substitution sweep of a set of symbols into the given
+     * tensor of symbolic expressions, and immediately evaluate the tensorial
+     * result.
+     * The symbols in the @p expression_tensor that correspond to the entry keys
+     * of the @p substitution_map are substituted with the map entry's associated
+     * value.
+     * This substitution function is used to give a set of symbolic variables
+     * a numeric interpretation, with the returned result being of the type
+     * specified by the @p ValueType template argument.
+     *
+     * For more information regarding the performance of symbolic substitution,
+     * and the outcome of evaluation using a substitution map with cyclic
+     * dependencies, see the @ref substitute(const Expression &,
+     * const types::substitution_map &) function.
+     *
+     * @note It is required that all symbols in @p expression_tensor be
+     * successfully resolved by the @p substitution_map.
+     * If only partial substitution is performed, then an error is thrown.
+     */
+    template <typename ValueType, int rank, int dim>
+    Tensor<rank, dim, ValueType>
+    substitute_and_evaluate(
+      const Tensor<rank, dim, Expression> &expression_tensor,
+      const types::substitution_map &      substitution_map);
+
+    /**
+     * Perform a single substitution sweep of a set of symbols into the given
+     * symmetric tensor of symbolic expressions, and immediately evaluate the
+     * tensorial result.
+     * The symbols in the @p expression_tensor that correspond to the entry keys
+     * of the @p substitution_map are substituted with the map entry's associated
+     * value.
+     * This substitution function is used to give a set of symbolic variables
+     * a numeric interpretation, with the returned result being of the type
+     * specified by the @p ValueType template argument.
+     *
+     * For more information regarding the performance of symbolic substitution,
+     * and the outcome of evaluation using a substitution map with cyclic
+     * dependencies, see the @ref substitute(const Expression &,
+     * const types::substitution_map &) function.
+     *
+     * @note It is required that all symbols in @p expression_tensor be
+     * successfully resolved by the @p substitution_map.
+     * If only partial substitution is performed, then an error is thrown.
+     */
+    template <typename ValueType, int rank, int dim>
+    SymmetricTensor<rank, dim, ValueType>
+    substitute_and_evaluate(
+      const SymmetricTensor<rank, dim, Expression> &expression_tensor,
+      const types::substitution_map &               substitution_map);
+
+    //@}
+
   } // namespace SD
 } // namespace Differentiation
 
@@ -1246,6 +1351,143 @@ namespace Differentiation
         substitution_map,
         internal::tensor_substitution_map(symbol_tensor, value_tensor));
     }
+
+
+    /* ---------------- Symbol substitution and evaluation --------------*/
+
+
+    namespace internal
+    {
+      template <int rank,
+                int dim,
+                template <int, int, typename> class TensorType>
+      TensorType<rank, dim, Expression>
+      tensor_substitute(
+        const TensorType<rank, dim, Expression> &expression_tensor,
+        const types::substitution_map &          substitution_map)
+      {
+        TensorType<rank, dim, Expression> out;
+        for (unsigned int i = 0; i < out.n_independent_components; ++i)
+          {
+            const TableIndices<rank> indices(
+              out.unrolled_to_component_indices(i));
+            out[indices] =
+              substitute(expression_tensor[indices], substitution_map);
+          }
+        return out;
+      }
+
+
+      template <int dim>
+      SymmetricTensor<4, dim, Expression>
+      tensor_substitute(
+        const SymmetricTensor<4, dim, Expression> &expression_tensor,
+        const types::substitution_map &            substitution_map)
+      {
+        SymmetricTensor<4, dim, Expression> out;
+        for (unsigned int i = 0;
+             i < SymmetricTensor<2, dim>::n_independent_components;
+             ++i)
+          for (unsigned int j = 0;
+               j < SymmetricTensor<2, dim>::n_independent_components;
+               ++j)
+            {
+              const TableIndices<4> indices =
+                make_rank_4_tensor_indices<dim>(i, j);
+              out[indices] =
+                substitute(expression_tensor[indices], substitution_map);
+            }
+        return out;
+      }
+
+
+      template <typename ValueType,
+                int rank,
+                int dim,
+                template <int, int, typename> class TensorType>
+      TensorType<rank, dim, ValueType>
+      tensor_substitute_evaluate(
+        const TensorType<rank, dim, Expression> &expression_tensor,
+        const types::substitution_map &          substitution_map)
+      {
+        TensorType<rank, dim, ValueType> out;
+        for (unsigned int i = 0; i < out.n_independent_components; ++i)
+          {
+            const TableIndices<rank> indices(
+              out.unrolled_to_component_indices(i));
+            out[indices] =
+              substitute_and_evaluate<ValueType>(expression_tensor[indices],
+                                                 substitution_map);
+          }
+        return out;
+      }
+
+
+      template <typename ValueType, int dim>
+      SymmetricTensor<4, dim, ValueType>
+      tensor_substitute_evaluate(
+        const SymmetricTensor<4, dim, Expression> &expression_tensor,
+        const types::substitution_map &            substitution_map)
+      {
+        SymmetricTensor<4, dim, ValueType> out;
+        for (unsigned int i = 0;
+             i < SymmetricTensor<2, dim>::n_independent_components;
+             ++i)
+          for (unsigned int j = 0;
+               j < SymmetricTensor<2, dim>::n_independent_components;
+               ++j)
+            {
+              const TableIndices<4> indices =
+                make_rank_4_tensor_indices<dim>(i, j);
+              out[indices] =
+                substitute_and_evaluate<ValueType>(expression_tensor[indices],
+                                                   substitution_map);
+            }
+        return out;
+      }
+    } // namespace internal
+
+
+    template <int rank, int dim>
+    Tensor<rank, dim, Expression>
+    substitute(const Tensor<rank, dim, Expression> &expression_tensor,
+               const types::substitution_map &      substitution_map)
+    {
+      return internal::tensor_substitute(expression_tensor, substitution_map);
+    }
+
+
+    template <int rank, int dim>
+    SymmetricTensor<rank, dim, Expression>
+    substitute(const SymmetricTensor<rank, dim, Expression> &expression_tensor,
+               const types::substitution_map &               substitution_map)
+    {
+      return internal::tensor_substitute(expression_tensor, substitution_map);
+    }
+
+
+    template <typename ValueType, int rank, int dim>
+    Tensor<rank, dim, ValueType>
+    substitute_and_evaluate(
+      const Tensor<rank, dim, Expression> &expression_tensor,
+      const types::substitution_map &      substitution_map)
+    {
+      return internal::tensor_substitute_evaluate<ValueType>(expression_tensor,
+                                                             substitution_map);
+    }
+
+
+    template <typename ValueType, int rank, int dim>
+    SymmetricTensor<rank, dim, ValueType>
+    substitute_and_evaluate(
+      const SymmetricTensor<rank, dim, Expression> &expression_tensor,
+      const types::substitution_map &               substitution_map)
+    {
+      return internal::tensor_substitute_evaluate<ValueType>(expression_tensor,
+                                                             substitution_map);
+    }
+
+
 
   } // namespace SD
 } // namespace Differentiation
