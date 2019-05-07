@@ -192,8 +192,8 @@ namespace TrilinosWrappers
  * parts with indicators contained in a std::map<types::boundary_id, const
  * Function<spacedim,number>*> passed to the function (i.e. if you want to set
  * up the mass matrix for the parts of the boundary with indicators zero and 2,
- * you pass the function a map of <tt>unsigned
- * char</tt>s as parameter @p boundary_functions containing the keys zero and
+ * you pass the function a map with key type types::boundary_id
+ * as the parameter @p boundary_functions containing the keys zero and
  * 2). The size of the matrix is equal to the number of degrees of freedom
  * that have support on the boundary, i.e. it is <em>not</em> a matrix on all
  * degrees of freedom, but only a subset. (The $\phi_i$ in the formula are the
