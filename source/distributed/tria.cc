@@ -2888,7 +2888,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    typename dealii::internal::p4est::types<dim>::forest *
+    const typename dealii::internal::p4est::types<dim>::forest *
     Triangulation<dim, spacedim>::get_p4est() const
     {
       Assert(parallel_forest != nullptr,

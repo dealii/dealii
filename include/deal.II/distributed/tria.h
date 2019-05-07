@@ -822,7 +822,7 @@ namespace parallel
        * @warning: If you modify the p4est object, internal data structures
        * can become inconsistent.
        */
-      typename dealii::internal::p4est::types<dim>::forest *
+      const typename dealii::internal::p4est::types<dim>::forest *
       get_p4est() const;
 
       /**
