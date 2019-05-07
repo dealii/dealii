@@ -109,8 +109,10 @@ protected:
   {
     // generate a new data object and
     // initialize some fields
-    auto data         = std_cxx14::make_unique<InternalData>();
-    data->update_each = requires_update_flags(update_flags);
+    std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+          data_ptr   = std_cxx14::make_unique<InternalData>();
+    auto &data       = dynamic_cast<InternalData &>(*data_ptr);
+    data.update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
 
@@ -124,11 +126,11 @@ protected:
     // initialize fields only if really
     // necessary. otherwise, don't
     // allocate memory
-    if (data->update_each & update_values)
+    if (data.update_each & update_values)
       {
         values.resize(poly_space.n());
-        data->shape_values.resize(poly_space.n(),
-                                  std::vector<double>(n_q_points));
+        data.shape_values.resize(poly_space.n(),
+                                 std::vector<double>(n_q_points));
         for (unsigned int i = 0; i < n_q_points; ++i)
           {
             poly_space.compute(quadrature.point(i),
@@ -139,18 +141,18 @@ protected:
                                empty_vector_of_4th_order_tensors);
 
             for (unsigned int k = 0; k < poly_space.n(); ++k)
-              data->shape_values[k][i] = values[k];
+              data.shape_values[k][i] = values[k];
           }
       }
     // No derivatives of this element
     // are implemented.
-    if (data->update_each & update_gradients ||
-        data->update_each & update_hessians)
+    if (data.update_each & update_gradients ||
+        data.update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }
 
-    return std::move(data);
+    return data_ptr;
   }
 
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>

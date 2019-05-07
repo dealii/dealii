@@ -140,18 +140,19 @@ FE_P1NC::get_data(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
     &output_data) const
 {
-  auto data = std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
+  auto data_ptr =
+    std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
 
-  data->update_each = requires_update_flags(update_flags);
+  data_ptr->update_each = requires_update_flags(update_flags);
 
   const unsigned int n_q_points = quadrature.size();
-  output_data.initialize(n_q_points, FE_P1NC(), data->update_each);
+  output_data.initialize(n_q_points, FE_P1NC(), data_ptr->update_each);
 
   // this is a linear element, so its second derivatives are zero
-  if (data->update_each & update_hessians)
+  if (data_ptr->update_each & update_hessians)
     output_data.shape_hessians.fill(Tensor<2, 2>());
 
-  return data;
+  return data_ptr;
 }
 
 
@@ -164,18 +165,19 @@ FE_P1NC::get_face_data(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
     &output_data) const
 {
-  auto data = std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
+  auto data_ptr =
+    std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
 
-  data->update_each = requires_update_flags(update_flags);
+  data_ptr->update_each = requires_update_flags(update_flags);
 
   const unsigned int n_q_points = quadrature.size();
-  output_data.initialize(n_q_points, FE_P1NC(), data->update_each);
+  output_data.initialize(n_q_points, FE_P1NC(), data_ptr->update_each);
 
   // this is a linear element, so its second derivatives are zero
-  if (data->update_each & update_hessians)
+  if (data_ptr->update_each & update_hessians)
     output_data.shape_hessians.fill(Tensor<2, 2>());
 
-  return data;
+  return data_ptr;
 }
 
 
@@ -188,18 +190,19 @@ FE_P1NC::get_subface_data(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2, 2>
     &output_data) const
 {
-  auto data = std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
+  auto data_ptr =
+    std_cxx14::make_unique<FiniteElement<2, 2>::InternalDataBase>();
 
-  data->update_each = requires_update_flags(update_flags);
+  data_ptr->update_each = requires_update_flags(update_flags);
 
   const unsigned int n_q_points = quadrature.size();
-  output_data.initialize(n_q_points, FE_P1NC(), data->update_each);
+  output_data.initialize(n_q_points, FE_P1NC(), data_ptr->update_each);
 
   // this is a linear element, so its second derivatives are zero
-  if (data->update_each & update_hessians)
+  if (data_ptr->update_each & update_hessians)
     output_data.shape_hessians.fill(Tensor<2, 2>());
 
-  return data;
+  return data_ptr;
 }
 
 

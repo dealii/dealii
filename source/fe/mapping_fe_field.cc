@@ -566,10 +566,12 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_data(
   const UpdateFlags      update_flags,
   const Quadrature<dim> &quadrature) const
 {
-  auto data =
+  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
-  this->compute_data(update_flags, quadrature, quadrature.size(), *data);
-  return std::move(data);
+  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  this->compute_data(update_flags, quadrature, quadrature.size(), data);
+
+  return data_ptr;
 }
 
 
@@ -580,12 +582,13 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_face_data(
   const UpdateFlags          update_flags,
   const Quadrature<dim - 1> &quadrature) const
 {
-  auto data =
+  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
+  auto &                data = dynamic_cast<InternalData &>(*data_ptr);
   const Quadrature<dim> q(QProjector<dim>::project_to_all_faces(quadrature));
-  this->compute_face_data(update_flags, q, quadrature.size(), *data);
+  this->compute_face_data(update_flags, q, quadrature.size(), data);
 
-  return std::move(data);
+  return data_ptr;
 }
 
 
@@ -595,12 +598,13 @@ MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::get_subface_data(
   const UpdateFlags          update_flags,
   const Quadrature<dim - 1> &quadrature) const
 {
-  auto data =
+  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
     std_cxx14::make_unique<InternalData>(euler_dof_handler->get_fe(), fe_mask);
+  auto &                data = dynamic_cast<InternalData &>(*data_ptr);
   const Quadrature<dim> q(QProjector<dim>::project_to_all_subfaces(quadrature));
-  this->compute_face_data(update_flags, q, quadrature.size(), *data);
+  this->compute_face_data(update_flags, q, quadrature.size(), data);
 
-  return std::move(data);
+  return data_ptr;
 }
 
 

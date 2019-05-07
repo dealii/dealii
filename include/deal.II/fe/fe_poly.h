@@ -243,8 +243,10 @@ protected:
   {
     // generate a new data object and
     // initialize some fields
-    auto data         = std_cxx14::make_unique<InternalData>();
-    data->update_each = requires_update_flags(update_flags);
+    std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+          data_ptr   = std_cxx14::make_unique<InternalData>();
+    auto &data       = dynamic_cast<InternalData &>(*data_ptr);
+    data.update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
 
@@ -281,16 +283,16 @@ protected:
     if ((update_flags & update_values) &&
         !((output_data.shape_values.n_rows() > 0) &&
           (output_data.shape_values.n_cols() == n_q_points)))
-      data->shape_values.reinit(this->dofs_per_cell, n_q_points);
+      data.shape_values.reinit(this->dofs_per_cell, n_q_points);
 
     if (update_flags & update_gradients)
-      data->shape_gradients.reinit(this->dofs_per_cell, n_q_points);
+      data.shape_gradients.reinit(this->dofs_per_cell, n_q_points);
 
     if (update_flags & update_hessians)
-      data->shape_hessians.reinit(this->dofs_per_cell, n_q_points);
+      data.shape_hessians.reinit(this->dofs_per_cell, n_q_points);
 
     if (update_flags & update_3rd_derivatives)
-      data->shape_3rd_derivatives.reinit(this->dofs_per_cell, n_q_points);
+      data.shape_3rd_derivatives.reinit(this->dofs_per_cell, n_q_points);
 
     // next already fill those fields of which we have information by
     // now. note that the shape gradients are only those on the unit
@@ -321,7 +323,7 @@ protected:
                     output_data.shape_values[k][i] = values[k];
                 else
                   for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-                    data->shape_values[k][i] = values[k];
+                    data.shape_values[k][i] = values[k];
               }
 
           // for everything else, derivatives need to be transformed,
@@ -329,17 +331,17 @@ protected:
           // copy stuff into where FEValues wants it
           if (update_flags & update_gradients)
             for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-              data->shape_gradients[k][i] = grads[k];
+              data.shape_gradients[k][i] = grads[k];
 
           if (update_flags & update_hessians)
             for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-              data->shape_hessians[k][i] = grad_grads[k];
+              data.shape_hessians[k][i] = grad_grads[k];
 
           if (update_flags & update_3rd_derivatives)
             for (unsigned int k = 0; k < this->dofs_per_cell; ++k)
-              data->shape_3rd_derivatives[k][i] = third_derivatives[k];
+              data.shape_3rd_derivatives[k][i] = third_derivatives[k];
         }
-    return std::move(data);
+    return data_ptr;
   }
 
   virtual void

@@ -331,33 +331,35 @@ FE_Enriched<dim, spacedim>::setup_data(
   // Pass ownership of the FiniteElement::InternalDataBase object
   // that fes_data points to, to the new InternalData object.
   auto update_each_flags = fes_data->update_each;
-  auto data = std_cxx14::make_unique<InternalData>(std::move(fes_data));
+  std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+        data_ptr = std_cxx14::make_unique<InternalData>(std::move(fes_data));
+  auto &data     = dynamic_cast<InternalData &>(*data_ptr);
 
   // copy update_each from FESystem data:
-  data->update_each = update_each_flags;
+  data.update_each = update_each_flags;
 
   // resize cache array according to requested flags
-  data->enrichment.resize(this->n_base_elements());
+  data.enrichment.resize(this->n_base_elements());
 
   const unsigned int n_q_points = quadrature.size();
 
   for (unsigned int base = 0; base < this->n_base_elements(); ++base)
     {
-      data->enrichment[base].resize(this->element_multiplicity(base));
+      data.enrichment[base].resize(this->element_multiplicity(base));
       for (unsigned int m = 0; m < this->element_multiplicity(base); ++m)
         {
           if (flags & update_values)
-            data->enrichment[base][m].values.resize(n_q_points);
+            data.enrichment[base][m].values.resize(n_q_points);
 
           if (flags & update_gradients)
-            data->enrichment[base][m].gradients.resize(n_q_points);
+            data.enrichment[base][m].gradients.resize(n_q_points);
 
           if (flags & update_hessians)
-            data->enrichment[base][m].hessians.resize(n_q_points);
+            data.enrichment[base][m].hessians.resize(n_q_points);
         }
     }
 
-  return std::move(data);
+  return data_ptr;
 }
 
 

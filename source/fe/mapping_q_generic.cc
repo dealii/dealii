@@ -2724,10 +2724,12 @@ std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingQGeneric<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                          const Quadrature<dim> &q) const
 {
-  auto data = std_cxx14::make_unique<InternalData>(polynomial_degree);
-  data->initialize(this->requires_update_flags(update_flags), q, q.size());
+  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
+    std_cxx14::make_unique<InternalData>(polynomial_degree);
+  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  data.initialize(this->requires_update_flags(update_flags), q, q.size());
 
-  return std::move(data);
+  return data_ptr;
 }
 
 
@@ -2738,12 +2740,14 @@ MappingQGeneric<dim, spacedim>::get_face_data(
   const UpdateFlags          update_flags,
   const Quadrature<dim - 1> &quadrature) const
 {
-  auto data = std_cxx14::make_unique<InternalData>(polynomial_degree);
-  data->initialize_face(this->requires_update_flags(update_flags),
-                        QProjector<dim>::project_to_all_faces(quadrature),
-                        quadrature.size());
+  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
+    std_cxx14::make_unique<InternalData>(polynomial_degree);
+  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  data.initialize_face(this->requires_update_flags(update_flags),
+                       QProjector<dim>::project_to_all_faces(quadrature),
+                       quadrature.size());
 
-  return std::move(data);
+  return data_ptr;
 }
 
 
@@ -2754,12 +2758,14 @@ MappingQGeneric<dim, spacedim>::get_subface_data(
   const UpdateFlags          update_flags,
   const Quadrature<dim - 1> &quadrature) const
 {
-  auto data = std_cxx14::make_unique<InternalData>(polynomial_degree);
-  data->initialize_face(this->requires_update_flags(update_flags),
-                        QProjector<dim>::project_to_all_subfaces(quadrature),
-                        quadrature.size());
+  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
+    std_cxx14::make_unique<InternalData>(polynomial_degree);
+  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  data.initialize_face(this->requires_update_flags(update_flags),
+                       QProjector<dim>::project_to_all_subfaces(quadrature),
+                       quadrature.size());
 
-  return std::move(data);
+  return data_ptr;
 }
 
 

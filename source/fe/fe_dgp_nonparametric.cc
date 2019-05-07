@@ -283,14 +283,14 @@ FE_DGPNonparametric<dim, spacedim>::get_data(
     & /*output_data*/) const
 {
   // generate a new data object
-  auto data = std_cxx14::make_unique<
+  auto data_ptr = std_cxx14::make_unique<
     typename FiniteElement<dim, spacedim>::InternalDataBase>();
-  data->update_each = requires_update_flags(update_flags);
+  data_ptr->update_each = requires_update_flags(update_flags);
 
   // other than that, there is nothing we can add here as discussed
   // in the general documentation of this class
 
-  return std::move(data);
+  return data_ptr;
 }
 
 
