@@ -253,6 +253,14 @@ namespace Differentiation
       return symbol_values_resolved;
     }
 
+
+    Expression
+    substitute(const Expression &             expression,
+               const types::substitution_map &substitution_map)
+    {
+      return expression.substitute(substitution_map);
+    }
+
   } // namespace SD
 } // namespace Differentiation
 
