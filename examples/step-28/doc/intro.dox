@@ -2,32 +2,28 @@
 
 <i>This program was contributed by Yaqi Wang and Wolfgang
 Bangerth. Results from this program are used and discussed in the publication
-"Three-dimensional $h$-adaptivity for the multigroup neutron diffusion
+"Three-dimensional h-adaptivity for the multigroup neutron diffusion
 equations" by Yaqi Wang, Wolfgang Bangerth and Jean Ragusa. The paper's full
 bibliographic details are as follows:
 @code
 @Article{WBR09,
-  author = 	 {Yaqi Wang and Wolfgang Bangerth and Jean Ragusa},
-  title = 	 {Three-dimensional $h$-adaptivity for the multigroup
-                  neutron diffusion equations},
-  journal = 	 {Progr. Nucl. Energy},
-  year = 	 2009,
-  volume = 	 51,
-  pages = 	 {543--555}
+  author  = {Yaqi Wang and Wolfgang Bangerth and Jean Ragusa},
+  title   = {Three-dimensional h-adaptivity for the multigroup
+             neutron diffusion equations},
+  journal = {Progr. Nucl. Energy},
+  year    = 2009,
+  volume  = 51,
+  pages   = {543--555}
 }
 @endcode
-A preprint that mostly matches the final version of the paper is
-available <a target="_top"
-href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=19">here</a>.
+The paper is available <a target="_top"
+href="https://www.semanticscholar.org/paper/Three-dimensional-h-adaptivity-for-the-multigroup-Wang-Bangerth/900592e8e891d9b888d59a69ec58bf2bbda56b4b">here</a>.
 </i>
 
 <br>
 
 
 <a name="Intro"></a> <h1>Introduction</h1>
-
-
-
 In this example, we intend to solve the multigroup diffusion approximation of
 the neutron transport equation. Essentially, the way to view this is as follows: In a
 nuclear reactor, neutrons are speeding around at different energies, get
@@ -176,7 +172,7 @@ one for stable operation of a reactor: if it is less than one, the chain reactio
 die down, whereas nuclear bombs for example have a $k$-eigenvalue larger than
 one. A stable reactor should have $k_{\mathrm{eff}}=1$.
 
-[For those who wonder how this can be achieved in practice without
+For those who wonder how this can be achieved in practice without
 inadvertently getting slightly larger than one and triggering a nuclear bomb:
 first, fission processes happen on different time scales. While most neutrons
 are released very quickly after a fission event, a small number of neutrons
@@ -201,7 +197,7 @@ Finally, some of the absorption and scattering reactions have some
 stability built in; for example, higher neutron fluxes result in locally
 higher temperatures, which lowers the density of water and therefore reduces
 the number of scatterers that are necessary to moderate neutrons from high to
-low energies before they can start fission events themselves.]
+low energies before they can start fission events themselves.
 
 In this tutorial program, we solve above $k$-eigenvalue problem for two energy
 groups, and we are looking for the largest multiplication factor
@@ -586,7 +582,7 @@ This whole arrangement would make the description or spatially dependent
 material parameters very complicated. It will not become much simpler, but we
 will make one approximation: we merge the volume inhabited by each cylindrical
 rod and the surrounding water into volumes of quadratic cross section into
-so-called ``pin cells'' for which homogenized material data are obtained with
+so-called `pin cells' for which homogenized material data are obtained with
 nuclear database and knowledge of neutron spectrum. The homogenization makes
 all material data piecewise constant on the solution domain for a reactor with
 fresh fuel. Spatially dependent material parameters are then looked up for the

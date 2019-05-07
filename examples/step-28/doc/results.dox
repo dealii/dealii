@@ -15,59 +15,67 @@ set Number of energy groups   = 2
 set Power iteration tolerance = 1e-12
 
 # Number of refinement cycles to be performed
-set Refinement cycles         = 5
+set Refinement cycles         = 12
 @endcode
-The output of this program then consists of the console output, a file 
-named ``convergence_table'' to record main results of mesh iteration, 
+The output of this program then consists of the console output, a file
+named `convergence_table' to record main results of mesh iteration,
 and the graphical output in vtu format.
 
 The console output looks like this:
 @code
 Cycle 0:
-   Numbers of active cells:       1156 1156 
-   Numbers of degrees of freedom: 4761 4761 
-Iter number:1 k_eff=319.375676634307 flux ratio=6.836246075631 max_thermal=1.433899030144
-Iter number:2 k_eff=0.834072546055 flux ratio=5.204601882141 max_thermal=0.004630925876
-Iter number:3 k_eff=0.862826188043 flux ratio=4.645051765984 max_thermal=0.005380396338
-Iter number:4 k_eff=0.877887920967 flux ratio=4.318030683875 max_thermal=0.006005512201
-Iter number:5 k_eff=0.887161559547 flux ratio=4.256596788174
-max_thermal=0.006639443035
+   Numbers of active cells:       1156 1156
+   Numbers of degrees of freedom: 4761 4761
+
+Iter number: 1 k_eff=319.375676634310 flux_ratio=6.836246075630 max_thermal=1.433899030144
+Iter number: 2 k_eff=0.834072546055 flux_ratio=5.204601882144 max_thermal=0.004630925876
+Iter number: 3 k_eff=0.862826188043 flux_ratio=4.645051765984 max_thermal=0.005380396338
 ...
-Iter number:69 k_eff=0.906841960370 flux ratio=4.384056022578 max_thermal=0.008466414246
-Iter number:70 k_eff=0.906841960371 flux ratio=4.384056022582 max_thermal=0.008466414246
+Iter number:69 k_eff=0.906841960370 flux_ratio=4.384056022578 max_thermal=0.008466414246
+Iter number:70 k_eff=0.906841960371 flux_ratio=4.384056022583 max_thermal=0.008466414246
+
+   Cycle=0, n_dofs=9522,  k_eff=0.906841960371, time=7.623425000000
+
+
 Cycle 1:
-   Numbers of active cells:       1156 2380 
-   Numbers of degrees of freedom: 4761 10667 
-Iter number:1 k_eff=0.906838267472 flux ratio=4.385474405124 max_thermal=0.008463675976
-Iter number:2 k_eff=0.906837892433 flux ratio=4.385486158840 max_thermal=0.008463675386
+   Numbers of active cells:       1156 2380
+   Numbers of degrees of freedom: 4761 10667
+
+Iter number: 1 k_eff=0.906838267472 flux_ratio=4.385474405125 max_thermal=0.008463675976
 ...
+
 Cycle 11:
-   Numbers of active cells:       11749 47074 
-   Numbers of degrees of freedom: 50261 204523 
-Iter number:1 k_eff=0.906805395149 flux ratio=4.384872231023 max_thermal=0.008464861813
-...Iter number:32 k_eff=0.906834736551 flux ratio=4.384846081796 max_thermal=0.008465019607
-Iter number:33 k_eff=0.906834736552 flux ratio=4.384846081800 max_thermal=0.008465019607
+   Numbers of active cells:       11749 47074
+   Numbers of degrees of freedom: 50261 204523
+
+Iter number: 1 k_eff=0.906798057750 flux_ratio=4.384878772166 max_thermal=0.008464822382
+Iter number: 2 k_eff=0.906833008185 flux_ratio=4.384868138638 max_thermal=0.008465057191
+...
+Iter number:32 k_eff=0.906834736550 flux_ratio=4.384846081793 max_thermal=0.008465019607
+Iter number:33 k_eff=0.906834736551 flux_ratio=4.384846081798 max_thermal=0.008465019607
+
+   Cycle=11, n_dofs=254784,  k_eff=0.906834736551, time=238.593762000000
 @endcode
 
-We see that power iteration does converge faster after cycle 0 due to the initialization 
-with solution from last mesh iteration. 
-The contents of ``convergence_table'' are,
+We see that power iteration does converge faster after cycle 0 due to the initialization
+with solution from last mesh iteration.
+The contents of `convergence_table' are,
 @code
-0 4761 4761 0.906841960371 4.384056022582
-1 4761 10667 0.906837901031 4.385489087760
-2 4761 18805 0.906836075928 4.385466647499
-3 6629 27301 0.906835500111 4.385404580865
-4 12263 48095 0.906835001796 4.385381798734
-5 17501 69297 0.906834858174 4.384853823414
-6 19933 78605 0.906834824060 4.384850658788
-7 23979 93275 0.906834787556 4.384848379257
-8 30285 117017 0.906834761604 4.384846544947
-9 40087 154355 0.906834746216 4.384846083191
-10 45467 179469 0.906834740155 4.384846005044
-11 50261 204523 0.906834736552 4.384846081800
+0 4761 4761 0.906841960371 4.38405602258
+1 4761 10667 0.906837901031 4.38548908776
+2 4761 18805 0.906836075928 4.3854666475
+3 6629 27301 0.90683550011 4.38540458087
+4 12263 48095 0.906835001796 4.38538179873
+5 17501 69297 0.906834858174 4.38485382341
+6 19933 78605 0.90683482406 4.38485065879
+7 23979 93275 0.906834787555 4.38484837926
+8 30285 117017 0.906834761604 4.38484654495
+9 40087 154355 0.906834746215 4.38484608319
+10 45467 179469 0.906834740155 4.38484600505
+11 50261 204523 0.906834736551 4.3848460818
 @endcode
 The meanings of columns are: number of mesh iteration, numbers of degrees of
- freedom of fast energy group, numbers of DoFs of thermal group, converged 
+ freedom of fast energy group, numbers of DoFs of thermal group, converged
 k-effective and the ratio between maximum of fast flux and maximum of thermal one.
 
 The grids of fast and thermal energy groups at mesh iteration #9 look
@@ -77,7 +85,7 @@ as follows:
 &nbsp;
 <img width="400" src="https://www.dealii.org/images/steps/developer/step-28.grid-1.9.order2.png" alt="">
 
-We see that the grid of thermal group is much finer than the one of fast group. 
+We see that the grid of thermal group is much finer than the one of fast group.
 The solutions on these grids are, (Note: flux are normalized with total fission
 source equal to 1)
 
@@ -89,8 +97,8 @@ Then we plot the convergence data with polynomial order being equal to 1,2 and 3
 
 <img src="https://www.dealii.org/images/steps/developer/step-28.convergence.png" alt="">
 
-The estimated ``exact'' k-effective = 0.906834721253 which is simply from last
+The estimated `exact' k-effective = 0.906834721253 which is simply from last
 mesh iteration of polynomial order 3 minus 2e-10. We see that h-adaptive calculations
-deliver an algebraic convergence. And the higher polynomial order is, the faster mesh 
+deliver an algebraic convergence. And the higher polynomial order is, the faster mesh
 iteration converges. In our problem, we need smaller number of DoFs to achieve same
 accuracy with higher polynomial order.

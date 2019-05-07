@@ -668,11 +668,7 @@ namespace Step28
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_matrix = 0;
 
@@ -743,11 +739,7 @@ namespace Step28
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_rhs = 0;
 
@@ -803,18 +795,14 @@ namespace Step28
       cell_list =
         GridTools::get_finest_common_cells(dof_handler, g_prime.dof_handler);
 
-    typename std::list<std::pair<typename DoFHandler<dim>::cell_iterator,
-                                 typename DoFHandler<dim>::cell_iterator>>::
-      const_iterator cell_iter = cell_list.begin();
-
-    for (; cell_iter != cell_list.end(); ++cell_iter)
+    for (const auto &cell_pair : cell_list)
       {
         FullMatrix<double> unit_matrix(fe.dofs_per_cell);
         for (unsigned int i = 0; i < unit_matrix.m(); ++i)
           unit_matrix(i, i) = 1;
         assemble_cross_group_rhs_recursive(g_prime,
-                                           cell_iter->first,
-                                           cell_iter->second,
+                                           cell_pair.first,
+                                           cell_pair.second,
                                            unit_matrix);
       }
   }
@@ -993,10 +981,7 @@ namespace Step28
 
     double fission_source = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
 
@@ -1080,12 +1065,7 @@ namespace Step28
                                      const double         refine_threshold,
                                      const double         coarsen_threshold)
   {
-    typename Triangulation<dim>::active_cell_iterator cell = triangulation
-                                                               .begin_active(),
-                                                      endc =
-                                                        triangulation.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       if (error_indicators(cell->active_cell_index()) > refine_threshold)
         cell->set_refine_flag();
       else if (error_indicators(cell->active_cell_index()) < coarsen_threshold)
@@ -1185,10 +1165,7 @@ namespace Step28
       double convergence_tolerance;
     };
 
-
-
     NeutronDiffusionProblem(const Parameters &parameters);
-    ~NeutronDiffusionProblem();
 
     void run();
 
@@ -1226,10 +1203,14 @@ namespace Step28
     // group:
     double k_eff;
 
-    // Finally, (v), we have an array of pointers to the energy group
-    // objects. The length of this array is, of course, equal to the number of
-    // energy groups specified in the parameter file.
-    std::vector<EnergyGroup<dim> *> energy_groups;
+    // The last computational object (v) is an array of pointers to the energy
+    // group objects. The length of this array is, of course, equal to the
+    // number of energy groups specified in the parameter file.
+    std::vector<std::unique_ptr<EnergyGroup<dim>>> energy_groups;
+
+    // Finally (vi) we have a file stream to which we will save summarized
+    // output.
+    std::ofstream convergence_table_stream;
   };
 
 
@@ -1302,15 +1283,6 @@ namespace Step28
   {}
 
 
-
-  template <int dim>
-  NeutronDiffusionProblem<dim>::~NeutronDiffusionProblem()
-  {
-    for (unsigned int group = 0; group < energy_groups.size(); ++group)
-      delete energy_groups[group];
-
-    energy_groups.resize(0);
-  }
 
   // @sect5{<code>NeutronDiffusionProblem::initialize_problem</code>}
   //
@@ -1456,10 +1428,7 @@ namespace Step28
     // add a few checks to see that the locations we compute are within the
     // bounds of the arrays in which we have to look up materials.) At the end
     // of the loop, we set material identifiers accordingly:
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           coarse_grid.begin_active();
-         cell != coarse_grid.end();
-         ++cell)
+    for (auto &cell : coarse_grid.active_cell_iterators())
       {
         const Point<dim> cell_center = cell->center();
 
@@ -1489,10 +1458,11 @@ namespace Step28
     // With the coarse mesh so initialized, we create the appropriate number
     // of energy group objects and let them initialize their individual meshes
     // with the coarse mesh generated above:
-    energy_groups.resize(parameters.n_groups);
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      energy_groups[group] =
-        new EnergyGroup<dim>(group, material_data, coarse_grid, fe);
+      energy_groups.emplace_back(std_cxx14::make_unique<EnergyGroup<dim>>(
+        group, material_data, coarse_grid, fe));
+    convergence_table_stream.open("convergence_table");
+    convergence_table_stream.precision(12);
   }
 
 
@@ -1600,7 +1570,9 @@ namespace Step28
     boost::io::ios_flags_saver restore_flags(std::cout);
     std::cout << std::setprecision(12) << std::fixed;
 
-    double k_eff_old = k_eff;
+    // We calculate the error below by the change in k_eff (i.e., the
+    // difference between k_eff_old,
+    double k_eff_old = 0.0;
 
     for (unsigned int cycle = 0; cycle < parameters.n_refinement_cycles;
          ++cycle)
@@ -1664,9 +1636,14 @@ namespace Step28
               }
 
             k_eff = get_total_fission_source();
-            error = fabs(k_eff - k_eff_old) / fabs(k_eff);
-            std::cout << "   Iteration " << iteration << ": k_eff=" << k_eff
-                      << std::endl;
+            error = std::abs(k_eff - k_eff_old) / std::abs(k_eff);
+            const double flux_ratio = energy_groups[0]->solution.linfty_norm() /
+                                      energy_groups[1]->solution.linfty_norm();
+            const double max_thermal = energy_groups[1]->solution.linfty_norm();
+            std::cout << "Iter number:" << std::setw(2) << std::right
+                      << iteration << " k_eff=" << k_eff
+                      << " flux_ratio=" << flux_ratio
+                      << " max_thermal=" << max_thermal << std::endl;
             k_eff_old = k_eff;
 
             for (unsigned int group = 0; group < parameters.n_groups; ++group)
@@ -1679,6 +1656,12 @@ namespace Step28
             ++iteration;
           }
         while ((error > parameters.convergence_tolerance) && (iteration < 500));
+        convergence_table_stream << cycle << " " << energy_groups[0]->n_dofs()
+                                 << " " << energy_groups[1]->n_dofs() << " "
+                                 << k_eff << " "
+                                 << energy_groups[0]->solution.linfty_norm() /
+                                      energy_groups[1]->solution.linfty_norm()
+                                 << '\n';
 
         for (unsigned int group = 0; group < parameters.n_groups; ++group)
           energy_groups[group]->output_results(cycle);
