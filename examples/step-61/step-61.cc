@@ -68,9 +68,14 @@ namespace Step61
 
   // @sect3{The WGDarcyEquation class template}
 
-  // We will solve for the numerical pressure in the interior and on faces and
-  // calculate its $L_2$ error of pressure. In the post-processing step, we will
-  // calculate $L_2$-errors of velocity and flux.
+  // This is the main class of this program. We will solve for the numerical
+  // pressure in the interior and on faces using the weak Galerkin (WG) method,
+  // and calculate the $L_2$ error of pressure. In the post-processing step, we
+  // will also calculate $L_2$-errors of the velocity and flux.
+  //
+  // The structure of the class is not fundamentally different from that of
+  // previous tutorial programs, so there is little need to comment on the
+  // details.
   template <int dim>
   class WGDarcyEquation
   {
@@ -91,10 +96,6 @@ namespace Step61
 
     AffineConstraints<double> constraints;
 
-    FE_RaviartThomas<dim> fe_rt;
-    DoFHandler<dim>       dof_handler_rt;
-
-    // The finite element system is used for interior and face solutions.
     FESystem<dim>   fe;
     DoFHandler<dim> dof_handler;
 
@@ -232,11 +233,7 @@ namespace Step61
   // the same as previous tutorial programs.
   template <int dim>
   WGDarcyEquation<dim>::WGDarcyEquation()
-    : fe_rt(0)
-    , dof_handler_rt(triangulation)
-    ,
-
-    fe(FE_DGQ<dim>(0), 1, FE_FaceQ<dim>(0), 1)
+    : fe(FE_DGQ<dim>(0), 1, FE_FaceQ<dim>(0), 1)
     , dof_handler(triangulation)
 
   {}
@@ -265,11 +262,7 @@ namespace Step61
   template <int dim>
   void WGDarcyEquation<dim>::setup_system()
   {
-    dof_handler_rt.distribute_dofs(fe_rt);
     dof_handler.distribute_dofs(fe);
-
-    std::cout << "   Number of flux degrees of freedom: "
-              << dof_handler_rt.n_dofs() << std::endl;
 
     std::cout << "   Number of pressure degrees of freedom: "
               << dof_handler.n_dofs() << std::endl;
@@ -310,9 +303,10 @@ namespace Step61
   template <int dim>
   void WGDarcyEquation<dim>::assemble_system()
   {
-    QGauss<dim>              quadrature_formula(fe_rt.degree + 1);
-    QGauss<dim - 1>          face_quadrature_formula(fe_rt.degree + 1);
-    const RightHandSide<dim> right_hand_side;
+    const FE_RaviartThomas<dim> fe_rt(0);
+    const QGauss<dim>           quadrature_formula(fe_rt.degree + 1);
+    const QGauss<dim - 1>       face_quadrature_formula(fe_rt.degree + 1);
+    const RightHandSide<dim>    right_hand_side;
 
     // We define objects to evaluate values and
     // gradients of shape functions at the quadrature points.
@@ -367,19 +361,14 @@ namespace Step61
     const FEValuesExtractors::Scalar interior(0);
     const FEValuesExtractors::Scalar face(1);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    typename DoFHandler<dim>::active_cell_iterator cell_rt =
-      dof_handler_rt.begin_active();
-
     // Here, we will calculate cell matrices used to construct the local matrix
     // on each cell. We need shape functions for the Raviart-Thomas space as
     // well, so we also loop over the corresponding velocity cell iterators.
-    for (; cell != endc; ++cell, ++cell_rt)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         // On each cell, cell matrices are different, so in every loop, they
         // need to be re-computed.
+        const typename Triangulation<dim>::active_cell_iterator cell_rt = cell;
         fe_values_rt.reinit(cell_rt);
         fe_values.reinit(cell);
         coefficient.value_list(fe_values_rt.get_quadrature_points(),
@@ -600,8 +589,9 @@ namespace Step61
   template <int dim>
   void WGDarcyEquation<dim>::postprocess()
   {
-    QGauss<dim>     quadrature_formula(fe_rt.degree + 1);
-    QGauss<dim - 1> face_quadrature_formula(fe_rt.degree + 1);
+    const FE_RaviartThomas<dim> fe_rt(0);
+    const QGauss<dim>           quadrature_formula(fe_rt.degree + 1);
+    const QGauss<dim - 1>       face_quadrature_formula(fe_rt.degree + 1);
 
     FEValues<dim> fe_values_rt(fe_rt,
                                quadrature_formula,
@@ -647,17 +637,8 @@ namespace Step61
     Tensor<1, dim>     velocity_cell;
     Tensor<1, dim>     velocity_face;
     Tensor<1, dim>     exact_velocity_face;
-    double             L2_err_velocity_cell_sqr_global;
-    L2_err_velocity_cell_sqr_global = 0;
-    double L2_err_flux_sqr;
-    L2_err_flux_sqr = 0;
-
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    typename DoFHandler<dim>::active_cell_iterator cell_rt =
-      dof_handler_rt.begin_active();
+    double             L2_err_velocity_cell_sqr_global = 0;
+    double             L2_err_flux_sqr                 = 0;
 
     const Coefficient<dim>           coefficient;
     std::vector<Tensor<2, dim>>      coefficient_values(n_q_points_rt);
@@ -684,8 +665,10 @@ namespace Step61
     // components. Then, we multiply all these coefficients and call them beta.
     // The numerical velocity is the product of beta and the basis functions of
     // the Raviart-Thomas space.
-    for (; cell != endc; ++cell, ++cell_rt)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
+        const typename Triangulation<dim>::active_cell_iterator cell_rt = cell;
+
         fe_values_rt.reinit(cell_rt);
         fe_values.reinit(cell);
         coefficient.value_list(fe_values_rt.get_quadrature_points(),
