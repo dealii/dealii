@@ -1308,6 +1308,18 @@ namespace Differentiation
       template <int dim, typename ExpressionType, typename ValueType>
       std::vector<std::pair<ExpressionType, ValueType>>
       tensor_substitution_map(
+        const Tensor<0, dim, ExpressionType> &symbol_tensor,
+        const Tensor<0, dim, ValueType> &     value_tensor)
+      {
+        const ExpressionType &expression = symbol_tensor;
+        const ValueType &     value      = value_tensor;
+        return {std::make_pair(expression, value)};
+      }
+
+
+      template <int dim, typename ExpressionType, typename ValueType>
+      std::vector<std::pair<ExpressionType, ValueType>>
+      tensor_substitution_map(
         const SymmetricTensor<4, dim, ExpressionType> &symbol_tensor,
         const SymmetricTensor<4, dim, ValueType> &     value_tensor)
       {
@@ -1389,6 +1401,16 @@ namespace Differentiation
 
 
       template <int dim>
+      Tensor<0, dim, Expression>
+      tensor_substitute(const Tensor<0, dim, Expression> &expression_tensor,
+                        const types::substitution_map &   substitution_map)
+      {
+        const Expression &expression = expression_tensor;
+        return substitute(expression, substitution_map);
+      }
+
+
+      template <int dim>
       SymmetricTensor<4, dim, Expression>
       tensor_substitute(
         const SymmetricTensor<4, dim, Expression> &expression_tensor,
@@ -1430,6 +1452,17 @@ namespace Differentiation
                                                  substitution_map);
           }
         return out;
+      }
+
+
+      template <typename ValueType, int dim>
+      Tensor<0, dim, ValueType>
+      tensor_substitute_evaluate(
+        const Tensor<0, dim, Expression> &expression_tensor,
+        const types::substitution_map &   substitution_map)
+      {
+        const Expression &expression = expression_tensor;
+        return substitute_and_evaluate<ValueType>(expression, substitution_map);
       }
 
 
