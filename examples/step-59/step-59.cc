@@ -1018,8 +1018,8 @@ namespace Step59
       additional_data.mapping_update_flags_boundary_faces =
         (update_gradients | update_JxW_values | update_normal_vectors |
          update_quadrature_points);
-      std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
-        new MatrixFree<dim, double>());
+      const auto system_mf_storage =
+        std::make_shared<MatrixFree<dim, double>>();
       system_mf_storage->reinit(dof_handler,
                                 dummy,
                                 QGauss<1>(fe.degree + 1),
@@ -1050,8 +1050,8 @@ namespace Step59
         additional_data.mapping_update_flags_boundary_faces =
           (update_gradients | update_JxW_values);
         additional_data.level_mg_handler = level;
-        std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
-          new MatrixFree<dim, float>());
+        const auto mg_mf_storage_level =
+          std::make_shared<MatrixFree<dim, float>>();
         mg_mf_storage_level->reinit(dof_handler,
                                     dummy,
                                     QGauss<1>(fe.degree + 1),
@@ -1244,8 +1244,8 @@ namespace Step59
             smoother_data[0].degree          = numbers::invalid_unsigned_int;
             smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
           }
-        smoother_data[level].preconditioner.reset(
-          new PreconditionBlockJacobi<dim, fe_degree, float>());
+        smoother_data[level].preconditioner =
+          std::make_shared<PreconditionBlockJacobi<dim, fe_degree, float>>();
         smoother_data[level].preconditioner->initialize(mg_matrices[level]);
       }
     mg_smoother.initialize(mg_matrices, smoother_data);
