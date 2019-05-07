@@ -88,8 +88,8 @@ namespace Step61
     void setup_system();
     void assemble_system();
     void solve();
-    void postprocess();
-    void process_solution();
+    void compute_velocity_errors();
+    void compute_pressure_error();
     void output_results() const;
 
     Triangulation<dim> triangulation;
@@ -516,11 +516,13 @@ namespace Step61
     constraints.distribute(solution);
   }
 
-  // @sect4{WGDarcyEquation<dim>::process_solution}
+
+
+  // @sect4{WGDarcyEquation<dim>::compute_pressure_error}
 
   // This part is to calculate the $L_2$ error of the pressure.
   template <int dim>
-  void WGDarcyEquation<dim>::process_solution()
+  void WGDarcyEquation<dim>::compute_pressure_error()
   {
     // Since we have two different spaces for finite elements in interior and on
     // faces, if we want to calculate $L_2$ errors in interior, we need degrees
@@ -576,6 +578,8 @@ namespace Step61
     std::cout << "L2_error_pressure " << L2_error << std::endl;
   }
 
+
+
   // @sect4{WGDarcyEquation<dim>::postprocess}
 
   // After we calculated the numerical pressure, we evaluate $L_2$ errors for
@@ -587,7 +591,7 @@ namespace Step61
   // cell matrices.
 
   template <int dim>
-  void WGDarcyEquation<dim>::postprocess()
+  void WGDarcyEquation<dim>::compute_velocity_errors()
   {
     const FE_RaviartThomas<dim> fe_rt(0);
     const QGauss<dim>           quadrature_formula(fe_rt.degree + 1);
@@ -899,8 +903,8 @@ namespace Step61
     setup_system();
     assemble_system();
     solve();
-    process_solution();
-    postprocess();
+    compute_pressure_error();
+    compute_velocity_errors();
     output_results();
   }
 
