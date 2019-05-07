@@ -1,0 +1,3 @@
+Improved: Extend Utilities::inverse_Hilbert_space_filling_curve to handle degenerate cases.
+<br>
+(Denis Davydov, 2019/05/07)

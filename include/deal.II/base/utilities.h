@@ -91,6 +91,9 @@ namespace Utilities
    *
    * The depth of the Hilbert curve (i.e. the number of bits per dimension) by
    * default is equal to <code>64</code>.
+   *
+   * @note This function can also handle degenerate cases, e.g. when the bounding
+   * box has zero size in one of the dimensions.
    */
   template <int dim, typename Number>
   std::vector<std::array<std::uint64_t, dim>>
