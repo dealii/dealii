@@ -1165,10 +1165,7 @@ namespace Step28
       double convergence_tolerance;
     };
 
-
-
     NeutronDiffusionProblem(const Parameters &parameters);
-    ~NeutronDiffusionProblem();
 
     void run();
 
@@ -1209,7 +1206,7 @@ namespace Step28
     // Finally, (v), we have an array of pointers to the energy group
     // objects. The length of this array is, of course, equal to the number of
     // energy groups specified in the parameter file.
-    std::vector<EnergyGroup<dim> *> energy_groups;
+    std::vector<std::unique_ptr<EnergyGroup<dim>>> energy_groups;
   };
 
 
@@ -1282,15 +1279,6 @@ namespace Step28
   {}
 
 
-
-  template <int dim>
-  NeutronDiffusionProblem<dim>::~NeutronDiffusionProblem()
-  {
-    for (unsigned int group = 0; group < energy_groups.size(); ++group)
-      delete energy_groups[group];
-
-    energy_groups.resize(0);
-  }
 
   // @sect5{<code>NeutronDiffusionProblem::initialize_problem</code>}
   //
@@ -1466,10 +1454,9 @@ namespace Step28
     // With the coarse mesh so initialized, we create the appropriate number
     // of energy group objects and let them initialize their individual meshes
     // with the coarse mesh generated above:
-    energy_groups.resize(parameters.n_groups);
     for (unsigned int group = 0; group < parameters.n_groups; ++group)
-      energy_groups[group] =
-        new EnergyGroup<dim>(group, material_data, coarse_grid, fe);
+      energy_groups.emplace_back(std_cxx14::make_unique<EnergyGroup<dim>>(
+        group, material_data, coarse_grid, fe));
   }
 
 
