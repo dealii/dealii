@@ -24,10 +24,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace numbers
 {
   template <typename number>
-  const bool NumberTraits<number>::is_complex;
+  constexpr bool NumberTraits<number>::is_complex;
 
   template <typename number>
-  const bool NumberTraits<std::complex<number>>::is_complex;
+  constexpr bool NumberTraits<std::complex<number>>::is_complex;
 
   // explicit instantiations
   template struct NumberTraits<double>;

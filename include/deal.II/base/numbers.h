@@ -118,52 +118,52 @@ namespace numbers
   /**
    * e
    */
-  static const double E = 2.7182818284590452354;
+  static constexpr double E = 2.7182818284590452354;
 
   /**
    * log_2 e
    */
-  static const double LOG2E = 1.4426950408889634074;
+  static constexpr double LOG2E = 1.4426950408889634074;
 
   /**
    * log_10 e
    */
-  static const double LOG10E = 0.43429448190325182765;
+  static constexpr double LOG10E = 0.43429448190325182765;
 
   /**
    * log_e 2
    */
-  static const double LN2 = 0.69314718055994530942;
+  static constexpr double LN2 = 0.69314718055994530942;
 
   /**
    * log_e 10
    */
-  static const double LN10 = 2.30258509299404568402;
+  static constexpr double LN10 = 2.30258509299404568402;
 
   /**
    * pi
    */
-  static const double PI = 3.14159265358979323846;
+  static constexpr double PI = 3.14159265358979323846;
 
   /**
    * pi/2
    */
-  static const double PI_2 = 1.57079632679489661923;
+  static constexpr double PI_2 = 1.57079632679489661923;
 
   /**
    * pi/4
    */
-  static const double PI_4 = 0.78539816339744830962;
+  static constexpr double PI_4 = 0.78539816339744830962;
 
   /**
    * sqrt(2)
    */
-  static const double SQRT2 = 1.41421356237309504880;
+  static constexpr double SQRT2 = 1.41421356237309504880;
 
   /**
    * 1/sqrt(2)
    */
-  static const double SQRT1_2 = 0.70710678118654752440;
+  static constexpr double SQRT1_2 = 0.70710678118654752440;
 
   /**
    * Check whether the given type can be used in CUDA device code.
@@ -352,7 +352,7 @@ namespace numbers
      * complex or real. Since the general template is selected for non-complex
      * types, the answer is <code>false</code>.
      */
-    static const bool is_complex = false;
+    static constexpr bool is_complex = false;
 
     /**
      * For this data type, alias the corresponding real type. Since the
@@ -369,8 +369,8 @@ namespace numbers
      *
      * @note This function can also be used in CUDA device code.
      */
-    static DEAL_II_CUDA_HOST_DEV const number &
-                                       conjugate(const number &x);
+    static constexpr DEAL_II_CUDA_HOST_DEV const number &
+                                                 conjugate(const number &x);
 
     /**
      * Return the square of the absolute value of the given number. Since the
@@ -381,17 +381,18 @@ namespace numbers
      * for this function.
      */
     template <typename Dummy = number>
-    static DEAL_II_CUDA_HOST_DEV
+    static constexpr DEAL_II_CUDA_HOST_DEV
       typename std::enable_if<std::is_same<Dummy, number>::value &&
                                 is_cuda_compatible<Dummy>::value,
                               real_type>::type
       abs_square(const number &x);
 
     template <typename Dummy = number>
-    static typename std::enable_if<std::is_same<Dummy, number>::value &&
-                                     !is_cuda_compatible<Dummy>::value,
-                                   real_type>::type
-    abs_square(const number &x);
+    static constexpr
+      typename std::enable_if<std::is_same<Dummy, number>::value &&
+                                !is_cuda_compatible<Dummy>::value,
+                              real_type>::type
+      abs_square(const number &x);
 
     /**
      * Return the absolute value of a number.
@@ -415,7 +416,7 @@ namespace numbers
      * complex or real. Since this specialization of the general template is
      * selected for complex types, the answer is <code>true</code>.
      */
-    static const bool is_complex = true;
+    static constexpr bool is_complex = true;
 
     /**
      * For this data type, alias the corresponding real type. Since this
@@ -428,7 +429,7 @@ namespace numbers
     /**
      * Return the complex-conjugate of the given number.
      */
-    static std::complex<number>
+    static constexpr std::complex<number>
     conjugate(const std::complex<number> &x);
 
     /**
@@ -437,7 +438,7 @@ namespace numbers
      * std::complex, this function returns the product of a number and its
      * complex conjugate.
      */
-    static real_type
+    static constexpr real_type
     abs_square(const std::complex<number> &x);
 
 
@@ -495,8 +496,8 @@ namespace numbers
 
 
   template <typename number>
-  DEAL_II_CUDA_HOST_DEV const number &
-                              NumberTraits<number>::conjugate(const number &x)
+  constexpr DEAL_II_CUDA_HOST_DEV const number &
+                                        NumberTraits<number>::conjugate(const number &x)
   {
     return x;
   }
@@ -505,7 +506,7 @@ namespace numbers
 
   template <typename number>
   template <typename Dummy>
-  DEAL_II_CUDA_HOST_DEV
+  constexpr DEAL_II_CUDA_HOST_DEV
     typename std::enable_if<std::is_same<Dummy, number>::value &&
                               is_cuda_compatible<Dummy>::value,
                             typename NumberTraits<number>::real_type>::type
@@ -518,10 +519,11 @@ namespace numbers
 
   template <typename number>
   template <typename Dummy>
-  typename std::enable_if<std::is_same<Dummy, number>::value &&
-                            !is_cuda_compatible<Dummy>::value,
-                          typename NumberTraits<number>::real_type>::type
-  NumberTraits<number>::abs_square(const number &x)
+  constexpr
+    typename std::enable_if<std::is_same<Dummy, number>::value &&
+                              !is_cuda_compatible<Dummy>::value,
+                            typename NumberTraits<number>::real_type>::type
+    NumberTraits<number>::abs_square(const number &x)
   {
     return x * x;
   }
@@ -538,7 +540,7 @@ namespace numbers
 
 
   template <typename number>
-  std::complex<number>
+  constexpr std::complex<number>
   NumberTraits<std::complex<number>>::conjugate(const std::complex<number> &x)
   {
     return std::conj(x);
@@ -556,7 +558,7 @@ namespace numbers
 
 
   template <typename number>
-  typename NumberTraits<std::complex<number>>::real_type
+  constexpr typename NumberTraits<std::complex<number>>::real_type
   NumberTraits<std::complex<number>>::abs_square(const std::complex<number> &x)
   {
     return std::norm(x);
@@ -632,8 +634,8 @@ namespace internal
   template <typename T>
   struct NumberType
   {
-    static DEAL_II_CUDA_HOST_DEV const T &
-                                       value(const T &t)
+    static constexpr DEAL_II_CUDA_HOST_DEV const T &
+                                                 value(const T &t)
     {
       return t;
     }
@@ -647,9 +649,9 @@ namespace internal
 
     // Type T is constructible from F.
     template <typename F>
-    static DEAL_II_CUDA_HOST_DEV T
-                                 value(const F &f,
-                                       typename std::enable_if<
+    static constexpr DEAL_II_CUDA_HOST_DEV T
+                                           value(const F &f,
+                                                 typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
                           typename std::decay<F>::type>::value &&
             std::is_constructible<T, F>::value>::type * = nullptr)
@@ -659,7 +661,7 @@ namespace internal
 
     // Type T is explicitly convertible (but not constructible) from F.
     template <typename F>
-    static T
+    static constexpr T
     value(const F &f,
           typename std::enable_if<
             !std::is_same<typename std::decay<T>::type,
@@ -691,13 +693,13 @@ namespace internal
   template <typename T>
   struct NumberType<std::complex<T>>
   {
-    static const std::complex<T> &
+    static constexpr const std::complex<T> &
     value(const std::complex<T> &t)
     {
       return t;
     }
 
-    static std::complex<T>
+    static constexpr std::complex<T>
     value(const T &t)
     {
       return std::complex<T>(t);
@@ -705,7 +707,7 @@ namespace internal
 
     // Facilitate cast from complex<double> to complex<float>
     template <typename U>
-    static std::complex<T>
+    static constexpr std::complex<T>
     value(const std::complex<U> &t)
     {
       return std::complex<T>(NumberType<T>::value(t.real()),
