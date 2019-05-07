@@ -477,9 +477,8 @@ namespace step62
           }
       }
 
-    return std::complex<double>(1,
-                                std::max(calculated_pml_x_coeff,
-                                         calculated_pml_y_coeff));
+    return 1 + std::max(calculated_pml_x_coeff, calculated_pml_y_coeff) *
+                 std::complex<double>(0, 1);
   }
 
 
@@ -665,14 +664,12 @@ namespace step62
     , dimension_y(data.get_attribute<double>("dimension_y"))
     , nb_probe_points(data.get_attribute<int>("nb_probe_points"))
     , grid_level(data.get_attribute<int>("grid_level"))
-    , probe_start_point(
-        Point<dim>(data.get_attribute<double>("probe_pos_x"),
-                   data.get_attribute<double>("probe_pos_y") -
-                     data.get_attribute<double>("probe_width_y") / 2))
-    , probe_stop_point(
-        Point<dim>(data.get_attribute<double>("probe_pos_x"),
-                   data.get_attribute<double>("probe_pos_y") +
-                     data.get_attribute<double>("probe_width_y") / 2))
+    , probe_start_point(data.get_attribute<double>("probe_pos_x"),
+                        data.get_attribute<double>("probe_pos_y") -
+                          data.get_attribute<double>("probe_width_y") / 2)
+    , probe_stop_point(data.get_attribute<double>("probe_pos_x"),
+                       data.get_attribute<double>("probe_pos_y") +
+                         data.get_attribute<double>("probe_width_y") / 2)
     , right_hand_side(data)
     , pml(data)
     , rho(data)
@@ -822,179 +819,158 @@ namespace step62
     const FEValuesExtractors::Vector displacement(0);
 
     for (const auto &cell : dof_handler.active_cell_iterators())
-      {
-        if (cell->is_locally_owned())
-          {
-            cell_matrix = 0;
-            cell_rhs    = 0;
+      if (cell->is_locally_owned())
+        {
+          cell_matrix = 0;
+          cell_rhs    = 0;
 
-            // We have to calculate the values of the right hand side, rho and
-            // the PML only if we are going to calculate the mass and the
-            // stiffness matrices. Otherwise we can skip this calculation which
-            // considerably reduces the total calculation time.
-            if (calculate_quadrature_data)
-              {
-                fe_values.reinit(cell);
+          // We have to calculate the values of the right hand side, rho and
+          // the PML only if we are going to calculate the mass and the
+          // stiffness matrices. Otherwise we can skip this calculation which
+          // considerably reduces the total calculation time.
+          if (calculate_quadrature_data)
+            {
+              fe_values.reinit(cell);
 
-                parameters.right_hand_side.vector_value_list(
-                  fe_values.get_quadrature_points(), rhs_values);
-                parameters.rho.value_list(fe_values.get_quadrature_points(),
-                                          rho_values);
-                parameters.pml.vector_value_list(
-                  fe_values.get_quadrature_points(), pml_values);
-              }
+              parameters.right_hand_side.vector_value_list(
+                fe_values.get_quadrature_points(), rhs_values);
+              parameters.rho.value_list(fe_values.get_quadrature_points(),
+                                        rho_values);
+              parameters.pml.vector_value_list(
+                fe_values.get_quadrature_points(), pml_values);
+            }
 
-            // We have done this in step-18. Get a pointer to the quadrature
-            // cache data local to the present cell, and, as a defensive
-            // measure, make sure that this pointer is within the bounds of the
-            // global array:
-            QuadratureCache<dim> *local_quadrature_points_data =
-              reinterpret_cast<QuadratureCache<dim> *>(cell->user_pointer());
-            Assert(local_quadrature_points_data >= &quadrature_cache.front(),
-                   ExcInternalError());
-            Assert(local_quadrature_points_data <= &quadrature_cache.back(),
-                   ExcInternalError());
-            for (unsigned int q = 0; q < n_q_points; ++q)
-              {
-                // The quadrature_data variable is used to store the mass and
-                // stiffness matrices, the right hand side vector and the value
-                // of `JxW`.
-                QuadratureCache<dim> &quadrature_data =
-                  local_quadrature_points_data[q];
+          // We have done this in step-18. Get a pointer to the quadrature
+          // cache data local to the present cell, and, as a defensive
+          // measure, make sure that this pointer is within the bounds of the
+          // global array:
+          QuadratureCache<dim> *local_quadrature_points_data =
+            reinterpret_cast<QuadratureCache<dim> *>(cell->user_pointer());
+          Assert(local_quadrature_points_data >= &quadrature_cache.front(),
+                 ExcInternalError());
+          Assert(local_quadrature_points_data <= &quadrature_cache.back(),
+                 ExcInternalError());
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              // The quadrature_data variable is used to store the mass and
+              // stiffness matrices, the right hand side vector and the value
+              // of `JxW`.
+              QuadratureCache<dim> &quadrature_data =
+                local_quadrature_points_data[q];
 
-                // Below we declare the force vector and the parameters of the
-                // PML $s$ and $\xi$.
-                Tensor<1, dim>                       force;
-                Tensor<1, dim, std::complex<double>> s;
-                std::complex<double>                 xi(1, 0);
+              // Below we declare the force vector and the parameters of the
+              // PML $s$ and $\xi$.
+              Tensor<1, dim>                       force;
+              Tensor<1, dim, std::complex<double>> s;
+              std::complex<double>                 xi(1, 0);
 
-                // The following block is calculated only in the first frequency
-                // step.
-                if (calculate_quadrature_data)
-                  {
-                    // Store the value of `JxW`.
-                    quadrature_data.JxW = fe_values.JxW(q);
+              // The following block is calculated only in the first frequency
+              // step.
+              if (calculate_quadrature_data)
+                {
+                  // Store the value of `JxW`.
+                  quadrature_data.JxW = fe_values.JxW(q);
 
-                    for (unsigned int component = 0; component < dim;
-                         ++component)
-                      {
-                        // Convert vectors to tensors and calculate xi
-                        force[component] = rhs_values[q][component];
-                        s[component]     = pml_values[q][component];
-                        xi *= s[component];
-                      }
-                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                      {
-                        const Tensor<1, dim> phi_i =
-                          fe_values[displacement].value(i, q);
-                        const Tensor<2, dim> grad_phi_i =
-                          fe_values[displacement].gradient(i, q);
+                  for (unsigned int component = 0; component < dim; ++component)
+                    {
+                      // Convert vectors to tensors and calculate xi
+                      force[component] = rhs_values[q][component];
+                      s[component]     = pml_values[q][component];
+                      xi *= s[component];
+                    }
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    {
+                      const Tensor<1, dim> phi_i =
+                        fe_values[displacement].value(i, q);
+                      const Tensor<2, dim> grad_phi_i =
+                        fe_values[displacement].gradient(i, q);
 
-                        for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                          {
-                            const Tensor<1, dim> phi_j =
-                              fe_values[displacement].value(j, q);
-                            const Tensor<2, dim> grad_phi_j =
-                              fe_values[displacement].gradient(j, q);
+                      for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                        {
+                          const Tensor<1, dim> phi_j =
+                            fe_values[displacement].value(j, q);
+                          const Tensor<2, dim> grad_phi_j =
+                            fe_values[displacement].gradient(j, q);
 
-                            // calculate the values of the mass matrix.
-                            quadrature_data.mass_coefficient[i][j] =
-                              rho_values[q] * xi * phi_i * phi_j;
+                          // calculate the values of the mass matrix.
+                          quadrature_data.mass_coefficient[i][j] =
+                            rho_values[q] * xi * phi_i * phi_j;
 
-                            // Loop over the $mnkl$ indices of the stiffness
-                            // tensor.
-                            std::complex<double> stiffness_coefficient = 0;
-                            for (unsigned int m = 0; m < dim; ++m)
-                              {
-                                for (unsigned int n = 0; n < dim; ++n)
+                          // Loop over the $mnkl$ indices of the stiffness
+                          // tensor.
+                          std::complex<double> stiffness_coefficient = 0;
+                          for (unsigned int m = 0; m < dim; ++m)
+                            for (unsigned int n = 0; n < dim; ++n)
+                              for (unsigned int k = 0; k < dim; ++k)
+                                for (unsigned int l = 0; l < dim; ++l)
                                   {
-                                    for (unsigned int k = 0; k < dim; ++k)
-                                      {
-                                        for (unsigned int l = 0; l < dim; ++l)
-                                          {
-                                            // Here we calculate the tensors
-                                            // $\alpha_{mnkl}$ and
-                                            // $\beta_{mnkl}$
-                                            const std::complex<double> alpha =
-                                              xi *
-                                              stiffness_tensor[m][n][k][l] /
-                                              (2.0 * s[n] * s[k]);
-                                            const std::complex<double> beta =
-                                              xi *
-                                              stiffness_tensor[m][n][k][l] /
-                                              (2.0 * s[n] * s[l]);
+                                    // Here we calculate the tensors
+                                    // $\alpha_{mnkl}$ and $\beta_{mnkl}$
+                                    const std::complex<double> alpha =
+                                      xi * stiffness_tensor[m][n][k][l] /
+                                      (2.0 * s[n] * s[k]);
+                                    const std::complex<double> beta =
+                                      xi * stiffness_tensor[m][n][k][l] /
+                                      (2.0 * s[n] * s[l]);
 
-                                            // Here we calculate the stiffness
-                                            // matrix. Note that the stiffness
-                                            // matrix is not symmetric because
-                                            // of the PMLs. We use the gradient
-                                            // function (see the
-                                            // [documentation](https://www.dealii.org/current/doxygen/deal.II/group__vector__valued.html))
-                                            // which is a
-                                            // <code>Tensor@<2,dim@></code>.
-                                            // The matrix $G_{ij}$
-                                            // consists of entries
-                                            // @f[
-                                            // G_{ij}=
-                                            // \frac{\partial\phi_i}{\partial
-                                            // x_j}
-                                            // =\partial_j \phi_i
-                                            // @f]
-                                            // Note the position of the indices
-                                            // $i$ and $j$ and the notation that
-                                            // we use in this tutorial:
-                                            // $\partial_j\phi_i$. As the
-                                            // stiffness tensor is not
-                                            // symmetric, it is very easy to
-                                            // make a mistake.
-                                            stiffness_coefficient +=
-                                              grad_phi_i[m][n] *
-                                              (alpha * grad_phi_j[l][k] +
-                                               beta * grad_phi_j[k][l]);
-                                          }
-                                      }
+                                    // Here we calculate the stiffness matrix.
+                                    // Note that the stiffness matrix is not
+                                    // symmetric because of the PMLs. We use the
+                                    // gradient function (see the
+                                    // [documentation](https://www.dealii.org/current/doxygen/deal.II/group__vector__valued.html))
+                                    // which is a <code>Tensor@<2,dim@></code>.
+                                    // The matrix $G_{ij}$ consists of entries
+                                    // @f[
+                                    // G_{ij}=
+                                    // \frac{\partial\phi_i}{\partial x_j}
+                                    // =\partial_j \phi_i
+                                    // @f]
+                                    // Note the position of the indices $i$ and
+                                    // $j$ and the notation that we use in this
+                                    // tutorial: $\partial_j\phi_i$. As the
+                                    // stiffness tensor is not symmetric, it is
+                                    // very easy to make a mistake.
+                                    stiffness_coefficient +=
+                                      grad_phi_i[m][n] *
+                                      (alpha * grad_phi_j[l][k] +
+                                       beta * grad_phi_j[k][l]);
                                   }
-                              }
 
-                            // We save the value of the stiffness matrix in
-                            // quadrature_data
-                            quadrature_data.stiffness_coefficient[i][j] =
-                              stiffness_coefficient;
-                          }
+                          // We save the value of the stiffness matrix in
+                          // quadrature_data
+                          quadrature_data.stiffness_coefficient[i][j] =
+                            stiffness_coefficient;
+                        }
 
-                        // and the value of the right hand side in
-                        // quadrature_data.
-                        quadrature_data.right_hand_side[i] =
-                          phi_i * force * fe_values.JxW(q);
-                      }
-                  }
+                      // and the value of the right hand side in
+                      // quadrature_data.
+                      quadrature_data.right_hand_side[i] =
+                        phi_i * force * fe_values.JxW(q);
+                    }
+                }
 
-                // We loop again over the degrees of freedom of the cells to
-                // calculate the system matrix. These loops are really quick
-                // because we have already calculated the stiffness and mass
-                // matrices, only the value of $\omega$ changes.
-                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              // We loop again over the degrees of freedom of the cells to
+              // calculate the system matrix. These loops are really quick
+              // because we have already calculated the stiffness and mass
+              // matrices, only the value of $\omega$ changes.
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
                   {
-                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                      {
-                        std::complex<double> matrix_sum = 0;
-                        matrix_sum += -std::pow(omega, 2) *
-                                      quadrature_data.mass_coefficient[i][j];
-                        matrix_sum +=
-                          quadrature_data.stiffness_coefficient[i][j];
-                        cell_matrix(i, j) += matrix_sum * quadrature_data.JxW;
-                      }
-                    cell_rhs(i) += quadrature_data.right_hand_side[i];
+                    std::complex<double> matrix_sum = 0;
+                    matrix_sum += -std::pow(omega, 2) *
+                                  quadrature_data.mass_coefficient[i][j];
+                    matrix_sum += quadrature_data.stiffness_coefficient[i][j];
+                    cell_matrix(i, j) += matrix_sum * quadrature_data.JxW;
                   }
-              }
-            cell->get_dof_indices(local_dof_indices);
-            constraints.distribute_local_to_global(cell_matrix,
-                                                   cell_rhs,
-                                                   local_dof_indices,
-                                                   system_matrix,
-                                                   system_rhs);
-          }
-      }
+              cell_rhs(i) += quadrature_data.right_hand_side[i];
+            }
+          cell->get_dof_indices(local_dof_indices);
+          constraints.distribute_local_to_global(cell_matrix,
+                                                 cell_rhs,
+                                                 local_dof_indices,
+                                                 system_matrix,
+                                                 system_rhs);
+        }
 
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
@@ -1251,10 +1227,7 @@ namespace step62
                               quadrature_formula.size(),
                             QuadratureCache<dim>(fe.dofs_per_cell));
     unsigned int cache_index = 0;
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           cell->set_user_pointer(&quadrature_cache[cache_index]);
