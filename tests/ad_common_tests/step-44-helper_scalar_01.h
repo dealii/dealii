@@ -186,7 +186,6 @@ namespace Step44
     {
       std::string type_lin;
       double      tol_lin;
-      double      max_iterations_lin;
       bool        use_static_condensation;
       std::string preconditioner_type;
       double      preconditioner_relaxation;
@@ -208,11 +207,6 @@ namespace Step44
                           "1e-6",
                           Patterns::Double(0.0),
                           "Linear solver residual (scaled by residual norm)");
-        prm.declare_entry(
-          "Max iteration multiplier",
-          "1",
-          Patterns::Double(0.0),
-          "Linear solver iterations (multiples of the system matrix size)");
         prm.declare_entry("Use static condensation",
                           "true",
                           Patterns::Bool(),
@@ -235,7 +229,6 @@ namespace Step44
       {
         type_lin                  = prm.get("Solver type");
         tol_lin                   = prm.get_double("Residual");
-        max_iterations_lin        = prm.get_double("Max iteration multiplier");
         use_static_condensation   = prm.get_bool("Use static condensation");
         preconditioner_type       = prm.get("Preconditioner type");
         preconditioner_relaxation = prm.get_double("Preconditioner relaxation");
@@ -2107,8 +2100,8 @@ namespace Step44
           std::cout << " SLV " << std::flush;
           if (parameters.type_lin == "CG")
             {
-              const int solver_its = tangent_matrix.block(u_dof, u_dof).m() *
-                                     parameters.max_iterations_lin;
+              const unsigned int solver_its =
+                tangent_matrix.block(u_dof, u_dof).m();
               const double tol_sol =
                 parameters.tol_lin * system_rhs.block(u_dof).l2_norm();
               SolverControl solver_control(solver_its, tol_sol, false, false);
@@ -2189,8 +2182,7 @@ namespace Step44
             preconditioner_K_Jp_inv.use_matrix(
               tangent_matrix.block(J_dof, p_dof));
             ReductionControl solver_control_K_Jp_inv(
-              tangent_matrix.block(J_dof, p_dof).m() *
-                parameters.max_iterations_lin,
+              tangent_matrix.block(J_dof, p_dof).m(),
               1.0e-30,
               parameters.tol_lin);
             SolverSelector<Vector<double>> solver_K_Jp_inv;
@@ -2208,8 +2200,7 @@ namespace Step44
             preconditioner_K_con_inv.use_matrix(
               tangent_matrix.block(u_dof, u_dof));
             ReductionControl solver_control_K_con_inv(
-              tangent_matrix.block(u_dof, u_dof).m() *
-                parameters.max_iterations_lin,
+              tangent_matrix.block(u_dof, u_dof).m(),
               1.0e-30,
               parameters.tol_lin);
             SolverSelector<Vector<double>> solver_K_con_inv;

@@ -41,8 +41,8 @@ test_tensor()
             << "Type code: " << static_cast<int>(ad_type_code) << std::endl;
 
   const ADNumberType                 a = 1.0;
-  const Tensor<1, dim, ADNumberType> v1;
-  const Tensor<1, dim, ADNumberType> v2;
+  const Tensor<1, dim, ADNumberType> v1{};
+  const Tensor<1, dim, ADNumberType> v2{};
   const Tensor<2, dim, ADNumberType> A(
     unit_symmetric_tensor<dim, ADNumberType>());
   const Tensor<2, dim, ADNumberType> B(
