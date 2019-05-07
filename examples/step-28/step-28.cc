@@ -1570,7 +1570,9 @@ namespace Step28
     boost::io::ios_flags_saver restore_flags(std::cout);
     std::cout << std::setprecision(12) << std::fixed;
 
-    double k_eff_old = k_eff;
+    // We calculate the error below by the change in k_eff (i.e., the
+    // difference between k_eff_old,
+    double k_eff_old = 0.0;
 
     for (unsigned int cycle = 0; cycle < parameters.n_refinement_cycles;
          ++cycle)
