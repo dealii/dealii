@@ -930,7 +930,7 @@ namespace internal
   namespace ComplexWorkaround
   {
     template <typename Number, typename OtherNumber>
-    constexpr DEAL_II_CUDA_HOST_DEV void
+    DEAL_II_CUDA_HOST_DEV void
     multiply_assign_scalar(Number &val, const OtherNumber &s)
     {
       val *= s;
@@ -938,7 +938,7 @@ namespace internal
 
 #ifdef __CUDA_ARCH__
     template <typename Number, typename OtherNumber>
-    constexpr DEAL_II_CUDA_HOST_DEV void
+    DEAL_II_CUDA_HOST_DEV void
     multiply_assign_scalar(std::complex<Number> &, const OtherNumber &)
     {
       printf("This function is not implemented for std::complex<Number>!\n");
