@@ -96,13 +96,22 @@ boundary condition will yield partial reflections, i.e. only parts of the wave
 will pass through the boundary as if it wasn't here whereas the remaining
 fraction of the wave will be reflected back into the domain.
 
-If we are willing to accept this as a sufficient approximation to an absorbing boundary we finally arrive at the following problem for $u$:
+If we are willing to accept this as a sufficient approximation to an absorbing
+boundary we finally arrive at the following problem for $u$:
 @f{eqnarray*}
 -\omega^2 u - c^2\Delta u &=& 0, \qquad x\in\Omega,\\
 c (n\cdot\nabla u) + i\,\omega\,u &=&0, \qquad x\in\Gamma_2,\\
 u &=& 1,  \qquad x\in\Gamma_1.
 @f}
-This is a Helmholtz equation (similar to the one in step-7, but this time with ''the bad sign'') with Dirichlet data on $\Gamma_1$ and mixed boundary conditions on $\Gamma_2$. Because of the condition on $\Gamma_2$, we cannot just treat the equations for real and imaginary parts of $u$ separately. What we can do however is to view the PDE for $u$ as a system of two PDEs for the real and imaginary parts of $u$, with the boundary condition on $\Gamma_2$ representing the coupling terms between the two components of the system. This works along the following lines: Let $v=\textrm{Re}\;u,\; w=\textrm{Im}\;u$, then in terms of $v$ and $w$ we have the following system:
+This is a Helmholtz equation (similar to the one in step-7, but this time with
+''the bad sign'') with Dirichlet data on $\Gamma_1$ and mixed boundary
+conditions on $\Gamma_2$. Because of the condition on $\Gamma_2$, we cannot just
+treat the equations for real and imaginary parts of $u$ separately. What we can
+do however is to view the PDE for $u$ as a system of two PDEs for the real and
+imaginary parts of $u$, with the boundary condition on $\Gamma_2$ representing
+the coupling terms between the two components of the system. This works along
+the following lines: Let $v=\textrm{Re}\;u,\; w=\textrm{Im}\;u$, then in terms
+of $v$ and $w$ we have the following system:
 @f{eqnarray*}
   \left.\begin{array}{ccc}
     -\omega^2 v - c^2\Delta v &=& 0 \quad\\
@@ -120,13 +129,20 @@ This is a Helmholtz equation (similar to the one in step-7, but this time with '
   \end{array}\right\} &\;& x\in\Gamma_1.
 @f}
 
-For test functions $\phi,\psi$ with $\phi|_{\Gamma_1}=\psi|_{\Gamma_1}=0$, after the usual multiplication, integration over $\Omega$ and applying integration by parts, we get the weak formulation
+For test functions $\phi,\psi$ with $\phi|_{\Gamma_1}=\psi|_{\Gamma_1}=0$, after
+the usual multiplication, integration over $\Omega$ and applying integration by
+parts, we get the weak formulation
 @f{eqnarray*}
--\omega^2 \langle \phi, v \rangle_{\mathrm{L}^2(\Omega)} + c^2 \langle \nabla \phi, \nabla v \rangle_{\mathrm{L}^2(\Omega)} - c \omega \langle \phi, w \rangle_{\mathrm{L}^2(\Gamma_2)} &=& 0, \\
--\omega^2 \langle \psi, w \rangle_{\mathrm{L}^2(\Omega)} + c^2 \langle \nabla \psi, \nabla w \rangle_{\mathrm{L}^2(\Omega)} + c \omega \langle \psi, v \rangle_{\mathrm{L}^2(\Gamma_2)} &=& 0.
+-\omega^2 \langle \phi, v \rangle_{\mathrm{L}^2(\Omega)}
++ c^2 \langle \nabla \phi, \nabla v \rangle_{\mathrm{L}^2(\Omega)}
+- c \omega \langle \phi, w \rangle_{\mathrm{L}^2(\Gamma_2)} &=& 0, \\
+-\omega^2 \langle \psi, w \rangle_{\mathrm{L}^2(\Omega)}
++ c^2 \langle \nabla \psi, \nabla w \rangle_{\mathrm{L}^2(\Omega)}
++ c \omega \langle \psi, v \rangle_{\mathrm{L}^2(\Gamma_2)} &=& 0.
 @f}
 
-We choose finite element spaces $V_h$ and $W_h$ with bases $\{\phi_j\}_{j=1}^n, \{\psi_j\}_{j=1}^n$ and look for approximate solutions
+We choose finite element spaces $V_h$ and $W_h$ with bases $\{\phi_j\}_{j=1}^n,
+\{\psi_j\}_{j=1}^n$ and look for approximate solutions
 @f[
 v_h = \sum_{j=1}^n \alpha_j \phi_j, \;\; w_h = \sum_{j=1}^n \beta_j \psi_j.
 @f]
@@ -134,8 +150,25 @@ Plugging into the variational form yields the equation system
 @f[
 \renewcommand{\arraystretch}{2.0}
 \left.\begin{array}{ccc}
-\sum_{j=1}^n \left(-\omega^2 \langle \phi_i, \phi_j \rangle_{\mathrm{L}^2(\Omega)} +c^2 \langle \nabla \phi_i, \nabla \phi_j \rangle_{\mathrm{L}^2(\Omega)}\right)\alpha_j - \left(c\omega \langle \phi_i,\psi_j\rangle_{\mathrm{L}^2(\Gamma_2)}\right)\beta_j &=& 0 \\
-\sum_{j=1}^n \left(-\omega^2 \langle \psi_i, \psi_j \rangle_{\mathrm{L}^2(\Omega)} +c^2 \langle \nabla \psi_i, \nabla \psi_j \rangle_{\mathrm{L}^2(\Omega)}\right)\beta_j + \left(c\omega \langle \psi_i,\phi_j\rangle_{\mathrm{L}^2(\Gamma_2)}\right)\alpha_j &=& 0
+\sum_{j=1}^n
+\left(
+-\omega^2 \langle \phi_i, \phi_j \rangle_{\mathrm{L}^2(\Omega)}
++ c^2 \langle \nabla \phi_i, \nabla \phi_j \rangle_{\mathrm{L}^2(\Omega)}
+\right)
+\alpha_j
+- \left(
+c\omega \langle \phi_i,\psi_j\rangle_{\mathrm{L}^2(\Gamma_2)}\right)\beta_j
+&=& 0 \\
+\sum_{j=1}^n
+\left(
+-\omega^2 \langle \psi_i, \psi_j \rangle_{\mathrm{L}^2(\Omega)}
++ c^2 \langle \nabla \psi_i, \nabla \psi_j \rangle_{\mathrm{L}^2(\Omega)}
+\right)\beta_j
++ \left(
+c\omega \langle
+\psi_i,\phi_j\rangle_{\mathrm{L}^2(\Gamma_2)}
+\right)\alpha_j
+&=& 0
 \end{array}\right\}\;\;\forall\; i =1,\ldots,n.
 @f]
 In matrix notation:
@@ -143,8 +176,12 @@ In matrix notation:
 \renewcommand{\arraystretch}{2.0}
 \left(
 \begin{array}{cc}
--\omega^2 \langle \phi_i, \phi_j \rangle_{\mathrm{L}^2(\Omega)} + c^2 \langle \nabla \phi_i, \nabla \phi_j \rangle_{\mathrm{L}^2(\Omega)} & -c\omega \langle \phi_i,\psi_j\rangle_{\mathrm{L}^2(\Gamma_2)} \\
-c\omega \langle \psi_i,\phi_j\rangle_{\mathrm{L}^2(\Gamma_2)} & -\omega^2 \langle \psi_{i}, \psi_j \rangle_{\mathrm{L}^2(\Omega)} + c^2 \langle \nabla \psi_{i}, \nabla \psi_j  \rangle_{\mathrm{L}^2(\Omega)}
+-\omega^2 \langle \phi_i, \phi_j \rangle_{\mathrm{L}^2(\Omega)}
++ c^2 \langle \nabla \phi_i, \nabla \phi_j \rangle_{\mathrm{L}^2(\Omega)}
+& -c\omega \langle \phi_i,\psi_j\rangle_{\mathrm{L}^2(\Gamma_2)} \\
+c\omega \langle \psi_i,\phi_j\rangle_{\mathrm{L}^2(\Gamma_2)}
+& -\omega^2 \langle \psi_{i}, \psi_j \rangle_{\mathrm{L}^2(\Omega)}
++ c^2 \langle \nabla \psi_{i}, \nabla \psi_j  \rangle_{\mathrm{L}^2(\Omega)}
 \end{array}
 \right)
 \left(
