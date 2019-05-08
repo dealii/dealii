@@ -43,33 +43,39 @@ parameters here and therefore stick with their default values.
 Here's the console output of the program in debug mode:
 
 @code
-examples/\step-29> make run
-============================ Running \step-29
-DEAL::Generating grid... done (1.11607s)
+> make run
+[ 66%] Built target step-29
+[100%] Run step-29 with Debug configuration
+DEAL::Generating grid... done (0.832682s)
 DEAL::  Number of active cells:  25600
-DEAL::Setting up system... done (1.10807s)
+DEAL::Setting up system... done (0.614761s)
 DEAL::  Number of degrees of freedom: 51842
-DEAL::Assembling system matrix... done (6.50841s)
-DEAL::Solving linear system... done (2.89218s)
-DEAL::Generating output... done (4.52428s)
+DEAL::Assembling system matrix... done (2.82536s)
+DEAL::Solving linear system... done (2.27971s)
+DEAL::Generating output... done (1.84418s)
+[100%] Built target run
 @endcode
 
 (Of course, execution times will differ if you run the program
 locally.) The fact that most of the time is spent on assembling
-the system matrix and generating output is due to the many assertion
+the system matrix and generating output is due to the many assertions
 that need to be checked in debug mode. In release mode these parts
 of the program run much faster whereas solving the linear system is
 hardly sped up at all:
 
 @code
-============================ Running \step-29
-DEAL::Generating grid... done (0.0280020s)
+> make run
+[ 66%] Built target step-29
+Scanning dependencies of target run
+[100%] Run step-29 with Release configuration
+DEAL::Generating grid... done (0.0144960s)
 DEAL::  Number of active cells:  25600
-DEAL::Setting up system... done (0.112007s)
+DEAL::Setting up system... done (0.0356880s)
 DEAL::  Number of degrees of freedom: 51842
-DEAL::Assembling system matrix... done (0.160010s)
-DEAL::Solving linear system... done (2.21614s)
-DEAL::Generating output... done (0.880055s)
+DEAL::Assembling system matrix... done (0.0436570s)
+DEAL::Solving linear system... done (1.54733s)
+DEAL::Generating output... done (0.720528s)
+[100%] Built target run
 @endcode
 
 The graphical output of the program looks as follows:
@@ -122,29 +128,41 @@ refined and which parts don't. Here are the run times for 5, 6, and 7
 global refinements:
 
 @code
-DEAL::Generating grid... done (0.0320020s)
+> make run
+[ 66%] Built target step-29
+[100%] Run step-29 with Release configuration
+DEAL::Generating grid... done (0.0135260s)
 DEAL::  Number of active cells:  25600
-DEAL::Setting up system... done (0.104006s)
+DEAL::Setting up system... done (0.0213910s)
 DEAL::  Number of degrees of freedom: 51842
-DEAL::Assembling system matrix... done (0.164011s)
-DEAL::Solving linear system... done (2.23214s)
-DEAL::Generating output... done (0.900056s)
+DEAL::Assembling system matrix... done (0.0414300s)
+DEAL::Solving linear system... done (1.56621s)
+DEAL::Generating output... done (0.729605s)
+[100%] Built target run
 
-DEAL::Generating grid... done (0.132009s)
+> make run
+[ 66%] Built target step-29
+[100%] Run step-29 with Release configuration
+DEAL::Generating grid... done (0.0668490s)
 DEAL::  Number of active cells:  102400
-DEAL::Setting up system... done (0.408025s)
+DEAL::Setting up system... done (0.109694s)
 DEAL::  Number of degrees of freedom: 206082
-DEAL::Assembling system matrix... done (0.656041s)
-DEAL::Solving linear system... done (14.8849s)
-DEAL::Generating output... done (3.57222s)
+DEAL::Assembling system matrix... done (0.160784s)
+DEAL::Solving linear system... done (7.86577s)
+DEAL::Generating output... done (2.89320s)
+[100%] Built target run
 
-DEAL::Generating grid... done (0.504031s)
+> make run
+[ 66%] Built target step-29
+[100%] Run step-29 with Release configuration
+DEAL::Generating grid... done (0.293154s)
 DEAL::  Number of active cells:  409600
-DEAL::Setting up system... done (1.72011s)
+DEAL::Setting up system... done (0.491301s)
 DEAL::  Number of degrees of freedom: 821762
-DEAL::Assembling system matrix... done (2.63216s)
-DEAL::Solving linear system... done (117.811s)
-DEAL::Generating output... done (15.1489s)
+DEAL::Assembling system matrix... done (0.605386s)
+DEAL::Solving linear system... done (45.1989s)
+DEAL::Generating output... done (11.2292s)
+[100%] Built target run
 @endcode
 
 Each time we refine the mesh once, so the number of cells and degrees

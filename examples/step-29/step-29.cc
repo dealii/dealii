@@ -20,8 +20,7 @@
 
 // @sect3{Include files}
 
-// The following header files are unchanged from step-7 and have been
-// discussed before:
+// The following header files have all been discussed before:
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -103,38 +102,26 @@ namespace Step29
       : Function<dim>(2)
     {}
 
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  values) const override;
+    virtual void vector_value(const Point<dim> & /*p*/,
+                              Vector<double> &values) const override
+    {
+      Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
+
+      values(0) = 1;
+      values(1) = 0;
+    }
 
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override;
+                      std::vector<Vector<double>> &  value_list) const override
+    {
+      Assert(value_list.size() == points.size(),
+             ExcDimensionMismatch(value_list.size(), points.size()));
+
+      for (unsigned int p = 0; p < points.size(); ++p)
+        DirichletBoundaryValues<dim>::vector_value(points[p], value_list[p]);
+    }
   };
-
-
-  template <int dim>
-  inline void
-  DirichletBoundaryValues<dim>::vector_value(const Point<dim> & /*p*/,
-                                             Vector<double> &values) const
-  {
-    Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
-
-    values(0) = 1;
-    values(1) = 0;
-  }
-
-
-  template <int dim>
-  void DirichletBoundaryValues<dim>::vector_value_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
-  {
-    Assert(value_list.size() == points.size(),
-           ExcDimensionMismatch(value_list.size(), points.size()));
-
-    for (unsigned int p = 0; p < points.size(); ++p)
-      DirichletBoundaryValues<dim>::vector_value(points[p], value_list[p]);
-  }
 
   // @sect3{The <code>ParameterReader</code> class}
 
@@ -377,7 +364,6 @@ namespace Step29
   {
   public:
     UltrasoundProblem(ParameterHandler &);
-    ~UltrasoundProblem();
     void run();
 
   private:
@@ -410,13 +396,6 @@ namespace Step29
     , dof_handler(triangulation)
     , fe(FE_Q<dim>(1), 2)
   {}
-
-
-  template <int dim>
-  UltrasoundProblem<dim>::~UltrasoundProblem()
-  {
-    dof_handler.clear();
-  }
 
   // @sect4{<code>UltrasoundProblem::make_grid</code>}
 
@@ -467,10 +446,7 @@ namespace Step29
     // boundary indicator.
     GridGenerator::subdivided_hyper_cube(triangulation, 5, 0, 1);
 
-    typename Triangulation<dim>::cell_iterator cell = triangulation.begin(),
-                                               endc = triangulation.end();
-
-    for (; cell != endc; ++cell)
+    for (auto &cell : triangulation.cell_iterators())
       for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
            ++face)
         if (cell->face(face)->at_boundary() &&
@@ -582,11 +558,7 @@ namespace Step29
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         // On each cell, we first need to reset the local contribution matrix
         // and request the FEValues object to compute the shape functions for
