@@ -76,8 +76,8 @@ All refinement cases of cells are described by an enumeration
 RefinementPossibilities::Possibilities, and the above anisotropic
 cases are called @p cut_x and @p cut_y for obvious reasons. The
 isotropic refinement case is called @p cut_xy in 2D and can be
-requested from the GeometryInfo class via
-GeometryInfo<2>::isotropic_refinement.
+requested from the RefinementCase class via
+RefinementCase<dim>::isotropic_refinement.
 
 In 3D, there is a third axis which can be split, the z-axis, and thus we
 have an additional refinement case @p cut_z here. Isotropic refinement will now
@@ -112,39 +112,39 @@ we have the isotropic refinement case,
   |     |     |/
   *-----*-----*
 
-     cut_xyz
+  RefinementCase<3>::cut_xyz
 @endcode
 three anisotropic cases which refine only one axis:
 @code
-      *-----*-----*           *-----------*           *-----------*
-     /     /     /|          /           /|          /           /|
-    /     /     / |         *-----------* |         /           / |
-   /     /     /  |        /           /| |        /           /  *
-  *-----*-----*   |       *-----------* | |       *-----------*  /|
-  |     |     |   |       |           | | |       |           | / |
-  |     |     |   *       |           | | *       |           |/  *
-  |     |     |  /        |           | |/        *-----------*  /
-  |     |     | /         |           | *         |           | /
-  |     |     |/          |           |/          |           |/
-  *-----*-----*           *-----------*           *-----------*
+      *-----*-----*             *-----------*             *-----------*
+     /     /     /|            /           /|            /           /|
+    /     /     / |           *-----------* |           /           / |
+   /     /     /  |          /           /| |          /           /  *
+  *-----*-----*   |         *-----------* | |         *-----------*  /|
+  |     |     |   |         |           | | |         |           | / |
+  |     |     |   *         |           | | *         |           |/  *
+  |     |     |  /          |           | |/          *-----------*  /
+  |     |     | /           |           | *           |           | /
+  |     |     |/            |           |/            |           |/
+  *-----*-----*             *-----------*             *-----------*
 
-     cut_x                   cut_y                   cut_z
+  RefinementCase<3>::cut_x  RefinementCase<3>::cut_y  RefinementCase<3>::cut_z
 @endcode
 and three cases which refine two of the three axes:
 @code
-      *-----*-----*           *-----*-----*           *-----------*
-     /     /     /|          /     /     /|          /           /|
-    *-----*-----* |         /     /     / |         *-----------* |
-   /     /     /| |        /     /     /  *        /           /| *
-  *-----*-----* | |       *-----*-----*  /|       *-----------* |/|
-  |     |     | | |       |     |     | / |       |           | * |
-  |     |     | | *       |     |     |/  *       |           |/| *
-  |     |     | |/        *-----*-----*  /        *-----------* |/
-  |     |     | *         |     |     | /         |           | *
-  |     |     |/          |     |     |/          |           |/
-  *-----*-----*           *-----*-----*           *-----------*
+      *-----*-----*             *-----*-----*             *-----------*
+     /     /     /|            /     /     /|            /           /|
+    *-----*-----* |           /     /     / |           *-----------* |
+   /     /     /| |          /     /     /  *          /           /| *
+  *-----*-----* | |         *-----*-----*  /|         *-----------* |/|
+  |     |     | | |         |     |     | / |         |           | * |
+  |     |     | | *         |     |     |/  *         |           |/| *
+  |     |     | |/          *-----*-----*  /          *-----------* |/
+  |     |     | *           |     |     | /           |           | *
+  |     |     |/            |     |     |/            |           |/
+  *-----*-----*             *-----*-----*             *-----------*
 
-     cut_xy                  cut_xz                  cut_yz
+  RefinementCase<3>::cut_xy RefinementCase<3>::cut_xz RefinementCase<3>::cut_yz
 @endcode
 For 1D problems, anisotropic refinement can make no difference, as there is only
 one coordinate direction for a cell, so it is not possible to split it
@@ -245,6 +245,7 @@ FEFaceValues and FESubfaceValues classes. We will also show how to
 write code that works for both isotropic and anisotropic refinement:
 
 <ul>
+
   <li> <em>Finer neighbor</em>: If we are on an active cell and want
   to integrate over a face $f\subset \partial K$, the first
   possibility is that the neighbor behind this face is more refined,
@@ -266,7 +267,7 @@ write code that works for both isotropic and anisotropic refinement:
   actually be a child of our
   neighbor, but perhaps a grandchild or even a farther offspring. Fortunately,
   this complexity is hidden in the internals of the library. All we need to do
-  is call the <code>cell->neighbor_child_on_subface(face_no, subface_no)</code>
+  is call the CellAccessor::neighbor_child_on_subface()
   function. Still, in 3D there are two cases which need special consideration:
   <ul>
     <li> If the neighbor is refined more than once anisotropically, it might be
@@ -283,10 +284,11 @@ write code that works for both isotropic and anisotropic refinement:
    *-------*        *---*---*        *---*---*
 @endcode
      Here the number of subfaces is three. It is important to note the subtle
-  differences between <code>face->n_children()</code> and
-  <code>face->number_of_children()</code>. The first function returns the number of
+  differences between, for a face, TriaAccessor::n_children() and
+  TriaAccessor::number_of_children(). The first function returns the number of
   immediate children, which would be two for the above example, whereas the
-  second returns the number of active offsprings, which is the correct three in
+  second returns the number of active offspring (i.e., including children,
+  grandchildren, and further descendants), which is the correct three in
   the example above. Using <code>face->number_of_children()</code> works for
   isotropic and anisotropic as well as 2D and 3D cases, so it should always be
   used. It should be noted that if any of the cells behind the two
@@ -325,28 +327,26 @@ write code that works for both isotropic and anisotropic refinement:
   large cell.
   </ul>
 
-  However, it is comfortable to know, that
-  <code>cell->neighbor_child_on_subface(face_no,subface_no)</code> takes care of
+  However, fortunately, CellAccessor::neighbor_child_on_subface() takes care of
   these situations by itself, if you loop over the correct number of subfaces,
   in the above example this is two. The FESubfaceValues<dim>::reinit function
   takes care of this too, so that the resulting state is always correct. There
-  is one little aspect, however: For reiniting the neighbors FEFaceValues object
+  is one little caveat, however: For reiniting the neighbors FEFaceValues object
   you need to know the index of the face that points toward the current
   cell. Usually you assume that the neighbor you get directly is as coarse or as
-  fine as you, if it has children, thus this information can be obtained by the
-  <code>cell->neighbor_of_neighbor(face_no)</code> function. If the neighbor is
-  coarser, however, you would have to use
-  <code>cell->neighbor_of_coarser_neighbor(face_no).first</code> instead. In order
-  to make this easy for you, there is the new
-  <code>cell->neighbor_face_no(face_no)</code> function which does the correct thing
-  for you and returns the desired result.
+  fine as you, if it has children, thus this information can be obtained with
+  CellAccessor::neighbor_of_neighbor(). If the neighbor is coarser, however, you
+  would have to use the first value in CellAccessor::neighbor_of_coarser_neighbor()
+  instead. In order to make this easy for you, there is
+  CellAccessor::neighbor_face_no() which does the correct thing for you and
+  returns the desired result.
 
   <li> <em>Neighbor is as fine as our cell</em>: After we ruled out all cases in
   which there are finer children, we only need to decide, whether the neighbor
   is coarser here. For this, there is the
-  <code>cell->coarser_neighbor(face_no)</code> function returning a bool value. In
+  CellAccessor::neighbor_is_coarser() function which returns a boolean. In
   order to get the relevant case of a neighbor of the same coarseness we would
-  use <code>else if (!cell->coarser_neighbor(face_no))</code>. The code inside this
+  use <code>else if (!cell->neighbor_is_coarser(face_no))</code>. The code inside this
   block can be left untouched. However, there is one thing to mention here: If
   we want to use a rule, which cell should assemble certain terms on a given
   face we might think of the rule presented in step-12. We know that we have to
@@ -360,9 +360,9 @@ write code that works for both isotropic and anisotropic refinement:
   implementation below.
 
   <li> <em>Coarser neighbor</em>: The remaining case is obvious: If there are no
-  refined neighbors and the neighbor is not as fine as the current cell, then it needs
-  to be coarser. Thus we can leave the old condition phrase, simply using
-  <code>else</code>. The <code>cell->neighbor_of_coarser_neighbor(face_no)</code>
+  refined neighbors and the neighbor is not as fine as the current cell, then it must
+  be coarser. Thus we can leave the old condition phrase, simply using
+  <code>else</code>. The CellAccessor::neighbor_of_coarser_neighbor()
   function takes care of all the complexity of anisotropic refinement combined
   with possible non standard face orientation, flip and rotation on general 3D meshes.
 
