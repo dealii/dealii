@@ -390,7 +390,7 @@ On cell $K$,
 the numerical velocity $ \mathbf{u}_h = -\mathbf{K} \nabla_{w,d}p_h$ can be written as
 @f{align*}{
   \mathbf{u}_h 
-  &= -\mathbf{K} \nabla_{w,d} p 
+  &= -\mathbf{K} \nabla_{w,d} p_h 
    = -\mathbf{K}\sum_{i} \sum_{j} P_i C^K_{ij}\mathbf{v}_j,
 @f}
 where $C^K$ is the expansion matrix from above, and
@@ -440,7 +440,7 @@ Then the elementwise velocity is
 \sum_{k}- \left(\sum_{j} \sum_{i} P_ic_{ij}d_{jk} \right)\mathbf{v}_k,
 @f}
 where $-\sum_{j} \sum_{i} P_ic_{ij}d_{jk}$ is called 
-<code>beta</code> in the code.
+`cell_velocity` in the code.
 
 Using this velocity obtained by "postprocessing" the solution, we can
 define the $L_2$-errors of pressure, velocity, and flux 

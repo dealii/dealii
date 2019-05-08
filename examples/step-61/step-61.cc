@@ -94,10 +94,10 @@ namespace Step61
 
     Triangulation<dim> triangulation;
 
-    AffineConstraints<double> constraints;
-
     FESystem<dim>   fe;
     DoFHandler<dim> dof_handler;
+
+    AffineConstraints<double> constraints;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -106,25 +106,24 @@ namespace Step61
     Vector<double> system_rhs;
   };
 
+
+
   // @sect3{Right hand side, boundary values, and exact solution}
 
-  // Next, we define the coefficient matrix $\mathbf{K}$,
-  // Dirichlet boundary conditions, the right-hand side $f = 2\pi^2 \sin(\pi x)
-  // \sin(\pi y)$, and the reference solutions $p = \sin(\pi x) \sin(\pi y) $.
-  //
-  // The coefficient matrix $\mathbf{K}$ is the identity matrix as a test
-  // example.
+  // Next, we define the coefficient matrix $\mathbf{K}$ (here, the
+  // identity matrix), Dirichlet boundary conditions, the right-hand
+  // side $f = 2\pi^2 \sin(\pi x) \sin(\pi y)$, and the exact solution
+  // that corresponds to these choices for $K$ and $f$, namely $p =
+  // \sin(\pi x) \sin(\pi y)$.
   template <int dim>
   class Coefficient : public TensorFunction<2, dim>
   {
   public:
-    Coefficient()
-      : TensorFunction<2, dim>()
-    {}
-
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<Tensor<2, dim>> &values) const override;
   };
+
+
 
   template <int dim>
   void Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
@@ -133,12 +132,10 @@ namespace Step61
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
     for (unsigned int p = 0; p < points.size(); ++p)
-      {
-        values[p].clear();
-        for (unsigned int d = 0; d < dim; ++d)
-          values[p][d][d] = 1;
-      }
+      values[p] = unit_symmetric_tensor<dim>();
   }
+
+
 
   template <int dim>
   class BoundaryValues : public Function<dim>
@@ -152,6 +149,8 @@ namespace Step61
                          const unsigned int component = 0) const override;
   };
 
+
+
   template <int dim>
   double BoundaryValues<dim>::value(const Point<dim> & /*p*/,
                                     const unsigned int /*component*/) const
@@ -159,78 +158,91 @@ namespace Step61
     return 0;
   }
 
+
+
   template <int dim>
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide()
-      : Function<dim>()
-    {}
-
     virtual double value(const Point<dim> & p,
                          const unsigned int component = 0) const override;
   };
+
+
 
   template <int dim>
   double RightHandSide<dim>::value(const Point<dim> &p,
                                    const unsigned int /*component*/) const
   {
-    double return_value = 0.0;
-    return_value        = 2 * M_PI * M_PI * sin(M_PI * p[0]) * sin(M_PI * p[1]);
-    return return_value;
+    return (2 * numbers::PI * numbers::PI * std::sin(numbers::PI * p[0]) *
+            std::sin(numbers::PI * p[1]));
   }
 
+
+
+  // The class that implements the exact pressure solution has an
+  // oddity in that we implement it as a vector-valued one with two
+  // components. (We say that it has two components in the constructor
+  // where we call the constructor of the base Function class.) In the
+  // `value()` function, we do not test for the value of the
+  // `component` argument, which implies that we return the same value
+  // for both components of the vector-valued function. We do this
+  // because we describe the finite element in use in this program as
+  // a vector-valued system that contains the interior and the
+  // interface pressures, and when we compute errors, we will want to
+  // use the same pressure solution to test both of these components.
   template <int dim>
-  class Solution : public Function<dim>
+  class ExactPressure : public Function<dim>
   {
   public:
-    Solution()
-      : Function<dim>(1)
+    ExactPressure()
+      : Function<dim>(2)
     {}
 
-    virtual double value(const Point<dim> &p,
-                         const unsigned int) const override;
+    virtual double value(const Point<dim> & p,
+                         const unsigned int component) const override;
   };
 
+
+
   template <int dim>
-  double Solution<dim>::value(const Point<dim> &p, const unsigned int) const
+  double ExactPressure<dim>::value(const Point<dim> &p,
+                                   const unsigned int /*component*/) const
   {
-    double return_value = 0;
-    return_value        = sin(M_PI * p[0]) * sin(M_PI * p[1]);
-    return return_value;
+    return std::sin(numbers::PI * p[0]) * std::sin(numbers::PI * p[1]);
   }
 
+
+
   template <int dim>
-  class Velocity : public TensorFunction<1, dim>
+  class ExactVelocity : public TensorFunction<1, dim>
   {
   public:
-    Velocity()
-      : TensorFunction<1, dim>()
-    {}
-
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
   };
 
+
+
   template <int dim>
-  Tensor<1, dim> Velocity<dim>::value(const Point<dim> &p) const
+  Tensor<1, dim> ExactVelocity<dim>::value(const Point<dim> &p) const
   {
     Tensor<1, dim> return_value;
-    return_value[0] = -M_PI * cos(M_PI * p[0]) * sin(M_PI * p[1]);
-    return_value[1] = -M_PI * sin(M_PI * p[0]) * cos(M_PI * p[1]);
+    return_value[0] = -numbers::PI * std::cos(numbers::PI * p[0]) *
+                      std::sin(numbers::PI * p[1]);
+    return_value[1] = -numbers::PI * std::sin(numbers::PI * p[0]) *
+                      std::cos(numbers::PI * p[1]);
     return return_value;
   }
+
+
 
   // @sect3{WGDarcyEquation class implementation}
 
   // @sect4{WGDarcyEquation::WGDarcyEquation}
 
   // In this constructor, we create a finite element space for vector valued
-  // functions, <code>FE_RaviartThomas</code>. We will need shape functions in
-  // this space to approximate discrete weak gradients.
-
-  // <code>FESystem</code> defines finite element spaces in the interior and on
-  // edges of elements. Each of them gets an individual component. Others are
-  // the same as previous tutorial programs.
+  // functions, which will here include the ones used for the interior and
+  // interface pressures, $p^\circ$ and $p^\partial$.
   template <int dim>
   WGDarcyEquation<dim>::WGDarcyEquation()
     : fe(FE_DGQ<dim>(0), 1, FE_FaceQ<dim>(0), 1)
@@ -238,15 +250,16 @@ namespace Step61
 
   {}
 
+
+
   // @sect4{WGDarcyEquation::make_grid}
 
   // We generate a mesh on the unit square domain and refine it.
-
   template <int dim>
   void WGDarcyEquation<dim>::make_grid()
   {
     GridGenerator::hyper_cube(triangulation, 0, 1);
-    triangulation.refine_global(1);
+    triangulation.refine_global(2);
 
     std::cout << "   Number of active cells: " << triangulation.n_active_cells()
               << std::endl
@@ -254,11 +267,20 @@ namespace Step61
               << std::endl;
   }
 
+
+
   // @sect4{WGDarcyEquation::setup_system}
 
-  // After we create the mesh, we distribute degrees of freedom for the two
-  // <code>DoFHandler</code> objects.
-
+  // After we have created the mesh above, we distribute degrees of
+  // freedom and resize matrices and vectors. The only piece of
+  // interest in this function is how we interpolate the boundary
+  // values for the pressure. Since the pressure consists of interior
+  // and interface components, we need to make sure that we only
+  // interpolate onto that component of the vector-valued solution
+  // space that corresponds to the interface pressures (as these are
+  // the only ones that are defined on the boundary of the domain). We
+  // do this via a component mask object for only the interface
+  // pressures.
   template <int dim>
   void WGDarcyEquation<dim>::setup_system()
   {
@@ -272,10 +294,14 @@ namespace Step61
 
     {
       constraints.clear();
-      FEValuesExtractors::Scalar face(1);
-      ComponentMask              face_pressure_mask = fe.component_mask(face);
-      VectorTools::interpolate_boundary_values(
-        dof_handler, 0, BoundaryValues<dim>(), constraints, face_pressure_mask);
+      const FEValuesExtractors::Scalar interface_pressure(1);
+      const ComponentMask              interface_pressure_mask =
+        fe.component_mask(interface_pressure);
+      VectorTools::interpolate_boundary_values(dof_handler,
+                                               0,
+                                               BoundaryValues<dim>(),
+                                               constraints,
+                                               interface_pressure_mask);
       constraints.close();
     }
 
@@ -289,138 +315,178 @@ namespace Step61
     sparsity_pattern.copy_from(dsp);
 
     system_matrix.reinit(sparsity_pattern);
-
-    //  solution.reinit(dof_handler.n_dofs());
-    //  system_rhs.reinit(dof_handler.n_dofs());
   }
+
+
 
   // @sect4{WGDarcyEquation::assemble_system}
 
-  // First, we create quadrature points and <code>FEValue</code> objects for
-  // cells and faces. Then we allocate space for all cell matrices and the
-  // right-hand side vector. The following definitions have been explained in
-  // previous tutorials.
+  // This function is more interesting. As detailed in the
+  // introduction, the assembly of the linear system requires us to
+  // evaluate the weak gradient of the shape functions, which is an
+  // element in the Raviart-Thomas space. As a consequence, we need to
+  // define a Raviart-Thomas finite element object, and have FEValues
+  // objects that evaluate it at quadrature points. We then need to
+  // compute the matrix $C^K$ on every cell $K$, for which we need the
+  // matrices $M^K$ and $G^K$ mentioned in the introduction.
+  //
+  // A point that may not be obvious is that in all previous tutorial
+  // programs, we have always called FEValues::reinit() with a cell
+  // iterator from a DoFHandler. This is so that one can call
+  // functions such as FEValuesBase::get_function_values() that
+  // extract the values of a finite element function (represented by a
+  // vector of DoF values) on the quadrature points of a cell. For
+  // this operation to work, one needs to know which vector elements
+  // correspond to the degrees of freedom on a given cell -- i.e.,
+  // exactly the kind of information and operation provided by the
+  // DoFHandler class.
+  //
+  // On the other hand, we don't have such a DoFHandler object for the
+  // Raviart-Thomas space in this program. In fact, we don't even have
+  // an element that can represent the "broken" Raviart-Thomas space
+  // we really want to use here (i.e., the restriction of the
+  // Raviart-Thomas shape functions to individual cells, without the
+  // need for any kind of continuity across cell interfaces). We solve
+  // this conundrum by using the fact that one can call
+  // FEValues::reinit() also with cell iterators into Triangulation
+  // objects (rather than DoFHandler objects). In this case, FEValues
+  // can of course only provide us with information that only
+  // references information of cells, rather than degrees of freedom
+  // enumerated on these cells. So we can't use
+  // FEValuesBase::get_function_values(), but we can use
+  // FEValues::shape_value() to obtain the values of shape functions
+  // at quadrature points on the current cell. It is this kind of
+  // functionality we will make use of below.
+  //
+  // Given this introduction, the following declarations should be
+  // pretty obvious:
   template <int dim>
   void WGDarcyEquation<dim>::assemble_system()
   {
     const FE_RaviartThomas<dim> fe_rt(0);
-    const QGauss<dim>           quadrature_formula(fe_rt.degree + 1);
-    const QGauss<dim - 1>       face_quadrature_formula(fe_rt.degree + 1);
-    const RightHandSide<dim>    right_hand_side;
 
-    // We define objects to evaluate values and
-    // gradients of shape functions at the quadrature points.
-    // Since we need shape functions and normal vectors on faces, we need
-    // <code>FEFaceValues</code>.
-    FEValues<dim> fe_values_rt(fe_rt,
-                               quadrature_formula,
-                               update_values | update_gradients |
-                                 update_quadrature_points | update_JxW_values);
+    const QGauss<dim>     quadrature_formula(fe_rt.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe_rt.degree + 1);
 
-    FEValues<dim> fe_values(fe,
+    FEValues<dim>     fe_values(fe,
                             quadrature_formula,
                             update_values | update_quadrature_points |
                               update_JxW_values);
-
     FEFaceValues<dim> fe_face_values(fe,
                                      face_quadrature_formula,
                                      update_values | update_normal_vectors |
                                        update_quadrature_points |
                                        update_JxW_values);
 
+    FEValues<dim>     fe_values_rt(fe_rt,
+                               quadrature_formula,
+                               update_values | update_gradients |
+                                 update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values_rt(fe_rt,
                                         face_quadrature_formula,
                                         update_values | update_normal_vectors |
                                           update_quadrature_points |
                                           update_JxW_values);
 
-
-    const unsigned int dofs_per_cell_rt = fe_rt.dofs_per_cell;
     const unsigned int dofs_per_cell    = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell_rt = fe_rt.dofs_per_cell;
 
-    const unsigned int n_q_points      = fe_values.get_quadrature().size();
-    const unsigned int n_q_points_rt   = fe_values_rt.get_quadrature().size();
+    const unsigned int n_q_points    = fe_values.get_quadrature().size();
+    const unsigned int n_q_points_rt = fe_values_rt.get_quadrature().size();
+
     const unsigned int n_face_q_points = fe_face_values.get_quadrature().size();
+
+    const RightHandSide<dim> right_hand_side;
+    std::vector<double>      right_hand_side_values(n_q_points);
+
+    const Coefficient<dim>      coefficient;
+    std::vector<Tensor<2, dim>> coefficient_values(n_q_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    // We will construct these cell matrices to solve for the pressure.
-    FullMatrix<double> cell_matrix_rt(dofs_per_cell_rt, dofs_per_cell_rt);
-    FullMatrix<double> cell_matrix_F(dofs_per_cell, dofs_per_cell_rt);
+
+    // Next, let us declare the various cell matrices discussed in the
+    // introduction:
+    FullMatrix<double> cell_matrix_M(dofs_per_cell_rt, dofs_per_cell_rt);
+    FullMatrix<double> cell_matrix_G(dofs_per_cell_rt, dofs_per_cell);
     FullMatrix<double> cell_matrix_C(dofs_per_cell, dofs_per_cell_rt);
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
     Vector<double>     cell_solution(dofs_per_cell);
 
-    const Coefficient<dim>      coefficient;
-    std::vector<Tensor<2, dim>> coefficient_values(n_q_points_rt);
-
     // We need <code>FEValuesExtractors</code> to access the @p interior and
-    // @p face component of the FESystem shape functions.
+    // @p face component of the shape functions.
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar interior(0);
     const FEValuesExtractors::Scalar face(1);
 
-    // Here, we will calculate cell matrices used to construct the local matrix
-    // on each cell. We need shape functions for the Raviart-Thomas space as
-    // well, so we also loop over the corresponding velocity cell iterators.
+    // This finally gets us in position to loop over all cells. On
+    // each cell, we will first calculate the various cell matrices
+    // used to construct the local matrix -- as they depend on the
+    // cell in question, they need to be re-computed on each cell. We
+    // need shape functions for the Raviart-Thomas space as well, for
+    // which we need to create first an iterator to the cell of the
+    // triangulation, which we can obtain by assignment from the cell
+    // pointing into the DoFHandler.
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
-        // On each cell, cell matrices are different, so in every loop, they
-        // need to be re-computed.
+        fe_values.reinit(cell);
+
         const typename Triangulation<dim>::active_cell_iterator cell_rt = cell;
         fe_values_rt.reinit(cell_rt);
-        fe_values.reinit(cell);
-        coefficient.value_list(fe_values_rt.get_quadrature_points(),
+
+        right_hand_side.value_list(fe_values.get_quadrature_points(),
+                                   right_hand_side_values);
+        coefficient.value_list(fe_values.get_quadrature_points(),
                                coefficient_values);
 
-        // This cell matrix is the mass matrix for the Raviart-Thomas space.
-        // Hence, we need to loop over all the quadrature points
-        // for the velocity FEValues object.
-        cell_matrix_rt = 0;
+        // The first cell matrix we will compute is the mass matrix
+        // for the Raviart-Thomas space.  Hence, we need to loop over
+        // all the quadrature points for the velocity FEValues object.
+        cell_matrix_M = 0;
         for (unsigned int q = 0; q < n_q_points_rt; ++q)
-          {
-            for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
-              {
-                const Tensor<1, dim> phi_i_u =
-                  fe_values_rt[velocities].value(i, q);
-                for (unsigned int j = 0; j < dofs_per_cell_rt; ++j)
-                  {
-                    const Tensor<1, dim> phi_j_u =
-                      fe_values_rt[velocities].value(j, q);
-                    cell_matrix_rt(i, j) +=
-                      (phi_i_u * phi_j_u * fe_values_rt.JxW(q));
-                  }
-              }
-          }
+          for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+            {
+              const Tensor<1, dim> v_i = fe_values_rt[velocities].value(i, q);
+              for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+                {
+                  const Tensor<1, dim> v_k =
+                    fe_values_rt[velocities].value(k, q);
+                  cell_matrix_M(i, k) += (v_i * v_k * fe_values_rt.JxW(q));
+                }
+            }
         // Next we take the inverse of this matrix by using
-        // <code>gauss_jordan()</code>. It will be used to calculate the
-        // coefficient matrix later.
-        cell_matrix_rt.gauss_jordan();
+        // FullMatrix::gauss_jordan(). It will be used to calculate
+        // the coefficient matrix $C^K$ later. It is worth recalling
+        // later that `cell_matrix_M` actually contains the *inverse*
+        // of $M^K$ after this call.
+        cell_matrix_M.gauss_jordan();
 
         // From the introduction, we know that the right hand side
-        // is the difference between a face integral and a cell integral.
-        // Here, we approximate the negative of the contribution in the
-        // interior. Each component of this matrix is the integral of a product
-        // between a basis function of the polynomial space and the divergence
-        // of a basis function of the Raviart-Thomas space. These basis
-        // functions are defined in the interior.
-        cell_matrix_F = 0;
+        // $G^K$ of the equation that defines $C^K$ is the difference
+        // between a face integral and a cell integral. Here, we
+        // approximate the negative of the contribution in the
+        // interior. Each component of this matrix is the integral of
+        // a product between a basis function of the polynomial space
+        // and the divergence of a basis function of the
+        // Raviart-Thomas space. These basis functions are defined in
+        // the interior.
+        cell_matrix_G = 0;
         for (unsigned int q = 0; q < n_q_points; ++q)
-          {
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              {
-                for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
-                  {
-                    const double phi_k_u_div =
-                      fe_values_rt[velocities].divergence(k, q);
-                    cell_matrix_F(i, k) -= (fe_values[interior].value(i, q) *
-                                            phi_k_u_div * fe_values.JxW(q));
-                  }
-              }
-          }
+          for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+            {
+              const double div_v_i = fe_values_rt[velocities].divergence(i, q);
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                {
+                  const double phi_j_interior = fe_values[interior].value(j, q);
 
-        // Now, we approximate the integral on faces.
+                  cell_matrix_G(i, j) -=
+                    (div_v_i * phi_j_interior * fe_values.JxW(q));
+                }
+            }
+
+
+        // Next, we approximate the integral on faces by quadrature.
         // Each component is the integral of a product between a basis function
         // of the polynomial space and the dot product of a basis function of
         // the Raviart-Thomas space and the normal vector. So we loop over all
@@ -431,82 +497,82 @@ namespace Step61
           {
             fe_face_values.reinit(cell, face_n);
             fe_face_values_rt.reinit(cell_rt, face_n);
+
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
                 const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
-                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+
+                for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
                   {
-                    for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+                    const Tensor<1, dim> v_i =
+                      fe_face_values_rt[velocities].value(i, q);
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       {
-                        const Tensor<1, dim> phi_k_u =
-                          fe_face_values_rt[velocities].value(k, q);
-                        cell_matrix_F(i, k) +=
-                          (fe_face_values[face].value(i, q) *
-                           (phi_k_u * normal) * fe_face_values.JxW(q));
+                        const double phi_j_face =
+                          fe_face_values[face].value(j, q);
+
+                        cell_matrix_G(i, j) +=
+                          ((v_i * normal) * phi_j_face * fe_face_values.JxW(q));
                       }
                   }
               }
           }
 
-        // @p cell_matrix_C is matrix product between the inverse of mass matrix @p cell_matrix_rt and @p cell_matrix_F.
-        cell_matrix_C = 0;
-        cell_matrix_F.mmult(cell_matrix_C, cell_matrix_rt);
+        // @p cell_matrix_C is then the matrix product between the
+        // transpose of $G^K$ and the inverse of the mass matrix
+        // (where this inverse is stored in @p cell_matrix_M):
+        cell_matrix_G.Tmmult(cell_matrix_C, cell_matrix_M);
 
-        // Element $a_{ij}$ of the local cell matrix $A$ is given by
-        // $\int_{E} \sum_{k,l} c_{ik} c_{jl} (\mathbf{K}  \mathbf{w}_k) \cdot
-        // \mathbf{w}_l \mathrm{d}x.$ We have calculated coefficients $c$ in the
-        // previous step.
+        // Finally we can compute the local matrix $A^K$.  Element
+        // $A^K_{ij}$ is given by $\int_{E} \sum_{k,l} C_{ik} C_{jl}
+        // (\mathbf{K} \mathbf{v}_k) \cdot \mathbf{v}_l
+        // \mathrm{d}x$. We have calculated the coefficients $C$ in
+        // the previous step, and so obtain the following after
+        // suitably re-arranging the loops:
         local_matrix = 0;
         for (unsigned int q = 0; q < n_q_points_rt; ++q)
           {
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
               {
-                for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                const Tensor<1, dim> v_k = fe_values_rt[velocities].value(k, q);
+                for (unsigned int l = 0; l < dofs_per_cell_rt; ++l)
                   {
-                    for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
-                      {
-                        const Tensor<1, dim> phi_k_u =
-                          fe_values_rt[velocities].value(k, q);
-                        for (unsigned int l = 0; l < dofs_per_cell_rt; ++l)
-                          {
-                            const Tensor<1, dim> phi_l_u =
-                              fe_values_rt[velocities].value(l, q);
-                            local_matrix(i, j) +=
-                              coefficient_values[q] * cell_matrix_C[i][k] *
-                              phi_k_u * cell_matrix_C[j][l] * phi_l_u *
-                              fe_values_rt.JxW(q);
-                          }
-                      }
+                    const Tensor<1, dim> v_l =
+                      fe_values_rt[velocities].value(l, q);
+
+                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                      for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                        local_matrix(i, j) +=
+                          (coefficient_values[q] * cell_matrix_C[i][k] * v_k) *
+                          cell_matrix_C[j][l] * v_l * fe_values_rt.JxW(q);
                   }
               }
           }
 
-        // Next, we calculate the right hand side, $\int_{E} f q \mathrm{d}x$.
+        // Next, we calculate the right hand side, $\int_{K} f q \mathrm{d}x$:
         cell_rhs = 0;
         for (unsigned int q = 0; q < n_q_points; ++q)
-          {
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              {
-                cell_rhs(i) +=
-                  (fe_values[interior].value(i, q) *
-                   right_hand_side.value(fe_values.quadrature_point(q)) *
-                   fe_values.JxW(q));
-              }
-          }
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            {
+              cell_rhs(i) += (fe_values[interior].value(i, q) *
+                              right_hand_side_values[q] * fe_values.JxW(q));
+            }
 
-        // In this part, we distribute components of this local matrix into the
-        // system matrix and transfer components of the cell right-hand side
-        // into the system right hand side.
+        // The last step is to distribute components of the local
+        // matrix into the system matrix and transfer components of
+        // the cell right hand side into the system right hand side:
         cell->get_dof_indices(local_dof_indices);
         constraints.distribute_local_to_global(
           local_matrix, cell_rhs, local_dof_indices, system_matrix, system_rhs);
       }
   }
 
+
+
   // @sect4{WGDarcyEquation<dim>::solve}
 
-  // Solving the system of the Darcy equation. Now, we have pressures in the
-  // interior and on the faces of all the cells.
+  // This step is rather trivial and the same as in many previous
+  // tutorial programs:
   template <int dim>
   void WGDarcyEquation<dim>::solve()
   {
@@ -520,59 +586,31 @@ namespace Step61
 
   // @sect4{WGDarcyEquation<dim>::compute_pressure_error}
 
-  // This part is to calculate the $L_2$ error of the pressure.
+  // This part is to calculate the $L_2$ error of the pressure.  We
+  // define a vector that holds the norm of the error on each cell.
+  // Next, we use VectorTool::integrate_difference() to compute the
+  // error in the $L_2$ norm on each cell. However, we really only
+  // care about the error in the interior component of the solution
+  // vector (we can't even evaluate the interface pressures at the
+  // quadrature points because these are all located in the interior
+  // of cells) and consequently have to use a weight function that
+  // ensures that the interface component of the solution variable is
+  // ignored. This is done by using the ComponentSelectFunction whose
+  // arguments indicate which component we want to select (component
+  // zero, i.e., the interior pressures) and how many components there
+  // are in total (two).
   template <int dim>
   void WGDarcyEquation<dim>::compute_pressure_error()
   {
-    // Since we have two different spaces for finite elements in interior and on
-    // faces, if we want to calculate $L_2$ errors in interior, we need degrees
-    // of freedom only defined in cells. In <code>FESystem</code>, we have two
-    // components, the first one is for interior, the second one is for
-    // skeletons. <code>fe.base_element(0)</code> shows we only need degrees of
-    // freedom defined in cells.
-    DoFHandler<dim> interior_dof_handler(triangulation);
-    interior_dof_handler.distribute_dofs(fe.base_element(0));
-    // We define a vector to extract pressures in cells.
-    // The size of the vector is the collective number of all degrees of freedom
-    // in the interior of all the elements.
-    Vector<double> interior_solution(interior_dof_handler.n_dofs());
-    {
-      // <code>types::global_dof_index</code> is used to know the global indices
-      // of degrees of freedom. So here, we get the global indices of local
-      // degrees of freedom and the global indices of interior degrees of
-      // freedom.
-      std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
-      std::vector<types::global_dof_index> interior_local_dof_indices(
-        fe.base_element(0).dofs_per_cell);
-      typename DoFHandler<dim>::active_cell_iterator
-        cell          = dof_handler.begin_active(),
-        endc          = dof_handler.end(),
-        interior_cell = interior_dof_handler.begin_active();
-
-      // In the loop of all cells and interior of the cell,
-      // we extract interior solutions from the global solution.
-      for (; cell != endc; ++cell, ++interior_cell)
-        {
-          cell->get_dof_indices(local_dof_indices);
-          interior_cell->get_dof_indices(interior_local_dof_indices);
-
-          for (unsigned int i = 0; i < fe.base_element(0).dofs_per_cell; ++i)
-            interior_solution(interior_local_dof_indices[i]) =
-              solution(local_dof_indices[fe.component_to_system_index(0, i)]);
-        }
-    }
-
-    // We define a vector that holds the norm of the error on each cell.
-    // Next, we use <code>VectorTool::integrate_difference</code>
-    // to compute the error in the $L_2$ norm on each cell.
-    // Finally, we get the global $L_2$ norm.
     Vector<float> difference_per_cell(triangulation.n_active_cells());
-    VectorTools::integrate_difference(interior_dof_handler,
-                                      interior_solution,
-                                      Solution<dim>(),
+    const ComponentSelectFunction<dim> select_interior_pressure(0, 2);
+    VectorTools::integrate_difference(dof_handler,
+                                      solution,
+                                      ExactPressure<dim>(),
                                       difference_per_cell,
                                       QGauss<dim>(fe.degree + 2),
-                                      VectorTools::L2_norm);
+                                      VectorTools::L2_norm,
+                                      &select_interior_pressure);
 
     const double L2_error = difference_per_cell.l2_norm();
     std::cout << "L2_error_pressure " << L2_error << std::endl;
@@ -580,27 +618,41 @@ namespace Step61
 
 
 
-  // @sect4{WGDarcyEquation<dim>::postprocess}
+  // @sect4{WGDarcyEquation<dim>::compute_velocity_errors}
 
-  // After we calculated the numerical pressure, we evaluate $L_2$ errors for
-  // the velocity on each cell and $L_2$ errors for the flux on faces.
+  // In this function, we evaluate $L_2$ errors for the velocity on
+  // each cell, and $L_2$ errors for the flux on faces.
 
-  // We are going to evaluate velocities on each cell and calculate the
-  // difference between numerical and exact velocities. To calculate velocities,
-  // we need interior and face pressure values of each element, and some other
-  // cell matrices.
-
+  // We are going to evaluate velocities on each cell and calculate
+  // the difference between numerical and exact velocities. The
+  // velocity is defined as $\mathbf{u}_h = \mathbf{Q}_h \left(
+  // -\mathbf{K}\nabla_{w,d}p_h \right)$, which requires us to compute
+  // many of the same terms as in the assembly of the system matrix.
+  // There are also the matrices $E^K,D^K$ we need to assemble (see
+  // the introduction) but they really just follow the same kind of
+  // pattern.
+  //
+  // Computing the same matrices here as we have already done in the
+  // `assemble_system()` function is of course wasteful in terms of
+  // CPU time. Likewise, we copy some of the code from there to this
+  // function, and this is also generally a poor idea. A better
+  // implementation might provide for a function that encapsulates
+  // this duplicated code. One could also think of using the classic
+  // trade-off between computing efficiency and memory efficiency to
+  // only compute the $C^K$ matrices once per cell during the
+  // assembly, storing them somewhere on the side, and re-using them
+  // here. (This is what step-51 does, for example, where the
+  // `assemble_system()` function takes an argument that determines
+  // whether the local matrices are recomputed, and a similar approach
+  // -- maybe with storing local matrices elsewhere -- could be
+  // adapted for the current program.)
   template <int dim>
   void WGDarcyEquation<dim>::compute_velocity_errors()
   {
     const FE_RaviartThomas<dim> fe_rt(0);
-    const QGauss<dim>           quadrature_formula(fe_rt.degree + 1);
-    const QGauss<dim - 1>       face_quadrature_formula(fe_rt.degree + 1);
 
-    FEValues<dim> fe_values_rt(fe_rt,
-                               quadrature_formula,
-                               update_values | update_gradients |
-                                 update_quadrature_points | update_JxW_values);
+    const QGauss<dim>     quadrature_formula(fe_rt.degree + 1);
+    const QGauss<dim - 1> face_quadrature_formula(fe_rt.degree + 1);
 
     FEValues<dim> fe_values(fe,
                             quadrature_formula,
@@ -613,45 +665,52 @@ namespace Step61
                                        update_quadrature_points |
                                        update_JxW_values);
 
+    FEValues<dim> fe_values_rt(fe_rt,
+                               quadrature_formula,
+                               update_values | update_gradients |
+                                 update_quadrature_points | update_JxW_values);
+
     FEFaceValues<dim> fe_face_values_rt(fe_rt,
                                         face_quadrature_formula,
                                         update_values | update_normal_vectors |
                                           update_quadrature_points |
                                           update_JxW_values);
 
-    const unsigned int dofs_per_cell_rt = fe_rt.dofs_per_cell;
     const unsigned int dofs_per_cell    = fe.dofs_per_cell;
+    const unsigned int dofs_per_cell_rt = fe_rt.dofs_per_cell;
 
-    const unsigned int n_q_points_rt   = fe_values_rt.get_quadrature().size();
-    const unsigned int n_q_points      = fe_values.get_quadrature().size();
+    const unsigned int n_q_points    = fe_values.get_quadrature().size();
+    const unsigned int n_q_points_rt = fe_values_rt.get_quadrature().size();
+
     const unsigned int n_face_q_points = fe_face_values.get_quadrature().size();
     const unsigned int n_face_q_points_rt =
       fe_face_values_rt.get_quadrature().size();
 
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    FullMatrix<double> cell_matrix_rt(dofs_per_cell_rt, dofs_per_cell_rt);
-    FullMatrix<double> cell_matrix_F(dofs_per_cell, dofs_per_cell_rt);
+
+    FullMatrix<double> cell_matrix_M(dofs_per_cell_rt, dofs_per_cell_rt);
+    FullMatrix<double> cell_matrix_G(dofs_per_cell_rt, dofs_per_cell);
     FullMatrix<double> cell_matrix_C(dofs_per_cell, dofs_per_cell_rt);
-    FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
+
     FullMatrix<double> cell_matrix_D(dofs_per_cell_rt, dofs_per_cell_rt);
     FullMatrix<double> cell_matrix_E(dofs_per_cell_rt, dofs_per_cell_rt);
-    Vector<double>     cell_rhs(dofs_per_cell);
-    Vector<double>     cell_solution(dofs_per_cell);
-    Tensor<1, dim>     velocity_cell;
-    Tensor<1, dim>     velocity_face;
-    Tensor<1, dim>     exact_velocity_face;
-    double             L2_err_velocity_cell_sqr_global = 0;
-    double             L2_err_flux_sqr                 = 0;
 
-    const Coefficient<dim>           coefficient;
-    std::vector<Tensor<2, dim>>      coefficient_values(n_q_points_rt);
+    Vector<double> cell_solution(dofs_per_cell);
+    Vector<double> cell_velocity(dofs_per_cell_rt);
+
+    double L2_err_velocity_cell_sqr_global = 0;
+    double L2_err_flux_sqr                 = 0;
+
+    const Coefficient<dim>      coefficient;
+    std::vector<Tensor<2, dim>> coefficient_values(n_q_points_rt);
+
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(dim);
     const FEValuesExtractors::Scalar interior(0);
     const FEValuesExtractors::Scalar face(1);
 
-    Velocity<dim> exact_velocity;
+    const ExactVelocity<dim> exact_velocity;
 
     // In the loop over all cells, we will calculate $L_2$ errors of velocity
     // and flux.
@@ -671,61 +730,58 @@ namespace Step61
     // the Raviart-Thomas space.
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
-        const typename Triangulation<dim>::active_cell_iterator cell_rt = cell;
-
-        fe_values_rt.reinit(cell_rt);
         fe_values.reinit(cell);
+
+        const typename Triangulation<dim>::active_cell_iterator cell_rt = cell;
+        fe_values_rt.reinit(cell_rt);
+
         coefficient.value_list(fe_values_rt.get_quadrature_points(),
                                coefficient_values);
 
         // The component of this <code>cell_matrix_E</code> is the integral of
-        // $(\mathbf{K} \mathbf{w}, \mathbf{w})$. <code>cell_matrix_rt</code> is
+        // $(\mathbf{K} \mathbf{w}, \mathbf{w})$. <code>cell_matrix_M</code> is
         // the Gram matrix.
-        cell_matrix_E  = 0;
-        cell_matrix_rt = 0;
+        cell_matrix_M = 0;
+        cell_matrix_E = 0;
         for (unsigned int q = 0; q < n_q_points_rt; ++q)
-          {
-            for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
-              {
-                const Tensor<1, dim> phi_i_u =
-                  fe_values_rt[velocities].value(i, q);
+          for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+            {
+              const Tensor<1, dim> v_i = fe_values_rt[velocities].value(i, q);
+              for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+                {
+                  const Tensor<1, dim> v_k =
+                    fe_values_rt[velocities].value(k, q);
 
-                for (unsigned int j = 0; j < dofs_per_cell_rt; ++j)
-                  {
-                    const Tensor<1, dim> phi_j_u =
-                      fe_values_rt[velocities].value(j, q);
+                  cell_matrix_E(i, k) +=
+                    (coefficient_values[q] * v_i * v_k * fe_values_rt.JxW(q));
 
-                    cell_matrix_E(i, j) += (coefficient_values[q] * phi_j_u *
-                                            phi_i_u * fe_values_rt.JxW(q));
-                    cell_matrix_rt(i, j) +=
-                      (phi_i_u * phi_j_u * fe_values_rt.JxW(q));
-                  }
-              }
-          }
+                  cell_matrix_M(i, k) += (v_i * v_k * fe_values_rt.JxW(q));
+                }
+            }
 
-        // We take the inverse of the Gram matrix, take matrix multiplication
-        // and get the matrix with coefficients of projection.
-        cell_matrix_D = 0;
-        cell_matrix_rt.gauss_jordan();
-        cell_matrix_rt.mmult(cell_matrix_D, cell_matrix_E);
+        // To compute the matrix $D$ mentioned in the introduction, we
+        // then need to evaluate $D=M^{-1}E$ as explained in the
+        // introduction:
+        cell_matrix_M.gauss_jordan();
+        cell_matrix_M.mmult(cell_matrix_D, cell_matrix_E);
 
-        // This cell matrix will be used to calculate the coefficients of the
-        // Gram matrix. This part is the same as the part in evaluating
-        // pressure.
-        cell_matrix_F = 0;
+        // Then we also need, again, to compute the matrix $C$ that is
+        // used to evaluate the weak discrete gradient. This is the
+        // exact same code as used in the assembly of the system
+        // matrix, so we just copy it from there:
+        cell_matrix_G = 0;
         for (unsigned int q = 0; q < n_q_points; ++q)
-          {
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              {
-                for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
-                  {
-                    const double phi_k_u_div =
-                      fe_values_rt[velocities].divergence(k, q);
-                    cell_matrix_F(i, k) -= (fe_values[interior].value(i, q) *
-                                            phi_k_u_div * fe_values.JxW(q));
-                  }
-              }
-          }
+          for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
+            {
+              const double div_v_i = fe_values_rt[velocities].divergence(i, q);
+              for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                {
+                  const double phi_j_interior = fe_values[interior].value(j, q);
+
+                  cell_matrix_G(i, j) -=
+                    (div_v_i * phi_j_interior * fe_values.JxW(q));
+                }
+            }
 
         for (unsigned int face_n = 0;
              face_n < GeometryInfo<dim>::faces_per_cell;
@@ -733,89 +789,73 @@ namespace Step61
           {
             fe_face_values.reinit(cell, face_n);
             fe_face_values_rt.reinit(cell_rt, face_n);
+
             for (unsigned int q = 0; q < n_face_q_points; ++q)
               {
                 const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
-                for (unsigned int i = 0; i < dofs_per_cell; ++i)
+
+                for (unsigned int i = 0; i < dofs_per_cell_rt; ++i)
                   {
-                    for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
+                    const Tensor<1, dim> v_i =
+                      fe_face_values_rt[velocities].value(i, q);
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
                       {
-                        const Tensor<1, dim> phi_k_u =
-                          fe_face_values_rt[velocities].value(k, q);
-                        cell_matrix_F(i, k) +=
-                          (fe_face_values[face].value(i, q) *
-                           (phi_k_u * normal) * fe_face_values.JxW(q));
+                        const double phi_j_face =
+                          fe_face_values[face].value(j, q);
+
+                        cell_matrix_G(i, j) +=
+                          ((v_i * normal) * phi_j_face * fe_face_values.JxW(q));
                       }
                   }
               }
           }
-        cell_matrix_C = 0;
-        cell_matrix_F.mmult(cell_matrix_C, cell_matrix_rt);
+        cell_matrix_G.Tmmult(cell_matrix_C, cell_matrix_M);
 
-        // This is to extract pressure values of the element.
-        cell->get_dof_indices(local_dof_indices);
-        cell_solution = 0;
-        for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          {
-            cell_solution(i) = solution(local_dof_indices[i]);
-          }
+        // Finally, we need to extract the pressure unknowns that
+        // correspond to the current cell:
+        cell->get_dof_values(solution, cell_solution);
 
-        // From previous calculations we obtained all the coefficients needed to
-        // calculate beta.
-        Vector<double> beta(dofs_per_cell_rt);
-        beta = 0;
+        // We are now in a position to compute the local velocity
+        // unknowns (with respect to the Raviart-Thomas space we are
+        // projecting the term $-\mathbf K \nabla_{w,d} p_h$ into):
+        cell_velocity = 0;
         for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
-          {
-            for (unsigned int j = 0; j < dofs_per_cell_rt; ++j)
-              {
-                for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                  {
-                    beta(k) += -(cell_solution(i) * cell_matrix_C(i, j) *
-                                 cell_matrix_D(k, j));
-                  }
-              }
-          }
+          for (unsigned int j = 0; j < dofs_per_cell_rt; ++j)
+            for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              cell_velocity(k) +=
+                -(cell_solution(i) * cell_matrix_C(i, j) * cell_matrix_D(k, j));
 
         // Now, we can calculate the numerical velocity at each quadrature point
         // and compute the $L_2$ error on each cell.
-        double L2_err_velocity_cell_sqr_local;
-        double difference_velocity_cell_sqr;
-        L2_err_velocity_cell_sqr_local = 0;
-        velocity_cell                  = 0;
+        double L2_err_velocity_cell_sqr_local = 0;
         for (unsigned int q = 0; q < n_q_points_rt; ++q)
           {
-            difference_velocity_cell_sqr = 0;
-            velocity_cell                = 0;
+            Tensor<1, dim> velocity;
             for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
               {
                 const Tensor<1, dim> phi_k_u =
                   fe_values_rt[velocities].value(k, q);
-                velocity_cell += beta(k) * phi_k_u;
+                velocity += cell_velocity(k) * phi_k_u;
               }
-            difference_velocity_cell_sqr =
-              (velocity_cell -
-               exact_velocity.value(fe_values_rt.quadrature_point(q))) *
-              (velocity_cell -
-               exact_velocity.value(fe_values_rt.quadrature_point(q)));
-            L2_err_velocity_cell_sqr_local +=
-              difference_velocity_cell_sqr * fe_values_rt.JxW(q);
-          }
 
+            const Tensor<1, dim> true_velocity =
+              exact_velocity.value(fe_values_rt.quadrature_point(q));
+
+            L2_err_velocity_cell_sqr_local +=
+              ((velocity - true_velocity) * (velocity - true_velocity) *
+               fe_values_rt.JxW(q));
+          }
         L2_err_velocity_cell_sqr_global += L2_err_velocity_cell_sqr_local;
 
-        // For reconstructing the flux we need the size of cells and faces.
-        // Since fluxes are calculated on faces, we have the loop over all four
-        // faces of each cell. To calculate face velocity, we use the
-        // coefficient beta we have calculated previously. Then, we calculate
-        // the squared velocity error in normal direction. Finally, we calculate
-        // $L_2$ flux error on the cell and add it to the global error.
-        double difference_velocity_face_sqr;
-        double L2_err_flux_face_sqr_local;
-        double err_flux_each_face;
-        double err_flux_face;
-        L2_err_flux_face_sqr_local = 0;
-        err_flux_face              = 0;
-        const double cell_area     = cell->measure();
+        // For reconstructing the flux we need the size of cells and
+        // faces.  Since fluxes are calculated on faces, we have the
+        // loop over all four faces of each cell. To calculate the
+        // face velocity, we use the coefficients `cell_velocity` we
+        // have computed previously. Then, we calculate the squared
+        // velocity error in normal direction. Finally, we calculate
+        // the $L_2$ flux error on the cell and add it to the global
+        // error.
+        const double cell_area = cell->measure();
         for (unsigned int face_n = 0;
              face_n < GeometryInfo<dim>::faces_per_cell;
              ++face_n)
@@ -823,70 +863,83 @@ namespace Step61
             const double face_length = cell->face(face_n)->measure();
             fe_face_values.reinit(cell, face_n);
             fe_face_values_rt.reinit(cell_rt, face_n);
-            L2_err_flux_face_sqr_local = 0;
-            err_flux_each_face         = 0;
+
+            double L2_err_flux_face_sqr_local = 0;
             for (unsigned int q = 0; q < n_face_q_points_rt; ++q)
               {
-                difference_velocity_face_sqr = 0;
-                velocity_face                = 0;
-                const Tensor<1, dim> normal  = fe_face_values.normal_vector(q);
+                Tensor<1, dim> velocity;
                 for (unsigned int k = 0; k < dofs_per_cell_rt; ++k)
                   {
                     const Tensor<1, dim> phi_k_u =
                       fe_face_values_rt[velocities].value(k, q);
-                    velocity_face += beta(k) * phi_k_u;
+                    velocity += cell_velocity(k) * phi_k_u;
                   }
-                exact_velocity_face =
+                const Tensor<1, dim> true_velocity =
                   exact_velocity.value(fe_face_values_rt.quadrature_point(q));
-                difference_velocity_face_sqr =
-                  (velocity_face * normal - exact_velocity_face * normal) *
-                  (velocity_face * normal - exact_velocity_face * normal);
+
+                const Tensor<1, dim> normal = fe_face_values.normal_vector(q);
+
                 L2_err_flux_face_sqr_local +=
-                  difference_velocity_face_sqr * fe_face_values_rt.JxW(q);
+                  ((velocity * normal - true_velocity * normal) *
+                   (velocity * normal - true_velocity * normal) *
+                   fe_face_values_rt.JxW(q));
               }
-            err_flux_each_face =
+            const double err_flux_each_face =
               L2_err_flux_face_sqr_local / (face_length) * (cell_area);
-            err_flux_face += err_flux_each_face;
+            L2_err_flux_sqr += err_flux_each_face;
           }
-        L2_err_flux_sqr += err_flux_face;
       }
 
-    // After adding up errors over all cells, we take square root and get the
-    // $L_2$ errors of velocity and flux.
+    // After adding up errors over all cells and faces, we take the
+    // square root and get the $L_2$ errors of velocity and
+    // flux. These we output to screen.
     const double L2_err_velocity_cell =
       std::sqrt(L2_err_velocity_cell_sqr_global);
-    std::cout << "L2_error_vel " << L2_err_velocity_cell << std::endl;
     const double L2_err_flux_face = std::sqrt(L2_err_flux_sqr);
-    std::cout << "L2_error_flux " << L2_err_flux_face << std::endl;
+
+    std::cout << "L2_error_vel:  " << L2_err_velocity_cell << std::endl
+              << "L2_error_flux: " << L2_err_flux_face << std::endl;
   }
 
 
   // @sect4{WGDarcyEquation::output_results}
 
-  // We have 2 sets of results to output:  the interior solution
-  // and the skeleton solution. We use <code>DataOut</code> to visualize
-  // interior results. The graphical output for the skeleton results is done by
-  // using the <code>DataOutFaces</code> class.
+  // We have two sets of results to output: the interior solution and
+  // the skeleton solution. We use <code>DataOut</code> to visualize
+  // interior results. The graphical output for the skeleton results
+  // is done by using the DataOutFaces class.
+  //
+  // In both of the output files, both the interior and the face
+  // variables are stored. For the interface output, the output file
+  // simply contains the interpolation of the interior pressures onto
+  // the faces, but because it is undefined which of the two interior
+  // pressure variables you get from the two adjacent cells, it is
+  // best to ignore the interior pressure in the interface output
+  // file. Conversely, for the cell interior output file, it is of
+  // course impossible to show any interface pressures $p^\partial$,
+  // because these are only available on interfaces and not cell
+  // interiors. Consequently, you will see them shown as an invalid
+  // value (such as an infinity).
   template <int dim>
   void WGDarcyEquation<dim>::output_results() const
   {
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution, "Pressure_Interior");
-    data_out.build_patches(fe.degree);
-    std::ofstream output("Pressure_Interior.vtk");
-    data_out.write_vtk(output);
+    {
+      DataOut<dim> data_out;
+      data_out.attach_dof_handler(dof_handler);
+      data_out.add_data_vector(solution, "Pressure_Interior");
+      data_out.build_patches(fe.degree);
+      std::ofstream output("Pressure_Interior.vtu");
+      data_out.write_vtu(output);
+    }
 
-    DataOutFaces<dim> data_out_face(false);
-    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      face_component_type(2, DataComponentInterpretation::component_is_scalar);
-    data_out_face.add_data_vector(dof_handler,
-                                  solution,
-                                  "Pressure_Edge",
-                                  face_component_type);
-    data_out_face.build_patches(fe.degree);
-    std::ofstream face_output("Pressure_Edge.vtk");
-    data_out_face.write_vtk(face_output);
+    {
+      DataOutFaces<dim> data_out_faces(false);
+      data_out_faces.attach_dof_handler(dof_handler);
+      data_out_faces.add_data_vector(solution, "Pressure_Face");
+      data_out_faces.build_patches(fe.degree);
+      std::ofstream face_output("Pressure_Face.vtu");
+      data_out_faces.write_vtu(face_output);
+    }
   }
 
 
