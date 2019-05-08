@@ -483,8 +483,4 @@ extended to cover $[-1,1]\times[0,1]$ in 2D, where the flow field $\beta$ descri
 counterclockwise quarter circle around the origin in the right half of the
 domain and is parallel to the x-axis in the left part of the domain. The inflow
 boundary is again located at $x=1$ and along the positive part of the x-axis,
-and the boundary conditions are chosen as in step-12. Compared to step-12 we
-only use the more effective second assembling technique. In order to make
-comparisons more effective, we decided to keep function names like @p
-assemble_system2 even if there is only one of these routines in this tutorial
-program.
+and the boundary conditions are chosen as in step-12.

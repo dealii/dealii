@@ -152,8 +152,7 @@ namespace Step30
   // @sect3{Class: DGTransportEquation}
   //
   // This declaration of this class is utterly unaffected by our current
-  // changes.  The only substantial change is that we use only the second
-  // assembly scheme described in step-12.
+  // changes.
   template <int dim>
   class DGTransportEquation
   {
@@ -168,12 +167,12 @@ namespace Step30
                                 FullMatrix<double> &     ui_vi_matrix,
                                 Vector<double> &         cell_vector) const;
 
-    void assemble_face_term2(const FEFaceValuesBase<dim> &fe_v,
-                             const FEFaceValuesBase<dim> &fe_v_neighbor,
-                             FullMatrix<double> &         ui_vi_matrix,
-                             FullMatrix<double> &         ue_vi_matrix,
-                             FullMatrix<double> &         ui_ve_matrix,
-                             FullMatrix<double> &         ue_ve_matrix) const;
+    void assemble_face_term(const FEFaceValuesBase<dim> &fe_v,
+                            const FEFaceValuesBase<dim> &fe_v_neighbor,
+                            FullMatrix<double> &         ui_vi_matrix,
+                            FullMatrix<double> &         ue_vi_matrix,
+                            FullMatrix<double> &         ui_ve_matrix,
+                            FullMatrix<double> &         ue_ve_matrix) const;
 
   private:
     const Beta<dim>           beta_function;
@@ -258,7 +257,7 @@ namespace Step30
 
 
   template <int dim>
-  void DGTransportEquation<dim>::assemble_face_term2(
+  void DGTransportEquation<dim>::assemble_face_term(
     const FEFaceValuesBase<dim> &fe_v,
     const FEFaceValuesBase<dim> &fe_v_neighbor,
     FullMatrix<double> &         ui_vi_matrix,
@@ -309,10 +308,8 @@ namespace Step30
 
   // @sect3{Class: DGMethod}
   //
-  // Even the main class of this program stays more or less the same. We omit
-  // one of the assembly routines and use only the second, more effective one
-  // of the two presented in step-12. However, we introduce a new routine
-  // (set_anisotropic_flags) and modify another one (refine_grid).
+  // This declaration is much like that of step-12. However, we introduce a
+  // new routine (set_anisotropic_flags) and modify another one (refine_grid).
   template <int dim>
   class DGMethod
   {
@@ -324,8 +321,7 @@ namespace Step30
 
   private:
     void setup_system();
-    void assemble_system1();
-    void assemble_system2();
+    void assemble_system();
     void solve(Vector<double> &solution);
     void refine_grid();
     void set_anisotropic_flags();
@@ -413,18 +409,19 @@ namespace Step30
   }
 
 
-  // @sect4{Function: assemble_system2}
+  // @sect4{Function: assemble_system}
   //
-  // We proceed with the <code>assemble_system2</code> function that
-  // implements the DG discretization in its second version. This function is
-  // very similar to the <code>assemble_system2</code> function from step-12,
-  // even the four cases considered for the neighbor-relations of a cell are
-  // the same, namely a) cell is at the boundary, b) there are finer
-  // neighboring cells, c) the neighbor is neither coarser nor finer and d)
-  // the neighbor is coarser.  However, the way in which we decide upon which
-  // case we have are modified in the way described in the introduction.
+  // We proceed with the <code>assemble_system</code> function that implements
+  // the DG discretization. This function does the same thing as the
+  // <code>assemble_system</code> function from step-12 (but without
+  // MeshWorker).  The four cases considered for the neighbor-relations of a
+  // cell are the same as the isotropic case, namely a) cell is at the
+  // boundary, b) there are finer neighboring cells, c) the neighbor is
+  // neither coarser nor finer and d) the neighbor is coarser.  However, the
+  // way in which we decide upon which case we have are modified in the way
+  // described in the introduction.
   template <int dim>
-  void DGMethod<dim>::assemble_system2()
+  void DGMethod<dim>::assemble_system()
   {
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs(dofs_per_cell);
@@ -463,10 +460,7 @@ namespace Step30
 
     Vector<double> cell_vector(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         ui_vi_matrix = 0;
         cell_vector  = 0;
@@ -481,7 +475,7 @@ namespace Step30
              face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           {
-            typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
+            const auto face = cell->face(face_no);
 
             // Case (a): The face is at the boundary.
             if (face->at_boundary())
@@ -494,8 +488,7 @@ namespace Step30
               {
                 Assert(cell->neighbor(face_no).state() == IteratorState::valid,
                        ExcInternalError());
-                typename DoFHandler<dim>::cell_iterator neighbor =
-                  cell->neighbor(face_no);
+                const auto neighbor = cell->neighbor(face_no);
 
                 // Case (b): This is an internal face and the neighbor
                 // is refined (which we can test by asking whether the
@@ -536,7 +529,7 @@ namespace Step30
                         // use the @p neighbor_child_on_subface function. it
                         // takes care of all the complicated situations of
                         // anisotropic refinement and non-standard faces.
-                        typename DoFHandler<dim>::cell_iterator neighbor_child =
+                        const auto neighbor_child =
                           cell->neighbor_child_on_subface(face_no, subface_no);
                         Assert(!neighbor_child->has_children(),
                                ExcInternalError());
@@ -549,12 +542,12 @@ namespace Step30
                         fe_v_subface.reinit(cell, face_no, subface_no);
                         fe_v_face_neighbor.reinit(neighbor_child, neighbor2);
 
-                        dg.assemble_face_term2(fe_v_subface,
-                                               fe_v_face_neighbor,
-                                               ui_vi_matrix,
-                                               ue_vi_matrix,
-                                               ui_ve_matrix,
-                                               ue_ve_matrix);
+                        dg.assemble_face_term(fe_v_subface,
+                                              fe_v_face_neighbor,
+                                              ui_vi_matrix,
+                                              ue_vi_matrix,
+                                              ui_ve_matrix,
+                                              ue_ve_matrix);
 
                         neighbor_child->get_dof_indices(dofs_neighbor);
 
@@ -622,12 +615,12 @@ namespace Step30
                         fe_v_face.reinit(cell, face_no);
                         fe_v_face_neighbor.reinit(neighbor, neighbor2);
 
-                        dg.assemble_face_term2(fe_v_face,
-                                               fe_v_face_neighbor,
-                                               ui_vi_matrix,
-                                               ue_vi_matrix,
-                                               ui_ve_matrix,
-                                               ue_ve_matrix);
+                        dg.assemble_face_term(fe_v_face,
+                                              fe_v_face_neighbor,
+                                              ui_vi_matrix,
+                                              ue_vi_matrix,
+                                              ui_ve_matrix,
+                                              ue_ve_matrix);
 
                         neighbor->get_dof_indices(dofs_neighbor);
 
@@ -697,11 +690,8 @@ namespace Step30
                                                   gradient_indicator);
 
     // and scale it to obtain an error indicator.
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-      gradient_indicator(cell_no) *=
+    for (const auto &cell : triangulation.active_cell_iterators())
+      gradient_indicator[cell->active_cell_index()] *=
         std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
     // Then we use this indicator to flag the 30 percent of the cells with
     // highest error indicator to be refined.
@@ -749,11 +739,7 @@ namespace Step30
                                          update_values);
 
     // Now we need to loop over all active cells.
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       // We only need to consider cells which are flagged for refinement.
       if (cell->refine_flag_set())
         {
@@ -764,16 +750,14 @@ namespace Step30
                face_no < GeometryInfo<dim>::faces_per_cell;
                ++face_no)
             {
-              typename DoFHandler<dim>::face_iterator face =
-                cell->face(face_no);
+              const auto face = cell->face(face_no);
 
               if (!face->at_boundary())
                 {
                   Assert(cell->neighbor(face_no).state() ==
                            IteratorState::valid,
                          ExcInternalError());
-                  typename DoFHandler<dim>::cell_iterator neighbor =
-                    cell->neighbor(face_no);
+                  const auto neighbor = cell->neighbor(face_no);
 
                   std::vector<double> u(fe_v_face.n_quadrature_points);
                   std::vector<double> u_neighbor(fe_v_face.n_quadrature_points);
@@ -795,10 +779,9 @@ namespace Step30
                         {
                           // get an iterator pointing to the cell behind the
                           // present subface...
-                          typename DoFHandler<dim>::cell_iterator
-                            neighbor_child =
-                              cell->neighbor_child_on_subface(face_no,
-                                                              subface_no);
+                          const auto neighbor_child =
+                            cell->neighbor_child_on_subface(face_no,
+                                                            subface_no);
                           Assert(!neighbor_child->has_children(),
                                  ExcInternalError());
                           // ... and reinit the respective FEFaceValues and
@@ -1032,8 +1015,8 @@ namespace Step30
                   << std::endl;
 
         Timer assemble_timer;
-        assemble_system2();
-        std::cout << "Time of assemble_system2: " << assemble_timer.cpu_time()
+        assemble_system();
+        std::cout << "Time of assemble_system: " << assemble_timer.cpu_time()
                   << std::endl;
         solve(solution2);
 
