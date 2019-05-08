@@ -99,6 +99,7 @@
 #cmakedefine DEAL_II_ALWAYS_INLINE @DEAL_II_ALWAYS_INLINE@
 #cmakedefine DEAL_II_RESTRICT @DEAL_II_RESTRICT@
 #cmakedefine DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
+#cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
 /*
  * A variable to tell if the compiler used in the current compilation process
