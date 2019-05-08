@@ -20,7 +20,7 @@ each vertex <i>for each of the adjacent elements</i>, rather than just one,
 and similarly for edges and faces.  As an example of how fast the number of
 unknowns grows, consider the FE_DGPMonomial basis: each
 scalar solution component is represented by polynomials of degree $p$
-with $(1/dim!)*\prod_{i=1}^{dim}(p+i)$ degrees of freedom per
+with $(1/\text{dim}!) \prod_{i=1}^{\text{dim}}(p+i)$ degrees of freedom per
 element. Typically, all degrees of freedom in an element are coupled
 to all of the degrees of freedom in the adjacent elements.  The resulting
 discrete equations yield very large linear systems very quickly, especially
@@ -275,8 +275,9 @@ ingredients:
 <ol>
   <li> The computed solution gradient $\mathbf{q}_h$ converges at optimal rate,
    i.e., $\mathcal{O}(h^{p+1})$.
-  <li> The average of the scalar part of the solution, <i>u<sub>h</sub></i>,
-   on each cell $K$ super-converges at rate $\mathcal{O}(h^{p+2})$.
+  <li> The cell-wise average of the scalar part of the solution,
+   $\frac{(1,u_h)_K}{\text{vol}(K)}$, super-converges at rate
+   $\mathcal{O}(h^{p+2})$.
 </ol>
 
 We now introduce a new variable $u_h^* \in \mathcal{V}_h^{p+1}$, which we find
