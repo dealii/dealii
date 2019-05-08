@@ -435,6 +435,28 @@ DynamicSparsityPattern::clear_row(const size_type row)
 
 
 
+DynamicSparsityPattern
+DynamicSparsityPattern::get_view(const IndexSet &rows) const
+{
+  DynamicSparsityPattern view;
+  view.reinit(rows.n_elements(), this->n_cols());
+  AssertDimension(rows.size(), this->n_rows());
+
+  const auto                        end      = rows.end();
+  DynamicSparsityPattern::size_type view_row = 0;
+  for (auto it = rows.begin(); it != end; ++it, ++view_row)
+    {
+      const size_type rowindex =
+        rowset.size() == 0 ? *it : rowset.index_within_set(*it);
+
+      view.lines[view_row].entries = lines[rowindex].entries;
+      view.have_entries |= (lines[rowindex].entries.size() > 0);
+    }
+  return view;
+}
+
+
+
 template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
 void
 DynamicSparsityPattern::compute_Tmmult_pattern(

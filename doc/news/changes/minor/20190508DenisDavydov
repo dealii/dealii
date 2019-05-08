@@ -1,0 +1,3 @@
+New: Add DynamicSparsityPattern::get_view() to create a subset of a sparsity pattern based on a selection of some rows.
+<br>
+(Denis Davydov, 2019/05/08)
