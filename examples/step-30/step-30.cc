@@ -20,29 +20,30 @@
 
 // The deal.II include files have already been covered in previous examples
 // and will thus not be further commented on.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/lac/precondition_block.h>
+#include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/fe/fe_values.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/data_out.h>
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/lac/solver_richardson.h>
-#include <deal.II/lac/precondition_block.h>
+#include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/derivative_approximation.h>
-#include <deal.II/base/timer.h>
 
 // And this again is C++:
+#include <array>
 #include <iostream>
 #include <fstream>
 
@@ -62,7 +63,14 @@ namespace Step30
   public:
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int /*component*/ = 0) const override
+    {
+      (void)points;
+      Assert(values.size() == points.size(),
+             ExcDimensionMismatch(values.size(), points.size()));
+
+      std::fill(values.begin(), values.end(), 0.);
+    }
   };
 
 
@@ -72,7 +80,19 @@ namespace Step30
   public:
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int /*component*/ = 0) const override
+    {
+      Assert(values.size() == points.size(),
+             ExcDimensionMismatch(values.size(), points.size()));
+
+      for (unsigned int i = 0; i < values.size(); ++i)
+        {
+          if (points[i](0) < 0.5)
+            values[i] = 1.;
+          else
+            values[i] = 0.;
+        }
+    }
   };
 
 
@@ -80,73 +100,38 @@ namespace Step30
   class Beta
   {
   public:
+    // The flow field is chosen to be a quarter circle with counterclockwise
+    // flow direction and with the origin as midpoint for the right half of the
+    // domain with positive $x$ values, whereas the flow simply goes to the left
+    // in the left part of the domain at a velocity that matches the one coming
+    // in from the right. In the circular part the magnitude of the flow
+    // velocity is proportional to the distance from the origin. This is a
+    // difference to step-12, where the magnitude was 1 everywhere. the new
+    // definition leads to a linear variation of $\beta$ along each given face
+    // of a cell. On the other hand, the solution $u(x,y)$ is exactly the same
+    // as before.
     void value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Point<dim>> &      values) const;
+                    std::vector<Point<dim>> &      values) const
+    {
+      Assert(values.size() == points.size(),
+             ExcDimensionMismatch(values.size(), points.size()));
+
+      for (unsigned int i = 0; i < points.size(); ++i)
+        {
+          if (points[i](0) > 0)
+            {
+              values[i](0) = -points[i](1);
+              values[i](1) = points[i](0);
+            }
+          else
+            {
+              values[i]    = Point<dim>();
+              values[i](0) = -points[i](1);
+            }
+        }
+    }
   };
 
-
-  template <int dim>
-  void RHS<dim>::value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
-                            const unsigned int) const
-  {
-    (void)points;
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    std::fill(values.begin(), values.end(), 0.);
-  }
-
-
-  // The flow field is chosen to be a quarter circle with counterclockwise
-  // flow direction and with the origin as midpoint for the right half of the
-  // domain with positive $x$ values, whereas the flow simply goes to the left
-  // in the left part of the domain at a velocity that matches the one coming
-  // in from the right. In the circular part the magnitude of the flow
-  // velocity is proportional to the distance from the origin. This is a
-  // difference to step-12, where the magnitude was 1 everywhere. the new
-  // definition leads to a linear variation of $\beta$ along each given face
-  // of a cell. On the other hand, the solution $u(x,y)$ is exactly the same
-  // as before.
-  template <int dim>
-  void Beta<dim>::value_list(const std::vector<Point<dim>> &points,
-                             std::vector<Point<dim>> &      values) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    for (unsigned int i = 0; i < points.size(); ++i)
-      {
-        if (points[i](0) > 0)
-          {
-            values[i](0) = -points[i](1);
-            values[i](1) = points[i](0);
-          }
-        else
-          {
-            values[i]    = Point<dim>();
-            values[i](0) = -points[i](1);
-          }
-      }
-  }
-
-
-  template <int dim>
-  void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
-                                       std::vector<double> &          values,
-                                       const unsigned int) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    for (unsigned int i = 0; i < values.size(); ++i)
-      {
-        if (points[i](0) < 0.5)
-          values[i] = 1.;
-        else
-          values[i] = 0.;
-      }
-  }
 
 
   // @sect3{Class: DGTransportEquation}
@@ -181,6 +166,7 @@ namespace Step30
   };
 
 
+
   // Likewise, the constructor of the class as well as the functions
   // assembling the terms corresponding to cell interiors and boundary faces
   // are unchanged from before. The function that assembles face terms between
@@ -196,6 +182,7 @@ namespace Step30
     , rhs_function()
     , boundary_function()
   {}
+
 
 
   template <int dim>
@@ -315,7 +302,6 @@ namespace Step30
   {
   public:
     DGMethod(const bool anisotropic);
-    ~DGMethod();
 
     void run();
 
@@ -379,12 +365,6 @@ namespace Step30
     , dg()
   {}
 
-
-  template <int dim>
-  DGMethod<dim>::~DGMethod()
-  {
-    dof_handler.clear();
-  }
 
 
   template <int dim>
@@ -813,7 +793,7 @@ namespace Step30
                               // accumulate these values into vectors with
                               // <code>dim</code> components.
                               jump[face_no / 2] +=
-                                std::fabs(u[x] - u_neighbor[x]) * JxW[x];
+                                std::abs(u[x] - u_neighbor[x]) * JxW[x];
                               // We also sum up the scaled weights to obtain
                               // the measure of the face.
                               area[face_no / 2] += JxW[x];
@@ -847,7 +827,7 @@ namespace Step30
                                ++x)
                             {
                               jump[face_no / 2] +=
-                                std::fabs(u[x] - u_neighbor[x]) * JxW[x];
+                                std::abs(u[x] - u_neighbor[x]) * JxW[x];
                               area[face_no / 2] += JxW[x];
                             }
                         }
@@ -892,7 +872,7 @@ namespace Step30
                                ++x)
                             {
                               jump[face_no / 2] +=
-                                std::fabs(u[x] - u_neighbor[x]) * JxW[x];
+                                std::abs(u[x] - u_neighbor[x]) * JxW[x];
                               area[face_no / 2] += JxW[x];
                             }
                         }
@@ -901,8 +881,8 @@ namespace Step30
             }
           // Now we analyze the size of the mean jumps, which we get dividing
           // the jumps by the measure of the respective faces.
-          double average_jumps[dim];
-          double sum_of_average_jumps = 0.;
+          std::array<double, dim> average_jumps;
+          double                  sum_of_average_jumps = 0.;
           for (unsigned int i = 0; i < dim; ++i)
             {
               average_jumps[i] = jump(i) / area(i);
@@ -974,6 +954,7 @@ namespace Step30
 
     data_out.write_gnuplot(gnuplot_output);
   }
+
 
 
   template <int dim>

@@ -204,12 +204,10 @@ GeometryInfo<dim>::max_children_per_cell which specifies the
 <i>maximum</i> number of children a cell can have. How many children a
 refined cell has was previously available as static information, but
 now it depends on the actual refinement state of a cell and can be
-retrieved using the function call <code>cell-@>n_children()</code>,
+retrieved using TriaAccessor::n_children(),
 a call that works equally well for both isotropic and anisotropic
 refinement. A very similar situation can be found for
-faces and their subfaces: the previously available variable
-GeometryInfo<dim>::subfaces_per_face no
-longer exists; the pertinent information can now be queried using
+faces and their subfaces: the pertinent information can be queried using
 GeometryInfo<dim>::max_children_per_face or <code>face->n_children()</code>,
 depending on the context.
 
@@ -252,7 +250,7 @@ write code that works for both isotropic and anisotropic refinement:
   i.e. has children occupying only part of the
   common face. In this case, the face
   under consideration has to be a refined one, which can determine by
-  asking <code>if(face->has_children())</code>. If this is true, we need to
+  asking <code>if (face->has_children())</code>. If this is true, we need to
   loop over
   all subfaces and get the neighbors' child behind this subface, so that we can
   reinit an FEFaceValues object with the neighbor and an FESubfaceValues object
@@ -450,7 +448,7 @@ cell. Of course, in the limit we expect that the jumps tend to zero as
 we refine the mesh and approximate the true solution better and better.
 Thus, a large jump
 across a given face indicates that the cell should be refined (at least)
-orthogonal to that face, whereas a small jump does not lead to this
+orthogonally to that face, whereas a small jump does not lead to this
 conclusion. It is possible, of course, that the exact solution is not smooth and
 that it also features a jump. In that case, however, a large jump over one face
 indicates, that this face is more or less parallel to the jump and in the
