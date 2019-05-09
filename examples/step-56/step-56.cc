@@ -409,7 +409,8 @@ namespace Step56
   class StokesProblem
   {
   public:
-    StokesProblem(const unsigned int pressure_degree, SolverType solver_type);
+    StokesProblem(const unsigned int pressure_degree,
+                  const SolverType   solver_type);
     void run();
 
   private:
@@ -421,7 +422,7 @@ namespace Step56
     void output_results(const unsigned int refinement_cycle) const;
 
     const unsigned int pressure_degree;
-    SolverType         solver_type;
+    const SolverType   solver_type;
 
     Triangulation<dim> triangulation;
     FESystem<dim>      velocity_fe;
@@ -450,7 +451,8 @@ namespace Step56
 
   template <int dim>
   StokesProblem<dim>::StokesProblem(const unsigned int pressure_degree,
-                                    SolverType         solver_type)
+                                    const SolverType   solver_type)
+
     : pressure_degree(pressure_degree)
     , solver_type(solver_type)
     , triangulation(Triangulation<dim>::maximum_smoothing)
