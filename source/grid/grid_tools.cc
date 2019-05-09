@@ -1479,11 +1479,6 @@ namespace GridTools
                ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
       adjacent_cells;
 
-    typename dealii::internal::
-      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type
-        cell = mesh.begin_active(),
-        endc = mesh.end();
-
     // go through all active cells and look if the vertex is part of that cell
     //
     // in 1d, this is all we need to care about. in 2d/3d we also need to worry
@@ -1517,7 +1512,7 @@ namespace GridTools
     // finer and so in the 2d case below we simply add *any* *active* neighbor.
     // in the worst case, we add cells multiple times to the adjacent_cells
     // list, but std::set throws out those cells already entered
-    for (; cell != endc; ++cell)
+    for (const auto &cell : mesh.active_cell_iterators())
       {
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
           if (cell->vertex_index(v) == vertex)
@@ -2522,11 +2517,7 @@ namespace GridTools
     // works, but this map can get quite big. Not sure about more efficient
     // solutions.
     std::map<std::pair<unsigned int, unsigned int>, unsigned int> indexmap;
-    for (typename dealii::internal::
-           ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim>>::type
-             cell = triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       indexmap[std::pair<unsigned int, unsigned int>(cell->level(),
                                                      cell->index())] =
         cell->active_cell_index();
@@ -2538,11 +2529,7 @@ namespace GridTools
     // if we only do something if the neighbor has no children -- in that case
     // it is either on the same or a coarser level than we are. in return, we
     // have to add entries in both directions for both cells
-    for (typename dealii::internal::
-           ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim>>::type
-             cell = triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         const unsigned int index = cell->active_cell_index();
         cell_connectivity.add(index, index);
@@ -2550,7 +2537,7 @@ namespace GridTools
           if ((cell->at_boundary(f) == false) &&
               (cell->neighbor(f)->has_children() == false))
             {
-              unsigned int other_index =
+              const unsigned int other_index =
                 indexmap
                   .find(std::pair<unsigned int, unsigned int>(
                     cell->neighbor(f)->level(), cell->neighbor(f)->index()))
@@ -2683,13 +2670,7 @@ namespace GridTools
     // check for an easy return
     if (n_partitions == 1)
       {
-        for (typename dealii::internal::ActiveCellIterator<
-               dim,
-               spacedim,
-               Triangulation<dim, spacedim>>::type cell =
-               triangulation.begin_active();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           cell->set_subdomain_id(0);
         return;
       }
@@ -2770,13 +2751,7 @@ namespace GridTools
     // check for an easy return
     if (n_partitions == 1)
       {
-        for (typename dealii::internal::ActiveCellIterator<
-               dim,
-               spacedim,
-               Triangulation<dim, spacedim>>::type cell =
-               triangulation.begin_active();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           cell->set_subdomain_id(0);
         return;
       }
@@ -2792,13 +2767,8 @@ namespace GridTools
                              partition_indices,
                              partitioner);
 
-    // finally loop over all cells and set the
-    // subdomain ids
-    for (typename dealii::internal::
-           ActiveCellIterator<dim, spacedim, Triangulation<dim, spacedim>>::type
-             cell = triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    // finally loop over all cells and set the subdomain ids
+    for (const auto &cell : triangulation.active_cell_iterators())
       cell->set_subdomain_id(partition_indices[cell->active_cell_index()]);
   }
 
@@ -2852,13 +2822,7 @@ namespace GridTools
     // check for an easy return
     if (n_partitions == 1)
       {
-        for (typename dealii::internal::ActiveCellIterator<
-               dim,
-               spacedim,
-               Triangulation<dim, spacedim>>::type cell =
-               triangulation.begin_active();
-             cell != triangulation.end();
-             ++cell)
+        for (const auto &cell : triangulation.active_cell_iterators())
           cell->set_subdomain_id(0);
         return;
       }
@@ -3021,13 +2985,7 @@ namespace GridTools
     if (const parallel::distributed::Triangulation<dim, spacedim> *tr =
           dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
                          *>(&triangulation))
-      for (typename dealii::internal::ActiveCellIterator<
-             dim,
-             spacedim,
-             Triangulation<dim, spacedim>>::type cell =
-             triangulation.begin_active();
-           cell != triangulation.end();
-           ++cell)
+      for (const auto &cell : triangulation.active_cell_iterators())
         if (cell->is_artificial() ||
             (cell->is_ghost() &&
              (cell->subdomain_id() < tr->locally_owned_subdomain())))
