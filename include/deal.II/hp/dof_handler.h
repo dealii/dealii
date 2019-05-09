@@ -1256,21 +1256,28 @@ namespace hp
 
     /**
      * Whenever the underlying triangulation changes by either
-     * refinement/coarsening and serialization, the active_fe_index of cells
+     * h/p refinement/coarsening and serialization, the active_fe_index of cells
      * needs to be transferred. This structure stores all temporary information
      * required during that process.
      */
     struct ActiveFEIndexTransfer
     {
       /**
-       * Container to temporarily store the iterator and active FE index of
-       * cells that will be refined.
+       * Container to temporarily store the iterator and future active FE index
+       * of cells that persist.
+       */
+      std::map<const cell_iterator, const unsigned int>
+        persisting_cells_fe_index;
+
+      /**
+       * Container to temporarily store the iterator and future active FE index
+       * of cells that will be refined.
        */
       std::map<const cell_iterator, const unsigned int> refined_cells_fe_index;
 
       /**
-       * Container to temporarily store the iterator and active FE index of
-       * parent cells that will remain after coarsening.
+       * Container to temporarily store the iterator and future active FE index
+       * of parent cells that will remain after coarsening.
        */
       std::map<const cell_iterator, const unsigned int>
         coarsened_cells_fe_index;
