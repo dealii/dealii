@@ -80,7 +80,7 @@ namespace Step61
   class WGDarcyEquation
   {
   public:
-    WGDarcyEquation();
+    WGDarcyEquation(const unsigned int degree);
     void run();
 
   private:
@@ -244,8 +244,8 @@ namespace Step61
   // functions, which will here include the ones used for the interior and
   // interface pressures, $p^\circ$ and $p^\partial$.
   template <int dim>
-  WGDarcyEquation<dim>::WGDarcyEquation()
-    : fe(FE_DGQ<dim>(0), 1, FE_FaceQ<dim>(0), 1)
+  WGDarcyEquation<dim>::WGDarcyEquation(const unsigned int degree)
+    : fe(FE_DGQ<dim>(degree), 1, FE_FaceQ<dim>(degree), 1)
     , dof_handler(triangulation)
 
   {}
@@ -363,7 +363,7 @@ namespace Step61
   template <int dim>
   void WGDarcyEquation<dim>::assemble_system()
   {
-    const FE_RaviartThomas<dim> fe_rt(0);
+    const FE_RaviartThomas<dim> fe_rt(fe.base_element(0).degree);
 
     const QGauss<dim>     quadrature_formula(fe_rt.degree + 1);
     const QGauss<dim - 1> face_quadrature_formula(fe_rt.degree + 1);
@@ -649,7 +649,7 @@ namespace Step61
   template <int dim>
   void WGDarcyEquation<dim>::compute_velocity_errors()
   {
-    const FE_RaviartThomas<dim> fe_rt(0);
+    const FE_RaviartThomas<dim> fe_rt(fe.base_element(0).degree);
 
     const QGauss<dim>     quadrature_formula(fe_rt.degree + 1);
     const QGauss<dim - 1> face_quadrature_formula(fe_rt.degree + 1);
@@ -972,7 +972,7 @@ int main()
   try
     {
       dealii::deallog.depth_console(2);
-      Step61::WGDarcyEquation<2> wg_darcy;
+      Step61::WGDarcyEquation<2> wg_darcy(0);
       wg_darcy.run();
     }
   catch (std::exception &exc)

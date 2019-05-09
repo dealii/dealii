@@ -1,16 +1,20 @@
 <h1>Results</h1>
 
-We run the program with a right hand side that will produce the solution
-$p = \sin(\pi x) \sin(\pi y)$ and with homogeneous Dirichlet 
-boundary conditions in the domain $\Omega = (0,1)^2$. In addition, we choose
-the coefficient matrix in the differential operator $\mathbf{K}$ as the 
-identity matrix. We test this setup using $\mbox{WG}(Q_0,Q_0;RT_{[0]})$, 
-$\mbox{WG}(Q_1,Q_1;RT_{[1]})$ and $\mbox{WG}(Q_2,Q_2;RT_{[2]})$ element 
-combinations. We will then visualize pressure values in interiors of cells 
-and on faces. We want to see that the pressure maximum is around 1 and the minimum 
-is around 0. With mesh refinement, the convergence rates of pressure, 
-velocity and flux should then be around 1 for $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ , 2 
-for $\mbox{WG}(Q_1,Q_1;RT_{[1]})$, and 3 for $\mbox{WG}(Q_2,Q_2;RT_{[2]})$.
+We run the program with a right hand side that will produce the
+solution $p = \sin(\pi x) \sin(\pi y)$ and with homogeneous Dirichlet
+boundary conditions in the domain $\Omega = (0,1)^2$. In addition, we
+choose the coefficient matrix in the differential operator
+$\mathbf{K}$ as the identity matrix. We test this setup using
+$\mbox{WG}(Q_0,Q_0;RT_{[0]})$, $\mbox{WG}(Q_1,Q_1;RT_{[1]})$ and
+$\mbox{WG}(Q_2,Q_2;RT_{[2]})$ element combinations, which one can
+select by using the appropriate constructor argument for the
+`WGDarcyEquation` object in `main()`. We will then visualize pressure
+values in interiors of cells and on faces. We want to see that the
+pressure maximum is around 1 and the minimum is around 0. With mesh
+refinement, the convergence rates of pressure, velocity and flux
+should then be around 1 for $\mbox{WG}(Q_0,Q_0;RT_{[0]})$ , 2 for
+$\mbox{WG}(Q_1,Q_1;RT_{[1]})$, and 3 for
+$\mbox{WG}(Q_2,Q_2;RT_{[2]})$.
 
 
 <h3>Test results on <i>WG(Q<sub>0</sub>,Q<sub>0</sub>;RT<sub>[0]</sub>)</i></h3>
