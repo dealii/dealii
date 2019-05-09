@@ -379,7 +379,7 @@ namespace SparseMatrixIterators
     Iterator(const SparseMatrixIterators::Iterator<number, false> &i);
 
     /**
-     * Copy assignment operator.
+     * Copy assignment operator from a non-const iterator to a const iterator.
      */
     const Iterator<number, Constness> &
     operator=(const SparseMatrixIterators::Iterator<number, false> &i);

@@ -1511,16 +1511,6 @@ namespace Threads
     }
 
 
-    /**
-     * Copy constructor.
-     *
-     * @post Using this constructor automatically makes the task object
-     * joinable().
-     */
-    Task(const Task<RT> &t)
-      : task_descriptor(t.task_descriptor)
-    {}
-
 
     /**
      * Default constructor. You can't do much with a task object constructed
@@ -1532,16 +1522,6 @@ namespace Threads
      */
     Task() = default;
 
-
-    /**
-     * Copy assignment operator.
-     */
-    const Task &
-    operator=(const Task<RT> &t)
-    {
-      task_descriptor = t.task_descriptor;
-      return *this;
-    }
 
 
     /**

@@ -63,12 +63,6 @@ namespace Particles
     ParticleAccessor<dim, spacedim> &operator*();
 
     /**
-     * Assignment operator.
-     */
-    ParticleIterator &
-    operator=(const ParticleIterator &) = default;
-
-    /**
      * Dereferencing operator, returns a pointer of the particle pointed to.
      * Usage is thus like <tt>i->get_id ();</tt>
      *
