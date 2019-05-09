@@ -334,7 +334,7 @@ namespace Step53
   // domain and returns the corresponding location in the domain that we
   // want to map to. This is, of course, exactly the push forward
   // function of the geometry we use. We wrap it by a lambda function to
-  // obtaining the desired object required for the transformation.
+  // obtain the kind of function object required for the transformation.
   void run()
   {
     AfricaGeometry   geometry;
