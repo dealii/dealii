@@ -1063,11 +1063,11 @@ namespace internal
          * their childrean and thus will be stored as such.
          *
          * On cells to be coarsened, the active_fe_index on parent cells will be
-         * determined by the least dominating finite element of its children. We
-         * will thus assign the corresponding fe_index to the parent cell. See
-         * documentation of
-         * FECollection::find_least_dominating_fe_in_collection() for further
-         * information.
+         * determined by the least dominating finite element of its children's
+         * common subspace. We  will thus assign the corresponding fe_index to
+         * the parent cell. See documentation of
+         * hp::FECollection::find_common_subspace() and
+         * hp::FECollection::find_dominated_fe() for further information.
          */
         template <int dim, int spacedim>
         static void
@@ -1110,11 +1110,13 @@ namespace internal
                             fe_indices_children.insert(
                               parent->child(child_index)->active_fe_index());
                           }
+                        Assert(!fe_indices_children.empty(),
+                               ExcInternalError());
 
                         const unsigned int fe_index =
-                          dof_handler.fe_collection
-                            .find_least_dominating_fe_in_collection(
-                              fe_indices_children, /*codim=*/0);
+                          dof_handler.fe_collection.find_dominating_fe_extended(
+                            fe_indices_children,
+                            /*codim=*/0);
 
                         Assert(
                           fe_index != numbers::invalid_unsigned_int,

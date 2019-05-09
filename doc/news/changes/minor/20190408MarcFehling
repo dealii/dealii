@@ -1,0 +1,5 @@
+New: Member function hp::FECollection::find_common_subspace()
+returns a set of indices from the full FECollection whose associated
+finite elements dominate all elements of a given set of indices.
+<br>
+(Marc Fehling, 2019/04/08)

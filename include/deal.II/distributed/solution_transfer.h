@@ -165,10 +165,9 @@ namespace parallel
      * correpsonding `active_fe_index`. Further, if refinement is involved,
      * data will be packed on the parent cell with its `active_fe_index` and
      * unpacked later with the same index on its children. If cells get
-     * coarsened into one, data will be packed on the latter with the least
-     * dominating `active_fe_index` amongst its children, as determined by the
-     * function hp::FECollection::find_least_face_dominating_fe_in_collection(),
-     * and unpacked on the same cell with the same index.
+     * coarsened into one, data will be packed on the children with the least
+     * dominating finite element of their common subspace, and unpacked on the
+     * parent with this particular finite element.
      *
      * Transferring a solution across refinement works exactly like in the
      * non-hp case. However, when considering serialization, we also have to

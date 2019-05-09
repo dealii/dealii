@@ -1281,27 +1281,33 @@ namespace DoFTools
                         // we first have to find the finite element that is able
                         // to generate a space that all the other ones can be
                         // constrained to. At this point we potentially have
-                        // different scenarios: 1) sub-faces dominate mother
-                        // face and there is a dominating FE among sub faces. We
-                        // could loop over sub faces to find the needed FE
-                        // index. However, this will not work in the case when
+                        // different scenarios:
+                        //
+                        // 1) sub-faces dominate mother face and there is a
+                        // dominating FE among sub faces. We could loop over sub
+                        // faces to find the needed FE index. However, this will
+                        // not work in the case when ...
+                        //
                         // 2) there is no dominating FE among sub faces (e.g.
                         // Q1xQ2 vs Q2xQ1), but subfaces still dominate mother
                         // face (e.g. Q2xQ2). To cover this case we would have
-                        // to use find_least_dominating_fe_in_collection()
-                        // of FECollection with fe_indices of sub faces. 3)
-                        // Finally, it could happen that we got here because
+                        // to find the least dominating element amongst all
+                        // finite elements on sub faces.
+                        //
+                        // 3) Finally, it could happen that we got here because
                         // neither_element_dominates (e.g. Q1xQ1xQ2 and Q1xQ2xQ1
                         // for subfaces and Q2xQ1xQ1 for mother face). This
-                        // requires usage of
-                        // find_least_dominating_fe_in_collection() with
-                        // fe_indices of sub-faces and the mother face.
+                        // requires finding the least dominating element amongst
+                        // all finite elements on sub faces and the mother face.
+                        //
                         // Note that the last solution covers the first two
                         // scenarios, thus we stick with it assuming that we
                         // won't lose much time/efficiency.
-                        const unsigned int dominating_fe_index =
-                          fe_collection.find_least_dominating_fe_in_collection(
-                            fe_ind_face_subface, /*codim=*/1);
+                        unsigned int dominating_fe_index =
+                          fe_collection.find_dominating_fe_extended(
+                            fe_ind_face_subface,
+                            /*codim=*/1);
+
                         AssertThrow(
                           dominating_fe_index != numbers::invalid_unsigned_int,
                           ExcMessage(
@@ -1599,10 +1605,11 @@ namespace DoFTools
                             fes.insert(neighbor_fe_index);
                             const dealii::hp::FECollection<dim, spacedim>
                               &fe_collection = dof_handler.get_fe_collection();
-                            const unsigned int dominating_fe_index =
-                              fe_collection
-                                .find_least_dominating_fe_in_collection(
-                                  fes, /*codim=*/1);
+
+                            unsigned int dominating_fe_index =
+                              fe_collection.find_dominating_fe_extended(
+                                fes,
+                                /*codim=*/1);
 
                             AssertThrow(
                               dominating_fe_index !=

@@ -637,9 +637,9 @@ namespace internal
                     // find out which is the most dominating finite
                     // element of the ones that are used on this vertex
                     unsigned int most_dominating_fe_index =
-                      dof_handler.get_fe_collection()
-                        .find_dominating_fe_in_subset(fe_indices,
-                                                      /*codim=*/dim);
+                      dof_handler.get_fe_collection().find_dominating_fe(
+                        fe_indices,
+                        /*codim*/ dim);
 
                     // if we haven't found a dominating finite element,
                     // choose the very first one to be dominant
@@ -875,8 +875,8 @@ namespace internal
 
                                     unsigned int dominating_fe_index =
                                       dof_handler.get_fe_collection()
-                                        .find_dominating_fe_in_subset(
-                                          fe_indices, /*codim=*/dim - 1);
+                                        .find_dominating_fe(fe_indices,
+                                                            /*codim=*/dim - 1);
                                     unsigned int other_fe_index =
                                       numbers::invalid_unsigned_int;
 
@@ -1009,9 +1009,9 @@ namespace internal
                       // find out which is the most dominating finite element of
                       // the ones that are used on this line
                       const unsigned int most_dominating_fe_index =
-                        dof_handler.get_fe_collection()
-                          .find_dominating_fe_in_subset(fe_indices,
-                                                        /*codim=*/dim - 1);
+                        dof_handler.get_fe_collection().find_dominating_fe(
+                          fe_indices,
+                          /*codim=*/dim - 1);
 
                       // if we found the most dominating element, then use this
                       // to eliminate some of the degrees of freedom by
@@ -1168,9 +1168,9 @@ namespace internal
                   // find out which is the most dominating finite
                   // element of the ones that are used on this quad
                   const unsigned int most_dominating_fe_index =
-                    dof_handler.get_fe_collection()
-                      .find_dominating_fe_in_subset(fe_indices,
-                                                    /*codim=*/dim - 2);
+                    dof_handler.get_fe_collection().find_dominating_fe(
+                      fe_indices,
+                      /*codim=*/dim - 2);
 
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom
@@ -1477,9 +1477,9 @@ namespace internal
                     // find out which is the most dominating finite
                     // element of the ones that are used on this vertex
                     const unsigned int most_dominating_fe_index =
-                      dof_handler.get_fe_collection()
-                        .find_dominating_fe_in_subset(fe_indices,
-                                                      /*codim=*/dim);
+                      dof_handler.get_fe_collection().find_dominating_fe(
+                        fe_indices,
+                        /*codim=*/dim);
 
                     // if we found the most dominating element, then use
                     // this to eliminate some of the degrees of freedom
@@ -1694,8 +1694,8 @@ namespace internal
 
                                     unsigned int dominating_fe_index =
                                       dof_handler.get_fe_collection()
-                                        .find_dominating_fe_in_subset(
-                                          fe_indices, /*codim*/ dim - 1);
+                                        .find_dominating_fe(fe_indices,
+                                                            /*codim*/ dim - 1);
                                     unsigned int other_fe_index =
                                       numbers::invalid_unsigned_int;
 
@@ -1768,9 +1768,9 @@ namespace internal
                       // find out which is the most dominating finite element of
                       // the ones that are used on this line
                       const unsigned int most_dominating_fe_index =
-                        dof_handler.get_fe_collection()
-                          .find_dominating_fe_in_subset(fe_indices,
-                                                        /*codim=*/dim - 1);
+                        dof_handler.get_fe_collection().find_dominating_fe(
+                          fe_indices,
+                          /*codim=*/dim - 1);
 
                       // if we found the most dominating element, then use this
                       // to eliminate some of the degrees of freedom by
@@ -1910,9 +1910,9 @@ namespace internal
                   // find out which is the most dominating finite
                   // element of the ones that are used on this quad
                   const unsigned int most_dominating_fe_index =
-                    dof_handler.get_fe_collection()
-                      .find_dominating_fe_in_subset(fe_indices,
-                                                    /*codim=*/dim - 2);
+                    dof_handler.get_fe_collection().find_dominating_fe(
+                      fe_indices,
+                      /*codim=*/dim - 2);
 
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom

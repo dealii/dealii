@@ -1262,16 +1262,16 @@ namespace ColorEnriched
       /*
        * Treat interface between enriched cells specially,
        * until #1496 (https://github.com/dealii/dealii/issues/1496) is resolved.
-       * Each time we build constraints at the
-       * interface between two different FE_Enriched, we look for the least
-       * dominating FE via
-       * hp::FECollection::find_least_dominating_fe_in_collection(). If we don't
-       * take further actions, we may find a dominating FE that is too
-       * restrictive, i.e. enriched FE consisting of only FE_Nothing. New
-       * elements needs to be added to FECollection object to help find the
-       * correct enriched FE underlying the spaces in the adjacent cells. This
-       * is done by creating an appropriate set in fe_sets and a call to the
-       * function make_fe_collection_from_colored_enrichments at a later stage.
+       * Each time we build constraints at the interface between two different
+       * FE_Enriched, we look for the least dominating FE of their common
+       * subspace via hp::FECollection::find_common_subspace() and
+       * hp::FECollection::find_dominated_fe(). If we don't take further
+       * actions, we may find a dominating FE that is too restrictive, i.e.
+       * enriched FE consisting of only FE_Nothing. New elements needs to be
+       * added to FECollection object to help find the correct enriched FE
+       * underlying the spaces in the adjacent cells. This is done by creating
+       * an appropriate set in fe_sets and a call to the function
+       * make_fe_collection_from_colored_enrichments at a later stage.
        *
        * Consider a domain with three predicates and hence with three different
        * enrichment functions. Let the enriched finite element of a cell with
@@ -1280,12 +1280,11 @@ namespace ColorEnriched
        * the cell. If the interface has enriched FE [1 0 1] and [0 1 1]
        * on adjacent cells, an enriched FE [0 0 1] should exist and is
        * found as the least dominating finite element for the two cells by
-       * DoFTools::make_hanging_node_constraints using a call to the function
-       * hp::FECollection::find_least_dominating_fe_in_collection().
-       * Denoting the fe set in adjacent cells as {1,3} and {2,3}, this
-       * implies that an fe set {3} needs to be added! Based on the
-       * predicate configuration, this may not be automatically done without
-       * the following special treatment.
+       * DoFTools::make_hanging_node_constraints, using the above mentioned
+       * hp::FECollection functions. Denoting the fe set in adjacent cells as
+       * {1,3} and {2,3}, this implies that an fe set {3} needs to be added!
+       * Based on the predicate configuration, this may not be automatically
+       * done without the following special treatment.
        */
 
       // loop through faces

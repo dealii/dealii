@@ -269,8 +269,7 @@ main(int argc, char **argv)
     }
 
   deallog << "Face dominating set for 1 and 2: "
-          << fe_collection.find_least_dominating_fe_in_collection({1, 2},
-                                                                  /*codim=*/1)
+          << fe_collection.find_dominating_fe_extended({1, 2}, /*codim=*/1)
           << std::endl;
 
   dof_handler.distribute_dofs(fe_collection);
