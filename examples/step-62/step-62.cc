@@ -954,15 +954,17 @@ namespace step62
               // because we have already calculated the stiffness and mass
               // matrices, only the value of $\omega$ changes.
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                  {
-                    std::complex<double> matrix_sum = 0;
-                    matrix_sum += -std::pow(omega, 2) *
-                                  quadrature_data.mass_coefficient[i][j];
-                    matrix_sum += quadrature_data.stiffness_coefficient[i][j];
-                    cell_matrix(i, j) += matrix_sum * quadrature_data.JxW;
-                  }
-              cell_rhs(i) += quadrature_data.right_hand_side[i];
+                {
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                    {
+                      std::complex<double> matrix_sum = 0;
+                      matrix_sum += -std::pow(omega, 2) *
+                                    quadrature_data.mass_coefficient[i][j];
+                      matrix_sum += quadrature_data.stiffness_coefficient[i][j];
+                      cell_matrix(i, j) += matrix_sum * quadrature_data.JxW;
+                    }
+                  cell_rhs(i) += quadrature_data.right_hand_side[i];
+                }
             }
           cell->get_dof_indices(local_dof_indices);
           constraints.distribute_local_to_global(cell_matrix,
