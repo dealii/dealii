@@ -134,52 +134,40 @@ namespace Step51
       : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p,
+                         const unsigned int /*component*/ = 0) const override
+    {
+      double sum = 0;
+      for (unsigned int i = 0; i < this->n_source_centers; ++i)
+        {
+          const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+          sum +=
+            std::exp(-x_minus_xi.norm_square() / (this->width * this->width));
+        }
+
+      return sum /
+             std::pow(2. * numbers::PI * this->width * this->width, dim / 2.);
+    }
 
     virtual Tensor<1, dim>
-    gradient(const Point<dim> & p,
-             const unsigned int component = 0) const override;
+    gradient(const Point<dim> &p,
+             const unsigned int /*component*/ = 0) const override
+    {
+      Tensor<1, dim> sum;
+      for (unsigned int i = 0; i < this->n_source_centers; ++i)
+        {
+          const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
+
+          sum +=
+            (-2 / (this->width * this->width) *
+             std::exp(-x_minus_xi.norm_square() / (this->width * this->width)) *
+             x_minus_xi);
+        }
+
+      return sum /
+             std::pow(2. * numbers::PI * this->width * this->width, dim / 2.);
+    }
   };
-
-
-
-  template <int dim>
-  double Solution<dim>::value(const Point<dim> &p, const unsigned int) const
-  {
-    double return_value = 0;
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
-      {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
-        return_value +=
-          std::exp(-x_minus_xi.norm_square() / (this->width * this->width));
-      }
-
-    return return_value / Utilities::fixed_power<dim>(
-                            std::sqrt(2. * numbers::PI) * this->width);
-  }
-
-
-
-  template <int dim>
-  Tensor<1, dim> Solution<dim>::gradient(const Point<dim> &p,
-                                         const unsigned int) const
-  {
-    Tensor<1, dim> return_value;
-
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
-      {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
-
-        return_value +=
-          (-2 / (this->width * this->width) *
-           std::exp(-x_minus_xi.norm_square() / (this->width * this->width)) *
-           x_minus_xi);
-      }
-
-    return return_value / Utilities::fixed_power<dim>(
-                            std::sqrt(2 * numbers::PI) * this->width);
-  }
 
 
 
@@ -196,20 +184,16 @@ namespace Step51
     {}
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  v) const override;
+                              Vector<double> &  v) const override
+    {
+      AssertDimension(v.size(), dim + 1);
+      Solution<dim>  solution;
+      Tensor<1, dim> grad = solution.gradient(p);
+      for (unsigned int d = 0; d < dim; ++d)
+        v[d] = -grad[d];
+      v[dim] = solution.value(p);
+    }
   };
-
-  template <int dim>
-  void SolutionAndGradient<dim>::vector_value(const Point<dim> &p,
-                                              Vector<double> &  v) const
-  {
-    AssertDimension(v.size(), dim + 1);
-    Solution<dim>  solution;
-    Tensor<1, dim> grad = solution.gradient(p);
-    for (unsigned int d = 0; d < dim; ++d)
-      v[d] = -grad[d];
-    v[dim] = solution.value(p);
-  }
 
 
 
@@ -224,42 +208,37 @@ namespace Step51
       : TensorFunction<1, dim>()
     {}
 
-    virtual Tensor<1, dim> value(const Point<dim> &p) const override;
+    virtual Tensor<1, dim> value(const Point<dim> &p) const override
+    {
+      Tensor<1, dim> convection;
+      switch (dim)
+        {
+          case 1:
+            convection[0] = 1;
+            break;
+          case 2:
+            convection[0] = p[1];
+            convection[1] = -p[0];
+            break;
+          case 3:
+            convection[0] = p[1];
+            convection[1] = -p[0];
+            convection[2] = 1;
+            break;
+          default:
+            Assert(false, ExcNotImplemented());
+        }
+      return convection;
+    }
   };
 
 
 
-  template <int dim>
-  Tensor<1, dim> ConvectionVelocity<dim>::value(const Point<dim> &p) const
-  {
-    Tensor<1, dim> convection;
-    switch (dim)
-      {
-        case 1:
-          convection[0] = 1;
-          break;
-        case 2:
-          convection[0] = p[1];
-          convection[1] = -p[0];
-          break;
-        case 3:
-          convection[0] = p[1];
-          convection[1] = -p[0];
-          convection[2] = 1;
-          break;
-        default:
-          Assert(false, ExcNotImplemented());
-      }
-    return convection;
-  }
-
-
-
-  // The last function we implement is the right hand side for the manufactured
-  // solution. It is very similar to step-7, with the exception that we now have
-  // a convection term instead of the reaction term. Since the velocity field is
-  // incompressible, i.e. $\nabla \cdot \mathbf{c} = 0$, this term simply reads
-  // $\mathbf{c} \nabla u$.
+  // The last function we implement is the right hand side for the
+  // manufactured solution. It is very similar to step-7, with the exception
+  // that we now have a convection term instead of the reaction term. Since
+  // the velocity field is incompressible, i.e., $\nabla \cdot \mathbf{c} =
+  // 0$, the advection term simply reads $\mathbf{c} \nabla u$.
   template <int dim>
   class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
@@ -268,48 +247,43 @@ namespace Step51
       : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p,
+                         const unsigned int /*component*/ = 0) const override
+    {
+      ConvectionVelocity<dim> convection_velocity;
+      Tensor<1, dim>          convection = convection_velocity.value(p);
+      double                  sum        = 0;
+      for (unsigned int i = 0; i < this->n_source_centers; ++i)
+        {
+          const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
 
-  private:
-    const ConvectionVelocity<dim> convection_velocity;
+          sum +=
+            ((2 * dim - 2 * convection * x_minus_xi -
+              4 * x_minus_xi.norm_square() / (this->width * this->width)) /
+             (this->width * this->width) *
+             std::exp(-x_minus_xi.norm_square() / (this->width * this->width)));
+        }
+
+      return sum /
+             std::pow(2. * numbers::PI * this->width * this->width, dim / 2.);
+    }
   };
 
 
-  template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> &p,
-                                   const unsigned int) const
-  {
-    Tensor<1, dim> convection   = convection_velocity.value(p);
-    double         return_value = 0;
-    for (unsigned int i = 0; i < this->n_source_centers; ++i)
-      {
-        const Tensor<1, dim> x_minus_xi = p - this->source_centers[i];
-
-        return_value +=
-          ((2 * dim - 2 * convection * x_minus_xi -
-            4 * x_minus_xi.norm_square() / (this->width * this->width)) /
-           (this->width * this->width) *
-           std::exp(-x_minus_xi.norm_square() / (this->width * this->width)));
-      }
-
-    return return_value / Utilities::fixed_power<dim>(
-                            std::sqrt(2 * numbers::PI) * this->width);
-  }
 
   // @sect3{The HDG solver class}
 
   // The HDG solution procedure follows closely that of step-7. The major
-  // difference is the use of three different sets of <code>DoFHandler</code>
-  // and FE objects, along with the <code>ChunkSparseMatrix</code> and the
-  // corresponding solutions vectors. We also use WorkStream to enable a
-  // multithreaded local solution process which exploits the embarrassingly
-  // parallel nature of the local solver. For WorkStream, we define the local
-  // operations on a cell and a copy function into the global matrix and
-  // vector. We do this both for the assembly (which is run twice, once when we
-  // generate the system matrix and once when we compute the element-interior
-  // solutions from the skeleton values) and for the postprocessing where
-  // we extract a solution that converges at higher order.
+  // difference is the use of three different sets of DoFHandler and FE
+  // objects, along with the ChunkSparseMatrix and the corresponding solutions
+  // vectors. We also use WorkStream to enable a multithreaded local solution
+  // process which exploits the embarrassingly parallel nature of the local
+  // solver. For WorkStream, we define the local operations on a cell and a
+  // copy function into the global matrix and vector. We do this both for the
+  // assembly (which is run twice, once when we generate the system matrix and
+  // once when we compute the element-interior solutions from the skeleton
+  // values) and for the postprocessing where we extract a solution that
+  // converges at higher order.
   template <int dim>
   class HDG
   {
@@ -384,12 +358,19 @@ namespace Step51
 
     // The degrees of freedom corresponding to the skeleton strongly enforce
     // Dirichlet boundary conditions, just as in a continuous Galerkin finite
-    // element method.  We can enforce the boundary conditions in an analogous
-    // manner through the use of AffineConstraints constructs. In
-    // addition, hanging nodes are handled in the same way as for
-    // continuous finite elements: For the face elements which
-    // only define degrees of freedom on the face, this process sets the
-    // solution on the refined to be the one from the coarse side.
+    // element method. We can enforce the boundary conditions in an analogous
+    // manner via an AffineConstraints object. In addition, hanging nodes are
+    // handled in the same way as for continuous finite elements: For the face
+    // elements which only define degrees of freedom on the face, this process
+    // sets the solution on the refined side to coincide with the
+    // representation on the coarse side.
+    //
+    // Note that for HDG, the elimination of hanging nodes is not the only
+    // possibility &mdash; in terms of the HDG theory, one could also use the
+    // unknowns from the refined side and express the local solution on the
+    // coarse side through the trace values on the refined side. However, such
+    // a setup is not as easily implemented in terms of deal.II loops and not
+    // further analyzed.
     AffineConstraints<double> constraints;
 
     // The usage of the ChunkSparseMatrix class is similar to the usual sparse
@@ -407,11 +388,10 @@ namespace Step51
   // @sect3{The HDG class implementation}
 
   // @sect4{Constructor}
-  // The constructor is similar to those in other examples,
-  // with the exception of handling multiple <code>DoFHandler</code> and
-  // <code>FiniteElement</code> objects. Note that we create a system of finite
-  // elements for the local DG part, including the gradient/flux part and the
-  // scalar part.
+  // The constructor is similar to those in other examples, with the exception
+  // of handling multiple DoFHandler and FiniteElement objects. Note that we
+  // create a system of finite elements for the local DG part, including the
+  // gradient/flux part and the scalar part.
   template <int dim>
   HDG<dim>::HDG(const unsigned int degree, const RefinementMode refinement_mode)
     : fe_local(FE_DGQ<dim>(degree), dim, FE_DGQ<dim>(degree), 1)
@@ -428,7 +408,7 @@ namespace Step51
   // @sect4{HDG::setup_system}
   // The system for an HDG solution is setup in an analogous manner to most
   // of the other tutorial programs.  We are careful to distribute dofs with
-  // all of our <code>DoFHandler</code> objects.  The @p solution and @p system_matrix
+  // all of our DoFHandler objects.  The @p solution and @p system_matrix
   // objects go with the global skeleton solution.
   template <int dim>
   void HDG<dim>::setup_system()
@@ -458,7 +438,7 @@ namespace Step51
     constraints.close();
 
     // When creating the chunk sparsity pattern, we first create the usual
-    // compressed sparsity pattern and then set the chunk size, which is equal
+    // dynamic sparsity pattern and then set the chunk size, which is equal
     // to the number of dofs on a face, when copying this into the final
     // sparsity pattern.
     {
@@ -508,11 +488,11 @@ namespace Step51
 
   // @sect4{HDG::ScratchData}
   // @p ScratchData contains persistent data for each
-  // thread within <code>WorkStream</code>.  The <code>FEValues</code>, matrix,
+  // thread within WorkStream.  The FEValues, matrix,
   // and vector objects should be familiar by now.  There are two objects that
-  // need to be discussed: @p std::vector<std::vector<unsigned int> >
-  // fe_local_support_on_face and @p std::vector<std::vector<unsigned int> >
-  // fe_support_on_face.  These are used to indicate whether or not the finite
+  // need to be discussed: `std::vector<std::vector<unsigned int> >
+  // fe_local_support_on_face` and `std::vector<std::vector<unsigned int> >
+  // fe_support_on_face`.  These are used to indicate whether or not the finite
   // elements chosen have support (non-zero values) on a given face of the
   // reference cell for the local part associated to @p fe_local and the
   // skeleton part @p fe. We extract this information in the
@@ -621,7 +601,7 @@ namespace Step51
 
 
   // @sect4{HDG::PostProcessScratchData}
-  // @p PostProcessScratchData contains the data used by <code>WorkStream</code>
+  // @p PostProcessScratchData contains the data used by WorkStream
   // when post-processing the local solution $u^*$.  It is similar, but much
   // simpler, than @p ScratchData.
   template <int dim>
@@ -669,7 +649,7 @@ namespace Step51
 
 
   // @sect4{HDG::assemble_system}
-  // The @p assemble_system function is similar to <code>Step-32</code>, where
+  // The @p assemble_system function is similar to the one on Step-32, where
   // the quadrature formula and the update flags are set up, and then
   // <code>WorkStream</code> is used to do the work in a multi-threaded
   // manner.  The @p trace_reconstruct input parameter is used to decide
@@ -1211,8 +1191,8 @@ namespace Step51
   // codimension-1 surfaces
   // of the triangulation.  Our @p output_results function writes all local solutions
   // to the same vtk file, even though they correspond to different
-  // <code>DoFHandler</code> objects.  The graphical output for the skeleton
-  // variable is done through use of the <code>DataOutFaces</code> class.
+  // DoFHandler objects.  The graphical output for the skeleton
+  // variable is done through use of the DataOutFaces class.
   template <int dim>
   void HDG<dim>::output_results(const unsigned int cycle)
   {
@@ -1359,9 +1339,7 @@ namespace Step51
     // conditions. Since we re-create the triangulation every time for global
     // refinement, the flags are set in every refinement step, not just at the
     // beginning.
-    typename Triangulation<dim>::cell_iterator cell = triangulation.begin(),
-                                               endc = triangulation.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.cell_iterators())
       for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
            ++face)
         if (cell->face(face)->at_boundary())

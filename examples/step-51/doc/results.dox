@@ -281,13 +281,15 @@ One final note on the efficiency comparison: We tried to use general-purpose
 sparse matrix structures and similar solvers (optimal AMG preconditioners for
 both without particular tuning of the AMG parameters on any of them) to give a
 fair picture of the cost versus accuracy of two methods, on a toy example. It
-should be noted however that geometric multigrid (GMG) for continuous finite elements is about a
-factor four to five faster for $p=3$ and $p=6$. The authors of this
-tutorial have not seen similarly advanced solvers for the HDG linear
-systems. Also, there are other implementation aspects for CG available such as
-fast matrix-free approaches as shown in step-37 that make higher order
-continuous elements more competitive. Again, it is not clear to the authors of
-the tutorial whether similar improvements could be made for HDG.
+should be noted however that geometric multigrid (GMG) for continuous finite
+elements is about a factor four to five faster for $p=3$ and $p=6$. As of
+2019, optimal-complexity iterative solvers for HDG are still under development
+in the research community. Also, there are other implementation aspects for CG
+available such as fast matrix-free approaches as shown in step-37 that make
+higher order continuous elements more competitive. Again, it is not clear to
+the authors of the tutorial whether similar improvements could be made for
+HDG. We refer to <a href="https://dx.doi.org/10.1137/16M110455X">Kronbichler
+and Wall (2018)</a> for a recent efficiency evaluation.
 
 
 <h3>Possibilities for improvements</h3>
@@ -370,13 +372,14 @@ improvements would make the most sense:
   problem size (the number of iterations for Q1 elements and global
   refinements starts at 35 for the small sizes but increase up to 701 for the
   largest size). To do better, one could for example use an algebraic
-  multigrid preconditioner from Trilinos. For diffusion-dominated
-  problems such as
-  the problem at hand with finer meshes, such a solver can be designed that
-  uses the matrix-vector products from the more efficient ChunkSparseMatrix on
-  the finest level, as long as we are not working in parallel with MPI. For
-  MPI-parallelized computation, a standard TrilinosWrappers::SparseMatrix can
-  be used.
+  multigrid preconditioner from Trilinos, or some more advanced variants as
+  the one discussed in <a
+  href="https://dx.doi.org/10.1137/16M110455X">Kronbichler and Wall
+  (2018)</a>. For diffusion-dominated problems such as the problem at hand
+  with finer meshes, such a solver can be designed that uses the matrix-vector
+  products from the more efficient ChunkSparseMatrix on the finest level, as
+  long as we are not working in parallel with MPI. For MPI-parallelized
+  computations, a standard TrilinosWrappers::SparseMatrix can be used.
 
   <li> Speed up assembly by pre-assembling parts that do not change from one
   cell to another (those that do neither contain variable coefficients nor
