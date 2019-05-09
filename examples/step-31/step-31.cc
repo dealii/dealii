@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Martin Kronbichler, Uppsala University,
  *          Wolfgang Bangerth, Texas A&M University 2007, 2008
@@ -89,18 +88,18 @@ namespace Step31
   // same as in step-22. Regarding the details, though, there are some
   // differences.
 
-  // The first thing is that we don't set any nonhomogeneous boundary
+  // The first thing is that we don't set any inhomogeneous boundary
   // conditions on the velocity, since as is explained in the introduction we
   // will use no-flux conditions $\mathbf{n}\cdot\mathbf{u}=0$. So what is
   // left are <code>dim-1</code> conditions for the tangential part of the
   // normal component of the stress tensor, $\textbf{n} \cdot [p \textbf{1} -
   // \eta\varepsilon(\textbf{u})]$; we assume homogeneous values for these
-  // components, i.e. a natural boundary condition that requires no specific
+  // components, i.e., a natural boundary condition that requires no specific
   // action (it appears as a zero term in the right hand side of the weak
   // form).
   //
-  // For the temperature <i>T</i>, we assume no thermal energy flux,
-  // i.e. $\mathbf{n} \cdot \kappa \nabla T=0$. This, again, is a boundary
+  // For the temperature $T$, we assume no thermal energy flux,
+  // i.e., $\mathbf{n} \cdot \kappa \nabla T=0$. This, again, is a boundary
   // condition that does not require us to do anything in particular.
   //
   // Secondly, we have to set initial conditions for the temperature (no
@@ -418,9 +417,9 @@ namespace Step31
     // components.
     //
     // The first step multiplies the velocity part of the vector by a
-    // preconditioner of the matrix <i>A</i>, i.e. we compute $Y_0={\tilde
+    // preconditioner of the matrix $A$, i.e., we compute $Y_0={\tilde
     // A}^{-1}X_0$.  The resulting velocity vector is then multiplied by $B$
-    // and subtracted from the pressure, i.e. we want to compute $X_1-BY_0$.
+    // and subtracted from the pressure, i.e., we want to compute $X_1-BY_0$.
     // This second step only acts on the pressure vector and is accomplished
     // by the residual function of our matrix classes, except that the sign is
     // wrong. Consequently, we change the sign in the temporary pressure
@@ -1107,7 +1106,7 @@ namespace Step31
         // done in two lines. Once the local matrix is ready (loop over rows
         // and columns in the local matrix on each quadrature point), we get
         // the local DoF indices and write the local information into the
-        // global matrix. We do this as in step-27, i.e. we directly apply the
+        // global matrix. We do this as in step-27, i.e., we directly apply the
         // constraints from hanging nodes locally. By doing so, we don't have
         // to do that afterwards, and we don't also write into entries of the
         // matrix that will actually be set to zero again later when
@@ -1575,8 +1574,8 @@ namespace Step31
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     // Next comes the declaration of vectors to hold the old and older
-    // solution values (as a notation for time levels <i>n-1</i> and
-    // <i>n-2</i>, respectively) and gradients at quadrature points of the
+    // solution values (as a notation for time levels $n-1$ and
+    // $n-2$, respectively) and gradients at quadrature points of the
     // current cell. We also declare an object to hold the temperature right
     // hand side values (<code>gamma_values</code>), and we again use
     // shortcuts for the temperature basis functions. Eventually, we need to
@@ -1748,7 +1747,7 @@ namespace Step31
   // reduced set of vectors by restarting at every 100 iterations.
   //
   // With this all set up, we solve the system and distribute the constraints
-  // in the Stokes system, i.e. hanging nodes and no-flux boundary condition,
+  // in the Stokes system, i.e., hanging nodes and no-flux boundary condition,
   // in order to have the appropriate solution values even at constrained
   // dofs. Finally, we write the number of iterations to the screen.
   template <int dim>
@@ -2124,7 +2123,7 @@ namespace Step31
         // the pre-refinement steps or if we should remesh (every fifth time
         // step), refining up to a level that is consistent with initial
         // refinement and pre-refinement steps. Last in the loop is to advance
-        // the solutions, i.e. to copy the solutions to the next "older" time
+        // the solutions, i.e., to copy the solutions to the next "older" time
         // level.
         assemble_stokes_system();
         build_stokes_preconditioner();

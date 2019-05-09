@@ -18,13 +18,13 @@ California Institute of Technology.
 <h3>The Boussinesq equations</h3>
 
 This program deals with an interesting physical problem: how does a
-fluid (i.e. a liquid or gas) behave if it experiences differences in
+fluid (i.e., a liquid or gas) behave if it experiences differences in
 buoyancy caused by temperature differences? It is clear that those
 parts of the fluid that are hotter (and therefore lighter) are going
 to rise up and those that are cooler (and denser) are going to sink
 down with gravity.
 
-In cases where the fluid moves slowly enough such that inertia effects
+In cases where the fluid moves slowly enough such that inertial effects
 can be neglected, the equations that describe such behavior are the
 Boussinesq equations that read as follows:
 @f{eqnarray*}
@@ -41,7 +41,7 @@ Boussinesq equations that read as follows:
 @f}
 These equations fall into the class of vector-valued problems (a
 toplevel overview of this topic can be found in the @ref vector_valued module).
-Here, <b>u</b> is the velocity field, <i>p</i> the pressure, and <i>T</i>
+Here, $\mathbf u$ is the velocity field, $p$ the pressure, and $T$
 the temperature of the fluid. $\varepsilon ({\mathbf u}) = \frac 12
 [(\nabla{\mathbf u}) + (\nabla {\mathbf u})^T]$ is the symmetric
 gradient of the velocity. As can be seen, velocity and pressure
@@ -53,13 +53,13 @@ particular with regard to efficient linear Stokes solvers.
 The forcing term of the fluid motion is the buoyancy of the
 fluid, expressed as the product of the density $\rho$, the thermal expansion
 coefficient $\beta$,
-the temperature <i>T</i> and the gravity vector <b>g</b> pointing
+the temperature $T$ and the gravity vector $\mathbf{g}$ pointing
 downward. (A derivation of why the right hand side looks like it looks
 is given in the introduction of step-32.)
 While the first two equations describe how the fluid reacts to
 temperature differences by moving around, the third equation states
 how the fluid motion affects the temperature field: it is an advection
-diffusion equation, i.e. the temperature is attached to the fluid
+diffusion equation, i.e., the temperature is attached to the fluid
 particles and advected along in the flow field, with an additional
 diffusion (heat conduction) term. In many applications, the diffusion
 coefficient is fairly small, and the temperature equation is in fact
@@ -72,7 +72,7 @@ heat sources and may be a spatially and temporally varying function. $\eta$
 and $\kappa$ denote the viscosity and diffusivity coefficients, which we assume
 constant for this tutorial program. The more general case when $\eta$ depends on
 the temperature is an important factor in physical applications: Most materials
-become more fluid as they get hotter (i.e., $\eta$ decreases with <i>T</i>);
+become more fluid as they get hotter (i.e., $\eta$ decreases with $T$);
 sometimes, as in the case of rock minerals at temperatures close to their
 melting point, $\eta$ may change by orders of magnitude over the typical range
 of temperatures.
@@ -80,14 +80,14 @@ of temperatures.
 We note that the Stokes equation above could be nondimensionalized by
 introducing the <a target="_top"
 href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
-number</a> $\mathrm{Ra}=\frac{\|g\| \beta \rho}{\eta \kappa} \delta T L^3$ using a
+number</a> $\mathrm{Ra}=\frac{\|\mathbf{g}\| \beta \rho}{\eta \kappa} \delta T L^3$ using a
 typical length scale $L$, typical temperature difference $\delta T$, density
 $\rho$, thermal diffusivity $\eta$, and thermal conductivity $\kappa$.
 $\mathrm{Ra}$ is a dimensionless number that describes the ratio of heat
 transport due to convection induced by buoyancy changes from
 temperature differences, and of heat transport due to thermal
 diffusion. A small Rayleigh number implies that buoyancy is not strong
-relative to viscosity and fluid motion <b>u</b> is slow enough so
+relative to viscosity and fluid motion $\mathbf{u}$ is slow enough so
 that heat diffusion $\kappa\nabla T$ is the dominant heat transport
 term. On the other hand, a fluid with a high Rayleigh number will show
 vigorous convection that dominates heat conduction.
@@ -96,7 +96,7 @@ For most fluids for which we are interested in computing thermal
 convection, the Rayleigh number is very large, often $10^6$ or
 larger. From the structure of the equations, we see that this will
 lead to large pressure differences and large velocities. Consequently,
-the convection term in the convection-diffusion equation for <i>T</i> will
+the convection term in the convection-diffusion equation for $T$ will
 also be very large and an accurate solution of this equation will
 require us to choose small time steps. Problems with large Rayleigh
 numbers are therefore hard to solve numerically for similar reasons
@@ -134,7 +134,7 @@ at previous times. This is reflected by the fact that the first two equations
 above are the steady state Stokes equation that do not contain a time
 derivative. Consequently, we do not need initial conditions for either
 velocities or pressure. On the other hand, the temperature field does satisfy
-an equation with a time derivative, so we need initial conditions for <i>T</i>.
+an equation with a time derivative, so we need initial conditions for $T$.
 
 As for boundary conditions: if $\kappa>0$ then the temperature
 satisfies a second order differential equation that requires
@@ -142,10 +142,10 @@ boundary data all around the boundary for all times. These can either be a
 prescribed boundary temperature $T|_{\partial\Omega}=T_b$ (Dirichlet boundary
 conditions), or a prescribed thermal flux $\mathbf{n}\cdot\kappa\nabla
 T|_{\partial\Omega}=\phi$; in this program, we will use an insulated boundary
-condition, i.e. prescribe no thermal flux: $\phi=0$.
+condition, i.e., prescribe no thermal flux: $\phi=0$.
 
 Similarly, the velocity field requires us to pose boundary conditions. These
-may be no-slip no-flux conditions <b>u</b>=0 on $\partial\Omega$ if the fluid
+may be no-slip no-flux conditions $\mathbf{u}=0$ on $\partial\Omega$ if the fluid
 sticks to the boundary, or no normal flux conditions $\mathbf n \cdot \mathbf
 u = 0$ if the fluid can flow along but not across the boundary, or any number
 of other conditions that are physically reasonable. In this program, we will
@@ -157,7 +157,7 @@ use no normal flux conditions.
 Like the equations solved in step-21, we here have a
 system of differential-algebraic equations (DAE): with respect to the time
 variable, only the temperature equation is a differential equation
-whereas the Stokes system for <b>u</b> and <i>p</i> has no
+whereas the Stokes system for $\mathbf{u}$ and $p$ has no
 time-derivatives and is therefore of the sort of an algebraic
 constraint that has to hold at each time instant. The main difference
 to step-21 is that the algebraic constraint there was a
@@ -183,7 +183,7 @@ in the top-left corner of the differential operator.
 <h4>Time stepping</h4>
 
 The structure of the problem as a DAE allows us to use the same strategy as
-we have already used in step-21, i.e. we use a time lag
+we have already used in step-21, i.e., we use a time lag
 scheme: we first solve the temperature equation (using an extrapolated
 velocity field), and then insert the new temperature solution into the right
 hand side of the velocity equation. The way we implement this in our code
@@ -191,7 +191,7 @@ looks at things from a slightly different perspective, though. We first
 solve the Stokes equations for velocity and pressure using the temperature
 field from the previous time step, which means that we get the velocity for
 the previous time step. In other words, we first solve the Stokes system for
-time step <i>n-1</i> as
+time step $n - 1$ as
 @f{eqnarray*}
   -\nabla \cdot (2\eta \varepsilon ({\mathbf u}^{n-1})) + \nabla p^{n-1} &=&
   -\rho\; \beta \; T^{n-1} \mathbf{g},
@@ -199,7 +199,7 @@ time step <i>n-1</i> as
   \nabla \cdot {\mathbf u}^{n-1} &=& 0,
 @f}
 and then the temperature equation with an extrapolated velocity field to
-time <i>n</i>.
+time $n$.
 
 In contrast to step-21, we'll use a higher order time
 stepping scheme here, namely the <a
@@ -207,7 +207,7 @@ href="http://en.wikipedia.org/wiki/Backward_differentiation_formula">Backward
 Differentiation Formula scheme of order 2 (BDF-2 in short)</a> that replaces
 the time derivative $\frac{\partial T}{\partial t}$ by the (one-sided)
 difference quotient $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k}$
-with <i>k</i> the time step size. This gives the discretized-in-time
+with $k$ the time step size. This gives the discretized-in-time
 temperature equation
 @f{eqnarray*}
   \frac 32 T^n
@@ -226,7 +226,7 @@ Note how the temperature equation is solved semi-explicitly: diffusion is
 treated implicitly whereas advection is treated explicitly using an
 extrapolation (or forward-projection) of temperature and velocity, including
 the just-computed velocity ${\mathbf u}^{n-1}$. The forward-projection to
-the current time level <i>n</i> is derived from a Taylor expansion, $T^n
+the current time level $n$ is derived from a Taylor expansion, $T^n
 \approx T^{n-1} + k_n \frac{\partial T}{\partial t} \approx T^{n-1} + k_n
 \frac{T^{n-1}-T^{n-2}}{k_n} = 2T^{n-1}-T^{n-2}$. We need this projection for
 maintaining the order of accuracy of the BDF-2 scheme. In other words, the
@@ -242,7 +242,7 @@ advection term implicitly since the BDF-2 scheme is A-stable, at the price
 that we needed to build a new temperature matrix at each time step.) We will
 discuss the exact choice of time step in the <a href="#Results">results
 section</a>, but for the moment of importance is that this CFL condition
-means that the time step size <i>k</i> may change from time step to time
+means that the time step size $k$ may change from time step to time
 step, and that we have to modify the above formula slightly. If
 $k_n,k_{n-1}$ are the time steps sizes of the current and previous time
 step, then we use the approximations
@@ -281,7 +281,7 @@ and above equation is generalized as follows:
 
 where ${(\cdot)}^{*,n} = \left(1+\frac{k_n}{k_{n-1}}\right)(\cdot)^{n-1} -
 \frac{k_n}{k_{n-1}}(\cdot)^{n-2}$ denotes the extrapolation of velocity
-<b>u</b> and temperature <i>T</i> to time level <i>n</i>, using the values
+$\mathbf u$ and temperature $T$ to time level $n$, using the values
 at the two previous time steps. That's not an easy to read equation, but
 will provide us with the desired higher order accuracy. As a consistency
 check, it is easy to verify that it reduces to the same equation as above if
@@ -348,7 +348,7 @@ The more interesting question is what to do with the temperature
 advection-diffusion equation. By default, not all discretizations of
 this equation are equally stable unless we either do something like
 upwinding, stabilization, or all of this. One way to achieve this is
-to use discontinuous elements (i.e. the FE_DGQ class that we used, for
+to use discontinuous elements (i.e., the FE_DGQ class that we used, for
 example, in the discretization of the transport equation in
 step-12, or in discretizing the pressure in
 step-20 and step-21) and to define a
@@ -384,7 +384,7 @@ to something like
 @f}
 where $\nu(T)$ is an addition viscosity (diffusion) term that only
 acts in the vicinity of shocks and other discontinuities. $\nu(T)$ is
-chosen in such a way that if <i>T</i> satisfies the original equations, the
+chosen in such a way that if $T$ satisfies the original equations, the
 additional viscosity is zero.
 
 To achieve this, the literature contains a number of approaches. We
@@ -458,7 +458,7 @@ constant. To understand why this method works consider this: If on a particular
 cell $K$ the temperature field is smooth, then we expect the residual
 to be small there (in fact to be on the order of ${\cal O}(h_K)$) and
 the stabilization term that injects artificial diffusion will there be
-of size $h_K^{\alpha+1}$ &mdash; i.e. rather small, just as we hope it to
+of size $h_K^{\alpha+1}$ &mdash; i.e., rather small, just as we hope it to
 be when no additional diffusion is necessary. On the other hand, if we
 are on or close to a discontinuity of the temperature field, then the
 residual will be large; the minimum operation in the definition of
@@ -466,7 +466,7 @@ $\nu_\alpha(T)$ will then ensure that the stabilization has size $h_K$
 &mdash; the optimal amount of artificial viscosity to ensure stability of
 the scheme.
 
-It is certainly a good questions whether this scheme really works?
+Whether or not this scheme really works is a good question.
 Computations by Guermond and Popov have shown that this form of
 stabilization actually performs much better than most of the other
 stabilization schemes that are around (for example streamline
@@ -480,9 +480,9 @@ are considerably better than for $\alpha=1$.
 A more practical question is how to introduce this artificial
 diffusion into the equations we would like to solve. Note that the
 numerical viscosity $\nu(T)$ is temperature-dependent, so the equation
-we want to solve is nonlinear in <i>T</i> &mdash; not what one desires from a
+we want to solve is nonlinear in $T$ &mdash; not what one desires from a
 simple method to stabilize an equation, and even less so if we realize
-that $\nu(T)$ is nondifferentiable in <i>T</i>. However, there is no
+that $\nu(T)$ is nondifferentiable in $T$. However, there is no
 reason to despair: we still have to discretize in time and we can
 treat the term explicitly.
 
@@ -494,7 +494,7 @@ previous time steps (which enabled us to use the BDF-2 scheme without
 additional storage cost). We could now simply evaluate the rest of the
 terms at $t_{n-1}$, but then the discrete residual would be nothing else than
 a backward Euler approximation, which is only first order accurate. So, in
-case of smooth solutions, the residual would be still of the order <i>h</i>,
+case of smooth solutions, the residual would be still of the order $h$,
 despite the second order time accuracy in the outer BDF-2 scheme and the
 spatial FE discretization. This is certainly not what we want to have
 (in fact, we desired to have small residuals in regions where the solution
@@ -509,15 +509,15 @@ intermediate temperature, $\nu_\alpha =
 evaluation of the residual is nothing else than a Crank-Nicholson scheme,
 so we can be sure that now everything is alright. One might wonder whether
 it is a problem that the numerical viscosity now is not evaluated at
-time <i>n</i> (as opposed to the rest of the equation). However, this offset
+time $n$ (as opposed to the rest of the equation). However, this offset
 is uncritical: For smooth solutions, $\nu_\alpha$ will vary continuously,
-so the error in time offset is <i>k</i> times smaller than the nonlinear
+so the error in time offset is $k$ times smaller than the nonlinear
 viscosity itself, i.e., it is a small higher order contribution that is
 left out. That's fine because the term itself is already at the level of
 discretization error in smooth regions.
 
 Using the BDF-2 scheme introduced above,
-this yields for the simpler case of uniform time steps of size <i>k</i>:
+this yields for the simpler case of uniform time steps of size $k$:
 @f{eqnarray*}
   \frac 32 T^n
   -
@@ -548,7 +548,7 @@ derivative and the original (physical) diffusion which we treat
 implicitly (this is actually a nice term: the matrices that result
 from the left hand side are the mass matrix and a multiple of the
 Laplace matrix &mdash; both are positive definite and if the time step
-size <i>k</i> is small, the sum is simple to invert). On the right hand
+size $k$ is small, the sum is simple to invert). On the right hand
 side, the terms in the first line result from the time derivative; in
 the second line is the artificial diffusion at time $t_{n-\frac
 32}$; the third line contains the
@@ -688,7 +688,7 @@ and as discussed there a good preconditioner is
     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
   \end{array}\right)
 @f}
-where <i>S</i> is the Schur complement of the Stokes operator
+where $S$ is the Schur complement of the Stokes operator
 $S=B^TA^{-1}B$. Of course, this preconditioner is not useful because we
 can't form the various inverses of matrices, but we can use the
 following as a preconditioner:
@@ -700,7 +700,7 @@ following as a preconditioner:
   \end{array}\right)
 @f}
 where $\tilde A^{-1},\tilde S^{-1}$ are approximations to the inverse
-matrices. In particular, it turned out that <i>S</i> is spectrally
+matrices. In particular, it turned out that $S$ is spectrally
 equivalent to the mass matrix and consequently replacing $\tilde
 S^{-1}$ by a CG solver applied to the mass matrix on the pressure
 space was a good choice. In a small deviation from step-22, we
@@ -715,7 +715,7 @@ the vector-valued velocity field, i.e.
 $A_{ij} = (\varepsilon {\mathbf v}_i, 2\eta \varepsilon ({\mathbf
 v}_j))$.
 In step-22 we used a sparse LU decomposition (using the
-SparseDirectUMFPACK class) of <i>A</i> for $\tilde A^{-1}$ &mdash; the
+SparseDirectUMFPACK class) of $A$ for $\tilde A^{-1}$ &mdash; the
 perfect preconditioner &mdash; in 2d, but for 3d memory and compute
 time is not usually sufficient to actually compute this decomposition;
 consequently, we only use an incomplete LU decomposition (ILU, using
@@ -731,11 +731,11 @@ $(\nabla {\mathbf v}_i, \eta \nabla {\mathbf v}_j)
 $ (note that the factor 2 has disappeared in this form). The latter,
 however, has the advantage that the <code>dim</code> vector components
 of the test functions are not coupled (well, almost, see below),
-i.e. the resulting matrix is block-diagonal: one block for each vector
+i.e., the resulting matrix is block-diagonal: one block for each vector
 component, and each of these blocks is equal to the Laplace matrix for
 this vector component. So assuming we order degrees of freedom in such
-a way that first all <i>x</i>-components of the velocity are numbered, then
-the <i>y</i>-components, and then the <i>z</i>-components, then the matrix
+a way that first all $x$-components of the velocity are numbered, then
+the $y$-components, and then the $z$-components, then the matrix
 $\hat A$ that is associated with this slightly different bilinear form has
 the form
 @f{eqnarray*}
@@ -747,7 +747,7 @@ the form
 where $A_s$ is a Laplace matrix of size equal to the number of shape functions
 associated with each component of the vector-valued velocity. With this
 matrix, one could be tempted to define our preconditioner for the
-velocity matrix <i>A</i> as follows:
+velocity matrix $A$ as follows:
 @f{eqnarray*}
   \tilde A^{-1} =
   \left(\begin{array}{ccc}
@@ -764,20 +764,21 @@ $\tilde A$ definite, we need to make the individual blocks $\tilde
 A_s$ definite by applying boundary conditions. One can try to do so by
 applying Dirichlet boundary conditions all around the boundary, and
 then the so-defined preconditioner $\tilde A^{-1}$ turns out to be a
-good preconditioner for <i>A</i> if the latter matrix results from a Stokes
+good preconditioner for $A$ if the latter matrix results from a Stokes
 problem where we also have Dirichlet boundary conditions on the
-velocity components all around the domain, i.e. if we enforce <b>u</b>=0.
+velocity components all around the domain, i.e., if we enforce $\mathbf{u} =
+0$.
 
 Unfortunately, this "if" is an "if and only if": in the program below
 we will want to use no-flux boundary conditions of the form $\mathbf u
-\cdot \mathbf n = 0$ (i.e. flow %parallel to the boundary is allowed,
+\cdot \mathbf n = 0$ (i.e., flow %parallel to the boundary is allowed,
 but no flux through the boundary). In this case, it turns out that the
 block diagonal matrix defined above is not a good preconditioner
 because it neglects the coupling of components at the boundary. A
 better way to do things is therefore if we build the matrix $\hat A$
 as the vector Laplace matrix $\hat A_{ij} = (\nabla {\mathbf v}_i,
 \eta \nabla {\mathbf v}_j)$ and then apply the same boundary condition
-as we applied to <i>A</i>. If this is a Dirichlet boundary condition all
+as we applied to $A$. If this is a Dirichlet boundary condition all
 around the domain, the $\hat A$ will decouple to three diagonal blocks
 as above, and if the boundary conditions are of the form $\mathbf u
 \cdot \mathbf n = 0$ then this will introduce a coupling of degrees of
@@ -788,7 +789,7 @@ almost all the benefits of what we hoped to get.
 
 To sum this whole story up, we can observe:
 <ul>
-  <li> Compared to building a preconditioner from the original matrix <i>A</i>
+  <li> Compared to building a preconditioner from the original matrix $A$
   resulting from the symmetric gradient as we did in step-22,
   we have to expect that the preconditioner based on the Laplace bilinear form
   performs worse since it does not take into account the coupling between
@@ -804,7 +805,7 @@ To sum this whole story up, we can observe:
   have to store an additional matrix we didn't need before, the
   preconditioner $\tilde A_s^{-1}$ is likely going to need much less
   memory than storing a preconditioner for the coupled matrix
-  <i>A</i>. This is because the matrix $A_s$ has only a third of the
+  $A$. This is because the matrix $A_s$ has only a third of the
   entries per row for all rows corresponding to interior degrees of
   freedom, and contains coupling between vector components only on
   those parts of the boundary where the boundary conditions introduce
@@ -991,7 +992,7 @@ design.
 
 The case we want to solve here is as follows: we solve the Boussinesq
 equations described above with $\kappa=10^{-6}, \eta=1, \rho=1, \beta=10$,
-i.e. a relatively slow moving fluid that has virtually no thermal diffusive
+i.e., a relatively slow moving fluid that has virtually no thermal diffusive
 conductivity and transports heat mainly through convection. On the
 boundary, we will require no-normal flux for the velocity
 ($\mathrm{n}\cdot\mathrm{u}=0$) and for the temperature
@@ -1004,7 +1005,7 @@ we do not have to anything special. Initial conditions are only necessary for
 the temperature field, and we choose it to be constant zero.
 
 The evolution of the problem is then entirely driven by the right hand side
-$\gamma(\mathrm{x},t)$ of the temperature equation, i.e. by heat sources and
+$\gamma(\mathrm{x},t)$ of the temperature equation, i.e., by heat sources and
 sinks. Here, we choose a setup invented in advance of a Christmas lecture:
 real candles are of course prohibited in U.S. class rooms, but virtual ones
 are allowed. We therefore choose three spherical heat sources unequally spaced
