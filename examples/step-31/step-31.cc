@@ -134,29 +134,19 @@ namespace Step31
       {}
 
       virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+                           const unsigned int component = 0) const override
+      {
+        return 0;
+      }
 
       virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  value) const override;
+                                Vector<double> &  value) const override
+      {
+        for (unsigned int c = 0; c < this->n_components; ++c)
+          values(c) = TemperatureInitialValues<dim>::value(p, c);
+      }
     };
 
-
-    template <int dim>
-    double TemperatureInitialValues<dim>::value(const Point<dim> &,
-                                                const unsigned int) const
-    {
-      return 0;
-    }
-
-
-    template <int dim>
-    void
-    TemperatureInitialValues<dim>::vector_value(const Point<dim> &p,
-                                                Vector<double> &  values) const
-    {
-      for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = TemperatureInitialValues<dim>::value(p, c);
-    }
 
 
     template <int dim>
@@ -168,46 +158,34 @@ namespace Step31
       {}
 
       virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+                           const unsigned int component = 0) const override
+      {
+        (void)component;
+        Assert(component == 0,
+               ExcMessage("Invalid operation for a scalar function."));
+
+        Assert((dim == 2) || (dim == 3), ExcNotImplemented());
+
+        static const Point<dim> source_centers[3] = {
+          (dim == 2 ? Point<dim>(.3, .1) : Point<dim>(.3, .5, .1)),
+          (dim == 2 ? Point<dim>(.45, .1) : Point<dim>(.45, .5, .1)),
+          (dim == 2 ? Point<dim>(.75, .1) : Point<dim>(.75, .5, .1))};
+        static const double source_radius = (dim == 2 ? 1. / 32 : 1. / 8);
+
+        return ((source_centers[0].distance(p) < source_radius) ||
+                    (source_centers[1].distance(p) < source_radius) ||
+                    (source_centers[2].distance(p) < source_radius) ?
+                  1 :
+                  0);
+      }
 
       virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  value) const override;
+                                Vector<double> &  value) const override
+      {
+        for (unsigned int c = 0; c < this->n_components; ++c)
+          values(c) = TemperatureRightHandSide<dim>::value(p, c);
+      }
     };
-
-
-    template <int dim>
-    double
-    TemperatureRightHandSide<dim>::value(const Point<dim> & p,
-                                         const unsigned int component) const
-    {
-      (void)component;
-      Assert(component == 0,
-             ExcMessage("Invalid operation for a scalar function."));
-
-      Assert((dim == 2) || (dim == 3), ExcNotImplemented());
-
-      static const Point<dim> source_centers[3] = {
-        (dim == 2 ? Point<dim>(.3, .1) : Point<dim>(.3, .5, .1)),
-        (dim == 2 ? Point<dim>(.45, .1) : Point<dim>(.45, .5, .1)),
-        (dim == 2 ? Point<dim>(.75, .1) : Point<dim>(.75, .5, .1))};
-      static const double source_radius = (dim == 2 ? 1. / 32 : 1. / 8);
-
-      return ((source_centers[0].distance(p) < source_radius) ||
-                  (source_centers[1].distance(p) < source_radius) ||
-                  (source_centers[2].distance(p) < source_radius) ?
-                1 :
-                0);
-    }
-
-
-    template <int dim>
-    void
-    TemperatureRightHandSide<dim>::vector_value(const Point<dim> &p,
-                                                Vector<double> &  values) const
-    {
-      for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = TemperatureRightHandSide<dim>::value(p, c);
-    }
   } // namespace EquationData
 
 
@@ -333,7 +311,7 @@ namespace Step31
     // systems part II.  Using general block preconditioners", SIAM
     // J. Numer. Anal., 31 (1994), pp. 1352-1367).
     //
-    // Replacing <i>P</i> by $\tilde{P}$ keeps that spirit alive: the product
+    // Replacing $P$ by $\tilde{P}$ keeps that spirit alive: the product
     // $P^{-1} A$ will still be close to a matrix with eigenvalues 1 with a
     // distribution that does not depend on the problem size. This lets us
     // hope to be able to get a number of GMRES iterations that is
@@ -346,7 +324,7 @@ namespace Step31
     // complement will be approximated by the pressure mass matrix $M_p$
     // (weighted by $\eta^{-1}$ as mentioned in the introduction). As pointed
     // out in the results section of step-22, we can replace the exact inverse
-    // of <i>A</i> by just the application of a preconditioner, in this case
+    // of $A$ by just the application of a preconditioner, in this case
     // on a vector Laplace matrix as was explained in the introduction. This
     // does increase the number of (outer) GMRES iterations, but is still
     // significantly cheaper than an exact inverse, which would require
@@ -1134,9 +1112,9 @@ namespace Step31
   // preconditioner matrices.
   //
   // Next, we set up the preconditioner for the velocity-velocity matrix
-  // <i>A</i>. As explained in the introduction, we are going to use an AMG
+  // $A$. As explained in the introduction, we are going to use an AMG
   // preconditioner based on a vector Laplace matrix $\hat{A}$ (which is
-  // spectrally close to the Stokes matrix <i>A</i>). Usually, the
+  // spectrally close to the Stokes matrix $A$). Usually, the
   // TrilinosWrappers::PreconditionAMG class can be seen as a good black-box
   // preconditioner which does not need any special knowledge. In this case,
   // however, we have to be careful: since we build an AMG for a vector
