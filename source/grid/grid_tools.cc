@@ -2640,21 +2640,40 @@ namespace GridTools
                           Triangulation<dim, spacedim> &   triangulation,
                           const SparsityTools::Partitioner partitioner)
   {
+    Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
+              &triangulation) == nullptr),
+           ExcMessage("Objects of type parallel::distributed::Triangulation "
+                      "are already partitioned implicitly and can not be "
+                      "partitioned again explicitly."));
+
     std::vector<unsigned int> cell_weights;
 
     // Get cell weighting if a signal has been attached to the triangulation
     if (!triangulation.signals.cell_weight.empty())
       {
-        cell_weights.resize(triangulation.n_active_cells(),
-                            std::numeric_limits<unsigned int>::max());
+        cell_weights.resize(triangulation.n_active_cells(), 0U);
 
-        unsigned int c = 0;
-        typename Triangulation<dim>::active_cell_iterator
-          cell = triangulation.begin_active(),
-          endc = triangulation.end();
-        for (; cell != endc; ++cell, ++c)
-          cell_weights[c] = triangulation.signals.cell_weight(
-            cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
+        // In a first step, obtain the weights of the locally owned
+        // cells. For all others, the weight remains at the zero the
+        // vector was initialized with above.
+        for (const auto &cell : triangulation.active_cell_iterators())
+          if (cell->is_locally_owned())
+            cell_weights[cell->active_cell_index()] =
+              triangulation.signals.cell_weight(
+                cell, Triangulation<dim, spacedim>::CellStatus::CELL_PERSIST);
+
+        // If this is a parallel triangulation, we then need to also
+        // get the weights for all other cells. We have asserted above
+        // that this function can't be used for
+        // parallel::distribute::Triangulation objects, so the only
+        // ones we have to worry about here are
+        // parallel::shared::Triangulation
+        if (const auto shared_tria =
+              dynamic_cast<parallel::shared::Triangulation<dim, spacedim> *>(
+                &triangulation))
+          Utilities::MPI::sum(cell_weights,
+                              shared_tria->get_communicator(),
+                              cell_weights);
       }
 
     // Call the other more general function
