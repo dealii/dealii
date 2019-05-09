@@ -379,6 +379,12 @@ namespace SparseMatrixIterators
     Iterator(const SparseMatrixIterators::Iterator<number, false> &i);
 
     /**
+     * Copy assignment operator.
+     */
+    const Iterator<number, Constness> &
+    operator=(const SparseMatrixIterators::Iterator<number, false> &i);
+
+    /**
      * Prefix increment.
      */
     Iterator &
@@ -2259,6 +2265,17 @@ namespace SparseMatrixIterators
     const SparseMatrixIterators::Iterator<number, false> &i)
     : accessor(*i)
   {}
+
+
+
+  template <typename number, bool Constness>
+  inline const Iterator<number, Constness> &
+  Iterator<number, Constness>::
+  operator=(const SparseMatrixIterators::Iterator<number, false> &i)
+  {
+    accessor = *i;
+    return *this;
+  }
 
 
 

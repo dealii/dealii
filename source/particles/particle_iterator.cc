@@ -62,15 +62,6 @@ namespace Particles
   }
 
 
-  template <int dim, int spacedim>
-  ParticleIterator<dim, spacedim> &
-  ParticleIterator<dim, spacedim>::operator=(const ParticleIterator &other)
-  {
-    accessor = other.accessor;
-    return *this;
-  }
-
-
 
   template <int dim, int spacedim>
   bool

@@ -1532,6 +1532,18 @@ namespace Threads
      */
     Task() = default;
 
+
+    /**
+     * Copy assignment operator.
+     */
+    const Task &
+    operator=(const Task<RT> &t)
+    {
+      task_descriptor = t.task_descriptor;
+      return *this;
+    }
+
+
     /**
      * Join the task represented by this object, i.e. wait for it to finish.
      *

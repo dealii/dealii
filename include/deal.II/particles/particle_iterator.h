@@ -66,7 +66,7 @@ namespace Particles
      * Assignment operator.
      */
     ParticleIterator &
-    operator=(const ParticleIterator &);
+    operator=(const ParticleIterator &) = default;
 
     /**
      * Dereferencing operator, returns a pointer of the particle pointed to.
