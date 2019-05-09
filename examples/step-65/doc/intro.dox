@@ -1,0 +1,14 @@
+
+<br>
+
+<i>
+This program was contributed by Martin Kronbichler.
+</i>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This tutorial program presents a way to handle expensive manifold classes,
+exemplified for the TransfiniteInterpolationManifold, a special manifold class
+that can blend a curved approximation on a boundary with straight-sided
+descriptions elsewhere.

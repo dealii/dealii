@@ -1,0 +1,61 @@
+
+<h1>Results</h1>
+
+<h3>Program output</h3>
+
+@code
+$ make run
+Scanning dependencies of target step-65
+[ 33%] Building CXX object CMakeFiles/step-65.dir/step-65.cc.o
+[ 66%] Linking CXX executable step-65
+[ 66%] Built target step-65
+[100%] Run step-65 with Release configuration
+
+====== Running with the basic MappingQGeneric class ====== 
+
+   Number of active cells:       6656
+   Number of degrees of freedom: 181609
+   Number of solver iterations:  285
+   L2 error vs exact solution:   8.99328e-08
+   H1 error vs exact solution:   6.45341e-06
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      56.3s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble linear system          |         1 |      5.39s |       9.6% |
+| Compute constraints             |         1 |     0.109s |      0.19% |
+| Compute error estimator         |         1 |      17.3s |        31% |
+| Compute error norms             |         1 |      9.53s |        17% |
+| Solve linear system             |         1 |      10.6s |        19% |
+| Write output                    |         2 |      10.3s |        18% |
++---------------------------------+-----------+------------+------------+
+
+====== Running with the optimized MappingQCache class ====== 
+
+   Memory consumption cache:     22.9976 MB
+   Number of active cells:       6656
+   Number of degrees of freedom: 181609
+   Number of solver iterations:  285
+   L2 error vs exact solution:   8.99328e-08
+   H1 error vs exact solution:   6.45341e-06
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      19.7s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble linear system          |         1 |     0.876s |       4.4% |
+| Compute constraints             |         1 |   0.00368s |         0% |
+| Compute error estimator         |         1 |     0.488s |       2.5% |
+| Compute error norms             |         1 |     0.513s |       2.6% |
+| Initialize mapping cache        |         1 |       5.2s |        26% |
+| Solve linear system             |         1 |      10.6s |        54% |
+| Write output                    |         2 |      1.86s |       9.5% |
++---------------------------------+-----------+------------+------------+
+
+[100%] Built target run
+@endcode
