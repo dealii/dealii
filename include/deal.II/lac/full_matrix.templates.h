@@ -529,13 +529,12 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
+  const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
   if ((std::is_same<number, double>::value ||
        std::is_same<number, float>::value) &&
       std::is_same<number, number2>::value)
-    if (this->n() * this->m() * src.n() > 300 &&
-        src.n() <= std::numeric_limits<types::blas_int>::max() &&
-        this->m() <= std::numeric_limits<types::blas_int>::max() &&
-        this->n() <= std::numeric_limits<types::blas_int>::max())
+    if (this->n() * this->m() * src.n() > 300 && src.n() <= max_blas_int &&
+        this->m() <= max_blas_int && this->n() <= max_blas_int)
       {
         // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
@@ -613,13 +612,12 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
+  const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
   if ((std::is_same<number, double>::value ||
        std::is_same<number, float>::value) &&
       std::is_same<number, number2>::value)
-    if (this->n() * this->m() * src.n() > 300 &&
-        src.n() <= std::numeric_limits<types::blas_int>::max() &&
-        this->n() <= std::numeric_limits<types::blas_int>::max() &&
-        this->m() <= std::numeric_limits<types::blas_int>::max())
+    if (this->n() * this->m() * src.n() > 300 && src.n() <= max_blas_int &&
+        this->n() <= max_blas_int && this->m() <= max_blas_int)
       {
         // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
@@ -718,13 +716,12 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
+  const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
   if ((std::is_same<number, double>::value ||
        std::is_same<number, float>::value) &&
       std::is_same<number, number2>::value)
-    if (this->n() * this->m() * src.m() > 300 &&
-        src.m() <= std::numeric_limits<types::blas_int>::max() &&
-        this->n() <= std::numeric_limits<types::blas_int>::max() &&
-        this->m() <= std::numeric_limits<types::blas_int>::max())
+    if (this->n() * this->m() * src.m() > 300 && src.m() <= max_blas_int &&
+        this->n() <= max_blas_int && this->m() <= max_blas_int)
       {
         // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
@@ -821,13 +818,12 @@ FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
+  const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
   if ((std::is_same<number, double>::value ||
        std::is_same<number, float>::value) &&
       std::is_same<number, number2>::value)
-    if (this->n() * this->m() * src.m() > 300 &&
-        src.m() <= std::numeric_limits<types::blas_int>::max() &&
-        this->n() <= std::numeric_limits<types::blas_int>::max() &&
-        this->m() <= std::numeric_limits<types::blas_int>::max())
+    if (this->n() * this->m() * src.m() > 300 && src.m() <= max_blas_int &&
+        this->n() <= max_blas_int && this->m() <= max_blas_int)
       {
         // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
@@ -1829,8 +1825,8 @@ FullMatrix<number>::gauss_jordan()
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   if (std::is_same<number, double>::value || std::is_same<number, float>::value)
-    if (this->n_cols() > 15 &&
-        this->n_cols() <= std::numeric_limits<types::blas_int>::max())
+    if (this->n_cols() > 15 && static_cast<types::blas_int>(this->n_cols()) <=
+                                 std::numeric_limits<types::blas_int>::max())
       {
         // In case we have the LAPACK functions
         // getrf and getri detected by CMake,
