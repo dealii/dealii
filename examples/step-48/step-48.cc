@@ -109,11 +109,12 @@ namespace Step48
   // mass matrix. Since we use Gauss-Lobatto elements, the mass matrix is a
   // diagonal matrix and can be stored as a vector. The computation of the
   // mass matrix diagonal is simple to achieve with the data structures
-  // provided by FEEvaluation: Just loop over all (macro-) cells and integrate
-  // over the function that is constant one on all quadrature points by using
-  // the <code>integrate</code> function with @p true argument at the slot for
-  // values. Finally, we invert the diagonal entries since we have to multiply
-  // by the inverse mass matrix in each time step.
+  // provided by FEEvaluation: Just loop over all cell batches, i.e.,
+  // collections of cells due to SIMD vectorization, and integrate over the
+  // function that is constant one on all quadrature points by using the
+  // <code>integrate</code> function with @p true argument at the slot for
+  // values. Finally, we invert the diagonal entries to have the inverse mass
+  // matrix directly available in each time step.
   template <int dim, int fe_degree>
   SineGordonOperation<dim, fe_degree>::SineGordonOperation(
     const MatrixFree<dim, double> &data_in,
@@ -121,18 +122,16 @@ namespace Step48
     : data(data_in)
     , delta_t_sqr(make_vectorized_array(time_step * time_step))
   {
-    VectorizedArray<double> one = make_vectorized_array(1.);
-
     data.initialize_dof_vector(inv_mass_matrix);
 
     FEEvaluation<dim, fe_degree> fe_eval(data);
     const unsigned int           n_q_points = fe_eval.n_q_points;
 
-    for (unsigned int cell = 0; cell < data.n_macro_cells(); ++cell)
+    for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
       {
         fe_eval.reinit(cell);
         for (unsigned int q = 0; q < n_q_points; ++q)
-          fe_eval.submit_value(one, q);
+          fe_eval.submit_value(make_vectorized_array(1.), q);
         fe_eval.integrate(true, false);
         fe_eval.distribute_local_to_global(inv_mass_matrix);
       }
@@ -143,7 +142,7 @@ namespace Step48
         inv_mass_matrix.local_element(k) =
           1. / inv_mass_matrix.local_element(k);
       else
-        inv_mass_matrix.local_element(k) = 0;
+        inv_mass_matrix.local_element(k) = 1;
   }
 
 
@@ -158,29 +157,30 @@ namespace Step48
   // of shape function values on quadrature points which is simply the
   // injection of the values of cell degrees of freedom. The MatrixFree class
   // detects possible structure of the finite element at quadrature points
-  // when initializing, which is then used by FEEvaluation for selecting the
-  // most appropriate numerical kernel.
+  // when initializing, which is then automatically used by FEEvaluation for
+  // selecting the most appropriate numerical kernel.
 
   // The nonlinear function that we have to evaluate for the time stepping
   // routine includes the value of the function at the present time @p current
   // as well as the value at the previous time step @p old. Both values are
-  // passed to the operator in the collection of source vectors @p src, which is
-  // simply a <tt>std::vector</tt> of pointers to the actual solution
+  // passed to the operator in the collection of source vectors @p src, which
+  // is simply a <tt>std::vector</tt> of pointers to the actual solution
   // vectors. This construct of collecting several source vectors into one is
   // necessary as the cell loop in @p MatrixFree takes exactly one source and
-  // one destination vector, even if we happen to use many vectors like the two
-  // in this case. Note that the cell loop accepts any valid class for input and
-  // output, which does not only include vectors but general data types.
-  // However, only in case it encounters a
+  // one destination vector, even if we happen to use many vectors like the
+  // two in this case. Note that the cell loop accepts any valid class for
+  // input and output, which does not only include vectors but general data
+  // types.  However, only in case it encounters a
   // LinearAlgebra::distributed::Vector<Number> or a <tt>std::vector</tt>
-  // collecting these vectors, it calls functions that exchange data at the
-  // beginning and the end of the loop. In the loop over the cells, we first
-  // have to read in the values in the vectors related to the local values.
-  // Then, we evaluate the value and the gradient of the current solution vector
-  // and the values of the old vector at the quadrature points. Then, we combine
-  // the terms in the scheme in the loop over the quadrature points. Finally, we
-  // integrate the result against the test
-  // function and accumulate the result to the global solution vector @p dst.
+  // collecting these vectors, it calls functions that exchange ghost data due
+  // to MPI at the beginning and the end of the loop. In the loop over the
+  // cells, we first have to read in the values in the vectors related to the
+  // local values.  Then, we evaluate the value and the gradient of the
+  // current solution vector and the values of the old vector at the
+  // quadrature points. Next, we combine the terms in the scheme in the loop
+  // over the quadrature points. Finally, we integrate the result against the
+  // test function and accumulate the result to the global solution vector @p
+  // dst.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::local_apply(
     const MatrixFree<dim> &                                          data,
@@ -222,59 +222,65 @@ namespace Step48
   //@sect4{SineGordonOperation::apply}
 
   // This function performs the time stepping routine based on the cell-local
-  // strategy. First the destination vector is set to zero, then the cell-loop
-  // is called, and finally the solution is multiplied by the inverse mass
-  // matrix. The structure of the cell loop is implemented in the cell finite
+  // strategy. Note that we need to set the destination vector to zero before
+  // we add the integral contributions of the current time step (via the
+  // FEEvaluation::distribute_local_to_global() call). In this tutorial, we
+  // let the cell-loop do the zero operation via the fifth `true` argument
+  // passed to MatrixFree::cell_loop. The loop can schedule the zero operation
+  // closer to the operations on vector entries for supported vector entries,
+  // thereby possibly increasing data locality (the vector entries that first
+  // get zeroed are later re-used in the `distribute_local_to_global()`
+  // call). The structure of the cell loop is implemented in the cell finite
   // element operator class. On each cell it applies the routine defined as
   // the <code>local_apply()</code> method of the class
   // <code>SineGordonOperation</code>, i.e., <code>this</code>. One could also
-  // provide a function with the same signature that is not part of a class.
+  // provide a function with the same signature that is not part of a
+  // class. Finally, the result of the integration is multiplied by the
+  // inverse mass matrix.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::apply(
     LinearAlgebra::distributed::Vector<double> &                     dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const
   {
-    dst = 0;
-    data.cell_loop(&SineGordonOperation<dim, fe_degree>::local_apply,
-                   this,
-                   dst,
-                   src);
+    data.cell_loop(
+      &SineGordonOperation<dim, fe_degree>::local_apply, this, dst, src, true);
     dst.scale(inv_mass_matrix);
   }
+
 
 
   //@sect3{Equation data}
 
   // We define a time-dependent function that is used as initial
   // value. Different solutions can be obtained by varying the starting
-  // time. This function has already been explained in step-25.
+  // time. This function, taken from step-25, would represent an analytic
+  // solution in 1D for all times, but is merely used for setting some
+  // starting solution of interest here. More elaborate choices that could
+  // test the convergence of this program are given in step-25.
   template <int dim>
-  class ExactSolution : public Function<dim>
+  class InitialCondition : public Function<dim>
   {
   public:
-    ExactSolution(const unsigned int n_components = 1, const double time = 0.)
+    InitialCondition(const unsigned int n_components = 1,
+                     const double       time         = 0.)
       : Function<dim>(n_components, time)
     {}
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p,
+                         const unsigned int /*component*/) const override
+    {
+      double t = this->get_time();
+
+      const double m  = 0.5;
+      const double c1 = 0.;
+      const double c2 = 0.;
+      const double factor =
+        (m / std::sqrt(1. - m * m) * std::sin(std::sqrt(1. - m * m) * t + c2));
+      double result = 1.;
+      for (unsigned int d = 0; d < dim; ++d)
+        result *= -4. * std::atan(factor / std::cosh(m * p[d] + c1));
+      return result;
+    }
   };
-
-  template <int dim>
-  double ExactSolution<dim>::value(const Point<dim> &p,
-                                   const unsigned int /* component */) const
-  {
-    double t = this->get_time();
-
-    const double m  = 0.5;
-    const double c1 = 0.;
-    const double c2 = 0.;
-    const double factor =
-      (m / std::sqrt(1. - m * m) * std::sin(std::sqrt(1. - m * m) * t + c2));
-    double result = 1.;
-    for (unsigned int d = 0; d < dim; ++d)
-      result *= -4. * std::atan(factor / std::cosh(m * p[d] + c1));
-    return result;
-  }
 
 
 
@@ -332,7 +338,7 @@ namespace Step48
   // though), see also the discussion in the introduction. Note that FE_Q
   // selects the Gauss-Lobatto nodal points by default due to their improved
   // conditioning versus equidistant points. To make things more explicit, we
-  // choose to state the selection of the nodal points nonetheless.
+  // state the selection of the nodal points nonetheless.
   template <int dim>
   SineGordonProblem<dim>::SineGordonProblem()
     : pcout(std::cout, Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -346,7 +352,7 @@ namespace Step48
     , n_global_refinements(10 - 2 * dim)
     , time(-10)
     , time_step(10.)
-    , final_time(10)
+    , final_time(10.)
     , cfl_number(.1 / fe_degree)
     , output_timestep_skip(200)
   {}
@@ -404,29 +410,33 @@ namespace Step48
     // solution. As in step-40, we need to equip the constraint matrix with
     // the IndexSet of locally relevant degrees of freedom to avoid it to
     // consume too much memory for big problems. Next, the <code> MatrixFree
-    // </code> for the problem is set up. Note that we specify the MPI
-    // communicator which we are going to use, and that we also want to use
-    // shared-memory parallelization (hence one would use multithreading for
-    // intra-node parallelism and not MPI; note that we here choose the
-    // standard option &mdash; if we wanted to disable shared memory
-    // parallelization, we would choose @p none). Finally, three solution
-    // vectors are initialized. MatrixFree stores the layout that is to be
-    // used by distributed vectors, so we just ask it to initialize the
-    // vectors.
+    // </code> object for the problem is set up. Note that we specify a
+    // particular scheme for shared-memory parallelization (hence one would
+    // use multithreading for intra-node parallelism and not MPI; we here
+    // choose the standard option &mdash; if we wanted to disable shared
+    // memory parallelization even in case where there is more than one TBB
+    // thread available in the program, we would choose
+    // MatrixFree::AdditionalData::TasksParallelScheme::none). Also note that,
+    // instead of using the default QGauss quadrature argument, we supply a
+    // QGaussLobatto quadrature formula to enable the desired
+    // behavior. Finally, three solution vectors are initialized. MatrixFree
+    // expects a particular layout of ghost indices (as it handles index
+    // access in MPI-local numbers that need to match between the vector and
+    // MatrixFree), so we just ask it to initialize the vectors to be sure the
+    // ghost exchange is properly handled.
     DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     constraints.close();
 
-    QGaussLobatto<1>                         quadrature(fe_degree + 1);
     typename MatrixFree<dim>::AdditionalData additional_data;
     additional_data.tasks_parallel_scheme =
-      MatrixFree<dim>::AdditionalData::partition_partition;
+      MatrixFree<dim>::AdditionalData::TasksParallelScheme::partition_partition;
 
     matrix_free_data.reinit(dof_handler,
                             constraints,
-                            quadrature,
+                            QGaussLobatto<1>(fe_degree + 1),
                             additional_data);
 
     matrix_free_data.initialize_dof_vector(solution);
@@ -440,25 +450,27 @@ namespace Step48
 
   // This function prints the norm of the solution and writes the solution
   // vector to a file. The norm is standard (except for the fact that we need
-  // to accumulate the norms over all processors for the parallel grid), and
-  // the second is similar to what we did in step-40 or step-37. Note that we
-  // can use the same vector for output as the one used during computations:
-  // The vectors in the matrix-free framework always provide full information
-  // on all locally owned cells (this is what is needed in the local
-  // evaluations, too), including ghost vector entries on these cells. This is
-  // the only data that is needed in the integrate_difference function as well
-  // as in DataOut. The only action to take at this point is then to make sure
-  // that the vector updates its ghost values before we read from them. This
-  // is a feature present only in the LinearAlgebra::distributed::Vector
-  // class. Distributed vectors with PETSc and Trilinos, on the other hand,
-  // need to be copied to special vectors including ghost values (see the
-  // relevant section in step-40). If we also wanted to access all degrees of
-  // freedom on ghost cells (e.g. when computing error estimators that use the
-  // jump of solution over cell boundaries), we would need more information
-  // and create a vector initialized with locally relevant dofs just as in
-  // step-40. Observe also that we need to distribute constraints for output -
-  // they are not filled during computations (rather, they are interpolated on
-  // the fly in the matrix-free method read_dof_values).
+  // to accumulate the norms over all processors for the parallel grid which
+  // we do via the VectorTools::compute_global_error() function), and the
+  // second is similar to what we did in step-40 or step-37. Note that we can
+  // use the same vector for output as the one used during computations: The
+  // vectors in the matrix-free framework always provide full information on
+  // all locally owned cells (this is what is needed in the local evaluations,
+  // too), including ghost vector entries on these cells. This is the only
+  // data that is needed in the VectorTools::integrate_difference() function
+  // as well as in DataOut. The only action to take at this point is to make
+  // sure that the vector updates its ghost values before we read from
+  // them. This is a feature present only in the
+  // LinearAlgebra::distributed::Vector class. Distributed vectors with PETSc
+  // and Trilinos, on the other hand, need to be copied to special vectors
+  // including ghost values (see the relevant section in step-40). If we also
+  // wanted to access all degrees of freedom on ghost cells (e.g. when
+  // computing error estimators that use the jump of solution over cell
+  // boundaries), we would need more information and create a vector
+  // initialized with locally relevant dofs just as in step-40. Observe also
+  // that we need to distribute constraints for output - they are not filled
+  // during computations (rather, they are interpolated on the fly in the
+  // matrix-free method FEEvaluation::read_dof_values()).
   template <int dim>
   void
   SineGordonProblem<dim>::output_results(const unsigned int timestep_number)
@@ -516,21 +528,38 @@ namespace Step48
 
   // @sect4{SineGordonProblem::run}
 
-  // This function is called by the main function and calls the subroutines of
-  // the class.
+  // This function is called by the main function and steps into the
+  // subroutines of the class.
   //
-  // The first step is to set up the grid and the cell operator. Then, the
-  // time step is computed from the CFL number given in the constructor and
-  // the finest mesh size. The finest mesh size is computed as the diameter of
-  // the last cell in the triangulation, which is the last cell on the finest
-  // level of the mesh. This is only possible for Cartesian meshes, otherwise,
-  // one needs to loop over all cells. Note that we need to query all the
-  // processors for their finest cell since the not all processors might hold
-  // a region where the mesh is at the finest level. Then, we readjust the
-  // time step a little to hit the final time exactly.
+  // After printing some information about the parallel setup, the first
+  // action is to set up the grid and the cell operator. Then, the time step
+  // is computed from the CFL number given in the constructor and the finest
+  // mesh size. The finest mesh size is computed as the diameter of the last
+  // cell in the triangulation, which is the last cell on the finest level of
+  // the mesh. This is only possible for meshes where all elements on a level
+  // have the same size, otherwise, one needs to loop over all cells. Note
+  // that we need to query all the processors for their finest cell since
+  // not all processors might hold a region where the mesh is at the finest
+  // level. Then, we readjust the time step a little to hit the final time
+  // exactly.
   template <int dim>
   void SineGordonProblem<dim>::run()
   {
+    {
+      pcout << "Number of MPI ranks:            "
+            << Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) << std::endl;
+      pcout << "Number of threads on each rank: "
+            << MultithreadInfo::n_threads() << std::endl;
+      const unsigned int n_vect_doubles =
+        VectorizedArray<double>::n_array_elements;
+      const unsigned int n_vect_bits = 8 * sizeof(double) * n_vect_doubles;
+      pcout << "Vectorization over " << n_vect_doubles
+            << " doubles = " << n_vect_bits << " bits ("
+            << Utilities::System::get_current_vectorization_level()
+            << "), VECTORIZATION_LEVEL=" << DEAL_II_COMPILER_VECTORIZATION_LEVEL
+            << std::endl
+            << std::endl;
+    }
     make_grid_and_dofs();
 
     const double local_min_cell_diameter =
@@ -550,44 +579,43 @@ namespace Step48
     // difficulty and just set it to the initial value function at that
     // artificial time.
 
-    // We create an output of the initial value. Then we also need to collect
-    // the two starting solutions in a <tt>std::vector</tt> of pointers field
-    // and to set up an instance of the <code> SineGordonOperation class </code>
-    // based on the finite element degree specified at the top of this file.
+    // We then go on by writing the initial state to file and collecting
+    // the two starting solutions in a <tt>std::vector</tt> of pointers that
+    // get later consumed by the SineGordonOperation::apply() function. Next,
+    // an instance of the <code> SineGordonOperation class </code> based on
+    // the finite element degree specified at the top of this file is set up.
     VectorTools::interpolate(dof_handler,
-                             ExactSolution<dim>(1, time),
+                             InitialCondition<dim>(1, time),
                              solution);
     VectorTools::interpolate(dof_handler,
-                             ExactSolution<dim>(1, time - time_step),
+                             InitialCondition<dim>(1, time - time_step),
                              old_solution);
     output_results(0);
 
     std::vector<LinearAlgebra::distributed::Vector<double> *>
-      previous_solutions;
-    previous_solutions.push_back(&old_solution);
-    previous_solutions.push_back(&old_old_solution);
+      previous_solutions({&old_solution, &old_old_solution});
 
     SineGordonOperation<dim, fe_degree> sine_gordon_op(matrix_free_data,
                                                        time_step);
 
     // Now loop over the time steps. In each iteration, we shift the solution
-    // vectors by one and call the <code> apply </code> function of the <code>
-    // SineGordonOperator </code>. Then, we write the solution to a file. We
+    // vectors by one and call the `apply` function of the
+    // `SineGordonOperator` class. Then, we write the solution to a file. We
     // clock the wall times for the computational time needed as wall as the
     // time needed to create the output and report the numbers when the time
     // stepping is finished.
     //
     // Note how this shift is implemented: We simply call the swap method on
     // the two vectors which swaps only some pointers without the need to copy
-    // data around. Obviously, this is a more efficient way to update the
-    // vectors during time stepping. Let us see what happens in more detail:
-    // First, we exchange <code>old_solution</code> with
-    // <code>old_old_solution</code>, which means that
-    // <code>old_old_solution</code> gets <code>old_solution</code>, which is
-    // what we expect. Similarly, <code>old_solution</code> gets the content
-    // from <code>solution</code> in the next step. Afterward,
-    // <code>solution</code> holds <code>old_old_solution</code>, but that
-    // will be overwritten during this step.
+    // data around, a relatively expensive operation within an explicit time
+    // stepping method. Let us see what happens in more detail: First, we
+    // exchange <code>old_solution</code> with <code>old_old_solution</code>,
+    // which means that <code>old_old_solution</code> gets
+    // <code>old_solution</code>, which is what we expect. Similarly,
+    // <code>old_solution</code> gets the content from <code>solution</code>
+    // in the next step. After this, <code>solution</code> holds
+    // <code>old_old_solution</code>, but that will be overwritten during this
+    // step.
     unsigned int timestep_number = 1;
 
     Timer  timer;

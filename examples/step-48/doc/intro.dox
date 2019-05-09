@@ -17,9 +17,9 @@ International Conference on e-Science, 2011.  </i>
 
 This program demonstrates how to use the cell-based implementation of finite
 element operators with the MatrixFree class, first introduced in step-37, to
-solve nonlinear partial differential equations. Moreover, we demonstrate how
-the MatrixFree class handles constraints, an issue shortly mentioned in the
-results section of step-37. Finally, we will use an explicit time-stepping
+solve nonlinear partial differential equations. Moreover, we have another look
+at the handling of constraints within the matrix-free framework.
+Finally, we will use an explicit time-stepping
 method to solve the problem and introduce Gauss-Lobatto finite elements that
 are very convenient in this case since their mass matrix can be accurately
 approximated by a diagonal, and thus trivially invertible, matrix. The two
@@ -27,17 +27,17 @@ ingredients to this property are firstly a distribution of the nodal points of
 Lagrange polynomials according to the point distribution of the Gauss-Lobatto
 quadrature rule. Secondly, the quadrature is done with the same Gauss-Lobatto
 quadrature rule. In this formula, the integrals $\int_K \varphi_i \varphi_j
-dx\approx \sum_q \varphi_i \varphi_j \mathrm{det}(J) \big |_{x_q}$ are
-approximated to zero whenever $i\neq j$, because on the points defining the
-Lagrange polynomials exactly one function $\varphi_j$ is one and all others
-zero. Moreover, the Gauss-Lobatto distribution of nodes of Lagrange
+dx\approx \sum_q \varphi_i \varphi_j \mathrm{det}(J) \big |_{x_q}$ become
+zero whenever $i\neq j$, because exactly one function $\varphi_j$ is one and
+all others zero in the points defining the Lagrange polynomials.
+Moreover, the Gauss-Lobatto distribution of nodes of Lagrange
 polynomials clusters the nodes towards the element boundaries. This results in
 a well-conditioned polynomial basis for high-order discretization
 methods. Indeed, the condition number of an FE_Q elements with equidistant
 nodes grows exponentially with the degree, which destroys any benefit for
 orders of about five and higher. For this reason, Gauss-Lobatto points are the
-default distribution for FE_Q (but at degrees one and two, those are
-equivalent to the equidistant points).
+default distribution for the FE_Q element (but at degrees one and two, those
+are equivalent to the equidistant points).
 
 <h3> Problem statement and discretization </h3>
 
@@ -52,7 +52,8 @@ u(x,t_0) &=& u_0(x).
 
 that was already introduced in step-25. As a simple explicit time
 integration method, we choose leap frog scheme using the second-order
-formulation of the equation. Then, the scheme reads in weak form
+formulation of the equation. With this time stepping, the scheme reads in
+weak form
 
 \f{eqnarray*}
 (v,u^{n+1}) = (v,2 u^n-u^{n-1} -
@@ -72,15 +73,18 @@ finite element is Lagrangian, this will yield a diagonal mass matrix
 on the left hand side of the equation, making the solution of the
 linear system in each time step trivial.
 
-Using this quadrature rule, for a <i>p</i>th order finite element, we
-use a <i>(2p-1)</i>th order accurate formula to evaluate the
-integrals. Since the product of two <i>p</i>th order basis functions
-when computing a mass matrix gives a function with polynomial degree
-<i>2p</i> in each direction, the integrals are not computed exactly.
-However, considering the fact that the interpolation order
-of finite elements of degree <i>p</i> is <i>p+1</i>, the overall
-convergence properties are not disturbed by the quadrature error, in
-particular not when we use high orders.
+Using this quadrature rule, for a <i>p</i>th order finite element, we use a
+<i>(2p-1)</i>th order accurate formula to evaluate the integrals. Since the
+product of two <i>p</i>th order basis functions when computing a mass matrix
+gives a function with polynomial degree <i>2p</i> in each direction, the
+integrals are not computed exactly.  However, the overall convergence
+properties are not disturbed by the quadrature error on meshes with affine
+element shapes with L2 errors proportional to <i>h<sup>p+1</sup></i>. Note
+however that order reduction with sub-optimal convergence rates of the L2
+error of <i>O(h<sup>p</sup>)</i> or even <i>O(h<sup>p-1</sup>)</i> for some 3D
+setups has been reported <a href="https://dx.doi.org/10.1002/num.20353">in
+literature</a> on deformed (non-affine) element shapes for wave equations
+when the integrand is not a polynomial any more.
 
 Apart from the fact that we avoid solving linear systems with this
 type of elements when using explicit time-stepping, they come with two
@@ -90,21 +94,17 @@ evaluate the function at the quadrature points. In the case of
 Gauss-Lobatto elements, where quadrature points and node points of the
 finite element coincide, this operation is trivial since the value
 of the function at the quadrature points is given by its one-dimensional
-coefficients. In this way, the complexity of a finite element operator
-evaluation is further reduced compared to equidistant elements.
-
-The third advantage is the fact that these elements are better conditioned than
-equidistant Lagrange polynomials for increasing order so that we can use
-higher order elements for an accurate solution of the equation. Lagrange
-elements FE_Q with equidistant points should not be used for polynomial
-degrees four and higher.
+coefficients. In this way, the arithmetic work for the finite element operator
+evaluation is reduced by approximately a factor of two compared to the generic
+Gaussian quadrature.
 
 To sum up the discussion, by using the right finite element and
-quadrature rule combination, we end up with a scheme where we in each
-time step need to compute the right hand side vector corresponding
+quadrature rule combination, we end up with a scheme where we
+only need to compute the right hand side vector corresponding
 to the formulation above and then multiply it by the inverse of the
-diagonal mass matrix. In practice, of course, we extract the diagonal
-elements and invert them only once at the beginning of the program.
+diagonal mass matrix in each time step. In practice, of course, we extract
+the diagonal elements and invert them only once at the beginning of the
+program.
 
 <h3>Implementation of constraints</h3>
 
@@ -114,30 +114,42 @@ information about which degrees of freedom (DoF) are constrained and
 how they are constrained. This format uses an unnecessarily large
 amount of memory since there are not so many different types of
 constraints: for example, in the case of hanging nodes when using
-linear finite element on every cell, constraints most have the form
+linear finite element on every cell, most constraints have the form
 $x_k = \frac 12 x_i + \frac 12 x_j$ where the coefficients $\frac 12$
 are always the same and only $i,j,k$ are different. While storing this
 redundant information is not a problem in general because it is only
 needed once during matrix and right hand side assembly, it becomes a
-problem when we want to use the matrix-free approach since there this
-information has to be accessed every time we apply the operator. Thus,
-instead of an AffineConstraints object, we use a variable that we call
-<code>constraint_pool</code> that collects the weights of the
-different constraints. Then, we only have to store an identifier of
-each constraint in the mesh instead of all the weights. Moreover, we
-do not want to apply the constraints in a pre- and postprocessing step
-but want to take care of constraints as we evaluate the finite element
-operator. Therefore, we embed the constraint information into the
+bottleneck in the matrix-free approach since there this
+information has to be accessed every time we apply the operator, and the
+remaining components of the operator evaluation are so fast. Thus,
+instead of an AffineConstraints object, MatrixFree uses a variable that
+we call <code>constraint_pool</code> that collects the weights of the
+different constraints. Then, only an identifier of each constraint in the
+mesh instead of all the weights have to be stored. Moreover,
+the constraints are not applied in a pre- and postprocessing step
+but rather as we evaluate the finite element
+operator. Therefore, the constraint information is embedded into the
 variable <code>indices_local_to_global</code> that is used to extract
 the cell information from the global vector. If a DoF is constrained,
 the <code>indices_local_to_global</code> variable contains the global
 indices of the DoFs that it is constrained to. Then, we have another
 variable <code>constraint_indicator</code> at hand that holds, for
 each cell, the local indices of DoFs that are constrained as well as
-the identifier of the type of constraint. Actually, you will not see
+the identifier of the type of constraint. Fortunately, you will not see
 these data structures in the example program since the class
 <code>FEEvaluation</code> takes care of the constraints without user
 interaction.
+
+In the presence of hanging nodes, the diagonal mass matrix obtained on the
+element level via the Gauss-Lobatto quadrature/node point procedure does not
+directly translate to a diagonal global mass matrix, as following the
+constraints on rows and columns would also add off-diagonal entries. As
+explained in <a href="https://dx.doi.org/10.4208/cicp.101214.021015a">Kormann
+(2016)</a>, interpolating constraints on a vector, which maintains the
+diagonal shape of the mass matrix, is consistent with the equations up to an
+error of the same magnitude as the quadrature error. In the program below, we
+will simply assemble the diagonal of the mass matrix as if it were a vector to
+enable this approximation.
 
 
 <h3> Parallelization </h3>
@@ -145,8 +157,9 @@ interaction.
 The MatrixFree class comes with the option to be parallelized on three levels:
 MPI parallelization on clusters of distributed nodes, thread parallelization
 scheduled by the Threading Building Blocks library, and finally with a
-vectorization by clustering of two (or more) cells into a SIMD data type for
-the operator application. As we have already discussed in step-37, you will
+vectorization by working on a batch of two (or more) cells via SIMD data type
+(sometimes called cross-element or external vectorization).
+As we have already discussed in step-37, you will
 get best performance by using an instruction set specific to your system,
 e.g. with the cmake variable <tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>. The
 MPI parallelization was already exploited in step-37. Here, we additionally
@@ -154,10 +167,10 @@ consider thread parallelization with TBB. This is fairly simple, as all we
 need to do is to tell the initialization of the MatrixFree object about the
 fact that we want to use a thread parallel scheme through the variable
 MatrixFree::AdditionalData::thread_parallel_scheme. During setup, a dependency
-graph similar to the one described in the @ref workstream_paper , which allows
-the code to schedule the work of the @p local_apply function on chunks of cell
-without several threads accessing the same vector indices. As opposed to the
-WorkStream loops, some additional clever tricks to avoid global
+graph is set up similar to the one described in the @ref workstream_paper ,
+which allows to schedule the work of the @p local_apply function on chunks of
+cells without several threads accessing the same vector indices. As opposed to
+the WorkStream loops, some additional clever tricks to avoid global
 synchronizations as described in <a
 href="https://dx.doi.org/10.1109/eScience.2011.53">Kormann and Kronbichler
 (2011)</a> are also applied.
