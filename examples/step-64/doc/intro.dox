@@ -9,7 +9,7 @@ This program was contributed by Bruno Turcksin, Daniel Arndt, Oak Ridge National
 
 This example shows how to implement a matrix-free method on the GPU using CUDA
 for the Helmhotz equation with variable coefficients on a hypercube. The linear
-system willbe solved using CG and MPI.
+system will be solved using CG and MPI.
 
 In the last few years, heterogeneous computing in general and GPUs in particular
 have gained a lot of popularity. This is because GPUs offer better computing
@@ -19,13 +19,13 @@ interesting to be able to efficiently run a simulation along side a machine
 learning code.
 
 While we have tried for the interface of the matrix-free classes for the CPU and
-the GPU to be a close as possible, there are a few differences. When using
-matrix-free on GPU, one must write some CUDA codes. However, the amount is
-fairly small and the use of CUDA is limited to a few keyword
+the GPU to be as close as possible, there are a few differences. When using
+matrix-free on GPU, one must write some CUDA code. However, the amount is
+fairly small and the use of CUDA is limited to a few keywords.
 
 <h3>The test case</h3>
 
-In this example, we consider the Poisson problem @f{eqnarray*} - \nabla \cdot
+In this example, we consider the Helmholtz problem @f{eqnarray*} - \nabla \cdot
 \nabla u + a(\mathbf r) u &=&1,\\ u &=& 0 \quad \text{on} \partial \Omega @f}
 where $a(\mathbf x)$ is a variable coefficient. 
 
@@ -41,7 +41,7 @@ now on). A normal calculation on the device can be divided in three separte
 steps:
  1) the data is moved from the host to the device
  2) computation is done on the device
- 3) the result is move from the device to the host
+ 3) the result is moved back from the device to the host
 The data movements can either done manually by the user or done automatically
 using UVM (Unified Virtual Memory). In deal.II, only the first method is
 supported. While it means an extra burden for the user, it allows a better
@@ -50,7 +50,7 @@ important kernels on the host instead of the device.
 
 The data movement in deal.II is done using
 LinearAlgebra::ReadWriteVector<Number>. These vectors can be seen as buffers on
-the host that are used to either store data from the device or to seen the
+the host that are used to either store data from the device or to send data to the
 device. There are two types of vectors that can be used on the device:
 LinearAlgebra::CUDAWrappers::Vector<Number>, which is similar to the more common
 Vector<Number>, and LinearAlgebra::distributed::Vector<Number,
@@ -59,7 +59,7 @@ LinearAlgebra::distributed::Vector<Number> where we have specified which memory
 space to use. The default value if the memory space is not specified is
 MemorySpace::Host.
 
-Next, we show how to move data to/from
+Next, we show how to move data to/from the device using
 LinearAlgebra::CUDAWrappers::Vector<Number>:
 <code>
 unsigned int size = 10;
