@@ -20,29 +20,30 @@
 
 // The deal.II include files have already been covered in previous examples
 // and will thus not be further commented on.
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/lac/precondition_block.h>
+#include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/fe/fe_values.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/numerics/data_out.h>
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_dgq.h>
-#include <deal.II/lac/solver_richardson.h>
-#include <deal.II/lac/precondition_block.h>
+#include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/derivative_approximation.h>
-#include <deal.II/base/timer.h>
 
 // And this again is C++:
+#include <array>
 #include <iostream>
 #include <fstream>
 
@@ -62,7 +63,14 @@ namespace Step30
   public:
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int /*component*/ = 0) const override
+    {
+      (void)points;
+      Assert(values.size() == points.size(),
+             ExcDimensionMismatch(values.size(), points.size()));
+
+      std::fill(values.begin(), values.end(), 0.);
+    }
   };
 
 
@@ -72,7 +80,19 @@ namespace Step30
   public:
     virtual void value_list(const std::vector<Point<dim>> &points,
                             std::vector<double> &          values,
-                            const unsigned int component = 0) const override;
+                            const unsigned int /*component*/ = 0) const override
+    {
+      Assert(values.size() == points.size(),
+             ExcDimensionMismatch(values.size(), points.size()));
+
+      for (unsigned int i = 0; i < values.size(); ++i)
+        {
+          if (points[i](0) < 0.5)
+            values[i] = 1.;
+          else
+            values[i] = 0.;
+        }
+    }
   };
 
 
@@ -80,80 +100,44 @@ namespace Step30
   class Beta
   {
   public:
+    // The flow field is chosen to be a quarter circle with counterclockwise
+    // flow direction and with the origin as midpoint for the right half of the
+    // domain with positive $x$ values, whereas the flow simply goes to the left
+    // in the left part of the domain at a velocity that matches the one coming
+    // in from the right. In the circular part the magnitude of the flow
+    // velocity is proportional to the distance from the origin. This is a
+    // difference to step-12, where the magnitude was 1 everywhere. the new
+    // definition leads to a linear variation of $\beta$ along each given face
+    // of a cell. On the other hand, the solution $u(x,y)$ is exactly the same
+    // as before.
     void value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Point<dim>> &      values) const;
+                    std::vector<Point<dim>> &      values) const
+    {
+      Assert(values.size() == points.size(),
+             ExcDimensionMismatch(values.size(), points.size()));
+
+      for (unsigned int i = 0; i < points.size(); ++i)
+        {
+          if (points[i](0) > 0)
+            {
+              values[i](0) = -points[i](1);
+              values[i](1) = points[i](0);
+            }
+          else
+            {
+              values[i]    = Point<dim>();
+              values[i](0) = -points[i](1);
+            }
+        }
+    }
   };
 
-
-  template <int dim>
-  void RHS<dim>::value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
-                            const unsigned int) const
-  {
-    (void)points;
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    std::fill(values.begin(), values.end(), 0.);
-  }
-
-
-  // The flow field is chosen to be a quarter circle with counterclockwise
-  // flow direction and with the origin as midpoint for the right half of the
-  // domain with positive $x$ values, whereas the flow simply goes to the left
-  // in the left part of the domain at a velocity that matches the one coming
-  // in from the right. In the circular part the magnitude of the flow
-  // velocity is proportional to the distance from the origin. This is a
-  // difference to step-12, where the magnitude was 1 everywhere. the new
-  // definition leads to a linear variation of $\beta$ along each given face
-  // of a cell. On the other hand, the solution $u(x,y)$ is exactly the same
-  // as before.
-  template <int dim>
-  void Beta<dim>::value_list(const std::vector<Point<dim>> &points,
-                             std::vector<Point<dim>> &      values) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    for (unsigned int i = 0; i < points.size(); ++i)
-      {
-        if (points[i](0) > 0)
-          {
-            values[i](0) = -points[i](1);
-            values[i](1) = points[i](0);
-          }
-        else
-          {
-            values[i]    = Point<dim>();
-            values[i](0) = -points[i](1);
-          }
-      }
-  }
-
-
-  template <int dim>
-  void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
-                                       std::vector<double> &          values,
-                                       const unsigned int) const
-  {
-    Assert(values.size() == points.size(),
-           ExcDimensionMismatch(values.size(), points.size()));
-
-    for (unsigned int i = 0; i < values.size(); ++i)
-      {
-        if (points[i](0) < 0.5)
-          values[i] = 1.;
-        else
-          values[i] = 0.;
-      }
-  }
 
 
   // @sect3{Class: DGTransportEquation}
   //
   // This declaration of this class is utterly unaffected by our current
-  // changes.  The only substantial change is that we use only the second
-  // assembly scheme described in step-12.
+  // changes.
   template <int dim>
   class DGTransportEquation
   {
@@ -168,18 +152,19 @@ namespace Step30
                                 FullMatrix<double> &     ui_vi_matrix,
                                 Vector<double> &         cell_vector) const;
 
-    void assemble_face_term2(const FEFaceValuesBase<dim> &fe_v,
-                             const FEFaceValuesBase<dim> &fe_v_neighbor,
-                             FullMatrix<double> &         ui_vi_matrix,
-                             FullMatrix<double> &         ue_vi_matrix,
-                             FullMatrix<double> &         ui_ve_matrix,
-                             FullMatrix<double> &         ue_ve_matrix) const;
+    void assemble_face_term(const FEFaceValuesBase<dim> &fe_v,
+                            const FEFaceValuesBase<dim> &fe_v_neighbor,
+                            FullMatrix<double> &         ui_vi_matrix,
+                            FullMatrix<double> &         ue_vi_matrix,
+                            FullMatrix<double> &         ui_ve_matrix,
+                            FullMatrix<double> &         ue_ve_matrix) const;
 
   private:
     const Beta<dim>           beta_function;
     const RHS<dim>            rhs_function;
     const BoundaryValues<dim> boundary_function;
   };
+
 
 
   // Likewise, the constructor of the class as well as the functions
@@ -197,6 +182,7 @@ namespace Step30
     , rhs_function()
     , boundary_function()
   {}
+
 
 
   template <int dim>
@@ -258,7 +244,7 @@ namespace Step30
 
 
   template <int dim>
-  void DGTransportEquation<dim>::assemble_face_term2(
+  void DGTransportEquation<dim>::assemble_face_term(
     const FEFaceValuesBase<dim> &fe_v,
     const FEFaceValuesBase<dim> &fe_v_neighbor,
     FullMatrix<double> &         ui_vi_matrix,
@@ -309,23 +295,19 @@ namespace Step30
 
   // @sect3{Class: DGMethod}
   //
-  // Even the main class of this program stays more or less the same. We omit
-  // one of the assembly routines and use only the second, more effective one
-  // of the two presented in step-12. However, we introduce a new routine
-  // (set_anisotropic_flags) and modify another one (refine_grid).
+  // This declaration is much like that of step-12. However, we introduce a
+  // new routine (set_anisotropic_flags) and modify another one (refine_grid).
   template <int dim>
   class DGMethod
   {
   public:
     DGMethod(const bool anisotropic);
-    ~DGMethod();
 
     void run();
 
   private:
     void setup_system();
-    void assemble_system1();
-    void assemble_system2();
+    void assemble_system();
     void solve(Vector<double> &solution);
     void refine_grid();
     void set_anisotropic_flags();
@@ -384,12 +366,6 @@ namespace Step30
   {}
 
 
-  template <int dim>
-  DGMethod<dim>::~DGMethod()
-  {
-    dof_handler.clear();
-  }
-
 
   template <int dim>
   void DGMethod<dim>::setup_system()
@@ -413,18 +389,19 @@ namespace Step30
   }
 
 
-  // @sect4{Function: assemble_system2}
+  // @sect4{Function: assemble_system}
   //
-  // We proceed with the <code>assemble_system2</code> function that
-  // implements the DG discretization in its second version. This function is
-  // very similar to the <code>assemble_system2</code> function from step-12,
-  // even the four cases considered for the neighbor-relations of a cell are
-  // the same, namely a) cell is at the boundary, b) there are finer
-  // neighboring cells, c) the neighbor is neither coarser nor finer and d)
-  // the neighbor is coarser.  However, the way in which we decide upon which
-  // case we have are modified in the way described in the introduction.
+  // We proceed with the <code>assemble_system</code> function that implements
+  // the DG discretization. This function does the same thing as the
+  // <code>assemble_system</code> function from step-12 (but without
+  // MeshWorker).  The four cases considered for the neighbor-relations of a
+  // cell are the same as the isotropic case, namely a) cell is at the
+  // boundary, b) there are finer neighboring cells, c) the neighbor is
+  // neither coarser nor finer and d) the neighbor is coarser.  However, the
+  // way in which we decide upon which case we have are modified in the way
+  // described in the introduction.
   template <int dim>
-  void DGMethod<dim>::assemble_system2()
+  void DGMethod<dim>::assemble_system()
   {
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs(dofs_per_cell);
@@ -463,10 +440,7 @@ namespace Step30
 
     Vector<double> cell_vector(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         ui_vi_matrix = 0;
         cell_vector  = 0;
@@ -481,7 +455,7 @@ namespace Step30
              face_no < GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           {
-            typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
+            const auto face = cell->face(face_no);
 
             // Case (a): The face is at the boundary.
             if (face->at_boundary())
@@ -494,8 +468,7 @@ namespace Step30
               {
                 Assert(cell->neighbor(face_no).state() == IteratorState::valid,
                        ExcInternalError());
-                typename DoFHandler<dim>::cell_iterator neighbor =
-                  cell->neighbor(face_no);
+                const auto neighbor = cell->neighbor(face_no);
 
                 // Case (b): This is an internal face and the neighbor
                 // is refined (which we can test by asking whether the
@@ -536,7 +509,7 @@ namespace Step30
                         // use the @p neighbor_child_on_subface function. it
                         // takes care of all the complicated situations of
                         // anisotropic refinement and non-standard faces.
-                        typename DoFHandler<dim>::cell_iterator neighbor_child =
+                        const auto neighbor_child =
                           cell->neighbor_child_on_subface(face_no, subface_no);
                         Assert(!neighbor_child->has_children(),
                                ExcInternalError());
@@ -549,12 +522,12 @@ namespace Step30
                         fe_v_subface.reinit(cell, face_no, subface_no);
                         fe_v_face_neighbor.reinit(neighbor_child, neighbor2);
 
-                        dg.assemble_face_term2(fe_v_subface,
-                                               fe_v_face_neighbor,
-                                               ui_vi_matrix,
-                                               ue_vi_matrix,
-                                               ui_ve_matrix,
-                                               ue_ve_matrix);
+                        dg.assemble_face_term(fe_v_subface,
+                                              fe_v_face_neighbor,
+                                              ui_vi_matrix,
+                                              ue_vi_matrix,
+                                              ui_ve_matrix,
+                                              ue_ve_matrix);
 
                         neighbor_child->get_dof_indices(dofs_neighbor);
 
@@ -622,12 +595,12 @@ namespace Step30
                         fe_v_face.reinit(cell, face_no);
                         fe_v_face_neighbor.reinit(neighbor, neighbor2);
 
-                        dg.assemble_face_term2(fe_v_face,
-                                               fe_v_face_neighbor,
-                                               ui_vi_matrix,
-                                               ue_vi_matrix,
-                                               ui_ve_matrix,
-                                               ue_ve_matrix);
+                        dg.assemble_face_term(fe_v_face,
+                                              fe_v_face_neighbor,
+                                              ui_vi_matrix,
+                                              ue_vi_matrix,
+                                              ui_ve_matrix,
+                                              ue_ve_matrix);
 
                         neighbor->get_dof_indices(dofs_neighbor);
 
@@ -697,11 +670,8 @@ namespace Step30
                                                   gradient_indicator);
 
     // and scale it to obtain an error indicator.
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-      gradient_indicator(cell_no) *=
+    for (const auto &cell : triangulation.active_cell_iterators())
+      gradient_indicator[cell->active_cell_index()] *=
         std::pow(cell->diameter(), 1 + 1.0 * dim / 2);
     // Then we use this indicator to flag the 30 percent of the cells with
     // highest error indicator to be refined.
@@ -749,11 +719,7 @@ namespace Step30
                                          update_values);
 
     // Now we need to loop over all active cells.
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       // We only need to consider cells which are flagged for refinement.
       if (cell->refine_flag_set())
         {
@@ -764,16 +730,14 @@ namespace Step30
                face_no < GeometryInfo<dim>::faces_per_cell;
                ++face_no)
             {
-              typename DoFHandler<dim>::face_iterator face =
-                cell->face(face_no);
+              const auto face = cell->face(face_no);
 
               if (!face->at_boundary())
                 {
                   Assert(cell->neighbor(face_no).state() ==
                            IteratorState::valid,
                          ExcInternalError());
-                  typename DoFHandler<dim>::cell_iterator neighbor =
-                    cell->neighbor(face_no);
+                  const auto neighbor = cell->neighbor(face_no);
 
                   std::vector<double> u(fe_v_face.n_quadrature_points);
                   std::vector<double> u_neighbor(fe_v_face.n_quadrature_points);
@@ -795,10 +759,9 @@ namespace Step30
                         {
                           // get an iterator pointing to the cell behind the
                           // present subface...
-                          typename DoFHandler<dim>::cell_iterator
-                            neighbor_child =
-                              cell->neighbor_child_on_subface(face_no,
-                                                              subface_no);
+                          const auto neighbor_child =
+                            cell->neighbor_child_on_subface(face_no,
+                                                            subface_no);
                           Assert(!neighbor_child->has_children(),
                                  ExcInternalError());
                           // ... and reinit the respective FEFaceValues and
@@ -830,7 +793,7 @@ namespace Step30
                               // accumulate these values into vectors with
                               // <code>dim</code> components.
                               jump[face_no / 2] +=
-                                std::fabs(u[x] - u_neighbor[x]) * JxW[x];
+                                std::abs(u[x] - u_neighbor[x]) * JxW[x];
                               // We also sum up the scaled weights to obtain
                               // the measure of the face.
                               area[face_no / 2] += JxW[x];
@@ -864,7 +827,7 @@ namespace Step30
                                ++x)
                             {
                               jump[face_no / 2] +=
-                                std::fabs(u[x] - u_neighbor[x]) * JxW[x];
+                                std::abs(u[x] - u_neighbor[x]) * JxW[x];
                               area[face_no / 2] += JxW[x];
                             }
                         }
@@ -909,7 +872,7 @@ namespace Step30
                                ++x)
                             {
                               jump[face_no / 2] +=
-                                std::fabs(u[x] - u_neighbor[x]) * JxW[x];
+                                std::abs(u[x] - u_neighbor[x]) * JxW[x];
                               area[face_no / 2] += JxW[x];
                             }
                         }
@@ -918,8 +881,8 @@ namespace Step30
             }
           // Now we analyze the size of the mean jumps, which we get dividing
           // the jumps by the measure of the respective faces.
-          double average_jumps[dim];
-          double sum_of_average_jumps = 0.;
+          std::array<double, dim> average_jumps;
+          double                  sum_of_average_jumps = 0.;
           for (unsigned int i = 0; i < dim; ++i)
             {
               average_jumps[i] = jump(i) / area(i);
@@ -993,6 +956,7 @@ namespace Step30
   }
 
 
+
   template <int dim>
   void DGMethod<dim>::run()
   {
@@ -1032,8 +996,8 @@ namespace Step30
                   << std::endl;
 
         Timer assemble_timer;
-        assemble_system2();
-        std::cout << "Time of assemble_system2: " << assemble_timer.cpu_time()
+        assemble_system();
+        std::cout << "Time of assemble_system: " << assemble_timer.cpu_time()
                   << std::endl;
         solve(solution2);
 
