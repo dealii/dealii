@@ -566,7 +566,7 @@ namespace MeshWorker
    * ...
    *
    * MyClass<dim, spacedim> my_class;
-   * SratchData             scratch;
+   * ScratchData            scratch;
    * CopyData               copy;
    *
    * mesh_loop(tria.begin_active(),
