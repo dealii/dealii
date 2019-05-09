@@ -477,8 +477,8 @@ namespace step62
           }
       }
 
-    return 1 + std::max(calculated_pml_x_coeff, calculated_pml_y_coeff) *
-                 std::complex<double>(0, 1);
+    return 1. + std::max(calculated_pml_x_coeff, calculated_pml_y_coeff) *
+                  std::complex<double>(0., 1.);
   }
 
 
