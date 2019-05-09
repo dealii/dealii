@@ -120,14 +120,14 @@ namespace Step52
                              const double       final_time);
 
 
-    unsigned int fe_degree;
+    const unsigned int fe_degree;
 
-    double diffusion_coefficient;
-    double absorption_cross_section;
+    const double diffusion_coefficient;
+    const double absorption_cross_section;
 
     Triangulation<2> triangulation;
 
-    FE_Q<2> fe;
+    const FE_Q<2> fe;
 
     DoFHandler<2> dof_handler;
 
@@ -214,10 +214,7 @@ namespace Step52
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
-                                        endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_matrix      = 0.;
         cell_mass_matrix = 0.;
@@ -310,10 +307,7 @@ namespace Step52
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
-                                        endc = dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         cell_source = 0.;
 
@@ -354,11 +348,10 @@ namespace Step52
   //   - compute $z=\left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} tmp =
   //   \left(M-\tau \frac{\partial f}{\partial y}\right)^{-1} My$
   //   - return z.
-  Vector<double> Diffusion::id_minus_tau_J_inverse(const double          time,
+  Vector<double> Diffusion::id_minus_tau_J_inverse(const double /*time*/,
                                                    const double          tau,
                                                    const Vector<double> &y)
   {
-    (void)time;
     SparseDirectUMFPACK inverse_mass_minus_tau_Jacobian;
 
     mass_minus_tau_Jacobian.copy_from(mass_matrix);
@@ -503,10 +496,9 @@ namespace Step52
     for (unsigned int i = 0; i < n_time_steps; ++i)
       {
         time = explicit_runge_kutta.evolve_one_time_step(
-          std::bind(&Diffusion::evaluate_diffusion,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2),
+          [this](const double time, const Vector<double> &y) {
+            return this->evaluate_diffusion(time, y);
+          },
           time,
           time_step,
           solution);
@@ -544,15 +536,12 @@ namespace Step52
     for (unsigned int i = 0; i < n_time_steps; ++i)
       {
         time = implicit_runge_kutta.evolve_one_time_step(
-          std::bind(&Diffusion::evaluate_diffusion,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2),
-          std::bind(&Diffusion::id_minus_tau_J_inverse,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    std::placeholders::_3),
+          [this](const double time, const Vector<double> &y) {
+            return this->evaluate_diffusion(time, y);
+          },
+          [this](const double time, const double tau, const Vector<double> &y) {
+            return this->id_minus_tau_J_inverse(time, tau, y);
+          },
           time,
           time_step,
           solution);
@@ -620,10 +609,9 @@ namespace Step52
           time_step = final_time - time;
 
         time = embedded_explicit_runge_kutta.evolve_one_time_step(
-          std::bind(&Diffusion::evaluate_diffusion,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2),
+          [this](const double time, const Vector<double> &y) {
+            return this->evaluate_diffusion(time, y);
+          },
           time,
           time_step,
           solution);
@@ -653,10 +641,7 @@ namespace Step52
     GridGenerator::hyper_cube(triangulation, 0., 5.);
     triangulation.refine_global(4);
 
-    Triangulation<2>::active_cell_iterator cell = triangulation.begin_active(),
-                                           endc = triangulation.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
         if (cell->face(f)->at_boundary())
           {
