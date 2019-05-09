@@ -81,14 +81,11 @@ namespace Step56
   // In order to make it easy to switch between the different solvers that are
   // being used, we declare an enum that can be passed as an argument to the
   // constructor of the main class.
-  struct SolverType
+  enum class SolverType
   {
-    enum type
-    {
-      FGMRES_ILU,
-      FGMRES_GMG,
-      UMFPACK
-    };
+    FGMRES_ILU,
+    FGMRES_GMG,
+    UMFPACK
   };
 
   // @sect3{Functions for Solution and Righthand side}
@@ -413,7 +410,7 @@ namespace Step56
   {
   public:
     StokesProblem(const unsigned int pressure_degree,
-                  SolverType::type   solver_type);
+                  const SolverType   solver_type);
     void run();
 
   private:
@@ -425,7 +422,7 @@ namespace Step56
     void output_results(const unsigned int refinement_cycle) const;
 
     const unsigned int pressure_degree;
-    SolverType::type   solver_type;
+    const SolverType   solver_type;
 
     Triangulation<dim> triangulation;
     FESystem<dim>      velocity_fe;
@@ -454,7 +451,8 @@ namespace Step56
 
   template <int dim>
   StokesProblem<dim>::StokesProblem(const unsigned int pressure_degree,
-                                    SolverType::type   solver_type)
+                                    const SolverType   solver_type)
+
     : pressure_degree(pressure_degree)
     , solver_type(solver_type)
     , triangulation(Triangulation<dim>::maximum_smoothing)
@@ -642,10 +640,7 @@ namespace Step56
     std::vector<double>                  div_phi_u(dofs_per_cell);
     std::vector<double>                  phi_p(dofs_per_cell);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         local_matrix = 0;
@@ -755,10 +750,7 @@ namespace Step56
       }
 
     // This iterator goes over all cells (not just active)
-    typename DoFHandler<dim>::cell_iterator cell = velocity_dof_handler.begin(),
-                                            endc = velocity_dof_handler.end();
-
-    for (; cell != endc; ++cell)
+    for (const auto &cell : velocity_dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         cell_matrix = 0;
