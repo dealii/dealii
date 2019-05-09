@@ -58,6 +58,7 @@ SET(_unity_include_src
   mapping.cc
   mapping_q1.cc
   mapping_q.cc
+  mapping_q_cache.cc
   mapping_manifold.cc
   )
 
@@ -133,6 +134,7 @@ SET(_inst
   mapping_q_generic.inst.in
   mapping_q1_eulerian.inst.in
   mapping_q1.inst.in
+  mapping_q_cache.inst.in
   mapping_q_eulerian.inst.in
   mapping_q.inst.in
   mapping_manifold.inst.in
