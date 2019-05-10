@@ -946,24 +946,20 @@ namespace MatrixFreeOperators
     fill_inverse_JxW_values(
       AlignedVector<VectorizedArray<Number>> &inverse_jxw) const
   {
-    constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
-    Assert(inverse_jxw.size() > 0 && inverse_jxw.size() % dofs_per_cell == 0,
+    constexpr unsigned int dofs_per_component_on_cell =
+      Utilities::pow(fe_degree + 1, dim);
+    Assert(inverse_jxw.size() > 0 &&
+             inverse_jxw.size() % dofs_per_component_on_cell == 0,
            ExcMessage(
              "Expected diagonal to be a multiple of scalar dof per cells"));
 
     // temporarily reduce size of inverse_jxw to dofs_per_cell to get JxW values
     // from fe_eval (will not reallocate any memory)
-    const unsigned int previous_size = inverse_jxw.size();
-    inverse_jxw.resize(dofs_per_cell);
-    fe_eval.fill_JxW_values(inverse_jxw);
-
-    // invert
-    inverse_jxw.resize_fast(previous_size);
-    for (unsigned int q = 0; q < dofs_per_cell; ++q)
-      inverse_jxw[q] = 1. / inverse_jxw[q];
+    for (unsigned int q = 0; q < dofs_per_component_on_cell; ++q)
+      inverse_jxw[q] = 1. / fe_eval.JxW(q);
     // copy values to rest of vector
-    for (unsigned int q = dofs_per_cell; q < previous_size;)
-      for (unsigned int i = 0; i < dofs_per_cell; ++i, ++q)
+    for (unsigned int q = dofs_per_component_on_cell; q < inverse_jxw.size();)
+      for (unsigned int i = 0; i < dofs_per_component_on_cell; ++i, ++q)
         inverse_jxw[q] = inverse_jxw[i];
   }
 
