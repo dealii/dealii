@@ -58,7 +58,19 @@ system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc", "$cmake_source_di
 
 print "  <li> <a href=\"#CommProg\" class=bold>The commented program</a>\n";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc", "$cmake_source_dir/examples/$step/$step.cc";
+my $file_extension;
+
+if (-f "$cmake_source_dir/examples/$step/$step.cc")
+{
+  $file_extension = cc;
+}
+
+if (-f "$cmake_source_dir/examples/$step/$step.cu")
+{
+  $file_extension = cu;
+}
+
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc", "$cmake_source_dir/examples/$step/$step.$file_extension";
 
 print
 "</ol></td><td width=\"50%\" valign=\"top\"><ol>
@@ -77,13 +89,14 @@ system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_sour
 
 print " * <a name=\"CommProg\"></a>\n";
 print " * <h1> The commented program</h1>\n";
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen", "$cmake_source_dir/examples/$step/$step.cc";
+
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen", "$cmake_source_dir/examples/$step/$step.$file_extension";
 
 system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_source_dir/examples/$step/doc/results.dox";
 
 print
 "<a name=\"PlainProg\"></a>
 <h1> The plain program</h1>
-\@include \"$step.cc\"
+\@include \"$step.$file_extension\"
  */
 ";
