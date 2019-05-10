@@ -69,17 +69,7 @@ Mapping<dim, spacedim>::get_bounding_box(
   if (preserves_vertex_locations())
     return cell->bounding_box();
   else
-    {
-      const auto      vertices = get_vertices(cell);
-      Point<spacedim> p0 = vertices[0], p1 = vertices[0];
-      for (unsigned int j = 1; j < vertices.size(); ++j)
-        for (unsigned int d = 0; d < spacedim; ++d)
-          {
-            p0[d] = std::min(p0[d], vertices[j][d]);
-            p1[d] = std::max(p1[d], vertices[j][d]);
-          }
-      return BoundingBox<spacedim>({p0, p1});
-    }
+    return BoundingBox<spacedim>(get_vertices(cell));
 }
 
 
