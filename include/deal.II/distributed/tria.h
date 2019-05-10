@@ -816,6 +816,16 @@ namespace parallel
       get_coarse_cell_to_p4est_tree_permutation() const;
 
       /**
+       * This returns a pointer to the internally stored p4est object (of type
+       * p4est_t or p8est_t depending on @p dim).
+       *
+       * @warning: If you modify the p4est object, internal data structures
+       * can become inconsistent.
+       */
+      const typename dealii::internal::p4est::types<dim>::forest *
+      get_p4est() const;
+
+      /**
        * In addition to the action in the base class Triangulation, this
        * function joins faces in the p4est forest for periodic boundary
        * conditions. As a result, each pair of faces will differ by at most one
