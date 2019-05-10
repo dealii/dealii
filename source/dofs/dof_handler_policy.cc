@@ -5679,6 +5679,8 @@ namespace internal
                                             *dof_handler,
                                             /*check_validity=*/false);
 
+            // Since we have not updated the number cache yet, we can use the
+            // index sets contained in the DoFHandler at this stage.
             return NumberCache(dof_handler->locally_owned_dofs_per_processor(),
                                Utilities::MPI::this_mpi_process(
                                  triangulation->get_communicator()));
