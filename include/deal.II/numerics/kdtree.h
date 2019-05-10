@@ -56,10 +56,13 @@ DEAL_II_NAMESPACE_OPEN
  * > case, the hyperplane would be set by the $x$-value of the point, and its
  * > normal would be the unit $x$-axis.
  *
+ * @deprecated This class has been deprecated in favor of RTree, which is
+ * based on <code>boost::geometry::index::rtree</code>.
+ *
  * @author Luca Heltai, 2017.
  */
 template <int dim>
-class KDTree
+class DEAL_II_DEPRECATED KDTree
 {
 public:
   /**
