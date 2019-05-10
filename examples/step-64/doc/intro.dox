@@ -9,25 +9,28 @@ This program was contributed by Bruno Turcksin, Daniel Arndt, Oak Ridge National
 
 This example shows how to implement a matrix-free method on the GPU using CUDA
 for the Helmhotz equation with variable coefficients on a hypercube. The linear
-system will be solved using CG and MPI.
+system will be solved using the conjugate gradient method and is parallelized
+ with MPI.
 
 In the last few years, heterogeneous computing in general and GPUs in particular
 have gained a lot of popularity. This is because GPUs offer better computing
-capabilities and memory bandwidth than CPU for a given power. GPUs are also the
-most popular architecture for machine learning. Therefore it might be
-interesting to be able to efficiently run a simulation along side a machine
+capabilities and memory bandwidth than CPUs for a given power budget.
+Among the architectures available in early 2019, GPUs are about 2x-3x as power
+efficient than server CPUs with wide SIMD for PDE-related tasks. GPUs are also
+the most popular architecture for machine learning. Therefore, it might be
+interesting to be able to efficiently run a simulation alongside a machine
 learning code.
 
 While we have tried for the interface of the matrix-free classes for the CPU and
 the GPU to be as close as possible, there are a few differences. When using
-matrix-free on GPU, one must write some CUDA code. However, the amount is
-fairly small and the use of CUDA is limited to a few keywords.
+the matrix-free framework on a GPU, one must write some CUDA code. However, the
+amount is fairly small and the use of CUDA is limited to a few keywords.
 
 <h3>The test case</h3>
 
 In this example, we consider the Helmholtz problem @f{eqnarray*} - \nabla \cdot
 \nabla u + a(\mathbf r) u &=&1,\\ u &=& 0 \quad \text{on} \partial \Omega @f}
-where $a(\mathbf x)$ is a variable coefficient. 
+where $a(\mathbf x)$ is a variable coefficient.
 
 We choose as domain $\Omega=[0,1]^3$ and $a(\mathbf x)=\frac{10}{0.05 +
 2\|mathbf r\|^2}$, Since the coefficient is symmetric around the origin but
@@ -36,28 +39,27 @@ the domain is not, we will end up with a non-symmetric solution.
 <h3>Moving data to and from the device</h3>
 
 GPUs (we will use device from now on to refer to the GPU) have their own memory
-that is separate from the memory accessible to the CPU (we will use host from
-now on). A normal calculation on the device can be divided in three separte
-steps:
+that is separate from the memory accessible to the CPU (we will use the term
+"host" from now on). A normal calculation on the device can be divided in three
+separate steps:
  1) the data is moved from the host to the device
- 2) computation is done on the device
+ 2) the computation is done on the device
  3) the result is moved back from the device to the host
-The data movements can either done manually by the user or done automatically
-using UVM (Unified Virtual Memory). In deal.II, only the first method is
-supported. While it means an extra burden for the user, it allows a better
-control of data movement and more importantly it avoids to mistakenly run
+The data movements can either be done explicitly by the user code or done
+automatically using UVM (Unified Virtual Memory). In deal.II, only the first
+method is supported. While it means an extra burden for the user, it allows a
+better control of data movement and more importantly it avoids to mistakenly run
 important kernels on the host instead of the device.
 
 The data movement in deal.II is done using
 LinearAlgebra::ReadWriteVector<Number>. These vectors can be seen as buffers on
-the host that are used to either store data from the device or to send data to the
-device. There are two types of vectors that can be used on the device:
+the host that are used to either store data from the device or to send data to
+the device. There are two types of vectors that can be used on the device:
 LinearAlgebra::CUDAWrappers::Vector<Number>, which is similar to the more common
 Vector<Number>, and LinearAlgebra::distributed::Vector<Number,
-MemorySpace::CUDA>, which is a regular 
+MemorySpace::CUDA>, which is a regular
 LinearAlgebra::distributed::Vector<Number> where we have specified which memory
-space to use. The default value if the memory space is not specified is
-MemorySpace::Host.
+space to use. If no memory space is specified, the default is MemorySpace::Host.
 
 Next, we show how to move data to/from the device using
 LinearAlgebra::CUDAWrappers::Vector<Number>:
@@ -73,7 +75,7 @@ vector_dev.import(rw_vector, VectorOperations::insert);
 rw_vector.import(vector_dev, VectorOperations::insert);
 </code>
 Using LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> is similar
-but import() stage may involve an MPI communication::
+but the import() stage may involve MPI communication:
 <code>
 IndexSet locally_owned_dofs, locally_relevant_dofs;
 // Fill the two IndexSet...
@@ -91,13 +93,13 @@ LinearAlgebra::ReadWriteVector<double> relevant_rw_vector(locally_relevant_dofs)
 relevnt_rw_vector(distributed_vector_dev, VectorOperations::insert);
 </code>
 
-import() supports two kinds of VectorOperations: VectorOperations::insert and
+import() supports two kinds of strategies: VectorOperations::insert and
 VectorOperations::add.
 
 
 <h3>Matrix-vector product implementation</h3>
 
 The code necessary to evaluate the matrix-free operator on the device is very
-similar to the one on the host. There are however a few differences, the main
-ones are that the local_apply() function in Step-37 and the loop over quadrature
-points both need to be encapsulated in their own functors.
+similar to the one on the host. However, there are a few differences, the main
+ones being that the local_apply() function in Step-37 and the loop over
+quadrature points both need to be encapsulated in their own functors.
