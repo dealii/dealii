@@ -53,7 +53,7 @@ namespace Step64
 
 
   // Define a class that implements the varying coefficients we want to use in
-  // the Helmholtzoperator.
+  // the Helmholtz operator.
   // Later, we want to pass an object of this type to a
   // CUDAWrappers::MatrixFree<dim, double> object that expects the class to have
   // an operator that fills the values provided in the constructor for a given
@@ -92,7 +92,7 @@ namespace Step64
   {
     const unsigned int pos = CUDAWrappers::local_q_point_id<dim, double>(
       cell, gpu_data, n_dofs_1d, n_q_points);
-    const auto q_point =
+    const Tensor<1, dim> q_point =
       CUDAWrappers::get_quadrature_point<dim, double>(cell,
                                                       gpu_data,
                                                       n_dofs_1d);
@@ -107,9 +107,9 @@ namespace Step64
   }
 
 
-  // The class HelmholtzOperatorQuad implements the evaluation of the Helmholtz
-  // operator in each quadrature point. It uses a similar mechanism as the
-  // MatrixFree framework introduced in step-37.
+  // The class `HelmholtzOperatorQuad` implements the evaluation of the
+  // Helmholtz operator at each quadrature point. It uses a similar mechanism as
+  // the MatrixFree framework introduced in step-37.
   template <int dim, int fe_degree>
   class HelmholtzOperatorQuad
   {
@@ -127,25 +127,25 @@ namespace Step64
   };
 
 
-  // The Helmholtz operator reads
-  // \begin{align*}
-  // -\Delta u + c\cdot u
-  // \end{align*}
-  // and consists of two parts that are correspond to the two function calls
+  // The Helmholtz problem reads in weak form
+  // @f{eqnarray*}
+  //   (\nabla v, \nabla u)+ (v, a(\mathbf x) u) &=&(v,1) \quad \forall v.
+  // @f}
+  // The two terms on the left-hand side correspond to the two function calls
   // here.
   template <int dim, int fe_degree>
   __device__ void HelmholtzOperatorQuad<dim, fe_degree>::
                   operator()(CUDAWrappers::FEEvaluation<dim, fe_degree> *fe_eval,
              const unsigned int                          q) const
   {
-    fe_eval->submit_value(/*coef **/ fe_eval->get_value(q), q);
+    fe_eval->submit_value(coef * fe_eval->get_value(q), q);
     fe_eval->submit_gradient(fe_eval->get_gradient(q), q);
   }
 
 
   // Finally, we need to define a class that implements the whole operator
-  // evaluation that corresponds to matrix-vector product in matrix-based
-  // approaches. It corresponds
+  // evaluation that corresponds to a matrix-vector product in matrix-based
+  // approaches.
   template <int dim, int fe_degree>
   class LocalHelmholtzOperator
   {
@@ -174,9 +174,10 @@ namespace Step64
 
 
   // This is the call operator that performs the Helmholtz operator evaluation
-  // on a given cell similar to the MatrixFree framework. In particular, we need
-  // access to both values and gradients of the source vector and we write value
-  // and gradient information to the destincation vector.
+  // on a given cell similar to the MatrixFree framework on the CPU.
+  // In particular, we need access to both values and gradients of the source
+  // vector and we write value and gradient information to the destination
+  // vector.
   template <int dim, int fe_degree>
   __device__ void LocalHelmholtzOperator<dim, fe_degree>::operator()(
     const unsigned int                                          cell,
@@ -272,7 +273,6 @@ namespace Step64
   {
   public:
     HelmholtzProblem();
-    ~HelmholtzProblem();
 
     void run();
 
@@ -289,8 +289,8 @@ namespace Step64
 
     parallel::distributed::Triangulation<dim> triangulation;
 
-    DoFHandler<dim> dof_handler;
     FE_Q<dim>       fe;
+    DoFHandler<dim> dof_handler;
 
     IndexSet locally_owned_dofs;
     IndexSet locally_relevant_dofs;
@@ -326,18 +326,10 @@ namespace Step64
   HelmholtzProblem<dim, fe_degree>::HelmholtzProblem()
     : mpi_communicator(MPI_COMM_WORLD)
     , triangulation(mpi_communicator)
-    , dof_handler(triangulation)
     , fe(fe_degree)
+    , dof_handler(triangulation)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
   {}
-
-
-
-  template <int dim, int fe_degree>
-  HelmholtzProblem<dim, fe_degree>::~HelmholtzProblem()
-  {
-    dof_handler.clear();
-  }
 
 
 
@@ -429,11 +421,12 @@ namespace Step64
 
 
   // This solve() function finally contains the calls to the new classes
-  // previously dicussed. Here we don't use any preconditioner, i.e. the
-  // identity, to focus just on the pecuiarities of the CUDA MatrixFree
-  // framework. Of course, in a real application the choice of a suitable
-  // preconditioner is crucial but we have at least the same restructions as in
-  // step-37 since matrix entries are computed on the fly and not stored.
+  // previously dicussed. Here we don't use any preconditioner, i.e.
+  // precondition by the identity, to focus just on the peculiarities of the
+  // CUDAWrappers::MatrixFree framework. Of course, in a real application the
+  // choice of a suitable preconditioner is crucial but we have at least the
+  // same restructions as in step-37 since matrix entries are computed on the
+  // fly and not stored.
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::solve()
   {
@@ -497,8 +490,8 @@ namespace Step64
   }
 
 
-  // Nothing surprising in the run function as well. We simply compute the
-  // solution on a series of (globally) refined meshes.
+  // There is nothing surprising in the `run()` function either. We simply
+  // compute the solution on a series of (globally) refined meshes.
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::run()
   {

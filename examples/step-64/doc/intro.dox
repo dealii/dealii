@@ -29,11 +29,11 @@ amount is fairly small and the use of CUDA is limited to a few keywords.
 <h3>The test case</h3>
 
 In this example, we consider the Helmholtz problem @f{eqnarray*} - \nabla \cdot
-\nabla u + a(\mathbf r) u &=&1,\\ u &=& 0 \quad \text{on} \partial \Omega @f}
+\nabla u + a(\mathbf x) u &=&1,\\ u &=& 0 \quad \text{on } \partial \Omega @f}
 where $a(\mathbf x)$ is a variable coefficient.
 
 We choose as domain $\Omega=[0,1]^3$ and $a(\mathbf x)=\frac{10}{0.05 +
-2\|mathbf r\|^2}$, Since the coefficient is symmetric around the origin but
+2\|\mathbf x\|^2}$, Since the coefficient is symmetric around the origin but
 the domain is not, we will end up with a non-symmetric solution.
 
 <h3>Moving data to and from the device</h3>
@@ -42,28 +42,32 @@ GPUs (we will use device from now on to refer to the GPU) have their own memory
 that is separate from the memory accessible to the CPU (we will use the term
 "host" from now on). A normal calculation on the device can be divided in three
 separate steps:
- 1) the data is moved from the host to the device
- 2) the computation is done on the device
- 3) the result is moved back from the device to the host
+ -# the data is moved fromi the host to the device,
+ -# the computation is done on the device,
+ -# the result is moved back from the device to the host
+
 The data movements can either be done explicitly by the user code or done
 automatically using UVM (Unified Virtual Memory). In deal.II, only the first
 method is supported. While it means an extra burden for the user, it allows a
 better control of data movement and more importantly it avoids to mistakenly run
 important kernels on the host instead of the device.
 
-The data movement in deal.II is done using
-LinearAlgebra::ReadWriteVector<Number>. These vectors can be seen as buffers on
-the host that are used to either store data from the device or to send data to
-the device. There are two types of vectors that can be used on the device:
-LinearAlgebra::CUDAWrappers::Vector<Number>, which is similar to the more common
-Vector<Number>, and LinearAlgebra::distributed::Vector<Number,
+The data movement in deal.II is done using LinearAlgebra::ReadWriteVector. These
+vectors can be seen as buffers on the host that are used to either store data
+from the device or to send data to the device. There are two types of vectors
+that can be used on the device:
+- LinearAlgebra::CUDAWrappers::Vector, which is similar to the more common
+Vector<Number>, and
+- LinearAlgebra::distributed::Vector<Number,
 MemorySpace::CUDA>, which is a regular
-LinearAlgebra::distributed::Vector<Number> where we have specified which memory
-space to use. If no memory space is specified, the default is MemorySpace::Host.
+LinearAlgebra::distributed::Vector where we have specified which memory
+space to use.
+
+If no memory space is specified, the default is MemorySpace::Host.
 
 Next, we show how to move data to/from the device using
-LinearAlgebra::CUDAWrappers::Vector<Number>:
-<code>
+LinearAlgebra::CUDAWrappers::Vector:
+@code
 unsigned int size = 10;
 LinearAlgebra::CUDAWrappers::Vector<double> vector_dev(10);
 LinearAlgebra::ReadWriteVector<double> rw_vector(10);
@@ -73,10 +77,11 @@ vector_dev.import(rw_vector, VectorOperations::insert);
 // Do some computations on the device
 // Move the data to the host
 rw_vector.import(vector_dev, VectorOperations::insert);
-</code>
-Using LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> is similar
-but the import() stage may involve MPI communication:
-<code>
+@endcode
+Using LinearAlgebra::distributed::Vector<Number,
+MemorySpace::CUDA> is similar
+but the `import()` stage may involve MPI communication:
+@code
 IndexSet locally_owned_dofs, locally_relevant_dofs;
 // Fill the two IndexSet...
 LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
@@ -91,15 +96,15 @@ distributed_vector_dev.import(owned_rw_vector, VectorOperations::insert);
 LinearAlgebra::ReadWriteVector<double> relevant_rw_vector(locally_relevant_dofs);
 // Move the data to the host and do an MPI communication
 relevnt_rw_vector(distributed_vector_dev, VectorOperations::insert);
-</code>
+@endcode
 
-import() supports two kinds of strategies: VectorOperations::insert and
-VectorOperations::add.
+While importing a vector, values can either by inserted (using VectorOperation::insert)
+or added (using VectorOperation::add).
 
 
 <h3>Matrix-vector product implementation</h3>
 
 The code necessary to evaluate the matrix-free operator on the device is very
 similar to the one on the host. However, there are a few differences, the main
-ones being that the local_apply() function in Step-37 and the loop over
+ones being that the `local_apply()` function in Step-37 and the loop over
 quadrature points both need to be encapsulated in their own functors.
