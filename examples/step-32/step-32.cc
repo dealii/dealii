@@ -110,20 +110,20 @@ namespace Step32
   // after the value indicates its physical units):
   namespace EquationData
   {
-    const double eta                   = 1e21;    /* Pa s       */
-    const double kappa                 = 1e-6;    /* m^2 / s    */
-    const double reference_density     = 3300;    /* kg / m^3   */
-    const double reference_temperature = 293;     /* K          */
-    const double expansion_coefficient = 2e-5;    /* 1/K        */
-    const double specific_heat         = 1250;    /* J / K / kg */
-    const double radiogenic_heating    = 7.4e-12; /* W / kg     */
+    constexpr double eta                   = 1e21;    /* Pa s       */
+    constexpr double kappa                 = 1e-6;    /* m^2 / s    */
+    constexpr double reference_density     = 3300;    /* kg / m^3   */
+    constexpr double reference_temperature = 293;     /* K          */
+    constexpr double expansion_coefficient = 2e-5;    /* 1/K        */
+    constexpr double specific_heat         = 1250;    /* J / K / kg */
+    constexpr double radiogenic_heating    = 7.4e-12; /* W / kg     */
 
 
-    const double R0 = 6371000. - 2890000.; /* m          */
-    const double R1 = 6371000. - 35000.;   /* m          */
+    constexpr double R0 = 6371000. - 2890000.; /* m          */
+    constexpr double R1 = 6371000. - 35000.;   /* m          */
 
-    const double T0 = 4000 + 273; /* K          */
-    const double T1 = 700 + 273;  /* K          */
+    constexpr double T0 = 4000 + 273; /* K          */
+    constexpr double T1 = 700 + 273;  /* K          */
 
 
     // The next set of definitions are for functions that encode the density
@@ -196,7 +196,7 @@ namespace Step32
     // conservation equations. The scaling factor is $\frac{\eta}{L}$ where
     // $L$ was a typical length scale. By experimenting it turns out that a
     // good length scale is the diameter of plumes, which is around 10 km:
-    const double pressure_scaling = eta / 10000;
+    constexpr double pressure_scaling = eta / 10000;
 
     // The final number in this namespace is a constant that denotes the
     // number of seconds per (average, tropical) year. We use this only when
@@ -1301,11 +1301,7 @@ namespace Step32
 
     double max_local_velocity = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator cell = stokes_dof_handler
-                                                            .begin_active(),
-                                                   endc =
-                                                     stokes_dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : stokes_dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1347,11 +1343,7 @@ namespace Step32
 
     double max_local_cfl = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator cell = stokes_dof_handler
-                                                            .begin_active(),
-                                                   endc =
-                                                     stokes_dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : stokes_dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1426,10 +1418,7 @@ namespace Step32
            max_entropy = -std::numeric_limits<double>::max(), area = 0,
            entropy_integrated = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = temperature_dof_handler.begin_active(),
-      endc = temperature_dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : temperature_dof_handler.active_cell_iterators())
       if (cell->is_locally_owned())
         {
           fe_values.reinit(cell);
@@ -1511,10 +1500,7 @@ namespace Step32
 
     if (timestep_number != 0)
       {
-        typename DoFHandler<dim>::active_cell_iterator
-          cell = temperature_dof_handler.begin_active(),
-          endc = temperature_dof_handler.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : temperature_dof_handler.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               fe_values.reinit(cell);
@@ -1539,10 +1525,7 @@ namespace Step32
       }
     else
       {
-        typename DoFHandler<dim>::active_cell_iterator
-          cell = temperature_dof_handler.begin_active(),
-          endc = temperature_dof_handler.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : temperature_dof_handler.active_cell_iterators())
           if (cell->is_locally_owned())
             {
               fe_values.reinit(cell);
@@ -3227,7 +3210,7 @@ namespace Step32
   UpdateFlags
   BoussinesqFlowProblem<dim>::Postprocessor::get_needed_update_flags() const
   {
-    return update_values | update_gradients | update_q_points;
+    return update_values | update_gradients | update_quadrature_points;
   }
 
 
