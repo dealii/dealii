@@ -763,7 +763,6 @@ namespace Step32
     void   assemble_stokes_system();
     void   assemble_temperature_matrix();
     void   assemble_temperature_system(const double maximal_velocity);
-    void   project_temperature_field();
     double get_maximal_velocity() const;
     double get_cfl_number() const;
     double get_entropy_variation(const double average_temperature) const;
@@ -1635,155 +1634,6 @@ namespace Step32
 
         return std::min(max_viscosity, entropy_viscosity);
       }
-  }
-
-
-
-  // @sect5{BoussinesqFlowProblem::project_temperature_field}
-
-  // This function is new compared to step-31. What is does is to re-implement
-  // the library function <code>VectorTools::project()</code> for an MPI-based
-  // parallelization, a function we used for generating an initial vector for
-  // temperature based on some initial function. The library function only
-  // works with shared memory but doesn't know how to utilize multiple
-  // machines coupled through MPI to compute the projected field. The details
-  // of a <code>project()</code> function are not very difficult. All we do is
-  // to use a mass matrix and put the evaluation of the initial value function
-  // on the right hand side. The mass matrix for temperature we can simply
-  // generate using the respective assembly function, so all we need to do
-  // here is to create the right hand side and do a CG solve. The assembly
-  // function does a loop over all cells and evaluates the function in the
-  // <code>EquationData</code> namespace, and does this only on cells owned by
-  // the respective processor. The implementation of this assembly differs
-  // from the assembly we do for the principal assembly functions further down
-  // (which include thread-based parallelization with the WorkStream
-  // concept). Here we chose to keep things simple (keeping in mind that this
-  // function is also only called once at the beginning of the program, not in
-  // every time step), and generating the right hand side is cheap anyway so
-  // we won't even notice that this part is not parallelized by threads.
-  //
-  // Regarding the implementation of inhomogeneous Dirichlet boundary
-  // conditions: Since we use the temperature AffineConstraints object, we
-  // could apply the boundary conditions directly when building the respective
-  // matrix and right hand side. In this case, the boundary conditions are
-  // inhomogeneous, which makes this procedure somewhat tricky since we get the
-  // matrix from some other function that uses its own integration and assembly
-  // loop. However, the correct imposition of boundary conditions needs the
-  // matrix data we work on plus the right hand side simultaneously, since the
-  // right hand side is created by Gaussian elimination on the matrix rows. In
-  // order to not introduce the matrix assembly at this place, but still
-  // having the matrix data available, we choose to create a dummy matrix
-  // <code>matrix_for_bc</code> that we only fill with data when we need it
-  // for imposing boundary conditions. These positions are exactly those where
-  // we have an inhomogeneous entry in the AffineConstraints<double>. There are
-  // only a few such positions (on the boundary DoFs), so it is still much
-  // cheaper to use this function than to create the full matrix here. To
-  // implement this, we ask the constraint matrix whether the DoF under
-  // consideration is inhomogeneously constrained. In that case, we generate the
-  // respective matrix column that we need for creating the correct right hand
-  // side. Note that this (manually generated) matrix entry needs to be exactly
-  // the entry that we would fill the matrix with &mdash; otherwise, this will
-  // not work.
-  template <int dim>
-  void BoussinesqFlowProblem<dim>::project_temperature_field()
-  {
-    assemble_temperature_matrix();
-
-    QGauss<dim> quadrature(parameters.temperature_degree + 2);
-    UpdateFlags update_flags =
-      UpdateFlags(update_values | update_quadrature_points | update_JxW_values);
-    FEValues<dim> fe_values(mapping, temperature_fe, quadrature, update_flags);
-
-    const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
-                       n_q_points    = fe_values.n_quadrature_points;
-
-    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
-    Vector<double>                       cell_vector(dofs_per_cell);
-    FullMatrix<double> matrix_for_bc(dofs_per_cell, dofs_per_cell);
-
-    std::vector<double> rhs_values(n_q_points);
-
-    IndexSet row_temp_matrix_partitioning(temperature_mass_matrix.n());
-    row_temp_matrix_partitioning.add_range(
-      temperature_mass_matrix.local_range().first,
-      temperature_mass_matrix.local_range().second);
-    TrilinosWrappers::MPI::Vector rhs(row_temp_matrix_partitioning),
-      solution(row_temp_matrix_partitioning);
-
-
-    const EquationData::TemperatureInitialValues<dim> initial_temperature;
-
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = temperature_dof_handler.begin_active(),
-      endc = temperature_dof_handler.end();
-
-    for (; cell != endc; ++cell)
-      if (cell->is_locally_owned())
-        {
-          cell->get_dof_indices(local_dof_indices);
-          fe_values.reinit(cell);
-
-          initial_temperature.value_list(fe_values.get_quadrature_points(),
-                                         rhs_values);
-
-          cell_vector   = 0;
-          matrix_for_bc = 0;
-          for (unsigned int point = 0; point < n_q_points; ++point)
-            for (unsigned int i = 0; i < dofs_per_cell; ++i)
-              {
-                cell_vector(i) += rhs_values[point] *
-                                  fe_values.shape_value(i, point) *
-                                  fe_values.JxW(point);
-                if (temperature_constraints.is_inhomogeneously_constrained(
-                      local_dof_indices[i]))
-                  {
-                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                      matrix_for_bc(j, i) += fe_values.shape_value(i, point) *
-                                             fe_values.shape_value(j, point) *
-                                             fe_values.JxW(point);
-                  }
-              }
-
-          temperature_constraints.distribute_local_to_global(cell_vector,
-                                                             local_dof_indices,
-                                                             rhs,
-                                                             matrix_for_bc);
-        }
-
-    rhs.compress(VectorOperation::add);
-
-    // Now that we have the right linear system, we solve it using the CG
-    // method with a simple Jacobi preconditioner:
-    SolverControl solver_control(5 * rhs.size(), 1e-12 * rhs.l2_norm());
-    SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
-
-    TrilinosWrappers::PreconditionJacobi preconditioner_mass;
-    preconditioner_mass.initialize(temperature_mass_matrix, 1.3);
-
-    cg.solve(temperature_mass_matrix, solution, rhs, preconditioner_mass);
-
-    temperature_constraints.distribute(solution);
-
-    // Having so computed the current temperature field, let us set the member
-    // variable that holds the temperature nodes. Strictly speaking, we really
-    // only need to set <code>old_temperature_solution</code> since the first
-    // thing we will do is to compute the Stokes solution that only requires
-    // the previous time step's temperature field. That said, nothing good can
-    // come from not initializing the other vectors as well (especially since
-    // it's a relatively cheap operation and we only have to do it once at the
-    // beginning of the program) if we ever want to extend our numerical
-    // method or physical model, and so we initialize
-    // <code>temperature_solution</code> and
-    // <code>old_old_temperature_solution</code> as well. As a sidenote, while
-    // the <code>solution</code> vector is strictly distributed (i.e. each
-    // processor only stores a mutually exclusive subset of elements), the
-    // assignment makes sure that the vectors on the left hand side (which
-    // where initialized to contain ghost elements as well) also get the
-    // correct ghost elements. In other words, the assignment here requires
-    // communication between processors:
-    temperature_solution         = solution;
-    old_temperature_solution     = solution;
-    old_old_temperature_solution = solution;
   }
 
 
@@ -3564,10 +3414,8 @@ namespace Step32
 
   // This is the final and controlling function in this class. It, in fact,
   // runs the entire rest of the program and is, once more, very similar to
-  // step-31. We use a different mesh now (a GridGenerator::hyper_shell
-  // instead of a simple cube geometry), and use the
-  // <code>project_temperature_field()</code> function instead of the library
-  // function <code>VectorTools::project</code>.
+  // step-31. The only substantial difference is that we use a different mesh
+  // now (a GridGenerator::hyper_shell instead of a simple cube geometry).
   template <int dim>
   void BoussinesqFlowProblem<dim>::run()
   {
@@ -3588,7 +3436,37 @@ namespace Step32
 
   start_time_iteration:
 
-    project_temperature_field();
+    {
+      TrilinosWrappers::MPI::Vector solution(
+        temperature_dof_handler.locally_owned_dofs());
+      // VectorTools::project supports parallel vector classes with most
+      // standard finite elements via deal.II's own native MatrixFree framework:
+      // since we use standard Lagrange elements of moderate order this function
+      // works well here.
+      VectorTools::project(temperature_dof_handler,
+                           temperature_constraints,
+                           QGauss<dim>(parameters.temperature_degree + 2),
+                           EquationData::TemperatureInitialValues<dim>(),
+                           solution);
+      // Having so computed the current temperature field, let us set the member
+      // variable that holds the temperature nodes. Strictly speaking, we really
+      // only need to set <code>old_temperature_solution</code> since the first
+      // thing we will do is to compute the Stokes solution that only requires
+      // the previous time step's temperature field. That said, nothing good can
+      // come from not initializing the other vectors as well (especially since
+      // it's a relatively cheap operation and we only have to do it once at the
+      // beginning of the program) if we ever want to extend our numerical
+      // method or physical model, and so we initialize
+      // <code>old_temperature_solution</code> and
+      // <code>old_old_temperature_solution</code> as well. The assignment makes
+      // sure that the vectors on the left hand side (which where initialized to
+      // contain ghost elements as well) also get the correct ghost elements. In
+      // other words, the assignment here requires communication between
+      // processors:
+      temperature_solution         = solution;
+      old_temperature_solution     = solution;
+      old_old_temperature_solution = solution;
+    }
 
     timestep_number = 0;
     time_step = old_time_step = 0;
