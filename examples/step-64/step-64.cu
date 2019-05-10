@@ -438,6 +438,9 @@ namespace Step64
       solver_control);
     cg.solve(*system_matrix_dev, solution_dev, system_rhs_dev, preconditioner);
 
+    pcout << "  Solved in " << solver_control.last_step() << " iterations."
+          << std::endl;
+
     // Copy the solution from the device to the host to be able to view its
     // values and display it in output_results().
     LinearAlgebra::ReadWriteVector<double> rw_vector(locally_owned_dofs);
@@ -445,9 +448,6 @@ namespace Step64
     ghost_solution_host.import(rw_vector, VectorOperation::insert);
 
     constraints.distribute(ghost_solution_host);
-
-    std::cout << "solution norm: " << ghost_solution_host.l2_norm()
-              << std::endl;
 
     ghost_solution_host.update_ghost_values();
   }
@@ -487,6 +487,19 @@ namespace Step64
         std::ofstream master_output(master_name);
         data_out.write_pvtu_record(master_output, filenames);
       }
+
+    Vector<float> cellwise_norm(triangulation.n_active_cells());
+    VectorTools::integrate_difference(dof_handler,
+                                      ghost_solution_host,
+                                      Functions::ZeroFunction<dim>(),
+                                      cellwise_norm,
+                                      QGauss<dim>(fe.degree + 2),
+                                      VectorTools::L2_norm);
+    const double global_norm =
+      VectorTools::compute_global_error(triangulation,
+                                        cellwise_norm,
+                                        VectorTools::L2_norm);
+    pcout << "  solution norm: " << global_norm << std::endl;
   }
 
 
@@ -495,17 +508,21 @@ namespace Step64
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::run()
   {
-    for (unsigned int cycle = 0; cycle < 5 - dim; ++cycle)
+    for (unsigned int cycle = 0; cycle < 7 - dim; ++cycle)
       {
         pcout << "Cycle " << cycle << std::endl;
 
         if (cycle == 0)
-          {
-            GridGenerator::hyper_cube(triangulation, 0., 1.);
-            triangulation.refine_global(4 - dim);
-          }
+          GridGenerator::hyper_cube(triangulation, 0., 1.);
         triangulation.refine_global(1);
+
         setup_system();
+
+        pcout << "   Number of active cells:       "
+              << triangulation.n_global_active_cells() << std::endl
+              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl;
+
         assemble_rhs();
         solve();
         output_results(cycle);
