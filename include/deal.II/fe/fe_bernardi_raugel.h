@@ -33,7 +33,37 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * The Bernardi-Raugel element.
  *
+ * This class implements the non-standard Bernardi-Raugel (BR) element
+ * that can be used as one part of a stable velocity/pressure pair for
+ * the Stokes equation. The BR element can be seen as either an
+ * enriched version of the $Q_1^d$ element with added bubble functions
+ * on each edge (in 2d) or face (in 3d), or as a reduced version of
+ * the $Q_2^d$ element. It addresses the fact that the $Q_1^d\times
+ * Q_0$ combination is not inf-sup stable (requiring a larger velocity
+ * space), and that the $Q_2^d\times Q_1$ combination is stable but
+ * sub-optimal since the velocity space is too large relative to the
+ * pressure space to provide additional accuracy commensurate with the
+ * cost of the large number of velocity unknowns.
+ *
+ * The element was introduced in the following paper:
+ * @code{.bib}
+ * @article{BR85,
+ *   author    = {Christine Bernardi and Genevi{\`e}ve Raugel},
+ *   title     = {Analysis of some finite elements for the {S}tokes problem},
+ *   journal   = {Mathematics of Computation},
+ *   publisher = {American Mathematical Society ({AMS})},
+ *   volume    = {44},
+ *   number    = {169},
+ *   pages     = {71--79},
+ *   year      = {1985},
+ *   doi       = {10.1090/s0025-5718-1985-0771031-7},
+ *   url       = {https://doi.org/10.1090/s0025-5718-1985-0771031-7}
+ * }
+ * @endcode
+ *
+ *
  * <h3>Degrees of freedom</h3>
+ *
  * The BR1 element has <i>dim</i> degrees of freedom on each vertex and 1 on
  * each face. The shape functions are ordered by the $(Q_1)^d$ shape functions
  * supported on each vertex, increasing according to vertex ordering on the
