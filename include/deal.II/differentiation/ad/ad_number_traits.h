@@ -17,6 +17,7 @@
 #define dealii_differentiation_ad_ad_number_traits_h
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
 
 #include <deal.II/differentiation/ad/ad_number_types.h>
 
@@ -332,6 +333,24 @@ namespace Differentiation
                  (void)std::declval<typename ADNumberTrait::derivative_type>(),
                  void())> : std::true_type
       {};
+
+
+      /**
+       * A specialization for the information struct for arithmetic / floating
+       * point numbers.
+       */
+      template <typename ScalarType>
+      struct ADNumberInfoFromEnum<
+        ScalarType,
+        Differentiation::AD::NumberTypes::none,
+        typename std::enable_if<
+          std::is_floating_point<ScalarType>::value>::type>
+      {
+        static const bool is_taped                              = false;
+        using real_type                                         = ScalarType;
+        using derivative_type                                   = ScalarType;
+        static const unsigned int n_supported_derivative_levels = 0;
+      };
 
 
       /**
@@ -1068,12 +1087,309 @@ namespace Differentiation
 #  endif
 
 
+
     /**
      * A dummy specialization for floating point numbers. This is necessary to
-     * deal with the tricky case of higher-order derivative extraction from
-     * AD numbers.
+     * deal with the special case of the ADNumberTypeCode that represents a
+     * floating point number.
      *
-     * Sacado nests the directional derivatives within Sacado numbers, while
+     * This specific version specializes the generic case where the template
+     * @p ScalarType represents a floating point type, or complex number that
+     * is templated on a floating point type.
+     */
+    template <typename ScalarType>
+    struct NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>
+    {
+      /**
+       * The internal number type code.
+       */
+      static constexpr enum NumberTypes type_code = NumberTypes::none;
+
+      // The clang compiler does not seem to like these
+      // variables being defined as constant expressions
+      // (the tests <adolc|sacado>/ad_number_traits_02 will
+      // fail with linking errors). However, GCC complains
+      // about the use of non-constant expressions in
+      // std::conditional.
+#  ifdef __clang__
+
+      /**
+       * A flag to indicate whether the number is of
+       * the taped variety or not.
+       */
+      static const bool is_taped;
+
+
+      /**
+       * A flag to indicate whether the number is of
+       * the tapeless variety or not.
+       */
+      static const bool is_tapeless;
+
+
+      /**
+       * A flag to indicate whether the number represents
+       * a real value.
+       */
+      static const bool is_real_valued;
+
+
+      /**
+       * A flag to indicate whether the number represents
+       * a complex value.
+       */
+      static const bool is_complex_valued;
+
+
+      /**
+       * The number of directional derivatives that can be
+       * taken with this (floating point) number.
+       */
+      static const unsigned int n_supported_derivative_levels;
+
+#  else
+
+      /**
+       * A flag to indicate whether the number is of
+       * the taped variety or not.
+       */
+      static constexpr bool is_taped = false;
+
+
+      /**
+       * A flag to indicate whether the number is of
+       * the tapeless variety or not.
+       */
+      static constexpr bool is_tapeless = false;
+
+
+      /**
+       * A flag to indicate whether the number represents
+       * a real value.
+       */
+      static constexpr bool is_real_valued =
+        (!boost::is_complex<ScalarType>::value);
+
+
+      /**
+       * A flag to indicate whether the number represents
+       * a complex value.
+       */
+      static constexpr bool is_complex_valued = !is_real_valued;
+
+
+      /**
+       * The number of directional derivatives that can be
+       * taken with this (floating point) number.
+       */
+      static constexpr unsigned int n_supported_derivative_levels = 0;
+
+#  endif
+
+
+      /**
+       * Underlying floating point value type.
+       * This could real-valued or complex-valued.
+       */
+      using scalar_type = ScalarType;
+
+
+      /**
+       * Type for real numbers.
+       */
+      using real_type =
+        typename dealii::numbers::NumberTraits<scalar_type>::real_type;
+
+
+      /**
+       * Type for complex numbers.
+       */
+      using complex_type = std::complex<real_type>;
+
+
+      /**
+       * The actual auto-differentiable number type.
+       */
+      using ad_type = ScalarType;
+
+      /**
+       * The actual auto-differentiable number directional derivative type.
+       */
+      using derivative_type = ScalarType;
+
+
+      /**
+       * Extract the value of an auto-differentiable number.
+       */
+      static scalar_type
+      get_scalar_value(const ad_type &x)
+      {
+        return x;
+      }
+
+
+      /**
+       * Extract the derivative value of an auto-differentiable number.
+       */
+      static derivative_type
+      get_directional_derivative(const ad_type &, const unsigned int)
+      {
+        Assert(
+          false,
+          ExcMessage(
+            "Floating point/arithmetic numbers have no directional derivatives."));
+        return derivative_type();
+      }
+
+
+      /**
+       * Extract the number of directional derivatives value tracked by
+       * an auto-differentiable number.
+       */
+      static unsigned int
+      n_directional_derivatives(const ad_type &)
+      {
+        Assert(
+          false,
+          ExcMessage(
+            "Floating point/arithmetic numbers have no directional derivatives."));
+        return 0;
+      }
+    };
+
+#  ifdef __clang__
+
+    template <typename ScalarType>
+    const bool NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_taped = false;
+
+
+    template <typename ScalarType>
+    const bool NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_tapeless = false;
+
+
+    template <typename ScalarType>
+    const bool NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_real_valued =
+      (!boost::is_complex<ScalarType>::value);
+
+
+    template <typename ScalarType>
+    const bool NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_complex_valued =
+      !(NumberTraits<ScalarType, NumberTypes::none>::is_real_valued);
+
+
+    template <typename ScalarType>
+    const unsigned int NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::n_supported_derivative_levels =
+      0;
+
+#  else
+
+    template <typename ScalarType>
+    constexpr bool NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_taped;
+
+
+    template <typename ScalarType>
+    constexpr bool NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_tapeless;
+
+
+    template <typename ScalarType>
+    constexpr bool NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_real_valued;
+
+
+    template <typename ScalarType>
+    constexpr bool NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::is_complex_valued;
+
+
+    template <typename ScalarType>
+    constexpr unsigned int NumberTraits<
+      ScalarType,
+      NumberTypes::none,
+      typename std::enable_if<
+        std::is_floating_point<ScalarType>::value ||
+        (boost::is_complex<ScalarType>::value &&
+         std::is_floating_point<typename internal::RemoveComplexWrapper<
+           ScalarType>::type>::value)>::type>::n_supported_derivative_levels;
+
+#  endif
+
+
+    /**
+     * A dummy specialization for floating point numbers.
+     *
+     * This is necessary to deal with two situations:
+     * 1. when the dummy "none" number type is to be used, and
+     * 2. the tricky case of higher-order derivative extraction from AD numbers.
+     *
+     * @note Sacado nests the directional derivatives within Sacado numbers, while
      * ADOL-C does not. So, starting off from a scalar function f(x), the number
      * type resulting from the computation of a directional derivative f'(x) of
      * that function is a floating point number for ADOL-C number types and
@@ -1087,30 +1403,21 @@ namespace Differentiation
     template <typename ScalarType>
     struct ADNumberTraits<
       ScalarType,
-      typename std::enable_if<std::is_arithmetic<ScalarType>::value>::type>
-    {
-      /**
-       * Underlying floating point value type.
-       * This could real-valued or complex-valued.
-       */
-      using scalar_type = ScalarType;
+      typename std::enable_if<std::is_floating_point<ScalarType>::value>::type>
+      : NumberTraits<ScalarType, NumberTypes::none>
+    {};
 
-      static ScalarType
-      get_directional_derivative(const ScalarType & /*x*/,
-                                 const unsigned int /*direction*/)
-      {
-        // If the AD drivers are correctly implemented then we should not get
-        // here. This is essentially a dummy for when the ADNumberTypeCode for
-        // the original AD number (from which one is getting a derivative >= 2)
-        // is one that specified ADOL-C taped and tapeless numbers, or a
-        // non-nested Sacado number.
-        AssertThrow(
-          false,
-          ExcMessage(
-            "Floating point numbers have no directional derivatives."));
-        return 0.0;
-      }
-    };
+    /**
+     * A dummy specialization for complex floating point numbers.
+     */
+    template <typename ComplexScalarType>
+    struct ADNumberTraits<
+      ComplexScalarType,
+      typename std::enable_if<
+        boost::is_complex<ComplexScalarType>::value &&
+        std::is_floating_point<typename ComplexScalarType::value_type>::value>::
+        type> : NumberTraits<ComplexScalarType, NumberTypes::none>
+    {};
 
   } // namespace AD
 } // namespace Differentiation
