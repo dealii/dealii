@@ -133,8 +133,8 @@ namespace Step31
         : Function<dim>(1)
       {}
 
-      virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override
+      virtual double value(const Point<dim> & /*p*/,
+                           const unsigned int /*component*/ = 0) const override
       {
         return 0;
       }
@@ -143,7 +143,7 @@ namespace Step31
                                 Vector<double> &  value) const override
       {
         for (unsigned int c = 0; c < this->n_components; ++c)
-          values(c) = TemperatureInitialValues<dim>::value(p, c);
+          value(c) = TemperatureInitialValues<dim>::value(p, c);
       }
     };
 
@@ -183,7 +183,7 @@ namespace Step31
                                 Vector<double> &  value) const override
       {
         for (unsigned int c = 0; c < this->n_components; ++c)
-          values(c) = TemperatureRightHandSide<dim>::value(p, c);
+          value(c) = TemperatureRightHandSide<dim>::value(p, c);
       }
     };
   } // namespace EquationData
