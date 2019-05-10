@@ -1,11 +1,17 @@
+#Epsilon
+set Epsilon = 0.005
+
 # Finite Element degree
 set Fe degree = 1
 
 # Smoother Type: SOR|Jacobi|block SOR|block Jacobi
 set Smoother type = Jacobi
 
+# Number of smoothing steps
+set Smoothing steps = 6
+
 # DoF renumbering: no|downstream|upstream|random
-set DoF renumbering = downstream
+set DoF renumbering = downstream 
 
 # With streamline diffusion: true|false
 set With streamline diffusion = true
