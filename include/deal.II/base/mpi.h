@@ -19,8 +19,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/numbers.h>
 
 #include <map>
+#include <numeric>
 #include <vector>
 
 #if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
@@ -237,6 +239,29 @@ namespace Utilities
     std::vector<IndexSet>
     create_ascending_partitioning(const MPI_Comm &           comm,
                                   const IndexSet::size_type &local_size);
+
+#ifdef DEAL_II_WITH_MPI
+    /**
+     * Calculate mean and standard deviation across the MPI communicator @p comm
+     * for values provided as a range `[begin,end)`.
+     * The mean is computed as $\bar x=\frac 1N \sum x_k$ where the $x_k$ are
+     * the elements pointed to by the `begin` and `end` iterators on all
+     * processors (i.e., each processor's `[begin,end)` range points to a subset
+     * of the overall number of elements). The standard deviation is calculated
+     * as $\sigma=\sqrt{\frac {1}{N-1} \sum |x_k -\bar x|^2}$, which is known as
+     * unbiased sample variance.
+     *
+     * @tparam Number specifies the type to store the mean value.
+     * The standard deviation is stored as the corresponding real type.
+     * This allows, for example, to calculate statistics from integer input
+     * values.
+     */
+    template <class Iterator, typename Number = long double>
+    std::pair<Number, typename numbers::NumberTraits<Number>::real_type>
+    mean_and_standard_deviation(const Iterator  begin,
+                                const Iterator  end,
+                                const MPI_Comm &comm);
+#endif
 
     /**
      * Return the sum over all processors of the value @p t. This function is
@@ -951,6 +976,36 @@ namespace Utilities
       return received_objects;
 #  endif
     }
+
+
+#  ifdef DEAL_II_WITH_MPI
+    template <class Iterator, typename Number>
+    std::pair<Number, typename numbers::NumberTraits<Number>::real_type>
+    mean_and_standard_deviation(const Iterator  begin,
+                                const Iterator  end,
+                                const MPI_Comm &comm)
+    {
+      // below we do simple and straight-forward implementation. More elaborate
+      // options are:
+      // http://dx.doi.org/10.1145/2807591.2807644 section 3.1.2
+      // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
+      // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online
+      using Std        = typename numbers::NumberTraits<Number>::real_type;
+      const Number sum = std::accumulate(begin, end, Number(0.));
+
+      const auto size = Utilities::MPI::sum(std::distance(begin, end), comm);
+      Assert(size > 0, ExcDivideByZero());
+      const Number mean =
+        Utilities::MPI::sum(sum, comm) / static_cast<Std>(size);
+      Std sq_sum = 0.;
+      std::for_each(begin, end, [&mean, &sq_sum](const Number &v) {
+        sq_sum += numbers::NumberTraits<Number>::abs_square(v - mean);
+      });
+      sq_sum = Utilities::MPI::sum(sq_sum, comm);
+      return std::make_pair(mean,
+                            std::sqrt(sq_sum / static_cast<Std>(size - 1)));
+    }
+#  endif
 
 #endif
   } // end of namespace MPI
