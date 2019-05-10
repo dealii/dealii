@@ -305,7 +305,7 @@ namespace Step64
     // that always uses GPU memory storage but doesn't work with MPI. It might
     // be worth noticing that the communication between different MPI processes
     // can be improved if the MPI implementation is CUDA-aware and the configure
-    // flag DEAL_II_WITH_CUDA_AWARE_MPI is enabled.
+    // flag DEAL_II_MPI_WITH_CUDA_SUPPORT is enabled.
     //
     // Here, we also have a finite element vector with CPU storage such that we
     // can view and display the solution as usual.
@@ -425,7 +425,7 @@ namespace Step64
   // precondition by the identity, to focus just on the peculiarities of the
   // CUDAWrappers::MatrixFree framework. Of course, in a real application the
   // choice of a suitable preconditioner is crucial but we have at least the
-  // same restructions as in step-37 since matrix entries are computed on the
+  // same restrictions as in step-37 since matrix entries are computed on the
   // fly and not stored.
   template <int dim, int fe_degree>
   void HelmholtzProblem<dim, fe_degree>::solve()

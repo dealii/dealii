@@ -1,0 +1,5 @@
+New: Ths step-64 tutorial demonstrates how to use the CUDAWrappers::MatrixFree
+framework (possibly with MPI) and discusses the peculiarities of using CUDA
+inside deal.II in general.
+<br>
+(Daniel Arndt, Bruno Turcksin, 2019/05/10)
