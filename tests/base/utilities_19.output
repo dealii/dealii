@@ -1,0 +1,13 @@
+
+DEAL::dim=1
+DEAL:: 0
+DEAL:: 1
+DEAL:: 2
+DEAL::dim=2
+DEAL:: 0 0
+DEAL:: 0 1
+DEAL:: 0 2
+DEAL::dim=3
+DEAL:: 0 0 0
+DEAL:: 0 0 1
+DEAL:: 0 0 2

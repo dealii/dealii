@@ -32,6 +32,7 @@
 #include <boost/random.hpp>
 
 #include <algorithm>
+#include <bitset>
 #include <cctype>
 #include <cerrno>
 #include <cmath>
@@ -90,6 +91,48 @@ namespace Utilities
   }
 
 
+  namespace
+  {
+    template <int dim,
+              typename Number,
+              int effective_dim,
+              typename LongDouble,
+              typename Integer>
+    std::vector<std::array<std::uint64_t, effective_dim>>
+    inverse_Hilbert_space_filling_curve_effective(
+      const std::vector<Point<dim, Number>> &points,
+      const Point<dim, Number> &             bl,
+      const std::array<LongDouble, dim> &    extents,
+      const std::bitset<dim> &               valid_extents,
+      const int                              min_bits,
+      const Integer                          max_int)
+    {
+      std::vector<std::array<Integer, effective_dim>> int_points(points.size());
+
+      for (unsigned int i = 0; i < points.size(); ++i)
+        {
+          // convert into integers:
+          unsigned int eff_d = 0;
+          for (unsigned int d = 0; d < dim; ++d)
+            if (valid_extents[d])
+              {
+                Assert(extents[d] > 0, ExcInternalError());
+                const LongDouble v = (static_cast<LongDouble>(points[i][d]) -
+                                      static_cast<LongDouble>(bl[d])) /
+                                     extents[d];
+                Assert(v >= 0. && v <= 1., ExcInternalError());
+                AssertIndexRange(eff_d, effective_dim);
+                int_points[i][eff_d] =
+                  static_cast<Integer>(v * static_cast<LongDouble>(max_int));
+                ++eff_d;
+              }
+        }
+
+      // note that we call this with "min_bits"
+      return inverse_Hilbert_space_filling_curve<effective_dim>(int_points,
+                                                                min_bits);
+    }
+  } // namespace
 
   template <int dim, typename Number>
   std::vector<std::array<std::uint64_t, dim>>
@@ -116,11 +159,12 @@ namespace Utilities
         }
 
     std::array<LongDouble, dim> extents;
+    std::bitset<dim>            valid_extents;
     for (unsigned int i = 0; i < dim; ++i)
       {
         extents[i] =
           static_cast<LongDouble>(tr[i]) - static_cast<LongDouble>(bl[i]);
-        Assert(extents[i] > 0., ExcMessage("Bounding box is degenerate."));
+        valid_extents[i] = (extents[i] > 0.);
       }
 
     // make sure our conversion from fractional coordinates to
@@ -135,24 +179,66 @@ namespace Utilities
                                std::numeric_limits<Integer>::max() :
                                (Integer(1) << min_bits) - 1);
 
-    std::vector<std::array<Integer, dim>> int_points(points.size());
-
-    for (unsigned int i = 0; i < points.size(); ++i)
+    const unsigned int effective_dim = valid_extents.count();
+    if (effective_dim == dim)
       {
-        // convert into integers:
-        for (unsigned int d = 0; d < dim; ++d)
-          {
-            const LongDouble v = (static_cast<LongDouble>(points[i][d]) -
-                                  static_cast<LongDouble>(bl[d])) /
-                                 extents[d];
-            Assert(v >= 0. && v <= 1., ExcInternalError());
-            int_points[i][d] =
-              static_cast<Integer>(v * static_cast<LongDouble>(max_int));
-          }
+        return inverse_Hilbert_space_filling_curve_effective<dim,
+                                                             Number,
+                                                             dim,
+                                                             LongDouble,
+                                                             Integer>(
+          points, bl, extents, valid_extents, min_bits, max_int);
       }
 
-    // note that we call this with "min_bits"
-    return inverse_Hilbert_space_filling_curve<dim>(int_points, min_bits);
+    // various degenerate cases
+    std::array<std::uint64_t, dim> zero_ind;
+    for (unsigned int d = 0; d < dim; ++d)
+      zero_ind[d] = 0;
+
+    std::vector<std::array<std::uint64_t, dim>> ind(points.size(), zero_ind);
+    // manually check effective_dim == 1 and effective_dim == 2
+    if (dim == 3 && effective_dim == 2)
+      {
+        const auto ind2 =
+          inverse_Hilbert_space_filling_curve_effective<dim,
+                                                        Number,
+                                                        2,
+                                                        LongDouble,
+                                                        Integer>(
+            points, bl, extents, valid_extents, min_bits, max_int);
+
+        for (unsigned int i = 0; i < ind.size(); ++i)
+          for (unsigned int d = 0; d < 2; ++d)
+            ind[i][d + 1] = ind2[i][d];
+
+        return ind;
+      }
+    else if (effective_dim == 1)
+      {
+        const auto ind1 =
+          inverse_Hilbert_space_filling_curve_effective<dim,
+                                                        Number,
+                                                        1,
+                                                        LongDouble,
+                                                        Integer>(
+            points, bl, extents, valid_extents, min_bits, max_int);
+
+        for (unsigned int i = 0; i < ind.size(); ++i)
+          ind[i][dim - 1] = ind1[i][0];
+
+        return ind;
+      }
+
+    // we should get here only if effective_dim == 0
+    Assert(effective_dim == 0, ExcInternalError());
+
+    // if the bounding box is degenerate in all dimensions,
+    // can't do much but exit gracefully by setting index according
+    // to the index of each point so that there is no re-ordering
+    for (unsigned int i = 0; i < points.size(); ++i)
+      ind[i][dim - 1] = i;
+
+    return ind;
   }
 
 
