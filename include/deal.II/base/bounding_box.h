@@ -67,7 +67,7 @@ enum class NeighborType
  *
  * Objects of this class are used to represent bounding boxes. They are,
  * among other uses, useful in parallel distributed meshes to give a general
- * description the owners of each portion of the mesh.
+ * description of the owners of each portion of the mesh.
  *
  * Bounding boxes are represented by two vertices (bottom left and top right).
  * Geometrically, a bounding box is:
@@ -89,7 +89,7 @@ enum class NeighborType
  * |      |/
  * V------.
  * @endcode
- * Notice the sides are always parallel to the respective axis.
+ * Notice that the sides are always parallel to the respective axis.
  *
  * @author Giovanni Alzetta, 2017.
  */
@@ -112,10 +112,20 @@ public:
                 &boundary_points);
 
   /**
-   * Return the boundary_points
+   * Construct the bounding box that encloses all the points in the given
+   * container.
+   *
+   * The constructor supports any Container that provides begin() and end()
+   * iterators to Point<spacedim, Number> elements.
    */
-  const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
-  get_boundary_points() const;
+  template <class Container>
+  BoundingBox(const Container &points);
+
+  /**
+   * Return a reference to the boundary_points
+   */
+  std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
+  get_boundary_points();
 
   /**
    * Check if the current object and @p other_bbox are neighbors, i.e. if the boxes
@@ -188,6 +198,20 @@ inline BoundingBox<spacedim, Number>::BoundingBox(
 
   this->boundary_points = boundary_points;
 }
+
+
+
+template <int spacedim, typename Number>
+template <class Container>
+inline BoundingBox<spacedim, Number>::BoundingBox(const Container &points)
+{
+  boost::geometry::envelope(
+    boost::geometry::model::multi_point<Point<spacedim, Number>>(points.begin(),
+                                                                 points.end()),
+    *this);
+}
+
+
 
 template <int spacedim, typename Number>
 inline void
