@@ -1511,16 +1511,6 @@ namespace Threads
     }
 
 
-    /**
-     * Copy constructor.
-     *
-     * @post Using this constructor automatically makes the task object
-     * joinable().
-     */
-    Task(const Task<RT> &t)
-      : task_descriptor(t.task_descriptor)
-    {}
-
 
     /**
      * Default constructor. You can't do much with a task object constructed
@@ -1531,6 +1521,8 @@ namespace Threads
      * i.e., joinable() will return false.
      */
     Task() = default;
+
+
 
     /**
      * Join the task represented by this object, i.e. wait for it to finish.
