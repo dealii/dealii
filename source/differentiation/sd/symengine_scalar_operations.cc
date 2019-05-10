@@ -133,8 +133,7 @@ namespace Differentiation
           ExcMessage(
             "Substitution with a number that does not represent a symbol or symbolic derivative"));
 
-        types::substitution_map::iterator it_sym =
-          substitution_map.find(Expression(symbol));
+        auto it_sym = substitution_map.find(Expression(symbol));
         Assert(it_sym != substitution_map.end(),
                ExcMessage("Did not find this symbol in the map."));
 
