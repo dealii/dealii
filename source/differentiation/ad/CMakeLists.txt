@@ -26,6 +26,7 @@ SET(_inst
   ad_drivers.inst.in
   ad_drivers.inst1.in
   ad_drivers.inst2.in
+  ad_helpers.inst.in
   ad_helpers.inst1.in
   ad_helpers.inst2.in
   adolc_number_types.inst.in
