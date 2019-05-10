@@ -459,6 +459,7 @@ namespace Differentiation
             // duration of the simulation, we create a global live variable
             // that doesn't go out of scope.
             static ad_type num = 0.0;
+            (void)num;
           }
     }
 
