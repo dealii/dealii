@@ -491,8 +491,32 @@ namespace Differentiation
      * a situation the resolve_explicit_dependencies() function may be useful
      * to simplify the final substitution map by resolving all explicit
      * interdependencies between entries in the substitution map.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
+     * @tparam T An arbitrary type resulting from the application of
+     *         the SFINAE idiom to selectively specialize this class.
+     *         The required condition is fulfilled when the @p ExpressionType
+     *         can be explicitly converted to a
+     *         `const SymEngine::RCP<const SymEngine::Basic> &`, and it is
+     *         possible to construct an @p ExpressionType directly from the
+     *         @p ValueType.
      */
-    template <typename ExpressionType = SD::Expression, typename ValueType>
+    template <typename ExpressionType,
+              typename ValueType,
+              typename T = typename std::enable_if<
+                dealii::internal::is_explicitly_convertible<
+                  ExpressionType,
+                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
+                std::is_constructible<ExpressionType, ValueType>::value>::type>
     types::substitution_map
     make_substitution_map(const ExpressionType &symbol, const ValueType &value);
 
@@ -505,8 +529,19 @@ namespace Differentiation
      * using this function. For more details on this, see the other
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
-    template <typename ExpressionType = SD::Expression, typename ValueType>
+    template <typename ExpressionType, typename ValueType>
     types::substitution_map
     make_substitution_map(const std::vector<ExpressionType> &symbols,
                           const std::vector<ValueType> &     values);
@@ -520,8 +555,19 @@ namespace Differentiation
      * using this function. For more details on this, see the other
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
-    template <typename ExpressionType = SD::Expression, typename ValueType>
+    template <typename ExpressionType, typename ValueType>
     types::substitution_map
     make_substitution_map(
       const std::pair<ExpressionType, ValueType> &symbol_value);
@@ -536,8 +582,19 @@ namespace Differentiation
      * using this function. For more details on this, see the other
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
-    template <typename ExpressionType = SD::Expression, typename ValueType>
+    template <typename ExpressionType, typename ValueType>
     types::substitution_map
     make_substitution_map(
       const std::vector<std::pair<ExpressionType, ValueType>> &symbol_values);
@@ -669,9 +726,20 @@ namespace Differentiation
      * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &,const Expression &) function for a detailed
      * discussion on the role of this template argument.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
     template <bool ignore_invalid_symbols = false,
-              typename ExpressionType     = SD::Expression,
+              typename ExpressionType,
               typename ValueType,
               typename = typename std::enable_if<
                 dealii::internal::is_explicitly_convertible<
@@ -704,9 +772,20 @@ namespace Differentiation
      * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &,const Expression &) function for a detailed
      * discussion on the role of this template argument.
+     *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, although if the @p ValueType is not supported
+     *         by this class then a user-defined @p ExpressionType should be
+     *         used.
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type or be a special type that a user-defined
+     *         @p ExpressionType can be constructed from.
      */
     template <bool ignore_invalid_symbols = false,
-              typename ExpressionType     = SD::Expression,
+              typename ExpressionType,
               typename ValueType,
               typename = typename std::enable_if<
                 dealii::internal::is_explicitly_convertible<
