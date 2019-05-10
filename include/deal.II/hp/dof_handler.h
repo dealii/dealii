@@ -1122,7 +1122,8 @@ namespace hp
 
     /**
      * A function that will be triggered through a triangulation
-     * signal just before the associated Triangulation is modified.
+     * signal just before the associated Triangulation or
+     * parallel::shared::Triangulation is modified.
      *
      * The function that stores the active_fe_indices of all cells that will
      * be refined or coarsened before the refinement happens, so that
@@ -1130,18 +1131,6 @@ namespace hp
      */
     void
     pre_active_fe_index_transfer();
-
-    /**
-     * A function that will be triggered through a triangulation
-     * signal just before the associated parallel::shared::Triangulation is
-     * modified.
-     *
-     * The function that stores the active_fe_indices of all cells that will
-     * be refined or coarsened before the refinement happens, so that
-     * they can be set again after refinement.
-     */
-    void
-    pre_shared_active_fe_index_transfer();
 
     /**
      * A function that will be triggered through a triangulation
@@ -1156,24 +1145,14 @@ namespace hp
 
     /**
      * A function that will be triggered through a triangulation
-     * signal just after the associated Triangulation is modified.
+     * signal just after the associated Triangulation or
+     * parallel::shared::Triangulation is modified.
      *
      * The function that restores the active_fe_indices of all cells that
      * were refined or coarsened.
      */
     void
     post_active_fe_index_transfer();
-
-    /**
-     * A function that will be triggered through a triangulation
-     * signal just after the associated parallel::shared::Triangulation is
-     * modified.
-     *
-     * The function that restores the active_fe_indices of all cells that
-     * were refined or coarsened.
-     */
-    void
-    post_shared_active_fe_index_transfer();
 
     /**
      * A function that will be triggered through a triangulation

@@ -3705,16 +3705,12 @@ namespace internal
           {
             saved_subdomain_ids.resize(tr->n_active_cells());
 
-            typename parallel::shared::Triangulation<dim, spacedim>::
-              active_cell_iterator
-                cell = this->dof_handler->get_triangulation().begin_active(),
-                endc = this->dof_handler->get_triangulation().end();
-
             const std::vector<types::subdomain_id> &true_subdomain_ids =
               tr->get_true_subdomain_ids_of_cells();
 
-            for (unsigned int index = 0; cell != endc; ++cell, ++index)
+            for (const auto &cell : tr->active_cell_iterators())
               {
+                const unsigned int index   = cell->active_cell_index();
                 saved_subdomain_ids[index] = cell->subdomain_id();
                 cell->set_subdomain_id(true_subdomain_ids[index]);
               }
@@ -3834,15 +3830,9 @@ namespace internal
 
         // finally, restore current subdomain ids
         if (tr->with_artificial_cells())
-          {
-            typename parallel::shared::Triangulation<dim, spacedim>::
-              active_cell_iterator
-                cell = this->dof_handler->get_triangulation().begin_active(),
-                endc = this->dof_handler->get_triangulation().end();
-
-            for (unsigned int index = 0; cell != endc; ++cell, ++index)
-              cell->set_subdomain_id(saved_subdomain_ids[index]);
-          }
+          for (const auto &cell : tr->active_cell_iterators())
+            cell->set_subdomain_id(
+              saved_subdomain_ids[cell->active_cell_index()]);
 
         // return a NumberCache object made up from the sets of locally
         // owned DoFs
