@@ -90,8 +90,8 @@ test_tensor()
   adt7           = adt1 * t1;
 
   // Outer product
-  const Tensor<1, dim, number_t>    v1;
-  const Tensor<1, dim, ad_number_t> av1;
+  const Tensor<1, dim, number_t>    v1{};
+  const Tensor<1, dim, ad_number_t> av1{};
   const AD_Tensor                   adt8  = outer_product(v1, av1);
   const AD_Tensor                   adt9  = outer_product(av1, v1);
   const AD_Tensor                   adt10 = outer_product(av1, av1);
@@ -168,8 +168,8 @@ test_symmetric_tensor()
   //  const ad_number_t ad_res6 = adt1*t1; // TODO: Overload issue
 
   // Outer product
-  const Tensor<1, dim, number_t>    v1;
-  const Tensor<1, dim, ad_number_t> av1;
+  const Tensor<1, dim, number_t>    v1{};
+  const Tensor<1, dim, ad_number_t> av1{};
   const AD_STensor                  adt8  = symmetrize(outer_product(v1, av1));
   const AD_STensor                  adt9  = symmetrize(outer_product(av1, v1));
   const AD_STensor                  adt10 = symmetrize(outer_product(av1, av1));
