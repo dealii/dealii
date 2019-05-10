@@ -447,6 +447,15 @@ public:
   exists(const size_type i, const size_type j) const;
 
   /**
+   * Return a view of this sparsity pattern.
+   * That is, for all rows in @p rows extract non-empty columns.
+   * The resulting sparsity pattern will have number of rows equal
+   * `rows.n_elements()`.
+   */
+  DynamicSparsityPattern
+  get_view(const IndexSet &rows) const;
+
+  /**
    * Make the sparsity pattern symmetric by adding the sparsity pattern of the
    * transpose object.
    *
