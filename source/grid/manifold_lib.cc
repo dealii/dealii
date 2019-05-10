@@ -1801,7 +1801,8 @@ namespace
         // identify the weights for the lines to be accumulated (vertex
         // weights are set outside and coincide with the flat manifold case)
 
-        std::array<double, GeometryInfo<3>::lines_per_cell> weights_lines{};
+        std::array<double, GeometryInfo<3>::lines_per_cell> weights_lines;
+        std::fill(weights_lines.begin(), weights_lines.end(), 0.0);
 
         // start with the contributions of the faces
         std::array<double, GeometryInfo<2>::vertices_per_cell>          weights;
