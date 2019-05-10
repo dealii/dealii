@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
+
 # ---------------------------------------------------------------------
 #
 # Copyright (C) 2018 by the deal.II authors
