@@ -792,9 +792,8 @@ and per-cell data. Suffice it to mention that we need the following:
 - An iterator range for those cells on which we are supposed to work. This is
   provided by the FilteredIterator class which acts just like every other cell
   iterator in deal.II with the exception that it skips all cells that do not
-  satisfy a particular predicate (i.e. a criterion that evaluates to true or
-  false). In our case, the predicate is whether a cell has the correct
-  subdomain id.
+  satisfy a particular predicate (i.e., a criterion that evaluates to true or
+  false). In our case, the predicate is whether a cell is locally owned.
 
 - A function that does the work on each cell for each of the tasks identified
   above, i.e., functions that assemble the local contributions to Stokes matrix
