@@ -1,5 +1,5 @@
 
-DEAL:NumberTraits:float::type_code: 5
+DEAL:NumberTraits:float::type_code: 6
 DEAL:NumberTraits:float::is_taped: 0
 DEAL:NumberTraits:float::is_tapeless: 1
 DEAL:NumberTraits:float::is_real_valued: 1
@@ -9,7 +9,7 @@ DEAL:NumberTraits:float::is_ad_number: 1
 DEAL:NumberTraits:float::is_sacado_number: 1
 DEAL:NumberTraits:float::is_taped_ad_number: 0
 DEAL:NumberTraits:float::is_tapeless_ad_number: 1
-DEAL:NumberTraits:std::complex<float>::type_code: 5
+DEAL:NumberTraits:std::complex<float>::type_code: 6
 DEAL:NumberTraits:std::complex<float>::is_taped: 0
 DEAL:NumberTraits:std::complex<float>::is_tapeless: 1
 DEAL:NumberTraits:std::complex<float>::is_real_valued: 0
@@ -19,7 +19,7 @@ DEAL:NumberTraits:std::complex<float>::is_ad_number: 1
 DEAL:NumberTraits:std::complex<float>::is_sacado_number: 1
 DEAL:NumberTraits:std::complex<float>::is_taped_ad_number: 0
 DEAL:NumberTraits:std::complex<float>::is_tapeless_ad_number: 1
-DEAL:NumberTraits:double::type_code: 5
+DEAL:NumberTraits:double::type_code: 6
 DEAL:NumberTraits:double::is_taped: 0
 DEAL:NumberTraits:double::is_tapeless: 1
 DEAL:NumberTraits:double::is_real_valued: 1
@@ -29,7 +29,7 @@ DEAL:NumberTraits:double::is_ad_number: 1
 DEAL:NumberTraits:double::is_sacado_number: 1
 DEAL:NumberTraits:double::is_taped_ad_number: 0
 DEAL:NumberTraits:double::is_tapeless_ad_number: 1
-DEAL:NumberTraits:std::complex<double>::type_code: 5
+DEAL:NumberTraits:std::complex<double>::type_code: 6
 DEAL:NumberTraits:std::complex<double>::is_taped: 0
 DEAL:NumberTraits:std::complex<double>::is_tapeless: 1
 DEAL:NumberTraits:std::complex<double>::is_real_valued: 0
@@ -39,7 +39,7 @@ DEAL:NumberTraits:std::complex<double>::is_ad_number: 1
 DEAL:NumberTraits:std::complex<double>::is_sacado_number: 1
 DEAL:NumberTraits:std::complex<double>::is_taped_ad_number: 0
 DEAL:NumberTraits:std::complex<double>::is_tapeless_ad_number: 1
-DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::type_code: 5
+DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::type_code: 6
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_taped: 0
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_tapeless: 1
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_real_valued: 1
@@ -49,7 +49,7 @@ DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_ad_number: 1
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_sacado_number: 1
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_taped_ad_number: 0
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_tapeless_ad_number: 1
-DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::type_code: 5
+DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::type_code: 6
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_taped: 0
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_tapeless: 1
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_real_valued: 0
@@ -59,7 +59,7 @@ DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >:
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_sacado_number: 1
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_taped_ad_number: 0
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_tapeless_ad_number: 1
-DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::type_code: 5
+DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::type_code: 6
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_taped: 0
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_tapeless: 1
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_real_valued: 1
@@ -69,7 +69,7 @@ DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_ad_number: 
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_sacado_number: 1
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_taped_ad_number: 0
 DEAL:NumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_tapeless_ad_number: 1
-DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::type_code: 5
+DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::type_code: 6
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::is_taped: 0
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::is_tapeless: 1
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::is_real_valued: 0
@@ -80,7 +80,7 @@ DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::is_taped_ad_number: 0
 DEAL:NumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::is_tapeless_ad_number: 1
 DEAL::
-DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::type_code: 5
+DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::type_code: 6
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_taped: 0
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_tapeless: 1
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_real_valued: 1
@@ -90,7 +90,7 @@ DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_ad_number:
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_sacado_number: 1
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_taped_ad_number: 0
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<float> >::is_tapeless_ad_number: 1
-DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::type_code: 5
+DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::type_code: 6
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_taped: 0
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_tapeless: 1
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_real_valued: 0
@@ -100,7 +100,7 @@ DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > 
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_sacado_number: 1
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_taped_ad_number: 0
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<float> > >::is_tapeless_ad_number: 1
-DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::type_code: 5
+DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::type_code: 6
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_taped: 0
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_tapeless: 1
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_real_valued: 1
@@ -110,7 +110,7 @@ DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_ad_number
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_sacado_number: 1
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_taped_ad_number: 0
 DEAL:ADNumberTraits:Sacado::Rad::ADvar<Sacado::Fad::DFad<double> >::is_tapeless_ad_number: 1
-DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::type_code: 5
+DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::type_code: 6
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::is_taped: 0
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::is_tapeless: 1
 DEAL:ADNumberTraits:std::complex< Sacado::Rad::ADvar<Sacado::Fad::DFad<double> > >::is_real_valued: 0

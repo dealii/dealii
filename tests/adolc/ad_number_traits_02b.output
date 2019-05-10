@@ -1,5 +1,5 @@
 
-DEAL:NumberTraits:float::type_code: 1
+DEAL:NumberTraits:float::type_code: 2
 DEAL:NumberTraits:float::is_taped: 0
 DEAL:NumberTraits:float::is_tapeless: 1
 DEAL:NumberTraits:float::is_real_valued: 1
@@ -9,7 +9,7 @@ DEAL:NumberTraits:float::is_ad_number: 1
 DEAL:NumberTraits:float::is_adolc_number: 1
 DEAL:NumberTraits:float::is_taped_ad_number: 0
 DEAL:NumberTraits:float::is_tapeless_ad_number: 1
-DEAL:NumberTraits:std::complex<float>::type_code: 1
+DEAL:NumberTraits:std::complex<float>::type_code: 2
 DEAL:NumberTraits:std::complex<float>::is_taped: 0
 DEAL:NumberTraits:std::complex<float>::is_tapeless: 1
 DEAL:NumberTraits:std::complex<float>::is_real_valued: 0
@@ -19,7 +19,7 @@ DEAL:NumberTraits:std::complex<float>::is_ad_number: 1
 DEAL:NumberTraits:std::complex<float>::is_adolc_number: 1
 DEAL:NumberTraits:std::complex<float>::is_taped_ad_number: 0
 DEAL:NumberTraits:std::complex<float>::is_tapeless_ad_number: 1
-DEAL:NumberTraits:double::type_code: 1
+DEAL:NumberTraits:double::type_code: 2
 DEAL:NumberTraits:double::is_taped: 0
 DEAL:NumberTraits:double::is_tapeless: 1
 DEAL:NumberTraits:double::is_real_valued: 1
@@ -29,7 +29,7 @@ DEAL:NumberTraits:double::is_ad_number: 1
 DEAL:NumberTraits:double::is_adolc_number: 1
 DEAL:NumberTraits:double::is_taped_ad_number: 0
 DEAL:NumberTraits:double::is_tapeless_ad_number: 1
-DEAL:NumberTraits:std::complex<double>::type_code: 1
+DEAL:NumberTraits:std::complex<double>::type_code: 2
 DEAL:NumberTraits:std::complex<double>::is_taped: 0
 DEAL:NumberTraits:std::complex<double>::is_tapeless: 1
 DEAL:NumberTraits:std::complex<double>::is_real_valued: 0
@@ -39,7 +39,7 @@ DEAL:NumberTraits:std::complex<double>::is_ad_number: 1
 DEAL:NumberTraits:std::complex<double>::is_adolc_number: 1
 DEAL:NumberTraits:std::complex<double>::is_taped_ad_number: 0
 DEAL:NumberTraits:std::complex<double>::is_tapeless_ad_number: 1
-DEAL:NumberTraits:adouble::type_code: 1
+DEAL:NumberTraits:adouble::type_code: 2
 DEAL:NumberTraits:adouble::is_taped: 0
 DEAL:NumberTraits:adouble::is_tapeless: 1
 DEAL:NumberTraits:adouble::is_real_valued: 1
@@ -49,7 +49,7 @@ DEAL:NumberTraits:adouble::is_ad_number: 1
 DEAL:NumberTraits:adouble::is_adolc_number: 1
 DEAL:NumberTraits:adouble::is_taped_ad_number: 0
 DEAL:NumberTraits:adouble::is_tapeless_ad_number: 1
-DEAL:NumberTraits:std::complex<adouble>::type_code: 1
+DEAL:NumberTraits:std::complex<adouble>::type_code: 2
 DEAL:NumberTraits:std::complex<adouble>::is_taped: 0
 DEAL:NumberTraits:std::complex<adouble>::is_tapeless: 1
 DEAL:NumberTraits:std::complex<adouble>::is_real_valued: 0
@@ -60,7 +60,7 @@ DEAL:NumberTraits:std::complex<adouble>::is_adolc_number: 1
 DEAL:NumberTraits:std::complex<adouble>::is_taped_ad_number: 0
 DEAL:NumberTraits:std::complex<adouble>::is_tapeless_ad_number: 1
 DEAL::
-DEAL:ADNumberTraits:adtl::adouble::type_code: 1
+DEAL:ADNumberTraits:adtl::adouble::type_code: 2
 DEAL:ADNumberTraits:adtl::adouble::is_taped: 0
 DEAL:ADNumberTraits:adtl::adouble::is_tapeless: 1
 DEAL:ADNumberTraits:adtl::adouble::is_real_valued: 1
@@ -70,7 +70,7 @@ DEAL:ADNumberTraits:adtl::adouble::is_ad_number: 1
 DEAL:ADNumberTraits:adtl::adouble::is_adolc_number: 1
 DEAL:ADNumberTraits:adtl::adouble::is_taped_ad_number: 0
 DEAL:ADNumberTraits:adtl::adouble::is_tapeless_ad_number: 1
-DEAL:ADNumberTraits:std::complex<adtl::adouble>::type_code: 1
+DEAL:ADNumberTraits:std::complex<adtl::adouble>::type_code: 2
 DEAL:ADNumberTraits:std::complex<adtl::adouble>::is_taped: 0
 DEAL:ADNumberTraits:std::complex<adtl::adouble>::is_tapeless: 1
 DEAL:ADNumberTraits:std::complex<adtl::adouble>::is_real_valued: 0
