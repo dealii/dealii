@@ -284,6 +284,8 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     > ${CMAKE_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
     || ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doxygen.log ${CMAKE_BINARY_DIR}/doxygen.err
+  COMMAND
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.py
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial
@@ -302,10 +304,6 @@ ADD_CUSTOM_TARGET(doxygen ALL
   DEPENDS ${CMAKE_BINARY_DIR}/doxygen.log
   )
 ADD_DEPENDENCIES(documentation doxygen)
-
-# Set the canonical link for the doxygen webpages
-ADD_CUSTOM_COMMAND(TARGET doxygen POST_BUILD
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/set_canonical_doxygen.py)
 
 INSTALL(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/deal.tag
