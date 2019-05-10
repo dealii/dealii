@@ -114,13 +114,13 @@ FOREACH(_step ${_deal_ii_steps})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
 
   IF(EXISTS "${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cu")
-	  SET(_FILE_EXTENSION "cu")
+    SET(_FILE_EXTENSION "cu")
   ELSE()
     SET(_FILE_EXTENSION "cc")
   ENDIF()
 
   ADD_CUSTOM_COMMAND(
-	  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_FILE_EXTENSION}
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.${_FILE_EXTENSION}
     COMMAND ${PERL_EXECUTABLE}
     ARGS
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
