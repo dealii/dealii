@@ -21,9 +21,9 @@ The work discussed here is also presented in the following publication:
   <a href="http://dx.doi.org/10.1111/j.1365-246X.2012.05609.x">[DOI]</a>
 </b>
 
-The continuation of development of this program has led to the much larger
-open source code Aspect (see http://aspect.dealii.org/ ) which is much more
-flexible in solving many kinds of related problems.
+The continuation of development of this program has led to the much larger open
+source code <i>Aspect</i> (see http://aspect.geodynamics.org/) which is much
+more flexible in solving many kinds of related problems.
 </i>
 
 
@@ -1306,8 +1306,8 @@ That said, both step-31 and the current step-32 have not come about by chance
 but are certainly meant as wayposts along the path to a more comprehensive
 program that will simulate convection in the earth mantle. We call this code
 <i>Aspect</i> (short for <i>Advanced %Solver for Problems in Earth's
-ConvecTion</i>); its development is funded by the <a
-href="http://www.geodynamics.org">Computational Infrastructure in
+ConvecTion</i>); its development is funded by
+the <a href="http://www.geodynamics.org">Computational Infrastructure in
 Geodynamics</a> initiative with support from the National Science
-Foundation. We hope to release this code not long after this tutorial program
-will officially be released as part of deal.II 7.1.
+Foundation. More information on <i>Aspect</i> is available at
+its <a href="https://aspect.geodynamics.org/">homepage</a>.
