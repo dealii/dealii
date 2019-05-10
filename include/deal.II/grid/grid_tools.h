@@ -737,6 +737,11 @@ namespace GridTools
    * The type is abbreviated in the online documentation to improve readability
    * of this page.
    *
+   * @note This function optimizes the search by making use of
+   * GridTools::Cache::get_cell_bounding_boxes_rtree(), which either returns
+   * a cached rtree or builds and stores one. Building an rtree might hinder
+   * the performance if the function is called only once on few points.
+   *
    * @author Giovanni Alzetta, 2017
    */
   template <int dim, int spacedim>
@@ -774,6 +779,11 @@ namespace GridTools
    *     std::vector<unsigned int>
    *   >
    * @endcode
+   *
+   * @note This function optimizes the search by making use of
+   * GridTools::Cache::get_cell_bounding_boxes_rtree(), which either returns
+   * a cached rtree or builds and stores one. Building an rtree might hinder
+   * the performance if the function is called only once on few points.
    *
    * For a more detailed documentation see
    * GridTools::compute_point_locations().

@@ -4309,19 +4309,23 @@ namespace GridTools
       &cell_hint)
   {
     // How many points are here?
-    const unsigned int        np = points.size();
-    std::vector<unsigned int> points_outside;
+    const unsigned int np = points.size();
 
-    std::tuple<
-      std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>,
-      std::vector<std::vector<Point<dim>>>,
-      std::vector<std::vector<unsigned int>>,
-      std::vector<unsigned int>>
-      cell_qpoint_map;
+    std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>
+                                           cells_out;
+    std::vector<std::vector<Point<dim>>>   qpoints_out;
+    std::vector<std::vector<unsigned int>> maps_out;
+    std::vector<unsigned int>              missing_points_out;
 
     // Now the easy case.
     if (np == 0)
-      return cell_qpoint_map;
+      return std::make_tuple(std::move(cells_out),
+                             std::move(qpoints_out),
+                             std::move(maps_out),
+                             std::move(missing_points_out));
+
+    // For the search we shall use the following tree
+    const auto &b_tree = cache.get_cell_bounding_boxes_rtree();
 
     // We begin by finding the cell/transform of the first point
     std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
@@ -4330,6 +4334,8 @@ namespace GridTools
 
     bool         found          = false;
     unsigned int points_checked = 0;
+
+    // If a hint cell was given, use it
     if (cell_hint.state() == IteratorState::valid)
       {
         try
@@ -4341,25 +4347,99 @@ namespace GridTools
           }
         catch (const GridTools::ExcPointNotFound<dim> &)
           {
-            points_outside.emplace_back(0);
+            missing_points_out.emplace_back(0);
           }
         ++points_checked;
       }
 
+    // The tree search returns
+    // - a bounding box covering the cell
+    // - the active cell iterator
+    std::vector<
+      std::pair<BoundingBox<spacedim>,
+                typename Triangulation<dim, spacedim>::active_cell_iterator>>
+      box_cell;
+
+    // This is used as an index for box_cell
+    int cell_candidate_idx = -1;
+    // If any of the cells in box_cell is a ghost cell,
+    // an artificial cell or at the boundary,
+    // we want to use try/catch
+    bool use_try = false;
 
     while (!found && points_checked < np)
       {
-        try
+        box_cell.clear();
+        b_tree.query(boost::geometry::index::intersects(points[points_checked]),
+                     std::back_inserter(box_cell));
+
+        // Checking box_cell result for a suitable candidate
+        cell_candidate_idx = -1;
+        for (unsigned int i = 0; i < box_cell.size(); ++i)
           {
-            my_pair =
-              GridTools::find_active_cell_around_point(cache,
-                                                       points[points_checked]);
-            found = true;
+            // As a candidate we don't want artificial cells
+            if (!box_cell[i].second->is_artificial())
+              cell_candidate_idx = i;
+
+            // If the cell is not locally owned or at boundary
+            // we check for exceptions
+            if (cell_candidate_idx != -1 &&
+                (!box_cell[i].second->is_locally_owned() ||
+                 box_cell[i].second->at_boundary()))
+              use_try = true;
+
+
+            if (cell_candidate_idx != -1)
+              break;
           }
-        catch (const GridTools::ExcPointNotFound<dim> &)
+
+        // If a suitable cell was found, use it as hint
+        if (cell_candidate_idx != -1)
           {
-            points_outside.emplace_back(points_checked);
+            if (use_try)
+              {
+                try
+                  {
+                    my_pair = GridTools::find_active_cell_around_point(
+                      cache,
+                      points[points_checked],
+                      box_cell[cell_candidate_idx].second);
+                    found = true;
+                  }
+                catch (const GridTools::ExcPointNotFound<dim> &)
+                  {
+                    missing_points_out.emplace_back(points_checked);
+                  }
+              }
+            else
+              {
+                my_pair = GridTools::find_active_cell_around_point(
+                  cache,
+                  points[points_checked],
+                  box_cell[cell_candidate_idx].second);
+                found = true;
+              }
           }
+        else
+          {
+            try
+              {
+                my_pair = GridTools::find_active_cell_around_point(
+                  cache, points[points_checked]);
+                // If we arrive here the cell was not among
+                // the candidates returned by the tree, so we're adding it
+                // by hand
+                found              = true;
+                cell_candidate_idx = box_cell.size();
+                box_cell.push_back(
+                  std::make_pair(my_pair.first->bounding_box(), my_pair.first));
+              }
+            catch (const GridTools::ExcPointNotFound<dim> &)
+              {
+                missing_points_out.emplace_back(points_checked);
+              }
+          }
+
         // Updating the position of the analyzed points
         ++points_checked;
       }
@@ -4367,93 +4447,167 @@ namespace GridTools
     // If the point has been found in a cell, adding it
     if (found)
       {
-        std::get<0>(cell_qpoint_map).emplace_back(my_pair.first);
-        std::get<1>(cell_qpoint_map).emplace_back(1, my_pair.second);
-        std::get<2>(cell_qpoint_map).emplace_back(1, points_checked - 1);
+        cells_out.emplace_back(my_pair.first);
+        qpoints_out.emplace_back(1, my_pair.second);
+        maps_out.emplace_back(1, points_checked - 1);
       }
 
     // Now the second easy case.
-    if (np == points_outside.size())
-      return cell_qpoint_map;
-    // Computing the cell center and diameter
-    Point<spacedim> cell_center = std::get<0>(cell_qpoint_map)[0]->center();
-    double cell_diameter        = std::get<0>(cell_qpoint_map)[0]->diameter() *
-                           (0.5 + std::numeric_limits<double>::epsilon());
+    if (np == qpoints_out.size())
+      return std::make_tuple(std::move(cells_out),
+                             std::move(qpoints_out),
+                             std::move(maps_out),
+                             std::move(missing_points_out));
 
     // Cycle over all points left
     for (unsigned int p = points_checked; p < np; ++p)
       {
-        // Checking if the point is close to the cell center, in which
-        // case calling find active cell with a cell hint
-        try
+        // We assume the last used cell contains the point: checking it
+        if (cell_candidate_idx != -1)
+          if (!box_cell[cell_candidate_idx].first.point_inside(points[p]))
+            // Point ouside candidate cell: we have no candidate
+            cell_candidate_idx = -1;
+
+        // If there's no candidate, run a tree search
+        if (cell_candidate_idx == -1)
           {
-            if (cell_center.distance(points[p]) < cell_diameter)
-              my_pair = GridTools::find_active_cell_around_point(
-                cache, points[p], std::get<0>(cell_qpoint_map).back());
-            else
-              my_pair =
-                GridTools::find_active_cell_around_point(cache, points[p]);
-          }
-        catch (const GridTools::ExcPointNotFound<dim> &)
-          {
-            points_outside.push_back(p);
-            continue;
+            // Using the b_tree to find new candidates
+            box_cell.clear();
+            b_tree.query(boost::geometry::index::intersects(points[p]),
+                         std::back_inserter(box_cell));
+            // Checking the returned bounding boxes/cells
+            use_try            = false;
+            cell_candidate_idx = -1;
+            for (unsigned int i = 0; i < box_cell.size(); ++i)
+              {
+                // As a candidate we don't want artificial cells
+                if (!box_cell[i].second->is_artificial())
+                  cell_candidate_idx = i;
+
+                // If the cell is not locally owned or at boundary
+                // we check for exceptions
+                if (cell_candidate_idx != -1 &&
+                    (!box_cell[i].second->is_locally_owned() ||
+                     box_cell[i].second->at_boundary()))
+                  use_try = true;
+
+                // If a cell candidate was found we can stop
+                if (cell_candidate_idx != -1)
+                  break;
+              }
           }
 
-        // Assuming the cell is probably the last cell added
-        if (my_pair.first == std::get<0>(cell_qpoint_map).back())
+        if (cell_candidate_idx == -1)
+          {
+            // No candidate cell, but the cell might
+            // still be inside the mesh, this is our final check:
+            try
+              {
+                my_pair =
+                  GridTools::find_active_cell_around_point(cache, points[p]);
+                // If we arrive here the cell was not among
+                // the candidates returned by the tree, so we're adding it
+                // by hand
+                cell_candidate_idx = box_cell.size();
+                box_cell.push_back(
+                  std::make_pair(my_pair.first->bounding_box(), my_pair.first));
+              }
+            catch (const GridTools::ExcPointNotFound<dim> &)
+              {
+                missing_points_out.emplace_back(p);
+                continue;
+              }
+          }
+        else
+          {
+            // We have a candidate cell
+            if (use_try)
+              {
+                try
+                  {
+                    my_pair = GridTools::find_active_cell_around_point(
+                      cache, points[p], box_cell[cell_candidate_idx].second);
+                  }
+                catch (const GridTools::ExcPointNotFound<dim> &)
+                  {
+                    missing_points_out.push_back(p);
+                    continue;
+                  }
+              }
+            else
+              {
+                my_pair = GridTools::find_active_cell_around_point(
+                  cache, points[p], box_cell[cell_candidate_idx].second);
+              }
+
+            // If the point was found in another cell,
+            // updating cell_candidate_idx
+            if (my_pair.first != box_cell[cell_candidate_idx].second)
+              {
+                for (unsigned int i = 0; i < box_cell.size(); ++i)
+                  {
+                    if (my_pair.first == box_cell[i].second)
+                      {
+                        cell_candidate_idx = i;
+                        break;
+                      }
+                  }
+
+                if (my_pair.first != box_cell[cell_candidate_idx].second)
+                  {
+                    // The cell was not among the candidates returned by the
+                    // tree
+                    cell_candidate_idx = box_cell.size();
+                    box_cell.push_back(
+                      std::make_pair(my_pair.first->bounding_box(),
+                                     my_pair.first));
+                  }
+              }
+          }
+
+
+        // Assuming the point is more likely to be in the last
+        // used cell
+        if (my_pair.first == cells_out.back())
           {
             // Found in the last cell: adding the data
-            std::get<1>(cell_qpoint_map).back().emplace_back(my_pair.second);
-            std::get<2>(cell_qpoint_map).back().emplace_back(p);
+            qpoints_out.back().emplace_back(my_pair.second);
+            maps_out.back().emplace_back(p);
           }
         else
           {
             // Check if it is in another cell already found
             typename std::vector<typename Triangulation<dim, spacedim>::
                                    active_cell_iterator>::iterator cells_it =
-              std::find(std::get<0>(cell_qpoint_map).begin(),
-                        std::get<0>(cell_qpoint_map).end() - 1,
-                        my_pair.first);
+              std::find(cells_out.begin(), cells_out.end() - 1, my_pair.first);
 
-            if (cells_it == std::get<0>(cell_qpoint_map).end() - 1)
+            if (cells_it == cells_out.end() - 1)
               {
                 // Cell not found: adding a new cell
-                std::get<0>(cell_qpoint_map).emplace_back(my_pair.first);
-                std::get<1>(cell_qpoint_map).emplace_back(1, my_pair.second);
-                std::get<2>(cell_qpoint_map).emplace_back(1, p);
-                // Updating center and radius of the cell
-                cell_center = std::get<0>(cell_qpoint_map).back()->center();
-                cell_diameter =
-                  std::get<0>(cell_qpoint_map).back()->diameter() *
-                  (0.5 + std::numeric_limits<double>::epsilon());
+                cells_out.emplace_back(my_pair.first);
+                qpoints_out.emplace_back(1, my_pair.second);
+                maps_out.emplace_back(1, p);
               }
             else
               {
-                unsigned int current_cell =
-                  cells_it - std::get<0>(cell_qpoint_map).begin();
                 // Cell found: just adding the point index and qpoint to the
                 // list
-                std::get<1>(cell_qpoint_map)[current_cell].emplace_back(
-                  my_pair.second);
-                std::get<2>(cell_qpoint_map)[current_cell].emplace_back(p);
+                unsigned int current_cell = cells_it - cells_out.begin();
+                qpoints_out[current_cell].emplace_back(my_pair.second);
+                maps_out[current_cell].emplace_back(p);
               }
           }
       }
 
     // Debug Checking
-    Assert(std::get<0>(cell_qpoint_map).size() ==
-             std::get<2>(cell_qpoint_map).size(),
-           ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(),
-                                std::get<2>(cell_qpoint_map).size()));
+    Assert(cells_out.size() == maps_out.size(),
+           ExcDimensionMismatch(cells_out.size(), maps_out.size()));
 
-    Assert(std::get<0>(cell_qpoint_map).size() ==
-             std::get<1>(cell_qpoint_map).size(),
-           ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(),
-                                std::get<1>(cell_qpoint_map).size()));
+    Assert(cells_out.size() == qpoints_out.size(),
+           ExcDimensionMismatch(cells_out.size(), qpoints_out.size()));
 
 #ifdef DEBUG
-    unsigned int c   = std::get<0>(cell_qpoint_map).size();
+    unsigned int c   = cells_out.size();
     unsigned int qps = 0;
     // The number of points in all
     // the cells must be the same as
@@ -4462,19 +4616,19 @@ namespace GridTools
     // plus the points which were ignored
     for (unsigned int n = 0; n < c; ++n)
       {
-        Assert(std::get<1>(cell_qpoint_map)[n].size() ==
-                 std::get<2>(cell_qpoint_map)[n].size(),
-               ExcDimensionMismatch(std::get<1>(cell_qpoint_map)[n].size(),
-                                    std::get<2>(cell_qpoint_map)[n].size()));
-        qps += std::get<1>(cell_qpoint_map)[n].size();
+        Assert(qpoints_out[n].size() == maps_out[n].size(),
+               ExcDimensionMismatch(qpoints_out[n].size(), maps_out[n].size()));
+        qps += qpoints_out[n].size();
       }
 
-    Assert(qps + points_outside.size() == np,
-           ExcDimensionMismatch(qps + points_outside.size(), np));
+    Assert(qps + missing_points_out.size() == np,
+           ExcDimensionMismatch(qps + missing_points_out.size(), np));
 #endif
 
-    std::get<3>(cell_qpoint_map) = points_outside;
-    return cell_qpoint_map;
+    return std::make_tuple(std::move(cells_out),
+                           std::move(qpoints_out),
+                           std::move(maps_out),
+                           std::move(missing_points_out));
   }
 
 
