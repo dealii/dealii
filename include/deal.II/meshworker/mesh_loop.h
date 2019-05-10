@@ -456,6 +456,71 @@ namespace MeshWorker
   /**
    * Same as the function above, but for iterator ranges (and, therefore,
    * filtered iterators).
+   *
+   * An example usage of the function for the serial case is given by
+   * @code
+   *
+   * using ScratchData      = MeshWorker::ScratchData<dim, spacedim>;
+   * using CopyData         = MeshWorker::CopyData<1, 1, 1>;
+   * using CellIteratorType = decltype(dof_handler.begin_active());
+   *
+   * ScratchData            scratch(...);
+   * CopyData               copy(...);
+   *
+   * auto cell_worker = [...] (
+   *   const CellIteratorType &cell,
+   *   ScratchData            &scratch_data,
+   *   CopyData               &copy_data)
+   * {
+   *   ...
+   * };
+   *
+   * auto copier = [...](const CopyData &copy_data)
+   * {
+   *   ...
+   * };
+   *
+   * MeshWorker::mesh_loop(dof_handler.active_cell_iterators(),
+   *                       cell_worker, copier,
+   *                       scratch, copy,
+   *                       MeshWorker::assemble_own_cells);
+   * @endcode
+   *
+   * and an example usage of the function for the parallel distributed case,
+   * where the copier is only to be called on locally owned cells, is given by
+   * @code
+   *
+   * using ScratchData      = MeshWorker::ScratchData<dim, spacedim>;
+   * using CopyData         = MeshWorker::CopyData<1, 1, 1>;
+   * using CellIteratorType = decltype(dof_handler.begin_active());
+   *
+   * ScratchData            scratch(...);
+   * CopyData               copy(...);
+   *
+   * auto cell_worker = [...] (
+   *   const CellIteratorType &cell,
+   *   ScratchData            &scratch_data,
+   *   CopyData               &copy_data)
+   * {
+   *   ...
+   * };
+   *
+   * auto copier = [...](const CopyData &copy_data)
+   * {
+   *   ...
+   * };
+   *
+   * const auto filtered_iterator_range =
+   *   filter_iterators(dof_handler.active_cell_iterators(),
+   *                    IteratorFilters::LocallyOwnedCell());
+   *
+   * MeshWorker::mesh_loop(filtered_iterator_range,
+   *                       cell_worker, copier,
+   *                       scratch, copy,
+   *                       MeshWorker::assemble_own_cells);
+   * @endcode
+   *
+   * @ingroup MeshWorker
    */
   template <class CellIteratorType,
             class ScratchData,
@@ -566,7 +631,7 @@ namespace MeshWorker
    * ...
    *
    * MyClass<dim, spacedim> my_class;
-   * SratchData             scratch;
+   * ScratchData            scratch;
    * CopyData               copy;
    *
    * mesh_loop(tria.begin_active(),
@@ -672,6 +737,81 @@ namespace MeshWorker
   /**
    * Same as the function above, but for iterator ranges (and, therefore,
    * filtered iterators).
+   *
+   * An example usage of the function for the serial case is given by
+   * @code
+   *
+   * struct ScratchData;
+   * struct CopyData;
+   *
+   * template <int dim, int spacedim>
+   * class MyClass
+   * {
+   * public:
+   *   void
+   *   cell_worker(const CellIteratorType &cell, ScratchData &, CopyData &);
+   *
+   *   void
+   *   copier(const CopyData &);
+   *
+   *   ...
+   * };
+   *
+   * ...
+   *
+   * MyClass<dim, spacedim> my_class;
+   * ScratchData            scratch;
+   * CopyData               copy;
+   *
+   * mesh_loop(tria.active_cell_iterators(),
+   *           my_class,
+   *           &MyClass<dim, spacedim>::cell_worker,
+   *           &MyClass<dim, spacedim>::copier,
+   *           scratch,
+   *           copy,
+   *           assemble_own_cells);
+   * @endcode
+   *
+   * and an example usage of the function for the parallel distributed case,
+   * where the copier is only to be called on locally owned cells, is given by
+   * @code
+   *
+   * struct ScratchData;
+   * struct CopyData;
+   *
+   * template <int dim, int spacedim>
+   * class MyClass
+   * {
+   * public:
+   *   void
+   *   cell_worker(const CellIteratorType &cell, ScratchData &, CopyData &);
+   *
+   *   void
+   *   copier(const CopyData &);
+   *
+   *   ...
+   * };
+   *
+   * ...
+   *
+   * MyClass<dim, spacedim> my_class;
+   * ScratchData            scratch;
+   * CopyData               copy;
+   *
+   * const auto filtered_iterator_range =
+   *   filter_iterators(distributed_tria.active_cell_iterators(),
+   *                    IteratorFilters::LocallyOwnedCell());
+   *
+   * mesh_loop(filtered_iterator_range,
+   *           my_class,
+   *           &MyClass<dim, spacedim>::cell_worker,
+   *           &MyClass<dim, spacedim>::copier,
+   *           scratch,
+   *           copy,
+   *           assemble_own_cells);
+   * @endcode
+   *
+   * @ingroup MeshWorker
    */
   template <class CellIteratorType,
             class ScratchData,
