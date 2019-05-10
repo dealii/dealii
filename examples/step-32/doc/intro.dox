@@ -85,7 +85,7 @@ hand side, we can assume that $\rho=\rho(T)$. An assumption that may
 not be entirely justified is that we can assume that the changes of
 density as a function of temperature are small, leading to an
 expression of the form $\rho(T) = \rho_{\text{ref}}
-[1-\beta(T-T_{\text{ref}})]$, i.e. the density equals
+[1-\beta(T-T_{\text{ref}})]$, i.e., the density equals
 $\rho_{\text{ref}}$ at reference temperature and decreases linearly as
 the temperature increases (as the material expands). The force balance
 equation then looks properly written like this:
@@ -213,7 +213,7 @@ Stokes problem: if we discretize it as usual, we get a linear system
 @f}
 which in this program we will solve with a FGMRES solver. This solver
 iterates until the residual of these linear equations is below a
-certain tolerance, i.e. until
+certain tolerance, i.e., until
 @f[
   \left\|
   \left(\begin{array}{c}
@@ -309,7 +309,7 @@ also have to scale the pressure immediately <i>before</i> solving.
 
 In this tutorial program, we apply a variant of the preconditioner used in
 step-31. That preconditioner was built to operate on the
-system matrix <i>M</i> in block form such that the product matrix
+system matrix $M$ in block form such that the product matrix
 @f{eqnarray*}
   P^{-1} M
   =
@@ -321,7 +321,7 @@ system matrix <i>M</i> in block form such that the product matrix
   \end{array}\right)
 @f}
 is of a form that Krylov-based iterative solvers like GMRES can solve in a
-few iterations. We then replaced the exact inverse of <i>A</i> by the action
+few iterations. We then replaced the exact inverse of $A$ by the action
 of an AMG preconditioner $\tilde{A}$ based on a vector Laplace matrix,
 approximated the Schur complement $S = B A^{-1} B^T$ by a mass matrix $M_p$
 on the pressure space and wrote an <tt>InverseMatrix</tt> class for
@@ -655,7 +655,7 @@ computers is almost always done using the Message Passing Interface
 of the step-17 and step-18 programs in this though in practice it borrows more
 from step-40 in which we first introduced the classes and strategies we use
 when we want to <i>completely</i> distribute all computations, and
-step-55 that shows how to do that for 
+step-55 that shows how to do that for
 @ref vector_valued "vector-valued problems": including, for
 example, splitting the mesh up into a number of parts so that each processor
 only stores its own share plus some ghost cells, and using strategies where no
@@ -696,7 +696,7 @@ necessary information. As a consequence, there are two Trilinos classes that
 we have to deal with directly (rather than through wrappers), both of which
 are part of Trilinos' Epetra library of basic linear algebra and tool classes:
 <ul>
-<li> The Epetra_Comm class is an abstraction of an MPI "communicator", i.e.
+<li> The Epetra_Comm class is an abstraction of an MPI "communicator", i.e.,
   it describes how many and which machines can communicate with each other.
   Each distributed object, such as a sparse matrix or a vector for which we
   may want to store parts on different machines, needs to have a communicator
@@ -714,8 +714,7 @@ are part of Trilinos' Epetra library of basic linear algebra and tool classes:
   rows of a matrix should reside on the current machine that is part of a
   communicator. To create such an object, you need to know (i) the total
   number of elements or rows, (ii) the indices of the elements you want to
-  store locally. We will set up
-  these <code>partitioners</code> in the
+  store locally. We will set up these <code>partitioners</code> in the
   <code>BoussinesqFlowProblem::setup_dofs</code> function below and then hand
   it to every %parallel object we create.
 
@@ -755,7 +754,7 @@ same memory. In other words, in this model, we don't explicitly have to say
 which pieces of data reside where -- all of the data we need is directly
 accessible and all we have to do is split <i>processing</i> this data between
 the available processors. We will then couple this with the MPI
-parallelization outlined above, i.e. we will have all the processors on a
+parallelization outlined above, i.e., we will have all the processors on a
 machine work together to, for example, assemble the local contributions to the
 global matrix for the cells that this machine actually "owns" but not for
 those cells that are owned by other machines. We will use this strategy for
@@ -766,7 +765,7 @@ preconditioner, and assembly of the right hand side of the temperature system.
 All of these operations essentially look as follows: we need to loop over all
 cells for which <code>cell-@>subdomain_id()</code> equals the index our
 machine has within the communicator object used for all communication
-(i.e. <code>MPI_COMM_WORLD</code>, as explained above). The test we are
+(i.e., <code>MPI_COMM_WORLD</code>, as explained above). The test we are
 actually going to use for this, and which describes in a concise way why we
 test this condition, is <code>cell-@>is_locally_owned()</code>. On each
 such cell we need to assemble the local contributions to the global matrix or
@@ -798,7 +797,7 @@ and per-cell data. Suffice it to mention that we need the following:
   subdomain id.
 
 - A function that does the work on each cell for each of the tasks identified
-  above, i.e. functions that assemble the local contributions to Stokes matrix
+  above, i.e., functions that assemble the local contributions to Stokes matrix
   and preconditioner, temperature matrix, and temperature right hand
   side. These are the
   <code>BoussinesqFlowProblem::local_assemble_stokes_system</code>,
@@ -953,7 +952,7 @@ the following quantities:
   Chemical separation is difficult to model since it requires modeling mantle
   material as multiple phases; it is also a relatively small
   effect. Crystallization heat is even more difficult since it is confined to
-  areas where temperature and pressure allow for phase changes, i.e. a
+  areas where temperature and pressure allow for phase changes, i.e., a
   discontinuous process. Given the difficulties in modeling these two
   phenomena, we will neglect them.
 
@@ -976,8 +975,8 @@ the following quantities:
   commented on in detail in the results section below.
 
   <li>For the velocity we choose as boundary conditions $\mathbf{v}=0$ at the
-  inner radius (i.e. the fluid sticks to the earth core) and
-  $\mathbf{n}\cdot\mathbf{v}=0$ at the outer radius (i.e. the fluid flows
+  inner radius (i.e., the fluid sticks to the earth core) and
+  $\mathbf{n}\cdot\mathbf{v}=0$ at the outer radius (i.e., the fluid flows
   tangentially along the bottom of the earth crust). Neither of these is
   physically overly correct: certainly, on both boundaries, fluids can flow
   tangentially, but they will incur a shear stress through friction against
@@ -1065,7 +1064,7 @@ the following quantities:
   @f]
   The factor $-\frac{\mathbf x}{\|\mathbf x\|}$ is the unit vector pointing
   radially inward. Of course, within this problem, we are only interested in
-  the branch that pertains to within the earth, i.e. $\|\mathbf
+  the branch that pertains to within the earth, i.e., $\|\mathbf
   x\|<R_1$. We would therefore only consider the expression
   @f[
     \mathbf g(\mathbf x) =
@@ -1080,7 +1079,7 @@ the following quantities:
 
   One can derive a more general expression by integrating the
   differential equation for $\varphi(r)$ in the case that the density
-  distribution is radially symmetric, i.e. $\rho(\mathbf
+  distribution is radially symmetric, i.e., $\rho(\mathbf
   x)=\rho(\|\mathbf x\|)=\rho(r)$. In that case, one would get
   @f[
     \varphi(r)
@@ -1089,7 +1088,7 @@ the following quantities:
 
 
   There are two problems with this, however: (i) The Earth is not homogeneous,
-  i.e. the density $\rho$ depends on $\mathbf x$; in fact it is not even a
+  i.e., the density $\rho$ depends on $\mathbf x$; in fact it is not even a
   function that only depends on the radius $r=\|\mathbf x\|$. In reality, gravity therefore
   does not always decrease as we get deeper: because the earth core is so much
   denser than the mantle, gravity actually peaks at around $10.7
@@ -1146,7 +1145,7 @@ the following quantities:
   viscosity of the material that flows into the area vacated under the
   rebounding continental plates.
 
-  Using this technique, values around $\eta=10^{21} \text{Pa\; s}
+  Using this technique, values around $\eta=10^{21} \text{Pa \thinmuskip s}
   = 10^{21} \frac{\text{N\; s}}{\text{m}^2}
   = 10^{21} \frac{\text{kg}}{\text{m\; s}}$ have been found as the most
   likely, though the error bar on this is at least one order of magnitude.
