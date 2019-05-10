@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/boost_adaptors/bounding_box.h>
+
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/tria.h>

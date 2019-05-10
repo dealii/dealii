@@ -380,7 +380,7 @@ public:
    * true bounding box, since it does not take into account curved faces, and it
    * may be smaller than the true bounding box.
    *
-   * @param[in] cell The cell for which you want to compute the center
+   * @param[in] cell The cell for which you want to compute the bounding box
    *
    * @author Luca Heltai, 2019.
    */

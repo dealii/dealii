@@ -128,6 +128,12 @@ public:
   get_boundary_points();
 
   /**
+   * Return a const reference to the boundary_points
+   */
+  const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
+  get_boundary_points() const;
+
+  /**
    * Check if the current object and @p other_bbox are neighbors, i.e. if the boxes
    * have dimension spacedim, check if their intersection is non empty.
    *

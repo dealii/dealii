@@ -154,6 +154,15 @@ BoundingBox<spacedim, Number>::get_boundary_points()
 
 
 template <int spacedim, typename Number>
+const std::pair<Point<spacedim, Number>, Point<spacedim, Number>> &
+BoundingBox<spacedim, Number>::get_boundary_points() const
+{
+  return this->boundary_points;
+}
+
+
+
+template <int spacedim, typename Number>
 double
 BoundingBox<spacedim, Number>::volume() const
 {
