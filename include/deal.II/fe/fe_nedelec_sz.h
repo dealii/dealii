@@ -37,17 +37,19 @@ DEAL_II_NAMESPACE_OPEN
  * 2006.
  *
  * This element overcomes the sign conflict issues present in
- * traditional N&eacute;d&eacute;lec elements which arise from the edge and face
- * parameterizations used in the basis functions. Therefore, this
- * element should provide consistent results for general quadrilateral
- * and hexahedral elements.
+ * traditional N&eacute;d&eacute;lec elements that arise from the edge
+ * and face parameterizations used in the basis functions. Therefore,
+ * this element should provide consistent results for general
+ * quadrilateral and hexahedral elements for which the relative
+ * orientations of edges and faces as seen from all adjacent cells are
+ * often difficult to establish.
  *
- * The way this element addresses the sign conflict problem is to assign
- * local edges and faces a globally defined orientation for all cells. The
- * local edge orientation is always chosen such that the first vertex defining
- * the edge is always chosen to be that which has the highest global vertex
- * numbering, with the second being that which has the lowest global vertex
- * numbering.
+ * The way this element addresses the sign conflict problem is to
+ * assign local edges and faces a globally defined orientation. The
+ * local edge orientation is always chosen such that the first vertex
+ * defining the edge is the one that has the highest global vertex
+ * numbering, with the second edge vertex being that which has the
+ * lowest global vertex numbering.
  *
  * Similarly, the face orientation is always chosen such that the first
  * vertex is chosen to be that with the highest global vertex numbering of the
