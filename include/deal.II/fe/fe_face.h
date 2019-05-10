@@ -357,22 +357,22 @@ protected:
       & /*output_data*/) const override
   {
     // generate a new data object and initialize some fields
-    auto data = std_cxx14::make_unique<
+    auto data_ptr = std_cxx14::make_unique<
       typename FiniteElement<1, spacedim>::InternalDataBase>();
-    data->update_each = requires_update_flags(update_flags);
+    data_ptr->update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
     AssertDimension(n_q_points, 1);
     (void)n_q_points;
 
     // No derivatives of this element are implemented.
-    if (data->update_each & update_gradients ||
-        data->update_each & update_hessians)
+    if (data_ptr->update_each & update_gradients ||
+        data_ptr->update_each & update_hessians)
       {
         Assert(false, ExcNotImplemented());
       }
 
-    return std::move(data);
+    return data_ptr;
   }
 
   std::unique_ptr<typename FiniteElement<1, spacedim>::InternalDataBase>

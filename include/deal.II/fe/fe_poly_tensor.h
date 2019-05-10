@@ -227,8 +227,10 @@ protected:
   {
     // generate a new data object and
     // initialize some fields
-    auto data         = std_cxx14::make_unique<InternalData>();
-    data->update_each = requires_update_flags(update_flags);
+    std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+          data_ptr   = std_cxx14::make_unique<InternalData>();
+    auto &data       = dynamic_cast<InternalData &>(*data_ptr);
+    data.update_each = requires_update_flags(update_flags);
 
     const unsigned int n_q_points = quadrature.size();
 
@@ -240,7 +242,7 @@ protected:
     std::vector<Tensor<5, dim>> fourth_derivatives(0);
 
     if (update_flags & (update_values | update_gradients | update_hessians))
-      data->sign_change.resize(this->dofs_per_cell);
+      data.sign_change.resize(this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -248,31 +250,31 @@ protected:
     if (update_flags & update_values)
       {
         values.resize(this->dofs_per_cell);
-        data->shape_values.reinit(this->dofs_per_cell, n_q_points);
+        data.shape_values.reinit(this->dofs_per_cell, n_q_points);
         if (mapping_type != mapping_none)
-          data->transformed_shape_values.resize(n_q_points);
+          data.transformed_shape_values.resize(n_q_points);
       }
 
     if (update_flags & update_gradients)
       {
         grads.resize(this->dofs_per_cell);
-        data->shape_grads.reinit(this->dofs_per_cell, n_q_points);
-        data->transformed_shape_grads.resize(n_q_points);
+        data.shape_grads.reinit(this->dofs_per_cell, n_q_points);
+        data.transformed_shape_grads.resize(n_q_points);
 
         if ((mapping_type == mapping_raviart_thomas) ||
             (mapping_type == mapping_piola) ||
             (mapping_type == mapping_nedelec) ||
             (mapping_type == mapping_contravariant))
-          data->untransformed_shape_grads.resize(n_q_points);
+          data.untransformed_shape_grads.resize(n_q_points);
       }
 
     if (update_flags & update_hessians)
       {
         grad_grads.resize(this->dofs_per_cell);
-        data->shape_grad_grads.reinit(this->dofs_per_cell, n_q_points);
-        data->transformed_shape_hessians.resize(n_q_points);
+        data.shape_grad_grads.reinit(this->dofs_per_cell, n_q_points);
+        data.transformed_shape_hessians.resize(n_q_points);
         if (mapping_type != mapping_none)
-          data->untransformed_shape_hessian_tensors.resize(n_q_points);
+          data.untransformed_shape_hessian_tensors.resize(n_q_points);
       }
 
     // Compute shape function values
@@ -296,14 +298,14 @@ protected:
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-                  data->shape_values[i][k] = values[i];
+                  data.shape_values[i][k] = values[i];
               else
                 for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
                   {
                     Tensor<1, dim> add_values;
                     for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
                       add_values += inverse_node_matrix(j, i) * values[j];
-                    data->shape_values[i][k] = add_values;
+                    data.shape_values[i][k] = add_values;
                   }
             }
 
@@ -311,14 +313,14 @@ protected:
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-                  data->shape_grads[i][k] = grads[i];
+                  data.shape_grads[i][k] = grads[i];
               else
                 for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
                   {
                     Tensor<2, dim> add_grads;
                     for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
                       add_grads += inverse_node_matrix(j, i) * grads[j];
-                    data->shape_grads[i][k] = add_grads;
+                    data.shape_grads[i][k] = add_grads;
                   }
             }
 
@@ -326,7 +328,7 @@ protected:
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-                  data->shape_grad_grads[i][k] = grad_grads[i];
+                  data.shape_grad_grads[i][k] = grad_grads[i];
               else
                 for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
                   {
@@ -334,11 +336,11 @@ protected:
                     for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
                       add_grad_grads +=
                         inverse_node_matrix(j, i) * grad_grads[j];
-                    data->shape_grad_grads[i][k] = add_grad_grads;
+                    data.shape_grad_grads[i][k] = add_grad_grads;
                   }
             }
         }
-    return std::move(data);
+    return data_ptr;
   }
 
   virtual void

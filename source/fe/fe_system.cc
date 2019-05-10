@@ -940,8 +940,10 @@ FESystem<dim, spacedim>::get_data(
   // and so the current object's update_each flag needs to be
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
-  auto data = std_cxx14::make_unique<InternalData>(this->n_base_elements());
-  data->update_each = requires_update_flags(flags);
+  std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+        data_ptr = std_cxx14::make_unique<InternalData>(this->n_base_elements());
+  auto &data     = dynamic_cast<InternalData &>(*data_ptr);
+  data.update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
   // them. one might think that doing this in parallel (over the
@@ -958,7 +960,7 @@ FESystem<dim, spacedim>::get_data(
   for (unsigned int base_no = 0; base_no < this->n_base_elements(); ++base_no)
     {
       internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
-        &base_fe_output_object = data->get_fe_output_object(base_no);
+        &base_fe_output_object = data.get_fe_output_object(base_no);
       base_fe_output_object.initialize(
         quadrature.size(),
         base_element(base_no),
@@ -975,10 +977,10 @@ FESystem<dim, spacedim>::get_data(
                                                          quadrature,
                                                          base_fe_output_object);
 
-      data->set_fe_data(base_no, std::move(base_fe_data));
+      data.set_fe_data(base_no, std::move(base_fe_data));
     }
 
-  return std::move(data);
+  return data_ptr;
 }
 
 // The following function is a clone of get_data, with the exception
@@ -1001,8 +1003,10 @@ FESystem<dim, spacedim>::get_face_data(
   // and so the current object's update_each flag needs to be
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
-  auto data = std_cxx14::make_unique<InternalData>(this->n_base_elements());
-  data->update_each = requires_update_flags(flags);
+  std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+        data_ptr = std_cxx14::make_unique<InternalData>(this->n_base_elements());
+  auto &data     = dynamic_cast<InternalData &>(*data_ptr);
+  data.update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
   // them. one might think that doing this in parallel (over the
@@ -1019,7 +1023,7 @@ FESystem<dim, spacedim>::get_face_data(
   for (unsigned int base_no = 0; base_no < this->n_base_elements(); ++base_no)
     {
       internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
-        &base_fe_output_object = data->get_fe_output_object(base_no);
+        &base_fe_output_object = data.get_fe_output_object(base_no);
       base_fe_output_object.initialize(
         quadrature.size(),
         base_element(base_no),
@@ -1034,10 +1038,10 @@ FESystem<dim, spacedim>::get_face_data(
       auto base_fe_data = base_element(base_no).get_face_data(
         flags, mapping, quadrature, base_fe_output_object);
 
-      data->set_fe_data(base_no, std::move(base_fe_data));
+      data.set_fe_data(base_no, std::move(base_fe_data));
     }
 
-  return std::move(data);
+  return data_ptr;
 }
 
 
@@ -1062,8 +1066,11 @@ FESystem<dim, spacedim>::get_subface_data(
   // and so the current object's update_each flag needs to be
   // correct in case the current FESystem is a base element for another,
   // higher-level FESystem itself.
-  auto data = std_cxx14::make_unique<InternalData>(this->n_base_elements());
-  data->update_each = requires_update_flags(flags);
+  std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
+        data_ptr = std_cxx14::make_unique<InternalData>(this->n_base_elements());
+  auto &data     = dynamic_cast<InternalData &>(*data_ptr);
+
+  data.update_each = requires_update_flags(flags);
 
   // get data objects from each of the base elements and store
   // them. one might think that doing this in parallel (over the
@@ -1080,7 +1087,7 @@ FESystem<dim, spacedim>::get_subface_data(
   for (unsigned int base_no = 0; base_no < this->n_base_elements(); ++base_no)
     {
       internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
-        &base_fe_output_object = data->get_fe_output_object(base_no);
+        &base_fe_output_object = data.get_fe_output_object(base_no);
       base_fe_output_object.initialize(
         quadrature.size(),
         base_element(base_no),
@@ -1095,10 +1102,10 @@ FESystem<dim, spacedim>::get_subface_data(
       auto base_fe_data = base_element(base_no).get_subface_data(
         flags, mapping, quadrature, base_fe_output_object);
 
-      data->set_fe_data(base_no, std::move(base_fe_data));
+      data.set_fe_data(base_no, std::move(base_fe_data));
     }
 
-  return std::move(data);
+  return data_ptr;
 }
 
 
