@@ -375,7 +375,10 @@ public:
    * MappingQEulerian, MappingQ1Eulerian, or MappingFEField.
    *
    * This function returns the bounding box containing all the vertices of the
-   * cell, as returned by the get_vertices() method.
+   * cell, as returned by the get_vertices() method. Beware of the fact that
+   * for higher order mappings this bounding box is only an approximation of the
+   * true bounding box, since it does not take into account curved faces, and it
+   * may be smaller than the true bounding box.
    *
    * @param[in] cell The cell for which you want to compute the center
    *
