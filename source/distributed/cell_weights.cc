@@ -149,11 +149,9 @@ namespace parallel
               fe_indices_children.insert(
                 cell->child(child_index)->active_fe_index());
 
-            unsigned int fe_index =
-              dof_handler->get_fe_collection().find_dominating_fe_extended(
-                fe_indices_children, /*codim=*/0);
-
-            Assert(fe_index != numbers::invalid_unsigned_int,
+            Assert(dof_handler->get_fe_collection().find_dominating_fe_extended(
+                     fe_indices_children, /*codim=*/0) !=
+                     numbers::invalid_unsigned_int,
                    ExcMessage(
                      "No FiniteElement has been found in your FECollection "
                      "that dominates all children of a cell you are trying "

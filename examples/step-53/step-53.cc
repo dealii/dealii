@@ -110,9 +110,9 @@ namespace Step53
   // access any member variables of the class, and (ii) because they are
   // called at a time when the object is not initialized fully anyway.
   AfricaTopography::AfricaTopography()
-    : topography_data({std::make_pair(-6.983333, 11.966667),
-                       std::make_pair(25, 35.95)},
-                      {379, 219},
+    : topography_data({{std::make_pair(-6.983333, 11.966667),
+                        std::make_pair(25, 35.95)}},
+                      {{379, 219}},
                       Table<2, double>(380, 220, get_data().begin()))
   {}
 

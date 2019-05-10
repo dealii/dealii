@@ -143,11 +143,11 @@ namespace Step24
                          const unsigned int /*component*/ = 0) const override
     {
       static const std::array<Source, 5> sources{
-        Source(Point<dim>(0, 0), 0.025),
-        Source(Point<dim>(-0.135, 0), 0.05),
-        Source(Point<dim>(0.17, 0), 0.03),
-        Source(Point<dim>(-0.25, 0), 0.02),
-        Source(Point<dim>(-0.05, -0.15), 0.015)};
+        {Source(Point<dim>(0, 0), 0.025),
+         Source(Point<dim>(-0.135, 0), 0.05),
+         Source(Point<dim>(0.17, 0), 0.03),
+         Source(Point<dim>(-0.25, 0), 0.02),
+         Source(Point<dim>(-0.05, -0.15), 0.015)}};
 
       for (const auto &source : sources)
         if (p.distance(source.location) < source.radius)
