@@ -246,11 +246,11 @@ namespace Differentiation
      * given by @p symbol, to the symbolic map @p substitution_map.
      *
      * For more context which this function is used, see the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function for a detailed discussion on the role of this
      * template argument.
      *
@@ -277,11 +277,11 @@ namespace Differentiation
      * functions.
      *
      * For more context which this function is used, see the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function for a detailed discussion on the role of this
      * template argument.
      */
@@ -296,11 +296,11 @@ namespace Differentiation
      * map @p symbol_map.
      *
      * For more context which this function is used, see the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function for a detailed discussion on the role of this
      * template argument.
      */
@@ -318,7 +318,7 @@ namespace Differentiation
      * functions.
      *
      * For more context which this function is used, see the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function.
      *
      * With this function it is possible to add entries from different types
@@ -334,7 +334,7 @@ namespace Differentiation
      * @endcode
      *
      * @tparam ignore_invalid_symbols See the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function for a detailed discussion on the role of this
      * template argument.
      */

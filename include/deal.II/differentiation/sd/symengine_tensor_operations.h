@@ -377,11 +377,11 @@ namespace Differentiation
      * map @p symbol_map.
      *
      * For more context which this function is used, see the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function for a detailed discussion on the role of this
      * template argument.
      *
@@ -402,11 +402,11 @@ namespace Differentiation
      * map @p symbol_map.
      *
      * For more context which this function is used, see the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * \ref add_to_symbol_map(types::substitution_map &,const
+     * @ref add_to_symbol_map(types::substitution_map &,const
      * Expression &) function for a detailed discussion on the role of this
      * template argument.
      *
@@ -467,7 +467,7 @@ namespace Differentiation
      *
      * It is possible to map symbolic types to other symbolic types
      * using this function. For more details on this, see the other
-     * \ref make_substitution_map(const Expression &,const ValueType &)
+     * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
      */
     template <int rank, int dim, typename ValueType>
@@ -482,7 +482,7 @@ namespace Differentiation
      *
      * It is possible to map symbolic types to other symbolic types
      * using this function. For more details on this, see the other
-     * \ref make_substitution_map(const Expression &,const ValueType &)
+     * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
      */
     template <int rank, int dim, typename ValueType>
@@ -505,11 +505,11 @@ namespace Differentiation
      * @p value_tensor.
      *
      * For more context which this function is used, see the other
-     * \ref add_to_substitution_map(types::substitution_map &,const
+     * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &, const Expression &) function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * \ref add_to_substitution_map(types::substitution_map &,const
+     * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &,const Expression &) function for a detailed
      * discussion on the role of this template argument.
      */
@@ -528,11 +528,11 @@ namespace Differentiation
      * their paired values extracted from the corresponding elements of the @p value_tensor.
      *
      * For more context which this function is used, see the other
-     * \ref add_to_substitution_map(types::substitution_map &,const
+     * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &, const Expression &) function.
      *
      * @tparam ignore_invalid_symbols See the other
-     * \ref add_to_substitution_map(types::substitution_map &,const
+     * @ref add_to_substitution_map(types::substitution_map &,const
      * Expression &,const Expression &) function for a detailed
      * discussion on the role of this template argument.
      */
