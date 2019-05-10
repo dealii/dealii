@@ -149,7 +149,8 @@ namespace parallel
               fe_indices_children.insert(
                 cell->child(child_index)->active_fe_index());
 
-            unsigned int fe_index =
+#ifdef DEBUG
+            const unsigned int fe_index =
               dof_handler->get_fe_collection().find_dominating_fe_extended(
                 fe_indices_children, /*codim=*/0);
 
@@ -158,6 +159,7 @@ namespace parallel
                      "No FiniteElement has been found in your FECollection "
                      "that dominates all children of a cell you are trying "
                      "to coarsen!"));
+#endif
           }
           break;
 
