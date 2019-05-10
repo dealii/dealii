@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Martin Kronbichler, Uppsala University,
  *          Wolfgang Bangerth, Texas A&M University 2007, 2008
@@ -89,18 +88,18 @@ namespace Step31
   // same as in step-22. Regarding the details, though, there are some
   // differences.
 
-  // The first thing is that we don't set any nonhomogeneous boundary
+  // The first thing is that we don't set any inhomogeneous boundary
   // conditions on the velocity, since as is explained in the introduction we
   // will use no-flux conditions $\mathbf{n}\cdot\mathbf{u}=0$. So what is
   // left are <code>dim-1</code> conditions for the tangential part of the
   // normal component of the stress tensor, $\textbf{n} \cdot [p \textbf{1} -
   // \eta\varepsilon(\textbf{u})]$; we assume homogeneous values for these
-  // components, i.e. a natural boundary condition that requires no specific
+  // components, i.e., a natural boundary condition that requires no specific
   // action (it appears as a zero term in the right hand side of the weak
   // form).
   //
-  // For the temperature <i>T</i>, we assume no thermal energy flux,
-  // i.e. $\mathbf{n} \cdot \kappa \nabla T=0$. This, again, is a boundary
+  // For the temperature $T$, we assume no thermal energy flux,
+  // i.e., $\mathbf{n} \cdot \kappa \nabla T=0$. This, again, is a boundary
   // condition that does not require us to do anything in particular.
   //
   // Secondly, we have to set initial conditions for the temperature (no
@@ -120,10 +119,10 @@ namespace Step31
   // thermal expansion coefficient $\beta$):
   namespace EquationData
   {
-    const double eta     = 1;
-    const double kappa   = 1e-6;
-    const double beta    = 10;
-    const double density = 1;
+    constexpr double eta     = 1;
+    constexpr double kappa   = 1e-6;
+    constexpr double beta    = 10;
+    constexpr double density = 1;
 
 
     template <int dim>
@@ -135,29 +134,19 @@ namespace Step31
       {}
 
       virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+                           const unsigned int component = 0) const override
+      {
+        return 0;
+      }
 
       virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  value) const override;
+                                Vector<double> &  value) const override
+      {
+        for (unsigned int c = 0; c < this->n_components; ++c)
+          values(c) = TemperatureInitialValues<dim>::value(p, c);
+      }
     };
 
-
-    template <int dim>
-    double TemperatureInitialValues<dim>::value(const Point<dim> &,
-                                                const unsigned int) const
-    {
-      return 0;
-    }
-
-
-    template <int dim>
-    void
-    TemperatureInitialValues<dim>::vector_value(const Point<dim> &p,
-                                                Vector<double> &  values) const
-    {
-      for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = TemperatureInitialValues<dim>::value(p, c);
-    }
 
 
     template <int dim>
@@ -169,46 +158,34 @@ namespace Step31
       {}
 
       virtual double value(const Point<dim> & p,
-                           const unsigned int component = 0) const override;
+                           const unsigned int component = 0) const override
+      {
+        (void)component;
+        Assert(component == 0,
+               ExcMessage("Invalid operation for a scalar function."));
+
+        Assert((dim == 2) || (dim == 3), ExcNotImplemented());
+
+        static const Point<dim> source_centers[3] = {
+          (dim == 2 ? Point<dim>(.3, .1) : Point<dim>(.3, .5, .1)),
+          (dim == 2 ? Point<dim>(.45, .1) : Point<dim>(.45, .5, .1)),
+          (dim == 2 ? Point<dim>(.75, .1) : Point<dim>(.75, .5, .1))};
+        static const double source_radius = (dim == 2 ? 1. / 32 : 1. / 8);
+
+        return ((source_centers[0].distance(p) < source_radius) ||
+                    (source_centers[1].distance(p) < source_radius) ||
+                    (source_centers[2].distance(p) < source_radius) ?
+                  1 :
+                  0);
+      }
 
       virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  value) const override;
+                                Vector<double> &  value) const override
+      {
+        for (unsigned int c = 0; c < this->n_components; ++c)
+          values(c) = TemperatureRightHandSide<dim>::value(p, c);
+      }
     };
-
-
-    template <int dim>
-    double
-    TemperatureRightHandSide<dim>::value(const Point<dim> & p,
-                                         const unsigned int component) const
-    {
-      (void)component;
-      Assert(component == 0,
-             ExcMessage("Invalid operation for a scalar function."));
-
-      Assert((dim == 2) || (dim == 3), ExcNotImplemented());
-
-      static const Point<dim> source_centers[3] = {
-        (dim == 2 ? Point<dim>(.3, .1) : Point<dim>(.3, .5, .1)),
-        (dim == 2 ? Point<dim>(.45, .1) : Point<dim>(.45, .5, .1)),
-        (dim == 2 ? Point<dim>(.75, .1) : Point<dim>(.75, .5, .1))};
-      static const double source_radius = (dim == 2 ? 1. / 32 : 1. / 8);
-
-      return ((source_centers[0].distance(p) < source_radius) ||
-                  (source_centers[1].distance(p) < source_radius) ||
-                  (source_centers[2].distance(p) < source_radius) ?
-                1 :
-                0);
-    }
-
-
-    template <int dim>
-    void
-    TemperatureRightHandSide<dim>::vector_value(const Point<dim> &p,
-                                                Vector<double> &  values) const
-    {
-      for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = TemperatureRightHandSide<dim>::value(p, c);
-    }
   } // namespace EquationData
 
 
@@ -334,7 +311,7 @@ namespace Step31
     // systems part II.  Using general block preconditioners", SIAM
     // J. Numer. Anal., 31 (1994), pp. 1352-1367).
     //
-    // Replacing <i>P</i> by $\tilde{P}$ keeps that spirit alive: the product
+    // Replacing $P$ by $\tilde{P}$ keeps that spirit alive: the product
     // $P^{-1} A$ will still be close to a matrix with eigenvalues 1 with a
     // distribution that does not depend on the problem size. This lets us
     // hope to be able to get a number of GMRES iterations that is
@@ -347,7 +324,7 @@ namespace Step31
     // complement will be approximated by the pressure mass matrix $M_p$
     // (weighted by $\eta^{-1}$ as mentioned in the introduction). As pointed
     // out in the results section of step-22, we can replace the exact inverse
-    // of <i>A</i> by just the application of a preconditioner, in this case
+    // of $A$ by just the application of a preconditioner, in this case
     // on a vector Laplace matrix as was explained in the introduction. This
     // does increase the number of (outer) GMRES iterations, but is still
     // significantly cheaper than an exact inverse, which would require
@@ -418,9 +395,9 @@ namespace Step31
     // components.
     //
     // The first step multiplies the velocity part of the vector by a
-    // preconditioner of the matrix <i>A</i>, i.e. we compute $Y_0={\tilde
+    // preconditioner of the matrix $A$, i.e., we compute $Y_0={\tilde
     // A}^{-1}X_0$.  The resulting velocity vector is then multiplied by $B$
-    // and subtracted from the pressure, i.e. we want to compute $X_1-BY_0$.
+    // and subtracted from the pressure, i.e., we want to compute $X_1-BY_0$.
     // This second step only acts on the pressure vector and is accomplished
     // by the residual function of our matrix classes, except that the sign is
     // wrong. Consequently, we change the sign in the temporary pressure
@@ -640,11 +617,7 @@ namespace Step31
 
     const FEValuesExtractors::Vector velocities(0);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = stokes_dof_handler
-                                                            .begin_active(),
-                                                   endc =
-                                                     stokes_dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : stokes_dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         fe_values[velocities].get_function_values(stokes_solution,
@@ -700,10 +673,7 @@ namespace Step31
         double min_temperature = std::numeric_limits<double>::max(),
                max_temperature = -std::numeric_limits<double>::max();
 
-        typename DoFHandler<dim>::active_cell_iterator
-          cell = temperature_dof_handler.begin_active(),
-          endc = temperature_dof_handler.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : temperature_dof_handler.active_cell_iterators())
           {
             fe_values.reinit(cell);
             fe_values.get_function_values(old_temperature_solution,
@@ -729,10 +699,7 @@ namespace Step31
         double min_temperature = std::numeric_limits<double>::max(),
                max_temperature = -std::numeric_limits<double>::max();
 
-        typename DoFHandler<dim>::active_cell_iterator
-          cell = temperature_dof_handler.begin_active(),
-          endc = temperature_dof_handler.end();
-        for (; cell != endc; ++cell)
+        for (const auto &cell : temperature_dof_handler.active_cell_iterators())
           {
             fe_values.reinit(cell);
             fe_values.get_function_values(old_temperature_solution,
@@ -791,8 +758,8 @@ namespace Step31
     const double                       global_T_variation,
     const double                       cell_diameter) const
   {
-    const double beta  = 0.017 * dim;
-    const double alpha = 1;
+    constexpr double beta  = 0.017 * dim;
+    constexpr double alpha = 1.0;
 
     if (global_u_infty == 0)
       return 5e-3 * cell_diameter;
@@ -1092,11 +1059,7 @@ namespace Step31
     const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(dim);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = stokes_dof_handler
-                                                            .begin_active(),
-                                                   endc =
-                                                     stokes_dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : stokes_dof_handler.active_cell_iterators())
       {
         stokes_fe_values.reinit(cell);
         local_matrix = 0;
@@ -1107,7 +1070,7 @@ namespace Step31
         // done in two lines. Once the local matrix is ready (loop over rows
         // and columns in the local matrix on each quadrature point), we get
         // the local DoF indices and write the local information into the
-        // global matrix. We do this as in step-27, i.e. we directly apply the
+        // global matrix. We do this as in step-27, i.e., we directly apply the
         // constraints from hanging nodes locally. By doing so, we don't have
         // to do that afterwards, and we don't also write into entries of the
         // matrix that will actually be set to zero again later when
@@ -1149,9 +1112,9 @@ namespace Step31
   // preconditioner matrices.
   //
   // Next, we set up the preconditioner for the velocity-velocity matrix
-  // <i>A</i>. As explained in the introduction, we are going to use an AMG
+  // $A$. As explained in the introduction, we are going to use an AMG
   // preconditioner based on a vector Laplace matrix $\hat{A}$ (which is
-  // spectrally close to the Stokes matrix <i>A</i>). Usually, the
+  // spectrally close to the Stokes matrix $A$). Usually, the
   // TrilinosWrappers::PreconditionAMG class can be seen as a good black-box
   // preconditioner which does not need any special knowledge. In this case,
   // however, we have to be careful: since we build an AMG for a vector
@@ -1331,12 +1294,9 @@ namespace Step31
     // the update flags, zeroing out the local arrays and getting the values
     // of the old solution at the quadrature points. Then we are ready to loop
     // over the quadrature points on the cell.
-    typename DoFHandler<dim>::active_cell_iterator cell = stokes_dof_handler
-                                                            .begin_active(),
-                                                   endc =
-                                                     stokes_dof_handler.end();
-    typename DoFHandler<dim>::active_cell_iterator temperature_cell =
-      temperature_dof_handler.begin_active();
+    auto cell             = stokes_dof_handler.begin_active(),
+         endc             = stokes_dof_handler.end();
+    auto temperature_cell = temperature_dof_handler.begin_active();
 
     for (; cell != endc; ++cell, ++temperature_cell)
       {
@@ -1475,10 +1435,7 @@ namespace Step31
     // <code>EquationData::kappa</code>. Finally, we let the constraints
     // object insert these values into the global matrix, and directly
     // condense the constraints into the matrix.
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = temperature_dof_handler.begin_active(),
-      endc = temperature_dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : temperature_dof_handler.active_cell_iterators())
       {
         local_mass_matrix      = 0;
         local_stiffness_matrix = 0;
@@ -1575,8 +1532,8 @@ namespace Step31
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     // Next comes the declaration of vectors to hold the old and older
-    // solution values (as a notation for time levels <i>n-1</i> and
-    // <i>n-2</i>, respectively) and gradients at quadrature points of the
+    // solution values (as a notation for time levels $n-1$ and
+    // $n-2$, respectively) and gradients at quadrature points of the
     // current cell. We also declare an object to hold the temperature right
     // hand side values (<code>gamma_values</code>), and we again use
     // shortcuts for the temperature basis functions. Eventually, we need to
@@ -1616,11 +1573,9 @@ namespace Step31
     // Stokes part we restrict ourselves to extracting the velocity part (and
     // ignoring the pressure part) by using
     // <code>stokes_fe_values[velocities].get_function_values</code>.
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = temperature_dof_handler.begin_active(),
-      endc = temperature_dof_handler.end();
-    typename DoFHandler<dim>::active_cell_iterator stokes_cell =
-      stokes_dof_handler.begin_active();
+    auto cell        = temperature_dof_handler.begin_active(),
+         endc        = temperature_dof_handler.end();
+    auto stokes_cell = stokes_dof_handler.begin_active();
 
     for (; cell != endc; ++cell, ++stokes_cell)
       {
@@ -1748,7 +1703,7 @@ namespace Step31
   // reduced set of vectors by restarting at every 100 iterations.
   //
   // With this all set up, we solve the system and distribute the constraints
-  // in the Stokes system, i.e. hanging nodes and no-flux boundary condition,
+  // in the Stokes system, i.e., hanging nodes and no-flux boundary condition,
   // in order to have the appropriate solution values even at constrained
   // dofs. Finally, we write the number of iterations to the screen.
   template <int dim>
@@ -1973,22 +1928,19 @@ namespace Step31
   {
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
-    KellyErrorEstimator<dim>::estimate(
-      temperature_dof_handler,
-      QGauss<dim - 1>(temperature_degree + 1),
-      std::map<types::boundary_id, const Function<dim> *>(),
-      temperature_solution,
-      estimated_error_per_cell);
+    KellyErrorEstimator<dim>::estimate(temperature_dof_handler,
+                                       QGauss<dim - 1>(temperature_degree + 1),
+                                       {},
+                                       temperature_solution,
+                                       estimated_error_per_cell);
 
     GridRefinement::refine_and_coarsen_fixed_fraction(triangulation,
                                                       estimated_error_per_cell,
                                                       0.8,
                                                       0.1);
     if (triangulation.n_levels() > max_grid_level)
-      for (typename Triangulation<dim>::active_cell_iterator cell =
-             triangulation.begin_active(max_grid_level);
-           cell != triangulation.end();
-           ++cell)
+      for (auto &cell :
+           triangulation.active_cell_iterators_on_level(max_grid_level))
         cell->clear_refine_flag();
 
     // As part of mesh refinement we need to transfer the solution vectors
@@ -2124,7 +2076,7 @@ namespace Step31
         // the pre-refinement steps or if we should remesh (every fifth time
         // step), refining up to a level that is consistent with initial
         // refinement and pre-refinement steps. Last in the loop is to advance
-        // the solutions, i.e. to copy the solutions to the next "older" time
+        // the solutions, i.e., to copy the solutions to the next "older" time
         // level.
         assemble_stokes_system();
         build_stokes_preconditioner();
