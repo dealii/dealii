@@ -2244,6 +2244,7 @@ namespace Differentiation
 
 
 /* --- Explicit instantiations --- */
+#  include "ad_drivers.inst"
 #  ifdef DEAL_II_WITH_ADOLC
 #    include "ad_drivers.inst1"
 #  endif
