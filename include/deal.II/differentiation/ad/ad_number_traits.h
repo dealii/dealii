@@ -317,12 +317,13 @@ namespace Differentiation
       /**
        * Specialization to detect whether the input AD number
        * is internally supported or not. In particular, we
-       * check to see that it has been assigned a type_code and
-       * has other basic characteristics necessary for the
-       * internal interface of both the AD and SD drivers.
+       * check to see that it is not an floating point type, that it
+       * has been assigned a type_code and has other basic
+       * characteristics necessary for the internal interface of
+       * the AD drivers.
        *
        * The implementation of this struct follows this suggestion:
-       *  https://stackoverflow.com/a/16000226
+       * https://stackoverflow.com/a/16000226
        */
       template <typename ADNumberTrait>
       struct HasRequiredADInfo<
@@ -331,7 +332,11 @@ namespace Differentiation
                  (void)ADNumberTrait::is_taped,
                  (void)std::declval<typename ADNumberTrait::real_type>(),
                  (void)std::declval<typename ADNumberTrait::derivative_type>(),
-                 void())> : std::true_type
+                 void())>
+        : std::conditional<
+            std::is_floating_point<typename ADNumberTrait::real_type>::value,
+            std::false_type,
+            std::true_type>::type
       {};
 
 
@@ -359,9 +364,9 @@ namespace Differentiation
        * mechanism can be employed (e.g. Sacado types).
        */
       template <typename ScalarType>
-      struct Marking<
-        ScalarType,
-        typename std::enable_if<std::is_arithmetic<ScalarType>::value>::type>
+      struct Marking<ScalarType,
+                     typename std::enable_if<
+                       std::is_floating_point<ScalarType>::value>::type>
       {
         /**
          * Initialize the state of an independent variable.
@@ -554,9 +559,9 @@ namespace Differentiation
        * mechanism can be employed (e.g. Sacado types).
        */
       template <typename NumberType>
-      struct ExtractData<
-        NumberType,
-        typename std::enable_if<std::is_arithmetic<NumberType>::value>::type>
+      struct ExtractData<NumberType,
+                         typename std::enable_if<
+                           std::is_floating_point<NumberType>::value>::type>
       {
         /**
          * Extract the floating point value.
@@ -669,8 +674,8 @@ namespace Differentiation
         static T
         value(const F &f,
               typename std::enable_if<is_ad_number<F>::value &&
-                                      std::is_arithmetic<T>::value>::type * =
-                nullptr)
+                                      std::is_floating_point<T>::value>::type
+                * = nullptr)
         {
           // We recursively call this function in case the AD number is a
           // nested one. The recursion ends when the extracted value is
@@ -721,8 +726,8 @@ namespace Differentiation
         static std::complex<T>
         value(const F &f,
               typename std::enable_if<is_ad_number<F>::value &&
-                                      std::is_arithmetic<T>::value>::type * =
-                nullptr)
+                                      std::is_floating_point<T>::value>::type
+                * = nullptr)
         {
           // We recursively call this function in case the AD number is a
           // nested one. The recursion ends when the extracted value is
