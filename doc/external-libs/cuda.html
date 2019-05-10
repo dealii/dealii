@@ -56,15 +56,20 @@
     </p>
 
     <p>
-      In order to enable MPI Cuda support (provided that your MPI library
-      supports it) configure with:
+      Several MPI implementations are able to perform MPI operations with data
+      located in device memory directly without the need to copy to CPU memory
+      explicitly first. This feature is commonly known as "CUDA-aware MPI".
+      In case deal.II is compiled with MPI support and the MPI implementation
+      supports this feature, you can tell deal.II to use it by configuring with
       <pre>
 
         -DDEAL_II_WITH_CUDA=ON
         -DDEAL_II_WITH_MPI=ON
         -DDEAL_II_MPI_WITH_CUDA_SUPPORT=ON
       </pre>
-      This configuration option is currently not autodetected.
+      Note, that there is no check that detects if the MPI implementation
+      really is CUDA-aware. Activating this flag for incompatible MPI libraries
+      will lead to segmentation faults in MPI calls.
     </p>
 
   </body>
