@@ -741,10 +741,10 @@ namespace Differentiation
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
      */
-    template <typename SymbolicType, typename ValueType, typename... Args>
+    template <typename ExpressionType, typename ValueType, typename... Args>
     types::substitution_map
     make_substitution_map(
-      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &... other_symbol_values);
 
     //@}
@@ -942,7 +942,7 @@ namespace Differentiation
      * expression, and that the paired @p symbol_value elements are compatible
      * with the other add_to_substitution_map() functions.
      *
-     * The @p SymbolicType and its associated @ValueType need not be scalar
+     * The @p ExpressionType and its associated @ValueType need not be scalar
      * types. So, for example, this function could be used to add tensor-valued
      * data to the map in the following way:
      *
@@ -965,12 +965,12 @@ namespace Differentiation
      * discussion on the role of this template argument.
      */
     template <bool ignore_invalid_symbols = false,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                 substitution_map,
-      const std::pair<SymbolicType, ValueType> &symbol_value);
+      types::substitution_map &                   substitution_map,
+      const std::pair<ExpressionType, ValueType> &symbol_value);
 
     /**
      * A convenience function for adding multiple entries to the
@@ -980,7 +980,7 @@ namespace Differentiation
      * symbolic expressions, and that the paired @p symbol_value elements are
      * compatible with the other add_to_substitution_map() functions.
      *
-     * The @p SymbolicType and its associated @ValueType need not be scalar
+     * The @p ExpressionType and its associated @ValueType need not be scalar
      * types. So, for example, this function could be used to add tensor-valued
      * data to the map in the following way:
      *
@@ -1007,12 +1007,12 @@ namespace Differentiation
      * discussion on the role of this template argument.
      */
     template <bool ignore_invalid_symbols = false,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                              substitution_map,
-      const std::vector<std::pair<SymbolicType, ValueType>> &symbol_values);
+      types::substitution_map &                                substitution_map,
+      const std::vector<std::pair<ExpressionType, ValueType>> &symbol_values);
 
     /**
      * A convenience function for adding multiple entries to the
@@ -1045,13 +1045,13 @@ namespace Differentiation
      * function.
      */
     template <bool ignore_invalid_symbols = false,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType,
               typename... Args>
     void
     add_to_substitution_map(
-      types::substitution_map &                 substitution_map,
-      const std::pair<SymbolicType, ValueType> &symbol_value,
+      types::substitution_map &                   substitution_map,
+      const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &... other_symbol_values);
 
     /**
@@ -1420,10 +1420,10 @@ namespace Differentiation
     }
 
 
-    template <typename SymbolicType, typename ValueType, typename... Args>
+    template <typename ExpressionType, typename ValueType, typename... Args>
     types::substitution_map
     make_substitution_map(
-      const std::pair<SymbolicType, ValueType> &symbol_value,
+      const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &... other_symbol_values)
     {
       types::substitution_map substitution_map;
@@ -1536,12 +1536,12 @@ namespace Differentiation
 
 
     template <bool ignore_invalid_symbols,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                 substitution_map,
-      const std::pair<SymbolicType, ValueType> &symbol_value)
+      types::substitution_map &                   substitution_map,
+      const std::pair<ExpressionType, ValueType> &symbol_value)
     {
       add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
                                                       symbol_value.first,
@@ -1550,12 +1550,12 @@ namespace Differentiation
 
 
     template <bool ignore_invalid_symbols,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType>
     void
     add_to_substitution_map(
-      types::substitution_map &                              substitution_map,
-      const std::vector<std::pair<SymbolicType, ValueType>> &symbol_values)
+      types::substitution_map &                                substitution_map,
+      const std::vector<std::pair<ExpressionType, ValueType>> &symbol_values)
     {
       for (const auto &entry : symbol_values)
         {
@@ -1581,13 +1581,13 @@ namespace Differentiation
 
 
     template <bool ignore_invalid_symbols,
-              typename SymbolicType,
+              typename ExpressionType,
               typename ValueType,
               typename... Args>
     void
     add_to_substitution_map(
-      types::substitution_map &                 substitution_map,
-      const std::pair<SymbolicType, ValueType> &symbol_value,
+      types::substitution_map &                   substitution_map,
+      const std::pair<ExpressionType, ValueType> &symbol_value,
       const Args &... other_symbol_values)
     {
       add_to_substitution_map<ignore_invalid_symbols>(substitution_map,
