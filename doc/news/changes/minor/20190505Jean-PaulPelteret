@@ -1,4 +1,4 @@
-New: Some utility functions that facilitate the symbolic maps and symbolic 
-substitution maps have been added to the Differentiation::SD namespace.
+New: Some utility functions that facilitate the creation of symbolic maps and 
+symbolic substitution maps have been added to the Differentiation::SD namespace.
 <br>
 (Jean-Paul Pelteret, 2019/05/05)
