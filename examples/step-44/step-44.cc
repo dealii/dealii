@@ -1478,11 +1478,7 @@ namespace Step44
     // a distinct boundary ID number.  The faces we are looking for are on the
     // +y surface and will get boundary ID 6 (zero through five are already
     // used when creating the six faces of the cube domain):
-    typename Triangulation<dim>::active_cell_iterator cell = triangulation
-                                                               .begin_active(),
-                                                      endc =
-                                                        triangulation.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
            ++face)
         {
@@ -1664,10 +1660,7 @@ namespace Step44
     // Next we setup the initial quadrature point data.
     // Note that when the quadrature point data is retrieved,
     // it is returned as a vector of smart pointers.
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
@@ -1702,8 +1695,7 @@ namespace Step44
 
     // We then pass them and the one-cell update function to the WorkStream to
     // be processed:
-    WorkStream::run(dof_handler_ref.begin_active(),
-                    dof_handler_ref.end(),
+    WorkStream::run(dof_handler_ref.active_cell_iterators(),
                     *this,
                     &Solid::update_qph_incremental_one_cell,
                     &Solid::copy_local_to_global_UQPH,
@@ -1922,10 +1914,7 @@ namespace Step44
 
     FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         fe_values_ref.reinit(cell);
 
@@ -1964,10 +1953,7 @@ namespace Step44
 
     FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
-    for (typename Triangulation<dim>::active_cell_iterator cell =
-           triangulation.begin_active();
-         cell != triangulation.end();
-         ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         fe_values_ref.reinit(cell);
 
@@ -2075,8 +2061,7 @@ namespace Step44
     // call to WorkStream because assemble_system_tangent_one_cell
     // is a constant function and copy_local_to_global_K is
     // non-constant.
-    WorkStream::run(dof_handler_ref.begin_active(),
-                    dof_handler_ref.end(),
+    WorkStream::run(dof_handler_ref.active_cell_iterators(),
                     std::bind(&Solid<dim>::assemble_system_tangent_one_cell,
                               this,
                               std::placeholders::_1,
@@ -2261,8 +2246,7 @@ namespace Step44
     PerTaskData_RHS per_task_data(dofs_per_cell);
     ScratchData_RHS scratch_data(fe, qf_cell, uf_cell, qf_face, uf_face);
 
-    WorkStream::run(dof_handler_ref.begin_active(),
-                    dof_handler_ref.end(),
+    WorkStream::run(dof_handler_ref.active_cell_iterators(),
                     std::bind(&Solid<dim>::assemble_system_rhs_one_cell,
                               this,
                               std::placeholders::_1,
@@ -2649,8 +2633,7 @@ namespace Step44
                                  element_indices_J.size());
     ScratchData_SC scratch_data;
 
-    WorkStream::run(dof_handler_ref.begin_active(),
-                    dof_handler_ref.end(),
+    WorkStream::run(dof_handler_ref.active_cell_iterators(),
                     *this,
                     &Solid::assemble_sc_one_cell,
                     &Solid::copy_local_to_global_sc,
