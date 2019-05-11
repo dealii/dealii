@@ -150,7 +150,7 @@ namespace Step46
 
   // @sect3{Boundary values and right hand side}
 
-  // The following class does as its names suggest. The boundary values for
+  // The following class does as its name suggests. The boundary values for
   // the velocity are $\mathbf u=(0, \sin(\pi x))^T$ in 2d and $\mathbf u=(0,
   // 0, \sin(\pi x)\sin(\pi y))^T$ in 3d, respectively. The remaining boundary
   // conditions for this problem are all homogeneous and have been discussed in
