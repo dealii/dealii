@@ -84,6 +84,7 @@ namespace step62
   {
   public:
     RightHandSide(HDF5::Group &data);
+
     virtual double value(const Point<dim> & p,
                          const unsigned int component) const override;
 
@@ -119,8 +120,9 @@ namespace step62
   {
   public:
     PML(HDF5::Group &data);
-    virtual std::complex<double> value(const Point<dim> & p,
-                                       const unsigned int component) const;
+
+    virtual std::complex<double>
+    value(const Point<dim> &p, const unsigned int component) const override;
 
   private:
     // HDF5::Group in which all the simulation results will be stored.
@@ -150,8 +152,9 @@ namespace step62
   {
   public:
     Rho(HDF5::Group &data);
+
     virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const;
+                         const unsigned int component = 0) const override;
 
   private:
     // HDF5::Group in which all the simulation results will be stored.
@@ -381,12 +384,9 @@ namespace step62
   //   a \exp(- (\frac{(x-b_x)^2 }{ 2 \sigma_x^2}+\frac{(y-b_y)^2 }{ 2
   //   \sigma_y^2}))
   // & \text{if}\, x_\textrm{min} <x<x_\textrm{max}\, \text{and}\,
-  // y_\textrm{min}
-  // <y<y_\textrm{max}  \\
-  //   0 & \text{otherwise},
+  // y_\textrm{min} <y<y_\textrm{max}  \\ 0 & \text{otherwise},
   // \end{array}
-  // \right.\\
-  // F_y &= 0
+  // \right.\\ F_y &= 0
   // @f}
   // where $a$ is the maximum amplitude that takes the force and $\sigma_x$ and
   // $\sigma_y$ are the standard deviations for the $x$ and $y$ components. Note
