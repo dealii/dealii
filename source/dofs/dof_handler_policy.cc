@@ -5581,6 +5581,103 @@ namespace internal
         Assert(triangulation != nullptr, ExcInternalError());
 
 
+        // We start by checking whether only the numbering within the MPI
+        // ranks changed. In that case, we can apply the renumbering with some
+        // local renumbering only (this is similar to the renumber_mg_dofs()
+        // function below)
+        bool locally_owned_set_changes = false;
+        for (types::global_dof_index i : new_numbers)
+          if (dof_handler->locally_owned_dofs().is_element(i) == false)
+            {
+              locally_owned_set_changes = true;
+              break;
+            }
+
+        if (Utilities::MPI::sum(static_cast<unsigned int>(
+                                  locally_owned_set_changes),
+                                triangulation->get_communicator()) == 0)
+          {
+            IndexSet relevant_dofs;
+            DoFTools::extract_locally_relevant_dofs(*dof_handler,
+                                                    relevant_dofs);
+            std::vector<types::global_dof_index> ghosted_new_numbers(
+              relevant_dofs.n_elements());
+            {
+              Utilities::MPI::Partitioner partitioner(
+                dof_handler->locally_owned_dofs(),
+                relevant_dofs,
+                triangulation->get_communicator());
+
+              std::vector<types::global_dof_index> temp_array(
+                partitioner.n_import_indices());
+              const unsigned int       communication_channel = 19;
+              std::vector<MPI_Request> requests;
+              partitioner.export_to_ghosted_array_start(
+                communication_channel,
+                make_array_view(new_numbers),
+                make_array_view(temp_array),
+                ArrayView<types::global_dof_index>(
+                  ghosted_new_numbers.data() + new_numbers.size(),
+                  partitioner.n_ghost_indices()),
+                requests);
+              partitioner.export_to_ghosted_array_finish(
+                ArrayView<types::global_dof_index>(
+                  ghosted_new_numbers.data() + new_numbers.size(),
+                  partitioner.n_ghost_indices()),
+                requests);
+
+              // we need to fill the indices of the locally owned part into
+              // the new numbers array. their right position is somewhere in
+              // the middle of the array, so we first copy the ghosted part
+              // from smaller ranks to the front, then insert the data in the
+              // middle.
+              unsigned int n_ghosts_on_smaller_ranks = 0;
+              for (std::pair<unsigned int, unsigned int> t :
+                   partitioner.ghost_targets())
+                {
+                  if (t.first > partitioner.this_mpi_process())
+                    break;
+                  n_ghosts_on_smaller_ranks += t.second;
+                }
+              if (n_ghosts_on_smaller_ranks > 0)
+                {
+                  Assert(ghosted_new_numbers.data() != nullptr,
+                         ExcInternalError());
+                  std::memmove(ghosted_new_numbers.data(),
+                               ghosted_new_numbers.data() + new_numbers.size(),
+                               sizeof(types::global_dof_index) *
+                                 n_ghosts_on_smaller_ranks);
+                }
+              if (new_numbers.size() > 0)
+                {
+                  Assert(new_numbers.data() != nullptr, ExcInternalError());
+                  std::memcpy(ghosted_new_numbers.data() +
+                                n_ghosts_on_smaller_ranks,
+                              new_numbers.data(),
+                              sizeof(types::global_dof_index) *
+                                new_numbers.size());
+                }
+            }
+
+            // In case we do not carry any relevant dof (but only some remote
+            // processor), we do not need to call the renumbering. We call the
+            // version without validity check because vertex dofs will be
+            // set already in the artificial region.
+            if (relevant_dofs.n_elements() > 0)
+              Implementation::renumber_dofs(ghosted_new_numbers,
+                                            relevant_dofs,
+                                            *dof_handler,
+                                            /*check_validity=*/false);
+
+            // Since we have not updated the number cache yet, we can use the
+            // index sets contained in the DoFHandler at this stage.
+            return NumberCache(dof_handler->locally_owned_dofs_per_processor(),
+                               Utilities::MPI::this_mpi_process(
+                                 triangulation->get_communicator()));
+          }
+
+        // Now back to the more complicated case
+        //
         // First figure out the new set of locally owned DoF indices.
         // If we own no DoFs, we still need to go through this function,
         // but we can skip this calculation.
@@ -5702,96 +5799,94 @@ namespace internal
         // processor owns which DoF index. this requires communication.
         //
         // this step is substantially more complicated than it is in
-        // distribute_dofs() because the IndexSets of locally owned DoFs
-        // after renumbering may not be contiguous any more. for
-        // distribute_dofs() it was enough to exchange the starting
-        // indices for each processor and the global number of DoFs,
-        // but here we actually have to serialize the IndexSet
+        // distribute_dofs() in case the IndexSets of locally owned DoFs after
+        // renumbering are not contiguous any more (which we have done at the
+        // top of this function). for distribute_dofs() it was enough to
+        // exchange the starting indices for each processor and the global
+        // number of DoFs, but here we actually have to serialize the IndexSet
         // objects and shop them across the network.
         const unsigned int n_cpus =
           Utilities::MPI::n_mpi_processes(triangulation->get_communicator());
         std::vector<IndexSet> locally_owned_dofs_per_processor(
           n_cpus, IndexSet(dof_handler->n_dofs()));
+        // serialize our own IndexSet
+        std::vector<char> my_data;
         {
-          // serialize our own IndexSet
-          std::vector<char> my_data;
-          {
 #  ifdef DEAL_II_WITH_ZLIB
 
-            boost::iostreams::filtering_ostream out;
-            out.push(
-              boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-                boost::iostreams::gzip::best_compression)));
-            out.push(boost::iostreams::back_inserter(my_data));
+          boost::iostreams::filtering_ostream out;
+          out.push(
+            boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
+              boost::iostreams::gzip::best_compression)));
+          out.push(boost::iostreams::back_inserter(my_data));
 
-            boost::archive::binary_oarchive archive(out);
+          boost::archive::binary_oarchive archive(out);
 
-            archive << my_locally_owned_new_dof_indices;
-            out.flush();
+          archive << my_locally_owned_new_dof_indices;
+          out.flush();
 #  else
-            std::ostringstream              out;
-            boost::archive::binary_oarchive archive(out);
-            archive << my_locally_owned_new_dof_indices;
-            const std::string &s = out.str();
-            my_data.reserve(s.size());
-            my_data.assign(s.begin(), s.end());
+          std::ostringstream              out;
+          boost::archive::binary_oarchive archive(out);
+          archive << my_locally_owned_new_dof_indices;
+          const std::string &s = out.str();
+          my_data.reserve(s.size());
+          my_data.assign(s.begin(), s.end());
 #  endif
-          }
-
-          // determine maximum size of IndexSet
-          const unsigned int max_size =
-            Utilities::MPI::max(my_data.size(),
-                                triangulation->get_communicator());
-
-          // as the MPI_Allgather call will be reading max_size elements, and
-          // as this may be past the end of my_data, we need to increase the
-          // size of the local buffer. This is filled with zeros.
-          my_data.resize(max_size);
-
-          std::vector<char> buffer(max_size * n_cpus);
-          const int         ierr = MPI_Allgather(my_data.data(),
-                                         max_size,
-                                         MPI_BYTE,
-                                         buffer.data(),
-                                         max_size,
-                                         MPI_BYTE,
-                                         triangulation->get_communicator());
-          AssertThrowMPI(ierr);
-
-          for (unsigned int i = 0; i < n_cpus; ++i)
-            if (i == Utilities::MPI::this_mpi_process(
-                       triangulation->get_communicator()))
-              locally_owned_dofs_per_processor[i] =
-                my_locally_owned_new_dof_indices;
-            else
-              {
-                // copy the data previously received into a stringstream
-                // object and then read the IndexSet from it
-                std::string decompressed_buffer;
-
-                // first decompress the buffer
-                {
-#  ifdef DEAL_II_WITH_ZLIB
-
-                  boost::iostreams::filtering_ostream decompressing_stream;
-                  decompressing_stream.push(
-                    boost::iostreams::gzip_decompressor());
-                  decompressing_stream.push(
-                    boost::iostreams::back_inserter(decompressed_buffer));
-
-                  decompressing_stream.write(&buffer[i * max_size], max_size);
-#  else
-                  decompressed_buffer.assign(&buffer[i * max_size], max_size);
-#  endif
-                }
-
-                // then restore the object from the buffer
-                std::istringstream              in(decompressed_buffer);
-                boost::archive::binary_iarchive archive(in);
-
-                archive >> locally_owned_dofs_per_processor[i];
-              }
         }
+
+        // determine maximum size of IndexSet
+        const unsigned int max_size =
+          Utilities::MPI::max(my_data.size(),
+                              triangulation->get_communicator());
+
+        // as the MPI_Allgather call will be reading max_size elements, and
+        // as this may be past the end of my_data, we need to increase the
+        // size of the local buffer. This is filled with zeros.
+        my_data.resize(max_size);
+
+        std::vector<char> buffer(max_size * n_cpus);
+        const int         ierr = MPI_Allgather(my_data.data(),
+                                       max_size,
+                                       MPI_BYTE,
+                                       buffer.data(),
+                                       max_size,
+                                       MPI_BYTE,
+                                       triangulation->get_communicator());
+        AssertThrowMPI(ierr);
+
+        for (unsigned int i = 0; i < n_cpus; ++i)
+          if (i == Utilities::MPI::this_mpi_process(
+                     triangulation->get_communicator()))
+            locally_owned_dofs_per_processor[i] =
+              my_locally_owned_new_dof_indices;
+          else
+            {
+              // copy the data previously received into a stringstream
+              // object and then read the IndexSet from it
+              std::string decompressed_buffer;
+
+              // first decompress the buffer
+              {
+#  ifdef DEAL_II_WITH_ZLIB
+
+                boost::iostreams::filtering_ostream decompressing_stream;
+                decompressing_stream.push(
+                  boost::iostreams::gzip_decompressor());
+                decompressing_stream.push(
+                  boost::iostreams::back_inserter(decompressed_buffer));
+
+                decompressing_stream.write(&buffer[i * max_size], max_size);
+#  else
+                decompressed_buffer.assign(&buffer[i * max_size], max_size);
+#  endif
+              }
+
+              // then restore the object from the buffer
+              std::istringstream              in(decompressed_buffer);
+              boost::archive::binary_iarchive archive(in);
+
+              archive >> locally_owned_dofs_per_processor[i];
+            }
 
         return NumberCache(locally_owned_dofs_per_processor,
                            Utilities::MPI::this_mpi_process(
