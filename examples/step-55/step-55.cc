@@ -95,10 +95,9 @@ namespace Step55
     // This class exposes the action of applying the inverse of a giving
     // matrix via the function InverseMatrix::vmult(). Internally, the
     // inverse is not formed explicitly. Instead, a linear solver with CG
-    // is performed. This class extends the InverseMatrix class in step-20
+    // is performed. This class extends the InverseMatrix class in step-22
     // with an option to specify a preconditioner, and to allow for different
-    // vector types
-    // in the vmult function.
+    // vector types in the vmult function.
     template <class Matrix, class Preconditioner>
     class InverseMatrix : public Subscriptor
     {

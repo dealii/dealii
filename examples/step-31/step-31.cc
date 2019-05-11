@@ -214,7 +214,7 @@ namespace Step31
     // of (templated) class <code>PreconditionerType</code>.
     //
     // In a minor deviation from the implementation of the same class in
-    // step-22 (and step-20), we make the <code>vmult</code> function take any
+    // step-22, we make the <code>vmult</code> function take any
     // kind of vector type (it will yield compiler errors, however, if the
     // matrix does not allow a matrix-vector product with this kind of
     // vector).
