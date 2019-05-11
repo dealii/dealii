@@ -484,21 +484,19 @@ namespace Step34
   // in 3d.
   //
   // The other detail that is required for appropriate refinement of
-  // the boundary element mesh, is an accurate description of the
-  // manifold that the mesh is approximating. We already saw this
+  // the boundary element mesh is an accurate description of the
+  // manifold that the mesh approximates. We already saw this
   // several times for the boundary of standard finite element meshes
   // (for example in step-5 and step-6), and here the principle and
   // usage is the same, except that the SphericalManifold class takes
   // an additional template parameter that specifies the embedding
-  // space dimension. The function object still has to be static to
-  // live at least as long as the triangulation object to which it is
-  // attached.
+  // space dimension.
 
   template <int dim>
   void BEMProblem<dim>::read_domain()
   {
-    static const Point<dim>                      center = Point<dim>();
-    static const SphericalManifold<dim - 1, dim> manifold(center);
+    const Point<dim>                      center = Point<dim>();
+    const SphericalManifold<dim - 1, dim> manifold(center);
 
     std::ifstream in;
     switch (dim)
@@ -520,6 +518,9 @@ namespace Step34
     gi.read_ucd(in);
 
     tria.set_all_manifold_ids(1);
+    // The call to Triangulation::set_manifold copies the manifold (via
+    // Manifold::clone()), so we do not need to worry about invalid pointers
+    // to <code>manifold</code>:
     tria.set_manifold(1, manifold);
   }
 
