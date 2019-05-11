@@ -509,10 +509,11 @@ namespace Differentiation
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
      */
-    template <int rank, int dim, typename ValueType>
+    template <int rank, int dim, typename ExpressionType, typename ValueType>
     types::substitution_map
-    make_substitution_map(const Tensor<rank, dim, Expression> &symbol_tensor,
-                          const Tensor<rank, dim, ValueType> & value_tensor);
+    make_substitution_map(
+      const Tensor<rank, dim, ExpressionType> &symbol_tensor,
+      const Tensor<rank, dim, ValueType> &     value_tensor);
 
     /**
      * Return a substitution map that has the entry keys given by the
@@ -524,11 +525,11 @@ namespace Differentiation
      * @ref make_substitution_map(const Expression &,const ValueType &)
      * function.
      */
-    template <int rank, int dim, typename ValueType>
+    template <int rank, int dim, typename ExpressionType, typename ValueType>
     types::substitution_map
     make_substitution_map(
-      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
-      const SymmetricTensor<rank, dim, ValueType> & value_tensor);
+      const SymmetricTensor<rank, dim, ExpressionType> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> &     value_tensor);
 
     //@}
 
@@ -1093,10 +1094,11 @@ namespace Differentiation
     /* ------------------ Symbol substitution map creation ----------------*/
 
 
-    template <int rank, int dim, typename ValueType>
+    template <int rank, int dim, typename ExpressionType, typename ValueType>
     types::substitution_map
-    make_substitution_map(const Tensor<rank, dim, Expression> &symbol_tensor,
-                          const Tensor<rank, dim, ValueType> & value_tensor)
+    make_substitution_map(
+      const Tensor<rank, dim, ExpressionType> &symbol_tensor,
+      const Tensor<rank, dim, ValueType> &     value_tensor)
     {
       types::substitution_map substitution_map;
       add_to_substitution_map(substitution_map, symbol_tensor, value_tensor);
@@ -1104,11 +1106,11 @@ namespace Differentiation
     }
 
 
-    template <int rank, int dim, typename ValueType>
+    template <int rank, int dim, typename ExpressionType, typename ValueType>
     types::substitution_map
     make_substitution_map(
-      const SymmetricTensor<rank, dim, Expression> &symbol_tensor,
-      const SymmetricTensor<rank, dim, ValueType> & value_tensor)
+      const SymmetricTensor<rank, dim, ExpressionType> &symbol_tensor,
+      const SymmetricTensor<rank, dim, ValueType> &     value_tensor)
     {
       types::substitution_map substitution_map;
       add_to_substitution_map(substitution_map, symbol_tensor, value_tensor);
@@ -1123,6 +1125,7 @@ namespace Differentiation
     {
       template <int rank,
                 int dim,
+                typename ExpressionType,
                 typename ValueType,
                 template <int, int, typename> class TensorType>
       std::vector<std::pair<ExpressionType, ValueType>>
