@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 ## ---------------------------------------------------------------------
 ##
 ## Copyright (C) 2019 by the deal.II authors
@@ -20,17 +20,37 @@
 # This script should be invoked from the root folder of the deal.ii
 # repository:
 # contrib/utilities/check_encoding.py
+from __future__ import print_function
 
-import glob
 import itertools
+import io
+import os
+import sys
 
-filenames = itertools.chain(glob.iglob('**/*.h', recursive=True),
-                            glob.iglob('**/*.cc', recursive=True),
-                            glob.iglob('**/*.html', recursive=True))
 
+def filename_generator(suffix):
+    for root, _, file_names in os.walk("./"):
+        for file_name in file_names:
+            if file_name.endswith(suffix):
+                if root == "./":
+                    yield root + file_name
+                else:
+                    yield root + "/" + file_name
+
+
+filenames = itertools.chain(filename_generator(".h"),
+                            filename_generator(".cc"),
+                            filename_generator(".html"))
+
+return_code = 0
 for filename in filenames:
+    file_handle = io.open(filename, encoding='utf-8')
     try:
-        with open(filename, encoding='utf-8') as file:
-            file.read()
-    except:
-        raise Exception(filename + ' is not encoded is not encoded with UTF-8')
+        file_handle.read()
+    except UnicodeDecodeError:
+        print(filename + ' is not encoded with UTF-8')
+        return_code = 1
+    finally:
+        file_handle.close()
+
+sys.exit(return_code)
