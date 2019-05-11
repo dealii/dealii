@@ -284,10 +284,7 @@ void Step6<dim>::assemble_system()
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell =
-                                                   dof_handler.begin_active(),
-                                                 endc = dof_handler.end();
-  for (; cell != endc; ++cell)
+  for (const auto cell : dof_handler.active_cell_iterators())
     {
       cell_matrix = 0;
       cell_rhs    = 0;
