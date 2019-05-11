@@ -461,7 +461,7 @@ namespace Step42
 
       AssertThrow(nx > 0 && ny > 0, ExcMessage("Invalid file format."));
 
-      for (int k = 0; k < nx * ny; k++)
+      for (int k = 0; k < nx * ny; ++k)
         {
           double val;
           f >> val;
@@ -1048,7 +1048,7 @@ namespace Step42
 
       const unsigned int start = (newton_rhs.local_range().first),
                          end   = (newton_rhs.local_range().second);
-      for (unsigned int j = start; j < end; j++)
+      for (unsigned int j = start; j < end; ++j)
         diag_mass_matrix_vector(j) = mass_matrix.diag_element(j);
       diag_mass_matrix_vector.compress(VectorOperation::insert);
 
@@ -1175,7 +1175,7 @@ namespace Step42
 
               cell->get_dof_indices(local_dof_indices);
 
-              for (unsigned int i = 0; i < dofs_per_cell; i++)
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 mass_matrix.add(local_dof_indices[i],
                                 local_dof_indices[i],
                                 cell_matrix(i, i));
@@ -1814,7 +1814,7 @@ namespace Step42
           }
         else
           {
-            for (unsigned int i = 0; i < 5; i++)
+            for (unsigned int i = 0; i < 5; ++i)
               {
                 distributed_solution = solution;
 
