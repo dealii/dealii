@@ -32,7 +32,7 @@ subsection Linear solver
   # Use static condensation and solve a 1-block system, or solve
   # the full 3-block system using Linear Operators and the Schur
   # complement
-  set Use static condensation = true
+  set Use static condensation = false
 
   # Preconditioner type
   set Preconditioner type  = ssor
