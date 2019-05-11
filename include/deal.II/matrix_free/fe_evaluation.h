@@ -546,8 +546,10 @@ public:
 
   /**
    * Fills the JxW values currently used into the given array.
+   *
+   * @deprecated Use JxW() instead.
    */
-  void
+  DEAL_II_DEPRECATED void
   fill_JxW_values(AlignedVector<VectorizedArray<Number>> &JxW_values) const;
 
   /**

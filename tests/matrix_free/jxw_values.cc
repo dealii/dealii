@@ -76,14 +76,12 @@ test()
 
   double error = 0, error2 = 0, abs = 0;
 
-  QGauss<dim>                            quad(2);
-  FEValues<dim>                          fe_values(fe, quad, update_JxW_values);
-  FEEvaluation<dim, 1>                   fe_eval(mf_data);
-  AlignedVector<VectorizedArray<double>> jxw_values_manual(fe_eval.n_q_points);
+  QGauss<dim>          quad(2);
+  FEValues<dim>        fe_values(fe, quad, update_JxW_values);
+  FEEvaluation<dim, 1> fe_eval(mf_data);
   for (unsigned int cell = 0; cell < mf_data.n_macro_cells(); ++cell)
     {
       fe_eval.reinit(cell);
-      fe_eval.fill_JxW_values(jxw_values_manual);
       for (unsigned int v = 0; v < mf_data.n_components_filled(cell); ++v)
         {
           fe_values.reinit(mf_data.get_cell_iterator(cell, v));
@@ -91,14 +89,11 @@ test()
             {
               abs += fe_values.JxW(q);
               error += std::abs(fe_values.JxW(q) - fe_eval.JxW(q)[v]);
-              error2 += std::abs(fe_values.JxW(q) - jxw_values_manual[q][v]);
             }
         }
     }
 
-  deallog << "Norm of difference: " << error / abs << " " << error2 / abs
-          << std::endl
-          << std::endl;
+  deallog << "Norm of difference: " << error / abs << std::endl << std::endl;
 }
 
 
