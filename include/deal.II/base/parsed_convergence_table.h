@@ -499,7 +499,7 @@ ParsedConvergenceTable::difference(
   error_from_exact(dh,
                    solution,
                    ConstantFunction<DoFHandlerType::space_dimension>(
-                     0, component_names.size()),
+                     0.0, component_names.size()),
                    weight);
 }
 
