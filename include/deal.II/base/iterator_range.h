@@ -162,6 +162,19 @@ public:
   begin();
 
   /**
+   * Return the iterator pointing to the first element of this range.
+   */
+  IteratorOverIterators
+  begin() const;
+
+  /**
+   * Return the iterator pointing to the element past the last element of this
+   * range.
+   */
+  IteratorOverIterators
+  end() const;
+
+  /**
    * Return the iterator pointing to the element past the last element of this
    * range.
    */
@@ -381,7 +394,23 @@ IteratorRange<Iterator>::begin()
 
 template <typename Iterator>
 inline typename IteratorRange<Iterator>::IteratorOverIterators
+IteratorRange<Iterator>::begin() const
+{
+  return it_begin;
+}
+
+
+template <typename Iterator>
+inline typename IteratorRange<Iterator>::IteratorOverIterators
 IteratorRange<Iterator>::end()
+{
+  return it_end;
+}
+
+
+template <typename Iterator>
+inline typename IteratorRange<Iterator>::IteratorOverIterators
+IteratorRange<Iterator>::end() const
 {
   return it_end;
 }
