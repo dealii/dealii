@@ -316,9 +316,6 @@ namespace Step42
 
       virtual double value(const Point<dim> & p,
                            const unsigned int component = 0) const override;
-
-      virtual void vector_value(const Point<dim> &p,
-                                Vector<double> &  values) const override;
     };
 
 
@@ -335,13 +332,6 @@ namespace Step42
       return 0.;
     }
 
-    template <int dim>
-    void BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                           Vector<double> &  values) const
-    {
-      for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = BoundaryValues<dim>::value(p, c);
-    }
 
 
     // @sect4{The <code>SphereObstacle</code> class}
