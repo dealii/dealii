@@ -705,6 +705,11 @@ namespace Differentiation
      * @note It is required that all symbols in @p expression_tensor be
      * successfully resolved by the @p substitution_map.
      * If only partial substitution is performed, then an error is thrown.
+     *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. In the context of this particular
+     *         function, this template parameter is typically arithmetic in
+     *         nature.
      */
     template <typename ValueType, int rank, int dim>
     Tensor<rank, dim, ValueType>
@@ -731,6 +736,11 @@ namespace Differentiation
      * @note It is required that all symbols in @p expression_tensor be
      * successfully resolved by the @p substitution_map.
      * If only partial substitution is performed, then an error is thrown.
+     *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. In the context of this particular
+     *         function, this template parameter is typically arithmetic in
+     *         nature.
      */
     template <typename ValueType, int rank, int dim>
     SymmetricTensor<rank, dim, ValueType>

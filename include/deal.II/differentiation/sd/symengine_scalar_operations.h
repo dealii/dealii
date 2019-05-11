@@ -1306,6 +1306,11 @@ namespace Differentiation
      * @note It is not required that all symbolic expressions be fully resolved
      * when using this function. In other words, partial substitutions are
      * valid.
+     *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. Although it is typically
+     *         arithmetic in nature, it may also represent another symbolic
+     *         expression type.
      */
     template <typename ValueType>
     Expression
@@ -1330,13 +1335,17 @@ namespace Differentiation
      * when using this function. In other words, partial substitutions are
      * valid.
      *
+     * @tparam ExpressionType A type that represents a symbolic expression.
+     *         The Differentiation::SD::Expression class is often suitable for
+     *         this purpose, but this may also represent Tensors and
+     *         SymmetricTensors of Expressions.
      * @tparam Args Any symbolic type and value combination that is understood
      *         by the make_substitution_map() functions. This includes
      *         arguments involving individual Expressions,
      *         std::vector<Expression>, as well as Tensors and SymmetricTensors
      *         of Expressions.
      */
-    template <typename ExpressionType = SD::Expression, typename... Args>
+    template <typename ExpressionType, typename... Args>
     ExpressionType
     substitute(const ExpressionType &expression, const Args &... symbol_values);
 
@@ -1358,6 +1367,11 @@ namespace Differentiation
      * @note It is required that all symbols in the @p expression be
      * successfully resolved by the @p substitution_map.
      * If only partial substitution is performed, then an error is thrown.
+     *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. In the context of this particular
+     *         function, this template parameter is typically arithmetic in
+     *         nature.
      */
     template <typename ValueType>
     ValueType
@@ -1384,6 +1398,10 @@ namespace Differentiation
      * input collection of @p symbol_values.
      * If only partial substitution is performed, then an error is thrown.
      *
+     * @tparam ValueType A type that corresponds to the @p value that the
+     *         @p symbol is to represent. In the context of this particular
+     *         function, this template parameter is typically arithmetic in
+     *         nature.
      * @tparam Args Any symbolic type and value combination that is understood
      *         by the make_substitution_map() functions. This includes
      *         arguments involving individual Expressions,
