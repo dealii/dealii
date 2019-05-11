@@ -553,7 +553,7 @@ namespace Differentiation
      *         expression type or be a special type that a user-defined
      *         @p SymbolicType can be constructed from.
      */
-    template <typename SymbolicType = SD::Expression, typename ValueType>
+    template <typename SymbolicType, typename ValueType>
     void
     set_value_in_symbol_map(
       types::substitution_map &                              substitution_map,
