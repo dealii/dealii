@@ -226,20 +226,12 @@ namespace Step43
 
     private:
       static std::vector<Point<dim>> centers;
-
-      static std::vector<Point<dim>> get_centers();
     };
 
 
 
     template <int dim>
-    std::vector<Point<dim>>
-      KInverse<dim>::centers = KInverse<dim>::get_centers();
-
-
-    template <int dim>
-    std::vector<Point<dim>> KInverse<dim>::get_centers()
-    {
+    std::vector<Point<dim>> KInverse<dim>::centers = []() {
       const unsigned int N =
         (dim == 2 ? 40 : (dim == 3 ? 100 : throw ExcNotImplemented()));
 
@@ -249,7 +241,7 @@ namespace Step43
           centers_list[i][d] = static_cast<double>(rand()) / RAND_MAX;
 
       return centers_list;
-    }
+    }();
 
 
 
