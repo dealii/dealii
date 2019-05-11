@@ -144,19 +144,13 @@ namespace Step21
       : Function<dim>(1)
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> & /*p*/,
+                         const unsigned int /*component*/ = 0) const override
+    {
+      return 0;
+    }
   };
 
-
-
-  template <int dim>
-  double
-  PressureRightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int /*component*/) const
-  {
-    return 0;
-  }
 
 
   // @sect4{Pressure boundary values}
@@ -171,18 +165,13 @@ namespace Step21
       : Function<dim>(1)
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p,
+                         const unsigned int /*component*/ = 0) const override
+    {
+      return 1 - p[0];
+    }
   };
 
-
-  template <int dim>
-  double
-  PressureBoundaryValues<dim>::value(const Point<dim> &p,
-                                     const unsigned int /*component*/) const
-  {
-    return 1 - p[0];
-  }
 
 
   // @sect4{Saturation boundary values}
@@ -200,22 +189,15 @@ namespace Step21
       : Function<dim>(1)
     {}
 
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+    virtual double value(const Point<dim> &p,
+                         const unsigned int /*component*/ = 0) const override
+    {
+      if (p[0] == 0)
+        return 1;
+      else
+        return 0;
+    }
   };
-
-
-
-  template <int dim>
-  double
-  SaturationBoundaryValues<dim>::value(const Point<dim> &p,
-                                       const unsigned int /*component*/) const
-  {
-    if (p[0] == 0)
-      return 1;
-    else
-      return 0;
-  }
 
 
 
@@ -241,27 +223,17 @@ namespace Step21
     {}
 
     virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
+                         const unsigned int component = 0) const override
+    {
+      return Functions::ZeroFunction<dim>(dim + 2).value(p, component);
+    }
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
+                              Vector<double> &  values) const override
+    {
+      Functions::ZeroFunction<dim>(dim + 2).vector_value(p, values);
+    }
   };
-
-
-  template <int dim>
-  double InitialValues<dim>::value(const Point<dim> & p,
-                                   const unsigned int component) const
-  {
-    return Functions::ZeroFunction<dim>(dim + 2).value(p, component);
-  }
-
-
-  template <int dim>
-  void InitialValues<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
-  {
-    Functions::ZeroFunction<dim>(dim + 2).vector_value(p, values);
-  }
 
 
 
@@ -289,34 +261,30 @@ namespace Step21
         : TensorFunction<2, dim>()
       {}
 
-      virtual void value_list(const std::vector<Point<dim>> &points,
-                              std::vector<Tensor<2, dim>> &  values) const;
+      virtual void
+      value_list(const std::vector<Point<dim>> &points,
+                 std::vector<Tensor<2, dim>> &  values) const override
+      {
+        Assert(points.size() == values.size(),
+               ExcDimensionMismatch(points.size(), values.size()));
+
+        for (unsigned int p = 0; p < points.size(); ++p)
+          {
+            values[p].clear();
+
+            const double distance_to_flowline =
+              std::fabs(points[p][1] - 0.5 - 0.1 * std::sin(10 * points[p][0]));
+
+            const double permeability =
+              std::max(std::exp(-(distance_to_flowline * distance_to_flowline) /
+                                (0.1 * 0.1)),
+                       0.01);
+
+            for (unsigned int d = 0; d < dim; ++d)
+              values[p][d][d] = 1. / permeability;
+          }
+      }
     };
-
-
-    template <int dim>
-    void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
-                                   std::vector<Tensor<2, dim>> &  values) const
-    {
-      Assert(points.size() == values.size(),
-             ExcDimensionMismatch(points.size(), values.size()));
-
-      for (unsigned int p = 0; p < points.size(); ++p)
-        {
-          values[p].clear();
-
-          const double distance_to_flowline =
-            std::fabs(points[p][1] - 0.5 - 0.1 * std::sin(10 * points[p][0]));
-
-          const double permeability =
-            std::max(std::exp(-(distance_to_flowline * distance_to_flowline) /
-                              (0.1 * 0.1)),
-                     0.01);
-
-          for (unsigned int d = 0; d < dim; ++d)
-            values[p][d][d] = 1. / permeability;
-        }
-    }
   } // namespace SingleCurvingCrack
 
 
@@ -364,12 +332,43 @@ namespace Step21
 
       virtual void
       value_list(const std::vector<Point<dim>> &points,
-                 std::vector<Tensor<2, dim>> &  values) const override;
+                 std::vector<Tensor<2, dim>> &  values) const override
+      {
+        Assert(points.size() == values.size(),
+               ExcDimensionMismatch(points.size(), values.size()));
+
+        for (unsigned int p = 0; p < points.size(); ++p)
+          {
+            values[p].clear();
+
+            double permeability = 0;
+            for (unsigned int i = 0; i < centers.size(); ++i)
+              permeability += std::exp(-(points[p] - centers[i]).norm_square() /
+                                       (0.05 * 0.05));
+
+            const double normalized_permeability =
+              std::min(std::max(permeability, 0.01), 4.);
+
+            for (unsigned int d = 0; d < dim; ++d)
+              values[p][d][d] = 1. / normalized_permeability;
+          }
+      }
 
     private:
       static std::vector<Point<dim>> centers;
 
-      static std::vector<Point<dim>> get_centers();
+      static std::vector<Point<dim>> get_centers()
+      {
+        const unsigned int N =
+          (dim == 2 ? 40 : (dim == 3 ? 100 : throw ExcNotImplemented()));
+
+        std::vector<Point<dim>> centers_list(N);
+        for (unsigned int i = 0; i < N; ++i)
+          for (unsigned int d = 0; d < dim; ++d)
+            centers_list[i][d] = static_cast<double>(rand()) / RAND_MAX;
+
+        return centers_list;
+      }
     };
 
 
@@ -377,47 +376,6 @@ namespace Step21
     template <int dim>
     std::vector<Point<dim>>
       KInverse<dim>::centers = KInverse<dim>::get_centers();
-
-
-    template <int dim>
-    std::vector<Point<dim>> KInverse<dim>::get_centers()
-    {
-      const unsigned int N =
-        (dim == 2 ? 40 : (dim == 3 ? 100 : throw ExcNotImplemented()));
-
-      std::vector<Point<dim>> centers_list(N);
-      for (unsigned int i = 0; i < N; ++i)
-        for (unsigned int d = 0; d < dim; ++d)
-          centers_list[i][d] = static_cast<double>(rand()) / RAND_MAX;
-
-      return centers_list;
-    }
-
-
-
-    template <int dim>
-    void KInverse<dim>::value_list(const std::vector<Point<dim>> &points,
-                                   std::vector<Tensor<2, dim>> &  values) const
-    {
-      Assert(points.size() == values.size(),
-             ExcDimensionMismatch(points.size(), values.size()));
-
-      for (unsigned int p = 0; p < points.size(); ++p)
-        {
-          values[p].clear();
-
-          double permeability = 0;
-          for (unsigned int i = 0; i < centers.size(); ++i)
-            permeability +=
-              std::exp(-(points[p] - centers[i]).norm_square() / (0.05 * 0.05));
-
-          const double normalized_permeability =
-            std::min(std::max(permeability, 0.01), 4.);
-
-          for (unsigned int d = 0; d < dim; ++d)
-            values[p][d][d] = 1. / normalized_permeability;
-        }
-    }
   } // namespace RandomMedium
 
 
@@ -458,34 +416,24 @@ namespace Step21
   class InverseMatrix : public Subscriptor
   {
   public:
-    InverseMatrix(const MatrixType &m);
+    InverseMatrix(const MatrixType &m)
+      : matrix(&m)
+    {}
 
-    void vmult(Vector<double> &dst, const Vector<double> &src) const;
+    void vmult(Vector<double> &dst, const Vector<double> &src) const
+    {
+      SolverControl solver_control(std::max<unsigned int>(src.size(), 200),
+                                   1e-8 * src.l2_norm());
+      SolverCG<>    cg(solver_control);
+
+      dst = 0;
+
+      cg.solve(*matrix, dst, src, PreconditionIdentity());
+    }
 
   private:
     const SmartPointer<const MatrixType> matrix;
   };
-
-
-  template <class MatrixType>
-  InverseMatrix<MatrixType>::InverseMatrix(const MatrixType &m)
-    : matrix(&m)
-  {}
-
-
-
-  template <class MatrixType>
-  void InverseMatrix<MatrixType>::vmult(Vector<double> &      dst,
-                                        const Vector<double> &src) const
-  {
-    SolverControl solver_control(std::max<unsigned int>(src.size(), 200),
-                                 1e-8 * src.l2_norm());
-    SolverCG<>    cg(solver_control);
-
-    dst = 0;
-
-    cg.solve(*matrix, dst, src, PreconditionIdentity());
-  }
 
 
 
@@ -493,9 +441,19 @@ namespace Step21
   {
   public:
     SchurComplement(const BlockSparseMatrix<double> &          A,
-                    const InverseMatrix<SparseMatrix<double>> &Minv);
+                    const InverseMatrix<SparseMatrix<double>> &Minv)
+      : system_matrix(&A)
+      , m_inverse(&Minv)
+      , tmp1(A.block(0, 0).m())
+      , tmp2(A.block(0, 0).m())
+    {}
 
-    void vmult(Vector<double> &dst, const Vector<double> &src) const;
+    void vmult(Vector<double> &dst, const Vector<double> &src) const
+    {
+      system_matrix->block(0, 1).vmult(tmp1, src);
+      m_inverse->vmult(tmp2, tmp1);
+      system_matrix->block(1, 0).vmult(dst, tmp2);
+    }
 
   private:
     const SmartPointer<const BlockSparseMatrix<double>>           system_matrix;
@@ -506,55 +464,27 @@ namespace Step21
 
 
 
-  SchurComplement::SchurComplement(
-    const BlockSparseMatrix<double> &          A,
-    const InverseMatrix<SparseMatrix<double>> &Minv)
-    : system_matrix(&A)
-    , m_inverse(&Minv)
-    , tmp1(A.block(0, 0).m())
-    , tmp2(A.block(0, 0).m())
-  {}
-
-
-  void SchurComplement::vmult(Vector<double> &      dst,
-                              const Vector<double> &src) const
-  {
-    system_matrix->block(0, 1).vmult(tmp1, src);
-    m_inverse->vmult(tmp2, tmp1);
-    system_matrix->block(1, 0).vmult(dst, tmp2);
-  }
-
-
-
   class ApproximateSchurComplement : public Subscriptor
   {
   public:
-    ApproximateSchurComplement(const BlockSparseMatrix<double> &A);
+    ApproximateSchurComplement(const BlockSparseMatrix<double> &A)
+      : system_matrix(&A)
+      , tmp1(A.block(0, 0).m())
+      , tmp2(A.block(0, 0).m())
+    {}
 
-    void vmult(Vector<double> &dst, const Vector<double> &src) const;
+    void vmult(Vector<double> &dst, const Vector<double> &src) const
+    {
+      system_matrix->block(0, 1).vmult(tmp1, src);
+      system_matrix->block(0, 0).precondition_Jacobi(tmp2, tmp1);
+      system_matrix->block(1, 0).vmult(dst, tmp2);
+    }
 
   private:
     const SmartPointer<const BlockSparseMatrix<double>> system_matrix;
 
     mutable Vector<double> tmp1, tmp2;
   };
-
-
-  ApproximateSchurComplement::ApproximateSchurComplement(
-    const BlockSparseMatrix<double> &A)
-    : system_matrix(&A)
-    , tmp1(A.block(0, 0).m())
-    , tmp2(A.block(0, 0).m())
-  {}
-
-
-  void ApproximateSchurComplement::vmult(Vector<double> &      dst,
-                                         const Vector<double> &src) const
-  {
-    system_matrix->block(0, 1).vmult(tmp1, src);
-    system_matrix->block(0, 0).precondition_Jacobi(tmp2, tmp1);
-    system_matrix->block(1, 0).vmult(dst, tmp2);
-  }
 
 
 
@@ -720,10 +650,7 @@ namespace Step21
     const FEValuesExtractors::Scalar pressure(dim);
     const FEValuesExtractors::Scalar saturation(dim + 1);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         local_matrix = 0;
@@ -878,10 +805,7 @@ namespace Step21
 
     const FEValuesExtractors::Scalar saturation(dim + 1);
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         local_rhs = 0;
         fe_values.reinit(cell);
@@ -936,8 +860,7 @@ namespace Step21
                 fe_face_values.get_quadrature_points(), neighbor_saturation);
             else
               {
-                const typename DoFHandler<dim>::active_cell_iterator neighbor =
-                  cell->neighbor(face_no);
+                const auto         neighbor = cell->neighbor(face_no);
                 const unsigned int neighbor_face =
                   cell->neighbor_of_neighbor(face_no);
 
@@ -1093,18 +1016,11 @@ namespace Step21
     switch (dim)
       {
         case 2:
-          solution_names.emplace_back("u");
-          solution_names.emplace_back("v");
-          solution_names.emplace_back("p");
-          solution_names.emplace_back("S");
+          solution_names = {"u", "v", "p", "S"};
           break;
 
         case 3:
-          solution_names.emplace_back("u");
-          solution_names.emplace_back("v");
-          solution_names.emplace_back("w");
-          solution_names.emplace_back("p");
-          solution_names.emplace_back("S");
+          solution_names = {"u", "v", "w", "p", "S"};
           break;
 
         default:
@@ -1169,10 +1085,7 @@ namespace Step21
                                                 Vector<double>(dim + 2));
     double                      max_velocity = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       {
         fe_values.reinit(cell);
         fe_values.get_function_values(solution, solution_values);
