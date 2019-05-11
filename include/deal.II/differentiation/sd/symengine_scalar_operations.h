@@ -1303,10 +1303,10 @@ namespace Differentiation
     }
 
 
-    template <typename ExpressionType, typename ValueType, typename>
+    template <typename SymbolicType, typename ValueType, typename>
     void
     set_value_in_symbol_map(types::substitution_map &substitution_map,
-                            const ExpressionType &   symbol,
+                            const SymbolicType &     symbol,
                             const ValueType &        value)
     {
       // Call the above function
@@ -1314,7 +1314,7 @@ namespace Differentiation
       internal::set_value_in_symbol_map(substitution_map,
                                         static_cast<SE_RCP_Basic>(symbol),
                                         static_cast<SE_RCP_Basic>(
-                                          ExpressionType(value)));
+                                          SymbolicType(value)));
     }
 
 
