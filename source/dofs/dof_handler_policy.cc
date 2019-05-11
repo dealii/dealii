@@ -5597,6 +5597,13 @@ namespace internal
                                   locally_owned_set_changes),
                                 triangulation->get_communicator()) == 0)
           {
+            // Since only the order within the local subdomains has changed,
+            // all we need to do is to propagate the knowledge about the
+            // numbers from the locally owned dofs (given by the new_numbers
+            // array) to all ghosted dofs on neighboring processors. We can do
+            // this by ghost layer exchange routines as in parallel vectors:
+            // We create an IndexSet for the relevant dofs and then export
+            // into an array of those values via Utilities::MPI::Partitioner.
             IndexSet relevant_dofs;
             DoFTools::extract_locally_relevant_dofs(*dof_handler,
                                                     relevant_dofs);
@@ -5608,9 +5615,12 @@ namespace internal
                 relevant_dofs,
                 triangulation->get_communicator());
 
+              // choose some number that makes it unlikely to get conflicts
+              // with other ongoing non-blocking communication (there
+              // shouldn't be any at this place in most programs).
+              const unsigned int                   communication_channel = 19;
               std::vector<types::global_dof_index> temp_array(
                 partitioner.n_import_indices());
-              const unsigned int       communication_channel = 19;
               std::vector<MPI_Request> requests;
               partitioner.export_to_ghosted_array_start(
                 communication_channel,
@@ -5627,10 +5637,10 @@ namespace internal
                 requests);
 
               // we need to fill the indices of the locally owned part into
-              // the new numbers array. their right position is somewhere in
-              // the middle of the array, so we first copy the ghosted part
-              // from smaller ranks to the front, then insert the data in the
-              // middle.
+              // the new numbers array, which is not provided by the parallel
+              // partitioner. their right position is somewhere in the middle
+              // of the array, so we first copy the ghosted part from smaller
+              // ranks to the front, then insert the data in the middle.
               unsigned int n_ghosts_on_smaller_ranks = 0;
               for (std::pair<unsigned int, unsigned int> t :
                    partitioner.ghost_targets())
@@ -5675,222 +5685,228 @@ namespace internal
                                Utilities::MPI::this_mpi_process(
                                  triangulation->get_communicator()));
           }
-
-        // Now back to the more complicated case
-        //
-        // First figure out the new set of locally owned DoF indices.
-        // If we own no DoFs, we still need to go through this function,
-        // but we can skip this calculation.
-        //
-        // The IndexSet::add_indices() function is substantially more
-        // efficient if the set of indices is already sorted because
-        // it can then insert ranges instead of individual elements.
-        // consequently, pre-sort the array of new indices
-        IndexSet my_locally_owned_new_dof_indices(dof_handler->n_dofs());
-        if (dof_handler->n_locally_owned_dofs() > 0)
+        else
           {
-            std::vector<dealii::types::global_dof_index> new_numbers_sorted =
-              new_numbers;
-            std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
-
-            my_locally_owned_new_dof_indices.add_indices(
-              new_numbers_sorted.begin(), new_numbers_sorted.end());
-            my_locally_owned_new_dof_indices.compress();
-
-            Assert(my_locally_owned_new_dof_indices.n_elements() ==
-                     new_numbers.size(),
-                   ExcInternalError());
-          }
-
-        // delete all knowledge of DoF indices that are not locally
-        // owned. we do so by getting DoF indices on cells, checking
-        // whether they are locally owned, if not, setting them to
-        // an invalid value, and then setting them again on the current
-        // cell
-        //
-        // DoFs we (i) know about, and (ii) don't own locally must be located
-        // either on ghost cells, or on the interface between a locally
-        // owned cell and a ghost cell. In any case, it is sufficient
-        // to kill them only from the ghost side cell, so loop only over
-        // ghost cells
-        {
-          std::vector<dealii::types::global_dof_index> local_dof_indices;
-
-          for (auto cell : dof_handler->active_cell_iterators())
-            if (cell->is_ghost())
+            // Now back to the more complicated case
+            //
+            // First figure out the new set of locally owned DoF indices.
+            // If we own no DoFs, we still need to go through this function,
+            // but we can skip this calculation.
+            //
+            // The IndexSet::add_indices() function is substantially more
+            // efficient if the set of indices is already sorted because
+            // it can then insert ranges instead of individual elements.
+            // consequently, pre-sort the array of new indices
+            IndexSet my_locally_owned_new_dof_indices(dof_handler->n_dofs());
+            if (dof_handler->n_locally_owned_dofs() > 0)
               {
-                local_dof_indices.resize(cell->get_fe().dofs_per_cell);
-                cell->get_dof_indices(local_dof_indices);
+                std::vector<dealii::types::global_dof_index>
+                  new_numbers_sorted = new_numbers;
+                std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
 
-                for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
-                  // delete a DoF index if it has not already been deleted
-                  // (e.g., by visiting a neighboring cell, if it is on the
-                  // boundary), and if we don't own it
-                  if ((local_dof_indices[i] != numbers::invalid_dof_index) &&
-                      (!dof_handler->locally_owned_dofs().is_element(
-                        local_dof_indices[i])))
-                    local_dof_indices[i] = numbers::invalid_dof_index;
+                my_locally_owned_new_dof_indices.add_indices(
+                  new_numbers_sorted.begin(), new_numbers_sorted.end());
+                my_locally_owned_new_dof_indices.compress();
 
-                cell->set_dof_indices(local_dof_indices);
+                Assert(my_locally_owned_new_dof_indices.n_elements() ==
+                         new_numbers.size(),
+                       ExcInternalError());
               }
-        }
 
-
-        // renumber. Skip when there is nothing to do because we own no DoF.
-        if (dof_handler->locally_owned_dofs().n_elements() > 0)
-          Implementation::renumber_dofs(new_numbers,
-                                        dof_handler->locally_owned_dofs(),
-                                        *dof_handler,
-                                        /*check_validity=*/false);
-
-        // Communicate newly assigned DoF indices to other processors
-        // and get the same information for our own ghost cells.
-        //
-        // This is the same as phase 5+6 in the distribute_dofs() algorithm,
-        // taking into account that we have to unify a few DoFs in between
-        // then communication phases if we do hp numbering
-        {
-          std::vector<bool> user_flags;
-          triangulation->save_user_flags(user_flags);
-          triangulation->clear_user_flags();
-
-          // mark all own cells for transfer
-          for (const auto &cell : dof_handler->active_cell_iterators())
-            if (!cell->is_artificial())
-              cell->set_user_flag();
-
-          // figure out which cells are ghost cells on which we have
-          // to exchange DoF indices
-          const std::map<unsigned int, std::set<dealii::types::subdomain_id>>
-            vertices_with_ghost_neighbors =
-              triangulation->compute_vertices_with_ghost_neighbors();
-
-
-          // Send and receive cells. After this, only the local cells
-          // are marked, that received new data. This has to be
-          // communicated in a second communication step.
-          //
-          // as explained in the 'distributed' paper, this has to be
-          // done twice
-          communicate_dof_indices_on_marked_cells(
-            *dof_handler,
-            vertices_with_ghost_neighbors,
-            triangulation->coarse_cell_to_p4est_tree_permutation,
-            triangulation->p4est_tree_to_coarse_cell_permutation);
-
-          // in case of hp::DoFHandlers, we may have received valid
-          // indices of degrees of freedom that are dominated by a fe
-          // object adjacent to a ghost interface.
-          // thus, we overwrite the remaining invalid indices with
-          // the valid ones in this step.
-          Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
-            *dof_handler);
-
-          communicate_dof_indices_on_marked_cells(
-            *dof_handler,
-            vertices_with_ghost_neighbors,
-            triangulation->coarse_cell_to_p4est_tree_permutation,
-            triangulation->p4est_tree_to_coarse_cell_permutation);
-
-          triangulation->load_user_flags(user_flags);
-        }
-
-        // the last step is to update the NumberCache, including knowing which
-        // processor owns which DoF index. this requires communication.
-        //
-        // this step is substantially more complicated than it is in
-        // distribute_dofs() in case the IndexSets of locally owned DoFs after
-        // renumbering are not contiguous any more (which we have done at the
-        // top of this function). for distribute_dofs() it was enough to
-        // exchange the starting indices for each processor and the global
-        // number of DoFs, but here we actually have to serialize the IndexSet
-        // objects and shop them across the network.
-        const unsigned int n_cpus =
-          Utilities::MPI::n_mpi_processes(triangulation->get_communicator());
-        std::vector<IndexSet> locally_owned_dofs_per_processor(
-          n_cpus, IndexSet(dof_handler->n_dofs()));
-        // serialize our own IndexSet
-        std::vector<char> my_data;
-        {
-#  ifdef DEAL_II_WITH_ZLIB
-
-          boost::iostreams::filtering_ostream out;
-          out.push(
-            boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
-              boost::iostreams::gzip::best_compression)));
-          out.push(boost::iostreams::back_inserter(my_data));
-
-          boost::archive::binary_oarchive archive(out);
-
-          archive << my_locally_owned_new_dof_indices;
-          out.flush();
-#  else
-          std::ostringstream              out;
-          boost::archive::binary_oarchive archive(out);
-          archive << my_locally_owned_new_dof_indices;
-          const std::string &s = out.str();
-          my_data.reserve(s.size());
-          my_data.assign(s.begin(), s.end());
-#  endif
-        }
-
-        // determine maximum size of IndexSet
-        const unsigned int max_size =
-          Utilities::MPI::max(my_data.size(),
-                              triangulation->get_communicator());
-
-        // as the MPI_Allgather call will be reading max_size elements, and
-        // as this may be past the end of my_data, we need to increase the
-        // size of the local buffer. This is filled with zeros.
-        my_data.resize(max_size);
-
-        std::vector<char> buffer(max_size * n_cpus);
-        const int         ierr = MPI_Allgather(my_data.data(),
-                                       max_size,
-                                       MPI_BYTE,
-                                       buffer.data(),
-                                       max_size,
-                                       MPI_BYTE,
-                                       triangulation->get_communicator());
-        AssertThrowMPI(ierr);
-
-        for (unsigned int i = 0; i < n_cpus; ++i)
-          if (i == Utilities::MPI::this_mpi_process(
-                     triangulation->get_communicator()))
-            locally_owned_dofs_per_processor[i] =
-              my_locally_owned_new_dof_indices;
-          else
+            // delete all knowledge of DoF indices that are not locally
+            // owned. we do so by getting DoF indices on cells, checking
+            // whether they are locally owned, if not, setting them to
+            // an invalid value, and then setting them again on the current
+            // cell
+            //
+            // DoFs we (i) know about, and (ii) don't own locally must be
+            // located either on ghost cells, or on the interface between a
+            // locally owned cell and a ghost cell. In any case, it is
+            // sufficient to kill them only from the ghost side cell, so loop
+            // only over ghost cells
             {
-              // copy the data previously received into a stringstream
-              // object and then read the IndexSet from it
-              std::string decompressed_buffer;
+              std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-              // first decompress the buffer
-              {
-#  ifdef DEAL_II_WITH_ZLIB
+              for (auto cell : dof_handler->active_cell_iterators())
+                if (cell->is_ghost())
+                  {
+                    local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+                    cell->get_dof_indices(local_dof_indices);
 
-                boost::iostreams::filtering_ostream decompressing_stream;
-                decompressing_stream.push(
-                  boost::iostreams::gzip_decompressor());
-                decompressing_stream.push(
-                  boost::iostreams::back_inserter(decompressed_buffer));
+                    for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell;
+                         ++i)
+                      // delete a DoF index if it has not already been deleted
+                      // (e.g., by visiting a neighboring cell, if it is on the
+                      // boundary), and if we don't own it
+                      if ((local_dof_indices[i] !=
+                           numbers::invalid_dof_index) &&
+                          (!dof_handler->locally_owned_dofs().is_element(
+                            local_dof_indices[i])))
+                        local_dof_indices[i] = numbers::invalid_dof_index;
 
-                decompressing_stream.write(&buffer[i * max_size], max_size);
-#  else
-                decompressed_buffer.assign(&buffer[i * max_size], max_size);
-#  endif
-              }
-
-              // then restore the object from the buffer
-              std::istringstream              in(decompressed_buffer);
-              boost::archive::binary_iarchive archive(in);
-
-              archive >> locally_owned_dofs_per_processor[i];
+                    cell->set_dof_indices(local_dof_indices);
+                  }
             }
 
-        return NumberCache(locally_owned_dofs_per_processor,
-                           Utilities::MPI::this_mpi_process(
-                             triangulation->get_communicator()));
+
+            // renumber. Skip when there is nothing to do because we own no DoF.
+            if (dof_handler->locally_owned_dofs().n_elements() > 0)
+              Implementation::renumber_dofs(new_numbers,
+                                            dof_handler->locally_owned_dofs(),
+                                            *dof_handler,
+                                            /*check_validity=*/false);
+
+            // Communicate newly assigned DoF indices to other processors
+            // and get the same information for our own ghost cells.
+            //
+            // This is the same as phase 5+6 in the distribute_dofs() algorithm,
+            // taking into account that we have to unify a few DoFs in between
+            // then communication phases if we do hp numbering
+            {
+              std::vector<bool> user_flags;
+              triangulation->save_user_flags(user_flags);
+              triangulation->clear_user_flags();
+
+              // mark all own cells for transfer
+              for (const auto &cell : dof_handler->active_cell_iterators())
+                if (!cell->is_artificial())
+                  cell->set_user_flag();
+
+              // figure out which cells are ghost cells on which we have
+              // to exchange DoF indices
+              const std::map<unsigned int,
+                             std::set<dealii::types::subdomain_id>>
+                vertices_with_ghost_neighbors =
+                  triangulation->compute_vertices_with_ghost_neighbors();
+
+
+              // Send and receive cells. After this, only the local cells
+              // are marked, that received new data. This has to be
+              // communicated in a second communication step.
+              //
+              // as explained in the 'distributed' paper, this has to be
+              // done twice
+              communicate_dof_indices_on_marked_cells(
+                *dof_handler,
+                vertices_with_ghost_neighbors,
+                triangulation->coarse_cell_to_p4est_tree_permutation,
+                triangulation->p4est_tree_to_coarse_cell_permutation);
+
+              // in case of hp::DoFHandlers, we may have received valid
+              // indices of degrees of freedom that are dominated by a fe
+              // object adjacent to a ghost interface.
+              // thus, we overwrite the remaining invalid indices with
+              // the valid ones in this step.
+              Implementation::merge_invalid_dof_indices_on_ghost_interfaces(
+                *dof_handler);
+
+              communicate_dof_indices_on_marked_cells(
+                *dof_handler,
+                vertices_with_ghost_neighbors,
+                triangulation->coarse_cell_to_p4est_tree_permutation,
+                triangulation->p4est_tree_to_coarse_cell_permutation);
+
+              triangulation->load_user_flags(user_flags);
+            }
+
+            // the last step is to update the NumberCache, including knowing
+            // which processor owns which DoF index. this requires
+            // communication.
+            //
+            // this step is substantially more complicated than it is in
+            // distribute_dofs() in case the IndexSets of locally owned DoFs
+            // after renumbering are not contiguous any more (which we have done
+            // at the top of this function). for distribute_dofs() it was enough
+            // to exchange the starting indices for each processor and the
+            // global number of DoFs, but here we actually have to serialize the
+            // IndexSet objects and shop them across the network.
+            const unsigned int n_cpus = Utilities::MPI::n_mpi_processes(
+              triangulation->get_communicator());
+            std::vector<IndexSet> locally_owned_dofs_per_processor(
+              n_cpus, IndexSet(dof_handler->n_dofs()));
+            // serialize our own IndexSet
+            std::vector<char> my_data;
+            {
+#  ifdef DEAL_II_WITH_ZLIB
+
+              boost::iostreams::filtering_ostream out;
+              out.push(
+                boost::iostreams::gzip_compressor(boost::iostreams::gzip_params(
+                  boost::iostreams::gzip::best_compression)));
+              out.push(boost::iostreams::back_inserter(my_data));
+
+              boost::archive::binary_oarchive archive(out);
+
+              archive << my_locally_owned_new_dof_indices;
+              out.flush();
+#  else
+              std::ostringstream              out;
+              boost::archive::binary_oarchive archive(out);
+              archive << my_locally_owned_new_dof_indices;
+              const std::string &s = out.str();
+              my_data.reserve(s.size());
+              my_data.assign(s.begin(), s.end());
+#  endif
+            }
+
+            // determine maximum size of IndexSet
+            const unsigned int max_size =
+              Utilities::MPI::max(my_data.size(),
+                                  triangulation->get_communicator());
+
+            // as the MPI_Allgather call will be reading max_size elements, and
+            // as this may be past the end of my_data, we need to increase the
+            // size of the local buffer. This is filled with zeros.
+            my_data.resize(max_size);
+
+            std::vector<char> buffer(max_size * n_cpus);
+            const int         ierr = MPI_Allgather(my_data.data(),
+                                           max_size,
+                                           MPI_BYTE,
+                                           buffer.data(),
+                                           max_size,
+                                           MPI_BYTE,
+                                           triangulation->get_communicator());
+            AssertThrowMPI(ierr);
+
+            for (unsigned int i = 0; i < n_cpus; ++i)
+              if (i == Utilities::MPI::this_mpi_process(
+                         triangulation->get_communicator()))
+                locally_owned_dofs_per_processor[i] =
+                  my_locally_owned_new_dof_indices;
+              else
+                {
+                  // copy the data previously received into a stringstream
+                  // object and then read the IndexSet from it
+                  std::string decompressed_buffer;
+
+                  // first decompress the buffer
+                  {
+#  ifdef DEAL_II_WITH_ZLIB
+
+                    boost::iostreams::filtering_ostream decompressing_stream;
+                    decompressing_stream.push(
+                      boost::iostreams::gzip_decompressor());
+                    decompressing_stream.push(
+                      boost::iostreams::back_inserter(decompressed_buffer));
+
+                    decompressing_stream.write(&buffer[i * max_size], max_size);
+#  else
+                    decompressed_buffer.assign(&buffer[i * max_size], max_size);
+#  endif
+                  }
+
+                  // then restore the object from the buffer
+                  std::istringstream              in(decompressed_buffer);
+                  boost::archive::binary_iarchive archive(in);
+
+                  archive >> locally_owned_dofs_per_processor[i];
+                }
+
+            return NumberCache(locally_owned_dofs_per_processor,
+                               Utilities::MPI::this_mpi_process(
+                                 triangulation->get_communicator()));
+          }
 #endif
       }
 
