@@ -299,11 +299,14 @@ void Step6<dim>::assemble_system()
             {
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 cell_matrix(i, j) +=
-                  (current_coefficient * fe_values.shape_grad(i, q_index) *
-                   fe_values.shape_grad(j, q_index) * fe_values.JxW(q_index));
+                  (current_coefficient *              // a(x_q)
+                   fe_values.shape_grad(i, q_index) * // grad phi_j(x_q)
+                   fe_values.shape_grad(j, q_index) * // grad phi_i(x_q)
+                   fe_values.JxW(q_index));           // dx
 
-              cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
-                              fe_values.JxW(q_index));
+              cell_rhs(i) += (1.0 *                               //
+                              fe_values.shape_value(i, q_index) * // phi_i(x_q)
+                              fe_values.JxW(q_index));            // dx
             }
         }
 
