@@ -150,12 +150,12 @@ namespace Step46
 
   // @sect3{Boundary values and right hand side}
 
-  // The following classes do as their names suggest. The boundary values for
+  // The following class does as its names suggest. The boundary values for
   // the velocity are $\mathbf u=(0, \sin(\pi x))^T$ in 2d and $\mathbf u=(0,
   // 0, \sin(\pi x)\sin(\pi y))^T$ in 3d, respectively. The remaining boundary
   // conditions for this problem are all homogeneous and have been discussed in
   // the introduction. The right hand side forcing term is zero for both the
-  // fluid and the solid.
+  // fluid and the solid so we don't need an extra class for it.
   template <int dim>
   class StokesBoundaryValues : public Function<dim>
   {
@@ -200,40 +200,6 @@ namespace Step46
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = StokesBoundaryValues<dim>::value(p, c);
-  }
-
-
-
-  template <int dim>
-  class RightHandSide : public Function<dim>
-  {
-  public:
-    RightHandSide()
-      : Function<dim>(dim + 1)
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
-
-    virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
-  };
-
-
-  template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                   const unsigned int /*component*/) const
-  {
-    return 0;
-  }
-
-
-  template <int dim>
-  void RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
-  {
-    for (unsigned int c = 0; c < this->n_components; ++c)
-      values(c) = RightHandSide<dim>::value(p, c);
   }
 
 
@@ -556,7 +522,7 @@ namespace Step46
     std::vector<types::global_dof_index> neighbor_dof_indices(
       stokes_dofs_per_cell);
 
-    const RightHandSide<dim> right_hand_side;
+    const Functions::ZeroFunction<dim> right_hand_side(dim + 1);
 
     // ...to variables that allow us to extract certain components of the
     // shape functions and cache their values rather than having to recompute
