@@ -3373,6 +3373,10 @@ namespace Step44
     solution_name.emplace_back("pressure");
     solution_name.emplace_back("dilatation");
 
+    DataOutBase::VtkFlags output_flags;
+    output_flags.write_higher_order_cells = true;
+    data_out.set_flags(output_flags);
+
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution_n,
                              solution_name,
@@ -3394,8 +3398,8 @@ namespace Step44
     data_out.build_patches(q_mapping, degree);
 
     std::ofstream output("solution-" + std::to_string(dim) + "d-" +
-                         std::to_string(time.get_timestep()) + ".vtk");
-    data_out.write_vtk(output);
+                         std::to_string(time.get_timestep()) + ".vtu");
+    data_out.write_vtu(output);
   }
 
 } // namespace Step44
