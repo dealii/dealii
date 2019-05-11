@@ -891,7 +891,7 @@ namespace LinearAlgebra
       if (partitioner->n_import_indices() > 0)
         {
 #  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
           Assert(
             (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value),
             ExcMessage(
@@ -901,7 +901,7 @@ namespace LinearAlgebra
               Utilities::CUDA::allocate_device_data<Number>(
                 partitioner->n_import_indices()));
 #  else
-#    ifdef DEAL_II_WITH_CUDA_AWARE_MPI
+#    ifdef DEAL_II_MPI_WITH_CUDA_SUPPORT
           static_assert(
             std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
             "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
@@ -919,7 +919,7 @@ namespace LinearAlgebra
         }
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+    !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       // Move the data to the host and then move it back to the
       // the device. We use values to store the elements because the function
       // uses a view of the array and thus we need the data on the host to
@@ -939,7 +939,7 @@ namespace LinearAlgebra
 #  endif
 
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_WITH_CUDA_AWARE_MPI))
+        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
       partitioner->import_from_ghosted_array_start(
         operation,
         counter,
@@ -980,7 +980,7 @@ namespace LinearAlgebra
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_WITH_CUDA_AWARE_MPI))
+        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
       Assert(partitioner->n_import_indices() == 0 ||
                import_data.values != nullptr,
              ExcNotInitialized());
@@ -1011,7 +1011,7 @@ namespace LinearAlgebra
 #  endif
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined  DEAL_II_WITH_CUDA_AWARE_MPI
+    !defined  DEAL_II_MPI_WITH_CUDA_SUPPORT
       // The communication is done on the host, so we need to
       // move the data back to the device.
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)
@@ -1051,7 +1051,7 @@ namespace LinearAlgebra
       if (partitioner->n_import_indices() > 0)
         {
 #  if defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-    defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+    defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
           Assert(
             (std::is_same<MemorySpaceType, dealii::MemorySpace::CUDA>::value),
             ExcMessage(
@@ -1061,7 +1061,7 @@ namespace LinearAlgebra
               Utilities::CUDA::allocate_device_data<Number>(
                 partitioner->n_import_indices()));
 #  else
-#    ifdef DEAL_II_WITH_CUDA_AWARE_MPI
+#    ifdef DEAL_II_MPI_WITH_CUDA_SUPPORT
           static_assert(
             std::is_same<MemorySpaceType, dealii::MemorySpace::Host>::value,
             "This code path should only be compiled for CUDA-aware-MPI for MemorySpace::Host!");
@@ -1079,7 +1079,7 @@ namespace LinearAlgebra
         }
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined(DEAL_II_WITH_CUDA_AWARE_MPI)
+    !defined(DEAL_II_MPI_WITH_CUDA_SUPPORT)
       // Move the data to the host and then move it back to the
       // the device. We use values to store the elements because the function
       // uses a view of the array and thus we need the data on the host to
@@ -1099,7 +1099,7 @@ namespace LinearAlgebra
 #  endif
 
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_WITH_CUDA_AWARE_MPI))
+        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
       partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
         counter,
         ArrayView<const Number, MemorySpace::Host>(data.values.get(),
@@ -1146,7 +1146,7 @@ namespace LinearAlgebra
           std::lock_guard<std::mutex> lock(mutex);
 
 #  if !(defined(DEAL_II_COMPILER_CUDA_AWARE) && \
-        defined(DEAL_II_WITH_CUDA_AWARE_MPI))
+        defined(DEAL_II_MPI_WITH_CUDA_SUPPORT))
           partitioner->export_to_ghosted_array_finish(
             ArrayView<Number, MemorySpace::Host>(
               data.values.get() + partitioner->local_size(),
@@ -1162,7 +1162,7 @@ namespace LinearAlgebra
         }
 
 #  if defined DEAL_II_COMPILER_CUDA_AWARE && \
-    !defined  DEAL_II_WITH_CUDA_AWARE_MPI
+    !defined  DEAL_II_MPI_WITH_CUDA_SUPPORT
       // The communication is done on the host, so we need to
       // move the data back to the device.
       if (std::is_same<MemorySpaceType, MemorySpace::CUDA>::value)

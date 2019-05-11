@@ -10,7 +10,7 @@
 
   <body>
 
-    <h1>Installing deal.II with CUDA</h1>                  
+    <h1>Installing deal.II with CUDA</h1>
 
     <p>
       To compile and run CUDA code, you need a CUDA-enabled GPU, appropriate
@@ -45,16 +45,32 @@
 
         -DDEAL_II_CUDA_FLAGS="-arch=sm_60"
       </pre>
-      <code>-DDEAL_II_CUDA_FLAGS_DEBUG</code> and 
+      <code>-DDEAL_II_CUDA_FLAGS_DEBUG</code> and
       <code>-DDEAL_II_CUDA_FLAGS_RELEASE</code> are also available if you want
       a finer control on the CUDA flags. The CUDA compiler and the
-      CUDA toolkit root directory can be set using 
-      <code>-DDEAL_II_CUDA_COMPILER</code> and 
+      CUDA toolkit root directory can be set using
+      <code>-DDEAL_II_CUDA_COMPILER</code> and
       <code>-DDEAL_II_CUDA_TOOLKIT_ROOT_DIR</code>.
       Finally, the CUDA host compiler is the same as the C++ compiler
       by default, but can be changed using CUDA flags as well.
     </p>
 
+    <p>
+      Several MPI implementations are able to perform MPI operations with data
+      located in device memory directly without the need to copy to CPU memory
+      explicitly first. This feature is commonly known as "CUDA-aware MPI".
+      In case deal.II is compiled with MPI support and the MPI implementation
+      supports this feature, you can tell deal.II to use it by configuring with
+      <pre>
+
+        -DDEAL_II_WITH_CUDA=ON
+        -DDEAL_II_WITH_MPI=ON
+        -DDEAL_II_MPI_WITH_CUDA_SUPPORT=ON
+      </pre>
+      Note, that there is no check that detects if the MPI implementation
+      really is CUDA-aware. Activating this flag for incompatible MPI libraries
+      will lead to segmentation faults in MPI calls.
+    </p>
+
   </body>
-  
 </html>

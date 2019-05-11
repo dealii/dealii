@@ -1,4 +1,4 @@
 New: LinearAlgebra::distributed::Vector with CUDA memory space uses CUDA-aware
-MPI in case deal.II is configured with DEAL_II_WITH_CUDA_AWARE_MPI=ON.
+MPI in case deal.II is configured with DEAL_II_MPI_WITH_CUDA_SUPPORT=ON.
 <br>
 (Daniel Arndt, Bruno Turcksin, 2019/01/04)
