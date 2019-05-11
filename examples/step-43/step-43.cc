@@ -178,8 +178,9 @@ namespace Step43
         : TensorFunction<2, dim>()
       {}
 
-      virtual void value_list(const std::vector<Point<dim>> &points,
-                              std::vector<Tensor<2, dim>> &  values) const;
+      virtual void
+      value_list(const std::vector<Point<dim>> &points,
+                 std::vector<Tensor<2, dim>> &  values) const override;
     };
 
 
