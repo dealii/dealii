@@ -66,7 +66,7 @@
 // matrices that are distributed across several
 // @ref GlossMPIProcess "processes" in MPI programs (and
 // simply map to sequential, local vectors and matrices if there is only a
-// single process, i.e. if you are running on only one machine, and without
+// single process, i.e., if you are running on only one machine, and without
 // MPI support):
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
@@ -107,7 +107,6 @@ namespace Step17
   {
   public:
     ElasticProblem();
-    ~ElasticProblem();
     void run();
 
   private:
@@ -143,7 +142,7 @@ namespace Step17
     // is a lot of clutter. Rather, we would want to only have one
     // @ref GlossMPIProcess "process" output everything once, for
     // example the one with @ref GlossMPIRank "rank" zero. At the same
-    // time, it seems silly to prefix <i>every</i> places where we
+    // time, it seems silly to prefix <i>every</i> place where we
     // create output with an <code>if (my_rank==0)</code> condition.
     //
     // To make this simpler, the ConditionalOStream class does exactly
@@ -166,9 +165,8 @@ namespace Step17
     // we do not use a separate sparsity pattern, since PETSc manages this
     // internally as part of its matrix data structures.
     Triangulation<dim> triangulation;
+    FESystem<dim>      fe;
     DoFHandler<dim>    dof_handler;
-
-    FESystem<dim> fe;
 
     AffineConstraints<double> hanging_node_constraints;
 
@@ -186,61 +184,41 @@ namespace Step17
   class RightHandSide : public Function<dim>
   {
   public:
-    RightHandSide();
-
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  values) const override;
+                              Vector<double> &  values) const override
+    {
+      Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
+      Assert(dim >= 2, ExcInternalError());
+
+      Point<dim> point_1, point_2;
+      point_1(0) = 0.5;
+      point_2(0) = -0.5;
+
+      if (((p - point_1).norm_square() < 0.2 * 0.2) ||
+          ((p - point_2).norm_square() < 0.2 * 0.2))
+        values(0) = 1;
+      else
+        values(0) = 0;
+
+      if (p.square() < 0.2 * 0.2)
+        values(1) = 1;
+      else
+        values(1) = 0;
+    }
 
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override;
+                      std::vector<Vector<double>> &  value_list) const override
+    {
+      const unsigned int n_points = points.size();
+
+      Assert(value_list.size() == n_points,
+             ExcDimensionMismatch(value_list.size(), n_points));
+
+      for (unsigned int p = 0; p < n_points; ++p)
+        RightHandSide<dim>::vector_value(points[p], value_list[p]);
+    }
   };
-
-
-  template <int dim>
-  RightHandSide<dim>::RightHandSide()
-    : Function<dim>(dim)
-  {}
-
-
-  template <int dim>
-  inline void RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                               Vector<double> &  values) const
-  {
-    Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
-    Assert(dim >= 2, ExcInternalError());
-
-    Point<dim> point_1, point_2;
-    point_1(0) = 0.5;
-    point_2(0) = -0.5;
-
-    if (((p - point_1).norm_square() < 0.2 * 0.2) ||
-        ((p - point_2).norm_square() < 0.2 * 0.2))
-      values(0) = 1;
-    else
-      values(0) = 0;
-
-    if (p.square() < 0.2 * 0.2)
-      values(1) = 1;
-    else
-      values(1) = 0;
-  }
-
-
-
-  template <int dim>
-  void RightHandSide<dim>::vector_value_list(
-    const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
-  {
-    const unsigned int n_points = points.size();
-
-    Assert(value_list.size() == n_points,
-           ExcDimensionMismatch(value_list.size(), n_points));
-
-    for (unsigned int p = 0; p < n_points; ++p)
-      RightHandSide<dim>::vector_value(points[p], value_list[p]);
-  }
 
 
 
@@ -268,20 +246,10 @@ namespace Step17
     , n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator))
     , this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator))
     , pcout(std::cout, (this_mpi_process == 0))
-    , dof_handler(triangulation)
     , fe(FE_Q<dim>(1), dim)
+    , dof_handler(triangulation)
   {}
 
-
-
-  // @sect4{ElasticProblem::~ElasticProblem}
-
-  // The destructor is exactly as in step-8.
-  template <int dim>
-  ElasticProblem<dim>::~ElasticProblem()
-  {
-    dof_handler.clear();
-  }
 
 
   // @sect4{ElasticProblem::setup_system}
@@ -289,7 +257,7 @@ namespace Step17
   // Next, the function in which we set up the various variables
   // for the global linear system to be solved needs to be implemented.
   //
-  // However, before we with this, there is one thing to do for a
+  // However, before we proceed with this, there is one thing to do for a
   // parallel program: we need to determine which MPI process is
   // responsible for each of the cells. Splitting cells among
   // processes, commonly called "partitioning the mesh", is done by
@@ -339,8 +307,8 @@ namespace Step17
   // object knows everything about every cell, in particular the
   // degrees of freedom that live on each cell, whether it is one that
   // the current process owns or not. This can not scale to large
-  // problems because eventually just storing on every process the
-  // entire mesh, and everything that is associated with it, will
+  // problems because eventually just storing the entire mesh, and
+  // everything that is associated with it, on every process will
   // become infeasible if the problem is large enough. On the other
   // hand, if we split the triangulation into parts so that every
   // process stores only those cells it "owns" but nothing else (or,
@@ -492,7 +460,7 @@ namespace Step17
     // of by other processes. This is what the if-clause immediately
     // after the for-loop takes care of: it queries the subdomain
     // identifier of each cell, which is a number associated with each
-    // cell that tells us which process owns it. In more generality,
+    // cell that tells us about the owner process. In more generality,
     // the subdomain id is used to split a domain into several parts
     // (we do this above, at the beginning of
     // <code>setup_system()</code>), and which allows to identify
@@ -505,10 +473,7 @@ namespace Step17
     // distributing local contributions into the global matrix
     // and right hand sides also takes care of hanging node constraints in the
     // same way as is done in step-6.
-    typename DoFHandler<dim>::active_cell_iterator cell =
-                                                     dof_handler.begin_active(),
-                                                   endc = dof_handler.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof_handler.active_cell_iterators())
       if (cell->subdomain_id() == this_mpi_process)
         {
           cell_matrix = 0;
@@ -570,12 +535,14 @@ namespace Step17
                                                               system_rhs);
         }
 
-    // The next step is to "compress" the vector and the system
-    // matrix. This means that each process sends the additions that
-    // were made above to those entries of the matrix and vector that
-    // the process did not own itself, to the process that owns
-    // them. After receiving these additions from other processes,
-    // each process then adds them to the values it already has.
+    // The next step is to "compress" the vector and the system matrix. This
+    // means that each process sends the additions that were made to those
+    // entries of the matrix and vector that the process did not own itself to
+    // the process that owns them. After receiving these additions from other
+    // processes, each process then adds them to the values it already
+    // has. These additions are combining the integral contributions of shape
+    // functions living on several cells just as in a serial computation, with
+    // the difference that the cells are assigned to different processes.
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
 
@@ -725,7 +692,7 @@ namespace Step17
   // make this happen, we do essentially what we did in
   // <code>solve()</code> already, namely get a <i>complete</i> copy
   // of the solution vector onto every process, and use that to
-  // compute. This is, in itself expensive as explained above, and it
+  // compute. This is in itself expensive as explained above and it
   // is particular unnecessary since we had just created and then
   // destroyed such a vector in <code>solve()</code>, but efficiency
   // is not the point of this program and so let us opt for a design
@@ -753,9 +720,9 @@ namespace Step17
   //   subdomain/process. The last argument of the call indicates
   //   which subdomain we are interested in. The three arguments
   //   before it are various other default arguments that one usually
-  //   doesn't need (and doesn't state values for, but rather uses the
+  //   does not need (and does not state values for, but rather uses the
   //   defaults), but which we have to state here explicitly since we
-  //   want to modify the value of a following argument (i.e. the one
+  //   want to modify the value of a following argument (i.e., the one
   //   indicating the subdomain).
   template <int dim>
   void ElasticProblem<dim>::refine_grid()
@@ -763,16 +730,15 @@ namespace Step17
     const Vector<double> localized_solution(solution);
 
     Vector<float> local_error_per_cell(triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate(
-      dof_handler,
-      QGauss<dim - 1>(fe.degree + 1),
-      std::map<types::boundary_id, const Function<dim> *>(),
-      localized_solution,
-      local_error_per_cell,
-      ComponentMask(),
-      nullptr,
-      MultithreadInfo::n_threads(),
-      this_mpi_process);
+    KellyErrorEstimator<dim>::estimate(dof_handler,
+                                       QGauss<dim - 1>(fe.degree + 1),
+                                       {},
+                                       localized_solution,
+                                       local_error_per_cell,
+                                       ComponentMask(),
+                                       nullptr,
+                                       MultithreadInfo::n_threads(),
+                                       this_mpi_process);
 
     // Now all processes have computed error indicators for their own
     // cells and stored them in the respective elements of the
@@ -783,7 +749,7 @@ namespace Step17
     // the values of refinement indicators for all cells of the
     // triangulation. Thus, we need to distribute our results. We do
     // this by creating a distributed vector where each process has
-    // its share, and sets the elements it has computed. Consequently,
+    // its share and sets the elements it has computed. Consequently,
     // when you view this vector as one that lives across all
     // processes, then every element of this vector has been set
     // once. We can then assign this parallel vector to a local,
@@ -796,27 +762,27 @@ namespace Step17
     // elements is stored with process zero, the next chunk with
     // process one, and so on. It is important to remark, however,
     // that these elements are not necessarily the ones we will write
-    // to. This is so, since the order in which cells are arranged,
+    // to. This is a consequence of the order in which cells are arranged,
     // i.e., the order in which the elements of the vector correspond
-    // to cells, is not ordered according to the subdomain these cells
+    // to cells is not ordered according to the subdomain these cells
     // belong to. In other words, if on this process we compute
     // indicators for cells of a certain subdomain, we may write the
     // results to more or less random elements of the distributed
     // vector; in particular, they may not necessarily lie within the
     // chunk of vector we own on the present process. They will
-    // subsequently have to be copied into another process's memory
+    // subsequently have to be copied into another process' memory
     // space, an operation that PETSc does for us when we call the
     // <code>compress()</code> function. This inefficiency could be
     // avoided with some more code, but we refrain from it since it is
     // not a major factor in the program's total runtime.
     //
-    // So here's how we do it: count how many cells belong to this
+    // So here is how we do it: count how many cells belong to this
     // process, set up a distributed vector with that many elements to
-    // be stored locally, and copy over the elements we computed
-    // locally, then compress the result. In fact, we really only copy
+    // be stored locally, copy over the elements we computed
+    // locally, and finally compress the result. In fact, we really only copy
     // the elements that are nonzero, so we may miss a few that we
     // computed to zero, but this won't hurt since the original values
-    // of the vector is zero anyway.
+    // of the vector are zero anyway.
     const unsigned int n_local_cells =
       GridTools::count_cells_with_subdomain_association(triangulation,
                                                         this_mpi_process);
@@ -899,15 +865,15 @@ namespace Step17
   // things more self-contained, we simply re-create one here from the
   // distributed solution vector.
   //
-  // An important thing to realize is that we do this localization
-  // operation on all processes, not only the one that actually needs
-  // the data. This can't be avoided, however, with the communication
-  // model of MPI: MPI does not have a way to query data on another
-  // process, both sides have to initiate a communication at the same
-  // time. So even though most of the processes do not need the
-  // localized solution, we have to place the statement converting the
-  // distributed into a localized vector so that all processes execute
-  // it.
+  // An important thing to realize is that we do this localization operation
+  // on all processes, not only the one that actually needs the data. This
+  // can't be avoided, however, with the simplified communication model of MPI
+  // we use for vectors in this tutorial program: MPI does not have a way to
+  // query data on another process, both sides have to initiate a
+  // communication at the same time. So even though most of the processes do
+  // not need the localized solution, we have to place the statement
+  // converting the distributed into a localized vector so that all processes
+  // execute it.
   //
   // (Part of this work could in fact be avoided. What we do is
   // send the local parts of all processes to all other processes. What we
@@ -917,7 +883,7 @@ namespace Step17
   // something like a gather operation. PETSc can do this, but for
   // simplicity's sake we don't attempt to make use of this here. We don't,
   // since what we do is not very expensive in the grand scheme of things:
-  // it is one vector communication among all processes , which has to be
+  // it is one vector communication among all processes, which has to be
   // compared to the number of communications we have to do when solving the
   // linear system, setting up the block-ILU for the preconditioner, and
   // other operations.)
@@ -1044,10 +1010,12 @@ int main(int argc, char **argv)
       using namespace dealii;
       using namespace Step17;
 
-      // Here is the only real difference: MPI and PETSc both require
-      // that we initialize these libraries at the beginning of the
-      // program, and un-initialize them at the end. The class
-      // MPI_InitFinalize takes care of all of that.
+      // Here is the only real difference: MPI and PETSc both require that we
+      // initialize these libraries at the beginning of the program, and
+      // un-initialize them at the end. The class MPI_InitFinalize takes care
+      // of all of that. The trailing argument `1` means that we do want to
+      // run each MPI process with a single thread, a prerequisite with the
+      // PETSc parallel linear algebra.
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       ElasticProblem<2> elastic_problem;
