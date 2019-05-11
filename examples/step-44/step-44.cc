@@ -938,7 +938,7 @@ namespace Step44
     // solution vectors:
     const unsigned int               degree;
     const FESystem<dim>              fe;
-    DoFHandler<dim>                  dof_handler_ref;
+    DoFHandler<dim>                  dof_handler;
     const unsigned int               dofs_per_cell;
     const FEValuesExtractors::Vector u_fe;
     const FEValuesExtractors::Scalar p_fe;
@@ -1064,7 +1064,7 @@ namespace Step44
        FE_DGPMonomial<dim>(parameters.poly_degree - 1),
        1)
     , // dilatation
-    dof_handler_ref(triangulation)
+    dof_handler(triangulation)
     , dofs_per_cell(fe.dofs_per_cell)
     , u_fe(first_u_component)
     , p_fe(p_component)
@@ -1084,7 +1084,7 @@ namespace Step44
   template <int dim>
   Solid<dim>::~Solid()
   {
-    dof_handler_ref.clear();
+    dof_handler.clear();
   }
 
 
@@ -1126,11 +1126,8 @@ namespace Step44
 
       const ComponentSelectFunction<dim> J_mask(J_component, n_components);
 
-      VectorTools::project(dof_handler_ref,
-                           constraints,
-                           QGauss<dim>(degree + 2),
-                           J_mask,
-                           solution_n);
+      VectorTools::project(
+        dof_handler, constraints, QGauss<dim>(degree + 2), J_mask, solution_n);
     }
     output_results();
     time.increment();
@@ -1198,7 +1195,7 @@ namespace Step44
   template <int dim>
   struct Solid<dim>::ScratchData_K
   {
-    FEValues<dim> fe_values_ref;
+    FEValues<dim> fe_values;
 
     std::vector<std::vector<double>>                  Nx;
     std::vector<std::vector<Tensor<2, dim>>>          grad_Nx;
@@ -1207,7 +1204,7 @@ namespace Step44
     ScratchData_K(const FiniteElement<dim> &fe_cell,
                   const QGauss<dim> &       qf_cell,
                   const UpdateFlags         uf_cell)
-      : fe_values_ref(fe_cell, qf_cell, uf_cell)
+      : fe_values(fe_cell, qf_cell, uf_cell)
       , Nx(qf_cell.size(), std::vector<double>(fe_cell.dofs_per_cell))
       , grad_Nx(qf_cell.size(),
                 std::vector<Tensor<2, dim>>(fe_cell.dofs_per_cell))
@@ -1217,9 +1214,9 @@ namespace Step44
     {}
 
     ScratchData_K(const ScratchData_K &rhs)
-      : fe_values_ref(rhs.fe_values_ref.get_fe(),
-                      rhs.fe_values_ref.get_quadrature(),
-                      rhs.fe_values_ref.get_update_flags())
+      : fe_values(rhs.fe_values.get_fe(),
+                  rhs.fe_values.get_quadrature(),
+                  rhs.fe_values.get_update_flags())
       , Nx(rhs.Nx)
       , grad_Nx(rhs.grad_Nx)
       , symm_grad_Nx(rhs.symm_grad_Nx)
@@ -1270,8 +1267,8 @@ namespace Step44
   template <int dim>
   struct Solid<dim>::ScratchData_RHS
   {
-    FEValues<dim>     fe_values_ref;
-    FEFaceValues<dim> fe_face_values_ref;
+    FEValues<dim>     fe_values;
+    FEFaceValues<dim> fe_face_values;
 
     std::vector<std::vector<double>>                  Nx;
     std::vector<std::vector<SymmetricTensor<2, dim>>> symm_grad_Nx;
@@ -1281,8 +1278,8 @@ namespace Step44
                     const UpdateFlags         uf_cell,
                     const QGauss<dim - 1> &   qf_face,
                     const UpdateFlags         uf_face)
-      : fe_values_ref(fe_cell, qf_cell, uf_cell)
-      , fe_face_values_ref(fe_cell, qf_face, uf_face)
+      : fe_values(fe_cell, qf_cell, uf_cell)
+      , fe_face_values(fe_cell, qf_face, uf_face)
       , Nx(qf_cell.size(), std::vector<double>(fe_cell.dofs_per_cell))
       , symm_grad_Nx(qf_cell.size(),
                      std::vector<SymmetricTensor<2, dim>>(
@@ -1290,12 +1287,12 @@ namespace Step44
     {}
 
     ScratchData_RHS(const ScratchData_RHS &rhs)
-      : fe_values_ref(rhs.fe_values_ref.get_fe(),
-                      rhs.fe_values_ref.get_quadrature(),
-                      rhs.fe_values_ref.get_update_flags())
-      , fe_face_values_ref(rhs.fe_face_values_ref.get_fe(),
-                           rhs.fe_face_values_ref.get_quadrature(),
-                           rhs.fe_face_values_ref.get_update_flags())
+      : fe_values(rhs.fe_values.get_fe(),
+                  rhs.fe_values.get_quadrature(),
+                  rhs.fe_values.get_update_flags())
+      , fe_face_values(rhs.fe_face_values.get_fe(),
+                       rhs.fe_face_values.get_quadrature(),
+                       rhs.fe_face_values.get_update_flags())
       , Nx(rhs.Nx)
       , symm_grad_Nx(rhs.symm_grad_Nx)
     {}
@@ -1414,7 +1411,7 @@ namespace Step44
     std::vector<double>         solution_values_p_total;
     std::vector<double>         solution_values_J_total;
 
-    FEValues<dim> fe_values_ref;
+    FEValues<dim> fe_values;
 
     ScratchData_UQPH(const FiniteElement<dim> & fe_cell,
                      const QGauss<dim> &        qf_cell,
@@ -1424,7 +1421,7 @@ namespace Step44
       , solution_grads_u_total(qf_cell.size())
       , solution_values_p_total(qf_cell.size())
       , solution_values_J_total(qf_cell.size())
-      , fe_values_ref(fe_cell, qf_cell, uf_cell)
+      , fe_values(fe_cell, qf_cell, uf_cell)
     {}
 
     ScratchData_UQPH(const ScratchData_UQPH &rhs)
@@ -1432,9 +1429,9 @@ namespace Step44
       , solution_grads_u_total(rhs.solution_grads_u_total)
       , solution_values_p_total(rhs.solution_values_p_total)
       , solution_values_J_total(rhs.solution_values_J_total)
-      , fe_values_ref(rhs.fe_values_ref.get_fe(),
-                      rhs.fe_values_ref.get_quadrature(),
-                      rhs.fe_values_ref.get_update_flags())
+      , fe_values(rhs.fe_values.get_fe(),
+                  rhs.fe_values.get_quadrature(),
+                  rhs.fe_values.get_update_flags())
     {}
 
     void reset()
@@ -1519,18 +1516,18 @@ namespace Step44
 
     // The DOF handler is then initialized and we renumber the grid in an
     // efficient manner. We also record the number of DOFs per block.
-    dof_handler_ref.distribute_dofs(fe);
-    DoFRenumbering::Cuthill_McKee(dof_handler_ref);
-    DoFRenumbering::component_wise(dof_handler_ref, block_component);
-    DoFTools::count_dofs_per_block(dof_handler_ref,
+    dof_handler.distribute_dofs(fe);
+    DoFRenumbering::Cuthill_McKee(dof_handler);
+    DoFRenumbering::component_wise(dof_handler, block_component);
+    DoFTools::count_dofs_per_block(dof_handler,
                                    dofs_per_block,
                                    block_component);
 
     std::cout << "Triangulation:"
               << "\n\t Number of active cells: "
               << triangulation.n_active_cells()
-              << "\n\t Number of degrees of freedom: "
-              << dof_handler_ref.n_dofs() << std::endl;
+              << "\n\t Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl;
 
     // Setup the sparsity pattern and tangent matrix
     tangent_matrix.clear();
@@ -1589,7 +1586,7 @@ namespace Step44
           else
             coupling[ii][jj] = DoFTools::always;
       DoFTools::make_sparsity_pattern(
-        dof_handler_ref, coupling, dsp, constraints, false);
+        dof_handler, coupling, dsp, constraints, false);
       sparsity_pattern.copy_from(dsp);
     }
 
@@ -1695,7 +1692,7 @@ namespace Step44
 
     // We then pass them and the one-cell update function to the WorkStream to
     // be processed:
-    WorkStream::run(dof_handler_ref.active_cell_iterators(),
+    WorkStream::run(dof_handler.active_cell_iterators(),
                     *this,
                     &Solid::update_qph_incremental_one_cell,
                     &Solid::copy_local_to_global_UQPH,
@@ -1731,12 +1728,12 @@ namespace Step44
     // inside the current cell and then we update each local QP using the
     // displacement gradient and total pressure and dilatation solution
     // values:
-    scratch.fe_values_ref.reinit(cell);
-    scratch.fe_values_ref[u_fe].get_function_gradients(
+    scratch.fe_values.reinit(cell);
+    scratch.fe_values[u_fe].get_function_gradients(
       scratch.solution_total, scratch.solution_grads_u_total);
-    scratch.fe_values_ref[p_fe].get_function_values(
+    scratch.fe_values[p_fe].get_function_values(
       scratch.solution_total, scratch.solution_values_p_total);
-    scratch.fe_values_ref[J_fe].get_function_values(
+    scratch.fe_values[J_fe].get_function_values(
       scratch.solution_total, scratch.solution_values_J_total);
 
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
@@ -1912,11 +1909,11 @@ namespace Step44
   {
     double vol_current = 0.0;
 
-    FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
+    FEValues<dim> fe_values(fe, qf_cell, update_JxW_values);
 
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        fe_values_ref.reinit(cell);
+        fe_values.reinit(cell);
 
         // In contrast to that which was previously called for,
         // in this instance the quadrature point data is specifically
@@ -1930,7 +1927,7 @@ namespace Step44
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             const double det_F_qp = lqph[q_point]->get_det_F();
-            const double JxW      = fe_values_ref.JxW(q_point);
+            const double JxW      = fe_values.JxW(q_point);
 
             vol_current += det_F_qp * JxW;
           }
@@ -1951,11 +1948,11 @@ namespace Step44
   {
     double dil_L2_error = 0.0;
 
-    FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
+    FEValues<dim> fe_values(fe, qf_cell, update_JxW_values);
 
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        fe_values_ref.reinit(cell);
+        fe_values.reinit(cell);
 
         const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
           quadrature_point_history.get_data(cell);
@@ -1967,7 +1964,7 @@ namespace Step44
             const double J_tilde_qp = lqph[q_point]->get_J_tilde();
             const double the_error_qp_squared =
               std::pow((det_F_qp - J_tilde_qp), 2);
-            const double JxW = fe_values_ref.JxW(q_point);
+            const double JxW = fe_values.JxW(q_point);
 
             dil_L2_error += the_error_qp_squared * JxW;
           }
@@ -1989,7 +1986,7 @@ namespace Step44
   {
     BlockVector<double> error_res(dofs_per_block);
 
-    for (unsigned int i = 0; i < dof_handler_ref.n_dofs(); ++i)
+    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (!constraints.is_constrained(i))
         error_res(i) = system_rhs(i);
 
@@ -2008,7 +2005,7 @@ namespace Step44
                                     Errors &                   error_update)
   {
     BlockVector<double> error_ud(dofs_per_block);
-    for (unsigned int i = 0; i < dof_handler_ref.n_dofs(); ++i)
+    for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
       if (!constraints.is_constrained(i))
         error_ud(i) = newton_update(i);
 
@@ -2061,7 +2058,7 @@ namespace Step44
     // call to WorkStream because assemble_system_tangent_one_cell
     // is a constant function and copy_local_to_global_K is
     // non-constant.
-    WorkStream::run(dof_handler_ref.active_cell_iterators(),
+    WorkStream::run(dof_handler.active_cell_iterators(),
                     std::bind(&Solid<dim>::assemble_system_tangent_one_cell,
                               this,
                               std::placeholders::_1,
@@ -2106,7 +2103,7 @@ namespace Step44
   {
     data.reset();
     scratch.reset();
-    scratch.fe_values_ref.reinit(cell);
+    scratch.fe_values.reinit(cell);
     cell->get_dof_indices(data.local_dof_indices);
 
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
@@ -2123,16 +2120,16 @@ namespace Step44
             if (k_group == u_dof)
               {
                 scratch.grad_Nx[q_point][k] =
-                  scratch.fe_values_ref[u_fe].gradient(k, q_point) * F_inv;
+                  scratch.fe_values[u_fe].gradient(k, q_point) * F_inv;
                 scratch.symm_grad_Nx[q_point][k] =
                   symmetrize(scratch.grad_Nx[q_point][k]);
               }
             else if (k_group == p_dof)
               scratch.Nx[q_point][k] =
-                scratch.fe_values_ref[p_fe].value(k, q_point);
+                scratch.fe_values[p_fe].value(k, q_point);
             else if (k_group == J_dof)
               scratch.Nx[q_point][k] =
-                scratch.fe_values_ref[J_fe].value(k, q_point);
+                scratch.fe_values[J_fe].value(k, q_point);
             else
               Assert(k_group <= J_dof, ExcInternalError());
           }
@@ -2166,7 +2163,7 @@ namespace Step44
         const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
           scratch.symm_grad_Nx[q_point];
         const std::vector<Tensor<2, dim>> &grad_Nx = scratch.grad_Nx[q_point];
-        const double JxW = scratch.fe_values_ref.JxW(q_point);
+        const double                       JxW = scratch.fe_values.JxW(q_point);
 
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
@@ -2246,7 +2243,7 @@ namespace Step44
     PerTaskData_RHS per_task_data(dofs_per_cell);
     ScratchData_RHS scratch_data(fe, qf_cell, uf_cell, qf_face, uf_face);
 
-    WorkStream::run(dof_handler_ref.active_cell_iterators(),
+    WorkStream::run(dof_handler.active_cell_iterators(),
                     std::bind(&Solid<dim>::assemble_system_rhs_one_cell,
                               this,
                               std::placeholders::_1,
@@ -2280,7 +2277,7 @@ namespace Step44
   {
     data.reset();
     scratch.reset();
-    scratch.fe_values_ref.reinit(cell);
+    scratch.fe_values.reinit(cell);
     cell->get_dof_indices(data.local_dof_indices);
 
     const std::vector<std::shared_ptr<const PointHistory<dim>>> lqph =
@@ -2297,13 +2294,13 @@ namespace Step44
 
             if (k_group == u_dof)
               scratch.symm_grad_Nx[q_point][k] = symmetrize(
-                scratch.fe_values_ref[u_fe].gradient(k, q_point) * F_inv);
+                scratch.fe_values[u_fe].gradient(k, q_point) * F_inv);
             else if (k_group == p_dof)
               scratch.Nx[q_point][k] =
-                scratch.fe_values_ref[p_fe].value(k, q_point);
+                scratch.fe_values[p_fe].value(k, q_point);
             else if (k_group == J_dof)
               scratch.Nx[q_point][k] =
-                scratch.fe_values_ref[J_fe].value(k, q_point);
+                scratch.fe_values[J_fe].value(k, q_point);
             else
               Assert(k_group <= J_dof, ExcInternalError());
           }
@@ -2320,7 +2317,7 @@ namespace Step44
         const std::vector<double> &                 N = scratch.Nx[q_point];
         const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
           scratch.symm_grad_Nx[q_point];
-        const double JxW = scratch.fe_values_ref.JxW(q_point);
+        const double JxW = scratch.fe_values.JxW(q_point);
 
         // We first compute the contributions
         // from the internal forces.  Note, by
@@ -2350,13 +2347,13 @@ namespace Step44
       if (cell->face(face)->at_boundary() == true &&
           cell->face(face)->boundary_id() == 6)
         {
-          scratch.fe_face_values_ref.reinit(cell, face);
+          scratch.fe_face_values.reinit(cell, face);
 
           for (unsigned int f_q_point = 0; f_q_point < n_q_points_f;
                ++f_q_point)
             {
               const Tensor<1, dim> &N =
-                scratch.fe_face_values_ref.normal_vector(f_q_point);
+                scratch.fe_face_values.normal_vector(f_q_point);
 
               // Using the face normal at this quadrature point we specify the
               // traction in reference configuration. For this problem, a
@@ -2387,9 +2384,8 @@ namespace Step44
                       const unsigned int component_i =
                         fe.system_to_component_index(i).first;
                       const double Ni =
-                        scratch.fe_face_values_ref.shape_value(i, f_q_point);
-                      const double JxW =
-                        scratch.fe_face_values_ref.JxW(f_q_point);
+                        scratch.fe_face_values.shape_value(i, f_q_point);
+                      const double JxW = scratch.fe_face_values.JxW(f_q_point);
 
                       data.cell_rhs(i) += (Ni * traction[component_i]) * JxW;
                     }
@@ -2454,14 +2450,14 @@ namespace Step44
 
       if (apply_dirichlet_bc == true)
         VectorTools::interpolate_boundary_values(
-          dof_handler_ref,
+          dof_handler,
           boundary_id,
           Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(x_displacement));
       else
         VectorTools::interpolate_boundary_values(
-          dof_handler_ref,
+          dof_handler,
           boundary_id,
           Functions::ZeroFunction<dim>(n_components),
           constraints,
@@ -2472,14 +2468,14 @@ namespace Step44
 
       if (apply_dirichlet_bc == true)
         VectorTools::interpolate_boundary_values(
-          dof_handler_ref,
+          dof_handler,
           boundary_id,
           Functions::ZeroFunction<dim>(n_components),
           constraints,
           fe.component_mask(y_displacement));
       else
         VectorTools::interpolate_boundary_values(
-          dof_handler_ref,
+          dof_handler,
           boundary_id,
           Functions::ZeroFunction<dim>(n_components),
           constraints,
@@ -2495,7 +2491,7 @@ namespace Step44
 
           if (apply_dirichlet_bc == true)
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2503,7 +2499,7 @@ namespace Step44
                fe.component_mask(z_displacement)));
           else
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2515,14 +2511,14 @@ namespace Step44
 
           if (apply_dirichlet_bc == true)
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
               fe.component_mask(z_displacement));
           else
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2534,7 +2530,7 @@ namespace Step44
 
           if (apply_dirichlet_bc == true)
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2542,7 +2538,7 @@ namespace Step44
                fe.component_mask(z_displacement)));
           else
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2557,14 +2553,14 @@ namespace Step44
 
           if (apply_dirichlet_bc == true)
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
           else
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2575,14 +2571,14 @@ namespace Step44
 
           if (apply_dirichlet_bc == true)
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
               (fe.component_mask(x_displacement)));
           else
             VectorTools::interpolate_boundary_values(
-              dof_handler_ref,
+              dof_handler,
               boundary_id,
               Functions::ZeroFunction<dim>(n_components),
               constraints,
@@ -2633,7 +2629,7 @@ namespace Step44
                                  element_indices_J.size());
     ScratchData_SC scratch_data;
 
-    WorkStream::run(dof_handler_ref.active_cell_iterators(),
+    WorkStream::run(dof_handler.active_cell_iterators(),
                     *this,
                     &Solid::assemble_sc_one_cell,
                     &Solid::copy_local_to_global_sc,
@@ -3377,7 +3373,7 @@ namespace Step44
     solution_name.emplace_back("pressure");
     solution_name.emplace_back("dilatation");
 
-    data_out.attach_dof_handler(dof_handler_ref);
+    data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution_n,
                              solution_name,
                              DataOut<dim>::type_dof_data,
@@ -3394,7 +3390,7 @@ namespace Step44
     Vector<double> soln(solution_n.size());
     for (unsigned int i = 0; i < soln.size(); ++i)
       soln(i) = solution_n(i);
-    MappingQEulerian<dim> q_mapping(degree, dof_handler_ref, soln);
+    MappingQEulerian<dim> q_mapping(degree, dof_handler, soln);
     data_out.build_patches(q_mapping, degree);
 
     std::ofstream output("solution-" + std::to_string(dim) + "d-" +
