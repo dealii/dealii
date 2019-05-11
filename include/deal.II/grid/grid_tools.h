@@ -43,6 +43,7 @@
 #  include <boost/archive/binary_iarchive.hpp>
 #  include <boost/archive/binary_oarchive.hpp>
 #  include <boost/geometry/index/detail/serialization.hpp>
+#  include <boost/geometry/index/rtree.hpp>
 #  include <boost/optional.hpp>
 #  include <boost/serialization/array.hpp>
 #  include <boost/serialization/vector.hpp>
@@ -1650,6 +1651,51 @@ namespace GridTools
   guess_point_owner(
     const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
     const std::vector<Point<spacedim>> &                   points);
+
+
+  /**
+   * Given a covering rtree (see GridTools::Cache::get_covering_rtree()), and an
+   * array of points, find a superset of processes which, individually,
+   * may own the cell containing the point.
+   *
+   * For further details see GridTools::guess_point_owner; here only
+   * different input/output types are reported:
+   *
+   * @param[in] covering_rtree RTRee which enables us to identify which
+   * process(es) in a parallel computation may own the cell that
+   * surrounds a given point.
+   *
+   * @return A tuple containing the following information:
+   *  - A map indexed by processor ranks. For each rank it contains
+   *   a vector of the indices of points it might own.
+   *  - A map from the index <code>unsigned int</code> of the point in @p points
+   *   to the rank of the owner; these are points for which a single possible
+   *   owner was found.
+   *  - A map from the index <code>unsigned int</code> of the point in @p points
+   *   to the ranks of the guessed owners; these are points for which multiple
+   *   possible owners were found.
+   *
+   * @note The actual return type of this function, i.e., the type referenced
+   * above as @p return_type, is
+   * @code
+   * std::tuple<std::map<unsigned int, std::vector<unsigned int>>,
+   *            std::map<unsigned int, unsigned int>,
+   *            std::map<unsigned int, std::vector<unsigned int>>>
+   * @endcode
+   * The type is abbreviated in the online documentation to improve readability
+   * of this page.
+   */
+  template <int spacedim>
+#  ifndef DOXYGEN
+  std::tuple<std::map<unsigned int, std::vector<unsigned int>>,
+             std::map<unsigned int, unsigned int>,
+             std::map<unsigned int, std::vector<unsigned int>>>
+#  else
+  return_type
+#  endif
+  guess_point_owner(
+    const RTree<std::pair<BoundingBox<spacedim>, unsigned int>> &covering_rtree,
+    const std::vector<Point<spacedim>> &                         points);
 
 
   /**
