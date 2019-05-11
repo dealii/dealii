@@ -238,7 +238,7 @@ cell term to get an equation as follows:
 In each time step, we then apply the mixed finite method of @ref step_20
 "step-20" to the velocity and pressure. To be well-posed, we choose
 Raviart-Thomas spaces $RT_{k}$ for $\mathbf{u}$ and discontinuous elements of
-class $DQ_{k}$ for $p$. For the saturation, we will also choose $DQ_{k}$
+class $DGQ_{k}$ for $p$. For the saturation, we will also choose $DGQ_{k}$
 spaces.
 
 Since we have discontinuous spaces, we have to think about how to evaluate
@@ -267,8 +267,8 @@ fluxes can also be found in step-12.
 <h3>Linear solvers</h3>
 
 The linear solvers used in this program are a straightforward extension of the
-ones used in step-20. Essentially, we simply have to extend
-everything from
+ones used in step-20 (but without LinearOperator). Essentially, we simply have
+to extend everything from
 two to three solution components. If we use the discrete spaces
 mentioned above and put shape functions into the bilinear forms, we
 arrive at the following linear system to be solved for time step $n+1$:
@@ -294,7 +294,7 @@ B &    0 & 0\\
 @f]
 where the individual matrices and vectors are defined as follows using
 shape functions $\mathbf v_i$ (of type Raviart Thomas $RT_k$) for
-velocities and $\phi_i$ (of type $DG_k$) for both pressures and saturations:
+velocities and $\phi_i$ (of type $DGQ_k$) for both pressures and saturations:
 @f{eqnarray*}
 M^u(S^n)_{ij} &=&
 \left((\mathbf{K}\lambda(S^n))^{-1} \mathbf{v}_i,\mathbf

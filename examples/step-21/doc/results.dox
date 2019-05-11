@@ -42,7 +42,7 @@ the pressure once is significantly reduced.
 The final observation concerns the number of iterations needed to solve for
 the saturation, i.e. one. This shouldn't surprise us too much: the matrix we
 have to solve with is the mass matrix. However, this is the mass matrix for
-the $DQ_0$ element of piecewise constants where no element couples with the
+the $DGQ_0$ element of piecewise constants where no element couples with the
 degrees of freedom on neighboring cells. The matrix is therefore a diagonal
 one, and it is clear that we should be able to invert this matrix in a single
 CG iteration.
