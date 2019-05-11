@@ -78,33 +78,10 @@ namespace Step43
   using namespace dealii;
 
 
-  // @sect3{Right hand side, boundary and initial value classes}
+  // @sect3{Boundary and initial value classes}
 
   // The following part is taken directly from step-21 so there is no need to
   // repeat the descriptions found there.
-  template <int dim>
-  class PressureRightHandSide : public Function<dim>
-  {
-  public:
-    PressureRightHandSide()
-      : Function<dim>(1)
-    {}
-
-    virtual double value(const Point<dim> & p,
-                         const unsigned int component = 0) const override;
-  };
-
-
-
-  template <int dim>
-  double
-  PressureRightHandSide<dim>::value(const Point<dim> & /*p*/,
-                                    const unsigned int /*component*/) const
-  {
-    return 0;
-  }
-
-
   template <int dim>
   class PressureBoundaryValues : public Function<dim>
   {
@@ -1053,8 +1030,8 @@ namespace Step43
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    const PressureRightHandSide<dim>  pressure_right_hand_side;
-    const PressureBoundaryValues<dim> pressure_boundary_values;
+    const Functions::ZeroFunction<dim> pressure_right_hand_side;
+    const PressureBoundaryValues<dim>  pressure_boundary_values;
 
     std::vector<double>         pressure_rhs_values(n_q_points);
     std::vector<double>         boundary_values(n_face_q_points);
